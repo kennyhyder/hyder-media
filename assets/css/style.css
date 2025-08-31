@@ -1,0 +1,511 @@
+/* ========================= */
+/* :: 1.0 WEB FONTS  */
+/* ========================= */
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
+/* ================================== */
+/* :: 2.0 GLOBAL Variable Define CSS  */
+/* ================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    /* Google Font */
+    --roboto-mono: 'Roboto Mono', monospace;
+    --pt-sans: "PT Sans", sans-serif;
+
+    /* Color Palette */
+    --white-color: #fff;
+    --black-color: #000;
+    --text-color: #354231;
+    --light-text-color: #3b5053;
+    --body-color: #efe2b9;
+    --dark-brown-color: #795232;
+    --yellow-color: #e1d42b;
+    --sand-yellow-color: #f1ca4b;
+    --light-yellow-color: #e2bb5e;
+    --crimson-red-color: #971d00;
+    --deep-orange-color: #d14d00;
+    --purple-color: #4c2c4b;
+    --dark-purple-color: #150218;
+}
+
+/* ========================= */
+/* :: 3.0 COMMON CSS */
+/* ========================= */
+html,
+body {
+    height: 100%;
+    scroll-behavior: smooth;
+}
+body {
+    color: var(--black-color);
+    font-size: 15px;
+    font-family: var(--roboto-mono);
+    font-weight: 400;
+    line-height: 1.35;
+    background-color: var(--body-color);
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    transition: all 0.3s ease-in-out;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+}
+section,
+.section {
+    position: relative;
+}
+a,
+button {
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+    -webkit-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+}
+button {
+    padding: 0;
+    border: none;
+    background: unset;
+}
+ol,
+ul {
+    margin: 0;
+    padding: 0;
+}
+ol li,
+ul li {
+    list-style: none;
+}
+img {
+    height: auto;
+    max-width: 100%;
+    object-fit: cover;
+}
+input,
+input:focus,
+input:focus-visible,
+input:active,
+select,
+.form-select,
+.form-select:focus,
+textarea {
+    outline: none;
+    box-shadow: none;
+}
+* + address,
+* + dl,
+* + fieldset,
+* + figure,
+* + ol,
+* + p,
+* + pre,
+* + ul {
+    margin: 0;
+    padding: 0;
+}
+
+*::-moz-selection {
+    background: var(--black-color);
+    color: var(--white-color);
+    text-shadow: none;
+}
+::-moz-selection {
+    background: var(--black-color);
+    color: var(--white-color);
+    text-shadow: none;
+}
+
+::selection {
+    background: var(--black-color);
+    color: var(--white-color);
+    text-shadow: none;
+}
+
+/* Button CSS Start */
+.btn {
+    min-width: 140px;
+    height: 50px;
+    padding: 12px 24px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 0;
+    color: var(--white-color);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    background-color: var(--text-color);
+}
+.btn:hover {
+    color: var(--white-color);
+    background-color: var(--dark-brown-color);
+}
+/* Button CSS End */
+
+/* Typography CSS Start */
+.fs-xsm {
+    font-size: 14px;
+}
+.fs-sm {
+    font-size: 15px;
+}
+.fs-normal {
+    font-size: 16px;
+}
+.fs-1 {
+    font-size: 32px !important;
+    line-height: 1;
+}
+
+.ff-pt-sans {
+    font-family: var(--pt-sans);
+}
+/* Typography CSS End */
+
+/* Color CSS Start */
+.text-color {
+    color: var(--text-color);
+}
+.text-dark-brown {
+    color: var(--dark-brown-color);
+}
+/* Color CSS End */
+
+/* Reusable CSS Start */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+.section__block {
+    max-width: 940px;
+}
+.section__block__two {
+    max-width: 780px;
+}
+.transition {
+    -webkit-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+/* Reusable CSS End */
+
+/* ============================ */
+/* :: 4.0 Header Area CSS Start */
+/* ============================ */
+.header__topbar__line {
+    width: 100%;
+    height: 4px;
+}
+.header__topbar__line:nth-child(1) {
+    background-color: var(--text-color);
+}
+.header__topbar__line:nth-child(2) {
+    background-color: var(--dark-brown-color);
+}
+.header__topbar__line:nth-child(3) {
+    background-color: var(--sand-yellow-color);
+}
+.header__topbar__line:nth-child(4) {
+    background-color: var(--light-yellow-color);
+}
+.header__topbar__line:nth-child(5) {
+    background-color: var(--body-color);
+}
+/* ========================== */
+/* :: 4.0 Header Area CSS End */
+/* ========================== */
+
+/* ============================= */
+/* :: 5.0 Hero Section CSS Start */
+/* ============================= */
+.hero--section {
+    padding: 80px 0;
+    min-height: 300px;
+    background-color: #fefbed;
+}
+.hero--section::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../imgs/bgs-thumbs/hero-bg.png') no-repeat center / cover;
+    opacity: 0.2;
+    z-index: -1;
+}
+.hero__badge {
+    letter-spacing: 0.75em;
+    font-weight: 600 !important;
+}
+.hero__links__wrap {
+    gap: 16px;
+}
+.hero__link {
+    font-size: 14px;
+    color: var(--light-text-color);
+}
+.hero__link:hover {
+    color: var(--dark-brown-color);
+}
+.hero__links__sep {
+    width: 2px;
+    height: 2px;
+    background-color: var(--light-text-color);
+}
+/* =========================== */
+/* :: 5.0 Hero Section CSS End */
+/* =========================== */
+
+/* ================================== */
+/* :: 6.0 TextBlock Section CSS Start */
+/* ================================== */
+.textBlock--section {
+    padding: 24px 0 48px;
+}
+/* =============================== */
+/* :: 6.0 TextBlock Section CSS End */
+/* =============================== */
+
+/* ================================= */
+/* :: 7.0 Services Section CSS Start */
+/* ================================= */
+.services__wrapper {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--dark-brown-color);
+}
+.services__item {
+    height: 100%;
+    padding: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+.services__icon {
+    max-width: 48px;
+}
+/* =============================== */
+/* :: 7.0 Services Section CSS End */
+/* =============================== */
+
+/* =============================== */
+/* :: 8.0 Contact Section CSS Start */
+/* =============================== */
+.contact--section {
+    padding: 24px 0;
+}
+.form__label {
+    margin-bottom: 6px;
+}
+.form__input {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 0;
+    padding: 13px;
+    font-size: 15px;
+    color: var(--black-color);
+    background-color: var(--white-color);
+}
+.form__input::placeholder {
+    font-size: 15px;
+    color: var(--text-color);
+    opacity: 1;
+}
+.form__textarea {
+    resize: none;
+    height: 104px;
+}
+/* =============================== */
+/* :: 8.0 Contact Section CSS End */
+/* =============================== */
+
+/* =============================== */
+/* :: 9.0 Footer Section CSS Start */
+/* =============================== */
+.footer--area {
+    padding: 24px 0;
+    background-color: var(--dark-brown-color);
+}
+/* =============================== */
+/* :: 9.0 Footer Section CSS End */
+/* =============================== */
+
+/* =========================================== */
+/* :: 10.0 blog-article.html Section CSS Start */
+/* =========================================== */
+.blog-article--section {
+    padding: 48px 0 64px;
+}
+.blog-article__icon__img {
+    max-width: 80px;
+    height: 80px;
+    color: #231F20;
+    margin-bottom: 40px;
+}
+.blog-article__inner__title, .blog-article__para__link {
+    color: var(--dark-brown-color);
+}
+/* ========================================= */
+/* :: 10.0 blog-article.html Section CSS End */
+/* ========================================= */
+
+/* ======================= */
+/* :: 11.0 Cards CSS Start */
+/* ======================= */
+.card--post {
+    max-width: 360px;
+    padding: 16px 16px 10px;
+    border-radius: 0;
+}
+.card__thumb {
+    width: 100%;
+    height: 240px;
+    border-radius: 10px;
+}
+.card__avatar {
+    width: 24px;
+    height: 24px;
+}
+.card__title__badge {
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background-color: #CCC;
+}
+.card__action__info__item {
+    gap: 5px;
+    color: #9E9EA7;
+}
+.card__action__info__item .icon svg {
+    width: 16px;
+    height: 16px;
+}
+/* ===================== */
+/* :: 11.0 Cards CSS End */
+/* ===================== */
+
+
+
+/* ========================== */
+/* :: DarkMode CSS Start */
+/* ========================== */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: var(--white-color);
+        background-color: var(--dark-purple-color);
+
+        *::-moz-selection {
+            background: var(--white-color);
+            color: var(--black-color);
+            text-shadow: none;
+        }
+        ::-moz-selection {
+            background: var(--white-color);
+            color: var(--black-color);
+            text-shadow: none;
+        }
+
+        ::selection {
+            background: var(--white-color);
+            color: var(--black-color);
+            text-shadow: none;
+        }
+    }
+
+    .btn {
+        background-color: var(--deep-orange-color);
+    }
+    .btn:hover {
+        color: var(--black-color);
+        background-color: var(--yellow-color);
+    }
+    .text-color {
+        color: var(--white-color);
+    }
+
+    .text-dark-brown {
+        color: var(--white-color);
+    }
+
+    .header__topbar__line:nth-child(1) {
+        background-color: var(--yellow-color);
+    }
+    .header__topbar__line:nth-child(2) {
+        background-color: var(--deep-orange-color);
+    }
+    .header__topbar__line:nth-child(3) {
+        background-color: var(--crimson-red-color);
+    }
+    .header__topbar__line:nth-child(4) {
+        background-color: var(--purple-color);
+    }
+    .header__topbar__line:nth-child(5) {
+        background-color: var(--dark-purple-color);
+    }
+
+    .hero--section {
+        background-color: #360639;
+    }
+    .hero--section::after {
+        background-image: url('../imgs/bgs-thumbs/hero-bg-dark.png');
+    }
+    .hero__badge {
+        color: #231f20 !important;
+    }
+
+    .main__title,
+    .contact--section .section__title,
+    .contact--section .form__label {
+        color: var(--yellow-color);
+    }
+
+    .hero__link {
+        color: var(--white-color);
+    }
+    .hero__link:hover {
+        color: var(--yellow-color);
+    }
+
+    .hero__links__sep {
+        background-color: var(--white-color);
+    }
+
+    .services__wrapper {
+        padding: 0 0 48px;
+        border-color: var(--yellow-color);
+    }
+    .services__icon img {
+        filter: brightness(0) saturate(100%) invert(27%) sepia(32%)
+            saturate(4639%) hue-rotate(272deg) brightness(80%) contrast(90%);
+    }
+
+    .contact--section {
+        padding: 48px 0;
+    }
+
+    .footer--area {
+        background-color: var(--crimson-red-color);
+    }
+
+    /* blog-article.html DarkMode CSS Start */
+    .blog-article__inner__title, .blog-article__para__link {
+    color: var(--yellow-color);
+}
+    /* blog-article.html DarkMode CSS End */
+}
+/* ======================== */
+/* :: DarkMode CSS End */
+/* ======================== */
