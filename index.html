@@ -17,9 +17,45 @@
         <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="assets/css/style.css" />
         <link rel="stylesheet" href="assets/css/responsive.css" />
+
+        <!-- === Head Script For Dark Mode === -->
+        <script>
+            (function () {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                } else if (
+                    !savedTheme &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches
+                ) {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            })();
+        </script>
     </head>
 
     <body>
+        <!-- ===== Page Theme Toggle Start ===== -->
+        <div class="page-theme-toggle position-relative">
+            <div class="page-theme-toggle-inner">
+                <label id="theme-switch" class="theme-switch">
+                    <input type="checkbox" id="toggleSwitch" />
+                    <div class="page-theme-slider">
+                        <div class="sun"></div>
+                        <div class="moon"></div>
+                        <div class="cloud cloud1"></div>
+                        <div class="cloud cloud2"></div>
+                        <div class="star star1"></div>
+                        <div class="star star2"></div>
+                        <div class="star star3"></div>
+                        <div class="star star4"></div>
+                        <div class="star star5"></div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        <!-- ===== Page Theme Toggle End ===== -->
+
         <!-- ===== Header Area Start ===== -->
         <header class="header header--area">
             <div class="header__topbar">
@@ -42,7 +78,7 @@
                     <div class="section__block mx-auto text-md-end">
                         <div class="hero__wrapper text-start d-md-inline-block">
                             <p
-                                class="hero__badge ff-pt-sans fs-xsm text-black text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2"
+                                class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2"
                             >
                                 HYDER MEDIA
                             </p>
@@ -54,7 +90,7 @@
                             </h1>
                             <div class="hero__links">
                                 <ul
-                                    class="hero__links__wrap d-flex flex-column flex-md-row align-items-md-center"
+                                    class="hero__links__wrap d-flex align-items-center"
                                 >
                                     <li class="hero__links__item lh-1">
                                         <a
@@ -393,7 +429,9 @@
             <div class="container">
                 <div class="section__block mx-auto">
                     <div class="footer__wrapper text-center">
-                        <p class="text-white fs-sm">Copyright © 2020 Hyder Media</p>
+                        <p class="text-white fs-sm">
+                            Copyright © 2020 Hyder Media
+                        </p>
                     </div>
                 </div>
             </div>

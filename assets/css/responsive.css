@@ -27,6 +27,10 @@
         line-height: 0.87;
     }
 
+    .page-theme-toggle-inner {
+        top: 60px;
+    }
+
     .header__topbar__line {
         height: 8px;
     }
@@ -88,6 +92,11 @@
         font-size: 48px !important;
     }
 
+    .theme-switch {
+        --switch-width: 72px;
+        --switch-height: 32px;
+    }
+
     .hero--section {
         min-height: 540px;
     }
@@ -118,6 +127,10 @@
         width: 1140px;
     }
 
+    .page-theme-toggle-inner {
+        top: 80px;
+    }
+
     .header__topbar__line {
         height: 10px;
     }
@@ -136,10 +149,8 @@
     .textBlock--section {
         padding: 24px 0 80px;
     }
-    @media (prefers-color-scheme: dark) {
-        .textBlock--section {
-            padding: 24px 0 64px;
-        }
+    html.dark-mode .textBlock--section {
+        padding: 24px 0 64px;
     }
     .form__row.g-3 {
         --bs-gutter-y: 48px;

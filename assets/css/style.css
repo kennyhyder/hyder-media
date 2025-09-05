@@ -14,7 +14,7 @@
 :root {
     /* Google Font */
     --roboto-mono: 'Roboto Mono', monospace;
-    --pt-sans: "PT Sans", sans-serif;
+    --pt-sans: 'PT Sans', sans-serif;
 
     /* Color Palette */
     --white-color: #fff;
@@ -22,6 +22,7 @@
     --text-color: #354231;
     --light-text-color: #3b5053;
     --body-color: #efe2b9;
+    --light-body-color: #fffff0;
     --dark-brown-color: #795232;
     --yellow-color: #e1d42b;
     --sand-yellow-color: #f1ca4b;
@@ -49,7 +50,6 @@ body {
     background-color: var(--body-color);
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
-    transition: all 0.3s ease-in-out;
 }
 p,
 h1,
@@ -181,6 +181,9 @@ textarea {
 .text-dark-brown {
     color: var(--dark-brown-color);
 }
+.light-body-color {
+    background-color: var(--light-body-color);
+}
 /* Color CSS End */
 
 /* Reusable CSS Start */
@@ -234,7 +237,7 @@ textarea {
 .hero--section {
     padding: 80px 0;
     min-height: 300px;
-    background-color: #fefbed;
+    background-color: #fffff0;
 }
 .hero--section::after {
     content: '';
@@ -352,10 +355,11 @@ textarea {
 .blog-article__icon__img {
     max-width: 80px;
     height: 80px;
-    color: #231F20;
+    color: #231f20;
     margin-bottom: 40px;
 }
-.blog-article__inner__title, .blog-article__para__link {
+.blog-article__inner__title,
+.blog-article__para__link {
     color: var(--dark-brown-color);
 }
 /* ========================================= */
@@ -383,11 +387,11 @@ textarea {
     font-size: 12px;
     padding: 2px 4px;
     border-radius: 4px;
-    background-color: #CCC;
+    background-color: #ccc;
 }
 .card__action__info__item {
     gap: 5px;
-    color: #9E9EA7;
+    color: #9e9ea7;
 }
 .card__action__info__item .icon svg {
     width: 16px;
@@ -397,115 +401,297 @@ textarea {
 /* :: 11.0 Cards CSS End */
 /* ===================== */
 
+/* ============================== */
+/* :: Page Theme Button CSS Start */
+/* ============================== */
+.page-theme-toggle {
+    max-width: 1920px;
+}
+.page-theme-toggle-inner {
+    position: absolute;
+    top: 40px;
+    right: 16px;
+    z-index: 999;
+}
+.theme-switch {
+    --switch-width: 56px;
+    --switch-height: 27px;
+    --slider-padding: calc(var(--switch-height) * 0.1);
+    position: relative;
+    width: var(--switch-width);
+    height: var(--switch-height);
+    background: linear-gradient(0deg, #87ceeb 0%, #e0f6ff 100%);
+    border-radius: calc(var(--switch-height) / 2);
+    cursor: pointer;
+    transition: all 1s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    box-shadow: 0 calc(var(--switch-height) / 16) calc(var(--switch-height) / 5)
+        rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: calc(var(--switch-height) / 32) solid #fff;
+}
 
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.page-theme-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 1s;
+}
+
+.sun,
+.moon {
+    position: absolute;
+    width: calc(var(--switch-height) * 0.625);
+    height: calc(var(--switch-height) * 0.625);
+    border-radius: 50%;
+    top: calc(var(--switch-height) * 0.15625);
+    transition: 1s;
+}
+
+.sun {
+    background: radial-gradient(circle, #ffd700 30%, #ffa500 70%);
+    left: calc(var(--switch-height) * 0.1875);
+    box-shadow: 0 0 calc(var(--switch-height) * 0.125) #ffd700;
+    transform: scale(1);
+}
+
+.moon {
+    background: radial-gradient(circle, #f4f4f4 30%, #e0e0e0 70%);
+    right: calc(-0.875 * var(--switch-height));
+    box-shadow: 0 0 calc(var(--switch-height) * 0.125) #f4f4f4;
+    transform: scale(0);
+}
+
+.cloud {
+    background-color: white;
+    border-radius: calc(var(--switch-height) * 0.25);
+    position: absolute;
+    transition: 1s;
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.cloud1 {
+    width: calc(var(--switch-height) * 0.625);
+    height: calc(var(--switch-height) * 0.21875);
+    top: calc(var(--switch-height) * 0.21875);
+    left: calc(var(--switch-height) * 1.0625);
+}
+.cloud1::before {
+    width: calc(var(--switch-height) * 0.3125);
+    height: calc(var(--switch-height) * 0.3125);
+    top: calc(-0.15625 * var(--switch-height));
+    left: calc(0.0625 * var(--switch-height));
+}
+.cloud1::after {
+    width: calc(var(--switch-height) * 0.25);
+    height: calc(var(--switch-height) * 0.25);
+    top: calc(-0.125 * var(--switch-height));
+    right: calc(0.0625 * var(--switch-height));
+}
+
+.cloud2 {
+    width: calc(var(--switch-height) * 0.4375);
+    height: calc(var(--switch-height) * 0.15625);
+    top: calc(var(--switch-height) * 0.5625);
+    left: calc(var(--switch-height) * 1.5);
+}
+.cloud2::before {
+    width: calc(var(--switch-height) * 0.21875);
+    height: calc(var(--switch-height) * 0.21875);
+    top: calc(-0.09375 * var(--switch-height));
+    left: calc(0.0625 * var(--switch-height));
+}
+.cloud2::after {
+    width: calc(var(--switch-height) * 0.1875);
+    height: calc(var(--switch-height) * 0.1875);
+    top: calc(-0.09375 * var(--switch-height));
+    right: calc(0.0625 * var(--switch-height));
+}
+
+.star {
+    position: absolute;
+    background-color: white;
+    clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+    opacity: 0;
+    transition: 1s;
+}
+
+.star1 {
+    width: calc(var(--switch-height) * 0.125);
+    height: calc(var(--switch-height) * 0.125);
+    top: calc(var(--switch-height) * 0.1875);
+    left: calc(var(--switch-height) * 0.25);
+}
+.star2 {
+    width: calc(var(--switch-height) * 0.09375);
+    height: calc(var(--switch-height) * 0.09375);
+    top: calc(var(--switch-height) * 0.375);
+    left: calc(var(--switch-height) * 0.53125);
+}
+.star3 {
+    width: calc(var(--switch-height) * 0.09375);
+    height: calc(var(--switch-height) * 0.09375);
+    top: calc(var(--switch-height) * 0.59375);
+    left: calc(var(--switch-height) * 0.3125);
+}
+.star4 {
+    width: calc(var(--switch-height) * 0.09375);
+    height: calc(var(--switch-height) * 0.09375);
+    top: calc(var(--switch-height) * 0.25);
+    left: calc(var(--switch-height) * 0.75);
+}
+.star5 {
+    width: calc(var(--switch-height) * 0.0625);
+    height: calc(var(--switch-height) * 0.0625);
+    top: calc(var(--switch-height) * 0.5);
+    left: calc(var(--switch-height) * 0.875);
+}
+
+input:checked + .page-theme-slider {
+    background: linear-gradient(0deg, #1a1a2e 0%, #16213e 100%);
+}
+
+input:checked + .page-theme-slider .sun {
+    left: calc(-0.75 * var(--switch-height));
+    transform: scale(0);
+}
+
+input:checked + .page-theme-slider .moon {
+    right: calc(0.1875 * var(--switch-height));
+    transform: scale(1);
+}
+
+input:checked + .page-theme-slider .cloud {
+    transform: translateX(var(--switch-width)) scale(0);
+}
+
+input:checked + .page-theme-slider .star {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* ============================ */
+/* :: Page Theme Button CSS End */
+/* ============================ */
 
 /* ========================== */
 /* :: DarkMode CSS Start */
 /* ========================== */
-@media (prefers-color-scheme: dark) {
-    body {
-        color: var(--white-color);
-        background-color: var(--dark-purple-color);
+html.dark-mode body {
+    color: var(--white-color);
+    background-color: var(--dark-purple-color);
 
-        *::-moz-selection {
-            background: var(--white-color);
-            color: var(--black-color);
-            text-shadow: none;
-        }
-        ::-moz-selection {
-            background: var(--white-color);
-            color: var(--black-color);
-            text-shadow: none;
-        }
-
-        ::selection {
-            background: var(--white-color);
-            color: var(--black-color);
-            text-shadow: none;
-        }
-    }
-
-    .btn {
-        background-color: var(--deep-orange-color);
-    }
-    .btn:hover {
+    *::-moz-selection {
+        background: var(--white-color);
         color: var(--black-color);
-        background-color: var(--yellow-color);
+        text-shadow: none;
     }
-    .text-color {
-        color: var(--white-color);
+    ::-moz-selection {
+        background: var(--white-color);
+        color: var(--black-color);
+        text-shadow: none;
     }
+    ::selection {
+        background: var(--white-color);
+        color: var(--black-color);
+        text-shadow: none;
+    }
+}
 
-    .text-dark-brown {
-        color: var(--white-color);
-    }
+html.dark-mode .btn {
+    background-color: var(--deep-orange-color);
+}
+html.dark-mode .btn:hover {
+    color: var(--black-color);
+    background-color: var(--yellow-color);
+}
+html.dark-mode .text-color,
+html.dark-mode .text-dark-brown,
+html.dark-mode .hero__link {
+    color: var(--white-color);
+}
 
-    .header__topbar__line:nth-child(1) {
-        background-color: var(--yellow-color);
-    }
-    .header__topbar__line:nth-child(2) {
-        background-color: var(--deep-orange-color);
-    }
-    .header__topbar__line:nth-child(3) {
-        background-color: var(--crimson-red-color);
-    }
-    .header__topbar__line:nth-child(4) {
-        background-color: var(--purple-color);
-    }
-    .header__topbar__line:nth-child(5) {
-        background-color: var(--dark-purple-color);
-    }
+html.dark-mode .header__topbar__line:nth-child(1) {
+    background-color: var(--yellow-color);
+}
+html.dark-mode .header__topbar__line:nth-child(2) {
+    background-color: var(--deep-orange-color);
+}
+html.dark-mode .header__topbar__line:nth-child(3) {
+    background-color: var(--crimson-red-color);
+}
+html.dark-mode .header__topbar__line:nth-child(4) {
+    background-color: var(--purple-color);
+}
+html.dark-mode .header__topbar__line:nth-child(5) {
+    background-color: var(--dark-purple-color);
+}
 
-    .hero--section {
-        background-color: #360639;
-    }
-    .hero--section::after {
-        background-image: url('../imgs/bgs-thumbs/hero-bg-dark.png');
-    }
-    .hero__badge {
-        color: #231f20 !important;
-    }
+html.dark-mode .hero--section {
+    background-color: #360639;
+}
+html.dark-mode .hero--section::after {
+    background-image: url('../imgs/bgs-thumbs/hero-bg-dark.png');
+}
+html.dark-mode .blog-article__icon__img {
+    color: var(--body-color);
+}
 
-    .main__title,
-    .contact--section .section__title,
-    .contact--section .form__label {
-        color: var(--yellow-color);
-    }
-
-    .hero__link {
-        color: var(--white-color);
-    }
-    .hero__link:hover {
-        color: var(--yellow-color);
-    }
-
-    .hero__links__sep {
-        background-color: var(--white-color);
-    }
-
-    .services__wrapper {
-        padding: 0 0 48px;
-        border-color: var(--yellow-color);
-    }
-    .services__icon img {
-        filter: brightness(0) saturate(100%) invert(27%) sepia(32%)
-            saturate(4639%) hue-rotate(272deg) brightness(80%) contrast(90%);
-    }
-
-    .contact--section {
-        padding: 48px 0;
-    }
-
-    .footer--area {
-        background-color: var(--crimson-red-color);
-    }
-
-    /* blog-article.html DarkMode CSS Start */
-    .blog-article__inner__title, .blog-article__para__link {
+html.dark-mode .main__title,
+html.dark-mode .contact--section .section__title,
+html.dark-mode .contact--section .form__label,
+html.dark-mode .hero__link:hover,
+html.dark-mode .blog-article__inner__title,
+html.dark-mode .blog-article__para__link {
     color: var(--yellow-color);
 }
-    /* blog-article.html DarkMode CSS End */
+
+html.dark-mode .hero__links__sep {
+    background-color: var(--white-color);
 }
+
+html.dark-mode .services__wrapper {
+    padding: 0 0 48px;
+    border-color: var(--yellow-color);
+}
+html.dark-mode .services__icon img {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(32%) saturate(4639%)
+        hue-rotate(272deg) brightness(80%) contrast(90%);
+}
+
+html.dark-mode .contact--section {
+    padding: 48px 0;
+}
+
+html.dark-mode .footer--area {
+    background-color: var(--crimson-red-color);
+}
+
 /* ======================== */
 /* :: DarkMode CSS End */
 /* ======================== */
