@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Title&Favicon -->
+    <title>Ad Spend ROI Calculator - HYDER MEDIA</title>
+    <link rel="shortcut icon" href="assets/imgs/logos/favicon.png" type="image/x-icon" />
+
+    <!-- === CSS CDNs & StyleSheets === -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <!-- === Head Script For Dark Mode === -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (
+                !savedTheme &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            ) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <style>
+        /* Calculator Specific Styles - Using Your Design System */
+        .calculator--section {
+            padding: 48px 0 64px;
+        }
+
+        .calculator__wrapper {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .calculator__wrapper {
+            border-color: var(--yellow-color);
+        }
+
+        .calculator__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .calculator__grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .calculator__input__group {
+            margin-bottom: 20px;
+        }
+
+        .calculator__label {
+            display: block;
+            color: var(--text-color);
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        html.dark-mode .calculator__label {
+            color: var(--white-color);
+        }
+
+        .calculator__input__wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .calculator__input {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 0;
+            padding: 13px;
+            font-size: 15px;
+            color: var(--black-color);
+            background-color: var(--white-color);
+            font-family: var(--roboto-mono);
+            transition: all 0.3s ease 0s;
+        }
+
+        html.dark-mode .calculator__input {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .calculator__input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--dark-brown-color);
+        }
+
+        html.dark-mode .calculator__input:focus {
+            box-shadow: 0 0 0 2px var(--yellow-color);
+        }
+
+        .calculator__prefix,
+        .calculator__suffix {
+            position: absolute;
+            color: var(--text-color);
+            font-weight: 500;
+            opacity: 0.7;
+        }
+
+        html.dark-mode .calculator__prefix,
+        html.dark-mode .calculator__suffix {
+            color: var(--white-color);
+        }
+
+        .calculator__prefix {
+            left: 15px;
+        }
+
+        .calculator__suffix {
+            right: 15px;
+        }
+
+        .input-with-prefix .calculator__input {
+            padding-left: 30px;
+        }
+
+        .input-with-suffix .calculator__input {
+            padding-right: 35px;
+        }
+
+        .calculator__help {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        html.dark-mode .calculator__help {
+            color: var(--white-color);
+        }
+
+        .calculator__btn {
+            min-width: 100%;
+            height: 50px;
+            padding: 12px 24px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 0;
+            color: var(--white-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background-color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease 0s;
+            margin-top: 20px;
+        }
+
+        .calculator__btn:hover {
+            color: var(--white-color);
+            background-color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .calculator__btn {
+            background-color: var(--deep-orange-color);
+        }
+
+        html.dark-mode .calculator__btn:hover {
+            color: var(--black-color);
+            background-color: var(--yellow-color);
+        }
+
+        .metric__card {
+            padding: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease 0s;
+        }
+
+        html.dark-mode .metric__card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .metric__card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark-mode .metric__card:hover {
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+        .metric__label {
+            color: var(--text-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        html.dark-mode .metric__label {
+            color: var(--white-color);
+        }
+
+        .metric__value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            font-family: var(--roboto-mono);
+        }
+
+        html.dark-mode .metric__value {
+            color: var(--yellow-color);
+        }
+
+        .metric--positive {
+            color: #10b981 !important;
+        }
+
+        .metric--negative {
+            color: var(--crimson-red-color) !important;
+        }
+
+        .roi__display {
+            text-align: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--dark-brown-color), var(--sand-yellow-color));
+            margin-bottom: 24px;
+            color: var(--white-color);
+        }
+
+        html.dark-mode .roi__display {
+            background: linear-gradient(135deg, var(--deep-orange-color), var(--crimson-red-color));
+        }
+
+        .roi__label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.75em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .roi__value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 15px 0;
+            font-family: var(--roboto-mono);
+        }
+
+        .roi__ratio {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .chart__container {
+            background: var(--white-color);
+            padding: 20px;
+            margin-top: 30px;
+            height: 350px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        html.dark-mode .chart__container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .projections__table {
+            width: 100%;
+            margin-top: 30px;
+            background: var(--white-color);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        html.dark-mode .projections__table {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .projections__table thead {
+            background: var(--body-color);
+        }
+
+        html.dark-mode .projections__table thead {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .projections__table th,
+        .projections__table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-family: var(--roboto-mono);
+        }
+
+        html.dark-mode .projections__table th,
+        html.dark-mode .projections__table td {
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--white-color);
+        }
+
+        .projections__table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .projections__table th {
+            color: var(--yellow-color);
+        }
+
+        .projections__table tbody tr:hover {
+            background: var(--light-body-color);
+        }
+
+        html.dark-mode .projections__table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section__subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 16px;
+            color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .section__subtitle {
+            color: var(--yellow-color);
+        }
+
+        .input__row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .input__row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            background: var(--light-body-color);
+            color: var(--dark-brown-color);
+            border: 1px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .alert {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--yellow-color);
+            border-color: var(--yellow-color);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== Page Theme Toggle Start ===== -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div>
+                    <div class="moon"></div>
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                    <div class="star star1"></div>
+                    <div class="star star2"></div>
+                    <div class="star star3"></div>
+                    <div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <!-- ===== Page Theme Toggle End ===== -->
+
+    <!-- ===== Header Area Start ===== -->
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+    <!-- ===== Header Area End ===== -->
+
+    <!-- ===== Main Area Start ===== -->
+    <main class="main">
+        <!-- Hero Section Start -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            HYDER MEDIA
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            Ad Spend ROI<br />Calculator
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">ROAS</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">CPA</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">LTV</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Hero Section End -->
+
+        <!-- Calculator Section Start -->
+        <section class="calculator calculator--section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <div class="calculator__wrapper">
+                        <div class="alert" id="calculateAlert">
+                            Enter your campaign metrics below and click Calculate to see your ROI projections
+                        </div>
+
+                        <div class="calculator__grid">
+                            <!-- Input Section -->
+                            <div class="calculator__inputs">
+                                <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                                    <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                                        CAMPAIGN PARAMETERS
+                                    </h2>
+                                </div>
+
+                                <!-- Ad Spend Inputs -->
+                                <div class="calculator__input__group">
+                                    <label for="adSpend" class="calculator__label">Monthly Ad Spend Budget</label>
+                                    <div class="calculator__input__wrapper input-with-prefix">
+                                        <span class="calculator__prefix">$</span>
+                                        <input type="number" id="adSpend" class="calculator__input" value="10000" min="0" step="100">
+                                    </div>
+                                    <div class="calculator__help">Total monthly advertising budget</div>
+                                </div>
+
+                                <div class="input__row">
+                                    <div class="calculator__input__group">
+                                        <label for="cpc" class="calculator__label">Cost Per Click</label>
+                                        <div class="calculator__input__wrapper input-with-prefix">
+                                            <span class="calculator__prefix">$</span>
+                                            <input type="number" id="cpc" class="calculator__input" value="2.50" min="0" step="0.01">
+                                        </div>
+                                    </div>
+
+                                    <div class="calculator__input__group">
+                                        <label for="ctr" class="calculator__label">Click-Through Rate</label>
+                                        <div class="calculator__input__wrapper input-with-suffix">
+                                            <input type="number" id="ctr" class="calculator__input" value="2.5" min="0" max="100" step="0.1">
+                                            <span class="calculator__suffix">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Conversion Metrics -->
+                                <h3 class="section__subtitle">CONVERSION METRICS</h3>
+
+                                <div class="input__row">
+                                    <div class="calculator__input__group">
+                                        <label for="conversionRate" class="calculator__label">Conversion Rate</label>
+                                        <div class="calculator__input__wrapper input-with-suffix">
+                                            <input type="number" id="conversionRate" class="calculator__input" value="3.5" min="0" max="100" step="0.1">
+                                            <span class="calculator__suffix">%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="calculator__input__group">
+                                        <label for="aov" class="calculator__label">Average Order Value</label>
+                                        <div class="calculator__input__wrapper input-with-prefix">
+                                            <span class="calculator__prefix">$</span>
+                                            <input type="number" id="aov" class="calculator__input" value="150" min="0" step="1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Customer Value Metrics -->
+                                <h3 class="section__subtitle">CUSTOMER VALUE</h3>
+
+                                <div class="input__row">
+                                    <div class="calculator__input__group">
+                                        <label for="ltv" class="calculator__label">Customer Lifetime Value</label>
+                                        <div class="calculator__input__wrapper input-with-prefix">
+                                            <span class="calculator__prefix">$</span>
+                                            <input type="number" id="ltv" class="calculator__input" value="500" min="0" step="1">
+                                        </div>
+                                        <div class="calculator__help">Average total revenue per customer</div>
+                                    </div>
+
+                                    <div class="calculator__input__group">
+                                        <label for="margin" class="calculator__label">Profit Margin</label>
+                                        <div class="calculator__input__wrapper input-with-suffix">
+                                            <input type="number" id="margin" class="calculator__input" value="30" min="0" max="100" step="1">
+                                            <span class="calculator__suffix">%</span>
+                                        </div>
+                                        <div class="calculator__help">Net profit margin on products</div>
+                                    </div>
+                                </div>
+
+                                <div class="calculator__input__group">
+                                    <label for="projectionPeriod" class="calculator__label">Projection Period</label>
+                                    <select id="projectionPeriod" class="calculator__input">
+                                        <option value="1">1 Month</option>
+                                        <option value="3" selected>3 Months</option>
+                                        <option value="6">6 Months</option>
+                                        <option value="12">12 Months</option>
+                                    </select>
+                                </div>
+
+                                <button class="calculator__btn btn" onclick="calculateROI()">CALCULATE PROJECTIONS</button>
+                            </div>
+
+                            <!-- Results Section -->
+                            <div class="calculator__results">
+                                <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                                    <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                                        PERFORMANCE PROJECTIONS
+                                    </h2>
+                                </div>
+
+                                <!-- ROI Display -->
+                                <div class="roi__display">
+                                    <div class="roi__label">Return on Ad Spend</div>
+                                    <div class="roi__value" id="roasValue">--%</div>
+                                    <div class="roi__ratio">
+                                        <span id="roasRatio">--</span> return per dollar spent
+                                    </div>
+                                </div>
+
+                                <!-- Key Metrics -->
+                                <div class="metric__card">
+                                    <div class="metric__label">Cost Per Acquisition</div>
+                                    <div class="metric__value" id="cpaValue">$--</div>
+                                </div>
+
+                                <div class="metric__card">
+                                    <div class="metric__label">Total Conversions</div>
+                                    <div class="metric__value" id="conversionsValue">--</div>
+                                </div>
+
+                                <div class="metric__card">
+                                    <div class="metric__label">Total Revenue</div>
+                                    <div class="metric__value metric--positive" id="revenueValue">$--</div>
+                                </div>
+
+                                <div class="metric__card">
+                                    <div class="metric__label">Net Profit</div>
+                                    <div class="metric__value" id="profitValue">$--</div>
+                                </div>
+
+                                <div class="metric__card">
+                                    <div class="metric__label">ROI Percentage</div>
+                                    <div class="metric__value" id="roiValue">--%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="chart__container">
+                            <canvas id="projectionChart"></canvas>
+                        </div>
+
+                        <!-- Projections Table -->
+                        <table class="projections__table" id="projectionsTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Ad Spend</th>
+                                    <th>Revenue</th>
+                                    <th>Profit</th>
+                                    <th>ROI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="projectionsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Calculator Section End -->
+    </main>
+    <!-- ===== Main Area End ===== -->
+
+    <!-- ===== Footer Area End ===== -->
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2025 Hyder Media
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== Footer Area End ===== -->
+
+    <!-- === jQuery CDNs & Scripts === -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+    
+    <script>
+        let projectionChart = null;
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function calculateROI() {
+            // Get input values
+            const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
+            const c
