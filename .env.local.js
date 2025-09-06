@@ -1,4 +1,0 @@
-EMAIL_USER=contactform@hyder.me
-EMAIL_PASS=ceryczaxsyryemau
-ADMIN_EMAIL=kenny@hyder.me
-RECAPTCHA_SECRET_KEY=optional-recaptcha-secret
