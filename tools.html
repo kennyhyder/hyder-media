@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Title&Favicon -->
+    <title>PPC Tools - HYDER MEDIA</title>
+    <link rel="shortcut icon" href="assets/imgs/logos/favicon.png" type="image/x-icon" />
+
+    <!-- === CSS CDNs & StyleSheets === -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- === Head Script For Dark Mode === -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (
+                !savedTheme &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            ) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <style>
+        /* Tools Page Specific Styles */
+        .tools--section {
+            padding: 48px 0 64px;
+        }
+
+        .tools__wrapper {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .tools__wrapper {
+            border-color: var(--yellow-color);
+        }
+
+        .tools__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        @media (min-width: 992px) {
+            .tools__grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .tool__card {
+            background-color: var(--white-color);
+            border: 2px solid var(--dark-brown-color);
+            padding: 32px 24px;
+            transition: all 0.3s ease 0s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        html.dark-mode .tool__card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--yellow-color);
+        }
+
+        .tool__card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        html.dark-mode .tool__card:hover {
+            box-shadow: 0 12px 24px rgba(225, 212, 43, 0.15);
+        }
+
+        .tool__icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--body-color);
+            border: 2px solid var(--dark-brown-color);
+            position: relative;
+        }
+
+        html.dark-mode .tool__icon {
+            background-color: rgba(225, 212, 43, 0.1);
+            border-color: var(--yellow-color);
+        }
+
+        .tool__icon svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--dark-brown-color);
+        }
+
+        html.dark-mode .tool__icon svg {
+            fill: var(--yellow-color);
+        }
+
+        .tool__title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        html.dark-mode .tool__title {
+            color: var(--yellow-color);
+        }
+
+        .tool__description {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            min-height: 80px;
+        }
+
+        html.dark-mode .tool__description {
+            color: var(--white-color);
+            opacity: 0.9;
+        }
+
+        .tool__features {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .tool__features li {
+            color: var(--text-color);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        html.dark-mode .tool__features li {
+            color: var(--white-color);
+            opacity: 0.8;
+        }
+
+        .tool__features li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--sand-yellow-color);
+        }
+
+        html.dark-mode .tool__features li:before {
+            color: var(--yellow-color);
+        }
+
+        .tool__link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 48px;
+            background-color: var(--text-color);
+            color: var(--white-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s ease 0s;
+        }
+
+        .tool__link:hover {
+            background-color: var(--dark-brown-color);
+            color: var(--white-color);
+        }
+
+        html.dark-mode .tool__link {
+            background-color: var(--deep-orange-color);
+        }
+
+        html.dark-mode .tool__link:hover {
+            background-color: var(--yellow-color);
+            color: var(--black-color);
+        }
+
+        .section__description {
+            max-width: 680px;
+            margin: 0 auto 48px;
+            text-align: center;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        html.dark-mode .section__description {
+            color: var(--white-color);
+            opacity: 0.9;
+        }
+
+        .badge__new {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--crimson-red-color);
+            color: var(--white-color);
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        html.dark-mode .badge__new {
+            background-color: var(--deep-orange-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== Page Theme Toggle Start ===== -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div>
+                    <div class="moon"></div>
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                    <div class="star star1"></div>
+                    <div class="star star2"></div>
+                    <div class="star star3"></div>
+                    <div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <!-- ===== Page Theme Toggle End ===== -->
+
+    <!-- ===== Header Area Start ===== -->
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+    <!-- ===== Header Area End ===== -->
+
+    <!-- ===== Main Area Start ===== -->
+    <main class="main">
+        <!-- Hero Section Start -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            HYDER MEDIA
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            Free PPC<br />Marketing Tools
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">CALCULATE</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">OPTIMIZE</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">TRACK</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Hero Section End -->
+
+        <!-- Tools Section Start -->
+        <section class="tools tools--section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <div class="tools__wrapper">
+                        <div class="section__head text-center mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                            <h2 class="section__title text-color fw-bold text-uppercase fs-1">
+                                PROFESSIONAL PPC TOOLS
+                            </h2>
+                            <p class="section__description mt-4">
+                                Streamline your paid advertising campaigns with our suite of free, professional-grade PPC tools. 
+                                Built specifically for digital marketers and agencies to save time and improve campaign performance.
+                            </p>
+                        </div>
+
+                        <div class="tools__grid">
+                            <!-- ROI Calculator Tool -->
+                            <div class="tool__card">
+                                <div class="badge__new">POPULAR</div>
+                                <div class="tool__icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M19 3H5c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 16H5V5h14v14z"/>
+                                        <path d="M7 12h2v5H7zm4-5h2v10h-2zm4 3h2v7h-2z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="tool__title">Ad Spend ROI Calculator</h3>
+                                <p class="tool__description">
+                                    Calculate your return on ad spend (ROAS) and project future performance with our comprehensive ROI calculator.
+                                </p>
+                                <ul class="tool__features">
+                                    <li>ROAS & ROI calculations</li>
+                                    <li>Multi-period projections</li>
+                                    <li>Interactive charts</li>
+                                    <li>CPA & LTV analysis</li>
+                                </ul>
+                                <a href="calculator.html" class="tool__link">LAUNCH CALCULATOR</a>
+                            </div>
+
+                            <!-- Keyword Match Type Tool -->
+                            <div class="tool__card">
+                                <div class="tool__icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="tool__title">Keyword Match Type Generator</h3>
+                                <p class="tool__description">
+                                    Instantly generate broad, phrase, and exact match keywords for Google Ads campaigns with proper formatting.
+                                </p>
+                                <ul class="tool__features">
+                                    <li>Bulk keyword processing</li>
+                                    <li>All match type formats</li>
+                                    <li>One-click copy</li>
+                                    <li>Google Ads ready</li>
+                                </ul>
+                                <a href="matchtypes.html" class="tool__link">GENERATE KEYWORDS</a>
+                            </div>
+
+                            <!-- UTM Builder Tool -->
+                            <div class="tool__card">
+                                <div class="badge__new">ADVANCED</div>
+                                <div class="tool__icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="tool__title">Advanced UTM Builder</h3>
+                                <p class="tool__description">
+                                    Build tracking URLs with platform-specific dynamic parameters for Google, Facebook, TikTok, Bing & LinkedIn.
+                                </p>
+                                <ul class="tool__features">
+                                    <li>Multi-platform support</li>
+                                    <li>ValueTrack parameters</li>
+                                    <li>Dynamic variables</li>
+                                    <li>Preset templates</li>
+                                </ul>
+                                <a href="utm-builder.html" class="tool__link">BUILD UTM LINKS</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Tools Section End -->
+    </main>
+    <!-- ===== Main Area End ===== -->
+
+    <!-- ===== Footer Area End ===== -->
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2025 Hyder Media
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== Footer Area End ===== -->
+
+    <!-- === jQuery CDNs & Scripts === -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
