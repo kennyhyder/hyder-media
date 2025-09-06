@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Title&Favicon -->
+    <title>Keyword Match Type Generator - HYDER MEDIA</title>
+    <link rel="shortcut icon" href="assets/imgs/logos/favicon.png" type="image/x-icon" />
+
+    <!-- === CSS CDNs & StyleSheets === -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- === Head Script For Dark Mode === -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (
+                !savedTheme &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            ) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <style>
+        /* Keyword Generator Specific Styles - Using Your Design System */
+        .generator--section {
+            padding: 48px 0 64px;
+        }
+
+        .generator__wrapper {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .generator__wrapper {
+            border-color: var(--yellow-color);
+        }
+
+        .generator__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .generator__grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .generator__input__group {
+            margin-bottom: 20px;
+        }
+
+        .generator__label {
+            display: block;
+            color: var(--text-color);
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        html.dark-mode .generator__label {
+            color: var(--white-color);
+        }
+
+        .generator__textarea {
+            width: 100%;
+            min-height: 250px;
+            border: none;
+            border-radius: 0;
+            padding: 13px;
+            font-size: 15px;
+            color: var(--black-color);
+            background-color: var(--white-color);
+            font-family: var(--roboto-mono);
+            transition: all 0.3s ease 0s;
+            resize: vertical;
+        }
+
+        html.dark-mode .generator__textarea {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .generator__textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--dark-brown-color);
+        }
+
+        html.dark-mode .generator__textarea:focus {
+            box-shadow: 0 0 0 2px var(--yellow-color);
+        }
+
+        .generator__help {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        html.dark-mode .generator__help {
+            color: var(--white-color);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 2rem;
+            justify-content: flex-start;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            accent-color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .checkbox-wrapper input[type="checkbox"] {
+            accent-color: var(--yellow-color);
+        }
+
+        .checkbox-label {
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        html.dark-mode .checkbox-label {
+            color: var(--white-color);
+        }
+
+        .generator__btn {
+            min-width: 200px;
+            height: 50px;
+            padding: 12px 24px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 0;
+            color: var(--white-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            background-color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease 0s;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .generator__btn:hover {
+            color: var(--white-color);
+            background-color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .generator__btn {
+            background-color: var(--deep-orange-color);
+        }
+
+        html.dark-mode .generator__btn:hover {
+            color: var(--black-color);
+            background-color: var(--yellow-color);
+        }
+
+        .generator__btn--secondary {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+        }
+
+        .generator__btn--secondary:hover {
+            background-color: var(--text-color);
+            color: var(--white-color);
+        }
+
+        html.dark-mode .generator__btn--secondary {
+            color: var(--white-color);
+            border-color: var(--white-color);
+        }
+
+        html.dark-mode .generator__btn--secondary:hover {
+            background-color: var(--white-color);
+            color: var(--black-color);
+        }
+
+        .results__textarea {
+            width: 100%;
+            min-height: 250px;
+            padding: 13px;
+            border: none;
+            border-radius: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            background-color: #f8f8f8;
+            color: var(--black-color);
+            resize: vertical;
+        }
+
+        html.dark-mode .results__textarea {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--white-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .results__textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--dark-brown-color);
+        }
+
+        html.dark-mode .results__textarea:focus {
+            box-shadow: 0 0 0 2px var(--yellow-color);
+        }
+
+        .copy-button-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark-brown-color);
+            color: var(--white-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        html.dark-mode .copy-success {
+            background-color: var(--yellow-color);
+            color: var(--black-color);
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+
+        .stats__grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--light-body-color);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark-mode .stats__grid {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat__item {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .stat__value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            font-family: var(--roboto-mono);
+        }
+
+        html.dark-mode .stat__value {
+            color: var(--yellow-color);
+        }
+
+        .stat__label {
+            color: var(--text-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        html.dark-mode .stat__label {
+            color: var(--white-color);
+        }
+
+        .section__subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 16px;
+            color: var(--dark-brown-color);
+        }
+
+        html.dark-mode .section__subtitle {
+            color: var(--yellow-color);
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            background: var(--light-body-color);
+            color: var(--dark-brown-color);
+            border: 1px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .alert {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--yellow-color);
+            border-color: var(--yellow-color);
+        }
+
+        @media (max-width: 640px) {
+            .stats__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .generator__btn {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== Page Theme Toggle Start ===== -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div>
+                    <div class="moon"></div>
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                    <div class="star star1"></div>
+                    <div class="star star2"></div>
+                    <div class="star star3"></div>
+                    <div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+    <!-- ===== Page Theme Toggle End ===== -->
+
+    <!-- ===== Header Area Start ===== -->
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+    <!-- ===== Header Area End ===== -->
+
+    <!-- ===== Main Area Start ===== -->
+    <main class="main">
+        <!-- Hero Section Start -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            HYDER MEDIA
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            Keyword Match Type<br />Generator
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">BROAD</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">PHRASE</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#" class="hero__link fw-light text-uppercase">EXACT</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Hero Section End -->
+
+        <!-- Generator Section Start -->
+        <section class="generator generator--section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <div class="generator__wrapper">
+                        <div class="alert" id="generateAlert">
+                            Enter your keywords below and select match types to generate Google Ads formatted keywords
+                        </div>
+
+                        <div class="generator__grid">
+                            <!-- Input Section -->
+                            <div class="generator__inputs">
+                                <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                                    <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                                        INPUT KEYWORDS
+                                    </h2>
+                                </div>
+
+                                <div class="generator__input__group">
+                                    <label for="keywordInput" class="generator__label">Enter Keywords (one per line)</label>
+                                    <textarea 
+                                        id="keywordInput" 
+                                        class="generator__textarea" 
+                                        placeholder="Enter your keywords here...&#10;keyword 1&#10;keyword 2&#10;keyword 3"
+                                    ></textarea>
+                                    <div class="generator__help">Add one keyword or phrase per line</div>
+                                </div>
+
+                                <h3 class="section__subtitle">SELECT MATCH TYPES</h3>
+
+                                <div class="checkbox-group">
+                                    <label class="checkbox-wrapper">
+                                        <input type="checkbox" id="broadMatch" checked>
+                                        <span class="checkbox-label">Broad Match</span>
+                                    </label>
+                                    <label class="checkbox-wrapper">
+                                        <input type="checkbox" id="phraseMatch" checked>
+                                        <span class="checkbox-label">Phrase Match ("keyword")</span>
+                                    </label>
+                                    <label class="checkbox-wrapper">
+                                        <input type="checkbox" id="exactMatch" checked>
+                                        <span class="checkbox-label">Exact Match ([keyword])</span>
+                                    </label>
+                                </div>
+
+                                <div class="generator__button__group">
+                                    <button class="generator__btn btn" onclick="generateMatchTypes()">GENERATE MATCH TYPES</button>
+                                    <button class="generator__btn generator__btn--secondary btn" onclick="clearAll()">CLEAR ALL</button>
+                                </div>
+                            </div>
+
+                            <!-- Results Section -->
+                            <div class="generator__results">
+                                <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                                    <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                                        GENERATED KEYWORDS
+                                    </h2>
+                                </div>
+
+                                <div class="generator__input__group">
+                                    <label for="results" class="generator__label">Output Keywords</label>
+                                    <textarea 
+                                        id="results" 
+                                        class="results__textarea" 
+                                        readonly
+                                        placeholder="Generated keywords will appear here..."
+                                    ></textarea>
+                                    <div class="generator__help">Copy these keywords directly into Google Ads</div>
+                                </div>
+
+                                <div class="copy-button-wrapper">
+                                    <span class="copy-success" id="copySuccess">Copied to clipboard!</span>
+                                    <button class="generator__btn btn" onclick="copyToClipboard()">COPY TO CLIPBOARD</button>
+                                </div>
+
+                                <div class="stats__grid" id="statsGrid" style="display: none;">
+                                    <div class="stat__item">
+                                        <div class="stat__value" id="totalKeywords">0</div>
+                                        <div class="stat__label">Original Keywords</div>
+                                    </div>
+                                    <div class="stat__item">
+                                        <div class="stat__value" id="totalGenerated">0</div>
+                                        <div class="stat__label">Generated Variations</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Generator Section End -->
+    </main>
+    <!-- ===== Main Area End ===== -->
+
+    <!-- ===== Footer Area End ===== -->
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2025 Hyder Media
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== Footer Area End ===== -->
+
+    <!-- === jQuery CDNs & Scripts === -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+    
+    <script>
+        function generateMatchTypes() {
+            const input = document.getElementById('keywordInput').value.trim();
+            const resultsTextarea = document.getElementById('results');
+            const statsGrid = document.getElementById('statsGrid');
+            const generateAlert = document.getElementById('generateAlert');
+            
+            if (!input) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+
+            // Get selected match types
+            const broadMatch = document.getElementById('broadMatch').checked;
+            const phraseMatch = document.getElementById('phraseMatch').checked;
+            const exactMatch = document.getElementById('exactMatch').checked;
+
+            if (!broadMatch && !phraseMatch && !exactMatch) {
+                alert('Please select at least one match type');
+                return;
+            }
+
+            // Split keywords by line and clean them
+            const keywords = input.split('\n')
+                .map(keyword => keyword.trim())
+                .filter(keyword => keyword.length > 0);
+
+            const results = [];
+
+            // Generate selected match types
+            keywords.forEach(keyword => {
+                if (broadMatch) {
+                    results.push(keyword);
+                }
+                if (phraseMatch) {
+                    results.push(`"${keyword}"`);
+                }
+                if (exactMatch) {
+                    results.push(`[${keyword}]`);
+                }
+            });
+
+            // Display results
+            resultsTextarea.value = results.join('\n');
+            
+            // Update stats
+            document.getElementById('totalKeywords').textContent = keywords.length;
+            document.getElementById('totalGenerated').textContent = results.length;
+            
+            // Show stats grid and hide alert
+            statsGrid.style.display = 'grid';
+            generateAlert.style.display = 'none';
+
+            // Scroll to results on mobile
+            if (window.innerWidth < 992) {
+                resultsTextarea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('keywordInput').value = '';
+            document.getElementById('results').value = '';
+            document.getElementById('statsGrid').style.display = 'none';
+            document.getElementById('generateAlert').style.display = 'block';
+            
+            // Reset checkboxes to default
+            document.getElementById('broadMatch').checked = true;
+            document.getElementById('phraseMatch').checked = true;
+            document.getElementById('exactMatch').checked = true;
+        }
+
+        function copyToClipboard() {
+            const results = document.getElementById('results');
+            const copySuccess = document.getElementById('copySuccess');
+            
+            if (!results.value) {
+                alert('No keywords to copy');
+                return;
+            }
+
+            // Select and copy text
+            results.select();
+            results.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                
+                // Show success message
+                copySuccess.classList.add('show');
+                setTimeout(() => {
+                    copySuccess.classList.remove('show');
+                }, 2000);
+            } catch (err) {
+                // Fallback for modern browsers
+                navigator.clipboard.writeText(results.value).then(() => {
+                    copySuccess.classList.add('show');
+                    setTimeout(() => {
+                        copySuccess.classList.remove('show');
+                    }, 2000);
+                }).catch(() => {
+                    alert('Failed to copy. Please select the text manually and copy.');
+                });
+            }
+
+            // Deselect text
+            window.getSelection().removeAllRanges();
+        }
+
+        // Handle Enter key in textarea (allow new lines)
+        document.getElementById('keywordInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateMatchTypes();
+            }
+        });
+
+        // Initialize theme toggle if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme is handled by the main script.js file
+        });
+    </script>
