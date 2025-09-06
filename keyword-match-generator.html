@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title & Favicon -->
+    <title>Keyword Match Type Generator - Hyder Media</title>
+    <link rel="shortcut icon" href="assets/imgs/logos/favicon.png" type="image/x-icon">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    
+    <!-- Custom Styles for This Tool -->
+    <style>
+        .tool-section {
+            padding: 4rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .tool__wrapper {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 3rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tool__title {
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--dark-brown);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tool__subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .form__group {
+            margin-bottom: 2rem;
+        }
+
+        .form__label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--brown);
+            margin-bottom: 0.75rem;
+        }
+
+        .keyword-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+        }
+
+        .keyword-textarea:focus {
+            outline: none;
+            border-color: var(--brown);
+            box-shadow: 0 0 0 3px rgba(52, 38, 34, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            accent-color: var(--brown);
+        }
+
+        .checkbox-label {
+            font-size: 1rem;
+            color: var(--dark-brown);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tool-btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tool-btn {
+            padding: 0.875rem 2.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--brown);
+            background-color: var(--brown);
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--dark-brown);
+            border-color: var(--dark-brown);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .tool-btn-secondary {
+            background-color: transparent;
+            color: var(--brown);
+        }
+
+        .tool-btn-secondary:hover {
+            background-color: var(--brown);
+            color: var(--white);
+        }
+
+        .results-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results__textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            background-color: #f8f8f8;
+            resize: vertical;
+        }
+
+        .results__textarea:focus {
+            outline: none;
+            border-color: var(--brown);
+        }
+
+        .copy-button {
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brown);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9f6f1;
+            border-radius: 4px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .tool__wrapper {
+                padding: 2rem 1.5rem;
+            }
+
+            .tool__title {
+                font-size: 2rem;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .tool-btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tool-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+    
+    <!-- Head Script For Dark Mode -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (
+                !savedTheme &&
+                window.matchMedia('(prefers-color-scheme: dark)').matches
+            ) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- ===== Header Area Start ===== -->
+    <header class="header header--area position-fixed w-100 z-5">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="header__wrapper d-flex align-items-center justify-content-between">
+                    <a href="index.html" class="header__logo d-flex align-items-center">
+                        <svg width="50" height="50" viewBox="0 0 141 140" fill="none" xmlns="http://www.w3.org/2000/svg" class="header__logo__img">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M59.8027 79.7107L70.3195 99.6335L80.5821 79.7107L90.4896 99.6335V71.9568H50.2829V99.6469L59.8027 79.7107ZM83.1275 40.3658V60.6861H57.6422V40.3658H50.2829V68.0446H90.4896V40.3658H83.1275ZM140.387 70.0004C140.387 108.659 109.046 140 70.3852 140C31.7234 140 0.386963 108.659 0.386963 70.0004C0.386963 31.3403 31.7234 0 70.3852 0C109.046 0 140.387 31.3403 140.387 70.0004V70.0004Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+
+                    <nav class="header__nav d-none d-lg-block">
+                        <ul class="header__nav__list d-flex align-items-center">
+                            <li class="header__nav__item">
+                                <a href="index.html" class="header__nav__link">Home</a>
+                            </li>
+                            <li class="header__nav__item">
+                                <a href="index.html#about" class="header__nav__link">About</a>
+                            </li>
+                            <li class="header__nav__item">
+                                <a href="index.html#projects" class="header__nav__link">Projects</a>
+                            </li>
+                            <li class="header__nav__item">
+                                <a href="index.html#contact" class="header__nav__link">Contact</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <button class="header__toggle d-lg-none" id="headerToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- ===== Header Area End ===== -->
+
+    <!-- ===== Main Area Start ===== -->
+    <main class="main overflow-hidden">
+        <!-- Tool Section -->
+        <section class="tool-section" style="padding-top: 120px;">
+            <div class="container">
+                <div class="tool__wrapper">
+                    <h1 class="tool__title">Keyword Match Type Generator</h1>
+                    <p class="tool__subtitle">Generate Google Ads keyword match types instantly</p>
+
+                    <!-- Input Section -->
+                    <div class="form__group">
+                        <label class="form__label" for="keywordInput">Enter Keywords (one per line)</label>
+                        <textarea 
+                            id="keywordInput" 
+                            class="keyword-textarea" 
+                            placeholder="Enter your keywords here...&#10;keyword 1&#10;keyword 2&#10;keyword 3"
+                        ></textarea>
+                    </div>
+
+                    <!-- Match Type Selection -->
+                    <div class="form__group">
+                        <label class="form__label">Select Match Types</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="broadMatch" checked>
+                                <span class="checkbox-label">Broad Match</span>
+                            </label>
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="phraseMatch" checked>
+                                <span class="checkbox-label">Phrase Match ("keyword")</span>
+                            </label>
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="exactMatch" checked>
+                                <span class="checkbox-label">Exact Match ([keyword])</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="tool-btn-group">
+                        <button class="tool-btn" onclick="generateMatchTypes()">Generate Match Types</button>
+                        <button class="tool-btn tool-btn-secondary" onclick="clearAll()">Clear All</button>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="resultsSection" class="results-section">
+                        <div class="form__group">
+                            <label class="form__label" for="results">Generated Keywords</label>
+                            <textarea 
+                                id="results" 
+                                class="results__textarea" 
+                                readonly
+                                placeholder="Generated keywords will appear here..."
+                            ></textarea>
+                        </div>
+
+                        <div class="tool-btn-group copy-button">
+                            <span class="copy-success" id="copySuccess">Copied to clipboard!</span>
+                            <button class="tool-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                        </div>
+
+                        <div class="stats" id="stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalKeywords">0</div>
+                                <div class="stat-label">Original Keywords</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalGenerated">0</div>
+                                <div class="stat-label">Generated Variations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- ===== Main Area End ===== -->
+
+    <!-- ===== Footer Area Start ===== -->
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2025 Hyder Media
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== Footer Area End ===== -->
+
+    <!-- === jQuery CDNs & Scripts === -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+    
+    <!-- Tool Specific Scripts -->
+    <script>
+        function generateMatchTypes() {
+            const input = document.getElementById('keywordInput').value.trim();
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsTextarea = document.getElementById('results');
+            
+            if (!input) {
+                alert('Please enter at least one keyword');
+                return;
+            }
+
+            // Get selected match types
+            const broadMatch = document.getElementById('broadMatch').checked;
+            const phraseMatch = document.getElementById('phraseMatch').checked;
+            const exactMatch = document.getElementById('exactMatch').checked;
+
+            if (!broadMatch && !phraseMatch && !exactMatch) {
+                alert('Please select at least one match type');
+                return;
+            }
+
+            // Split keywords by line and clean them
+            const keywords = input.split('\n')
+                .map(keyword => keyword.trim())
+                .filter(keyword => keyword.length > 0);
+
+            const results = [];
+
+            // Generate selected match types
+            keywords.forEach(keyword => {
+                if (broadMatch) {
+                    results.push(keyword);
+                }
+                if (phraseMatch) {
+                    results.push(`"${keyword}"`);
+                }
+                if (exactMatch) {
+                    results.push(`[${keyword}]`);
+                }
+            });
+
+            // Display results
+            resultsTextarea.value = results.join('\n');
+            resultsSection.classList.add('active');
+
+            // Update stats
+            document.getElementById('totalKeywords').textContent = keywords.length;
+            document.getElementById('totalGenerated').textContent = results.length;
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearAll() {
+            document.getElementById('keywordInput').value = '';
+            document.getElementById('results').value = '';
+            document.getElementById('resultsSection').classList.remove('active');
+            
+            // Reset checkboxes to default
+            document.getElementById('broadMatch').checked = true;
+            document.getElementById('phraseMatch').checked = true;
+            document.getElementById('exactMatch').checked = true;
+        }
+
+        function copyToClipboard() {
+            const results = document.getElementById('results');
+            const copySuccess = document.getElementById('copySuccess');
+            
+            if (!results.value) {
+                alert('No keywords to copy');
+                return;
+            }
+
+            // Select and copy text
+            results.select();
+            results.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                
+                // Show success message
+                copySuccess.classList.add('show');
+                setTimeout(() => {
+                    copySuccess.classList.remove('show');
+                }, 2000);
+            } catch (err) {
+                // Fallback for modern browsers
+                navigator.clipboard.writeText(results.value).then(() => {
+                    copySuccess.classList.add('show');
+                    setTimeout(() => {
+                        copySuccess.classList.remove('show');
+                    }, 2000);
+                }).catch(() => {
+                    alert('Failed to copy. Please select the text manually and copy.');
+                });
+            }
+
+            // Deselect text
+            window.getSelection().removeAllRanges();
+        }
+
+        // Handle Enter key in textarea (allow new lines)
+        document.getElementById('keywordInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateMatchTypes();
+            }
+        });
+    </script>
+</body>
+</html>
