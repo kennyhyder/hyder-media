@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribution Control in the Age of AI | Hyder Media</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/logos/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --roboto-mono: 'Roboto Mono', monospace;
+            --pt-sans: 'PT Sans', sans-serif;
+            --body-color: #efe2b9;
+            --text-color: #354231;
+            --deep-orange: #d14d00;
+            --dark-brown: #795232;
+            --yellow: #e1d42b;
+            --sand-yellow: #f1ca4b;
+            --purple: #4c2c4b;
+            --dark-purple: #150218;
+            --white: #fff;
+            --light-body: #fffff0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--roboto-mono);
+            background: var(--dark-purple);
+            overflow: hidden;
+        }
+
+        .deck-container {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-title {
+            background: linear-gradient(135deg, var(--deep-orange), var(--dark-brown));
+        }
+
+        .slide-dark {
+            background: var(--dark-purple);
+            color: var(--body-color);
+        }
+
+        .slide-light {
+            background: var(--body-color);
+            color: var(--text-color);
+        }
+
+        .slide-accent {
+            background: linear-gradient(135deg, var(--purple), var(--dark-purple));
+            color: var(--body-color);
+        }
+
+        .slide-orange {
+            background: linear-gradient(135deg, var(--deep-orange), var(--dark-brown));
+            color: var(--white);
+        }
+
+        .logo {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            height: 40px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        h1 {
+            font-family: var(--pt-sans);
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: var(--pt-sans);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 32px;
+        }
+
+        h3 {
+            font-family: var(--pt-sans);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .content {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .big-quote {
+            font-size: 36px;
+            font-style: italic;
+            text-align: center;
+            max-width: 900px;
+            line-height: 1.4;
+            border-left: 4px solid var(--deep-orange);
+            padding-left: 32px;
+            text-align: left;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .card-light {
+            background: var(--white);
+            color: var(--text-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--deep-orange);
+            margin-bottom: 12px;
+        }
+
+        .card-light h3 {
+            color: var(--deep-orange);
+        }
+
+        .card p, .card li {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "+";
+            position: absolute;
+            left: 0;
+            color: var(--deep-orange);
+            font-weight: bold;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--sand-yellow);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .year-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 24px;
+            border-left: 4px solid var(--sand-yellow);
+        }
+
+        .year-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--sand-yellow);
+            margin-bottom: 8px;
+        }
+
+        .layer-row {
+            display: grid;
+            grid-template-columns: 150px 200px 1fr;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .layer-name {
+            font-weight: 700;
+            color: var(--sand-yellow);
+        }
+
+        .layer-tech {
+            font-size: 14px;
+            color: var(--deep-orange);
+        }
+
+        .highlight {
+            color: var(--sand-yellow);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--deep-orange);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-green {
+            background: #2d7a3e;
+        }
+
+        .tag-yellow {
+            background: var(--dark-brown);
+        }
+
+        .opportunity-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            color: var(--text-color);
+        }
+
+        .opportunity-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .opportunity-card .industry {
+            font-size: 12px;
+            color: var(--deep-orange);
+            margin-bottom: 12px;
+        }
+
+        .opportunity-card p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .capex-highlight {
+            background: rgba(209, 77, 0, 0.1);
+            border-left: 3px solid var(--deep-orange);
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--deep-orange);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--deep-orange);
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 40px;
+            }
+            h1 { font-size: 42px; }
+            h2 { font-size: 32px; }
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="deck-container">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-title active" data-slide="1">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <h1 style="color: var(--white);">Distribution Control<br>in the Age of AI</h1>
+            <p class="subtitle" style="color: var(--body-color);">A framework for building vertical token systems that capture lasting value</p>
+            <span class="slide-number" style="color: var(--body-color);">1 / 20</span>
+        </div>
+
+        <!-- Slide 2: The Core Thesis -->
+        <div class="slide slide-dark" data-slide="2">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Core Thesis</h2>
+                <p class="big-quote">
+                    "Whoever controls the distribution of tokens (data, relationships, information) in a vertical will own that vertical. Build the tokenizer, become the operating system."
+                </p>
+            </div>
+            <span class="slide-number">2 / 20</span>
+        </div>
+
+        <!-- Slide 3: What Are Tokens? -->
+        <div class="slide slide-light" data-slide="3">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>What Are Tokens?</h2>
+                <p style="font-size: 20px; margin-bottom: 32px;">Tokens are discrete units of encoded information that make the world accessible and legible to machines.</p>
+                <div class="grid-3">
+                    <div class="card card-light">
+                        <h3>Access Tokens</h3>
+                        <p>Credentials and permissions that grant entry to systems and services</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Memory Tokens</h3>
+                        <p>Personal context and history that AI uses to understand and serve individuals</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Expert Tokens</h3>
+                        <p>Domain-specific knowledge encoded into systems for specialized tasks</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Identity Tokens</h3>
+                        <p>Personal information establishing who someone is across digital systems</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Knowledge Tokens</h3>
+                        <p>Company and organizational data powering business operations</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Asset Tokens</h3>
+                        <p>Digital representations of ownership rights and value</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">3 / 20</span>
+        </div>
+
+        <!-- Slide 4: Why Now? -->
+        <div class="slide slide-accent" data-slide="4">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Why Now?</h2>
+                <div class="grid-2">
+                    <div class="stat-box">
+                        <div class="stat-number">1000x</div>
+                        <div class="stat-label">Reduction in inference costs over 3 years</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">500T+</div>
+                        <div class="stat-label">Tokens processed monthly by major platforms</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">80%+</div>
+                        <div class="stat-label">New vehicles with ADAS features</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">$0.02</div>
+                        <div class="stat-label">Blockchain transaction fees collapsed</div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">4 / 20</span>
+        </div>
+
+        <!-- Slide 5: The PowerOutage Example -->
+        <div class="slide slide-dark" data-slide="5">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The PowerOutage Example</h2>
+                <p style="font-size: 18px; margin-bottom: 32px;">A case study in distribution control</p>
+                <div class="grid-2">
+                    <div>
+                        <div class="stat-box" style="text-align: left;">
+                            <div class="stat-number" style="font-size: 42px;">927+</div>
+                            <div class="stat-label">Utilities tracked</div>
+                        </div>
+                        <div class="stat-box" style="text-align: left;">
+                            <div class="stat-number" style="font-size: 42px;">213M+</div>
+                            <div class="stat-label">Customers covered</div>
+                        </div>
+                        <div class="stat-box" style="text-align: left;">
+                            <div class="stat-number" style="font-size: 42px;">10 min</div>
+                            <div class="stat-label">Real-time data updates</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">The Insight</h3>
+                        <p style="font-size: 18px; line-height: 1.6;">
+                            "VCs with 10 PhDs who built amazing hardware/software and raised $100M... go to PowerOutage for distribution."
+                        </p>
+                        <p style="font-size: 16px; margin-top: 16px; opacity: 0.8;">
+                            Everyone is struggling with problem awareness. Control distribution, and they come to you.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">5 / 20</span>
+        </div>
+
+        <!-- Slide 6: Common Sense + Determinism -->
+        <div class="slide slide-light" data-slide="6">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Mental Model</h2>
+                <h3 style="color: var(--deep-orange); margin-bottom: 24px;">Common Sense + Determinism Architecture</h3>
+                <p style="margin-bottom: 32px;">LLMs are "common sense engines" while code is deterministic. Mixing these creates powerful automation.</p>
+                <div style="background: var(--text-color); border-radius: 12px; padding: 32px; color: var(--body-color);">
+                    <div class="layer-row">
+                        <span class="layer-name">Common Sense</span>
+                        <span class="layer-tech">Local LLMs (Qwen 80B)</span>
+                        <span>Pattern recognition, data enrichment, ambiguity handling</span>
+                    </div>
+                    <div class="layer-row">
+                        <span class="layer-name">Determinism</span>
+                        <span class="layer-tech">Traditional Code</span>
+                        <span>Reliable execution, data pipelines, business logic</span>
+                    </div>
+                    <div class="layer-row">
+                        <span class="layer-name">Infrastructure</span>
+                        <span class="layer-tech">Mac Studios 128-512GB</span>
+                        <span>Self-hosted compute at $4K-10K/unit, years of runtime</span>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">6 / 20</span>
+        </div>
+
+        <!-- Slide 7: The Cap-Ex Arbitrage -->
+        <div class="slide slide-orange" data-slide="7">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Cap-Ex vs Op-Ex Arbitrage</h2>
+                <p style="font-size: 20px; margin-bottom: 32px;">The most powerful tactical insight: understand how your customers make money.</p>
+                <div class="card" style="background: rgba(0,0,0,0.2); max-width: 900px;">
+                    <p style="font-size: 18px; line-height: 1.7;">
+                        Investor-owned utilities make profit by building their <span class="highlight">rate base</span> (capital investments). Operating expenses are pass-through costs with no profit margin.
+                    </p>
+                    <p style="font-size: 18px; line-height: 1.7; margin-top: 16px;">
+                        By repackaging SaaS as <span class="highlight">on-premise infrastructure</span>, you convert a cost center (Op-Ex) into a profit center (Cap-Ex)&mdash;and can bill <span class="highlight">2-3x</span>.
+                    </p>
+                </div>
+                <p style="margin-top: 24px; font-style: italic; opacity: 0.9;">"You only learn insights like this by controlling distribution in an industry."</p>
+            </div>
+            <span class="slide-number">7 / 20</span>
+        </div>
+
+        <!-- Slide 8: 3-Year Playbook -->
+        <div class="slide slide-dark" data-slide="8">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>3-Year Distribution Capture Playbook</h2>
+                <div class="grid-3" style="margin-top: 32px;">
+                    <div class="year-card">
+                        <div class="year-label">YEAR 1</div>
+                        <h3 style="color: var(--white); font-size: 20px;">Build & Give</h3>
+                        <p style="font-size: 15px;">Build platform, give away distribution free. Invest in user/entity acquisition.</p>
+                    </div>
+                    <div class="year-card">
+                        <div class="year-label">YEAR 2</div>
+                        <h3 style="color: var(--white); font-size: 20px;">Sustain</h3>
+                        <p style="font-size: 15px;">Small SaaS or get major sponsor. Break even or slight profit.</p>
+                    </div>
+                    <div class="year-card">
+                        <div class="year-label">YEAR 3</div>
+                        <h3 style="color: var(--white); font-size: 20px;">Monetize</h3>
+                        <p style="font-size: 15px;">World has changed, you own the relationships. Monetize distribution, expand vertically.</p>
+                    </div>
+                </div>
+                <p style="margin-top: 32px; font-size: 16px; opacity: 0.8; text-align: center;">
+                    Example: Get Sig Sauer to sponsor a firearms site, offer free listings to instructors&mdash;while capturing all relationships and data.
+                </p>
+            </div>
+            <span class="slide-number">8 / 20</span>
+        </div>
+
+        <!-- Slide 9: What to Target -->
+        <div class="slide slide-light" data-slide="9">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Selection Criteria</h2>
+                <div class="grid-2" style="margin-top: 24px;">
+                    <div class="card card-light" style="border-left: 4px solid #2d7a3e;">
+                        <h3 style="color: #2d7a3e;">Target These</h3>
+                        <ul>
+                            <li>Already unaggregated industries</li>
+                            <li>Verticals big business won't touch</li>
+                            <li>Real-time data-sensitive industries</li>
+                            <li>Industries with cap-ex budget structures</li>
+                            <li>Obscure data aggregators (ship movements, etc.)</li>
+                        </ul>
+                    </div>
+                    <div class="card card-light" style="border-left: 4px solid #971d00;">
+                        <h3 style="color: #971d00;">Avoid These</h3>
+                        <ul style="list-style: none;">
+                            <li style="padding-left: 24px; position: relative;"><span style="position: absolute; left: 0; color: #971d00;">-</span>Heavily regulated (finance, healthcare) without resources</li>
+                            <li style="padding-left: 24px; position: relative;"><span style="position: absolute; left: 0; color: #971d00;">-</span>Anything a big tech company cares about</li>
+                            <li style="padding-left: 24px; position: relative;"><span style="position: absolute; left: 0; color: #971d00;">-</span>Static directories (live data has defensibility)</li>
+                            <li style="padding-left: 24px; position: relative;"><span style="position: absolute; left: 0; color: #971d00;">-</span>Consumer-focused without institutional buyers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">9 / 20</span>
+        </div>
+
+        <!-- Slide 10: Why SEO Distribution is Dying -->
+        <div class="slide slide-accent" data-slide="10">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content" style="text-align: center;">
+                <h2>The Window is Closing</h2>
+                <p class="big-quote" style="border: none; text-align: center; padding: 0;">
+                    "SEO-style cheap distribution is going to be dead in 3-5 years. Get distribution while you can."
+                </p>
+                <p style="margin-top: 32px; font-size: 18px; max-width: 700px;">
+                    LLMs are changing how people form consideration sets. The way discovery works is fundamentally shifting. Capture relationships now.
+                </p>
+            </div>
+            <span class="slide-number">10 / 20</span>
+        </div>
+
+        <!-- Slide 11: Cap-Ex Opportunities Intro -->
+        <div class="slide slide-orange" data-slide="11">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content" style="text-align: center;">
+                <h2>Cap-Ex Opportunities</h2>
+                <p style="font-size: 22px; max-width: 800px; margin: 0 auto;">
+                    Industries where customers make money from infrastructure investment, enabling 2-3x pricing and stickier relationships.
+                </p>
+                <div style="margin-top: 48px;">
+                    <span class="tag">Automotive Services</span>
+                    <span class="tag">Energy</span>
+                    <span class="tag">Infrastructure</span>
+                    <span class="tag">Healthcare</span>
+                    <span class="tag">Commercial Real Estate</span>
+                    <span class="tag">Manufacturing</span>
+                    <span class="tag">Agriculture</span>
+                    <span class="tag">Utilities</span>
+                </div>
+            </div>
+            <span class="slide-number">11 / 20</span>
+        </div>
+
+        <!-- Slide 12: Opportunity - Auto Glass -->
+        <div class="slide slide-light" data-slide="12">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Auto Glass & ADAS Calibration</h2>
+                <div class="grid-2">
+                    <div>
+                        <p style="font-size: 16px; line-height: 1.7; margin-bottom: 20px;">
+                            <strong>Market:</strong> $20.2B aftermarket glass, ADAS calibration growing to $5.8B by 2030. Calibration costs $300-800 per vehicle.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; margin-bottom: 20px;">
+                            <strong>Problem:</strong> Safelite dominates but only 26% of shops have calibration equipment ($15K-50K/unit). Insurers need certified networks.
+                        </p>
+                        <div class="capex-highlight">
+                            <strong>Cap-Ex Angle:</strong> Equipment financing bundled with network membership. Insurance companies fund rollout to ensure calibration compliance.
+                        </div>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Distribution Path</h3>
+                        <ul>
+                            <li>Partner with insurance carriers (70%+ of claims)</li>
+                            <li>Become preferred network for claims routing</li>
+                            <li>Control insurer-to-shop relationships</li>
+                        </ul>
+                        <p style="margin-top: 16px; font-size: 14px; color: var(--deep-orange);">
+                            <strong>Sponsors:</strong> State Farm, Progressive, Autel, Hunter
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">12 / 20</span>
+        </div>
+
+        <!-- Slide 13: Opportunity - Generator Network -->
+        <div class="slide slide-dark" data-slide="13">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Generator & Backup Power</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">The Opportunity</h3>
+                        <p style="font-size: 16px; line-height: 1.7;">
+                            Generac dominates hardware but installers are completely fragmented. No standardized quoting, wildly variable quality.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; margin-top: 12px;">
+                            <strong>Token Play:</strong> Aggregate installer network, track every installation. Know where every backup power system is = know grid resilience gaps.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Cap-Ex Angle</h3>
+                        <p style="font-size: 16px; line-height: 1.7;">
+                            Municipalities and utilities can fund backup power programs as infrastructure investment. HOAs and commercial properties capitalize generator systems.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; margin-top: 12px;">
+                            <strong>Synergy:</strong> Direct tie to PowerOutage data&mdash;outages drive generator demand.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">13 / 20</span>
+        </div>
+
+        <!-- Slide 14: Opportunity - EV Charging -->
+        <div class="slide slide-light" data-slide="14">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>EV Charging Infrastructure</h2>
+                <div class="grid-2">
+                    <div>
+                        <p style="font-size: 16px; line-height: 1.7; margin-bottom: 16px;">
+                            ChargePoint, EVgo exist but 30%+ of chargers broken at any time. No aggregated reliability data.
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7; margin-bottom: 16px;">
+                            <strong>Token Play:</strong> Aggregate real-time status, reliability scores, wait times. Become the "TripAdvisor for EV charging."
+                        </p>
+                        <div class="capex-highlight">
+                            <strong>Cap-Ex Angle:</strong> Pure cap-ex for utilities, retail, municipalities. Reliability data influences where billions in federal infrastructure money flows.
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-box card card-light">
+                            <div class="stat-number" style="color: var(--deep-orange);">30%+</div>
+                            <div class="stat-label" style="color: var(--text-color);">Chargers broken at any time</div>
+                        </div>
+                        <div class="stat-box card card-light" style="margin-top: 16px;">
+                            <div class="stat-number" style="color: var(--deep-orange);">$7.5B</div>
+                            <div class="stat-label" style="color: var(--text-color);">Federal EV infrastructure program</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">14 / 20</span>
+        </div>
+
+        <!-- Slide 15: More Opportunities Grid -->
+        <div class="slide slide-accent" data-slide="15">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>More Cap-Ex Opportunities</h2>
+                <div class="grid-3" style="margin-top: 24px;">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Solar & Battery</h3>
+                        <p style="font-size: 14px;">30% ITC flows to capital investors. Fragmented installers need quality tracking.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Elevator Maintenance</h3>
+                        <p style="font-size: 14px;">$100K-500K modernization projects. OEMs have 80% margins on service.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Medical Equipment</h3>
+                        <p style="font-size: 14px;">Imaging equipment $500K-$3M. Third-party service saves 30-50%.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Commercial HVAC</h3>
+                        <p style="font-size: 14px;">Building controls are capitalized assets. Utility efficiency programs.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Water Infrastructure</h3>
+                        <p style="font-size: 14px;">$625B infrastructure bill. Lead pipe replacement mandated.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow); font-size: 18px;">Data Center Edge</h3>
+                        <p style="font-size: 14px;">Edge facilities $1-10M each. Reliability affects financing terms.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">15 / 20</span>
+        </div>
+
+        <!-- Slide 16: The Common Pattern -->
+        <div class="slide slide-dark" data-slide="16">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content" style="text-align: center;">
+                <h2>The Common Pattern</h2>
+                <div style="max-width: 800px; margin: 32px auto;">
+                    <div class="layer-row" style="justify-content: center; text-align: left;">
+                        <span style="color: var(--sand-yellow); font-weight: bold;">1.</span>
+                        <span style="grid-column: span 2;">OEMs protect service revenue, independents are fragmented</span>
+                    </div>
+                    <div class="layer-row" style="justify-content: center; text-align: left;">
+                        <span style="color: var(--sand-yellow); font-weight: bold;">2.</span>
+                        <span style="grid-column: span 2;">Capital intensity of equipment creates financing opportunities</span>
+                    </div>
+                    <div class="layer-row" style="justify-content: center; text-align: left;">
+                        <span style="color: var(--sand-yellow); font-weight: bold;">3.</span>
+                        <span style="grid-column: span 2;">Financing bundled with network membership = distribution moat</span>
+                    </div>
+                    <div class="layer-row" style="justify-content: center; text-align: left;">
+                        <span style="color: var(--sand-yellow); font-weight: bold;">4.</span>
+                        <span style="grid-column: span 2;">Real-time data creates defensibility static directories lack</span>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">16 / 20</span>
+        </div>
+
+        <!-- Slide 17: Key Insight - Self-Hosted Models -->
+        <div class="slide slide-light" data-slide="17">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>On Self-Hosted Models</h2>
+                <p class="big-quote" style="color: var(--text-color); border-color: var(--deep-orange);">
+                    "Self-hosted non-frontier models will be the workhorses and steam engines of this era."
+                </p>
+                <div class="grid-2" style="margin-top: 32px;">
+                    <div class="card card-light">
+                        <h3>The Economics</h3>
+                        <p>A Qwen 80B at 6-bit quant on a $4K Mac Studio is "like having a smart high schooler do data entry 24/7" for years at minimal marginal cost.</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3>The Strategy</h3>
+                        <p>Not about cost savings (5x more than OpenAI). It's about ownership, learning from first principles, and protection from vendor lock-in.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">17 / 20</span>
+        </div>
+
+        <!-- Slide 18: Key Quotes -->
+        <div class="slide slide-orange" data-slide="18">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Key Principles</h2>
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <div class="card" style="background: rgba(0,0,0,0.2); margin-bottom: 16px;">
+                        <p style="font-size: 18px; font-style: italic;">"Figure out how to control the relationships with the biggest wallets in the industry."</p>
+                    </div>
+                    <div class="card" style="background: rgba(0,0,0,0.2); margin-bottom: 16px;">
+                        <p style="font-size: 18px; font-style: italic;">"Aggregate an entire industry. Build a platform. Get everyone on it. Control distribution."</p>
+                    </div>
+                    <div class="card" style="background: rgba(0,0,0,0.2); margin-bottom: 16px;">
+                        <p style="font-size: 18px; font-style: italic;">"Golf courses, wedding venues, birthday places... all of that will go on and no one sees it."</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">18 / 20</span>
+        </div>
+
+        <!-- Slide 19: The Playbook Summary -->
+        <div class="slide slide-dark" data-slide="19">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Playbook</h2>
+                <div class="grid-2" style="margin-top: 24px;">
+                    <ul style="font-size: 18px;">
+                        <li>Pick a vertical where distribution is capturable</li>
+                        <li>Aggregate the fragmented&mdash;the messier, the better</li>
+                        <li>Capture real-time data (not static directories)</li>
+                        <li>Control relationships with institutional buyers</li>
+                    </ul>
+                    <ul style="font-size: 18px;">
+                        <li>Use local LLMs for data enrichment</li>
+                        <li>Think Cap-Ex, not Op-Ex</li>
+                        <li>Structure around how customers make money</li>
+                        <li>Move now&mdash;the window is closing</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">19 / 20</span>
+        </div>
+
+        <!-- Slide 20: Contact -->
+        <div class="slide slide-title" data-slide="20">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <h1 style="color: var(--white);">Let's Build</h1>
+            <p class="subtitle" style="color: var(--body-color); margin-bottom: 32px;">Distribution control in your vertical</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;">
+                <a href="https://hyder.me" style="color: var(--body-color); font-size: 18px; text-decoration: underline;">hyder.me</a>
+                <a href="mailto:kenny@hyder.me" style="color: var(--body-color); font-size: 18px; text-decoration: underline;">kenny@hyder.me</a>
+            </div>
+            <span class="slide-number" style="color: var(--body-color);">20 / 20</span>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+        <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 20;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            document.querySelector(`[data-slide="${n}"]`).classList.add('active');
+            currentSlide = n;
+
+            // Update progress bar
+            document.getElementById('progress').style.width = `${(n / totalSlides) * 100}%`;
+
+            // Update URL hash
+            history.replaceState(null, null, `#${n}`);
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Touch navigation
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        // Check URL hash on load
+        window.addEventListener('load', () => {
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (hash >= 1 && hash <= totalSlides) {
+                showSlide(hash);
+            }
+        });
+    </script>
+</body>
+</html>

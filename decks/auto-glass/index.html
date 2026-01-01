@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Glass & ADAS Calibration Opportunity | Hyder Media</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/logos/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --roboto-mono: 'Roboto Mono', monospace;
+            --pt-sans: 'PT Sans', sans-serif;
+            --body-color: #efe2b9;
+            --text-color: #354231;
+            --deep-orange: #d14d00;
+            --dark-brown: #795232;
+            --yellow: #e1d42b;
+            --sand-yellow: #f1ca4b;
+            --purple: #4c2c4b;
+            --dark-purple: #150218;
+            --white: #fff;
+            --light-body: #fffff0;
+            --blue: #1e40af;
+            --light-blue: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--roboto-mono);
+            background: var(--dark-purple);
+            overflow: hidden;
+        }
+
+        .deck-container {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-title {
+            background: linear-gradient(135deg, var(--blue), var(--dark-purple));
+        }
+
+        .slide-dark {
+            background: var(--dark-purple);
+            color: var(--body-color);
+        }
+
+        .slide-light {
+            background: var(--body-color);
+            color: var(--text-color);
+        }
+
+        .slide-accent {
+            background: linear-gradient(135deg, var(--purple), var(--dark-purple));
+            color: var(--body-color);
+        }
+
+        .slide-orange {
+            background: linear-gradient(135deg, var(--deep-orange), var(--dark-brown));
+            color: var(--white);
+        }
+
+        .slide-blue {
+            background: linear-gradient(135deg, var(--blue), #1e3a5f);
+            color: var(--white);
+        }
+
+        .logo {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            height: 40px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        h1 {
+            font-family: var(--pt-sans);
+            font-size: 58px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: var(--pt-sans);
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 32px;
+        }
+
+        h3 {
+            font-family: var(--pt-sans);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            opacity: 0.9;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .content {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .big-quote {
+            font-size: 32px;
+            font-style: italic;
+            text-align: center;
+            max-width: 900px;
+            line-height: 1.4;
+            border-left: 4px solid var(--light-blue);
+            padding-left: 32px;
+            text-align: left;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .card-light {
+            background: var(--white);
+            color: var(--text-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--light-blue);
+            margin-bottom: 12px;
+        }
+
+        .card-light h3 {
+            color: var(--blue);
+        }
+
+        .card p, .card li {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: "+";
+            position: absolute;
+            left: 0;
+            color: var(--light-blue);
+            font-weight: bold;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .stat-number {
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--sand-yellow);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .highlight {
+            color: var(--sand-yellow);
+        }
+
+        .highlight-blue {
+            color: var(--light-blue);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--blue);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-orange {
+            background: var(--deep-orange);
+        }
+
+        .tag-green {
+            background: #2d7a3e;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            max-width: 900px;
+            margin: 32px auto 0;
+        }
+
+        .timeline-item {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline-item::after {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+
+        .problem-box {
+            background: rgba(255,0,0,0.1);
+            border-left: 4px solid #dc2626;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .solution-box {
+            background: rgba(0,255,0,0.1);
+            border-left: 4px solid #16a34a;
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .capex-box {
+            background: rgba(209, 77, 0, 0.15);
+            border-left: 4px solid var(--deep-orange);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 16px;
+        }
+
+        .competitor-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .competitor-card h4 {
+            font-size: 18px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .competitor-card .share {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--blue);
+        }
+
+        .competitor-card p {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .flow-box {
+            background: rgba(255,255,255,0.1);
+            padding: 16px 24px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .flow-arrow span {
+            font-size: 24px;
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--light-blue);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--light-blue);
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: var(--blue);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 40px;
+            }
+            h1 { font-size: 38px; }
+            h2 { font-size: 30px; }
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="deck-container">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-title active" data-slide="1">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <h1 style="color: var(--white);">Auto Glass & ADAS<br>Calibration Network</h1>
+            <p class="subtitle" style="color: var(--body-color);">A $20B+ market opportunity in distribution control</p>
+            <span class="slide-number" style="color: var(--body-color);">1 / 18</span>
+        </div>
+
+        <!-- Slide 2: Executive Summary -->
+        <div class="slide slide-dark" data-slide="2">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Executive Summary</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">The Opportunity</h3>
+                        <p style="font-size: 17px; line-height: 1.7;">
+                            ADAS (Advanced Driver Assistance Systems) is exploding. 80%+ of new vehicles have sensors that require calibration after windshield replacement. Most independent shops lack the equipment.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">The Play</h3>
+                        <p style="font-size: 17px; line-height: 1.7;">
+                            Aggregate independent auto glass shops, provide calibration equipment financing, and become the network of record for insurance companies routing claims.
+                        </p>
+                    </div>
+                </div>
+                <div class="capex-box" style="max-width: 800px; margin: 24px auto 0; background: rgba(241, 202, 75, 0.15); border-color: var(--sand-yellow);">
+                    <p style="font-size: 16px; text-align: center;">
+                        <strong>Cap-Ex Angle:</strong> Equipment financing bundled with network membership. Insurance companies fund equipment rollout for calibration compliance.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number">2 / 18</span>
+        </div>
+
+        <!-- Slide 3: Market Size -->
+        <div class="slide slide-light" data-slide="3">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Market Size</h2>
+                <div class="grid-4">
+                    <div class="stat-box card card-light">
+                        <div class="stat-number" style="color: var(--blue);">$20.2B</div>
+                        <div class="stat-label" style="color: var(--text-color);">Aftermarket glass (2025)</div>
+                    </div>
+                    <div class="stat-box card card-light">
+                        <div class="stat-number" style="color: var(--blue);">$28.5B</div>
+                        <div class="stat-label" style="color: var(--text-color);">Projected by 2030</div>
+                    </div>
+                    <div class="stat-box card card-light">
+                        <div class="stat-number" style="color: var(--blue);">$5.8B</div>
+                        <div class="stat-label" style="color: var(--text-color);">ADAS calibration by 2030</div>
+                    </div>
+                    <div class="stat-box card card-light">
+                        <div class="stat-number" style="color: var(--blue);">7.15%</div>
+                        <div class="stat-label" style="color: var(--text-color);">CAGR growth rate</div>
+                    </div>
+                </div>
+                <div style="margin-top: 32px; text-align: center;">
+                    <p style="font-size: 18px; color: var(--text-color);">
+                        The auto glass industry is undergoing a fundamental shift from simple glass replacement to <strong>technical calibration services</strong>.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">3 / 18</span>
+        </div>
+
+        <!-- Slide 4: ADAS Explosion -->
+        <div class="slide slide-blue" data-slide="4">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The ADAS Explosion</h2>
+                <div class="grid-2">
+                    <div>
+                        <div class="stat-box" style="text-align: left;">
+                            <div class="stat-number" style="font-size: 72px;">80%+</div>
+                            <div class="stat-label" style="font-size: 16px;">of new vehicles have at least one ADAS feature</div>
+                        </div>
+                        <p style="font-size: 16px; margin-top: 24px; line-height: 1.7;">
+                            Forward-facing cameras, radar sensors, and LiDAR units are now standard. Every windshield replacement on these vehicles requires calibration.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h3>Calibration Economics</h3>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Cost:</strong> $300-800 per vehicle</li>
+                            <li><strong>Time:</strong> 2-3 hours labor</li>
+                            <li><strong>Equipment:</strong> $15K-50K per unit</li>
+                            <li><strong>Training:</strong> Specialized certification required</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">4 / 18</span>
+        </div>
+
+        <!-- Slide 5: The Problem -->
+        <div class="slide slide-light" data-slide="5">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Problem</h2>
+                <div class="grid-2">
+                    <div>
+                        <div class="problem-box" style="margin-bottom: 20px;">
+                            <h3 style="color: #dc2626; font-size: 20px;">Equipment Gap</h3>
+                            <p style="font-size: 16px;">Only <strong>26%</strong> of workshops have ADAS calibration equipment. The other 74% lose the entire job.</p>
+                        </div>
+                        <div class="problem-box" style="margin-bottom: 20px;">
+                            <h3 style="color: #dc2626; font-size: 20px;">Capital Barrier</h3>
+                            <p style="font-size: 16px;">$15K-50K per calibration unit is prohibitive for independent shops operating on thin margins.</p>
+                        </div>
+                        <div class="problem-box">
+                            <h3 style="color: #dc2626; font-size: 20px;">Certification Chaos</h3>
+                            <p style="font-size: 16px;">Insurers now require certified procedures. No standardization across independent networks.</p>
+                        </div>
+                    </div>
+                    <div class="card card-light">
+                        <h3>Insurance Pressure</h3>
+                        <p style="font-size: 16px; line-height: 1.7; margin-bottom: 16px;">
+                            "Insurance companies are starting to emphasize certifications and standards more. They want to ensure only qualified professionals handle repairs."
+                        </p>
+                        <p style="font-size: 16px; line-height: 1.7;">
+                            Insurers are liable if an uncalibrated ADAS system causes an accident. They have strong incentive to fund compliance infrastructure.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">5 / 18</span>
+        </div>
+
+        <!-- Slide 6: The Safelite Problem -->
+        <div class="slide slide-dark" data-slide="6">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Safelite Problem</h2>
+                <p style="font-size: 18px; margin-bottom: 32px; text-align: center;">Safelite controls distribution through a clever structural advantage</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Safelite AutoGlass</h3>
+                        <p style="font-size: 28px; color: var(--sand-yellow); margin-bottom: 12px;">800+ locations</p>
+                        <p style="font-size: 28px; color: var(--sand-yellow); margin-bottom: 12px;">7,000+ mobile units</p>
+                        <p style="font-size: 16px; opacity: 0.8;">The service/repair side of the business</p>
+                    </div>
+                    <div class="card" style="border: 2px solid var(--deep-orange);">
+                        <h3 style="color: var(--deep-orange);">Safelite Solutions</h3>
+                        <p style="font-size: 28px; color: var(--deep-orange); margin-bottom: 12px;">Claims management</p>
+                        <p style="font-size: 28px; color: var(--deep-orange); margin-bottom: 12px;">9,000+ affiliate providers</p>
+                        <p style="font-size: 16px; opacity: 0.8;">Routes claims to their own shops first</p>
+                    </div>
+                </div>
+                <div style="margin-top: 32px; text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <p style="font-size: 16px; font-style: italic;">
+                        "When you call your insurance company for glass, you're often talking to Safelite Solutions&mdash;who routes claims to their own shops."
+                    </p>
+                    <p style="font-size: 14px; margin-top: 12px; opacity: 0.7;">
+                        The Independent Glass Association filed an FTC antitrust complaint in 2025.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number">6 / 18</span>
+        </div>
+
+        <!-- Slide 7: Market Structure -->
+        <div class="slide slide-light" data-slide="7">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Market Structure</h2>
+                <div class="grid-3" style="margin-bottom: 24px;">
+                    <div class="competitor-card">
+                        <h4>Safelite</h4>
+                        <div class="share">~20%</div>
+                        <p>Market share, but controls claims routing through Safelite Solutions</p>
+                    </div>
+                    <div class="competitor-card">
+                        <h4>Independents</h4>
+                        <div class="share">~80%</div>
+                        <p>Thousands of fragmented local shops, no unified network</p>
+                    </div>
+                    <div class="competitor-card">
+                        <h4>Insurance Claims</h4>
+                        <div class="share">40%+</div>
+                        <p>Of all replacements are insurance-backed</p>
+                    </div>
+                </div>
+                <div class="card card-light" style="max-width: 700px; margin: 0 auto;">
+                    <p style="font-size: 16px; text-align: center;">
+                        <strong>The opportunity:</strong> Aggregate the 80% of independents into a network that can compete for the 40%+ of insurance-routed claims.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">7 / 18</span>
+        </div>
+
+        <!-- Slide 8: The Solution -->
+        <div class="slide slide-blue" data-slide="8">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Solution</h2>
+                <p style="font-size: 18px; margin-bottom: 32px; text-align: center;">A three-layer platform for distribution control</p>
+                <div class="grid-3">
+                    <div class="card">
+                        <h3>1. Aggregate</h3>
+                        <p>Unified network of independent shops with standardized quoting, quality tracking, and ADAS capability mapping.</p>
+                    </div>
+                    <div class="card">
+                        <h3>2. Equip</h3>
+                        <p>Equipment financing/leasing bundled with network membership. Turn cap-ex barrier into distribution moat.</p>
+                    </div>
+                    <div class="card">
+                        <h3>3. Distribute</h3>
+                        <p>Become the preferred network for insurance carriers. Control the relationship between insurers and shops.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">8 / 18</span>
+        </div>
+
+        <!-- Slide 9: The Cap-Ex Flywheel -->
+        <div class="slide slide-orange" data-slide="9">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Cap-Ex Flywheel</h2>
+                <div class="flow-arrow">
+                    <div class="flow-box">
+                        <strong>Finance Equipment</strong>
+                        <p style="font-size: 12px; margin-top: 4px;">$15K-50K per unit</p>
+                    </div>
+                    <span>&rarr;</span>
+                    <div class="flow-box">
+                        <strong>Join Network</strong>
+                        <p style="font-size: 12px; margin-top: 4px;">Exclusivity agreement</p>
+                    </div>
+                    <span>&rarr;</span>
+                    <div class="flow-box">
+                        <strong>Get Claims</strong>
+                        <p style="font-size: 12px; margin-top: 4px;">Insurance routing</p>
+                    </div>
+                    <span>&rarr;</span>
+                    <div class="flow-box">
+                        <strong>Pay Off Equipment</strong>
+                        <p style="font-size: 12px; margin-top: 4px;">From claim revenue</p>
+                    </div>
+                </div>
+                <div class="card" style="background: rgba(0,0,0,0.2); max-width: 800px; margin: 32px auto 0;">
+                    <p style="font-size: 18px; text-align: center;">
+                        <strong>The insight:</strong> Equipment financing creates stickiness. Shops with financed calibration equipment can't leave the network without losing their investment.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number">9 / 18</span>
+        </div>
+
+        <!-- Slide 10: Insurance Partnership Model -->
+        <div class="slide slide-dark" data-slide="10">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Insurance Partnership Model</h2>
+                <p style="font-size: 18px; margin-bottom: 32px; text-align: center;">Why insurers will fund your growth</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Their Problem</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Liable if uncalibrated ADAS causes accidents</li>
+                            <li>Safelite controls too much of the flow</li>
+                            <li>No visibility into independent shop quality</li>
+                            <li>Rising claims costs (15% premium increase after 2+ claims)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Your Solution</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Certified calibration network they can trust</li>
+                            <li>Alternative to Safelite dependence</li>
+                            <li>Quality tracking and compliance data</li>
+                            <li>Equipment subsidy = calibration compliance</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 24px; text-align: center; font-size: 16px; opacity: 0.8;">
+                    Insurance companies paying 70%+ of claims have strong incentive to control the network.
+                </p>
+            </div>
+            <span class="slide-number">10 / 18</span>
+        </div>
+
+        <!-- Slide 11: 3-Year Roadmap -->
+        <div class="slide slide-light" data-slide="11">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>3-Year Roadmap</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">Y1</div>
+                        <h3 style="font-size: 18px; color: var(--blue);">Aggregate</h3>
+                        <p style="font-size: 14px;">Free listings, standardized quoting. Map ADAS capabilities. Build shop database.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">Y2</div>
+                        <h3 style="font-size: 18px; color: var(--blue);">Partner</h3>
+                        <p style="font-size: 14px;">1-2 major insurers. Equipment financing program. Claims routing integration.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">Y3</div>
+                        <h3 style="font-size: 18px; color: var(--blue);">Dominate</h3>
+                        <p style="font-size: 14px;">Control insurer-shop relationships. Expand calibration data products. Vertical expansion.</p>
+                    </div>
+                </div>
+                <div class="card card-light" style="max-width: 700px; margin: 32px auto 0;">
+                    <p style="font-size: 15px; text-align: center;">
+                        <strong>Success metric:</strong> By Year 3, every major insurer routes claims through your network before Safelite Solutions.
+                    </p>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">11 / 18</span>
+        </div>
+
+        <!-- Slide 12: Data Moat -->
+        <div class="slide slide-accent" data-slide="12">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>The Data Moat</h2>
+                <p style="font-size: 18px; margin-bottom: 32px; text-align: center;">ADAS calibration data is valuable beyond glass</p>
+                <div class="grid-3">
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For OEMs</h3>
+                        <p>Calibration quality data for warranty claims. Sensor performance across conditions.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For AV Companies</h3>
+                        <p>Real-world sensor calibration data. Edge cases and failure modes.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For Insurers</h3>
+                        <p>Calibration compliance for underwriting. Risk models for ADAS-equipped vehicles.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For Fleet Managers</h3>
+                        <p>Vehicle lifecycle integration. Predictive maintenance signals.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For Equipment Mfrs</h3>
+                        <p>Usage patterns. Feature adoption. Market intelligence.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px;">For Regulators</h3>
+                        <p>Industry standards development. Safety compliance tracking.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">12 / 18</span>
+        </div>
+
+        <!-- Slide 13: Potential Sponsors -->
+        <div class="slide slide-light" data-slide="13">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Strategic Partners</h2>
+                <table>
+                    <tr>
+                        <th>Partner Type</th>
+                        <th>Examples</th>
+                        <th>Value Proposition</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Insurance Carriers</strong></td>
+                        <td>State Farm, Progressive, GEICO, Allstate</td>
+                        <td>Alternative to Safelite, calibration compliance, quality data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Equipment Manufacturers</strong></td>
+                        <td>Autel, Hunter, Bosch</td>
+                        <td>Distribution channel, financing partner, market data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Auto OEMs</strong></td>
+                        <td>Toyota, Ford, GM</td>
+                        <td>Certified calibration network, warranty integration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Glass Distributors</strong></td>
+                        <td>Pilkington, PGW, Vitro</td>
+                        <td>Bundled distribution, installer network access</td>
+                    </tr>
+                </table>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">13 / 18</span>
+        </div>
+
+        <!-- Slide 14: Competitive Advantages -->
+        <div class="slide slide-blue" data-slide="14">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Why This Works</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Why Safelite Won't</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Vertically integrated&mdash;don't want to help competitors</li>
+                            <li>Solutions arm profits from current routing</li>
+                            <li>Antitrust scrutiny increasing</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Why Equipment Mfrs Won't</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Sell hardware, not networks</li>
+                            <li>No insurance relationships</li>
+                            <li>Not in services business</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Why Insurers Won't</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Don't want to run shop networks</li>
+                            <li>Core competency is risk, not operations</li>
+                            <li>Happy to fund others who do it</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Why Independents Can't</h3>
+                        <ul style="font-size: 16px;">
+                            <li>Too fragmented to self-organize</li>
+                            <li>No capital for equipment</li>
+                            <li>No tech/data capabilities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">14 / 18</span>
+        </div>
+
+        <!-- Slide 15: Revenue Model -->
+        <div class="slide slide-dark" data-slide="15">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Revenue Model</h2>
+                <div class="grid-3">
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Network Fees</h3>
+                        <p style="font-size: 16px;">% of claims routed through network. Transaction fee on each job.</p>
+                        <p style="font-size: 24px; color: var(--sand-yellow); margin-top: 12px;">5-10% per claim</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Equipment Financing</h3>
+                        <p style="font-size: 16px;">Lease/finance calibration equipment. Spread on financing.</p>
+                        <p style="font-size: 24px; color: var(--sand-yellow); margin-top: 12px;">$500-1K/mo/unit</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--sand-yellow);">Data Products</h3>
+                        <p style="font-size: 16px;">Calibration data to OEMs, insurers, AV companies.</p>
+                        <p style="font-size: 24px; color: var(--sand-yellow); margin-top: 12px;">Enterprise SaaS</p>
+                    </div>
+                </div>
+                <div style="margin-top: 32px; text-align: center;">
+                    <span class="tag-orange tag">Short-term: Network fees</span>
+                    <span class="tag-orange tag">Mid-term: Equipment financing</span>
+                    <span class="tag-orange tag">Long-term: Data products</span>
+                </div>
+            </div>
+            <span class="slide-number">15 / 18</span>
+        </div>
+
+        <!-- Slide 16: Expansion Opportunities -->
+        <div class="slide slide-light" data-slide="16">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Expansion Opportunities</h2>
+                <p style="font-size: 16px; margin-bottom: 24px; text-align: center;">Once you control auto glass distribution, adjacent verticals open up</p>
+                <div class="grid-3">
+                    <div class="card card-light">
+                        <h3 style="font-size: 18px;">Collision Repair</h3>
+                        <p>Same ADAS calibration requirements. Same insurer relationships. Same fragmented independents.</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3 style="font-size: 18px;">PDR (Paintless Dent)</h3>
+                        <p>Often bundled with glass. Mobile techs need network access. Insurance routing opportunity.</p>
+                    </div>
+                    <div class="card card-light">
+                        <h3 style="font-size: 18px;">Fleet Services</h3>
+                        <p>Commercial fleets need standardized vendors. Lifecycle data integration. Predictive maintenance.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number" style="color: var(--text-color);">16 / 18</span>
+        </div>
+
+        <!-- Slide 17: Key Risks -->
+        <div class="slide slide-accent" data-slide="17">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="content">
+                <h2>Key Risks & Mitigations</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="font-size: 18px; color: #fca5a5;">Safelite Response</h3>
+                        <p style="font-size: 15px; margin-bottom: 12px;">They could aggressively compete or acquire.</p>
+                        <p style="font-size: 14px; opacity: 0.8;"><strong>Mitigation:</strong> FTC scrutiny limits M&A. Build insurer relationships they can't replicate.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px; color: #fca5a5;">Equipment Financing Risk</h3>
+                        <p style="font-size: 15px; margin-bottom: 12px;">Default risk on equipment loans.</p>
+                        <p style="font-size: 14px; opacity: 0.8;"><strong>Mitigation:</strong> Equipment is collateral. Claims revenue is predictable. Partner with equipment finance specialists.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px; color: #fca5a5;">Insurance Partner Concentration</h3>
+                        <p style="font-size: 15px; margin-bottom: 12px;">Dependence on few major insurers.</p>
+                        <p style="font-size: 14px; opacity: 0.8;"><strong>Mitigation:</strong> Multi-carrier strategy from start. Data products reduce dependence.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 18px; color: #fca5a5;">Tech Commoditization</h3>
+                        <p style="font-size: 15px; margin-bottom: 12px;">Calibration equipment prices could drop.</p>
+                        <p style="font-size: 14px; opacity: 0.8;"><strong>Mitigation:</strong> Network effects compound. Data moat grows. Switching costs remain.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">17 / 18</span>
+        </div>
+
+        <!-- Slide 18: Contact -->
+        <div class="slide slide-title" data-slide="18">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <h1 style="color: var(--white);">Let's Build This</h1>
+            <p class="subtitle" style="color: var(--body-color); margin-bottom: 32px;">Auto glass is just the beginning</p>
+            <div style="display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;">
+                <a href="https://hyder.me" style="color: var(--body-color); font-size: 18px; text-decoration: underline;">hyder.me</a>
+                <a href="mailto:kenny@hyder.me" style="color: var(--body-color); font-size: 18px; text-decoration: underline;">kenny@hyder.me</a>
+            </div>
+            <span class="slide-number" style="color: var(--body-color);">18 / 18</span>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+        <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 18;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            document.querySelector(`[data-slide="${n}"]`).classList.add('active');
+            currentSlide = n;
+
+            document.getElementById('progress').style.width = `${(n / totalSlides) * 100}%`;
+            history.replaceState(null, null, `#${n}`);
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (hash >= 1 && hash <= totalSlides) {
+                showSlide(hash);
+            }
+        });
+    </script>
+</body>
+</html>
