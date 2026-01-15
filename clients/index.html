@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Client Portal | Hyder Media</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/responsive.css" />
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--body-color);
+            background-image: url('/assets/imgs/bgs-thumbs/hero-bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            max-width: 180px;
+            height: auto;
+        }
+
+        .login-title {
+            text-align: center;
+            color: var(--dark-brown-color);
+            font-family: var(--pt-sans);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0d5c0;
+            border-radius: 6px;
+            font-family: var(--roboto-mono);
+            font-size: 15px;
+            color: var(--text-color);
+            background: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--dark-brown-color);
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #a0a0a0;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--text-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--roboto-mono);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: var(--dark-brown-color);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #059669;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-color);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--dark-brown-color);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <a href="https://hyder.me">
+                    <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" />
+                </a>
+            </div>
+
+            <h1 class="login-title">Client Portal</h1>
+            <p class="login-subtitle">Sign in to access your project dashboard</p>
+
+            <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="you@company.com"
+                        required
+                        autocomplete="email"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    />
+                </div>
+
+                <button type="submit" id="login-btn" class="login-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <a href="https://hyder.me" class="back-link">&larr; Back to Hyder Media</a>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://yzwjfkidoijohnmrixaq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6d2pma2lkb2lqb2hubXJpeGFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY4NjM4MjAsImV4cCI6MjA0MjQzOTgyMH0.hBBXpQpWJYsLz7N2FVx2gp7bKJGEyOvFh4wj8R5Gbxc';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Client routing configuration
+        const CLIENT_ROUTES = {
+            'digistore24': '/clients/digistore24/',
+            // Add more clients here as needed
+        };
+
+        // Check if already logged in
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                redirectToClientPage(session.user);
+            }
+        }
+
+        // Redirect to client's page based on email domain or metadata
+        function redirectToClientPage(user) {
+            const email = user.email.toLowerCase();
+
+            // Check for known client emails
+            if (email.includes('digistore')) {
+                window.location.href = CLIENT_ROUTES['digistore24'];
+                return;
+            }
+
+            // Check user metadata for client assignment
+            const clientId = user.user_metadata?.client_id;
+            if (clientId && CLIENT_ROUTES[clientId]) {
+                window.location.href = CLIENT_ROUTES[clientId];
+                return;
+            }
+
+            // Default redirect - could be a general dashboard
+            showError('No project assigned to your account. Please contact support.');
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successEl = document.getElementById('success-message');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        // Handle login form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+            // Hide previous messages
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                showSuccess('Login successful! Redirecting...');
+
+                // Redirect after short delay
+                setTimeout(() => {
+                    redirectToClientPage(data.user);
+                }, 1000);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Invalid email or password. Please try again.');
+
+                // Reset button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Sign In';
+            }
+        });
+
+        // Check session on page load
+        checkSession();
+    </script>
+</body>
+</html>
