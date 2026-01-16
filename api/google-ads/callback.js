@@ -75,23 +75,52 @@ export default async function handler(req, res) {
         // Calculate token expiry
         const expiresAt = new Date(Date.now() + (tokens.expires_in * 1000));
 
-        // Store connection in database
-        // Note: In production, you should associate this with the logged-in user
-        const { data: connection, error: dbError } = await supabase
+        // Check if connection already exists for this email
+        const { data: existingConnection } = await supabase
             .from('google_ads_connections')
-            .upsert({
-                email: userInfo.email,
-                access_token: tokens.access_token,
-                refresh_token: tokens.refresh_token,
-                token_expires_at: expiresAt.toISOString(),
-                login_customer_id: process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID,
-                is_active: true,
-                updated_at: new Date().toISOString(),
-            }, {
-                onConflict: 'email',
-            })
-            .select()
+            .select('id')
+            .eq('email', userInfo.email)
             .single();
+
+        let connection;
+        let dbError;
+
+        if (existingConnection) {
+            // Update existing connection
+            const result = await supabase
+                .from('google_ads_connections')
+                .update({
+                    access_token: tokens.access_token,
+                    refresh_token: tokens.refresh_token,
+                    token_expires_at: expiresAt.toISOString(),
+                    login_customer_id: process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID,
+                    is_active: true,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('id', existingConnection.id)
+                .select()
+                .single();
+            connection = result.data;
+            dbError = result.error;
+        } else {
+            // Insert new connection
+            const result = await supabase
+                .from('google_ads_connections')
+                .insert({
+                    email: userInfo.email,
+                    access_token: tokens.access_token,
+                    refresh_token: tokens.refresh_token,
+                    token_expires_at: expiresAt.toISOString(),
+                    login_customer_id: process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID,
+                    is_active: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                })
+                .select()
+                .single();
+            connection = result.data;
+            dbError = result.error;
+        }
 
         if (dbError) {
             console.error('Database error:', dbError);
