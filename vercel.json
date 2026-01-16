@@ -2,6 +2,21 @@
   "functions": {
     "api/contact.js": {
       "maxDuration": 10
+    },
+    "api/google-ads/auth.js": {
+      "maxDuration": 10
+    },
+    "api/google-ads/callback.js": {
+      "maxDuration": 30
+    },
+    "api/google-ads/sync.js": {
+      "maxDuration": 60
+    },
+    "api/google-ads/accounts.js": {
+      "maxDuration": 30
+    },
+    "api/google-ads/campaigns.js": {
+      "maxDuration": 30
     }
   }
 }
