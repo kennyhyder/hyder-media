@@ -11,6 +11,15 @@ export default function handler(req, res) {
     const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
     const redirectUri = process.env.GOOGLE_ADS_REDIRECT_URI || 'https://hyder.me/api/google-ads/callback';
 
+    // Debug mode - show config instead of redirecting
+    if (req.query.debug === 'true') {
+        return res.status(200).json({
+            clientId: clientId ? `${clientId.substring(0, 20)}...` : 'NOT SET',
+            redirectUri: redirectUri,
+            hasClientId: !!clientId,
+        });
+    }
+
     if (!clientId) {
         return res.status(500).json({ error: 'Google Ads client ID not configured' });
     }
@@ -22,8 +31,8 @@ export default function handler(req, res) {
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('scope', 'https://www.googleapis.com/auth/adwords email profile');
-    authUrl.searchParams.set('access_type', 'offline'); // Required for refresh token
-    authUrl.searchParams.set('prompt', 'consent'); // Force consent to get refresh token
+    authUrl.searchParams.set('access_type', 'offline');
+    authUrl.searchParams.set('prompt', 'consent');
 
     // Optional: Add state parameter for security
     const state = Buffer.from(JSON.stringify({
