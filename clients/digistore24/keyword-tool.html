@@ -894,22 +894,6 @@
             </div>
         </div>
 
-        <!-- Keyword Groups Accordion -->
-        <div class="groups-section">
-            <div class="groups-header" onclick="toggleGroupsSection(this)">
-                <h2><span class="toggle-icon">▼</span> Keyword Groups (Short-Tail Categories)</h2>
-                <span id="groups-summary" style="font-size: 0.85rem; color: var(--text-secondary);">Loading...</span>
-            </div>
-            <div class="groups-content show" id="groups-content">
-                <div class="groups-tabs">
-                    <button class="groups-tab active" onclick="switchGroupTab('topics', this)">Topic Groups (<span id="topic-count">0</span>)</button>
-                    <button class="groups-tab" onclick="switchGroupTab('brands', this)">Brand Groups (<span id="brand-count">0</span>)</button>
-                </div>
-                <div id="groups-topics" class="groups-grid"></div>
-                <div id="groups-brands" class="groups-grid" style="display: none;"></div>
-            </div>
-        </div>
-
         <div class="stats-bar" id="stats-bar">
             <div class="stat-card">
                 <div class="stat-label">Total Keywords</div>
@@ -1023,6 +1007,22 @@
             </div>
         </div>
 
+        <!-- Keyword Groups Accordion -->
+        <div class="groups-section">
+            <div class="groups-header" onclick="toggleGroupsSection(this)">
+                <h2><span class="toggle-icon">▼</span> Keyword Groups (Short-Tail Categories)</h2>
+                <span id="groups-summary" style="font-size: 0.85rem; color: var(--text-secondary);">Loading...</span>
+            </div>
+            <div class="groups-content show" id="groups-content">
+                <div class="groups-tabs">
+                    <button class="groups-tab active" onclick="switchGroupTab('topics', this)">Topic Groups (<span id="topic-count">0</span>)</button>
+                    <button class="groups-tab" onclick="switchGroupTab('brands', this)">Brand Groups (<span id="brand-count">0</span>)</button>
+                </div>
+                <div id="groups-topics" class="groups-grid"></div>
+                <div id="groups-brands" class="groups-grid" style="display: none;"></div>
+            </div>
+        </div>
+
         <!-- Group Filter Indicator -->
         <div id="group-filter-indicator" style="display: none; background: var(--bg-secondary); padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--accent); align-items: center;"></div>
 
@@ -1078,6 +1078,7 @@
         let sortColumn = 'calc_spend';
         let sortDirection = 'desc';
         let activeGroupFilter = null; // { type: 'brand'|'topic', name: string }
+        let activeKeywordTab = 'topics'; // 'topics' or 'brands' - controls which keywords show in table
 
         async function loadData() {
             try {
@@ -1210,7 +1211,13 @@
                     // Must have at least one selected brand
                     if (kw.brand_count === 0) return false;
 
-                    // Filter by keyword group if active
+                    // Filter by keyword type based on active tab
+                    // Topics tab = show keywords with short_tail_group (nonbrand/topic keywords)
+                    // Brands tab = show keywords with brand_group (brand keywords)
+                    if (activeKeywordTab === 'topics' && !kw.short_tail_group) return false;
+                    if (activeKeywordTab === 'brands' && !kw.brand_group) return false;
+
+                    // Filter by specific keyword group if active
                     if (activeGroupFilter) {
                         if (activeGroupFilter.type === 'brand' && kw.brand_group !== activeGroupFilter.name) return false;
                         if (activeGroupFilter.type === 'topic' && kw.short_tail_group !== activeGroupFilter.name) return false;
@@ -1457,6 +1464,13 @@
             sortColumn = 'calc_spend';
             sortDirection = 'desc';
             activeGroupFilter = null;
+            // Reset to Topics tab
+            activeKeywordTab = 'topics';
+            document.querySelectorAll('.groups-tab').forEach(t => {
+                t.classList.toggle('active', t.textContent.includes('Topic'));
+            });
+            document.getElementById('groups-brands').style.display = 'none';
+            document.getElementById('groups-topics').style.display = 'grid';
             updateGroupFilterDisplay();
             onBrandFilterChange();
         }
@@ -1621,6 +1635,13 @@
 
             document.getElementById('groups-brands').style.display = tab === 'brands' ? 'grid' : 'none';
             document.getElementById('groups-topics').style.display = tab === 'topics' ? 'grid' : 'none';
+
+            // Update active keyword tab and refilter table
+            activeKeywordTab = tab;
+            // Clear any specific group filter when switching tabs
+            activeGroupFilter = null;
+            updateGroupFilterDisplay();
+            applyFilters();
         }
 
         function renderKeywordGroups(data) {
