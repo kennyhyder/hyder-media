@@ -828,6 +828,54 @@
             gap: 8px;
         }
 
+        /* Brand/Nonbrand Tabs */
+        .keyword-type-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 10px;
+            width: fit-content;
+            border: 1px solid var(--border);
+        }
+
+        .keyword-type-tab {
+            padding: 12px 28px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .keyword-type-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .keyword-type-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .keyword-type-tab .tab-count {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .keyword-type-tab.active .tab-count {
+            background: rgba(255,255,255,0.3);
+        }
+
         @media (max-width: 768px) {
             .filter-row {
                 flex-direction: column;
@@ -892,6 +940,16 @@
                     <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform (excluded by default)">samcart*</span>
                 </div>
             </div>
+        </div>
+
+        <!-- Brand/Nonbrand Keyword Type Tabs -->
+        <div class="keyword-type-tabs">
+            <button class="keyword-type-tab active" data-type="nonbrand" onclick="switchKeywordType('nonbrand', this)">
+                Nonbrand Keywords <span class="tab-count" id="nonbrand-count">-</span>
+            </button>
+            <button class="keyword-type-tab" data-type="brand" onclick="switchKeywordType('brand', this)">
+                Brand Keywords <span class="tab-count" id="brand-kw-count">-</span>
+            </button>
         </div>
 
         <!-- Keyword Groups Accordion -->
@@ -1078,6 +1136,7 @@
         let sortColumn = 'calc_spend';
         let sortDirection = 'desc';
         let activeGroupFilter = null; // { type: 'brand'|'topic', name: string }
+        let activeKeywordType = 'nonbrand'; // 'brand' or 'nonbrand'
 
         async function loadData() {
             try {
@@ -1209,6 +1268,12 @@
                 .filter(kw => {
                     // Must have at least one selected brand
                     if (kw.brand_count === 0) return false;
+
+                    // Filter by keyword type (brand vs nonbrand)
+                    // Brand keywords have a brand_group or are in "Brand - Competitor" category
+                    const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
+                    if (activeKeywordType === 'brand' && !isBrandKeyword) return false;
+                    if (activeKeywordType === 'nonbrand' && isBrandKeyword) return false;
 
                     // Filter by keyword group if active
                     if (activeGroupFilter) {
@@ -1457,6 +1522,11 @@
             sortColumn = 'calc_spend';
             sortDirection = 'desc';
             activeGroupFilter = null;
+            // Reset to nonbrand tab
+            activeKeywordType = 'nonbrand';
+            document.querySelectorAll('.keyword-type-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.type === 'nonbrand');
+            });
             updateGroupFilterDisplay();
             onBrandFilterChange();
         }
@@ -1543,6 +1613,9 @@
             selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
                 .map(cb => cb.value);
 
+            // Update keyword type tab counts
+            updateKeywordTypeCounts();
+
             // Recalculate keyword groups based on selected brands
             recalculateKeywordGroups();
 
@@ -1550,14 +1623,22 @@
             applyFilters();
         }
 
-        // Recalculate keyword group counts based on selected brands
+        // Recalculate keyword group counts based on selected brands and keyword type
         function recalculateKeywordGroups() {
             // Filter keywords to only those with at least one selected brand
-            const filteredKeywords = allData.keywords.filter(kw =>
+            const keywordsWithSelectedBrands = allData.keywords.filter(kw =>
                 kw.brands.some(b => selectedBrands.includes(b.name))
             );
 
-            // Recalculate brand groups
+            // Further filter by keyword type
+            const filteredKeywords = keywordsWithSelectedBrands.filter(kw => {
+                const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
+                if (activeKeywordType === 'brand') return isBrandKeyword;
+                if (activeKeywordType === 'nonbrand') return !isBrandKeyword;
+                return true;
+            });
+
+            // Recalculate groups based on active keyword type
             const brandGroups = {};
             const topicGroups = {};
 
@@ -1582,13 +1663,30 @@
                 }
             });
 
-            // Update the display
             const brandCount = Object.keys(brandGroups).length;
             const topicCount = Object.keys(topicGroups).length;
 
             document.getElementById('brand-count').textContent = brandCount;
             document.getElementById('topic-count').textContent = topicCount;
-            document.getElementById('groups-summary').textContent = `${brandCount} brand groups, ${topicCount} topic groups`;
+
+            // Update groups header text based on active tab
+            if (activeKeywordType === 'nonbrand') {
+                document.getElementById('groups-summary').textContent = `${topicCount} topic groups (nonbrand)`;
+                // Show topic groups tab by default for nonbrand
+                document.getElementById('groups-brands').style.display = 'none';
+                document.getElementById('groups-topics').style.display = 'grid';
+                document.querySelectorAll('.groups-tab').forEach(t => {
+                    t.classList.toggle('active', t.textContent.includes('Topic'));
+                });
+            } else {
+                document.getElementById('groups-summary').textContent = `${brandCount} brand groups`;
+                // Show brand groups tab by default for brand keywords
+                document.getElementById('groups-brands').style.display = 'grid';
+                document.getElementById('groups-topics').style.display = 'none';
+                document.querySelectorAll('.groups-tab').forEach(t => {
+                    t.classList.toggle('active', t.textContent.includes('Brand'));
+                });
+            }
 
             // Render brand groups
             const brandsContainer = document.getElementById('groups-brands');
@@ -1604,7 +1702,7 @@
                 .map(([name, info]) => createGroupCard(name, info, 'topic'))
                 .join('');
 
-            // Update total keywords stat to reflect filtered count
+            // Update total keywords stat to reflect filtered count for current tab
             document.getElementById('stat-total').textContent = filteredKeywords.length.toLocaleString();
         }
 
@@ -1710,6 +1808,48 @@
             } else {
                 indicator.style.display = 'none';
             }
+        }
+
+        // Switch between Brand and Nonbrand keyword tabs
+        function switchKeywordType(type, btn) {
+            activeKeywordType = type;
+
+            // Update tab styling
+            document.querySelectorAll('.keyword-type-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Clear any active group filter when switching tabs
+            activeGroupFilter = null;
+            updateGroupFilterDisplay();
+
+            // Recalculate groups for the new tab
+            recalculateKeywordGroups();
+
+            // Apply filters
+            applyFilters();
+        }
+
+        // Update the Brand/Nonbrand tab counts
+        function updateKeywordTypeCounts() {
+            // Count keywords with at least one selected brand
+            const keywordsWithSelectedBrands = allData.keywords.filter(kw =>
+                kw.brands.some(b => selectedBrands.includes(b.name))
+            );
+
+            let brandCount = 0;
+            let nonbrandCount = 0;
+
+            keywordsWithSelectedBrands.forEach(kw => {
+                const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
+                if (isBrandKeyword) {
+                    brandCount++;
+                } else {
+                    nonbrandCount++;
+                }
+            });
+
+            document.getElementById('nonbrand-count').textContent = nonbrandCount.toLocaleString();
+            document.getElementById('brand-kw-count').textContent = brandCount.toLocaleString();
         }
 
         loadData();
