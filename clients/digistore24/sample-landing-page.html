@@ -331,9 +331,10 @@
         .comparison-table {
             background: var(--white);
             border-radius: 16px;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             border: 1px solid var(--gray-200);
+            margin-top: 20px;
         }
 
         .comparison-table table {
@@ -358,6 +359,11 @@
         .comparison-table thead th:first-child {
             background: var(--gray-100);
             color: var(--gray-700);
+            border-radius: 16px 0 0 0;
+        }
+
+        .comparison-table thead th:last-child {
+            border-radius: 0 16px 0 0;
         }
 
         .comparison-table thead th.highlight {
@@ -391,6 +397,18 @@
         .comparison-table tbody td:first-child {
             font-weight: 600;
             color: var(--gray-900);
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 16px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 16px 0;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
         .check {
