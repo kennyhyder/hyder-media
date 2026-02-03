@@ -469,34 +469,33 @@
         </header>
 
         <!-- Summary Stats -->
-        <div class="section">
+        <div class="section" id="overview-section">
             <div class="section-header">
-                <h2>Landing Pages Overview</h2>
+                <h2 id="overview-title">ClickBank Landing Pages Overview</h2>
             </div>
             <div class="section-content">
                 <div class="insights-grid">
                     <div class="insight-card">
-                        <h3>Total Unique Pages</h3>
-                        <p style="font-size: 2rem; font-weight: 700; color: var(--accent);">150+</p>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Across all competitors</p>
+                        <h3>Unique Landing Pages</h3>
+                        <p style="font-size: 2rem; font-weight: 700; color: var(--accent);" id="overview-pages">12</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;" id="overview-pages-sub">Tracked in PPC campaigns</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>Total Clicks</h3>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: var(--success);" id="overview-clicks">34,980</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;" id="overview-clicks-sub">Top page: 18,780 clicks</p>
                     </div>
                     <div class="insight-card">
                         <h3>Top Page Type</h3>
-                        <p style="font-size: 1.5rem; font-weight: 700; color: var(--success);">Comparison Pages</p>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">53K+ clicks for SamCart's top comparison</p>
+                        <p style="font-size: 1.2rem; font-weight: 600;" id="overview-type">Comparison Pages</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;" id="overview-type-sub">5 of 6 top pages are comparisons</p>
                     </div>
                     <div class="insight-card">
-                        <h3>Highest Converting Pattern</h3>
-                        <p style="font-size: 1.2rem; font-weight: 600;">"[Brand] vs [Competitor]"</p>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Used by all top performers</p>
-                    </div>
-                    <div class="insight-card">
-                        <h3>Common CTA Color</h3>
-                        <p>
-                            <span class="color-swatch" style="background: #2c20df;"></span>Blue/Purple
-                            <span class="color-swatch" style="background: #ff7529; margin-left: 12px;"></span>Orange
+                        <h3>Primary CTA Color</h3>
+                        <p id="overview-cta">
+                            <span class="color-swatch" style="background: #2c20df;"></span>Blue/Purple Gradient
                         </p>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">High contrast, action-oriented</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;" id="overview-cta-sub">"Start Here" button style</p>
                     </div>
                 </div>
             </div>
@@ -1256,6 +1255,103 @@
     </div>
 
     <script>
+        // Competitor overview data
+        const competitorOverviews = {
+            clickbank: {
+                title: 'ClickBank Landing Pages Overview',
+                pages: '12',
+                pagesSub: 'Tracked in PPC campaigns',
+                clicks: '34,980',
+                clicksSub: 'Top page: 18,780 clicks',
+                type: 'Comparison Pages',
+                typeSub: '5 of 6 top pages are comparisons',
+                ctaHtml: '<span class="color-swatch" style="background: #2c20df;"></span>Blue/Purple Gradient',
+                ctaSub: '"Start Here" button style'
+            },
+            impact: {
+                title: 'Impact Landing Pages Overview',
+                pages: '18',
+                pagesSub: 'Enterprise-focused pages',
+                clicks: '11,590',
+                clicksSub: 'Top page: 4,820 clicks',
+                type: 'Product Pages',
+                typeSub: 'Feature-focused verticals',
+                ctaHtml: '<span class="color-swatch" style="background: #ec4899;"></span>Pink/Magenta',
+                ctaSub: '"Request a Demo" enterprise focus'
+            },
+            awin: {
+                title: 'Awin Landing Pages Overview',
+                pages: '45+',
+                pagesSub: 'Localized for each market',
+                clicks: '28,450',
+                clicksSub: 'Top page: 8,510 clicks (DE)',
+                type: 'Lead Gen Pages',
+                typeSub: 'Country-specific landing pages',
+                ctaHtml: '<span class="color-swatch" style="background: #6b21a8;"></span>Purple',
+                ctaSub: '"Get started" across markets'
+            },
+            maxweb: {
+                title: 'MaxWeb Landing Pages Overview',
+                pages: '7',
+                pagesSub: 'Minimal, focused funnel',
+                clicks: '3,230',
+                clicksSub: 'Top page: 2,240 clicks',
+                type: 'Homepage Focus',
+                typeSub: 'Brand search traffic strategy',
+                ctaHtml: '<span class="color-swatch" style="background: #ff7529;"></span>Bold Orange',
+                ctaSub: '"Apply Now" action-oriented'
+            },
+            realize: {
+                title: 'Realize Landing Pages Overview',
+                pages: '4',
+                pagesSub: 'Limited PPC presence',
+                clicks: '184',
+                clicksSub: 'Top page: 95 clicks',
+                type: 'Product Pages',
+                typeSub: 'Self-serve signup focus',
+                ctaHtml: '<span class="color-swatch" style="background: #14b8a6;"></span>Teal',
+                ctaSub: '"Start Free Trial" self-serve'
+            },
+            samcart: {
+                title: 'SamCart Landing Pages Overview',
+                pages: '25+',
+                pagesSub: 'Aggressive comparison strategy',
+                clicks: '146,980',
+                clicksSub: 'Top page: 53,490 clicks',
+                type: 'Comparison Pages',
+                typeSub: '7 of top 10 are comparisons',
+                ctaHtml: '<span class="color-swatch" style="background: #2f37f5;"></span>Blue <span class="color-swatch" style="background: #27ff8b; margin-left: 8px;"></span>Green accent',
+                ctaSub: '"Try SamCart Free" conversion focus'
+            },
+            patterns: {
+                title: 'All Competitors Overview',
+                pages: '150+',
+                pagesSub: 'Across all competitors',
+                clicks: '225K+',
+                clicksSub: 'Total tracked clicks',
+                type: 'Comparison Pages',
+                typeSub: 'Highest performing page type',
+                ctaHtml: '<span class="color-swatch" style="background: #2c20df;"></span>Blue/Purple <span class="color-swatch" style="background: #ff7529; margin-left: 8px;"></span>Orange',
+                ctaSub: 'High contrast, action-oriented'
+            }
+        };
+
+        // Update overview section
+        function updateOverview(tab) {
+            const data = competitorOverviews[tab];
+            if (!data) return;
+
+            document.getElementById('overview-title').textContent = data.title;
+            document.getElementById('overview-pages').textContent = data.pages;
+            document.getElementById('overview-pages-sub').textContent = data.pagesSub;
+            document.getElementById('overview-clicks').textContent = data.clicks;
+            document.getElementById('overview-clicks-sub').textContent = data.clicksSub;
+            document.getElementById('overview-type').textContent = data.type;
+            document.getElementById('overview-type-sub').textContent = data.typeSub;
+            document.getElementById('overview-cta').innerHTML = data.ctaHtml;
+            document.getElementById('overview-cta-sub').textContent = data.ctaSub;
+        }
+
         // Tab functionality
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1266,6 +1362,9 @@
                 // Add active to clicked tab and corresponding content
                 btn.classList.add('active');
                 document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+                // Update overview section
+                updateOverview(btn.dataset.tab);
             });
         });
     </script>
