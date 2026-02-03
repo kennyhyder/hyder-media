@@ -847,14 +847,6 @@
 
             document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
 
-            // Brand spend stats
-            if (allData.total_spend_by_brand) {
-                document.getElementById('stat-samcart').textContent = '$' + formatNumber(allData.total_spend_by_brand.samcart || 0);
-                document.getElementById('stat-awin').textContent = '$' + formatNumber(allData.total_spend_by_brand.awin || 0);
-                document.getElementById('stat-clickbank').textContent = '$' + formatNumber(allData.total_spend_by_brand.clickbank || 0);
-                document.getElementById('stat-maxweb').textContent = '$' + formatNumber(allData.total_spend_by_brand.maxweb || 0);
-            }
-
             // Event listeners
             document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
             document.getElementById('category').addEventListener('change', applyFilters);
@@ -894,6 +886,8 @@
             });
         }
 
+        let selectedBrands = [];
+
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase().trim();
             const category = document.getElementById('category').value;
@@ -905,26 +899,40 @@
             const minSpend = parseFloat(document.getElementById('min-spend').value) || 0;
             const intent = document.getElementById('intent').value;
 
-            const selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
+            selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
                 .map(cb => cb.value);
 
-            filteredData = allData.keywords.filter(kw => {
-                if (search && !kw.keyword.toLowerCase().includes(search)) return false;
-                if (category && !kw.categories.includes(category)) return false;
-                if (kw.brand_count < minBrands) return false;
+            filteredData = allData.keywords
+                .map(kw => {
+                    // Filter brands to only selected ones
+                    const filteredBrands = kw.brands.filter(b => selectedBrands.includes(b.name));
 
-                if (selectedBrands.length > 0) {
-                    const hasSelectedBrand = kw.brands.some(b => selectedBrands.includes(b.name));
-                    if (!hasSelectedBrand) return false;
-                }
+                    // Recalculate metrics based on filtered brands
+                    const filteredClicks = filteredBrands.reduce((sum, b) => sum + b.clicks, 0);
+                    const filteredSpend = filteredBrands.reduce((sum, b) => sum + b.est_spend, 0);
 
-                if (kw.volume < minVolume || kw.volume > maxVolume) return false;
-                if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
-                if (kw.est_spend < minSpend) return false;
-                if (intent && !kw.intent.includes(intent)) return false;
+                    return {
+                        ...kw,
+                        brands: filteredBrands,
+                        brand_count: filteredBrands.length,
+                        total_clicks: filteredClicks,
+                        est_spend: filteredSpend,
+                    };
+                })
+                .filter(kw => {
+                    // Must have at least one selected brand
+                    if (kw.brand_count === 0) return false;
 
-                return true;
-            });
+                    if (search && !kw.keyword.toLowerCase().includes(search)) return false;
+                    if (category && !kw.categories.includes(category)) return false;
+                    if (kw.brand_count < minBrands) return false;
+                    if (kw.volume < minVolume || kw.volume > maxVolume) return false;
+                    if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
+                    if (kw.est_spend < minSpend) return false;
+                    if (intent && !kw.intent.includes(intent)) return false;
+
+                    return true;
+                });
 
             // Sort
             filteredData.sort((a, b) => {
@@ -950,6 +958,26 @@
             document.getElementById('stat-filtered').textContent = filteredData.length.toLocaleString();
             document.getElementById('stat-multi').textContent =
                 filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
+
+            // Calculate brand-specific spend from filtered data
+            const brandSpend = { awin: 0, samcart: 0, clickbank: 0, maxweb: 0 };
+            filteredData.forEach(kw => {
+                kw.brands.forEach(b => {
+                    if (brandSpend.hasOwnProperty(b.name)) {
+                        brandSpend[b.name] += b.est_spend;
+                    }
+                });
+            });
+
+            // Update brand spend stats
+            document.getElementById('stat-samcart').textContent = selectedBrands.includes('samcart')
+                ? '$' + formatNumber(brandSpend.samcart) : '-';
+            document.getElementById('stat-awin').textContent = selectedBrands.includes('awin')
+                ? '$' + formatNumber(brandSpend.awin) : '-';
+            document.getElementById('stat-clickbank').textContent = selectedBrands.includes('clickbank')
+                ? '$' + formatNumber(brandSpend.clickbank) : '-';
+            document.getElementById('stat-maxweb').textContent = selectedBrands.includes('maxweb')
+                ? '$' + formatNumber(brandSpend.maxweb) : '-';
 
             if (filteredData.length > 0) {
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
