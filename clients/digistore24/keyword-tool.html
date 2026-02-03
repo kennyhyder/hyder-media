@@ -1041,7 +1041,7 @@
         let filteredData = [];
         let currentPage = 1;
         let pageSize = 50;
-        let sortColumn = 'google_volume';
+        let sortColumn = 'calc_spend';
         let sortDirection = 'desc';
         let activeGroupFilter = null; // { type: 'brand'|'topic', name: string }
 
@@ -1285,7 +1285,7 @@
                         <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
                         <td class="number-cell spend-cell">${kw.calc_spend > 0 ? '$' + formatNumber(kw.calc_spend) : '-'}</td>
                         <td>${formatIntent(kw.intent)}</td>
-                        <td>${formatBrandDetails(kw.brands, rowId)}</td>
+                        <td>${formatBrandDetails(kw.brands, rowId, kw.active_cpc)}</td>
                     </tr>
                 `}).join('');
             }
@@ -1299,17 +1299,20 @@
             document.getElementById('next-btn').disabled = currentPage >= totalPages;
         }
 
-        function formatBrandDetails(brands, rowId) {
-            // Summary chips (always visible)
-            const summaryChips = brands.map(b => `
+        function formatBrandDetails(brands, rowId, activeCpc) {
+            // Summary chips (always visible) - use active CPC for spend calculation
+            const summaryChips = brands.map(b => {
+                const brandSpend = b.clicks * (activeCpc || 0);
+                return `
                 <span class="brand-chip brand-${b.name}">
                     ${b.name}
-                    <span class="brand-chip-spend">$${formatNumber(b.est_spend)}</span>
+                    <span class="brand-chip-spend">$${formatNumber(brandSpend)}</span>
                 </span>
-            `).join('');
+            `}).join('');
 
             // Detailed cards (hidden by default)
             const detailCards = brands.map(b => {
+                const brandSpend = b.clicks * (activeCpc || 0);
                 const desktopPct = (b.desktop_share * 100).toFixed(0);
                 const mobilePct = (b.mobile_share * 100).toFixed(0);
                 const urlDisplay = b.top_url ? shortenUrl(b.top_url) : '';
@@ -1319,13 +1322,13 @@
                     <div class="brand-card">
                         <div class="brand-card-header">
                             <span class="brand-card-name brand-${b.name}">${b.name}</span>
-                            <span class="brand-card-spend">$${formatNumber(b.est_spend)}</span>
+                            <span class="brand-card-spend">$${formatNumber(brandSpend)}</span>
                         </div>
                         <div class="brand-card-stats">
                             <span title="Clicks from this brand">${b.clicks.toLocaleString()} clicks</span>
                             <span title="Desktop traffic share">🖥 ${desktopPct}%</span>
                             <span title="Mobile traffic share">📱 ${mobilePct}%</span>
-                            ${b.cpc > 0 ? `<span title="CPC for this brand">$${b.cpc.toFixed(2)} CPC</span>` : ''}
+                            ${activeCpc > 0 ? `<span title="Active CPC">$${activeCpc.toFixed(2)} CPC</span>` : ''}
                         </div>
                         ${fullUrl ? `<div class="brand-card-url"><a href="${makeAbsoluteUrl(fullUrl)}" target="_blank" rel="noopener" title="${escapeHtml(fullUrl)}">${escapeHtml(urlDisplay)}</a></div>` : ''}
                     </div>
@@ -1413,7 +1416,7 @@
             document.querySelectorAll('#brand-filters input').forEach(cb => {
                 cb.checked = cb.value !== 'samcart';
             });
-            sortColumn = 'google_volume';
+            sortColumn = 'calc_spend';
             sortDirection = 'desc';
             activeGroupFilter = null;
             updateGroupFilterDisplay();
