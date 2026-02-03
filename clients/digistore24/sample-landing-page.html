@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digistore24 vs ClickBank - Which Platform is Right for You?</title>
+    <meta name="description" content="Compare Digistore24 and ClickBank side-by-side. See features, commissions, and why top affiliates and vendors choose Digistore24.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Digistore24 Brand Colors */
+            --primary: #146dc7;
+            --primary-dark: #0d5aa3;
+            --secondary: #0ad6c7;
+            --dark: #04253e;
+            --dark-light: #0a3a5c;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-900);
+            line-height: 1.6;
+            background: var(--white);
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 14px rgba(20, 109, 199, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(20, 109, 199, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(180deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(20, 109, 199, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray-500);
+            margin-bottom: 32px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        /* Logos Section */
+        .logos-section {
+            padding: 40px 24px;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logos-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .logos-title {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 24px;
+        }
+
+        .logos-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            opacity: 0.6;
+        }
+
+        .logos-grid span {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            padding: 80px 24px;
+            background: var(--white);
+        }
+
+        .comparison-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-header h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--gray-500);
+            font-size: 1.1rem;
+        }
+
+        .comparison-table {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 20px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .comparison-table thead th {
+            background: var(--dark);
+            color: var(--white);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .comparison-table thead th:first-child {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .comparison-table thead th.highlight {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            position: relative;
+        }
+
+        .comparison-table thead th.highlight::after {
+            content: "RECOMMENDED";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            font-size: 0.65rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .comparison-table tbody td {
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        .comparison-table tbody td:first-child {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .check {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        .cross {
+            color: var(--gray-300);
+            font-size: 1.2rem;
+        }
+
+        .highlight-cell {
+            background: rgba(20, 109, 199, 0.05);
+            font-weight: 600;
+            color: var(--primary) !important;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 24px;
+            background: var(--gray-50);
+        }
+
+        .features-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(20, 109, 199, 0.1), rgba(10, 214, 199, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        /* Testimonials */
+        .testimonials-section {
+            padding: 80px 24px;
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .testimonials-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .testimonials-section .section-header h2 {
+            color: var(--white);
+        }
+
+        .testimonials-section .section-header p {
+            color: var(--gray-300);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .testimonial-card {
+            background: var(--dark-light);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testimonial-quote {
+            font-size: 1.05rem;
+            color: var(--gray-200);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .testimonial-name {
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .testimonial-title {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 24px;
+            background: var(--white);
+        }
+
+        .faq-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-list {
+            margin-top: 48px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .faq-question {
+            width: 100%;
+            text-align: left;
+            padding: 24px 0;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question .icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .faq-item.open .faq-question .icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding-bottom: 24px;
+            color: var(--gray-500);
+            line-height: 1.7;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-inner {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .cta-section .btn-primary {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-section .btn-primary:hover {
+            background: var(--gray-100);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: var(--gray-400);
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--white);
+        }
+
+        /* Sample Page Notice */
+        .sample-notice {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 12px 24px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sample-notice a {
+            color: var(--dark);
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .comparison-table {
+                overflow-x: auto;
+            }
+
+            .hero-stats {
+                gap: 24px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sample Notice -->
+    <div class="sample-notice">
+        ⚠️ This is a SAMPLE landing page template. <a href="landing-page-analysis.html">View the analysis</a> or <a href="keyword-tool.html">return to keyword tool</a>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">D</div>
+                Digistore24
+            </a>
+            <nav class="nav-links">
+                <a href="#">For Affiliates</a>
+                <a href="#">For Vendors</a>
+                <a href="#">Marketplace</a>
+                <a href="#">Pricing</a>
+                <a href="#" class="btn btn-primary">Start Free</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge">🏆 Trusted by 100,000+ Digital Entrepreneurs</span>
+            <h1>Digistore24 vs ClickBank:<br><span>The Smarter Choice for 2026</span></h1>
+            <p>See why top affiliates and vendors are switching to Digistore24 for higher commissions, better support, and a modern platform built for today's digital products.</p>
+            <div class="hero-ctas">
+                <a href="#" class="btn btn-primary btn-large">Start Selling Free →</a>
+                <a href="#" class="btn btn-secondary btn-large">Join as Affiliate</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-value">$500M+</div>
+                    <div class="stat-label">Paid to Partners</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">8,000+</div>
+                    <div class="stat-label">Digital Products</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100K+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">180+</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logos -->
+    <section class="logos-section">
+        <div class="logos-inner">
+            <div class="logos-title">Trusted by Leading Digital Creators</div>
+            <div class="logos-grid">
+                <span>Brand One</span>
+                <span>Creator Co</span>
+                <span>Digital Pro</span>
+                <span>Course Lab</span>
+                <span>Affiliate Max</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison-section">
+        <div class="comparison-inner">
+            <div class="section-header">
+                <h2>Feature Comparison</h2>
+                <p>See how Digistore24 stacks up against ClickBank</p>
+            </div>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th class="highlight">Digistore24</th>
+                            <th>ClickBank</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Commission Rates</td>
+                            <td class="highlight-cell">Up to 70%</td>
+                            <td>Up to 75%</td>
+                        </tr>
+                        <tr>
+                            <td>Payout Frequency</td>
+                            <td class="highlight-cell">Weekly</td>
+                            <td>Bi-weekly</td>
+                        </tr>
+                        <tr>
+                            <td>Minimum Payout</td>
+                            <td class="highlight-cell">$50</td>
+                            <td>$100</td>
+                        </tr>
+                        <tr>
+                            <td>Free to Join</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                        </tr>
+                        <tr>
+                            <td>Built-in Funnel Builder</td>
+                            <td><span class="check">✓</span> Digibiz24</td>
+                            <td><span class="cross">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td>EU VAT Handling</td>
+                            <td><span class="check">✓</span> Automatic</td>
+                            <td><span class="cross">✗</span> Manual</td>
+                        </tr>
+                        <tr>
+                            <td>Multi-Currency Support</td>
+                            <td><span class="check">✓</span> 25+ currencies</td>
+                            <td>Limited</td>
+                        </tr>
+                        <tr>
+                            <td>Membership Sites</td>
+                            <td><span class="check">✓</span> Built-in</td>
+                            <td><span class="cross">✗</span> Third-party</td>
+                        </tr>
+                        <tr>
+                            <td>Subscription Management</td>
+                            <td><span class="check">✓</span> Advanced</td>
+                            <td>Basic</td>
+                        </tr>
+                        <tr>
+                            <td>Customer Support</td>
+                            <td class="highlight-cell">24/7 Live Chat</td>
+                            <td>Email Only</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+        <div class="features-inner">
+            <div class="section-header">
+                <h2>Why Choose Digistore24?</h2>
+                <p>Everything you need to sell digital products, all in one platform</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Higher Take-Home Pay</h3>
+                    <p>Lower minimum payouts and weekly payments mean you get your money faster. No waiting around for your earnings.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Global Tax Compliance</h3>
+                    <p>We handle EU VAT, international taxes, and compliance automatically. Focus on selling, not paperwork.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>All-in-One Platform</h3>
+                    <p>Built-in funnel builder, membership sites, and email integration. No need for expensive third-party tools.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Conversion Cockpit</h3>
+                    <p>Advanced analytics and split testing to optimize your sales funnel and maximize conversions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Affiliate Marketplace</h3>
+                    <p>Connect with thousands of affiliates ready to promote your products. Grow your sales on autopilot.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Award-Winning Support</h3>
+                    <p>24/7 live chat support from real humans. Get help when you need it, not when it's convenient for us.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="testimonials-inner">
+            <div class="section-header">
+                <h2>What Our Users Say</h2>
+                <p>Join thousands of successful digital entrepreneurs</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">"Switching from ClickBank to Digistore24 was the best decision I made. The built-in funnel builder alone saved me $300/month in software costs."</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MK</div>
+                        <div>
+                            <div class="testimonial-name">Michael K.</div>
+                            <div class="testimonial-title">Course Creator, $50K/month</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">"The EU VAT handling is a game changer. I used to spend hours on tax compliance. Now it's completely automated."</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SL</div>
+                        <div>
+                            <div class="testimonial-name">Sarah L.</div>
+                            <div class="testimonial-title">Digital Product Vendor</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">"As an affiliate, I love the weekly payouts. Getting paid faster helps me reinvest in ads and scale my campaigns."</div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JR</div>
+                        <div>
+                            <div class="testimonial-name">James R.</div>
+                            <div class="testimonial-title">Super Affiliate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <div class="faq-inner">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Got questions? We've got answers.</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item open">
+                    <button class="faq-question">
+                        Is Digistore24 really free to join?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Yes! There are no monthly fees or setup costs. You only pay a small transaction fee when you make a sale. This means zero risk to get started.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How does Digistore24 compare to ClickBank?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        While both platforms offer affiliate marketplaces, Digistore24 includes built-in tools like funnel builders and membership sites that ClickBank doesn't offer. We also have lower minimum payouts ($50 vs $100) and weekly payments.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What types of products can I sell?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Digistore24 supports digital products including online courses, ebooks, software, memberships, coaching programs, and more. We specialize in digital and information products.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How fast will I get paid?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        We process payments weekly with a minimum payout of just $50. Most users receive their funds within 2-3 business days after the payout is processed.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I migrate from ClickBank?
+                        <span class="icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Absolutely! We offer migration assistance to help you move your products and affiliate program from ClickBank. Our support team can guide you through the process step by step.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-inner">
+            <h2>Ready to Make the Switch?</h2>
+            <p>Join 100,000+ digital entrepreneurs who chose Digistore24. Start selling in minutes, not days.</p>
+            <a href="#" class="btn btn-primary btn-large">Create Free Account →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">For Vendors</a>
+                <a href="#">For Affiliates</a>
+                <a href="#">Help Center</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <p>© 2026 Digistore24. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const wasOpen = item.classList.contains('open');
+
+                // Close all
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+                // Toggle clicked
+                if (!wasOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

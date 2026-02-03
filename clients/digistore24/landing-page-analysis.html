@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Analysis | Digistore24 Competitive Intel</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+
+            /* Competitor brand colors */
+            --clickbank: #2c20df;
+            --maxweb: #ff7529;
+            --awin: #6b21a8;
+            --samcart: #2f37f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            margin-top: 12px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .brand-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .brand-clickbank { background: var(--clickbank); }
+        .brand-maxweb { background: var(--maxweb); }
+        .brand-awin { background: var(--awin); }
+        .brand-samcart { background: var(--samcart); }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .landing-pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .landing-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .landing-card-preview {
+            height: 200px;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landing-card-preview iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+
+        .landing-card-preview .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(15, 23, 42, 0.9));
+            display: flex;
+            align-items: flex-end;
+            padding: 16px;
+        }
+
+        .landing-card-content {
+            padding: 16px;
+        }
+
+        .landing-card-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .landing-card-url {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .landing-card-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .landing-card-stats .value {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .landing-card-link {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .landing-card-link:hover {
+            background: var(--accent-hover);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .insight-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .insight-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .insight-card p, .insight-card ul {
+            font-size: 0.95rem;
+        }
+
+        .insight-card ul {
+            padding-left: 20px;
+        }
+
+        .insight-card li {
+            margin-bottom: 6px;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .element-analysis {
+            margin-top: 16px;
+        }
+
+        .element-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .element-row:last-child {
+            border-bottom: none;
+        }
+
+        .element-label {
+            min-width: 120px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .element-value {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .key-patterns {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .key-patterns h3 {
+            color: var(--success);
+            margin-bottom: 16px;
+        }
+
+        .pattern-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .pattern-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .pattern-item .icon {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #146dc7, #0ad6c7);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .cta-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .cta-section .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: white;
+            color: #146dc7;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .cta-section .btn:hover {
+            background: #f0f0f0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            background: rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Competitor Landing Page Analysis</h1>
+            <p class="subtitle">Deep dive into landing pages used by ClickBank, MaxWeb, Awin, and SamCart</p>
+            <div class="nav-links">
+                <a href="keyword-tool.html">&larr; Keyword Tool</a>
+                <a href="competitor-ads.html">Competitor Ads</a>
+                <a href="sample-landing-page.html">Sample Landing Page &rarr;</a>
+            </div>
+        </header>
+
+        <!-- Summary Stats -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Landing Pages Overview</h2>
+            </div>
+            <div class="section-content">
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <h3>Total Unique Pages</h3>
+                        <p style="font-size: 2rem; font-weight: 700; color: var(--accent);">150+</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Across all competitors</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>Top Page Type</h3>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: var(--success);">Comparison Pages</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">53K+ clicks for SamCart's top comparison</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>Highest Converting Pattern</h3>
+                        <p style="font-size: 1.2rem; font-weight: 600;">"[Brand] vs [Competitor]"</p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Used by all top performers</p>
+                    </div>
+                    <div class="insight-card">
+                        <h3>Common CTA Color</h3>
+                        <p>
+                            <span class="color-swatch" style="background: #2c20df;"></span>Blue/Purple
+                            <span class="color-swatch" style="background: #ff7529; margin-left: 12px;"></span>Orange
+                        </p>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">High contrast, action-oriented</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs for each competitor -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="clickbank">ClickBank</button>
+            <button class="tab-btn" data-tab="samcart">SamCart</button>
+            <button class="tab-btn" data-tab="maxweb">MaxWeb</button>
+            <button class="tab-btn" data-tab="awin">Awin</button>
+            <button class="tab-btn" data-tab="patterns">Best Practices</button>
+        </div>
+
+        <!-- ClickBank Tab -->
+        <div class="tab-content active" id="tab-clickbank">
+            <div class="section">
+                <div class="section-header">
+                    <span class="brand-badge brand-clickbank">ClickBank</span>
+                    <h2>Landing Page Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <div class="insights-grid" style="margin-bottom: 24px;">
+                        <div class="insight-card">
+                            <h3>Brand Colors</h3>
+                            <p>
+                                <span class="color-swatch" style="background: #2c20df;"></span>#2c20df (Primary)<br>
+                                <span class="color-swatch" style="background: #900390;"></span>#900390 (Gradient)<br>
+                                <span class="color-swatch" style="background: #f1f3fe;"></span>#f1f3fe (Background)
+                            </p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Key Stats Displayed</h3>
+                            <ul>
+                                <li>$7.1B paid in commissions</li>
+                                <li>100,000+ active affiliates</li>
+                                <li>190+ countries</li>
+                                <li>27+ years operating</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Primary CTA</h3>
+                            <p style="font-weight: 600; color: var(--success);">"Start Here"</p>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">Blue gradient button, appears 4+ times per page</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Page Strategy</h3>
+                            <p>Heavy focus on <strong>comparison pages</strong> targeting competitor brand searches</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px;">Top Landing Pages by Clicks</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Clicks</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight">
+                                <td>/clickbank-vs-buygoods</td>
+                                <td><strong>18,780</strong></td>
+                                <td>Comparison</td>
+                                <td><a href="https://clickbank.com/clickbank-vs-buygoods" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/view-marketplace-2</td>
+                                <td>4,610</td>
+                                <td>Marketplace</td>
+                                <td><a href="https://clickbank.com/view-marketplace-2" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/clickbank-vs-cj</td>
+                                <td>3,900</td>
+                                <td>Comparison</td>
+                                <td><a href="https://clickbank.com/clickbank-vs-cj" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/clickbank-vs-shareasale</td>
+                                <td>3,630</td>
+                                <td>Comparison</td>
+                                <td><a href="https://clickbank.com/clickbank-vs-shareasale" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/clickbank-vs-jvzoo</td>
+                                <td>3,000</td>
+                                <td>Comparison</td>
+                                <td><a href="https://clickbank.com/clickbank-vs-jvzoo" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/clickbank-vs-digistore24</td>
+                                <td>1,060</td>
+                                <td>Comparison</td>
+                                <td><a href="https://clickbank.com/clickbank-vs-digistore24" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="element-analysis">
+                        <h3 style="margin: 24px 0 16px;">Page Elements Breakdown</h3>
+                        <div class="element-row">
+                            <div class="element-label">Headline Style</div>
+                            <div class="element-value">"One Platform. Limitless Potential." - Short, benefit-focused, aspirational</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Trust Elements</div>
+                            <div class="element-value">Customer testimonials, partner logos, large statistics prominently displayed</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Page Structure</div>
+                            <div class="element-value">Hero → Stats → Dual paths (Affiliates/Sellers) → Features → Testimonials → FAQ → Footer CTA</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Social Proof</div>
+                            <div class="element-value">"5M+ people trust ClickBank" - Large numbers featured prominently</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SamCart Tab -->
+        <div class="tab-content" id="tab-samcart">
+            <div class="section">
+                <div class="section-header">
+                    <span class="brand-badge brand-samcart">SamCart</span>
+                    <h2>Landing Page Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <div class="insights-grid" style="margin-bottom: 24px;">
+                        <div class="insight-card">
+                            <h3>Brand Colors</h3>
+                            <p>
+                                <span class="color-swatch" style="background: #2f37f5;"></span>#2f37f5 (Primary Blue)<br>
+                                <span class="color-swatch" style="background: #27ff8b;"></span>#27ff8b (Accent Green)<br>
+                                <span class="color-swatch" style="background: #001134;"></span>#001134 (Dark)
+                            </p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Dominant Strategy</h3>
+                            <p style="font-size: 1.2rem; font-weight: 600; color: var(--warning);">Comparison Pages</p>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">7 of top 10 pages are "[X] vs SamCart" or "Alternative to [X]"</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Top Keywords Targeted</h3>
+                            <ul>
+                                <li>Stan Store alternative</li>
+                                <li>ClickFunnels alternative</li>
+                                <li>Kajabi alternative</li>
+                                <li>ThriveCart alternative</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Unique Approach</h3>
+                            <p>Also targets <strong>customer checkouts</strong> (samcart.com subdomains) for individual creators</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px;">Top Landing Pages by Clicks</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Clicks</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight">
+                                <td>/compare/stan-store</td>
+                                <td><strong>53,490</strong></td>
+                                <td>Comparison</td>
+                                <td><a href="https://samcart.com/compare/stan-store" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>/compare/samcart-vs-clickfunnels</td>
+                                <td><strong>36,160</strong></td>
+                                <td>Comparison</td>
+                                <td><a href="https://samcart.com/compare/samcart-vs-clickfunnels" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/compare/kajabi-with-samcart</td>
+                                <td>21,780</td>
+                                <td>Comparison</td>
+                                <td><a href="https://samcart.com/compare/kajabi-with-samcart" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/compare/samcart-vs-thrivecart</td>
+                                <td>19,770</td>
+                                <td>Comparison</td>
+                                <td><a href="https://samcart.com/compare/samcart-vs-thrivecart" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/get-checkout-os</td>
+                                <td>9,840</td>
+                                <td>Product</td>
+                                <td><a href="https://samcart.com/get-checkout-os" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/compare/gumroad-alternative</td>
+                                <td>5,940</td>
+                                <td>Comparison</td>
+                                <td><a href="https://samcart.com/compare/gumroad-alternative" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="key-patterns" style="margin-top: 24px;">
+                        <h3>🔑 SamCart's Winning Formula</h3>
+                        <div class="pattern-list">
+                            <div class="pattern-item">
+                                <span class="icon">✓</span>
+                                <span>Create dedicated pages for EVERY competitor</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">✓</span>
+                                <span>Use "/compare/[competitor]" URL structure</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">✓</span>
+                                <span>Bid on "[competitor] alternative" keywords</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">✓</span>
+                                <span>Feature side-by-side comparison tables</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MaxWeb Tab -->
+        <div class="tab-content" id="tab-maxweb">
+            <div class="section">
+                <div class="section-header">
+                    <span class="brand-badge brand-maxweb">MaxWeb</span>
+                    <h2>Landing Page Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <div class="insights-grid" style="margin-bottom: 24px;">
+                        <div class="insight-card">
+                            <h3>Brand Colors</h3>
+                            <p>
+                                <span class="color-swatch" style="background: #ff7529;"></span>#ff7529 (Orange CTA)<br>
+                                <span class="color-swatch" style="background: #1c212e;"></span>#1c212e (Dark BG)<br>
+                                <span class="color-swatch" style="background: #ffffff;"></span>#ffffff (Text)
+                            </p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Page Count</h3>
+                            <p style="font-size: 2rem; font-weight: 700;">7</p>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">Minimal page strategy - focused funnel</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Primary Focus</h3>
+                            <p>CPA affiliate network for <strong>health/wellness VSL offers</strong></p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Trust Elements</h3>
+                            <ul>
+                                <li>Testimonials carousel</li>
+                                <li>Partner logos</li>
+                                <li>Team member profiles</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px;">Landing Pages</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Clicks</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight">
+                                <td>maxweb.com (home)</td>
+                                <td><strong>2,240</strong></td>
+                                <td>Home</td>
+                                <td><a href="https://maxweb.com" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/campaigns</td>
+                                <td>650</td>
+                                <td>Offers</td>
+                                <td><a href="https://maxweb.com/campaigns" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/payments</td>
+                                <td>280</td>
+                                <td>Info</td>
+                                <td><a href="https://maxweb.com/payments" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/affiliates</td>
+                                <td>60</td>
+                                <td>Signup</td>
+                                <td><a href="https://maxweb.com/affiliates" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="element-analysis">
+                        <h3 style="margin: 24px 0 16px;">Design Observations</h3>
+                        <div class="element-row">
+                            <div class="element-label">Visual Style</div>
+                            <div class="element-value">Dark theme, bold orange CTAs, professional/aggressive aesthetic</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Font</div>
+                            <div class="element-value">Poppins - modern, clean sans-serif</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Strategy</div>
+                            <div class="element-value">Fewer pages, more focused. Relies on brand search traffic rather than comparison pages.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Awin Tab -->
+        <div class="tab-content" id="tab-awin">
+            <div class="section">
+                <div class="section-header">
+                    <span class="brand-badge brand-awin">Awin</span>
+                    <h2>Landing Page Analysis</h2>
+                </div>
+                <div class="section-content">
+                    <div class="insights-grid" style="margin-bottom: 24px;">
+                        <div class="insight-card">
+                            <h3>Brand Colors</h3>
+                            <p>
+                                <span class="color-swatch" style="background: #6b21a8;"></span>Purple<br>
+                                <span class="color-swatch" style="background: #000000;"></span>Black<br>
+                                <span class="color-swatch" style="background: #ffffff;"></span>White
+                            </p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Tagline</h3>
+                            <p style="font-size: 1.1rem; font-style: italic;">"Infinite partnerships, simply enabled."</p>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Key Stats</h3>
+                            <ul>
+                                <li>30,000+ customers</li>
+                                <li>25 years of growth</li>
+                                <li>Global presence</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Strategy</h3>
+                            <p>Localized landing pages for <strong>each country/language</strong> (DE, GB, FR, PL, etc.)</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px;">Top Landing Pages by Clicks</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Clicks</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/de/advertiser/awin-accelerate-web-to-lead-de</td>
+                                <td>8,510</td>
+                                <td>Lead Gen (Germany)</td>
+                                <td><a href="https://awin.com/de/advertiser/awin-accelerate-web-to-lead-de" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/us/advertisers/awin-access/join-our-platform-sas</td>
+                                <td>8,230</td>
+                                <td>Lead Gen (US)</td>
+                                <td><a href="https://awin.com/us/advertisers/awin-access/join-our-platform-sas" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/gb/advertisers/awin-accelerate-web-to-lead-gb</td>
+                                <td>7,880</td>
+                                <td>Lead Gen (UK)</td>
+                                <td><a href="https://awin.com/gb/advertisers/awin-accelerate-web-to-lead-gb" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                            <tr>
+                                <td>/us/advertisers/awin-access/join-our-platform</td>
+                                <td>3,830</td>
+                                <td>Lead Gen (US)</td>
+                                <td><a href="https://awin.com/us/advertisers/awin-access/join-our-platform" target="_blank" style="color: var(--accent);">View &rarr;</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="element-analysis">
+                        <h3 style="margin: 24px 0 16px;">Page Elements</h3>
+                        <div class="element-row">
+                            <div class="element-label">Trust Elements</div>
+                            <div class="element-value">Nike UK, Sephora UK, Etsy, Viator logos prominently displayed</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">Page Structure</div>
+                            <div class="element-value">Hero → Logos → 3 Audience Segments → Industry Verticals → Product Tiers → Featured Content</div>
+                        </div>
+                        <div class="element-row">
+                            <div class="element-label">CTA Text</div>
+                            <div class="element-value">"Get started", "Explore Awin's plans", "View our Advertiser plans"</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices Tab -->
+        <div class="tab-content" id="tab-patterns">
+            <div class="section">
+                <div class="section-header">
+                    <h2>🏆 Best Practices & Winning Patterns</h2>
+                </div>
+                <div class="section-content">
+                    <div class="key-patterns">
+                        <h3>What Top Performers Have in Common</h3>
+                        <div class="pattern-list">
+                            <div class="pattern-item">
+                                <span class="icon">1️⃣</span>
+                                <span><strong>Comparison Pages:</strong> "[Your Brand] vs [Competitor]" pages get the MOST traffic</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">2️⃣</span>
+                                <span><strong>Big Stats:</strong> Lead with impressive numbers ($7B+, 100K+ users, 25+ years)</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">3️⃣</span>
+                                <span><strong>Social Proof:</strong> Partner logos, testimonials, and user counts build trust</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">4️⃣</span>
+                                <span><strong>Clear CTAs:</strong> High-contrast buttons with action verbs ("Start Here", "Get Started")</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">5️⃣</span>
+                                <span><strong>Dual Paths:</strong> Separate messaging for Affiliates vs. Advertisers/Vendors</span>
+                            </div>
+                            <div class="pattern-item">
+                                <span class="icon">6️⃣</span>
+                                <span><strong>FAQ Section:</strong> Address objections directly on the page</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 32px 0 16px;">Recommended Page Types for Digistore24</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page Type</th>
+                                <th>Example URL</th>
+                                <th>Target Keywords</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight">
+                                <td>Comparison vs ClickBank</td>
+                                <td>/compare/digistore24-vs-clickbank</td>
+                                <td>"clickbank alternative", "digistore vs clickbank"</td>
+                                <td>🔴 High</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Comparison vs JVZoo</td>
+                                <td>/compare/digistore24-vs-jvzoo</td>
+                                <td>"jvzoo alternative"</td>
+                                <td>🔴 High</td>
+                            </tr>
+                            <tr>
+                                <td>Comparison vs Gumroad</td>
+                                <td>/compare/digistore24-vs-gumroad</td>
+                                <td>"gumroad alternative"</td>
+                                <td>🟡 Medium</td>
+                            </tr>
+                            <tr>
+                                <td>For Affiliates</td>
+                                <td>/affiliates</td>
+                                <td>"affiliate programs", "best affiliate network"</td>
+                                <td>🔴 High</td>
+                            </tr>
+                            <tr>
+                                <td>For Vendors</td>
+                                <td>/vendors</td>
+                                <td>"sell digital products", "course platform"</td>
+                                <td>🔴 High</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="margin: 32px 0 16px;">Landing Page Checklist</h3>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <h3>Above the Fold</h3>
+                            <ul>
+                                <li>☐ Clear headline with value prop</li>
+                                <li>☐ Supporting subheadline</li>
+                                <li>☐ Primary CTA button</li>
+                                <li>☐ Trust indicator (stats or logos)</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Body Content</h3>
+                            <ul>
+                                <li>☐ Feature comparison table (for vs pages)</li>
+                                <li>☐ Benefits with icons</li>
+                                <li>☐ Testimonials/reviews</li>
+                                <li>☐ Partner/customer logos</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Conversion Elements</h3>
+                            <ul>
+                                <li>☐ Multiple CTAs throughout</li>
+                                <li>☐ FAQ section</li>
+                                <li>☐ Risk reversal (free trial, guarantee)</li>
+                                <li>☐ Urgency/scarcity (if applicable)</li>
+                            </ul>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Technical</h3>
+                            <ul>
+                                <li>☐ Mobile responsive</li>
+                                <li>☐ Fast load time</li>
+                                <li>☐ Clear URL structure</li>
+                                <li>☐ Tracking pixels installed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>See the Sample Landing Page</h2>
+            <p>Based on these insights, we've created a best-in-class landing page template for Digistore24</p>
+            <a href="sample-landing-page.html" class="btn">View Sample Landing Page &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all tabs and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked tab and corresponding content
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
