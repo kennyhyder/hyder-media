@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPC Keyword Analysis | Digistore24</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .filters {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group.flex-1 {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        input[type="number"] {
+            width: 100px;
+        }
+
+        select {
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .checkbox-item label {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background: var(--border);
+        }
+
+        th.sorted-asc::after,
+        th.sorted-desc::after {
+            position: absolute;
+            right: 8px;
+            font-size: 0.7rem;
+        }
+
+        th.sorted-asc::after {
+            content: '▲';
+        }
+
+        th.sorted-desc::after {
+            content: '▼';
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .keyword-cell {
+            font-weight: 500;
+            max-width: 300px;
+        }
+
+        .brand-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .brand-awin { background: #3b82f6; color: white; }
+        .brand-samcart { background: #8b5cf6; color: white; }
+        .brand-clickbank { background: #22c55e; color: white; }
+        .brand-maxweb { background: #f59e0b; color: white; }
+
+        .category-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            margin: 2px;
+        }
+
+        .number-cell {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .brand-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .brand-count-4 { background: var(--success); color: white; }
+        .brand-count-3 { background: var(--accent); color: white; }
+        .brand-count-2 { background: var(--warning); color: white; }
+        .brand-count-1 { background: var(--bg-tertiary); color: var(--text-secondary); }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .page-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--border);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .intent-pill {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin: 1px;
+        }
+
+        .intent-navigational { background: #0ea5e9; color: white; }
+        .intent-informational { background: #6366f1; color: white; }
+        .intent-transactional { background: #22c55e; color: white; }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .filter-group.flex-1 {
+                width: 100%;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PPC Keyword Analysis Tool</h1>
+            <p class="subtitle">Competitor keyword data from SimilarWeb - Awin, SamCart, ClickBank, MaxWeb</p>
+        </header>
+
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Keywords</div>
+                <div class="stat-value" id="stat-total">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Filtered</div>
+                <div class="stat-value" id="stat-filtered">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Multi-Brand</div>
+                <div class="stat-value" id="stat-multi">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Volume</div>
+                <div class="stat-value" id="stat-volume">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. CPC</div>
+                <div class="stat-value" id="stat-cpc">-</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row" style="margin-bottom: 16px;">
+                <div class="filter-group flex-1">
+                    <label for="search">Search Keywords</label>
+                    <input type="text" id="search" placeholder="Type to filter keywords...">
+                </div>
+                <div class="filter-group">
+                    <label for="category">Category</label>
+                    <select id="category">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="min-brands">Min Brands</label>
+                    <select id="min-brands">
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row" style="margin-bottom: 16px;">
+                <div class="filter-group">
+                    <label for="min-volume">Min Volume</label>
+                    <input type="number" id="min-volume" placeholder="0" value="">
+                </div>
+                <div class="filter-group">
+                    <label for="max-volume">Max Volume</label>
+                    <input type="number" id="max-volume" placeholder="Any" value="">
+                </div>
+                <div class="filter-group">
+                    <label for="min-cpc">Min CPC ($)</label>
+                    <input type="number" id="min-cpc" placeholder="0" step="0.1" value="">
+                </div>
+                <div class="filter-group">
+                    <label for="max-cpc">Max CPC ($)</label>
+                    <input type="number" id="max-cpc" placeholder="Any" step="0.1" value="">
+                </div>
+                <div class="filter-group">
+                    <label for="intent">Intent</label>
+                    <select id="intent">
+                        <option value="">All Intents</option>
+                        <option value="Navigational">Navigational</option>
+                        <option value="Informational">Informational</option>
+                        <option value="Transactional">Transactional</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Include Brands</label>
+                    <div class="checkbox-group" id="brand-filters"></div>
+                </div>
+                <div style="flex: 1;"></div>
+                <button class="btn btn-secondary" id="reset-btn">Reset Filters</button>
+                <button class="btn btn-primary" id="export-btn">Export CSV</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <span class="table-info" id="table-info">Loading...</span>
+                <div class="table-actions">
+                    <select id="page-size">
+                        <option value="25">25 per page</option>
+                        <option value="50" selected>50 per page</option>
+                        <option value="100">100 per page</option>
+                        <option value="250">250 per page</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="brand_count" style="width: 80px;">Brands</th>
+                            <th data-sort="keyword">Keyword</th>
+                            <th data-sort="primary_category">Category</th>
+                            <th data-sort="volume" style="width: 120px;">Volume</th>
+                            <th data-sort="cpc" style="width: 80px;">CPC</th>
+                            <th data-sort="total_clicks" style="width: 100px;">Clicks</th>
+                            <th data-sort="intent" style="width: 160px;">Intent</th>
+                            <th>Bidding Brands</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr><td colspan="8" class="loading">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <span class="page-info" id="page-info">Page 1 of 1</span>
+                <div class="page-controls">
+                    <button class="page-btn" id="prev-btn" disabled>Previous</button>
+                    <button class="page-btn" id="next-btn" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data will be loaded from JSON file
+        let allData = { brands: [], keywords: [], category_counts: {} };
+        let filteredData = [];
+        let currentPage = 1;
+        let pageSize = 50;
+        let sortColumn = 'brand_count';
+        let sortDirection = 'desc';
+
+        // Load data
+        async function loadData() {
+            try {
+                const response = await fetch('data/keywords-combined.json');
+                allData = await response.json();
+                initializeUI();
+                applyFilters();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('table-body').innerHTML =
+                    '<tr><td colspan="8" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
+            }
+        }
+
+        function initializeUI() {
+            // Populate category dropdown
+            const categorySelect = document.getElementById('category');
+            const categories = Object.keys(allData.category_counts).sort((a, b) =>
+                allData.category_counts[b] - allData.category_counts[a]
+            );
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = `${cat} (${allData.category_counts[cat].toLocaleString()})`;
+                categorySelect.appendChild(option);
+            });
+
+            // Populate brand filters
+            const brandFilters = document.getElementById('brand-filters');
+            allData.brands.forEach(brand => {
+                const item = document.createElement('div');
+                item.className = 'checkbox-item';
+                item.innerHTML = `
+                    <input type="checkbox" id="brand-${brand}" value="${brand}" checked>
+                    <label for="brand-${brand}">${brand}</label>
+                `;
+                brandFilters.appendChild(item);
+            });
+
+            // Update stats
+            document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
+
+            // Add event listeners
+            document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
+            document.getElementById('category').addEventListener('change', applyFilters);
+            document.getElementById('min-brands').addEventListener('change', applyFilters);
+            document.getElementById('min-volume').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('max-volume').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('min-cpc').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('max-cpc').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('intent').addEventListener('change', applyFilters);
+            document.getElementById('page-size').addEventListener('change', function() {
+                pageSize = parseInt(this.value);
+                currentPage = 1;
+                renderTable();
+            });
+
+            document.querySelectorAll('#brand-filters input').forEach(cb => {
+                cb.addEventListener('change', applyFilters);
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', resetFilters);
+            document.getElementById('export-btn').addEventListener('click', exportCSV);
+            document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
+            document.getElementById('next-btn').addEventListener('click', () => changePage(1));
+
+            // Sort headers
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const column = th.dataset.sort;
+                    if (sortColumn === column) {
+                        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortColumn = column;
+                        sortDirection = column === 'keyword' ? 'asc' : 'desc';
+                    }
+                    applyFilters();
+                });
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase().trim();
+            const category = document.getElementById('category').value;
+            const minBrands = parseInt(document.getElementById('min-brands').value) || 1;
+            const minVolume = parseInt(document.getElementById('min-volume').value) || 0;
+            const maxVolume = parseInt(document.getElementById('max-volume').value) || Infinity;
+            const minCpc = parseFloat(document.getElementById('min-cpc').value) || 0;
+            const maxCpc = parseFloat(document.getElementById('max-cpc').value) || Infinity;
+            const intent = document.getElementById('intent').value;
+
+            const selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
+                .map(cb => cb.value);
+
+            filteredData = allData.keywords.filter(kw => {
+                // Search filter
+                if (search && !kw.keyword.toLowerCase().includes(search)) return false;
+
+                // Category filter
+                if (category && !kw.categories.includes(category)) return false;
+
+                // Brand count filter
+                if (kw.brand_count < minBrands) return false;
+
+                // Brand selection filter
+                if (selectedBrands.length > 0) {
+                    const hasSelectedBrand = kw.brands.some(b => selectedBrands.includes(b));
+                    if (!hasSelectedBrand) return false;
+                }
+
+                // Volume filter
+                if (kw.volume < minVolume || kw.volume > maxVolume) return false;
+
+                // CPC filter
+                if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
+
+                // Intent filter
+                if (intent && !kw.intent.includes(intent)) return false;
+
+                return true;
+            });
+
+            // Sort
+            filteredData.sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            currentPage = 1;
+            updateStats();
+            renderTable();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-filtered').textContent = filteredData.length.toLocaleString();
+            document.getElementById('stat-multi').textContent =
+                filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
+
+            if (filteredData.length > 0) {
+                const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
+                const avgCpc = filteredData.filter(k => k.cpc > 0).reduce((sum, k) => sum + k.cpc, 0) /
+                    filteredData.filter(k => k.cpc > 0).length || 0;
+
+                document.getElementById('stat-volume').textContent = formatNumber(avgVolume);
+                document.getElementById('stat-cpc').textContent = '$' + avgCpc.toFixed(2);
+            } else {
+                document.getElementById('stat-volume').textContent = '-';
+                document.getElementById('stat-cpc').textContent = '-';
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = startIdx + pageSize;
+            const pageData = filteredData.slice(startIdx, endIdx);
+
+            // Update sort indicators
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (th.dataset.sort === sortColumn) {
+                    th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="loading">No keywords match your filters</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(kw => `
+                    <tr>
+                        <td>
+                            <span class="brand-count brand-count-${kw.brand_count}">${kw.brand_count}</span>
+                        </td>
+                        <td class="keyword-cell">${escapeHtml(kw.keyword)}</td>
+                        <td>
+                            ${kw.categories.map(c => `<span class="category-pill">${c}</span>`).join('')}
+                        </td>
+                        <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
+                        <td class="number-cell">${kw.cpc > 0 ? '$' + kw.cpc.toFixed(2) : '-'}</td>
+                        <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
+                        <td>${formatIntent(kw.intent)}</td>
+                        <td>${kw.brands.map(b => `<span class="brand-pill brand-${b}">${b}</span>`).join('')}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update pagination
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            document.getElementById('page-info').textContent =
+                `Page ${currentPage} of ${totalPages || 1}`;
+            document.getElementById('table-info').textContent =
+                `Showing ${startIdx + 1}-${Math.min(endIdx, filteredData.length)} of ${filteredData.length.toLocaleString()} keywords`;
+            document.getElementById('prev-btn').disabled = currentPage <= 1;
+            document.getElementById('next-btn').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('min-brands').value = '1';
+            document.getElementById('min-volume').value = '';
+            document.getElementById('max-volume').value = '';
+            document.getElementById('min-cpc').value = '';
+            document.getElementById('max-cpc').value = '';
+            document.getElementById('intent').value = '';
+            document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
+            sortColumn = 'brand_count';
+            sortDirection = 'desc';
+            applyFilters();
+        }
+
+        function exportCSV() {
+            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Clicks', 'Intent'];
+            const rows = filteredData.map(kw => [
+                kw.keyword,
+                kw.brand_count,
+                kw.brands.join('; '),
+                kw.primary_category,
+                kw.volume,
+                kw.cpc,
+                kw.total_clicks,
+                kw.intent
+            ]);
+
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `keywords-export-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return Math.round(num).toLocaleString();
+        }
+
+        function formatIntent(intent) {
+            if (!intent) return '-';
+            return intent.split(', ').map(i => {
+                const cls = i.toLowerCase().replace(/[^a-z]/g, '');
+                return `<span class="intent-pill intent-${cls}">${i.substring(0, 3)}</span>`;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
