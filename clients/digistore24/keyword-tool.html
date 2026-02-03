@@ -906,7 +906,7 @@
                     <span class="brand-pill brand-maxweb tooltip-trigger" data-tooltip="MaxWeb - Affiliate network">maxweb</span>
                     <span class="brand-pill brand-impact tooltip-trigger" data-tooltip="Impact - Partnership automation platform">impact</span>
                     <span class="brand-pill brand-realize tooltip-trigger" data-tooltip="Realize - Affiliate management">realize</span>
-                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform (excluded by default)">samcart*</span>
+                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform">samcart</span>
                 </div>
             </div>
         </div>
@@ -961,7 +961,7 @@
                 <div class="stat-value small spend-cell" id="stat-realize">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">SamCart Spend*</div>
+                <div class="stat-label">SamCart Spend</div>
                 <div class="stat-value small spend-cell" id="stat-samcart">-</div>
             </div>
         </div>
@@ -1014,9 +1014,6 @@
                 <div class="filter-group">
                     <label>Include Brands</label>
                     <div class="checkbox-group" id="brand-filters"></div>
-                    <div id="samcart-note" style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 6px; font-style: italic;">
-                        * SamCart data excluded by default due to anomalous bid patterns that skewed aggregate metrics
-                    </div>
                 </div>
                 <div style="flex: 1;"></div>
                 <button class="btn btn-secondary" id="reset-btn">Reset Filters</button>
@@ -1127,7 +1124,7 @@
             allData.brands.forEach(brand => {
                 const item = document.createElement('div');
                 item.className = 'checkbox-item';
-                const isChecked = brand !== 'samcart'; // SamCart unchecked by default
+                const isChecked = true; // All brands checked by default
                 item.innerHTML = `
                     <input type="checkbox" id="brand-${brand}" value="${brand}" ${isChecked ? 'checked' : ''}>
                     <label for="brand-${brand}">${brand}</label>
@@ -1137,8 +1134,8 @@
 
             document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
 
-            // Initialize selectedBrands (exclude samcart by default)
-            selectedBrands = allData.brands.filter(b => b !== 'samcart');
+            // Initialize selectedBrands (all brands)
+            selectedBrands = [...allData.brands];
 
             // Event listeners
             document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
@@ -1474,9 +1471,9 @@
             document.getElementById('min-brands').value = '1';
             document.getElementById('intent').value = '';
             document.getElementById('cpc-source').value = 'google_avg';
-            // Reset brand checkboxes (samcart unchecked by default)
+            // Reset brand checkboxes (all checked by default)
             document.querySelectorAll('#brand-filters input').forEach(cb => {
-                cb.checked = cb.value !== 'samcart';
+                cb.checked = true;
             });
             sortColumn = 'calc_spend';
             sortDirection = 'desc';
