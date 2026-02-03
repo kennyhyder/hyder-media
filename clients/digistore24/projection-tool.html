@@ -1049,18 +1049,53 @@
             // Get keywords that belong to selected groups
             const groupField = groupType === 'topics' ? 'short_tail_group' : 'brand_group';
 
-            // For exact match, we only want the short tail keyword itself
+            // For exact match, first identify the short tail keyword for each selected group
+            // The short tail is the keyword that matches the group name or is the shortest keyword containing it
+            let shortTailKeywords = new Set();
+
+            if (matchType === 'exact') {
+                selectedGroups.forEach(groupName => {
+                    // Find keywords in this group
+                    const groupKeywords = keywordData.keywords.filter(kw => kw[groupField] === groupName);
+
+                    // First try exact match to group name
+                    let shortTail = groupKeywords.find(kw => kw.keyword === groupName);
+
+                    // If no exact match, find the shortest keyword that contains the group name
+                    if (!shortTail) {
+                        const candidates = groupKeywords.filter(kw =>
+                            kw.keyword.includes(groupName) || groupName.includes(kw.keyword)
+                        );
+                        if (candidates.length > 0) {
+                            shortTail = candidates.reduce((shortest, kw) =>
+                                kw.keyword.length < shortest.keyword.length ? kw : shortest
+                            );
+                        }
+                    }
+
+                    // If still nothing, just use the first keyword in the group as representative
+                    if (!shortTail && groupKeywords.length > 0) {
+                        // Sort by volume to get the most significant keyword
+                        shortTail = groupKeywords.reduce((best, kw) => {
+                            const kwVol = kw.google?.annual_volume || kw.volume || 0;
+                            const bestVol = best.google?.annual_volume || best.volume || 0;
+                            return kwVol > bestVol ? kw : best;
+                        });
+                    }
+
+                    if (shortTail) {
+                        shortTailKeywords.add(shortTail.keyword);
+                    }
+                });
+            }
+
             // For phrase match, we want all keywords in the selected groups
             keywordData.keywords.forEach(kw => {
                 if (!selectedGroups.has(kw[groupField])) return;
 
-                // For exact match, only include if keyword exactly matches the group name
-                // This gives us only the short tail keyword, not long tail variations
-                if (matchType === 'exact') {
-                    const groupName = kw[groupField];
-                    if (kw.keyword !== groupName) {
-                        return; // Skip long-tail keywords in exact match mode
-                    }
+                // For exact match, only include identified short tail keywords
+                if (matchType === 'exact' && !shortTailKeywords.has(kw.keyword)) {
+                    return;
                 }
 
                 totalKeywords++;
