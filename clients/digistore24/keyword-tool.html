@@ -1069,7 +1069,7 @@
                             <span title="Mobile traffic share">📱 ${mobilePct}%</span>
                             ${b.cpc > 0 ? `<span title="CPC for this brand">$${b.cpc.toFixed(2)} CPC</span>` : ''}
                         </div>
-                        ${fullUrl ? `<div class="brand-card-url"><a href="${escapeHtml(fullUrl)}" target="_blank" rel="noopener" title="${escapeHtml(fullUrl)}">${escapeHtml(urlDisplay)}</a></div>` : ''}
+                        ${fullUrl ? `<div class="brand-card-url"><a href="${makeAbsoluteUrl(fullUrl)}" target="_blank" rel="noopener" title="${escapeHtml(fullUrl)}">${escapeHtml(urlDisplay)}</a></div>` : ''}
                     </div>
                 `;
             }).join('');
@@ -1111,6 +1111,16 @@
             } catch {
                 return url.length > 50 ? url.substring(0, 47) + '...' : url;
             }
+        }
+
+        function makeAbsoluteUrl(url) {
+            if (!url) return '';
+            // If URL already has protocol, return as-is
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                return escapeHtml(url);
+            }
+            // Otherwise prepend https://
+            return 'https://' + escapeHtml(url);
         }
 
         function getCategoryTooltip(category) {
