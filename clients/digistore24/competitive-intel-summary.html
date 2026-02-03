@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitive Intelligence Summary | Digistore24</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand:hover {
+            color: var(--accent-hover);
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 32px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .hero-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Context Section */
+        .context-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .context-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .context-section p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .context-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .highlight-box h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .highlight-box li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            color: var(--text-primary);
+        }
+
+        .highlight-box li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Tools Grid */
+        .tools-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .tool-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .tool-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .tool-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .tool-card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .tool-card-body {
+            padding: 24px;
+        }
+
+        .tool-card-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .tool-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 24px;
+        }
+
+        .tool-features li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tool-features li:last-child {
+            border-bottom: none;
+        }
+
+        .tool-features li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .tool-card-footer {
+            padding: 0 24px 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        /* How to Use Section */
+        .how-to-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .how-to-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .step {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .step h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-section .btn {
+            background: white;
+            color: var(--accent);
+            width: auto;
+            padding: 16px 32px;
+        }
+
+        .cta-section .btn:hover {
+            background: var(--gray-100);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero-stats {
+                gap: 24px;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">Digistore24 Competitive Intel</a>
+        <div class="nav-links">
+            <a href="competitive-intel-summary.html" class="nav-link active">Summary</a>
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link">Projections</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Digistore24 Paid Search Competitive Intelligence</h1>
+            <p class="subtitle">A comprehensive analysis of the competitive landscape for Google Ads, providing actionable insights and tools to build a full-faceted paid search strategy.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">31,000+</div>
+                    <div class="hero-stat-label">Keywords Analyzed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">6</div>
+                    <div class="hero-stat-label">Competitors Tracked</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">150+</div>
+                    <div class="hero-stat-label">Landing Pages Reviewed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">$225K+</div>
+                    <div class="hero-stat-label">Monthly Competitor Spend</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Context Section -->
+        <section class="context-section">
+            <h2>Background & Purpose</h2>
+            <p>This analysis was conducted on behalf of <strong>Digistore24</strong> to provide context for the competitive landscape in Paid Search advertising. After a preliminary review of the Digistore24 Google Ads account, it was determined that there was not enough prior campaign history to conduct a proper performance audit.</p>
+            <p>Instead, this comprehensive competitive intelligence suite was compiled to provide a <strong>roadmap and set of tools</strong> for building a full-faceted Google Search Ads strategy from the ground up.</p>
+            <p>The analysis covers six key competitors in the affiliate network and digital marketplace space: <strong>ClickBank</strong>, <strong>Impact</strong>, <strong>Awin</strong>, <strong>MaxWeb</strong>, <strong>Realize</strong>, and <strong>SamCart</strong>. Data was sourced from SimilarWeb, Google Keyword Planner, and Google Ads Transparency Center.</p>
+
+            <div class="highlight-box">
+                <h3>What This Tool Suite Provides</h3>
+                <ul>
+                    <li>Complete keyword database with competitor bidding data and search volumes</li>
+                    <li>Competitor ad creative examples from Google Ads Transparency</li>
+                    <li>Landing page analysis with design patterns and conversion strategies</li>
+                    <li>Revenue projection calculator based on real competitor data</li>
+                    <li>Sample landing page template based on best practices identified</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Tools Grid -->
+        <section class="tools-section">
+            <h2>Tool Suite Overview</h2>
+            <div class="tools-grid">
+                <!-- Keyword Tool -->
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-icon">🔍</div>
+                        <div>
+                            <h3 class="tool-card-title">Keyword Tool</h3>
+                            <p class="tool-card-subtitle">PPC Keyword Analysis</p>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <p class="tool-card-desc">Interactive database of 31,000+ keywords that competitors are bidding on, with search volume, CPC data, and competitive analysis.</p>
+                        <ul class="tool-features">
+                            <li>Filter by competitor, category, intent type</li>
+                            <li>View Google Keyword Planner bid ranges</li>
+                            <li>Identify multi-brand keyword opportunities</li>
+                            <li>Export filtered data to CSV for campaign building</li>
+                            <li>Keyword groups organized by topic and brand</li>
+                        </ul>
+                    </div>
+                    <div class="tool-card-footer">
+                        <a href="keyword-tool.html" class="btn btn-primary">Open Keyword Tool →</a>
+                    </div>
+                </div>
+
+                <!-- Competitor Ads -->
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-icon">📢</div>
+                        <div>
+                            <h3 class="tool-card-title">Competitor Ads</h3>
+                            <p class="tool-card-subtitle">Ad Transparency Research</p>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <p class="tool-card-desc">View actual Google Ads being run by competitors via Google Ads Transparency Center, with sample screenshots and company profiles.</p>
+                        <ul class="tool-features">
+                            <li>Direct links to Google Ads Transparency for each competitor</li>
+                            <li>Sample ad screenshots captured from live campaigns</li>
+                            <li>Competitor company profiles and key strengths</li>
+                            <li>Quick links to SimilarWeb and SEMrush analysis</li>
+                        </ul>
+                    </div>
+                    <div class="tool-card-footer">
+                        <a href="competitor-ads.html" class="btn btn-primary">View Competitor Ads →</a>
+                    </div>
+                </div>
+
+                <!-- Landing Pages -->
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-icon">📄</div>
+                        <div>
+                            <h3 class="tool-card-title">Landing Page Analysis</h3>
+                            <p class="tool-card-subtitle">Design & Conversion Patterns</p>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <p class="tool-card-desc">Deep dive into competitor landing pages, identifying winning design patterns, CTA strategies, and page structures that drive conversions.</p>
+                        <ul class="tool-features">
+                            <li>Detailed breakdown for each competitor</li>
+                            <li>Top performing pages by click volume</li>
+                            <li>Brand colors, CTA styles, and trust elements</li>
+                            <li>Best practices checklist for new pages</li>
+                            <li>Page type recommendations for Digistore24</li>
+                        </ul>
+                    </div>
+                    <div class="tool-card-footer">
+                        <a href="landing-page-analysis.html" class="btn btn-primary">View Landing Page Analysis →</a>
+                    </div>
+                </div>
+
+                <!-- Projections -->
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-icon">📊</div>
+                        <div>
+                            <h3 class="tool-card-title">Projection Tool</h3>
+                            <p class="tool-card-subtitle">Spend & Revenue Forecasting</p>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <p class="tool-card-desc">Interactive calculator to forecast ad spend, clicks, conversions, and ROAS based on keyword group selection and performance assumptions.</p>
+                        <ul class="tool-features">
+                            <li>Select keyword groups to model campaigns</li>
+                            <li>Adjust CTR, CVR, and LTV assumptions</li>
+                            <li>Toggle between CPC data sources</li>
+                            <li>Monthly and annual projections</li>
+                            <li>Industry benchmarks for comparison</li>
+                        </ul>
+                    </div>
+                    <div class="tool-card-footer">
+                        <a href="projection-tool.html" class="btn btn-primary">Open Projection Tool →</a>
+                    </div>
+                </div>
+
+                <!-- Sample Landing Page -->
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-icon">🎨</div>
+                        <div>
+                            <h3 class="tool-card-title">Sample Landing Page</h3>
+                            <p class="tool-card-subtitle">Template Based on Best Practices</p>
+                        </div>
+                    </div>
+                    <div class="tool-card-body">
+                        <p class="tool-card-desc">A fully designed landing page template for Digistore24, incorporating the winning patterns and strategies identified in the competitive analysis.</p>
+                        <ul class="tool-features">
+                            <li>"Digistore24 vs ClickBank" comparison format</li>
+                            <li>Hero section with key stats and dual CTAs</li>
+                            <li>Feature comparison table</li>
+                            <li>Testimonials and FAQ sections</li>
+                            <li>Mobile-responsive design</li>
+                        </ul>
+                    </div>
+                    <div class="tool-card-footer">
+                        <a href="sample-landing-page.html" class="btn btn-primary">View Sample Page →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Use Section -->
+        <section class="how-to-section">
+            <h2>Recommended Workflow</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Explore Keywords</h3>
+                    <p>Start with the Keyword Tool to identify high-value keyword opportunities. Filter by category, intent, and competitor presence to find gaps and opportunities.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Study Competitors</h3>
+                    <p>Review competitor ads and landing pages to understand their messaging, offers, and conversion strategies. Note what's working for them.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Model Campaigns</h3>
+                    <p>Use the Projection Tool to forecast potential spend and returns for different keyword groups. Identify the most promising campaign themes.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Build & Launch</h3>
+                    <p>Export keyword data, adapt the sample landing page template, and launch campaigns. Monitor performance against projected benchmarks.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Get Started?</h2>
+            <p>Begin exploring the competitive landscape with the Keyword Tool to identify your highest-value opportunities.</p>
+            <a href="keyword-tool.html" class="btn">Start with Keyword Tool →</a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Competitive Intelligence Suite prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a> for Digistore24</p>
+            <p style="margin-top: 8px;">Data sources: SimilarWeb, Google Keyword Planner, Google Ads Transparency Center</p>
+        </footer>
+    </div>
+</body>
+</html>
