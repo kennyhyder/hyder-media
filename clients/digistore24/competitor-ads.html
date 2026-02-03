@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Ad Transparency | Digistore24</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .nav-links {
+            margin-top: 12px;
+        }
+
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .competitor-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        .tab-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-btn .domain {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .tab-btn.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .content-area {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .content-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 700px;
+            background: white;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .fallback-message {
+            padding: 60px;
+            text-align: center;
+        }
+
+        .fallback-message h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .fallback-message p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .competitor-info {
+            padding: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .info-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-card p {
+            font-size: 1rem;
+        }
+
+        .info-card a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .quick-link {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: var(--border);
+        }
+
+        .warning-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-banner .icon {
+            font-size: 1.5rem;
+        }
+
+        .warning-banner .text {
+            flex: 1;
+        }
+
+        .warning-banner .text strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .warning-banner .text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .competitor-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Competitor Ad Transparency</h1>
+            <p class="subtitle">View ads running on Google for each competitor via Google Ads Transparency Center</p>
+            <div class="nav-links">
+                <a href="keyword-tool.html">&larr; Back to Keyword Tool</a>
+            </div>
+        </header>
+
+        <div class="warning-banner">
+            <span class="icon">&#9888;</span>
+            <div class="text">
+                <strong>Note: External Tool</strong>
+                <p>Google Ads Transparency Center cannot be embedded due to security restrictions. Click "Open in Google" to view ads in a new tab.</p>
+            </div>
+        </div>
+
+        <div class="competitor-tabs">
+            <button class="tab-btn active" data-competitor="clickbank" data-domain="clickbank.com">
+                <span>ClickBank</span>
+                <span class="domain">clickbank.com</span>
+            </button>
+            <button class="tab-btn" data-competitor="buygoods" data-domain="buygoods.com">
+                <span>BuyGoods</span>
+                <span class="domain">buygoods.com</span>
+            </button>
+            <button class="tab-btn" data-competitor="maxweb" data-domain="maxweb.com">
+                <span>MaxWeb</span>
+                <span class="domain">maxweb.com</span>
+            </button>
+            <button class="tab-btn" data-competitor="awin" data-domain="awin.com">
+                <span>Awin</span>
+                <span class="domain">awin.com</span>
+            </button>
+            <button class="tab-btn" data-competitor="samcart" data-domain="samcart.com">
+                <span>SamCart</span>
+                <span class="domain">samcart.com</span>
+            </button>
+            <button class="tab-btn unavailable" data-competitor="pandacar" data-domain="">
+                <span>PandaCar</span>
+                <span class="domain">not found</span>
+            </button>
+        </div>
+
+        <div class="content-area">
+            <div class="content-header">
+                <span class="content-title" id="content-title">ClickBank Ads</span>
+                <div class="content-actions">
+                    <a href="#" class="btn btn-primary" id="open-transparency" target="_blank">
+                        Open in Google Ads Transparency Center &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <div class="competitor-info" id="competitor-info">
+                <!-- Dynamic content loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const competitors = {
+            clickbank: {
+                name: 'ClickBank',
+                domain: 'clickbank.com',
+                transparencyUrl: 'https://adstransparency.google.com/?region=US&domain=clickbank.com',
+                description: 'Leading digital product marketplace and affiliate network. Claims $7.1B+ paid in commissions.',
+                website: 'https://www.clickbank.com',
+                affiliateSignup: 'https://www.clickbank.com/signup/',
+                founded: '1998',
+                focus: 'Digital products, e-books, courses, software',
+                estimatedAffiliates: '100,000+',
+                keyStrengths: [
+                    'Largest digital product marketplace',
+                    'High commissions (up to 75%)',
+                    'Reliable weekly payments',
+                    'Extensive product variety'
+                ]
+            },
+            buygoods: {
+                name: 'BuyGoods',
+                domain: 'buygoods.com',
+                transparencyUrl: 'https://adstransparency.google.com/?region=US&domain=buygoods.com',
+                description: 'Global ecommerce marketplace specializing in health, wellness, and digital products.',
+                website: 'https://buygoods.com',
+                affiliateSignup: 'https://backoffice.buygoods.com/affsignup',
+                founded: '2012',
+                focus: 'Health supplements, weight loss, digital products',
+                estimatedAffiliates: '50,000+',
+                keyStrengths: [
+                    'Up to 3x weekly payments',
+                    'High-converting health offers',
+                    'Dedicated affiliate managers',
+                    'Legends program for top earners'
+                ]
+            },
+            maxweb: {
+                name: 'MaxWeb',
+                domain: 'maxweb.com',
+                transparencyUrl: 'https://adstransparency.google.com/?region=US&domain=maxweb.com',
+                description: 'Performance-based CPA affiliate network specializing in VSL offers and health products.',
+                website: 'https://maxweb.com',
+                affiliateSignup: 'https://backoffice.maxweb.com/affsignup',
+                founded: '2010',
+                focus: 'Health supplements, cognitive enhancers, weight loss VSLs',
+                estimatedAffiliates: '40,000+',
+                keyStrengths: [
+                    'Highest CPA payouts in industry',
+                    'In-house tracking technology',
+                    '300+ proprietary offers',
+                    '24/7 affiliate support'
+                ]
+            },
+            awin: {
+                name: 'Awin',
+                domain: 'awin.com',
+                transparencyUrl: 'https://adstransparency.google.com/?region=US&domain=awin.com',
+                description: 'Global affiliate network connecting 16,500+ merchants with 225,000+ affiliates worldwide.',
+                website: 'https://www.awin.com',
+                affiliateSignup: 'https://www.awin.com/us/publishers',
+                founded: '2000 (as Zanox, rebranded 2017)',
+                focus: 'Retail, travel, finance, telecommunications',
+                estimatedAffiliates: '225,000+',
+                keyStrengths: [
+                    'Global reach (180+ countries)',
+                    'Major brand partnerships',
+                    'Multi-currency support',
+                    'Advanced tracking & reporting'
+                ]
+            },
+            samcart: {
+                name: 'SamCart',
+                domain: 'samcart.com',
+                transparencyUrl: 'https://adstransparency.google.com/?region=US&domain=samcart.com',
+                description: 'Shopping cart platform for digital creators with built-in affiliate management.',
+                website: 'https://www.samcart.com',
+                affiliateSignup: 'https://www.samcart.com/affiliate',
+                founded: '2014',
+                focus: 'Course creators, coaches, digital entrepreneurs',
+                estimatedAffiliates: '25,000+',
+                keyStrengths: [
+                    'High-converting checkout pages',
+                    'Built-in affiliate center',
+                    'Subscription/payment plans',
+                    'A/B testing features'
+                ]
+            },
+            pandacar: {
+                name: 'PandaCar',
+                domain: null,
+                transparencyUrl: null,
+                description: 'Unable to locate this affiliate network. The domain/company could not be verified.',
+                website: null,
+                affiliateSignup: null,
+                founded: 'Unknown',
+                focus: 'Unknown',
+                estimatedAffiliates: 'Unknown',
+                keyStrengths: []
+            }
+        };
+
+        let activeCompetitor = 'clickbank';
+
+        function updateContent(competitorId) {
+            const competitor = competitors[competitorId];
+            activeCompetitor = competitorId;
+
+            // Update tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.competitor === competitorId) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update title
+            document.getElementById('content-title').textContent = competitor.name + ' Ads & Info';
+
+            // Update transparency link
+            const openBtn = document.getElementById('open-transparency');
+            if (competitor.transparencyUrl) {
+                openBtn.href = competitor.transparencyUrl;
+                openBtn.style.display = 'inline-flex';
+            } else {
+                openBtn.style.display = 'none';
+            }
+
+            // Update info content
+            const infoContainer = document.getElementById('competitor-info');
+
+            if (!competitor.domain) {
+                infoContainer.innerHTML = `
+                    <div class="fallback-message">
+                        <h2>Competitor Not Found</h2>
+                        <p>${competitor.description}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            infoContainer.innerHTML = `
+                <p style="font-size: 1.1rem; margin-bottom: 20px;">${competitor.description}</p>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Website</h3>
+                        <p><a href="${competitor.website}" target="_blank">${competitor.website}</a></p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Affiliate Sign-up</h3>
+                        <p><a href="${competitor.affiliateSignup}" target="_blank">${competitor.affiliateSignup}</a></p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Founded</h3>
+                        <p>${competitor.founded}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Focus Areas</h3>
+                        <p>${competitor.focus}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Est. Affiliates</h3>
+                        <p>${competitor.estimatedAffiliates}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Key Strengths</h3>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            ${competitor.keyStrengths.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 32px; margin-bottom: 16px; color: var(--text-secondary);">Quick Links</h3>
+                <div class="quick-links">
+                    <a href="${competitor.transparencyUrl}" target="_blank" class="quick-link">
+                        📊 Google Ads Transparency
+                    </a>
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(competitor.name + ' reviews')}" target="_blank" class="quick-link">
+                        🔍 Search Reviews
+                    </a>
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(competitor.name + ' vs')}" target="_blank" class="quick-link">
+                        ⚖️ Comparisons
+                    </a>
+                    <a href="https://www.similarweb.com/website/${competitor.domain}/" target="_blank" class="quick-link">
+                        📈 SimilarWeb Traffic
+                    </a>
+                    <a href="https://www.semrush.com/analytics/overview/?q=${competitor.domain}" target="_blank" class="quick-link">
+                        🎯 SEMrush Analysis
+                    </a>
+                </div>
+            `;
+        }
+
+        // Tab click handlers
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!btn.classList.contains('unavailable')) {
+                    updateContent(btn.dataset.competitor);
+                }
+            });
+        });
+
+        // Initial load
+        updateContent('clickbank');
+    </script>
+</body>
+</html>
