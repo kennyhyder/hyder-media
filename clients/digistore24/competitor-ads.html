@@ -33,6 +33,61 @@
             min-height: 100vh;
         }
 
+        /* Standardized Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-brand:hover {
+            color: var(--accent-hover);
+        }
+
+        .main-nav .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 0;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -307,13 +362,21 @@
     </style>
 </head>
 <body>
+    <!-- Standardized Navigation -->
+    <nav class="main-nav">
+        <a href="keyword-tool.html" class="nav-brand">Digistore24 Competitive Intel</a>
+        <div class="nav-links">
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link active">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="sample-landing-page.html" class="nav-link">Sample LP</a>
+        </div>
+    </nav>
+
     <div class="container">
         <header>
             <h1>Competitor Ad Transparency</h1>
             <p class="subtitle">View ads running on Google for each competitor via Google Ads Transparency Center</p>
-            <div class="nav-links">
-                <a href="keyword-tool.html">&larr; Back to Keyword Tool</a>
-            </div>
         </header>
 
         <div class="warning-banner">

@@ -33,10 +33,64 @@
             min-height: 100vh;
         }
 
+        /* Standardized Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-brand:hover {
+            color: var(--accent-hover);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
         .container {
             max-width: 1800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px 20px;
         }
 
         header {
@@ -52,6 +106,163 @@
         .subtitle {
             color: var(--text-secondary);
             font-size: 0.95rem;
+        }
+
+        /* Keyword Groups Accordion */
+        .groups-section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .groups-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .groups-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .groups-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .groups-header .toggle-icon {
+            transition: transform 0.2s;
+        }
+
+        .groups-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .groups-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .groups-content.show {
+            display: block;
+        }
+
+        .groups-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .groups-tab {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .groups-tab:hover {
+            background: var(--border);
+        }
+
+        .groups-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .group-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .group-card-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .group-card-header:hover {
+            background: var(--border);
+        }
+
+        .group-card-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .group-card-count {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .group-card-body {
+            padding: 0 16px 12px;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .group-card.expanded .group-card-body {
+            display: block;
+        }
+
+        .group-keyword {
+            padding: 6px 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .group-keyword:hover {
+            color: var(--accent);
+        }
+
+        .group-keyword:last-child {
+            border-bottom: none;
+        }
+
+        .group-filter-btn {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .group-filter-btn:hover {
+            background: var(--accent-hover);
         }
 
         .stats-bar {
@@ -609,15 +820,21 @@
     </style>
 </head>
 <body>
+    <!-- Standardized Navigation -->
+    <nav class="main-nav">
+        <a href="keyword-tool.html" class="nav-brand">Digistore24 Competitive Intel</a>
+        <div class="nav-links">
+            <a href="keyword-tool.html" class="nav-link active">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="sample-landing-page.html" class="nav-link">Sample LP</a>
+        </div>
+    </nav>
+
     <div class="container">
         <header>
             <h1>PPC Keyword Analysis Tool</h1>
-            <p class="subtitle">Competitor keyword data from SimilarWeb + Google Keyword Planner - Awin, SamCart, ClickBank, MaxWeb</p>
-            <p class="subtitle" style="margin-top: 8px;">
-                <a href="competitor-ads.html" style="color: #3b82f6;">Competitor Ads</a> &nbsp;|&nbsp;
-                <a href="landing-page-analysis.html" style="color: #3b82f6;">Landing Page Analysis</a> &nbsp;|&nbsp;
-                <a href="sample-landing-page.html" style="color: #3b82f6;">Sample Landing Page</a>
-            </p>
+            <p class="subtitle">16,616 keywords from SimilarWeb + Google Keyword Planner data for Awin, SamCart, ClickBank, MaxWeb</p>
         </header>
 
         <!-- Legend -->
@@ -648,6 +865,22 @@
                     <span class="brand-pill brand-clickbank tooltip-trigger" data-tooltip="ClickBank - Digital product marketplace">clickbank</span>
                     <span class="brand-pill brand-maxweb tooltip-trigger" data-tooltip="MaxWeb - Affiliate network">maxweb</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Keyword Groups Accordion -->
+        <div class="groups-section">
+            <div class="groups-header" onclick="toggleGroupsSection(this)">
+                <h2><span class="toggle-icon">▼</span> Keyword Groups (Short-Tail Categories)</h2>
+                <span id="groups-summary" style="font-size: 0.85rem; color: var(--text-secondary);">Loading...</span>
+            </div>
+            <div class="groups-content show" id="groups-content">
+                <div class="groups-tabs">
+                    <button class="groups-tab active" onclick="switchGroupTab('brands', this)">Brand Groups (<span id="brand-count">0</span>)</button>
+                    <button class="groups-tab" onclick="switchGroupTab('topics', this)">Topic Groups (<span id="topic-count">0</span>)</button>
+                </div>
+                <div id="groups-brands" class="groups-grid"></div>
+                <div id="groups-topics" class="groups-grid" style="display: none;"></div>
             </div>
         </div>
 
@@ -1283,6 +1516,123 @@
         }
 
         loadData();
+
+        // Keyword Groups functionality
+        function toggleGroupsSection(header) {
+            header.classList.toggle('collapsed');
+            const content = document.getElementById('groups-content');
+            content.classList.toggle('show');
+        }
+
+        function switchGroupTab(tab, btn) {
+            document.querySelectorAll('.groups-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.getElementById('groups-brands').style.display = tab === 'brands' ? 'grid' : 'none';
+            document.getElementById('groups-topics').style.display = tab === 'topics' ? 'grid' : 'none';
+        }
+
+        function renderKeywordGroups(data) {
+            const groups = data.keyword_groups;
+            if (!groups) {
+                document.getElementById('groups-summary').textContent = 'No groups available';
+                return;
+            }
+
+            const brandCount = Object.keys(groups.brands || {}).length;
+            const topicCount = Object.keys(groups.topics || {}).length;
+
+            document.getElementById('brand-count').textContent = brandCount;
+            document.getElementById('topic-count').textContent = topicCount;
+            document.getElementById('groups-summary').textContent = `${brandCount} brand groups, ${topicCount} topic groups`;
+
+            // Render brand groups
+            const brandsContainer = document.getElementById('groups-brands');
+            brandsContainer.innerHTML = Object.entries(groups.brands || {})
+                .sort((a, b) => b[1].count - a[1].count)
+                .map(([name, info]) => createGroupCard(name, info, 'brand'))
+                .join('');
+
+            // Render topic groups
+            const topicsContainer = document.getElementById('groups-topics');
+            topicsContainer.innerHTML = Object.entries(groups.topics || {})
+                .sort((a, b) => b[1].count - a[1].count)
+                .map(([name, info]) => createGroupCard(name, info, 'topic'))
+                .join('');
+        }
+
+        function createGroupCard(name, info, type) {
+            const cardId = `group-${type}-${name.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            const sampleKeywords = (info.sample_keywords || []).slice(0, 10);
+
+            return `
+                <div class="group-card" id="${cardId}">
+                    <div class="group-card-header" onclick="toggleGroupCard('${cardId}')">
+                        <span class="group-card-name">${escapeHtml(name)}</span>
+                        <span class="group-card-count">${info.count.toLocaleString()}</span>
+                    </div>
+                    <div class="group-card-body">
+                        ${sampleKeywords.map(kw => `
+                            <div class="group-keyword" onclick="filterByKeyword('${escapeHtml(kw).replace(/'/g, "\\'")}')">${escapeHtml(kw)}</div>
+                        `).join('')}
+                        <button class="group-filter-btn" onclick="filterByGroup('${type}', '${escapeHtml(name).replace(/'/g, "\\'")}')">
+                            Show all ${info.count.toLocaleString()} keywords
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleGroupCard(cardId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('expanded');
+        }
+
+        function filterByKeyword(keyword) {
+            document.getElementById('search').value = keyword;
+            applyFilters();
+            // Scroll to table
+            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function filterByGroup(type, groupName) {
+            // Get all keywords in this group
+            const keywords = allData.keywords.filter(kw => {
+                if (type === 'brand') {
+                    return kw.brand_group === groupName;
+                } else {
+                    return kw.short_tail_group === groupName;
+                }
+            });
+
+            if (keywords.length === 0) {
+                // Fall back to searching by group name
+                document.getElementById('search').value = groupName.toLowerCase();
+            } else {
+                // Build a search pattern that matches any of these keywords
+                // For simplicity, just search by the group name
+                document.getElementById('search').value = groupName.toLowerCase().split(/[\s()\[\]]+/).filter(w => w.length > 3)[0] || groupName.toLowerCase();
+            }
+
+            applyFilters();
+            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Modify loadData to also render keyword groups
+        const originalLoadData = loadData;
+        loadData = async function() {
+            try {
+                const response = await fetch('data/keywords-combined.json');
+                allData = await response.json();
+                initializeUI();
+                renderKeywordGroups(allData);
+                applyFilters();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('table-body').innerHTML =
+                    '<tr><td colspan="9" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
+            }
+        };
     </script>
 </body>
 </html>
