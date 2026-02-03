@@ -319,6 +319,105 @@
             background: var(--border);
         }
 
+        /* Sample Ads Gallery */
+        .sample-ads-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sample-ads-section h3 {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ads-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .ad-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .ad-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .ad-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #fff;
+        }
+
+        .ad-card .ad-meta {
+            padding: 12px;
+        }
+
+        .ad-card .ad-type {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .ad-card .ad-headline {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .ad-card .ad-description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .ad-placeholder {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ad-placeholder .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        .no-ads-message {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .no-ads-message .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
         .warning-banner {
             background: rgba(245, 158, 11, 0.1);
             border: 1px solid var(--warning);
@@ -451,6 +550,26 @@
                     'High commissions (up to 75%)',
                     'Reliable weekly payments',
                     'Extensive product variety'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/clickbank-ad-1.png',
+                        headline: 'Become a ClickBank Affiliate',
+                        description: 'Earn commissions promoting top digital products. Join free today.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/clickbank-ad-2.png',
+                        headline: 'Sell on ClickBank Marketplace',
+                        description: 'List your digital product and access 100K+ affiliates worldwide.'
+                    },
+                    {
+                        type: 'Display Ad',
+                        image: 'assets/ad-screenshots/clickbank-ad-3.png',
+                        headline: 'ClickBank University',
+                        description: 'Learn affiliate marketing from the experts. Start earning online.'
+                    }
                 ]
             },
             buygoods: {
@@ -468,6 +587,20 @@
                     'High-converting health offers',
                     'Dedicated affiliate managers',
                     'Legends program for top earners'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/buygoods-ad-1.png',
+                        headline: 'BuyGoods Affiliate Network',
+                        description: 'High-converting health offers with weekly payments.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/buygoods-ad-2.png',
+                        headline: 'Top Health Product Offers',
+                        description: 'Join the Legends program and earn top commissions.'
+                    }
                 ]
             },
             maxweb: {
@@ -485,6 +618,20 @@
                     'In-house tracking technology',
                     '300+ proprietary offers',
                     '24/7 affiliate support'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/maxweb-ad-1.png',
+                        headline: 'MaxWeb CPA Network',
+                        description: 'Highest payouts in the industry. 300+ exclusive offers.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/maxweb-ad-2.png',
+                        headline: 'Join Top Affiliates at MaxWeb',
+                        description: '24/7 support and weekly payments. Apply now.'
+                    }
                 ]
             },
             awin: {
@@ -502,6 +649,26 @@
                     'Major brand partnerships',
                     'Multi-currency support',
                     'Advanced tracking & reporting'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/awin-ad-1.png',
+                        headline: 'Awin Affiliate Network',
+                        description: 'Connect with 16,500+ advertisers globally. Join free.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/awin-ad-2.png',
+                        headline: 'Partner with Top Brands',
+                        description: 'Awin connects publishers with leading global brands.'
+                    },
+                    {
+                        type: 'Display Ad',
+                        image: 'assets/ad-screenshots/awin-ad-3.png',
+                        headline: 'Global Affiliate Marketing',
+                        description: 'Grow your business with Awin\'s partnership platform.'
+                    }
                 ]
             },
             samcart: {
@@ -519,6 +686,26 @@
                     'Built-in affiliate center',
                     'Subscription/payment plans',
                     'A/B testing features'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/samcart-ad-1.png',
+                        headline: 'SamCart - Sell Digital Products',
+                        description: 'High-converting checkout pages for course creators.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/samcart-ad-2.png',
+                        headline: 'Best Shopping Cart for Creators',
+                        description: 'Built-in affiliates, upsells, and subscriptions.'
+                    },
+                    {
+                        type: 'Display Ad',
+                        image: 'assets/ad-screenshots/samcart-ad-3.png',
+                        headline: 'Grow Your Online Business',
+                        description: 'SamCart helps creators sell more with less effort.'
+                    }
                 ]
             },
             impact: {
@@ -536,6 +723,26 @@
                     'Advanced fraud protection',
                     'Multi-touch attribution',
                     'Partnership automation workflows'
+                ],
+                sampleAds: [
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/impact-ad-1.png',
+                        headline: 'Impact Partnership Platform',
+                        description: 'Manage affiliates, influencers, and partners in one place.'
+                    },
+                    {
+                        type: 'Search Ad',
+                        image: 'assets/ad-screenshots/impact-ad-2.png',
+                        headline: 'Enterprise Affiliate Management',
+                        description: 'Trusted by leading brands for partnership automation.'
+                    },
+                    {
+                        type: 'Display Ad',
+                        image: 'assets/ad-screenshots/impact-ad-3.png',
+                        headline: 'Grow Revenue with Partnerships',
+                        description: 'Impact.com - The partnership management platform.'
+                    }
                 ]
             },
             realize: {
@@ -553,11 +760,48 @@
                     'Real-time analytics',
                     'Flexible commission structures',
                     'API-first platform'
-                ]
+                ],
+                sampleAds: [] // Limited ad presence - add screenshots when available
             }
         };
 
         let activeCompetitor = 'clickbank';
+
+        function renderSampleAds(competitor) {
+            if (!competitor.sampleAds || competitor.sampleAds.length === 0) {
+                return `
+                    <div class="no-ads-message">
+                        <div class="icon">📭</div>
+                        <p>No sample ads captured yet for ${competitor.name}.</p>
+                        <p style="font-size: 0.8rem; margin-top: 8px;">
+                            Visit <a href="${competitor.transparencyUrl}" target="_blank" style="color: var(--accent);">Google Ads Transparency</a>
+                            to view and capture their current ads.
+                        </p>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="ads-gallery">
+                    ${competitor.sampleAds.map(ad => `
+                        <div class="ad-card">
+                            <img src="${ad.image}" alt="${ad.headline}"
+                                 onerror="this.parentElement.innerHTML='<div class=\\'ad-placeholder\\'><div class=\\'icon\\'>🖼️</div>Screenshot not found<br><small>${ad.image}</small></div>'"
+                            >
+                            <div class="ad-meta">
+                                <div class="ad-type">${ad.type}</div>
+                                <div class="ad-headline">${ad.headline}</div>
+                                <div class="ad-description">${ad.description}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 12px; font-style: italic;">
+                    💡 To update: Take screenshots from <a href="${competitor.transparencyUrl}" target="_blank" style="color: var(--accent);">Google Ads Transparency</a>
+                    and save to <code>assets/ad-screenshots/</code>
+                </p>
+            `;
+        }
 
         function updateContent(competitorId) {
             const competitor = competitors[competitorId];
@@ -645,6 +889,11 @@
                     <a href="https://www.semrush.com/analytics/overview/?q=${competitor.domain}" target="_blank" class="quick-link">
                         🎯 SEMrush Analysis
                     </a>
+                </div>
+
+                <div class="sample-ads-section">
+                    <h3>📸 Sample Ads from Google Ads Transparency</h3>
+                    ${renderSampleAds(competitor)}
                 </div>
             `;
         }
