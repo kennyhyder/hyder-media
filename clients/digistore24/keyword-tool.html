@@ -612,7 +612,7 @@
     <div class="container">
         <header>
             <h1>PPC Keyword Analysis Tool</h1>
-            <p class="subtitle">Competitor keyword data from SimilarWeb - Awin, SamCart, ClickBank, MaxWeb</p>
+            <p class="subtitle">Competitor keyword data from SimilarWeb + Google Keyword Planner - Awin, SamCart, ClickBank, MaxWeb</p>
         </header>
 
         <!-- Legend -->
@@ -779,7 +779,8 @@
                             <th data-sort="keyword">Keyword</th>
                             <th data-sort="primary_category" class="tooltip-trigger" data-tooltip="Auto-categorized based on keyword content">Category</th>
                             <th data-sort="volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Monthly search volume">Volume</th>
-                            <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Average cost per click">CPC</th>
+                            <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Average cost per click (SimilarWeb)">CPC</th>
+                            <th data-sort="google_bid_high" style="width: 110px;" class="tooltip-trigger" data-tooltip="Google Ads Top of Page Bid (low - high). This is what Google suggests for ads to appear at the top of search results.">Google Bid</th>
                             <th data-sort="total_clicks" style="width: 90px;" class="tooltip-trigger" data-tooltip="Total clicks across all brands">Clicks</th>
                             <th data-sort="est_spend" style="width: 100px;" class="tooltip-trigger" data-tooltip="Estimated total spend (clicks × CPC)">Est. Spend</th>
                             <th data-sort="primary_intent" style="width: 100px;" class="tooltip-trigger" data-tooltip="Search intent: Transactional (ready to buy), Navigational (looking for specific site), Informational (researching)">Intent</th>
@@ -787,7 +788,7 @@
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <tr><td colspan="9" class="loading">Loading data...</td></tr>
+                        <tr><td colspan="10" class="loading">Loading data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -920,6 +921,8 @@
                         brand_count: filteredBrands.length,
                         total_clicks: filteredClicks,
                         est_spend: filteredSpend,
+                        google_bid_high: kw.google?.high_top_of_page_bid || 0,
+                        google_bid_low: kw.google?.low_top_of_page_bid || 0,
                     };
                 })
                 .filter(kw => {
@@ -1012,7 +1015,7 @@
             });
 
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="loading">No keywords match your filters</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="loading">No keywords match your filters</td></tr>';
             } else {
                 tbody.innerHTML = pageData.map((kw, idx) => {
                     const rowId = `row-${currentPage}-${idx}`;
@@ -1027,6 +1030,7 @@
                         </td>
                         <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
                         <td class="number-cell">${kw.cpc > 0 ? '$' + kw.cpc.toFixed(2) : '-'}</td>
+                        <td class="number-cell">${formatGoogleBid(kw.google)}</td>
                         <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
                         <td class="number-cell spend-cell">${kw.est_spend > 0 ? '$' + formatNumber(kw.est_spend) : '-'}</td>
                         <td>${formatIntent(kw.intent)}</td>
@@ -1165,7 +1169,7 @@
         }
 
         function exportCSV() {
-            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
+            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Google Bid Low', 'Google Bid High', 'Google Competition', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
             const rows = filteredData.map(kw => [
                 kw.keyword,
                 kw.brand_count,
@@ -1173,6 +1177,9 @@
                 kw.primary_category,
                 kw.volume,
                 kw.cpc,
+                kw.google?.low_top_of_page_bid || '',
+                kw.google?.high_top_of_page_bid || '',
+                kw.google?.competition || '',
                 kw.total_clicks,
                 kw.est_spend,
                 kw.intent,
@@ -1188,6 +1195,17 @@
             link.href = URL.createObjectURL(blob);
             link.download = `keywords-export-${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
+        }
+
+        function formatGoogleBid(google) {
+            if (!google || (!google.low_top_of_page_bid && !google.high_top_of_page_bid)) {
+                return '<span style="color: var(--text-secondary);">-</span>';
+            }
+            const low = google.low_top_of_page_bid ? '$' + google.low_top_of_page_bid.toFixed(2) : '-';
+            const high = google.high_top_of_page_bid ? '$' + google.high_top_of_page_bid.toFixed(2) : '-';
+            const comp = google.competition || '';
+            const compClass = comp === 'HIGH' ? 'var(--danger)' : comp === 'MEDIUM' ? 'var(--warning)' : comp === 'LOW' ? 'var(--success)' : 'var(--text-secondary)';
+            return `<span title="Competition: ${comp || 'Unknown'}" style="color: ${compClass};">${low} - ${high}</span>`;
         }
 
         function formatNumber(num) {
