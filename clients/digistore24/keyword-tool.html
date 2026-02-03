@@ -956,22 +956,6 @@
 
             <div class="filter-row" style="margin-bottom: 16px;">
                 <div class="filter-group">
-                    <label for="min-volume">Min Volume</label>
-                    <input type="number" id="min-volume" placeholder="0" value="">
-                </div>
-                <div class="filter-group">
-                    <label for="max-volume">Max Volume</label>
-                    <input type="number" id="max-volume" placeholder="Any" value="">
-                </div>
-                <div class="filter-group">
-                    <label for="min-cpc">Min CPC ($)</label>
-                    <input type="number" id="min-cpc" placeholder="0" step="0.1" value="">
-                </div>
-                <div class="filter-group">
-                    <label for="max-cpc">Max CPC ($)</label>
-                    <input type="number" id="max-cpc" placeholder="Any" step="0.1" value="">
-                </div>
-                <div class="filter-group">
                     <label for="intent">Intent</label>
                     <select id="intent">
                         <option value="">All Intents</option>
@@ -979,10 +963,6 @@
                         <option value="Navigational">Navigational</option>
                         <option value="Informational">Informational</option>
                     </select>
-                </div>
-                <div class="filter-group">
-                    <label for="min-spend">Min Spend ($)</label>
-                    <input type="number" id="min-spend" placeholder="0" step="1" value="">
                 </div>
                 <div class="filter-group">
                     <label for="cpc-source">CPC Source for Calculations</label>
@@ -999,6 +979,9 @@
                 <div class="filter-group">
                     <label>Include Brands</label>
                     <div class="checkbox-group" id="brand-filters"></div>
+                    <div id="samcart-note" style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 6px; font-style: italic;">
+                        * SamCart data excluded by default due to anomalous bid patterns that skewed aggregate metrics
+                    </div>
                 </div>
                 <div style="flex: 1;"></div>
                 <button class="btn btn-secondary" id="reset-btn">Reset Filters</button>
@@ -1067,8 +1050,8 @@
                 const response = await fetch('data/keywords-combined.json');
                 allData = await response.json();
                 initializeUI();
-                renderKeywordGroups(allData);
-                applyFilters();
+                // Use onBrandFilterChange to set initial state (respects samcart being unchecked)
+                onBrandFilterChange();
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('table-body').innerHTML =
@@ -1092,8 +1075,9 @@
             allData.brands.forEach(brand => {
                 const item = document.createElement('div');
                 item.className = 'checkbox-item';
+                const isChecked = brand !== 'samcart'; // SamCart unchecked by default
                 item.innerHTML = `
-                    <input type="checkbox" id="brand-${brand}" value="${brand}" checked>
+                    <input type="checkbox" id="brand-${brand}" value="${brand}" ${isChecked ? 'checked' : ''}>
                     <label for="brand-${brand}">${brand}</label>
                 `;
                 brandFilters.appendChild(item);
@@ -1101,18 +1085,13 @@
 
             document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
 
-            // Initialize selectedBrands with all brands
-            selectedBrands = [...allData.brands];
+            // Initialize selectedBrands (exclude samcart by default)
+            selectedBrands = allData.brands.filter(b => b !== 'samcart');
 
             // Event listeners
             document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
             document.getElementById('category').addEventListener('change', applyFilters);
             document.getElementById('min-brands').addEventListener('change', applyFilters);
-            document.getElementById('min-volume').addEventListener('input', debounce(applyFilters, 500));
-            document.getElementById('max-volume').addEventListener('input', debounce(applyFilters, 500));
-            document.getElementById('min-cpc').addEventListener('input', debounce(applyFilters, 500));
-            document.getElementById('max-cpc').addEventListener('input', debounce(applyFilters, 500));
-            document.getElementById('min-spend').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('intent').addEventListener('change', applyFilters);
             document.getElementById('cpc-source').addEventListener('change', applyFilters);
             document.getElementById('page-size').addEventListener('change', function() {
@@ -1122,7 +1101,7 @@
             });
 
             document.querySelectorAll('#brand-filters input').forEach(cb => {
-                cb.addEventListener('change', applyFilters);
+                cb.addEventListener('change', onBrandFilterChange);
             });
 
             document.getElementById('reset-btn').addEventListener('click', resetFilters);
@@ -1150,11 +1129,6 @@
             const search = document.getElementById('search').value.toLowerCase().trim();
             const category = document.getElementById('category').value;
             const minBrands = parseInt(document.getElementById('min-brands').value) || 1;
-            const minVolume = parseInt(document.getElementById('min-volume').value) || 0;
-            const maxVolume = parseInt(document.getElementById('max-volume').value) || Infinity;
-            const minCpc = parseFloat(document.getElementById('min-cpc').value) || 0;
-            const maxCpc = parseFloat(document.getElementById('max-cpc').value) || Infinity;
-            const minSpend = parseFloat(document.getElementById('min-spend').value) || 0;
             const intent = document.getElementById('intent').value;
 
             selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
@@ -1211,9 +1185,6 @@
                     if (search && !kw.keyword.toLowerCase().includes(search)) return false;
                     if (category && !kw.categories.includes(category)) return false;
                     if (kw.brand_count < minBrands) return false;
-                    if (kw.volume < minVolume || kw.volume > maxVolume) return false;
-                    if (kw.active_cpc < minCpc || kw.active_cpc > maxCpc) return false;
-                    if (kw.calc_spend < minSpend) return false;
                     if (intent && kw.intent && !kw.intent.includes(intent)) return false;
 
                     return true;
@@ -1436,19 +1407,17 @@
             document.getElementById('search').value = '';
             document.getElementById('category').value = '';
             document.getElementById('min-brands').value = '1';
-            document.getElementById('min-volume').value = '';
-            document.getElementById('max-volume').value = '';
-            document.getElementById('min-cpc').value = '';
-            document.getElementById('max-cpc').value = '';
-            document.getElementById('min-spend').value = '';
             document.getElementById('intent').value = '';
             document.getElementById('cpc-source').value = 'google_avg';
-            document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
+            // Reset brand checkboxes (samcart unchecked by default)
+            document.querySelectorAll('#brand-filters input').forEach(cb => {
+                cb.checked = cb.value !== 'samcart';
+            });
             sortColumn = 'google_volume';
             sortDirection = 'desc';
             activeGroupFilter = null;
             updateGroupFilterDisplay();
-            applyFilters();
+            onBrandFilterChange();
         }
 
         function exportCSV() {
@@ -1526,6 +1495,76 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
+        }
+
+        // Called when brand checkboxes change - updates groups and stats
+        function onBrandFilterChange() {
+            selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
+                .map(cb => cb.value);
+
+            // Recalculate keyword groups based on selected brands
+            recalculateKeywordGroups();
+
+            // Apply filters (which will also update stats)
+            applyFilters();
+        }
+
+        // Recalculate keyword group counts based on selected brands
+        function recalculateKeywordGroups() {
+            // Filter keywords to only those with at least one selected brand
+            const filteredKeywords = allData.keywords.filter(kw =>
+                kw.brands.some(b => selectedBrands.includes(b.name))
+            );
+
+            // Recalculate brand groups
+            const brandGroups = {};
+            const topicGroups = {};
+
+            filteredKeywords.forEach(kw => {
+                if (kw.brand_group) {
+                    if (!brandGroups[kw.brand_group]) {
+                        brandGroups[kw.brand_group] = { count: 0, sample_keywords: [] };
+                    }
+                    brandGroups[kw.brand_group].count++;
+                    if (brandGroups[kw.brand_group].sample_keywords.length < 5) {
+                        brandGroups[kw.brand_group].sample_keywords.push(kw.keyword);
+                    }
+                }
+                if (kw.short_tail_group) {
+                    if (!topicGroups[kw.short_tail_group]) {
+                        topicGroups[kw.short_tail_group] = { count: 0, sample_keywords: [] };
+                    }
+                    topicGroups[kw.short_tail_group].count++;
+                    if (topicGroups[kw.short_tail_group].sample_keywords.length < 5) {
+                        topicGroups[kw.short_tail_group].sample_keywords.push(kw.keyword);
+                    }
+                }
+            });
+
+            // Update the display
+            const brandCount = Object.keys(brandGroups).length;
+            const topicCount = Object.keys(topicGroups).length;
+
+            document.getElementById('brand-count').textContent = brandCount;
+            document.getElementById('topic-count').textContent = topicCount;
+            document.getElementById('groups-summary').textContent = `${brandCount} brand groups, ${topicCount} topic groups`;
+
+            // Render brand groups
+            const brandsContainer = document.getElementById('groups-brands');
+            brandsContainer.innerHTML = Object.entries(brandGroups)
+                .sort((a, b) => b[1].count - a[1].count)
+                .map(([name, info]) => createGroupCard(name, info, 'brand'))
+                .join('');
+
+            // Render topic groups
+            const topicsContainer = document.getElementById('groups-topics');
+            topicsContainer.innerHTML = Object.entries(topicGroups)
+                .sort((a, b) => b[1].count - a[1].count)
+                .map(([name, info]) => createGroupCard(name, info, 'topic'))
+                .join('');
+
+            // Update total keywords stat to reflect filtered count
+            document.getElementById('stat-total').textContent = filteredKeywords.length.toLocaleString();
         }
 
         // Keyword Groups functionality
