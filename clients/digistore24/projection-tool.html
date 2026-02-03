@@ -52,9 +52,17 @@
             font-weight: 700;
             color: var(--accent);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .nav-brand:hover { color: var(--accent-hover); }
+
+        .nav-brand img {
+            height: 24px;
+            width: auto;
+        }
 
         .nav-links {
             display: flex;
@@ -548,7 +556,7 @@
 <body>
     <!-- Navigation -->
     <nav class="main-nav">
-        <a href="keyword-tool.html" class="nav-brand">Digistore24 Competitive Intel</a>
+        <a href="keyword-tool.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media">Digistore24 Competitive Intel</a>
         <div class="nav-links">
             <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
             <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
