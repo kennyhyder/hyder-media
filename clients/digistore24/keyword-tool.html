@@ -876,11 +876,11 @@
             </div>
             <div class="groups-content show" id="groups-content">
                 <div class="groups-tabs">
-                    <button class="groups-tab active" onclick="switchGroupTab('brands', this)">Brand Groups (<span id="brand-count">0</span>)</button>
-                    <button class="groups-tab" onclick="switchGroupTab('topics', this)">Topic Groups (<span id="topic-count">0</span>)</button>
+                    <button class="groups-tab active" onclick="switchGroupTab('topics', this)">Topic Groups (<span id="topic-count">0</span>)</button>
+                    <button class="groups-tab" onclick="switchGroupTab('brands', this)">Brand Groups (<span id="brand-count">0</span>)</button>
                 </div>
-                <div id="groups-brands" class="groups-grid"></div>
-                <div id="groups-topics" class="groups-grid" style="display: none;"></div>
+                <div id="groups-topics" class="groups-grid"></div>
+                <div id="groups-brands" class="groups-grid" style="display: none;"></div>
             </div>
         </div>
 
@@ -1006,6 +1006,9 @@
             </div>
         </div>
 
+        <!-- Group Filter Indicator -->
+        <div id="group-filter-indicator" style="display: none; background: var(--bg-secondary); padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--accent); align-items: center;"></div>
+
         <div class="table-container">
             <div class="table-header">
                 <span class="table-info" id="table-info">Loading...</span>
@@ -1057,6 +1060,7 @@
         let pageSize = 50;
         let sortColumn = 'brand_count';
         let sortDirection = 'desc';
+        let activeGroupFilter = null; // { type: 'brand'|'topic', name: string }
 
         async function loadData() {
             try {
@@ -1197,6 +1201,12 @@
                 .filter(kw => {
                     // Must have at least one selected brand
                     if (kw.brand_count === 0) return false;
+
+                    // Filter by keyword group if active
+                    if (activeGroupFilter) {
+                        if (activeGroupFilter.type === 'brand' && kw.brand_group !== activeGroupFilter.name) return false;
+                        if (activeGroupFilter.type === 'topic' && kw.short_tail_group !== activeGroupFilter.name) return false;
+                    }
 
                     if (search && !kw.keyword.toLowerCase().includes(search)) return false;
                     if (category && !kw.categories.includes(category)) return false;
@@ -1436,6 +1446,8 @@
             document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
             sortColumn = 'brand_count';
             sortDirection = 'desc';
+            activeGroupFilter = null;
+            updateGroupFilterDisplay();
             applyFilters();
         }
 
@@ -1594,22 +1606,30 @@
         }
 
         function filterByGroup(type, groupName) {
-            const keywords = allData.keywords.filter(kw => {
-                if (type === 'brand') {
-                    return kw.brand_group === groupName;
-                } else {
-                    return kw.short_tail_group === groupName;
-                }
-            });
-
-            if (keywords.length === 0) {
-                document.getElementById('search').value = groupName.toLowerCase();
-            } else {
-                document.getElementById('search').value = groupName.toLowerCase().split(/[\s()\[\]]+/).filter(w => w.length > 3)[0] || groupName.toLowerCase();
-            }
-
+            activeGroupFilter = { type, name: groupName };
+            updateGroupFilterDisplay();
             applyFilters();
             document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearGroupFilter() {
+            activeGroupFilter = null;
+            updateGroupFilterDisplay();
+            applyFilters();
+        }
+
+        function updateGroupFilterDisplay() {
+            const indicator = document.getElementById('group-filter-indicator');
+            if (activeGroupFilter) {
+                const typeLabel = activeGroupFilter.type === 'brand' ? 'Brand' : 'Topic';
+                indicator.innerHTML = `
+                    <span>Filtered by ${typeLabel}: <strong>${escapeHtml(activeGroupFilter.name)}</strong></span>
+                    <button onclick="clearGroupFilter()" style="background: var(--danger); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Clear Filter</button>
+                `;
+                indicator.style.display = 'flex';
+            } else {
+                indicator.style.display = 'none';
+            }
         }
 
         loadData();
