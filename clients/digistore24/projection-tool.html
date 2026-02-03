@@ -358,12 +358,19 @@
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 24px;
+            height: 280px;
+            max-height: 280px;
         }
 
         .chart-container h3 {
             font-size: 0.9rem;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text-secondary);
+        }
+
+        .chart-wrapper {
+            height: 230px;
+            position: relative;
         }
 
         /* Projections Table */
@@ -479,49 +486,6 @@
             color: white;
         }
 
-        /* Budget Slider */
-        .budget-slider-container {
-            margin-top: 16px;
-        }
-
-        .budget-slider {
-            width: 100%;
-            height: 8px;
-            -webkit-appearance: none;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .budget-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .budget-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
-        }
-
-        .budget-display {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .budget-display .current {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--accent);
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-
         /* Quick Actions */
         .quick-actions {
             display: flex;
@@ -609,6 +573,55 @@
             color: white;
         }
 
+        /* Match Type Toggle */
+        .match-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .match-toggle-btn {
+            flex: 1;
+            padding: 8px 10px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match-toggle-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .match-toggle-btn.active {
+            background: var(--purple);
+            color: white;
+        }
+
+        /* CPC Source Selector */
+        .cpc-source-select {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .cpc-source-select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
         /* Loading State */
         .loading {
             text-align: center;
@@ -631,8 +644,8 @@
 
     <div class="container">
         <header>
-            <h1>PPC Budget & Revenue Projections</h1>
-            <p class="subtitle">Forecast ad spend, conversions, and ROAS based on competitor keyword data and your performance assumptions</p>
+            <h1>PPC Spend & Revenue Forecasting</h1>
+            <p class="subtitle">Forecast expected ad spend, conversions, and ROAS based on competitor click data and keyword CPCs</p>
         </header>
 
         <div class="main-grid">
@@ -675,28 +688,41 @@
                                 <span class="value" id="summary-volume">0</span>
                             </div>
                             <div class="summary-row">
-                                <span class="label">Avg Google CPC</span>
+                                <span class="label">Avg CPC (Selected Source)</span>
                                 <span class="value" id="summary-cpc">$0.00</span>
+                            </div>
+                            <div class="summary-row" style="border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px;">
+                                <span class="label">Est. Monthly Clicks</span>
+                                <span class="value" id="summary-clicks" style="color: var(--purple);">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Est. Monthly Spend</span>
+                                <span class="value" id="summary-spend" style="color: var(--accent);">$0</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Budget Input -->
+                    <!-- CPC Source Selection -->
                     <div class="input-section">
-                        <div class="section-title">2. Monthly Ad Budget</div>
-                        <div class="budget-slider-container">
-                            <input type="range" class="budget-slider" id="budget-slider" min="1000" max="100000" step="1000" value="10000">
-                            <div class="budget-display">
-                                <span>$1K</span>
-                                <span class="current" id="budget-display">$10,000</span>
-                                <span>$100K</span>
-                            </div>
+                        <div class="section-title">2. CPC Source & Match Type</div>
+                        <div class="input-group">
+                            <label>CPC Data Source</label>
+                            <select class="cpc-source-select" id="cpc-source" onchange="calculateProjections()">
+                                <option value="google_avg">Google Ads - Average Bid</option>
+                                <option value="google_high">Google Ads - High (Top of Page)</option>
+                                <option value="google_low">Google Ads - Low (Top of Page)</option>
+                                <option value="similarweb">SimilarWeb CPC</option>
+                            </select>
+                            <div class="input-hint">Select which CPC data to use for spend calculations</div>
                         </div>
-                        <div class="input-group" style="margin-top: 12px;">
-                            <div class="input-with-unit">
-                                <input type="number" id="budget-input" value="10000" min="100">
-                                <span class="input-unit">/mo</span>
+
+                        <div class="input-group" style="margin-top: 16px;">
+                            <label>Keyword Match Type</label>
+                            <div class="match-toggle">
+                                <button class="match-toggle-btn" onclick="setMatchType('exact')">Exact Match</button>
+                                <button class="match-toggle-btn active" onclick="setMatchType('phrase')">Phrase Match</button>
                             </div>
+                            <div class="input-hint">Exact = short tail only. Phrase = short tail + all long tail keywords</div>
                         </div>
                     </div>
 
@@ -705,19 +731,8 @@
                         <div class="section-title">3. Performance Assumptions</div>
 
                         <div class="input-group">
-                            <label class="tooltip-trigger" data-tooltip="Percentage of impressions that result in clicks. Industry avg for B2B SaaS: 2-3%">
-                                Click-Through Rate (CTR)
-                            </label>
-                            <div class="input-with-unit">
-                                <input type="number" id="ctr" value="2.5" min="0.1" max="20" step="0.1">
-                                <span class="input-unit">%</span>
-                            </div>
-                            <div class="input-hint">Industry avg: 2-3% for B2B SaaS</div>
-                        </div>
-
-                        <div class="input-group">
                             <label class="tooltip-trigger" data-tooltip="Percentage of clicks that become customers. Affiliate platforms typically see 1-3%">
-                                Conversion Rate
+                                Conversion Rate (CVR)
                             </label>
                             <div class="input-with-unit">
                                 <input type="number" id="conversion-rate" value="2.0" min="0.1" max="20" step="0.1">
@@ -795,7 +810,9 @@
                         <!-- Chart -->
                         <div class="chart-container">
                             <h3>Cumulative Performance Over Time</h3>
-                            <canvas id="projection-chart" height="280"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="projection-chart"></canvas>
+                            </div>
                         </div>
 
                         <!-- Monthly Breakdown Table -->
@@ -890,7 +907,42 @@
         let selectedGroups = new Set();
         let groupType = 'topics';
         let projectionPeriod = 6;
+        let matchType = 'phrase'; // 'exact' or 'phrase'
         let chart = null;
+
+        // Set match type (exact vs phrase)
+        function setMatchType(type) {
+            matchType = type;
+            document.querySelectorAll('.match-toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type));
+            });
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Get CPC for a keyword based on selected source
+        function getCpcForKeyword(kw) {
+            const source = document.getElementById('cpc-source').value;
+            switch(source) {
+                case 'google_high':
+                    return kw.google?.high_top_of_page_bid || 0;
+                case 'google_low':
+                    return kw.google?.low_top_of_page_bid || 0;
+                case 'google_avg':
+                    const high = kw.google?.high_top_of_page_bid || 0;
+                    const low = kw.google?.low_top_of_page_bid || 0;
+                    return high > 0 && low > 0 ? (high + low) / 2 : (high || low);
+                case 'similarweb':
+                    return kw.cpc || 0;
+                default:
+                    return kw.cpc || 0;
+            }
+        }
+
+        // Get total clicks for a keyword from all brand data
+        function getTotalClicks(kw) {
+            return kw.brands.reduce((sum, b) => sum + (b.clicks || 0), 0);
+        }
 
         // Load keyword data
         async function loadData() {
@@ -991,31 +1043,57 @@
             let totalVolume = 0;
             let totalCpc = 0;
             let cpcCount = 0;
+            let totalClicks = 0;
+            let totalExpectedSpend = 0;
 
             // Get keywords that belong to selected groups
             const groupField = groupType === 'topics' ? 'short_tail_group' : 'brand_group';
 
+            // For exact match, we only want the short tail keyword itself
+            // For phrase match, we want all keywords in the selected groups
             keywordData.keywords.forEach(kw => {
-                if (selectedGroups.has(kw[groupField])) {
-                    totalKeywords++;
-                    totalVolume += kw.google?.annual_volume || kw.volume || 0;
-                    const gCpc = (kw.google?.high_top_of_page_bid + kw.google?.low_top_of_page_bid) / 2;
-                    if (gCpc > 0) {
-                        totalCpc += gCpc;
-                        cpcCount++;
+                if (!selectedGroups.has(kw[groupField])) return;
+
+                // For exact match, only include if keyword exactly matches the group name
+                // This gives us only the short tail keyword, not long tail variations
+                if (matchType === 'exact') {
+                    const groupName = kw[groupField];
+                    if (kw.keyword !== groupName) {
+                        return; // Skip long-tail keywords in exact match mode
                     }
                 }
+
+                totalKeywords++;
+                totalVolume += kw.google?.annual_volume || kw.volume || 0;
+
+                const cpc = getCpcForKeyword(kw);
+                if (cpc > 0) {
+                    totalCpc += cpc;
+                    cpcCount++;
+                }
+
+                // Calculate clicks from competitor data
+                const clicks = getTotalClicks(kw);
+                totalClicks += clicks;
+
+                // Calculate expected spend for this keyword
+                totalExpectedSpend += clicks * cpc;
             });
 
             const avgCpc = cpcCount > 0 ? totalCpc / cpcCount : 0;
             const monthlyVolume = Math.round(totalVolume / 12);
 
+            const monthlyClicks = Math.round(totalClicks / 12);
+            const monthlySpend = totalExpectedSpend / 12;
+
             document.getElementById('summary-groups').textContent = selectedGroups.size;
             document.getElementById('summary-keywords').textContent = totalKeywords.toLocaleString();
             document.getElementById('summary-volume').textContent = formatNumber(monthlyVolume);
             document.getElementById('summary-cpc').textContent = '$' + avgCpc.toFixed(2);
+            document.getElementById('summary-clicks').textContent = formatNumber(monthlyClicks);
+            document.getElementById('summary-spend').textContent = '$' + formatNumber(monthlySpend);
 
-            return { totalKeywords, monthlyVolume, avgCpc };
+            return { totalKeywords, monthlyVolume, avgCpc, totalClicks, totalExpectedSpend };
         }
 
         // Set projection period
@@ -1030,24 +1108,26 @@
 
         // Main calculation function
         function calculateProjections() {
-            const budget = parseFloat(document.getElementById('budget-input').value) || 10000;
-            const ctr = parseFloat(document.getElementById('ctr').value) / 100 || 0.025;
             const cvr = parseFloat(document.getElementById('conversion-rate').value) / 100 || 0.02;
             const ltv = parseFloat(document.getElementById('ltv').value) || 1500;
 
-            // Get selected keywords data
+            // Get selected keywords data - now includes totalClicks and totalExpectedSpend
             const summary = updateSelectedSummary();
-            const avgCpc = summary.avgCpc > 0 ? summary.avgCpc : 2.50; // Default CPC if none selected
+            const avgCpc = summary.avgCpc > 0 ? summary.avgCpc : 2.50;
 
-            // Monthly calculations
-            const monthlyClicks = Math.floor(budget / avgCpc);
+            // Expected monthly spend is based on competitor click data
+            // Note: SimilarWeb data is annual, so divide by 12 for monthly estimates
+            const monthlySpend = summary.totalExpectedSpend / 12;
+            const monthlyClicks = summary.totalClicks / 12;
+
+            // Monthly calculations using expected spend from keyword data
             const monthlyConversions = monthlyClicks * cvr;
             const monthlyRevenue = monthlyConversions * ltv;
-            const monthlyProfit = monthlyRevenue - budget;
-            const monthlyRoas = budget > 0 ? monthlyRevenue / budget : 0;
+            const monthlyProfit = monthlyRevenue - monthlySpend;
+            const monthlyRoas = monthlySpend > 0 ? monthlyRevenue / monthlySpend : 0;
 
-            // Total calculations
-            const totalSpend = budget * projectionPeriod;
+            // Total calculations for the projection period
+            const totalSpend = monthlySpend * projectionPeriod;
             const totalClicks = monthlyClicks * projectionPeriod;
             const totalConversions = monthlyConversions * projectionPeriod;
             const totalRevenue = monthlyRevenue * projectionPeriod;
@@ -1056,9 +1136,9 @@
 
             // Update result cards
             document.getElementById('result-spend').textContent = '$' + formatNumber(totalSpend);
-            document.getElementById('result-spend-monthly').textContent = '$' + formatNumber(budget) + '/month';
+            document.getElementById('result-spend-monthly').textContent = '$' + formatNumber(monthlySpend) + '/month';
 
-            document.getElementById('result-clicks').textContent = formatNumber(totalClicks);
+            document.getElementById('result-clicks').textContent = formatNumber(Math.round(totalClicks));
             document.getElementById('result-cpc').textContent = '$' + avgCpc.toFixed(2) + ' avg CPC';
 
             document.getElementById('result-conversions').textContent = formatNumber(Math.round(totalConversions));
@@ -1076,12 +1156,12 @@
             profitElement.className = 'result-value ' + (totalProfit >= 0 ? 'success' : 'danger');
 
             // Update chart and table
-            updateChart(budget, avgCpc, cvr, ltv);
-            updateProjectionsTable(budget, avgCpc, cvr, ltv);
+            updateChart(monthlySpend, avgCpc, cvr, ltv, monthlyClicks);
+            updateProjectionsTable(monthlySpend, avgCpc, cvr, ltv, monthlyClicks);
         }
 
         // Update chart
-        function updateChart(budget, avgCpc, cvr, ltv) {
+        function updateChart(monthlySpend, avgCpc, cvr, ltv, monthlyClicks) {
             const ctx = document.getElementById('projection-chart').getContext('2d');
 
             const labels = [];
@@ -1095,11 +1175,10 @@
             for (let i = 1; i <= projectionPeriod; i++) {
                 labels.push('Month ' + i);
 
-                const clicks = Math.floor(budget / avgCpc);
-                const conversions = clicks * cvr;
+                const conversions = monthlyClicks * cvr;
                 const revenue = conversions * ltv;
 
-                cumSpend += budget;
+                cumSpend += monthlySpend;
                 cumRevenue += revenue;
 
                 spendData.push(cumSpend);
@@ -1144,7 +1223,8 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.5,
                     plugins: {
                         legend: {
                             labels: { color: '#94a3b8' }
@@ -1177,23 +1257,22 @@
         }
 
         // Update projections table
-        function updateProjectionsTable(budget, avgCpc, cvr, ltv) {
+        function updateProjectionsTable(monthlySpend, avgCpc, cvr, ltv, monthlyClicks) {
             const tbody = document.getElementById('projections-tbody');
             let rows = [];
             let cumProfit = 0;
 
             for (let i = 1; i <= projectionPeriod; i++) {
-                const clicks = Math.floor(budget / avgCpc);
-                const conversions = clicks * cvr;
+                const conversions = monthlyClicks * cvr;
                 const revenue = conversions * ltv;
-                const roas = revenue / budget;
-                cumProfit += (revenue - budget);
+                const roas = monthlySpend > 0 ? revenue / monthlySpend : 0;
+                cumProfit += (revenue - monthlySpend);
 
                 rows.push(`
                     <tr>
                         <td class="month-label">Month ${i}</td>
-                        <td>$${formatNumber(budget)}</td>
-                        <td>${formatNumber(clicks)}</td>
+                        <td>$${formatNumber(monthlySpend)}</td>
+                        <td>${formatNumber(Math.round(monthlyClicks))}</td>
                         <td>${Math.round(conversions).toLocaleString()}</td>
                         <td style="color: var(--success);">$${formatNumber(revenue)}</td>
                         <td style="color: ${roas >= 4 ? 'var(--success)' : roas >= 2 ? 'var(--warning)' : 'var(--danger)'};">${roas.toFixed(2)}x</td>
@@ -1229,23 +1308,8 @@
             document.getElementById('benchmark-cpc').textContent = '$' + (keywordData.global_avg_cpc || 2.50).toFixed(2);
         }
 
-        // Budget slider handlers
-        document.getElementById('budget-slider').addEventListener('input', function() {
-            const value = parseInt(this.value);
-            document.getElementById('budget-input').value = value;
-            document.getElementById('budget-display').textContent = '$' + formatNumber(value);
-            calculateProjections();
-        });
-
-        document.getElementById('budget-input').addEventListener('input', function() {
-            const value = parseInt(this.value) || 1000;
-            document.getElementById('budget-slider').value = Math.min(100000, Math.max(1000, value));
-            document.getElementById('budget-display').textContent = '$' + formatNumber(value);
-            calculateProjections();
-        });
-
         // Input change handlers
-        ['ctr', 'conversion-rate', 'ltv'].forEach(id => {
+        ['conversion-rate', 'ltv'].forEach(id => {
             document.getElementById(id).addEventListener('input', calculateProjections);
         });
 
