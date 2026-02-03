@@ -155,21 +155,21 @@ export default async function handler(req, res) {
         }
 
         // Parse and format the results
-        const results = (keywordPlanData.results || []).map(result => {
+        const allResults = (keywordPlanData.results || []).map(result => {
             const metrics = result.keywordIdeaMetrics || {};
 
             return {
                 keyword: result.text,
                 avgMonthlySearches: parseInt(metrics.avgMonthlySearches) || 0,
                 competition: metrics.competition || 'UNKNOWN',
-                competitionIndex: metrics.competitionIndex || 0,
-                lowTopOfPageBidMicros: metrics.lowTopOfPageBidMicros
+                competitionIndex: parseInt(metrics.competitionIndex) || 0,
+                lowTopOfPageBid: metrics.lowTopOfPageBidMicros
                     ? parseInt(metrics.lowTopOfPageBidMicros) / 1000000
                     : null,
-                highTopOfPageBidMicros: metrics.highTopOfPageBidMicros
+                highTopOfPageBid: metrics.highTopOfPageBidMicros
                     ? parseInt(metrics.highTopOfPageBidMicros) / 1000000
                     : null,
-                averageCpcMicros: metrics.averageCpc?.micros
+                averageCpc: metrics.averageCpc?.micros
                     ? parseInt(metrics.averageCpc.micros) / 1000000
                     : null,
                 // Monthly search volumes (last 12 months)
@@ -181,10 +181,20 @@ export default async function handler(req, res) {
             };
         });
 
+        // Check if user wants exact matches only
+        const exactOnly = req.query.exact === 'true' || req.body?.exactOnly === true;
+        const keywordsLower = keywords.map(k => k.toLowerCase());
+
+        const results = exactOnly
+            ? allResults.filter(r => keywordsLower.includes(r.keyword.toLowerCase()))
+            : allResults;
+
         return res.status(200).json({
             success: true,
             requestedKeywords: keywords.length,
+            totalResults: allResults.length,
             resultsCount: results.length,
+            exactOnly: exactOnly,
             results: results
         });
 
