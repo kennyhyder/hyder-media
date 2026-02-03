@@ -847,6 +847,9 @@
 
             document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
 
+            // Initialize selectedBrands with all brands
+            selectedBrands = [...allData.brands];
+
             // Event listeners
             document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
             document.getElementById('category').addEventListener('change', applyFilters);
