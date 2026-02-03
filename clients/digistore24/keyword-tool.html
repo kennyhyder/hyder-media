@@ -1063,6 +1063,7 @@
                 const response = await fetch('data/keywords-combined.json');
                 allData = await response.json();
                 initializeUI();
+                renderKeywordGroups(allData);
                 applyFilters();
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -1515,8 +1516,6 @@
             };
         }
 
-        loadData();
-
         // Keyword Groups functionality
         function toggleGroupsSection(header) {
             header.classList.toggle('collapsed');
@@ -1591,12 +1590,10 @@
         function filterByKeyword(keyword) {
             document.getElementById('search').value = keyword;
             applyFilters();
-            // Scroll to table
             document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         function filterByGroup(type, groupName) {
-            // Get all keywords in this group
             const keywords = allData.keywords.filter(kw => {
                 if (type === 'brand') {
                     return kw.brand_group === groupName;
@@ -1606,11 +1603,8 @@
             });
 
             if (keywords.length === 0) {
-                // Fall back to searching by group name
                 document.getElementById('search').value = groupName.toLowerCase();
             } else {
-                // Build a search pattern that matches any of these keywords
-                // For simplicity, just search by the group name
                 document.getElementById('search').value = groupName.toLowerCase().split(/[\s()\[\]]+/).filter(w => w.length > 3)[0] || groupName.toLowerCase();
             }
 
@@ -1618,21 +1612,7 @@
             document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Modify loadData to also render keyword groups
-        const originalLoadData = loadData;
-        loadData = async function() {
-            try {
-                const response = await fetch('data/keywords-combined.json');
-                allData = await response.json();
-                initializeUI();
-                renderKeywordGroups(allData);
-                applyFilters();
-            } catch (error) {
-                console.error('Error loading data:', error);
-                document.getElementById('table-body').innerHTML =
-                    '<tr><td colspan="9" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
-            }
-        };
+        loadData();
     </script>
 </body>
 </html>
