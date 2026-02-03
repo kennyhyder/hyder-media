@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPC Projection Tool | Digistore24</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-brand:hover { color: var(--accent-hover); }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        /* Input Sections */
+        .input-section {
+            margin-bottom: 24px;
+        }
+
+        .input-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'SF Mono', Monaco, monospace;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-with-unit input {
+            padding-right: 45px;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .input-hint {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Keyword Group Selection */
+        .group-selector {
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .group-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .group-option:hover {
+            background: var(--border);
+        }
+
+        .group-option input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        .group-option-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-option-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .group-option-count {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Selected Groups Summary */
+        .selected-summary {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.85rem;
+        }
+
+        .summary-row .label {
+            color: var(--text-secondary);
+        }
+
+        .summary-row .value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 600;
+        }
+
+        /* Results Panel */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .result-card.highlight {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(59, 130, 246, 0.15));
+            border: 1px solid var(--success);
+        }
+
+        .result-card.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+            border: 1px solid var(--warning);
+        }
+
+        .result-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .result-value.success { color: var(--success); }
+        .result-value.warning { color: var(--warning); }
+        .result-value.danger { color: var(--danger); }
+        .result-value.accent { color: var(--accent); }
+        .result-value.purple { color: var(--purple); }
+
+        .result-subtext {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-container h3 {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Projections Table */
+        .projections-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .projections-table th {
+            text-align: left;
+            padding: 12px 14px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .projections-table td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .projections-table tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .projections-table .month-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Benchmarks Section */
+        .benchmarks {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .benchmarks h3 {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .benchmark-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .benchmark-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .benchmark-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 4px;
+        }
+
+        .benchmark-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: var(--accent);
+        }
+
+        .benchmark-source {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* Scenario Tabs */
+        .scenario-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .scenario-tab {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scenario-tab:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .scenario-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Budget Slider */
+        .budget-slider-container {
+            margin-top: 16px;
+        }
+
+        .budget-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .budget-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .budget-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .budget-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .budget-display .current {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        /* Tooltips */
+        .tooltip-trigger {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip-trigger::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            z-index: 100;
+            max-width: 250px;
+            white-space: normal;
+        }
+
+        .tooltip-trigger:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Type Toggle */
+        .type-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .type-toggle-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-toggle-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .type-toggle-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="keyword-tool.html" class="nav-brand">Digistore24 Competitive Intel</a>
+        <div class="nav-links">
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link active">Projections</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>PPC Budget & Revenue Projections</h1>
+            <p class="subtitle">Forecast ad spend, conversions, and ROAS based on competitor keyword data and your performance assumptions</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Panel - Inputs -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Projection Parameters</h2>
+                </div>
+                <div class="panel-content">
+                    <!-- Keyword Group Selection -->
+                    <div class="input-section">
+                        <div class="section-title">1. Select Keyword Groups</div>
+
+                        <div class="type-toggle">
+                            <button class="type-toggle-btn active" onclick="toggleGroupType('topics')">Topic Groups</button>
+                            <button class="type-toggle-btn" onclick="toggleGroupType('brands')">Brand Groups</button>
+                        </div>
+
+                        <div class="group-selector" id="group-selector">
+                            <div class="loading">Loading keyword data...</div>
+                        </div>
+
+                        <div class="quick-actions">
+                            <button class="quick-btn" onclick="selectAllGroups()">Select All</button>
+                            <button class="quick-btn" onclick="clearAllGroups()">Clear All</button>
+                            <button class="quick-btn" onclick="selectTopGroups(5)">Top 5</button>
+                        </div>
+
+                        <div class="selected-summary" id="selected-summary">
+                            <div class="summary-row">
+                                <span class="label">Selected Groups</span>
+                                <span class="value" id="summary-groups">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Total Keywords</span>
+                                <span class="value" id="summary-keywords">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Avg Monthly Volume</span>
+                                <span class="value" id="summary-volume">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Avg Google CPC</span>
+                                <span class="value" id="summary-cpc">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Input -->
+                    <div class="input-section">
+                        <div class="section-title">2. Monthly Ad Budget</div>
+                        <div class="budget-slider-container">
+                            <input type="range" class="budget-slider" id="budget-slider" min="1000" max="100000" step="1000" value="10000">
+                            <div class="budget-display">
+                                <span>$1K</span>
+                                <span class="current" id="budget-display">$10,000</span>
+                                <span>$100K</span>
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-top: 12px;">
+                            <div class="input-with-unit">
+                                <input type="number" id="budget-input" value="10000" min="100">
+                                <span class="input-unit">/mo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Assumptions -->
+                    <div class="input-section">
+                        <div class="section-title">3. Performance Assumptions</div>
+
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Percentage of impressions that result in clicks. Industry avg for B2B SaaS: 2-3%">
+                                Click-Through Rate (CTR)
+                            </label>
+                            <div class="input-with-unit">
+                                <input type="number" id="ctr" value="2.5" min="0.1" max="20" step="0.1">
+                                <span class="input-unit">%</span>
+                            </div>
+                            <div class="input-hint">Industry avg: 2-3% for B2B SaaS</div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Percentage of clicks that become customers. Affiliate platforms typically see 1-3%">
+                                Conversion Rate
+                            </label>
+                            <div class="input-with-unit">
+                                <input type="number" id="conversion-rate" value="2.0" min="0.1" max="20" step="0.1">
+                                <span class="input-unit">%</span>
+                            </div>
+                            <div class="input-hint">Affiliate platform avg: 1-3%</div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Customer Lifetime Value over 30 days. Digistore24 benchmark: $1,500">
+                                LTV30 (30-Day Lifetime Value)
+                            </label>
+                            <div class="input-with-unit">
+                                <input type="number" id="ltv" value="1500" min="100" step="50">
+                                <span class="input-unit">USD</span>
+                            </div>
+                            <div class="input-hint">Digistore24 LTV30: $1,500</div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario Selection -->
+                    <div class="input-section">
+                        <div class="section-title">4. Projection Period</div>
+                        <div class="scenario-tabs">
+                            <button class="scenario-tab" onclick="setProjectionPeriod(3)">3 Months</button>
+                            <button class="scenario-tab active" onclick="setProjectionPeriod(6)">6 Months</button>
+                            <button class="scenario-tab" onclick="setProjectionPeriod(12)">12 Months</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Results -->
+            <div>
+                <!-- Key Metrics -->
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h2>Projected Results</h2>
+                        <span id="period-label" style="font-size: 0.85rem; color: var(--text-secondary);">6 Month Projection</span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="results-grid">
+                            <div class="result-card">
+                                <div class="result-label">Total Ad Spend</div>
+                                <div class="result-value accent" id="result-spend">$0</div>
+                                <div class="result-subtext" id="result-spend-monthly">$0/month</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Estimated Clicks</div>
+                                <div class="result-value purple" id="result-clicks">0</div>
+                                <div class="result-subtext" id="result-cpc">$0.00 avg CPC</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Projected Conversions</div>
+                                <div class="result-value" id="result-conversions">0</div>
+                                <div class="result-subtext" id="result-cpa">$0.00 CPA</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="result-label">Projected Revenue</div>
+                                <div class="result-value success" id="result-revenue">$0</div>
+                                <div class="result-subtext">Based on LTV30</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="result-label">ROAS</div>
+                                <div class="result-value success" id="result-roas">0x</div>
+                                <div class="result-subtext" id="result-roas-pct">0% return</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Net Profit</div>
+                                <div class="result-value" id="result-profit">$0</div>
+                                <div class="result-subtext">Revenue - Ad Spend</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="chart-container">
+                            <h3>Cumulative Performance Over Time</h3>
+                            <canvas id="projection-chart" height="280"></canvas>
+                        </div>
+
+                        <!-- Monthly Breakdown Table -->
+                        <h3 style="font-size: 0.9rem; margin-bottom: 12px; color: var(--text-secondary);">Monthly Breakdown</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="projections-table">
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Ad Spend</th>
+                                        <th>Clicks</th>
+                                        <th>Conversions</th>
+                                        <th>Revenue</th>
+                                        <th>ROAS</th>
+                                        <th>Cumulative Profit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projections-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Industry Benchmarks -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Industry Benchmarks & Competitor Insights</h2>
+                    </div>
+                    <div class="panel-content">
+                        <div class="benchmark-grid">
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Avg CTR (B2B SaaS)</div>
+                                <div class="benchmark-value">2.41%</div>
+                                <div class="benchmark-source">WordStream 2024</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Avg CVR (B2B SaaS)</div>
+                                <div class="benchmark-value">2.23%</div>
+                                <div class="benchmark-source">WordStream 2024</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Avg CPA (B2B SaaS)</div>
+                                <div class="benchmark-value">$116.13</div>
+                                <div class="benchmark-source">WordStream 2024</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Affiliate Platform Avg CPC</div>
+                                <div class="benchmark-value" id="benchmark-cpc">$2.50</div>
+                                <div class="benchmark-source">Competitor Data</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">ClickBank Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-clickbank">-</div>
+                                <div class="benchmark-source">SimilarWeb Data</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Impact Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-impact">-</div>
+                                <div class="benchmark-source">SimilarWeb Data</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Awin Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-awin">-</div>
+                                <div class="benchmark-source">SimilarWeb Data</div>
+                            </div>
+                            <div class="benchmark-item">
+                                <div class="benchmark-label">Good ROAS Target</div>
+                                <div class="benchmark-value">4x+</div>
+                                <div class="benchmark-source">Industry Standard</div>
+                            </div>
+                        </div>
+
+                        <div class="benchmarks" style="margin-top: 20px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid var(--accent);">
+                            <h3 style="color: var(--accent);">Key Insights from Competitor Analysis</h3>
+                            <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+                                <li><strong>Comparison keywords convert highest</strong> - "X vs Y" and "X alternative" keywords show 2-3x higher intent</li>
+                                <li><strong>Brand bidding is expensive but effective</strong> - Competitors spend 40%+ of budget on brand terms</li>
+                                <li><strong>Mobile traffic is growing</strong> - 35-45% of affiliate platform searches are mobile</li>
+                                <li><strong>Long-tail keywords offer better CPA</strong> - Specific terms like "affiliate program for [niche]" convert at lower cost</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let keywordData = null;
+        let selectedGroups = new Set();
+        let groupType = 'topics';
+        let projectionPeriod = 6;
+        let chart = null;
+
+        // Load keyword data
+        async function loadData() {
+            try {
+                const response = await fetch('data/keywords-combined.json');
+                keywordData = await response.json();
+                renderGroupSelector();
+                updateBenchmarks();
+                calculateProjections();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('group-selector').innerHTML =
+                    '<div class="loading">Error loading data</div>';
+            }
+        }
+
+        // Render group selector
+        function renderGroupSelector() {
+            const container = document.getElementById('group-selector');
+            const groups = keywordData.keyword_groups[groupType] || {};
+
+            // Sort by count descending
+            const sortedGroups = Object.entries(groups)
+                .sort((a, b) => b[1].count - a[1].count);
+
+            container.innerHTML = sortedGroups.map(([name, info]) => `
+                <label class="group-option">
+                    <input type="checkbox" value="${escapeHtml(name)}"
+                           onchange="toggleGroup('${escapeHtml(name)}')"
+                           ${selectedGroups.has(name) ? 'checked' : ''}>
+                    <div class="group-option-info">
+                        <span class="group-option-name">${escapeHtml(name)}</span>
+                        <span class="group-option-count">${info.count.toLocaleString()} kws</span>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        // Toggle group type (topics/brands)
+        function toggleGroupType(type) {
+            groupType = type;
+            selectedGroups.clear();
+
+            document.querySelectorAll('.type-toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type));
+            });
+
+            renderGroupSelector();
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Toggle individual group
+        function toggleGroup(name) {
+            if (selectedGroups.has(name)) {
+                selectedGroups.delete(name);
+            } else {
+                selectedGroups.add(name);
+            }
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Select all groups
+        function selectAllGroups() {
+            const groups = keywordData.keyword_groups[groupType] || {};
+            Object.keys(groups).forEach(name => selectedGroups.add(name));
+            renderGroupSelector();
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Clear all groups
+        function clearAllGroups() {
+            selectedGroups.clear();
+            renderGroupSelector();
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Select top N groups
+        function selectTopGroups(n) {
+            selectedGroups.clear();
+            const groups = keywordData.keyword_groups[groupType] || {};
+            const sorted = Object.entries(groups)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, n);
+            sorted.forEach(([name]) => selectedGroups.add(name));
+            renderGroupSelector();
+            updateSelectedSummary();
+            calculateProjections();
+        }
+
+        // Update selected groups summary
+        function updateSelectedSummary() {
+            const groups = keywordData.keyword_groups[groupType] || {};
+            let totalKeywords = 0;
+            let totalVolume = 0;
+            let totalCpc = 0;
+            let cpcCount = 0;
+
+            // Get keywords that belong to selected groups
+            const groupField = groupType === 'topics' ? 'short_tail_group' : 'brand_group';
+
+            keywordData.keywords.forEach(kw => {
+                if (selectedGroups.has(kw[groupField])) {
+                    totalKeywords++;
+                    totalVolume += kw.google?.annual_volume || kw.volume || 0;
+                    const gCpc = (kw.google?.high_top_of_page_bid + kw.google?.low_top_of_page_bid) / 2;
+                    if (gCpc > 0) {
+                        totalCpc += gCpc;
+                        cpcCount++;
+                    }
+                }
+            });
+
+            const avgCpc = cpcCount > 0 ? totalCpc / cpcCount : 0;
+            const monthlyVolume = Math.round(totalVolume / 12);
+
+            document.getElementById('summary-groups').textContent = selectedGroups.size;
+            document.getElementById('summary-keywords').textContent = totalKeywords.toLocaleString();
+            document.getElementById('summary-volume').textContent = formatNumber(monthlyVolume);
+            document.getElementById('summary-cpc').textContent = '$' + avgCpc.toFixed(2);
+
+            return { totalKeywords, monthlyVolume, avgCpc };
+        }
+
+        // Set projection period
+        function setProjectionPeriod(months) {
+            projectionPeriod = months;
+            document.querySelectorAll('.scenario-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.textContent.includes(months));
+            });
+            document.getElementById('period-label').textContent = `${months} Month Projection`;
+            calculateProjections();
+        }
+
+        // Main calculation function
+        function calculateProjections() {
+            const budget = parseFloat(document.getElementById('budget-input').value) || 10000;
+            const ctr = parseFloat(document.getElementById('ctr').value) / 100 || 0.025;
+            const cvr = parseFloat(document.getElementById('conversion-rate').value) / 100 || 0.02;
+            const ltv = parseFloat(document.getElementById('ltv').value) || 1500;
+
+            // Get selected keywords data
+            const summary = updateSelectedSummary();
+            const avgCpc = summary.avgCpc > 0 ? summary.avgCpc : 2.50; // Default CPC if none selected
+
+            // Monthly calculations
+            const monthlyClicks = Math.floor(budget / avgCpc);
+            const monthlyConversions = monthlyClicks * cvr;
+            const monthlyRevenue = monthlyConversions * ltv;
+            const monthlyProfit = monthlyRevenue - budget;
+            const monthlyRoas = budget > 0 ? monthlyRevenue / budget : 0;
+
+            // Total calculations
+            const totalSpend = budget * projectionPeriod;
+            const totalClicks = monthlyClicks * projectionPeriod;
+            const totalConversions = monthlyConversions * projectionPeriod;
+            const totalRevenue = monthlyRevenue * projectionPeriod;
+            const totalProfit = totalRevenue - totalSpend;
+            const cpa = totalConversions > 0 ? totalSpend / totalConversions : 0;
+
+            // Update result cards
+            document.getElementById('result-spend').textContent = '$' + formatNumber(totalSpend);
+            document.getElementById('result-spend-monthly').textContent = '$' + formatNumber(budget) + '/month';
+
+            document.getElementById('result-clicks').textContent = formatNumber(totalClicks);
+            document.getElementById('result-cpc').textContent = '$' + avgCpc.toFixed(2) + ' avg CPC';
+
+            document.getElementById('result-conversions').textContent = formatNumber(Math.round(totalConversions));
+            document.getElementById('result-cpa').textContent = '$' + formatNumber(cpa) + ' CPA';
+
+            document.getElementById('result-revenue').textContent = '$' + formatNumber(totalRevenue);
+
+            const roasElement = document.getElementById('result-roas');
+            roasElement.textContent = monthlyRoas.toFixed(2) + 'x';
+            roasElement.className = 'result-value ' + (monthlyRoas >= 4 ? 'success' : monthlyRoas >= 2 ? 'warning' : 'danger');
+            document.getElementById('result-roas-pct').textContent = ((monthlyRoas - 1) * 100).toFixed(0) + '% return';
+
+            const profitElement = document.getElementById('result-profit');
+            profitElement.textContent = (totalProfit >= 0 ? '$' : '-$') + formatNumber(Math.abs(totalProfit));
+            profitElement.className = 'result-value ' + (totalProfit >= 0 ? 'success' : 'danger');
+
+            // Update chart and table
+            updateChart(budget, avgCpc, cvr, ltv);
+            updateProjectionsTable(budget, avgCpc, cvr, ltv);
+        }
+
+        // Update chart
+        function updateChart(budget, avgCpc, cvr, ltv) {
+            const ctx = document.getElementById('projection-chart').getContext('2d');
+
+            const labels = [];
+            const spendData = [];
+            const revenueData = [];
+            const profitData = [];
+
+            let cumSpend = 0;
+            let cumRevenue = 0;
+
+            for (let i = 1; i <= projectionPeriod; i++) {
+                labels.push('Month ' + i);
+
+                const clicks = Math.floor(budget / avgCpc);
+                const conversions = clicks * cvr;
+                const revenue = conversions * ltv;
+
+                cumSpend += budget;
+                cumRevenue += revenue;
+
+                spendData.push(cumSpend);
+                revenueData.push(cumRevenue);
+                profitData.push(cumRevenue - cumSpend);
+            }
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Cumulative Spend',
+                            data: spendData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Cumulative Revenue',
+                            data: revenueData,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Cumulative Profit',
+                            data: profitData,
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': $' + formatNumber(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return '$' + formatNumber(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update projections table
+        function updateProjectionsTable(budget, avgCpc, cvr, ltv) {
+            const tbody = document.getElementById('projections-tbody');
+            let rows = [];
+            let cumProfit = 0;
+
+            for (let i = 1; i <= projectionPeriod; i++) {
+                const clicks = Math.floor(budget / avgCpc);
+                const conversions = clicks * cvr;
+                const revenue = conversions * ltv;
+                const roas = revenue / budget;
+                cumProfit += (revenue - budget);
+
+                rows.push(`
+                    <tr>
+                        <td class="month-label">Month ${i}</td>
+                        <td>$${formatNumber(budget)}</td>
+                        <td>${formatNumber(clicks)}</td>
+                        <td>${Math.round(conversions).toLocaleString()}</td>
+                        <td style="color: var(--success);">$${formatNumber(revenue)}</td>
+                        <td style="color: ${roas >= 4 ? 'var(--success)' : roas >= 2 ? 'var(--warning)' : 'var(--danger)'};">${roas.toFixed(2)}x</td>
+                        <td style="color: ${cumProfit >= 0 ? 'var(--success)' : 'var(--danger)'};">${cumProfit >= 0 ? '$' : '-$'}${formatNumber(Math.abs(cumProfit))}</td>
+                    </tr>
+                `);
+            }
+
+            tbody.innerHTML = rows.join('');
+        }
+
+        // Update benchmarks from data
+        function updateBenchmarks() {
+            // Calculate competitor spend estimates
+            const brandSpend = { clickbank: 0, impact: 0, awin: 0 };
+
+            keywordData.keywords.forEach(kw => {
+                const gCpc = ((kw.google?.high_top_of_page_bid || 0) + (kw.google?.low_top_of_page_bid || 0)) / 2;
+                const cpc = gCpc > 0 ? gCpc : kw.cpc || 0;
+
+                kw.brands.forEach(b => {
+                    if (brandSpend.hasOwnProperty(b.name)) {
+                        brandSpend[b.name] += b.clicks * cpc;
+                    }
+                });
+            });
+
+            document.getElementById('benchmark-clickbank').textContent = '$' + formatNumber(brandSpend.clickbank);
+            document.getElementById('benchmark-impact').textContent = '$' + formatNumber(brandSpend.impact);
+            document.getElementById('benchmark-awin').textContent = '$' + formatNumber(brandSpend.awin);
+
+            // Global avg CPC
+            document.getElementById('benchmark-cpc').textContent = '$' + (keywordData.global_avg_cpc || 2.50).toFixed(2);
+        }
+
+        // Budget slider handlers
+        document.getElementById('budget-slider').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            document.getElementById('budget-input').value = value;
+            document.getElementById('budget-display').textContent = '$' + formatNumber(value);
+            calculateProjections();
+        });
+
+        document.getElementById('budget-input').addEventListener('input', function() {
+            const value = parseInt(this.value) || 1000;
+            document.getElementById('budget-slider').value = Math.min(100000, Math.max(1000, value));
+            document.getElementById('budget-display').textContent = '$' + formatNumber(value);
+            calculateProjections();
+        });
+
+        // Input change handlers
+        ['ctr', 'conversion-rate', 'ltv'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateProjections);
+        });
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return Math.round(num).toLocaleString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
