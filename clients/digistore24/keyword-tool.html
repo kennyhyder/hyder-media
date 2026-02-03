@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -56,20 +56,20 @@
 
         .stats-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             margin-bottom: 24px;
         }
 
         .stat-card {
             background: var(--bg-secondary);
-            padding: 16px;
+            padding: 14px;
             border-radius: 8px;
             border: 1px solid var(--border);
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -77,8 +77,12 @@
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
+        }
+
+        .stat-value.small {
+            font-size: 1rem;
         }
 
         .filters {
@@ -224,12 +228,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         th {
             text-align: left;
-            padding: 14px 16px;
+            padding: 12px 14px;
             background: var(--bg-tertiary);
             font-weight: 600;
             color: var(--text-secondary);
@@ -246,8 +250,8 @@
         th.sorted-asc::after,
         th.sorted-desc::after {
             position: absolute;
-            right: 8px;
-            font-size: 0.7rem;
+            right: 6px;
+            font-size: 0.65rem;
         }
 
         th.sorted-asc::after {
@@ -259,7 +263,7 @@
         }
 
         td {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-bottom: 1px solid var(--border);
             vertical-align: top;
         }
@@ -270,16 +274,64 @@
 
         .keyword-cell {
             font-weight: 500;
+            max-width: 280px;
+        }
+
+        /* Tooltip styles */
+        .tooltip-trigger {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip-trigger::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             max-width: 300px;
+            white-space: normal;
+            text-align: left;
+        }
+
+        .tooltip-trigger:hover::after {
+            opacity: 1;
+            visibility: visible;
         }
 
         .brand-pill {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
             font-weight: 500;
             margin: 2px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+
+        .brand-pill:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .brand-pill.has-link {
+            cursor: pointer;
         }
 
         .brand-awin { background: #3b82f6; color: white; }
@@ -287,11 +339,28 @@
         .brand-clickbank { background: #22c55e; color: white; }
         .brand-maxweb { background: #f59e0b; color: white; }
 
+        .brand-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .brand-meta {
+            font-size: 0.65rem;
+            opacity: 0.85;
+            display: flex;
+            gap: 6px;
+        }
+
+        .brand-spend {
+            font-weight: 600;
+        }
+
         .category-pill {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             background: var(--bg-tertiary);
             color: var(--text-secondary);
             margin: 2px;
@@ -299,7 +368,7 @@
 
         .number-cell {
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-align: right;
         }
 
@@ -307,11 +376,11 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .brand-count-4 { background: var(--success); color: white; }
@@ -358,9 +427,9 @@
 
         .intent-pill {
             display: inline-block;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             margin: 1px;
@@ -374,6 +443,92 @@
             text-align: center;
             padding: 60px;
             color: var(--text-secondary);
+        }
+
+        .spend-cell {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .brand-card {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin: 3px 0;
+            font-size: 0.75rem;
+        }
+
+        .brand-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .brand-card-name {
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .brand-card-spend {
+            color: var(--success);
+            font-weight: 600;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .brand-card-stats {
+            display: flex;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+        }
+
+        .brand-card-url {
+            margin-top: 4px;
+            font-size: 0.65rem;
+        }
+
+        .brand-card-url a {
+            color: var(--accent);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .brand-card-url a:hover {
+            text-decoration: underline;
+        }
+
+        /* Legend section */
+        .legend {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .legend-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .legend-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         @media (max-width: 768px) {
@@ -398,6 +553,37 @@
             <p class="subtitle">Competitor keyword data from SimilarWeb - Awin, SamCart, ClickBank, MaxWeb</p>
         </header>
 
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-section">
+                <div class="legend-title">Intent Types</div>
+                <div class="legend-items">
+                    <span class="intent-pill intent-transactional tooltip-trigger" data-tooltip="User is ready to buy or take action. High conversion potential.">TRA</span>
+                    <span class="intent-pill intent-navigational tooltip-trigger" data-tooltip="User is looking for a specific website or brand. Often brand searches.">NAV</span>
+                    <span class="intent-pill intent-informational tooltip-trigger" data-tooltip="User is researching or learning. Earlier in funnel.">INF</span>
+                </div>
+            </div>
+            <div class="legend-section">
+                <div class="legend-title">Categories</div>
+                <div class="legend-items">
+                    <span class="category-pill tooltip-trigger" data-tooltip="Keywords containing competitor brand names">Brand - Competitor</span>
+                    <span class="category-pill tooltip-trigger" data-tooltip="Affiliate marketing, networks, partner programs">Affiliate/Network</span>
+                    <span class="category-pill tooltip-trigger" data-tooltip="Digital marketing, advertising, SEO/SEM terms">Marketing/Strategy</span>
+                    <span class="category-pill tooltip-trigger" data-tooltip="Shopping carts, checkout, e-commerce platforms">E-commerce/Cart</span>
+                    <span class="category-pill tooltip-trigger" data-tooltip="Online courses, education, training">Course/Education</span>
+                </div>
+            </div>
+            <div class="legend-section">
+                <div class="legend-title">Brands</div>
+                <div class="legend-items">
+                    <span class="brand-pill brand-awin tooltip-trigger" data-tooltip="Awin - Global affiliate network">awin</span>
+                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform">samcart</span>
+                    <span class="brand-pill brand-clickbank tooltip-trigger" data-tooltip="ClickBank - Digital product marketplace">clickbank</span>
+                    <span class="brand-pill brand-maxweb tooltip-trigger" data-tooltip="MaxWeb - Affiliate network">maxweb</span>
+                </div>
+            </div>
+        </div>
+
         <div class="stats-bar" id="stats-bar">
             <div class="stat-card">
                 <div class="stat-label">Total Keywords</div>
@@ -418,6 +604,30 @@
             <div class="stat-card">
                 <div class="stat-label">Avg. CPC</div>
                 <div class="stat-value" id="stat-cpc">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Est. Total Spend</div>
+                <div class="stat-value small" id="stat-spend">-</div>
+            </div>
+        </div>
+
+        <!-- Brand spend breakdown -->
+        <div class="stats-bar" id="brand-spend-bar">
+            <div class="stat-card">
+                <div class="stat-label">SamCart Spend</div>
+                <div class="stat-value small spend-cell" id="stat-samcart">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Awin Spend</div>
+                <div class="stat-value small spend-cell" id="stat-awin">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">ClickBank Spend</div>
+                <div class="stat-value small spend-cell" id="stat-clickbank">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">MaxWeb Spend</div>
+                <div class="stat-value small spend-cell" id="stat-maxweb">-</div>
             </div>
         </div>
 
@@ -465,10 +675,14 @@
                     <label for="intent">Intent</label>
                     <select id="intent">
                         <option value="">All Intents</option>
+                        <option value="Transactional">Transactional</option>
                         <option value="Navigational">Navigational</option>
                         <option value="Informational">Informational</option>
-                        <option value="Transactional">Transactional</option>
                     </select>
+                </div>
+                <div class="filter-group">
+                    <label for="min-spend">Min Spend ($)</label>
+                    <input type="number" id="min-spend" placeholder="0" step="1" value="">
                 </div>
             </div>
 
@@ -499,18 +713,19 @@
                 <table>
                     <thead>
                         <tr>
-                            <th data-sort="brand_count" style="width: 80px;">Brands</th>
+                            <th data-sort="brand_count" style="width: 70px;" class="tooltip-trigger" data-tooltip="Number of competitors bidding on this keyword">Brands</th>
                             <th data-sort="keyword">Keyword</th>
-                            <th data-sort="primary_category">Category</th>
-                            <th data-sort="volume" style="width: 120px;">Volume</th>
-                            <th data-sort="cpc" style="width: 80px;">CPC</th>
-                            <th data-sort="total_clicks" style="width: 100px;">Clicks</th>
-                            <th data-sort="intent" style="width: 160px;">Intent</th>
-                            <th>Bidding Brands</th>
+                            <th data-sort="primary_category" class="tooltip-trigger" data-tooltip="Auto-categorized based on keyword content">Category</th>
+                            <th data-sort="volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Monthly search volume">Volume</th>
+                            <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Average cost per click">CPC</th>
+                            <th data-sort="total_clicks" style="width: 90px;" class="tooltip-trigger" data-tooltip="Total clicks across all brands">Clicks</th>
+                            <th data-sort="est_spend" style="width: 100px;" class="tooltip-trigger" data-tooltip="Estimated total spend (clicks × CPC)">Est. Spend</th>
+                            <th data-sort="primary_intent" style="width: 100px;" class="tooltip-trigger" data-tooltip="Search intent: Transactional (ready to buy), Navigational (looking for specific site), Informational (researching)">Intent</th>
+                            <th style="min-width: 300px;" class="tooltip-trigger" data-tooltip="Brands bidding on this keyword with their metrics">Brand Details</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <tr><td colspan="8" class="loading">Loading data...</td></tr>
+                        <tr><td colspan="9" class="loading">Loading data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -525,15 +740,13 @@
     </div>
 
     <script>
-        // Data will be loaded from JSON file
-        let allData = { brands: [], keywords: [], category_counts: {} };
+        let allData = { brands: [], keywords: [], category_counts: {}, total_spend_by_brand: {} };
         let filteredData = [];
         let currentPage = 1;
         let pageSize = 50;
         let sortColumn = 'brand_count';
         let sortDirection = 'desc';
 
-        // Load data
         async function loadData() {
             try {
                 const response = await fetch('data/keywords-combined.json');
@@ -543,12 +756,11 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('table-body').innerHTML =
-                    '<tr><td colspan="8" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
+                    '<tr><td colspan="9" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
             }
         }
 
         function initializeUI() {
-            // Populate category dropdown
             const categorySelect = document.getElementById('category');
             const categories = Object.keys(allData.category_counts).sort((a, b) =>
                 allData.category_counts[b] - allData.category_counts[a]
@@ -560,7 +772,6 @@
                 categorySelect.appendChild(option);
             });
 
-            // Populate brand filters
             const brandFilters = document.getElementById('brand-filters');
             allData.brands.forEach(brand => {
                 const item = document.createElement('div');
@@ -572,10 +783,17 @@
                 brandFilters.appendChild(item);
             });
 
-            // Update stats
             document.getElementById('stat-total').textContent = allData.total_keywords.toLocaleString();
 
-            // Add event listeners
+            // Brand spend stats
+            if (allData.total_spend_by_brand) {
+                document.getElementById('stat-samcart').textContent = '$' + formatNumber(allData.total_spend_by_brand.samcart || 0);
+                document.getElementById('stat-awin').textContent = '$' + formatNumber(allData.total_spend_by_brand.awin || 0);
+                document.getElementById('stat-clickbank').textContent = '$' + formatNumber(allData.total_spend_by_brand.clickbank || 0);
+                document.getElementById('stat-maxweb').textContent = '$' + formatNumber(allData.total_spend_by_brand.maxweb || 0);
+            }
+
+            // Event listeners
             document.getElementById('search').addEventListener('input', debounce(applyFilters, 300));
             document.getElementById('category').addEventListener('change', applyFilters);
             document.getElementById('min-brands').addEventListener('change', applyFilters);
@@ -583,6 +801,7 @@
             document.getElementById('max-volume').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('min-cpc').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('max-cpc').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('min-spend').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('intent').addEventListener('change', applyFilters);
             document.getElementById('page-size').addEventListener('change', function() {
                 pageSize = parseInt(this.value);
@@ -599,7 +818,6 @@
             document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
             document.getElementById('next-btn').addEventListener('click', () => changePage(1));
 
-            // Sort headers
             document.querySelectorAll('th[data-sort]').forEach(th => {
                 th.addEventListener('click', () => {
                     const column = th.dataset.sort;
@@ -622,34 +840,25 @@
             const maxVolume = parseInt(document.getElementById('max-volume').value) || Infinity;
             const minCpc = parseFloat(document.getElementById('min-cpc').value) || 0;
             const maxCpc = parseFloat(document.getElementById('max-cpc').value) || Infinity;
+            const minSpend = parseFloat(document.getElementById('min-spend').value) || 0;
             const intent = document.getElementById('intent').value;
 
             const selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
                 .map(cb => cb.value);
 
             filteredData = allData.keywords.filter(kw => {
-                // Search filter
                 if (search && !kw.keyword.toLowerCase().includes(search)) return false;
-
-                // Category filter
                 if (category && !kw.categories.includes(category)) return false;
-
-                // Brand count filter
                 if (kw.brand_count < minBrands) return false;
 
-                // Brand selection filter
                 if (selectedBrands.length > 0) {
-                    const hasSelectedBrand = kw.brands.some(b => selectedBrands.includes(b));
+                    const hasSelectedBrand = kw.brands.some(b => selectedBrands.includes(b.name));
                     if (!hasSelectedBrand) return false;
                 }
 
-                // Volume filter
                 if (kw.volume < minVolume || kw.volume > maxVolume) return false;
-
-                // CPC filter
                 if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
-
-                // Intent filter
+                if (kw.est_spend < minSpend) return false;
                 if (intent && !kw.intent.includes(intent)) return false;
 
                 return true;
@@ -684,12 +893,15 @@
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
                 const avgCpc = filteredData.filter(k => k.cpc > 0).reduce((sum, k) => sum + k.cpc, 0) /
                     filteredData.filter(k => k.cpc > 0).length || 0;
+                const totalSpend = filteredData.reduce((sum, k) => sum + k.est_spend, 0);
 
                 document.getElementById('stat-volume').textContent = formatNumber(avgVolume);
                 document.getElementById('stat-cpc').textContent = '$' + avgCpc.toFixed(2);
+                document.getElementById('stat-spend').textContent = '$' + formatNumber(totalSpend);
             } else {
                 document.getElementById('stat-volume').textContent = '-';
                 document.getElementById('stat-cpc').textContent = '-';
+                document.getElementById('stat-spend').textContent = '-';
             }
         }
 
@@ -699,7 +911,6 @@
             const endIdx = startIdx + pageSize;
             const pageData = filteredData.slice(startIdx, endIdx);
 
-            // Update sort indicators
             document.querySelectorAll('th[data-sort]').forEach(th => {
                 th.classList.remove('sorted-asc', 'sorted-desc');
                 if (th.dataset.sort === sortColumn) {
@@ -708,7 +919,7 @@
             });
 
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="loading">No keywords match your filters</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="loading">No keywords match your filters</td></tr>';
             } else {
                 tbody.innerHTML = pageData.map(kw => `
                     <tr>
@@ -717,18 +928,18 @@
                         </td>
                         <td class="keyword-cell">${escapeHtml(kw.keyword)}</td>
                         <td>
-                            ${kw.categories.map(c => `<span class="category-pill">${c}</span>`).join('')}
+                            ${kw.categories.map(c => `<span class="category-pill tooltip-trigger" data-tooltip="${getCategoryTooltip(c)}">${c}</span>`).join('')}
                         </td>
                         <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
                         <td class="number-cell">${kw.cpc > 0 ? '$' + kw.cpc.toFixed(2) : '-'}</td>
                         <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
+                        <td class="number-cell spend-cell">${kw.est_spend > 0 ? '$' + formatNumber(kw.est_spend) : '-'}</td>
                         <td>${formatIntent(kw.intent)}</td>
-                        <td>${kw.brands.map(b => `<span class="brand-pill brand-${b}">${b}</span>`).join('')}</td>
+                        <td>${formatBrandDetails(kw.brands)}</td>
                     </tr>
                 `).join('');
             }
 
-            // Update pagination
             const totalPages = Math.ceil(filteredData.length / pageSize);
             document.getElementById('page-info').textContent =
                 `Page ${currentPage} of ${totalPages || 1}`;
@@ -736,6 +947,60 @@
                 `Showing ${startIdx + 1}-${Math.min(endIdx, filteredData.length)} of ${filteredData.length.toLocaleString()} keywords`;
             document.getElementById('prev-btn').disabled = currentPage <= 1;
             document.getElementById('next-btn').disabled = currentPage >= totalPages;
+        }
+
+        function formatBrandDetails(brands) {
+            return brands.map(b => {
+                const desktopPct = (b.desktop_share * 100).toFixed(0);
+                const mobilePct = (b.mobile_share * 100).toFixed(0);
+                const urlDisplay = b.top_url ? shortenUrl(b.top_url) : '';
+                const fullUrl = b.top_url || '';
+
+                return `
+                    <div class="brand-card">
+                        <div class="brand-card-header">
+                            <span class="brand-card-name brand-${b.name}">${b.name}</span>
+                            <span class="brand-card-spend">$${formatNumber(b.est_spend)}</span>
+                        </div>
+                        <div class="brand-card-stats">
+                            <span title="Clicks from this brand">${b.clicks.toLocaleString()} clicks</span>
+                            <span title="Desktop traffic share">🖥 ${desktopPct}%</span>
+                            <span title="Mobile traffic share">📱 ${mobilePct}%</span>
+                            ${b.cpc > 0 ? `<span title="CPC for this brand">$${b.cpc.toFixed(2)} CPC</span>` : ''}
+                        </div>
+                        ${fullUrl ? `<div class="brand-card-url"><a href="${escapeHtml(fullUrl)}" target="_blank" rel="noopener" title="${escapeHtml(fullUrl)}">${escapeHtml(urlDisplay)}</a></div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function shortenUrl(url) {
+            try {
+                const u = new URL(url.startsWith('http') ? url : 'https://' + url);
+                let path = u.pathname;
+                if (path.length > 40) {
+                    path = path.substring(0, 37) + '...';
+                }
+                return u.hostname + path;
+            } catch {
+                return url.length > 50 ? url.substring(0, 47) + '...' : url;
+            }
+        }
+
+        function getCategoryTooltip(category) {
+            const tooltips = {
+                'Brand - Competitor': 'Keywords containing competitor brand names',
+                'Affiliate/Network': 'Affiliate marketing, networks, partner programs',
+                'Marketing/Strategy': 'Digital marketing, advertising, SEO/SEM terms',
+                'E-commerce/Cart': 'Shopping carts, checkout, e-commerce platforms',
+                'Course/Education': 'Online courses, education, training',
+                'Product/Digital': 'Digital products, downloads, memberships',
+                'Money/Income': 'Earning money, passive income, commissions',
+                'Sign Up/Login': 'Account creation, registration, login',
+                'Review/Comparison': 'Reviews, comparisons, best-of lists',
+                'Other': 'Keywords not matching other categories',
+            };
+            return tooltips[category] || category;
         }
 
         function changePage(delta) {
@@ -752,6 +1017,7 @@
             document.getElementById('max-volume').value = '';
             document.getElementById('min-cpc').value = '';
             document.getElementById('max-cpc').value = '';
+            document.getElementById('min-spend').value = '';
             document.getElementById('intent').value = '';
             document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
             sortColumn = 'brand_count';
@@ -760,16 +1026,18 @@
         }
 
         function exportCSV() {
-            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Clicks', 'Intent'];
+            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
             const rows = filteredData.map(kw => [
                 kw.keyword,
                 kw.brand_count,
-                kw.brands.join('; '),
+                kw.brands.map(b => b.name).join('; '),
                 kw.primary_category,
                 kw.volume,
                 kw.cpc,
                 kw.total_clicks,
-                kw.intent
+                kw.est_spend,
+                kw.intent,
+                kw.brands.map(b => `${b.name}: $${b.est_spend} (${b.clicks} clicks, ${(b.desktop_share*100).toFixed(0)}% desktop, ${(b.mobile_share*100).toFixed(0)}% mobile)`).join(' | ')
             ]);
 
             const csv = [headers, ...rows]
@@ -791,9 +1059,15 @@
 
         function formatIntent(intent) {
             if (!intent) return '-';
+            const tooltips = {
+                'Transactional': 'User is ready to buy or take action',
+                'Navigational': 'User is looking for a specific website',
+                'Informational': 'User is researching or learning',
+            };
             return intent.split(', ').map(i => {
                 const cls = i.toLowerCase().replace(/[^a-z]/g, '');
-                return `<span class="intent-pill intent-${cls}">${i.substring(0, 3)}</span>`;
+                const shortName = i.substring(0, 3).toUpperCase();
+                return `<span class="intent-pill intent-${cls} tooltip-trigger" data-tooltip="${tooltips[i] || i}">${shortName}</span>`;
             }).join('');
         }
 
@@ -811,7 +1085,6 @@
             };
         }
 
-        // Initialize
         loadData();
     </script>
 </body>
