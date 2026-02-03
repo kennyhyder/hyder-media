@@ -20,6 +20,9 @@
     },
     "api/google-ads/debug.js": {
       "maxDuration": 30
+    },
+    "api/google-ads/keywords.js": {
+      "maxDuration": 60
     }
   }
 }
