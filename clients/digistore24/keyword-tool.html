@@ -449,27 +449,44 @@
             font-weight: 600;
             color: var(--text-secondary);
             white-space: nowrap;
-            cursor: pointer;
             user-select: none;
             position: relative;
         }
 
-        th:hover {
+        th[data-sort] {
+            cursor: pointer !important;
+            padding-right: 24px;
+        }
+
+        th[data-sort]::before {
+            content: '⇅';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            opacity: 0.4;
+        }
+
+        th[data-sort]:hover {
             background: var(--border);
         }
 
-        th.sorted-asc::after,
-        th.sorted-desc::after {
-            position: absolute;
-            right: 6px;
-            font-size: 0.65rem;
+        th[data-sort]:hover::before {
+            opacity: 0.7;
         }
 
-        th.sorted-asc::after {
+        th.sorted-asc::before,
+        th.sorted-desc::before {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        th.sorted-asc::before {
             content: '▲';
         }
 
-        th.sorted-desc::after {
+        th.sorted-desc::before {
             content: '▼';
         }
 
@@ -492,6 +509,11 @@
         .tooltip-trigger {
             position: relative;
             cursor: help;
+        }
+
+        /* Sortable headers override tooltip cursor */
+        th[data-sort].tooltip-trigger {
+            cursor: pointer !important;
         }
 
         .tooltip-trigger::after {
