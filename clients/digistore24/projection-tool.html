@@ -555,6 +555,16 @@
     </style>
 </head>
 <body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
     <!-- Navigation -->
     <nav class="main-nav">
         <a href="keyword-tool.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">Digistore24 Competitive Intel</a>
