@@ -987,10 +987,10 @@
                 <div class="filter-group">
                     <label for="cpc-source">CPC Source for Calculations</label>
                     <select id="cpc-source">
-                        <option value="similarweb">SimilarWeb CPC</option>
+                        <option value="google_avg" selected>Google Avg Bid</option>
                         <option value="google_high">Google High Bid</option>
                         <option value="google_low">Google Low Bid</option>
-                        <option value="google_avg">Google Avg Bid</option>
+                        <option value="similarweb">SimilarWeb CPC</option>
                     </select>
                 </div>
             </div>
@@ -1058,7 +1058,7 @@
         let filteredData = [];
         let currentPage = 1;
         let pageSize = 50;
-        let sortColumn = 'brand_count';
+        let sortColumn = 'google_volume';
         let sortDirection = 'desc';
         let activeGroupFilter = null; // { type: 'brand'|'topic', name: string }
 
@@ -1212,9 +1212,9 @@
                     if (category && !kw.categories.includes(category)) return false;
                     if (kw.brand_count < minBrands) return false;
                     if (kw.volume < minVolume || kw.volume > maxVolume) return false;
-                    if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
+                    if (kw.active_cpc < minCpc || kw.active_cpc > maxCpc) return false;
                     if (kw.calc_spend < minSpend) return false;
-                    if (intent && !kw.intent.includes(intent)) return false;
+                    if (intent && kw.intent && !kw.intent.includes(intent)) return false;
 
                     return true;
                 });
@@ -1442,9 +1442,9 @@
             document.getElementById('max-cpc').value = '';
             document.getElementById('min-spend').value = '';
             document.getElementById('intent').value = '';
-            document.getElementById('cpc-source').value = 'similarweb';
+            document.getElementById('cpc-source').value = 'google_avg';
             document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
-            sortColumn = 'brand_count';
+            sortColumn = 'google_volume';
             sortDirection = 'desc';
             activeGroupFilter = null;
             updateGroupFilterDisplay();
