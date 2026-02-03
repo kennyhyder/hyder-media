@@ -571,6 +571,8 @@
         .brand-samcart { background: #8b5cf6; color: white; }
         .brand-clickbank { background: #22c55e; color: white; }
         .brand-maxweb { background: #f59e0b; color: white; }
+        .brand-impact { background: #ec4899; color: white; }
+        .brand-realize { background: #14b8a6; color: white; }
 
         .brand-details {
             display: flex;
@@ -856,7 +858,7 @@
     <div class="container">
         <header>
             <h1>PPC Keyword Analysis Tool</h1>
-            <p class="subtitle">16,616 keywords from SimilarWeb + Google Keyword Planner data for Awin, SamCart, ClickBank, MaxWeb</p>
+            <p class="subtitle">31,164 keywords from SimilarWeb + Google Keyword Planner data for Awin, ClickBank, MaxWeb, Impact, Realize (+ SamCart)</p>
         </header>
 
         <!-- Legend -->
@@ -883,9 +885,11 @@
                 <div class="legend-title">Brands</div>
                 <div class="legend-items">
                     <span class="brand-pill brand-awin tooltip-trigger" data-tooltip="Awin - Global affiliate network">awin</span>
-                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform">samcart</span>
                     <span class="brand-pill brand-clickbank tooltip-trigger" data-tooltip="ClickBank - Digital product marketplace">clickbank</span>
                     <span class="brand-pill brand-maxweb tooltip-trigger" data-tooltip="MaxWeb - Affiliate network">maxweb</span>
+                    <span class="brand-pill brand-impact tooltip-trigger" data-tooltip="Impact - Partnership automation platform">impact</span>
+                    <span class="brand-pill brand-realize tooltip-trigger" data-tooltip="Realize - Affiliate management">realize</span>
+                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform (excluded by default)">samcart*</span>
                 </div>
             </div>
         </div>
@@ -936,8 +940,8 @@
         <!-- Brand spend breakdown -->
         <div class="stats-bar" id="brand-spend-bar">
             <div class="stat-card">
-                <div class="stat-label">SamCart Spend</div>
-                <div class="stat-value small spend-cell" id="stat-samcart">-</div>
+                <div class="stat-label">Impact Spend</div>
+                <div class="stat-value small spend-cell" id="stat-impact">-</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Awin Spend</div>
@@ -950,6 +954,14 @@
             <div class="stat-card">
                 <div class="stat-label">MaxWeb Spend</div>
                 <div class="stat-value small spend-cell" id="stat-maxweb">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Realize Spend</div>
+                <div class="stat-value small spend-cell" id="stat-realize">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SamCart Spend*</div>
+                <div class="stat-value small spend-cell" id="stat-samcart">-</div>
             </div>
         </div>
 
@@ -1238,7 +1250,7 @@
                 filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
 
             // Calculate brand-specific spend using active CPC
-            const brandSpend = { awin: 0, samcart: 0, clickbank: 0, maxweb: 0 };
+            const brandSpend = { awin: 0, samcart: 0, clickbank: 0, maxweb: 0, impact: 0, realize: 0 };
             filteredData.forEach(kw => {
                 kw.brands.forEach(b => {
                     if (brandSpend.hasOwnProperty(b.name)) {
@@ -1248,14 +1260,18 @@
             });
 
             // Update brand spend stats
-            document.getElementById('stat-samcart').textContent = selectedBrands.includes('samcart')
-                ? '$' + formatNumber(brandSpend.samcart) : '-';
+            document.getElementById('stat-impact').textContent = selectedBrands.includes('impact')
+                ? '$' + formatNumber(brandSpend.impact) : '-';
             document.getElementById('stat-awin').textContent = selectedBrands.includes('awin')
                 ? '$' + formatNumber(brandSpend.awin) : '-';
             document.getElementById('stat-clickbank').textContent = selectedBrands.includes('clickbank')
                 ? '$' + formatNumber(brandSpend.clickbank) : '-';
             document.getElementById('stat-maxweb').textContent = selectedBrands.includes('maxweb')
                 ? '$' + formatNumber(brandSpend.maxweb) : '-';
+            document.getElementById('stat-realize').textContent = selectedBrands.includes('realize')
+                ? '$' + formatNumber(brandSpend.realize) : '-';
+            document.getElementById('stat-samcart').textContent = selectedBrands.includes('samcart')
+                ? '$' + formatNumber(brandSpend.samcart) : '-';
 
             if (filteredData.length > 0) {
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;

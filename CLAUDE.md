@@ -101,32 +101,52 @@ Function timeout configurations (10s-60s depending on endpoint)
 
 ## Current Projects
 
-### Digistore24 PPC Strategy
+### Digistore24 Competitive Intelligence Suite
 **Location:** `/clients/digistore24/`
 **Status:** In Progress
 
 **Data Files:** `/clients/digistore24/data/ppc-kws/`
 - SimilarWeb exports for competitor analysis
-- Brands analyzed: awin, samcart, clickbank, maxweb
-- Processed JSON: `/clients/digistore24/data/keywords-combined.json`
+- Google Keyword Planner data for volume/bid estimates
+- Processed JSON: `/clients/digistore24/data/keywords-combined.json` (31,164 keywords)
 
-**Keyword Tool:** `/clients/digistore24/keyword-tool.html`
-Interactive analysis dashboard with 16,616 unique keywords:
-- Pivot table showing keywords and which brands bid on each
-- Filtering by category, brand, volume, CPC, intent
-- Sortable columns (brand count, keyword, volume, CPC, clicks)
-- CSV export functionality
-- Auto-categorization into 10 categories:
-  - Affiliate/Network (6,285)
-  - Other (4,903)
-  - E-commerce/Cart (2,519)
-  - Brand - Competitor (2,367)
-  - Marketing/Strategy (1,582)
-  - Review/Comparison (1,034)
-  - Product/Digital (939)
-  - Course/Education (266)
-  - Sign Up/Login (184)
-  - Money/Income (110)
+**Brands Analyzed (6 total):**
+- awin (blue #3b82f6)
+- samcart (purple #8b5cf6) - *Note: Data may skew results, default unchecked*
+- clickbank (green #22c55e)
+- maxweb (amber #f59e0b)
+- impact (pink #ec4899)
+- realize (teal #14b8a6)
+
+**Tool Pages:**
+
+1. **Keyword Tool:** `/clients/digistore24/keyword-tool.html`
+   Interactive analysis dashboard:
+   - Pivot table with 31,164 keywords across 6 brands
+   - CPC Source selector: SimilarWeb, Google High/Low/Avg Bid
+   - Keyword Groups accordion (Topic Groups & Brand Groups)
+   - Brand filtering with cascading stat updates
+   - Est. Spend calculation: clicks × active_cpc
+   - CSV export, intent filtering, category filtering
+
+2. **Competitor Ads:** `/clients/digistore24/competitor-ads.html`
+   Google Ads Transparency Center integration:
+   - Direct links to each competitor's ad library
+   - Brand-specific styling and descriptions
+
+3. **Landing Page Analysis:** `/clients/digistore24/landing-page-analysis.html`
+   Competitor landing page teardowns:
+   - Screenshot comparisons
+   - Copy analysis and CTA review
+   - Tabbed interface for each competitor
+
+4. **Sample Landing Page:** `/clients/digistore24/sample-landing-page.html`
+   Reference landing page template
+
+**Keyword Categories (10):**
+- Affiliate/Network, E-commerce/Cart, Brand - Competitor
+- Marketing/Strategy, Review/Comparison, Product/Digital
+- Course/Education, Sign Up/Login, Money/Income, Other
 
 ### Google Ads Integration
 **Status:** Blocked on 501 error
