@@ -17,6 +17,9 @@
     },
     "api/google-ads/campaigns.js": {
       "maxDuration": 30
+    },
+    "api/google-ads/debug.js": {
+      "maxDuration": 30
     }
   }
 }
