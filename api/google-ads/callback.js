@@ -155,11 +155,12 @@ async function fetchAndStoreAccounts(supabase, connectionId, accessToken) {
     try {
         // Use Google Ads API to list accessible customers
         const response = await fetch(
-            'https://googleads.googleapis.com/v15/customers:listAccessibleCustomers',
+            'https://googleads.googleapis.com/v23/customers:listAccessibleCustomers',
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'developer-token': developerToken,
+                    'login-customer-id': loginCustomerId,
                 },
             }
         );
@@ -224,7 +225,7 @@ async function fetchAccountDetails(customerId, accessToken, developerToken, logi
     `;
 
     const response = await fetch(
-        `https://googleads.googleapis.com/v15/customers/${customerId}/googleAds:search`,
+        `https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`,
         {
             method: 'POST',
             headers: {

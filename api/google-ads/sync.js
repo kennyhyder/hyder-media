@@ -208,7 +208,7 @@ async function refreshToken(supabase, connection) {
  */
 async function executeQuery(customerId, query, accessToken, loginCustomerId) {
     const response = await fetch(
-        `https://googleads.googleapis.com/v15/customers/${customerId}/googleAds:search`,
+        `https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`,
         {
             method: 'POST',
             headers: {

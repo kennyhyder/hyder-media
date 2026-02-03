@@ -103,7 +103,7 @@ export default async function handler(req, res) {
 
         // Try WITHOUT login-customer-id first (not required for listAccessibleCustomers)
         const listResponse = await fetch(
-            'https://googleads.googleapis.com/v18/customers:listAccessibleCustomers',
+            'https://googleads.googleapis.com/v23/customers:listAccessibleCustomers',
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
                     `;
 
                     const detailResponse = await fetch(
-                        `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
+                        `https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`,
                         {
                             method: 'POST',
                             headers: {
@@ -211,7 +211,7 @@ async function tryDirectMccQuery(accessToken, developerToken, loginCustomerId) {
         `;
 
         const response = await fetch(
-            `https://googleads.googleapis.com/v18/customers/${loginCustomerId}/googleAds:search`,
+            `https://googleads.googleapis.com/v23/customers/${loginCustomerId}/googleAds:search`,
             {
                 method: 'POST',
                 headers: {
@@ -245,7 +245,7 @@ async function tryDirectMccQuery(accessToken, developerToken, loginCustomerId) {
             `;
 
             const clientsResponse = await fetch(
-                `https://googleads.googleapis.com/v18/customers/${loginCustomerId}/googleAds:search`,
+                `https://googleads.googleapis.com/v23/customers/${loginCustomerId}/googleAds:search`,
                 {
                     method: 'POST',
                     headers: {
