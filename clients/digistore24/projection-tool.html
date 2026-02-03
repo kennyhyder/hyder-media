@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPC Projection Tool | Digistore24</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -352,60 +351,6 @@
             margin-top: 4px;
         }
 
-        /* Chart Container */
-        .chart-container {
-            background: var(--bg-tertiary);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 24px;
-            height: 280px;
-            max-height: 280px;
-        }
-
-        .chart-container h3 {
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-        }
-
-        .chart-wrapper {
-            height: 230px;
-            position: relative;
-        }
-
-        /* Projections Table */
-        .projections-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
-        .projections-table th {
-            text-align: left;
-            padding: 12px 14px;
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .projections-table td {
-            padding: 14px;
-            border-bottom: 1px solid var(--border);
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-
-        .projections-table tr:hover td {
-            background: rgba(59, 130, 246, 0.05);
-        }
-
-        .projections-table .month-label {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
         /* Benchmarks Section */
         .benchmarks {
             background: var(--bg-tertiary);
@@ -454,36 +399,6 @@
             color: var(--text-secondary);
             margin-top: 4px;
             font-style: italic;
-        }
-
-        /* Scenario Tabs */
-        .scenario-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .scenario-tab {
-            padding: 10px 20px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .scenario-tab:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
-
-        .scenario-tab.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
         }
 
         /* Quick Actions */
@@ -731,6 +646,17 @@
                         <div class="section-title">3. Performance Assumptions</div>
 
                         <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Percentage of impressions that result in clicks. Industry avg for B2B SaaS: 2-3%">
+                                Click-Through Rate (CTR)
+                            </label>
+                            <div class="input-with-unit">
+                                <input type="number" id="ctr" value="2.5" min="0.1" max="20" step="0.1">
+                                <span class="input-unit">%</span>
+                            </div>
+                            <div class="input-hint">Industry avg: 2-3% for B2B SaaS</div>
+                        </div>
+
+                        <div class="input-group">
                             <label class="tooltip-trigger" data-tooltip="Percentage of clicks that become customers. Affiliate platforms typically see 1-3%">
                                 Conversion Rate (CVR)
                             </label>
@@ -752,46 +678,51 @@
                             <div class="input-hint">Digistore24 LTV30: $1,500</div>
                         </div>
                     </div>
-
-                    <!-- Scenario Selection -->
-                    <div class="input-section">
-                        <div class="section-title">4. Projection Period</div>
-                        <div class="scenario-tabs">
-                            <button class="scenario-tab" onclick="setProjectionPeriod(3)">3 Months</button>
-                            <button class="scenario-tab active" onclick="setProjectionPeriod(6)">6 Months</button>
-                            <button class="scenario-tab" onclick="setProjectionPeriod(12)">12 Months</button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <!-- Right Panel - Results -->
             <div>
-                <!-- Key Metrics -->
+                <!-- Monthly Projections -->
                 <div class="panel" style="margin-bottom: 24px;">
                     <div class="panel-header">
-                        <h2>Projected Results</h2>
-                        <span id="period-label" style="font-size: 0.85rem; color: var(--text-secondary);">6 Month Projection</span>
+                        <h2>Monthly Projections</h2>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Based on selected keyword groups</span>
                     </div>
                     <div class="panel-content">
                         <div class="results-grid">
                             <div class="result-card">
-                                <div class="result-label">Total Ad Spend</div>
-                                <div class="result-value accent" id="result-spend">$0</div>
-                                <div class="result-subtext" id="result-spend-monthly">$0/month</div>
+                                <div class="result-label">Monthly Search Volume</div>
+                                <div class="result-value accent" id="result-volume">0</div>
+                                <div class="result-subtext">Total impressions potential</div>
                             </div>
                             <div class="result-card">
-                                <div class="result-label">Estimated Clicks</div>
+                                <div class="result-label">Est. Clicks</div>
                                 <div class="result-value purple" id="result-clicks">0</div>
-                                <div class="result-subtext" id="result-cpc">$0.00 avg CPC</div>
+                                <div class="result-subtext" id="result-ctr">0% CTR</div>
                             </div>
                             <div class="result-card">
-                                <div class="result-label">Projected Conversions</div>
+                                <div class="result-label">Est. CPC</div>
+                                <div class="result-value" id="result-cpc">$0</div>
+                                <div class="result-subtext">Avg cost per click</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Est. Ad Spend</div>
+                                <div class="result-value accent" id="result-spend">$0</div>
+                                <div class="result-subtext">Clicks × CPC</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Est. Conversions</div>
                                 <div class="result-value" id="result-conversions">0</div>
-                                <div class="result-subtext" id="result-cpa">$0.00 CPA</div>
+                                <div class="result-subtext" id="result-cvr">0% CVR</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Est. CPA</div>
+                                <div class="result-value warning" id="result-cpa">$0</div>
+                                <div class="result-subtext" id="result-cpa-formula">CPC ÷ CVR</div>
                             </div>
                             <div class="result-card highlight">
-                                <div class="result-label">Projected Revenue</div>
+                                <div class="result-label">Est. Revenue</div>
                                 <div class="result-value success" id="result-revenue">$0</div>
                                 <div class="result-subtext">Based on LTV30</div>
                             </div>
@@ -806,33 +737,37 @@
                                 <div class="result-subtext">Revenue - Ad Spend</div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Chart -->
-                        <div class="chart-container">
-                            <h3>Cumulative Performance Over Time</h3>
-                            <div class="chart-wrapper">
-                                <canvas id="projection-chart"></canvas>
+                <!-- Yearly Summary -->
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h2>Annual Projection</h2>
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);">12-month forecast</span>
+                    </div>
+                    <div class="panel-content">
+                        <div class="results-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                            <div class="result-card">
+                                <div class="result-label">Annual Spend</div>
+                                <div class="result-value accent" id="result-annual-spend">$0</div>
                             </div>
-                        </div>
-
-                        <!-- Monthly Breakdown Table -->
-                        <h3 style="font-size: 0.9rem; margin-bottom: 12px; color: var(--text-secondary);">Monthly Breakdown</h3>
-                        <div style="overflow-x: auto;">
-                            <table class="projections-table">
-                                <thead>
-                                    <tr>
-                                        <th>Month</th>
-                                        <th>Ad Spend</th>
-                                        <th>Clicks</th>
-                                        <th>Conversions</th>
-                                        <th>Revenue</th>
-                                        <th>ROAS</th>
-                                        <th>Cumulative Profit</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="projections-tbody">
-                                </tbody>
-                            </table>
+                            <div class="result-card">
+                                <div class="result-label">Annual Clicks</div>
+                                <div class="result-value purple" id="result-annual-clicks">0</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Annual Conversions</div>
+                                <div class="result-value" id="result-annual-conversions">0</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="result-label">Annual Revenue</div>
+                                <div class="result-value success" id="result-annual-revenue">$0</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="result-label">Annual Profit</div>
+                                <div class="result-value" id="result-annual-profit">$0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -906,9 +841,7 @@
         let keywordData = null;
         let selectedGroups = new Set();
         let groupType = 'topics';
-        let projectionPeriod = 6;
         let matchType = 'phrase'; // 'exact' or 'phrase'
-        let chart = null;
 
         // Set match type (exact vs phrase)
         function setMatchType(type) {
@@ -1131,55 +1064,56 @@
             return { totalKeywords, monthlyVolume, avgCpc, totalClicks, totalExpectedSpend };
         }
 
-        // Set projection period
-        function setProjectionPeriod(months) {
-            projectionPeriod = months;
-            document.querySelectorAll('.scenario-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.textContent.includes(months));
-            });
-            document.getElementById('period-label').textContent = `${months} Month Projection`;
-            calculateProjections();
-        }
-
         // Main calculation function
         function calculateProjections() {
+            const ctr = parseFloat(document.getElementById('ctr').value) / 100 || 0.025;
             const cvr = parseFloat(document.getElementById('conversion-rate').value) / 100 || 0.02;
             const ltv = parseFloat(document.getElementById('ltv').value) || 1500;
 
-            // Get selected keywords data - now includes totalClicks and totalExpectedSpend
+            // Get selected keywords data
             const summary = updateSelectedSummary();
             const avgCpc = summary.avgCpc > 0 ? summary.avgCpc : 2.50;
+            const monthlyVolume = summary.monthlyVolume;
 
-            // Expected monthly spend is based on competitor click data
-            // Note: SimilarWeb data is annual, so divide by 12 for monthly estimates
-            const monthlySpend = summary.totalExpectedSpend / 12;
-            const monthlyClicks = summary.totalClicks / 12;
+            // Calculate clicks based on volume and CTR
+            const monthlyClicks = monthlyVolume * ctr;
 
-            // Monthly calculations using expected spend from keyword data
+            // Calculate spend based on clicks and CPC
+            const monthlySpend = monthlyClicks * avgCpc;
+
+            // Calculate conversions and CPA
             const monthlyConversions = monthlyClicks * cvr;
+            const cpa = cvr > 0 ? avgCpc / cvr : 0;
+
+            // Calculate revenue and profit
             const monthlyRevenue = monthlyConversions * ltv;
             const monthlyProfit = monthlyRevenue - monthlySpend;
             const monthlyRoas = monthlySpend > 0 ? monthlyRevenue / monthlySpend : 0;
 
-            // Total calculations for the projection period
-            const totalSpend = monthlySpend * projectionPeriod;
-            const totalClicks = monthlyClicks * projectionPeriod;
-            const totalConversions = monthlyConversions * projectionPeriod;
-            const totalRevenue = monthlyRevenue * projectionPeriod;
-            const totalProfit = totalRevenue - totalSpend;
-            const cpa = totalConversions > 0 ? totalSpend / totalConversions : 0;
+            // Annual calculations
+            const annualSpend = monthlySpend * 12;
+            const annualClicks = monthlyClicks * 12;
+            const annualConversions = monthlyConversions * 12;
+            const annualRevenue = monthlyRevenue * 12;
+            const annualProfit = monthlyProfit * 12;
 
-            // Update result cards
-            document.getElementById('result-spend').textContent = '$' + formatNumber(totalSpend);
-            document.getElementById('result-spend-monthly').textContent = '$' + formatNumber(monthlySpend) + '/month';
+            // Update monthly result cards
+            document.getElementById('result-volume').textContent = formatNumber(monthlyVolume);
 
-            document.getElementById('result-clicks').textContent = formatNumber(Math.round(totalClicks));
-            document.getElementById('result-cpc').textContent = '$' + avgCpc.toFixed(2) + ' avg CPC';
+            document.getElementById('result-clicks').textContent = formatNumber(Math.round(monthlyClicks));
+            document.getElementById('result-ctr').textContent = (ctr * 100).toFixed(1) + '% CTR';
 
-            document.getElementById('result-conversions').textContent = formatNumber(Math.round(totalConversions));
-            document.getElementById('result-cpa').textContent = '$' + formatNumber(cpa) + ' CPA';
+            document.getElementById('result-cpc').textContent = '$' + avgCpc.toFixed(2);
 
-            document.getElementById('result-revenue').textContent = '$' + formatNumber(totalRevenue);
+            document.getElementById('result-spend').textContent = '$' + formatNumber(monthlySpend);
+
+            document.getElementById('result-conversions').textContent = formatNumber(Math.round(monthlyConversions));
+            document.getElementById('result-cvr').textContent = (cvr * 100).toFixed(1) + '% CVR';
+
+            document.getElementById('result-cpa').textContent = '$' + formatNumber(cpa);
+            document.getElementById('result-cpa-formula').textContent = '$' + avgCpc.toFixed(2) + ' ÷ ' + (cvr * 100).toFixed(1) + '%';
+
+            document.getElementById('result-revenue').textContent = '$' + formatNumber(monthlyRevenue);
 
             const roasElement = document.getElementById('result-roas');
             roasElement.textContent = monthlyRoas.toFixed(2) + 'x';
@@ -1187,136 +1121,18 @@
             document.getElementById('result-roas-pct').textContent = ((monthlyRoas - 1) * 100).toFixed(0) + '% return';
 
             const profitElement = document.getElementById('result-profit');
-            profitElement.textContent = (totalProfit >= 0 ? '$' : '-$') + formatNumber(Math.abs(totalProfit));
-            profitElement.className = 'result-value ' + (totalProfit >= 0 ? 'success' : 'danger');
+            profitElement.textContent = (monthlyProfit >= 0 ? '$' : '-$') + formatNumber(Math.abs(monthlyProfit));
+            profitElement.className = 'result-value ' + (monthlyProfit >= 0 ? 'success' : 'danger');
 
-            // Update chart and table
-            updateChart(monthlySpend, avgCpc, cvr, ltv, monthlyClicks);
-            updateProjectionsTable(monthlySpend, avgCpc, cvr, ltv, monthlyClicks);
-        }
+            // Update annual result cards
+            document.getElementById('result-annual-spend').textContent = '$' + formatNumber(annualSpend);
+            document.getElementById('result-annual-clicks').textContent = formatNumber(Math.round(annualClicks));
+            document.getElementById('result-annual-conversions').textContent = formatNumber(Math.round(annualConversions));
+            document.getElementById('result-annual-revenue').textContent = '$' + formatNumber(annualRevenue);
 
-        // Update chart
-        function updateChart(monthlySpend, avgCpc, cvr, ltv, monthlyClicks) {
-            const ctx = document.getElementById('projection-chart').getContext('2d');
-
-            const labels = [];
-            const spendData = [];
-            const revenueData = [];
-            const profitData = [];
-
-            let cumSpend = 0;
-            let cumRevenue = 0;
-
-            for (let i = 1; i <= projectionPeriod; i++) {
-                labels.push('Month ' + i);
-
-                const conversions = monthlyClicks * cvr;
-                const revenue = conversions * ltv;
-
-                cumSpend += monthlySpend;
-                cumRevenue += revenue;
-
-                spendData.push(cumSpend);
-                revenueData.push(cumRevenue);
-                profitData.push(cumRevenue - cumSpend);
-            }
-
-            if (chart) {
-                chart.destroy();
-            }
-
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [
-                        {
-                            label: 'Cumulative Spend',
-                            data: spendData,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Cumulative Revenue',
-                            data: revenueData,
-                            borderColor: '#22c55e',
-                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Cumulative Profit',
-                            data: profitData,
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2.5,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#94a3b8' }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': $' + formatNumber(context.raw);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        y: {
-                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + formatNumber(value);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update projections table
-        function updateProjectionsTable(monthlySpend, avgCpc, cvr, ltv, monthlyClicks) {
-            const tbody = document.getElementById('projections-tbody');
-            let rows = [];
-            let cumProfit = 0;
-
-            for (let i = 1; i <= projectionPeriod; i++) {
-                const conversions = monthlyClicks * cvr;
-                const revenue = conversions * ltv;
-                const roas = monthlySpend > 0 ? revenue / monthlySpend : 0;
-                cumProfit += (revenue - monthlySpend);
-
-                rows.push(`
-                    <tr>
-                        <td class="month-label">Month ${i}</td>
-                        <td>$${formatNumber(monthlySpend)}</td>
-                        <td>${formatNumber(Math.round(monthlyClicks))}</td>
-                        <td>${Math.round(conversions).toLocaleString()}</td>
-                        <td style="color: var(--success);">$${formatNumber(revenue)}</td>
-                        <td style="color: ${roas >= 4 ? 'var(--success)' : roas >= 2 ? 'var(--warning)' : 'var(--danger)'};">${roas.toFixed(2)}x</td>
-                        <td style="color: ${cumProfit >= 0 ? 'var(--success)' : 'var(--danger)'};">${cumProfit >= 0 ? '$' : '-$'}${formatNumber(Math.abs(cumProfit))}</td>
-                    </tr>
-                `);
-            }
-
-            tbody.innerHTML = rows.join('');
+            const annualProfitElement = document.getElementById('result-annual-profit');
+            annualProfitElement.textContent = (annualProfit >= 0 ? '$' : '-$') + formatNumber(Math.abs(annualProfit));
+            annualProfitElement.className = 'result-value ' + (annualProfit >= 0 ? 'success' : 'danger');
         }
 
         // Update benchmarks from data
@@ -1344,7 +1160,7 @@
         }
 
         // Input change handlers
-        ['conversion-rate', 'ltv'].forEach(id => {
+        ['ctr', 'conversion-rate', 'ltv'].forEach(id => {
             document.getElementById(id).addEventListener('input', calculateProjections);
         });
 
