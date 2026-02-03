@@ -746,6 +746,15 @@
                     <label for="min-spend">Min Spend ($)</label>
                     <input type="number" id="min-spend" placeholder="0" step="1" value="">
                 </div>
+                <div class="filter-group">
+                    <label for="cpc-source">CPC Source for Calculations</label>
+                    <select id="cpc-source">
+                        <option value="similarweb">SimilarWeb CPC</option>
+                        <option value="google_high">Google High Bid</option>
+                        <option value="google_low">Google Low Bid</option>
+                        <option value="google_avg">Google Avg Bid</option>
+                    </select>
+                </div>
             </div>
 
             <div class="filter-row">
@@ -778,17 +787,18 @@
                             <th data-sort="brand_count" style="width: 70px;" class="tooltip-trigger" data-tooltip="Number of competitors bidding on this keyword">Brands</th>
                             <th data-sort="keyword">Keyword</th>
                             <th data-sort="primary_category" class="tooltip-trigger" data-tooltip="Auto-categorized based on keyword content">Category</th>
-                            <th data-sort="volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Monthly search volume">Volume</th>
-                            <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Average cost per click (SimilarWeb)">CPC</th>
-                            <th data-sort="google_bid_high" style="width: 110px;" class="tooltip-trigger" data-tooltip="Google Ads Top of Page Bid (low - high). This is what Google suggests for ads to appear at the top of search results.">Google Bid</th>
+                            <th data-sort="volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Annual search volume (SimilarWeb)">SW Volume</th>
+                            <th data-sort="google_volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Annual search volume (Google Keyword Planner - sum of 12 months)">G Volume</th>
+                            <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Cost per click (SimilarWeb)">SW CPC</th>
+                            <th data-sort="google_bid_high" style="width: 110px;" class="tooltip-trigger" data-tooltip="Google Ads Top of Page Bid (low - high). This is what Google suggests for ads to appear at the top of search results.">G Bid</th>
                             <th data-sort="total_clicks" style="width: 90px;" class="tooltip-trigger" data-tooltip="Total clicks across all brands">Clicks</th>
-                            <th data-sort="est_spend" style="width: 100px;" class="tooltip-trigger" data-tooltip="Estimated total spend (clicks × CPC)">Est. Spend</th>
+                            <th data-sort="calc_spend" style="width: 100px;" class="tooltip-trigger" data-tooltip="Estimated spend (clicks × selected CPC source)">Est. Spend</th>
                             <th data-sort="primary_intent" style="width: 100px;" class="tooltip-trigger" data-tooltip="Search intent: Transactional (ready to buy), Navigational (looking for specific site), Informational (researching)">Intent</th>
                             <th style="min-width: 300px;" class="tooltip-trigger" data-tooltip="Brands bidding on this keyword with their metrics">Brand Details</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <tr><td colspan="10" class="loading">Loading data...</td></tr>
+                        <tr><td colspan="11" class="loading">Loading data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -861,6 +871,7 @@
             document.getElementById('max-cpc').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('min-spend').addEventListener('input', debounce(applyFilters, 500));
             document.getElementById('intent').addEventListener('change', applyFilters);
+            document.getElementById('cpc-source').addEventListener('change', applyFilters);
             document.getElementById('page-size').addEventListener('change', function() {
                 pageSize = parseInt(this.value);
                 currentPage = 1;
@@ -906,23 +917,42 @@
             selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
                 .map(cb => cb.value);
 
+            const cpcSource = document.getElementById('cpc-source').value;
+
             filteredData = allData.keywords
                 .map(kw => {
                     // Filter brands to only selected ones
                     const filteredBrands = kw.brands.filter(b => selectedBrands.includes(b.name));
 
-                    // Recalculate metrics based on filtered brands
+                    // Get CPC based on selected source
+                    const googleHigh = kw.google?.high_top_of_page_bid || 0;
+                    const googleLow = kw.google?.low_top_of_page_bid || 0;
+                    const googleAvg = (googleHigh + googleLow) / 2;
+
+                    let activeCpc;
+                    switch(cpcSource) {
+                        case 'google_high': activeCpc = googleHigh; break;
+                        case 'google_low': activeCpc = googleLow; break;
+                        case 'google_avg': activeCpc = googleAvg; break;
+                        default: activeCpc = kw.cpc || 0; // similarweb
+                    }
+
+                    // Recalculate metrics based on filtered brands and selected CPC
                     const filteredClicks = filteredBrands.reduce((sum, b) => sum + b.clicks, 0);
-                    const filteredSpend = filteredBrands.reduce((sum, b) => sum + b.est_spend, 0);
+                    const calcSpend = filteredClicks * activeCpc;
+                    const origSpend = filteredBrands.reduce((sum, b) => sum + b.est_spend, 0);
 
                     return {
                         ...kw,
                         brands: filteredBrands,
                         brand_count: filteredBrands.length,
                         total_clicks: filteredClicks,
-                        est_spend: filteredSpend,
-                        google_bid_high: kw.google?.high_top_of_page_bid || 0,
-                        google_bid_low: kw.google?.low_top_of_page_bid || 0,
+                        est_spend: origSpend,
+                        calc_spend: calcSpend,
+                        active_cpc: activeCpc,
+                        google_volume: kw.google?.annual_volume || 0,
+                        google_bid_high: googleHigh,
+                        google_bid_low: googleLow,
                     };
                 })
                 .filter(kw => {
@@ -934,7 +964,7 @@
                     if (kw.brand_count < minBrands) return false;
                     if (kw.volume < minVolume || kw.volume > maxVolume) return false;
                     if (kw.cpc < minCpc || kw.cpc > maxCpc) return false;
-                    if (kw.est_spend < minSpend) return false;
+                    if (kw.calc_spend < minSpend) return false;
                     if (intent && !kw.intent.includes(intent)) return false;
 
                     return true;
@@ -965,12 +995,12 @@
             document.getElementById('stat-multi').textContent =
                 filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
 
-            // Calculate brand-specific spend from filtered data
+            // Calculate brand-specific spend using active CPC
             const brandSpend = { awin: 0, samcart: 0, clickbank: 0, maxweb: 0 };
             filteredData.forEach(kw => {
                 kw.brands.forEach(b => {
                     if (brandSpend.hasOwnProperty(b.name)) {
-                        brandSpend[b.name] += b.est_spend;
+                        brandSpend[b.name] += b.clicks * kw.active_cpc;
                     }
                 });
             });
@@ -987,9 +1017,9 @@
 
             if (filteredData.length > 0) {
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
-                const avgCpc = filteredData.filter(k => k.cpc > 0).reduce((sum, k) => sum + k.cpc, 0) /
-                    filteredData.filter(k => k.cpc > 0).length || 0;
-                const totalSpend = filteredData.reduce((sum, k) => sum + k.est_spend, 0);
+                const avgCpc = filteredData.filter(k => k.active_cpc > 0).reduce((sum, k) => sum + k.active_cpc, 0) /
+                    filteredData.filter(k => k.active_cpc > 0).length || 0;
+                const totalSpend = filteredData.reduce((sum, k) => sum + k.calc_spend, 0);
 
                 document.getElementById('stat-volume').textContent = formatNumber(avgVolume);
                 document.getElementById('stat-cpc').textContent = '$' + avgCpc.toFixed(2);
@@ -1015,7 +1045,7 @@
             });
 
             if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="loading">No keywords match your filters</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="loading">No keywords match your filters</td></tr>';
             } else {
                 tbody.innerHTML = pageData.map((kw, idx) => {
                     const rowId = `row-${currentPage}-${idx}`;
@@ -1029,10 +1059,11 @@
                             ${kw.categories.map(c => `<span class="category-pill tooltip-trigger" data-tooltip="${getCategoryTooltip(c)}">${c}</span>`).join('')}
                         </td>
                         <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
+                        <td class="number-cell">${kw.google_volume > 0 ? kw.google_volume.toLocaleString() : '-'}</td>
                         <td class="number-cell">${kw.cpc > 0 ? '$' + kw.cpc.toFixed(2) : '-'}</td>
                         <td class="number-cell">${formatGoogleBid(kw.google)}</td>
                         <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
-                        <td class="number-cell spend-cell">${kw.est_spend > 0 ? '$' + formatNumber(kw.est_spend) : '-'}</td>
+                        <td class="number-cell spend-cell">${kw.calc_spend > 0 ? '$' + formatNumber(kw.calc_spend) : '-'}</td>
                         <td>${formatIntent(kw.intent)}</td>
                         <td>${formatBrandDetails(kw.brands, rowId)}</td>
                     </tr>
@@ -1162,6 +1193,7 @@
             document.getElementById('max-cpc').value = '';
             document.getElementById('min-spend').value = '';
             document.getElementById('intent').value = '';
+            document.getElementById('cpc-source').value = 'similarweb';
             document.querySelectorAll('#brand-filters input').forEach(cb => cb.checked = true);
             sortColumn = 'brand_count';
             sortDirection = 'desc';
@@ -1169,21 +1201,24 @@
         }
 
         function exportCSV() {
-            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'Volume', 'CPC', 'Google Bid Low', 'Google Bid High', 'Google Competition', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
+            const cpcSource = document.getElementById('cpc-source').value;
+            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'SW Volume', 'Google Volume', 'SW CPC', 'Google Bid Low', 'Google Bid High', 'Google Competition', 'Active CPC', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
             const rows = filteredData.map(kw => [
                 kw.keyword,
                 kw.brand_count,
                 kw.brands.map(b => b.name).join('; '),
                 kw.primary_category,
                 kw.volume,
+                kw.google_volume,
                 kw.cpc,
                 kw.google?.low_top_of_page_bid || '',
                 kw.google?.high_top_of_page_bid || '',
                 kw.google?.competition || '',
+                kw.active_cpc,
                 kw.total_clicks,
-                kw.est_spend,
+                kw.calc_spend,
                 kw.intent,
-                kw.brands.map(b => `${b.name}: $${b.est_spend} (${b.clicks} clicks, ${(b.desktop_share*100).toFixed(0)}% desktop, ${(b.mobile_share*100).toFixed(0)}% mobile)`).join(' | ')
+                kw.brands.map(b => `${b.name}: ${b.clicks} clicks, ${(b.desktop_share*100).toFixed(0)}% desktop, ${(b.mobile_share*100).toFixed(0)}% mobile`).join(' | ')
             ]);
 
             const csv = [headers, ...rows]
