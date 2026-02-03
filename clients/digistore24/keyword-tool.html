@@ -828,35 +828,37 @@
             gap: 8px;
         }
 
-        /* Brand/Nonbrand Tabs */
+        /* Brand/Nonbrand Tabs in Table Header */
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         .keyword-type-tabs {
             display: flex;
-            gap: 4px;
-            margin-bottom: 24px;
-            background: var(--bg-secondary);
-            padding: 6px;
-            border-radius: 10px;
-            width: fit-content;
-            border: 1px solid var(--border);
+            gap: 2px;
+            background: var(--bg-tertiary);
+            padding: 3px;
+            border-radius: 6px;
         }
 
         .keyword-type-tab {
-            padding: 12px 28px;
+            padding: 6px 14px;
             background: transparent;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .keyword-type-tab:hover {
-            background: var(--bg-tertiary);
             color: var(--text-primary);
         }
 
@@ -866,14 +868,14 @@
         }
 
         .keyword-type-tab .tab-count {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.75rem;
+            background: rgba(255,255,255,0.15);
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 0.7rem;
         }
 
         .keyword-type-tab.active .tab-count {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
         }
 
         @media (max-width: 768px) {
@@ -940,16 +942,6 @@
                     <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform (excluded by default)">samcart*</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Brand/Nonbrand Keyword Type Tabs -->
-        <div class="keyword-type-tabs">
-            <button class="keyword-type-tab active" data-type="nonbrand" onclick="switchKeywordType('nonbrand', this)">
-                Nonbrand Keywords <span class="tab-count" id="nonbrand-count">-</span>
-            </button>
-            <button class="keyword-type-tab" data-type="brand" onclick="switchKeywordType('brand', this)">
-                Brand Keywords <span class="tab-count" id="brand-kw-count">-</span>
-            </button>
         </div>
 
         <!-- Keyword Groups Accordion -->
@@ -1086,7 +1078,17 @@
 
         <div class="table-container">
             <div class="table-header">
-                <span class="table-info" id="table-info">Loading...</span>
+                <div class="table-header-left">
+                    <div class="keyword-type-tabs">
+                        <button class="keyword-type-tab active" data-type="nonbrand" onclick="switchKeywordType('nonbrand', this)">
+                            Nonbrand <span class="tab-count" id="nonbrand-count">-</span>
+                        </button>
+                        <button class="keyword-type-tab" data-type="brand" onclick="switchKeywordType('brand', this)">
+                            Brand <span class="tab-count" id="brand-kw-count">-</span>
+                        </button>
+                    </div>
+                    <span class="table-info" id="table-info">Loading...</span>
+                </div>
                 <div class="table-actions">
                     <select id="page-size">
                         <option value="25">25 per page</option>
@@ -1270,10 +1272,10 @@
                     if (kw.brand_count === 0) return false;
 
                     // Filter by keyword type (brand vs nonbrand)
-                    // Brand keywords have a brand_group or are in "Brand - Competitor" category
-                    const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
-                    if (activeKeywordType === 'brand' && !isBrandKeyword) return false;
-                    if (activeKeywordType === 'nonbrand' && isBrandKeyword) return false;
+                    // Brand keywords = those with brand_group (competitor brand mentions)
+                    // Nonbrand keywords = those with short_tail_group (topic-based)
+                    if (activeKeywordType === 'brand' && !kw.brand_group) return false;
+                    if (activeKeywordType === 'nonbrand' && !kw.short_tail_group) return false;
 
                     // Filter by keyword group if active
                     if (activeGroupFilter) {
@@ -1631,10 +1633,10 @@
             );
 
             // Further filter by keyword type
+            // Brand = has brand_group, Nonbrand = has short_tail_group
             const filteredKeywords = keywordsWithSelectedBrands.filter(kw => {
-                const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
-                if (activeKeywordType === 'brand') return isBrandKeyword;
-                if (activeKeywordType === 'nonbrand') return !isBrandKeyword;
+                if (activeKeywordType === 'brand') return kw.brand_group;
+                if (activeKeywordType === 'nonbrand') return kw.short_tail_group;
                 return true;
             });
 
@@ -1840,12 +1842,10 @@
             let nonbrandCount = 0;
 
             keywordsWithSelectedBrands.forEach(kw => {
-                const isBrandKeyword = kw.brand_group || kw.primary_category === 'Brand - Competitor';
-                if (isBrandKeyword) {
-                    brandCount++;
-                } else {
-                    nonbrandCount++;
-                }
+                // Brand keywords = those with brand_group
+                // Nonbrand keywords = those with short_tail_group (topic groups)
+                if (kw.brand_group) brandCount++;
+                if (kw.short_tail_group) nonbrandCount++;
             });
 
             document.getElementById('nonbrand-count').textContent = nonbrandCount.toLocaleString();
