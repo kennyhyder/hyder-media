@@ -162,9 +162,15 @@ All tool pages share standardized navigation:
 
 | File | Contents |
 |------|----------|
-| `keywords-combined.json` | 31,164 keywords with brand data, volumes, CPCs |
-| `ppc-kws/` | Raw SimilarWeb exports per competitor |
-| `google-keywords.json` | Google Keyword Planner volume/bid data |
+| `keywords-combined.json` | 31,164 keywords with brand data, volumes, CPCs, Google data |
+| `ppc-kws/` | Raw SimilarWeb exports per competitor (Excel .xlsx files) |
+
+**Current Data Stats (as of 2026-02-04):**
+- Total keywords: 31,164
+- Keywords with Google Keyword Planner data: 26,116
+- Keywords in topic groups: 9,932
+- Keywords in brand groups: 7,220
+- Keywords in both (should be 0): 0
 
 **keywords-combined.json structure (full file):**
 ```json
@@ -180,12 +186,26 @@ All tool pages share standardized navigation:
   },
   "keyword_groups": {
     "topics": {
-      "affiliate": { "count": 500, "total_clicks": 12000, "total_spend": 25000 },
-      "...": "..."
+      "affiliate marketing": {
+        "count": 500,
+        "total_clicks": 12000,
+        "total_spend": 25000,
+        "sample_keywords": [
+          { "keyword": "affiliate marketing programs", "clicks": 150, "brands": ["clickbank", "impact"] }
+        ],
+        "brands_bidding": {
+          "clickbank": { "count": 200, "clicks": 5000, "spend": 12000 }
+        }
+      }
     },
     "brands": {
-      "clickbank": { "count": 1783, "total_clicks": 45000, "total_spend": 98000 },
-      "...": "..."
+      "clickbank": {
+        "count": 1783,
+        "total_clicks": 45000,
+        "total_spend": 98000,
+        "sample_keywords": [...],
+        "brands_bidding": {...}
+      }
     }
   },
   "global_avg_cpc": 4.30,
@@ -199,7 +219,8 @@ All tool pages share standardized navigation:
   "keyword": "affiliate marketing",
   "category": "Affiliate/Network",
   "intent": "Informational",
-  "short_tail_group": "affiliate",
+  "short_tail_group": "affiliate marketing",
+  "brand_group": null,
   "total_clicks": 450,
   "total_spend": 1102.50,
   "volume": 12500,
@@ -214,15 +235,108 @@ All tool pages share standardized navigation:
       "mobile_share": 0.35,
       "top_url": "clickbank.com/affiliate"
     }
-  ]
+  ],
+  "google": {
+    "annual_volume": 150000,
+    "avg_monthly_searches": 12500,
+    "competition": "HIGH",
+    "competition_index": 85,
+    "low_top_of_page_bid": 1.50,
+    "high_top_of_page_bid": 4.25,
+    "average_cpc": 2.87
+  }
 }
 ```
 
-**Regenerating keyword data:**
+**IMPORTANT: Brand vs Topic Grouping Logic**
+- Keywords are assigned to EITHER a `brand_group` OR a `short_tail_group`, never both
+- Brand detection takes priority: if keyword contains a brand name → brand_group only
+- If keyword does NOT contain a brand → may get short_tail_group
+- Example: "impact affiliate marketing" → brand_group: "impact", short_tail_group: null
+
+### Data Import Scripts
+
+**Location:** `/scripts/`
+
+#### 1. Import Digistore Keywords (`import-digistore-keywords.js`)
+
+Reads SimilarWeb Excel exports and generates keywords-combined.json.
+
 ```bash
 node scripts/import-digistore-keywords.js
 ```
-Reads Excel files from `data/ppc-kws/` and outputs `keywords-combined.json`.
+
+**What it does:**
+1. Reads all `.xlsx` files from `data/ppc-kws/`
+2. Extracts brand from filename (e.g., `Website Keywords-clickbank.com-...`)
+3. Categorizes keywords, determines intent
+4. Assigns brand_group OR short_tail_group (mutually exclusive)
+5. Builds keyword_groups with sample_keywords and brands_bidding
+6. Outputs to `keywords-combined.json`
+
+**28 Brand Patterns Recognized:**
+```javascript
+const BRAND_KEYWORDS = {
+    'clickbank': /clickbank/i,
+    'impact': /\bimpact\b/i,
+    'awin': /\bawin\b|shareasale/i,
+    'samcart': /samcart/i,
+    'maxweb': /maxweb/i,
+    'realize': /\brealize\b/i,
+    'rakuten': /rakuten/i,
+    'cj': /commission\s*junction|\bcj\b/i,
+    'partnerstack': /partnerstack/i,
+    'refersion': /refersion/i,
+    'tapfiliate': /tapfiliate/i,
+    'stripe': /\bstripe\b/i,
+    'paypal': /paypal/i,
+    'shopify': /shopify/i,
+    'woocommerce': /woocommerce/i,
+    'clickfunnels': /clickfunnels/i,
+    'kajabi': /kajabi/i,
+    'teachable': /teachable/i,
+    'thinkific': /thinkific/i,
+    'gumroad': /gumroad/i,
+    'digistore': /digistore/i,
+    'jvzoo': /jvzoo/i,
+    'warriorplus': /warriorplus|warrior\s*plus/i,
+    'stan': /\bstan\s+store\b|\bstan\.store\b/i,
+    'kartra': /kartra/i,
+    'leadpages': /leadpages/i,
+    'unbounce': /unbounce/i,
+    'instapage': /instapage/i,
+};
+```
+
+**16 Topic Groups:**
+- affiliate marketing, affiliate network, partner program, referral program
+- influencer marketing, performance marketing, ecommerce, shopping cart
+- payment processing, digital products, online courses, commissions
+- tracking & attribution, landing pages, conversion, integrations
+
+#### 2. Fetch Google Keywords (`fetch-google-keywords.js`)
+
+Enriches keywords with Google Keyword Planner data via the hyder.me API.
+
+```bash
+node scripts/fetch-google-keywords.js
+```
+
+**What it does:**
+1. Reads keywords-combined.json
+2. Filters to keywords missing `google` data
+3. Batches requests to `/api/google-ads/keywords` (15 at a time)
+4. Merges Google data (volume, CPC, competition) into keywords
+5. Saves updated file
+
+**IMPORTANT: Batch size MUST be 15, not 100**
+- Batch size 100 causes Google API 400 INVALID_ARGUMENT errors
+- 1.5 second delay between batches to avoid rate limits
+- Script is incremental - skips keywords that already have Google data
+
+**API endpoint:** `https://hyder.me/api/google-ads/keywords`
+- POST with `{ keywords: [...], exactOnly: true }`
+- Returns `{ results: [{ keyword, avgMonthlySearches, competition, ... }] }`
 
 ### Keyword Categories (10)
 - Affiliate/Network
@@ -380,8 +494,34 @@ Function timeout configurations (10s-60s depending on endpoint)
 
 ## Git Workflow
 - Main branch: `main`
-- Deploys automatically to Vercel on push
-- Recent commits focus on Digistore24 competitive intel suite
+- **Deploys automatically to Vercel on push to GitHub** - DO NOT use `vercel --prod` from local
+- GitHub repo: `kennyhyder/hyder-media`
+
+### Deployment Process
+1. Make changes locally
+2. `git add <files>` - stage changes
+3. `git commit -m "message"` - commit
+4. `git push origin main` - push to GitHub
+5. Vercel auto-deploys from GitHub (no manual steps needed)
+
+**If production doesn't update after push:**
+- Check Vercel dashboard for deployment status
+- May need to manually alias: `vercel alias <deployment-url> hyder.me`
+
+### iCloud File Eviction Issue
+
+**Problem:** Desktop folder syncs to iCloud Drive. Large files (like keywords-combined.json) get "evicted" - replaced with `.icloud` placeholder files when iCloud needs space.
+
+**Solution:**
+- Git is the source of truth - all data files are committed
+- Deploy from GitHub (auto-deploy), not local machine
+- If local files are evicted, restore from git:
+  ```bash
+  git checkout HEAD -- clients/digistore24/data/keywords-combined.json
+  ```
+- Or force iCloud to download: `brctl download <file>`
+
+**Never rely on local copies of data files persisting!**
 
 ## Commands Reference
 ```bash
@@ -389,14 +529,20 @@ Function timeout configurations (10s-60s depending on endpoint)
 npm install
 vercel dev
 
-# Beads (task tracking)
-bd ready              # See available tasks
-bd new "task name"    # Create new task
-bd status             # Check task status
-bd close <id>         # Complete a task
+# Regenerate keyword data from Excel sources
+node scripts/import-digistore-keywords.js
 
-# Deploy
-vercel --prod
+# Fetch Google Keyword Planner data (incremental)
+node scripts/fetch-google-keywords.js
+
+# Restore evicted iCloud files from git
+git checkout HEAD -- <file-path>
+
+# Deploy (just push to GitHub - auto-deploys)
+git push origin main
+
+# If needed, manually alias deployment
+vercel alias <deployment-url> hyder.me
 ```
 
 ## Important Notes
@@ -410,6 +556,15 @@ vercel --prod
 ---
 
 ## Recent Changes Log
+
+### 2026-02-04
+- **Fixed brand/topic grouping** - Keywords containing brand names now only appear in brand groups, not topic groups
+- Expanded brand recognition to 28 brands (added CJ, Rakuten, PartnerStack, Shopify, Kajabi, etc.)
+- **Restored Google Keyword Planner data** - 26,116 keywords now have volume/CPC/competition data
+- Created `fetch-google-keywords.js` script for batch API requests (batch size 15, 1.5s delay)
+- Fixed deployment workflow - now deploys from GitHub auto-deploy, not local `vercel --prod`
+- Documented iCloud file eviction issue and recovery process
+- Updated keyword-tool.html with dropdown details showing brands_bidding per group
 
 ### 2026-02-03
 - **Omicron Dashboard:** Migrated project from ~/Desktop/omicron to /clients/omicron
@@ -433,3 +588,30 @@ vercel --prod
 - Added Google Keyword Planner data integration
 - Created competitor ads and landing page analysis tools
 - Implemented projection calculator
+
+---
+
+## Troubleshooting Guide
+
+### Keywords-combined.json 404 on production
+1. Check if file is committed: `git status`
+2. If committed but still 404, Vercel may be pointing to old deployment
+3. Fix: `vercel alias <latest-deployment-url> hyder.me`
+
+### Google Keyword Planner data missing
+1. Check if keywords have `google` property: look at keywords-combined.json
+2. If missing, run: `node scripts/fetch-google-keywords.js`
+3. Script is incremental - only fetches for keywords without `google` data
+4. Batch size must be 15 (100 causes API errors)
+
+### Keywords appearing in wrong groups
+1. Brand keywords should only be in brand_group, not short_tail_group
+2. Check import script brand patterns in BRAND_KEYWORDS
+3. Regenerate: `node scripts/import-digistore-keywords.js`
+4. Script checks brand first - if match, sets brand_group and short_tail_group=null
+
+### Local files missing (iCloud eviction)
+1. Don't panic - git has the data
+2. Restore: `git checkout HEAD -- <file-path>`
+3. Or force iCloud download: `brctl download <file>`
+4. Always deploy from GitHub, not local
