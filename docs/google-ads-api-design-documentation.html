@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyder Media - Google Ads API Design Documentation</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .page-break { page-break-before: always; }
+            @page { margin: 0.75in; }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fff;
+        }
+
+        .cover-page {
+            text-align: center;
+            padding: 100px 0;
+            min-height: 600px;
+        }
+
+        .cover-page h1 {
+            font-size: 32px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 60px;
+        }
+
+        .cover-page .doc-type {
+            font-size: 18px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .cover-page .company {
+            font-size: 20px;
+            margin-top: 100px;
+        }
+
+        .cover-page .date {
+            font-size: 14px;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 30px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .diagram {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .highlight-box {
+            background: #e8f4fd;
+            border-left: 4px solid #1a73e8;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .security-box {
+            background: #e6f4ea;
+            border-left: 4px solid #34a853;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            padding: 5px 0;
+            border-bottom: 1px dotted #ddd;
+        }
+
+        .toc a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cover Page -->
+<div class="cover-page">
+    <div class="doc-type">Design Documentation</div>
+    <h1>Hyder Media Client Dashboard</h1>
+    <div class="subtitle">Google Ads API Integration</div>
+
+    <div style="margin-top: 80px;">
+        <p><strong>Application for Standard Access</strong></p>
+        <p>Developer Token: eeJvV948ZdoeZ2EKJGmwjA</p>
+        <p>MCC Account ID: 673-698-8718</p>
+    </div>
+
+    <div class="company">
+        <strong>Hyder Media</strong><br>
+        https://hyder.me
+    </div>
+
+    <div class="date">
+        January 2026<br>
+        Version 1.0
+    </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <h2>Table of Contents</h2>
+    <ul>
+        <li><a href="#section1">1. Executive Summary</a></li>
+        <li><a href="#section2">2. Tool Overview</a></li>
+        <li><a href="#section3">3. System Architecture</a></li>
+        <li><a href="#section4">4. Google Ads API Usage</a></li>
+        <li><a href="#section5">5. Data Flow & Processing</a></li>
+        <li><a href="#section6">6. User Interface</a></li>
+        <li><a href="#section7">7. Security & Compliance</a></li>
+        <li><a href="#section8">8. Standard Access Justification</a></li>
+        <li><a href="#section9">9. Contact Information</a></li>
+    </ul>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<h1 id="section1">1. Executive Summary</h1>
+
+<p>Hyder Media Client Dashboard is a <strong>read-only reporting and analytics platform</strong> that aggregates Google Ads performance data for marketing agency clients. The tool provides:</p>
+
+<ul>
+    <li>Centralized dashboard for clients to view their Google Ads performance</li>
+    <li>Automated daily data synchronization from Google Ads API</li>
+    <li>Historical trend analysis and performance visualization</li>
+    <li>Multi-account management through MCC (Manager Account) integration</li>
+</ul>
+
+<div class="highlight-box">
+    <strong>Key Point:</strong> This tool is strictly <strong>read-only</strong>. We do not create, modify, or delete any campaigns, ad groups, keywords, or other Google Ads entities. We only retrieve performance metrics for reporting purposes.
+</div>
+
+<!-- Section 2: Tool Overview -->
+<h1 id="section2">2. Tool Overview</h1>
+
+<h2>2.1 Purpose</h2>
+<p>The Hyder Media Client Dashboard serves as a centralized reporting portal where agency clients can log in to view their Google Ads campaign performance. Instead of requiring clients to navigate the Google Ads interface directly, they access a simplified, branded dashboard that presents only the metrics relevant to their business goals.</p>
+
+<h2>2.2 Target Users</h2>
+<table>
+    <tr>
+        <th>User Type</th>
+        <th>Description</th>
+        <th>Access Level</th>
+    </tr>
+    <tr>
+        <td>Agency Administrators</td>
+        <td>Hyder Media team members who manage client accounts</td>
+        <td>Full access to all client data</td>
+    </tr>
+    <tr>
+        <td>Client Users</td>
+        <td>Business owners/marketing managers at client companies</td>
+        <td>Access to their own account data only</td>
+    </tr>
+</table>
+
+<h2>2.3 Core Features</h2>
+<ul>
+    <li><strong>Performance Dashboard:</strong> Visual overview of key metrics (spend, clicks, conversions, ROAS)</li>
+    <li><strong>Campaign Breakdown:</strong> Detailed performance by campaign, ad group, and keyword</li>
+    <li><strong>Search Term Analysis:</strong> Insights into actual search queries triggering ads</li>
+    <li><strong>Historical Trends:</strong> Performance data over time with comparison periods</li>
+    <li><strong>Automated Reporting:</strong> Daily data synchronization without manual intervention</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- Section 3: System Architecture -->
+<h1 id="section3">3. System Architecture</h1>
+
+<h2>3.1 High-Level Architecture Diagram</h2>
+
+<div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         HYDER MEDIA CLIENT DASHBOARD                         │
+│                           System Architecture                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+    │   Client 1   │         │   Client 2   │         │   Client N   │
+    │   Browser    │         │   Browser    │         │   Browser    │
+    └──────┬───────┘         └──────┬───────┘         └──────┬───────┘
+           │                        │                        │
+           └────────────────────────┼────────────────────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │      HTTPS / TLS 1.3          │
+                    │    (Vercel Edge Network)      │
+                    └───────────────┬───────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           VERCEL PLATFORM                                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                        API LAYER (Serverless)                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐ │   │
+│  │  │   /auth     │  │  /callback  │  │   /sync     │  │ /campaigns │ │   │
+│  │  │  (OAuth)    │  │  (Token)    │  │  (Data)     │  │  (Query)   │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                        │
+│                    ┌───────────────┴───────────────┐                       │
+│                    │    Environment Variables       │                       │
+│                    │  (Encrypted Credentials)       │                       │
+│                    └───────────────────────────────┘                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                 ┌──────────────────┴──────────────────┐
+                 │                                     │
+                 ▼                                     ▼
+    ┌────────────────────────┐          ┌────────────────────────┐
+    │    GOOGLE ADS API      │          │       SUPABASE         │
+    │    (googleapis.com)    │          │   (PostgreSQL + Auth)  │
+    │                        │          │                        │
+    │  • OAuth 2.0 Auth      │          │  • OAuth Tokens        │
+    │  • MCC Account Access  │          │  • Account Metadata    │
+    │  • GAQL Queries        │          │  • Campaign Data       │
+    │  • Read-Only Access    │          │  • Performance Metrics │
+    │                        │          │  • User Sessions       │
+    └────────────────────────┘          └────────────────────────┘
+</div>
+
+<h2>3.2 Technology Stack</h2>
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Technology</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>Frontend</td>
+        <td>HTML/CSS/JavaScript</td>
+        <td>Client dashboard interface</td>
+    </tr>
+    <tr>
+        <td>API Layer</td>
+        <td>Vercel Serverless Functions (Node.js)</td>
+        <td>API endpoints for data sync and queries</td>
+    </tr>
+    <tr>
+        <td>Database</td>
+        <td>Supabase (PostgreSQL)</td>
+        <td>Persistent storage for synced data and tokens</td>
+    </tr>
+    <tr>
+        <td>Authentication</td>
+        <td>Supabase Auth + Google OAuth 2.0</td>
+        <td>User login and API authorization</td>
+    </tr>
+    <tr>
+        <td>Hosting</td>
+        <td>Vercel</td>
+        <td>Global CDN and serverless infrastructure</td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- Section 4: Google Ads API Usage -->
+<h1 id="section4">4. Google Ads API Usage</h1>
+
+<h2>4.1 API Services Used</h2>
+
+<div class="highlight-box">
+    <strong>Read-Only Operations Only:</strong> All API operations are strictly read-only. We use <code>GoogleAdsService.Search</code> and <code>GoogleAdsService.SearchStream</code> to retrieve data. We do not use any mutate operations.
+</div>
+
+<table>
+    <tr>
+        <th>Service</th>
+        <th>Method</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>CustomerService</td>
+        <td>ListAccessibleCustomers</td>
+        <td>Discover client accounts under MCC</td>
+    </tr>
+    <tr>
+        <td>GoogleAdsService</td>
+        <td>Search</td>
+        <td>Query campaign, ad group, keyword data</td>
+    </tr>
+    <tr>
+        <td>GoogleAdsService</td>
+        <td>SearchStream</td>
+        <td>Stream large result sets efficiently</td>
+    </tr>
+</table>
+
+<h2>4.2 Resources Accessed (Read-Only)</h2>
+
+<table>
+    <tr>
+        <th>Resource</th>
+        <th>Data Retrieved</th>
+        <th>Frequency</th>
+    </tr>
+    <tr>
+        <td>customer</td>
+        <td>Account name, currency, timezone</td>
+        <td>On connection</td>
+    </tr>
+    <tr>
+        <td>customer_client</td>
+        <td>List of accounts under MCC</td>
+        <td>On connection</td>
+    </tr>
+    <tr>
+        <td>campaign</td>
+        <td>Campaign names, status, budgets</td>
+        <td>Daily sync</td>
+    </tr>
+    <tr>
+        <td>ad_group</td>
+        <td>Ad group names, status, bids</td>
+        <td>Daily sync</td>
+    </tr>
+    <tr>
+        <td>ad_group_criterion (keywords)</td>
+        <td>Keywords, match types, status</td>
+        <td>Daily sync</td>
+    </tr>
+    <tr>
+        <td>search_term_view</td>
+        <td>Actual search queries</td>
+        <td>Daily sync</td>
+    </tr>
+    <tr>
+        <td>metrics</td>
+        <td>Impressions, clicks, cost, conversions</td>
+        <td>Daily sync</td>
+    </tr>
+</table>
+
+<h2>4.3 Sample GAQL Queries</h2>
+
+<p><strong>Campaign Performance Query:</strong></p>
+<div class="diagram" style="font-size: 12px;">
+SELECT
+    campaign.id,
+    campaign.name,
+    campaign.status,
+    campaign.advertising_channel_type,
+    metrics.impressions,
+    metrics.clicks,
+    metrics.cost_micros,
+    metrics.conversions,
+    metrics.conversions_value
+FROM campaign
+WHERE segments.date DURING LAST_30_DAYS
+ORDER BY metrics.cost_micros DESC
+</div>
+
+<p><strong>Search Terms Query:</strong></p>
+<div class="diagram" style="font-size: 12px;">
+SELECT
+    search_term_view.search_term,
+    campaign.name,
+    ad_group.name,
+    metrics.impressions,
+    metrics.clicks,
+    metrics.cost_micros,
+    metrics.conversions
+FROM search_term_view
+WHERE segments.date DURING LAST_7_DAYS
+ORDER BY metrics.impressions DESC
+LIMIT 1000
+</div>
+
+<div class="page-break"></div>
+
+<!-- Section 5: Data Flow -->
+<h1 id="section5">5. Data Flow & Processing</h1>
+
+<h2>5.1 OAuth Authorization Flow</h2>
+
+<div class="diagram">
+┌──────────┐     ┌──────────────┐     ┌─────────────┐     ┌──────────────┐
+│  Agency  │     │ Hyder Media  │     │   Google    │     │   Supabase   │
+│  Admin   │     │    Server    │     │   OAuth     │     │   Database   │
+└────┬─────┘     └──────┬───────┘     └──────┬──────┘     └──────┬───────┘
+     │                  │                    │                   │
+     │  1. Click        │                    │                   │
+     │  "Connect"       │                    │                   │
+     │─────────────────>│                    │                   │
+     │                  │                    │                   │
+     │                  │  2. Redirect to    │                   │
+     │                  │  Google OAuth      │                   │
+     │<─────────────────│───────────────────>│                   │
+     │                  │                    │                   │
+     │  3. User grants  │                    │                   │
+     │  permission      │                    │                   │
+     │─────────────────────────────────────>│                   │
+     │                  │                    │                   │
+     │                  │  4. Auth code      │                   │
+     │                  │<───────────────────│                   │
+     │                  │                    │                   │
+     │                  │  5. Exchange for   │                   │
+     │                  │  access token      │                   │
+     │                  │───────────────────>│                   │
+     │                  │                    │                   │
+     │                  │  6. Access +       │                   │
+     │                  │  Refresh tokens    │                   │
+     │                  │<───────────────────│                   │
+     │                  │                    │                   │
+     │                  │  7. Store tokens   │                   │
+     │                  │  (encrypted)       │                   │
+     │                  │───────────────────────────────────────>│
+     │                  │                    │                   │
+     │  8. Success      │                    │                   │
+     │  redirect        │                    │                   │
+     │<─────────────────│                    │                   │
+     │                  │                    │                   │
+</div>
+
+<h2>5.2 Daily Data Sync Process</h2>
+
+<div class="diagram">
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        DAILY SYNC PROCESS                                 │
+└──────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────┐
+  │ Cron Trigger│ (Daily at 6 AM UTC)
+  │ or Manual   │
+  └──────┬──────┘
+         │
+         ▼
+  ┌─────────────────────────────────┐
+  │  1. Get Active Connections      │
+  │     from Supabase               │
+  └──────────────┬──────────────────┘
+                 │
+         ┌───────┴───────┐
+         ▼               ▼
+  ┌─────────────┐ ┌─────────────┐
+  │ Connection 1│ │ Connection N│  (Process in parallel)
+  └──────┬──────┘ └──────┬──────┘
+         │               │
+         ▼               ▼
+  ┌─────────────────────────────────┐
+  │  2. Check Token Expiry          │
+  │     Refresh if needed           │
+  └──────────────┬──────────────────┘
+                 │
+                 ▼
+  ┌─────────────────────────────────┐
+  │  3. For Each Client Account:    │
+  │     • Query campaigns           │
+  │     • Query ad groups           │
+  │     • Query keywords            │
+  │     • Query search terms        │
+  │     • Query metrics             │
+  └──────────────┬──────────────────┘
+                 │
+                 ▼
+  ┌─────────────────────────────────┐
+  │  4. Upsert Data to Supabase     │
+  │     (Update existing or insert) │
+  └──────────────┬──────────────────┘
+                 │
+                 ▼
+  ┌─────────────────────────────────┐
+  │  5. Log Sync Status             │
+  │     (Success/Failure/Duration)  │
+  └─────────────────────────────────┘
+</div>
+
+<div class="page-break"></div>
+
+<!-- Section 6: User Interface -->
+<h1 id="section6">6. User Interface</h1>
+
+<h2>6.1 Client Login Portal</h2>
+<p>Clients access the dashboard at <code>https://hyder.me/clients/</code> where they authenticate using their credentials stored in Supabase Auth.</p>
+
+<div class="diagram">
+┌────────────────────────────────────────────────────────────────┐
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    HYDER MEDIA                            │  │
+│  │                   Client Portal                           │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                                                          │  │
+│  │   Email Address                                          │  │
+│  │   ┌──────────────────────────────────────────────────┐   │  │
+│  │   │ you@company.com                                  │   │  │
+│  │   └──────────────────────────────────────────────────┘   │  │
+│  │                                                          │  │
+│  │   Password                                               │  │
+│  │   ┌──────────────────────────────────────────────────┐   │  │
+│  │   │ ••••••••••••                                     │   │  │
+│  │   └──────────────────────────────────────────────────┘   │  │
+│  │                                                          │  │
+│  │   ┌──────────────────────────────────────────────────┐   │  │
+│  │   │              SIGN IN                              │   │  │
+│  │   └──────────────────────────────────────────────────┘   │  │
+│  │                                                          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+</div>
+
+<h2>6.2 Client Dashboard</h2>
+<p>After login, clients see a dashboard with their Google Ads performance data:</p>
+
+<div class="diagram">
+┌────────────────────────────────────────────────────────────────────────────┐
+│  HYDER MEDIA                                         user@client.com [▼]  │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Welcome, [Client Name]                                                    │
+│  Here's your Google Ads performance overview                               │
+│                                                                            │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
+│  │   TOTAL SPEND   │  │     CLICKS      │  │   CONVERSIONS   │            │
+│  │    $12,450      │  │     8,234       │  │      156        │            │
+│  │    ▲ 12.5%      │  │    ▲ 8.2%       │  │    ▲ 15.3%      │            │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘            │
+│                                                                            │
+│  ┌──────────────────────────────────────────────────────────────────────┐ │
+│  │  CAMPAIGN PERFORMANCE                                    Last 30 Days │ │
+│  ├──────────────────────────────────────────────────────────────────────┤ │
+│  │  Campaign              Status    Spend     Clicks   Conv    ROAS     │ │
+│  ├──────────────────────────────────────────────────────────────────────┤ │
+│  │  Brand - Search        Active    $3,200    2,456    45     4.2x     │ │
+│  │  Non-Brand - Search    Active    $5,100    3,890    67     3.1x     │ │
+│  │  Display - Remarketing Active    $2,150    1,234    28     2.8x     │ │
+│  │  Shopping - Products   Active    $2,000      654    16     3.5x     │ │
+│  └──────────────────────────────────────────────────────────────────────┘ │
+│                                                                            │
+│  ┌──────────────────────────────────────────────────────────────────────┐ │
+│  │  TOP SEARCH TERMS                                                     │ │
+│  ├──────────────────────────────────────────────────────────────────────┤ │
+│  │  Search Term                        Impressions   Clicks   Cost      │ │
+│  ├──────────────────────────────────────────────────────────────────────┤ │
+│  │  "client product name"              12,456        890      $456      │ │
+│  │  "buy client product online"         8,234        567      $312      │ │
+│  │  "client brand name"                 6,789        456      $234      │ │
+│  └──────────────────────────────────────────────────────────────────────┘ │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+</div>
+
+<div class="page-break"></div>
+
+<!-- Section 7: Security & Compliance -->
+<h1 id="section7">7. Security & Compliance</h1>
+
+<div class="security-box">
+    <strong>Security First:</strong> We implement industry-standard security practices to protect Google Ads data and OAuth credentials.
+</div>
+
+<h2>7.1 Authentication & Authorization</h2>
+
+<table>
+    <tr>
+        <th>Security Measure</th>
+        <th>Implementation</th>
+    </tr>
+    <tr>
+        <td>OAuth 2.0</td>
+        <td>Standard Google OAuth 2.0 flow with PKCE</td>
+    </tr>
+    <tr>
+        <td>Token Storage</td>
+        <td>Encrypted at rest in Supabase (AES-256)</td>
+    </tr>
+    <tr>
+        <td>Token Refresh</td>
+        <td>Automatic refresh before expiry</td>
+    </tr>
+    <tr>
+        <td>Access Scope</td>
+        <td>Minimum required: <code>https://www.googleapis.com/auth/adwords</code></td>
+    </tr>
+    <tr>
+        <td>Client Authentication</td>
+        <td>Email/password with Supabase Auth (bcrypt hashing)</td>
+    </tr>
+</table>
+
+<h2>7.2 Data Protection</h2>
+
+<table>
+    <tr>
+        <th>Protection Layer</th>
+        <th>Details</th>
+    </tr>
+    <tr>
+        <td>Transport Security</td>
+        <td>TLS 1.3 for all communications</td>
+    </tr>
+    <tr>
+        <td>Database Encryption</td>
+        <td>Supabase PostgreSQL with encryption at rest</td>
+    </tr>
+    <tr>
+        <td>Row-Level Security</td>
+        <td>PostgreSQL RLS policies ensure clients only see their own data</td>
+    </tr>
+    <tr>
+        <td>API Security</td>
+        <td>Environment variables for secrets, never exposed to client</td>
+    </tr>
+    <tr>
+        <td>Access Logging</td>
+        <td>All API calls logged with timestamps and user context</td>
+    </tr>
+</table>
+
+<h2>7.3 Data Retention & Privacy</h2>
+
+<ul>
+    <li><strong>Data Minimization:</strong> We only store data necessary for reporting</li>
+    <li><strong>Retention Period:</strong> Performance data retained for 13 months (for YoY comparison)</li>
+    <li><strong>Data Deletion:</strong> Client data deleted upon request or account termination</li>
+    <li><strong>No Data Sharing:</strong> Client data is never shared with third parties</li>
+    <li><strong>Compliance:</strong> GDPR and CCPA compliant data handling</li>
+</ul>
+
+<h2>7.4 Infrastructure Security</h2>
+
+<ul>
+    <li><strong>Vercel Platform:</strong> SOC 2 Type II certified infrastructure</li>
+    <li><strong>Supabase:</strong> SOC 2 Type II certified, hosted on AWS</li>
+    <li><strong>No Server Access:</strong> Serverless architecture eliminates server management risks</li>
+    <li><strong>Automatic Updates:</strong> Platform handles security patches automatically</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- Section 8: Standard Access Justification -->
+<h1 id="section8">8. Standard Access Justification</h1>
+
+<h2>8.1 Current Usage & Growth</h2>
+
+<p>As a digital marketing agency, Hyder Media manages Google Ads campaigns for multiple clients. Our current and projected usage requires Standard Access:</p>
+
+<table>
+    <tr>
+        <th>Metric</th>
+        <th>Current</th>
+        <th>Projected (12 months)</th>
+    </tr>
+    <tr>
+        <td>Client Accounts Managed</td>
+        <td>15+</td>
+        <td>50+</td>
+    </tr>
+    <tr>
+        <td>Daily Sync Operations</td>
+        <td>~10,000</td>
+        <td>~50,000+</td>
+    </tr>
+    <tr>
+        <td>Data Points per Account</td>
+        <td>~500-1000</td>
+        <td>~500-1000</td>
+    </tr>
+</table>
+
+<h2>8.2 Why Basic Access is Insufficient</h2>
+
+<p>The 15,000 daily operation limit of Basic Access becomes constraining as we scale:</p>
+
+<ul>
+    <li><strong>Multi-Account Syncing:</strong> Each client account requires multiple queries (campaigns, ad groups, keywords, search terms, metrics)</li>
+    <li><strong>Historical Data:</strong> Initial sync and backfill operations require significant API calls</li>
+    <li><strong>Real-Time Dashboard:</strong> Users expect up-to-date data, requiring more frequent syncs</li>
+    <li><strong>Growth Trajectory:</strong> Adding new clients would quickly exceed Basic Access limits</li>
+</ul>
+
+<h2>8.3 Operations Breakdown</h2>
+
+<p>For each client account, a full daily sync requires approximately:</p>
+
+<table>
+    <tr>
+        <th>Query Type</th>
+        <th>Approx. Operations</th>
+    </tr>
+    <tr>
+        <td>Campaign data + metrics</td>
+        <td>50-100</td>
+    </tr>
+    <tr>
+        <td>Ad group data + metrics</td>
+        <td>100-300</td>
+    </tr>
+    <tr>
+        <td>Keyword data + metrics</td>
+        <td>200-500</td>
+    </tr>
+    <tr>
+        <td>Search term data</td>
+        <td>100-200</td>
+    </tr>
+    <tr>
+        <td><strong>Total per account</strong></td>
+        <td><strong>450-1,100</strong></td>
+    </tr>
+</table>
+
+<p>With 50 client accounts: <strong>22,500 - 55,000 daily operations</strong> (exceeds Basic Access limit)</p>
+
+<h2>8.4 Commitment to API Policies</h2>
+
+<div class="highlight-box">
+    <p>We commit to:</p>
+    <ul style="margin-bottom: 0;">
+        <li>Adhering to all Google Ads API Terms of Service</li>
+        <li>Implementing Required Minimum Functionality (RMF) as applicable</li>
+        <li>Maintaining read-only access (no mutate operations)</li>
+        <li>Respecting rate limits and implementing exponential backoff</li>
+        <li>Keeping our integration updated with API version changes</li>
+    </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- Section 9: Contact Information -->
+<h1 id="section9">9. Contact Information</h1>
+
+<table>
+    <tr>
+        <th>Role</th>
+        <th>Contact</th>
+    </tr>
+    <tr>
+        <td>Company</td>
+        <td>Hyder Media</td>
+    </tr>
+    <tr>
+        <td>Website</td>
+        <td>https://hyder.me</td>
+    </tr>
+    <tr>
+        <td>Technical Contact</td>
+        <td>kenny@hyder.me</td>
+    </tr>
+    <tr>
+        <td>MCC Account ID</td>
+        <td>673-698-8718</td>
+    </tr>
+    <tr>
+        <td>Developer Token</td>
+        <td>eeJvV948ZdoeZ2EKJGmwjA</td>
+    </tr>
+</table>
+
+<h2>9.1 Application URLs</h2>
+
+<table>
+    <tr>
+        <th>Endpoint</th>
+        <th>URL</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>Client Portal</td>
+        <td>https://hyder.me/clients/</td>
+        <td>Client login page</td>
+    </tr>
+    <tr>
+        <td>OAuth Initiation</td>
+        <td>https://hyder.me/api/google-ads/auth</td>
+        <td>Start OAuth flow</td>
+    </tr>
+    <tr>
+        <td>OAuth Callback</td>
+        <td>https://hyder.me/api/google-ads/callback</td>
+        <td>OAuth redirect handler</td>
+    </tr>
+</table>
+
+<div class="footer">
+    <p>Hyder Media - Google Ads API Design Documentation</p>
+    <p>Version 1.0 | January 2026</p>
+    <p>Confidential - For Google Ads API Review Only</p>
+</div>
+
+</body>
+</html>

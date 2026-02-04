@@ -21,6 +21,8 @@ const ACCOUNT_CONFIG = [
     // Review sites - BUR and Top10
     { id: '4413390727', name: 'BUR', mcc: '6736988718', color: '#3b82f6', group: 'review' },
     { id: '1478467425', name: 'Top10usenet', mcc: '1478467425', color: '#ec4899', group: 'review' },
+    // Privado VPN - under Privado MCC
+    { id: '6759792960', name: 'Privado', mcc: '2031897556', color: '#10b981', group: 'owned' },
 ];
 
 // Brand keywords to identify brand campaigns (case-insensitive)
@@ -38,7 +40,9 @@ const BRAND_PATTERNS = [
     'bestusenetreviews',
     'best usenet reviews',
     'top10usenet',
-    'top 10 usenet'
+    'top 10 usenet',
+    'privado',
+    'privadovpn'
 ];
 
 export default async function handler(req, res) {
@@ -262,7 +266,7 @@ async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessTok
 
     try {
         const response = await fetch(
-            `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
+            `https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`,
             {
                 method: 'POST',
                 headers: {

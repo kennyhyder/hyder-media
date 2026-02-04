@@ -22,6 +22,8 @@ const ACCOUNT_CONFIG = [
     { id: '4413390727', name: 'BUR', mcc: '6736988718', color: '#3b82f6' },
     // Top10usenet - direct access (use itself as login-customer-id)
     { id: '1478467425', name: 'Top10usenet', mcc: '1478467425', color: '#ec4899' },
+    // Privado VPN - under Privado MCC
+    { id: '6759792960', name: 'Privado', mcc: '2031897556', color: '#10b981' },
 ];
 
 export default async function handler(req, res) {
