@@ -205,7 +205,7 @@ async function fetchAccountMetrics(customerId, loginCustomerId, accessToken, dev
 
     try {
         const response = await fetch(
-            `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
+            `https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`,
             {
                 method: 'POST',
                 headers: {

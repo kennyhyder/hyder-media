@@ -110,7 +110,7 @@ export default async function handler(req, res) {
                     }
 
                     const response = await fetch(
-                        `https://googleads.googleapis.com/v18/customers/${account.id}/googleAds:search`,
+                        `https://googleads.googleapis.com/v23/customers/${account.id}/googleAds:search`,
                         {
                             method: 'POST',
                             headers,
@@ -118,7 +118,20 @@ export default async function handler(req, res) {
                         }
                     );
 
-                    const data = await response.json();
+                    const responseText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        accountResults.attempts.push({
+                            loginCustomerId: loginMcc.id,
+                            loginCustomerName: loginMcc.name,
+                            status: 'PARSE_ERROR',
+                            httpStatus: response.status,
+                            responsePreview: responseText.substring(0, 200)
+                        });
+                        continue;
+                    }
 
                     if (data.results && data.results.length > 0) {
                         accountResults.attempts.push({
