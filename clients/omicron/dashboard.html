@@ -173,7 +173,7 @@
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <div>
-                <h1 class="dashboard-title">Performance Dashboard <span class="demo-badge">DEMO DATA</span></h1>
+                <h1 class="dashboard-title">Performance Dashboard <span class="demo-badge" id="data-badge">LOADING...</span></h1>
                 <p class="text-muted">Multi-account comparison view</p>
             </div>
             <div class="dashboard-actions">
@@ -302,8 +302,8 @@
                     </tfoot>
                 </table>
             </div>
-            <p class="data-source-note" style="padding: 16px;">
-                * Demo data shown. Connect to Google Ads API for live metrics.
+            <p class="data-source-note" style="padding: 16px;" id="data-source-note">
+                Loading data from Google Ads API...
             </p>
         </div>
 
@@ -314,86 +314,121 @@
     </div>
 
     <script>
-        // Account definitions
-        const accounts = [
-            { key: 'bur', name: 'BUR', fullName: 'Best Usenet Reviews', id: '4413390727', color: '#3b82f6' },
-            { key: 'top10', name: 'Top10', fullName: 'Top10usenet', id: '1478467425', color: '#ec4899' },
-            { key: 'eweka', name: 'Eweka', fullName: 'Eweka', id: '7079118680', color: '#22c55e' },
-            { key: 'easynews', name: 'Easynews', fullName: 'Easynews', id: '5380661321', color: '#f59e0b' },
-            { key: 'newshosting', name: 'Newshosting', fullName: 'Newshosting', id: '7566341629', color: '#8b5cf6' },
-            { key: 'usenetserver', name: 'UsenetServer', fullName: 'UsenetServer', id: '3972303325', color: '#14b8a6' },
-            { key: 'tweak', name: 'Tweak', fullName: 'Tweak', id: '1146581474', color: '#ef4444' },
-            { key: 'pure', name: 'Pure', fullName: 'Pure', id: '1721346287', color: '#6366f1' },
-            { key: 'sunny', name: 'Sunny', fullName: 'Sunny', id: '8908689985', color: '#eab308' }
-        ];
+        // Store API data
+        let apiData = null;
+        let isLoading = false;
+
+        // Account definitions (will be populated from API)
+        let accounts = [];
 
         // Selected accounts
-        let selectedAccounts = new Set(accounts.map(a => a.key));
+        let selectedAccounts = new Set();
 
-        // Generate demo data
-        function generateDemoData() {
+        // Fetch data from API
+        async function fetchApiData() {
             const dateRange = document.getElementById('date-range').value;
             const days = dateRange === 'ytd' ? 365 : parseInt(dateRange);
 
-            const data = {};
-            const dates = [];
+            isLoading = true;
+            updateLoadingState();
 
-            // Generate dates
-            for (let i = days - 1; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                dates.push(date.toISOString().split('T')[0]);
-            }
+            try {
+                const response = await fetch(`/api/google-ads/omicron-data?days=${days}`);
+                const data = await response.json();
 
-            // Generate data for each account
-            accounts.forEach(account => {
-                const baseSpend = Math.random() * 500 + 100;
-                const baseCTR = Math.random() * 0.03 + 0.02;
-                const baseConvRate = Math.random() * 0.08 + 0.03;
+                if (data.errors && data.errors.length > 0) {
+                    console.error('API errors:', data.errors);
+                }
 
-                data[account.key] = {
-                    daily: dates.map((date, i) => {
-                        const dayVariance = 1 + (Math.random() - 0.5) * 0.4;
-                        const weekendFactor = [0, 6].includes(new Date(date).getDay()) ? 0.7 : 1;
-                        const spend = baseSpend * dayVariance * weekendFactor;
-                        const impressions = Math.round(spend * (Math.random() * 50 + 100));
-                        const clicks = Math.round(impressions * baseCTR * dayVariance);
-                        const conversions = Math.round(clicks * baseConvRate * dayVariance);
-                        const revenue = conversions * (Math.random() * 50 + 30);
+                // Transform API data to match our format
+                apiData = {
+                    dateRange: data.dateRange,
+                    totals: data.totals,
+                    accounts: {}
+                };
 
-                        return {
-                            date,
-                            spend,
-                            impressions,
-                            clicks,
-                            conversions,
-                            revenue,
-                            ctr: clicks / impressions,
-                            cpa: conversions > 0 ? spend / conversions : 0,
-                            roas: spend > 0 ? revenue / spend : 0,
-                            convRate: clicks > 0 ? conversions / clicks : 0
+                // Build accounts list from API response
+                accounts = [];
+                data.accounts.forEach(acc => {
+                    if (acc.status === 'success' && acc.metrics) {
+                        const key = acc.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        accounts.push({
+                            key: key,
+                            name: acc.name,
+                            fullName: acc.name,
+                            id: acc.id,
+                            color: acc.color
+                        });
+                        apiData.accounts[key] = {
+                            totals: {
+                                spend: acc.metrics.spend || 0,
+                                clicks: acc.metrics.clicks || 0,
+                                impressions: acc.metrics.impressions || 0,
+                                conversions: acc.metrics.conversions || 0,
+                                conversionValue: acc.metrics.conversionValue || 0,
+                                ctr: acc.metrics.ctr || 0,
+                                cpa: acc.metrics.cpa || 0,
+                                roas: acc.metrics.roas || 0,
+                                convRate: acc.metrics.convRate || 0
+                            }
                         };
-                    }),
-                    totals: {}
-                };
+                    } else if (acc.status === 'error') {
+                        // Still show account but mark as error
+                        const key = acc.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        accounts.push({
+                            key: key,
+                            name: acc.name,
+                            fullName: acc.name + ' (Error)',
+                            id: acc.id,
+                            color: acc.color,
+                            hasError: true,
+                            error: acc.error
+                        });
+                        apiData.accounts[key] = {
+                            totals: { spend: 0, clicks: 0, impressions: 0, conversions: 0, conversionValue: 0, ctr: 0, cpa: 0, roas: 0, convRate: 0 },
+                            error: acc.error
+                        };
+                    }
+                });
 
-                // Calculate totals
-                const daily = data[account.key].daily;
-                const totals = {
-                    spend: daily.reduce((s, d) => s + d.spend, 0),
-                    impressions: daily.reduce((s, d) => s + d.impressions, 0),
-                    clicks: daily.reduce((s, d) => s + d.clicks, 0),
-                    conversions: daily.reduce((s, d) => s + d.conversions, 0),
-                    revenue: daily.reduce((s, d) => s + d.revenue, 0)
-                };
-                totals.ctr = totals.impressions > 0 ? totals.clicks / totals.impressions : 0;
-                totals.cpa = totals.conversions > 0 ? totals.spend / totals.conversions : 0;
-                totals.roas = totals.spend > 0 ? totals.revenue / totals.spend : 0;
-                totals.convRate = totals.clicks > 0 ? totals.conversions / totals.clicks : 0;
-                data[account.key].totals = totals;
-            });
+                // Select all accounts by default
+                selectedAccounts = new Set(accounts.map(a => a.key));
 
-            return { dates, data };
+                // Update badge
+                const badge = document.getElementById('data-badge');
+                const successCount = data.accounts.filter(a => a.status === 'success').length;
+                const errorCount = data.accounts.filter(a => a.status === 'error').length;
+                if (errorCount > 0) {
+                    badge.textContent = `${successCount} LIVE / ${errorCount} ERRORS`;
+                    badge.style.background = '#f59e0b';
+                } else {
+                    badge.textContent = 'LIVE DATA';
+                    badge.style.background = '#22c55e';
+                }
+
+                // Update data source note
+                document.getElementById('data-source-note').innerHTML =
+                    `Data from Google Ads API | ${data.dateRange.start} to ${data.dateRange.end} | ${successCount} accounts`;
+
+                isLoading = false;
+                renderAccountFilters();
+                updateDashboard();
+
+            } catch (error) {
+                console.error('Failed to fetch API data:', error);
+                document.getElementById('data-badge').textContent = 'API ERROR';
+                document.getElementById('data-badge').style.background = '#ef4444';
+                document.getElementById('data-source-note').innerHTML =
+                    `Failed to load data: ${error.message}. <a href="/api/google-ads/auth?returnUrl=/clients/omicron/dashboard.html">Try reconnecting</a>`;
+                isLoading = false;
+            }
+        }
+
+        function updateLoadingState() {
+            if (isLoading) {
+                document.getElementById('data-badge').textContent = 'LOADING...';
+                document.getElementById('data-badge').style.background = '#3b82f6';
+            }
         }
 
         // Format currency
@@ -474,12 +509,13 @@
                 }
             };
 
-            // Spend Chart
+            // Spend Chart (bar chart per account)
             spendChart = new Chart(document.getElementById('spend-chart'), {
-                type: 'line',
+                type: 'bar',
                 data: { labels: [], datasets: [] },
                 options: {
                     ...chartOptions,
+                    plugins: { ...chartOptions.plugins, legend: { display: false } },
                     scales: {
                         ...chartOptions.scales,
                         y: {
@@ -497,15 +533,19 @@
             conversionsChart = new Chart(document.getElementById('conversions-chart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [] },
-                options: chartOptions
+                options: {
+                    ...chartOptions,
+                    plugins: { ...chartOptions.plugins, legend: { display: false } }
+                }
             });
 
             // CPA Chart
             cpaChart = new Chart(document.getElementById('cpa-chart'), {
-                type: 'line',
+                type: 'bar',
                 data: { labels: [], datasets: [] },
                 options: {
                     ...chartOptions,
+                    plugins: { ...chartOptions.plugins, legend: { display: false } },
                     scales: {
                         ...chartOptions.scales,
                         y: {
@@ -542,102 +582,91 @@
 
         // Update dashboard
         function updateDashboard() {
-            const { dates, data } = generateDemoData();
-            const selectedData = accounts.filter(a => selectedAccounts.has(a.key));
+            if (!apiData || accounts.length === 0) {
+                return; // No data yet
+            }
 
-            // Aggregate labels - sample every N days for readability
-            const sampleRate = Math.max(1, Math.floor(dates.length / 15));
-            const labels = dates.filter((_, i) => i % sampleRate === 0);
+            const selectedData = accounts.filter(a => selectedAccounts.has(a.key) && !a.hasError);
 
             // Update top stats
-            let totalSpend = 0, totalConversions = 0, totalClicks = 0, totalImpressions = 0, totalRevenue = 0;
+            let totalSpend = 0, totalConversions = 0, totalClicks = 0, totalImpressions = 0, totalConvValue = 0;
             selectedData.forEach(account => {
-                const t = data[account.key].totals;
-                totalSpend += t.spend;
-                totalConversions += t.conversions;
-                totalClicks += t.clicks;
-                totalImpressions += t.impressions;
-                totalRevenue += t.revenue;
+                const t = apiData.accounts[account.key]?.totals || {};
+                totalSpend += t.spend || 0;
+                totalConversions += t.conversions || 0;
+                totalClicks += t.clicks || 0;
+                totalImpressions += t.impressions || 0;
+                totalConvValue += t.conversionValue || 0;
             });
 
             document.getElementById('total-spend').textContent = formatCurrency(totalSpend);
             document.getElementById('total-conversions').textContent = formatNumber(totalConversions);
             document.getElementById('avg-cpa').textContent = formatCurrency(totalConversions > 0 ? totalSpend / totalConversions : 0);
-            document.getElementById('avg-roas').textContent = (totalSpend > 0 ? totalRevenue / totalSpend : 0).toFixed(2) + 'x';
+            document.getElementById('avg-roas').textContent = (totalSpend > 0 ? totalConvValue / totalSpend : 0).toFixed(2) + 'x';
             document.getElementById('avg-ctr').textContent = formatPercent(totalImpressions > 0 ? totalClicks / totalImpressions : 0);
             document.getElementById('total-clicks').textContent = formatNumber(totalClicks);
 
-            // Update Spend Chart
-            spendChart.data.labels = labels;
-            spendChart.data.datasets = selectedData.map(account => {
-                const dailyData = data[account.key].daily;
-                return {
-                    label: account.name,
-                    data: dailyData.filter((_, i) => i % sampleRate === 0).map(d => d.spend),
-                    borderColor: account.color,
-                    backgroundColor: account.color + '20',
-                    tension: 0.4,
-                    fill: false
-                };
-            });
+            // Update Spend Chart (bar chart showing spend per account)
+            spendChart.data.labels = selectedData.map(a => a.name);
+            spendChart.data.datasets = [{
+                label: 'Spend',
+                data: selectedData.map(a => apiData.accounts[a.key]?.totals.spend || 0),
+                backgroundColor: selectedData.map(a => a.color),
+                borderRadius: 4
+            }];
             spendChart.update();
 
             // Update Conversions Chart
-            conversionsChart.data.labels = labels;
-            conversionsChart.data.datasets = selectedData.map(account => {
-                const dailyData = data[account.key].daily;
-                return {
-                    label: account.name,
-                    data: dailyData.filter((_, i) => i % sampleRate === 0).map(d => d.conversions),
-                    backgroundColor: account.color,
-                    borderRadius: 4
-                };
-            });
+            conversionsChart.data.labels = selectedData.map(a => a.name);
+            conversionsChart.data.datasets = [{
+                label: 'Conversions',
+                data: selectedData.map(a => apiData.accounts[a.key]?.totals.conversions || 0),
+                backgroundColor: selectedData.map(a => a.color),
+                borderRadius: 4
+            }];
             conversionsChart.update();
 
             // Update CPA Chart
-            cpaChart.data.labels = labels;
-            cpaChart.data.datasets = selectedData.map(account => {
-                const dailyData = data[account.key].daily;
-                return {
-                    label: account.name,
-                    data: dailyData.filter((_, i) => i % sampleRate === 0).map(d => d.cpa),
-                    borderColor: account.color,
-                    backgroundColor: account.color + '20',
-                    tension: 0.4,
-                    fill: false
-                };
-            });
+            cpaChart.data.labels = selectedData.map(a => a.name);
+            cpaChart.data.datasets = [{
+                label: 'CPA',
+                data: selectedData.map(a => apiData.accounts[a.key]?.totals.cpa || 0),
+                backgroundColor: selectedData.map(a => a.color),
+                borderRadius: 4
+            }];
             cpaChart.update();
 
             // Update ROAS Chart
             roasChart.data.labels = selectedData.map(a => a.name);
             roasChart.data.datasets = [{
                 label: 'ROAS',
-                data: selectedData.map(a => data[a.key].totals.roas),
+                data: selectedData.map(a => apiData.accounts[a.key]?.totals.roas || 0),
                 backgroundColor: selectedData.map(a => a.color),
                 borderRadius: 4
             }];
             roasChart.update();
 
-            // Update comparison table
+            // Update comparison table (include all accounts, even those with errors)
+            const allSelectedData = accounts.filter(a => selectedAccounts.has(a.key));
             const tbody = document.getElementById('comparison-table-body');
-            tbody.innerHTML = selectedData.map(account => {
-                const t = data[account.key].totals;
+            tbody.innerHTML = allSelectedData.map(account => {
+                const t = apiData.accounts[account.key]?.totals || {};
+                const hasError = account.hasError;
                 return `
-                    <tr>
+                    <tr style="${hasError ? 'opacity: 0.5;' : ''}">
                         <td>
                             <span class="account-badge" style="background: ${account.color};">${account.name}</span>
                             ${account.fullName}
+                            ${hasError ? '<br><small style="color: var(--danger);">Permission denied</small>' : ''}
                         </td>
-                        <td style="text-align: right;">${formatCurrency(t.spend)}</td>
-                        <td style="text-align: right;">${formatNumber(t.clicks)}</td>
-                        <td style="text-align: right;">${formatNumber(t.impressions)}</td>
-                        <td style="text-align: right;">${formatPercent(t.ctr)}</td>
-                        <td style="text-align: right;">${formatNumber(t.conversions)}</td>
-                        <td style="text-align: right;">${formatCurrency(t.cpa)}</td>
-                        <td style="text-align: right;">${t.roas.toFixed(2)}x</td>
-                        <td style="text-align: right;">${formatPercent(t.convRate)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatCurrency(t.spend || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.clicks || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.impressions || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatPercent(t.ctr || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.conversions || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatCurrency(t.cpa || 0)}</td>
+                        <td style="text-align: right;">${hasError ? '-' : (t.roas || 0).toFixed(2) + 'x'}</td>
+                        <td style="text-align: right;">${hasError ? '-' : formatPercent(t.convRate || 0)}</td>
                     </tr>
                 `;
             }).join('');
@@ -645,7 +674,7 @@
             // Update footer totals
             const tfoot = document.getElementById('comparison-table-footer');
             const avgCPA = totalConversions > 0 ? totalSpend / totalConversions : 0;
-            const avgROAS = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+            const avgROAS = totalSpend > 0 ? totalConvValue / totalSpend : 0;
             const avgCTR = totalImpressions > 0 ? totalClicks / totalImpressions : 0;
             const avgConvRate = totalClicks > 0 ? totalConversions / totalClicks : 0;
 
@@ -665,24 +694,23 @@
         }
 
         // Refresh data
-        function refreshData() {
+        async function refreshData() {
             const icon = document.getElementById('refresh-icon');
             icon.style.animation = 'spin 1s linear infinite';
-            setTimeout(() => {
-                updateDashboard();
-                icon.style.animation = '';
-            }, 1000);
+            await fetchApiData();
+            icon.style.animation = '';
         }
 
         // Export CSV
         function exportCSV() {
-            const { data } = generateDemoData();
+            if (!apiData) return;
+
             const selectedData = accounts.filter(a => selectedAccounts.has(a.key));
 
             let csv = 'Account,Spend,Clicks,Impressions,CTR,Conversions,CPA,ROAS,Conv Rate\n';
             selectedData.forEach(account => {
-                const t = data[account.key].totals;
-                csv += `${account.fullName},${t.spend.toFixed(2)},${t.clicks},${t.impressions},${(t.ctr * 100).toFixed(2)}%,${t.conversions},${t.cpa.toFixed(2)},${t.roas.toFixed(2)},${(t.convRate * 100).toFixed(2)}%\n`;
+                const t = apiData.accounts[account.key]?.totals || {};
+                csv += `${account.fullName},${(t.spend || 0).toFixed(2)},${t.clicks || 0},${t.impressions || 0},${((t.ctr || 0) * 100).toFixed(2)}%,${t.conversions || 0},${(t.cpa || 0).toFixed(2)},${(t.roas || 0).toFixed(2)},${((t.convRate || 0) * 100).toFixed(2)}%\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -695,9 +723,8 @@
         }
 
         // Initialize
-        renderAccountFilters();
         initCharts();
-        updateDashboard();
+        fetchApiData(); // Load data from API on page load
 
         // Add CSS animation for refresh
         const style = document.createElement('style');
