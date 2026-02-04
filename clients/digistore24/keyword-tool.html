@@ -1097,6 +1097,9 @@
         async function loadData() {
             try {
                 const response = await fetch('data/keywords-combined.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 allData = await response.json();
                 initializeUI();
                 // Use onBrandFilterChange to set initial state (respects samcart being unchecked)
@@ -1104,7 +1107,7 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('table-body').innerHTML =
-                    '<tr><td colspan="9" class="loading">Error loading data. Make sure keywords-combined.json exists.</td></tr>';
+                    `<tr><td colspan="9" class="loading">Error loading data: ${error.message}. Make sure keywords-combined.json exists.</td></tr>`;
             }
         }
 
