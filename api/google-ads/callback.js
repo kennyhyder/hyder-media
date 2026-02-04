@@ -17,11 +17,11 @@ export default async function handler(req, res) {
     // Handle OAuth errors
     if (oauthError) {
         console.error('OAuth error:', oauthError);
-        return res.redirect('/clients/?error=' + encodeURIComponent(oauthError));
+        return res.redirect('/clients/omicron/summary.html?error=' + encodeURIComponent(oauthError));
     }
 
     if (!code) {
-        return res.redirect('/clients/?error=no_code');
+        return res.redirect('/clients/omicron/summary.html?error=no_code');
     }
 
     try {
@@ -124,19 +124,19 @@ export default async function handler(req, res) {
 
         if (dbError) {
             console.error('Database error:', dbError);
-            return res.redirect('/clients/?error=db_error');
+            return res.redirect('/clients/omicron/summary.html?error=db_error');
         }
 
         // Fetch accessible Google Ads accounts
         await fetchAndStoreAccounts(supabase, connection.id, tokens.access_token);
 
         // Redirect to success page or dashboard
-        const returnUrl = stateData.returnUrl || '/clients/';
+        const returnUrl = stateData.returnUrl || '/clients/omicron/summary.html';
         res.redirect(returnUrl + '?connected=true');
 
     } catch (error) {
         console.error('OAuth callback error:', error);
-        res.redirect('/clients/?error=' + encodeURIComponent(error.message));
+        res.redirect('/clients/omicron/summary.html?error=' + encodeURIComponent(error.message));
     }
 }
 
