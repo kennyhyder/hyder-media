@@ -244,9 +244,10 @@
 
     <script>
         // Account definitions with colors
+        // NOTE: 'key' must match what the API returns (acc.name.toLowerCase().replace(/[^a-z0-9]/g, ''))
         const accounts = [
             { key: 'bur', name: 'BUR', fullName: 'Best Usenet Reviews', id: '441-339-0727', color: '#3b82f6' },
-            { key: 'top10', name: 'Top10', fullName: 'Top10usenet', id: '147-846-7425', color: '#ec4899' },
+            { key: 'top10usenet', name: 'Top10', fullName: 'Top10usenet', id: '147-846-7425', color: '#ec4899' },
             { key: 'eweka', name: 'Eweka', fullName: 'Eweka', id: '707-911-8680', color: '#22c55e' },
             { key: 'easynews', name: 'Easynews', fullName: 'Easynews', id: '538-066-1321', color: '#f59e0b' },
             { key: 'newshosting', name: 'Newshosting', fullName: 'Newshosting', id: '756-634-1629', color: '#8b5cf6' },

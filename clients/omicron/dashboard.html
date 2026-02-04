@@ -635,14 +635,31 @@
             return months[parseInt(month, 10) - 1] + ' ' + year.slice(2);
         }
 
-        // Switch view tabs
-        function switchView(view) {
+        // Switch view tabs (with URL hash support for direct linking)
+        function switchView(view, updateHash = true) {
             document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
 
             document.querySelector(`[onclick="switchView('${view}')"]`).classList.add('active');
             document.getElementById(`view-${view}`).classList.add('active');
+
+            // Update URL hash for direct linking (e.g., dashboard.html#accounts)
+            if (updateHash) {
+                history.replaceState(null, null, `#${view}`);
+            }
         }
+
+        // Handle URL hash on page load and hash changes
+        function handleHashNavigation() {
+            const hash = window.location.hash.replace('#', '');
+            const validViews = ['overview', 'review', 'owned', 'conversions', 'accounts'];
+            if (hash && validViews.includes(hash)) {
+                switchView(hash, false);
+            }
+        }
+
+        // Listen for hash changes (browser back/forward)
+        window.addEventListener('hashchange', handleHashNavigation);
 
         // Change months selector
         function changeMonths() {
@@ -1378,6 +1395,7 @@
         // ========================================
         initCharts();
         fetchApiData();
+        handleHashNavigation(); // Handle direct links like dashboard.html#accounts
 
         // Add CSS animation for refresh
         const style = document.createElement('style');

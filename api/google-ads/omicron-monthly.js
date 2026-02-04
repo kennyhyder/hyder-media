@@ -26,8 +26,8 @@ const ACCOUNT_CONFIG = [
 ];
 
 // Brand keywords to identify brand campaigns (case-insensitive)
+// NOTE: We check for explicit "non-brand" FIRST before checking these patterns
 const BRAND_PATTERNS = [
-    'brand',
     'eweka',
     'easynews',
     'newshosting',
@@ -39,10 +39,24 @@ const BRAND_PATTERNS = [
     'sunny usenet',
     'bestusenetreviews',
     'best usenet reviews',
+    'bur',
     'top10usenet',
     'top 10 usenet',
     'privado',
     'privadovpn'
+];
+
+// Non-brand patterns to explicitly identify non-brand campaigns
+// These take priority over brand patterns
+const NON_BRAND_PATTERNS = [
+    'non-brand',
+    'nonbrand',
+    'non brand',
+    'generic',
+    'competitor',
+    'discovery',
+    'dsa',  // Dynamic Search Ads often non-brand
+    'prospecting'
 ];
 
 export default async function handler(req, res) {
@@ -373,8 +387,21 @@ async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessTok
 
 /**
  * Determine if a campaign is a brand campaign based on name patterns
+ * Non-brand patterns take priority (e.g., "BUR - Non-Brand" is non-brand)
  */
 function isBrandCampaign(campaignName) {
     const nameLower = campaignName.toLowerCase();
+
+    // First check if explicitly marked as non-brand
+    if (NON_BRAND_PATTERNS.some(pattern => nameLower.includes(pattern.toLowerCase()))) {
+        return false;
+    }
+
+    // Then check if it matches brand patterns
+    // Also check for explicit "brand" keyword but not as part of "non-brand"
+    if (nameLower.includes('brand') && !nameLower.includes('non')) {
+        return true;
+    }
+
     return BRAND_PATTERNS.some(pattern => nameLower.includes(pattern.toLowerCase()));
 }
