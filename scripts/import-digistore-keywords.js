@@ -168,16 +168,53 @@ async function main() {
         categoryCounts[kw.category] = (categoryCounts[kw.category] || 0) + 1;
     });
 
-    // Build output object matching keyword-tool.html expected format
+    // Build keyword_groups for projection tool
+    const topicGroups = {};
+    const brandGroups = {};
+
+    keywordsArray.forEach(kw => {
+        // Group by short_tail_group (topics)
+        const topic = kw.short_tail_group;
+        if (!topicGroups[topic]) {
+            topicGroups[topic] = { count: 0, total_clicks: 0, total_spend: 0 };
+        }
+        topicGroups[topic].count++;
+        topicGroups[topic].total_clicks += kw.total_clicks;
+        topicGroups[topic].total_spend += kw.total_spend;
+
+        // Group by brands
+        kw.brands.forEach(b => {
+            if (!brandGroups[b.name]) {
+                brandGroups[b.name] = { count: 0, total_clicks: 0, total_spend: 0 };
+            }
+            brandGroups[b.name].count++;
+            brandGroups[b.name].total_clicks += b.clicks;
+            brandGroups[b.name].total_spend += b.est_spend;
+        });
+    });
+
+    // Calculate global average CPC
+    const totalSpend = keywordsArray.reduce((sum, kw) => sum + kw.total_spend, 0);
+    const totalClicks = keywordsArray.reduce((sum, kw) => sum + kw.total_clicks, 0);
+    const globalAvgCpc = totalClicks > 0 ? totalSpend / totalClicks : 2.50;
+
+    // Build output object matching both keyword-tool.html and projection-tool.html formats
     const output = {
         total_keywords: keywordsArray.length,
         brands: uniqueBrands,
         category_counts: categoryCounts,
+        keyword_groups: {
+            topics: topicGroups,
+            brands: brandGroups
+        },
+        global_avg_cpc: Math.round(globalAvgCpc * 100) / 100,
         keywords: keywordsArray
     };
 
     console.log(`\nBrands found: ${uniqueBrands.join(', ')}`);
     console.log(`Categories: ${Object.entries(categoryCounts).map(([k,v]) => `${k}: ${v}`).join(', ')}`);
+    console.log(`Global avg CPC: $${output.global_avg_cpc.toFixed(2)}`);
+    console.log(`Topic groups: ${Object.keys(topicGroups).length}`);
 
     // Write to JSON file
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
