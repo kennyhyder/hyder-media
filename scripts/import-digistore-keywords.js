@@ -160,8 +160,27 @@ async function main() {
         console.log(`  ${i + 1}. "${kw.keyword}" - ${kw.total_clicks} clicks, $${kw.total_spend.toFixed(2)} spend`);
     });
 
+    // Build metadata for the keyword tool UI
+    const uniqueBrands = [...new Set(keywordsArray.flatMap(kw => kw.brands.map(b => b.name)))].sort();
+
+    const categoryCounts = {};
+    keywordsArray.forEach(kw => {
+        categoryCounts[kw.category] = (categoryCounts[kw.category] || 0) + 1;
+    });
+
+    // Build output object matching keyword-tool.html expected format
+    const output = {
+        total_keywords: keywordsArray.length,
+        brands: uniqueBrands,
+        category_counts: categoryCounts,
+        keywords: keywordsArray
+    };
+
+    console.log(`\nBrands found: ${uniqueBrands.join(', ')}`);
+    console.log(`Categories: ${Object.entries(categoryCounts).map(([k,v]) => `${k}: ${v}`).join(', ')}`);
+
     // Write to JSON file
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(keywordsArray, null, 2));
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
     console.log(`\nSaved ${keywordsArray.length} keywords to ${OUTPUT_FILE}`);
 
     // Also log file size
