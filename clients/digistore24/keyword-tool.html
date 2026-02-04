@@ -255,6 +255,61 @@
             border-bottom: none;
         }
 
+        .group-keyword {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-kw-brands {
+            display: flex;
+            gap: 2px;
+        }
+
+        .brand-mini {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .group-brands-summary {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .group-brands-title {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .group-brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 3px 0;
+        }
+
+        .group-brand-stats {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'SF Mono', monospace;
+        }
+
+        .group-keywords-list {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
         .group-filter-btn {
             margin-top: 8px;
             padding: 6px 12px;
@@ -1058,7 +1113,7 @@
                         <tr>
                             <th data-sort="brand_count" style="width: 70px;" class="tooltip-trigger" data-tooltip="Number of competitors bidding on this keyword">Brands</th>
                             <th data-sort="keyword">Keyword</th>
-                            <th data-sort="primary_category" class="tooltip-trigger" data-tooltip="Auto-categorized based on keyword content">Category</th>
+                            <th data-sort="category" class="tooltip-trigger" data-tooltip="Auto-categorized based on keyword content">Category</th>
                             <th data-sort="volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Annual search volume (SimilarWeb)">SW Volume</th>
                             <th data-sort="google_volume" style="width: 100px;" class="tooltip-trigger" data-tooltip="Annual search volume (Google Keyword Planner - sum of 12 months)">G Volume</th>
                             <th data-sort="cpc" style="width: 70px;" class="tooltip-trigger" data-tooltip="Cost per click (SimilarWeb)">SW CPC</th>
@@ -1241,7 +1296,7 @@
                     }
 
                     if (search && !kw.keyword.toLowerCase().includes(search)) return false;
-                    if (category && !kw.categories.includes(category)) return false;
+                    if (category && kw.category !== category) return false;
                     if (kw.brand_count < minBrands) return false;
                     if (intent && kw.intent && !kw.intent.includes(intent)) return false;
 
@@ -1338,7 +1393,7 @@
                         </td>
                         <td class="keyword-cell">${escapeHtml(kw.keyword)}</td>
                         <td>
-                            ${kw.categories.map(c => `<span class="category-pill tooltip-trigger" data-tooltip="${getCategoryTooltip(c)}">${c}</span>`).join('')}
+                            <span class="category-pill tooltip-trigger" data-tooltip="${getCategoryTooltip(kw.category)}">${kw.category}</span>
                         </td>
                         <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
                         <td class="number-cell">${kw.google_volume > 0 ? kw.google_volume.toLocaleString() : '-'}</td>
@@ -1499,7 +1554,7 @@
                 kw.keyword,
                 kw.brand_count,
                 kw.brands.map(b => b.name).join('; '),
-                kw.primary_category,
+                kw.category,
                 kw.volume,
                 kw.google_volume,
                 kw.cpc,
@@ -1588,29 +1643,86 @@
                 kw.brands.some(b => selectedBrands.includes(b.name))
             );
 
-            // Recalculate brand groups
+            // Recalculate brand groups and topic groups with full info
             const brandGroups = {};
             const topicGroups = {};
 
             filteredKeywords.forEach(kw => {
+                // Filter brands to only selected ones
+                const kwBrands = kw.brands.filter(b => selectedBrands.includes(b.name));
+                const kwTotalClicks = kwBrands.reduce((sum, b) => sum + b.clicks, 0);
+
+                // Process brand_group
                 if (kw.brand_group) {
                     if (!brandGroups[kw.brand_group]) {
-                        brandGroups[kw.brand_group] = { count: 0, sample_keywords: [] };
+                        brandGroups[kw.brand_group] = {
+                            count: 0,
+                            total_clicks: 0,
+                            sample_keywords: [],
+                            brands_bidding: {}
+                        };
                     }
                     brandGroups[kw.brand_group].count++;
-                    if (brandGroups[kw.brand_group].sample_keywords.length < 5) {
-                        brandGroups[kw.brand_group].sample_keywords.push(kw.keyword);
+                    brandGroups[kw.brand_group].total_clicks += kwTotalClicks;
+
+                    // Add sample keywords (max 10)
+                    if (brandGroups[kw.brand_group].sample_keywords.length < 10) {
+                        brandGroups[kw.brand_group].sample_keywords.push({
+                            keyword: kw.keyword,
+                            clicks: kwTotalClicks,
+                            brands: kwBrands.map(b => b.name)
+                        });
                     }
+
+                    // Track brands bidding
+                    kwBrands.forEach(b => {
+                        if (!brandGroups[kw.brand_group].brands_bidding[b.name]) {
+                            brandGroups[kw.brand_group].brands_bidding[b.name] = { count: 0, clicks: 0 };
+                        }
+                        brandGroups[kw.brand_group].brands_bidding[b.name].count++;
+                        brandGroups[kw.brand_group].brands_bidding[b.name].clicks += b.clicks;
+                    });
                 }
+
+                // Process short_tail_group (topic)
                 if (kw.short_tail_group) {
                     if (!topicGroups[kw.short_tail_group]) {
-                        topicGroups[kw.short_tail_group] = { count: 0, sample_keywords: [] };
+                        topicGroups[kw.short_tail_group] = {
+                            count: 0,
+                            total_clicks: 0,
+                            sample_keywords: [],
+                            brands_bidding: {}
+                        };
                     }
                     topicGroups[kw.short_tail_group].count++;
-                    if (topicGroups[kw.short_tail_group].sample_keywords.length < 5) {
-                        topicGroups[kw.short_tail_group].sample_keywords.push(kw.keyword);
+                    topicGroups[kw.short_tail_group].total_clicks += kwTotalClicks;
+
+                    // Add sample keywords (max 10, will sort later)
+                    if (topicGroups[kw.short_tail_group].sample_keywords.length < 10) {
+                        topicGroups[kw.short_tail_group].sample_keywords.push({
+                            keyword: kw.keyword,
+                            clicks: kwTotalClicks,
+                            brands: kwBrands.map(b => b.name)
+                        });
                     }
+
+                    // Track brands bidding
+                    kwBrands.forEach(b => {
+                        if (!topicGroups[kw.short_tail_group].brands_bidding[b.name]) {
+                            topicGroups[kw.short_tail_group].brands_bidding[b.name] = { count: 0, clicks: 0 };
+                        }
+                        topicGroups[kw.short_tail_group].brands_bidding[b.name].count++;
+                        topicGroups[kw.short_tail_group].brands_bidding[b.name].clicks += b.clicks;
+                    });
                 }
+            });
+
+            // Sort sample_keywords by clicks within each group
+            Object.values(brandGroups).forEach(g => {
+                g.sample_keywords.sort((a, b) => b.clicks - a.clicks);
+            });
+            Object.values(topicGroups).forEach(g => {
+                g.sample_keywords.sort((a, b) => b.clicks - a.clicks);
             });
 
             // Update the display
@@ -1692,7 +1804,41 @@
 
         function createGroupCard(name, info, type) {
             const cardId = `group-${type}-${name.replace(/[^a-zA-Z0-9]/g, '-')}`;
-            const sampleKeywords = (info.sample_keywords || []).slice(0, 10);
+            const sampleKeywords = (info.sample_keywords || []).slice(0, 8);
+            const brandsBidding = info.brands_bidding || {};
+            const brandsList = Object.entries(brandsBidding)
+                .filter(([b]) => selectedBrands.includes(b))
+                .sort((a, b) => b[1].clicks - a[1].clicks);
+
+            // Format sample keywords with brand pills
+            const sampleHtml = sampleKeywords.map(sample => {
+                // Handle both old format (string) and new format (object)
+                const kw = typeof sample === 'string' ? sample : sample.keyword;
+                const brands = typeof sample === 'object' && sample.brands ? sample.brands : [];
+                const filteredBrands = brands.filter(b => selectedBrands.includes(b));
+
+                return `
+                    <div class="group-keyword" onclick="filterByKeyword('${escapeHtml(kw).replace(/'/g, "\\'")}')">
+                        <span>${escapeHtml(kw)}</span>
+                        <span class="group-kw-brands">
+                            ${filteredBrands.map(b => `<span class="brand-mini brand-${b}" title="${b}">${b.charAt(0).toUpperCase()}</span>`).join('')}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            // Format brands bidding summary
+            const brandsHtml = brandsList.length > 0 ? `
+                <div class="group-brands-summary">
+                    <div class="group-brands-title">Brands bidding:</div>
+                    ${brandsList.map(([brand, data]) => `
+                        <div class="group-brand-row">
+                            <span class="brand-chip brand-${brand}">${brand}</span>
+                            <span class="group-brand-stats">${data.count} kws · ${formatNumber(data.clicks)} clicks</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
 
             return `
                 <div class="group-card" id="${cardId}">
@@ -1701,9 +1847,10 @@
                         <span class="group-card-count">${info.count.toLocaleString()}</span>
                     </div>
                     <div class="group-card-body">
-                        ${sampleKeywords.map(kw => `
-                            <div class="group-keyword" onclick="filterByKeyword('${escapeHtml(kw).replace(/'/g, "\\'")}')">${escapeHtml(kw)}</div>
-                        `).join('')}
+                        ${brandsHtml}
+                        <div class="group-keywords-list">
+                            ${sampleHtml}
+                        </div>
                         <button class="group-filter-btn" onclick="filterByGroup('${type}', '${escapeHtml(name).replace(/'/g, "\\'")}')">
                             Show all ${info.count.toLocaleString()} keywords
                         </button>

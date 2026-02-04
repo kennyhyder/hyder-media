@@ -12,6 +12,7 @@ const DATA_DIR = path.join(__dirname, '../clients/digistore24/data/ppc-kws');
 const OUTPUT_FILE = path.join(__dirname, '../clients/digistore24/data/keywords-combined.json');
 
 // Brand name mapping from filename to clean name
+// NOTE: Stripe excluded - not a direct competitor
 const BRAND_MAP = {
     'awin.com': 'awin',
     'clickbank.com': 'clickbank',
@@ -19,7 +20,7 @@ const BRAND_MAP = {
     'maxweb.com': 'maxweb',
     'realize.com': 'realize',
     'samcart.com': 'samcart',
-    'stripe.com': 'stripe'
+    // 'stripe.com': 'stripe' // Excluded - not direct competitor
 };
 
 // Category classification rules
@@ -34,6 +35,46 @@ const CATEGORY_RULES = [
     { pattern: /login|signup|sign up|register|account/i, category: 'Sign Up/Login' },
     { pattern: /money|income|earn|profit|commission/i, category: 'Money/Income' },
 ];
+
+// Short-tail topic groups - consolidated meaningful groups (< 20)
+const TOPIC_GROUPS = [
+    { pattern: /affiliate\s*marketing|affiliate\s*program/i, group: 'affiliate marketing' },
+    { pattern: /affiliate\s*network/i, group: 'affiliate network' },
+    { pattern: /partner\s*program|partnership/i, group: 'partner program' },
+    { pattern: /referral\s*program|referral\s*marketing/i, group: 'referral program' },
+    { pattern: /influencer\s*marketing|influencer\s*platform/i, group: 'influencer marketing' },
+    { pattern: /performance\s*marketing/i, group: 'performance marketing' },
+    { pattern: /ecommerce|e-commerce|online\s*store/i, group: 'ecommerce' },
+    { pattern: /shopping\s*cart|checkout/i, group: 'shopping cart' },
+    { pattern: /payment\s*gateway|payment\s*processing/i, group: 'payment processing' },
+    { pattern: /digital\s*product|sell\s*digital/i, group: 'digital products' },
+    { pattern: /online\s*course|course\s*platform/i, group: 'online courses' },
+    { pattern: /commission|payout/i, group: 'commissions' },
+    { pattern: /tracking|attribution/i, group: 'tracking & attribution' },
+    { pattern: /landing\s*page|sales\s*page/i, group: 'landing pages' },
+    { pattern: /conversion|cro/i, group: 'conversion' },
+    { pattern: /api|integration/i, group: 'integrations' },
+];
+
+// Brand-related keywords for brand groups
+const BRAND_KEYWORDS = {
+    'clickbank': /clickbank/i,
+    'impact': /impact\.com|impact\s+radius|partnerize/i,
+    'awin': /awin|shareasale/i,
+    'samcart': /samcart/i,
+    'maxweb': /maxweb/i,
+    'realize': /realize/i,
+    'rakuten': /rakuten/i,
+    'cj': /commission\s*junction|cj\s+affiliate/i,
+    'partnerstack': /partnerstack/i,
+    'refersion': /refersion/i,
+    'tapfiliate': /tapfiliate/i,
+    'stripe': /stripe/i,
+    'paypal': /paypal/i,
+    'shopify': /shopify/i,
+    'woocommerce': /woocommerce/i,
+    'clickfunnels': /clickfunnels/i,
+};
 
 function categorizeKeyword(keyword) {
     const kw = keyword.toLowerCase();
@@ -55,9 +96,30 @@ function getIntent(keyword) {
 }
 
 function getShortTailGroup(keyword) {
-    const words = keyword.toLowerCase().split(/\s+/);
-    if (words.length <= 2) return words[0];
-    return words.slice(0, 2).join(' ');
+    const kw = keyword.toLowerCase();
+
+    // Only check against consolidated topic groups - no fallback
+    // This ensures we get < 20 meaningful groups
+    for (const rule of TOPIC_GROUPS) {
+        if (rule.pattern.test(kw)) {
+            return rule.group;
+        }
+    }
+
+    return null; // No fallback - only use defined topic groups
+}
+
+function getBrandGroup(keyword) {
+    const kw = keyword.toLowerCase();
+
+    // Check if keyword contains any brand name
+    for (const [brand, pattern] of Object.entries(BRAND_KEYWORDS)) {
+        if (pattern.test(kw)) {
+            return brand;
+        }
+    }
+
+    return null;
 }
 
 async function main() {
@@ -105,6 +167,7 @@ async function main() {
                     category: categorizeKeyword(keyword),
                     intent: row['Intent'] || getIntent(keyword), // Use SimilarWeb intent if available
                     short_tail_group: getShortTailGroup(keyword),
+                    brand_group: getBrandGroup(keyword),
                     total_clicks: 0,
                     total_spend: 0,
                     volume: 0,
@@ -168,29 +231,90 @@ async function main() {
         categoryCounts[kw.category] = (categoryCounts[kw.category] || 0) + 1;
     });
 
-    // Build keyword_groups for projection tool
+    // Build keyword_groups for UI with sample_keywords and brand info
     const topicGroups = {};
     const brandGroups = {};
 
     keywordsArray.forEach(kw => {
-        // Group by short_tail_group (topics)
+        // Group by short_tail_group (topics) - only if has a group
         const topic = kw.short_tail_group;
-        if (!topicGroups[topic]) {
-            topicGroups[topic] = { count: 0, total_clicks: 0, total_spend: 0 };
-        }
-        topicGroups[topic].count++;
-        topicGroups[topic].total_clicks += kw.total_clicks;
-        topicGroups[topic].total_spend += kw.total_spend;
-
-        // Group by brands
-        kw.brands.forEach(b => {
-            if (!brandGroups[b.name]) {
-                brandGroups[b.name] = { count: 0, total_clicks: 0, total_spend: 0 };
+        if (topic) {
+            if (!topicGroups[topic]) {
+                topicGroups[topic] = {
+                    count: 0,
+                    total_clicks: 0,
+                    total_spend: 0,
+                    sample_keywords: [],
+                    brands_bidding: {}
+                };
             }
-            brandGroups[b.name].count++;
-            brandGroups[b.name].total_clicks += b.clicks;
-            brandGroups[b.name].total_spend += b.est_spend;
-        });
+            topicGroups[topic].count++;
+            topicGroups[topic].total_clicks += kw.total_clicks;
+            topicGroups[topic].total_spend += kw.total_spend;
+
+            // Add sample keywords (max 10, sorted by clicks)
+            if (topicGroups[topic].sample_keywords.length < 10) {
+                topicGroups[topic].sample_keywords.push({
+                    keyword: kw.keyword,
+                    clicks: kw.total_clicks,
+                    brands: kw.brands.map(b => b.name)
+                });
+            }
+
+            // Track which brands bid on this topic
+            kw.brands.forEach(b => {
+                if (!topicGroups[topic].brands_bidding[b.name]) {
+                    topicGroups[topic].brands_bidding[b.name] = { count: 0, clicks: 0, spend: 0 };
+                }
+                topicGroups[topic].brands_bidding[b.name].count++;
+                topicGroups[topic].brands_bidding[b.name].clicks += b.clicks;
+                topicGroups[topic].brands_bidding[b.name].spend += b.est_spend;
+            });
+        }
+
+        // Group by brand_group (brand keywords) - only if has a brand_group
+        const brandGroup = kw.brand_group;
+        if (brandGroup) {
+            if (!brandGroups[brandGroup]) {
+                brandGroups[brandGroup] = {
+                    count: 0,
+                    total_clicks: 0,
+                    total_spend: 0,
+                    sample_keywords: [],
+                    brands_bidding: {}
+                };
+            }
+            brandGroups[brandGroup].count++;
+            brandGroups[brandGroup].total_clicks += kw.total_clicks;
+            brandGroups[brandGroup].total_spend += kw.total_spend;
+
+            // Add sample keywords
+            if (brandGroups[brandGroup].sample_keywords.length < 10) {
+                brandGroups[brandGroup].sample_keywords.push({
+                    keyword: kw.keyword,
+                    clicks: kw.total_clicks,
+                    brands: kw.brands.map(b => b.name)
+                });
+            }
+
+            // Track which brands bid on this brand group
+            kw.brands.forEach(b => {
+                if (!brandGroups[brandGroup].brands_bidding[b.name]) {
+                    brandGroups[brandGroup].brands_bidding[b.name] = { count: 0, clicks: 0, spend: 0 };
+                }
+                brandGroups[brandGroup].brands_bidding[b.name].count++;
+                brandGroups[brandGroup].brands_bidding[b.name].clicks += b.clicks;
+                brandGroups[brandGroup].brands_bidding[b.name].spend += b.est_spend;
+            });
+        }
+    });
+
+    // Sort sample_keywords by clicks (descending) within each group
+    Object.values(topicGroups).forEach(group => {
+        group.sample_keywords.sort((a, b) => b.clicks - a.clicks);
+    });
+    Object.values(brandGroups).forEach(group => {
+        group.sample_keywords.sort((a, b) => b.clicks - a.clicks);
     });
 
     // Calculate global average CPC
