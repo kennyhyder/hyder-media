@@ -1,0 +1,12 @@
+{
+  "name": "omicron",
+  "version": "1.0.0",
+  "description": "Google Ads Performance Dashboard",
+  "private": true,
+  "scripts": {
+    "dev": "npx http-server -p 3000"
+  },
+  "keywords": ["dashboard", "google-ads", "analytics"],
+  "author": "Kenny Hyder",
+  "license": "MIT"
+}

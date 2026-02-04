@@ -56,6 +56,12 @@ Authenticated dashboards for individual clients.
 - PPC strategy and competitive intelligence
 - See detailed breakdown below
 
+**Omicron Google Ads Dashboard:** `/clients/omicron/`
+- Password-protected multi-account dashboard (password: LIEHAO)
+- 9 Google Ads accounts across Usenet portfolio
+- Powered by Google Ads API (live data when connected)
+- See detailed breakdown below
+
 ### `/assets` - Static Assets
 - CSS: Bootstrap, custom styles, responsive rules
 - JS: Bootstrap bundle, site scripts, calculator logic
@@ -227,6 +233,93 @@ function updateOverview(tab) {
 
 ---
 
+## Omicron Google Ads Dashboard
+
+**Location:** `/clients/omicron/`
+**URL:** https://hyder.me/clients/omicron
+**Status:** Active / In Development
+
+### Authentication Flow
+1. User visits `/clients/omicron/` → redirects to `password.html`
+2. User enters password "LIEHAO"
+3. sessionStorage stores `omicron_dashboard_auth = 'authenticated'`
+4. Redirects to `summary.html`
+5. All tool pages check sessionStorage auth on load
+
+**Auth implementation:**
+```javascript
+// On all protected pages (in <head>):
+<script>
+    (function() {
+        const AUTH_KEY = 'omicron_dashboard_auth';
+        if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+            window.location.href = 'password.html';
+        }
+    })();
+</script>
+```
+
+### Pages
+
+| Page | File | Purpose |
+|------|------|---------|
+| **Password** | `password.html` | Entry point, password gate |
+| **Summary** | `summary.html` | Overview page with account structure and API status |
+| **Dashboard** | `dashboard.html` | Multi-account comparison with charts and filters |
+| **Legacy** | `legacy-dashboard.html` | Original CSV-based view (BUR + Top10 only) |
+
+### Account Structure (9 accounts)
+
+All accounts accessible via **single OAuth connection**:
+
+| Account | Customer ID | Color | Access Path |
+|---------|-------------|-------|-------------|
+| BUR | 441-339-0727 | #3b82f6 (Blue) | Via MCC 673-698-8718 |
+| Top10usenet | 147-846-7425 | #ec4899 (Pink) | Direct user access |
+| **Omicron MCC** | 808-695-7043 | -- | User access (contains 7 children) |
+| └─ Eweka | 707-911-8680 | #22c55e (Green) | Child of Omicron MCC |
+| └─ Easynews | 538-066-1321 | #f59e0b (Amber) | Child of Omicron MCC |
+| └─ Newshosting | 756-634-1629 | #8b5cf6 (Purple) | Child of Omicron MCC |
+| └─ UsenetServer | 397-230-3325 | #14b8a6 (Teal) | Child of Omicron MCC |
+| └─ Tweak | 114-658-1474 | #ef4444 (Red) | Child of Omicron MCC |
+| └─ Pure | 172-134-6287 | #6366f1 (Indigo) | Child of Omicron MCC |
+| └─ Sunny | 890-868-9985 | #eab308 (Yellow) | Child of Omicron MCC |
+
+### Data Strategy
+- Dashboard currently shows **demo data** (randomly generated)
+- Will display live data once Google Ads API 501 error is resolved
+- Plan: Daily sync to Supabase, dashboard reads from cache
+- Manual refresh button for on-demand updates
+
+### File Structure
+```
+/clients/omicron/
+├── index.html              # Redirect to password.html
+├── password.html           # Password protection gate
+├── summary.html            # Overview with API status
+├── dashboard.html          # Multi-account comparison
+├── legacy-dashboard.html   # Original CSV-based view
+├── styles.css              # Shared styles (Digistore24 design system)
+├── app.js                  # Legacy dashboard logic
+├── topten_all_basic.csv    # Legacy Top10 data
+├── bur_all_basic.csv       # Legacy BUR data
+├── package.json            # Dependencies
+└── vercel.json             # Deployment config
+```
+
+### Google Ads API Integration
+- **Current Status:** 501 UNIMPLEMENTED error (see FOLLOWUP-NOTES.md)
+- OAuth flow works, tokens stored in Supabase
+- `callback.js` updated to recursively fetch MCC child accounts
+- Once fixed, dashboard will pull live metrics from all 9 accounts
+
+### Known Issues
+1. Google Ads API returns 501 error for all GAQL queries
+2. Need to verify OAuth consent screen is in Production mode
+3. May need to link Google Cloud project to Google Ads account
+
+---
+
 ## Configuration Files
 
 ### Environment Variables
@@ -284,12 +377,21 @@ vercel --prod
 3. **Google Ads MCC:** 673-698-8718
 4. **Developer Token:** Basic Access approved
 5. **Digistore24 password:** TR8FFIC (sessionStorage-based auth)
+6. **Omicron password:** LIEHAO (sessionStorage-based auth)
 
 ---
 
 ## Recent Changes Log
 
 ### 2026-02-03
+- **Omicron Dashboard:** Migrated project from ~/Desktop/omicron to /clients/omicron
+- Created password-protected multi-account Google Ads dashboard
+- Added summary.html with account structure and API status checking
+- Added dashboard.html with multi-account comparison, charts, and filters
+- Updated callback.js to recursively fetch MCC child accounts
+- Created shared styles.css based on Digistore24 design system
+
+### 2026-02-03 (earlier)
 - Added password protection to Digistore24 competitive intel suite
 - Created `password.html` entry point with sessionStorage auth
 - Created `competitive-intel-summary.html` overview page

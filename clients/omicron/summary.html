@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Summary | Omicron Google Ads</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'omicron_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="summary.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Omicron Google Ads
+        </a>
+        <div class="nav-links">
+            <a href="summary.html" class="nav-link active">Summary</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="legacy-dashboard.html" class="nav-link">Legacy View</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Omicron Media Google Ads Dashboard</h1>
+            <p class="subtitle">Multi-account performance tracking for 9 Google Ads accounts across the Usenet portfolio, powered by live API data.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">9</div>
+                    <div class="hero-stat-label">Active Accounts</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="total-spend">--</div>
+                    <div class="hero-stat-label">Total Monthly Spend</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="total-conversions">--</div>
+                    <div class="hero-stat-label">Monthly Conversions</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="avg-cpa">--</div>
+                    <div class="hero-stat-label">Avg Cost/Conversion</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connection Status -->
+        <section class="card mb-6" id="connection-status">
+            <div class="card-header">
+                <h2 class="card-title">API Connection Status</h2>
+                <button class="btn btn-sm btn-secondary" onclick="checkApiStatus()">Refresh Status</button>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" id="api-alert">
+                    <span>Checking API connection status...</span>
+                </div>
+                <div id="api-status-details" style="display: none;">
+                    <p class="text-muted mb-4">Last sync: <span id="last-sync">Never</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account Cards -->
+        <section class="mb-6">
+            <h2 style="font-size: 1.5rem; margin-bottom: 24px;">Account Overview</h2>
+            <div class="accounts-grid" id="accounts-grid">
+                <!-- Account cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Account Structure -->
+        <section class="card mb-6">
+            <div class="card-header">
+                <h2 class="card-title">Account Structure</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-container" style="border: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Account Name</th>
+                                <th>Customer ID</th>
+                                <th>Access Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="account-badge badge-bur">BUR</span> Best Usenet Reviews</td>
+                                <td><code>441-339-0727</code></td>
+                                <td>Via MCC 673-698-8718</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="account-badge badge-top10">Top10</span> Top10usenet</td>
+                                <td><code>147-846-7425</code></td>
+                                <td>Direct Access</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr style="background: var(--bg-tertiary);">
+                                <td colspan="4" style="font-weight: 600; color: var(--text-secondary);">
+                                    Omicron Media MCC (808-695-7043) - 7 Child Accounts
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-eweka">Eweka</span> Eweka</td>
+                                <td><code>707-911-8680</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-easynews">Easynews</span> Easynews</td>
+                                <td><code>538-066-1321</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-newshosting">NH</span> Newshosting</td>
+                                <td><code>756-634-1629</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-usenetserver">US</span> UsenetServer</td>
+                                <td><code>397-230-3325</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-tweak">Tweak</span> Tweak</td>
+                                <td><code>114-658-1474</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-pure">Pure</span> Pure</td>
+                                <td><code>172-134-6287</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding-left: 32px;"><span class="account-badge badge-sunny">Sunny</span> Sunny</td>
+                                <td><code>890-868-9985</code></td>
+                                <td>Child of Omicron MCC</td>
+                                <td><span class="status status-active"><span class="status-dot"></span>Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="mb-6">
+            <h2 style="font-size: 1.5rem; margin-bottom: 24px;">Available Tools</h2>
+            <div class="accounts-grid">
+                <!-- Dashboard Tool -->
+                <div class="account-card">
+                    <div class="account-card-header">
+                        <div class="account-icon" style="background: var(--accent);">
+                            <span style="font-size: 1.5rem;">📊</span>
+                        </div>
+                        <div>
+                            <div class="account-name">Performance Dashboard</div>
+                            <div class="account-id">Multi-account comparison</div>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        Compare all 9 accounts side-by-side with spend, conversions, CPA, and ROAS metrics. Filter by date range and export data.
+                    </p>
+                    <a href="dashboard.html" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        Open Dashboard →
+                    </a>
+                </div>
+
+                <!-- Legacy Dashboard -->
+                <div class="account-card">
+                    <div class="account-card-header">
+                        <div class="account-icon" style="background: var(--purple);">
+                            <span style="font-size: 1.5rem;">📈</span>
+                        </div>
+                        <div>
+                            <div class="account-name">Legacy Dashboard</div>
+                            <div class="account-id">Original CSV-based view</div>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        The original dashboard showing BUR and Top10usenet data from CSV exports. Useful for historical reference.
+                    </p>
+                    <a href="legacy-dashboard.html" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                        View Legacy →
+                    </a>
+                </div>
+
+                <!-- API Connection -->
+                <div class="account-card">
+                    <div class="account-card-header">
+                        <div class="account-icon" style="background: var(--success);">
+                            <span style="font-size: 1.5rem;">🔌</span>
+                        </div>
+                        <div>
+                            <div class="account-name">Connect Google Ads</div>
+                            <div class="account-id">OAuth authentication</div>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                        Authenticate with Google Ads to enable live data syncing. One connection grants access to all 9 accounts.
+                    </p>
+                    <a href="/api/google-ads/auth" class="btn btn-success" style="width: 100%; justify-content: center;">
+                        Connect Account →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Omicron Media Dashboard prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a></p>
+            <p style="margin-top: 8px;">Data powered by Google Ads API</p>
+        </footer>
+    </div>
+
+    <script>
+        // Account definitions with colors
+        const accounts = [
+            { key: 'bur', name: 'BUR', fullName: 'Best Usenet Reviews', id: '441-339-0727', color: '#3b82f6' },
+            { key: 'top10', name: 'Top10', fullName: 'Top10usenet', id: '147-846-7425', color: '#ec4899' },
+            { key: 'eweka', name: 'Eweka', fullName: 'Eweka', id: '707-911-8680', color: '#22c55e' },
+            { key: 'easynews', name: 'Easynews', fullName: 'Easynews', id: '538-066-1321', color: '#f59e0b' },
+            { key: 'newshosting', name: 'Newshosting', fullName: 'Newshosting', id: '756-634-1629', color: '#8b5cf6' },
+            { key: 'usenetserver', name: 'UsenetServer', fullName: 'UsenetServer', id: '397-230-3325', color: '#14b8a6' },
+            { key: 'tweak', name: 'Tweak', fullName: 'Tweak', id: '114-658-1474', color: '#ef4444' },
+            { key: 'pure', name: 'Pure', fullName: 'Pure', id: '172-134-6287', color: '#6366f1' },
+            { key: 'sunny', name: 'Sunny', fullName: 'Sunny', id: '890-868-9985', color: '#eab308' }
+        ];
+
+        // Render account cards
+        function renderAccountCards() {
+            const grid = document.getElementById('accounts-grid');
+            grid.innerHTML = accounts.map(account => `
+                <div class="account-card">
+                    <div class="account-card-header">
+                        <div class="account-icon" style="background: ${account.color};">
+                            ${account.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="account-name">${account.fullName}</div>
+                            <div class="account-id">${account.id}</div>
+                        </div>
+                    </div>
+                    <div class="account-metrics">
+                        <div class="account-metric">
+                            <div class="account-metric-label">Spend (30d)</div>
+                            <div class="account-metric-value" id="${account.key}-spend">--</div>
+                        </div>
+                        <div class="account-metric">
+                            <div class="account-metric-label">Conversions</div>
+                            <div class="account-metric-value" id="${account.key}-conv">--</div>
+                        </div>
+                        <div class="account-metric">
+                            <div class="account-metric-label">CPA</div>
+                            <div class="account-metric-value" id="${account.key}-cpa">--</div>
+                        </div>
+                        <div class="account-metric">
+                            <div class="account-metric-label">CTR</div>
+                            <div class="account-metric-value" id="${account.key}-ctr">--</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Check API status
+        async function checkApiStatus() {
+            const alertEl = document.getElementById('api-alert');
+
+            try {
+                alertEl.className = 'alert alert-info';
+                alertEl.innerHTML = '<span>Checking API connection...</span>';
+
+                const response = await fetch('/api/google-ads/debug');
+                const data = await response.json();
+
+                if (data.errors && data.errors.length > 0) {
+                    const lastError = data.errors[data.errors.length - 1];
+                    if (lastError.error && typeof lastError.error === 'object' && lastError.error.error) {
+                        // API error
+                        alertEl.className = 'alert alert-danger';
+                        alertEl.innerHTML = `
+                            <span>
+                                <strong>API Error:</strong> ${lastError.error.error.message || 'Unknown error'}
+                                <br><small>Code: ${lastError.error.error.code || 'N/A'} - ${lastError.error.error.status || 'N/A'}</small>
+                            </span>
+                        `;
+                    } else {
+                        alertEl.className = 'alert alert-warning';
+                        alertEl.innerHTML = `<span><strong>Warning:</strong> ${lastError.message || lastError.error || 'Check required'}</span>`;
+                    }
+                } else if (data.accessibleCustomers && data.accessibleCustomers.resourceNames) {
+                    const accountCount = data.accessibleCustomers.resourceNames.length;
+                    alertEl.className = 'alert alert-success';
+                    alertEl.innerHTML = `<span><strong>Connected!</strong> ${accountCount} accounts accessible via API</span>`;
+
+                    document.getElementById('api-status-details').style.display = 'block';
+                    document.getElementById('last-sync').textContent = new Date().toLocaleString();
+                } else if (data.connection) {
+                    alertEl.className = 'alert alert-warning';
+                    alertEl.innerHTML = `
+                        <span>
+                            <strong>Partially connected:</strong> OAuth token exists for ${data.connection.email}
+                            <br><small>Token expired: ${data.connection.isExpired ? 'Yes' : 'No'}</small>
+                        </span>
+                    `;
+                } else {
+                    alertEl.className = 'alert alert-warning';
+                    alertEl.innerHTML = '<span><strong>Not connected:</strong> Please authenticate with Google Ads</span>';
+                }
+            } catch (error) {
+                alertEl.className = 'alert alert-danger';
+                alertEl.innerHTML = `<span><strong>Connection failed:</strong> ${error.message}</span>`;
+            }
+        }
+
+        // Initialize
+        renderAccountCards();
+        checkApiStatus();
+    </script>
+</body>
+</html>

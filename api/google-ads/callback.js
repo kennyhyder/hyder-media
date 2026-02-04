@@ -142,6 +142,7 @@ export default async function handler(req, res) {
 
 /**
  * Fetch accessible Google Ads accounts and store them
+ * Includes recursive fetching of MCC child accounts
  */
 async function fetchAndStoreAccounts(supabase, connectionId, accessToken) {
     const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
@@ -173,6 +174,9 @@ async function fetchAndStoreAccounts(supabase, connectionId, accessToken) {
                 name.replace('customers/', '')
             );
 
+            // Track all accounts (including MCC children)
+            const allAccountIds = new Set(customerIds);
+
             // Fetch details for each account
             for (const customerId of customerIds) {
                 try {
@@ -193,11 +197,44 @@ async function fetchAndStoreAccounts(supabase, connectionId, accessToken) {
                                 currency_code: accountDetails.currencyCode,
                                 time_zone: accountDetails.timeZone,
                                 is_manager: accountDetails.manager || false,
+                                parent_customer_id: null,
                                 status: 'ENABLED',
                                 updated_at: new Date().toISOString(),
                             }, {
                                 onConflict: 'connection_id,customer_id',
                             });
+
+                        // If this is an MCC account, fetch its child accounts
+                        if (accountDetails.manager) {
+                            const childAccounts = await fetchMccChildAccounts(
+                                customerId,
+                                accessToken,
+                                developerToken,
+                                loginCustomerId
+                            );
+
+                            for (const child of childAccounts) {
+                                if (!allAccountIds.has(child.id)) {
+                                    allAccountIds.add(child.id);
+
+                                    await supabase
+                                        .from('google_ads_accounts')
+                                        .upsert({
+                                            connection_id: connectionId,
+                                            customer_id: child.id,
+                                            descriptive_name: child.descriptiveName,
+                                            currency_code: child.currencyCode,
+                                            time_zone: child.timeZone,
+                                            is_manager: child.manager || false,
+                                            parent_customer_id: customerId,
+                                            status: child.status || 'ENABLED',
+                                            updated_at: new Date().toISOString(),
+                                        }, {
+                                            onConflict: 'connection_id,customer_id',
+                                        });
+                                }
+                            }
+                        }
                     }
                 } catch (e) {
                     console.warn(`Could not fetch details for account ${customerId}:`, e.message);
@@ -207,6 +244,63 @@ async function fetchAndStoreAccounts(supabase, connectionId, accessToken) {
     } catch (error) {
         console.error('Error fetching accounts:', error);
     }
+}
+
+/**
+ * Fetch child accounts under an MCC account
+ */
+async function fetchMccChildAccounts(mccCustomerId, accessToken, developerToken, loginCustomerId) {
+    const childAccounts = [];
+
+    try {
+        const query = `
+            SELECT
+                customer_client.id,
+                customer_client.descriptive_name,
+                customer_client.currency_code,
+                customer_client.time_zone,
+                customer_client.manager,
+                customer_client.status
+            FROM customer_client
+            WHERE customer_client.level = 1
+        `;
+
+        const response = await fetch(
+            `https://googleads.googleapis.com/v23/customers/${mccCustomerId}/googleAds:search`,
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'developer-token': developerToken,
+                    'login-customer-id': loginCustomerId,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.results) {
+            for (const result of data.results) {
+                const client = result.customerClient;
+                if (client && client.id) {
+                    childAccounts.push({
+                        id: client.id.toString(),
+                        descriptiveName: client.descriptiveName,
+                        currencyCode: client.currencyCode,
+                        timeZone: client.timeZone,
+                        manager: client.manager || false,
+                        status: client.status
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.warn(`Error fetching child accounts for MCC ${mccCustomerId}:`, error.message);
+    }
+
+    return childAccounts;
 }
 
 /**
