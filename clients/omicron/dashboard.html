@@ -1196,14 +1196,17 @@
             '#2dd4bf'
         ];
 
-        // Brand colors for review sites (matching Omicron brands)
+        // Brand colors for review sites (matching Omicron brands in PDF)
+        // Conversion actions named like "Offsite Purchase -> Eweka"
         const brandConvColors = {
-            'Eweka': '#3b82f6',       // Blue (like PDF)
-            'Newshosting': '#ef4444', // Red
-            'Easynews': '#f59e0b',    // Amber/Yellow
-            'TweakNews': '#22c55e',   // Green
-            'Tweaknews': '#22c55e',
-            'UsenetServer': '#f97316' // Orange
+            'eweka': '#3b82f6',       // Blue (like PDF)
+            'newshosting': '#ef4444', // Red
+            'easynews': '#f59e0b',    // Amber/Yellow
+            'tweaknews': '#22c55e',   // Green
+            'tweak': '#22c55e',
+            'usenetserver': '#f97316', // Orange
+            'sunny': '#eab308',       // Yellow
+            'pure': '#6366f1'         // Indigo
         };
 
         async function refreshConversionData() {
@@ -1356,10 +1359,12 @@
         }
 
         function getConversionColor(actionName, index, isReviewSite) {
+            const lowerName = actionName.toLowerCase();
+
             if (isReviewSite) {
                 // For review sites, try to match brand colors
                 for (const [brand, color] of Object.entries(brandConvColors)) {
-                    if (actionName.toLowerCase().includes(brand.toLowerCase())) {
+                    if (lowerName.includes(brand)) {
                         return color;
                     }
                 }
