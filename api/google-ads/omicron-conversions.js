@@ -174,15 +174,16 @@ export default async function handler(req, res) {
  */
 async function fetchConversionActionData(customerId, loginCustomerId, accessToken, developerToken, dateRange) {
     // Query for conversion metrics segmented by conversion action and month
+    // Must use campaign resource (not customer) to segment by conversion action
     const query = `
         SELECT
             segments.conversion_action_name,
             segments.month,
             metrics.conversions,
-            metrics.conversions_value,
-            metrics.cost_micros
-        FROM customer
+            metrics.conversions_value
+        FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
+            AND campaign.status != 'REMOVED'
     `;
 
     try {
@@ -227,14 +228,13 @@ async function fetchConversionActionData(customerId, loginCustomerId, accessToke
 
                 const conversions = parseFloat(m.conversions || 0);
                 const conversionValue = parseFloat(m.conversionsValue || 0);
-                const spend = parseFloat(m.costMicros || 0) / 1000000;
 
                 // Initialize month if needed
                 if (!monthlyMap[month]) {
                     monthlyMap[month] = {
                         month,
                         actions: {},
-                        total: { conversions: 0, value: 0, spend: 0 }
+                        total: { conversions: 0, value: 0 }
                     };
                 }
 
@@ -248,7 +248,6 @@ async function fetchConversionActionData(customerId, loginCustomerId, accessToke
                 monthlyMap[month].actions[actionName].value += conversionValue;
                 monthlyMap[month].total.conversions += conversions;
                 monthlyMap[month].total.value += conversionValue;
-                monthlyMap[month].total.spend += spend;
 
                 // Track overall action totals
                 if (!actionTotals[actionName]) {
