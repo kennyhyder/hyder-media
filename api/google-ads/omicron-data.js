@@ -18,9 +18,10 @@ const ACCOUNT_CONFIG = [
     { id: '1146581474', name: 'Tweak', mcc: '8086957043', color: '#ef4444' },
     { id: '1721346287', name: 'Pure', mcc: '8086957043', color: '#6366f1' },
     { id: '8908689985', name: 'Sunny', mcc: '8086957043', color: '#eab308' },
-    // Kenny Hyder MCC accounts (use 6736988718 as login-customer-id)
+    // BUR - under Kenny Hyder MCC
     { id: '4413390727', name: 'BUR', mcc: '6736988718', color: '#3b82f6' },
-    { id: '1478467425', name: 'Top10usenet', mcc: '6736988718', color: '#ec4899' },
+    // Top10usenet - direct access (use itself as login-customer-id)
+    { id: '1478467425', name: 'Top10usenet', mcc: '1478467425', color: '#ec4899' },
 ];
 
 export default async function handler(req, res) {
