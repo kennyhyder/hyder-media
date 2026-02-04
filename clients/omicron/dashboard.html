@@ -45,86 +45,166 @@
             }
         }
 
-        .account-checkbox {
+        .view-tabs {
             display: flex;
-            align-items: center;
             gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-tertiary);
-            border-radius: 6px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .view-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
             cursor: pointer;
+            font-size: 0.9rem;
+            border-radius: 6px;
             transition: all 0.2s;
-            border: 2px solid transparent;
         }
 
-        .account-checkbox:hover {
-            background: var(--border);
+        .view-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
         }
 
-        .account-checkbox.checked {
-            border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.1);
+        .view-tab.active {
+            background: var(--accent);
+            color: white;
         }
 
-        .account-checkbox input {
+        .view-section {
             display: none;
         }
 
-        .account-checkbox .check-icon {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            color: white;
-            transition: all 0.2s;
-        }
-
-        .account-checkbox.checked .check-icon {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .account-checkbox .color-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .comparison-table {
-            width: 100%;
-            font-size: 0.9rem;
-        }
-
-        .comparison-table th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .comparison-table td {
-            white-space: nowrap;
-        }
-
-        .table-scroll {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .metric-positive {
-            color: var(--success);
-        }
-
-        .metric-negative {
-            color: var(--danger);
+        .view-section.active {
+            display: block;
         }
 
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 350px;
+        }
+
+        .legend-inline {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .group-header {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .group-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .group-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .group-stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .group-stat {
+            text-align: right;
+        }
+
+        .group-stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .group-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .account-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 24px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .account-row:last-child {
+            border-bottom: none;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .account-icon-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        .account-details {
+            flex: 1;
+        }
+
+        .account-name-sm {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .account-spend {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .mini-charts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .mini-chart {
+            height: 80px;
+        }
+
+        .mini-chart-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 4px;
         }
 
         .data-source-note {
@@ -143,6 +223,9 @@
             font-weight: 600;
             margin-left: 8px;
         }
+
+        .brand-color { color: #ef4444; }
+        .nonbrand-color { color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -173,10 +256,15 @@
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <div>
-                <h1 class="dashboard-title">Performance Dashboard <span class="demo-badge" id="data-badge">LOADING...</span></h1>
-                <p class="text-muted">Multi-account comparison view</p>
+                <h1 class="dashboard-title">PPC Performance Dashboard <span class="demo-badge" id="data-badge">LOADING...</span></h1>
+                <p class="text-muted">Monthly trends with Brand vs Non-Brand breakdown</p>
             </div>
             <div class="dashboard-actions">
+                <select id="months-selector" onchange="changeMonths()" style="padding: 8px 12px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                    <option value="3">Last 3 Months</option>
+                    <option value="6">Last 6 Months</option>
+                    <option value="13" selected>Last 13 Months</option>
+                </select>
                 <button class="btn btn-secondary btn-sm" onclick="refreshData()">
                     <span id="refresh-icon">↻</span> Refresh
                 </button>
@@ -186,126 +274,190 @@
             </div>
         </div>
 
-        <!-- Filters Bar -->
-        <div class="filters-bar">
-            <div class="filter-group">
-                <label>Date Range</label>
-                <select id="date-range" onchange="updateDashboard()">
-                    <option value="7">Last 7 Days</option>
-                    <option value="30" selected>Last 30 Days</option>
-                    <option value="90">Last 90 Days</option>
-                    <option value="ytd">Year to Date</option>
-                </select>
-            </div>
+        <!-- View Tabs -->
+        <div class="view-tabs">
+            <button class="view-tab active" onclick="switchView('overview')">Overview</button>
+            <button class="view-tab" onclick="switchView('review')">Review Sites</button>
+            <button class="view-tab" onclick="switchView('owned')">Owned Sites</button>
+            <button class="view-tab" onclick="switchView('accounts')">Account Details</button>
+        </div>
 
-            <div class="filter-group">
-                <label>Campaign Status</label>
-                <select id="campaign-status" onchange="updateDashboard()">
-                    <option value="all">All Campaigns</option>
-                    <option value="enabled" selected>Enabled Only</option>
-                    <option value="paused">Paused Only</option>
-                </select>
-            </div>
-
-            <div class="filter-group" style="flex: 1;">
-                <label>Accounts (click to toggle)</label>
-                <div id="account-filters" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <!-- Populated by JS -->
+        <!-- Overview Section -->
+        <div id="view-overview" class="view-section active">
+            <!-- Top Stats -->
+            <div class="top-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Spend</div>
+                    <div class="stat-value" id="total-spend">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Conversions</div>
+                    <div class="stat-value" id="total-conversions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg CPA</div>
+                    <div class="stat-value" id="avg-cpa">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Brand CPA</div>
+                    <div class="stat-value brand-color" id="brand-cpa">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Non-Brand CPA</div>
+                    <div class="stat-value nonbrand-color" id="nonbrand-cpa">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Clicks</div>
+                    <div class="stat-value" id="total-clicks">0</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Top Stats -->
-        <div class="top-stats">
-            <div class="stat-card">
-                <div class="stat-label">Total Spend</div>
-                <div class="stat-value" id="total-spend">$0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Conversions</div>
-                <div class="stat-value" id="total-conversions">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg CPA</div>
-                <div class="stat-value" id="avg-cpa">$0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg ROAS</div>
-                <div class="stat-value" id="avg-roas">0x</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg CTR</div>
-                <div class="stat-value" id="avg-ctr">0%</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Clicks</div>
-                <div class="stat-value" id="total-clicks">0</div>
-            </div>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-title">Spend Over Time</div>
+            <!-- All Conversions Chart -->
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h2 class="card-title">All Conversions</h2>
+                </div>
+                <div class="legend-inline">
+                    <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Non-Brand</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Brand</div>
+                </div>
                 <div class="chart-container">
-                    <canvas id="spend-chart"></canvas>
+                    <canvas id="all-conv-chart"></canvas>
                 </div>
             </div>
-            <div class="chart-card">
-                <div class="chart-title">Conversions Over Time</div>
-                <div class="chart-container">
-                    <canvas id="conversions-chart"></canvas>
+
+            <!-- CPA Trend Chart -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">CPA Trend (Brand vs Non-Brand)</div>
+                    <div class="chart-container">
+                        <canvas id="cpa-trend-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Cost Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="cost-dist-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-title">CPA Trend</div>
-                <div class="chart-container">
-                    <canvas id="cpa-chart"></canvas>
+        <!-- Review Sites Section -->
+        <div id="view-review" class="view-section">
+            <div class="group-header">
+                <div>
+                    <div class="group-title">Review Sites (BUR + Top10usenet)</div>
+                    <div class="group-subtitle">Affiliate review sites driving referral traffic</div>
+                </div>
+                <div class="group-stats">
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="review-spend">$0</div>
+                        <div class="group-stat-label">Total Spend</div>
+                    </div>
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="review-conv">0</div>
+                        <div class="group-stat-label">Conversions</div>
+                    </div>
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="review-cpa">$0</div>
+                        <div class="group-stat-label">CPA</div>
+                    </div>
                 </div>
             </div>
-            <div class="chart-card">
-                <div class="chart-title">ROAS by Account</div>
+
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h2 class="card-title">Review Sites Conversions</h2>
+                </div>
+                <div class="legend-inline">
+                    <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Non-Brand</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Brand</div>
+                </div>
                 <div class="chart-container">
-                    <canvas id="roas-chart"></canvas>
+                    <canvas id="review-conv-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Review Sites CPA</div>
+                    <div class="chart-container">
+                        <canvas id="review-cpa-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Review Sites Cost</div>
+                    <div class="chart-container">
+                        <canvas id="review-cost-chart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Account Comparison Table -->
-        <div class="card mb-6">
-            <div class="card-header">
-                <h2 class="card-title">Account Comparison</h2>
+        <!-- Owned Sites Section -->
+        <div id="view-owned" class="view-section">
+            <div class="group-header">
+                <div>
+                    <div class="group-title">Owned Sites (7 Brands)</div>
+                    <div class="group-subtitle">Direct-to-consumer Usenet provider brands</div>
+                </div>
+                <div class="group-stats">
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="owned-spend">$0</div>
+                        <div class="group-stat-label">Total Spend</div>
+                    </div>
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="owned-conv">0</div>
+                        <div class="group-stat-label">Conversions</div>
+                    </div>
+                    <div class="group-stat">
+                        <div class="group-stat-value" id="owned-cpa">$0</div>
+                        <div class="group-stat-label">CPA</div>
+                    </div>
+                </div>
             </div>
-            <div class="table-scroll">
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Account</th>
-                            <th style="text-align: right;">Spend</th>
-                            <th style="text-align: right;">Clicks</th>
-                            <th style="text-align: right;">Impressions</th>
-                            <th style="text-align: right;">CTR</th>
-                            <th style="text-align: right;">Conversions</th>
-                            <th style="text-align: right;">CPA</th>
-                            <th style="text-align: right;">ROAS</th>
-                            <th style="text-align: right;">Conv Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody id="comparison-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                    <tfoot id="comparison-table-footer">
-                        <!-- Populated by JS -->
-                    </tfoot>
-                </table>
+
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h2 class="card-title">Owned Sites Conversions</h2>
+                </div>
+                <div class="legend-inline">
+                    <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Non-Brand</div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Brand</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="owned-conv-chart"></canvas>
+                </div>
             </div>
-            <p class="data-source-note" style="padding: 16px;" id="data-source-note">
-                Loading data from Google Ads API...
-            </p>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Owned Sites CPA</div>
+                    <div class="chart-container">
+                        <canvas id="owned-cpa-chart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Owned Sites Cost</div>
+                    <div class="chart-container">
+                        <canvas id="owned-cost-chart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Account Details Section -->
+        <div id="view-accounts" class="view-section">
+            <div id="account-details-container">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Data Source Note -->
+        <p class="data-source-note" id="data-source-note">
+            Loading data from Google Ads API...
+        </p>
 
         <!-- Footer -->
         <footer class="footer">
@@ -318,87 +470,82 @@
         let apiData = null;
         let isLoading = false;
 
-        // Account definitions (will be populated from API)
-        let accounts = [];
+        // Chart instances
+        let charts = {};
 
-        // Selected accounts
-        let selectedAccounts = new Set();
+        // Account color map
+        const accountColors = {
+            'Eweka': '#22c55e',
+            'Easynews': '#f59e0b',
+            'Newshosting': '#8b5cf6',
+            'UsenetServer': '#14b8a6',
+            'Tweak': '#ef4444',
+            'Pure': '#6366f1',
+            'Sunny': '#eab308',
+            'BUR': '#3b82f6',
+            'Top10usenet': '#ec4899'
+        };
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value || 0);
+        }
+
+        // Format number
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(Math.round(value || 0));
+        }
+
+        // Format month for display (2025-01 -> Jan 2025)
+        function formatMonth(monthStr) {
+            if (!monthStr) return '';
+            const [year, month] = monthStr.split('-');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[parseInt(month, 10) - 1] + ' ' + year.slice(2);
+        }
+
+        // Switch view tabs
+        function switchView(view) {
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchView('${view}')"]`).classList.add('active');
+            document.getElementById(`view-${view}`).classList.add('active');
+        }
+
+        // Change months selector
+        function changeMonths() {
+            refreshData();
+        }
 
         // Fetch data from API
         async function fetchApiData() {
-            const dateRange = document.getElementById('date-range').value;
-            const days = dateRange === 'ytd' ? 365 : parseInt(dateRange);
-
+            const months = document.getElementById('months-selector').value;
             isLoading = true;
             updateLoadingState();
 
             try {
-                const response = await fetch(`/api/google-ads/omicron-data?days=${days}`);
-                const data = await response.json();
+                const response = await fetch(`/api/google-ads/omicron-monthly?months=${months}`);
+                apiData = await response.json();
 
-                if (data.errors && data.errors.length > 0) {
-                    console.error('API errors:', data.errors);
+                if (apiData.errors && apiData.errors.length > 0) {
+                    console.error('API errors:', apiData.errors);
                 }
-
-                // Transform API data to match our format
-                apiData = {
-                    dateRange: data.dateRange,
-                    totals: data.totals,
-                    accounts: {}
-                };
-
-                // Build accounts list from API response
-                accounts = [];
-                data.accounts.forEach(acc => {
-                    if (acc.status === 'success' && acc.metrics) {
-                        const key = acc.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        accounts.push({
-                            key: key,
-                            name: acc.name,
-                            fullName: acc.name,
-                            id: acc.id,
-                            color: acc.color
-                        });
-                        apiData.accounts[key] = {
-                            totals: {
-                                spend: acc.metrics.spend || 0,
-                                clicks: acc.metrics.clicks || 0,
-                                impressions: acc.metrics.impressions || 0,
-                                conversions: acc.metrics.conversions || 0,
-                                conversionValue: acc.metrics.conversionValue || 0,
-                                ctr: acc.metrics.ctr || 0,
-                                cpa: acc.metrics.cpa || 0,
-                                roas: acc.metrics.roas || 0,
-                                convRate: acc.metrics.convRate || 0
-                            }
-                        };
-                    } else if (acc.status === 'error') {
-                        // Still show account but mark as error
-                        const key = acc.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        accounts.push({
-                            key: key,
-                            name: acc.name,
-                            fullName: acc.name + ' (Error)',
-                            id: acc.id,
-                            color: acc.color,
-                            hasError: true,
-                            error: acc.error
-                        });
-                        apiData.accounts[key] = {
-                            totals: { spend: 0, clicks: 0, impressions: 0, conversions: 0, conversionValue: 0, ctr: 0, cpa: 0, roas: 0, convRate: 0 },
-                            error: acc.error
-                        };
-                    }
-                });
-
-                // Select all accounts by default
-                selectedAccounts = new Set(accounts.map(a => a.key));
 
                 // Update badge
                 const badge = document.getElementById('data-badge');
-                const successCount = data.accounts.filter(a => a.status === 'success').length;
-                const errorCount = data.accounts.filter(a => a.status === 'error').length;
-                if (errorCount > 0) {
+                const successCount = apiData.accounts?.filter(a => a.status === 'success').length || 0;
+                const errorCount = apiData.accounts?.filter(a => a.status !== 'success').length || 0;
+
+                if (successCount === 0) {
+                    badge.textContent = 'NO DATA';
+                    badge.style.background = '#ef4444';
+                } else if (errorCount > 0) {
                     badge.textContent = `${successCount} LIVE / ${errorCount} ERRORS`;
                     badge.style.background = '#f59e0b';
                 } else {
@@ -408,10 +555,9 @@
 
                 // Update data source note
                 document.getElementById('data-source-note').innerHTML =
-                    `Data from Google Ads API | ${data.dateRange.start} to ${data.dateRange.end} | ${successCount} accounts`;
+                    `Data from Google Ads API | ${apiData.dateRange?.start || ''} to ${apiData.dateRange?.end || ''} | ${successCount} accounts`;
 
                 isLoading = false;
-                renderAccountFilters();
                 updateDashboard();
 
             } catch (error) {
@@ -431,70 +577,66 @@
             }
         }
 
-        // Format currency
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(value);
-        }
+        // Update dashboard with data
+        function updateDashboard() {
+            if (!apiData || !apiData.monthlyTotals) return;
 
-        // Format number
-        function formatNumber(value) {
-            return new Intl.NumberFormat('en-US').format(Math.round(value));
-        }
+            // Calculate totals from monthly data
+            const totals = apiData.monthlyTotals.reduce((acc, m) => {
+                acc.spend += m.total?.spend || 0;
+                acc.conversions += m.total?.conversions || 0;
+                acc.clicks += m.total?.clicks || 0;
+                acc.brandSpend += m.brand?.spend || 0;
+                acc.brandConv += m.brand?.conversions || 0;
+                acc.nonBrandSpend += m.nonBrand?.spend || 0;
+                acc.nonBrandConv += m.nonBrand?.conversions || 0;
+                return acc;
+            }, { spend: 0, conversions: 0, clicks: 0, brandSpend: 0, brandConv: 0, nonBrandSpend: 0, nonBrandConv: 0 });
 
-        // Format percentage
-        function formatPercent(value) {
-            return (value * 100).toFixed(2) + '%';
-        }
+            // Update top stats
+            document.getElementById('total-spend').textContent = formatCurrency(totals.spend);
+            document.getElementById('total-conversions').textContent = formatNumber(totals.conversions);
+            document.getElementById('avg-cpa').textContent = formatCurrency(totals.conversions > 0 ? totals.spend / totals.conversions : 0);
+            document.getElementById('brand-cpa').textContent = formatCurrency(totals.brandConv > 0 ? totals.brandSpend / totals.brandConv : 0);
+            document.getElementById('nonbrand-cpa').textContent = formatCurrency(totals.nonBrandConv > 0 ? totals.nonBrandSpend / totals.nonBrandConv : 0);
+            document.getElementById('total-clicks').textContent = formatNumber(totals.clicks);
 
-        // Render account filters
-        function renderAccountFilters() {
-            const container = document.getElementById('account-filters');
-            container.innerHTML = accounts.map(account => `
-                <label class="account-checkbox ${selectedAccounts.has(account.key) ? 'checked' : ''}"
-                       onclick="toggleAccount('${account.key}', this)">
-                    <input type="checkbox" ${selectedAccounts.has(account.key) ? 'checked' : ''}>
-                    <span class="check-icon">${selectedAccounts.has(account.key) ? '✓' : ''}</span>
-                    <span class="color-dot" style="background: ${account.color};"></span>
-                    <span>${account.name}</span>
-                </label>
-            `).join('');
-        }
+            // Update group stats
+            if (apiData.groupTotals) {
+                const reviewTotals = apiData.groupTotals.review?.reduce((acc, m) => {
+                    acc.spend += m.total?.spend || 0;
+                    acc.conversions += m.total?.conversions || 0;
+                    return acc;
+                }, { spend: 0, conversions: 0 }) || { spend: 0, conversions: 0 };
 
-        // Toggle account selection
-        function toggleAccount(key, el) {
-            if (selectedAccounts.has(key)) {
-                selectedAccounts.delete(key);
-                el.classList.remove('checked');
-                el.querySelector('.check-icon').textContent = '';
-            } else {
-                selectedAccounts.add(key);
-                el.classList.add('checked');
-                el.querySelector('.check-icon').textContent = '✓';
+                const ownedTotals = apiData.groupTotals.owned?.reduce((acc, m) => {
+                    acc.spend += m.total?.spend || 0;
+                    acc.conversions += m.total?.conversions || 0;
+                    return acc;
+                }, { spend: 0, conversions: 0 }) || { spend: 0, conversions: 0 };
+
+                document.getElementById('review-spend').textContent = formatCurrency(reviewTotals.spend);
+                document.getElementById('review-conv').textContent = formatNumber(reviewTotals.conversions);
+                document.getElementById('review-cpa').textContent = formatCurrency(reviewTotals.conversions > 0 ? reviewTotals.spend / reviewTotals.conversions : 0);
+
+                document.getElementById('owned-spend').textContent = formatCurrency(ownedTotals.spend);
+                document.getElementById('owned-conv').textContent = formatNumber(ownedTotals.conversions);
+                document.getElementById('owned-cpa').textContent = formatCurrency(ownedTotals.conversions > 0 ? ownedTotals.spend / ownedTotals.conversions : 0);
             }
-            updateDashboard();
+
+            // Update charts
+            updateCharts();
+            updateAccountDetails();
         }
 
-        // Charts
-        let spendChart, conversionsChart, cpaChart, roasChart;
-
+        // Initialize charts
         function initCharts() {
             const chartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#94a3b8',
-                            usePointStyle: true,
-                            padding: 15
-                        }
+                        display: false
                     }
                 },
                 scales: {
@@ -509,188 +651,370 @@
                 }
             };
 
-            // Spend Chart (bar chart per account)
-            spendChart = new Chart(document.getElementById('spend-chart'), {
+            // All Conversions Chart (stacked bar)
+            charts.allConv = new Chart(document.getElementById('all-conv-chart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [] },
                 options: {
                     ...chartOptions,
-                    plugins: { ...chartOptions.plugins, legend: { display: false } },
+                    plugins: {
+                        ...chartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${formatNumber(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        ...chartOptions.scales,
+                        x: { ...chartOptions.scales.x, stacked: true },
+                        y: { ...chartOptions.scales.y, stacked: true }
+                    }
+                }
+            });
+
+            // CPA Trend Chart (grouped bar)
+            charts.cpaTrend = new Chart(document.getElementById('cpa-trend-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
                     scales: {
                         ...chartOptions.scales,
                         y: {
                             ...chartOptions.scales.y,
-                            ticks: {
-                                ...chartOptions.scales.y.ticks,
-                                callback: v => '$' + v.toLocaleString()
-                            }
+                            ticks: { ...chartOptions.scales.y.ticks, callback: v => '$' + v }
                         }
                     }
                 }
             });
 
-            // Conversions Chart
-            conversionsChart = new Chart(document.getElementById('conversions-chart'), {
+            // Cost Distribution Chart (stacked percentage)
+            charts.costDist = new Chart(document.getElementById('cost-dist-chart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [] },
                 options: {
                     ...chartOptions,
-                    plugins: { ...chartOptions.plugins, legend: { display: false } }
-                }
-            });
-
-            // CPA Chart
-            cpaChart = new Chart(document.getElementById('cpa-chart'), {
-                type: 'bar',
-                data: { labels: [], datasets: [] },
-                options: {
-                    ...chartOptions,
-                    plugins: { ...chartOptions.plugins, legend: { display: false } },
                     scales: {
                         ...chartOptions.scales,
+                        x: { ...chartOptions.scales.x, stacked: true },
                         y: {
                             ...chartOptions.scales.y,
-                            ticks: {
-                                ...chartOptions.scales.y.ticks,
-                                callback: v => '$' + v.toFixed(2)
-                            }
+                            stacked: true,
+                            max: 100,
+                            ticks: { ...chartOptions.scales.y.ticks, callback: v => v + '%' }
                         }
                     }
                 }
             });
 
-            // ROAS Chart (horizontal bar)
-            roasChart = new Chart(document.getElementById('roas-chart'), {
+            // Review Sites Charts
+            charts.reviewConv = new Chart(document.getElementById('review-conv-chart'), {
                 type: 'bar',
                 data: { labels: [], datasets: [] },
                 options: {
                     ...chartOptions,
-                    indexAxis: 'y',
                     scales: {
                         ...chartOptions.scales,
-                        x: {
-                            ...chartOptions.scales.x,
-                            ticks: {
-                                ...chartOptions.scales.x.ticks,
-                                callback: v => v.toFixed(1) + 'x'
-                            }
-                        }
+                        x: { ...chartOptions.scales.x, stacked: true },
+                        y: { ...chartOptions.scales.y, stacked: true }
+                    }
+                }
+            });
+
+            charts.reviewCpa = new Chart(document.getElementById('review-cpa-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: { ...chartOptions.scales.y, ticks: { ...chartOptions.scales.y.ticks, callback: v => '$' + v } }
+                    }
+                }
+            });
+
+            charts.reviewCost = new Chart(document.getElementById('review-cost-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        x: { ...chartOptions.scales.x, stacked: true },
+                        y: { ...chartOptions.scales.y, stacked: true, ticks: { ...chartOptions.scales.y.ticks, callback: v => '$' + v.toLocaleString() } }
+                    }
+                }
+            });
+
+            // Owned Sites Charts
+            charts.ownedConv = new Chart(document.getElementById('owned-conv-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        x: { ...chartOptions.scales.x, stacked: true },
+                        y: { ...chartOptions.scales.y, stacked: true }
+                    }
+                }
+            });
+
+            charts.ownedCpa = new Chart(document.getElementById('owned-cpa-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        y: { ...chartOptions.scales.y, ticks: { ...chartOptions.scales.y.ticks, callback: v => '$' + v } }
+                    }
+                }
+            });
+
+            charts.ownedCost = new Chart(document.getElementById('owned-cost-chart'), {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        ...chartOptions.scales,
+                        x: { ...chartOptions.scales.x, stacked: true },
+                        y: { ...chartOptions.scales.y, stacked: true, ticks: { ...chartOptions.scales.y.ticks, callback: v => '$' + v.toLocaleString() } }
                     }
                 }
             });
         }
 
-        // Update dashboard
-        function updateDashboard() {
-            if (!apiData || accounts.length === 0) {
-                return; // No data yet
-            }
+        // Update all charts with data
+        function updateCharts() {
+            if (!apiData) return;
 
-            const selectedData = accounts.filter(a => selectedAccounts.has(a.key) && !a.hasError);
+            const monthly = apiData.monthlyTotals || [];
+            const labels = monthly.map(m => formatMonth(m.month));
 
-            // Update top stats
-            let totalSpend = 0, totalConversions = 0, totalClicks = 0, totalImpressions = 0, totalConvValue = 0;
-            selectedData.forEach(account => {
-                const t = apiData.accounts[account.key]?.totals || {};
-                totalSpend += t.spend || 0;
-                totalConversions += t.conversions || 0;
-                totalClicks += t.clicks || 0;
-                totalImpressions += t.impressions || 0;
-                totalConvValue += t.conversionValue || 0;
-            });
+            // All Conversions Chart
+            charts.allConv.data.labels = labels;
+            charts.allConv.data.datasets = [
+                {
+                    label: 'Non-Brand',
+                    data: monthly.map(m => m.nonBrand?.conversions || 0),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand',
+                    data: monthly.map(m => m.brand?.conversions || 0),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts.allConv.update();
 
-            document.getElementById('total-spend').textContent = formatCurrency(totalSpend);
-            document.getElementById('total-conversions').textContent = formatNumber(totalConversions);
-            document.getElementById('avg-cpa').textContent = formatCurrency(totalConversions > 0 ? totalSpend / totalConversions : 0);
-            document.getElementById('avg-roas').textContent = (totalSpend > 0 ? totalConvValue / totalSpend : 0).toFixed(2) + 'x';
-            document.getElementById('avg-ctr').textContent = formatPercent(totalImpressions > 0 ? totalClicks / totalImpressions : 0);
-            document.getElementById('total-clicks').textContent = formatNumber(totalClicks);
+            // CPA Trend Chart
+            charts.cpaTrend.data.labels = labels;
+            charts.cpaTrend.data.datasets = [
+                {
+                    label: 'Non-Brand CPA',
+                    data: monthly.map(m => m.nonBrand?.cpa || 0),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand CPA',
+                    data: monthly.map(m => m.brand?.cpa || 0),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts.cpaTrend.update();
 
-            // Update Spend Chart (bar chart showing spend per account)
-            spendChart.data.labels = selectedData.map(a => a.name);
-            spendChart.data.datasets = [{
-                label: 'Spend',
-                data: selectedData.map(a => apiData.accounts[a.key]?.totals.spend || 0),
-                backgroundColor: selectedData.map(a => a.color),
-                borderRadius: 4
-            }];
-            spendChart.update();
+            // Cost Distribution Chart (percentage)
+            charts.costDist.data.labels = labels;
+            const totalSpends = monthly.map(m => (m.total?.spend || 1));
+            charts.costDist.data.datasets = [
+                {
+                    label: 'Non-Brand %',
+                    data: monthly.map((m, i) => ((m.nonBrand?.spend || 0) / totalSpends[i]) * 100),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand %',
+                    data: monthly.map((m, i) => ((m.brand?.spend || 0) / totalSpends[i]) * 100),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts.costDist.update();
 
-            // Update Conversions Chart
-            conversionsChart.data.labels = selectedData.map(a => a.name);
-            conversionsChart.data.datasets = [{
-                label: 'Conversions',
-                data: selectedData.map(a => apiData.accounts[a.key]?.totals.conversions || 0),
-                backgroundColor: selectedData.map(a => a.color),
-                borderRadius: 4
-            }];
-            conversionsChart.update();
+            // Update Review Sites Charts
+            const reviewMonthly = apiData.groupTotals?.review || [];
+            updateGroupCharts('review', reviewMonthly);
 
-            // Update CPA Chart
-            cpaChart.data.labels = selectedData.map(a => a.name);
-            cpaChart.data.datasets = [{
-                label: 'CPA',
-                data: selectedData.map(a => apiData.accounts[a.key]?.totals.cpa || 0),
-                backgroundColor: selectedData.map(a => a.color),
-                borderRadius: 4
-            }];
-            cpaChart.update();
+            // Update Owned Sites Charts
+            const ownedMonthly = apiData.groupTotals?.owned || [];
+            updateGroupCharts('owned', ownedMonthly);
+        }
 
-            // Update ROAS Chart
-            roasChart.data.labels = selectedData.map(a => a.name);
-            roasChart.data.datasets = [{
-                label: 'ROAS',
-                data: selectedData.map(a => apiData.accounts[a.key]?.totals.roas || 0),
-                backgroundColor: selectedData.map(a => a.color),
-                borderRadius: 4
-            }];
-            roasChart.update();
+        function updateGroupCharts(group, monthly) {
+            const labels = monthly.map(m => formatMonth(m.month));
 
-            // Update comparison table (include all accounts, even those with errors)
-            const allSelectedData = accounts.filter(a => selectedAccounts.has(a.key));
-            const tbody = document.getElementById('comparison-table-body');
-            tbody.innerHTML = allSelectedData.map(account => {
-                const t = apiData.accounts[account.key]?.totals || {};
-                const hasError = account.hasError;
+            // Conversions
+            charts[group + 'Conv'].data.labels = labels;
+            charts[group + 'Conv'].data.datasets = [
+                {
+                    label: 'Non-Brand',
+                    data: monthly.map(m => m.nonBrand?.conversions || 0),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand',
+                    data: monthly.map(m => m.brand?.conversions || 0),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts[group + 'Conv'].update();
+
+            // CPA
+            charts[group + 'Cpa'].data.labels = labels;
+            charts[group + 'Cpa'].data.datasets = [
+                {
+                    label: 'Non-Brand CPA',
+                    data: monthly.map(m => m.nonBrand?.cpa || 0),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand CPA',
+                    data: monthly.map(m => m.brand?.cpa || 0),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts[group + 'Cpa'].update();
+
+            // Cost
+            charts[group + 'Cost'].data.labels = labels;
+            charts[group + 'Cost'].data.datasets = [
+                {
+                    label: 'Non-Brand',
+                    data: monthly.map(m => m.nonBrand?.spend || 0),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Brand',
+                    data: monthly.map(m => m.brand?.spend || 0),
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }
+            ];
+            charts[group + 'Cost'].update();
+        }
+
+        // Update account details section
+        function updateAccountDetails() {
+            if (!apiData || !apiData.accounts) return;
+
+            const container = document.getElementById('account-details-container');
+            const successAccounts = apiData.accounts.filter(a => a.status === 'success');
+
+            container.innerHTML = successAccounts.map(account => {
+                const totals = account.totals || {};
+                const monthly = account.monthly || [];
+                const chartId = account.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
                 return `
-                    <tr style="${hasError ? 'opacity: 0.5;' : ''}">
-                        <td>
-                            <span class="account-badge" style="background: ${account.color};">${account.name}</span>
-                            ${account.fullName}
-                            ${hasError ? '<br><small style="color: var(--danger);">Permission denied</small>' : ''}
-                        </td>
-                        <td style="text-align: right;">${hasError ? '-' : formatCurrency(t.spend || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.clicks || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.impressions || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatPercent(t.ctr || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatNumber(t.conversions || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatCurrency(t.cpa || 0)}</td>
-                        <td style="text-align: right;">${hasError ? '-' : (t.roas || 0).toFixed(2) + 'x'}</td>
-                        <td style="text-align: right;">${hasError ? '-' : formatPercent(t.convRate || 0)}</td>
-                    </tr>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="account-icon-sm" style="background: ${account.color};">
+                                    ${account.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h2 class="card-title" style="margin: 0;">${account.name}</h2>
+                                    <div class="text-muted" style="font-size: 0.85rem;">
+                                        ${account.group === 'review' ? 'Review Site' : 'Owned Site'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="group-stats">
+                                <div class="group-stat">
+                                    <div class="group-stat-value">${formatCurrency(totals.total?.spend || 0)}</div>
+                                    <div class="group-stat-label">Total Spend</div>
+                                </div>
+                                <div class="group-stat">
+                                    <div class="group-stat-value">${formatNumber(totals.total?.conversions || 0)}</div>
+                                    <div class="group-stat-label">Conversions</div>
+                                </div>
+                                <div class="group-stat">
+                                    <div class="group-stat-value">${formatCurrency(totals.total?.cpa || 0)}</div>
+                                    <div class="group-stat-label">CPA</div>
+                                </div>
+                                <div class="group-stat">
+                                    <div class="group-stat-value brand-color">${formatCurrency(totals.brand?.cpa || 0)}</div>
+                                    <div class="group-stat-label">Brand CPA</div>
+                                </div>
+                                <div class="group-stat">
+                                    <div class="group-stat-value nonbrand-color">${formatCurrency(totals.nonBrand?.cpa || 0)}</div>
+                                    <div class="group-stat-label">Non-Brand CPA</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="legend-inline" style="margin-top: 16px;">
+                            <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Non-Brand</div>
+                            <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Brand</div>
+                        </div>
+                        <div style="height: 250px; padding: 0 16px 16px;">
+                            <canvas id="chart-${chartId}"></canvas>
+                        </div>
+                    </div>
                 `;
             }).join('');
 
-            // Update footer totals
-            const tfoot = document.getElementById('comparison-table-footer');
-            const avgCPA = totalConversions > 0 ? totalSpend / totalConversions : 0;
-            const avgROAS = totalSpend > 0 ? totalConvValue / totalSpend : 0;
-            const avgCTR = totalImpressions > 0 ? totalClicks / totalImpressions : 0;
-            const avgConvRate = totalClicks > 0 ? totalConversions / totalClicks : 0;
+            // Create charts for each account
+            successAccounts.forEach(account => {
+                const chartId = account.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const canvas = document.getElementById(`chart-${chartId}`);
+                if (!canvas) return;
 
-            tfoot.innerHTML = `
-                <tr style="background: var(--bg-tertiary); font-weight: 600;">
-                    <td>TOTAL</td>
-                    <td style="text-align: right;">${formatCurrency(totalSpend)}</td>
-                    <td style="text-align: right;">${formatNumber(totalClicks)}</td>
-                    <td style="text-align: right;">${formatNumber(totalImpressions)}</td>
-                    <td style="text-align: right;">${formatPercent(avgCTR)}</td>
-                    <td style="text-align: right;">${formatNumber(totalConversions)}</td>
-                    <td style="text-align: right;">${formatCurrency(avgCPA)}</td>
-                    <td style="text-align: right;">${avgROAS.toFixed(2)}x</td>
-                    <td style="text-align: right;">${formatPercent(avgConvRate)}</td>
-                </tr>
-            `;
+                const monthly = account.monthly || [];
+                const labels = monthly.map(m => formatMonth(m.month));
+
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Non-Brand',
+                                data: monthly.map(m => m.nonBrand?.conversions || 0),
+                                backgroundColor: '#3b82f6',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Brand',
+                                data: monthly.map(m => m.brand?.conversions || 0),
+                                backgroundColor: '#ef4444',
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, stacked: true },
+                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, stacked: true }
+                        }
+                    }
+                });
+            });
         }
 
         // Refresh data
@@ -703,28 +1027,28 @@
 
         // Export CSV
         function exportCSV() {
-            if (!apiData) return;
+            if (!apiData || !apiData.monthlyTotals) return;
 
-            const selectedData = accounts.filter(a => selectedAccounts.has(a.key));
+            let csv = 'Month,Total Spend,Total Conv,Total CPA,Brand Spend,Brand Conv,Brand CPA,Non-Brand Spend,Non-Brand Conv,Non-Brand CPA\n';
 
-            let csv = 'Account,Spend,Clicks,Impressions,CTR,Conversions,CPA,ROAS,Conv Rate\n';
-            selectedData.forEach(account => {
-                const t = apiData.accounts[account.key]?.totals || {};
-                csv += `${account.fullName},${(t.spend || 0).toFixed(2)},${t.clicks || 0},${t.impressions || 0},${((t.ctr || 0) * 100).toFixed(2)}%,${t.conversions || 0},${(t.cpa || 0).toFixed(2)},${(t.roas || 0).toFixed(2)},${((t.convRate || 0) * 100).toFixed(2)}%\n`;
-            });
+            for (const m of apiData.monthlyTotals) {
+                csv += `${m.month},${(m.total?.spend || 0).toFixed(2)},${m.total?.conversions || 0},${(m.total?.cpa || 0).toFixed(2)},`;
+                csv += `${(m.brand?.spend || 0).toFixed(2)},${m.brand?.conversions || 0},${(m.brand?.cpa || 0).toFixed(2)},`;
+                csv += `${(m.nonBrand?.spend || 0).toFixed(2)},${m.nonBrand?.conversions || 0},${(m.nonBrand?.cpa || 0).toFixed(2)}\n`;
+            }
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `omicron-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `omicron-ppc-report-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
 
         // Initialize
         initCharts();
-        fetchApiData(); // Load data from API on page load
+        fetchApiData();
 
         // Add CSS animation for refresh
         const style = document.createElement('style');

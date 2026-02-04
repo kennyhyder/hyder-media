@@ -231,11 +231,12 @@ async function fetchAccountMetrics(customerId, loginCustomerId, accessToken, dev
         if (data.results) {
             for (const row of data.results) {
                 const m = row.metrics || {};
-                spend += (m.costMicros || 0) / 1000000; // Convert micros to dollars
-                clicks += m.clicks || 0;
-                impressions += m.impressions || 0;
-                conversions += m.conversions || 0;
-                conversionValue += m.conversionsValue || 0;
+                // Parse all values as numbers to prevent string concatenation
+                spend += parseFloat(m.costMicros || 0) / 1000000; // Convert micros to dollars
+                clicks += parseInt(m.clicks || 0, 10);
+                impressions += parseInt(m.impressions || 0, 10);
+                conversions += parseFloat(m.conversions || 0);
+                conversionValue += parseFloat(m.conversionsValue || 0);
             }
         }
 

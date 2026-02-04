@@ -332,9 +332,71 @@
             }
         }
 
+        // Fetch actual metrics data
+        async function fetchMetricsData() {
+            try {
+                const response = await fetch('/api/google-ads/omicron-data?days=30');
+                const data = await response.json();
+
+                if (data.accounts && data.accounts.length > 0) {
+                    // Update hero stats
+                    const successAccounts = data.accounts.filter(a => a.status === 'success');
+
+                    if (data.totals) {
+                        document.getElementById('total-spend').textContent = formatCurrency(data.totals.spend);
+                        document.getElementById('total-conversions').textContent = formatNumber(data.totals.conversions);
+                        document.getElementById('avg-cpa').textContent = formatCurrency(data.totals.cpa);
+                    }
+
+                    // Update account cards
+                    for (const acc of data.accounts) {
+                        const key = acc.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        if (acc.status === 'success' && acc.metrics) {
+                            const m = acc.metrics;
+                            const spendEl = document.getElementById(key + '-spend');
+                            const convEl = document.getElementById(key + '-conv');
+                            const cpaEl = document.getElementById(key + '-cpa');
+                            const ctrEl = document.getElementById(key + '-ctr');
+
+                            if (spendEl) spendEl.textContent = formatCurrency(m.spend);
+                            if (convEl) convEl.textContent = formatNumber(m.conversions);
+                            if (cpaEl) cpaEl.textContent = formatCurrency(m.cpa);
+                            if (ctrEl) ctrEl.textContent = formatPercent(m.ctr);
+                        } else if (acc.status === 'error') {
+                            const spendEl = document.getElementById(key + '-spend');
+                            if (spendEl) spendEl.textContent = 'Error';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+            }
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value || 0);
+        }
+
+        // Format number
+        function formatNumber(value) {
+            return new Intl.NumberFormat('en-US').format(Math.round(value || 0));
+        }
+
+        // Format percentage
+        function formatPercent(value) {
+            return ((value || 0) * 100).toFixed(2) + '%';
+        }
+
         // Initialize
         renderAccountCards();
         checkApiStatus();
+        fetchMetricsData();
     </script>
 </body>
 </html>
