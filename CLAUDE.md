@@ -166,27 +166,49 @@ All tool pages share standardized navigation:
 | `ppc-kws/` | Raw SimilarWeb exports per competitor |
 | `google-keywords.json` | Google Keyword Planner volume/bid data |
 
-**Keyword JSON structure:**
+**keywords-combined.json structure (full file):**
+```json
+{
+  "total_keywords": 31164,
+  "brands": ["awin", "clickbank", "impact", "maxweb", "realize", "samcart"],
+  "category_counts": {
+    "Affiliate/Network": 15169,
+    "Other": 7054,
+    "E-commerce/Cart": 3397,
+    "Brand - Competitor": 2532,
+    "...": "..."
+  },
+  "keyword_groups": {
+    "topics": {
+      "affiliate": { "count": 500, "total_clicks": 12000, "total_spend": 25000 },
+      "...": "..."
+    },
+    "brands": {
+      "clickbank": { "count": 1783, "total_clicks": 45000, "total_spend": 98000 },
+      "...": "..."
+    }
+  },
+  "global_avg_cpc": 4.30,
+  "keywords": [/* array of keyword objects */]
+}
+```
+
+**Individual keyword object structure:**
 ```json
 {
   "keyword": "affiliate marketing",
+  "category": "Affiliate/Network",
+  "intent": "Informational",
+  "short_tail_group": "affiliate",
+  "total_clicks": 450,
+  "total_spend": 1102.50,
   "volume": 12500,
   "cpc": 2.45,
-  "categories": ["Affiliate/Network"],
-  "primary_category": "Affiliate/Network",
-  "intent": "Informational",
-  "brand_group": null,
-  "short_tail_group": "affiliate",
-  "google": {
-    "annual_volume": 150000,
-    "low_top_of_page_bid": 1.50,
-    "high_top_of_page_bid": 4.20,
-    "competition": "HIGH"
-  },
   "brands": [
     {
       "name": "clickbank",
       "clicks": 450,
+      "cpc": 2.45,
       "est_spend": 1102.50,
       "desktop_share": 0.65,
       "mobile_share": 0.35,
@@ -195,6 +217,12 @@ All tool pages share standardized navigation:
   ]
 }
 ```
+
+**Regenerating keyword data:**
+```bash
+node scripts/import-digistore-keywords.js
+```
+Reads Excel files from `data/ppc-kws/` and outputs `keywords-combined.json`.
 
 ### Keyword Categories (10)
 - Affiliate/Network
