@@ -450,15 +450,53 @@ All accounts accessible via **single OAuth connection**:
 ```
 
 ### Google Ads API Integration
-- **Current Status:** 501 UNIMPLEMENTED error (see FOLLOWUP-NOTES.md)
 - OAuth flow works, tokens stored in Supabase
 - `callback.js` updated to recursively fetch MCC child accounts
-- Once fixed, dashboard will pull live metrics from all 9 accounts
+- Dashboard pulls live metrics from all 10 accounts
+
+### API Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/google-ads/omicron-data` | 30-day summary metrics for all accounts |
+| `/api/google-ads/omicron-monthly` | Monthly data with brand/non-brand breakdown |
+| `/api/google-ads/omicron-conversions` | Conversion action breakdown per account |
+
+### Brand vs Non-Brand Classification
+
+**Location:** `/api/google-ads/omicron-monthly.js`
+
+The API classifies campaigns as brand or non-brand based on campaign name patterns:
+
+```javascript
+// Non-brand patterns (checked FIRST - take priority)
+const NON_BRAND_PATTERNS = [
+    'non-brand', 'nonbrand', 'non brand',
+    'generic', 'competitor', 'discovery', 'dsa', 'prospecting'
+];
+
+// Brand patterns
+const BRAND_PATTERNS = [
+    'eweka', 'easynews', 'newshosting', 'usenetserver',
+    'tweaknews', 'pure usenet', 'sunny usenet',
+    'bestusenetreviews', 'bur', 'top10usenet', 'privado'
+];
+```
+
+**Important:** Campaigns with "Non-Brand" in the name are classified as non-brand even if they contain brand terms.
+
+### Dashboard Tabs (Linkable)
+
+Tabs support direct linking via URL hash:
+- `dashboard.html#overview` - Overview
+- `dashboard.html#review` - Review Sites
+- `dashboard.html#owned` - Owned Sites
+- `dashboard.html#conversions` - SKU / Brand
+- `dashboard.html#accounts` - Account Details
 
 ### Known Issues
-1. Google Ads API returns 501 error for all GAQL queries
-2. Need to verify OAuth consent screen is in Production mode
-3. May need to link Google Cloud project to Google Ads account
+1. Google Ads API 501 UNIMPLEMENTED may occur - see FOLLOWUP-NOTES.md
+2. If accounts show "Error", try reconnecting OAuth via Summary page
 
 ---
 
@@ -557,7 +595,14 @@ vercel alias <deployment-url> hyder.me
 
 ## Recent Changes Log
 
-### 2026-02-04
+### 2026-02-04 (Omicron Dashboard)
+- **Fixed BUR non-brand data** - Non-brand patterns now take priority over brand patterns
+- **Fixed Top10usenet display** - Account key now matches API response (`top10usenet` not `top10`)
+- **Added linkable tabs** - Dashboard tabs now support URL hash (e.g., `dashboard.html#accounts`)
+- Documented brand vs non-brand classification logic
+- Added API endpoint documentation to CLAUDE.md
+
+### 2026-02-04 (Digistore24 Keywords)
 - **Fixed brand/topic grouping** - Keywords containing brand names now only appear in brand groups, not topic groups
 - Expanded brand recognition to 28 brands (added CJ, Rakuten, PartnerStack, Shopify, Kajabi, etc.)
 - **Restored Google Keyword Planner data** - 26,116 keywords now have volume/CPC/competition data
