@@ -1252,13 +1252,14 @@
                     const googleHigh = kw.google?.high_top_of_page_bid || 0;
                     const googleLow = kw.google?.low_top_of_page_bid || 0;
                     const googleAvg = (googleHigh + googleLow) / 2;
+                    const swCpc = kw.cpc || 0; // SimilarWeb CPC
 
                     let activeCpc;
                     switch(cpcSource) {
-                        case 'google_high': activeCpc = googleHigh; break;
-                        case 'google_low': activeCpc = googleLow; break;
-                        case 'google_avg': activeCpc = googleAvg; break;
-                        default: activeCpc = kw.cpc || 0; // similarweb
+                        case 'google_high': activeCpc = googleHigh || swCpc; break; // Fall back to SW
+                        case 'google_low': activeCpc = googleLow || swCpc; break;
+                        case 'google_avg': activeCpc = googleAvg || swCpc; break; // Fall back to SW
+                        default: activeCpc = swCpc; // similarweb
                     }
 
                     // Recalculate metrics based on filtered brands and selected CPC
