@@ -226,6 +226,48 @@
 
         .brand-color { color: #ef4444; }
         .nonbrand-color { color: #3b82f6; }
+
+        .conv-account-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .conv-account-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .conv-account-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .conv-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .sku-colors {
+            --sku-1: #22c55e;
+            --sku-2: #16a34a;
+            --sku-3: #15803d;
+            --sku-4: #166534;
+            --sku-5: #14532d;
+            --sku-6: #86efac;
+            --sku-7: #4ade80;
+            --sku-8: #bbf7d0;
+        }
     </style>
 </head>
 <body>
@@ -279,6 +321,7 @@
             <button class="view-tab active" onclick="switchView('overview')">Overview</button>
             <button class="view-tab" onclick="switchView('review')">Review Sites</button>
             <button class="view-tab" onclick="switchView('owned')">Owned Sites</button>
+            <button class="view-tab" onclick="switchView('conversions')">SKU / Brand</button>
             <button class="view-tab" onclick="switchView('accounts')">Account Details</button>
         </div>
 
@@ -443,6 +486,88 @@
                     <div class="chart-container">
                         <canvas id="owned-cost-chart"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SKU / Brand Conversions Section -->
+        <div id="view-conversions" class="view-section">
+            <div class="group-header">
+                <div>
+                    <div class="group-title">Conversion Action Breakdown</div>
+                    <div class="group-subtitle">Review Sites show brand attribution, Owned Sites show SKU/product selection</div>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="refreshConversionData()">
+                        <span id="conv-refresh-icon">↻</span> Load Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Account selector for conversion details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title">Select Account</h2>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 16px;">
+                    <button class="conv-account-btn active" data-account="BUR" onclick="selectConversionAccount('BUR')">
+                        <span class="conv-dot" style="background: #3b82f6;"></span> BUR (Brand Conv.)
+                    </button>
+                    <button class="conv-account-btn" data-account="Top10usenet" onclick="selectConversionAccount('Top10usenet')">
+                        <span class="conv-dot" style="background: #ec4899;"></span> Top10 (Brand Conv.)
+                    </button>
+                    <button class="conv-account-btn" data-account="Eweka" onclick="selectConversionAccount('Eweka')">
+                        <span class="conv-dot" style="background: #22c55e;"></span> Eweka (SKUs)
+                    </button>
+                    <button class="conv-account-btn" data-account="Newshosting" onclick="selectConversionAccount('Newshosting')">
+                        <span class="conv-dot" style="background: #8b5cf6;"></span> Newshosting (SKUs)
+                    </button>
+                    <button class="conv-account-btn" data-account="Easynews" onclick="selectConversionAccount('Easynews')">
+                        <span class="conv-dot" style="background: #f59e0b;"></span> Easynews (SKUs)
+                    </button>
+                    <button class="conv-account-btn" data-account="UsenetServer" onclick="selectConversionAccount('UsenetServer')">
+                        <span class="conv-dot" style="background: #14b8a6;"></span> UsenetServer (SKUs)
+                    </button>
+                    <button class="conv-account-btn" data-account="Tweak" onclick="selectConversionAccount('Tweak')">
+                        <span class="conv-dot" style="background: #ef4444;"></span> Tweak (SKUs)
+                    </button>
+                    <button class="conv-account-btn" data-account="Privado" onclick="selectConversionAccount('Privado')">
+                        <span class="conv-dot" style="background: #10b981;"></span> Privado (SKUs)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conversion action chart -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title" id="conv-chart-title">BUR: Brand Conversions</h2>
+                </div>
+                <div id="conv-legend" class="legend-inline" style="flex-wrap: wrap; padding: 0 16px;">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="conv-breakdown-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Conversion totals table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Conversion Action Totals</h2>
+                </div>
+                <div class="table-container" style="border: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Conversion Action</th>
+                                <th style="text-align: right;">Conversions</th>
+                                <th style="text-align: right;">% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="conv-totals-table">
+                            <tr><td colspan="3" class="text-muted">Click "Load Data" to fetch conversion action data</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1047,7 +1172,205 @@
             URL.revokeObjectURL(url);
         }
 
+        // ========================================
+        // Conversion Action / SKU Breakdown Functions
+        // ========================================
+
+        let conversionData = null;
+        let selectedConvAccount = 'BUR';
+        let convBreakdownChart = null;
+
+        // Color palette for SKU/Brand breakdown (green shades like the PDF)
+        const skuColors = [
+            '#166534', // Dark green
+            '#15803d',
+            '#16a34a',
+            '#22c55e',
+            '#4ade80',
+            '#86efac',
+            '#bbf7d0',
+            '#dcfce7',
+            '#134e4a', // Teal variants for variety
+            '#0d9488',
+            '#14b8a6',
+            '#2dd4bf'
+        ];
+
+        // Brand colors for review sites (matching Omicron brands)
+        const brandConvColors = {
+            'Eweka': '#3b82f6',       // Blue (like PDF)
+            'Newshosting': '#ef4444', // Red
+            'Easynews': '#f59e0b',    // Amber/Yellow
+            'TweakNews': '#22c55e',   // Green
+            'Tweaknews': '#22c55e',
+            'UsenetServer': '#f97316' // Orange
+        };
+
+        async function refreshConversionData() {
+            const icon = document.getElementById('conv-refresh-icon');
+            icon.style.animation = 'spin 1s linear infinite';
+
+            const months = document.getElementById('months-selector').value;
+
+            try {
+                const response = await fetch(`/api/google-ads/omicron-conversions?months=${months}`);
+                conversionData = await response.json();
+
+                if (conversionData.errors && conversionData.errors.length > 0) {
+                    console.error('Conversion API errors:', conversionData.errors);
+                }
+
+                updateConversionView();
+            } catch (error) {
+                console.error('Failed to fetch conversion data:', error);
+            }
+
+            icon.style.animation = '';
+        }
+
+        function selectConversionAccount(accountName) {
+            selectedConvAccount = accountName;
+
+            // Update button states
+            document.querySelectorAll('.conv-account-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.account === accountName);
+            });
+
+            updateConversionView();
+        }
+
+        function updateConversionView() {
+            if (!conversionData || !conversionData.accounts) return;
+
+            const account = conversionData.accounts.find(a => a.name === selectedConvAccount);
+            if (!account || account.status !== 'success') {
+                document.getElementById('conv-chart-title').textContent = `${selectedConvAccount}: No Data Available`;
+                document.getElementById('conv-totals-table').innerHTML = '<tr><td colspan="3" class="text-muted">No conversion data found for this account</td></tr>';
+                return;
+            }
+
+            const isReviewSite = account.group === 'review';
+            const chartTitle = isReviewSite
+                ? `${account.name}: Brand Conversions`
+                : `${account.name}: SKU Selection`;
+
+            document.getElementById('conv-chart-title').textContent = chartTitle;
+
+            // Get conversion actions and monthly data
+            const actions = account.conversionActions || [];
+            const monthly = account.monthly || [];
+
+            // Update legend
+            updateConversionLegend(actions, isReviewSite);
+
+            // Update chart
+            updateConversionChart(actions, monthly, isReviewSite);
+
+            // Update totals table
+            updateConversionTotals(actions, account.totals);
+        }
+
+        function updateConversionLegend(actions, isReviewSite) {
+            const legendEl = document.getElementById('conv-legend');
+            legendEl.innerHTML = actions.slice(0, 10).map((action, i) => {
+                const color = getConversionColor(action.name, i, isReviewSite);
+                return `<div class="legend-item"><div class="legend-dot" style="background: ${color};"></div> ${action.name}</div>`;
+            }).join('');
+        }
+
+        function updateConversionChart(actions, monthly, isReviewSite) {
+            const canvas = document.getElementById('conv-breakdown-chart');
+            const ctx = canvas.getContext('2d');
+
+            // Destroy existing chart
+            if (convBreakdownChart) {
+                convBreakdownChart.destroy();
+            }
+
+            const labels = monthly.map(m => formatMonth(m.month));
+            const topActions = actions.slice(0, 10).map(a => a.name);
+
+            const datasets = topActions.map((actionName, i) => {
+                const color = getConversionColor(actionName, i, isReviewSite);
+                return {
+                    label: actionName,
+                    data: monthly.map(m => m.actions?.[actionName]?.conversions || 0),
+                    backgroundColor: color,
+                    borderRadius: 2
+                };
+            });
+
+            convBreakdownChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${formatNumber(ctx.raw)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateConversionTotals(actions, totals) {
+            const tableEl = document.getElementById('conv-totals-table');
+            const totalConv = totals?.conversions || actions.reduce((sum, a) => sum + a.conversions, 0);
+
+            tableEl.innerHTML = actions.map(action => {
+                const pct = totalConv > 0 ? ((action.conversions / totalConv) * 100).toFixed(1) : 0;
+                return `
+                    <tr>
+                        <td>${action.name}</td>
+                        <td style="text-align: right;">${formatNumber(action.conversions)}</td>
+                        <td style="text-align: right;">${pct}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Add total row
+            tableEl.innerHTML += `
+                <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+                    <td>Total</td>
+                    <td style="text-align: right;">${formatNumber(totalConv)}</td>
+                    <td style="text-align: right;">100%</td>
+                </tr>
+            `;
+        }
+
+        function getConversionColor(actionName, index, isReviewSite) {
+            if (isReviewSite) {
+                // For review sites, try to match brand colors
+                for (const [brand, color] of Object.entries(brandConvColors)) {
+                    if (actionName.toLowerCase().includes(brand.toLowerCase())) {
+                        return color;
+                    }
+                }
+            }
+            // Default to SKU color palette
+            return skuColors[index % skuColors.length];
+        }
+
+        // ========================================
         // Initialize
+        // ========================================
         initCharts();
         fetchApiData();
 
