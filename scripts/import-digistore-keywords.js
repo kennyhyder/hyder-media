@@ -57,23 +57,36 @@ const TOPIC_GROUPS = [
 ];
 
 // Brand-related keywords for brand groups
+// If a keyword contains ANY of these brands, it goes to brand group (not topic group)
 const BRAND_KEYWORDS = {
     'clickbank': /clickbank/i,
-    'impact': /impact\.com|impact\s+radius|partnerize/i,
-    'awin': /awin|shareasale/i,
+    'impact': /\bimpact\b/i,  // "impact" as standalone word
+    'awin': /\bawin\b|shareasale/i,
     'samcart': /samcart/i,
     'maxweb': /maxweb/i,
-    'realize': /realize/i,
+    'realize': /\brealize\b/i,
     'rakuten': /rakuten/i,
-    'cj': /commission\s*junction|cj\s+affiliate/i,
+    'cj': /commission\s*junction|\bcj\b/i,  // CJ as standalone or commission junction
     'partnerstack': /partnerstack/i,
     'refersion': /refersion/i,
     'tapfiliate': /tapfiliate/i,
-    'stripe': /stripe/i,
+    'stripe': /\bstripe\b/i,
     'paypal': /paypal/i,
     'shopify': /shopify/i,
     'woocommerce': /woocommerce/i,
     'clickfunnels': /clickfunnels/i,
+    'kajabi': /kajabi/i,
+    'teachable': /teachable/i,
+    'thinkific': /thinkific/i,
+    'gumroad': /gumroad/i,
+    'digistore': /digistore/i,
+    'jvzoo': /jvzoo/i,
+    'warriorplus': /warriorplus|warrior\s*plus/i,
+    'stan': /\bstan\s+store\b|\bstan\.store\b/i,
+    'kartra': /kartra/i,
+    'leadpages': /leadpages/i,
+    'unbounce': /unbounce/i,
+    'instapage': /instapage/i,
 };
 
 function categorizeKeyword(keyword) {
@@ -162,12 +175,16 @@ async function main() {
 
             // Get or create keyword entry
             if (!allKeywords.has(keyword)) {
+                // Check brand first - if it's a brand keyword, don't assign topic group
+                const brandGroup = getBrandGroup(keyword);
+                const topicGroup = brandGroup ? null : getShortTailGroup(keyword);
+
                 allKeywords.set(keyword, {
                     keyword,
                     category: categorizeKeyword(keyword),
                     intent: row['Intent'] || getIntent(keyword), // Use SimilarWeb intent if available
-                    short_tail_group: getShortTailGroup(keyword),
-                    brand_group: getBrandGroup(keyword),
+                    short_tail_group: topicGroup,  // Only set if NOT a brand keyword
+                    brand_group: brandGroup,
                     total_clicks: 0,
                     total_spend: 0,
                     volume: 0,
