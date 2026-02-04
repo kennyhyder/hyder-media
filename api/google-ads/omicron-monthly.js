@@ -43,7 +43,10 @@ const BRAND_PATTERNS = [
     'top10usenet',
     'top 10 usenet',
     'privado',
-    'privadovpn'
+    'privadovpn',
+    'ownedsites',   // Top10usenet brand campaigns
+    'owned sites',
+    'owned-sites'
 ];
 
 // Non-brand patterns to explicitly identify non-brand campaigns
