@@ -15,8 +15,8 @@ const path = require('path');
 
 // Configuration
 const API_URL = process.env.API_URL || 'https://hyder.me/api/google-ads/keywords';
-const BATCH_SIZE = 100;
-const DELAY_MS = 2000; // Delay between batches to avoid rate limits
+const BATCH_SIZE = 15; // Smaller batches work better with Google API
+const DELAY_MS = 1500; // Delay between batches to avoid rate limits
 const INPUT_FILE = path.join(__dirname, '../clients/digistore24/data/keywords-combined.json');
 const OUTPUT_FILE = INPUT_FILE; // Overwrite the same file
 
@@ -55,9 +55,14 @@ async function main() {
 
     console.log(`Found ${data.keywords.length} keywords`);
 
-    // Extract unique keyword strings
-    const allKeywords = [...new Set(data.keywords.map(kw => kw.keyword))];
-    console.log(`${allKeywords.length} unique keywords to fetch`);
+    // Count existing Google data
+    const withGoogle = data.keywords.filter(kw => kw.google).length;
+    console.log(`${withGoogle} already have Google data`);
+
+    // Extract keywords that DON'T have Google data yet
+    const keywordsNeedingGoogle = data.keywords.filter(kw => !kw.google).map(kw => kw.keyword);
+    const allKeywords = [...new Set(keywordsNeedingGoogle)];
+    console.log(`${allKeywords.length} unique keywords need Google data`);
 
     // Create a map for quick lookup
     const googleDataMap = new Map();
