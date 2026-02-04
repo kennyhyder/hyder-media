@@ -161,7 +161,8 @@ export default async function handler(req, res) {
                     account.mcc,
                     accessToken,
                     developerToken,
-                    dateRange
+                    dateRange,
+                    account.name
                 );
 
                 if (monthlyData.error) {
@@ -265,7 +266,7 @@ function aggregateMonthlyByGroup(accounts) {
 /**
  * Fetch monthly metrics for a single account with brand/non-brand breakdown
  */
-async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessToken, developerToken, dateRange) {
+async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessToken, developerToken, dateRange, accountName) {
     // Query campaigns with monthly segments
     const query = `
         SELECT
@@ -314,7 +315,7 @@ async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessTok
                 if (!month) continue;
 
                 // Determine if this is a brand campaign
-                const isBrand = isBrandCampaign(campaignName);
+                const isBrand = isBrandCampaign(campaignName, accountName);
 
                 if (!monthlyMap[month]) {
                     monthlyMap[month] = {
@@ -391,10 +392,23 @@ async function fetchAccountMonthlyMetrics(customerId, loginCustomerId, accessTok
 /**
  * Determine if a campaign is a brand campaign based on name patterns
  * Non-brand patterns take priority (e.g., "BUR - Non-Brand" is non-brand)
+ *
+ * Account-specific rules:
+ * - Top10usenet: Only 'ownedsites' campaigns are brand, everything else is non-brand
  */
-function isBrandCampaign(campaignName) {
+function isBrandCampaign(campaignName, accountName = '') {
     const nameLower = campaignName.toLowerCase();
+    const accountLower = accountName.toLowerCase();
 
+    // Special handling for Top10usenet:
+    // Only 'ownedsites' campaigns are brand, all others are non-brand
+    if (accountLower === 'top10usenet') {
+        return nameLower.includes('ownedsites') ||
+               nameLower.includes('owned sites') ||
+               nameLower.includes('owned-sites');
+    }
+
+    // For all other accounts, use standard logic:
     // First check if explicitly marked as non-brand
     if (NON_BRAND_PATTERNS.some(pattern => nameLower.includes(pattern.toLowerCase()))) {
         return false;
