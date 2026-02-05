@@ -104,7 +104,7 @@ export default async function handler(req, res) {
         try {
             console.log(`Fetching data for ${account.name} (${account.id})...`);
 
-            // Build the Google Ads API query for monthly spend
+            // Build the Google Ads API query for monthly spend (query campaigns, not customer)
             const query = `
                 SELECT
                     segments.month,
@@ -113,8 +113,9 @@ export default async function handler(req, res) {
                     metrics.impressions,
                     metrics.conversions,
                     metrics.conversions_value
-                FROM customer
+                FROM campaign
                 WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND campaign.status != 'REMOVED'
             `;
 
             const loginCustomerId = account.mcc || account.id;
@@ -142,35 +143,38 @@ export default async function handler(req, res) {
 
             const data = await response.json();
 
-            // Process the streaming response
+            // Check for API errors
+            if (data.error) {
+                console.error(`API error for ${account.name}:`, data.error);
+                errors.push({ account: account.name, error: data.error.message || JSON.stringify(data.error) });
+                continue;
+            }
+
+            // Process results (search endpoint returns { results: [...] })
             const monthlySpend = {};
 
-            if (data && Array.isArray(data)) {
-                for (const batch of data) {
-                    if (batch.results) {
-                        for (const row of batch.results) {
-                            const month = row.segments?.month;
-                            if (!month) continue;
+            if (data.results) {
+                for (const row of data.results) {
+                    const month = row.segments?.month;
+                    if (!month) continue;
 
-                            if (!monthlySpend[month]) {
-                                monthlySpend[month] = {
-                                    month,
-                                    spend: 0,
-                                    clicks: 0,
-                                    impressions: 0,
-                                    conversions: 0,
-                                    conversionValue: 0
-                                };
-                            }
-
-                            const m = monthlySpend[month];
-                            m.spend += (row.metrics?.costMicros || 0) / 1000000;
-                            m.clicks += row.metrics?.clicks || 0;
-                            m.impressions += row.metrics?.impressions || 0;
-                            m.conversions += row.metrics?.conversions || 0;
-                            m.conversionValue += row.metrics?.conversionsValue || 0;
-                        }
+                    if (!monthlySpend[month]) {
+                        monthlySpend[month] = {
+                            month,
+                            spend: 0,
+                            clicks: 0,
+                            impressions: 0,
+                            conversions: 0,
+                            conversionValue: 0
+                        };
                     }
+
+                    const m = monthlySpend[month];
+                    m.spend += (row.metrics?.costMicros || 0) / 1000000;
+                    m.clicks += row.metrics?.clicks || 0;
+                    m.impressions += row.metrics?.impressions || 0;
+                    m.conversions += row.metrics?.conversions || 0;
+                    m.conversionValue += row.metrics?.conversionsValue || 0;
                 }
             }
 
