@@ -14,3 +14,6 @@ postcss.config.js
 tsconfig.json
 next-env.d.ts
 public/
+
+# Keep data files tracked (safe from iCloud eviction)
+!data/
