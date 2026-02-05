@@ -8,7 +8,7 @@
     (function() {
         var AUTH_KEY = 'ag2020_dashboard_auth';
         if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
-            window.location.href = 'password.html';
+            window.location.href = 'password.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
         }
     })();
     </script>
