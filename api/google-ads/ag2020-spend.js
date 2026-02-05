@@ -170,11 +170,11 @@ export default async function handler(req, res) {
                     }
 
                     const m = monthlySpend[month];
-                    m.spend += (row.metrics?.costMicros || 0) / 1000000;
-                    m.clicks += row.metrics?.clicks || 0;
-                    m.impressions += row.metrics?.impressions || 0;
-                    m.conversions += row.metrics?.conversions || 0;
-                    m.conversionValue += row.metrics?.conversionsValue || 0;
+                    m.spend += parseInt(row.metrics?.costMicros || 0) / 1000000;
+                    m.clicks += parseInt(row.metrics?.clicks || 0);
+                    m.impressions += parseInt(row.metrics?.impressions || 0);
+                    m.conversions += parseFloat(row.metrics?.conversions || 0);
+                    m.conversionValue += parseFloat(row.metrics?.conversionsValue || 0);
                 }
             }
 
