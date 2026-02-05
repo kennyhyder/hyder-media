@@ -62,6 +62,12 @@ Authenticated dashboards for individual clients.
 - Powered by Google Ads API (live data when connected)
 - See detailed breakdown below
 
+**Auto Glass 2020 Financial Dashboard:** `/clients/ag2020/`
+- Password-protected financial dashboard (password: AG2020FLOW)
+- Cash flow analysis, payroll, debt tracking, forecasting
+- Built with Next.js static export
+- See detailed breakdown below
+
 ### `/assets` - Static Assets
 - CSS: Bootstrap, custom styles, responsive rules
 - JS: Bootstrap bundle, site scripts, calculator logic
@@ -500,6 +506,109 @@ Tabs support direct linking via URL hash:
 
 ---
 
+## Auto Glass 2020 Financial Dashboard
+
+**Location:** `/clients/ag2020/`
+**URL:** https://hyder.me/clients/ag2020
+**Status:** Active
+
+### Authentication Flow
+1. User visits `/clients/ag2020/` → redirects to `password.html`
+2. User enters password "AG2020FLOW"
+3. sessionStorage stores `ag2020_dashboard_auth = 'authenticated'`
+4. Redirects to `index.html` (main dashboard)
+
+**Auth implementation:**
+```javascript
+// Injected into index.html <head> during build:
+<script>
+(function() {
+    const AUTH_KEY = 'ag2020_dashboard_auth';
+    if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+        window.location.href = 'password.html';
+    }
+})();
+</script>
+```
+
+### Technology Stack
+- **Framework:** Next.js 14.1.0 with static export
+- **UI:** React 18, Tailwind CSS
+- **Language:** TypeScript
+- **Data:** All data embedded in TypeScript files (no API)
+
+### Tab Navigation (7 tabs)
+All tabs use hash-based routing:
+
+| Tab | Hash | Purpose |
+|-----|------|---------|
+| Dashboard | `#dashboard` | Overview metrics, revenue, gross margin |
+| Overhead | `#overhead` | Fixed and variable expenses |
+| Payroll | `#payroll` | Employee wages and costs |
+| Debt | `#debt` | Outstanding debts and payments |
+| Forecast | `#forecast` | Revenue and expense projections |
+| 2025 Performance | `#2025-performance` | Year-to-date performance metrics |
+| Bank Statements | `#bank-statements` | Transaction history and categorization |
+
+### Build Process
+The dashboard is built as a Next.js static export:
+
+```bash
+cd /Users/kennyhyder/Desktop/hyder-media/clients/ag2020
+npm install
+npm run build  # Runs next build && post-build script
+```
+
+**Build output:** Files are placed directly in `clients/ag2020/`:
+- `index.html` - Main dashboard (auth check injected)
+- `password.html` - Password entry page
+- `_next/` - Static assets (JS, CSS chunks)
+- `logo.webp` - Auto Glass 2020 logo
+
+### File Structure
+```
+/clients/ag2020/
+├── index.html              # Built dashboard (auth-protected)
+├── password.html           # Password protection gate
+├── logo.webp               # Company logo
+├── _next/                  # Next.js static assets
+│   └── static/
+│       ├── css/            # Compiled Tailwind CSS
+│       └── chunks/         # JavaScript bundles
+├── 404.html                # 404 page (auth-protected)
+├── .gitignore              # Excludes source files
+│
+│ # Source files (gitignored, kept for rebuilds):
+├── src/                    # React components and data
+│   ├── app/page.tsx        # Main dashboard component
+│   └── lib/                # Data files (data.ts, bankTransactions.ts)
+├── scripts/post-build.js   # Auth injection script
+├── package.json            # Dependencies and build scripts
+├── next.config.js          # Static export config (basePath, assetPrefix)
+├── tailwind.config.js      # Tailwind configuration
+└── tsconfig.json           # TypeScript configuration
+```
+
+### Rebuilding
+To rebuild after source changes:
+
+```bash
+cd /Users/kennyhyder/Desktop/hyder-media/clients/ag2020
+npm run build
+```
+
+The build process:
+1. Runs `next build` to generate static files in `out/`
+2. Runs `scripts/post-build.js` to inject auth check into HTML files
+3. Output files are copied to `ag2020/` root (replaces previous build)
+
+**Note:** Source files are gitignored. Only the built output is deployed.
+
+### Original Deployment
+The original `auto-glass-cash-flow` deployment remains active at its Vercel URL as a backup. This migration does not modify that repository.
+
+---
+
 ## Configuration Files
 
 ### Environment Variables
@@ -590,10 +699,19 @@ vercel alias <deployment-url> hyder.me
 4. **Developer Token:** Basic Access approved
 5. **Digistore24 password:** TR8FFIC (sessionStorage-based auth)
 6. **Omicron password:** LIEHAO (sessionStorage-based auth)
+7. **AG2020 password:** AG2020FLOW (sessionStorage-based auth)
 
 ---
 
 ## Recent Changes Log
+
+### 2026-02-04 (Auto Glass 2020 Dashboard)
+- **Migrated from standalone deployment** - Moved from `auto-glass-cash-flow` repo to `hyder-media/clients/ag2020`
+- Created password-protected financial dashboard with sessionStorage auth
+- Configured Next.js static export with `basePath: '/clients/ag2020'`
+- Created post-build script to inject auth check into generated HTML
+- Source files gitignored; only built output deployed
+- Original deployment at `auto-glass-cash-flow` repo remains as backup
 
 ### 2026-02-04 (Omicron Dashboard)
 - **Fixed BUR non-brand data** - Non-brand patterns now take priority over brand patterns

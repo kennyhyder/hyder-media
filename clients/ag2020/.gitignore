@@ -1,0 +1,16 @@
+# Build artifacts
+node_modules/
+.next/
+.DS_Store
+
+# Source files (keep only built output)
+src/
+scripts/
+package.json
+package-lock.json
+next.config.js
+tailwind.config.js
+postcss.config.js
+tsconfig.json
+next-env.d.ts
+public/
