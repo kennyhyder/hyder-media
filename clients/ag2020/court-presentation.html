@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Glass 2020 LLC - Bankruptcy Court Presentation</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+            background: #fff;
+            padding: 0.5in;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                padding: 0;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .no-break {
+                page-break-inside: avoid;
+            }
+            @page {
+                margin: 0.75in;
+                size: letter;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.25in;
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.1in;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 0.25in;
+            margin-bottom: 0.15in;
+            border-bottom: 1px solid #666;
+            padding-bottom: 0.05in;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 0.15in;
+            margin-bottom: 0.1in;
+        }
+
+        p {
+            margin-bottom: 0.1in;
+            text-align: justify;
+        }
+
+        /* Case header */
+        .case-header {
+            text-align: center;
+            margin-bottom: 0.3in;
+        }
+
+        .case-header .court {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .case-header .case-info {
+            font-size: 11pt;
+            margin-top: 0.1in;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.15in 0;
+            font-size: 10pt;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        .highlight-red {
+            color: #c00;
+            font-weight: bold;
+        }
+
+        .highlight-green {
+            color: #060;
+            font-weight: bold;
+        }
+
+        /* Boxes and callouts */
+        .callout-box {
+            border: 2px solid #000;
+            padding: 0.15in;
+            margin: 0.15in 0;
+            background-color: #f9f9f9;
+        }
+
+        .callout-box.critical {
+            border-color: #c00;
+            background-color: #fff0f0;
+        }
+
+        .callout-box.success {
+            border-color: #060;
+            background-color: #f0fff0;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 0.3in;
+            margin-bottom: 0.1in;
+        }
+
+        li {
+            margin-bottom: 0.05in;
+        }
+
+        /* Columns */
+        .two-column {
+            display: flex;
+            gap: 0.25in;
+        }
+
+        .two-column > div {
+            flex: 1;
+        }
+
+        /* Scenario cards */
+        .scenario {
+            border: 1px solid #000;
+            padding: 0.15in;
+            margin-bottom: 0.15in;
+        }
+
+        .scenario.best {
+            border-color: #060;
+        }
+
+        .scenario.medium {
+            border-color: #960;
+        }
+
+        .scenario.worst {
+            border-color: #c00;
+        }
+
+        .scenario h4 {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 0.1in;
+        }
+
+        /* Footer */
+        .document-footer {
+            margin-top: 0.3in;
+            padding-top: 0.1in;
+            border-top: 1px solid #000;
+            font-size: 9pt;
+            text-align: center;
+        }
+
+        /* Summary metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.1in;
+            margin: 0.15in 0;
+        }
+
+        .metric {
+            border: 1px solid #ccc;
+            padding: 0.1in;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .metric-value {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="case-header">
+    <div class="court">UNITED STATES BANKRUPTCY COURT<br>DISTRICT OF ARIZONA</div>
+    <div class="case-info">
+        <strong>In re:</strong> AUTO GLASS 2020 LLC<br>
+        <strong>Case No:</strong> 2:25-bk-00374-MCW<br>
+        <strong>Chapter:</strong> 11 Subchapter V
+    </div>
+</div>
+
+<h1>COMPREHENSIVE BUSINESS ANALYSIS<br>AND PLAN FEASIBILITY ASSESSMENT</h1>
+
+<div style="text-align: center; margin: 0.3in 0;">
+    <p><strong>Filing Date:</strong> January 16, 2025</p>
+    <p><strong>Debtor:</strong> Auto Glass 2020 LLC</p>
+    <p><strong>Principal:</strong> William "Cash" LeSueur (sole member)</p>
+    <p><strong>Subchapter V Trustee:</strong> Dawn M. Maguire</p>
+    <p><strong>Debtor's Counsel:</strong> Alan A. Meda, Burch &amp; Cracchiolo, P.A.</p>
+</div>
+
+<div class="callout-box">
+    <h3>Document Purpose</h3>
+    <p>This document presents a comprehensive analysis of Auto Glass 2020 LLC's historical performance, current financial condition, and projected feasibility under the proposed Chapter 11 Subchapter V reorganization plan. Data is sourced from the company's actual financial records (2020-2026), the January 2026 Updated Court Plan, and bankruptcy court filings.</p>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="page-break"></div>
+<h2>I. EXECUTIVE SUMMARY</h2>
+
+<div class="callout-box critical no-break">
+    <h3>Critical Findings</h3>
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Concern</th>
+        </tr>
+        <tr>
+            <td>Feasibility</td>
+            <td class="highlight-red">CRITICAL</td>
+            <td>Revenue 27% below original projections; January 2026 plan revised down 24%</td>
+        </tr>
+        <tr>
+            <td>Tax Debt</td>
+            <td class="highlight-red">CRITICAL</td>
+            <td>~$2.2M owed to ADOR (priority claim)</td>
+        </tr>
+        <tr>
+            <td>Administrative Claims</td>
+            <td class="highlight-red">HIGH</td>
+            <td>$182K+ pending, only $5K set aside</td>
+        </tr>
+        <tr>
+            <td>Management</td>
+            <td class="highlight-red">HIGH</td>
+            <td>Both proposed managers (Kristy LeSueur, Griffen Granberg) have departed</td>
+        </tr>
+        <tr>
+            <td>Cash Position</td>
+            <td class="highlight-red">HIGH</td>
+            <td>Cannot meet Effective Date obligations without cash infusion</td>
+        </tr>
+    </table>
+</div>
+
+<div class="metrics-grid no-break">
+    <div class="metric">
+        <div class="metric-label">Total Priority Tax</div>
+        <div class="metric-value highlight-red">$2.2M</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Administrative Claims</div>
+        <div class="metric-value">$182K</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Unsecured Claims</div>
+        <div class="metric-value">~$1.9M</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Monthly Secured Payments</div>
+        <div class="metric-value">$12,077</div>
+    </div>
+</div>
+
+<h3>Trustee Position (November 3, 2025)</h3>
+<div class="callout-box critical">
+    <p><em>"The Trustee cannot support Confirmation of the Amended Plan."</em></p>
+    <p style="margin-top: 0.1in;"><strong>Key concerns:</strong> Revenue projections "inaccurate" and "not attainable," will default before first payment, management departed, staff insufficient to produce necessary revenue.</p>
+</div>
+
+<!-- HISTORICAL PERFORMANCE -->
+<div class="page-break"></div>
+<h2>II. HISTORICAL PERFORMANCE ANALYSIS (2020-2026)</h2>
+
+<p>The following data represents the complete financial history of Auto Glass 2020 LLC from inception through January 2026, demonstrating both the company's proven capability and its recent decline.</p>
+
+<table class="no-break">
+    <tr>
+        <th>Year</th>
+        <th class="text-right">Jobs</th>
+        <th class="text-right">Revenue</th>
+        <th class="text-right">Gross Margin</th>
+        <th class="text-right">Margin %</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>2020</td>
+        <td class="text-right">4,837</td>
+        <td class="text-right">$3,502,625</td>
+        <td class="text-right">$1,730,450</td>
+        <td class="text-right">49.4%</td>
+        <td>Startup year</td>
+    </tr>
+    <tr>
+        <td>2021</td>
+        <td class="text-right">7,512</td>
+        <td class="text-right">$4,624,566</td>
+        <td class="text-right">$2,188,407</td>
+        <td class="text-right">47.3%</td>
+        <td>Growth phase (+32% YoY)</td>
+    </tr>
+    <tr>
+        <td>2022</td>
+        <td class="text-right">8,958</td>
+        <td class="text-right">$6,217,618</td>
+        <td class="text-right">$3,319,086</td>
+        <td class="text-right">53.4%</td>
+        <td>Continued growth (+34% YoY)</td>
+    </tr>
+    <tr style="background-color: #e6ffe6;">
+        <td><strong>2023</strong></td>
+        <td class="text-right"><strong>17,811</strong></td>
+        <td class="text-right"><strong>$13,659,307</strong></td>
+        <td class="text-right"><strong>$6,747,365</strong></td>
+        <td class="text-right"><strong>49.4%</strong></td>
+        <td><strong>PEAK - 2nd largest in AZ (+120% YoY)</strong></td>
+    </tr>
+    <tr>
+        <td>2024</td>
+        <td class="text-right">10,590</td>
+        <td class="text-right">$7,741,664</td>
+        <td class="text-right">$4,144,956</td>
+        <td class="text-right">53.5%</td>
+        <td>Decline begins (-43% YoY)</td>
+    </tr>
+    <tr style="background-color: #ffe6e6;">
+        <td>2025</td>
+        <td class="text-right">4,709</td>
+        <td class="text-right">$3,165,957</td>
+        <td class="text-right">$1,767,157</td>
+        <td class="text-right">55.8%</td>
+        <td>Bankruptcy year (-59% YoY)</td>
+    </tr>
+    <tr>
+        <td>2026 (Jan)</td>
+        <td class="text-right">335</td>
+        <td class="text-right">$217,770</td>
+        <td class="text-right">$132,168</td>
+        <td class="text-right">60.7%</td>
+        <td>Partial month</td>
+    </tr>
+    <tr class="total-row">
+        <td><strong>TOTAL</strong></td>
+        <td class="text-right"><strong>54,752</strong></td>
+        <td class="text-right"><strong>$39,129,507</strong></td>
+        <td class="text-right"><strong>$20,029,589</strong></td>
+        <td class="text-right"><strong>51.2%</strong></td>
+        <td><strong>73 months of operations</strong></td>
+    </tr>
+</table>
+
+<div class="callout-box success no-break">
+    <h3>Key Historical Insights</h3>
+    <ul>
+        <li><strong>Proven Growth:</strong> Company grew from $3.5M (2020) to $13.7M (2023) - 291% growth in 3 years</li>
+        <li><strong>Consistent Margins:</strong> Gross margin remained stable at 49-56% throughout all periods</li>
+        <li><strong>Market Position:</strong> Achieved 2nd largest auto glass company in Arizona by 2023</li>
+        <li><strong>Peak Performance:</strong> March 2023 - 2,201 jobs, $1.53M revenue in single month</li>
+        <li><strong>Cause of Decline:</strong> Owner's personal struggles (relapse, divorce), not market conditions</li>
+        <li><strong>Business Model:</strong> Fundamentally sound - decline is operational, not structural</li>
+    </ul>
+</div>
+
+<!-- ACTUAL VS PROJECTED PERFORMANCE -->
+<div class="page-break"></div>
+<h2>III. ACTUAL VS. PROJECTED PERFORMANCE</h2>
+
+<h3>A. June-October 2025: Original Plan vs. Actual</h3>
+<p>This comparison shows actual revenue performance against the original June 2025 plan projections, which formed the basis for the Trustee's feasibility concerns.</p>
+
+<table class="no-break">
+    <tr>
+        <th>Month</th>
+        <th class="text-right">Projected</th>
+        <th class="text-right">Actual</th>
+        <th class="text-right">Shortfall</th>
+        <th class="text-right">% of Target</th>
+    </tr>
+    <tr>
+        <td>June 2025</td>
+        <td class="text-right">$364,500</td>
+        <td class="text-right">$299,534</td>
+        <td class="text-right highlight-red">-$64,966</td>
+        <td class="text-right">82%</td>
+    </tr>
+    <tr>
+        <td>July 2025</td>
+        <td class="text-right">$364,500</td>
+        <td class="text-right">$285,988</td>
+        <td class="text-right highlight-red">-$78,512</td>
+        <td class="text-right">78%</td>
+    </tr>
+    <tr>
+        <td>August 2025</td>
+        <td class="text-right">$405,000</td>
+        <td class="text-right">$298,936</td>
+        <td class="text-right highlight-red">-$106,064</td>
+        <td class="text-right">74%</td>
+    </tr>
+    <tr>
+        <td>September 2025</td>
+        <td class="text-right">$364,500</td>
+        <td class="text-right">$233,462</td>
+        <td class="text-right highlight-red">-$131,038</td>
+        <td class="text-right">64%</td>
+    </tr>
+    <tr>
+        <td>October 2025</td>
+        <td class="text-right">$344,250</td>
+        <td class="text-right">$222,761</td>
+        <td class="text-right highlight-red">-$121,489</td>
+        <td class="text-right">65%</td>
+    </tr>
+    <tr class="total-row">
+        <td><strong>TOTAL</strong></td>
+        <td class="text-right"><strong>$1,842,750</strong></td>
+        <td class="text-right"><strong>$1,340,681</strong></td>
+        <td class="text-right highlight-red"><strong>-$502,069</strong></td>
+        <td class="text-right"><strong>73%</strong></td>
+    </tr>
+</table>
+
+<h3>B. September-November 2025: Actual Performance (January 2026 Court Plan)</h3>
+<p>The January 2026 Updated Court Plan incorporates actual performance data:</p>
+
+<table class="no-break">
+    <tr>
+        <th>Month</th>
+        <th class="text-right">Installs</th>
+        <th class="text-right">Income</th>
+        <th class="text-right">Expenses</th>
+        <th class="text-right">Net Operating</th>
+    </tr>
+    <tr>
+        <td>September 2025</td>
+        <td class="text-right">320</td>
+        <td class="text-right">$233,743</td>
+        <td class="text-right">$180,981</td>
+        <td class="text-right">$9,279</td>
+    </tr>
+    <tr>
+        <td>October 2025</td>
+        <td class="text-right">380</td>
+        <td class="text-right">$285,727</td>
+        <td class="text-right">$212,702</td>
+        <td class="text-right">$15,610</td>
+    </tr>
+    <tr>
+        <td>November 2025</td>
+        <td class="text-right">302</td>
+        <td class="text-right">$214,226</td>
+        <td class="text-right">$172,118</td>
+        <td class="text-right">$7,270</td>
+    </tr>
+    <tr class="total-row">
+        <td><strong>TOTAL</strong></td>
+        <td class="text-right"><strong>1,002</strong></td>
+        <td class="text-right"><strong>$733,696</strong></td>
+        <td class="text-right"><strong>$565,801</strong></td>
+        <td class="text-right"><strong>$32,159</strong></td>
+    </tr>
+</table>
+
+<p><strong>Average Revenue per Install:</strong> $732.23 | <strong>Average Monthly Installs:</strong> 334 | <strong>Average Monthly Income:</strong> $244,565</p>
+
+<!-- REVISED PROJECTIONS -->
+<div class="page-break"></div>
+<h2>IV. REVISED PLAN PROJECTIONS (January 2026 Court Plan)</h2>
+
+<h3>A. Comparison: Original vs. Revised Projections</h3>
+<p>Based on actual performance, the January 2026 Updated Court Plan reduced revenue projections by approximately 24%:</p>
+
+<table class="no-break">
+    <tr>
+        <th>Year</th>
+        <th class="text-right">Original (June 2025)</th>
+        <th class="text-right">Revised (Jan 2026)</th>
+        <th class="text-right">Reduction</th>
+        <th class="text-right">% Change</th>
+    </tr>
+    <tr>
+        <td>2026</td>
+        <td class="text-right">$4,563,155</td>
+        <td class="text-right">$3,476,775</td>
+        <td class="text-right highlight-red">-$1,086,380</td>
+        <td class="text-right">-23.8%</td>
+    </tr>
+    <tr>
+        <td>2027</td>
+        <td class="text-right">$5,161,654</td>
+        <td class="text-right">$3,939,000</td>
+        <td class="text-right highlight-red">-$1,222,654</td>
+        <td class="text-right">-23.7%</td>
+    </tr>
+    <tr>
+        <td>2028</td>
+        <td class="text-right">$5,427,855</td>
+        <td class="text-right">$4,163,300</td>
+        <td class="text-right highlight-red">-$1,264,555</td>
+        <td class="text-right">-23.3%</td>
+    </tr>
+    <tr>
+        <td>2029</td>
+        <td class="text-right">$5,900,000</td>
+        <td class="text-right">$4,317,300</td>
+        <td class="text-right highlight-red">-$1,582,700</td>
+        <td class="text-right">-26.8%</td>
+    </tr>
+</table>
+
+<h3>B. Revised 5.5-Year Plan Projections</h3>
+
+<table class="no-break">
+    <tr>
+        <th>Year</th>
+        <th>Period</th>
+        <th class="text-right">Jobs</th>
+        <th class="text-right">Revenue</th>
+        <th class="text-right">Net Cash Flow</th>
+        <th class="text-right">AZ Tax Payment</th>
+        <th class="text-right">Admin Payment</th>
+    </tr>
+    <tr>
+        <td>2026</td>
+        <td>Full Year</td>
+        <td class="text-right">4,605</td>
+        <td class="text-right">$3,476,775</td>
+        <td class="text-right">$8,178</td>
+        <td class="text-right">$30,000</td>
+        <td class="text-right">$18,000</td>
+    </tr>
+    <tr>
+        <td>2027</td>
+        <td>Full Year</td>
+        <td class="text-right">5,050</td>
+        <td class="text-right">$3,939,000</td>
+        <td class="text-right">$6,584</td>
+        <td class="text-right">$60,000</td>
+        <td class="text-right">$24,000</td>
+    </tr>
+    <tr>
+        <td>2028</td>
+        <td>Full Year</td>
+        <td class="text-right">5,270</td>
+        <td class="text-right">$4,163,300</td>
+        <td class="text-right">$5,490</td>
+        <td class="text-right">$100,000</td>
+        <td class="text-right">$28,000</td>
+    </tr>
+    <tr>
+        <td>2029</td>
+        <td>Full Year</td>
+        <td class="text-right">5,535</td>
+        <td class="text-right">$4,317,300</td>
+        <td class="text-right">$8,672</td>
+        <td class="text-right">$90,000</td>
+        <td class="text-right">$24,000</td>
+    </tr>
+    <tr>
+        <td>2030</td>
+        <td>Full Year</td>
+        <td class="text-right">5,860</td>
+        <td class="text-right">$4,629,400</td>
+        <td class="text-right">$19,647</td>
+        <td class="text-right">$155,000</td>
+        <td class="text-right">$24,000</td>
+    </tr>
+    <tr>
+        <td>2031</td>
+        <td>Jan-Jun</td>
+        <td class="text-right">2,975</td>
+        <td class="text-right">$2,380,000</td>
+        <td class="text-right">$12,540</td>
+        <td class="text-right">$100,000</td>
+        <td class="text-right">$12,000</td>
+    </tr>
+    <tr class="total-row">
+        <td colspan="2"><strong>TOTAL</strong></td>
+        <td class="text-right"><strong>29,295</strong></td>
+        <td class="text-right"><strong>$22,905,775</strong></td>
+        <td class="text-right"><strong>$61,111</strong></td>
+        <td class="text-right"><strong>$535,000</strong></td>
+        <td class="text-right"><strong>$130,000</strong></td>
+    </tr>
+</table>
+
+<div class="callout-box critical no-break">
+    <h3>Feasibility Warning</h3>
+    <p>The revised plan shows total net cash flow of only <strong>$61,111 over 5.5 years</strong> - an average of <strong>$11,111 per year</strong> or <strong>$926 per month</strong>. This provides virtually no margin for error. Any unexpected expense, revenue shortfall, or economic downturn would immediately threaten the plan's viability.</p>
+</div>
+
+<!-- FORECAST SCENARIOS -->
+<div class="page-break"></div>
+<h2>V. FORECAST SCENARIOS</h2>
+
+<p>Based on historical performance data, three scenarios are presented to assess plan feasibility:</p>
+
+<div class="scenario best no-break">
+    <h4>SCENARIO A: BEST CASE - Return to Growth</h4>
+    <p><strong>Basis:</strong> Partial return to 2023 peak performance levels (1,000 jobs/month, ~$750K/month)</p>
+    <table>
+        <tr><td>Monthly Jobs</td><td class="text-right">1,000</td><td>Monthly Revenue</td><td class="text-right">$750,000</td></tr>
+        <tr><td>Annual Revenue</td><td class="text-right">$9,000,000</td><td>Annual Margin (49.4%)</td><td class="text-right">$4,446,000</td></tr>
+        <tr><td>Monthly Net After Debt</td><td class="text-right highlight-green">$180,000</td><td>Can Meet Obligations</td><td class="text-right highlight-green">YES</td></tr>
+    </table>
+    <p><strong>Assessment:</strong> Would comfortably meet all bankruptcy obligations. REQUIRES significant staffing increase, marketing investment, operational excellence, and new management.</p>
+</div>
+
+<div class="scenario medium no-break">
+    <h4>SCENARIO B: MEDIUM CASE - Current Plan Projections</h4>
+    <p><strong>Basis:</strong> January 2026 revised court plan (384 jobs/month, ~$290K/month)</p>
+    <table>
+        <tr><td>Monthly Jobs</td><td class="text-right">384</td><td>Monthly Revenue</td><td class="text-right">$289,731</td></tr>
+        <tr><td>Annual Revenue</td><td class="text-right">$3,476,775</td><td>Annual Margin (55.8%)</td><td class="text-right">$1,939,999</td></tr>
+        <tr><td>Monthly Net After Debt</td><td class="text-right">$681</td><td>Can Meet Obligations</td><td class="text-right highlight-red">BARELY</td></tr>
+    </table>
+    <p><strong>Assessment:</strong> BARELY FEASIBLE. Net cash flow of only $8,178/year leaves virtually no margin for error. Any unexpected expense or revenue shortfall causes immediate default.</p>
+</div>
+
+<div class="scenario worst no-break">
+    <h4>SCENARIO C: WORST CASE - Continued Decline</h4>
+    <p><strong>Basis:</strong> Continuation of 2025 decline trend (280 jobs/month, ~$200K/month)</p>
+    <table>
+        <tr><td>Monthly Jobs</td><td class="text-right">280</td><td>Monthly Revenue</td><td class="text-right">$200,000</td></tr>
+        <tr><td>Annual Revenue</td><td class="text-right">$2,400,000</td><td>Annual Margin (55.8%)</td><td class="text-right">$1,339,200</td></tr>
+        <tr><td>Monthly Net After Debt</td><td class="text-right highlight-red">-$15,000</td><td>Can Meet Obligations</td><td class="text-right highlight-red">NO</td></tr>
+    </table>
+    <p><strong>Assessment:</strong> NOT FEASIBLE. Would require immediate conversion to Chapter 7 liquidation. Cannot meet any bankruptcy payment obligations.</p>
+</div>
+
+<!-- DEBT STRUCTURE -->
+<div class="page-break"></div>
+<h2>VI. DEBT STRUCTURE SUMMARY</h2>
+
+<h3>A. Priority Tax Claims (ADOR)</h3>
+<table class="no-break">
+    <tr>
+        <th>Creditor</th>
+        <th class="text-right">Amount</th>
+        <th>Type</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>ADOR - Pre-petition TPT</td>
+        <td class="text-right">$1,889,140.75</td>
+        <td>Pre-petition</td>
+        <td>Per Claims Register 6-3</td>
+    </tr>
+    <tr>
+        <td>ADOR - Post-petition TPT</td>
+        <td class="text-right">$45,539.78</td>
+        <td>Post-petition</td>
+        <td>As of 9/11/25</td>
+    </tr>
+    <tr>
+        <td>ADOR - Assessment</td>
+        <td class="text-right">$259,318.21</td>
+        <td>Assessment</td>
+        <td>Per Exhibit C-2 (8/2022-12/2024)</td>
+    </tr>
+    <tr>
+        <td>AZ Dept of Economic Security</td>
+        <td class="text-right">$25,117.95</td>
+        <td>Pre-petition</td>
+        <td>Per Claims Register #3</td>
+    </tr>
+    <tr class="total-row">
+        <td><strong>TOTAL PRIORITY TAX</strong></td>
+        <td class="text-right highlight-red"><strong>$2,219,116.69</strong></td>
+        <td colspan="2"><strong>Plan pays $535,000 over 5.5 years</strong></td>
+    </tr>
+</table>
+
+<h3>B. Administrative Claims (Post-Petition)</h3>
+<table class="no-break">
+    <tr>
+        <th>Creditor</th>
+        <th class="text-right">Amount</th>
+        <th>Status</th>
+    </tr>
+    <tr>
+        <td>Burch &amp; Cracchiolo (attorneys)</td>
+        <td class="text-right">$42,563.91</td>
+        <td>Approved</td>
+    </tr>
+    <tr>
+        <td>Richard L. Joliet CPA</td>
+        <td class="text-right">$26,928.00</td>
+        <td>Approved/Pending</td>
+    </tr>
+    <tr>
+        <td>Subchapter V Trustee (Dawn)</td>
+        <td class="text-right">$31,354.18</td>
+        <td>Pending</td>
+    </tr>
+    <tr>
+        <td>Post-petition TPT (Jan-Jul 2025)</td>
+        <td class="text-right">$52,890.59</td>
+        <td>Unpaid</td>
+    </tr>
+    <tr>
+        <td>Back Payroll</td>
+        <td class="text-right">$28,739.76</td>
+        <td>Unpaid</td>
+    </tr>
+    <tr class="total-row">
+        <td><strong>TOTAL ADMINISTRATIVE</strong></td>
+        <td class="text-right highlight-red"><strong>$182,476.44</strong></td>
+        <td><strong>Only $5,000 set aside</strong></td>
+    </tr>
+</table>
+
+<h3>C. Monthly Fixed Debt Service</h3>
+<table class="no-break">
+    <tr><td>Truck Loan Payments</td><td class="text-right">$5,461/month</td><td class="text-right">$65,532/year</td></tr>
+    <tr><td>SBA/EIDL Payments</td><td class="text-right">$2,268/month</td><td class="text-right">$27,216/year</td></tr>
+    <tr class="total-row"><td><strong>TOTAL</strong></td><td class="text-right"><strong>$7,729/month</strong></td><td class="text-right"><strong>$92,748/year</strong></td></tr>
+</table>
+
+<!-- LIQUIDATION ANALYSIS -->
+<div class="page-break"></div>
+<h2>VII. LIQUIDATION ANALYSIS (Chapter 7 vs. Chapter 11)</h2>
+
+<div class="two-column">
+    <div>
+        <h3>Chapter 7 Liquidation</h3>
+        <table>
+            <tr><th>Asset</th><th class="text-right">Value</th><th class="text-right">Net</th></tr>
+            <tr><td>Cash</td><td class="text-right">$1,669</td><td class="text-right">$0</td></tr>
+            <tr><td>Accounts Receivable</td><td class="text-right">$15,000</td><td class="text-right">$0</td></tr>
+            <tr><td>Office Furniture</td><td class="text-right">$5,000</td><td class="text-right">$0</td></tr>
+            <tr><td>Tools/Racking</td><td class="text-right">$6,000</td><td class="text-right">$0</td></tr>
+            <tr><td>Recalibration Equip.</td><td class="text-right">$18,205</td><td class="text-right">$0</td></tr>
+            <tr><td>Windshields/Parts</td><td class="text-right">$14,000</td><td class="text-right">$0</td></tr>
+            <tr><td>Vehicles</td><td class="text-right">$7,838</td><td class="text-right">$0</td></tr>
+            <tr><td>Team Auto Recovery</td><td class="text-right">$26,218</td><td class="text-right">$9,000</td></tr>
+            <tr class="total-row"><td><strong>TOTAL</strong></td><td class="text-right"><strong>$93,930</strong></td><td class="text-right"><strong>$9,000</strong></td></tr>
+        </table>
+        <p>SBA lien of $466,327 exceeds all asset values.</p>
+        <p class="highlight-red"><strong>Distribution to unsecured: $0 (0%)</strong></p>
+    </div>
+    <div>
+        <h3>Chapter 11 Reorganization</h3>
+        <div class="callout-box success">
+            <p><strong>Proposed Distribution to Unsecured Creditors:</strong></p>
+            <p style="font-size: 18pt; text-align: center;"><strong>$306,000</strong></p>
+            <p style="text-align: center;">Approximately <strong>16%</strong> recovery</p>
+            <p style="margin-top: 0.1in;"><strong>Note:</strong> January 2026 revised plan shows reduced distributions, but still better than Chapter 7.</p>
+        </div>
+        <p><strong>Chapter 11 provides infinitely better recovery for unsecured creditors than Chapter 7 liquidation.</strong></p>
+    </div>
+</div>
+
+<!-- ARGUMENTS FOR/AGAINST -->
+<div class="page-break"></div>
+<h2>VIII. ARGUMENTS FOR AND AGAINST CONFIRMATION</h2>
+
+<div class="two-column">
+    <div>
+        <h3 class="highlight-green">Arguments FOR Confirmation</h3>
+        <ol>
+            <li><strong>Proven Business Model:</strong> Grew to $14.3M revenue, 2nd largest in AZ</li>
+            <li><strong>Strong Historical Margins:</strong> Consistent 49-56% gross margins over 6 years</li>
+            <li><strong>Better Than Liquidation:</strong> 16% to unsecured vs. 0% in Chapter 7</li>
+            <li><strong>Established Customer Base:</strong> Relationships with major insurance companies</li>
+            <li><strong>Market Position:</strong> Recognized player in AZ auto glass market</li>
+            <li><strong>54,000+ Jobs Completed:</strong> Demonstrated operational capability</li>
+            <li><strong>SBA Loan Current:</strong> Continuing $2,268/month payments</li>
+        </ol>
+    </div>
+    <div>
+        <h3 class="highlight-red">Arguments AGAINST Confirmation</h3>
+        <ol>
+            <li><strong>Revenue Performance:</strong> 27% below original projections</li>
+            <li><strong>No Operations Manager:</strong> Both proposed managers departed</li>
+            <li><strong>Trustee Opposition:</strong> Explicitly opposes confirmation</li>
+            <li><strong>Massive Tax Debt:</strong> $2.2M to ADOR, plan pays only $535K</li>
+            <li><strong>Management Misconduct:</strong> Owner diverted $26,218 from business</li>
+            <li><strong>Insufficient Cash:</strong> Only $5K set aside vs. $182K admin claims</li>
+            <li><strong>Minimal Margin:</strong> Only $61K net cash flow over 5.5 years</li>
+            <li><strong>Customer Rebates:</strong> $68,773 unpaid to customers</li>
+        </ol>
+    </div>
+</div>
+
+<!-- RECOMMENDATIONS -->
+<div class="page-break"></div>
+<h2>IX. RECOMMENDATIONS</h2>
+
+<h3>A. Immediate Actions Required for Plan Confirmation</h3>
+
+<div class="callout-box no-break">
+    <h4>1. Cash Infusion</h4>
+    <p>Owner must inject cash to cover Effective Date payments. <strong>Minimum required: $100,000+</strong> to address administrative claims shortfall ($177,476) and initial ADOR payment.</p>
+</div>
+
+<div class="callout-box no-break">
+    <h4>2. Management Solution</h4>
+    <p>Identify and hire qualified Operations Manager, or demonstrate that Trustee's expanded supervisory powers can adequately ensure operational compliance.</p>
+</div>
+
+<div class="callout-box no-break">
+    <h4>3. Revised Projections</h4>
+    <p>Submit updated projections aligned with January 2026 court plan figures. Demonstrate realistic path to 400+ installs/month with current or planned staffing levels.</p>
+</div>
+
+<div class="callout-box no-break">
+    <h4>4. ADOR Agreement</h4>
+    <p>Negotiate formal payment plan with Arizona Department of Revenue. Demonstrate commitment with immediate $20,000 payment as recommended by Trustee.</p>
+</div>
+
+<h3>B. Modified Plan Suggestions</h3>
+<ul>
+    <li><strong>Lower Revenue Assumptions:</strong> Base projections on actual monthly performance (~$245K/month)</li>
+    <li><strong>Extended Timeline:</strong> Consider 7-year plan instead of 5.5-year to reduce monthly payment burden</li>
+    <li><strong>Operational Control:</strong> Maintain Trustee's expanded supervisory powers for entire plan duration</li>
+    <li><strong>Owner Restrictions:</strong> Clear restrictions on owner's access to funds and business decisions</li>
+    <li><strong>Reporting Requirements:</strong> Monthly financial reports to Trustee and Court</li>
+</ul>
+
+<!-- CONCLUSION -->
+<h2>X. CONCLUSION</h2>
+
+<div class="callout-box">
+    <p>Auto Glass 2020 LLC represents a salvageable business with proven historical success. The company grew from startup to Arizona's 2nd largest auto glass company in just 4 years, completing over 54,000 jobs with consistent 51% gross margins. This demonstrates the fundamental viability of the business model and strong market demand.</p>
+
+    <p style="margin-top: 0.1in;">The recent decline was caused by the owner's personal struggles (relapse and divorce), not by market conditions or business fundamentals. With proper oversight through the Subchapter V Trustee's expanded powers, realistic projections based on actual performance, and owner accountability, the business can stabilize and begin recovery.</p>
+
+    <p style="margin-top: 0.1in;">Under Chapter 11, unsecured creditors will receive approximately 16% recovery - infinitely better than the 0% they would receive in Chapter 7 liquidation. The business has existing insurance company relationships, trained staff (though reduced), and operational infrastructure that would be lost in liquidation.</p>
+
+    <p style="margin-top: 0.1in;"><strong>The January 2026 revised plan, while showing minimal cash flow margins, is based on actual performance data and represents a realistic (if challenging) path forward. The key to success is immediate cash infusion, professional management, and continued Trustee oversight.</strong></p>
+</div>
+
+<div class="document-footer">
+    <p>Prepared for: United States Bankruptcy Court, District of Arizona</p>
+    <p>Case No: 2:25-bk-00374-MCW | In re: Auto Glass 2020 LLC</p>
+    <p>Document generated from company financial records (2020-2026) and court filings</p>
+</div>
+
+</body>
+</html>
