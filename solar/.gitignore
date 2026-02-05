@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Next.js source (only built output is deployed)
+src/
+scripts/
+public/
+next.config.ts
+next-env.d.ts
+tailwind.config.ts
+tsconfig.json
+postcss.config.mjs
+eslint.config.mjs
+package.json
+package-lock.json
+CLAUDE.md
+
+# Build temp/cache directories
+out/
+.next/
+
+# Environment
+.env.local
+.env*.local
+
+# Data files (too large for git)
+data/
+
+# Supabase temp files
+supabase/.temp/
+
+# Ralph Wiggum state
+.claude-plugins/
+.claude/
+STOP_RALPH
+ralph.log
+ralph.sh
+
+# Specs (documentation, not deployed)
+specs/
+
+# OS
+.DS_Store
+
+# Next.js build metadata
+*.txt
