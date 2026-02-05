@@ -10,9 +10,10 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Account configuration
+// Both accounts need MCC 6736988718 as login-customer-id
 const AG2020_ACCOUNTS = [
     { id: '5053365860', name: 'AG2020 Current', mcc: '6736988718', color: '#1B4B82' },
-    { id: '4399614856', name: 'AG2020 Historical', mcc: null, color: '#6BA4D0' }, // Direct access
+    { id: '4399614856', name: 'AG2020 Historical', mcc: '6736988718', color: '#6BA4D0' },
 ];
 
 export default async function handler(req, res) {
