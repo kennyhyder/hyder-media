@@ -41,25 +41,26 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_KEY
     );
 
-    // Get OAuth tokens
-    const { data: tokenData, error: tokenError } = await supabase
-        .from('google_ads_tokens')
+    // Get the most recent connection (same as omicron-data.js)
+    const { data: connection, error: connError } = await supabase
+        .from('google_ads_connections')
         .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
         .single();
 
-    if (tokenError || !tokenData) {
-        console.error('Token error:', tokenError);
+    if (connError || !connection) {
+        console.error('Connection error:', connError);
         return res.status(401).json({
             error: 'Not authenticated with Google Ads',
             details: 'Please connect via /api/google-ads/auth'
         });
     }
 
-    // Check if token needs refresh
-    let accessToken = tokenData.access_token;
-    const tokenExpiry = new Date(tokenData.expires_at);
+    let accessToken = connection.access_token;
 
-    if (tokenExpiry < new Date()) {
+    // Refresh token if expired
+    if (new Date(connection.token_expires_at) < new Date() && connection.refresh_token) {
         console.log('Token expired, refreshing...');
         try {
             const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
@@ -68,7 +69,7 @@ export default async function handler(req, res) {
                 body: new URLSearchParams({
                     client_id: process.env.GOOGLE_ADS_CLIENT_ID,
                     client_secret: process.env.GOOGLE_ADS_CLIENT_SECRET,
-                    refresh_token: tokenData.refresh_token,
+                    refresh_token: connection.refresh_token,
                     grant_type: 'refresh_token'
                 })
             });
@@ -79,12 +80,12 @@ export default async function handler(req, res) {
 
                 // Update token in database
                 await supabase
-                    .from('google_ads_tokens')
+                    .from('google_ads_connections')
                     .update({
                         access_token: refreshData.access_token,
-                        expires_at: new Date(Date.now() + refreshData.expires_in * 1000).toISOString()
+                        token_expires_at: new Date(Date.now() + refreshData.expires_in * 1000).toISOString()
                     })
-                    .eq('id', tokenData.id);
+                    .eq('id', connection.id);
             } else {
                 throw new Error('Failed to refresh token');
             }
