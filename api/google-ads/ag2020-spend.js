@@ -120,7 +120,7 @@ export default async function handler(req, res) {
             const loginCustomerId = account.mcc || account.id;
 
             const response = await fetch(
-                `https://googleads.googleapis.com/v18/customers/${account.id}/googleAds:searchStream`,
+                `https://googleads.googleapis.com/v23/customers/${account.id}/googleAds:search`,
                 {
                     method: 'POST',
                     headers: {
