@@ -392,6 +392,17 @@ When faced with a choice:
 - **Crossref cap**: Max 20 crossref_ids per record (community solar projects can legitimately have many TTS sub-installations)
 - **DB password**: `#FsW7iqg%EYX&G3M` via pooler at `aws-0-us-west-2.pooler.supabase.com:6543`
 
+### Gap-Filling Enrichments - COMPLETED (Feb 6, 2026)
+Direct SQL operations to maximize field coverage across all 125,389 records:
+- **Zip geocoding**: 63,951 records gained lat/lon from Census ZCTA centroids (43%→94% coverage)
+- **County derivation**: 28,852 records gained county via city+state lookup from existing records (60%→83%)
+- **cost_per_watt**: 12,935 records calculated from total_cost / (capacity_mw * 1M) (45%→55%)
+- **num_modules**: 75,261 records counted from solar_equipment module records (28%→88%)
+- **num_inverters**: 77,335 records counted from solar_equipment inverter records (0%→62%)
+- **location_precision**: 5,037 remaining NULL records assigned (state/city/exact) → 100% coverage
+- **last_import**: All 9 data sources updated from "Never" to current timestamp
+- **Census ZCTA data**: Downloaded from `census.gov/geo/docs/maps-data/data/gazetteer/2023_Gazetteer/` (33,791 zip centroids)
+
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
 
