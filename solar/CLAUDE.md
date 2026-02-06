@@ -67,6 +67,11 @@ python3 -u scripts/reverse-geocode.py                   # Nominatim reverse geoc
 python3 -u scripts/crossref-osm.py                      # OSM plant proximity matching
 python3 -u scripts/crossref-tts-eia.py                  # Inherit EIA addresses for TTS/CA
 
+# Additional enrichment (run after cross-references)
+python3 -u scripts/enrich-egrid.py                       # EPA eGRID operator/owner names
+python3 -u scripts/enrich-lbnl-queues.py                 # LBNL Queued Up developer names
+python3 -u scripts/enrich-gem.py                         # GEM owner/operator names
+
 # Cross-source deduplication (run after all enrichment)
 python3 -u scripts/crossref-dedup.py                    # Match records across sources, fill NULLs
 python3 -u scripts/crossref-dedup.py --dry-run          # Preview matches without patching
@@ -115,6 +120,9 @@ python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
 | OSM Solar | `fetch-osm-solar.py` + `crossref-osm.py` | Name/operator enrichment | Overpass API (free) → `data/osm_solar_farms.json` |
 | TTS↔EIA | `crossref-tts-eia.py` | Inherit EIA-860 addresses for TTS/CA | DB cross-reference |
 | Cross-Source Dedup | `crossref-dedup.py` | Match records across 10 sources, fill NULLs bidirectionally | DB cross-reference (3 phases) |
+| EPA eGRID | `enrich-egrid.py` | Operator + owner names from eGRID 2023 (5,658 solar plants) | `data/egrid/egrid2023_data.xlsx` |
+| LBNL Queued Up | `enrich-lbnl-queues.py` | Developer names from 50+ grid operator queues | `data/lbnl_queued_up/*.xlsx` |
+| GEM Solar Tracker | `enrich-gem.py` | Owner/operator names from Global Energy Monitor (>=1MW) | `data/gem/*.geojson` |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -141,17 +149,29 @@ python3 -u scripts/ingest-iso-queues.py --all       # All 7 ISOs (incl. manual)
 
 ### Future Sources (researched, not yet ingested)
 
+**Pending Manual Download (scripts ready)**:
+- **NJ NJCEP** — Download from https://njcleanenergy.com/renewable-energy/project-activity-reports/ → save to `data/nj_njcep/`. Installer names for NJ commercial solar.
+
+**Data Download URLs (for re-downloading)**:
+- **LBNL Queued Up**: `https://eta-publications.lbl.gov/sites/default/files/2025-08/lbnl_ix_queue_data_file_thru2024_v2.xlsx` (needs browser UA header)
+- **GEM Solar Tracker**: `https://publicgemdata.nyc3.cdn.digitaloceanspaces.com/solar/{YYYY-MM}/solar_map_{date}.geojson` (check config at `globalenergymonitor.github.io/maps/trackers/solar/config.js` for latest URL)
+
 **ISO Queues (manual download needed)**:
 - PJM (Queue Scope web app), ERCOT (MIS portal login), MISO (interactive export), SPP, ISO-NE
-- `gridstatus` library can programmatically access all 7 ISOs
+- `gridstatus` library (Python 3.10+) can access CAISO, NYISO, ISO-NE programmatically. PJM needs API key. MISO/SPP/ERCOT blocked.
 
 **Additional Free**:
 - CEC Equipment Full Data (updated 3x/month)
-- PUDL (Public Utility Data Liberation) - pre-cleaned EIA + FERC data
+- EPA RE-Powering Tracking Matrix (brownfield/landfill solar)
+- NREL Community Solar Project Database
+- Virginia Cooper Center Solar Database (utility-scale VA projects with developer/owner)
 
 **Paid (if budget allows)**:
-- Ohm Analytics (9/10, equipment per site, ~$30K), PVEL (7/10, reliability data, $5-15K)
-- ATTOM Data (7/10, property owner, pay-per-query), SEIA (5/10, $1K/yr)
+- SEIA Major Solar Projects List (~$1K/yr membership) — 7K+ projects with developer+owner+offtaker. Best bang for buck.
+- Wiki-Solar ($100-1K+) — 25K global projects with developer, owner, EPC contractor, equipment supplier
+- Ohm Analytics (~$30K/yr) — Equipment per site for distributed solar. Best commercial data.
+- ACP CleanPowerIQ ($10-20K/yr) — 60K+ power assets with 50+ attributes
+- Enverus ($20K+/yr) — Enterprise-grade project tracking
 
 ## Data File Locations
 
@@ -172,6 +192,12 @@ solar/data/
 ├── cec_specs/               # CEC equipment databases
 │   ├── CEC_Modules.csv      # 20,743 panel models
 │   └── CEC_Inverters.csv    # 2,084 inverter models
+├── egrid/                   # EPA eGRID 2023 (downloaded)
+│   └── egrid2023_data.xlsx  # 20MB, 5,658 solar plants
+├── lbnl_queued_up/          # LBNL Queued Up interconnection queues
+│   └── lbnl_ix_queue_data_file_thru2024_v2.xlsx  # 13MB, 36,441 records (17,422 solar)
+├── gem/                     # GEM Solar Power Tracker
+│   └── gem_solar_map_2026-02-05.geojson  # 183MB, 103,940 global (8,700 US)
 └── zcta_centroids.txt       # Census ZCTA geocoding file (33,144 zips)
 ```
 
@@ -402,6 +428,56 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **location_precision**: 5,037 remaining NULL records assigned (state/city/exact) → 100% coverage
 - **last_import**: All 9 data sources updated from "Never" to current timestamp
 - **Census ZCTA data**: Downloaded from `census.gov/geo/docs/maps-data/data/gazetteer/2023_Gazetteer/` (33,791 zip centroids)
+
+### EPA eGRID Enrichment - COMPLETED (Feb 6, 2026)
+- **enrich-egrid.py**: Cross-references EPA eGRID 2023 solar plants (5,658 total) with existing installations
+- **Phase 1 (EIA Plant ID)**: 3 matches (most EIA records already had operator from EIA-860 enrichment)
+- **Phase 2 (Coordinate proximity)**: 426 matches (2km radius + 50% capacity tolerance)
+- **Total**: 429 patches applied, 0 errors — 281 operator_name fills, 427 owner_name fills
+- **Key insight**: eGRID's main value is `UTLSRVNM` (utility/owner name) which differs from `OPRNAME` (operator)
+
+### GEM Solar Power Tracker Enrichment - COMPLETED (Feb 6, 2026)
+- **enrich-gem.py**: Cross-references GEM Global Solar Power Tracker GeoJSON (8,700 US projects, CC BY 4.0)
+- **Data**: 183MB GeoJSON from `publicgemdata.nyc3.cdn.digitaloceanspaces.com/solar/` CDN (found via GitHub tracker map config)
+- **Phase 1 (EIA Plant ID)**: 4 matches (GEM has `other-ids-(location)` with EIA IDs for 8,320 US plants)
+- **Phase 2 (Coordinate proximity)**: 86 matches (2km radius + 50% capacity tolerance)
+- **Total**: 90 patches applied, 0 errors — 34 owner_name fills, 64 operator_name fills
+- **Key insight**: Most GEM records already matched to installations that had owner/operator from eGRID/EIA enrichment
+
+### LBNL Queued Up Enrichment - COMPLETED (Feb 6, 2026)
+- **enrich-lbnl-queues.py**: Cross-references LBNL interconnection queue data (17,422 solar projects from 50+ grid operators)
+- **Data**: 13MB Excel from `eta-publications.lbl.gov` (Cloudflare-protected, needs browser UA header)
+- **Phase 1 (EIA Plant ID)**: 0 matches (LBNL queue data has no EIA IDs)
+- **Phase 2 (State + capacity)**: 1,166 matches (25% capacity tolerance + name/county similarity scoring)
+- **Total**: 1,166 developer_name patches applied, 0 errors
+- **Note**: Filtered out "Masked" developer names (ISOs redact some developer identities)
+
+### Reverse Geocoding - COMPLETED (Feb 6, 2026)
+- Latest run: 1,006 additional records geocoded (6 USPVDB + 1,000 NY-Sun), 990 addresses updated
+- Cumulative: 34,322 / 125,389 installations have addresses (27.4%)
+
+### Data Completeness Assessment (Feb 6, 2026)
+**Coverage vs total US market:**
+- Utility-scale (>=1 MW): ~95-100% coverage (EIA-860 is mandatory federal census)
+- Commercial (25 kW - 1 MW): ~60-65% coverage (~44-65K records missing)
+- 25 states have ZERO commercial data (TTS covers only 27 states)
+- Biggest gaps: NC (~5-10K missing), HI (~3-5K), NV (~2-4K), MI (~2-3K)
+
+**Field coverage snapshot (Feb 6, 2026, post-GEM/LBNL enrichment):**
+| Field | Coverage | Notes |
+|-------|----------|-------|
+| latitude/longitude | 94% | Census ZCTA centroids for zip-only records |
+| county | 96% | Derived from city+state + coord lookup |
+| location_precision | 100% | All records classified |
+| installer_name | 69% | Primarily from TTS/CADG/NY-Sun |
+| operator_name | ~41% | EIA-860 + eGRID + GEM enrichment |
+| owner_name | ~31% | EIA-860 + crossref + eGRID + GEM enrichment |
+| developer_name | ~1.3% | ISO queues (431) + LBNL Queued Up (1,166) |
+| total_cost | 45% | TTS + LBNL utility-scale |
+| cost_per_watt | 55% | Calculated from total_cost/capacity |
+| num_modules | 88% | Counted from equipment table |
+| num_inverters | 62% | Counted from equipment table |
+| address | 27% | Reverse geocoding + source data |
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
