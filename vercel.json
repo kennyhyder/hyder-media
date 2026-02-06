@@ -37,10 +37,13 @@
       "maxDuration": 30
     },
     "api/solar/stats.js": {
-      "maxDuration": 30
+      "maxDuration": 60
     },
     "api/solar/installers.js": {
       "maxDuration": 30
+    },
+    "api/solar/export.js": {
+      "maxDuration": 60
     }
   }
 }
