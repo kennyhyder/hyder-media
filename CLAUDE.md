@@ -20,6 +20,15 @@ Static HTML website for hyder.me - Kenny Hyder's consulting homepage.
 - `utm-builder.html` - UTM parameter builder
 - `youtube-search.html` - YouTube video search tool
 
+**Other Root Files:**
+- `index-old.html` - Archived previous version of homepage
+- `blank-tool-template.html` - Template for creating new tool pages
+- `blog-article.html` - Blog post template
+- `cards.html` - Card component reference
+- `robots.txt` - SEO robots configuration
+- `sitemap.xml` - Site map for search engines
+- `favicon.ico` - Site favicon
+
 ### `/api` - Serverless Backend
 Vercel serverless functions (Node.js)
 
@@ -29,20 +38,54 @@ Vercel serverless functions (Node.js)
 
 **Google Ads API Suite:** `/api/google-ads/`
 - `auth.js` - OAuth 2.0 initiation
-- `callback.js` - OAuth callback handler
+- `callback.js` - OAuth callback handler (recursively fetches MCC child accounts)
 - `accounts.js` - List connected accounts
 - `campaigns.js` - Campaign data with metrics
 - `sync.js` - Full data synchronization
+- `keywords.js` - Google Keyword Planner data (batch lookup)
 - `debug.js` - API diagnostics
-- `schema.sql` - Supabase database schema
+- `debug-omicron.js` - Test Omicron MCC access to all accounts
+- `debug-bur-top10.js` - Test BUR/Top10 access with different login-customer-ids
+- `test-direct.js` - Minimal direct API test endpoint
+- `schema.sql` - Supabase database schema (11 tables)
+- `SETUP.md` - Integration setup guide
+
+**Omicron Dashboard APIs:** `/api/google-ads/`
+- `omicron-data.js` - 30-day summary metrics for all 9 accounts
+- `omicron-monthly.js` - Monthly data with brand/non-brand campaign breakdown
+- `omicron-conversions.js` - Conversion action breakdown per account
+
+**AG2020 APIs:** `/api/ag2020/`
+- `ag2020-spend.js` (in `/api/google-ads/`) - Google Ads historical spend data
+- `cash-infusions.js` - Cash infusion tracking
+- `schema.sql` - AG2020-specific database schema
+
+**Digistore24 API:** `/api/digistore/`
+- `keywords.js` - Keyword data endpoint
 
 **Current Issue:** Google Ads API returns 501 UNIMPLEMENTED error. See FOLLOWUP-NOTES.md for investigation status.
+- **Blocked since:** January 27, 2026
+- **What works:** OAuth flow, developer token (Basic Access), Google Cloud setup
+- **Next steps:** Check OAuth consent screen mode, data access settings, API Explorer testing
 
 ### `/tokens` - Token Opportunity Framework (Next.js)
 Static Next.js export analyzing 150+ companies from Ribbit Capital Token Letter.
+- **URL:** https://hyder.me/tokens
 - 19 detailed capex/business-plan pages (capex-1 through capex-19)
 - Uses Tailwind CSS, React Server Components
-- Static export deployed to Vercel
+- Static export deployed to Vercel with `basePath: '/tokens'`
+- Source files are in a separate build process; only built output in this directory
+
+**Known Capex Opportunities:**
+| # | Company | Industry |
+|---|---------|----------|
+| 1 | CalibrateNet | Auto Glass/ADAS Calibration |
+| 2 | PowerReady | Backup Power Installation |
+| 3 | TowerTrack | Wireless Infrastructure |
+| 4 | ChargeScore | EV Charging Reliability |
+| 5-19 | Various | Various sectors |
+
+Each page includes: Executive Summary, Full Plan, Financials tabs with market sizing, seed ask, TAM, CAGR, and LTV:CAC ratios.
 
 ### `/clients` - Client Portal
 Authenticated dashboards for individual clients.
@@ -69,18 +112,74 @@ Authenticated dashboards for individual clients.
 - See detailed breakdown below
 
 ### `/assets` - Static Assets
-- CSS: Bootstrap, custom styles, responsive rules
-- JS: Bootstrap bundle, site scripts, calculator logic
-- Images: Logos, hero backgrounds, service icons
-- **Logo files:** `hyder-media-logo.png` (full), `hyder-media-icon.png` (icon only)
+```
+/assets/
+├── css/
+│   ├── bootstrap.min.css     # Bootstrap 5 framework
+│   ├── style.css             # Custom styles (CSS variables, dark mode)
+│   └── responsive.css        # Breakpoints: 576, 768, 992, 1200, 1400px
+├── js/
+│   ├── bootstrap.bundle.min.js  # Bootstrap JavaScript
+│   ├── script.js             # Site navigation, dark mode toggle, contact form
+│   └── calculator.js         # Ad Spend ROI calculator logic
+└── imgs/
+    ├── logos/
+    │   ├── hyder-media-logo.png   # Full logo
+    │   ├── hyder-media-icon.png   # Icon only
+    │   └── favicon.png            # Favicon
+    ├── bgs-thumbs/
+    │   ├── hero-bg.png            # Light mode hero
+    │   └── hero-bg-dark.png       # Dark mode hero
+    ├── services/service-01.png through service-06.png
+    ├── card/post-card-thumb-01.png, -02.png
+    └── kenny-hyder.jpg            # Profile photo
+```
+
+**CSS Design System:**
+- CSS variables for theming: `--brown`, `--dark-brown`, `--white`, etc.
+- Dark mode via `.dark-mode` class on `<html>`, saved to localStorage
+- Fonts: System fonts (no external font CDNs)
 
 ### `/docs` - Documentation
-- Solar Database Project specs (separate initiative)
-- HTML presentation decks
+```
+/docs/
+├── google-ads-api-design-documentation.html  # API integration design doc
+├── solarscore-pitch-deck.html                # SolarScore product pitch
+└── solar-database-project/                   # Separate initiative
+    ├── PROJECT_INSTRUCTIONS.md
+    ├── CONSTITUTION.md
+    ├── CLAUDE_INSTRUCTIONS.md
+    ├── AGENTS.md
+    ├── RALPH_WIGGUM_SETUP.md
+    └── specs/
+        ├── 001-database-schema/spec.md
+        ├── 002-data-ingestion/spec.md
+        ├── 003-api-endpoints/spec.md
+        ├── 004-web-interface/spec.md
+        └── 005-deployment/spec.md
+```
 
 ### `/decks` - Pitch Presentations
-- `/decks/framework/` - Token framework pitch
-- `/decks/auto-glass/` - Auto glass opportunity deck
+Full-screen HTML slide decks with custom navigation (prev/next buttons, progress bar, keyboard support).
+
+- **`/decks/framework/index.html`** - "Distribution Control in the Age of AI"
+  - Token systems framework pitch (~20 slides)
+  - Orange/brown color scheme, PT Sans + Roboto Mono fonts
+  - Topics: Token types, market catalysts, architecture patterns
+
+- **`/decks/auto-glass/index.html`** - "Auto Glass & ADAS Calibration Opportunity"
+  - CalibrateNet investor pitch (~20 slides)
+  - Blue gradient color scheme
+  - ADAS calibration market sizing and network model
+
+### `/scripts` - Data Processing Scripts
+- `import-digistore-keywords.js` - Transform SimilarWeb Excel exports → keywords-combined.json
+- `fetch-google-keywords.js` - Enrich keywords with Google Keyword Planner data
+
+### Other Root Files
+- `CLAUDE.md` - This project context file
+- `AGENTS.md` - Agent workflow instructions (bd/beads issue tracking)
+- `FOLLOWUP-NOTES.md` - Google Ads API investigation notes
 
 ---
 
@@ -533,11 +632,21 @@ Tabs support direct linking via URL hash:
 
 ### Technology Stack
 - **Framework:** Next.js 14.1.0 with static export
-- **UI:** React 18, Tailwind CSS
+- **UI:** React 18, Tailwind CSS, Recharts (^3.7.0) for charts
 - **Language:** TypeScript
-- **Data:** All data embedded in TypeScript files (no API)
+- **Data:** All data embedded in TypeScript files (no live API)
+- **Additional deps:** xlsx (^0.18.5) for Excel processing
 
-### Tab Navigation (7 tabs)
+### Pages
+| Page | File | Purpose |
+|------|------|---------|
+| **Dashboard** | `index.html` | Main multi-tab financial dashboard |
+| **Password** | `password.html` | Password gate |
+| **Court Presentation** | `court-presentation.html` | Standalone court document (password-protected, preserves deep links) |
+| **Cashflow** | `cashflow.html` | Legacy cashflow view |
+| **404** | `404.html` | 404 page (auth-protected) |
+
+### Tab Navigation (7+ tabs)
 All tabs use hash-based routing:
 
 | Tab | Hash | Purpose |
@@ -549,6 +658,25 @@ All tabs use hash-based routing:
 | Forecast | `#forecast` | Revenue and expense projections |
 | 2025 Performance | `#2025-performance` | Year-to-date performance metrics |
 | Bank Statements | `#bank-statements` | Transaction history and categorization |
+
+### Source Data Files
+```
+/clients/ag2020/src/lib/
+├── data.ts              # Revenue, overhead, payroll, debt data
+├── bankTransactions.ts  # Bank statement transaction data
+├── bankruptcyData.ts    # Bankruptcy analysis data (creditors, recovery scenarios)
+└── utils.ts             # Shared formatting utilities
+```
+
+### Data Directory
+`/clients/ag2020/data/` contains source files (bank statements, margin reports, legal docs):
+- Cash App statements (March-November 2025)
+- Bank eStatements (April, July, September 2025)
+- Factor payment records (7 PDFs)
+- Margin reports (CSV + JSON)
+- Historical performance data (JSON)
+- Google Ads spend data (JSON, Nov 2020 - Jan 2026)
+- `legal/` - Amended Plan exhibits (A-E), court filings, 5-year budget proforma
 
 ### Build Process
 The dashboard is built as a Next.js static export:
@@ -570,21 +698,34 @@ npm run build  # Runs next build && post-build script
 /clients/ag2020/
 ├── index.html              # Built dashboard (auth-protected)
 ├── password.html           # Password protection gate
+├── court-presentation.html # Standalone court document (auth-protected)
+├── cashflow.html           # Legacy cashflow view
 ├── logo.webp               # Company logo
 ├── _next/                  # Next.js static assets
 │   └── static/
 │       ├── css/            # Compiled Tailwind CSS
 │       └── chunks/         # JavaScript bundles
 ├── 404.html                # 404 page (auth-protected)
+├── data/                   # Source data files (bank statements, margins, legal)
+│   ├── legal/              # Court filings, amended plan exhibits
+│   ├── *.pdf               # Bank statements, factor payments
+│   ├── *.csv               # Margin reports
+│   └── *.json              # Historical performance, Google Ads spend
 ├── .gitignore              # Excludes source files
 │
 │ # Source files (gitignored, kept for rebuilds):
-├── src/                    # React components and data
-│   ├── app/page.tsx        # Main dashboard component
-│   └── lib/                # Data files (data.ts, bankTransactions.ts)
+├── src/
+│   ├── app/
+│   │   ├── page.tsx        # Main dashboard component
+│   │   └── layout.tsx      # App layout
+│   └── lib/
+│       ├── data.ts         # Revenue, overhead, payroll, debt data
+│       ├── bankTransactions.ts  # Bank statement data
+│       ├── bankruptcyData.ts    # Bankruptcy analysis data
+│       └── utils.ts        # Formatting utilities
 ├── scripts/post-build.js   # Auth injection script
-├── package.json            # Dependencies and build scripts
-├── next.config.js          # Static export config (basePath, assetPrefix)
+├── package.json            # Dependencies (next, react, recharts, xlsx)
+├── next.config.js          # Static export config (basePath: '/clients/ag2020')
 ├── tailwind.config.js      # Tailwind configuration
 └── tsconfig.json           # TypeScript configuration
 ```
@@ -628,16 +769,44 @@ ADMIN_EMAIL=kenny@hyder.me
 - SUPABASE_SERVICE_KEY
 
 ### `vercel.json`
-Function timeout configurations (10s-60s depending on endpoint)
+Function timeout configurations:
+| Function | Timeout |
+|----------|---------|
+| `api/contact.js` | 10s |
+| `api/google-ads/auth.js` | 10s |
+| `api/google-ads/callback.js` | 30s |
+| `api/google-ads/accounts.js` | 30s |
+| `api/google-ads/campaigns.js` | 30s |
+| `api/google-ads/debug.js` | 30s |
+| `api/google-ads/sync.js` | 60s |
+| `api/google-ads/keywords.js` | 60s |
+| `api/google-ads/ag2020-spend.js` | 60s |
+
+**Note:** Omicron endpoints (omicron-data, omicron-monthly, omicron-conversions) and debug endpoints (debug-omicron, debug-bur-top10) are NOT in vercel.json - they use the default 10s timeout.
 
 ## Technology Stack
-- **Frontend:** HTML5, CSS3, Bootstrap, Tailwind (tokens only)
-- **Framework:** Next.js 13+ (tokens only)
-- **Backend:** Vercel Functions (Node.js)
-- **Database:** Supabase (PostgreSQL)
-- **Auth:** Supabase Auth (main portal), sessionStorage (Digistore24 tools)
-- **APIs:** Google Ads API v18, Google OAuth 2.0
+- **Frontend:** HTML5, CSS3, Bootstrap 5, Tailwind CSS (tokens, ag2020)
+- **Framework:** Next.js 14 (tokens, ag2020 static exports)
+- **Backend:** Vercel Serverless Functions (Node.js, ES modules)
+- **Database:** Supabase (PostgreSQL) - project: ilbovwnhrowvxjdkvrln.supabase.co
+- **Auth:** Supabase Auth (main client portal), sessionStorage (all client dashboards)
+- **APIs:** Google Ads API v23, Google OAuth 2.0, Google Keyword Planner
 - **Email:** Nodemailer (Gmail)
+- **Charts:** Recharts (ag2020), Chart.js (referenced in some pages)
+
+### Root Dependencies (`package.json`)
+```json
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "xlsx": "^0.18.5"
+  }
+}
+```
 
 ## Git Workflow
 - Main branch: `main`
@@ -679,11 +848,17 @@ vercel dev
 # Regenerate keyword data from Excel sources
 node scripts/import-digistore-keywords.js
 
-# Fetch Google Keyword Planner data (incremental)
+# Fetch Google Keyword Planner data (incremental, batch size 15)
 node scripts/fetch-google-keywords.js
+
+# Rebuild AG2020 dashboard after source changes
+cd clients/ag2020 && npm install && npm run build
 
 # Restore evicted iCloud files from git
 git checkout HEAD -- <file-path>
+
+# Force iCloud to download evicted file
+brctl download <file-path>
 
 # Deploy (just push to GitHub - auto-deploys)
 git push origin main
@@ -697,13 +872,36 @@ vercel alias <deployment-url> hyder.me
 2. **Supabase project:** ilbovwnhrowvxjdkvrln.supabase.co
 3. **Google Ads MCC:** 673-698-8718
 4. **Developer Token:** Basic Access approved
-5. **Digistore24 password:** TR8FFIC (sessionStorage-based auth)
-6. **Omicron password:** LIEHAO (sessionStorage-based auth)
-7. **AG2020 password:** AG2020FLOW (sessionStorage-based auth)
+5. **Google Ads API version:** v23 (all endpoints use `/v23/`)
+6. **Digistore24 password:** TR8FFIC (sessionStorage-based auth)
+7. **Omicron password:** LIEHAO (sessionStorage-based auth)
+8. **AG2020 password:** AG2020FLOW (sessionStorage-based auth)
+9. **Google Cloud Project #:** 132234777258
+10. **Vercel plan:** Pro (team: kennys-projects-93847471)
+
+### Supabase Database Tables
+The schema (`/api/google-ads/schema.sql`) defines 11 tables:
+- `google_ads_connections` - OAuth tokens and connection info
+- `google_ads_customers` - Customer account metadata
+- `google_ads_campaigns` - Campaign data with metrics
+- `google_ads_ad_groups` - Ad group data with metrics
+- `google_ads_keywords` - Keyword data with quality scores
+- `google_ads_search_terms` - Search term reports
+- `google_ads_sync_log` - Sync operation tracking
+- Additional AG2020-specific tables (`/api/ag2020/schema.sql`)
 
 ---
 
 ## Recent Changes Log
+
+### 2026-02-05 (Auto Glass 2020 - Court Presentation)
+- **Added court presentation document** (`court-presentation.html`) - standalone password-protected page
+- Added Recovery Case scenario showing feasibility with owner return
+- Added $50K unsecured creditor distribution at end of 2027
+- Complete debt repayment plan with creditor list
+- Cash infusions feature and comprehensive bankruptcy analysis tab
+- Historical performance tab with year selector and drill-down charts
+- Deep links preserved after password authentication
 
 ### 2026-02-04 (Auto Glass 2020 Dashboard)
 - **Migrated from standalone deployment** - Moved from `auto-glass-cash-flow` repo to `hyder-media/clients/ag2020`
