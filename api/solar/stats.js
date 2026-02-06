@@ -7,6 +7,14 @@ function getSupabase() {
   );
 }
 
+// All US states and territories
+const US_STATES = [
+  "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN",
+  "IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH",
+  "NJ","NM","NY","NC","ND","OH","OK","OR","PA","PR","RI","SC","SD","TN","TX",
+  "UT","VT","VA","WA","WV","WI","WY"
+];
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -16,60 +24,50 @@ export default async function handler(req, res) {
   try {
     const supabase = getSupabase();
 
-    // Total installations and capacity
+    // Total installations
     const { count: totalInstallations } = await supabase
       .from("solar_installations")
       .select("*", { count: "exact", head: true });
 
-    // Installations by type
-    const { data: byType } = await supabase.rpc("solar_count_by_type");
-
-    // Installations by state (top 20)
-    const { data: byState } = await supabase.rpc("solar_count_by_state");
-
-    // If RPCs don't exist, fall back to manual queries
-    let installationsByType = {};
-    let installationsByState = {};
-    let totalCapacityMw = 0;
-
-    if (byType) {
-      byType.forEach((row) => { installationsByType[row.site_type] = row.count; });
-    } else {
-      // Fallback: query directly
-      for (const type of ["utility", "commercial", "community"]) {
-        const { count } = await supabase
-          .from("solar_installations")
-          .select("*", { count: "exact", head: true })
-          .eq("site_type", type);
-        if (count) installationsByType[type] = count;
-      }
-    }
-
-    if (byState) {
-      byState.forEach((row) => { installationsByState[row.state] = row.count; });
-    } else {
-      // Fallback: get states with most installations
-      const { data: states } = await supabase
+    // Installations by type - individual count queries (fast, no row limit)
+    const installationsByType = {};
+    for (const type of ["utility", "commercial", "community"]) {
+      const { count } = await supabase
         .from("solar_installations")
-        .select("state")
-        .not("state", "is", null);
-      if (states) {
-        const counts = {};
-        states.forEach((s) => { counts[s.state] = (counts[s.state] || 0) + 1; });
-        // Sort by count desc, take top 20
-        Object.entries(counts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 20)
-          .forEach(([state, count]) => { installationsByState[state] = count; });
-      }
+        .select("*", { count: "exact", head: true })
+        .eq("site_type", type);
+      if (count) installationsByType[type] = count;
     }
 
-    // Total capacity
-    const { data: capData } = await supabase
-      .from("solar_installations")
-      .select("capacity_mw");
-    if (capData) {
-      totalCapacityMw = capData.reduce((sum, row) => sum + (parseFloat(row.capacity_mw) || 0), 0);
+    // Installations by state - individual count queries per state (avoids 1000-row limit)
+    const installationsByState = {};
+    const statePromises = US_STATES.map(async (state) => {
+      const { count } = await supabase
+        .from("solar_installations")
+        .select("*", { count: "exact", head: true })
+        .eq("state", state);
+      return { state, count: count || 0 };
+    });
+    const stateResults = await Promise.all(statePromises);
+    stateResults
+      .filter(r => r.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 25)
+      .forEach(r => { installationsByState[r.state] = r.count; });
+
+    // Total capacity - paginated sum to avoid 1000-row limit
+    let totalCapacityMw = 0;
+    let capOffset = 0;
+    while (true) {
+      const { data: capData } = await supabase
+        .from("solar_installations")
+        .select("capacity_mw")
+        .not("capacity_mw", "is", null)
+        .range(capOffset, capOffset + 4999);
+      if (!capData || capData.length === 0) break;
+      totalCapacityMw += capData.reduce((sum, row) => sum + (parseFloat(row.capacity_mw) || 0), 0);
+      capOffset += 5000;
+      if (capData.length < 5000) break;
     }
 
     // Equipment stats
@@ -77,17 +75,22 @@ export default async function handler(req, res) {
       .from("solar_equipment")
       .select("*", { count: "exact", head: true });
 
-    // Top module technologies
-    const { data: techData } = await supabase
-      .from("solar_equipment")
-      .select("module_technology")
-      .eq("equipment_type", "module")
-      .not("module_technology", "is", null);
+    // Top module technologies - paginated to avoid 1000-row limit
     const techCounts = {};
-    if (techData) {
+    let techOffset = 0;
+    while (true) {
+      const { data: techData } = await supabase
+        .from("solar_equipment")
+        .select("module_technology")
+        .eq("equipment_type", "module")
+        .not("module_technology", "is", null)
+        .range(techOffset, techOffset + 4999);
+      if (!techData || techData.length === 0) break;
       techData.forEach((row) => {
         techCounts[row.module_technology] = (techCounts[row.module_technology] || 0) + 1;
       });
+      techOffset += 5000;
+      if (techData.length < 5000) break;
     }
 
     // Data sources
@@ -95,25 +98,20 @@ export default async function handler(req, res) {
       .from("solar_data_sources")
       .select("name, record_count, last_import");
 
-    // Equipment aging
+    // Equipment aging - use date range count queries (no row limit)
     const currentYear = new Date().getFullYear();
-    let over10Years = 0;
-    let over15Years = 0;
-    let over20Years = 0;
+    const cutoff10 = `${currentYear - 10}-01-01`;
+    const cutoff15 = `${currentYear - 15}-01-01`;
+    const cutoff20 = `${currentYear - 20}-01-01`;
 
-    const { data: dateData } = await supabase
-      .from("solar_installations")
-      .select("install_date")
-      .not("install_date", "is", null);
-    if (dateData) {
-      dateData.forEach((row) => {
-        const year = new Date(row.install_date).getFullYear();
-        const age = currentYear - year;
-        if (age >= 10) over10Years++;
-        if (age >= 15) over15Years++;
-        if (age >= 20) over20Years++;
-      });
-    }
+    const [age10, age15, age20] = await Promise.all([
+      supabase.from("solar_installations").select("*", { count: "exact", head: true })
+        .not("install_date", "is", null).lt("install_date", cutoff10),
+      supabase.from("solar_installations").select("*", { count: "exact", head: true })
+        .not("install_date", "is", null).lt("install_date", cutoff15),
+      supabase.from("solar_installations").select("*", { count: "exact", head: true })
+        .not("install_date", "is", null).lt("install_date", cutoff20),
+    ]);
 
     return res.status(200).json({
       total_installations: totalInstallations || 0,
@@ -127,9 +125,9 @@ export default async function handler(req, res) {
         .map(([name, count]) => ({ name, count })),
       data_sources: dataSources || [],
       equipment_aging: {
-        over_10_years: over10Years,
-        over_15_years: over15Years,
-        over_20_years: over20Years,
+        over_10_years: age10.count || 0,
+        over_15_years: age15.count || 0,
+        over_20_years: age20.count || 0,
       },
     });
   } catch (err) {
