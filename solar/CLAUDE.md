@@ -71,6 +71,7 @@ python3 -u scripts/crossref-tts-eia.py                  # Inherit EIA addresses 
 python3 -u scripts/enrich-egrid.py                       # EPA eGRID operator/owner names
 python3 -u scripts/enrich-lbnl-queues.py                 # LBNL Queued Up developer names
 python3 -u scripts/enrich-gem.py                         # GEM owner/operator names
+python3 -u scripts/backfill-source-fields.py              # Recover owner/address/operator from source files
 
 # Cross-source deduplication (run after all enrichment)
 python3 -u scripts/crossref-dedup.py                    # Match records across sources, fill NULLs
@@ -123,6 +124,7 @@ python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
 | EPA eGRID | `enrich-egrid.py` | Operator + owner names from eGRID 2023 (5,658 solar plants) | `data/egrid/egrid2023_data.xlsx` |
 | LBNL Queued Up | `enrich-lbnl-queues.py` | Developer names from 50+ grid operator queues | `data/lbnl_queued_up/*.xlsx` |
 | GEM Solar Tracker | `enrich-gem.py` | Owner/operator names from Global Energy Monitor (>=1MW) | `data/gem/*.geojson` |
+| Source Field Backfill | `backfill-source-fields.py` | Recover owner/address/operator from original source files | CA DGStats CSVs, NY-Sun CSV, TTS Parquet |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -160,11 +162,18 @@ python3 -u scripts/ingest-iso-queues.py --all       # All 7 ISOs (incl. manual)
 - PJM (Queue Scope web app), ERCOT (MIS portal login), MISO (interactive export), SPP, ISO-NE
 - `gridstatus` library (Python 3.10+) can access CAISO, NYISO, ISO-NE programmatically. PJM needs API key. MISO/SPP/ERCOT blocked.
 
+**REC Tracking Systems (highest-value free sources for owner names)**:
+- **WREGIS** (wecc.org/WREGIS) — Western US, public generator reports with facility owner. Covers AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY. CSV downloads available. ~5,000+ solar generators.
+- **PJM-GATS** (gats.pjm-eis.com) — PJM region (13 states: DE, IL, IN, KY, MD, MI, NJ, NC, OH, PA, TN, VA, WV, DC). Public reports with generator owner/operator. ~3,000+ solar generators.
+- **M-RETS** (app.mrets.org) — Midwest (15 states: IA, IL, IN, KS, MI, MN, MO, MT, ND, NE, NM, OH, OK, SD, WI). Public generator directory with owner names.
+
 **Additional Free**:
 - CEC Equipment Full Data (updated 3x/month)
 - EPA RE-Powering Tracking Matrix (brownfield/landfill solar)
 - NREL Community Solar Project Database
 - Virginia Cooper Center Solar Database (utility-scale VA projects with developer/owner)
+- FERC QF eLibrary (elibrary.ferc.gov) — Owner/operator for qualifying facilities >1MW, free but requires scraping
+- NREL Open PV (openpv.nrel.gov) — 1.6M records, overlaps with TTS but may fill gaps in states we're missing
 
 **Paid (if budget allows)**:
 - SEIA Major Solar Projects List (~$1K/yr membership) — 7K+ projects with developer+owner+offtaker. Best bang for buck.
@@ -452,6 +461,17 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Total**: 1,166 developer_name patches applied, 0 errors
 - **Note**: Filtered out "Masked" developer names (ISOs redact some developer identities)
 
+### Source Field Backfill - COMPLETED (Feb 6, 2026)
+- **backfill-source-fields.py**: Recovers fields from original source data files that weren't captured during initial ingestion
+- **CA DGStats `Third Party Name` → `owner_name`**: 2,530 patches (top: Sunrun 537, Everyday Energy 116, SolarCity 92)
+  - Reads 5 CSV files from `data/ca_dgstats/`, matches by `cadg_{Application Id}` source_record_id
+- **NY-Sun `Street Address` → `address`**: 182 patches (builds full address with city+state)
+  - Only patches records that don't already have an address
+- **TTS `utility_service_territory` → `operator_name`**: 6,080 patches (top: Xcel Energy 1,263, Green Mountain Power 678)
+  - Reads Hive-partitioned Parquet files, matches by extracting state+system_id from `tts3_{state}_{sys_id}_{i}` pattern
+  - Filters placeholder values: "-1", "-9", "0", "NA", "N/A", "Unknown", "None", "nan"
+- **Total**: 8,792 patches applied, 0 errors
+
 ### Reverse Geocoding - COMPLETED (Feb 6, 2026)
 - Latest run: 1,006 additional records geocoded (6 USPVDB + 1,000 NY-Sun), 990 addresses updated
 - Cumulative: 34,322 / 125,389 installations have addresses (27.4%)
@@ -463,21 +483,21 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - 25 states have ZERO commercial data (TTS covers only 27 states)
 - Biggest gaps: NC (~5-10K missing), HI (~3-5K), NV (~2-4K), MI (~2-3K)
 
-**Field coverage snapshot (Feb 6, 2026, post-GEM/LBNL enrichment):**
+**Field coverage snapshot (Feb 6, 2026, post-backfill):**
 | Field | Coverage | Notes |
 |-------|----------|-------|
 | latitude/longitude | 94% | Census ZCTA centroids for zip-only records |
 | county | 96% | Derived from city+state + coord lookup |
 | location_precision | 100% | All records classified |
 | installer_name | 69% | Primarily from TTS/CADG/NY-Sun |
-| operator_name | ~41% | EIA-860 + eGRID + GEM enrichment |
-| owner_name | ~31% | EIA-860 + crossref + eGRID + GEM enrichment |
+| operator_name | ~46% | EIA-860 + eGRID + GEM + TTS utility backfill (+6,080) |
+| owner_name | ~33% | EIA-860 + crossref + eGRID + GEM + CA DGStats third-party (+2,530) |
 | developer_name | ~1.3% | ISO queues (431) + LBNL Queued Up (1,166) |
 | total_cost | 45% | TTS + LBNL utility-scale |
 | cost_per_watt | 55% | Calculated from total_cost/capacity |
 | num_modules | 88% | Counted from equipment table |
 | num_inverters | 62% | Counted from equipment table |
-| address | 27% | Reverse geocoding + source data |
+| address | 27.5% | Reverse geocoding + source data + NY-Sun backfill (+182) |
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
