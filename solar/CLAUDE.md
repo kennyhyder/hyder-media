@@ -39,6 +39,10 @@ Blue Water Battery needs this data to:
 ### Python Dependencies
 ```bash
 pip3 install python-dotenv openpyxl pyarrow
+
+# For gridstatus ISO script (requires Python 3.10+):
+/opt/homebrew/bin/python3.13 -m venv .venv
+.venv/bin/pip install gridstatus python-dotenv
 ```
 
 ### Running All Scripts
@@ -136,9 +140,11 @@ python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
 |---|--------|--------|---------|--------|-------|
 | 8 | **LBNL Utility** | `ingest-lbnl-utility.py` | 1,725 + 1,725 equip | `lbnl_` | Utility-scale with cost/developer data |
 | 9 | **EIA-860M** | `ingest-eia860m.py` | 9,516 | `eia860m_` | Monthly generators (operating+planned+retired+canceled) |
-| 10 | **ISO Queues** | `ingest-iso-queues.py` | 431 | `iso_` | CAISO (294) + NYISO (137). Developer names! |
+| 10 | **ISO Queues** | `ingest-iso-queues.py` | 431 | `iso_` | CAISO (294) + NYISO (137) via direct Excel download |
+| 11 | **ISO gridstatus** | `ingest-iso-gridstatus.py` | 768 | `iso_` | ERCOT (634) + ISO-NE (91) + NYISO (43 new). Requires `.venv` Python 3.13 |
+| 12 | **NJ DEP** | `ingest-nj-dep.py` | 1,850 | `njdep_` | ArcGIS REST API: BTM (428) + Public Facilities (1,322) + Community Solar (100) |
 
-**Grand Total: ~125,389 installations, ~349,087 equipment records, 10 data sources**
+**Grand Total: ~128,007 installations, ~349,087 equipment records, 12 data sources**
 
 ### Running New Scripts
 ```bash
@@ -147,25 +153,28 @@ python3 -u scripts/ingest-eia860m.py                # EIA-860M monthly
 python3 -u scripts/ingest-iso-queues.py             # Auto: CAISO + NYISO
 python3 -u scripts/ingest-iso-queues.py --iso caiso # Single ISO
 python3 -u scripts/ingest-iso-queues.py --all       # All 7 ISOs (incl. manual)
+.venv/bin/python3.13 -u scripts/ingest-iso-gridstatus.py              # All ISOs via gridstatus
+.venv/bin/python3.13 -u scripts/ingest-iso-gridstatus.py --iso ercot  # Single ISO
+python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
 ```
 
 ### Future Sources (researched, not yet ingested)
-
-**Pending Manual Download (scripts ready)**:
-- **NJ NJCEP** — Download from https://njcleanenergy.com/renewable-energy/project-activity-reports/ → save to `data/nj_njcep/`. Installer names for NJ commercial solar.
 
 **Data Download URLs (for re-downloading)**:
 - **LBNL Queued Up**: `https://eta-publications.lbl.gov/sites/default/files/2025-08/lbnl_ix_queue_data_file_thru2024_v2.xlsx` (needs browser UA header)
 - **GEM Solar Tracker**: `https://publicgemdata.nyc3.cdn.digitaloceanspaces.com/solar/{YYYY-MM}/solar_map_{date}.geojson` (check config at `globalenergymonitor.github.io/maps/trackers/solar/config.js` for latest URL)
 
-**ISO Queues (manual download needed)**:
-- PJM (Queue Scope web app), ERCOT (MIS portal login), MISO (interactive export), SPP, ISO-NE
-- `gridstatus` library (Python 3.10+) can access CAISO, NYISO, ISO-NE programmatically. PJM needs API key. MISO/SPP/ERCOT blocked.
+**ISO Queues (remaining ISOs - blocked)**:
+- **PJM**: Requires `PJM_API_KEY` environment variable (free to register at dataminer2.pjm.com)
+- **MISO**: 403 Forbidden (Cloudflare protection), needs gridstatus >=0.34.0 or manual download
+- **SPP**: gridstatus parsing bug ("Extra column Replacement Generator Commercial Op Date")
+- All 3 are blocked in gridstatus 0.29.1. ERCOT, ISO-NE, CAISO, NYISO all work.
 
-**REC Tracking Systems (highest-value free sources for owner names)**:
-- **WREGIS** (wecc.org/WREGIS) — Western US, public generator reports with facility owner. Covers AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY. CSV downloads available. ~5,000+ solar generators.
-- **PJM-GATS** (gats.pjm-eis.com) — PJM region (13 states: DE, IL, IN, KY, MD, MI, NJ, NC, OH, PA, TN, VA, WV, DC). Public reports with generator owner/operator. ~3,000+ solar generators.
-- **M-RETS** (app.mrets.org) — Midwest (15 states: IA, IL, IN, KS, MI, MN, MO, MT, ND, NE, NM, OH, OK, SD, WI). Public generator directory with owner names.
+**REC Tracking Systems (researched - NOT viable for automated ingestion)**:
+- **WREGIS** (wecc.org/WREGIS) — API hostname doesn't resolve. Login-gated. No public download.
+- **PJM-GATS** (gats.pjm-eis.com) — 586K generators but web-only (HTML tables, CSV export returns HTML). "Owner?" column is blank. ORISPL only on large plants. Would need browser automation.
+- **M-RETS** (app.mrets.org, now CleanCounts) — API returns 404. Has public generator report page but no bulk download. Rebranded May 2025.
+- **Conclusion**: REC tracking systems are login/web-gated. No free API or bulk download available. Data largely duplicates EIA coverage anyway.
 
 **Additional Free**:
 - CEC Equipment Full Data (updated 3x/month)
@@ -174,6 +183,7 @@ python3 -u scripts/ingest-iso-queues.py --all       # All 7 ISOs (incl. manual)
 - Virginia Cooper Center Solar Database (utility-scale VA projects with developer/owner)
 - FERC QF eLibrary (elibrary.ferc.gov) — Owner/operator for qualifying facilities >1MW, free but requires scraping
 - NREL Open PV (openpv.nrel.gov) — 1.6M records, overlaps with TTS but may fill gaps in states we're missing
+- **NJ NJCEP** — Excel files from njcleanenergy.com (migrated to cleanenergy.nj.gov, URLs broken). ~209K total NJ installs. Lower priority since NJ DEP ArcGIS already ingested and TTS covers NJ.
 
 **Paid (if budget allows)**:
 - SEIA Major Solar Projects List (~$1K/yr membership) — 7K+ projects with developer+owner+offtaker. Best bang for buck.
@@ -372,7 +382,8 @@ git push origin main
 - **All tables prefixed `solar_`**: Prevents conflicts with other hyder-media tables
 - **Idempotent scripts**: All use `source_record_id` UNIQUE + ignore-duplicates for safe reruns
 - **CdTe = First Solar**: Safe inference, sole major manufacturer
-- **ISO queues**: Best free source for developer/owner names (CAISO + NYISO ingested, 431 records)
+- **ISO queues**: Best free source for developer/owner names (6 ISOs ingested, 1,199 records total)
+- **gridstatus venv**: `.venv` uses Python 3.13 (`/opt/homebrew/bin/python3.13`) because gridstatus requires >=3.10. System Python is 3.9.6.
 - **Ohm Analytics**: Best paid option ($30K) for equipment-per-site data
 
 ## Decision Framework
@@ -414,6 +425,27 @@ When faced with a choice:
   - **Bug fix**: city column had bogus numeric values (14.2, 12.5) — "city" pattern matched "capa**city**" in column header. Fixed with word-boundary matching, nulled out bad data.
 - **EIA-860M Monthly**: 9,516 installations created, 0 errors (7,767 operating + 972 planned + 174 retired + 580 canceled + 23 PR)
 - **ISO Queues**: 431 installations (CAISO 294 + NYISO 137, 0 errors). PJM URL dead (Queue Scope web app now)
+
+### ISO gridstatus Ingestion - COMPLETED (Feb 6, 2026)
+- **ingest-iso-gridstatus.py**: Uses `gridstatus` Python library (v0.29.1) to fetch queue data from 4 ISOs
+- **Requires**: `.venv/bin/python3.13` (gridstatus needs Python >=3.10, system Python is 3.9.6)
+- **ERCOT**: 634 solar projects >= 1 MW, ALL with developer names (100% `Interconnecting Entity` coverage)
+- **ISO-NE**: 91 solar projects >= 1 MW, 0 developer names (ISO-NE doesn't provide this field)
+- **CAISO**: 287 found but all duplicates of existing `ingest-iso-queues.py` records (0 net new)
+- **NYISO**: 143 found, 43 net new (100 duplicates of existing records)
+- **Total**: 768 net new records created, 0 errors
+- **Not supported**: PJM (needs API key), MISO (Cloudflare 403), SPP (column parsing bug)
+- **Note**: CAISO/NYISO "errors" in output are just duplicate key violations — data integrity is fine
+
+### NJ DEP ArcGIS Ingestion - COMPLETED (Feb 6, 2026)
+- **ingest-nj-dep.py**: Queries NJDEP ArcGIS REST API for 3 solar layers
+- **API**: `https://mapsdep.nj.gov/arcgis/rest/services/Features/Utilities/MapServer`
+- **Layer 22 (BTM >1 MW)**: 428 records with project company, address, lat/lng, third-party flag
+- **Layer 17 (Public Facilities)**: 1,322 records with **installer names** (unique to this source!)
+- **Layer 26 (Community Solar)**: 100 records with applicant (developer), capacity, completion year
+- **Total**: 1,850 net new records, state=NJ, all with coordinates
+- **Source record IDs**: `njdep_{project_num}`, `njdep_pub_{account_num}`, `njdep_cs_{record_key}`
+- **Data source name**: `nj_dep`
 
 ### Cross-Source Deduplication - COMPLETED (Feb 6, 2026)
 - **crossref-dedup.py**: Matches records across 10 data sources, fills NULL fields bidirectionally
@@ -492,7 +524,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | installer_name | 69% | Primarily from TTS/CADG/NY-Sun |
 | operator_name | ~46% | EIA-860 + eGRID + GEM + TTS utility backfill (+6,080) |
 | owner_name | ~33% | EIA-860 + crossref + eGRID + GEM + CA DGStats third-party (+2,530) |
-| developer_name | ~1.3% | ISO queues (431) + LBNL Queued Up (1,166) |
+| developer_name | ~1.9% | ISO queues (1,199) + LBNL Queued Up (1,166) — ERCOT 634 all with dev names |
 | total_cost | 45% | TTS + LBNL utility-scale |
 | cost_per_watt | 55% | Calculated from total_cost/capacity |
 | num_modules | 88% | Counted from equipment table |
