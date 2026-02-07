@@ -76,6 +76,9 @@ python3 -u scripts/enrich-egrid.py                       # EPA eGRID operator/ow
 python3 -u scripts/enrich-lbnl-queues.py                 # LBNL Queued Up developer names
 python3 -u scripts/enrich-gem.py                         # GEM owner/operator names
 python3 -u scripts/backfill-source-fields.py              # Recover owner/address/operator from source files
+python3 -u scripts/enrich-wregis.py                       # WREGIS owner names (western US, 10,695 matches)
+python3 -u scripts/enrich-wregis.py --dry-run             # Preview WREGIS matches
+python3 -u scripts/enrich-wregis.py --skip-download       # Use existing Excel file
 
 # Cross-source deduplication (run after all enrichment)
 python3 -u scripts/crossref-dedup.py                    # Match records across sources, fill NULLs
@@ -129,6 +132,7 @@ python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
 | LBNL Queued Up | `enrich-lbnl-queues.py` | Developer names from 50+ grid operator queues | `data/lbnl_queued_up/*.xlsx` |
 | GEM Solar Tracker | `enrich-gem.py` | Owner/operator names from Global Energy Monitor (>=1MW) | `data/gem/*.geojson` |
 | Source Field Backfill | `backfill-source-fields.py` | Recover owner/address/operator from original source files | CA DGStats CSVs, NY-Sun CSV, TTS Parquet |
+| WREGIS Owner | `enrich-wregis.py` | Owner names from western US REC tracking (10,695 matches) | `data/wregis/wregis_active_generators.xlsx` |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -170,11 +174,11 @@ python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
 - **SPP**: gridstatus parsing bug ("Extra column Replacement Generator Commercial Op Date")
 - All 3 are blocked in gridstatus 0.29.1. ERCOT, ISO-NE, CAISO, NYISO all work.
 
-**REC Tracking Systems (researched - NOT viable for automated ingestion)**:
-- **WREGIS** (wecc.org/WREGIS) — API hostname doesn't resolve. Login-gated. No public download.
-- **PJM-GATS** (gats.pjm-eis.com) — 586K generators but web-only (HTML tables, CSV export returns HTML). "Owner?" column is blank. ORISPL only on large plants. Would need browser automation.
-- **M-RETS** (app.mrets.org, now CleanCounts) — API returns 404. Has public generator report page but no bulk download. Rebranded May 2025.
-- **Conclusion**: REC tracking systems are login/web-gated. No free API or bulk download available. Data largely duplicates EIA coverage anyway.
+**REC Tracking Systems (researched)**:
+- **WREGIS** — **VIABLE!** Direct Excel download: `https://www.wecc.org/sites/default/files/documents/program/2026/WREGIS%20Public%20Report%20Active%20Generators%202.4.26xlsx.xlsx` (from wecc.org/wecc-document/1136). 17,241 total generators, **15,074 solar** (CA: 13,293, NM: 718, OR: 357, NV: 168, CO: 155). Has **Organization Name** (owner/off-taker) + capacity + state + COD. No EIA ID — needs name+state+capacity matching.
+- **PJM-GATS** (gats.pjm-eis.com) — 586K generators but web-only (DevExpress grid, CSV export needs browser session). "Owner?" is just Y/N flag, NOT actual name. Has ORISPL (EIA ID) for large plants. Would need Playwright/Puppeteer to export.
+- **M-RETS** (app.mrets.org, now CleanCounts) — API needs auth. Public CSV download only has 174 thermal generators (zero solar). REC generator data only in web app SPA. Rebranded May 2025.
+- **Conclusion**: WREGIS is the clear winner — direct download, 15K solar generators with org names. PJM-GATS and M-RETS require browser automation or API registration.
 
 **Additional Free**:
 - CEC Equipment Full Data (updated 3x/month)
@@ -217,6 +221,8 @@ solar/data/
 │   └── lbnl_ix_queue_data_file_thru2024_v2.xlsx  # 13MB, 36,441 records (17,422 solar)
 ├── gem/                     # GEM Solar Power Tracker
 │   └── gem_solar_map_2026-02-05.geojson  # 183MB, 103,940 global (8,700 US)
+├── wregis/                  # WREGIS REC tracking data
+│   └── wregis_active_generators.xlsx  # 17,241 generators, 15,074 solar
 └── zcta_centroids.txt       # Census ZCTA geocoding file (33,144 zips)
 ```
 
@@ -508,28 +514,50 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - Latest run: 1,006 additional records geocoded (6 USPVDB + 1,000 NY-Sun), 990 addresses updated
 - Cumulative: 34,322 / 125,389 installations have addresses (27.4%)
 
-### Data Completeness Assessment (Feb 6, 2026)
+### WREGIS Owner Enrichment - COMPLETED (Feb 7, 2026)
+- **enrich-wregis.py**: Downloads WREGIS active generators Excel, cross-references by state + capacity (20% tolerance) + name similarity
+- **Data**: 15,074 solar generators from WECC (covers western US: CA, AZ, NV, OR, CO, NM, UT, WA, ID, MT, WY)
+- **Matching**: Requires name word overlap (score >= 2) or very tight capacity match (5%). Originally matched 90% of candidates; tightened thresholds reduced to 23%
+- **Results**: 10,695 owner_name patches applied, 0 errors
+  - CA: 10,308 | AZ: 149 | NM: 177 | UT: 32 | OR: 17 | NV: 11 | CO: 1
+- **Impact**: owner_name coverage jumped from 32.6% → ~41%
+- **Key orgs assigned**: NextEra Energy Resources, Onyx Renewable Partners, SunRay Power, Bridge Solar Energy Holdings, Consolidated Edison Development
+
+### Data Completeness Assessment (Feb 7, 2026)
+**Database totals: 128,007 installations, 349,087 equipment, 80 events, 11 sources**
+
 **Coverage vs total US market:**
 - Utility-scale (>=1 MW): ~95-100% coverage (EIA-860 is mandatory federal census)
 - Commercial (25 kW - 1 MW): ~60-65% coverage (~44-65K records missing)
 - 25 states have ZERO commercial data (TTS covers only 27 states)
 - Biggest gaps: NC (~5-10K missing), HI (~3-5K), NV (~2-4K), MI (~2-3K)
 
-**Field coverage snapshot (Feb 6, 2026, post-backfill):**
-| Field | Coverage | Notes |
-|-------|----------|-------|
-| latitude/longitude | 94% | Census ZCTA centroids for zip-only records |
-| county | 96% | Derived from city+state + coord lookup |
-| location_precision | 100% | All records classified |
-| installer_name | 69% | Primarily from TTS/CADG/NY-Sun |
-| operator_name | ~46% | EIA-860 + eGRID + GEM + TTS utility backfill (+6,080) |
-| owner_name | ~33% | EIA-860 + crossref + eGRID + GEM + CA DGStats third-party (+2,530) |
-| developer_name | ~1.9% | ISO queues (1,199) + LBNL Queued Up (1,166) — ERCOT 634 all with dev names |
-| total_cost | 45% | TTS + LBNL utility-scale |
-| cost_per_watt | 55% | Calculated from total_cost/capacity |
-| num_modules | 88% | Counted from equipment table |
-| num_inverters | 62% | Counted from equipment table |
-| address | 27.5% | Reverse geocoding + source data + NY-Sun backfill (+182) |
+**Field coverage snapshot (Feb 7, 2026, post-WREGIS):**
+| Field | Count | Coverage | Notes |
+|-------|------:|----------|-------|
+| capacity_mw | 128,007 | 100% | Required by all ingestion scripts |
+| site_type | 128,007 | 100% | utility (34,271), commercial (93,636), community (100) |
+| site_status | 128,007 | 100% | active, proposed, retired, etc. |
+| state | 128,006 | ~100% | 1 record missing state |
+| install_date | 124,306 | 97.1% | COD or queue date |
+| location_precision | 125,389 | 97.9% | 2,618 newer records untagged |
+| county | 120,890 | 94.4% | Derived from city+state + coord lookup |
+| latitude/longitude | 119,821 | 93.6% | Census ZCTA centroids for zip-only records |
+| zip_code | 118,559 | 92.6% | From source data + geocoding |
+| city | 113,473 | 88.6% | From source data |
+| installer_name | 87,814 | 68.6% | Primarily from TTS/CADG/NY-Sun |
+| operator_name | 56,652 | 44.3% | EIA-860 + eGRID + GEM + TTS utility + OSM |
+| address | 54,881 | 42.9% | Reverse geocoding + source data + cross-reference |
+| owner_name | ~52,410 | ~41% | EIA-860 + crossref + eGRID + GEM + WREGIS (+10,695) |
+| developer_name | 1,943 | 1.5% | ISO queues + LBNL Queued Up — hardest to source |
+
+**Equipment coverage (349,087 total):**
+| Field | Count | Coverage | Notes |
+|-------|------:|----------|-------|
+| manufacturer | 334,645 | 95.9% | Excellent for brand identification |
+| model | 200,715 | 57.5% | Good for product matching |
+| CEC specs | 83,102 | 23.8% | Modules 19%, inverters 35.3% |
+| racking | 0 | 0% | No free source — requires Ohm Analytics ($30K) |
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
