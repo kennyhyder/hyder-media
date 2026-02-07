@@ -189,10 +189,32 @@ python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
 - NREL Open PV (openpv.nrel.gov) — 1.6M records, overlaps with TTS but may fill gaps in states we're missing
 - **NJ NJCEP** — Excel files from njcleanenergy.com (migrated to cleanenergy.nj.gov, URLs broken). ~209K total NJ installs. Lower priority since NJ DEP ArcGIS already ingested and TTS covers NJ.
 
+**Gap-Filling Research (Feb 7, 2026):**
+Comprehensive research into replicating Ohm Analytics' methodology and using satellite imagery:
+
+*How Ohm Analytics sources data ($30K/yr):* (1) Building permit scraping from thousands of municipal portals — permits require panel/inverter manufacturer+model; (2) Data partnerships — solar companies share project details for free platform access; (3) Utility/software partnerships — interconnection data from utilities and monitoring platforms.
+
+*High-Priority Free Sources (not yet ingested):*
+- **NOAA Storm Events** (ncei.noaa.gov/stormevents/) — County-level hail (>=1"), wind, tornado since 1950. Cross-reference with installations → flag sites with likely panel damage. Millions of events. HIGH VALUE for Blue Water (damage = replacement leads).
+- **PJM GATS** (gats.pjm-eis.com) — Owner names for 13+ PJM states (NJ, PA, MD, DE, DC, OH, etc.). Web-based DevExpress grid, needs Playwright/Puppeteer for CSV export. Has ORISPL (EIA ID) for large plants.
+- **CPSC Recalls** (cpsc.gov/Recalls) — Flag installations using recalled panel/inverter models. Small dataset but high urgency value.
+- **DeepSolar-3M** (github.com/rajanieprabha/DeepSolar-3M) — Stanford dataset: 3 million installations detected from satellite. Free cross-reference to validate our coordinates and find missing sites.
+- **Municipal Permit Portals** — Top cities with Socrata/open data APIs: Cary NC, Cambridge MA, Boston, Austin TX, NYC. Equipment-per-site data (panel/inverter manufacturer+model). This IS Ohm's core method. High effort per city.
+- **NYSERDA DER** (der.nyserda.ny.gov) — May have richer equipment fields than our NY-Sun ingest.
+
+*Satellite Imagery Pipeline (~$50-200 total):*
+- **NREL Panel-Segmentation** (github.com/NREL/Panel-Segmentation) — Open-source Faster R-CNN ResNet-50 that classifies ground-mount vs. rooftop vs. carport AND fixed-tilt vs. single-axis tracker. 77.8% mAP. This fills our 0% racking/mounting data gap.
+- **NAIP Imagery** — Free 0.6m resolution aerial photography, all 48 contiguous states, via Google Earth Engine or AWS. Public domain.
+- Pipeline: Extract 500m x 500m tiles per installation via GEE ($0) → Run NREL model on cloud GPU ($50-200) → Write mount_type to database.
+- **Google Solar API**: Skip — $9,600 for 128K requests, rooftop-only, useless for utility-scale.
+- **Google Street View**: Skip — $896, wrong viewing angle.
+- **Google Static Maps**: Cheap ($256 for 128K images) but ToS may restrict ML use. NAIP preferred.
+- **Global PV Dataset 2019-2022** — 20m resolution global detection (Beijing Normal University, Scientific Data 2025). Free cross-reference.
+
 **Paid (if budget allows)**:
 - SEIA Major Solar Projects List (~$1K/yr membership) — 7K+ projects with developer+owner+offtaker. Best bang for buck.
 - Wiki-Solar ($100-1K+) — 25K global projects with developer, owner, EPC contractor, equipment supplier
-- Ohm Analytics (~$30K/yr) — Equipment per site for distributed solar. Best commercial data.
+- Ohm Analytics (~$30K/yr) — Equipment per site for distributed solar. Best commercial data. Can be substantially replicated via building permit scraping + satellite imagery (see above).
 - ACP CleanPowerIQ ($10-20K/yr) — 60K+ power assets with 50+ attributes
 - Enverus ($20K+/yr) — Enterprise-grade project tracking
 
@@ -461,6 +483,7 @@ When faced with a choice:
 - **Phase 3 (Broad)**: 4 cross-tier coord matches (tight 25% capacity tolerance)
 - **Total**: 33,077 records enriched (26.4% of database), zero errors
 - **Key enrichments**: 14,614 owner_name, 3,749 total_cost, 3,033 installer_name, 490 location upgrades
+- **Re-run (Feb 7)**: +1,886 patches from 2,618 newer records (NJ DEP + ISO gridstatus). 454 developer_name, 289 owner_name, 474 address, 259 location upgrades, 162 install_date, 1,344 crossref links. 0 errors.
 - **Bug fix**: First run had Phase 2a city-only fallback that created 688-link crossref explosion. Fixed to require capacity match. Phase 3 limited to cross-tier matches (federal vs state sources).
 - **Crossref cap**: Max 20 crossref_ids per record (community solar projects can legitimately have many TTS sub-installations)
 - **DB password**: `#FsW7iqg%EYX&G3M` via pooler at `aws-0-us-west-2.pooler.supabase.com:6543`
@@ -557,7 +580,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | manufacturer | 334,645 | 95.9% | Excellent for brand identification |
 | model | 200,715 | 57.5% | Good for product matching |
 | CEC specs | 83,102 | 23.8% | Modules 19%, inverters 35.3% |
-| racking | 0 | 0% | No free source — requires Ohm Analytics ($30K) |
+| racking | 0 | 0% | NREL Panel-Segmentation + NAIP imagery can fill mount_type (~$50-200) |
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
