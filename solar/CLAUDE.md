@@ -84,6 +84,17 @@ python3 -u scripts/enrich-wregis.py --skip-download       # Use existing Excel f
 python3 -u scripts/crossref-dedup.py                    # Match records across sources, fill NULLs
 python3 -u scripts/crossref-dedup.py --dry-run          # Preview matches without patching
 python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
+
+# Event enrichment (run after cross-references)
+python3 -u scripts/enrich-noaa-storms.py                # NOAA storm events → site damage records (downloads 11yr data)
+python3 -u scripts/enrich-noaa-storms.py --skip-download # Use existing downloaded CSVs
+python3 -u scripts/enrich-noaa-storms.py --dry-run      # Preview matches without creating events
+python3 -u scripts/enrich-cpsc-recalls.py               # CPSC equipment recalls → recall events
+python3 -u scripts/enrich-cpsc-recalls.py --dry-run     # Preview recall matches
+
+# Data source monitoring
+python3 -u scripts/check-data-sources.py                # Check all 18 data sources for freshness/availability
+python3 -u scripts/check-data-sources.py --json         # Save report to data/source_health_report.json
 ```
 
 ## Data Sources - Complete Registry
@@ -133,6 +144,9 @@ python3 -u scripts/crossref-dedup.py --phase 1          # ID-based matching only
 | GEM Solar Tracker | `enrich-gem.py` | Owner/operator names from Global Energy Monitor (>=1MW) | `data/gem/*.geojson` |
 | Source Field Backfill | `backfill-source-fields.py` | Recover owner/address/operator from original source files | CA DGStats CSVs, NY-Sun CSV, TTS Parquet |
 | WREGIS Owner | `enrich-wregis.py` | Owner names from western US REC tracking (10,695 matches) | `data/wregis/wregis_active_generators.xlsx` |
+| NOAA Storms | `enrich-noaa-storms.py` | Hail/wind damage events cross-referenced to installations by county | `data/noaa_storms/*.csv.gz` (auto-downloaded, 11 years) |
+| CPSC Recalls | `enrich-cpsc-recalls.py` | Equipment recall events matched by manufacturer+model | Hardcoded 7 known solar recalls |
+| Data Source Monitor | `check-data-sources.py` | Health check for all 18 data sources (freshness, availability) | Reads DB + checks URLs |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -245,6 +259,8 @@ solar/data/
 │   └── gem_solar_map_2026-02-05.geojson  # 183MB, 103,940 global (8,700 US)
 ├── wregis/                  # WREGIS REC tracking data
 │   └── wregis_active_generators.xlsx  # 17,241 generators, 15,074 solar
+├── noaa_storms/             # NOAA Storm Events bulk CSVs (auto-downloaded)
+│   └── StormEvents_details-ftp_v1.0_d{YYYY}_*.csv.gz  # 11 years, ~120MB total
 └── zcta_centroids.txt       # Census ZCTA geocoding file (33,144 zips)
 ```
 
@@ -264,6 +280,8 @@ solar/data/
 - **CA DGStats**: 269 columns, up to 8 module arrays and 64 inverter arrays per site
 - **IL Shines**: NO equipment data at all
 - **MA PTS**: Header at row 11, data row 12. Has manufacturer but NO model numbers
+- **solar_site_events**: Has NO `event_subtype` or `source` column! Only: id, installation_id, event_type, event_date, description, old_capacity_kw, new_capacity_kw, equipment_changed, data_source_id, created_at
+- **NOAA storms dedup**: Keep only worst event per installation per year per type (hail/wind), otherwise county-level matching creates millions of events
 
 ## Regular Update Schedule
 
@@ -288,7 +306,7 @@ solar/data/
 - `solar_equipment` - Panel, inverter, racking, battery records per installation (21 columns)
 - `solar_site_owners` - Owner/developer/operator entities
 - `solar_installers` - Installer companies with stats
-- `solar_site_events` - Upgrades, repowers, maintenance, damage records
+- `solar_site_events` - Upgrades, repowers, maintenance, damage, recall records (columns: id, installation_id, event_type, event_date, description, old_capacity_kw, new_capacity_kw, equipment_changed, data_source_id, created_at. **NO event_subtype column!**)
 - `solar_data_sources` - Provenance tracking
 
 ### Key Column Constraints
@@ -325,7 +343,7 @@ All 5 pages built and deployed as static export:
 | Installers | `/solar/installers/` | `src/app/installers/page.tsx` | Search by name/state, sort by count/capacity/recent, card layout with portfolio stats |
 
 ### Key Components
-- **InstallationMap** (`src/components/InstallationMap.tsx`) - Leaflet map with circle markers color-coded by site type (utility=blue, commercial=green, community=purple), size by capacity, popup with details, fits bounds to markers, limited to 1000 markers for performance
+- **InstallationMap** (`src/components/InstallationMap.tsx`) - Leaflet map with ESRI World Imagery satellite tiles (default) + OpenStreetMap street view toggle. Circle markers color-coded by site type (utility=blue, commercial=green, community=purple), size by capacity, popup with details, fits bounds to markers, limited to 1000 markers for performance
 - **Dynamic imports**: Map uses `next/dynamic` with `ssr: false` since Leaflet requires `window`
 - **URL param support**: Search, Equipment pages read `useSearchParams()` for deep-linking from Site Detail
 - **Geospatial search**: "Use Location" button gets browser geolocation, radius picker (10-200 mi), shows distance column + auto-opens map
@@ -546,8 +564,38 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Impact**: owner_name coverage jumped from 32.6% → ~41%
 - **Key orgs assigned**: NextEra Energy Resources, Onyx Renewable Partners, SunRay Power, Bridge Solar Energy Holdings, Consolidated Edison Development
 
+### CPSC Recall Enrichment - COMPLETED (Feb 7, 2026)
+- **enrich-cpsc-recalls.py**: Matches 7 known CPSC solar equipment recalls against 334,645 equipment records
+- **Recalls tracked**: Fronius Galvo/Symo (shock, 2,484 matches), SMA Sunny Boy 240 (fire, 500), SolarWorld MC4 (shock, 356), Schneider Conext CL-60 (shock, 71), CertainTeed roofing (fire, 58), Bosch c-Si M60 (fire, 30), GAF Timberline (fire, 0)
+- **Total**: 3,499 recall events created affecting 3,111 installations, 0 errors
+- **Event type**: `recall` in solar_site_events
+
+### NOAA Storm Events Enrichment - COMPLETED (Feb 7, 2026)
+- **enrich-noaa-storms.py**: Downloads NOAA bulk CSVs (2015-2025), matches hail (>=1") and wind (>=58 kts) events to installations by state+county FIPS
+- **Data**: 125,623 damaging storm events across 11 years (~120MB of gzipped CSVs auto-downloaded)
+- **Dedup**: Keeps only worst event per installation per year per type (hail/wind) to avoid explosion
+- **Event types**: `hail`, `severe_hail` (>=2"), `high_wind` in solar_site_events
+- **Total**: 561,731 site events affecting 95,804 installations (75% of database)
+- **Impact**: Identifies sites with recurring storm damage — HIGH VALUE for Blue Water Battery (damage = replacement leads)
+
+### Map Satellite Tiles - COMPLETED (Feb 7, 2026)
+- Switched InstallationMap from OpenStreetMap-only to ESRI World Imagery satellite as default
+- Added layer control to switch between Satellite and Street views
+- Solar panels visible from satellite at zoom 15+
+
+### Forward Geocoding Investigation - COMPLETED (Feb 7, 2026)
+- Investigated 1,065 records with address but no lat/lng coordinates
+- All are ISO interconnection queue records with grid infrastructure names (substations, kV lines)
+- Not geocodable — these aren't real street addresses. 98.1% of actual addresses already have coordinates.
+
+### Data Source Health Monitor - COMPLETED (Feb 7, 2026)
+- **check-data-sources.py**: Comprehensive registry of all 18 data sources (11 primary + 7 enrichment)
+- Checks URL availability, record counts vs expected, freshness vs update schedule, data directory status
+- JSON export option for automation: `--json` saves to `data/source_health_report.json`
+- Covers: USPVDB, EIA-860, TTS, CA DGStats, NY-Sun, IL Shines, MA PTS, LBNL, EIA-860M, ISO, NJ DEP, CEC, Nominatim, OSM, NOAA, WREGIS, eGRID, GEM
+
 ### Data Completeness Assessment (Feb 7, 2026)
-**Database totals: 128,007 installations, 349,087 equipment, 80 events, 11 sources**
+**Database totals: 128,007 installations, 349,087 equipment, ~565,310 events (80 generator + 3,499 recall + ~561,731 storm), 12 sources**
 
 **Coverage vs total US market:**
 - Utility-scale (>=1 MW): ~95-100% coverage (EIA-860 is mandatory federal census)
