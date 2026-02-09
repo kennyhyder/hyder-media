@@ -95,6 +95,13 @@ python3 -u scripts/enrich-cpsc-recalls.py --dry-run     # Preview recall matches
 # Data source monitoring
 python3 -u scripts/check-data-sources.py                # Check all 18 data sources for freshness/availability
 python3 -u scripts/check-data-sources.py --json         # Save report to data/source_health_report.json
+
+# Satellite imagery + mount type classification (requires Google Maps API key + droplet)
+python3 -u scripts/fetch-satellite-images.py --location-precision exact   # Download satellite tiles (~$85, covered by free credit)
+bash scripts/deploy-nrel-to-droplet.sh setup            # One-time droplet setup (conda + NREL model)
+bash scripts/deploy-nrel-to-droplet.sh sync             # Rsync images + script to droplet
+bash scripts/deploy-nrel-to-droplet.sh classify         # Start classification in screen session
+bash scripts/deploy-nrel-to-droplet.sh status           # Check classification progress
 ```
 
 ## Data Sources - Complete Registry
@@ -628,7 +635,50 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | manufacturer | 334,645 | 95.9% | Excellent for brand identification |
 | model | 200,715 | 57.5% | Good for product matching |
 | CEC specs | 83,102 | 23.8% | Modules 19%, inverters 35.3% |
-| racking | 0 | 0% | NREL Panel-Segmentation + NAIP imagery can fill mount_type (~$50-200) |
+| mount_type | ~5,865+ | ~4.6%+ | NREL Panel-Segmentation classification in progress (batch 2 running) |
+| racking | 0 | 0% | No racking data in any source |
+
+### NREL Satellite Mount Type Classification - IN PROGRESS (Feb 9, 2026)
+
+**Pipeline**: Google Maps Static API → satellite images → NREL Panel-Segmentation model → mount_type in DB
+
+**Scripts**:
+- `fetch-satellite-images.py`: Downloads 640x640 satellite tiles for installations with exact coordinates
+- `classify-mount-type.py`: Runs NREL Faster R-CNN ResNet-50 model to detect panels and classify mount type
+- `deploy-nrel-to-droplet.sh`: Deploys conda env + model weights to DigitalOcean droplet (104.131.105.89)
+
+**Droplet Setup**:
+- 8 CPU, 15GB RAM, Ubuntu 25.04
+- Miniconda with Python 3.10, TensorFlow 2.17.1, PyTorch 2.10.0
+- NREL Panel-Segmentation models (~2.9 GB total) in conda env
+- Classification runs in `screen -r nrel` session
+
+**Image Download Progress**:
+- 23,338 images downloaded (of 52,973 exact-location installations)
+- Hit Google Maps daily quota (403 Forbidden) after ~13K images per session
+- Cost: $2/1000 requests, fully covered by $200/month free credit
+- Re-run `fetch-satellite-images.py --location-precision exact` tomorrow for remaining ~29K
+
+**Batch 1 Results (10,944 images, completed Feb 7)**:
+- Processed: 8,983 (1,961 already had mount_type from source data)
+- Classified: 5,865 (65.3% detection rate)
+- No panels detected: 3,095 (34.4%)
+- Errors: 23 (0.3%)
+- Time: 380.8 min (~6.3 hours) at 0.4 img/sec
+- Mount type breakdown:
+  - ground_fixed: 2,470 (42.1%)
+  - ground_single_axis: 1,899 (32.4%)
+  - rooftop: 1,087 (18.5%)
+  - carport: 409 (7.0%)
+
+**Batch 2 (23,365 images, started Feb 9)**: 15,282 images to classify (~10.6 hours)
+- Monitor: `ssh root@104.131.105.89 'grep Progress /root/solar-nrel/results/classify_batch2.log | tail -5'`
+
+**Mount Type Mapping**:
+- NREL `ground-fixed` → DB `ground_fixed`
+- NREL `ground-single_axis_tracker` → DB `ground_single_axis`
+- NREL `rooftop-fixed` → DB `rooftop`
+- NREL `carport-fixed` → DB `carport`
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.

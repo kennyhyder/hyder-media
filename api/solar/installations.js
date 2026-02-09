@@ -7,19 +7,6 @@ function getSupabase() {
   );
 }
 
-// Haversine distance in miles between two lat/lng pairs
-function haversineDistance(lat1, lng1, lat2, lng2) {
-  const R = 3958.8; // Earth radius in miles
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -54,7 +41,6 @@ export default async function handler(req, res) {
     const pageNum = Math.max(1, parseInt(page));
     const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
     const offset = (pageNum - 1) * limitNum;
-    const isGeoSearch = near_lat && near_lng && radius_miles;
 
     let query = supabase
       .from("solar_installations")
@@ -73,52 +59,17 @@ export default async function handler(req, res) {
     if (has_battery === "true") query = query.eq("has_battery_storage", true);
     if (q) query = query.or(`site_name.ilike.%${q}%,county.ilike.%${q}%,installer_name.ilike.%${q}%`);
 
-    // Geospatial search: bounding box filter + Haversine distance
-    if (isGeoSearch) {
-      const lat = parseFloat(near_lat);
-      const lng = parseFloat(near_lng);
-      const radius = parseFloat(radius_miles);
-      // Bounding box approximation (1 degree lat ≈ 69 miles)
-      const latRange = radius / 69;
-      const lngRange = radius / (69 * Math.cos((lat * Math.PI) / 180));
-      query = query
-        .not("latitude", "is", null)
-        .gte("latitude", lat - latRange)
-        .lte("latitude", lat + latRange)
-        .gte("longitude", lng - lngRange)
-        .lte("longitude", lng + lngRange);
-
-      // For geo search, fetch more results for distance filtering, then paginate in JS
-      const { data: geoData, error: geoError } = await query
-        .order("capacity_dc_kw", { ascending: false, nullsFirst: false })
-        .range(0, 4999);
-
-      if (geoError) return res.status(500).json({ error: geoError.message });
-
-      // Calculate exact Haversine distances and filter
-      const withDistance = (geoData || [])
-        .map((row) => ({
-          ...row,
-          distance_miles: haversineDistance(lat, lng, parseFloat(row.latitude), parseFloat(row.longitude)),
-        }))
-        .filter((row) => row.distance_miles <= radius)
-        .sort((a, b) => a.distance_miles - b.distance_miles);
-
-      const total = withDistance.length;
-      const paged = withDistance.slice(offset, offset + limitNum);
-
-      return res.status(200).json({
-        data: paged,
-        pagination: {
-          page: pageNum,
-          limit: limitNum,
-          total,
-          totalPages: Math.ceil(total / limitNum),
-        },
+    // Geospatial search
+    if (near_lat && near_lng && radius_miles) {
+      const meters = parseFloat(radius_miles) * 1609.34;
+      query = query.rpc("solar_nearby", {
+        lat: parseFloat(near_lat),
+        lng: parseFloat(near_lng),
+        radius_m: meters,
       });
     }
 
-    // Sort and paginate (non-geo search)
+    // Sort and paginate
     const validSorts = ["install_date", "capacity_dc_kw", "state", "site_name", "created_at"];
     const sortCol = validSorts.includes(sort) ? sort : "install_date";
     query = query

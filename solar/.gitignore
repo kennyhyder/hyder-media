@@ -3,6 +3,7 @@ node_modules/
 
 # Next.js source (only built output is deployed)
 src/
+scripts/
 public/
 next.config.ts
 next-env.d.ts
@@ -12,6 +13,7 @@ postcss.config.mjs
 eslint.config.mjs
 package.json
 package-lock.json
+CLAUDE.md
 
 # Build temp/cache directories
 out/
