@@ -154,6 +154,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | NOAA Storms | `enrich-noaa-storms.py` | Hail/wind damage events cross-referenced to installations by county | `data/noaa_storms/*.csv.gz` (auto-downloaded, 11 years) |
 | CPSC Recalls | `enrich-cpsc-recalls.py` | Equipment recall events matched by manufacturer+model | Hardcoded 7 known solar recalls |
 | Data Source Monitor | `check-data-sources.py` | Health check for all 18 data sources (freshness, availability) | Reads DB + checks URLs |
+| PJM-GATS | `enrich-pjm-gats.py` | Owner names from PJM REC tracking (13+ states: NJ, PA, MD, DE, DC, OH, VA, IL) | `data/pjm_gats/GATSGenerators_*.xlsx` (manual export from gats.pjm-eis.com) |
+| Municipal Permits | `ingest-permits.py` | Solar permits from 23 US city open data portals (4 tiers) | Socrata/OpenDataSoft APIs (no local files) |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -171,7 +173,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 13 | **SPP Queue** | `ingest-iso-spp-miso.py` | 283 | `iso_spp_` | Direct CSV download. 10 states (OK, KS, TX, NE, NM). No developer names. |
 | 14 | **MISO Queue** | `ingest-iso-spp-miso.py` | 919 | `iso_miso_` | JSON API. 16+ states (IA, IL, IN, MN, MI, etc). Has TO names as operator. |
 
-**Grand Total: ~129,209 installations, ~349,087 equipment records, 14 data sources**
+**Grand Total: ~213,772 installations (~129,209 original + 84,563 municipal permits), ~350,500+ equipment records, 14 primary sources + 23 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -186,6 +188,18 @@ python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
 python3 -u scripts/ingest-iso-spp-miso.py           # SPP CSV + MISO JSON API
 python3 -u scripts/ingest-iso-spp-miso.py --iso spp # SPP only
 python3 -u scripts/ingest-iso-spp-miso.py --iso miso # MISO only
+python3 -u scripts/ingest-permits.py                 # Municipal permits (all 23 cities)
+python3 -u scripts/ingest-permits.py --city cary     # Single city
+python3 -u scripts/ingest-permits.py --city sf,la    # Multiple cities
+python3 -u scripts/ingest-permits.py --tier 1        # All Tier 1 cities only
+python3 -u scripts/ingest-permits.py --tier 1,2      # Tier 1 and 2
+python3 -u scripts/ingest-permits.py --dry-run       # Preview without ingesting
+python3 -u scripts/ingest-permits.py --list-cities   # Show available cities
+
+# PJM-GATS enrichment (manual XLSX export required)
+python3 -u scripts/enrich-pjm-gats.py               # Owner enrichment from GATS export
+python3 -u scripts/enrich-pjm-gats.py --dry-run     # Preview matches
+python3 -u scripts/enrich-pjm-gats.py --file /path/to.xlsx  # Use specific file
 ```
 
 ### Future Sources (researched, not yet ingested)
@@ -202,9 +216,9 @@ python3 -u scripts/ingest-iso-spp-miso.py --iso miso # MISO only
 
 **REC Tracking Systems (researched)**:
 - **WREGIS** — **VIABLE!** Direct Excel download: `https://www.wecc.org/sites/default/files/documents/program/2026/WREGIS%20Public%20Report%20Active%20Generators%202.4.26xlsx.xlsx` (from wecc.org/wecc-document/1136). 17,241 total generators, **15,074 solar** (CA: 13,293, NM: 718, OR: 357, NV: 168, CO: 155). Has **Organization Name** (owner/off-taker) + capacity + state + COD. No EIA ID — needs name+state+capacity matching.
-- **PJM-GATS** (gats.pjm-eis.com) — 586K generators but web-only (DevExpress grid, CSV export needs browser session). "Owner?" is just Y/N flag, NOT actual name. Has ORISPL (EIA ID) for large plants. Would need Playwright/Puppeteer to export.
+- **PJM-GATS** (gats.pjm-eis.com) — **DONE!** 582K solar generators across 13+ PJM states. Manual XLSX export via built-in report (no Playwright needed). "Owner?" is Y/N flag only, NOT actual name. Capacity in Unit Name field (e.g., "13.30 kW"). MSET utility prefix codes map to owner names. `enrich-pjm-gats.py` cross-references with existing DB → 178 owner_name patches.
 - **M-RETS** (app.mrets.org, now CleanCounts) — API needs auth. Public CSV download only has 174 thermal generators (zero solar). REC generator data only in web app SPA. Rebranded May 2025.
-- **Conclusion**: WREGIS is the clear winner — direct download, 15K solar generators with org names. PJM-GATS and M-RETS require browser automation or API registration.
+- **Conclusion**: WREGIS and PJM-GATS both done. M-RETS requires browser automation or API registration (minimal solar data anyway).
 
 **Additional Free**:
 - CEC Equipment Full Data (updated 3x/month)
@@ -747,6 +761,38 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | address | 43% | ~45% | Most remaining are non-geocodable ISO records |
 | operator_name | 44% | ~50% | Municipal permit data, utility partnerships |
 | CEC specs | 24% | 24% | Limited by 55% of modules lacking model numbers |
+
+### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
+- **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
+- **Data source**: Manual XLSX export from https://gats.pjm-eis.com/gats2/PublicReports/GATSGenerators (filter: Solar - Photovoltaic)
+- **Key finding**: "Owner?" column is just Y/N flag, NOT actual owner name. No capacity field in export.
+- **Strategy**: Parse capacity from Unit Name field (e.g., "13.30 kW"), filter >= 25 kW. MSET (metered utility) records have utility prefix in Plant Name (AEP, VP, DPL, etc.)
+- **MSET utility prefixes mapped**: AEP → American Electric Power, VP → Virginia Power (Dominion Energy), DPL → Delmarva Power & Light, JC → Jersey Central P&L, PS → PSE&G, etc.
+- **Qualifying records**: 1,560 (377 MSET utility + 1,183 NON commercial). States: NJ 373, DC 372, PA 311, MD 294, OH 103, VA 95
+- **Matched**: 178 owner_name patches applied to existing installations via state + name similarity cross-reference
+- **File**: `data/pjm_gats/GATSGenerators_20260210_161547.xlsx` (588K rows, 582K solar)
+
+### Municipal Permit Ingestion - EXPANDED (Feb 10, 2026)
+- **ingest-permits.py**: Multi-city solar permit scraper — expanded from 4 to 23 cities across 4 tiers
+- **Platforms**: Socrata SODA API (22 cities), OpenDataSoft (1 city — Cary NC)
+- **CLI**: `--city sf,la`, `--tier 1,2`, `--dry-run`, `--list-cities`
+- **Tier 1** (solar-specific datasets, best data):
+  - Cambridge MA (692 records, HAS equipment: inverter make/model, mount type, panel count)
+  - Cary NC (1,963 records, installer + owner names)
+  - Richmond CA (3,716 records, geocoded, subtype=SOLAR)
+  - Honolulu HI (~3,355 commercial solar permits, installer names)
+  - NYC (~26,202 records, filtered by permittee business name containing SOLAR, has lat/lng)
+- **Tier 2** (building permits with confirmed solar filter):
+  - SF (1,845), LA (1,032), Chicago (11,333), Austin (22,589), Seattle (185)
+- **Tier 3** (generic permit datasets):
+  - Dallas (1,940), New Orleans (25,861), San Diego County (604 commercial), Montgomery County MD (437), Mesa AZ (2,090)
+- **Tier 4** (BLDS Partner Portal — standardized schema):
+  - Boston (4,091), Fort Worth (266), Raleigh (277), Seattle BLDS (44), Nashville (0), New Orleans BLDS (14,027), Redmond (5), Santa Rosa (1,147)
+- **Actual results**: 84,563 new records created, 177 errors (Raleigh BLDS 400 Bad Request)
+- **Key features**: In-memory dedup (`seen_ids`), false positive filtering (solar screens/shades/tubes), description parsing for kW/panels/wattage
+- **Cambridge rich data**: Inverter make+model, mount type (roof/ground), panel count, battery storage, system size kW — creates solar_equipment records
+- **Data source name in DB**: `municipal_permits_{city_key}` (one per city)
+- **Removed cities**: Cincinnati (0 solar), Roseville (sparse data), Chattanooga (SSL error), Baltimore (empty API)
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
