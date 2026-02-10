@@ -168,8 +168,10 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 10 | **ISO Queues** | `ingest-iso-queues.py` | 431 | `iso_` | CAISO (294) + NYISO (137) via direct Excel download |
 | 11 | **ISO gridstatus** | `ingest-iso-gridstatus.py` | 768 | `iso_` | ERCOT (634) + ISO-NE (91) + NYISO (43 new). Requires `.venv` Python 3.13 |
 | 12 | **NJ DEP** | `ingest-nj-dep.py` | 1,850 | `njdep_` | ArcGIS REST API: BTM (428) + Public Facilities (1,322) + Community Solar (100) |
+| 13 | **SPP Queue** | `ingest-iso-spp-miso.py` | 283 | `iso_spp_` | Direct CSV download. 10 states (OK, KS, TX, NE, NM). No developer names. |
+| 14 | **MISO Queue** | `ingest-iso-spp-miso.py` | 919 | `iso_miso_` | JSON API. 16+ states (IA, IL, IN, MN, MI, etc). Has TO names as operator. |
 
-**Grand Total: ~128,007 installations, ~349,087 equipment records, 12 data sources**
+**Grand Total: ~129,209 installations, ~349,087 equipment records, 14 data sources**
 
 ### Running New Scripts
 ```bash
@@ -181,6 +183,9 @@ python3 -u scripts/ingest-iso-queues.py --all       # All 7 ISOs (incl. manual)
 .venv/bin/python3.13 -u scripts/ingest-iso-gridstatus.py              # All ISOs via gridstatus
 .venv/bin/python3.13 -u scripts/ingest-iso-gridstatus.py --iso ercot  # Single ISO
 python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
+python3 -u scripts/ingest-iso-spp-miso.py           # SPP CSV + MISO JSON API
+python3 -u scripts/ingest-iso-spp-miso.py --iso spp # SPP only
+python3 -u scripts/ingest-iso-spp-miso.py --iso miso # MISO only
 ```
 
 ### Future Sources (researched, not yet ingested)
@@ -189,11 +194,11 @@ python3 -u scripts/ingest-nj-dep.py                 # NJ DEP ArcGIS (3 layers)
 - **LBNL Queued Up**: `https://eta-publications.lbl.gov/sites/default/files/2025-08/lbnl_ix_queue_data_file_thru2024_v2.xlsx` (needs browser UA header)
 - **GEM Solar Tracker**: `https://publicgemdata.nyc3.cdn.digitaloceanspaces.com/solar/{YYYY-MM}/solar_map_{date}.geojson` (check config at `globalenergymonitor.github.io/maps/trackers/solar/config.js` for latest URL)
 
-**ISO Queues (remaining ISOs - blocked)**:
-- **PJM**: Requires `PJM_API_KEY` environment variable (free to register at dataminer2.pjm.com)
-- **MISO**: 403 Forbidden (Cloudflare protection), needs gridstatus >=0.34.0 or manual download
-- **SPP**: gridstatus parsing bug ("Extra column Replacement Generator Commercial Op Date")
-- All 3 are blocked in gridstatus 0.29.1. ERCOT, ISO-NE, CAISO, NYISO all work.
+**ISO Queues (remaining ISOs)**:
+- **SPP**: DONE — Direct CSV download from `https://opsportal.spp.org/Studies/GenerateActiveCSV` (283 solar >= 1MW). No developer names. `ingest-iso-spp-miso.py`
+- **MISO**: DONE — JSON API at `https://www.misoenergy.org/api/giqueue/getprojects` (919 non-withdrawn solar). Has TO as operator. `ingest-iso-spp-miso.py`
+- **PJM**: BLOCKED — All direct download URLs return HTML (Queue Scope web app). Requires `PJM_API_KEY` (free to register at dataminer2.pjm.com) or browser automation.
+- **Summary**: 6 of 7 ISOs ingested (CAISO, NYISO, ERCOT, ISO-NE, SPP, MISO). Only PJM blocked.
 
 **REC Tracking Systems (researched)**:
 - **WREGIS** — **VIABLE!** Direct Excel download: `https://www.wecc.org/sites/default/files/documents/program/2026/WREGIS%20Public%20Report%20Active%20Generators%202.4.26xlsx.xlsx` (from wecc.org/wecc-document/1136). 17,241 total generators, **15,074 solar** (CA: 13,293, NM: 718, OR: 357, NV: 168, CO: 155). Has **Organization Name** (owner/off-taker) + capacity + state + COD. No EIA ID — needs name+state+capacity matching.
@@ -215,13 +220,16 @@ Comprehensive research into replicating Ohm Analytics' methodology and using sat
 
 *How Ohm Analytics sources data ($30K/yr):* (1) Building permit scraping from thousands of municipal portals — permits require panel/inverter manufacturer+model; (2) Data partnerships — solar companies share project details for free platform access; (3) Utility/software partnerships — interconnection data from utilities and monitoring platforms.
 
-*High-Priority Free Sources (not yet ingested):*
-- **NOAA Storm Events** (ncei.noaa.gov/stormevents/) — County-level hail (>=1"), wind, tornado since 1950. Cross-reference with installations → flag sites with likely panel damage. Millions of events. HIGH VALUE for Blue Water (damage = replacement leads).
+*High-Priority Free Sources:*
+- **NOAA Storm Events** — DONE (enrich-noaa-storms.py, 561K events)
+- **CPSC Recalls** — DONE (enrich-cpsc-recalls.py, 3,499 events)
 - **PJM GATS** (gats.pjm-eis.com) — Owner names for 13+ PJM states (NJ, PA, MD, DE, DC, OH, etc.). Web-based DevExpress grid, needs Playwright/Puppeteer for CSV export. Has ORISPL (EIA ID) for large plants.
-- **CPSC Recalls** (cpsc.gov/Recalls) — Flag installations using recalled panel/inverter models. Small dataset but high urgency value.
-- **DeepSolar-3M** (github.com/rajanieprabha/DeepSolar-3M) — Stanford dataset: 3 million installations detected from satellite. Free cross-reference to validate our coordinates and find missing sites.
 - **Municipal Permit Portals** — Top cities with Socrata/open data APIs: Cary NC, Cambridge MA, Boston, Austin TX, NYC. Equipment-per-site data (panel/inverter manufacturer+model). This IS Ohm's core method. High effort per city.
-- **NYSERDA DER** (der.nyserda.ny.gov) — May have richer equipment fields than our NY-Sun ingest.
+
+*Researched but NOT viable:*
+- **NREL Open PV** (openpv.nrel.gov) — Discontinued since 2019, data frozen. Fully superseded by TTS.
+- **NYSERDA DER** (der.nyserda.ny.gov) — No equipment fields beyond what NY-Sun already provides.
+- **DeepSolar-3M** (github.com/rajanieprabha/DeepSolar-3M) — Aggregate census-tract counts only, no individual installation coordinates. Not useful for cross-reference.
 
 *Satellite Imagery Pipeline (~$50-200 total):*
 - **NREL Panel-Segmentation** (github.com/NREL/Panel-Segmentation) — Open-source Faster R-CNN ResNet-50 that classifies ground-mount vs. rooftop vs. carport AND fixed-tilt vs. single-axis tracker. 77.8% mAP. This fills our 0% racking/mounting data gap.
@@ -268,6 +276,12 @@ solar/data/
 │   └── wregis_active_generators.xlsx  # 17,241 generators, 15,074 solar
 ├── noaa_storms/             # NOAA Storm Events bulk CSVs (auto-downloaded)
 │   └── StormEvents_details-ftp_v1.0_d{YYYY}_*.csv.gz  # 11 years, ~120MB total
+├── iso_queues/              # ISO interconnection queue data
+│   ├── caiso/               # CAISO Excel (auto-downloaded)
+│   ├── nyiso/               # NYISO Excel (auto-downloaded)
+│   ├── spp/spp_queue.csv    # SPP CSV (auto-downloaded, 972 rows)
+│   └── miso/miso_queue.json # MISO JSON (auto-downloaded, 3,701 records)
+├── satellite_images/        # Google Maps satellite tiles (640x640 PNG)
 └── zcta_centroids.txt       # Census ZCTA geocoding file (33,144 zips)
 ```
 
@@ -277,7 +291,7 @@ solar/data/
 
 - **URL encoding**: Supabase REST params with spaces crash without `urllib.parse.quote(str(v), safe='.*,()')`
 - **Batch size = 50**: All scripts use BATCH_SIZE = 50 for Supabase inserts
-- **`Prefer: resolution=ignore-duplicates`**: All POSTs use this for rerun safety
+- **`Prefer: resolution=ignore-duplicates`**: Only works with PRIMARY KEY conflicts, NOT unique indexes. For `source_record_id` UNIQUE INDEX, query existing IDs before inserting (see `ingest-iso-spp-miso.py` pattern). Whole batch fails if any record has duplicate source_record_id.
 - **safe_float()**: EIA Excel has empty strings/spaces in numeric fields - ALWAYS use try/except. Caused 5+ crashes.
 - **Column names**: `site_type` NOT `installation_type`, `install_date` NOT `commission_date`, `mount_type` NOT `mounting_type`
 - **data_sources table**: `name` column NOT `identifier`
@@ -602,7 +616,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - Covers: USPVDB, EIA-860, TTS, CA DGStats, NY-Sun, IL Shines, MA PTS, LBNL, EIA-860M, ISO, NJ DEP, CEC, Nominatim, OSM, NOAA, WREGIS, eGRID, GEM
 
 ### Data Completeness Assessment (Feb 7, 2026)
-**Database totals: 128,007 installations, 349,087 equipment, ~565,310 events (80 generator + 3,499 recall + ~561,731 storm), 12 sources**
+**Database totals: ~129,209 installations, 349,087 equipment, ~565,310 events (80 generator + 3,499 recall + ~561,731 storm), 14 sources**
 
 **Coverage vs total US market:**
 - Utility-scale (>=1 MW): ~95-100% coverage (EIA-860 is mandatory federal census)
@@ -635,7 +649,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | manufacturer | 334,645 | 95.9% | Excellent for brand identification |
 | model | 200,715 | 57.5% | Good for product matching |
 | CEC specs | 83,102 | 23.8% | Modules 19%, inverters 35.3% |
-| mount_type | ~5,865+ | ~4.6%+ | NREL Panel-Segmentation classification in progress (batch 2 running) |
+| mount_type | ~5,865+ | ~4.6%+ | NREL Panel-Segmentation classification (2 batches complete, ~29K images remaining) |
 | racking | 0 | 0% | No racking data in any source |
 
 ### NREL Satellite Mount Type Classification - IN PROGRESS (Feb 9, 2026)
@@ -671,14 +685,29 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
   - rooftop: 1,087 (18.5%)
   - carport: 409 (7.0%)
 
-**Batch 2 (23,365 images, started Feb 9)**: 15,282 images to classify (~10.6 hours)
-- Monitor: `ssh root@104.131.105.89 'grep Progress /root/solar-nrel/results/classify_batch2.log | tail -5'`
+**Batch 2 (23,365 images, COMPLETED Feb 9)**: 5,865 additional mount types classified
+- Same 65.3% detection rate as batch 1
 
 **Mount Type Mapping**:
 - NREL `ground-fixed` → DB `ground_fixed`
 - NREL `ground-single_axis_tracker` → DB `ground_single_axis`
 - NREL `rooftop-fixed` → DB `rooftop`
 - NREL `carport-fixed` → DB `carport`
+
+### SPP + MISO ISO Queue Ingestion - COMPLETED (Feb 9, 2026)
+- **ingest-iso-spp-miso.py**: Direct download from ISO websites (bypasses gridstatus limitations)
+- **SPP**: CSV from `https://opsportal.spp.org/Studies/GenerateActiveCSV`
+  - 283 solar projects >= 1MW across 10 states (OK: 80, KS: 70, TX: 39, NE: 31, NM: 27, MO: 12, AR: 9, LA: 7, SD: 4, ND: 3, MT: 1)
+  - No developer names (SPP doesn't publish). TO at POI stored as operator_name.
+  - All records >= 1MW, no withdrawn status in SPP export
+- **MISO**: JSON API at `https://www.misoenergy.org/api/giqueue/getprojects`
+  - 2,117 solar records (after dedup), 1,198 withdrawn (skipped), 919 created
+  - All have state, county, capacity, POI name. transmissionOwner stored as operator_name.
+  - Status mapping: Done→active, Active→proposed, Withdrawn→skip
+  - 1 duplicate projectNumber (J2987) — deduped in script
+- **Total**: 1,202 new records (283 SPP + 919 MISO), 0 errors
+- **PostgREST gotcha**: `Prefer: resolution=ignore-duplicates` only works with PRIMARY KEY conflicts, not UNIQUE INDEX. Script queries existing source_record_ids before inserting to handle reruns safely.
+- **PJM remains blocked**: All direct download URLs return HTML. Needs API key registration or browser automation.
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
