@@ -709,6 +709,45 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **PostgREST gotcha**: `Prefer: resolution=ignore-duplicates` only works with PRIMARY KEY conflicts, not UNIQUE INDEX. Script queries existing source_record_ids before inserting to handle reruns safely.
 - **PJM remains blocked**: All direct download URLs return HTML. Needs API key registration or browser automation.
 
+### URL Signing for Google Maps Static API - COMPLETED (Feb 10, 2026)
+- Added HMAC-SHA1 URL signing to `fetch-satellite-images.py` using `GOOGLE_MAPS_SIGNING_SECRET` env var
+- Signed requests have NO daily quota limit (unsigned was capped at ~25K/day)
+- User also increased quota in Cloud Console — both measures in place
+- Satellite download completing all ~30K remaining images in single session (previously required 3 daily sessions)
+
+### Enrichment Run - Feb 10, 2026
+- **Location precision**: Re-run on all records including new SPP/MISO
+- **Reverse geocoding**: Only 3 new records geocoded — remaining missing-address records are ISO queue substations (not real addresses, not geocodable)
+- **Cross-source dedup**: 1,066 patches from SPP/MISO linkage (854 crossref, 150 developer, 154 location upgrades)
+
+## Next Steps (Priority Order)
+
+### Immediate (after satellite download completes)
+1. **Sync new satellite images to droplet**: `bash scripts/deploy-nrel-to-droplet.sh sync` (~53K images, ~2 hours rsync)
+2. **Run classification batch 3**: `bash scripts/deploy-nrel-to-droplet.sh classify` (~29K new images, ~20 hours on droplet)
+3. **Commit and push updated scripts**: fetch-satellite-images.py with URL signing
+
+### Short-term (next session)
+4. **Re-run enrichment pipeline on full database**:
+   - `python3 -u scripts/set-location-precision.py` (tag new records)
+   - `python3 -u scripts/crossref-dedup.py` (re-run after classification adds mount_type)
+5. **Register for PJM API key** (free at dataminer2.pjm.com) to unlock last blocked ISO queue
+
+### Medium-term (data quality improvements)
+6. **Municipal permit portals**: Scrape equipment-per-site data from Socrata open data APIs (Austin TX, NYC, Boston, Cambridge MA)
+7. **PJM-GATS browser automation**: Playwright/Puppeteer to export owner names for 13+ PJM states
+8. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+
+### Data Gap Summary (Feb 10, 2026)
+| Field | Current | Target | How to close |
+|-------|---------|--------|-------------|
+| mount_type | ~4.6% | ~40%+ | Batch 3 classification (29K images) |
+| developer_name | 1.5% | ~5% | PJM API key + more ISO queues |
+| owner_name | ~41% | ~50%+ | PJM-GATS automation or SEIA |
+| address | 43% | ~45% | Most remaining are non-geocodable ISO records |
+| operator_name | 44% | ~50% | Municipal permit data, utility partnerships |
+| CEC specs | 24% | 24% | Limited by 55% of modules lacking model numbers |
+
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
 

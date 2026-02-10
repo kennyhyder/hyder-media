@@ -23,6 +23,9 @@ At zoom 18, each pixel = ~0.6m at equator. Solar panels clearly visible.
 """
 
 import argparse
+import base64
+import hashlib
+import hmac
 import json
 import os
 import sys
@@ -40,6 +43,7 @@ load_dotenv(env_path)
 SUPABASE_URL = (os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL") or "").strip()
 SERVICE_KEY = (os.environ.get("SUPABASE_SERVICE_KEY") or "").strip()
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "").strip()
+GOOGLE_MAPS_SIGNING_SECRET = os.environ.get("GOOGLE_MAPS_SIGNING_SECRET", "").strip()
 
 if not SUPABASE_URL or not SERVICE_KEY:
     print("Error: SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in .env.local")
@@ -78,6 +82,16 @@ def supabase_get(endpoint, params=None):
     return data, total
 
 
+def sign_url(input_url, secret):
+    """Sign a Google Maps API URL with HMAC-SHA1."""
+    url = urllib.parse.urlparse(input_url)
+    url_to_sign = url.path + "?" + url.query
+    decoded_key = base64.urlsafe_b64decode(secret)
+    signature = hmac.new(decoded_key, url_to_sign.encode(), hashlib.sha1)
+    encoded_sig = base64.urlsafe_b64encode(signature.digest()).decode()
+    return input_url + "&signature=" + encoded_sig
+
+
 def download_image(lat, lng, api_key, save_path):
     """Download a single satellite image from Google Maps Static API."""
     url = (
@@ -88,6 +102,8 @@ def download_image(lat, lng, api_key, save_path):
         f"&maptype={MAP_TYPE}"
         f"&key={api_key}"
     )
+    if GOOGLE_MAPS_SIGNING_SECRET:
+        url = sign_url(url, GOOGLE_MAPS_SIGNING_SECRET)
     try:
         req = urllib.request.Request(url)
         resp = urllib.request.urlopen(req, timeout=30)
@@ -140,6 +156,7 @@ def main():
         print(f"  Filter: location_precision = {args.location_precision}")
     if args.limit:
         print(f"  Limit: {args.limit}")
+    print(f"  URL signing: {'enabled' if GOOGLE_MAPS_SIGNING_SECRET else 'disabled (no daily limit with signing)'}")
     print(f"  Dry run: {args.dry_run}")
     print()
 
