@@ -559,6 +559,96 @@ def main():
     print(f"  State only: {permit_state}")
 
     # ================================================================
+    # Step 12: NREL Community Solar - all have city, no coordinates
+    # ================================================================
+    print("\n12. NREL Community Solar → 'city' (have city, no coordinates)")
+    offset = 0
+    nrel_city = 0
+    nrel_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,city",
+            "source_record_id": "like.nrel_cs_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        city_ids = [r["id"] for r in records if r.get("city")]
+        state_ids = [r["id"] for r in records if not r.get("city")]
+        if city_ids:
+            update_precision_batch(city_ids, "city")
+            nrel_city += len(city_ids)
+        if state_ids:
+            update_precision_batch(state_ids, "state")
+            nrel_state += len(state_ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  City: {nrel_city}")
+    print(f"  State: {nrel_state}")
+
+    # ================================================================
+    # Step 13: Virginia Cooper Center - most have address
+    # ================================================================
+    print("\n13. Virginia Cooper Center → 'address' or 'state'")
+    offset = 0
+    va_address = 0
+    va_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,address",
+            "source_record_id": "like.vacooper_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        addr_ids = [r["id"] for r in records if r.get("address")]
+        state_ids = [r["id"] for r in records if not r.get("address")]
+        if addr_ids:
+            update_precision_batch(addr_ids, "address")
+            va_address += len(addr_ids)
+        if state_ids:
+            update_precision_batch(state_ids, "state")
+            va_state += len(state_ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Address: {va_address}")
+    print(f"  State: {va_state}")
+
+    # ================================================================
+    # Step 14: EPA RE-Powering - all have city
+    # ================================================================
+    print("\n14. EPA RE-Powering → 'city' (have city, no coordinates)")
+    offset = 0
+    epa_city = 0
+    epa_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,city",
+            "source_record_id": "like.epa_re_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        city_ids = [r["id"] for r in records if r.get("city")]
+        state_ids = [r["id"] for r in records if not r.get("city")]
+        if city_ids:
+            update_precision_batch(city_ids, "city")
+            epa_city += len(city_ids)
+        if state_ids:
+            update_precision_batch(state_ids, "state")
+            epa_state += len(state_ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  City: {epa_city}")
+    print(f"  State: {epa_state}")
+
+    # ================================================================
     # Summary
     # ================================================================
     total_reverted = tts_reverted + ca_reverted + il_reverted + ma_reverted
@@ -566,11 +656,11 @@ def main():
     print("Location Precision Summary")
     print("=" * 60)
     print(f"  Exact (real coordinates): {uspvdb_count + eia_exact + nysun_exact + lbnl_count + njdep_count + permit_exact}")
-    print(f"  Address (geocodable): {eia_address + permit_address}")
-    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city + permit_city}")
+    print(f"  Address (geocodable): {eia_address + permit_address + va_address}")
+    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city + permit_city + nrel_city + epa_city}")
     print(f"  Zip-level: {tts_zip + ca_zip + il_zip + ma_zip + permit_zip}")
     print(f"  County-level: {ca_county + iso_county}")
-    print(f"  State-level: {permit_state}")
+    print(f"  State-level: {permit_state + nrel_state + va_state + epa_state}")
     print(f"  Zip centroids reverted: {total_reverted}")
     print("\nDone!")
 

@@ -178,7 +178,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: 289,878 installations, 354,019 equipment records, 1,428,132 events, 18 primary sources + 31 permit portals**
+**Grand Total: 289,878 installations, 354,019 equipment records, 1,636,997 events, 18 primary sources + 31 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -652,38 +652,36 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - Covers: USPVDB, EIA-860, TTS, CA DGStats, NY-Sun, IL Shines, MA PTS, LBNL, EIA-860M, ISO, NJ DEP, CEC, Nominatim, OSM, NOAA, WREGIS, eGRID, GEM, EPA RE-Powering, NREL Community Solar, Municipal Permits, PJM-GATS, Census Geocoder
 
 ### Data Completeness Assessment (Feb 11, 2026)
-**Database totals: 260,426 installations, 351,557 equipment, ~1.43M events (1,424,514 storm + 3,445 recall + 198 generator), 16 primary sources + 23 permit portals**
+**Database totals: 289,878 installations, 354,019 equipment, 1,636,997 events (1,633,299 storm + 3,458 recall + 240 generator), 18 primary sources + 31 permit portals**
 
 **Coverage vs total US market:**
 - Utility-scale (>=1 MW): ~95-100% coverage (EIA-860 is mandatory federal census)
 - Commercial (25 kW - 1 MW): ~70-75% coverage (municipal permits filled many gaps)
 - Biggest remaining gaps: States without TTS or permit coverage
 
-**Field coverage snapshot (Feb 11, 2026):**
+**Field coverage snapshot (Feb 11, 2026, post-final-dedup):**
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| state | 260,425 | 100.0% | 1 record missing state |
-| city | 244,700 | 94.0% | From source data + permits |
-| county | 255,421 | 98.1% | Derived from city+state lookup (+34,624) |
-| zip_code | 206,929 | 79.5% | From source data + geocoding |
-| install_date | 204,686 | 78.6% | COD or queue date |
-| installer_name | 185,821 | 71.4% | TTS/CADG/NY-Sun/permits (standardized) |
-| address | 183,606 | 70.5% | Reverse geocoding + source data + cross-reference |
-| capacity_mw | 166,468 | 63.9% | Many permits lack explicit capacity |
-| latitude/longitude | 121,907 | 46.8% | ZCTA centroids + source data (~60K zip-geocoded) |
-| operator_name | 101,397 | 38.9% | EIA-860 + eGRID + GEM + TTS utility + OSM + backfill |
-| owner_name | 85,209 | 32.7% | EIA-860 + crossref + eGRID + GEM + WREGIS + EPA |
-| mount_type | 58,161 | 22.3% | NREL satellite classification (3 batches) + source data |
-| location_precision | 252,245 | 96.9% | All records tagged (exact/address/city/zip/county) |
-| developer_name | 6,730 | 2.6% | ISO queues + LBNL + EPA + NREL Community |
+| location_precision | 289,878 | 100.0% | All records tagged (exact/address/city/zip/county/state) |
+| county | 284,873 | 98.3% | Derived from city+state lookup |
+| city | 272,264 | 93.9% | From source data + permits |
+| zip_code | 233,037 | 80.4% | From source data + geocoding |
+| install_date | 216,715 | 74.8% | COD or queue date |
+| installer_name | 211,809 | 73.1% | TTS/CADG/NY-Sun/permits (standardized) |
+| address | 211,930 | 73.1% | Reverse geocoding + source data + cross-reference |
+| capacity_mw | 186,364 | 64.3% | Many permits lack explicit capacity |
+| latitude/longitude | 137,886 | 47.6% | Source data + ZCTA centroids + dedup upgrades |
+| operator_name | 105,279 | 36.3% | EIA-860 + eGRID + GEM + TTS utility + OSM + backfill |
+| owner_name | 96,977 | 33.5% | EIA-860 + crossref + eGRID + GEM + WREGIS + EPA + PJM-GATS |
+| mount_type | 59,870 | 20.7% | NREL satellite classification (3 batches) + source data |
+| developer_name | 7,421 | 2.6% | ISO queues + LBNL + EPA + NREL Community + VA Cooper |
 
-**Equipment coverage (351,557 total):**
+**Equipment coverage (354,019 total):**
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| manufacturer | 335,096 | 95.3% | Excellent for brand identification |
-| model | 200,888 | 57.1% | Good for product matching |
-| CEC specs | 87,568 | 24.9% | Modules ~20%, inverters ~36% |
-| module_wattage_w | 58,011 | 16.5% | CEC panel wattage data |
+| manufacturer | 336,316 | 95.0% | Excellent for brand identification |
+| model | 200,888 | 56.7% | Good for product matching |
+| CEC specs | 90,086 | 25.4% | Modules ~20%, inverters ~36% |
 | racking | 0 | 0% | No racking data in any source |
 
 ### NREL Satellite Mount Type Classification - IN PROGRESS (Feb 9, 2026)
@@ -702,10 +700,10 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - Classification runs in `screen -r nrel` session
 
 **Image Download Progress**:
-- 23,338 images downloaded (of 52,973 exact-location installations)
-- Hit Google Maps daily quota (403 Forbidden) after ~13K images per session
+- 52,051 images downloaded (all exact-location installations covered)
+- URL signing enabled — no daily quota limit
 - Cost: $2/1000 requests, fully covered by $200/month free credit
-- Re-run `fetch-satellite-images.py --location-precision exact` tomorrow for remaining ~29K
+- New permit records have address/city precision, not exact — no additional images to download
 
 **Batch 1 Results (10,944 images, completed Feb 7)**:
 - Processed: 8,983 (1,961 already had mount_type from source data)
@@ -757,32 +755,29 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 ## Next Steps (Priority Order)
 
 ### Immediate
-1. **Wait for batch 3 classification** to complete on droplet (~17 hours remaining, 9,700/35,113 done)
-2. **Re-run enrichment pipeline** on all new records:
-   - `python3 -u scripts/set-location-precision.py` (tag new permit cities + PJM + VA Cooper)
-   - `python3 -u scripts/crossref-dedup.py` (cross-reference new records with existing)
-3. **Census batch geocoder**: Retry when API recovers (97K addresses ready in `forward-geocode-census.py`)
+1. **Census batch geocoder**: Retry when API recovers (97K addresses ready in `forward-geocode-census.py`)
+   - Would push lat/lng from 47.6% → ~80%
+2. **Batch 3 classification completing** on droplet (4,434 remaining images, ~38% done)
 
 ### Short-term
-4. **Re-run NOAA storms** on new permit city records for storm damage coverage
-5. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
-6. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+3. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
+4. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 
 ### Medium-term
-7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
-8. **More satellite images**: Download + classify for new permit city locations
+5. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+6. **Forward geocode permit addresses**: Once Census API recovers, geocode ~97K permit addresses
 
 ### Data Gap Summary (Feb 11, 2026)
 | Field | Current | Target | How to close |
 |-------|---------|--------|-------------|
-| mount_type | ~4.6% | ~40%+ | Batch 3 classification completing (~17 hrs) |
-| developer_name | ~3.5% | ~5%+ | PJM Queue (1,309) + VA Cooper (540) added today |
-| owner_name | ~33% | ~50%+ | PJM-GATS automation or SEIA |
-| operator_name | ~39% | ~50% | Municipal permit data, utility partnerships |
-| address | ~71% | ~78% | Census batch geocoder (when API recovers) |
-| capacity_mw | ~64% | ~80% | Many permits lack explicit capacity |
-| latitude/longitude | ~47% | ~80% | Census geocoder + zip geocoding on new records |
-| CEC specs | ~24% | 24% | Limited by 55% of modules lacking model numbers |
+| mount_type | 20.7% | ~40%+ | Batch 3 classification completing on droplet |
+| developer_name | 2.6% | ~5%+ | SEIA ($1K/yr) best option for developer names |
+| owner_name | 33.5% | ~50%+ | PJM-GATS automation or SEIA |
+| operator_name | 36.3% | ~50% | Municipal permit data, utility partnerships |
+| address | 73.1% | ~78% | Census batch geocoder (when API recovers) |
+| capacity_mw | 64.3% | ~80% | Many permits lack explicit capacity |
+| latitude/longitude | 47.6% | ~80% | Census geocoder (97K addresses ready) |
+| CEC specs | 25.4% | 25% | Limited by 55% of modules lacking model numbers |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -914,9 +909,9 @@ Continued gap-filling plan. Phase 4 (events + specs on new records) and Phase 5A
 - 0 new inverter matches
 - CEC specs total now 87,568 (24.9% of equipment)
 
-**Phase 4A — NOAA storms (still completing):**
-- 1,424,514 storm events being created affecting 188,043 installations
-- ~80% complete at session start, running in background
+**Phase 4A — NOAA storms (completed):**
+- 1,424,514 storm events created affecting 188,043 installations
+- Re-run in Session 4 on expanded 290K DB (see Session 4 notes)
 
 **Phase 5A — Final crossref-dedup:**
 - 55,628 match pairs across 3 phases (ID-based, proximity, broad proximity)
@@ -934,10 +929,11 @@ Continued gap-filling plan. Phase 4 (events + specs on new records) and Phase 5A
 - Re-tested Feb 11 — still TCP timeout on geocoding.census.gov
 - 97,420 addresses ready to geocode when API recovers
 
-**Location precision final results:**
+**Location precision final results (Session 3):**
 - Exact: 97,119 (37.3%) | Address: 63,667 (24.4%) | City: 81,457 (31.3%) | Zip: 6,487 (2.5%) | County: 3,515 (1.4%)
 - 27,852 zip centroids reverted (cleaned fake coordinates from prior ZCTA geocoding)
 - Total: 252,245 records with location_precision (96.9% of 260,426)
+- See Session 4 for updated 100% coverage with 289,878 records
 
 **Completed background tasks:**
 - NOAA storms: 1,424,514 events created, 188,043 installations affected, 0 errors
@@ -947,6 +943,45 @@ Continued gap-filling plan. Phase 4 (events + specs on new records) and Phase 5A
 - Mount type case normalization: Rooftop→rooftop (12,707), Ground→ground (4,354), Mixed→mixed (811)
 - Recall event deduplication: 10,499 → 3,445 (deleted 7,054 duplicates from redundant script runs)
 - Storm event deduplication: Deleted 561,731 old events from prior NOAA run (kept 1,424,514 from current run)
+
+### Gap-Filling Session - Feb 11, 2026 (Session 4)
+
+Completed Phases 4A (NOAA re-run on full 290K DB) and 5A (final dedup) from gap-filling plan.
+
+**Enrichment pipeline re-run results (on 290K records):**
+- eGRID: 2,331 patches (2,326 operator, 316 owner)
+- GEM: 47 patches (12 owner, 39 operator)
+- LBNL Queued Up: 82 developer patches
+- WREGIS: 1 match (previous run got 10,695 — nearly all already applied)
+- EIA-860 owner/plant: 0 new patches (all already applied)
+- OSM cross-reference: 66 site names, 1 operator, 1 owner
+- PJM-GATS: 168 owner patches
+- CPSC recalls: 3,519 events (on expanded equipment set)
+- CEC equipment specs: 65 inverter matches (modules saturated)
+- Backfill source fields: 0 new patches (all already applied)
+
+**NOAA storm events re-run (on 290K records):**
+- Cleaned up duplicate events from prior overlapping runs via psql
+- Deleted all storm events, then clean re-run with `--skip-download`
+- 1,633,299 storm events created affecting 248,861 installations (85.9% of DB)
+  - high_wind: 914,125 | hail: 586,532 | severe_hail: 132,642
+- NOAA dedup gotcha: Script uses UUID PKs, so `ignore-duplicates` header is useless. Must delete all storm events before re-running.
+- REST API DELETE returns HTTP 500 for large result sets (700K+). Use psql directly.
+
+**Final cross-source dedup:**
+- 55,013 match pairs across 3 phases
+- 5,601 patches applied, 0 errors
+- Key: 5,024 location upgrades, 631 crossref links, 80 operator, 42 address, 23 developer
+
+**Location precision: 100% coverage achieved**
+- Updated `set-location-precision.py` with 3 new steps: nrel_cs_* (city), vacooper_* (address), epa_re_* (city)
+- Fixed 10,243 remaining NULL records via direct SQL (paging race condition with 290K records)
+- Final: exact 126,633 (43.7%) | address 70,543 (24.3%) | city 76,662 (26.4%) | zip 7,748 (2.7%) | county 4,698 (1.6%) | state 3,594 (1.2%)
+
+**Satellite pipeline status:**
+- 52,051 images downloaded (all exact-precision installations)
+- Batch 3 classification resuming on droplet (~4,434 remaining, ~39% done)
+- Total mount_type in DB: 59,870 (20.7% of installations)
 
 
 <claude-mem-context>
