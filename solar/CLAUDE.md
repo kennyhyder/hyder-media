@@ -201,9 +201,12 @@ python3 -u scripts/ingest-permits.py --tier 1,2      # Tier 1 and 2
 python3 -u scripts/ingest-permits.py --dry-run       # Preview without ingesting
 python3 -u scripts/ingest-permits.py --list-cities   # Show available cities
 
-# New data sources (Feb 10, 2026)
+# New data sources (Feb 10-11, 2026)
 python3 -u scripts/ingest-epa-repowering.py          # EPA RE-Powering brownfield solar
 python3 -u scripts/ingest-nrel-community.py           # NREL Community Solar database
+python3 -u scripts/ingest-pjm-queue.py                # PJM queue (1,409 solar, extracts Commercial Name as developer_name)
+python3 -u scripts/ingest-pjm-queue.py --dry-run     # Preview PJM queue
+python3 -u scripts/ingest-virginia-cooper.py           # Virginia Cooper Center (579 records, 93% developer names)
 
 # PJM-GATS enrichment (manual XLSX export required)
 python3 -u scripts/enrich-pjm-gats.py               # Owner enrichment from GATS export
@@ -767,17 +770,21 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 5. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 6. **Forward geocode permit addresses**: Once Census API recovers, geocode ~97K permit addresses
 
-### Data Gap Summary (Feb 11, 2026)
-| Field | Current | Target | How to close |
-|-------|---------|--------|-------------|
-| mount_type | 20.7% | ~40%+ | Batch 3 classification completing on droplet |
-| developer_name | 2.6% | ~5%+ | SEIA ($1K/yr) best option for developer names |
-| owner_name | 33.5% | ~50%+ | PJM-GATS automation or SEIA |
-| operator_name | 36.3% | ~50% | Municipal permit data, utility partnerships |
-| address | 73.1% | ~78% | Census batch geocoder (when API recovers) |
-| capacity_mw | 64.3% | ~80% | Many permits lack explicit capacity |
-| latitude/longitude | 47.6% | ~80% | Census geocoder (97K addresses ready) |
-| CEC specs | 25.4% | 25% | Limited by 55% of modules lacking model numbers |
+### Data Gap Summary (Feb 11, 2026 — Session 5)
+| Field | Count | Coverage | Target | How to close |
+|-------|------:|----------|--------|-------------|
+| capacity_mw | 186,364 | 64.3% | ~80% | Many permits lack explicit capacity |
+| install_date | 216,715 | 74.8% | ~80% | Most remaining are permit records |
+| lat/lng | 137,886 | 47.6% | ~80% | Census geocoder (97K addresses ready) |
+| address | 211,930 | 73.1% | ~78% | Census batch geocoder (when API recovers) |
+| location_precision | 289,878 | 100% | 100% | **DONE** |
+| county | 284,873 | 98.3% | ~99% | Derive from new geocoded coords |
+| installer_name | 211,809 | 73.1% | ~75% | More permit cities |
+| operator_name | 105,279 | 36.3% | ~50% | Municipal permit data, utility partnerships |
+| owner_name | 96,977 | 33.5% | ~50%+ | PJM-GATS automation or SEIA |
+| developer_name | 8,108 | 2.8% | ~5%+ | SEIA ($1K/yr) best option |
+| mount_type | 59,870 | 20.7% | ~40%+ | Batch 3 on droplet (30% done, ~16hr remaining) |
+| CEC specs | 59,357 | 16.8% | ~17% | Limited by 55% of modules lacking model numbers |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -816,10 +823,11 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **API**: `POST https://services.pjm.com/PJMPlanningApi/api/Queue/ExportToXls` with static public key `E29477D0-70E0-4825-89B0-43F460BF9AB4`
 - **Discovery**: PJM's Queue Scope web app uses a separate Planning API that returns Excel directly — bypasses the blocked Data Miner 2 endpoint entirely
 - **All 7 ISOs now covered**: CAISO, NYISO, ERCOT, ISO-NE, SPP, MISO, PJM
-- **Results**: 1,409 solar projects >= 1 MW found, 1,309 created (100 batch errors from null-capacity records)
+- **Results**: 1,409 solar projects >= 1 MW found, 1,154 created, 14 states
 - **States**: VA 291, PA 262, OH 233, NJ 143, IN 122, IL 88, MD 78, KY 66, NC 61, WV 31, MI 16, DE 14
-- **Fields**: project_id, name, state, county, capacity (MW), status, transmission_owner (as operator_name)
-- **Limitation**: Developer names NOT in public export (PJM considers them confidential)
+- **Fields**: project_id, name, commercial_name (developer), state, county, capacity (MW), status, transmission_owner (operator)
+- **Commercial Name extraction**: 26.9% coverage (1,225 of 4,549 solar records). Extracted as `developer_name`. 775 records backfilled.
+- **PJM Data Miner 2 API**: Key obtained (`PJM_DATAMINER_API_KEY` in .env.local) but all ~95 feeds are aggregate RTO/zone-level data — NO plant-specific installation data. Not useful for our purposes.
 - **Source record prefix**: `iso_pjm_`
 
 ### Virginia Cooper Center Ingestion - COMPLETED (Feb 11, 2026)
@@ -982,6 +990,24 @@ Completed Phases 4A (NOAA re-run on full 290K DB) and 5A (final dedup) from gap-
 - 52,051 images downloaded (all exact-precision installations)
 - Batch 3 classification resuming on droplet (~4,434 remaining, ~39% done)
 - Total mount_type in DB: 59,870 (20.7% of installations)
+
+### Gap-Filling Session - Feb 11, 2026 (Session 5)
+
+**PJM Queue developer_name extraction:**
+- Updated `ingest-pjm-queue.py` to extract `Commercial Name` column as `developer_name`
+- Added backfill phase that patches developer_name onto existing PJM records
+- 775 developer_name patches applied, 0 errors (of 1,309 existing PJM records, 726 had Commercial Names in Excel)
+- developer_name total: 8,108 (2.8% of DB, up from 2.6%)
+
+**PJM Data Miner 2 API investigation:**
+- Obtained API key (saved as `PJM_DATAMINER_API_KEY` in .env.local)
+- Researched ~95 available feeds — ALL are aggregate RTO/zone-level market data (pricing, uplift credits, load)
+- NO plant-specific installation or ownership data in Data Miner 2
+- The Planning API (public, no registration) remains the correct source for queue data
+
+**Droplet classification batch 3 status:**
+- 10,700/35,113 images (30.5% complete), 5,014 classified, 5,686 no panels
+- ETA: ~16 hours remaining at 0.4 img/sec
 
 
 <claude-mem-context>

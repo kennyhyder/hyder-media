@@ -5,6 +5,9 @@ PJM Interconnection Queue Ingestion
 Downloads the PJM interconnection queue via the public Planning API
 (no registration needed) and ingests solar projects >= 1 MW.
 
+Extracts Commercial Name as developer_name (26.9% coverage).
+Also backfills developer_name onto existing PJM records.
+
 Usage:
   python3 -u scripts/ingest-pjm-queue.py
   python3 -u scripts/ingest-pjm-queue.py --dry-run
@@ -69,6 +72,28 @@ def supabase_post(table, records):
     }
     body = json.dumps(records).encode()
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return True, None
+    except Exception as e:
+        return False, str(e)
+
+
+def supabase_patch(table, filters, data):
+    """PATCH records matching filters with data."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}"
+    if filters:
+        url += "?" + "&".join(
+            f"{k}={urllib.parse.quote(str(v), safe='.*,()')}" for k, v in filters.items()
+        )
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal",
+    }
+    body = json.dumps(data).encode()
+    req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
     try:
         with urllib.request.urlopen(req) as resp:
             return True, None
@@ -304,6 +329,7 @@ def make_installation(record, headers, data_source_id):
 
     source_id = f"iso_pjm_{project_id}"
     name = get(["Name", "Project Name"])
+    commercial_name = get(["Commercial Name"])
     state = get(["State", "Location State"])
     county = get(["County", "Location County"])
     trans_owner = get(["Transmission Owner", "TO"])
@@ -342,6 +368,7 @@ def make_installation(record, headers, data_source_id):
         "install_date": install_date,
         "site_status": status,
         "operator_name": trans_owner if trans_owner else None,
+        "developer_name": commercial_name if commercial_name else None,
         "data_source_id": data_source_id,
         "latitude": None,
         "longitude": None,
@@ -416,8 +443,11 @@ def main():
 
     if args.dry_run:
         print(f"\n  [DRY RUN] Would ingest {len(installations)} records")
+        with_dev = sum(1 for i in installations if i.get("developer_name"))
+        print(f"  With developer_name: {with_dev}")
         for inst in installations[:10]:
-            print(f"    {inst['source_record_id']} | {inst.get('state', '?')} | {inst.get('capacity_mw', '?')} MW | {inst.get('site_name', 'N/A')}")
+            dev = inst.get('developer_name') or ''
+            print(f"    {inst['source_record_id']} | {inst.get('state', '?')} | {inst.get('capacity_mw', '?')} MW | {inst.get('site_name', 'N/A')} | dev={dev}")
         return
 
     if not installations:
@@ -441,6 +471,66 @@ def main():
 
     print(f"\n  Created: {created}")
     print(f"  Errors: {errors}")
+
+    # Phase 2: Backfill developer_name onto existing PJM records
+    print(f"\n{'=' * 60}")
+    print("Phase 2: Backfill developer_name onto existing records")
+    print("=" * 60)
+
+    # Build mapping: source_record_id -> commercial_name from Excel
+    dev_map = {}
+    for record in records:
+        def get_val(candidates):
+            for c in candidates:
+                if c in headers:
+                    val = record.get(c)
+                    if val is not None and str(val).strip():
+                        return str(val).strip()
+            return ""
+        pid = get_val(["Project ID", "Queue Number", "Queue ID", "Queue #"])
+        cname = get_val(["Commercial Name"])
+        if pid and cname:
+            dev_map[f"iso_pjm_{pid}"] = cname
+    print(f"  Records with Commercial Name in Excel: {len(dev_map)}")
+
+    # Find existing PJM records missing developer_name
+    missing_dev = []
+    offset = 0
+    while True:
+        batch = supabase_get("solar_installations", {
+            "select": "source_record_id",
+            "source_record_id": "like.iso_pjm_*",
+            "developer_name": "is.null",
+            "offset": offset,
+            "limit": 1000,
+        })
+        if not batch:
+            break
+        missing_dev.extend(r["source_record_id"] for r in batch)
+        offset += len(batch)
+        if len(batch) < 1000:
+            break
+    print(f"  Existing records missing developer_name: {len(missing_dev)}")
+
+    # Patch those that have a Commercial Name in the Excel
+    patched = 0
+    patch_errors = 0
+    for sid in missing_dev:
+        if sid in dev_map:
+            ok, err = supabase_patch("solar_installations",
+                {"source_record_id": f"eq.{sid}"},
+                {"developer_name": dev_map[sid]})
+            if ok:
+                patched += 1
+            else:
+                patch_errors += 1
+                if patch_errors <= 3:
+                    print(f"    Patch error for {sid}: {err}")
+            if patched % 100 == 0 and patched > 0:
+                print(f"    Progress: {patched} patched")
+
+    print(f"  Developer names backfilled: {patched}")
+    print(f"  Patch errors: {patch_errors}")
     print("\nDone!")
 
 
