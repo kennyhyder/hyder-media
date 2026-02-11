@@ -64,6 +64,59 @@ SOLAR_FALSE_POSITIVES = re.compile(
 
 CITIES = {
     # =========================================================================
+    # TIER 0: Rich datasets with new platform handlers (ArcGIS, Carto, CKAN)
+    # =========================================================================
+    "sacramento": {
+        "tier": 0,
+        "name": "Sacramento, CA",
+        "state": "CA",
+        "county": "SACRAMENTO",
+        "platform": "arcgis",
+        "base_url": "https://services5.arcgis.com/54falWtcpty3V47Z/arcgis/rest/services/BldgPermitIssued_Archive/FeatureServer/0",
+        "page_size": 1000,
+        "filter": "upper(Work_Desc) LIKE '%SOLAR%' OR Category='Solar System'",
+        "prefix": "permit_sacramento",
+        "transform": "sacramento",
+    },
+    "philadelphia": {
+        "tier": 0,
+        "name": "Philadelphia, PA",
+        "state": "PA",
+        "county": "PHILADELPHIA",
+        "platform": "carto",
+        "base_url": "https://phl.carto.com/api/v2/sql",
+        "table_name": "permits",
+        "page_size": 1000,
+        "filter": "approvedscopeofwork ILIKE '%solar%' OR typeofwork ILIKE '%solar%'",
+        "prefix": "permit_philly",
+        "transform": "philadelphia",
+    },
+    "san_jose": {
+        "tier": 0,
+        "name": "San Jose, CA",
+        "state": "CA",
+        "county": "SANTA CLARA",
+        "platform": "ckan",
+        "base_url": "https://data.sanjoseca.gov/api/3/action/datastore_search",
+        "resource_id": "761b7ae8-3be1-4ad6-923d-c7af6404a904",
+        "page_size": 100,
+        "prefix": "permit_sanjose",
+        "transform": "san_jose",
+    },
+    "salt_lake_city": {
+        "tier": 0,
+        "name": "Salt Lake City, UT",
+        "state": "UT",
+        "county": "SALT LAKE",
+        "platform": "socrata",
+        "base_url": "https://opendata.utah.gov/resource/nbv6-7v56.json",
+        "page_size": 1000,
+        "filter": "$where=upper(workdescription) LIKE '%25SOLAR%25'",
+        "prefix": "permit_slc",
+        "transform": "salt_lake_city",
+    },
+
+    # =========================================================================
     # TIER 1: Solar-specific datasets (best data)
     # =========================================================================
     "cambridge": {
@@ -386,13 +439,28 @@ def supabase_post(table, records):
         "Content-Type": "application/json",
         "Prefer": "resolution=ignore-duplicates,return=minimal",
     }
-    body = json.dumps(records).encode()
+    try:
+        body = json.dumps(records, allow_nan=False).encode()
+    except ValueError:
+        # NaN/Infinity in records — clean them
+        import math
+        for r in records:
+            for k, v in list(r.items()):
+                if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                    r[k] = None
+        body = json.dumps(records).encode()
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req) as resp:
             return True, None
     except Exception as e:
-        return False, str(e)
+        err_body = ""
+        if hasattr(e, 'read'):
+            try:
+                err_body = e.read().decode()[:200]
+            except Exception:
+                pass
+        return False, f"{e} | {err_body}" if err_body else str(e)
 
 
 def get_existing_source_ids(prefix):
@@ -490,6 +558,111 @@ def fetch_socrata(config):
         if offset % 1000 == 0:
             print(f"    Fetched {offset}...")
         if len(data) < config["page_size"]:
+            break
+        time.sleep(RATE_LIMIT)
+    return records
+
+
+def fetch_arcgis(config):
+    """Fetch all records from ArcGIS FeatureServer REST API."""
+    records = []
+    offset = 0
+    while True:
+        where = config.get("filter", "1=1")
+        params = urllib.parse.urlencode({
+            "where": where,
+            "outFields": "*",
+            "resultRecordCount": config["page_size"],
+            "resultOffset": offset,
+            "f": "json",
+            "returnGeometry": "true",
+        })
+        url = f"{config['base_url']}/query?{params}"
+        req = urllib.request.Request(url)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read().decode())
+        except Exception as e:
+            print(f"    API error at offset {offset}: {e}")
+            break
+        features = data.get("features", [])
+        if not features:
+            break
+        for feat in features:
+            rec = feat.get("attributes", {})
+            geo = feat.get("geometry", {})
+            if geo:
+                rec["_lat"] = geo.get("y")
+                rec["_lng"] = geo.get("x")
+            records.append(rec)
+        offset += len(features)
+        if offset % 1000 == 0:
+            print(f"    Fetched {offset}...")
+        if not data.get("exceededTransferLimit", False) and len(features) < config["page_size"]:
+            break
+        time.sleep(RATE_LIMIT)
+    return records
+
+
+def fetch_carto(config):
+    """Fetch all records from CARTO SQL API."""
+    records = []
+    offset = 0
+    while True:
+        where = config.get("filter", "1=1")
+        table = config.get("table_name", "permits")
+        sql = f"SELECT * FROM {table} WHERE {where} LIMIT {config['page_size']} OFFSET {offset}"
+        params = urllib.parse.urlencode({"q": sql, "format": "json"})
+        url = f"{config['base_url']}?{params}"
+        req = urllib.request.Request(url)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read().decode())
+        except Exception as e:
+            print(f"    API error at offset {offset}: {e}")
+            break
+        rows = data.get("rows", [])
+        if not rows:
+            break
+        records.extend(rows)
+        offset += len(rows)
+        if offset % 1000 == 0:
+            print(f"    Fetched {offset}...")
+        if len(rows) < config["page_size"]:
+            break
+        time.sleep(RATE_LIMIT)
+    return records
+
+
+def fetch_ckan(config):
+    """Fetch all records from CKAN Datastore API."""
+    records = []
+    offset = 0
+    while True:
+        params = {
+            "resource_id": config["resource_id"],
+            "q": "solar",
+            "limit": config["page_size"],
+            "offset": offset,
+        }
+        url = f"{config['base_url']}?{urllib.parse.urlencode(params)}"
+        req = urllib.request.Request(url)
+        try:
+            with urllib.request.urlopen(req) as resp:
+                data = json.loads(resp.read().decode())
+        except Exception as e:
+            print(f"    API error at offset {offset}: {e}")
+            break
+        result = data.get("result", {})
+        rows = result.get("records", [])
+        if not rows:
+            break
+        records.extend(rows)
+        offset += len(rows)
+        total = result.get("total", 0)
+        if offset % 500 == 0 or offset >= total:
+            print(f"    Fetched {offset}/{total}...")
+        if offset >= total:
             break
         time.sleep(RATE_LIMIT)
     return records
@@ -1028,7 +1201,7 @@ def transform_generic_socrata(record, data_source_id, config):
     """Generic Socrata building permit transform — tries common field names."""
     # Try many common permit ID field names
     permit_num = None
-    for field in ["permit_number", "permit_num", "permitnumber", "permitno", "permit_no",
+    for field in ["permit_number", "permit_num", "permitnum", "permitnumber", "permitno", "permit_no",
                    "permit_", "id", "permit_id", "application_number", "record_number", "case_number"]:
         val = record.get(field)
         if val and str(val).strip():
@@ -1149,6 +1322,245 @@ def transform_generic_socrata(record, data_source_id, config):
     return source_id, inst, None
 
 
+def transform_salt_lake_city(record, data_source_id, config):
+    """Salt Lake City UT — Socrata with location field containing embedded coords."""
+    permit_num = record.get("permitnum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_slc_{permit_num}"
+    desc = record.get("workdescription", "")
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+
+    # Build address from components
+    house = record.get("projecthousenbr", "")
+    street_dir = record.get("projectstreetdir", "")
+    street_name = record.get("projectstreetname", "")
+    suffix = record.get("projectstreetsufx", "")
+    addr = " ".join(p for p in [house, street_dir, street_name, suffix] if p).strip() or None
+
+    # Parse lat/lng from location field: "516 E 12TH Ave\nSalt Lake City, UT 84103\n(40.783, -111.874)"
+    lat, lng = None, None
+    loc = record.get("location", "")
+    if isinstance(loc, str):
+        m = re.search(r'\(([-\d.]+),\s*([-\d.]+)\)', loc)
+        if m:
+            lat = safe_float(m.group(1))
+            lng = safe_float(m.group(2))
+
+    zip_code = record.get("zipcode", "")
+    if zip_code and "-" in zip_code:
+        zip_code = zip_code.split("-")[0]  # Strip +4
+
+    installer = record.get("applicantbusinessname", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Salt Lake City",
+        zip_code=zip_code if zip_code else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("completedate") or record.get("applicationdate")),
+        installer_name=installer,
+        total_cost=safe_float(record.get("total_fee")),
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
+def transform_sacramento(record, data_source_id, config):
+    """Sacramento CA — ArcGIS with Category='Solar System' and Work_Desc."""
+    permit_num = record.get("Application", "") or record.get("PERMIT_NUM", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_sacramento_{permit_num}"
+    desc = record.get("Work_Desc", "") or record.get("work_desc", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Check for battery storage in description
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("Address", ""),
+        city="Sacramento",
+        zip_code=str(record.get("ZIP", "")) if record.get("ZIP") else None,
+        latitude=safe_float(record.get("_lat")),
+        longitude=safe_float(record.get("_lng")),
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("Status_Date")),
+        installer_name=record.get("Contractor", ""),
+        total_cost=safe_float(record.get("Valuation")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_philadelphia(record, data_source_id, config):
+    """Philadelphia PA — Carto SQL with rich approvedscopeofwork field."""
+    permit_num = record.get("permitnumber", "") or record.get("permit_number", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_philly_{permit_num}"
+    desc = record.get("approvedscopeofwork", "") or record.get("permitdescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Parse manufacturer from description (e.g., "JA SOLAR panels", "SolarEdge inverter")
+    equip_manufacturer = None
+    equip_model = None
+    for mfr in ["JA Solar", "Canadian Solar", "Hanwha", "Qcells", "Q CELLS", "REC", "LG",
+                 "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar", "Panasonic",
+                 "Solaria", "Axitec", "Aptos", "Meyer Burger", "Maxeon"]:
+        if mfr.lower() in desc.lower():
+            equip_manufacturer = mfr
+            break
+
+    inv_manufacturer = None
+    for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla"]:
+        if mfr.lower() in desc.lower():
+            inv_manufacturer = mfr
+            break
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    # Owner from Carto field
+    owner = record.get("opa_owner", "")
+
+    # Parse lat/lng from WKB hex geometry (geocode_x/y are State Plane, not lat/lng)
+    lat, lng = None, None
+    the_geom = record.get("the_geom")
+    if the_geom and len(the_geom) >= 50:
+        try:
+            import struct, binascii, math
+            wkb = binascii.unhexlify(the_geom)
+            _lng = struct.unpack_from('<d', wkb, 9)[0]
+            _lat = struct.unpack_from('<d', wkb, 17)[0]
+            if (not math.isnan(_lat) and not math.isnan(_lng) and
+                not math.isinf(_lat) and not math.isinf(_lng) and
+                -90 <= _lat <= 90 and -180 <= _lng <= 180):
+                lat, lng = _lat, _lng
+        except Exception:
+            pass
+
+    # Commercial check
+    comm_res = str(record.get("commercialorresidential", "")).lower()
+    site_type = "commercial" if "commercial" in comm_res else "commercial"
+
+    # Truncate zip to 5 digits
+    zip_code = str(record.get("zip", "")) if record.get("zip") else None
+    if zip_code and len(zip_code) > 5:
+        zip_code = zip_code[:5]
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("address", ""),
+        city="Philadelphia",
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("permitissuedate")),
+        installer_name=record.get("contractorname", ""),
+        owner_name=owner,
+        total_cost=safe_float(record.get("totalprojectvalue")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if equip_manufacturer:
+            eq["manufacturer"] = equip_manufacturer
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+    if inv_manufacturer:
+        equipment.append({
+            "equipment_type": "inverter",
+            "manufacturer": inv_manufacturer,
+        })
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_san_jose(record, data_source_id, config):
+    """San Jose CA — CKAN with owner name, contractor, and work description."""
+    permit_num = record.get("FOLDERNUMBER", "") or record.get("foldernumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_sanjose_{permit_num}"
+    desc = record.get("WORKDESCRIPTION", "") or record.get("workdescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Coordinates from gx_location
+    lat, lng = None, None
+    loc = record.get("gx_location")
+    if isinstance(loc, dict):
+        lat = safe_float(loc.get("latitude"))
+        lng = safe_float(loc.get("longitude"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("ADDRESS", "") or record.get("address", ""),
+        city="San Jose",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUEDATE") or record.get("issuedate")),
+        installer_name=record.get("CONTRACTOR", "") or record.get("contractor", ""),
+        owner_name=record.get("OWNERNAME", "") or record.get("ownername", ""),
+        total_cost=safe_float(record.get("PERMITVALUATION") or record.get("permitvaluation")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -1163,6 +1575,10 @@ TRANSFORMERS = {
     "seattle": transform_seattle,
     "blds": transform_blds,
     "generic_socrata": transform_generic_socrata,
+    "salt_lake_city": transform_salt_lake_city,
+    "sacramento": transform_sacramento,
+    "philadelphia": transform_philadelphia,
+    "san_jose": transform_san_jose,
 }
 
 
@@ -1182,8 +1598,15 @@ def ingest_city(city_key, config, dry_run=False):
     # Fetch records from API
     print(f"\n  Downloading records...")
     try:
-        if config["platform"] == "opendatasoft":
+        platform = config["platform"]
+        if platform == "opendatasoft":
             raw_records = fetch_opendatasoft(config)
+        elif platform == "arcgis":
+            raw_records = fetch_arcgis(config)
+        elif platform == "carto":
+            raw_records = fetch_carto(config)
+        elif platform == "ckan":
+            raw_records = fetch_ckan(config)
         else:
             raw_records = fetch_socrata(config)
     except Exception as e:
@@ -1317,7 +1740,7 @@ def main():
 
     if args.list_cities:
         print("Available cities:")
-        for tier in [1, 2, 3, 4]:
+        for tier in [0, 1, 2, 3, 4]:
             tier_cities = {k: v for k, v in CITIES.items() if v.get("tier") == tier}
             if tier_cities:
                 print(f"\n  Tier {tier}:")

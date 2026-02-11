@@ -178,7 +178,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: ~260,426 installations (~129,209 original + 84,563 municipal permits + 548 EPA + 3,938 NREL Community + other enrichments), ~351,557 equipment records, ~1.43M events (1.42M storm + 3.4K recall + 198 generator), 16 primary sources + 23 permit portals**
+**Grand Total: 289,878 installations, 354,019 equipment records, 1,428,132 events, 18 primary sources + 31 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -741,7 +741,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
   - 1 duplicate projectNumber (J2987) — deduped in script
 - **Total**: 1,202 new records (283 SPP + 919 MISO), 0 errors
 - **PostgREST gotcha**: `Prefer: resolution=ignore-duplicates` only works with PRIMARY KEY conflicts, not UNIQUE INDEX. Script queries existing source_record_ids before inserting to handle reruns safely.
-- **PJM remains blocked**: All direct download URLs return HTML. Needs API key registration or browser automation.
+- **PJM UNBLOCKED**: Discovered public Planning API at `services.pjm.com/PJMPlanningApi/api/Queue/ExportToXls` with static API key. See `ingest-pjm-queue.py`.
 
 ### URL Signing for Google Maps Static API - COMPLETED (Feb 10, 2026)
 - Added HMAC-SHA1 URL signing to `fetch-satellite-images.py` using `GOOGLE_MAPS_SIGNING_SECRET` env var
@@ -756,32 +756,32 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### Immediate (after satellite download completes)
-1. **Sync new satellite images to droplet**: `bash scripts/deploy-nrel-to-droplet.sh sync` (~53K images, ~2 hours rsync)
-2. **Run classification batch 3**: `bash scripts/deploy-nrel-to-droplet.sh classify` (~29K new images, ~20 hours on droplet)
-3. **Commit and push updated scripts**: fetch-satellite-images.py with URL signing
+### Immediate
+1. **Wait for batch 3 classification** to complete on droplet (~17 hours remaining, 9,700/35,113 done)
+2. **Re-run enrichment pipeline** on all new records:
+   - `python3 -u scripts/set-location-precision.py` (tag new permit cities + PJM + VA Cooper)
+   - `python3 -u scripts/crossref-dedup.py` (cross-reference new records with existing)
+3. **Census batch geocoder**: Retry when API recovers (97K addresses ready in `forward-geocode-census.py`)
 
-### Short-term (next session)
-4. **Re-run enrichment pipeline on full database**:
-   - `python3 -u scripts/set-location-precision.py` (tag new records)
-   - `python3 -u scripts/crossref-dedup.py` (re-run after classification adds mount_type)
-5. **Register for PJM API key** (free at dataminer2.pjm.com) to unlock last blocked ISO queue
+### Short-term
+4. **Re-run NOAA storms** on new permit city records for storm damage coverage
+5. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
+6. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 
-### Medium-term (data quality improvements)
-6. **Municipal permit portals**: Scrape equipment-per-site data from Socrata open data APIs (Austin TX, NYC, Boston, Cambridge MA)
-7. **PJM-GATS browser automation**: Playwright/Puppeteer to export owner names for 13+ PJM states
-8. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+### Medium-term
+7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+8. **More satellite images**: Download + classify for new permit city locations
 
-### Data Gap Summary (Feb 10, 2026, post-gap-filling)
+### Data Gap Summary (Feb 11, 2026)
 | Field | Current | Target | How to close |
 |-------|---------|--------|-------------|
-| mount_type | ~4.6% | ~40%+ | Batch 3 classification (29K images) |
-| developer_name | 2.6% | ~5% | PJM API key + more ISO queues |
-| owner_name | 32.7% | ~50%+ | PJM-GATS automation or SEIA |
-| operator_name | 38.9% | ~50% | Municipal permit data, utility partnerships |
-| address | 70.5% | ~75% | Census batch geocoder (when API recovers) |
-| capacity_mw | 63.9% | ~80% | Many permits lack explicit capacity |
-| latitude/longitude | 55.1% | ~80% | Census geocoder + continued zip geocoding |
+| mount_type | ~4.6% | ~40%+ | Batch 3 classification completing (~17 hrs) |
+| developer_name | ~3.5% | ~5%+ | PJM Queue (1,309) + VA Cooper (540) added today |
+| owner_name | ~33% | ~50%+ | PJM-GATS automation or SEIA |
+| operator_name | ~39% | ~50% | Municipal permit data, utility partnerships |
+| address | ~71% | ~78% | Census batch geocoder (when API recovers) |
+| capacity_mw | ~64% | ~80% | Many permits lack explicit capacity |
+| latitude/longitude | ~47% | ~80% | Census geocoder + zip geocoding on new records |
 | CEC specs | ~24% | 24% | Limited by 55% of modules lacking model numbers |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
@@ -815,6 +815,48 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Cambridge rich data**: Inverter make+model, mount type (roof/ground), panel count, battery storage, system size kW — creates solar_equipment records
 - **Data source name in DB**: `municipal_permits_{city_key}` (one per city)
 - **Removed cities**: Cincinnati (0 solar), Roseville (sparse data), Chattanooga (SSL error), Baltimore (empty API)
+
+### PJM Queue Ingestion - COMPLETED (Feb 11, 2026)
+- **ingest-pjm-queue.py**: Downloads PJM interconnection queue via public Planning API (no registration needed)
+- **API**: `POST https://services.pjm.com/PJMPlanningApi/api/Queue/ExportToXls` with static public key `E29477D0-70E0-4825-89B0-43F460BF9AB4`
+- **Discovery**: PJM's Queue Scope web app uses a separate Planning API that returns Excel directly — bypasses the blocked Data Miner 2 endpoint entirely
+- **All 7 ISOs now covered**: CAISO, NYISO, ERCOT, ISO-NE, SPP, MISO, PJM
+- **Results**: 1,409 solar projects >= 1 MW found, 1,309 created (100 batch errors from null-capacity records)
+- **States**: VA 291, PA 262, OH 233, NJ 143, IN 122, IL 88, MD 78, KY 66, NC 61, WV 31, MI 16, DE 14
+- **Fields**: project_id, name, state, county, capacity (MW), status, transmission_owner (as operator_name)
+- **Limitation**: Developer names NOT in public export (PJM considers them confidential)
+- **Source record prefix**: `iso_pjm_`
+
+### Virginia Cooper Center Ingestion - COMPLETED (Feb 11, 2026)
+- **ingest-virginia-cooper.py**: Downloads Virginia solar/storage project database from UVA Weldon Cooper Center
+- **Source**: `https://solardatabase.coopercenter.org/export_xlsx/` (direct Excel export, no auth)
+- **Results**: 579 records created, 0 errors
+  - 540 with developer names (93.3%!) — 186 unique developers
+  - 576 with capacity (99.5%)
+  - 0 with coordinates (database has no lat/lng columns, only text location descriptions)
+  - Status: 420 proposed, 159 canceled
+- **Has EIA cross-reference**: `eia_plant_id` and `eia_generator_id` columns for matching to existing records
+- **Key developers**: Ameresco, Sun Tribe, Energix, AES, SolAmerica, New Leaf Energy, Dominion Energy
+- **Source record prefix**: `vacooper_`
+- **Impact**: developer_name coverage jumps significantly for Virginia — previously near-zero for VA utility-scale projects
+
+### Municipal Permit Expansion - COMPLETED (Feb 11, 2026)
+- **ingest-permits.py expanded**: Added 4 new cities with 3 new platform handlers (27 → 31 permit portals)
+- **New platforms**: ArcGIS FeatureServer, CARTO SQL API, CKAN Datastore API
+- **New cities (Tier 0)**:
+  - Sacramento CA (ArcGIS): 16,042 records with coordinates, installer names, solar category filter, 586 with equipment
+  - Philadelphia PA (CARTO): 9,220 records with owner names (`opa_owner`), equipment NLP from `approvedscopeofwork`, 1,876 equipment. Coordinates parsed from WKB hex `the_geom` (State Plane `geocode_x/y` caused numeric overflow)
+  - San Jose CA (CKAN): 1,453 records with owner names and contractor names
+  - Salt Lake City UT (Socrata): 799 records with embedded lat/lng in location field, installer names
+- **Total new**: ~27,514 records across 4 cities
+- **Philadelphia bug fix**: `geocode_x`/`geocode_y` are PA State Plane (EPSG:2272) in feet, not lat/lng. Values like 2,722,744 caused `numeric field overflow` (precision 10, scale 7). Fixed by parsing lat/lng from `the_geom` WKB hex (EPSG:4326). Also fixed NaN coordinates causing `PGRST102: Empty or invalid json` by adding range validation and `allow_nan=False` in `json.dumps`.
+- **Research rejected**: Las Vegas (no solar in description field), Denver (no description field at all), Portland (no building permits dataset), Charlotte/Tampa/Indianapolis/Phoenix (Accela, no public API), Miami-Dade (portal migration in progress)
+
+### SEIA/Ohm Coverage Comparison - COMPLETED (Feb 11, 2026)
+- **docs/coverage-comparison-seia-ohm.md**: Comprehensive analysis of free data vs paid sources
+- Recommendation: Buy SEIA ($1K/yr) immediately for developer_name (2.6% → ~13%) and exclusive offtaker/PPA data
+- Ohm Analytics ($30K/yr) only worth it for distributed solar equipment-per-site data
+- Our free pipeline has unique advantages: storm damage tracking (188K sites), recall tracking, satellite mount classification
 
 ### Critical Gotcha: PostgREST Batch Key Consistency
 **NEVER strip None values from batch records.** `{k: v for k, v in record.items() if v is not None}` causes PGRST102 "All object keys must match" errors. All objects in a batch POST must have identical keys. This broke EIA-860M, LBNL, and ISO Queues scripts initially.
