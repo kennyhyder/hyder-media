@@ -155,8 +155,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | CPSC Recalls | `enrich-cpsc-recalls.py` | Equipment recall events matched by manufacturer+model | Hardcoded 7 known solar recalls |
 | Data Source Monitor | `check-data-sources.py` | Health check for all 18 data sources (freshness, availability) | Reads DB + checks URLs |
 | PJM-GATS | `enrich-pjm-gats.py` | Owner names from PJM REC tracking (13+ states: NJ, PA, MD, DE, DC, OH, VA, IL) | `data/pjm_gats/GATSGenerators_*.xlsx` (manual export from gats.pjm-eis.com) |
-| Municipal Permits | `ingest-permits.py` | Solar permits from 23 US city open data portals (4 tiers) | Socrata/OpenDataSoft APIs (no local files) |
-| Census Geocoder | `forward-geocode-census.py` | Batch address→coordinate geocoding (10K/batch, free) | Census Bureau API (currently down) |
+| Municipal Permits | `ingest-permits.py` | Solar permits from 27 US city open data portals (5 tiers) | Socrata/OpenDataSoft/ArcGIS APIs (no local files) |
+| Census Geocoder | `forward-geocode-census.py` | Batch address→coordinate geocoding (1K/batch, free, ~83% match rate) | `https://geocoding.geo.census.gov/geocoder/geographies/addressbatch` |
 | Permit Equipment | `parse-permit-equipment.py` | Extract panel/inverter from permit descriptions | Re-queries permit APIs for descriptions |
 | Data Quality Audit | `data-quality-audit.py` | Field coverage, impossible values, installer standardization | DB analysis + `--fix` flag |
 
@@ -178,7 +178,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: 289,878 installations, 354,019 equipment records, 1,636,997 events, 18 primary sources + 31 permit portals**
+**Grand Total: ~301,756 installations, ~354,555 equipment records, 1,636,997 events, 18 primary sources + 35 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -214,7 +214,7 @@ python3 -u scripts/enrich-pjm-gats.py --dry-run     # Preview matches
 python3 -u scripts/enrich-pjm-gats.py --file /path/to.xlsx  # Use specific file
 
 # Census geocoder (API currently down, script ready)
-python3 -u scripts/forward-geocode-census.py          # Census batch geocoding (10K/batch)
+python3 -u scripts/forward-geocode-census.py          # Census batch geocoding (1K/batch, ~83% match rate)
 python3 -u scripts/forward-geocode-census.py --dry-run # Preview without patching
 python3 -u scripts/forward-geocode-census.py --limit 1000  # Process first N
 
@@ -757,34 +757,37 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### Immediate
-1. **Census batch geocoder**: Retry when API recovers (97K addresses ready in `forward-geocode-census.py`)
-   - Would push lat/lng from 47.6% → ~80%
-2. **Batch 3 classification completing** on droplet (4,434 remaining images, ~38% done)
+### In Progress (Feb 11, 2026)
+1. **Census batch geocoder RUNNING**: 79,024 addresses, ~83% match rate, batch 10/79 (~13%)
+   - Will add ~66K coordinates when complete (lat/lng 47.6% → ~70%+)
+   - ETA: ~3 hours remaining
+2. **Droplet classification batch 3**: mount_type classification still running
 
 ### Short-term
-3. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
-4. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+3. **Re-run enrichment pipeline** on 11,878 new permit records:
+   - `set-location-precision.py`, `crossref-dedup.py`, `enrich-noaa-storms.py`
+4. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
+5. **Rebuild Next.js site** to reflect new record count (~302K)
 
 ### Medium-term
-5. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
-6. **Forward geocode permit addresses**: Once Census API recovers, geocode ~97K permit addresses
+6. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 
-### Data Gap Summary (Feb 11, 2026 — Session 5)
+### Data Gap Summary (Feb 11, 2026 — Session 6)
 | Field | Count | Coverage | Target | How to close |
 |-------|------:|----------|--------|-------------|
-| capacity_mw | 186,364 | 64.3% | ~80% | Many permits lack explicit capacity |
-| install_date | 216,715 | 74.8% | ~80% | Most remaining are permit records |
-| lat/lng | 137,886 | 47.6% | ~80% | Census geocoder (97K addresses ready) |
-| address | 211,930 | 73.1% | ~78% | Census batch geocoder (when API recovers) |
-| location_precision | 289,878 | 100% | 100% | **DONE** |
-| county | 284,873 | 98.3% | ~99% | Derive from new geocoded coords |
-| installer_name | 211,809 | 73.1% | ~75% | More permit cities |
-| operator_name | 105,279 | 36.3% | ~50% | Municipal permit data, utility partnerships |
-| owner_name | 96,977 | 33.5% | ~50%+ | PJM-GATS automation or SEIA |
-| developer_name | 8,108 | 2.8% | ~5%+ | SEIA ($1K/yr) best option |
-| mount_type | 59,870 | 20.7% | ~40%+ | Batch 3 on droplet (30% done, ~16hr remaining) |
-| CEC specs | 59,357 | 16.8% | ~17% | Limited by 55% of modules lacking model numbers |
+| capacity_mw | ~192,000 | ~64% | ~80% | Many permits lack explicit capacity |
+| install_date | ~222,000 | ~74% | ~80% | Most remaining are permit records |
+| lat/lng | ~142,000 | ~47% | ~70%+ | Census geocoder running (will add ~66K) |
+| address | ~218,000 | ~72% | ~78% | Census geocoder also returns matched addresses |
+| location_precision | ~302,000 | ~100% | 100% | Need re-run for new records |
+| county | ~289,000 | ~96% | ~99% | Derive from new geocoded coords |
+| installer_name | ~218,000 | ~72% | ~75% | New cities added installer names |
+| operator_name | ~105,000 | ~35% | ~50% | Municipal permit data, utility partnerships |
+| owner_name | ~100,000 | ~33% | ~50%+ | PJM-GATS automation or SEIA |
+| developer_name | ~8,100 | ~2.7% | ~5%+ | SEIA ($1K/yr) best option |
+| mount_type | ~60,000 | ~20% | ~40%+ | Batch 3 on droplet |
+| CEC specs | ~59,000 | ~17% | ~17% | Limited by 55% of modules lacking model numbers |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -796,10 +799,19 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Matched**: 178 owner_name patches applied to existing installations via state + name similarity cross-reference
 - **File**: `data/pjm_gats/GATSGenerators_20260210_161547.xlsx` (588K rows, 582K solar)
 
-### Municipal Permit Ingestion - EXPANDED (Feb 10, 2026)
-- **ingest-permits.py**: Multi-city solar permit scraper — expanded from 4 to 23 cities across 4 tiers
-- **Platforms**: Socrata SODA API (22 cities), OpenDataSoft (1 city — Cary NC)
+### Municipal Permit Ingestion - EXPANDED (Feb 10-11, 2026)
+- **ingest-permits.py**: Multi-city solar permit scraper — expanded from 4 to 27 cities across 5 tiers
+- **Platforms**: Socrata SODA API (22 cities), OpenDataSoft (1 city — Cary NC), ArcGIS REST (4 cities)
 - **CLI**: `--city sf,la`, `--tier 1,2`, `--dry-run`, `--list-cities`
+- **Tier 0** (ArcGIS with rich data):
+  - Sacramento CA (16,042 records, contractor, address, solar description)
+  - Philadelphia PA (CARTO, contractor, owner, equipment from descriptions)
+  - San Jose CA (CKAN, owner, contractor, address)
+  - Salt Lake City UT (Socrata, installer, address + embedded lat/lng)
+  - Denver/Boulder CO (6,506 records, dedicated PV kW field, PV cost, contractor) **NEW**
+  - Minneapolis MN (3,332 records, lat/lng, installer, owner, cost, permit type) **NEW**
+  - Detroit MI (643 records, lat/lng, cost, gap state MI coverage) **NEW**
+  - Albuquerque NM (1,397 records, owner + contractor + applicant, gap state NM) **NEW**
 - **Tier 1** (solar-specific datasets, best data):
   - Cambridge MA (692 records, HAS equipment: inverter make/model, mount type, panel count)
   - Cary NC (1,963 records, installer + owner names)
@@ -812,11 +824,16 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
   - Dallas (1,940), New Orleans (25,861), San Diego County (604 commercial), Montgomery County MD (437), Mesa AZ (2,090)
 - **Tier 4** (BLDS Partner Portal — standardized schema):
   - Boston (4,091), Fort Worth (266), Raleigh (277), Seattle BLDS (44), Nashville (0), New Orleans BLDS (14,027), Redmond (5), Santa Rosa (1,147)
-- **Actual results**: 84,563 new records created, 177 errors (Raleigh BLDS 400 Bad Request)
-- **Key features**: In-memory dedup (`seen_ids`), false positive filtering (solar screens/shades/tubes), description parsing for kW/panels/wattage
+- **Session 1 results**: 84,563 new records created, 177 errors (Raleigh BLDS 400 Bad Request)
+- **Session 2 results** (Feb 11): +11,878 records (Denver 6,506 + Minneapolis 3,332 + Detroit 643 + Albuquerque 1,397), 536 equipment, 0 errors
+- **Key features**: In-memory dedup (`seen_ids`), false positive filtering (solar screens/shades/tubes), description parsing for kW/panels/wattage, OBJECTID-based ArcGIS pagination for MapServer endpoints
 - **Cambridge rich data**: Inverter make+model, mount type (roof/ground), panel count, battery storage, system size kW — creates solar_equipment records
+- **Denver rich data**: Dedicated `PhotovoltaicKilowatt` and `EstPhotovoltaicCost` fields, `SolarSystemDescription`
+- **Minneapolis rich data**: Direct lat/lng coords, `applicantName` (installer), `fullName` (owner), `permitType` (commercial/residential)
+- **Albuquerque rich data**: Three entity fields: `Owner`, `Contractor`, `Applicant`. Web Mercator→WGS84 projection.
 - **Data source name in DB**: `municipal_permits_{city_key}` (one per city)
 - **Removed cities**: Cincinnati (0 solar), Roseville (sparse data), Chattanooga (SSL error), Baltimore (empty API)
+- **Dead endpoints (researched Feb 11)**: Kansas City MO (Socrata 404), Chicago Solar dedicated dataset (404)
 
 ### PJM Queue Ingestion - COMPLETED (Feb 11, 2026)
 - **ingest-pjm-queue.py**: Downloads PJM interconnection queue via public Planning API (no registration needed)
@@ -843,7 +860,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Source record prefix**: `vacooper_`
 - **Impact**: developer_name coverage jumps significantly for Virginia — previously near-zero for VA utility-scale projects
 
-### Municipal Permit Expansion - COMPLETED (Feb 11, 2026)
+### Municipal Permit Expansion - Session 4 (Feb 11, 2026)
 - **ingest-permits.py expanded**: Added 4 new cities with 3 new platform handlers (27 → 31 permit portals)
 - **New platforms**: ArcGIS FeatureServer, CARTO SQL API, CKAN Datastore API
 - **New cities (Tier 0)**:
@@ -854,6 +871,27 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 - **Total new**: ~27,514 records across 4 cities
 - **Philadelphia bug fix**: `geocode_x`/`geocode_y` are PA State Plane (EPSG:2272) in feet, not lat/lng. Values like 2,722,744 caused `numeric field overflow` (precision 10, scale 7). Fixed by parsing lat/lng from `the_geom` WKB hex (EPSG:4326). Also fixed NaN coordinates causing `PGRST102: Empty or invalid json` by adding range validation and `allow_nan=False` in `json.dumps`.
 - **Research rejected**: Las Vegas (no solar in description field), Denver (no description field at all), Portland (no building permits dataset), Charlotte/Tampa/Indianapolis/Phoenix (Accela, no public API), Miami-Dade (portal migration in progress)
+
+### Municipal Permit Expansion - Session 6 (Feb 11, 2026)
+- **4 more ArcGIS cities added**: Denver/Boulder CO, Minneapolis MN, Detroit MI, Albuquerque NM
+- **Denver/Boulder CO**: 6,506 records via ArcGIS FeatureServer. Rich solar-specific fields: `PhotovoltaicKilowatt`, `EstPhotovoltaicCost`, `SolarSystemDescription`, `ContractorCompanyName`. No geometry (addresses only, geocodable). Multi-city coverage (Boulder, Denver, Aurora, Lakewood, etc.).
+- **Minneapolis MN**: 3,332 records via ArcGIS FeatureServer. Direct lat/lng in attributes. `applicantName` (installer), `fullName` (owner), `value` (cost), `permitType` (commercial/residential). 532 commercial permits. `comments` field has descriptions.
+- **Detroit MI**: 643 records via ArcGIS FeatureServer. Direct lat/lng. `amt_estimated_contractor_cost` (string!), `work_description`. No contractor field but descriptions mention panel counts. Michigan is a gap state.
+- **Albuquerque NM**: 1,397 records via ArcGIS MapServer. Three entity fields: `Owner`, `Contractor`, `Applicant`. Web Mercator (EPSG:3857) → WGS84 projection in transform. NM is a gap state.
+- **MapServer pagination fix**: Old ArcGIS MapServer ignores `resultOffset`/`resultRecordCount`. Added OBJECTID-based deduplication in `fetch_arcgis` — tracks seen OIDs and breaks when records start repeating.
+- **Unix timestamp handling**: ArcGIS returns dates as Unix ms timestamps. Updated `safe_date()` to handle both int and string ms timestamps.
+- **Total**: 11,878 new records, 536 equipment, 0 errors
+- **Dead endpoints researched**: Kansas City MO Socrata (404), Chicago Solar dedicated dataset (404)
+
+### Census Batch Forward Geocoding - IN PROGRESS (Feb 11, 2026)
+- **forward-geocode-census.py**: Fixed Census API URL (`geocoding.geo.census.gov`, not `geocoding.census.gov`)
+- **Bug fix**: Batch size 10K caused timeout; reduced to 1K per request (~16s response time)
+- **Added**: Retry logic (3 attempts, exponential backoff), 300s timeout
+- **Running**: 79,024 valid addresses (82,554 total - 3,530 non-geocodable)
+- **Match rate**: ~83% (consistent across batches)
+- **Sources being geocoded**: permit (66,650), tts3 (7,622), cadg (2,742), mapts (1,224), vacooper (558), iso (228)
+- **Impact**: lat/lng coverage 47.6% → ~70%+ when complete
+- **Also sets**: `location_precision = 'exact'` on matched records
 
 ### SEIA/Ohm Coverage Comparison - COMPLETED (Feb 11, 2026)
 - **docs/coverage-comparison-seia-ohm.md**: Comprehensive analysis of free data vs paid sources
@@ -869,7 +907,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 Executed comprehensive gap-filling plan across Phases 0-2 and 3E/3F/5B/5C.
 
 **New scripts written:**
-- `forward-geocode-census.py` — Census Bureau batch geocoder (10K addresses/request, free). Script ready but Census API down.
+- `forward-geocode-census.py` — Census Bureau batch geocoder (1K addresses/request, free, ~83% match rate). URL: `geocoding.geo.census.gov`.
 - `parse-permit-equipment.py` — NLP extraction of panel/inverter from permit descriptions. 1,063 equipment records created.
 - `ingest-epa-repowering.py` — EPA RE-Powering brownfield/landfill solar tracker. 548 records with 100% owner+developer.
 - `ingest-nrel-community.py` — NREL Sharing the Sun community solar database. 3,938 records with developer (86%).
