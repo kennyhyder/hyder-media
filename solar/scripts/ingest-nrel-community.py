@@ -34,8 +34,8 @@ except ImportError:
 env_path = Path(__file__).parent.parent / ".env.local"
 load_dotenv(env_path)
 
-SUPABASE_URL = (os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL") or "").strip()
-SUPABASE_KEY = (os.environ.get("SUPABASE_SERVICE_KEY") or "").strip()
+SUPABASE_URL = (os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL") or "").strip().replace("\\n", "")
+SUPABASE_KEY = (os.environ.get("SUPABASE_SERVICE_KEY") or "").strip().replace("\\n", "")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     print("Error: SUPABASE_URL and SUPABASE_SERVICE_KEY must be set")
@@ -113,7 +113,7 @@ def safe_float(val):
 
 
 def safe_str(val):
-    if val is None or str(val).strip() in ("", "-", "N/A", "Unknown", "unknown"):
+    if val is None or str(val).strip() in ("", "-", ".", "N/A", "Unknown", "unknown", "None"):
         return None
     return str(val).strip()
 
