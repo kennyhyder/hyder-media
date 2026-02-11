@@ -469,17 +469,108 @@ def main():
     print(f"  Flagged: {iso_county}")
 
     # ================================================================
+    # Step 10: NJ DEP records - all have coordinates → 'exact'
+    # ================================================================
+    print("\n10. NJ DEP records → 'exact' (all have coordinates from ArcGIS)")
+    offset = 0
+    njdep_count = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id",
+            "source_record_id": "like.njdep_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        ids = [r["id"] for r in records]
+        update_precision_batch(ids, "exact")
+        njdep_count += len(ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Flagged: {njdep_count}")
+
+    # ================================================================
+    # Step 11: Municipal permit records - classify by available data
+    # ================================================================
+    print("\n11. Municipal permit records → classify by data quality")
+    offset = 0
+    permit_exact = 0
+    permit_address = 0
+    permit_city = 0
+    permit_zip = 0
+    permit_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude,address,city,zip_code",
+            "source_record_id": "like.permit_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+
+        exact_ids = []
+        address_ids = []
+        city_ids = []
+        zip_ids = []
+        state_ids = []
+        for r in records:
+            has_coords = r.get("latitude") and r.get("longitude")
+            has_address = bool(r.get("address"))
+            has_city = bool(r.get("city"))
+            has_zip = bool(r.get("zip_code"))
+
+            if has_coords:
+                exact_ids.append(r["id"])
+            elif has_address:
+                address_ids.append(r["id"])
+            elif has_city:
+                city_ids.append(r["id"])
+            elif has_zip:
+                zip_ids.append(r["id"])
+            else:
+                state_ids.append(r["id"])
+
+        if exact_ids:
+            update_precision_batch(exact_ids, "exact")
+            permit_exact += len(exact_ids)
+        if address_ids:
+            update_precision_batch(address_ids, "address")
+            permit_address += len(address_ids)
+        if city_ids:
+            update_precision_batch(city_ids, "city")
+            permit_city += len(city_ids)
+        if zip_ids:
+            update_precision_batch(zip_ids, "zip")
+            permit_zip += len(zip_ids)
+        if state_ids:
+            update_precision_batch(state_ids, "state")
+            permit_state += len(state_ids)
+
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact (coords): {permit_exact}")
+    print(f"  Address only: {permit_address}")
+    print(f"  City only: {permit_city}")
+    print(f"  Zip only: {permit_zip}")
+    print(f"  State only: {permit_state}")
+
+    # ================================================================
     # Summary
     # ================================================================
     total_reverted = tts_reverted + ca_reverted + il_reverted + ma_reverted
     print("\n" + "=" * 60)
     print("Location Precision Summary")
     print("=" * 60)
-    print(f"  Exact (real coordinates): {uspvdb_count + eia_exact + nysun_exact + lbnl_count}")
-    print(f"  Address (geocodable): {eia_address}")
-    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city}")
-    print(f"  Zip-level: {tts_zip + ca_zip + il_zip + ma_zip}")
+    print(f"  Exact (real coordinates): {uspvdb_count + eia_exact + nysun_exact + lbnl_count + njdep_count + permit_exact}")
+    print(f"  Address (geocodable): {eia_address + permit_address}")
+    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city + permit_city}")
+    print(f"  Zip-level: {tts_zip + ca_zip + il_zip + ma_zip + permit_zip}")
     print(f"  County-level: {ca_county + iso_county}")
+    print(f"  State-level: {permit_state}")
     print(f"  Zip centroids reverted: {total_reverted}")
     print("\nDone!")
 
