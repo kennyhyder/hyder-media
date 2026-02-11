@@ -115,6 +115,54 @@ CITIES = {
         "prefix": "permit_slc",
         "transform": "salt_lake_city",
     },
+    "denver": {
+        "tier": 0,
+        "name": "Denver/Boulder, CO",
+        "state": "CO",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/Construction_Permits/FeatureServer/0",
+        "page_size": 1000,
+        "filter": "EstPhotovoltaicCost IS NOT NULL",
+        "prefix": "permit_denver",
+        "transform": "denver",
+    },
+    "minneapolis": {
+        "tier": 0,
+        "name": "Minneapolis, MN",
+        "state": "MN",
+        "county": "HENNEPIN",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/CCS_Permits/FeatureServer/0",
+        "page_size": 1000,
+        "filter": "upper(comments) LIKE '%SOLAR%'",
+        "prefix": "permit_minneapolis",
+        "transform": "minneapolis",
+    },
+    "detroit": {
+        "tier": 0,
+        "name": "Detroit, MI",
+        "state": "MI",
+        "county": "WAYNE",
+        "platform": "arcgis",
+        "base_url": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/bseed_building_permits/FeatureServer/0",
+        "page_size": 1000,
+        "filter": "upper(work_description) LIKE '%SOLAR%'",
+        "prefix": "permit_detroit",
+        "transform": "detroit",
+    },
+    "albuquerque": {
+        "tier": 0,
+        "name": "Albuquerque, NM",
+        "state": "NM",
+        "county": "BERNALILLO",
+        "platform": "arcgis",
+        "base_url": "https://coagisweb.cabq.gov/arcgis/rest/services/public/BuildingPermits_KIVAPOSSE/MapServer/0",
+        "page_size": 1000,
+        "oid_paging": True,  # MapServer ignores resultOffset; use OBJECTID pagination
+        "filter": "upper(WorkDescription) LIKE '%SOLAR%'",
+        "prefix": "permit_abq",
+        "transform": "albuquerque",
+    },
 
     # =========================================================================
     # TIER 1: Solar-specific datasets (best data)
@@ -564,20 +612,34 @@ def fetch_socrata(config):
 
 
 def fetch_arcgis(config):
-    """Fetch all records from ArcGIS FeatureServer REST API."""
+    """Fetch all records from ArcGIS FeatureServer/MapServer REST API.
+
+    Uses offset-based pagination for FeatureServer, and OBJECTID-based
+    pagination for older MapServer endpoints that ignore resultOffset.
+    """
     records = []
     offset = 0
+    use_oid_paging = config.get("oid_paging", False)
+    last_oid = 0
+    seen_oids = set()
+
     while True:
         where = config.get("filter", "1=1")
-        params = urllib.parse.urlencode({
+        if use_oid_paging and last_oid > 0:
+            where = f"({where}) AND OBJECTID > {last_oid}"
+
+        params = {
             "where": where,
             "outFields": "*",
             "resultRecordCount": config["page_size"],
-            "resultOffset": offset,
             "f": "json",
             "returnGeometry": "true",
-        })
-        url = f"{config['base_url']}/query?{params}"
+            "orderByFields": "OBJECTID ASC" if use_oid_paging else "",
+        }
+        if not use_oid_paging:
+            params["resultOffset"] = offset
+
+        url = f"{config['base_url']}/query?{urllib.parse.urlencode(params)}"
         req = urllib.request.Request(url)
         try:
             with urllib.request.urlopen(req) as resp:
@@ -588,16 +650,32 @@ def fetch_arcgis(config):
         features = data.get("features", [])
         if not features:
             break
+
+        new_count = 0
         for feat in features:
             rec = feat.get("attributes", {})
+            oid = rec.get("OBJECTID") or rec.get("ObjectId") or rec.get("objectid")
+            # Dedup: skip records we've already seen (MapServer pagination bug)
+            if oid and oid in seen_oids:
+                continue
+            if oid:
+                seen_oids.add(oid)
+                last_oid = max(last_oid, oid)
+
             geo = feat.get("geometry", {})
             if geo:
                 rec["_lat"] = geo.get("y")
                 rec["_lng"] = geo.get("x")
             records.append(rec)
+            new_count += 1
+
         offset += len(features)
-        if offset % 1000 == 0:
-            print(f"    Fetched {offset}...")
+        if offset % 1000 == 0 or new_count == 0:
+            print(f"    Fetched {len(records)}...")
+
+        # Stop if no new records (dedup caught all — server is looping)
+        if new_count == 0:
+            break
         if not data.get("exceededTransferLimit", False) and len(features) < config["page_size"]:
             break
         time.sleep(RATE_LIMIT)
@@ -717,10 +795,26 @@ def safe_float(val):
 
 
 def safe_date(val):
-    """Extract YYYY-MM-DD from various date formats."""
+    """Extract YYYY-MM-DD from various date formats including Unix ms timestamps."""
     if not val:
         return None
+    # Handle Unix millisecond timestamps (ArcGIS returns these)
+    if isinstance(val, (int, float)) and val > 946684800000:  # After year 2000 in ms
+        try:
+            import datetime
+            dt = datetime.datetime.utcfromtimestamp(val / 1000)
+            return dt.strftime("%Y-%m-%d")
+        except (ValueError, OSError):
+            pass
     s = str(val).strip()
+    # Check for pure numeric (Unix ms as string)
+    if s.isdigit() and len(s) >= 12:
+        try:
+            import datetime
+            dt = datetime.datetime.utcfromtimestamp(int(s) / 1000)
+            return dt.strftime("%Y-%m-%d")
+        except (ValueError, OSError):
+            pass
     if "T" in s:
         s = s.split("T")[0]
     # Validate it looks like a date
@@ -1561,6 +1655,244 @@ def transform_san_jose(record, data_source_id, config):
     return source_id, inst, equipment if equipment else None
 
 
+def transform_denver(record, data_source_id, config):
+    """Denver/Boulder CO — ArcGIS with dedicated solar fields (PV kW, PV cost)."""
+    permit_num = record.get("PermitNum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_denver_{permit_num}"
+    desc = record.get("SolarSystemDescription", "") or record.get("Description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    # Dedicated PV kW field
+    capacity_kw = safe_float(record.get("PhotovoltaicKilowatt"))
+    if not capacity_kw:
+        capacity_kw = parse_capacity_from_description(desc)
+
+    panels, watts = parse_panels_from_description(desc)
+
+    # No geometry from this endpoint — addresses only
+    addr = record.get("OriginalAddress", "")
+    city = record.get("OriginalCity", "")
+    state = record.get("OriginalState", "CO")
+    zip_code = record.get("OriginalZip", "")
+
+    # Determine county from city
+    county = None
+    if city:
+        city_upper = city.upper()
+        if "BOULDER" in city_upper:
+            county = "BOULDER"
+        elif "DENVER" in city_upper:
+            county = "DENVER"
+        elif "AURORA" in city_upper:
+            county = "ARAPAHOE"
+        elif "LAKEWOOD" in city_upper or "GOLDEN" in city_upper:
+            county = "JEFFERSON"
+        elif "BROOMFIELD" in city_upper:
+            county = "BROOMFIELD"
+        elif "LONGMONT" in city_upper or "ERIE" in city_upper or "LOUISVILLE" in city_upper:
+            county = "BOULDER"
+
+    pv_cost = safe_float(record.get("EstPhotovoltaicCost"))
+    project_cost = safe_float(record.get("EstProjectCost"))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city if city else None,
+        zip_code=zip_code if zip_code else None,
+        county=county,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssuedDate") or record.get("AppliedDate")),
+        installer_name=record.get("ContractorCompanyName", ""),
+        total_cost=pv_cost or project_cost,
+        data_source_id=data_source_id,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_minneapolis(record, data_source_id, config):
+    """Minneapolis MN — ArcGIS with lat/lng, installer, owner, cost, permit type."""
+    permit_num = record.get("permitNumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_minneapolis_{permit_num}"
+    desc = record.get("comments", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("Latitude") or record.get("_lat"))
+    lng = safe_float(record.get("Longitude") or record.get("_lng"))
+
+    # Owner from fullName
+    owner = record.get("fullName", "")
+    if owner and owner.strip().upper() in ("", "NONE", "N/A"):
+        owner = ""
+
+    installer = record.get("applicantName", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("Display", ""),
+        city="Minneapolis",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issueDate")),
+        installer_name=installer,
+        owner_name=owner,
+        total_cost=safe_float(record.get("value")),
+        data_source_id=data_source_id,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_detroit(record, data_source_id, config):
+    """Detroit MI — ArcGIS with lat/lng, cost, detailed descriptions."""
+    permit_num = record.get("record_id", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_detroit_{permit_num}"
+    desc = record.get("work_description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("latitude") or record.get("_lat"))
+    lng = safe_float(record.get("longitude") or record.get("_lng"))
+
+    # Cost is a string field in Detroit's API
+    cost = safe_float(record.get("amt_estimated_contractor_cost"))
+
+    # Determine site type from current_use_type
+    use_type = str(record.get("current_use_type", "")).lower()
+    site_type = "commercial"
+    if "single family" in use_type or "two family" in use_type or "residential" in use_type:
+        site_type = "commercial"  # We keep as commercial per project spec (>= 25kW filter)
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("address", ""),
+        city="Detroit",
+        zip_code=record.get("zip_code"),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issued_date") or record.get("submitted_date")),
+        total_cost=cost,
+        site_type=site_type,
+        data_source_id=data_source_id,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_albuquerque(record, data_source_id, config):
+    """Albuquerque NM — ArcGIS with owner, contractor, applicant, and valuation."""
+    permit_num = record.get("PermitNumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_abq_{permit_num}"
+    desc = record.get("WorkDescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # ArcGIS geometry is Web Mercator — need to convert to WGS84
+    lat, lng = None, None
+    raw_lat = record.get("_lat")
+    raw_lng = record.get("_lng")
+    if raw_lat and raw_lng:
+        # Web Mercator (EPSG:3857) to WGS84 conversion
+        import math
+        x = float(raw_lng)
+        y = float(raw_lat)
+        lng = x / 20037508.34 * 180.0
+        lat = (math.atan(math.exp(y / 20037508.34 * math.pi)) * 360.0 / math.pi) - 90.0
+        # Validate
+        if lat < 30 or lat > 40 or lng < -110 or lng > -103:
+            lat, lng = None, None
+
+    addr = record.get("CalculatedAddress", "") or record.get("FreeFormAddress", "")
+    owner = record.get("Owner", "")
+    contractor = record.get("Contractor", "")
+    applicant = record.get("Applicant", "")
+
+    # Use contractor as installer, applicant as developer if different
+    installer = contractor if contractor else applicant
+
+    # Determine site type
+    category = str(record.get("GeneralCategory", "")).lower()
+    site_type = "commercial" if "commercial" in category else "commercial"
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Albuquerque",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("DateIssued")),
+        installer_name=installer,
+        owner_name=owner if owner else None,
+        total_cost=safe_float(record.get("Valuation")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -1579,6 +1911,10 @@ TRANSFORMERS = {
     "sacramento": transform_sacramento,
     "philadelphia": transform_philadelphia,
     "san_jose": transform_san_jose,
+    "denver": transform_denver,
+    "minneapolis": transform_minneapolis,
+    "detroit": transform_detroit,
+    "albuquerque": transform_albuquerque,
 }
 
 

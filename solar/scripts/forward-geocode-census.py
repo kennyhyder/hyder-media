@@ -7,7 +7,7 @@ to lat/lng coordinates. Much faster than Nominatim (10,000 per request vs 1/sec)
 
 Also captures county FIPS codes from Census response to fill county field.
 
-API: https://geocoding.geo.gov/geocoder/geographies/addressbatch
+API: https://geocoding.geo.census.gov/geocoder/geographies/addressbatch
   - POST multipart form with CSV (id, address, city, state, zip)
   - Returns CSV with match status, coordinates, FIPS codes
   - Max 10,000 records per batch
@@ -43,9 +43,10 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("Error: SUPABASE_URL and SUPABASE_SERVICE_KEY must be set")
     sys.exit(1)
 
-CENSUS_API_URL = "https://geocoding.census.gov/geocoder/geographies/addressbatch"
-CENSUS_BATCH_SIZE = 10000  # Census API max per request
+CENSUS_API_URL = "https://geocoding.geo.census.gov/geocoder/geographies/addressbatch"
+CENSUS_BATCH_SIZE = 1000  # Census allows 10K but times out; 1K works reliably
 SUPABASE_BATCH_SIZE = 50
+MAX_RETRIES = 3
 
 # FIPS county codes → county names (loaded from Census response)
 # Census returns county FIPS which we can use directly
@@ -197,12 +198,26 @@ def geocode_census_batch(csv_data):
         method="POST",
     )
 
-    try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            response_text = resp.read().decode("utf-8")
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
-        print(f"  Census API error: {e}")
-        return {}
+    for attempt in range(MAX_RETRIES):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as resp:
+                response_text = resp.read().decode("utf-8")
+            break
+        except Exception as e:
+            if attempt < MAX_RETRIES - 1:
+                wait = 10 * (attempt + 1)
+                print(f"  Census API error (attempt {attempt+1}): {e}. Retrying in {wait}s...")
+                time.sleep(wait)
+                # Rebuild request (consumed by previous attempt)
+                req = urllib.request.Request(
+                    CENSUS_API_URL,
+                    data=body.encode("utf-8"),
+                    headers=headers,
+                    method="POST",
+                )
+            else:
+                print(f"  Census API failed after {MAX_RETRIES} attempts: {e}")
+                return {}
 
     # Parse CSV response
     # Format: "ID","Input Address","Match","Match Type","Matched Address","Coordinates","TIGER Line ID","Side","State FIPS","County FIPS","Tract","Block"
