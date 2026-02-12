@@ -757,20 +757,24 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 12, 2026 — Session 11)
-1. **Droplet classification batch 3**: Wrapper running at 0.4 img/sec, memory stable at 2.3GB. Mount type at 96,956 (17.4%) and climbing.
+### In Progress (Feb 12, 2026 — Session 12)
+1. **Droplet classification batch 3**: 33.4% complete (~12,400/37,129), ETA ~17 hours. Memory stable at 2.9GB/15GB.
+2. **NOAA storm re-run**: Running on full 558K database (idempotent — skips existing events)
+
+### Completed This Session
+3. **Next.js site rebuilt**: Static pages regenerated with 558K installation stats
+4. **Cross-source dedup**: 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner)
+5. **CPSC recalls**: Re-running on expanded equipment set
 
 ### Short-term
-2. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
-3. **NOAA storm re-run**: Create storm damage events for ~3,809 new permit records (Fort Collins + Cambridge)
-4. **Rebuild Next.js site**: Reflect updated stats (558,366 installations)
-5. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+6. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
+7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 
 ### Medium-term
-6. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
-7. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-8. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
-9. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
+8. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
+9. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+10. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
+11. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
 
 ### Data Gap Summary (Feb 12, 2026 — Session 11)
 | Field | Count | Coverage | Target | How to close |
@@ -1330,4 +1334,22 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - **4,988,724 events**
 - **96,956 with mount_type** (17.4%, climbing from batch 3)
 - **100% location_precision coverage** (restored for new records)
-- **Droplet**: 2.3GB RAM, stable, actively classifying at ~1 img/sec
+- **Droplet**: 2.9GB/15GB RAM, stable, actively classifying at 0.4 img/sec
+
+### Session 12 — Feb 12, 2026
+
+**Enrichment pipeline re-run:**
+- Cross-source dedup: 54,912 match pairs, 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner, 4 installer, 3 operator, 2 install_date, 1 total_cost), 0 errors
+- NOAA storms: Re-running on 558K installations (idempotent — skips existing events via dedup check)
+- CPSC recalls: Re-running on expanded 377K equipment set
+
+**Next.js site rebuilt:**
+- Static pages regenerated with updated database stats (558K installations)
+- All 5 pages rebuilt: Dashboard, Search, Equipment, Installers, Site Detail
+- Auth injection applied, build output moved to production directory
+
+**Droplet classification batch 3 status:**
+- 12,400/37,129 images processed (33.4%)
+- 6,494 classified (52.4% detection rate — lower than batches 1-2's ~65%)
+- ETA: ~17 hours remaining at 0.4 img/sec
+- Memory healthy: 2.9GB/15GB (no pressure)
