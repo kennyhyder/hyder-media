@@ -558,20 +558,63 @@ def main():
         print("\n  No events to create.")
         return
 
-    # Step 5: Create site events in batches
-    print(f"\nCreating {len(site_events)} site events in batches of {BATCH_SIZE}...")
+    # Step 5: Load existing storm events to avoid duplicates
+    print(f"\nChecking for existing storm events...")
+    existing_keys = set()
+    offset = 0
+    while True:
+        rows = supabase_get("solar_site_events", {
+            "select": "installation_id,event_type,event_date",
+            "event_type": "in.(hail,severe_hail,high_wind)",
+            "limit": 10000,
+            "offset": offset,
+        })
+        if not rows:
+            break
+        for r in rows:
+            existing_keys.add((r["installation_id"], r["event_type"], r["event_date"]))
+        offset += len(rows)
+        if len(rows) < 10000:
+            break
+
+    if existing_keys:
+        before = len(site_events)
+        site_events = [e for e in site_events if (e["installation_id"], e["event_type"], e["event_date"]) not in existing_keys]
+        print(f"  Found {len(existing_keys)} existing storm events, skipped {before - len(site_events)} duplicates")
+    else:
+        print(f"  No existing storm events found (clean run)")
+
+    if not site_events:
+        print("\n  All events already exist. Nothing to create.")
+        return
+
+    # Step 5b: Create site events in batches (parallel for speed)
+    print(f"\nCreating {len(site_events)} site events in batches of {BATCH_SIZE} (10 parallel workers)...")
     created = 0
     errors = 0
 
+    # Build all batches first
+    all_batches = []
     for i in range(0, len(site_events), BATCH_SIZE):
-        batch = site_events[i:i + BATCH_SIZE]
-        ok = supabase_post("solar_site_events", batch)
-        if ok:
-            created += len(batch)
-        else:
-            errors += len(batch)
+        all_batches.append(site_events[i:i + BATCH_SIZE])
 
-        if (i + BATCH_SIZE) % 500 == 0:
+    # Process batches in parallel chunks of 10
+    PARALLEL_WORKERS = 10
+    for chunk_start in range(0, len(all_batches), PARALLEL_WORKERS):
+        chunk = all_batches[chunk_start:chunk_start + PARALLEL_WORKERS]
+        with ThreadPoolExecutor(max_workers=PARALLEL_WORKERS) as executor:
+            futures = {
+                executor.submit(supabase_post, "solar_site_events", batch): len(batch)
+                for batch in chunk
+            }
+            for future in as_completed(futures):
+                batch_size = futures[future]
+                if future.result():
+                    created += batch_size
+                else:
+                    errors += batch_size
+
+        if created % 5000 < PARALLEL_WORKERS * BATCH_SIZE:
             print(f"  Progress: {created} created, {errors} errors")
 
     print(f"\n{'=' * 60}")

@@ -30,6 +30,7 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 # Load environment
@@ -379,9 +380,8 @@ def main():
             total_failed += len(batch)
             continue
 
-        # Patch Supabase with results
-        patched = 0
-        county_filled = 0
+        # Patch Supabase with results (parallel for speed)
+        patches = []
         for rec in batch:
             rec_id = rec["id"]
             if rec_id not in results:
@@ -392,16 +392,22 @@ def main():
             patch_data = {
                 "latitude": r["lat"],
                 "longitude": r["lon"],
+                "location_precision": "exact",
             }
+            patches.append((rec_id, patch_data))
 
-            # Update location_precision to 'exact' since we now have coords
-            patch_data["location_precision"] = "exact"
-
-            ok = supabase_patch_single("solar_installations", rec_id, patch_data)
-            if ok:
-                patched += 1
-            else:
-                total_errors += 1
+        patched = 0
+        county_filled = 0
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            futures = {
+                executor.submit(supabase_patch_single, "solar_installations", rid, data): rid
+                for rid, data in patches
+            }
+            for future in as_completed(futures):
+                if future.result():
+                    patched += 1
+                else:
+                    total_errors += 1
 
         total_geocoded += patched
         total_county_filled += county_filled

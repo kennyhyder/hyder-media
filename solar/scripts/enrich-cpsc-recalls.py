@@ -303,6 +303,36 @@ def main():
         print("\n  No recall matches found.")
         return
 
+    # Check for existing recall events to avoid duplicates
+    print(f"\nChecking for existing recall events...")
+    existing_keys = set()
+    offset = 0
+    while True:
+        rows = supabase_get("solar_site_events", {
+            "select": "installation_id,event_type,event_date",
+            "event_type": "eq.recall",
+            "limit": 10000,
+            "offset": offset,
+        })
+        if not rows:
+            break
+        for r in rows:
+            existing_keys.add((r["installation_id"], r["event_type"], r.get("event_date")))
+        offset += len(rows)
+        if len(rows) < 10000:
+            break
+
+    if existing_keys:
+        before = len(events_to_create)
+        events_to_create = [e for e in events_to_create if (e["installation_id"], e["event_type"], e.get("event_date")) not in existing_keys]
+        print(f"  Found {len(existing_keys)} existing recall events, skipped {before - len(events_to_create)} duplicates")
+    else:
+        print(f"  No existing recall events found (clean run)")
+
+    if not events_to_create:
+        print("\n  All recall events already exist. Nothing to create.")
+        return
+
     # Create events
     print(f"\nCreating {len(events_to_create)} recall events...")
     created = 0

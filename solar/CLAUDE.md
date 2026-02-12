@@ -757,37 +757,35 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 11, 2026)
-1. **Census batch geocoder RUNNING**: 79,024 addresses, ~83% match rate, batch 10/79 (~13%)
-   - Will add ~66K coordinates when complete (lat/lng 47.6% → ~70%+)
-   - ETA: ~3 hours remaining
-2. **Droplet classification batch 3**: mount_type classification still running
+### In Progress (Feb 11, 2026 — Session 8)
+1. **Droplet classification batch 3**: 8,200/37,129 (22%), ~20 hours remaining at 0.4 img/sec
+2. **Location precision re-tagging**: Running on 302K records (2,120 NULL precision → tagging)
 
 ### Short-term
-3. **Re-run enrichment pipeline** on 11,878 new permit records:
-   - `set-location-precision.py`, `crossref-dedup.py`, `enrich-noaa-storms.py`
-4. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
-5. **Rebuild Next.js site** to reflect new record count (~302K)
+3. **County derivation** from newly geocoded coordinates
+4. **Rebuild Next.js site** to reflect updated stats
+5. **Expand permit scraper** further: Portland OR, Atlanta GA (if portals become viable)
 
 ### Medium-term
 6. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 
-### Data Gap Summary (Feb 11, 2026 — Session 6)
+### Data Gap Summary (Feb 11, 2026 — Session 8)
 | Field | Count | Coverage | Target | How to close |
 |-------|------:|----------|--------|-------------|
-| capacity_mw | ~192,000 | ~64% | ~80% | Many permits lack explicit capacity |
+| capacity_mw | ~193,600 | ~64% | ~80% | Many permits lack explicit capacity |
 | install_date | ~222,000 | ~74% | ~80% | Most remaining are permit records |
-| lat/lng | ~142,000 | ~47% | ~70%+ | Census geocoder running (will add ~66K) |
-| address | ~218,000 | ~72% | ~78% | Census geocoder also returns matched addresses |
-| location_precision | ~302,000 | ~100% | 100% | Need re-run for new records |
-| county | ~289,000 | ~96% | ~99% | Derive from new geocoded coords |
-| installer_name | ~218,000 | ~72% | ~75% | New cities added installer names |
-| operator_name | ~105,000 | ~35% | ~50% | Municipal permit data, utility partnerships |
-| owner_name | ~100,000 | ~33% | ~50%+ | PJM-GATS automation or SEIA |
+| lat/lng | **211,760** | **70.2%** | ~75% | Census geocoder DONE (+52,774 addresses) |
+| address | ~223,800 | ~74% | ~78% | Most remaining are ISO grid substations |
+| location_precision | ~299,600 | ~99.3% | 100% | Re-tagging 2,120 NULL records |
+| county | ~294,100 | ~97.5% | ~99% | Derive from new geocoded coords |
+| installer_name | ~223,000 | ~74% | ~75% | Mostly from permits |
+| operator_name | ~105,400 | ~35% | ~50% | Municipal permit data, utility partnerships |
+| owner_name | ~100,400 | ~33% | ~50%+ | PJM-GATS automation or SEIA |
 | developer_name | ~8,100 | ~2.7% | ~5%+ | SEIA ($1K/yr) best option |
-| mount_type | ~60,000 | ~20% | ~40%+ | Batch 3 on droplet |
+| mount_type | ~59,900 | ~20% | ~40%+ | Droplet batch 3 (~20 hrs remaining) |
 | CEC specs | ~59,000 | ~17% | ~17% | Limited by 55% of modules lacking model numbers |
+| **Events** | **1,690,700+** | — | — | 1.69M storm + 3.5K recall + 161 other |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -1046,6 +1044,54 @@ Completed Phases 4A (NOAA re-run on full 290K DB) and 5A (final dedup) from gap-
 **Droplet classification batch 3 status:**
 - 10,700/35,113 images (30.5% complete), 5,014 classified, 5,686 no panels
 - ETA: ~16 hours remaining at 0.4 img/sec
+
+### Gap-Filling Session - Feb 11, 2026 (Session 7)
+
+**Enrichment pipeline re-run on 302K records:**
+- Cross-source dedup: 6,561 patches, 0 errors
+  - 5,978 location upgrades, 553 crossref links, 95 operator, 30 install_date, 22 developer, 18 address, 17 owner, 8 installer
+  - Phase 1: 15,030 ID matches, Phase 2: 24,988 proximity, Phase 3: 92 broad
+- CEC equipment specs: 0 new matches (all existing records already enriched)
+- CPSC recalls: 3,519 events created (336K equipment scanned)
+- Location precision: Re-run completed (exact: 137,149, address: 61,856, city: 86,877, zip: 6,996, county: 4,814, state: 19)
+
+**Storm event deduplication crisis — FIXED:**
+- Discovered 1,660,149 storm events in DB (should have been ~561K) — duplicates from multiple script runs
+- Root cause: NOAA/CPSC scripts generate fresh UUID PKs, so `ignore-duplicates` header never catches duplicates
+- Deleted ALL storm events via psql: `DELETE FROM solar_site_events WHERE event_type IN ('hail','severe_hail','high_wind')` — 1,660,149 deleted in seconds
+- Deleted 3,520 duplicate recall events via psql window function (kept oldest per partition)
+- **Fixed both scripts** to check existing events before inserting:
+  - `enrich-noaa-storms.py`: Loads existing (installation_id, event_type, event_date) set, skips duplicates
+  - `enrich-cpsc-recalls.py`: Same dedup pattern for recall events
+  - Scripts are now idempotent — safe to re-run without creating duplicates
+- NOAA storms clean re-run started on 302K installations (~1.7M events expected)
+
+**Census batch geocoder — COMPLETED:**
+- 66,376 valid addresses submitted in 67 batches of 1,000
+- **52,774 addresses geocoded** (79.5% match rate), 13,600 no Census match, 2 patch errors
+- lat/lng coverage: 47% → **70.2%** (211,760 / 301,756)
+- Parallel patching fix (ThreadPoolExecutor 20 workers) reduced patch time from ~7 min/batch to ~5 sec/batch
+- Total geocoder runtime: ~25 minutes (was estimated at 3+ hours before parallel fix)
+
+**NOAA storms — COMPLETED (clean re-run):**
+- **1,687,103 site events created** affecting 256,840 installations, 50 errors (0.003%)
+- Parallel insert fix (10 workers) reduced runtime from ~4 hours to ~35 minutes
+- Dedup check correctly skipped 1,000 events from previous partial run
+- Events: 760K hail + 928K wind across 11 years (2015-2025)
+
+**Droplet classification batch 3 resume:**
+- Progress: 8,200/37,129 (22%), 4,330 classified, 3,870 no panels, 0.4 img/sec
+- ETA: ~20 hours remaining
+- Logs: `/root/solar-nrel/results/classify_batch3_resume.log`
+
+**Psql direct SQL access:**
+- Bulk operations (DELETE 1.7M rows, window function dedup) are instant via psql vs hours via REST API
+- `PGPASSWORD='#FsW7iqg%EYX&G3M' psql -h aws-0-us-west-2.pooler.supabase.com -p 6543 -U postgres.ilbovwnhrowvxjdkvrln -d postgres`
+
+**Performance optimizations applied this session:**
+- `forward-geocode-census.py`: ThreadPoolExecutor(20) for parallel PATCH — 84x faster
+- `enrich-noaa-storms.py`: ThreadPoolExecutor(10) for parallel POST — 5x faster
+- Both NOAA + CPSC scripts now have dedup checks — fully idempotent on re-run
 
 
 <claude-mem-context>
