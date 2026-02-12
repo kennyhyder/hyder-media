@@ -334,6 +334,8 @@ def load_uspvdb_eia_map():
                     specs = json.loads(specs)
                 except (json.JSONDecodeError, TypeError):
                     continue
+            if not isinstance(specs, dict):
+                continue
             if specs and specs.get('eia_id'):
                 eia_id = str(specs['eia_id']).strip()
                 if eia_id and eia_id != 'None':

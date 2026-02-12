@@ -24,6 +24,7 @@ import re
 import argparse
 import urllib.request
 import urllib.parse
+import ssl
 import time
 from pathlib import Path
 
@@ -163,6 +164,128 @@ CITIES = {
         "prefix": "permit_abq",
         "transform": "albuquerque",
     },
+    "riverside_county": {
+        "tier": 0,
+        "name": "Riverside County, CA",
+        "state": "CA",
+        "county": "RIVERSIDE",
+        "platform": "arcgis",
+        "base_url": "https://gis.countyofriverside.us/arcgis_mapping/rest/services/OpenData/General/MapServer/280",
+        "page_size": 2000,
+        "oid_paging": True,  # MapServer requires OBJECTID pagination
+        "out_sr": "4326",  # Request WGS84 coordinates (native is State Plane)
+        "filter": "CASE_WORK_CLASS LIKE 'SLRC%' OR CASE_WORK_CLASS LIKE 'DA03%' OR CASE_WORK_CLASS LIKE 'FCN59%' OR CASE_WORK_CLASS LIKE 'GSLRR%'",
+        "prefix": "permit_riverside",
+        "transform": "riverside_county",
+    },
+    "phoenix": {
+        "tier": 0,
+        "name": "Phoenix, AZ",
+        "state": "AZ",
+        "county": "MARICOPA",
+        "platform": "arcgis",
+        "base_url": "https://maps.phoenix.gov/pub/rest/services/Public/Planning_Permit/MapServer/1",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(PERMIT_NAME) LIKE '%SOLAR%'",
+        "prefix": "permit_phoenix",
+        "transform": "phoenix",
+    },
+    "maricopa_county": {
+        "tier": 0,
+        "name": "Maricopa County, AZ",
+        "state": "AZ",
+        "county": "MARICOPA",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/ykpntM6e3tHvzKRJ/arcgis/rest/services/Building_Permits_(view)/FeatureServer/0",
+        "page_size": 1000,
+        "out_sr": "4326",
+        "filter": "UPPER(PermitDescription) LIKE '%SOLAR%'",
+        "prefix": "permit_maricopa",
+        "transform": "maricopa_county",
+    },
+    "san_antonio": {
+        "tier": 0,
+        "name": "San Antonio, TX",
+        "state": "TX",
+        "county": "BEXAR",
+        "platform": "ckan",
+        "base_url": "https://data.sanantonio.gov/api/3/action/datastore_search",
+        "resource_id": "c22b1ef2-dcf8-4d77-be1a-ee3638092aab",
+        "ckan_filters": {"PERMIT TYPE": "Solar - Photovoltaic Permit"},
+        "page_size": 1000,
+        "prefix": "permit_sanantonio",
+        "transform": "san_antonio",
+    },
+    "sacramento_county": {
+        "tier": 0,
+        "name": "Sacramento County, CA",
+        "state": "CA",
+        "county": "SACRAMENTO",
+        "platform": "arcgis",
+        "base_url": "https://services1.arcgis.com/5NARefyPVtAeuJPU/arcgis/rest/services/Permits/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",  # Native is State Plane CA Zone 2 (WKID 2226)
+        "filter": "upper(WorkDescription) LIKE '%SOLAR%' OR Application_Subtype LIKE '%Solar%'",
+        "prefix": "permit_saccounty",
+        "transform": "sacramento_county",
+        "has_equipment": True,
+    },
+    "tucson": {
+        "tier": 0,
+        "name": "Tucson, AZ",
+        "state": "AZ",
+        "county": "PIMA",
+        "platform": "arcgis_multilayer",
+        "base_url": "https://mapdata.tucsonaz.gov/arcgis/rest/services/PublicMaps/PermitsCode/MapServer",
+        "layers": [85, 81],  # 85=residential, 81=commercial
+        "page_size": 1000,
+        "oid_paging": True,  # MapServer requires OBJECTID pagination
+        "out_sr": "4326",
+        "filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR WORKCLASS LIKE '%Solar%'",
+        "prefix": "permit_tucson",
+        "transform": "tucson",
+        "has_equipment": True,
+    },
+    "pittsburgh": {
+        "tier": 0,
+        "name": "Pittsburgh, PA",
+        "state": "PA",
+        "county": "ALLEGHENY",
+        "platform": "ckan",
+        "base_url": "https://data.wprdc.org/api/3/action/datastore_search",
+        "resource_id": "f4d1177a-f597-4c32-8cbf-7885f56253f6",
+        "page_size": 100,
+        "prefix": "permit_pittsburgh",
+        "transform": "pittsburgh",
+        "has_equipment": True,
+    },
+    "dc": {
+        "tier": 0,
+        "name": "Washington, DC",
+        "state": "DC",
+        "county": "DISTRICT OF COLUMBIA",
+        "platform": "arcgis_multilayer",
+        "base_url": "https://maps2.dcgis.dc.gov/dcgis/rest/services/FEEDS/DCRA/FeatureServer",
+        "layers": [25, 24, 37, 9, 8, 2, 3, 14, 15, 16, 17, 18],  # Years 2015-2026
+        "page_size": 2000,
+        "filter": "UPPER(DESC_OF_WORK) LIKE '%SOLAR%'",
+        "prefix": "permit_dc",
+        "transform": "dc",
+    },
+    "miami_dade": {
+        "tier": 0,
+        "name": "Miami-Dade County, FL",
+        "state": "FL",
+        "county": "MIAMI-DADE",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/BuildingPermit_gdb/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(DESC1) LIKE '%SOLAR%'",
+        "prefix": "permit_miami",
+        "transform": "miami_dade",
+    },
 
     # =========================================================================
     # TIER 1: Solar-specific datasets (best data)
@@ -288,6 +411,67 @@ CITIES = {
         "prefix": "permit_seattle",
         "transform": "seattle",
     },
+    "norfolk": {
+        "tier": 2,
+        "name": "Norfolk, VA",
+        "state": "VA",
+        "county": "NORFOLK",
+        "platform": "socrata",
+        "base_url": "https://data.norfolk.gov/resource/fahm-yuh4.json",
+        "page_size": 1000,
+        "filter": "$where=UPPER(work_type) LIKE '%25SOLAR%25'",
+        "prefix": "permit_norfolk",
+        "transform": "generic_socrata",
+    },
+    "kansas_city": {
+        "tier": 2,
+        "name": "Kansas City, MO",
+        "state": "MO",
+        "county": "JACKSON",
+        "platform": "socrata",
+        "base_url": "https://data.kcmo.org/resource/ntw8-aacc.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE}",
+        "prefix": "permit_kc",
+        "transform": "kansas_city",
+    },
+    "orlando": {
+        "tier": 2,
+        "name": "Orlando, FL",
+        "state": "FL",
+        "county": "ORANGE",
+        "platform": "socrata",
+        "base_url": "https://data.cityoforlando.net/resource/ryhf-m453.json",
+        "page_size": 1000,
+        "filter": "$where=UPPER(project_name) LIKE '%25SOLAR%25'",
+        "prefix": "permit_orlando",
+        "transform": "orlando",
+    },
+    "baton_rouge": {
+        "tier": 2,
+        "name": "Baton Rouge, LA",
+        "state": "LA",
+        "county": "EAST BATON ROUGE",
+        "platform": "socrata",
+        "base_url": "https://data.brla.gov/resource/7fq7-8j7r.json",
+        "page_size": 1000,
+        "filter": "$where=UPPER(projectdescription) LIKE '%25SOLAR%25'",
+        "prefix": "permit_batonrouge",
+        "transform": "baton_rouge",
+    },
+    "durham": {
+        "tier": 2,
+        "name": "Durham, NC",
+        "state": "NC",
+        "county": "DURHAM",
+        "platform": "arcgis",
+        "base_url": "https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/arcgis/rest/services/Permits/FeatureServer/13",
+        "page_size": 1000,
+        "out_sr": "4326",
+        "filter": "UPPER(P_Descript) LIKE '%SOLAR%'",
+        "prefix": "permit_durham",
+        "transform": "durham",
+    },
 
     # =========================================================================
     # TIER 3: Building permits (solar likely present, generic transform)
@@ -384,17 +568,31 @@ CITIES = {
         "prefix": "permit_ftw",
         "transform": "blds",
     },
-    "raleigh_blds": {
-        "tier": 4,
-        "name": "Raleigh, NC (BLDS)",
+    "raleigh": {
+        "tier": 2,
+        "name": "Raleigh, NC",
         "state": "NC",
         "county": "WAKE",
-        "platform": "socrata",
-        "base_url": "https://permits.partner.socrata.com/resource/pjib-v4rg.json",
-        "page_size": 1000,
-        "filter": f"$where={SOLAR_WHERE}",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/v400IkDOw1ad7Yad/arcgis/rest/services/Building_Permits/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(proposedworkdescription) LIKE '%SOLAR%'",
         "prefix": "permit_raleigh",
-        "transform": "blds",
+        "transform": "raleigh",
+    },
+    "fort_lauderdale": {
+        "tier": 2,
+        "name": "Fort Lauderdale, FL",
+        "state": "FL",
+        "county": "BROWARD",
+        "platform": "arcgis",
+        "base_url": "https://gis.fortlauderdale.gov/server/rest/services/BuildingPermits/MapServer/0",
+        "page_size": 1000,
+        "out_sr": "4326",
+        "filter": "UPPER(PERMITDESC) LIKE '%SOLAR%'",
+        "prefix": "permit_ftl",
+        "transform": "fort_lauderdale",
     },
     "seattle_blds": {
         "tier": 4,
@@ -455,6 +653,298 @@ CITIES = {
         "filter": f"$where={SOLAR_WHERE}",
         "prefix": "permit_santarosa",
         "transform": "blds",
+    },
+
+    # =========================================================================
+    # WAVE 2: New cities discovered Feb 12, 2026
+    # =========================================================================
+
+    # --- ArcGIS: Rich solar-specific datasets ---
+    "la_county": {
+        "tier": 0,
+        "name": "Los Angeles County, CA",
+        "state": "CA",
+        "county": "LOS ANGELES",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/EPIC-LA_Case_History_view/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "CASENAME = 'Unincorporated Solar'",
+        "prefix": "permit_lacounty",
+        "transform": "la_county",
+        "has_equipment": True,
+    },
+    "las_vegas": {
+        "tier": 0,
+        "name": "Las Vegas, NV",
+        "state": "NV",
+        "county": "CLARK",
+        "platform": "arcgis",
+        "base_url": "https://mapdata.lasvegasnevada.gov/clvgis/rest/services/DevelopmentServices/BuildingPermits/MapServer/0",
+        "page_size": 1000,
+        "oid_paging": True,
+        "out_sr": "4326",
+        "filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR UPPER(WORKDESC) LIKE '%SOLAR%' OR UPPER(FULL_DESC) LIKE '%SOLAR%'",
+        "prefix": "permit_lasvegas",
+        "transform": "las_vegas",
+    },
+    "baltimore": {
+        "tier": 0,
+        "name": "Baltimore, MD",
+        "state": "MD",
+        "county": "BALTIMORE CITY",
+        "platform": "arcgis",
+        "base_url": "https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/3",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(Description) LIKE '%SOLAR%'",
+        "prefix": "permit_baltimore",
+        "transform": "baltimore",
+    },
+    "louisville": {
+        "tier": 0,
+        "name": "Louisville/Jefferson County, KY",
+        "state": "KY",
+        "county": "JEFFERSON",
+        "platform": "arcgis",
+        "base_url": "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_Metro_KY_All_Permits_%28Historical%29/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(WORKTYPE) LIKE '%SOLAR%' OR UPPER(CATEGORYNAME) LIKE '%SOLAR%' OR UPPER(CONTRACTOR) LIKE '%SOLAR%'",
+        "prefix": "permit_louisville",
+        "transform": "louisville",
+    },
+    "columbus": {
+        "tier": 0,
+        "name": "Columbus, OH",
+        "state": "OH",
+        "county": "FRANKLIN",
+        "platform": "arcgis",
+        "base_url": "https://maps2.columbus.gov/arcgis/rest/services/Schemas/BuildingZoning/MapServer/5",
+        "page_size": 1000,
+        "oid_paging": True,
+        "out_sr": "4326",
+        "ssl_no_verify": True,
+        "filter": "UPPER(APPLICANT_BUS_NAME) LIKE '%SOLAR%'",
+        "prefix": "permit_columbus",
+        "transform": "columbus",
+    },
+    "charlotte": {
+        "tier": 0,
+        "name": "Charlotte/Mecklenburg County, NC",
+        "state": "NC",
+        "county": "MECKLENBURG",
+        "platform": "arcgis",
+        "base_url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/BuildingPermits/FeatureServer/0",
+        "page_size": 2000,
+        "out_sr": "4326",
+        "filter": "UPPER(workdesc) LIKE '%SOLAR%' OR UPPER(permitdesc) LIKE '%SOLAR%' OR UPPER(workdesc) LIKE '%PHOTOVOLTAIC%' OR UPPER(permitdesc) LIKE '%PHOTOVOLTAIC%'",
+        "prefix": "permit_charlotte",
+        "transform": "charlotte",
+    },
+    "portland": {
+        "tier": 0,
+        "name": "Portland, OR",
+        "state": "OR",
+        "county": "MULTNOMAH",
+        "platform": "arcgis",
+        "base_url": "https://www.portlandmaps.com/arcgis/rest/services/Public/BDS_Permit/MapServer/4",
+        "page_size": 1000,
+        "oid_paging": True,
+        "out_sr": "4326",
+        "filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR UPPER(DESCRIPTION) LIKE '%PHOTOVOLTAIC%'",
+        "prefix": "permit_portland",
+        "transform": "portland",
+        "has_equipment": True,
+    },
+
+    # --- CKAN: Rich equipment data ---
+    "virginia_beach": {
+        "tier": 0,
+        "name": "Virginia Beach, VA",
+        "state": "VA",
+        "county": "VIRGINIA BEACH",
+        "platform": "ckan",
+        "base_url": "https://data.virginia.gov/api/3/action/datastore_search",
+        "resource_id": "d66e8fbe-ce6f-431b-873b-b017a8c42861",
+        "page_size": 100,
+        "prefix": "permit_vabeach",
+        "transform": "virginia_beach",
+        "has_equipment": True,
+    },
+    "boston_ckan": {
+        "tier": 2,
+        "name": "Boston, MA (CKAN)",
+        "state": "MA",
+        "county": "SUFFOLK",
+        "platform": "ckan",
+        "base_url": "https://data.boston.gov/api/3/action/datastore_search",
+        "resource_id": "6ddcd912-32a0-43df-9908-63574f8c7e77",
+        "page_size": 100,
+        "prefix": "permit_boston_ckan",
+        "transform": "boston_ckan",
+    },
+    "tampa": {
+        "tier": 0,
+        "name": "Tampa, FL",
+        "state": "FL",
+        "county": "HILLSBOROUGH",
+        "platform": "ckan",
+        "base_url": "https://www.civicdata.com/api/3/action/datastore_search",
+        "resource_id": "474844a7-3bd1-4722-bc8b-9ec5a5f82508",
+        "page_size": 100,
+        "prefix": "permit_tampa",
+        "transform": "tampa",
+        "has_equipment": True,
+    },
+
+    # --- Socrata: Generic transform cities ---
+    "henderson": {
+        "tier": 2,
+        "name": "Henderson, NV",
+        "state": "NV",
+        "county": "CLARK",
+        "platform": "socrata",
+        "base_url": "https://performance.cityofhenderson.com/resource/fpc9-568j.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE.replace('description', 'permitdescription')} OR UPPER(permittype) LIKE '%25PHOTOVOLTAIC%25' OR UPPER(permittype) LIKE '%25PV%25'",
+        "prefix": "permit_henderson",
+        "transform": "generic_socrata",
+    },
+    "corona": {
+        "tier": 2,
+        "name": "Corona, CA",
+        "state": "CA",
+        "county": "RIVERSIDE",
+        "platform": "socrata",
+        "base_url": "https://corstat.coronaca.gov/resource/2agx-camz.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE} OR UPPER(permitsubtype) LIKE '%25SOLAR%25'",
+        "prefix": "permit_corona",
+        "transform": "generic_socrata",
+    },
+    "marin_county": {
+        "tier": 2,
+        "name": "Marin County, CA",
+        "state": "CA",
+        "county": "MARIN",
+        "platform": "socrata",
+        "base_url": "https://data.marincounty.gov/resource/mkbn-caye.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE}",
+        "prefix": "permit_marin",
+        "transform": "generic_socrata",
+    },
+    "sonoma_county": {
+        "tier": 2,
+        "name": "Sonoma County, CA",
+        "state": "CA",
+        "county": "SONOMA",
+        "platform": "socrata",
+        "base_url": "https://data.sonomacounty.ca.gov/resource/88ms-k5e7.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE}",
+        "prefix": "permit_sonoma",
+        "transform": "generic_socrata",
+    },
+    # Cincinnati OH: REMOVED — 0 solar records found, description field only echoes permit type name
+    "pierce_county": {
+        "tier": 3,
+        "name": "Pierce County, WA",
+        "state": "WA",
+        "county": "PIERCE",
+        "platform": "socrata",
+        "base_url": "https://open.piercecountywa.gov/resource/rcj9-mkn4.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE.replace('description', 'workdescription')}",
+        "prefix": "permit_pierce",
+        "transform": "generic_socrata",
+    },
+    "little_rock": {
+        "tier": 3,
+        "name": "Little Rock, AR",
+        "state": "AR",
+        "county": "PULASKI",
+        "platform": "socrata",
+        "base_url": "https://data.littlerock.gov/resource/mkfu-qap3.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE.replace('description', 'projectdesc')}",
+        "prefix": "permit_littlerock",
+        "transform": "generic_socrata",
+    },
+    "prince_georges_county": {
+        "tier": 3,
+        "name": "Prince George's County, MD",
+        "state": "MD",
+        "county": "PRINCE GEORGE'S",
+        "platform": "socrata",
+        "base_url": "https://data.princegeorgescountymd.gov/resource/weik-ttee.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE.replace('description', 'case_name')}",
+        "prefix": "permit_pgcounty",
+        "transform": "generic_socrata",
+    },
+    "framingham": {
+        "tier": 3,
+        "name": "Framingham, MA",
+        "state": "MA",
+        "county": "MIDDLESEX",
+        "platform": "socrata",
+        "base_url": "https://data.framinghamma.gov/resource/2vzw-yean.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE} OR UPPER(sub_type) LIKE '%25SOLAR%25'",
+        "prefix": "permit_framingham",
+        "transform": "generic_socrata",
+    },
+    "somerville": {
+        "tier": 3,
+        "name": "Somerville, MA",
+        "state": "MA",
+        "county": "MIDDLESEX",
+        "platform": "socrata",
+        "base_url": "https://data.somervillema.gov/resource/vxgw-vmky.json",
+        "page_size": 1000,
+        "filter": f"$where={SOLAR_WHERE.replace('description', 'work')}",
+        "prefix": "permit_somerville",
+        "transform": "generic_socrata",
+    },
+
+    # =========================================================================
+    # TIER 5: State-level program datasets (not building permits)
+    # =========================================================================
+    "ny_statewide": {
+        "tier": 1,
+        "name": "New York Statewide Distributed Solar",
+        "state": "NY",
+        "platform": "socrata",
+        "base_url": "https://data.ny.gov/resource/wgsj-jt5f.json",
+        "page_size": 1000,
+        "filter": "$where=estimated_pv_system_size >= 25",
+        "prefix": "nydist",
+        "transform": "ny_statewide",
+    },
+    "ct_rsip": {
+        "tier": 1,
+        "name": "Connecticut RSIP Solar",
+        "state": "CT",
+        "platform": "socrata",
+        "base_url": "https://data.ct.gov/resource/fvw8-89kt.json",
+        "page_size": 1000,
+        "filter": "$where=kw_stc >= 25",
+        "prefix": "ctrsip",
+        "transform": "ct_rsip",
+    },
+    "collin_county": {
+        "tier": 2,
+        "name": "Collin County, TX",
+        "state": "TX",
+        "county": "COLLIN",
+        "platform": "socrata",
+        "base_url": "https://data.texas.gov/resource/82ee-gbj5.json",
+        "page_size": 1000,
+        "filter": "$where=UPPER(permittypedescr) LIKE '%25SOLAR%25'",
+        "prefix": "permit_collintx",
+        "transform": "collin_county",
     },
 }
 
@@ -638,11 +1128,18 @@ def fetch_arcgis(config):
         }
         if not use_oid_paging:
             params["resultOffset"] = offset
+        if config.get("out_sr"):
+            params["outSR"] = config["out_sr"]
 
         url = f"{config['base_url']}/query?{urllib.parse.urlencode(params)}"
         req = urllib.request.Request(url)
         try:
-            with urllib.request.urlopen(req) as resp:
+            ctx = None
+            if config.get("ssl_no_verify"):
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+            with urllib.request.urlopen(req, context=ctx) as resp:
                 data = json.loads(resp.read().decode())
         except Exception as e:
             print(f"    API error at offset {offset}: {e}")
@@ -664,8 +1161,17 @@ def fetch_arcgis(config):
 
             geo = feat.get("geometry", {})
             if geo:
-                rec["_lat"] = geo.get("y")
-                rec["_lng"] = geo.get("x")
+                if "y" in geo and "x" in geo:
+                    rec["_lat"] = geo.get("y")
+                    rec["_lng"] = geo.get("x")
+                elif "rings" in geo:
+                    # Polygon geometry — compute centroid from first ring
+                    ring = geo["rings"][0] if geo["rings"] else []
+                    if ring:
+                        xs = [p[0] for p in ring]
+                        ys = [p[1] for p in ring]
+                        rec["_lng"] = sum(xs) / len(xs)
+                        rec["_lat"] = sum(ys) / len(ys)
             records.append(rec)
             new_count += 1
 
@@ -680,6 +1186,21 @@ def fetch_arcgis(config):
             break
         time.sleep(RATE_LIMIT)
     return records
+
+
+def fetch_arcgis_multilayer(config):
+    """Fetch from multiple ArcGIS FeatureServer layers and combine."""
+    all_records = []
+    base = config["base_url"]  # e.g., .../FeatureServer (no layer suffix)
+    layers = config.get("layers", [0])
+    for layer_id in layers:
+        layer_config = dict(config)
+        layer_config["base_url"] = f"{base}/{layer_id}"
+        print(f"    Layer {layer_id}...")
+        records = fetch_arcgis(layer_config)
+        print(f"      {len(records)} records from layer {layer_id}")
+        all_records.extend(records)
+    return all_records
 
 
 def fetch_carto(config):
@@ -713,20 +1234,31 @@ def fetch_carto(config):
 
 
 def fetch_ckan(config):
-    """Fetch all records from CKAN Datastore API."""
+    """Fetch all records from CKAN Datastore API.
+
+    Supports two modes:
+    - Text search: q="solar" (default, used by San Jose)
+    - Filter search: filters={"PERMIT TYPE":"Solar..."} (used by San Antonio)
+    """
     records = []
     offset = 0
     while True:
         params = {
             "resource_id": config["resource_id"],
-            "q": "solar",
             "limit": config["page_size"],
             "offset": offset,
         }
+        # Use exact filters if provided, otherwise text search
+        if "ckan_filters" in config:
+            params["filters"] = json.dumps(config["ckan_filters"])
+        else:
+            params["q"] = "solar"
         url = f"{config['base_url']}?{urllib.parse.urlencode(params)}"
-        req = urllib.request.Request(url)
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        })
         try:
-            with urllib.request.urlopen(req) as resp:
+            with urllib.request.urlopen(req, timeout=60) as resp:
                 data = json.loads(resp.read().decode())
         except Exception as e:
             print(f"    API error at offset {offset}: {e}")
@@ -850,6 +1382,8 @@ def make_installation(source_id, config, **fields):
         "site_status": fields.get("site_status", "active"),
         "installer_name": fields.get("installer_name"),
         "owner_name": fields.get("owner_name"),
+        "developer_name": fields.get("developer_name"),
+        "operator_name": fields.get("operator_name"),
         "total_cost": fields.get("total_cost"),
         "data_source_id": fields.get("data_source_id"),
         "has_battery_storage": fields.get("has_battery_storage", False),
@@ -1296,7 +1830,9 @@ def transform_generic_socrata(record, data_source_id, config):
     # Try many common permit ID field names
     permit_num = None
     for field in ["permit_number", "permit_num", "permitnum", "permitnumber", "permitno", "permit_no",
-                   "permit_", "id", "permit_id", "application_number", "record_number", "case_number"]:
+                   "permit_", "permit", "id", "permit_id", "application_number", "applicationnumber",
+                   "record_number", "case_number", "file_number", "permit_case_id",
+                   "permit_tracking_id", "objectid"]:
         val = record.get(field)
         if val and str(val).strip():
             permit_num = str(val).strip()
@@ -1311,7 +1847,8 @@ def transform_generic_socrata(record, data_source_id, config):
     # Description from multiple possible fields
     desc = ""
     for field in ["description", "work_description", "work_desc", "permit_description",
-                   "scope_of_work", "project_description"]:
+                   "permitdescription", "scope_of_work", "project_description", "projectdesc",
+                   "workdescription", "work", "case_name"]:
         val = record.get(field)
         if val and str(val).strip():
             desc = str(val).strip()
@@ -1326,7 +1863,7 @@ def transform_generic_socrata(record, data_source_id, config):
     addr = None
     for field in ["address", "street_address", "site_address", "location_address",
                    "original_address1", "originaladdress1", "primary_address", "project_address",
-                   "property_address", "full_address"]:
+                   "property_address", "propertyaddress", "full_address", "siteaddress"]:
         val = record.get(field)
         if val and str(val).strip():
             addr = str(val).strip()
@@ -1341,7 +1878,8 @@ def transform_generic_socrata(record, data_source_id, config):
 
     # City
     city = None
-    for field in ["city", "original_city", "originalcity", "site_city", "mailing_city"]:
+    for field in ["city", "original_city", "originalcity", "site_city", "mailing_city",
+                   "parceladdresscity", "propertycity", "city_town"]:
         val = record.get(field)
         if val and str(val).strip():
             city = str(val).strip()
@@ -1351,7 +1889,8 @@ def transform_generic_socrata(record, data_source_id, config):
 
     # Zip
     zip_code = None
-    for field in ["zip_code", "zipcode", "zip", "original_zip", "originalzip", "site_zip", "postal_code"]:
+    for field in ["zip_code", "zipcode", "zip", "original_zip", "originalzip", "site_zip",
+                   "postal_code", "parceladdresszip", "propertyzip"]:
         val = record.get(field)
         if val and str(val).strip():
             zip_code = str(val).strip()
@@ -1359,22 +1898,34 @@ def transform_generic_socrata(record, data_source_id, config):
 
     # Coordinates
     lat, lng = None, None
-    lat = safe_float(record.get("latitude") or record.get("lat"))
-    lng = safe_float(record.get("longitude") or record.get("lon") or record.get("lng"))
+    lat = safe_float(record.get("latitude") or record.get("lat") or record.get("gisy"))
+    lng = safe_float(record.get("longitude") or record.get("lon") or record.get("lng") or record.get("gisx"))
     if not lat:
-        loc = record.get("location")
-        if isinstance(loc, dict):
-            lat = safe_float(loc.get("latitude"))
-            lng = safe_float(loc.get("longitude"))
-            if not lat:
-                coords = loc.get("coordinates", [])
-                if coords and len(coords) >= 2:
-                    lng, lat = safe_float(coords[0]), safe_float(coords[1])
+        # Try xcoord/ycoord (Pierce County)
+        lat = safe_float(record.get("ycoord"))
+        lng = safe_float(record.get("xcoord"))
+    if not lat:
+        for loc_field in ["location", "location_1", "gis_point", "geolocation", "the_geom"]:
+            loc = record.get(loc_field)
+            if isinstance(loc, dict):
+                lat = safe_float(loc.get("latitude"))
+                lng = safe_float(loc.get("longitude"))
+                if not lat:
+                    coords = loc.get("coordinates", [])
+                    if coords and len(coords) >= 2:
+                        lng, lat = safe_float(coords[0]), safe_float(coords[1])
+                if lat:
+                    break
+
+    # Validate coordinate range (State Plane / projected coords would be way out of range)
+    if lat and (lat < -90 or lat > 90 or lng < -180 or lng > 180):
+        lat, lng = None, None
 
     # Date
     install_date = None
     for field in ["issue_date", "issued_date", "issueddate", "permit_issued_date", "date_issued",
-                   "issuedate", "issuance_date", "applied_date"]:
+                   "issuedate", "issuance_date", "permit_issuance_date", "issueddate",
+                   "permitissuedate", "applied_date", "applied", "issuedate"]:
         val = record.get(field)
         if val:
             install_date = safe_date(val)
@@ -1384,7 +1935,8 @@ def transform_generic_socrata(record, data_source_id, config):
     # Installer
     installer = None
     for field in ["contractor_name", "contractor", "contractor_company_desc", "contact_1_name",
-                   "applicant_name", "firm_name", "company_name"]:
+                   "applicant_name", "firm_name", "company_name", "companyname",
+                   "professionalname"]:
         val = record.get(field)
         if val and str(val).strip():
             installer = str(val).strip()
@@ -1392,13 +1944,24 @@ def transform_generic_socrata(record, data_source_id, config):
 
     # Cost
     cost = None
-    for field in ["project_valuation", "estimated_cost", "valuation", "value", "total_cost",
-                   "reported_cost", "job_value", "jobvalue", "fee"]:
+    for field in ["project_valuation", "estimated_cost", "valuation", "valuationtotal",
+                   "value", "total_cost", "reported_cost", "job_value", "jobvalue",
+                   "estimated_job_cost", "estprojectcostdec", "construction_value",
+                   "buildingvaluation", "declvltn", "amount", "fee"]:
         val = record.get(field)
         if val:
             cost = safe_float(val)
             if cost:
                 break
+
+    # Owner
+    owner = None
+    for field in ["owner_name", "property_owner_name", "owner", "ownername", "property_owner",
+                   "owner_company_name"]:
+        val = record.get(field)
+        if val and str(val).strip():
+            owner = str(val).strip()
+            break
 
     inst = make_installation(
         source_id, config,
@@ -1410,6 +1973,7 @@ def transform_generic_socrata(record, data_source_id, config):
         capacity_kw=capacity_kw,
         install_date=install_date,
         installer_name=installer,
+        owner_name=owner,
         total_cost=cost,
         data_source_id=data_source_id,
     )
@@ -1893,6 +2457,1831 @@ def transform_albuquerque(record, data_source_id, config):
     return source_id, inst, equipment if equipment else None
 
 
+def transform_riverside_county(record, data_source_id, config):
+    """Riverside County CA — ArcGIS MapServer with rich CASE_DESCR (kW, modules, manufacturer)."""
+    case_id = record.get("CASE_ID", "")
+    if not case_id:
+        return None, None, None
+
+    source_id = f"permit_riverside_{case_id}"
+    desc = record.get("CASE_DESCR", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    # Parse capacity from description: "5.33KW DC" or "206.93 MW DC"
+    capacity_kw = None
+    m = re.search(r'([\d]+\.?\d*)\s*MW\s*(?:DC|AC)?', desc, re.IGNORECASE)
+    if m:
+        mw = float(m.group(1))
+        if 0.025 <= mw <= 5000:
+            capacity_kw = mw * 1000
+    if not capacity_kw:
+        capacity_kw = parse_capacity_from_description(desc)
+
+    panels, watts = parse_panels_from_description(desc)
+
+    # Extract manufacturer from description
+    equip_manufacturer = None
+    for mfr in ["Qcells", "Q CELLS", "Canadian Solar", "JA Solar", "Hanwha", "REC", "LG",
+                 "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar", "Panasonic",
+                 "Solaria", "Axitec", "Aptos", "Maxeon"]:
+        if mfr.lower() in desc.lower():
+            equip_manufacturer = mfr
+            break
+
+    inv_manufacturer = None
+    for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla"]:
+        if mfr.lower() in desc.lower():
+            inv_manufacturer = mfr
+            break
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    # Mount type from CASE_WORK_CLASS
+    work_class = str(record.get("CASE_WORK_CLASS", "")).upper()
+    mount_type = None
+    if "GROUND" in work_class or "GSLRR" in work_class:
+        mount_type = "ground_fixed"
+    elif "ROOF" in work_class or "RSLRR" in work_class:
+        mount_type = "rooftop"
+
+    # Site type — SLRC = commercial, DA03 = utility-scale development
+    site_type = "commercial"
+    if "DA03" in work_class or (capacity_kw and capacity_kw >= 1000):
+        site_type = "utility"
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    # Date: prefer completed, then approved, then applied
+    install_date = (safe_date(record.get("COMPLETED_DATE"))
+                    or safe_date(record.get("APPROVED_DATE"))
+                    or safe_date(record.get("APPLIED_DATE")))
+
+    # Status mapping
+    status = str(record.get("CASE_STATUS", "")).upper()
+    site_status = "active"
+    if "WITHDRAWN" in status or "EXPIRED" in status:
+        site_status = "canceled"
+    elif "APPLIED" in status:
+        site_status = "proposed"
+
+    inst = make_installation(
+        source_id, config,
+        city=record.get("SUBDIVISION_NAME"),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=install_date,
+        site_type=site_type,
+        site_status=site_status,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if equip_manufacturer:
+            eq["manufacturer"] = equip_manufacturer
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+    elif equip_manufacturer:
+        equipment.append({"equipment_type": "module", "manufacturer": equip_manufacturer})
+    if inv_manufacturer:
+        equipment.append({"equipment_type": "inverter", "manufacturer": inv_manufacturer})
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_dc(record, data_source_id, config):
+    """Washington DC — ArcGIS multi-layer with owner + applicant."""
+    permit_id = record.get("PERMIT_ID", "") or record.get("PERMITID", "")
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_dc_{permit_id}"
+    desc = record.get("DESC_OF_WORK", "") or record.get("DESCRIPTION", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("LATITUDE") or record.get("_lat"))
+    lng = safe_float(record.get("LONGITUDE") or record.get("_lng"))
+
+    owner = record.get("OWNER_NAME", "") or record.get("OWNERNAME", "")
+    applicant = record.get("PERMIT_APPLICANT", "") or record.get("APPLICANT", "")
+
+    addr = record.get("FULL_ADDRESS", "") or record.get("ADDRESS", "")
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Washington",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUE_DATE") or record.get("ISSUEDATE")),
+        installer_name=applicant if applicant else None,
+        owner_name=owner if owner else None,
+        total_cost=safe_float(record.get("ESTIMATED_COST") or record.get("EST_NUM")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_miami_dade(record, data_source_id, config):
+    """Miami-Dade County FL — ArcGIS with contractor and descriptions."""
+    proc_num = record.get("PROCNUM", "") or record.get("PROCESS", "")
+    if not proc_num:
+        return None, None, None
+
+    source_id = f"permit_miami_{proc_num}"
+    desc = record.get("DESC1", "") or record.get("DESC2", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("ADDRESS", ""),
+        city=record.get("CITY", ""),
+        zip_code=str(record.get("ZIP", "")) if record.get("ZIP") else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUDATE") or record.get("ISSDATE")),
+        installer_name=record.get("CONTRNAME", ""),
+        total_cost=safe_float(record.get("JOBVALUE")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_kansas_city(record, data_source_id, config):
+    """Kansas City MO — Socrata with contractor, no coordinates."""
+    permit_num = record.get("permitnum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_kc_{permit_num}"
+    desc = record.get("description", "")
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("originaladdress1", ""),
+        city=record.get("originalcity", "Kansas City"),
+        zip_code=record.get("originalzip"),
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issuedate")),
+        installer_name=record.get("contractorcompanyname", ""),
+        total_cost=safe_float(record.get("estprojectcost")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_orlando(record, data_source_id, config):
+    """Orlando FL — Socrata with owner + contractor, minimal coordinates."""
+    permit_num = record.get("permit_number", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_orlando_{permit_num}"
+    desc = record.get("project_name", "") or record.get("description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("latitude"))
+    lng = safe_float(record.get("longitude"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("permit_address", ""),
+        city="Orlando",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issue_date") or record.get("applied_date")),
+        installer_name=record.get("contractor_name", ""),
+        owner_name=record.get("property_owner_name", ""),
+        total_cost=safe_float(record.get("construction_value")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_baton_rouge(record, data_source_id, config):
+    """Baton Rouge LA — Socrata with rich equipment details in descriptions."""
+    permit_num = record.get("permitnumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_batonrouge_{permit_num}"
+    desc = record.get("projectdescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    # Filter out billboard/sign permits
+    if re.search(r'\bbillboard\b|\bsign\b|\badvertis', desc, re.IGNORECASE):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Extract manufacturer from description
+    equip_manufacturer = None
+    for mfr in ["Qcells", "Q CELLS", "Canadian Solar", "JA Solar", "Hanwha", "REC", "LG",
+                 "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar", "Panasonic",
+                 "Solaria", "Axitec", "Aptos", "Maxeon", "Tesla"]:
+        if mfr.lower() in desc.lower():
+            equip_manufacturer = mfr
+            break
+
+    inv_manufacturer = None
+    for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla"]:
+        if mfr.lower() in desc.lower():
+            inv_manufacturer = mfr
+            break
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("streetaddress", ""),
+        city="Baton Rouge",
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issueddate") or record.get("applieddate")),
+        installer_name=record.get("contractorname", ""),
+        total_cost=safe_float(record.get("totalfees")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if equip_manufacturer:
+            eq["manufacturer"] = equip_manufacturer
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+    elif equip_manufacturer:
+        equipment.append({"equipment_type": "module", "manufacturer": equip_manufacturer})
+    if inv_manufacturer:
+        equipment.append({"equipment_type": "inverter", "manufacturer": inv_manufacturer})
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_durham(record, data_source_id, config):
+    """Durham NC — ArcGIS with coordinates (requested as WGS84 via out_sr)."""
+    permit_id = record.get("Permit_ID", "") or record.get("PERMIT_ID", "")
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_durham_{permit_id}"
+    desc = record.get("P_Descript", "") or record.get("P_DESCRIPT", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    addr = record.get("SiteAdd", "") or record.get("SITEADD", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Durham",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("P_Date") or record.get("P_DATE")),
+        data_source_id=data_source_id,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_raleigh(record, data_source_id, config):
+    """Raleigh NC — ArcGIS with contractor, owner, cost, rich descriptions."""
+    permit_id = record.get("permitnum", "") or record.get("PERMITNUM", "")
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_raleigh_{permit_id}"
+    desc = record.get("proposedworkdescription", "") or record.get("description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Raleigh has lat/lng directly in attributes AND in geometry
+    lat = safe_float(record.get("latitude_perm") or record.get("_lat"))
+    lng = safe_float(record.get("longitude_perm") or record.get("_lng"))
+
+    addr = record.get("originaladdress1", "") or ""
+    city = record.get("originalcity", "") or "Raleigh"
+    zipcode = str(record.get("originalzip", "") or "")
+
+    contractor = record.get("contractorcompanyname", "") or ""
+    owner = record.get("parcelownername", "") or ""
+    cost = safe_float(record.get("estprojectcost"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city,
+        zip_code=zipcode if zipcode else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issueddate") or record.get("ISSUEDDATE")),
+        installer_name=contractor if contractor else None,
+        owner_name=owner if owner else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_fort_lauderdale(record, data_source_id, config):
+    """Fort Lauderdale FL — ArcGIS MapServer with dedicated solar permit type."""
+    permit_id = record.get("PERMITID", "") or record.get("PermitId", "")
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_ftl_{permit_id}"
+    desc = record.get("PERMITDESC", "") or record.get("PermitDesc", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    contractor = record.get("CONTRACTOR", "") or record.get("Contractor", "")
+    owner = record.get("OWNERNAME", "") or record.get("OwnerName", "")
+    addr = record.get("FULLADDR", "") or record.get("FullAddr", "")
+    cost = safe_float(record.get("ESTCOST") or record.get("EstCost"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Fort Lauderdale",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("APPROVEDT") or record.get("SUBMITDT")),
+        installer_name=contractor if contractor else None,
+        owner_name=owner if owner else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_phoenix(record, data_source_id, config):
+    """Phoenix AZ — ArcGIS MapServer with kW in description, installer, coords."""
+    permit_num = record.get("PER_NUM", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_phoenix_{permit_num}"
+    desc = record.get("PERMIT_NAME", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    installer = record.get("PROFESS_NAME", "") or ""
+    addr = record.get("STREET_FULL_NAME", "") or ""
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Phoenix",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("PER_ISSUE_DATE")),
+        installer_name=installer if installer else None,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_maricopa_county(record, data_source_id, config):
+    """Maricopa County AZ — ArcGIS FeatureServer, includes utility-scale projects."""
+    permit_num = record.get("PermitNumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_maricopa_{permit_num}"
+    desc = record.get("PermitDescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    # Also check for MW in description (utility-scale projects)
+    if not capacity_kw:
+        m = re.search(r'([\d]+\.?\d*)\s*mw', desc, re.IGNORECASE)
+        if m:
+            try:
+                mw = float(m.group(1))
+                if 0.1 <= mw <= 10000:
+                    capacity_kw = mw * 1000
+            except ValueError:
+                pass
+
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    addr = record.get("FullStreetAddress", "") or ""
+    zipcode = str(record.get("ZipCode", "") or "")
+
+    # Determine site type from permit type
+    permit_type = record.get("PermitType", "") or ""
+    site_type = "utility" if capacity_kw and capacity_kw >= 1000 else "commercial"
+    if "Residential" in permit_type:
+        site_type = "commercial"  # keep as commercial per our filter (>=25kW)
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        site_name=desc if len(desc) < 100 and "/" in desc else None,
+        site_type=site_type,
+        address=addr,
+        city=None,  # Unincorporated county — city varies
+        zip_code=zipcode if zipcode else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssuedDate") or record.get("ApplicationDate")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_sacramento_county(record, data_source_id, config):
+    """Sacramento County CA — ArcGIS FeatureServer with rich WorkDescription (kW, modules, inverter model)."""
+    permit_num = record.get("Application", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_saccounty_{permit_num}"
+    desc = record.get("WorkDescription", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Check for MW in description (utility-scale)
+    if not capacity_kw:
+        m = re.search(r'([\d]+\.?\d*)\s*mw', desc, re.IGNORECASE)
+        if m:
+            try:
+                mw = float(m.group(1))
+                if 0.1 <= mw <= 10000:
+                    capacity_kw = mw * 1000
+            except ValueError:
+                pass
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    # Parse address — Sacramento County includes city+zip in Address field
+    # e.g., "2828 WALNUT AVE, CARMICHAEL, CA 956084217"
+    raw_addr = record.get("Address", "") or ""
+    addr, city, zipcode = raw_addr, None, None
+    if raw_addr:
+        parts = [p.strip() for p in raw_addr.split(",")]
+        if len(parts) >= 2:
+            addr = parts[0]
+            city = parts[1] if len(parts) >= 2 else None
+            # Extract zip from last part
+            for part in reversed(parts):
+                m = re.search(r'(\d{5})', part)
+                if m:
+                    zipcode = m.group(1)
+                    break
+
+    # Extract manufacturer from description
+    equip_manufacturer = None
+    for mfr in ["Qcells", "Q CELLS", "Canadian Solar", "JA Solar", "Hanwha", "REC", "LG",
+                 "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar", "Panasonic",
+                 "Solaria", "Axitec", "Aptos", "Maxeon", "Tesla"]:
+        if mfr.lower() in desc.lower():
+            equip_manufacturer = mfr
+            break
+
+    inv_manufacturer = None
+    inv_model = None
+    for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla", "Delta"]:
+        if mfr.lower() in desc.lower():
+            inv_manufacturer = mfr
+            # Try to extract model (e.g., "Delta M6-TL-US", "SolarEdge SE7600H")
+            pattern = re.compile(re.escape(mfr) + r'\s+(\S+)', re.IGNORECASE)
+            mm = pattern.search(desc)
+            if mm:
+                inv_model = mm.group(1)
+            break
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    # Determine site type from Application_Subtype
+    subtype = str(record.get("Application_Subtype", "")).lower()
+    site_type = "commercial"
+    if "commercial" in subtype:
+        site_type = "commercial"
+    if capacity_kw and capacity_kw >= 1000:
+        site_type = "utility"
+
+    contractor = record.get("Contractor", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr if addr else None,
+        city=city,
+        zip_code=zipcode,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUED_DATE")),
+        installer_name=contractor if contractor and contractor != "OWNER BUILDER" else None,
+        total_cost=safe_float(record.get("Valuation")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if equip_manufacturer:
+            eq["manufacturer"] = equip_manufacturer
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+    elif equip_manufacturer:
+        equipment.append({"equipment_type": "module", "manufacturer": equip_manufacturer})
+    if inv_manufacturer:
+        eq = {"equipment_type": "inverter", "manufacturer": inv_manufacturer}
+        if inv_model:
+            eq["model"] = inv_model
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_tucson(record, data_source_id, config):
+    """Tucson AZ — ArcGIS MapServer with BEST equipment data.
+
+    DESCRIPTION field has structured equipment:
+    • SYSTEM SIZE: 8140W DC, 6380W AC
+    • MODULES: (22) MISSION SOLAR ENERGY LLC: TXI6-370120BB
+    • INVERTERS: (22) ENPHASE ENERGY: IQ7PLUS-72-2-US
+    • RACKING: ADJUSTABLE TILE HOOK
+    """
+    permit_num = record.get("NUMBER", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_tucson_{permit_num}"
+    desc = record.get("DESCRIPTION", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    # Tucson has LAT/LON directly in attributes
+    lat = safe_float(record.get("LAT") or record.get("_lat"))
+    lng = safe_float(record.get("LON") or record.get("_lng"))
+
+    # Parse structured equipment from description
+    # System size: "SYSTEM SIZE: 8140W DC" or "8.14 kW" or "11.9KW DC"
+    capacity_kw = None
+    m = re.search(r'SYSTEM\s+SIZE:\s*([\d.]+)\s*W\s*DC', desc, re.IGNORECASE)
+    if m:
+        capacity_kw = float(m.group(1)) / 1000  # Convert watts to kW
+    if not capacity_kw:
+        m = re.search(r'([\d.]+)\s*KW\s*DC', desc, re.IGNORECASE)
+        if m:
+            capacity_kw = float(m.group(1))
+    if not capacity_kw:
+        capacity_kw = parse_capacity_from_description(desc)
+
+    # Parse modules: "MODULES: (22) MISSION SOLAR ENERGY LLC: TXI6-370120BB"
+    # or "(22) MISSION SOLAR ENERGY LLC:\nTXI6-370120BB"
+    module_manufacturer = None
+    module_model = None
+    module_count = None
+    m = re.search(r'MODULES?:\s*\((\d+)\)\s*([^:\n]+?):\s*(\S+)', desc, re.IGNORECASE)
+    if m:
+        module_count = int(m.group(1))
+        module_manufacturer = m.group(2).strip()
+        module_model = m.group(3).strip()
+    else:
+        # Simpler pattern: just count from description
+        panels, watts = parse_panels_from_description(desc)
+        module_count = panels
+
+    # Parse inverters: "INVERTERS: (22) ENPHASE ENERGY: IQ7PLUS-72-2-US"
+    inv_manufacturer = None
+    inv_model = None
+    inv_count = None
+    m = re.search(r'INVERTERS?:\s*\((\d+)\)\s*([^:\n]+?):\s*(\S+)', desc, re.IGNORECASE)
+    if m:
+        inv_count = int(m.group(1))
+        inv_manufacturer = m.group(2).strip()
+        inv_model = m.group(3).strip()
+
+    # Parse racking type: "RACKING: ADJUSTABLE TILE HOOK" or "RACKING: IRONRIDGE"
+    racking_type = None
+    m = re.search(r'RACKING:\s*([^\n•]+)', desc, re.IGNORECASE)
+    if m:
+        racking_type = m.group(1).strip()
+        # Clean up trailing reference numbers
+        racking_type = re.sub(r',?\s*SEE\s+DRAWING.*', '', racking_type, flags=re.IGNORECASE).strip()
+        if len(racking_type) > 100:
+            racking_type = racking_type[:100]
+
+    # Mount type from WORKCLASS or description
+    workclass = str(record.get("WORKCLASS", "")).lower()
+    mount_type = None
+    if "ground" in desc.lower() or "ground" in workclass:
+        mount_type = "ground_fixed"
+    elif "roof" in desc.lower() or "roof" in workclass:
+        mount_type = "rooftop"
+    elif "carport" in desc.lower():
+        mount_type = "carport"
+
+    # Site type from TYPE field
+    bldg_type = str(record.get("TYPE", "")).lower()
+    site_type = "commercial" if "commercial" in bldg_type else "commercial"
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("ADDRESS", ""),
+        city="Tucson",
+        zip_code=str(record.get("POSTALCODE", "")) if record.get("POSTALCODE") else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUEDATE")),
+        total_cost=safe_float(record.get("VALUE")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if module_count or module_manufacturer:
+        eq = {"equipment_type": "module"}
+        if module_count:
+            eq["quantity"] = module_count
+        if module_manufacturer:
+            eq["manufacturer"] = module_manufacturer
+        if module_model:
+            eq["model"] = module_model
+        equipment.append(eq)
+    if inv_count or inv_manufacturer:
+        eq = {"equipment_type": "inverter"}
+        if inv_count:
+            eq["quantity"] = inv_count
+        if inv_manufacturer:
+            eq["manufacturer"] = inv_manufacturer
+        if inv_model:
+            eq["model"] = inv_model
+        equipment.append(eq)
+    if racking_type:
+        equipment.append({
+            "equipment_type": "racking",
+            "manufacturer": racking_type,
+        })
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_pittsburgh(record, data_source_id, config):
+    """Pittsburgh PA — CKAN with rich descriptions including manufacturer+model.
+
+    work_description has: "install 3.52 kW DC grid-tied roof mounted solar array
+    consisting of (8) JA SOLAR (440W) solar modules and (8) ENPHASE IQ7A microinverters."
+    Also has: owner_name, contractor_name, commercial_or_residential, lat/lng.
+    """
+    permit_id = record.get("permit_id", "")
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_pittsburgh_{permit_id}"
+    desc = record.get("work_description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+
+    # Parse manufacturer + model from description
+    # Pattern: "(8) JA SOLAR (440W) solar modules" or "(22) MISSION SOLAR MSE400..."
+    module_manufacturer = None
+    module_model = None
+    module_count = None
+    module_watts = None
+
+    # Try structured pattern: "(count) MANUFACTURER (watts) modules"
+    m = re.search(r'\((\d+)\)\s+([A-Z][A-Za-z\s]+?)\s*(?:\((\d+)[Ww]\))?\s*(?:solar\s+)?module', desc, re.IGNORECASE)
+    if m:
+        module_count = int(m.group(1))
+        module_manufacturer = m.group(2).strip()
+        if m.group(3):
+            module_watts = int(m.group(3))
+    else:
+        # Try known manufacturer names
+        for mfr in ["JA Solar", "JA SOLAR", "Canadian Solar", "Hanwha", "Qcells", "Q CELLS", "REC",
+                     "LG", "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar",
+                     "Panasonic", "Solaria", "Axitec", "Aptos", "Maxeon"]:
+            if mfr.lower() in desc.lower():
+                module_manufacturer = mfr
+                # Try to get model
+                pattern = re.compile(re.escape(mfr) + r'[\s:]+(\S+)', re.IGNORECASE)
+                mm = pattern.search(desc)
+                if mm:
+                    model_candidate = mm.group(1)
+                    # Only use if it looks like a model number (has digits)
+                    if re.search(r'\d', model_candidate):
+                        module_model = model_candidate
+                break
+
+    # Parse inverter: "(8) ENPHASE IQ7A microinverters" or "SolarEdge SE7600H"
+    inv_manufacturer = None
+    inv_model = None
+    inv_count = None
+    m = re.search(r'\((\d+)\)\s+([A-Z][A-Za-z\s]+?)\s+(\S+)\s*(?:micro)?inverter', desc, re.IGNORECASE)
+    if m:
+        inv_count = int(m.group(1))
+        inv_manufacturer = m.group(2).strip()
+        inv_model = m.group(3).strip()
+    else:
+        for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla"]:
+            if mfr.lower() in desc.lower():
+                inv_manufacturer = mfr
+                pattern = re.compile(re.escape(mfr) + r'[\s:]+(\S+)', re.IGNORECASE)
+                mm = pattern.search(desc)
+                if mm:
+                    inv_model = mm.group(1)
+                break
+
+    if not module_count:
+        panels, watts = parse_panels_from_description(desc)
+        module_count = panels
+        if not module_watts and watts:
+            module_watts = watts
+
+    lat = safe_float(record.get("latitude"))
+    lng = safe_float(record.get("longitude"))
+
+    # Mount type from description
+    mount_type = None
+    if re.search(r'ground\s*mount', desc, re.IGNORECASE):
+        mount_type = "ground_fixed"
+    elif re.search(r'roof\s*mount', desc, re.IGNORECASE):
+        mount_type = "rooftop"
+    elif re.search(r'carport', desc, re.IGNORECASE):
+        mount_type = "carport"
+
+    # Site type
+    comm_res = str(record.get("commercial_or_residential", "")).lower()
+    site_type = "commercial" if "commercial" in comm_res else "commercial"
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    # Status mapping
+    status = str(record.get("status", "")).lower()
+    site_status = "active"
+    if "expired" in status or "withdrawn" in status:
+        site_status = "canceled"
+    elif "active" in status or "review" in status:
+        site_status = "proposed"
+
+    # Parse address — Pittsburgh includes city+zip: "6451 MONITOR ST, Pittsburgh, 15217-"
+    raw_addr = record.get("address", "") or ""
+    addr, zipcode = raw_addr, None
+    if raw_addr:
+        parts = [p.strip() for p in raw_addr.split(",")]
+        if parts:
+            addr = parts[0]
+        for part in reversed(parts):
+            m = re.search(r'(\d{5})', part)
+            if m:
+                zipcode = m.group(1)
+                break
+
+    owner = record.get("owner_name", "")
+    contractor = record.get("contractor_name", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr if addr else None,
+        city="Pittsburgh",
+        zip_code=zipcode or record.get("zip_code"),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issue_date")),
+        installer_name=contractor if contractor else None,
+        owner_name=owner if owner else None,
+        total_cost=safe_float(record.get("total_project_value")),
+        site_type=site_type,
+        site_status=site_status,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if module_count or module_manufacturer:
+        eq = {"equipment_type": "module"}
+        if module_count:
+            eq["quantity"] = module_count
+        if module_manufacturer:
+            eq["manufacturer"] = module_manufacturer
+        if module_model:
+            eq["model"] = module_model
+        if module_watts:
+            eq["specs"] = json.dumps({"watts": module_watts})
+        equipment.append(eq)
+    if inv_count or inv_manufacturer:
+        eq = {"equipment_type": "inverter"}
+        if inv_count:
+            eq["quantity"] = inv_count
+        if inv_manufacturer:
+            eq["manufacturer"] = inv_manufacturer
+        if inv_model:
+            eq["model"] = inv_model
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_san_antonio(record, data_source_id, config):
+    """San Antonio TX — CKAN with dedicated solar permit type, installer names."""
+    permit_num = record.get("PERMIT #", "") or record.get("PERMIT#", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_sanantonio_{permit_num}"
+
+    # Address parsing: "5603 BROOKHILL, City of San Antonio, TX 78228"
+    raw_addr = record.get("ADDRESS", "") or ""
+    addr, city, zipcode = "", "San Antonio", ""
+    if raw_addr:
+        parts = [p.strip() for p in raw_addr.split(",")]
+        if parts:
+            addr = parts[0]
+        # Extract zip from last part
+        for part in reversed(parts):
+            m = re.search(r'(\d{5})', part)
+            if m:
+                zipcode = m.group(1)
+                break
+
+    installer = record.get("PRIMARY CONTACT", "") or ""
+    project = record.get("PROJECT NAME", "") or ""
+    cost = safe_float(record.get("DECLARED VALUATION"))
+
+    # Parse capacity from project name if present
+    capacity_kw = parse_capacity_from_description(project)
+    panels, watts = parse_panels_from_description(project)
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', project, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr if addr else None,
+        city=city,
+        zip_code=zipcode if zipcode else None,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("DATE ISSUED") or record.get("DATE SUBMITTED")),
+        installer_name=installer if installer else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+# ---------------------------------------------------------------------------
+# Wave 2 transformers (Feb 12, 2026)
+# ---------------------------------------------------------------------------
+
+def transform_la_county(record, data_source_id, config):
+    """LA County — ArcGIS FeatureServer with solar-specific CASENAME.
+    ~30K solar records covering unincorporated LA County (Palmdale, Lancaster, etc.)."""
+    case_num = record.get("CASENUMBER", "")
+    if not case_num:
+        return None, None, None
+
+    source_id = f"permit_lacounty_{case_num}"
+    desc = record.get("DESCRIPTION", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    # Extract mount type from WORKCLASS_NAME
+    mount_type = None
+    wclass = record.get("WORKCLASS_NAME", "") or ""
+    if "ground mount" in wclass.lower():
+        if "utility" in wclass.lower():
+            mount_type = "ground_single_axis"
+        else:
+            mount_type = "ground_fixed"
+    elif "roof mount" in wclass.lower():
+        mount_type = "rooftop"
+    elif "carport" in wclass.lower():
+        mount_type = "carport"
+
+    site_type = "commercial"
+    if "utility" in wclass.lower():
+        site_type = "utility"
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("MAIN_ADDRESS", ""),
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUANCE_DATE") or record.get("APPLY_DATE")),
+        total_cost=safe_float(record.get("PERMIT_VALUATION")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+    inst["mount_type"] = mount_type  # Always include for batch key consistency
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_las_vegas(record, data_source_id, config):
+    """Las Vegas NV — ArcGIS MapServer with 3 description fields."""
+    permit_num = record.get("PERMIT_NUM", "") or record.get("PERMNUM", "")
+    if not permit_num:
+        permit_num = str(record.get("OBJECTID", ""))
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_lasvegas_{permit_num}"
+
+    desc = record.get("DESCRIPTION", "") or ""
+    workdesc = record.get("WORKDESC", "") or ""
+    full_desc = record.get("FULL_DESC", "") or ""
+    combined_desc = f"{desc} {workdesc} {full_desc}".strip()
+
+    if is_solar_false_positive(combined_desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(combined_desc)
+    panels, watts = parse_panels_from_description(combined_desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', combined_desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("ADDR", "") or record.get("ADDRESS", ""),
+        city="Las Vegas",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUE_DT") or record.get("ISSUEDDATE")),
+        installer_name=record.get("APPLICANT", "") or record.get("CONTRACTOR", ""),
+        total_cost=safe_float(record.get("VALUATION")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_baltimore(record, data_source_id, config):
+    """Baltimore MD — ArcGIS FeatureServer with long Description field."""
+    case_num = record.get("CaseNumber", "")
+    if not case_num:
+        return None, None, None
+
+    source_id = f"permit_baltimore_{case_num}"
+    desc = record.get("Description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("Address", ""),
+        city="Baltimore",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssuedDate")),
+        total_cost=safe_float(record.get("Cost")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_louisville(record, data_source_id, config):
+    """Louisville/Jefferson County KY — ArcGIS FeatureServer (Table) with lat/lng in fields."""
+    permit_num = record.get("PERMITNUMBER", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_louisville_{permit_num}"
+
+    worktype = record.get("WORKTYPE", "") or ""
+    category = record.get("CATEGORYNAME", "") or ""
+    desc = f"{worktype} {category}".strip()
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+
+    # Lat/lng in data fields (not geometry — this is a Table type FeatureServer)
+    lat = safe_float(record.get("Latitude") or record.get("GPSY") or record.get("_lat"))
+    lng = safe_float(record.get("Longitude") or record.get("GPSX") or record.get("_lng"))
+
+    contractor = record.get("CONTRACTOR", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("ADDRESS", ""),
+        city=record.get("CITY", "Louisville"),
+        zip_code=record.get("ZIPCODE", ""),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUEDATE")),
+        installer_name=contractor if contractor else None,
+        total_cost=safe_float(record.get("PROJECTCOSTS") or record.get("PERMITFEE")),
+        data_source_id=data_source_id,
+    )
+
+    return source_id, inst, None
+
+
+def transform_columbus(record, data_source_id, config):
+    """Columbus OH — ArcGIS MapServer, solar filtered by APPLICANT_BUS_NAME."""
+    permit_id = record.get("B1_ALT_ID", "") or str(record.get("OBJECTID", ""))
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_columbus_{permit_id}"
+
+    applicant = record.get("APPLICANT_BUS_NAME", "") or ""
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("SITE_ADDRESS", ""),
+        city="Columbus",
+        zip_code=record.get("B1_SITUS_ZIP", ""),
+        latitude=lat,
+        longitude=lng,
+        install_date=safe_date(record.get("ISSUED_DT")),
+        installer_name=applicant if applicant else None,
+        total_cost=safe_float(record.get("G3_VALUE_TTL")),
+        data_source_id=data_source_id,
+    )
+
+    return source_id, inst, None
+
+
+def transform_charlotte(record, data_source_id, config):
+    """Charlotte/Mecklenburg County NC — ArcGIS FeatureServer with owner, cost, kW in descriptions."""
+    permit_id = record.get("permitnum", "") or str(record.get("OBJECTID", "") or record.get("objectid", ""))
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_charlotte_{permit_id}"
+
+    # Get descriptions for solar keyword check and NLP
+    workdesc = (record.get("workdesc") or record.get("WORKDESC") or "").strip()
+    permitdesc = (record.get("permitdesc") or record.get("PERMITDESC") or "").strip()
+    desc = workdesc or permitdesc or ""
+
+    # Filter: must mention solar/photovoltaic somewhere
+    combined = f"{workdesc} {permitdesc}".upper()
+    if not any(kw in combined for kw in ["SOLAR", "PHOTOVOLTAIC", "PV SYSTEM", "PV ARRAY"]):
+        return None, None, None
+
+    # False positive filter
+    if is_solar_false_positive(f"{workdesc} {permitdesc}"):
+        return None, None, None
+
+    # Owner name from ownname field
+    owner = (record.get("ownname") or record.get("OWNNAME") or "").strip()
+
+    # Installer often in permitdesc or workdesc (e.g. "Titan Solar Power NC Inc")
+    installer = None
+    # If permitdesc looks like a company name (not a description), it might be installer
+    if permitdesc and not any(kw in permitdesc.upper() for kw in ["INSTALL", "MOUNT", "ROOF", "SYSTEM", "PANEL", "KW"]):
+        # It's likely just a company name
+        installer = permitdesc
+
+    # Address
+    address = (record.get("projadd") or record.get("PROJADD") or "").strip()
+    zipcode = (record.get("zipcode") or record.get("ZIPCODE") or "").strip()
+
+    # Coordinates from geometry (outSR=4326)
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    # Cost
+    cost = safe_float(record.get("bldgcost") or record.get("BLDGCOST"))
+
+    # Permit type → site_type
+    permit_type = (record.get("permittype") or record.get("PERMITTYPE") or "").upper()
+    site_type = "commercial"
+    if "ONE" in permit_type or "TWO" in permit_type or "FAMILY" in permit_type:
+        site_type = "residential"
+
+    # Extract capacity from descriptions
+    capacity_kw = parse_capacity_from_description(desc)
+    if not capacity_kw:
+        capacity_kw = parse_capacity_from_description(permitdesc)
+
+    # Mount type detection
+    mount_type = None
+    upper_desc = desc.upper()
+    if "GROUND" in upper_desc or "GROUND-MOUNT" in upper_desc:
+        mount_type = "ground"
+    elif "ROOF" in upper_desc or "ROOFTOP" in upper_desc:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_desc or "CANOPY" in upper_desc:
+        mount_type = "carport"
+
+    # City from taxjuris or default
+    city = (record.get("taxjuris") or record.get("TAXJURIS") or "Charlotte").strip().title()
+
+    # Issue date
+    install_date = safe_date(record.get("issuedate") or record.get("ISSUEDATE"))
+
+    inst = make_installation(
+        source_id, config,
+        site_name=record.get("projname") or record.get("PROJNAME"),
+        address=address,
+        city=city,
+        zip_code=zipcode,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=install_date,
+        site_type=site_type,
+        installer_name=installer,
+        owner_name=owner if owner else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    inst["mount_type"] = mount_type
+
+    return source_id, inst, None
+
+
+def transform_portland(record, data_source_id, config):
+    """Portland OR — ArcGIS MapServer Layer 4 with rich descriptions and equipment data.
+    Note: PERMIT field is permit TYPE (e.g. 'Residential 1 & 2 Family Permit'), not number.
+    Use OBJECTID as unique identifier."""
+    permit_id = str(record.get("OBJECTID", ""))
+    if not permit_id:
+        return None, None, None
+
+    source_id = f"permit_portland_{permit_id}"
+
+    desc = (record.get("DESCRIPTION") or "").strip()
+    work_desc = (record.get("WORK_DESCRIPTION") or "").strip()
+    combined_desc = f"{desc} {work_desc}".strip()
+
+    # Must mention solar
+    if not re.search(r'solar|photovoltaic|pv\s+(system|module|panel|array)', combined_desc, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(combined_desc):
+        return None, None, None
+    # Exclude "solarium" false positives
+    if re.search(r'\bsolarium\b', combined_desc, re.IGNORECASE):
+        return None, None, None
+
+    # Address from HOUSE + PROPSTREET
+    house = (record.get("HOUSE") or "").strip()
+    street = (record.get("PROPSTREET") or "").strip()
+    address = f"{house} {street}".strip() if house or street else None
+
+    city = (record.get("CITY") or "Portland").strip()
+
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    capacity_kw = parse_capacity_from_description(combined_desc)
+    cost = safe_float(record.get("SUBMITTEDVALUATION"))
+
+    # Mount type
+    mount_type = None
+    upper_desc = combined_desc.upper()
+    if "GROUND" in upper_desc or "GROUND-MOUNT" in upper_desc:
+        mount_type = "ground"
+    elif "ROOF" in upper_desc or "ROOFTOP" in upper_desc:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_desc or "CANOPY" in upper_desc:
+        mount_type = "carport"
+
+    # Site type
+    status = (record.get("STATUS") or "").upper()
+    site_status = "active" if "FINAL" in status or "ISSUED" in status else "proposed"
+
+    inst = make_installation(
+        source_id, config,
+        address=address,
+        city=city,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("ISSUED")),
+        site_type="commercial",
+        total_cost=cost,
+        data_source_id=data_source_id,
+        site_status=site_status,
+    )
+    inst["mount_type"] = mount_type
+
+    # Equipment extraction from descriptions
+    equip = []
+    # Parse module manufacturer + model
+    m = re.search(r'(\d+)\s*(?:x\s*)?([A-Z][A-Za-z\s]+?)\s+(\S+)\s+(\d+)[Ww]\s*(?:solar\s+)?(?:module|panel)', combined_desc, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "module",
+            "manufacturer": m.group(2).strip(),
+            "model": m.group(3).strip(),
+        })
+    # Parse inverter
+    m = re.search(r'([A-Z][A-Za-z]+)\s+(\S+)\s+(?:inverter|micro-?inverter)', combined_desc, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "inverter",
+            "manufacturer": m.group(1).strip(),
+            "model": m.group(2).strip(),
+        })
+
+    return source_id, inst, equip if equip else None
+
+
+def transform_tampa(record, data_source_id, config):
+    """Tampa FL — CivicData CKAN BLDS standard with rich equipment descriptions."""
+    permit_num = record.get("PermitNum", "") or record.get("permitnum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_tampa_{permit_num}"
+
+    desc = record.get("Description", "") or record.get("description", "") or ""
+
+    # Filter: must mention solar/PV
+    if not re.search(r'solar|photovoltaic|pv\s+(system|module|panel|array)', desc, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Address
+    address = (record.get("OriginalAddress1") or record.get("originaladdress1") or "").strip()
+    city = (record.get("OriginalCity") or record.get("originalcity") or "Tampa").strip()
+    zipcode = (record.get("OriginalZip") or record.get("originalzip") or "").strip()
+
+    lat = safe_float(record.get("LAT") or record.get("lat") or record.get("Lat"))
+    lng = safe_float(record.get("LON") or record.get("lon") or record.get("Lon"))
+
+    cost = safe_float(record.get("EstProjectCost") or record.get("estprojectcost"))
+
+    # Site type from PermitClass
+    permit_class = (record.get("PermitClass") or record.get("permitclass") or "").upper()
+    site_type = "commercial" if "COMMERCIAL" in permit_class else "residential" if "RESIDENTIAL" in permit_class else "commercial"
+
+    inst = make_installation(
+        source_id, config,
+        site_name=record.get("ProjectName") or record.get("projectname"),
+        address=address,
+        city=city,
+        zip_code=zipcode,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssuedDate") or record.get("issueddate")),
+        site_type=site_type,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+
+    # Mount type from description
+    mount_type = None
+    upper_desc = desc.upper()
+    if "GROUND" in upper_desc:
+        mount_type = "ground"
+    elif "ROOF" in upper_desc:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_desc or "CANOPY" in upper_desc:
+        mount_type = "carport"
+    inst["mount_type"] = mount_type
+
+    # Equipment extraction from rich descriptions
+    equip = []
+    # Parse module: "(26) Canadian Solar CS3W-445 445W"
+    m = re.search(r'\((\d+)\)\s+([A-Z][A-Za-z\s]+?)\s+(\S+)\s+(\d+)[Ww]\s*(?:solar\s+)?(?:module|panel)?', desc, re.IGNORECASE)
+    if not m:
+        m = re.search(r'(\d+)\s+([A-Z][A-Za-z\s]+?)\s+(\S+)\s+(\d+)[Ww]', desc, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "module",
+            "manufacturer": m.group(2).strip(),
+            "model": m.group(3).strip(),
+        })
+    # Parse inverter: "Enphase IQ7A" or "SolarEdge SE6000H-US inverter"
+    m = re.search(r'([A-Z][A-Za-z]+)\s+(\S+)\s+(?:inverter|micro-?inverter)', desc, re.IGNORECASE)
+    if not m:
+        m = re.search(r'([A-Z][A-Za-z]+)\s+(\S+)\s+\d+\.?\d*\s*kw\s*\(?AC', desc, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "inverter",
+            "manufacturer": m.group(1).strip(),
+            "model": m.group(2).strip(),
+        })
+
+    return source_id, inst, equip if equip else None
+
+
+def transform_virginia_beach(record, data_source_id, config):
+    """Virginia Beach VA — CKAN with BEST equipment data in WorkDesc field.
+
+    WorkDesc contains structured equipment specs like:
+    'Install 8.32 kW DC, 6.00 kW AC roof-mounted solar PV system.
+    (26) REC TwinPeak 4 Series 320W modules, SolarEdge SE6000H-US inverter,
+    IronRidge XR100 racking.'
+    """
+    permit_num = record.get("PermitNumber", "") or record.get("permitnumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_vabeach_{permit_num}"
+    desc = record.get("WorkDesc", "") or record.get("workdesc", "") or ""
+
+    if not re.search(r'solar|photovoltaic|pv\s+(system|module|panel|array)', desc, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Parse manufacturer + model from description
+    module_manufacturer = None
+    module_model = None
+    module_count = panels
+
+    m = re.search(r'\((\d+)\)\s+([A-Z][A-Za-z\s]+?)\s+(\S+)\s+(\d+)[Ww]\s*(?:solar\s+)?module', desc, re.IGNORECASE)
+    if m:
+        module_count = int(m.group(1))
+        module_manufacturer = m.group(2).strip()
+        module_model = m.group(3).strip()
+        watts = int(m.group(4))
+    else:
+        for mfr in ["REC", "JA Solar", "JA SOLAR", "Canadian Solar", "Hanwha", "Qcells", "Q CELLS",
+                     "LG", "SunPower", "Trina", "LONGi", "Jinko", "Silfab", "Mission Solar",
+                     "Panasonic", "Solaria", "Axitec", "Aptos", "Maxeon"]:
+            if mfr.lower() in desc.lower():
+                module_manufacturer = mfr
+                pattern = re.compile(re.escape(mfr) + r'[\s:]+(\S+)', re.IGNORECASE)
+                mm = pattern.search(desc)
+                if mm:
+                    model_candidate = mm.group(1)
+                    if re.search(r'\d', model_candidate):
+                        module_model = model_candidate
+                break
+
+    # Parse inverter
+    inv_manufacturer = None
+    inv_model = None
+    inv_count = None
+    m = re.search(r'(?:\((\d+)\)\s+)?([A-Z][A-Za-z]+(?:Edge)?)\s+(\S+)\s*(?:micro)?inverter', desc, re.IGNORECASE)
+    if m:
+        if m.group(1):
+            inv_count = int(m.group(1))
+        inv_manufacturer = m.group(2).strip()
+        inv_model = m.group(3).strip()
+    else:
+        for mfr in ["SolarEdge", "Enphase", "SMA", "Fronius", "ABB", "Generac", "Tesla"]:
+            if mfr.lower() in desc.lower():
+                inv_manufacturer = mfr
+                pattern = re.compile(re.escape(mfr) + r'[\s:]+(\S+)', re.IGNORECASE)
+                mm = pattern.search(desc)
+                if mm:
+                    inv_model = mm.group(1)
+                break
+
+    # Mount type
+    mount_type = None
+    if re.search(r'ground\s*mount', desc, re.IGNORECASE):
+        mount_type = "ground_fixed"
+    elif re.search(r'roof\s*mount', desc, re.IGNORECASE):
+        mount_type = "rooftop"
+    elif re.search(r'carport', desc, re.IGNORECASE):
+        mount_type = "carport"
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', desc, re.IGNORECASE))
+
+    addr = record.get("StreetAddress", "") or record.get("streetaddress", "")
+    city_val = record.get("City", "") or record.get("city", "") or "Virginia Beach"
+    zip_val = record.get("Zip", "") or record.get("zip", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city_val,
+        zip_code=zip_val,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssueDate") or record.get("issuedate") or record.get("ApplicationDate")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+    inst["mount_type"] = mount_type  # Always include for batch key consistency
+
+    equipment = []
+    if module_count or module_manufacturer:
+        eq = {"equipment_type": "module", "manufacturer": module_manufacturer, "model": module_model, "quantity": module_count or 1}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+    if inv_manufacturer:
+        eq = {"equipment_type": "inverter", "manufacturer": inv_manufacturer, "model": inv_model, "quantity": inv_count or 1}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_boston_ckan(record, data_source_id, config):
+    """Boston MA — CKAN with equipment details in comments field."""
+    permit_num = record.get("PermitNumber", "") or record.get("permitnumber", "") or record.get("PERMITNUMBER", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_boston_ckan_{permit_num}"
+    desc = record.get("Comments", "") or record.get("comments", "") or record.get("COMMENTS", "") or ""
+    work_type = record.get("WorkType", "") or record.get("worktype", "") or ""
+    combined_desc = f"{work_type} {desc}".strip()
+
+    if not re.search(r'solar|photovoltaic|pv\s+(system|module|panel)', combined_desc, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(combined_desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(combined_desc)
+    panels, watts = parse_panels_from_description(combined_desc)
+
+    lat = safe_float(record.get("Latitude") or record.get("latitude") or record.get("Y"))
+    lng = safe_float(record.get("Longitude") or record.get("longitude") or record.get("X"))
+
+    has_battery = bool(re.search(r'storage|battery|powerwall|bess', combined_desc, re.IGNORECASE))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("Address", "") or record.get("address", ""),
+        city="Boston",
+        zip_code=record.get("Zip", "") or record.get("zip", ""),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("Issued_Date") or record.get("issued_date") or record.get("ISSUED_DATE")),
+        installer_name=record.get("Applicant") or record.get("applicant", ""),
+        total_cost=safe_float(record.get("TotalFees") or record.get("totalfees")),
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_ny_statewide(record, data_source_id, config):
+    """NY Statewide Distributed Solar — interconnection data with developer names."""
+    project_id = record.get("project_id", "")
+    if not project_id:
+        return None, None, None
+
+    source_id = f"nydist_{project_id}"
+
+    capacity_kw = safe_float(record.get("estimated_pv_system_size"))
+    if not capacity_kw or capacity_kw < 25:
+        return None, None, None
+
+    city = record.get("city_town", "")
+    county = record.get("county", "")
+    zip_code = record.get("zip", "")
+    developer = record.get("developer", "")
+    utility = record.get("utility", "")
+    install_date = safe_date(record.get("interconnection_date"))
+
+    has_battery = bool(record.get("energy_storage_system_size_kwac"))
+
+    inst = make_installation(
+        source_id, config,
+        city=city,
+        county=county.upper() if county else None,
+        zip_code=zip_code,
+        capacity_kw=capacity_kw,
+        install_date=install_date,
+        developer_name=developer if developer else None,
+        operator_name=utility if utility else None,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+    return source_id, inst, None
+
+
+def transform_ct_rsip(record, data_source_id, config):
+    """Connecticut RSIP — solar rebate program with contractor and owner names."""
+    # Use entity + municipality + approved_date as unique key
+    entity = record.get("entity", "")
+    municipality = record.get("municipality", "")
+    approved = record.get("approved_date", "")
+    kw = safe_float(record.get("kw_stc"))
+    if not kw or kw < 25:
+        return None, None, None
+
+    # Build a unique ID from available fields
+    date_part = approved[:10].replace("-", "") if approved else "nodate"
+    key = f"{entity}_{municipality}_{date_part}_{kw}"
+    source_id = f"ctrsip_{key}"
+
+    contractor = record.get("contractor", "")
+    owner = record.get("system_owner", "")
+    if owner and owner.lower() in ("does not apply", "n/a", "na", "none"):
+        owner = None
+
+    city = record.get("host_customer_city", "") or municipality
+    zip_code = record.get("host_customer_zip_code", "")
+    county = record.get("county", "")
+    cost = safe_float(record.get("total_system_cost"))
+    install_date = safe_date(record.get("completed_date") or record.get("approved_date"))
+    utility = record.get("utility_company", "")
+
+    inst = make_installation(
+        source_id, config,
+        city=city,
+        county=county.upper().replace(" COUNTY", "") if county else None,
+        zip_code=zip_code,
+        capacity_kw=kw,
+        install_date=install_date,
+        installer_name=contractor if contractor else None,
+        owner_name=owner,
+        operator_name=utility if utility else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
+def transform_collin_county(record, data_source_id, config):
+    """Collin County TX — Socrata building permits with owner + builder names."""
+    permit_num = record.get("permitnum", "") or record.get("permitid", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_collintx_{permit_num}"
+    desc = record.get("permitcomments", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+
+    # Build address from parts
+    bldgnum = record.get("situsbldgnum", "")
+    street = record.get("situsstreetname", "")
+    suffix = record.get("situsstreetsuffix", "")
+    addr = record.get("situsconcat", "") or f"{bldgnum} {street} {suffix}".strip()
+
+    city = record.get("situscity", "")
+    zip_code = record.get("situszip", "")
+    owner = record.get("propownername", "")
+    installer = record.get("permitbuildername", "")
+    cost = safe_float(record.get("permitvalue"))
+    install_date = safe_date(record.get("permitissueddate"))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city,
+        zip_code=zip_code,
+        capacity_kw=capacity_kw,
+        install_date=install_date,
+        installer_name=installer if installer else None,
+        owner_name=owner if owner else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -1915,6 +4304,34 @@ TRANSFORMERS = {
     "minneapolis": transform_minneapolis,
     "detroit": transform_detroit,
     "albuquerque": transform_albuquerque,
+    "riverside_county": transform_riverside_county,
+    "dc": transform_dc,
+    "miami_dade": transform_miami_dade,
+    "kansas_city": transform_kansas_city,
+    "orlando": transform_orlando,
+    "baton_rouge": transform_baton_rouge,
+    "durham": transform_durham,
+    "raleigh": transform_raleigh,
+    "fort_lauderdale": transform_fort_lauderdale,
+    "phoenix": transform_phoenix,
+    "maricopa_county": transform_maricopa_county,
+    "san_antonio": transform_san_antonio,
+    "sacramento_county": transform_sacramento_county,
+    "tucson": transform_tucson,
+    "pittsburgh": transform_pittsburgh,
+    "la_county": transform_la_county,
+    "las_vegas": transform_las_vegas,
+    "baltimore": transform_baltimore,
+    "louisville": transform_louisville,
+    "columbus": transform_columbus,
+    "charlotte": transform_charlotte,
+    "portland": transform_portland,
+    "virginia_beach": transform_virginia_beach,
+    "boston_ckan": transform_boston_ckan,
+    "tampa": transform_tampa,
+    "ny_statewide": transform_ny_statewide,
+    "ct_rsip": transform_ct_rsip,
+    "collin_county": transform_collin_county,
 }
 
 
@@ -1937,6 +4354,8 @@ def ingest_city(city_key, config, dry_run=False):
         platform = config["platform"]
         if platform == "opendatasoft":
             raw_records = fetch_opendatasoft(config)
+        elif platform == "arcgis_multilayer":
+            raw_records = fetch_arcgis_multilayer(config)
         elif platform == "arcgis":
             raw_records = fetch_arcgis(config)
         elif platform == "carto":

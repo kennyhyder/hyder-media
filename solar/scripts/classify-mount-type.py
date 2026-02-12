@@ -41,6 +41,10 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+# Use non-interactive backend to reduce memory usage
+import matplotlib
+matplotlib.use('Agg')
+
 from dotenv import load_dotenv
 
 env_path = Path(__file__).parent.parent / ".env.local"
@@ -90,7 +94,9 @@ def classify_single(pd, image_path, confidence_cutoff):
 
     Returns: (mount_type, confidence, num_panels) or (None, None, None) if no panels found.
     """
+    import gc
     import numpy as np
+    import matplotlib.pyplot as plt
     from tensorflow.keras.preprocessing import image as imagex
 
     # Load and resize image
@@ -100,6 +106,8 @@ def classify_single(pd, image_path, confidence_cutoff):
     # Step 1: Check if panels exist
     has_panels = pd.hasPanels(img_array)
     if not has_panels:
+        del img, img_array
+        plt.close('all')
         return None, 0.0, 0
 
     # Step 2: Classify mounting configuration
@@ -109,7 +117,13 @@ def classify_single(pd, image_path, confidence_cutoff):
             acc_cutoff=confidence_cutoff,
         )
     except Exception as e:
+        del img, img_array
+        plt.close('all')
         return None, 0.0, 0
+
+    # Clean up to prevent memory leak
+    del img, img_array
+    plt.close('all')
 
     if not labels:
         return None, 0.0, 0
@@ -249,11 +263,20 @@ def main():
             errors += 1
             if errors <= 5:
                 print(f"  Error on {inst_id}: {e}")
+        finally:
+            # Close all matplotlib figures to prevent OOM kill
+            import matplotlib.pyplot as plt
+            plt.close('all')
 
         # Apply patches in batches
         if len(patches_queue) >= BATCH_SIZE:
             _apply_patches(patches_queue)
             patches_queue = []
+
+        # Aggressive garbage collection every 50 images
+        if (i + 1) % 50 == 0:
+            import gc
+            gc.collect()
 
         # Progress
         if (i + 1) % 100 == 0:
