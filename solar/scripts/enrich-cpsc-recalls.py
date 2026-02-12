@@ -307,19 +307,21 @@ def main():
     print(f"\nChecking for existing recall events...")
     existing_keys = set()
     offset = 0
+    page_size = 1000
     while True:
         rows = supabase_get("solar_site_events", {
             "select": "installation_id,event_type,event_date",
             "event_type": "eq.recall",
-            "limit": 10000,
+            "limit": page_size,
             "offset": offset,
+            "order": "id",
         })
         if not rows:
             break
         for r in rows:
             existing_keys.add((r["installation_id"], r["event_type"], r.get("event_date")))
         offset += len(rows)
-        if len(rows) < 10000:
+        if len(rows) < page_size:
             break
 
     if existing_keys:

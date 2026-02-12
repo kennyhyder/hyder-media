@@ -757,43 +757,48 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 12, 2026 — Session 12)
-1. **Droplet classification batch 3**: 33.4% complete (~12,400/37,129), ETA ~17 hours. Memory stable at 2.9GB/15GB.
-2. **NOAA storm re-run**: Running on full 558K database (idempotent — skips existing events)
+### In Progress (Feb 12, 2026 — Session 13)
+1. **Droplet classification batch 3**: 33.4% complete (~12,400/37,129), 6,494 classified, ETA ~17 hours. 0.4/sec.
+2. **NOAA storm re-run**: Clean run on full 558K database — 3,227,976 events inserting (0 errors)
 
-### Completed This Session
-3. **Next.js site rebuilt**: Static pages regenerated with 558K installation stats
-4. **Cross-source dedup**: 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner)
-5. **CPSC recalls**: Re-running on expanded equipment set
+### Completed This Session (Session 13)
+3. **Event dedup crisis fixed**: Found 5.5M duplicate storm events + 2.4K recall dupes from multiple overlapping runs
+   - Root cause: NOAA/CPSC dedup pagination bug (Supabase max_rows=1000 but scripts used limit=10000, only loaded first page)
+   - Fixed both scripts to use page_size=1000 with proper pagination
+   - Deleted all storm events via psql, running clean NOAA re-run
+   - Recall duplicates cleaned via window function dedup
+4. **CPSC recalls**: Clean re-run → 5,582 events, then deduped to 3,211 unique. Bug fix applied.
+5. **Cross-source dedup** (Session 12): 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner)
+6. **Next.js site rebuilt** (Session 12): Static pages regenerated with 558K installation stats
 
 ### Short-term
-6. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
-7. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+7. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
+8. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 
 ### Medium-term
-8. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
-9. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-10. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
-11. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
+9. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
+10. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+11. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
+12. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
 
-### Data Gap Summary (Feb 12, 2026 — Session 11)
+### Data Gap Summary (Feb 12, 2026 — Session 13)
 | Field | Count | Coverage | Target | How to close |
 |-------|------:|----------|--------|-------------|
 | **location_precision** | **558,366** | **100%** | 100% | DONE |
 | county | 550,649 | 98.6% | 99%+ | Near maximum |
 | city | 512,461 | 91.8% | 92%+ | Near maximum |
-| install_date | 458,819 | 82.2% | 82%+ | Near maximum for permits |
+| install_date | 458,821 | 82.2% | 82%+ | Near maximum for permits |
 | address | 428,729 | 76.8% | 78% | Most permits have addresses |
 | zip_code | 380,805 | 68.2% | 70% | Census geocoder on remaining |
-| lat/lng | 365,984 | 65.5% | 75% | Census geocoder + ZCTA fallback |
-| installer_name | 337,343 | 60.4% | 62% | Near maximum for current sources |
+| lat/lng (exact) | 367,940 | 65.9% | 75% | Census geocoder + ZCTA fallback |
+| installer_name | 337,347 | 60.4% | 62% | Near maximum for current sources |
 | capacity_mw | 323,106 | 57.9% | 60% | Many permits lack explicit capacity |
-| owner_name | 156,959 | 28.1% | 35% | SEIA ($1K/yr) or WREGIS re-run |
-| operator_name | 127,326 | 22.8% | 30% | Additional permit cities |
-| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 wrapper running (~30K+ remaining) |
-| developer_name | 20,103 | 3.6% | 13% | SEIA ($1K/yr) best option |
+| owner_name | 156,970 | 28.1% | 35% | SEIA ($1K/yr) or WREGIS re-run |
+| operator_name | 127,329 | 22.8% | 30% | Additional permit cities |
+| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 running (~25K remaining) |
+| developer_name | 20,121 | 3.6% | 13% | SEIA ($1K/yr) best option |
 | **Equipment** | **377,523** | — | — | 91% have manufacturer, 55% have model |
-| **Events** | **4,988,724** | — | — | 4.98M storm + 8.2K recall + 240 generator |
+| **Events** | **3,231,267** | — | — | 3.2M storm + 3.2K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -1340,16 +1345,40 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 
 **Enrichment pipeline re-run:**
 - Cross-source dedup: 54,912 match pairs, 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner, 4 installer, 3 operator, 2 install_date, 1 total_cost), 0 errors
-- NOAA storms: Re-running on 558K installations (idempotent — skips existing events via dedup check)
-- CPSC recalls: Re-running on expanded 377K equipment set
-
-**Next.js site rebuilt:**
-- Static pages regenerated with updated database stats (558K installations)
+- Next.js site rebuilt with 558K installation stats
 - All 5 pages rebuilt: Dashboard, Search, Equipment, Installers, Site Detail
-- Auth injection applied, build output moved to production directory
+
+### Session 13 — Feb 12, 2026
+
+**Event dedup crisis discovered and fixed:**
+- Storm events had ballooned to 5.5M (expected ~1.7M) from multiple overlapping NOAA/CPSC runs
+- Root cause: Dedup pagination bug in both `enrich-noaa-storms.py` and `enrich-cpsc-recalls.py`
+  - Both scripts used `limit: 10000` for existing event check, but Supabase max_rows=1000
+  - Result: Only first 1000 existing events loaded into dedup set, rest re-created as duplicates
+- Fix: Changed both scripts to `page_size = 1000` with proper pagination loop and `order: id`
+- Cleanup: Deleted all storm events via psql, deleted recall duplicates via window function
+- Clean NOAA re-run: 3,227,976 events (1,246,450 hail + 231,035 severe_hail + 1,750,491 wind) on 558K installations, 482,219 flagged (86.4%)
+- CPSC recalls: 3,211 unique events (deduped from 5,582)
+- **Total events: 3,231,267** (clean, verified via psql)
 
 **Droplet classification batch 3 status:**
 - 12,400/37,129 images processed (33.4%)
-- 6,494 classified (52.4% detection rate — lower than batches 1-2's ~65%)
+- 6,494 classified (52.4% detection rate)
 - ETA: ~17 hours remaining at 0.4 img/sec
-- Memory healthy: 2.9GB/15GB (no pressure)
+
+**Field coverage update (558,366 installations):**
+| Field | Count | Coverage |
+|-------|------:|----------|
+| location_precision | 558,366 | 100.0% |
+| county | 550,649 | 98.6% |
+| city | 512,461 | 91.8% |
+| install_date | 458,821 | 82.2% |
+| address | 428,729 | 76.8% |
+| zip_code | 380,805 | 68.2% |
+| exact lat/lng | 367,940 | 65.9% |
+| installer_name | 337,347 | 60.4% |
+| capacity_mw | 323,106 | 57.9% |
+| owner_name | 156,970 | 28.1% |
+| operator_name | 127,329 | 22.8% |
+| mount_type | 96,956 | 17.4% |
+| developer_name | 20,121 | 3.6% |
