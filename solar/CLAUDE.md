@@ -178,7 +178,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: ~554,557 installations, ~377,523 equipment records, ~4,988,724 events, 18 primary sources + 69 permit portals**
+**Grand Total: ~558,366 installations, ~377,523 equipment records, ~4,988,724 events, 18 primary sources + 69 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -757,36 +757,36 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 12, 2026 — Session 10)
-1. **Droplet classification batch 3**: Wrapper running at 0.4 img/sec, ~31K images remaining, ETA ~22 hours. Memory-safe (2.7GB, restarts every 2K images).
-2. **Census batch geocoding**: Running on permit addresses (Census API slow but progressing)
+### In Progress (Feb 12, 2026 — Session 11)
+1. **Droplet classification batch 3**: Wrapper running at 0.4 img/sec, memory stable at 2.3GB. Mount type at 96,956 (17.4%) and climbing.
 
 ### Short-term
-3. **San Diego City CSV**: 125K records — largest uncaptured source. Requires CSV download handler (JS-rendered portal, URLs TBD)
-4. **Honolulu HI upgrade**: Switch to dataset `4vab-c87q` at `data.honolulu.gov` (68K records vs current 3.3K)
-5. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
-6. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+2. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
+3. **NOAA storm re-run**: Create storm damage events for ~3,809 new permit records (Fort Collins + Cambridge)
+4. **Rebuild Next.js site**: Reflect updated stats (558,366 installations)
+5. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
 
 ### Medium-term
+6. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
 7. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-8. **Equipment extraction NLP**: Run parse-permit-equipment.py on all 69 permit cities (currently only done on subset)
-9. **Satellite images for new permit records**: Many new permits have addresses that could be geocoded → fetch satellite tiles → classify mount type
+8. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
+9. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
 
-### Data Gap Summary (Feb 12, 2026 — Session 10)
+### Data Gap Summary (Feb 12, 2026 — Session 11)
 | Field | Count | Coverage | Target | How to close |
 |-------|------:|----------|--------|-------------|
-| **location_precision** | **554,557** | **100%** | 100% | DONE |
-| county | 546,840 | 98.6% | 99%+ | DONE (3,843 derived this session) |
-| city | 508,652 | 91.7% | 92%+ | Near maximum |
-| install_date | 455,010 | 82.0% | 82%+ | Near maximum for permits |
-| address | 424,920 | 76.6% | 78% | Most permits have addresses |
-| zip_code | 380,805 | 68.7% | 70% | Census geocoder will add more |
-| lat/lng | 367,620 | 66.3% | 75% | Census geocoder running + ZCTA fallback |
-| installer_name | 337,343 | 60.8% | 62% | Near maximum for current sources |
-| capacity_mw | 319,307 | 57.6% | 60% | Many permits lack explicit capacity |
-| owner_name | 156,959 | 28.3% | 35% | SEIA ($1K/yr) or WREGIS re-run |
-| operator_name | 127,326 | 23.0% | 30% | Additional permit cities |
-| mount_type | 96,956 | 17.5% | 23% | Batch 3 running (31K images) |
+| **location_precision** | **558,366** | **100%** | 100% | DONE |
+| county | 550,649 | 98.6% | 99%+ | Near maximum |
+| city | 512,461 | 91.8% | 92%+ | Near maximum |
+| install_date | 458,819 | 82.2% | 82%+ | Near maximum for permits |
+| address | 428,729 | 76.8% | 78% | Most permits have addresses |
+| zip_code | 380,805 | 68.2% | 70% | Census geocoder on remaining |
+| lat/lng | 365,984 | 65.5% | 75% | Census geocoder + ZCTA fallback |
+| installer_name | 337,343 | 60.4% | 62% | Near maximum for current sources |
+| capacity_mw | 323,106 | 57.9% | 60% | Many permits lack explicit capacity |
+| owner_name | 156,959 | 28.1% | 35% | SEIA ($1K/yr) or WREGIS re-run |
+| operator_name | 127,326 | 22.8% | 30% | Additional permit cities |
+| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 wrapper running (~30K+ remaining) |
 | developer_name | 20,103 | 3.6% | 13% | SEIA ($1K/yr) best option |
 | **Equipment** | **377,523** | — | — | 91% have manufacturer, 55% have model |
 | **Events** | **4,988,724** | — | — | 4.98M storm + 8.2K recall + 240 generator |
@@ -1285,3 +1285,49 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - **100% location_precision coverage**
 - **66.3% with lat/lng coordinates** (Census geocoder still running)
 - **Droplet batch 3**: ~31K images remaining, ~22 hours, wrapper prevents OOM
+
+### Session 11 — Feb 12, 2026
+
+**New permit cities added:**
+- **Fort Collins, CO** (Solar Interconnections): 2,674 records with kW capacity and addresses. Dedicated solar interconnection dataset via `opendata.fcgov.com`.
+- **Cambridge, MA** (Solar Installations): 1,135 PV installation records with lat/lng, kW, and building type. Filtered by `systemtype='PV'`.
+- **Total**: 3,809 new records created, 0 errors
+
+**Dead endpoints removed:**
+- **Oxnard CA**: Portal migrated to OpenGov platform, DNS dead (`data.cityofoxnard.org` unresolvable)
+- **NYC Electrical Permits**: Field `scope_of_work` doesn't exist; `work_description` has near-zero solar content (3 matches)
+- **Bloomington IN**: Only 29 municipal facility records, no kW data — too sparse
+
+**Honolulu filter fixed:**
+- Changed `solar='Y'` → `solarvpinstallation='Y'` (PV-specific boolean). `solar` flag tracks solar water heating, not PV.
+- Commercial solar count: 3,737 (up from ~3,355 with old filter)
+
+**Comprehensive permit portal research completed:**
+- Launched 6 parallel research agents sweeping Socrata Discovery API, ArcGIS Hub, CKAN portals, state programs, and top 100 US cities
+- **69 portals already covered** in `ingest-permits.py`
+- **~35 new viable sources identified** (est. 150-200K records), but most are small (<500) and heavily residential
+- **Key findings**:
+  - San Diego City CSV (~125K records) is largest uncaptured source but data.sandiego.gov returns 404 (portal may have migrated)
+  - Howard County MD has 2,723 solar permits but ALL residential (zero commercial) — skipped
+  - Cincinnati OH returns 0 solar matches on all searched fields — skipped
+  - Delaware Green Energy Grants has 5,825 PV but only 144 non-residential, NO addresses — skipped
+  - Most remaining cities yield <500 mostly-residential records with marginal value
+- **Conclusion**: Municipal permit scraping has reached diminishing returns at 69 portals. Remaining coverage gaps are best filled by:
+  1. SEIA membership ($1K/yr) for developer/owner names
+  2. Continued droplet classification for mount_type
+  3. Cross-source dedup on expanded database
+
+**Spec completeness assessment completed:**
+- **A grade**: Geographic coverage (100% state, 98.6% county), site type classification (100%), location precision (100%), storm damage tracking (4.98M events), equipment manufacturer (91.4%)
+- **B+ grade**: Installer names (60.8%), install dates (82.0%), cross-source dedup
+- **D-F grade**: Developer names (3.6%), racking equipment (0.03%), mount type (17.4%), lifecycle events (240 total)
+- **Unique competitive advantages**: Storm damage tracking (no commercial DB has this), recall tracking, satellite mount classification
+- **Top ROI actions**: Complete batch 3 classification ($0), ingest Virginia Beach equipment data ($0), buy SEIA ($1K/yr)
+
+**Database status:**
+- **558,366 installations** (+3,809 from Fort Collins + Cambridge)
+- **377,523 equipment records**
+- **4,988,724 events**
+- **96,956 with mount_type** (17.4%, climbing from batch 3)
+- **100% location_precision coverage** (restored for new records)
+- **Droplet**: 2.3GB RAM, stable, actively classifying at ~1 img/sec

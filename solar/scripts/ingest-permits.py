@@ -332,7 +332,7 @@ CITIES = {
         "platform": "socrata",
         "base_url": "https://data.honolulu.gov/resource/4vab-c87q.json",
         "page_size": 1000,
-        "filter": "$where=solar='Y' AND commercialresidential='Commercial'",
+        "filter": "$where=solarvpinstallation='Y' AND commercialresidential='Commercial'",
         "prefix": "permit_honolulu",
         "transform": "honolulu",
     },
@@ -945,6 +945,31 @@ CITIES = {
         "filter": "$where=UPPER(permittypedescr) LIKE '%25SOLAR%25'",
         "prefix": "permit_collintx",
         "transform": "collin_county",
+    },
+    # --- Session 11 additions ---
+    "fort_collins": {
+        "tier": 0,
+        "name": "Fort Collins, CO (Solar Interconnections)",
+        "state": "CO",
+        "county": "LARIMER",
+        "platform": "socrata",
+        "base_url": "https://opendata.fcgov.com/resource/3ku5-x4k9.json",
+        "page_size": 1000,
+        "filter": "",
+        "prefix": "fcgov_solar",
+        "transform": "fort_collins",
+    },
+    "cambridge_installations": {
+        "tier": 0,
+        "name": "Cambridge, MA (Solar Installations)",
+        "state": "MA",
+        "county": "MIDDLESEX",
+        "platform": "socrata",
+        "base_url": "https://data.cambridgema.gov/resource/5a85-fb2s.json",
+        "page_size": 1000,
+        "filter": "$where=systemtype='PV'",
+        "prefix": "cambridge_solar",
+        "transform": "cambridge_installations",
     },
 }
 
@@ -4282,6 +4307,64 @@ def transform_collin_county(record, data_source_id, config):
     return source_id, inst, None
 
 
+def transform_fort_collins(record, data_source_id, config):
+    """Fort Collins CO — dedicated solar interconnection data with kW and address."""
+    address = record.get("system_address", "")
+    kw = safe_float(record.get("system_capacity_kw_dc"))
+    date_of_service = record.get("date_of_service", "")
+
+    if not address:
+        return None, None, None
+
+    # Build unique ID from address + date
+    date_part = safe_date(date_of_service) or "nodate"
+    source_id = f"fcgov_solar_{address.replace(' ', '_')}_{date_part}"
+
+    inst = make_installation(
+        source_id, config,
+        address=address,
+        city="Fort Collins",
+        capacity_kw=kw,
+        install_date=safe_date(date_of_service),
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
+def transform_cambridge_installations(record, data_source_id, config):
+    """Cambridge MA — active solar installation locations with kW, lat/lng, building type."""
+    address = record.get("streetaddress", "") or record.get("street_address", "")
+    if not address:
+        return None, None, None
+
+    kw = safe_float(record.get("kw") or record.get("pv_capacity_kw"))
+    system_type = record.get("systemtype", "") or record.get("system_type", "")
+    if system_type and system_type != "PV":
+        return None, None, None
+
+    system_id = record.get("systemid", "")
+    source_id = f"cambridge_solar_{system_id}" if system_id else f"cambridge_solar_{address.replace(' ', '_')}_{kw or 0}"
+
+    building_type = str(record.get("buildingtype", "")).lower()
+    site_type = "commercial" if any(x in building_type for x in ("commercial", "industrial", "municipal", "institutional")) else "commercial"
+
+    lat = safe_float(record.get("latitude"))
+    lng = safe_float(record.get("longitude"))
+
+    inst = make_installation(
+        source_id, config,
+        address=address,
+        city="Cambridge",
+        capacity_kw=kw,
+        latitude=lat,
+        longitude=lng,
+        install_date=safe_date(record.get("permitissuedate")),
+        site_type=site_type,
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -4332,6 +4415,8 @@ TRANSFORMERS = {
     "ny_statewide": transform_ny_statewide,
     "ct_rsip": transform_ct_rsip,
     "collin_county": transform_collin_county,
+    "fort_collins": transform_fort_collins,
+    "cambridge_installations": transform_cambridge_installations,
 }
 
 
