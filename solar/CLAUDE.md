@@ -178,7 +178,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: ~558,366 installations, ~377,523 equipment records, ~4,988,724 events, 18 primary sources + 69 permit portals**
+**Grand Total: ~558,366 installations, ~377,523 equipment records, ~3,231,267 events, 18 primary sources + 69 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -757,19 +757,17 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 12, 2026 — Session 13)
-1. **Droplet classification batch 3**: 33.4% complete (~12,400/37,129), 6,494 classified, ETA ~17 hours. 0.4/sec.
-2. **NOAA storm re-run**: Clean run on full 558K database — 3,227,976 events inserting (0 errors)
+### In Progress (Feb 12, 2026 — Session 14)
+1. **Droplet classification batch 3**: Still running at 0.4/sec, 96,956 mount_type in DB. Wrapper running batch of 2000 (at 1700/2000).
+2. **Satellite images for new exact-precision records**: Census geocoder added ~46K exact coordinates. ~362K more images needed at ~$724 total (spreadable across 4 months using $200/month Google Cloud free credit).
 
-### Completed This Session (Session 13)
-3. **Event dedup crisis fixed**: Found 5.5M duplicate storm events + 2.4K recall dupes from multiple overlapping runs
-   - Root cause: NOAA/CPSC dedup pagination bug (Supabase max_rows=1000 but scripts used limit=10000, only loaded first page)
-   - Fixed both scripts to use page_size=1000 with proper pagination
-   - Deleted all storm events via psql, running clean NOAA re-run
-   - Recall duplicates cleaned via window function dedup
-4. **CPSC recalls**: Clean re-run → 5,582 events, then deduped to 3,211 unique. Bug fix applied.
-5. **Cross-source dedup** (Session 12): 3,275 patches (2,934 location upgrades, 329 crossref, 18 developer, 11 owner)
-6. **Next.js site rebuilt** (Session 12): Static pages regenerated with 558K installation stats
+### Completed This Session (Session 14)
+3. **Census batch geocoding completed**: 45,812 coordinates geocoded (48.1% match rate on permit addresses), 0 errors. lat/lng coverage: 66.5% → 74.3%.
+4. **Operator enrichment pipeline (9 scripts)**: 4,448 patches, 0 errors — eGRID: 4,212 (operator+owner), PJM-GATS: 115 owner, LBNL: 61 developer, GEM: 43, OSM: 16, WREGIS: 1.
+5. **Cross-source dedup**: 56,780 match pairs, 312 patches (288 crossref, 34 operator, 17 owner, 9 developer), 0 errors.
+6. **Next.js site rebuilt**: Static pages regenerated with updated 558K stats reflecting all enrichments.
+7. **County derivation**: 0 new updates (remaining 2,050 records without county lack matching city data).
+8. **Capacity fixes** (Session 13): 8,380 records with kW→MW conversion errors fixed, 83,578 cost_per_watt records calculated.
 
 ### Short-term
 7. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
@@ -781,22 +779,24 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 11. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
 12. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
 
-### Data Gap Summary (Feb 12, 2026 — Session 13)
+### Data Gap Summary (Feb 12, 2026 — Session 14)
 | Field | Count | Coverage | Target | How to close |
 |-------|------:|----------|--------|-------------|
 | **location_precision** | **558,366** | **100%** | 100% | DONE |
-| county | 550,649 | 98.6% | 99%+ | Near maximum |
-| city | 512,461 | 91.8% | 92%+ | Near maximum |
-| install_date | 458,821 | 82.2% | 82%+ | Near maximum for permits |
+| county | 550,734 | 98.6% | 99%+ | Near maximum |
+| city | 512,462 | 91.8% | 92%+ | Near maximum |
+| install_date | 458,826 | 82.2% | 82%+ | Near maximum for permits |
 | address | 428,729 | 76.8% | 78% | Most permits have addresses |
+| lat/lng | 414,724 | 74.3% | 76% | Census geocoder DONE, +46K this session |
 | zip_code | 380,805 | 68.2% | 70% | Census geocoder on remaining |
-| lat/lng (exact) | 367,940 | 65.9% | 75% | Census geocoder + ZCTA fallback |
-| installer_name | 337,347 | 60.4% | 62% | Near maximum for current sources |
-| capacity_mw | 323,106 | 57.9% | 60% | Many permits lack explicit capacity |
-| owner_name | 156,970 | 28.1% | 35% | SEIA ($1K/yr) or WREGIS re-run |
-| operator_name | 127,329 | 22.8% | 30% | Additional permit cities |
-| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 running (~25K remaining) |
-| developer_name | 20,121 | 3.6% | 13% | SEIA ($1K/yr) best option |
+| installer_name | 337,349 | 60.4% | 62% | Near maximum for current sources |
+| capacity_mw | 331,486 | 59.4% | 60% | Capacity fixes applied (+8.4K) |
+| total_cost | 281,892 | 50.5% | 51% | cost_per_watt calc applied (+83.6K) |
+| owner_name | 161,286 | 28.9% | 35% | SEIA ($1K/yr) or WREGIS re-run |
+| cost_per_watt | 152,716 | 27.4% | 28% | Calculated from total_cost/capacity |
+| operator_name | 131,608 | 23.6% | 30% | eGRID +4.2K this session |
+| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 running on droplet |
+| developer_name | 20,191 | 3.6% | 13% | SEIA ($1K/yr) best option |
 | **Equipment** | **377,523** | — | — | 91% have manufacturer, 55% have model |
 | **Events** | **3,231,267** | — | — | 3.2M storm + 3.2K recall + 80 generator |
 
@@ -1287,13 +1287,13 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - Static build successful, all 5 pages regenerated
 - Stats API confirms 554,557 installations, 377,523 equipment
 
-**Grand Total (Feb 12, 2026 — Session 10):**
-- **554,557 installations** across 81 data sources (18 primary + 69 permit portals)
+**Grand Total (Feb 12, 2026 — Session 14):**
+- **558,366 installations** across 81 data sources (18 primary + 69 permit portals)
 - **377,523 equipment records** (91% have manufacturer, 55% have model)
-- **4,988,724 events** (4.98M storm + 8.2K recall + 240 generator)
+- **3,231,267 events** (3.2M storm + 3.2K recall + 80 generator) — cleaned from 5M+ duplicates in Session 13
 - **100% location_precision coverage**
-- **66.3% with lat/lng coordinates** (Census geocoder still running)
-- **Droplet batch 3**: ~31K images remaining, ~22 hours, wrapper prevents OOM
+- **74.3% with lat/lng coordinates** (Census geocoder completed: +46K this session)
+- **Droplet batch 3**: Running autonomously, 96,956 mount_type in DB
 
 ### Session 11 — Feb 12, 2026
 
@@ -1382,3 +1382,57 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 | operator_name | 127,329 | 22.8% |
 | mount_type | 96,956 | 17.4% |
 | developer_name | 20,121 | 3.6% |
+
+### Session 14 — Feb 12, 2026
+
+**Census batch geocoding — COMPLETED:**
+- 45,812 coordinates geocoded from 95,322 submitted addresses (48.1% match rate)
+- Match rate varied by source: early permit batches ~15-21%, later batches with good addresses ~67-69%
+- lat/lng coverage: 66.5% → 74.3% (414,724 / 558,366)
+- Location precision: exact 413,753 (74.1%)
+- 0 errors across 96 batches
+
+**Operator enrichment pipeline — COMPLETED (9 scripts):**
+- eGRID: 4,212 patches (4,206 operator, 4,171 owner) — biggest contributor by far
+- PJM-GATS: 115 owner patches
+- LBNL Queued Up: 61 developer patches
+- GEM: 43 patches (36 operator, 13 owner)
+- OSM cross-reference: 16 patches (3 operator)
+- WREGIS: 1 owner patch (nearly all previously applied)
+- EIA-860 owner/plant, backfill-source-fields: 0 new patches (all already applied)
+- **Total: 4,448 patches, 0 errors**
+
+**Capacity fixes — COMPLETED:**
+- 8,380 records had kW values stored as MW (capacity_mw > 500 for commercial sites)
+- Fixed via `SET capacity_mw = capacity_mw / 1000`
+- 83,578 cost_per_watt records calculated from total_cost / (capacity_mw * 1M)
+
+**Cross-source dedup — COMPLETED:**
+- 56,780 unique match pairs across 3 phases
+- 312 patches applied (288 crossref, 34 operator, 17 owner, 9 developer, 5 install_date, 5 total_cost, 2 installer)
+- Low patch count expected — database has been through many enrichment passes already
+
+**Next.js site — REBUILT:**
+- Static build successful, all pages regenerated with updated 558K stats
+- Auth injected into all HTML files
+
+**Field coverage update (558,366 installations):**
+| Field | Count | Coverage |
+|-------|------:|----------|
+| location_precision | 558,366 | 100.0% |
+| county | 550,734 | 98.6% |
+| city | 512,462 | 91.8% |
+| install_date | 458,826 | 82.2% |
+| address | 428,729 | 76.8% |
+| lat/lng | 414,724 | 74.3% |
+| zip_code | 380,805 | 68.2% |
+| installer_name | 337,349 | 60.4% |
+| capacity_mw | 331,486 | 59.4% |
+| total_cost | 281,892 | 50.5% |
+| owner_name | 161,286 | 28.9% |
+| cost_per_watt | 152,716 | 27.4% |
+| operator_name | 131,608 | 23.6% |
+| mount_type | 96,956 | 17.4% |
+| developer_name | 20,191 | 3.6% |
+
+**Droplet batch 3**: Still running autonomously, 96,956 mount_type in DB, memory stable at 2.8GB/15GB
