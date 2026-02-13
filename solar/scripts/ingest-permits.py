@@ -501,7 +501,7 @@ CITIES = {
         "transform": "blds",
     },
     "san_diego_county": {
-        "tier": 3,
+        "tier": 0,
         "name": "San Diego County, CA",
         "state": "CA",
         "county": "SAN DIEGO",
@@ -510,7 +510,8 @@ CITIES = {
         "page_size": 1000,
         "filter": "$where=primary_scope_code LIKE '8004%25'",
         "prefix": "permit_sdcounty",
-        "transform": "generic_socrata",
+        "transform": "san_diego_county",
+        "has_equipment": True,
     },
     "montgomery_county": {
         "tier": 3,
@@ -809,6 +810,19 @@ CITIES = {
         "page_size": 100,
         "prefix": "permit_tampa",
         "transform": "tampa",
+        "has_equipment": True,
+    },
+    "leon_county": {
+        "tier": 0,
+        "name": "Leon County, FL",
+        "state": "FL",
+        "county": "LEON",
+        "platform": "ckan",
+        "base_url": "https://www.civicdata.com/api/3/action/datastore_search",
+        "resource_id": "4e34687e-deba-428b-9509-921516df6208",
+        "page_size": 100,
+        "prefix": "permit_leon",
+        "transform": "leon_county",
         "has_equipment": True,
     },
 
@@ -4140,6 +4154,79 @@ def transform_tampa(record, data_source_id, config):
     return source_id, inst, equip if equip else None
 
 
+def transform_leon_county(record, data_source_id, config):
+    """Leon County FL — CivicData CKAN with lat/lng, contractor, and equipment descriptions."""
+    permit_num = record.get("PermitNum", "") or record.get("permitnum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_leon_{permit_num}"
+
+    desc = record.get("Description", "") or record.get("description", "") or ""
+
+    # Filter: must mention solar/PV
+    if not re.search(r'solar|photovoltaic|pv\s+(system|module|panel|array)', desc, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Address
+    address = (record.get("OriginalAddress1") or record.get("originaladdress1") or "").strip()
+    city = (record.get("OriginalCity") or record.get("originalcity") or "Tallahassee").strip()
+    zipcode = (record.get("OriginalZip") or record.get("originalzip") or "").strip()
+
+    lat = safe_float(record.get("LATITUDE") or record.get("latitude") or record.get("Latitude"))
+    lng = safe_float(record.get("LONGITUDE") or record.get("longitude") or record.get("Longitude"))
+
+    cost = safe_float(record.get("EstProjectCost") or record.get("estprojectcost"))
+
+    contractor = (record.get("ContractorCompanyName") or record.get("contractorcompanyname") or "").strip()
+
+    # Site type from PermitClass
+    permit_class = (record.get("PermitClass") or record.get("permitclass") or "").upper()
+    site_type = "commercial" if "COMMERCIAL" in permit_class else "commercial"
+
+    inst = make_installation(
+        source_id, config,
+        site_name=record.get("ProjectName") or record.get("projectname"),
+        address=address,
+        city=city,
+        zip_code=zipcode,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("IssuedDate") or record.get("issueddate")),
+        site_type=site_type,
+        installer_name=contractor,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+
+    # Mount type from description
+    mount_type = None
+    upper_desc = desc.upper()
+    if "GROUND" in upper_desc:
+        mount_type = "ground"
+    elif "ROOF" in upper_desc:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_desc or "CANOPY" in upper_desc:
+        mount_type = "carport"
+    inst["mount_type"] = mount_type
+
+    # Equipment from description
+    equip = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equip.append(eq)
+
+    return source_id, inst, equip if equip else None
+
+
 def transform_virginia_beach(record, data_source_id, config):
     """Virginia Beach VA — CKAN with BEST equipment data in WorkDesc field.
 
@@ -4476,6 +4563,113 @@ def transform_cambridge_installations(record, data_source_id, config):
     return source_id, inst, None
 
 
+def transform_san_diego_county(record, data_source_id, config):
+    """San Diego County CA — Socrata with rich structured equipment in 'use' field.
+
+    The 'use' field contains structured equipment data like:
+    "NO. OF MODULES: 12540 \nNO. OF INVERTERS: 105\nTOTAL SYSTEM SIZE IN KILOWATTS: 3900"
+    Also has contractor_name, geocoded lat/lng, full address.
+    """
+    record_id = record.get("record_id", "")
+    if not record_id:
+        return None, None, None
+
+    source_id = f"permit_sdcounty_{record_id}"
+
+    use_field = record.get("use", "") or ""
+    scope_code = record.get("primary_scope_code", "") or ""
+
+    # Filter: must be solar scope code 8004
+    if "8004" not in scope_code and not re.search(r'solar|photovoltaic|pv', use_field, re.IGNORECASE):
+        return None, None, None
+    if is_solar_false_positive(use_field):
+        return None, None, None
+
+    # Parse capacity from structured fields
+    capacity_kw = None
+    m = re.search(r'TOTAL\s+SYSTEM\s+SIZE\s+(?:IN\s+)?KILOWATTS?\s*:?\s*([\d,]+\.?\d*)', use_field, re.IGNORECASE)
+    if m:
+        capacity_kw = float(m.group(1).replace(",", ""))
+    if not capacity_kw:
+        m = re.search(r'([\d,]+\.?\d*)\s*MW', use_field, re.IGNORECASE)
+        if m:
+            capacity_kw = float(m.group(1).replace(",", "")) * 1000
+    if not capacity_kw:
+        capacity_kw = parse_capacity_from_description(use_field)
+
+    # Parse module count
+    module_count = None
+    m = re.search(r'NO\.?\s*OF\s+MODULES?\s*:?\s*(\d+)', use_field, re.IGNORECASE)
+    if m:
+        module_count = int(m.group(1))
+
+    # Parse inverter count
+    inverter_count = None
+    m = re.search(r'NO\.?\s*OF\s+INVERTERS?\s*:?\s*(\d+)', use_field, re.IGNORECASE)
+    if m:
+        inverter_count = int(m.group(1))
+
+    # Coordinates from geocoded_column
+    lat = None
+    lng = None
+    geo = record.get("geocoded_column")
+    if isinstance(geo, dict):
+        lat = safe_float(geo.get("latitude"))
+        lng = safe_float(geo.get("longitude"))
+    if not lat:
+        lat = safe_float(record.get("latitude"))
+    if not lng:
+        lng = safe_float(record.get("longitude"))
+
+    # Address
+    address = record.get("street_address", "") or ""
+    city = record.get("city", "") or ""
+    zip_code = record.get("zip_code", "") or ""
+
+    installer = record.get("contractor_name", "") or ""
+    cost = safe_float(record.get("valuation"))
+
+    # Mount type from description
+    mount_type = None
+    upper_use = use_field.upper()
+    if "GROUND" in upper_use and "MOUNT" in upper_use:
+        mount_type = "ground"
+    elif "ROOF" in upper_use:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_use or "CANOPY" in upper_use:
+        mount_type = "carport"
+
+    inst = make_installation(
+        source_id, config,
+        address=address,
+        city=city,
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issued_date") or record.get("open_date")),
+        installer_name=installer,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    inst["mount_type"] = mount_type
+
+    # Equipment records
+    equipment = []
+    if module_count:
+        equipment.append({
+            "equipment_type": "module",
+            "quantity": module_count,
+        })
+    if inverter_count:
+        equipment.append({
+            "equipment_type": "inverter",
+            "quantity": inverter_count,
+        })
+
+    return source_id, inst, equipment if equipment else None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -4524,11 +4718,13 @@ TRANSFORMERS = {
     "virginia_beach": transform_virginia_beach,
     "boston_ckan": transform_boston_ckan,
     "tampa": transform_tampa,
+    "leon_county": transform_leon_county,
     "ny_statewide": transform_ny_statewide,
     "ct_rsip": transform_ct_rsip,
     "collin_county": transform_collin_county,
     "fort_collins": transform_fort_collins,
     "cambridge_installations": transform_cambridge_installations,
+    "san_diego_county": transform_san_diego_county,
 }
 
 
