@@ -156,6 +156,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | Data Source Monitor | `check-data-sources.py` | Health check for all 18 data sources (freshness, availability) | Reads DB + checks URLs |
 | PJM-GATS | `enrich-pjm-gats.py` | Owner names from PJM REC tracking (13+ states: NJ, PA, MD, DE, DC, OH, VA, IL) | `data/pjm_gats/GATSGenerators_*.xlsx` (manual export from gats.pjm-eis.com) |
 | HIFLD Territories | `enrich-utility-territories.py` | Operator names via PostGIS spatial join (2,919 utility territory polygons) + zip/county fallbacks | HIFLD ArcGIS FeatureServer + `data/openei/` CSVs |
+| USASpending REAP | `enrich-usaspending-reap.py` | Owner names from USDA REAP solar grants (CFDA 10.868, 586 grants) | `api.usaspending.gov` REST API |
+| NY Statewide Solar | `enrich-ny-statewide-owner.py` | Owner names from NY distributed solar Developer field (15,375 matches) | `data.ny.gov` dataset `wgsj-jt5f` CSV |
 | Municipal Permits | `ingest-permits.py` | Solar permits from 55+ US city open data portals (6 tiers) | Socrata/OpenDataSoft/ArcGIS/CKAN/CARTO/BLDS APIs |
 | Census Geocoder | `forward-geocode-census.py` | Batch address→coordinate geocoding (1K/batch, free, ~83% match rate) | `https://geocoding.geo.census.gov/geocoder/geographies/addressbatch` |
 | Permit Equipment | `parse-permit-equipment.py` | Extract panel/inverter from permit descriptions | Re-queries permit APIs for descriptions |
@@ -220,6 +222,10 @@ python3 -u scripts/enrich-utility-territories.py --skip-upload  # Re-run spatial
 python3 -u scripts/enrich-utility-territories.py --phase 2     # Spatial join only
 python3 -u scripts/enrich-utility-territories.py --phase 3     # Zip fallback only
 python3 -u scripts/enrich-utility-territories.py --dry-run     # Preview without patching
+
+# Owner enrichment from USASpending REAP grants + NY Statewide
+python3 -u scripts/enrich-usaspending-reap.py            # USDA REAP solar grants → owner_name (102 matches)
+python3 -u scripts/enrich-ny-statewide-owner.py          # NY distributed solar Developer → owner_name (15,375 matches)
 
 # Census geocoder (API currently down, script ready)
 python3 -u scripts/forward-geocode-census.py          # Census batch geocoding (1K/batch, ~83% match rate)
@@ -766,10 +772,14 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 ## Next Steps (Priority Order)
 
 ### In Progress (Feb 13, 2026 — Session 15)
-1. **Owner_name enrichment**: USASpending REAP grants + NY Statewide Distributed Solar — scripts running
-2. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
+1. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
 
 ### Completed This Session (Session 15)
+2. **Owner_name enrichment**: USASpending REAP + NY Statewide Distributed Solar — 15,477 net patches, 0 errors
+   - **USASpending REAP**: `enrich-usaspending-reap.py` — fetched 586 USDA REAP solar grants (CFDA 10.868) via paginated API. 102 owner_name patches across 23 states (IL: 34, WA: 8, CO: 7, NY: 6)
+   - **NY Statewide**: `enrich-ny-statewide-owner.py` — downloaded 268K+ records from `data.ny.gov` dataset `wgsj-jt5f`. Used Developer column as owner for commercial-scale (>=25kW) projects, excluding known residential installers. 15,963 patches applied, 588 "Other" placeholders cleaned up → 15,375 net
+   - Top owners: Monolith Solar Assoc. LLC (1,160), Emes Solar Inc (832), Bright Power (756), US Light Energy (596), Nexamp (584)
+   - owner_name coverage: **28.6% → 31.4%** (+15,477 records)
 3. **Mount type heuristic classification**: 412,405 records classified via SQL heuristics, 0 errors
    - Tier 1 (95-100% accuracy): tracking_type→mount (9,392), utility>=5MW→ground (8,906), commercial<25kW→rooftop (143,255), residential→rooftop (5,246), ISO→ground (236)
    - Tier 2 (75-98% accuracy): permits→rooftop (229,774), utility 1-5MW→ground (7,855), community→ground (7,741)
@@ -812,7 +822,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | installer_name | 337,349 | 59.9% | 60%+ | — |
 | capacity_mw | 331,486 | 58.8% | 59%+ | — |
 | total_cost | 281,892 | 50.0% | 50%+ | — |
-| owner_name | 161,226 | 28.6% | 35%+ | Enrichment in progress |
+| owner_name | 176,703 | 31.4% | 35%+ | **+15,477 (REAP 102 + NY 15,375)** |
 | cost_per_watt | 152,716 | 27.1% | 28% | — |
 | **Equipment** | **433,700** | — | — | 91% manufacturer, 55% model |
 | **Events** | **3,231,267** | — | — | 3.2M storm + 3.2K recall + 80 generator |
