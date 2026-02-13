@@ -41,6 +41,9 @@ export default async function handler(req, res) {
           : "*"
       );
 
+    // Deduplicate by default
+    query = query.eq("is_canonical", true);
+
     // Apply same filters as installations endpoint
     if (state) query = query.eq("state", state.toUpperCase());
     if (site_type) query = query.eq("site_type", site_type);

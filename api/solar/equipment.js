@@ -40,11 +40,14 @@ export default async function handler(req, res) {
         *,
         installation:solar_installations!inner(
           id, site_name, state, city, county, capacity_dc_kw, capacity_mw,
-          install_date, site_type, site_status, latitude, longitude
+          install_date, site_type, site_status, latitude, longitude, is_canonical
         )
       `,
         { count: "exact" }
       );
+
+    // Only show equipment from canonical installations (avoid duplicates)
+    query = query.eq("installation.is_canonical", true);
 
     // Equipment filters
     if (manufacturer) query = query.ilike("manufacturer", `%${manufacturer}%`);

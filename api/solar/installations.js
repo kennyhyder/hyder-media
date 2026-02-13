@@ -49,6 +49,7 @@ export default async function handler(req, res) {
       near_lng,
       radius_miles,
       q, // text search
+      deduplicate, // filter to canonical records only (default: true)
     } = req.query;
 
     const pageNum = Math.max(1, parseInt(page));
@@ -59,6 +60,9 @@ export default async function handler(req, res) {
     let query = supabase
       .from("solar_installations")
       .select("*", { count: "exact" });
+
+    // Deduplicate by default (show only canonical records to avoid duplicate physical sites)
+    if (deduplicate !== "false") query = query.eq("is_canonical", true);
 
     // Apply filters
     if (state) query = query.eq("state", state.toUpperCase());
