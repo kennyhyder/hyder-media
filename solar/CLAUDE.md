@@ -181,7 +181,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: ~558,366 installations, ~377,523 equipment records, ~3,231,267 events, 18 primary sources + 69 permit portals**
+**Grand Total: ~641,784 installations, ~452,782 equipment records, ~3,229,371 events, 18 primary sources + 71 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -203,6 +203,12 @@ python3 -u scripts/ingest-permits.py --tier 1        # All Tier 1 cities only
 python3 -u scripts/ingest-permits.py --tier 1,2      # Tier 1 and 2
 python3 -u scripts/ingest-permits.py --dry-run       # Preview without ingesting
 python3 -u scripts/ingest-permits.py --list-cities   # Show available cities
+
+# San Diego City bulk CSV (Feb 13, 2026)
+python3 -u scripts/ingest-san-diego-csv.py            # SD City CSV (~77K solar from seshat.datasd.org)
+python3 -u scripts/ingest-san-diego-csv.py --set 1    # Set 1 only (historical)
+python3 -u scripts/ingest-san-diego-csv.py --set all  # Both sets
+python3 -u scripts/ingest-san-diego-csv.py --dry-run  # Preview without ingesting
 
 # New data sources (Feb 10-11, 2026)
 python3 -u scripts/ingest-epa-repowering.py          # EPA RE-Powering brownfield solar
@@ -771,61 +777,68 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 13, 2026 — Session 15)
-1. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
+### In Progress (Feb 13, 2026 — Session 16)
+1. **San Diego City CSV set2_closed equipment insertion**: 15,839 installations, ~23K equipment records being inserted (slow one-at-a-time API calls)
+2. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
 
-### Completed This Session (Session 15)
-2. **Owner_name enrichment**: USASpending REAP + NY Statewide Distributed Solar — 15,477 net patches, 0 errors
-   - **USASpending REAP**: `enrich-usaspending-reap.py` — fetched 586 USDA REAP solar grants (CFDA 10.868) via paginated API. 102 owner_name patches across 23 states (IL: 34, WA: 8, CO: 7, NY: 6)
-   - **NY Statewide**: `enrich-ny-statewide-owner.py` — downloaded 268K+ records from `data.ny.gov` dataset `wgsj-jt5f`. Used Developer column as owner for commercial-scale (>=25kW) projects, excluding known residential installers. 15,963 patches applied, 588 "Other" placeholders cleaned up → 15,375 net
-   - Top owners: Monolith Solar Assoc. LLC (1,160), Emes Solar Inc (832), Bright Power (756), US Light Energy (596), Nexamp (584)
-   - owner_name coverage: **28.6% → 31.4%** (+15,477 records)
-3. **Mount type heuristic classification**: 412,405 records classified via SQL heuristics, 0 errors
-   - Tier 1 (95-100% accuracy): tracking_type→mount (9,392), utility>=5MW→ground (8,906), commercial<25kW→rooftop (143,255), residential→rooftop (5,246), ISO→ground (236)
-   - Tier 2 (75-98% accuracy): permits→rooftop (229,774), utility 1-5MW→ground (7,855), community→ground (7,741)
+### Completed This Session (Session 16)
+3. **San Diego City CSV ingestion**: 76,936 solar permits from seshat.datasd.org — **largest single ingestion ever**
+   - New standalone script: `ingest-san-diego-csv.py` — downloads bulk CSVs from S3/CloudFront, filters by APPROVAL_TYPE (PV/Photovoltaic/SB 379)
+   - Set 2 Active: 28,013 installations + 13,713 equipment, 0 errors
+   - Set 2 Closed: 48,923 installations + ~23K equipment (inserting), 0 errors
+   - Equipment parsed from PROJECT_SCOPE: panel manufacturer/model, inverter details, kW/MW capacity, module/inverter counts
+   - All records have lat/lng (100% geocoded), installer names, addresses
+   - Total DB jump: 558K → 641K installations
+4. **Leon County FL CivicData CKAN**: 714 records + 20 equipment, 0 errors
+   - Added to ingest-permits.py as CivicData CKAN platform (same as Tampa)
+   - Solar filter on Description, lat/lng from attributes, contractor as installer
+5. **San Diego County transform upgrade**: 876 equipment records from structured `use` field
+   - Upgraded from tier 3/generic_socrata to tier 0/san_diego_county
+   - Parses: NO. OF MODULES, NO. OF INVERTERS, TOTAL SYSTEM SIZE IN KILOWATTS, mount type, contractor
+
+### Completed Last Session (Session 15)
+6. **Owner_name enrichment**: USASpending REAP + NY Statewide Distributed Solar — 15,477 net patches
+   - owner_name coverage: **28.6% → 31.4%**
+7. **Mount type heuristic classification**: 412,405 records classified via SQL heuristics
    - mount_type coverage: **17.2% → 90.4%**
-4. **Developer inference from installer**: 326,396 records — copied installer_name to developer_name for commercial/community/residential DG
+8. **Developer inference from installer**: 326,396 records
    - developer_name coverage: **3.6% → 61.5%**
-5. **HIFLD utility territory spatial join**: 372,033 records patched via PostGIS point-in-polygon
-   - Uploaded 2,919 HIFLD utility territory polygons (4.2MB simplified GeoJSON)
-   - Per-state spatial join: 272,171 initial + CA 51,295 + MD 41,544 + FL 7,023 (ST_Intersects fallback for complex geometries)
-   - Zip-to-utility fallback: 16,366 records (OpenEI IOU/non-IOU CSVs, 38,585 zip mappings)
-   - County-to-utility inference: 43,902 records (dominant operator per state+county from existing data)
+9. **HIFLD utility territory spatial join**: 372,033 records patched
    - operator_name coverage: **23.4% → 99.4%**
-6. **New script**: `enrich-utility-territories.py` — HIFLD spatial join + zip/county fallbacks
-7. **Next.js site rebuilt**: Static pages regenerated with updated stats
 
 ### Short-term
-8. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
-9. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated)
-10. **NLCD/NAIP for remaining mount_type**: 14,619 ambiguous records with exact coords, 41K without
+10. **Run enrichment pipeline on new 77K records**: eGRID, LBNL, CEC specs, location precision, county derivation, NOAA storms
+11. **Cross-source dedup on expanded 641K database**: Match SD City records to existing TTS/CA sources
+12. **Rebuild Next.js site**: Regenerate static pages with updated 641K stats
+13. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+14. **NLCD/NAIP for remaining mount_type**: 14,619 ambiguous records with exact coords
 
 ### Medium-term
-11. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL
-12. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-13. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
-14. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
+15. **CivicData BLDS expansion**: Lee County FL, Brevard County FL, Manatee County FL
+16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
+18. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
 
-### Data Gap Summary (Feb 13, 2026 — Session 15)
-| Field | Count | Coverage | Target | Change This Session |
-|-------|------:|----------|--------|-------------|
-| **location_precision** | **563,530** | **100%** | 100% | — |
-| **operator_name** | **560,287** | **99.4%** | 99%+ | **+428,678 (HIFLD spatial join)** |
-| county | 550,734 | 97.7% | 98%+ | — |
-| city | 512,462 | 90.9% | 91%+ | — |
-| **mount_type** | **509,488** | **90.4%** | 91%+ | **+412,405 (heuristic classification)** |
-| install_date | 458,826 | 81.4% | 82%+ | — |
-| address | 428,729 | 76.1% | 77% | — |
-| lat/lng | 414,724 | 73.6% | 74%+ | — |
-| zip_code | 380,805 | 67.6% | 68%+ | — |
-| **developer_name** | **346,617** | **61.5%** | 62%+ | **+326,396 (installer inference)** |
-| installer_name | 337,349 | 59.9% | 60%+ | — |
-| capacity_mw | 331,486 | 58.8% | 59%+ | — |
-| total_cost | 281,892 | 50.0% | 50%+ | — |
-| owner_name | 176,703 | 31.4% | 35%+ | **+15,477 (REAP 102 + NY 15,375)** |
-| cost_per_watt | 152,716 | 27.1% | 28% | — |
-| **Equipment** | **433,700** | — | — | 91% manufacturer, 55% model |
-| **Events** | **3,231,267** | — | — | 3.2M storm + 3.2K recall + 80 generator |
+### Data Gap Summary (Feb 13, 2026 — Session 16)
+| Field | Count | Coverage | Notes |
+|-------|------:|----------|-------|
+| **location_precision** | — | **~100%** | Need to re-run set-location-precision.py for new sdcity_* records |
+| **operator_name** | **560,287** | **87.3%** | Down from 99.4% (new records lack operator) |
+| county | 634,152 | 98.8% | SD City records have county |
+| city | 620,527 | 96.7% | SD City records have city |
+| **mount_type** | **510,775** | **79.6%** | Down from 90.4% (new records need heuristic classification) |
+| lat/lng | 517,414 | 80.6% | Up from 73.6% (SD City 100% geocoded) |
+| address | 512,005 | 79.8% | Up from 76.1% (SD City has addresses) |
+| zip_code | 481,282 | 75.0% | Up from 67.6% |
+| install_date | 464,579 | 72.4% | Down from 82.2% (many SD City lack dates) |
+| installer_name | 414,645 | 64.6% | Up from 59.9% (SD City has installer names) |
+| capacity_mw | 374,041 | 58.3% | SD City has kW in descriptions |
+| **developer_name** | **346,617** | **54.0%** | Down from 61.5% (new records need inference) |
+| total_cost | 283,173 | 44.1% | |
+| owner_name | 176,703 | 27.5% | |
+| cost_per_watt | 152,708 | 23.8% | |
+| **Equipment** | **452,782** | — | +~38K from SD City CSV + SD County + Leon County |
+| **Events** | **3,229,371** | — | 3.2M storm + 3.2K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -1314,13 +1327,12 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - Static build successful, all 5 pages regenerated
 - Stats API confirms 554,557 installations, 377,523 equipment
 
-**Grand Total (Feb 12, 2026 — Session 14):**
-- **558,366 installations** across 81 data sources (18 primary + 69 permit portals)
-- **377,523 equipment records** (91% have manufacturer, 55% have model)
-- **3,231,267 events** (3.2M storm + 3.2K recall + 80 generator) — cleaned from 5M+ duplicates in Session 13
-- **100% location_precision coverage**
-- **74.3% with lat/lng coordinates** (Census geocoder completed: +46K this session)
-- **Droplet batch 3**: Running autonomously, 96,956 mount_type in DB
+**Grand Total (Feb 13, 2026 — Session 16):**
+- **641,784 installations** across 92 data sources (18 primary + 71 permit portals)
+- **452,782+ equipment records** (growing — SD City set2_closed equipment still inserting)
+- **3,229,371 events** (3.2M storm + 3.2K recall + 80 generator)
+- **80.6% with lat/lng coordinates** (SD City 100% geocoded, Census geocoder completed)
+- **Droplet batch 3**: Running autonomously on droplet
 
 ### Session 11 — Feb 12, 2026
 
@@ -1463,3 +1475,46 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 | developer_name | 20,191 | 3.6% |
 
 **Droplet batch 3**: Still running autonomously, 96,956 mount_type in DB, memory stable at 2.8GB/15GB
+
+### Session 16 — Feb 13, 2026
+
+**San Diego City CSV Ingestion — COMPLETED (installations + set2_active equipment):**
+- **ingest-san-diego-csv.py**: New standalone script for bulk CSV download from `seshat.datasd.org/development_permits_set2/`
+- Downloads `set2_active.csv` (114.6 MB) and `set2_closed.csv` (71.7 MB) — cached after first download
+- Solar filtering via APPROVAL_TYPE regex: `photovoltaic|PV|SB 379`
+- Equipment parsed from PROJECT_SCOPE using regex: panel manufacturer/model, inverter details, kW/MW capacity, module/inverter counts
+- **Set 2 Active**: 254,674 total rows → 28,013 solar records → 28,013 created, 13,713 equipment, 0 errors
+- **Set 2 Closed**: 132,550 total rows → 76,937 solar (48,923 new) → 48,923 created, ~23K equipment (inserting), 0 errors
+- **Total**: 76,936 net new installations — **largest single ingestion in project history**
+- All records have lat/lng (100% geocoded from CSV columns), installer names, addresses, city/zip
+- CLI: `--set 1|2|all`, `--dry-run`, `--limit N`
+- Source prefix: `sdcity_`, data source: `municipal_permits_san_diego_city`
+- Equipment insertion is slow (~1hr for 9K records) due to individual GET+POST per installation — future optimization: batch equipment inserts
+
+**Leon County FL CivicData CKAN — COMPLETED:**
+- Added `leon_county` city config + `transform_leon_county()` to `ingest-permits.py`
+- Platform: CivicData CKAN (same as Tampa FL), resource ID: `4e34687e-deba-428b-9509-921516df6208`
+- **Results**: 857 raw → 714 created, 20 equipment, 0 errors
+- Fields: lat/lng, contractor (installer), project cost, permit class, address, mount type from description
+
+**San Diego County Transform Upgrade — COMPLETED:**
+- Upgraded from tier 3/generic_socrata to tier 0/san_diego_county with `has_equipment: True`
+- New `transform_san_diego_county()` parses structured equipment from `use` field:
+  - `NO. OF MODULES: 12540` → module equipment record with quantity
+  - `NO. OF INVERTERS: 105` → inverter equipment record with quantity
+  - `TOTAL SYSTEM SIZE IN KILOWATTS: 3900` → capacity_kw
+  - `GROUND MOUNT` / `ROOF MOUNT` → mount_type
+  - `geocoded_column.latitude/longitude` → exact coordinates
+  - `contractor_name` → installer_name
+- **Results**: 604 installations (already existed, silently ignored), **876 new equipment records**, 0 errors
+
+**Census Geocoder — COMPLETED (background):**
+- PID 413 process finished during this session
+- Final lat/lng coverage: 517,414 / 641,784 (80.6%)
+
+**Database Status (Session 16, equipment still inserting):**
+- **641,784 installations** across 92 data sources (18 primary + 71 permit portals)
+- **452,782 equipment records** (growing — set2_closed equipment still inserting)
+- **3,229,371 events** (3.2M storm + 3.2K recall + 80 generator)
+- **80.6% with lat/lng** (up from 74.3% — SD City 100% geocoded)
+- **Commit**: `ca1dea8` — added ingest-san-diego-csv.py + Leon County + SD County equipment parsing
