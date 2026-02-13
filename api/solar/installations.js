@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     }
 
     // Sort and paginate (non-geo search)
-    const validSorts = ["install_date", "capacity_dc_kw", "state", "site_name", "created_at"];
+    const validSorts = ["install_date", "capacity_dc_kw", "capacity_mw", "state", "site_name", "site_status", "created_at"];
     const sortCol = validSorts.includes(sort) ? sort : "install_date";
     query = query
       .order(sortCol, { ascending: order === "asc", nullsFirst: false })

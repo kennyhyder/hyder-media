@@ -18,6 +18,8 @@ export default async function handler(req, res) {
     const {
       page = "1",
       limit = "50",
+      sort = "manufacturer",
+      order = "asc",
       manufacturer,
       model,
       equipment_type,
@@ -60,8 +62,19 @@ export default async function handler(req, res) {
       query = query.lte("installation.install_date", cutoffDate.toISOString().split("T")[0]);
     }
 
+    // Server-side sorting
+    const validSorts = ["manufacturer", "model", "equipment_type", "created_at"];
+    const installationSorts = ["capacity_mw", "capacity_dc_kw", "install_date", "state"];
+    const ascending = order !== "desc";
+
+    if (installationSorts.includes(sort)) {
+      query = query.order(sort, { ascending, nullsFirst: false, referencedTable: "solar_installations" });
+    } else {
+      const sortCol = validSorts.includes(sort) ? sort : "manufacturer";
+      query = query.order(sortCol, { ascending, nullsFirst: false });
+    }
+
     const { data, error, count } = await query
-      .order("manufacturer", { ascending: true })
       .range(offset, offset + limitNum - 1);
 
     if (error) return res.status(500).json({ error: error.message });
