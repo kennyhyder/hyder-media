@@ -155,6 +155,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | CPSC Recalls | `enrich-cpsc-recalls.py` | Equipment recall events matched by manufacturer+model | Hardcoded 7 known solar recalls |
 | Data Source Monitor | `check-data-sources.py` | Health check for all 18 data sources (freshness, availability) | Reads DB + checks URLs |
 | PJM-GATS | `enrich-pjm-gats.py` | Owner names from PJM REC tracking (13+ states: NJ, PA, MD, DE, DC, OH, VA, IL) | `data/pjm_gats/GATSGenerators_*.xlsx` (manual export from gats.pjm-eis.com) |
+| HIFLD Territories | `enrich-utility-territories.py` | Operator names via PostGIS spatial join (2,919 utility territory polygons) + zip/county fallbacks | HIFLD ArcGIS FeatureServer + `data/openei/` CSVs |
 | Municipal Permits | `ingest-permits.py` | Solar permits from 55+ US city open data portals (6 tiers) | Socrata/OpenDataSoft/ArcGIS/CKAN/CARTO/BLDS APIs |
 | Census Geocoder | `forward-geocode-census.py` | Batch address→coordinate geocoding (1K/batch, free, ~83% match rate) | `https://geocoding.geo.census.gov/geocoder/geographies/addressbatch` |
 | Permit Equipment | `parse-permit-equipment.py` | Extract panel/inverter from permit descriptions | Re-queries permit APIs for descriptions |
@@ -212,6 +213,13 @@ python3 -u scripts/ingest-virginia-cooper.py           # Virginia Cooper Center 
 python3 -u scripts/enrich-pjm-gats.py               # Owner enrichment from GATS export
 python3 -u scripts/enrich-pjm-gats.py --dry-run     # Preview matches
 python3 -u scripts/enrich-pjm-gats.py --file /path/to.xlsx  # Use specific file
+
+# HIFLD utility territory operator enrichment
+python3 -u scripts/enrich-utility-territories.py               # Full: upload + spatial join + zip/county
+python3 -u scripts/enrich-utility-territories.py --skip-upload  # Re-run spatial join (territories already uploaded)
+python3 -u scripts/enrich-utility-territories.py --phase 2     # Spatial join only
+python3 -u scripts/enrich-utility-territories.py --phase 3     # Zip fallback only
+python3 -u scripts/enrich-utility-territories.py --dry-run     # Preview without patching
 
 # Census geocoder (API currently down, script ready)
 python3 -u scripts/forward-geocode-census.py          # Census batch geocoding (1K/batch, ~83% match rate)
@@ -757,47 +765,56 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 12, 2026 — Session 14)
-1. **Droplet classification batch 3**: Still running at 0.4/sec, 96,956 mount_type in DB. Wrapper running batch of 2000 (at 1700/2000).
-2. **Satellite images for new exact-precision records**: Census geocoder added ~46K exact coordinates. ~362K more images needed at ~$724 total (spreadable across 4 months using $200/month Google Cloud free credit).
+### In Progress (Feb 13, 2026 — Session 15)
+1. **Owner_name enrichment**: USASpending REAP grants + NY Statewide Distributed Solar — scripts running
+2. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
 
-### Completed This Session (Session 14)
-3. **Census batch geocoding completed**: 45,812 coordinates geocoded (48.1% match rate on permit addresses), 0 errors. lat/lng coverage: 66.5% → 74.3%.
-4. **Operator enrichment pipeline (9 scripts)**: 4,448 patches, 0 errors — eGRID: 4,212 (operator+owner), PJM-GATS: 115 owner, LBNL: 61 developer, GEM: 43, OSM: 16, WREGIS: 1.
-5. **Cross-source dedup**: 56,780 match pairs, 312 patches (288 crossref, 34 operator, 17 owner, 9 developer), 0 errors.
-6. **Next.js site rebuilt**: Static pages regenerated with updated 558K stats reflecting all enrichments.
-7. **County derivation**: 0 new updates (remaining 2,050 records without county lack matching city data).
-8. **Capacity fixes** (Session 13): 8,380 records with kW→MW conversion errors fixed, 83,578 cost_per_watt records calculated.
+### Completed This Session (Session 15)
+3. **Mount type heuristic classification**: 412,405 records classified via SQL heuristics, 0 errors
+   - Tier 1 (95-100% accuracy): tracking_type→mount (9,392), utility>=5MW→ground (8,906), commercial<25kW→rooftop (143,255), residential→rooftop (5,246), ISO→ground (236)
+   - Tier 2 (75-98% accuracy): permits→rooftop (229,774), utility 1-5MW→ground (7,855), community→ground (7,741)
+   - mount_type coverage: **17.2% → 90.4%**
+4. **Developer inference from installer**: 326,396 records — copied installer_name to developer_name for commercial/community/residential DG
+   - developer_name coverage: **3.6% → 61.5%**
+5. **HIFLD utility territory spatial join**: 372,033 records patched via PostGIS point-in-polygon
+   - Uploaded 2,919 HIFLD utility territory polygons (4.2MB simplified GeoJSON)
+   - Per-state spatial join: 272,171 initial + CA 51,295 + MD 41,544 + FL 7,023 (ST_Intersects fallback for complex geometries)
+   - Zip-to-utility fallback: 16,366 records (OpenEI IOU/non-IOU CSVs, 38,585 zip mappings)
+   - County-to-utility inference: 43,902 records (dominant operator per state+county from existing data)
+   - operator_name coverage: **23.4% → 99.4%**
+6. **New script**: `enrich-utility-territories.py` — HIFLD spatial join + zip/county fallbacks
+7. **Next.js site rebuilt**: Static pages regenerated with updated stats
 
 ### Short-term
-7. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated). Needs investigation.
 8. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+9. **San Diego City CSV**: 125K records — largest uncaptured source. Portal at data.sandiego.gov returns 404 (may have migrated)
+10. **NLCD/NAIP for remaining mount_type**: 14,619 ambiguous records with exact coords, 41K without
 
 ### Medium-term
-9. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL — same platform as Tampa
-10. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-11. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities (currently only done on subset)
-12. **Satellite images for new permit records**: Geocode addresses → fetch satellite tiles → classify mount type
+11. **CivicData BLDS expansion**: Leon County FL, Lee County FL, Brevard County FL, Manatee County FL
+12. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+13. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
+14. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
 
-### Data Gap Summary (Feb 12, 2026 — Session 14)
-| Field | Count | Coverage | Target | How to close |
+### Data Gap Summary (Feb 13, 2026 — Session 15)
+| Field | Count | Coverage | Target | Change This Session |
 |-------|------:|----------|--------|-------------|
-| **location_precision** | **558,366** | **100%** | 100% | DONE |
-| county | 550,734 | 98.6% | 99%+ | Near maximum |
-| city | 512,462 | 91.8% | 92%+ | Near maximum |
-| install_date | 458,826 | 82.2% | 82%+ | Near maximum for permits |
-| address | 428,729 | 76.8% | 78% | Most permits have addresses |
-| lat/lng | 414,724 | 74.3% | 76% | Census geocoder DONE, +46K this session |
-| zip_code | 380,805 | 68.2% | 70% | Census geocoder on remaining |
-| installer_name | 337,349 | 60.4% | 62% | Near maximum for current sources |
-| capacity_mw | 331,486 | 59.4% | 60% | Capacity fixes applied (+8.4K) |
-| total_cost | 281,892 | 50.5% | 51% | cost_per_watt calc applied (+83.6K) |
-| owner_name | 161,286 | 28.9% | 35% | SEIA ($1K/yr) or WREGIS re-run |
-| cost_per_watt | 152,716 | 27.4% | 28% | Calculated from total_cost/capacity |
-| operator_name | 131,608 | 23.6% | 30% | eGRID +4.2K this session |
-| mount_type | 96,956 | 17.4% | 25%+ | Batch 3 running on droplet |
-| developer_name | 20,191 | 3.6% | 13% | SEIA ($1K/yr) best option |
-| **Equipment** | **377,523** | — | — | 91% have manufacturer, 55% have model |
+| **location_precision** | **563,530** | **100%** | 100% | — |
+| **operator_name** | **560,287** | **99.4%** | 99%+ | **+428,678 (HIFLD spatial join)** |
+| county | 550,734 | 97.7% | 98%+ | — |
+| city | 512,462 | 90.9% | 91%+ | — |
+| **mount_type** | **509,488** | **90.4%** | 91%+ | **+412,405 (heuristic classification)** |
+| install_date | 458,826 | 81.4% | 82%+ | — |
+| address | 428,729 | 76.1% | 77% | — |
+| lat/lng | 414,724 | 73.6% | 74%+ | — |
+| zip_code | 380,805 | 67.6% | 68%+ | — |
+| **developer_name** | **346,617** | **61.5%** | 62%+ | **+326,396 (installer inference)** |
+| installer_name | 337,349 | 59.9% | 60%+ | — |
+| capacity_mw | 331,486 | 58.8% | 59%+ | — |
+| total_cost | 281,892 | 50.0% | 50%+ | — |
+| owner_name | 161,226 | 28.6% | 35%+ | Enrichment in progress |
+| cost_per_watt | 152,716 | 27.1% | 28% | — |
+| **Equipment** | **433,700** | — | — | 91% manufacturer, 55% model |
 | **Events** | **3,231,267** | — | — | 3.2M storm + 3.2K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
