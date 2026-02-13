@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Pagination } from "@/types/solar";
 
@@ -140,25 +140,8 @@ function EquipmentContent() {
     setPage(1);
   };
 
-  const sorted = useMemo(() => {
-    return [...results].sort((a, b) => {
-      let av: string | number = "";
-      let bv: string | number = "";
-      switch (sortKey) {
-        case "equipment_type": av = a.equipment_type; bv = b.equipment_type; break;
-        case "manufacturer": av = a.manufacturer || ""; bv = b.manufacturer || ""; break;
-        case "technology": av = a.module_technology || ""; bv = b.module_technology || ""; break;
-        case "site": av = a.installation.site_name || ""; bv = b.installation.site_name || ""; break;
-        case "location": av = a.installation.state || ""; bv = b.installation.state || ""; break;
-        case "capacity": av = Number(a.installation.capacity_mw) || 0; bv = Number(b.installation.capacity_mw) || 0; break;
-        case "year": av = a.installation.install_date || ""; bv = b.installation.install_date || ""; break;
-      }
-      const cmp = typeof av === "number" && typeof bv === "number"
-        ? av - bv
-        : String(av).localeCompare(String(bv));
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-  }, [results, sortKey, sortDir]);
+  // Server handles sorting — just use results directly
+  const sorted = results;
 
   return (
     <div className="space-y-6">

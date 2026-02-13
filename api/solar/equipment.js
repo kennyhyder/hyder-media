@@ -68,7 +68,8 @@ export default async function handler(req, res) {
     const ascending = order !== "desc";
 
     if (installationSorts.includes(sort)) {
-      query = query.order(sort, { ascending, nullsFirst: false, referencedTable: "solar_installations" });
+      // Use parenthetical syntax to sort parent equipment rows by installation column
+      query = query.order(`installation(${sort})`, { ascending, nullsFirst: false });
     } else {
       const sortCol = validSorts.includes(sort) ? sort : "manufacturer";
       query = query.order(sortCol, { ascending, nullsFirst: false });
