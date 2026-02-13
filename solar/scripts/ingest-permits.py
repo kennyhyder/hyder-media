@@ -757,6 +757,20 @@ CITIES = {
         "transform": "portland",
         "has_equipment": True,
     },
+    "nashville": {
+        "tier": 0,
+        "name": "Nashville, TN",
+        "state": "TN",
+        "county": "DAVIDSON",
+        "platform": "arcgis",
+        "base_url": "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Trade_Permits_View/FeatureServer/0",
+        "page_size": 1000,
+        "out_sr": "4326",
+        "filter": "UPPER(Permit_Subtype_Description) LIKE '%PHOTOVOLTAIC%'",
+        "prefix": "permit_nashville",
+        "transform": "nashville",
+        "has_equipment": True,
+    },
 
     # --- CKAN: Rich equipment data ---
     "virginia_beach": {
@@ -3857,6 +3871,103 @@ def transform_charlotte(record, data_source_id, config):
     return source_id, inst, None
 
 
+def transform_nashville(record, data_source_id, config):
+    """Nashville TN — ArcGIS FeatureServer Trade Permits with dedicated PV subtypes.
+
+    Fields: PermitNumber, Permit_Subtype_Description, Address, City, State, Zip,
+    Contact (installer), Purpose (equipment details), Contract_Value, Date_Issued,
+    Case_Status. Geometry is TN State Plane but outSR=4326 gives WGS84.
+    """
+    permit_num = record.get("PermitNumber", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_nashville_{permit_num}"
+
+    purpose = (record.get("Purpose") or "").strip()
+    subtype = (record.get("Permit_Subtype_Description") or "").strip()
+
+    if is_solar_false_positive(purpose):
+        return None, None, None
+
+    # Determine site type from subtype
+    site_type = "commercial"
+    if "RESIDENTIAL" in subtype.upper():
+        site_type = "residential"
+
+    # Installer from Contact field
+    installer = (record.get("Contact") or "").strip() or None
+
+    # Coordinates from geometry (outSR=4326)
+    lat = safe_float(record.get("_lat"))
+    lng = safe_float(record.get("_lng"))
+
+    # Extract capacity from Purpose field
+    capacity_kw = parse_capacity_from_description(purpose)
+
+    # Mount type detection from Purpose
+    mount_type = None
+    upper_purpose = purpose.upper()
+    if "GROUND" in upper_purpose:
+        mount_type = "ground"
+    elif "ROOF" in upper_purpose or "ROOFTOP" in upper_purpose:
+        mount_type = "rooftop"
+    elif "CARPORT" in upper_purpose or "CANOPY" in upper_purpose:
+        mount_type = "carport"
+
+    # Battery detection from Purpose
+    has_battery = bool(re.search(r'powerwall|battery|energy\s+storage|ess|kwh', purpose, re.IGNORECASE))
+
+    # Cost
+    cost = safe_float(record.get("Contract_Value"))
+
+    inst = make_installation(
+        source_id, config,
+        address=record.get("Address", ""),
+        city=record.get("City", "Nashville"),
+        zip_code=record.get("Zip", ""),
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("Date_Issued")),
+        site_type=site_type,
+        installer_name=installer,
+        total_cost=cost,
+        data_source_id=data_source_id,
+        has_battery_storage=has_battery,
+    )
+    inst["mount_type"] = mount_type
+
+    # Extract equipment from Purpose field
+    equip = []
+    # Panel pattern: "7 SILFAB SOLAR SIL-430 QD" or "20 LG LG400N2W panels"
+    m = re.search(r'(\d+)\s*(?:x\s*)?([A-Z][A-Za-z\s]+?)\s+(\S+)\s+(?:\d+[Ww]|panel|module)', purpose, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "module",
+            "manufacturer": m.group(2).strip(),
+            "model": m.group(3).strip(),
+        })
+    # Inverter pattern: "Enphase IQ8PLUS-72-2-US" or "SolarEdge SE7600H"
+    m = re.search(r'(Enphase|SolarEdge|SMA|Fronius|Tesla|Generac|Huawei|GoodWe|Delta|Sungrow)\s+([A-Z0-9][\w\-\.]+)', purpose, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "inverter",
+            "manufacturer": m.group(1).strip(),
+            "model": m.group(2).strip(),
+        })
+    # Racking pattern: "Unirac NXT" or "IronRidge XR100"
+    m = re.search(r'(Unirac|IronRidge|SnapNrack|Quick\s*Mount|Pegasus|Everest)\s+([A-Z0-9][\w\-\.]+)', purpose, re.IGNORECASE)
+    if m:
+        equip.append({
+            "equipment_type": "racking",
+            "manufacturer": m.group(1).strip(),
+            "model": m.group(2).strip(),
+        })
+
+    return source_id, inst, equip if equip else None
+
+
 def transform_portland(record, data_source_id, config):
     """Portland OR — ArcGIS MapServer Layer 4 with rich descriptions and equipment data.
     Note: PERMIT field is permit TYPE (e.g. 'Residential 1 & 2 Family Permit'), not number.
@@ -4408,6 +4519,7 @@ TRANSFORMERS = {
     "louisville": transform_louisville,
     "columbus": transform_columbus,
     "charlotte": transform_charlotte,
+    "nashville": transform_nashville,
     "portland": transform_portland,
     "virginia_beach": transform_virginia_beach,
     "boston_ckan": transform_boston_ckan,
