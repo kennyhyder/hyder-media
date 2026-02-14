@@ -1185,7 +1185,7 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 | 21 | **Columbus, OH** | ArcGIS | ~200+ | Applicant business name, address, issued date, geometry | `maps2.columbus.gov/arcgis/rest/services/Schemas/BuildingZoning/MapServer/5` |
 
 **UPGRADE opportunities for existing cities:**
-- **Honolulu HI**: New dataset `4vab-c87q` at `data.honolulu.gov` has 68,234 solar records with boolean `solarvpinstallation='Y'` filter. Current scraper uses different endpoint with ~3,355 records. **10x improvement possible.**
+- **Honolulu HI**: Dataset `4vab-c87q` has 68,234 total PV records but 64,493 are residential. Current scraper already captures all 3,737 commercial records correctly. No upgrade needed.
 - **San Antonio TX**: Already in system via ArcGIS but CKAN API has 14,885 dedicated solar permits with installer names. May supplement existing records.
 - **Boston MA**: Already in system via BLDS (4,091 records) but CKAN API has ~3K+ solar with MUCH richer equipment data in comments field (manufacturer+model for panels AND inverters). Worth adding as second endpoint.
 
