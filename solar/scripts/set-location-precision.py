@@ -648,6 +648,41 @@ def main():
     print(f"  City: {epa_city}")
     print(f"  State: {epa_state}")
 
+    # Step 15: San Diego City CSV records → classify by data quality
+    print("\n15. San Diego City CSV → classify by data quality")
+    offset = 0
+    sdcity_exact = 0
+    sdcity_address = 0
+    sdcity_city = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude,address,city",
+            "source_record_id": "like.sdcity_*",
+            "location_precision": "is.null",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        exact_ids = [r["id"] for r in records if r.get("latitude") and r.get("longitude")]
+        address_ids = [r["id"] for r in records if not (r.get("latitude") and r.get("longitude")) and r.get("address")]
+        city_ids = [r["id"] for r in records if not (r.get("latitude") and r.get("longitude")) and not r.get("address") and r.get("city")]
+        if exact_ids:
+            update_precision_batch(exact_ids, "exact")
+            sdcity_exact += len(exact_ids)
+        if address_ids:
+            update_precision_batch(address_ids, "address")
+            sdcity_address += len(address_ids)
+        if city_ids:
+            update_precision_batch(city_ids, "city")
+            sdcity_city += len(city_ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact (coords): {sdcity_exact}")
+    print(f"  Address only: {sdcity_address}")
+    print(f"  City only: {sdcity_city}")
+
     # ================================================================
     # Summary
     # ================================================================
@@ -655,9 +690,9 @@ def main():
     print("\n" + "=" * 60)
     print("Location Precision Summary")
     print("=" * 60)
-    print(f"  Exact (real coordinates): {uspvdb_count + eia_exact + nysun_exact + lbnl_count + njdep_count + permit_exact}")
-    print(f"  Address (geocodable): {eia_address + permit_address + va_address}")
-    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city + permit_city + nrel_city + epa_city}")
+    print(f"  Exact (real coordinates): {uspvdb_count + eia_exact + nysun_exact + lbnl_count + njdep_count + permit_exact + sdcity_exact}")
+    print(f"  Address (geocodable): {eia_address + permit_address + va_address + sdcity_address}")
+    print(f"  City-level: {eia_city + nysun_city + tts_city + ca_city + ma_city + permit_city + nrel_city + epa_city + sdcity_city}")
     print(f"  Zip-level: {tts_zip + ca_zip + il_zip + ma_zip + permit_zip}")
     print(f"  County-level: {ca_county + iso_county}")
     print(f"  State-level: {permit_state + nrel_state + va_state + epa_state}")
