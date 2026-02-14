@@ -187,7 +187,7 @@ CITIES = {
         "base_url": "https://maps.phoenix.gov/pub/rest/services/Public/Planning_Permit/MapServer/1",
         "page_size": 2000,
         "out_sr": "4326",
-        "filter": "UPPER(PERMIT_NAME) LIKE '%SOLAR%'",
+        "filter": "PER_TYPE IN ('RPV','F193','F194','F209','F800')",
         "prefix": "permit_phoenix",
         "transform": "phoenix",
     },
@@ -999,6 +999,87 @@ CITIES = {
         "prefix": "cambridge_solar",
         "transform": "cambridge_installations",
     },
+    # --- Session 18 additions ---
+    "richmond_va": {
+        "tier": 1,
+        "name": "Richmond, VA",
+        "state": "VA",
+        "county": "RICHMOND CITY",
+        "platform": "socrata",
+        "base_url": "https://www.transparentrichmond.org/resource/pj9s-n7wb.json",
+        "page_size": 1000,
+        "filter": "$where=subtype='SOLAR'",
+        "prefix": "permit_richmond_va",
+        "transform": "richmond_va",
+    },
+    "cincinnati": {
+        "tier": 1,
+        "name": "Cincinnati, OH",
+        "state": "OH",
+        "county": "HAMILTON",
+        "platform": "socrata",
+        "base_url": "https://data.cincinnati-oh.gov/resource/cfkj-xb9y.json",
+        "page_size": 1000,
+        "filter": "$where=UPPER(companyname) LIKE '%25SOLAR%25' OR UPPER(companyname) LIKE '%25SUNRUN%25' OR UPPER(companyname) LIKE '%25TESLA%25' OR UPPER(companyname) LIKE '%25PHOTOVOLTAIC%25'",
+        "prefix": "permit_cincinnati",
+        "transform": "cincinnati",
+    },
+    "ny_large_renewable": {
+        "tier": 0,
+        "name": "NY Large-Scale Renewable (NYSERDA)",
+        "state": "NY",
+        "platform": "socrata",
+        "base_url": "https://data.ny.gov/resource/dprp-55ye.json",
+        "page_size": 1000,
+        "filter": "$where=renewable_technology='Solar'",
+        "prefix": "nyserda_lsr",
+        "transform": "ny_large_renewable",
+    },
+    "virginia_deq": {
+        "tier": 0,
+        "name": "Virginia DEQ Renewable Energy",
+        "state": "VA",
+        "platform": "socrata",
+        "base_url": "https://data.virginia.gov/resource/8f983ea2-1e38-4281-ad26-f6477a3a4966.json",
+        "page_size": 1000,
+        "filter": "",
+        "prefix": "vadeq",
+        "transform": "virginia_deq",
+    },
+    "memphis": {
+        "tier": 1,
+        "name": "Memphis/Shelby County, TN",
+        "state": "TN",
+        "county": "SHELBY",
+        "platform": "opendatasoft",
+        "base_url": "https://datamidsouth.opendatasoft.com/api/explore/v2.1/catalog/datasets/shelby-county-building-and-demolition-permits/records",
+        "page_size": 100,
+        "filter": "where=description%20like%20%27SOLAR%27%20OR%20description%20like%20%27solar%27%20OR%20description%20like%20%27Solar%27%20OR%20description%20like%20%27PHOTOVOLTAIC%27",
+        "prefix": "permit_memphis",
+        "transform": "memphis",
+    },
+    "hawaii_energy": {
+        "tier": 0,
+        "name": "Hawaii Energy Projects Directory",
+        "state": "HI",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/HQ0xoN0EzDPBOEci/arcgis/rest/services/Statewide_Energy_Project_Directory/FeatureServer/0",
+        "page_size": 1000,
+        "filter": "Technology LIKE '%Solar%'",
+        "prefix": "hi_energy",
+        "transform": "hawaii_energy",
+    },
+    "md_clean_energy": {
+        "tier": 1,
+        "name": "Maryland Clean Energy Grants",
+        "state": "MD",
+        "platform": "socrata",
+        "base_url": "https://opendata.maryland.gov/resource/4jem-ugpy.json",
+        "page_size": 1000,
+        "filter": "$where=technology='Solar PV' AND capacity > 25",
+        "prefix": "md_ceg",
+        "transform": "md_clean_energy",
+    },
 }
 
 
@@ -1104,16 +1185,23 @@ def fetch_opendatasoft(config):
     offset = 0
     while True:
         url = f"{config['base_url']}?limit={config['page_size']}&offset={offset}"
+        if config.get("filter"):
+            url += "&" + config["filter"]
         req = urllib.request.Request(url)
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode())
-        batch = data.get("records", [])
+        # v2.1 API uses "results", v2 uses "records"
+        batch = data.get("results", data.get("records", []))
         if not batch:
             break
         for rec in batch:
-            fields = rec.get("record", {}).get("fields", {})
-            if not fields:
-                fields = rec.get("fields", {})
+            # v2.1: flat record, v2: nested under record.fields
+            if "record" in rec and "fields" in rec.get("record", {}):
+                fields = rec["record"]["fields"]
+            elif "fields" in rec:
+                fields = rec["fields"]
+            else:
+                fields = rec  # v2.1 returns flat records
             records.append(fields)
         offset += len(batch)
         total = data.get("total_count", 0)
@@ -1133,9 +1221,9 @@ def fetch_socrata(config):
         params = f"$limit={config['page_size']}&$offset={offset}"
         if config.get("filter"):
             params += "&" + config["filter"]
-        safe_chars = "$=&%'()"
+        safe_chars = "$=&%'()<>,"
         url = f"{config['base_url']}?{urllib.parse.quote(params, safe=safe_chars)}"
-        req = urllib.request.Request(url)
+        req = urllib.request.Request(url, headers={"User-Agent": "SolarTrack/1.0"})
         try:
             with urllib.request.urlopen(req) as resp:
                 data = json.loads(resp.read().decode())
@@ -4670,6 +4758,323 @@ def transform_san_diego_county(record, data_source_id, config):
     return source_id, inst, equipment if equipment else None
 
 
+def transform_richmond_va(record, data_source_id, config):
+    """Richmond VA — Socrata with dedicated SOLAR subtype, geocoded, equipment in desc."""
+    permit_no = record.get("permit_no", "") or record.get("permitno", "")
+    if not permit_no:
+        return None, None, None
+
+    source_id = f"permit_richmond_va_{permit_no}"
+    desc = record.get("description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Coordinates from geocoded_column Point
+    lat = None
+    lng = None
+    geo = record.get("geocoded_column")
+    if isinstance(geo, dict):
+        coords = geo.get("coordinates", [])
+        if len(coords) == 2:
+            lng = safe_float(coords[0])
+            lat = safe_float(coords[1])
+    if not lat:
+        lat = safe_float(record.get("latitude"))
+    if not lng:
+        lng = safe_float(record.get("longitude"))
+
+    addr = record.get("site_address", "") or ""
+    city = record.get("site_city", "") or "Richmond"
+    zip_code = record.get("site_zip", "") or ""
+    cost = safe_float(record.get("jobvalue"))
+
+    # Determine site type from type field
+    ptype = str(record.get("type", "")).upper()
+    site_type = "commercial" if "COMMERCIAL" in ptype else "commercial"
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city,
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("issued") or record.get("finaled")),
+        total_cost=cost,
+        data_source_id=data_source_id,
+        site_type=site_type,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_cincinnati(record, data_source_id, config):
+    """Cincinnati OH — Socrata with lat/lng, installer names, cost."""
+    permit_num = record.get("permitnum", "")
+    if not permit_num:
+        return None, None, None
+
+    source_id = f"permit_cincinnati_{permit_num}"
+
+    # Check installer name for solar company indicators
+    company = record.get("companyname", "") or ""
+
+    lat = safe_float(record.get("latitude"))
+    lng = safe_float(record.get("longitude"))
+    addr = record.get("originaladdress1", "") or ""
+    city = record.get("originalcity", "") or "Cincinnati"
+    state = record.get("originalstate", "") or "OH"
+    zip_code = record.get("originalzip", "") or ""
+    cost = safe_float(record.get("estprojectcostdec"))
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city=city,
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=None,
+        install_date=safe_date(record.get("issueddate")),
+        installer_name=company if company else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
+def transform_ny_large_renewable(record, data_source_id, config):
+    """NY Large-Scale Renewable (NYSERDA) — utility-scale solar with developer names."""
+    project_name = record.get("project_name", "")
+    if not project_name:
+        return None, None, None
+
+    # Use project name + developer as unique key
+    developer = record.get("developer_name", "") or record.get("seller_lead_party", "") or ""
+    key = re.sub(r'[^a-z0-9]', '_', project_name.lower())[:60]
+    source_id = f"nyserda_lsr_{key}"
+
+    capacity_mw = safe_float(record.get("new_renewable_capacity_mw"))
+    capacity_kw = capacity_mw * 1000 if capacity_mw else None
+
+    # Coordinates from georeference Point
+    lat = None
+    lng = None
+    geo = record.get("georeference")
+    if isinstance(geo, dict):
+        coords = geo.get("coordinates", [])
+        if len(coords) == 2:
+            lng = safe_float(coords[0])
+            lat = safe_float(coords[1])
+
+    county = record.get("county_province", "")
+    zip_code = record.get("zip_code", "")
+    status = str(record.get("project_status", "")).lower()
+    site_status = "active" if "oper" in status else "proposed"
+
+    counterparty = record.get("counterparty", "")  # Legal entity
+
+    inst = make_installation(
+        source_id, config,
+        site_name=project_name,
+        site_type="utility",
+        county=county.upper() if county else None,
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("year_of_delivery")),
+        developer_name=developer if developer else None,
+        owner_name=counterparty if counterparty else None,
+        data_source_id=data_source_id,
+        site_status=site_status,
+    )
+    return source_id, inst, None
+
+
+def transform_virginia_deq(record, data_source_id, config):
+    """Virginia DEQ Renewable Energy — utility-scale solar permits with capacity."""
+    project_name = record.get("project_name", "") or record.get("name", "")
+    if not project_name:
+        return None, None, None
+
+    # Filter for solar only
+    energy_type = str(record.get("energy_type", "") or record.get("type", "")).lower()
+    if "solar" not in energy_type and "photovoltaic" not in energy_type:
+        return None, None, None
+
+    key = re.sub(r'[^a-z0-9]', '_', project_name.lower())[:60]
+    source_id = f"vadeq_{key}"
+
+    capacity_mw = safe_float(record.get("capacity_mw") or record.get("nameplate_capacity_mw"))
+    capacity_kw = capacity_mw * 1000 if capacity_mw else None
+
+    county = record.get("county", "") or record.get("locality", "")
+    status = str(record.get("status", "")).lower()
+    site_status = "active" if "oper" in status or "approv" in status else "proposed"
+
+    inst = make_installation(
+        source_id, config,
+        site_name=project_name,
+        site_type="utility",
+        county=county.upper() if county else None,
+        capacity_kw=capacity_kw,
+        data_source_id=data_source_id,
+        site_status=site_status,
+    )
+    return source_id, inst, None
+
+
+def transform_memphis(record, data_source_id, config):
+    """Memphis/Shelby County TN — OpenDataSoft with lat/lng, cost, contractor."""
+    record_id = record.get("record_id", "") or record.get("permit_key", "")
+    if not record_id:
+        return None, None, None
+
+    source_id = f"permit_memphis_{record_id}"
+    desc = record.get("description", "") or ""
+
+    if is_solar_false_positive(desc):
+        return None, None, None
+
+    capacity_kw = parse_capacity_from_description(desc)
+    panels, watts = parse_panels_from_description(desc)
+
+    # Coordinates
+    lat = safe_float(record.get("lat"))
+    lng = safe_float(record.get("lon"))
+    # Also check centroid geometry
+    if not lat:
+        centroid = record.get("centroid")
+        if isinstance(centroid, dict):
+            lat = safe_float(centroid.get("lat"))
+            lng = safe_float(centroid.get("lon"))
+
+    addr = record.get("property_address", "") or ""
+    zip_code = record.get("zip_code", "") or ""
+    cost = safe_float(record.get("estimate_cost"))
+    contractor = record.get("business_name_contact", "") or record.get("business_name_prof", "")
+
+    inst = make_installation(
+        source_id, config,
+        address=addr,
+        city="Memphis",
+        zip_code=zip_code,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(record.get("date_status") or record.get("year")),
+        installer_name=contractor if contractor else None,
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+
+    equipment = []
+    if panels:
+        eq = {"equipment_type": "module", "quantity": panels}
+        if watts:
+            eq["specs"] = {"watts": watts}
+        equipment.append(eq)
+
+    return source_id, inst, equipment if equipment else None
+
+
+def transform_hawaii_energy(record, data_source_id, config):
+    """Hawaii Energy Projects Directory — ArcGIS FeatureServer with developer, PPA, storage."""
+    attrs = record.get("attributes", record)
+    oid = attrs.get("OBJECTID", "")
+    project = attrs.get("Project", "") or ""
+    if not project:
+        return None, None, None
+
+    source_id = f"hi_energy_{oid}"
+    tech = str(attrs.get("Technology", "")).lower()
+    if "solar" not in tech:
+        return None, None, None
+
+    capacity_mw = safe_float(attrs.get("ProductionCapacityMWac"))
+    capacity_kw = capacity_mw * 1000 if capacity_mw else None
+    developer = attrs.get("Developers_", "") or ""
+    lat = safe_float(attrs.get("Latitude"))
+    lng = safe_float(attrs.get("Longitude"))
+    start_date = safe_date(attrs.get("ServiceStartDate"))
+    if not start_date:
+        year = attrs.get("ServiceStartYear")
+        if year:
+            start_date = f"{int(year)}-01-01"
+
+    status_raw = str(attrs.get("Status", "")).lower()
+    site_status = "active" if "operational" in status_raw else "proposed"
+
+    has_storage = bool(attrs.get("Storage_Capacity_MWhac_"))
+
+    inst = make_installation(
+        source_id, config,
+        site_name=project,
+        site_type="utility",
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=start_date,
+        developer_name=developer if developer else None,
+        data_source_id=data_source_id,
+        site_status=site_status,
+        has_battery_storage=has_storage,
+    )
+    return source_id, inst, None
+
+
+def transform_md_clean_energy(record, data_source_id, config):
+    """Maryland Clean Energy Grants — Socrata with capacity, cost, coordinates."""
+    # Use row index as unique ID since no permit number
+    city = record.get("city", "") or ""
+    zip_code = record.get("zip_code", "") or ""
+    capacity = safe_float(record.get("capacity"))
+    award_date = record.get("award_date", "") or record.get("actual_end_date", "")
+
+    # Build unique key from city+zip+capacity+date
+    key = f"{city}_{zip_code}_{capacity}_{award_date}"
+    key = re.sub(r'[^a-z0-9]', '_', key.lower())[:60]
+    source_id = f"md_ceg_{key}"
+
+    capacity_kw = capacity if capacity else None
+    cost = safe_float(record.get("total_project_cost"))
+    county = record.get("county", "") or ""
+
+    # Coordinates from location_1 nested object
+    lat, lng = None, None
+    loc = record.get("location_1")
+    if isinstance(loc, dict):
+        lat = safe_float(loc.get("latitude"))
+        lng = safe_float(loc.get("longitude"))
+
+    inst = make_installation(
+        source_id, config,
+        city=city,
+        zip_code=zip_code,
+        county=county.upper() if county else None,
+        latitude=lat,
+        longitude=lng,
+        capacity_kw=capacity_kw,
+        install_date=safe_date(award_date),
+        total_cost=cost,
+        data_source_id=data_source_id,
+    )
+    return source_id, inst, None
+
+
 # Transformer registry
 TRANSFORMERS = {
     "cambridge_rich": transform_cambridge_rich,
@@ -4725,6 +5130,13 @@ TRANSFORMERS = {
     "fort_collins": transform_fort_collins,
     "cambridge_installations": transform_cambridge_installations,
     "san_diego_county": transform_san_diego_county,
+    "richmond_va": transform_richmond_va,
+    "cincinnati": transform_cincinnati,
+    "ny_large_renewable": transform_ny_large_renewable,
+    "virginia_deq": transform_virginia_deq,
+    "memphis": transform_memphis,
+    "hawaii_energy": transform_hawaii_energy,
+    "md_clean_energy": transform_md_clean_energy,
 }
 
 

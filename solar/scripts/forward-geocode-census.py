@@ -24,6 +24,7 @@ import sys
 import json
 import csv
 import io
+import re
 import time
 import argparse
 import urllib.request
@@ -150,10 +151,59 @@ def is_valid_address(address):
 # Census batch geocoding
 # ---------------------------------------------------------------------------
 
+US_STATES = {
+    'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+    'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+    'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+    'VA','WA','WV','WI','WY','DC','PR',
+}
+
+
+def parse_inline_address(address):
+    """Parse addresses with embedded city/state/zip like '2120 N Marengo Avenue, Altadena CA 91001'.
+
+    Returns (street, city, state, zip) or (address, '', '', '') if unparseable.
+    """
+    if not address:
+        return ('', '', '', '')
+    addr = address.strip()
+
+    # Pattern: "Street, City ST ZIP" or "Street, City ST"
+    m = re.match(
+        r'^(.+?),\s+([A-Za-z ]+?)\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$',
+        addr
+    )
+    if m and m.group(3) in US_STATES:
+        return (m.group(1).strip(), m.group(2).strip(), m.group(3), m.group(4)[:5])
+
+    # Pattern without zip: "Street, City ST"
+    m = re.match(
+        r'^(.+?),\s+([A-Za-z ]+?)\s+([A-Z]{2})$',
+        addr
+    )
+    if m and m.group(3) in US_STATES:
+        return (m.group(1).strip(), m.group(2).strip(), m.group(3), '')
+
+    # Honolulu-style: "91-277 KALAELOA BLVD Kapolei 96707" (no comma, city then zip at end)
+    m = re.match(
+        r'^(.+?)\s+([A-Za-z ]+?)\s+(\d{5})$',
+        addr
+    )
+    if m:
+        street = m.group(1).strip()
+        city_candidate = m.group(2).strip()
+        # Only use if city part is a single word (to avoid misparse)
+        if ' ' not in city_candidate and len(city_candidate) >= 3:
+            return (street, city_candidate, '', m.group(3))
+
+    return (addr, '', '', '')
+
+
 def build_census_csv(records):
     """Build CSV string for Census batch geocoder.
 
     Format: Unique ID, Street address, City, State, ZIP
+    Parses inline addresses (e.g., "Street, City ST ZIP") when city/zip columns are NULL.
     """
     output = io.StringIO()
     writer = csv.writer(output)
@@ -163,6 +213,19 @@ def build_census_csv(records):
         city = (rec.get("city") or "").strip()
         state = (rec.get("state") or "").strip()
         zip_code = str(rec.get("zip_code") or "").strip()[:5]
+
+        # If city or zip missing, try parsing from inline address
+        if (not city or not zip_code) and address:
+            parsed_street, parsed_city, parsed_state, parsed_zip = parse_inline_address(address)
+            if parsed_city and not city:
+                city = parsed_city
+                address = parsed_street
+            if parsed_zip and not zip_code:
+                zip_code = parsed_zip
+                address = parsed_street
+            if parsed_state and not state:
+                state = parsed_state
+
         writer.writerow([rec_id, address, city, state, zip_code])
     return output.getvalue()
 
@@ -394,6 +457,18 @@ def main():
                 "longitude": r["lon"],
                 "location_precision": "exact",
             }
+
+            # Also backfill city/zip if they were parsed from inline address
+            address = (rec.get("address") or "").strip()
+            existing_city = (rec.get("city") or "").strip()
+            existing_zip = str(rec.get("zip_code") or "").strip()
+            if (not existing_city or not existing_zip) and address:
+                _, parsed_city, parsed_state, parsed_zip = parse_inline_address(address)
+                if parsed_city and not existing_city:
+                    patch_data["city"] = parsed_city
+                if parsed_zip and not existing_zip:
+                    patch_data["zip_code"] = parsed_zip
+
             patches.append((rec_id, patch_data))
 
         patched = 0

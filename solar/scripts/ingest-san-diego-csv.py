@@ -88,7 +88,7 @@ BATTERY_PATTERN = re.compile(r'batter[yi]|powerwall|storage|encharge|bess|ess\b'
 # Supabase helpers
 # ---------------------------------------------------------------------------
 
-def supabase_get(table, params):
+def supabase_get(table, params, retries=3):
     url = f"{SUPABASE_URL}/rest/v1/{table}"
     if params:
         url += "?" + "&".join(
@@ -98,9 +98,18 @@ def supabase_get(table, params):
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
     }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode())
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            if attempt < retries - 1:
+                wait = 2 ** (attempt + 1)
+                print(f"    Retry {attempt+1}/{retries} after {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_post(table, records):
@@ -155,8 +164,32 @@ def get_data_source_id(name):
 
 
 def get_existing_source_ids(prefix):
-    """Get existing source_record_ids with given prefix."""
+    """Get existing source_record_ids with given prefix via psql (fast for large sets)."""
+    import subprocess
     existing = set()
+    try:
+        psql_cmd = [
+            "psql",
+            "-h", "aws-0-us-west-2.pooler.supabase.com",
+            "-p", "6543",
+            "-U", "postgres.ilbovwnhrowvxjdkvrln",
+            "-d", "postgres",
+            "-t", "-A",
+            "-c", f"SELECT source_record_id FROM solar_installations WHERE source_record_id LIKE '{prefix}_%'"
+        ]
+        env = os.environ.copy()
+        env["PGPASSWORD"] = "#FsW7iqg%EYX&G3M"
+        result = subprocess.run(psql_cmd, capture_output=True, text=True, env=env, timeout=120)
+        if result.returncode == 0:
+            for line in result.stdout.strip().split("\n"):
+                if line.strip():
+                    existing.add(line.strip())
+            print(f"  Loaded {len(existing):,} existing IDs via psql")
+            return existing
+    except Exception as e:
+        print(f"  psql failed ({e}), falling back to REST API")
+
+    # Fallback to REST API
     offset = 0
     while True:
         batch = supabase_get("solar_installations", {

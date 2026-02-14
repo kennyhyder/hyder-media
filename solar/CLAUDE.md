@@ -181,7 +181,11 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 15 | **EPA RE-Powering** | `ingest-epa-repowering.py` | 548 | `epa_repower_` | Brownfield/landfill solar. 100% owner + developer + capacity. |
 | 16 | **NREL Community Solar** | `ingest-nrel-community.py` | 3,938 | `nrel_cs_` | Sharing the Sun database. Developer (86%), utility (100%). |
 
-**Grand Total: ~641,784 installations, ~471,611 equipment records, ~3,651,204 events, 18 primary sources + 71 permit portals**
+| 17 | **MN PUC DER** | `ingest-mn-puc.py` | 7,072 | `mnpuc_` | Excel | >=25 kW non-residential solar | Annual |
+| 18 | **PA AEPS** | `ingest-pa-aeps.py` | 3,460 | `paaeps_` | CSV | SUN fuel, >=25 kW | Quarterly |
+| 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
+
+**Grand Total: ~709,759 installations, ~480,144 equipment records, ~3,900,707 events, 23 primary sources + 75 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -241,6 +245,16 @@ python3 -u scripts/forward-geocode-census.py --limit 1000  # Process first N
 # Permit equipment extraction
 python3 -u scripts/parse-permit-equipment.py          # Extract equipment from permit descriptions
 python3 -u scripts/parse-permit-equipment.py --dry-run # Preview without creating records
+
+# State-level solar programs (Feb 13, 2026)
+python3 -u scripts/ingest-mn-puc.py                # MN PUC DER data (7K records, utility/cost/city)
+python3 -u scripts/ingest-mn-puc.py --dry-run       # Preview
+python3 -u scripts/ingest-pa-aeps.py                # PA AEPS qualified facilities (3.5K records)
+python3 -u scripts/ingest-pa-aeps.py --dry-run       # Preview
+python3 -u scripts/ingest-nc-ncuc.py                # NC NCUC registrations (1.5K records, owner names)
+python3 -u scripts/ingest-nc-ncuc.py --dry-run       # Preview
+python3 -u scripts/ingest-permits.py --city hawaii_energy   # Hawaii Energy (93 utility-scale, developer+PPA)
+python3 -u scripts/ingest-permits.py --city md_clean_energy # Maryland Clean Energy grants (162 records)
 
 # Data quality audit
 python3 -u scripts/data-quality-audit.py              # Full audit report
@@ -777,64 +791,41 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 13, 2026 — Session 17)
+### In Progress (Feb 13, 2026 — Session 18)
 1. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
 
-### Completed This Session (Session 17)
-2. **Full enrichment pipeline on 641K database**: All enrichment scripts re-run after Session 16 SD City ingestion
-   - eGRID: 5,440 patches (owner names via coordinate matching), 0 errors
-   - WREGIS: 242 owner patches, 0 errors
-   - PJM-GATS: 145 owner patches, 0 errors
-   - GEM: 24 patches (22 owner, 4 operator), 0 errors
-   - LBNL: 9 developer patches, 0 errors
-   - OSM: 11 patches (10 site names, 1 operator), 0 errors
-   - CEC equipment specs: 1,465 enrichments, 0 errors
-   - CPSC recalls: 5 new events (3,211 existing correctly deduped), 0 errors
-   - Cross-source dedup: 6,175 patches (5,314 location, 472 developer, 434 crossref, 80 owner, 30 installer), 0 errors
-3. **NOAA storm events for new records**: 421,828 new events for SD City + Leon County records, 0 errors
-   - Total events: 3,651,204 (1.42M hail + 234K severe + 1.99M wind + 3.2K recall + 80 generator)
-   - Fixed NOAA script: Added psql-based dedup check (instant for 3.2M events) + retry logic for Supabase 502s
-4. **Next.js site rebuilt**: Static pages regenerated with 641K stats
-5. **Git pushed**: 4 Session 16 commits pushed to origin/main
-
-### Completed Last Session (Session 16)
-6. **San Diego City CSV ingestion**: 76,936 solar permits from seshat.datasd.org — **largest single ingestion ever**
-7. **Leon County FL CivicData CKAN**: 714 records + 20 equipment, 0 errors
-8. **San Diego County transform upgrade**: 876 equipment records from structured `use` field
-9. **Location precision restored**: 100% coverage via new sdcity_* handler
-10. **Mount type heuristic**: 76,964 new rooftop classifications
-11. **Developer inference**: 76,435 via SQL installer→developer copy
+### Completed This Session (Session 18)
+2. **4 new permit cities**: Richmond VA (3,775), Cincinnati OH (590), NYSERDA Large-Scale (136), Memphis TN (214)
+3. **Phoenix AZ filter fix**: +9,215 records from PER_TYPE code expansion
+4. **SD City Set 1 confirmed**: All duplicates of Set 2 — 0 new records
+5. **Gap state research**: 13 states swept, only Memphis TN viable. Permit scraping at diminishing returns.
+6. **Enrichment pipeline on 697K**: eGRID (2,959), cross-source dedup (947), NOAA storms (249,499), CEC (64), CPSC (4), Census geocoding (551)
+7. **Bug fixes**: Retry logic added to eGRID + CPSC `supabase_get()`, OpenDataSoft v2.1 API format fix
+8. **Next.js site rebuilt**: Static pages regenerated with 697K stats
 
 ### Short-term
-12. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
-13. **NLCD/NAIP for remaining mount_type**: 14,619 ambiguous records with exact coords
+9. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+10. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
 
 ### Medium-term
-14. **CivicData BLDS expansion**: Lee County FL, Brevard County FL, Manatee County FL
-15. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-16. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
-17. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
+11. **CivicData BLDS expansion**: Lee County FL, Brevard County FL, Manatee County FL
+12. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+13. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 13, 2026 — Session 17)
+### Data Gap Summary (Feb 13, 2026 — Session 19)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **641,784** | **100.0%** | Restored in Session 16 |
-| county | 634,152 | 98.8% | Near maximum |
-| city | 620,527 | 96.7% | Near maximum |
-| **operator_name** | **563,066** | **87.7%** | eGRID +5.4K this session |
-| **mount_type** | **587,739** | **91.6%** | Heuristic + satellite + source data |
-| lat/lng | 511,338 | 79.7% | Census geocoder + SD City |
-| address | 512,007 | 79.8% | SD City has addresses |
-| zip_code | 481,282 | 75.0% | |
-| install_date | 464,580 | 72.4% | Many SD City lack dates |
-| installer_name | 414,675 | 64.6% | SD City has installer names |
-| **developer_name** | **423,603** | **66.0%** | +472 from cross-source dedup |
-| capacity_mw | 374,041 | 58.3% | |
-| total_cost | 283,200 | 44.1% | |
-| **owner_name** | **182,631** | **28.5%** | eGRID +5.4K, WREGIS +242, PJM-GATS +145 |
-| cost_per_watt | 152,716 | 23.8% | |
-| **Equipment** | **471,611** | — | +18.8K from SD City set2_closed completion |
-| **Events** | **3,651,204** | — | 3.65M storm + 3.2K recall + 80 generator |
+| **location_precision** | **709,759** | **100.0%** | All records tagged |
+| county | ~697K | 98.2% | Near maximum |
+| city | ~688K | 96.9% | Near maximum |
+| **mount_type** | **587,739** | **82.8%** | Permits set rooftop + satellite classification |
+| **operator_name** | **576,583** | **81.2%** | Permits store contractor/applicant |
+| **lat/lng** | **564,480** | **79.5%** | Census geocoder + permit coords |
+| installer_name | 465,389 | 65.6% | Permits + TTS + CA DGStats |
+| **developer_name** | **425,953** | **60.0%** | Permits + dedup crossref (+1,955 this session) |
+| **owner_name** | **187,487** | **26.4%** | SEIA ($1K/yr) would boost significantly |
+| **Equipment** | **480,144** | — | 91% have manufacturer, 55% have model |
+| **Events** | **3,900,707** | — | 3.9M storm + 3.2K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -1543,3 +1534,120 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 **Other completed:**
 - Git pushed 4 Session 16 commits to origin/main
 - Next.js site rebuilt with updated 641K stats
+
+### Session 18 — Feb 13, 2026
+
+**New permit cities added:**
+- **Richmond, VA** (Socrata): 3,775 records + 1,321 equipment from `transparentrichmond.org`. Geocoded lat/lng, job value, equipment NLP from descriptions.
+- **Cincinnati, OH** (Socrata): 590 records from `data.cincinnati-oh.gov/resource/cfkj-xb9y`. Lat/lng, installer company name, cost. Ohio gap state coverage.
+- **NYSERDA Large-Scale Renewable** (Socrata): 136 records from `data.ny.gov`. Utility-scale with developer names, georeference Point, counterparty as owner.
+- **Memphis/Shelby County, TN** (OpenDataSoft): 214 records + 54 equipment from `datamidsouth.opendatasoft.com`. Tennessee gap state. Fixed ODS v2.1 API format (`results` not `records`, flat records not nested).
+- **Phoenix, AZ** (ArcGIS filter fix): 9,215 new records. Changed filter from `UPPER(PERMIT_NAME) LIKE '%SOLAR%'` to `PER_TYPE IN ('RPV','F193','F194','F209','F800')` to capture all solar permit types (RPV = Residential Photovoltaic).
+
+**SD City Set 1 — COMPLETED (no new records):**
+- All 1.17M rows from `set1_active.csv` and `set1_closed.csv` scanned
+- All solar records are duplicates of Set 2 (same PMT-XXXXXX permit IDs across sets)
+- Total SD City: 118,658 records unchanged
+
+**Gap state research completed:**
+- Swept 13 gap states (WI, GA, IN, SC, TN, IA, KS, NE, MS, AL, ID, MT, WV)
+- Only 3 viable sources found: Memphis/Shelby TN (ingested), Milwaukee WI (CSV, ~200-500), Kansas City MO (already ingested)
+- Most gap states have no public solar data. Best remaining: SEIA membership ($1K/yr)
+
+**Bug fixes:**
+- Added retry logic (3 attempts, exponential backoff, 60s timeout) to `enrich-egrid.py` and `enrich-cpsc-recalls.py` `supabase_get()`. Fixes HTTP 500 crashes when paginating 697K records.
+- Fixed OpenDataSoft fetcher: v2.1 API uses `results` key (not `records`), flat record objects (not nested under `record.fields`). Pre-encode URL filter spaces as `%20`.
+- Fixed eGRID `import time` for retry delays.
+
+**Enrichment Pipeline Re-run on 697K database — COMPLETED:**
+| Script | Patches | Notes |
+|--------|---------|-------|
+| eGRID | 2,959 | operator + owner via coord matching |
+| CPSC Recalls | 4 | New events (3,216 existing correctly deduped) |
+| CEC Equipment Specs | 64 | Module + inverter spec enrichments |
+| Cross-source dedup | 947 | 354 location, 677 crossref, 158 developer, 47 installer |
+| NOAA Storms | 249,499 | New events for ~140K new permit installations, 0 errors |
+| Census Geocoding | 551 | Addresses geocoded for new records |
+| County Derivation | 2 | Near maximum coverage |
+| **Total** | **254,026** | **0 errors across all scripts** |
+
+**Next.js Site — REBUILT:**
+- Static build successful, all 5 pages regenerated with updated 697K stats
+
+**Grand Total (Feb 13, 2026 — Session 18):**
+- **697,436 installations** across 96 data sources (18 primary + 75 permit portals)
+- **480,144 equipment records**
+- **3,900,707 events** (2.14M wind + 1.53M hail + 236K severe hail + 3.2K recall + 80 generator)
+- **80.4% with lat/lng coordinates**
+- **84.3% with mount_type** (mostly rooftop from permits + NREL classification)
+- **81.2% with operator_name** (mostly contractor/applicant from permits)
+- **Permit scraping at diminishing returns**: 75 portals nationwide, gap states researched exhaustively
+- **Droplet batch 3**: Still running autonomously on droplet
+
+### Session 19 — Feb 13, 2026
+
+**New state-level data sources ingested (5 new sources, +12,323 records):**
+
+| Source | Script | Records | Prefix | Key Fields |
+|--------|--------|---------|--------|------------|
+| **MN PUC DER** | `ingest-mn-puc.py` | 7,072 | `mnpuc_` | Utility (operator), capacity, city, zip, cost, year interconnected |
+| **PA AEPS** | `ingest-pa-aeps.py` | 3,460 | `paaeps_` | Facility name, county, zip, capacity MW DC/AC, utility (operator), cert date |
+| **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Company (owner), facility name, capacity kW, active/canceled status |
+| **Hawaii Energy** | `ingest-permits.py` | 93 | `hi_energy_` | Developer, PPA, lat/lng, storage, utility-scale only |
+| **MD Clean Energy** | `ingest-permits.py` | 162 | `md_ceg_` | Capacity, cost, lat/lng, county |
+
+**New scripts written:**
+- `ingest-mn-puc.py` — Minnesota PUC DER data from Excel. Exact normalized name matching for column headers (fixes "city" in "capacity" substring bug). Filters: solar, >= 25 kW, non-residential.
+- `ingest-pa-aeps.py` — Pennsylvania AEPS qualified facilities from CSV. 2 header note lines skipped. Filters: fuel=SUN, >= 25 kW.
+- `ingest-nc-ncuc.py` — NC NCUC renewable energy registrations from Excel. Header at row 6 (detects "Docket" keyword). Fixed column indices (0-6). Processes active + revoked/canceled sheets.
+- Hawaii Energy and Maryland Clean Energy added to `ingest-permits.py` with dedicated transforms.
+
+**Bug fixes this session:**
+- **MN PUC column mapping**: `find_col(["City"])` matched "DER.**Capacity**.kW.AC" via substring. Fixed with exact normalized name dictionary lookup (same bug as LBNL Session 2).
+- **NC NCUC header detection**: Multi-line title text in row 0 broke generic pattern matching. Fixed by detecting rows starting with "Docket" keyword.
+- **Maryland Socrata 403**: Added `User-Agent: SolarTrack/1.0` header to `fetch_socrata()`. Also added `<>,` to safe_chars for URL encoding.
+- **Supabase connection overload**: Running 6 enrichment scripts in parallel caused HTTP 500/RemoteDisconnected. Fixed by running scripts sequentially.
+
+**LBNL 2025 Update — No new records:**
+- Downloaded 2025 edition (56.9 MB, 59 sheets) from `data.openei.org`
+- All 1,775 records have identical EIA IDs to 2024 edition already in database
+- Net new: 0 records
+
+**Enrichment Pipeline Re-run on 709K database — COMPLETED:**
+| Script | Patches | Notes |
+|--------|---------|-------|
+| eGRID | 26 | 26 operator + 23 owner via coord matching |
+| LBNL Queued Up | 9 | Developer names via state+capacity |
+| PJM-GATS | 170 | Owner names from MSET utility prefixes |
+| CEC Equipment Specs | 13 | Module + inverter matches (near saturation) |
+| Cross-source dedup | 8,393 | 7,319 location, 1,955 developer, 151 crossref, 73 installer, 67 cost, 30 owner |
+| Location precision | 12,323 | All new records flagged (0 NULL remaining) |
+| **Total** | **20,934** | **0 errors across all scripts** |
+
+**Next.js Site — REBUILT:**
+- Static build successful, all 5 pages regenerated with updated 709K stats
+
+**Grand Total (Feb 13, 2026 — Session 19):**
+- **709,759 installations** across 101 data sources (23 primary + 75 permit portals + 3 state programs)
+- **480,144 equipment records** (91% have manufacturer, 55% have model)
+- **3,900,707 events** (2.14M wind + 1.53M hail + 236K severe hail + 3.2K recall + 80 generator)
+- **79.5% with lat/lng coordinates** (564,480)
+- **82.8% with mount_type** (587,739)
+- **81.2% with operator_name** (576,583)
+- **65.6% with installer_name** (465,389)
+- **60.0% with developer_name** (425,953)
+- **26.4% with owner_name** (187,487)
+- **100% location_precision coverage** (0 NULL)
+- **Droplet batch 3**: Still running autonomously on droplet
+
+### Running New Scripts
+```bash
+python3 -u scripts/ingest-mn-puc.py                # MN PUC DER data (7K records)
+python3 -u scripts/ingest-mn-puc.py --dry-run       # Preview
+python3 -u scripts/ingest-pa-aeps.py                # PA AEPS qualified facilities (3.5K records)
+python3 -u scripts/ingest-pa-aeps.py --dry-run       # Preview
+python3 -u scripts/ingest-nc-ncuc.py                # NC NCUC registrations (1.5K records)
+python3 -u scripts/ingest-nc-ncuc.py --dry-run       # Preview
+python3 -u scripts/ingest-permits.py --city hawaii_energy   # Hawaii Energy (93 records)
+python3 -u scripts/ingest-permits.py --city md_clean_energy # Maryland Clean Energy (162 records)
+```

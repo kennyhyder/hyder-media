@@ -648,8 +648,164 @@ def main():
     print(f"  City: {epa_city}")
     print(f"  State: {epa_state}")
 
-    # Step 15: San Diego City CSV records → classify by data quality
-    print("\n15. San Diego City CSV → classify by data quality")
+    # ================================================================
+    # Step 15: MN PUC DER → 'city' or 'zip' (city + zip, no coordinates)
+    # ================================================================
+    print("\n15. MN PUC DER → classify by data quality")
+    offset = 0
+    mn_exact = 0
+    mn_city = 0
+    mn_zip = 0
+    mn_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude,city,zip_code",
+            "source_record_id": "like.mnpuc_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        for r in records:
+            if r.get("latitude") and r.get("longitude"):
+                update_precision_batch([r["id"]], "exact")
+                mn_exact += 1
+            elif r.get("city"):
+                update_precision_batch([r["id"]], "city")
+                mn_city += 1
+            elif r.get("zip_code"):
+                update_precision_batch([r["id"]], "zip")
+                mn_zip += 1
+            else:
+                update_precision_batch([r["id"]], "state")
+                mn_state += 1
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact: {mn_exact}, City: {mn_city}, Zip: {mn_zip}, State: {mn_state}")
+
+    # ================================================================
+    # Step 16: PA AEPS → 'zip' or 'county' (county + zip, no coordinates)
+    # ================================================================
+    print("\n16. PA AEPS → classify by data quality")
+    offset = 0
+    pa_exact = 0
+    pa_zip = 0
+    pa_county = 0
+    pa_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude,zip_code,county",
+            "source_record_id": "like.paaeps_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        for r in records:
+            if r.get("latitude") and r.get("longitude"):
+                update_precision_batch([r["id"]], "exact")
+                pa_exact += 1
+            elif r.get("zip_code"):
+                update_precision_batch([r["id"]], "zip")
+                pa_zip += 1
+            elif r.get("county"):
+                update_precision_batch([r["id"]], "county")
+                pa_county += 1
+            else:
+                update_precision_batch([r["id"]], "state")
+                pa_state += 1
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact: {pa_exact}, Zip: {pa_zip}, County: {pa_county}, State: {pa_state}")
+
+    # ================================================================
+    # Step 17: NC NCUC → 'state' (state only, no coordinates)
+    # ================================================================
+    print("\n17. NC NCUC → 'state' (state only)")
+    offset = 0
+    nc_state = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id",
+            "source_record_id": "like.ncncuc_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        ids = [r["id"] for r in records]
+        update_precision_batch(ids, "state")
+        nc_state += len(ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  State: {nc_state}")
+
+    # ================================================================
+    # Step 18: Hawaii Energy → 'exact' (all have coordinates from ArcGIS)
+    # ================================================================
+    print("\n18. Hawaii Energy → 'exact' (all have ArcGIS coordinates)")
+    offset = 0
+    hi_exact = 0
+    hi_city = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude",
+            "source_record_id": "like.hi_energy_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        exact_ids = [r["id"] for r in records if r.get("latitude") and r.get("longitude")]
+        city_ids = [r["id"] for r in records if not (r.get("latitude") and r.get("longitude"))]
+        if exact_ids:
+            update_precision_batch(exact_ids, "exact")
+            hi_exact += len(exact_ids)
+        if city_ids:
+            update_precision_batch(city_ids, "city")
+            hi_city += len(city_ids)
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact: {hi_exact}, City: {hi_city}")
+
+    # ================================================================
+    # Step 19: Maryland Clean Energy → classify by data quality
+    # ================================================================
+    print("\n19. Maryland Clean Energy → classify by data quality")
+    offset = 0
+    md_exact = 0
+    md_city = 0
+    md_zip = 0
+    while True:
+        records = supabase_get("solar_installations", {
+            "select": "id,latitude,longitude,city,zip_code",
+            "source_record_id": "like.md_ceg_*",
+            "limit": 1000,
+            "offset": offset,
+        })
+        if not records:
+            break
+        for r in records:
+            if r.get("latitude") and r.get("longitude"):
+                update_precision_batch([r["id"]], "exact")
+                md_exact += 1
+            elif r.get("city"):
+                update_precision_batch([r["id"]], "city")
+                md_city += 1
+            elif r.get("zip_code"):
+                update_precision_batch([r["id"]], "zip")
+                md_zip += 1
+        offset += 1000
+        if len(records) < 1000:
+            break
+    print(f"  Exact: {md_exact}, City: {md_city}, Zip: {md_zip}")
+
+    # Step 20: San Diego City CSV records → classify by data quality
+    print("\n20. San Diego City CSV → classify by data quality")
     offset = 0
     sdcity_exact = 0
     sdcity_address = 0

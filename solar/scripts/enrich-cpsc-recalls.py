@@ -21,6 +21,7 @@ Usage:
 import os
 import sys
 import json
+import time
 import uuid
 import argparse
 import urllib.request
@@ -129,7 +130,7 @@ SOLAR_RECALLS = [
 # Supabase helpers
 # ---------------------------------------------------------------------------
 
-def supabase_get(table, params):
+def supabase_get(table, params, retries=3):
     url = f"{SUPABASE_URL}/rest/v1/{table}"
     if params:
         url += "?" + "&".join(
@@ -139,9 +140,18 @@ def supabase_get(table, params):
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
     }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode())
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            if attempt < retries - 1:
+                wait = 2 ** (attempt + 1)
+                print(f"    Retry {attempt+1}/{retries} after {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_post(table, data):
