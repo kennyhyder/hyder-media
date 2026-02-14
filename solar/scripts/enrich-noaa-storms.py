@@ -25,6 +25,7 @@ import json
 import csv
 import gzip
 import uuid
+import time
 import argparse
 import urllib.request
 import urllib.parse
@@ -79,7 +80,7 @@ STATE_ABBREV = {
 # Supabase helpers
 # ---------------------------------------------------------------------------
 
-def supabase_get(table, params):
+def supabase_get(table, params, retries=3):
     url = f"{SUPABASE_URL}/rest/v1/{table}"
     if params:
         url += "?" + "&".join(
@@ -89,9 +90,18 @@ def supabase_get(table, params):
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
     }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode())
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            if attempt < retries - 1:
+                wait = 2 ** (attempt + 1)
+                print(f"    Retry {attempt+1}/{retries} after {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_post(table, data):
@@ -559,30 +569,61 @@ def main():
         return
 
     # Step 5: Load existing storm events to avoid duplicates
+    # Use psql for fast bulk check (REST API can't handle 3M+ events)
     print(f"\nChecking for existing storm events...")
     existing_keys = set()
-    offset = 0
-    page_size = 1000
-    while True:
-        rows = supabase_get("solar_site_events", {
-            "select": "installation_id,event_type,event_date",
-            "event_type": "in.(hail,severe_hail,high_wind)",
-            "limit": page_size,
-            "offset": offset,
-            "order": "id",
-        })
-        if not rows:
-            break
-        for r in rows:
-            existing_keys.add((r["installation_id"], r["event_type"], r["event_date"]))
-        offset += len(rows)
-        if len(rows) < page_size:
-            break
+    try:
+        import subprocess
+        psql_cmd = [
+            "psql",
+            "-h", "aws-0-us-west-2.pooler.supabase.com",
+            "-p", "6543",
+            "-U", "postgres.ilbovwnhrowvxjdkvrln",
+            "-d", "postgres",
+            "-t", "-A", "-F", "|",
+            "-c", "SELECT installation_id, event_type, event_date FROM solar_site_events WHERE event_type IN ('hail','severe_hail','high_wind')"
+        ]
+        env = os.environ.copy()
+        env["PGPASSWORD"] = "#FsW7iqg%EYX&G3M"
+        result = subprocess.run(psql_cmd, capture_output=True, text=True, env=env, timeout=120)
+        if result.returncode == 0:
+            for line in result.stdout.strip().split("\n"):
+                if "|" in line:
+                    parts = line.split("|")
+                    if len(parts) >= 3:
+                        existing_keys.add((parts[0], parts[1], parts[2]))
+            print(f"  Loaded {len(existing_keys):,} existing storm event keys via psql")
+        else:
+            print(f"  psql failed: {result.stderr[:200]}")
+            print(f"  Falling back to REST API dedup (may be slow)...")
+            # Fallback: load via REST with retries
+            offset = 0
+            page_size = 1000
+            while True:
+                rows = supabase_get("solar_site_events", {
+                    "select": "installation_id,event_type,event_date",
+                    "event_type": "in.(hail,severe_hail,high_wind)",
+                    "limit": page_size,
+                    "offset": offset,
+                    "order": "id",
+                }, retries=5)
+                if not rows:
+                    break
+                for r in rows:
+                    existing_keys.add((r["installation_id"], r["event_type"], r["event_date"]))
+                offset += len(rows)
+                if offset % 100000 == 0:
+                    print(f"    Loaded {offset:,} events...")
+                if len(rows) < page_size:
+                    break
+    except Exception as e:
+        print(f"  Error loading existing events: {e}")
+        print(f"  Proceeding without dedup (may create duplicates)")
 
     if existing_keys:
         before = len(site_events)
         site_events = [e for e in site_events if (e["installation_id"], e["event_type"], e["event_date"]) not in existing_keys]
-        print(f"  Found {len(existing_keys)} existing storm events, skipped {before - len(site_events)} duplicates")
+        print(f"  Skipped {before - len(site_events):,} duplicates, {len(site_events):,} new events to create")
     else:
         print(f"  No existing storm events found (clean run)")
 
