@@ -77,8 +77,8 @@ function EquipmentContent() {
     state: searchParams.get("state") || "",
   });
   const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState<SortKey>("manufacturer");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortKey, setSortKey] = useState<SortKey>("capacity");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   // Map frontend sort keys to API column names (RPC handles join sorts)
   const sortColMap: Record<SortKey, string> = {

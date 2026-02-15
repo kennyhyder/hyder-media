@@ -126,6 +126,12 @@ export default async function handler(req, res) {
     // Sort and paginate (non-geo search)
     const validSorts = ["install_date", "capacity_dc_kw", "capacity_mw", "state", "site_name", "site_status", "created_at"];
     const sortCol = validSorts.includes(sort) ? sort : "install_date";
+
+    // When sorting by capacity, exclude NULL/zero values so users see real data
+    if (sortCol === "capacity_mw" || sortCol === "capacity_dc_kw") {
+      query = query.not(sortCol, "is", null).gt(sortCol, 0);
+    }
+
     query = query
       .order(sortCol, { ascending: order === "asc", nullsFirst: false })
       .range(offset, offset + limitNum - 1);
