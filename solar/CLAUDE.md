@@ -186,7 +186,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
 | 20 | **BLM Solar ROW** | `ingest-blm-solar.py` | 898 | `blm_` | ArcGIS FeatureServer | Solar energy facility ROWs on federal lands (AZ, CA, CO, NV, NM, UT, WY) | Quarterly |
 
-**Grand Total: ~710,705 installations, ~480,192 equipment records, ~3,900,707 events, 24 primary sources + 75 permit portals**
+**Grand Total: ~706,022 installations, ~426,431 equipment records, ~3,263,132 events, 24 primary sources + 75 permit portals**
+**Note**: Counts reduced from 710K/480K after Session 21 TRUNCATE CASCADE recovery (99.4% installations, 88.8% equipment recovered)
 
 ### Running New Scripts
 ```bash
@@ -792,41 +793,43 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 14, 2026 — Session 20)
-1. **Droplet classification batch 3**: Running at 0.4/sec on droplet 104.131.105.89. 72,000/86,000 images (83.7%), 37,832 classified. ~14 hours remaining.
-
-### Completed This Session (Session 20)
-2. **BLM Solar ROW ingested**: 898 records from BLM ArcGIS FeatureServer (completed in frozen Session 19)
-3. **LBNL 2025 update**: 48 new records from updated LBNL utility-scale data
-4. **Research completed**: BPA queue NOT viable (95% developer names redacted). Permit scraping at diminishing returns.
-5. **Full enrichment pipeline on 710K**: eGRID (78), WREGIS (1,661), GEM (49), LBNL (7), PJM-GATS (134), dedup (6,378). 0 errors.
-6. **Location precision**: 100% coverage restored (54 BLM records → state)
-7. **CPSC recalls**: All 3,220 events already exist (correctly deduplicated)
-8. **Next.js site rebuilt**: Static pages regenerated with 710K stats
+### Completed This Session (Session 21)
+1. **Zod validation**: Added input validation to all 5 solar API endpoints via shared `_validate.js`
+2. **Equipment RPC function**: Created `solar_equipment_search` PostgreSQL RPC for proper JOIN+ORDER BY (fixes capacity sort)
+3. **Marker clustering**: Added Leaflet MarkerClusterGroup with chunked loading (removes 1000-marker limit)
+4. **Entity table population**: 35,307 installers + 70,965 site owners, all FK IDs linked (475K installer, 160K owner, 135K operator, 16K developer)
+5. **Equipment capacity sort fix**: RPC function enables sorting by installation capacity_mw instead of equipment-only fields
+6. **Vercel function timeouts**: Added to `vercel.json` for all `/api/solar/*` endpoints
+7. **Equipment aging stats**: Added to `/api/solar/stats` endpoint
+8. **Data recovery from TRUNCATE CASCADE**: Recovered 706K of 710K installations after accidental `TRUNCATE solar_installers CASCADE`
+9. **Full enrichment re-run**: eGRID (31K), WREGIS (17K), CEC (53K), backfill (67K), dedup (42K), NOAA storms (3.3M), CPSC (3.7K recalls)
+10. **Location precision**: 100% coverage via direct SQL (fixed 211K NULLs from permit prefixes not in script)
+11. **Next.js site rebuilt**: Static pages regenerated with 706K stats
 
 ### Short-term
-9. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
-10. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
+12. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
+13. **Satellite images for new permit records**: ~362K images needed at ~$724 (4 months of free credit)
+14. **Equipment gap investigation**: 426K vs 480K target — ~54K equipment records from permit cities may need re-parsing
 
 ### Medium-term
-11. **CivicData BLDS expansion**: Lee County FL, Brevard County FL, Manatee County FL
-12. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
-13. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
+15. **CivicData BLDS expansion**: Lee County FL, Brevard County FL, Manatee County FL
+16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
+17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 14, 2026 — Session 20)
+### Data Gap Summary (Feb 14, 2026 — Session 21)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **710,705** | **100.0%** | All records tagged |
-| county | 693,470 | 97.6% | Near maximum |
-| city | 683,255 | 96.1% | Near maximum |
-| **mount_type** | **588,685** | **82.8%** | Permits set rooftop + satellite classification |
-| **operator_name** | **576,692** | **81.1%** | Permits store contractor/applicant |
-| **lat/lng** | **564,670** | **79.5%** | Census geocoder + permit coords |
-| installer_name | 465,454 | 65.5% | Permits + TTS + CA DGStats |
-| **developer_name** | **427,101** | **60.1%** | Permits + dedup crossref |
-| **owner_name** | **190,229** | **26.8%** | WREGIS +1,661 this session |
-| **Equipment** | **480,192** | — | 91% have manufacturer, 55% have model |
-| **Events** | **3,900,707** | — | 3.9M storm + 3.2K recall + 80 generator |
+| **location_precision** | **706,022** | **100.0%** | All records tagged |
+| **lat/lng (exact)** | **394,350** | **55.9%** | Exact coordinates |
+| address | 197,690 | 28.0% | Geocodable addresses |
+| city | ~93,514 | 13.2% | City-level precision |
+| installer_name (linked) | 475,370 | 67.3% | All linked to solar_installers via FK |
+| owner_name (linked) | 160,266 | 22.7% | All linked to solar_site_owners via FK |
+| operator_name (linked) | 135,127 | 19.1% | All linked to solar_site_owners via FK |
+| developer_name (linked) | 15,933 | 2.3% | All linked to solar_site_owners via FK |
+| **Entity tables** | **106,272** | — | 35,307 installers + 70,965 site owners |
+| **Equipment** | **426,431** | — | 88.8% of pre-truncate 480K (gap from permit equipment) |
+| **Events** | **3,263,132** | — | 2.2M storm + 1.1M storm (Phase 2) + 3.7K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -1688,6 +1691,67 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - **26.8% with owner_name** (190,229)
 - **100% location_precision coverage** (0 NULL)
 - **Droplet batch 3**: 83.7% complete, ~14 hours remaining
+
+### Session 21 — Feb 14, 2026
+
+**CRITICAL INCIDENT: TRUNCATE CASCADE data loss + recovery**
+- `TRUNCATE solar_installers CASCADE` wiped ALL data: 710K installations, 480K equipment, 3.9M events
+- Root cause: FK chain — `solar_installations.installer_id` → `solar_installers.id` cascaded deletion
+- **Recovery**: Re-ran all 20+ idempotent ingestion scripts in parallel (~9 hours total, permits script was bottleneck)
+- **Result**: 706,022 installations recovered (99.4%), 426,431 equipment (88.8%), 3,263,132 events (83.7%)
+- **Lesson**: NEVER use TRUNCATE CASCADE on entity tables with FK references to main data tables
+
+**API improvements (from original task):**
+- **Zod validation**: New `api/solar/_validate.js` with shared schemas for all 5 endpoints (installations, installation, equipment, installers, export)
+- **Equipment RPC function**: Created `solar_equipment_search` in PostgreSQL — proper SQL JOIN+ORDER BY enables sorting by installation capacity_mw. Fixes bug where capacity sort showed 0.1MW as max.
+- **Marker clustering**: `InstallationMap.tsx` rewritten with `L.MarkerClusterGroup` (leaflet.markercluster@1.5.3). Chunked loading, removes 1000-marker limit. New type declaration at `src/types/leaflet.markercluster.d.ts`.
+- **Vercel timeouts**: Added to `vercel.json` for all `/api/solar/*` endpoints
+- **Equipment aging stats**: Added to `/api/solar/stats` — average age, oldest installations, equipment model age distribution
+
+**Entity table population — COMPLETED (SAFELY):**
+- **solar_installers**: 27,393 new records inserted (total 35,307). Stats updated: installation_count, total_capacity_kw, first_seen, last_seen.
+- **solar_site_owners**: 70,965 records created from unique owner_name + operator_name + developer_name values (grouped by normalized_name, MODE() for display_name and entity_type). Updated owned_capacity_mw and developed_capacity_mw.
+- **FK linking**: All installations linked — 475,370 installer_id, 160,266 owner_id, 135,127 operator_id, 15,933 developer_id. 0 unlinked records.
+- **Approach**: INSERT ... WHERE NOT EXISTS (no TRUNCATE), UPDATE via normalized_name JOIN. All non-destructive.
+
+**Location precision fix:**
+- Script was too slow for 211K NULL records (permit prefixes not in pattern list)
+- Fixed via direct SQL: exact (122,948 with coords), address (63,821), city (3,687), remaining 1 → state
+- 100% coverage: exact 394,350, address 197,690, city 93,514, zip 10,395, state 5,335, county 4,738
+
+**Enrichment pipeline (Phase 1 — while permits still running):**
+| Script | Patches | Notes |
+|--------|---------|-------|
+| eGRID | 23,374 | operator + owner |
+| WREGIS | 16,854 | Owner names for western US |
+| CEC Equipment | 39,283 | 54.4% match rate |
+| Source Backfill | 67,477 | CA DGStats + NY-Sun + TTS fields |
+| GEM | 1,001 | Owner + operator |
+| LBNL Queued Up | 1,089 | Developer names |
+| PJM-GATS | 263 | Owner names |
+| EIA-860 Owner | 73 | USPVDB enrichment |
+| EIA-860 Plant | 80 | Generator events |
+| Cross-source Dedup | 32,911 | 1 error (502 timeout) |
+| CPSC Recalls | 3,699 | Events created |
+| NOAA Storms | 2,156,248 | Storm events |
+
+**Enrichment pipeline (Phase 2 — after permits completed):**
+| Script | Patches | Notes |
+|--------|---------|-------|
+| eGRID | 8,254 | For new permit records |
+| CEC Equipment | 13,658 | For new equipment |
+| Cross-source Dedup | 9,028 | For new records |
+| NOAA Storms | 1,103,055 | For ~250K new permit installations |
+
+**Equipment gap**: 426,431 vs 480,144 target (88.8%). Gap is ~54K records from permit cities' parsed equipment (not SD City — SD City has 37,014, matching original). May need re-run of `parse-permit-equipment.py`.
+
+**Grand Total (Feb 14, 2026 — Session 21):**
+- **706,022 installations** across 101 data sources
+- **426,431 equipment records** (88.8% of pre-truncate 480K)
+- **3,263,132 events** (2.2M storm + 1.1M storm Phase 2 + 3.7K recall + 80 generator)
+- **35,307 installers** + **70,965 site owners** (all FK linked)
+- **100% location_precision coverage** (0 NULL)
+- **55.9% exact lat/lng** (394,350 with real coordinates)
 
 ### Running New Scripts
 ```bash
