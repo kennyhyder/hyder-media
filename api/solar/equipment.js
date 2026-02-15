@@ -65,18 +65,12 @@ export default async function handler(req, res) {
       query = query.lte("installation.install_date", cutoffDate.toISOString().split("T")[0]);
     }
 
-    // Server-side sorting
+    // Server-side sorting — only sort by equipment-table columns to avoid timeouts
+    // Sorting 480K+ records by joined installation columns causes statement timeouts
     const validSorts = ["manufacturer", "model", "equipment_type", "created_at"];
-    const installationSorts = ["capacity_mw", "capacity_dc_kw", "install_date", "state"];
     const ascending = order !== "desc";
-
-    if (installationSorts.includes(sort)) {
-      // Use parenthetical syntax to sort parent equipment rows by installation column
-      query = query.order(`installation(${sort})`, { ascending, nullsFirst: false });
-    } else {
-      const sortCol = validSorts.includes(sort) ? sort : "manufacturer";
-      query = query.order(sortCol, { ascending, nullsFirst: false });
-    }
+    const sortCol = validSorts.includes(sort) ? sort : "manufacturer";
+    query = query.order(sortCol, { ascending, nullsFirst: false });
 
     const { data, error, count } = await query
       .range(offset, offset + limitNum - 1);
