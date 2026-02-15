@@ -94,6 +94,29 @@ def get_or_create_data_source():
     return ds_id
 
 
+def get_existing_source_ids():
+    """Load existing lbnl_ source_record_ids from Supabase."""
+    existing = set()
+    offset = 0
+    while True:
+        params = {
+            "select": "source_record_id",
+            "source_record_id": "like.lbnl_*",
+            "order": "source_record_id",
+            "offset": str(offset),
+            "limit": "1000",
+        }
+        batch = supabase_request("GET", "solar_installations", params=params)
+        if not batch:
+            break
+        for r in batch:
+            existing.add(r["source_record_id"])
+        if len(batch) < 1000:
+            break
+        offset += len(batch)
+    return existing
+
+
 def download_data():
     """Download the LBNL Utility-Scale Solar Excel file."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -188,20 +211,29 @@ def normalize_tracking(val):
     return safe_str(val)
 
 
-def normalize_mount_type(val):
+def normalize_mount_type(val, tracking_val=None):
     """Normalize mount type to standard values."""
     if not val:
-        return "ground"  # LBNL data is all ground-mounted utility-scale
+        return "ground_fixed"  # LBNL data is all ground-mounted utility-scale
     v = str(val).strip().lower()
-    if "ground" in v:
-        return "ground"
     if "roof" in v:
         return "rooftop"
     if "carport" in v or "canop" in v:
         return "carport"
     if "float" in v:
         return "floating"
-    return "ground"
+    # Check tracking to differentiate ground_fixed vs ground_single_axis
+    if tracking_val:
+        t = str(tracking_val).strip().lower()
+        if "single" in t or "1-axis" in t or "one" in t:
+            return "ground_single_axis"
+        if "dual" in t or "2-axis" in t or "two" in t:
+            return "ground_single_axis"
+    if "fixed" in v:
+        return "ground_fixed"
+    if "track" in v:
+        return "ground_single_axis"
+    return "ground_fixed"
 
 
 def find_project_sheet(wb):
@@ -510,12 +542,17 @@ def process_excel(xlsx_path, data_source_id):
         wb.close()
         return 0, 0, 0
 
+    # Load existing IDs for dedup
+    existing_ids = get_existing_source_ids()
+    print(f"  Existing LBNL records: {len(existing_ids)}")
+
     total = 0
     utility = 0
     created = 0
     errors = 0
     equipment_count = 0
     skipped_small = 0
+    skipped_dup = 0
 
     inst_batch = []
     eq_batch = []
@@ -559,6 +596,11 @@ def process_excel(xlsx_path, data_source_id):
         else:
             source_record_id = f"lbnl_row_{total}"
 
+        # Skip existing records
+        if source_record_id in existing_ids:
+            skipped_dup += 1
+            continue
+
         inst_id = str(uuid.uuid4())
 
         # Location
@@ -591,7 +633,7 @@ def process_excel(xlsx_path, data_source_id):
 
         # Mount type (LBNL is all ground-mounted utility-scale)
         mount_raw = safe_str(get_cell(row, col_map, "mount_type"))
-        mount_type = normalize_mount_type(mount_raw)
+        mount_type = normalize_mount_type(mount_raw, tracking_raw)
 
         # Cost
         cost_per_watt = safe_float(get_cell(row, col_map, "cost_per_watt"))
@@ -720,7 +762,13 @@ def process_excel(xlsx_path, data_source_id):
             if res is not None:
                 created += len(inst_batch)
             else:
-                errors += len(inst_batch)
+                # Retry individually on batch failure (handles stray duplicates)
+                for rec in inst_batch:
+                    res2 = supabase_request("POST", "solar_installations", [rec])
+                    if res2 is not None:
+                        created += 1
+                    else:
+                        errors += 1
             inst_batch = []
 
             if eq_batch:
@@ -740,7 +788,12 @@ def process_excel(xlsx_path, data_source_id):
         if res is not None:
             created += len(inst_batch)
         else:
-            errors += len(inst_batch)
+            for rec in inst_batch:
+                res2 = supabase_request("POST", "solar_installations", [rec])
+                if res2 is not None:
+                    created += 1
+                else:
+                    errors += 1
 
     if eq_batch:
         for i in range(0, len(eq_batch), BATCH_SIZE):
@@ -754,7 +807,8 @@ def process_excel(xlsx_path, data_source_id):
     print(f"\n  Results: {total} total rows scanned")
     print(f"    Utility-scale (>= {MIN_SIZE_KW} kW): {utility}")
     print(f"    Skipped (too small): {skipped_small}")
-    print(f"    Created: {created}, Errors: {errors}")
+    print(f"    Skipped (duplicate): {skipped_dup}")
+    print(f"    New: {created}, Errors: {errors}")
     print(f"    Equipment: {equipment_count}")
 
     return created, equipment_count, errors

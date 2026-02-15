@@ -184,8 +184,9 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 17 | **MN PUC DER** | `ingest-mn-puc.py` | 7,072 | `mnpuc_` | Excel | >=25 kW non-residential solar | Annual |
 | 18 | **PA AEPS** | `ingest-pa-aeps.py` | 3,460 | `paaeps_` | CSV | SUN fuel, >=25 kW | Quarterly |
 | 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
+| 20 | **BLM Solar ROW** | `ingest-blm-solar.py` | 898 | `blm_` | ArcGIS FeatureServer | Solar energy facility ROWs on federal lands (AZ, CA, CO, NV, NM, UT, WY) | Quarterly |
 
-**Grand Total: ~709,759 installations, ~480,144 equipment records, ~3,900,707 events, 23 primary sources + 75 permit portals**
+**Grand Total: ~710,705 installations, ~480,192 equipment records, ~3,900,707 events, 24 primary sources + 75 permit portals**
 
 ### Running New Scripts
 ```bash
@@ -791,17 +792,17 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 
 ## Next Steps (Priority Order)
 
-### In Progress (Feb 13, 2026 — Session 18)
-1. **Droplet classification batch 3**: Still running at 0.4/sec on droplet 104.131.105.89
+### In Progress (Feb 14, 2026 — Session 20)
+1. **Droplet classification batch 3**: Running at 0.4/sec on droplet 104.131.105.89. 72,000/86,000 images (83.7%), 37,832 classified. ~14 hours remaining.
 
-### Completed This Session (Session 18)
-2. **4 new permit cities**: Richmond VA (3,775), Cincinnati OH (590), NYSERDA Large-Scale (136), Memphis TN (214)
-3. **Phoenix AZ filter fix**: +9,215 records from PER_TYPE code expansion
-4. **SD City Set 1 confirmed**: All duplicates of Set 2 — 0 new records
-5. **Gap state research**: 13 states swept, only Memphis TN viable. Permit scraping at diminishing returns.
-6. **Enrichment pipeline on 697K**: eGRID (2,959), cross-source dedup (947), NOAA storms (249,499), CEC (64), CPSC (4), Census geocoding (551)
-7. **Bug fixes**: Retry logic added to eGRID + CPSC `supabase_get()`, OpenDataSoft v2.1 API format fix
-8. **Next.js site rebuilt**: Static pages regenerated with 697K stats
+### Completed This Session (Session 20)
+2. **BLM Solar ROW ingested**: 898 records from BLM ArcGIS FeatureServer (completed in frozen Session 19)
+3. **LBNL 2025 update**: 48 new records from updated LBNL utility-scale data
+4. **Research completed**: BPA queue NOT viable (95% developer names redacted). Permit scraping at diminishing returns.
+5. **Full enrichment pipeline on 710K**: eGRID (78), WREGIS (1,661), GEM (49), LBNL (7), PJM-GATS (134), dedup (6,378). 0 errors.
+6. **Location precision**: 100% coverage restored (54 BLM records → state)
+7. **CPSC recalls**: All 3,220 events already exist (correctly deduplicated)
+8. **Next.js site rebuilt**: Static pages regenerated with 710K stats
 
 ### Short-term
 9. **SEIA membership** ($1K/yr): 7K+ projects with developer+owner+offtaker — best ROI paid source
@@ -812,19 +813,19 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 12. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 13. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 13, 2026 — Session 19)
+### Data Gap Summary (Feb 14, 2026 — Session 20)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **709,759** | **100.0%** | All records tagged |
-| county | ~697K | 98.2% | Near maximum |
-| city | ~688K | 96.9% | Near maximum |
-| **mount_type** | **587,739** | **82.8%** | Permits set rooftop + satellite classification |
-| **operator_name** | **576,583** | **81.2%** | Permits store contractor/applicant |
-| **lat/lng** | **564,480** | **79.5%** | Census geocoder + permit coords |
-| installer_name | 465,389 | 65.6% | Permits + TTS + CA DGStats |
-| **developer_name** | **425,953** | **60.0%** | Permits + dedup crossref (+1,955 this session) |
-| **owner_name** | **187,487** | **26.4%** | SEIA ($1K/yr) would boost significantly |
-| **Equipment** | **480,144** | — | 91% have manufacturer, 55% have model |
+| **location_precision** | **710,705** | **100.0%** | All records tagged |
+| county | 693,470 | 97.6% | Near maximum |
+| city | 683,255 | 96.1% | Near maximum |
+| **mount_type** | **588,685** | **82.8%** | Permits set rooftop + satellite classification |
+| **operator_name** | **576,692** | **81.1%** | Permits store contractor/applicant |
+| **lat/lng** | **564,670** | **79.5%** | Census geocoder + permit coords |
+| installer_name | 465,454 | 65.5% | Permits + TTS + CA DGStats |
+| **developer_name** | **427,101** | **60.1%** | Permits + dedup crossref |
+| **owner_name** | **190,229** | **26.8%** | WREGIS +1,661 this session |
+| **Equipment** | **480,192** | — | 91% have manufacturer, 55% have model |
 | **Events** | **3,900,707** | — | 3.9M storm + 3.2K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
@@ -1640,6 +1641,54 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - **100% location_precision coverage** (0 NULL)
 - **Droplet batch 3**: Still running autonomously on droplet
 
+### Session 20 — Feb 14, 2026
+
+**Context recovery**: Continued from frozen Session 19 (context limit). Database at 710,705 installations after BLM (898) and LBNL 2025 (48) were ingested in the frozen session.
+
+**Research completed:**
+- **BPA queue**: NOT WORTH INGESTING — 359 solar projects but 95% of developer names redacted (8 of 17 with names already in DB). No coordinates.
+- **scrape-permit-portals.py**: Complete Playwright scraper exists for Tyler EnerGov portals (5 configured). Requires `pip install playwright && python3 -m playwright install chromium`. ~1,500 records estimated, but setup overhead high for diminishing returns.
+- **Remaining viable free sources**: Database at diminishing returns. Virginia Beach VA (3,457 records with Ohm-level equipment data in WorkDesc) is best uncaptured source but already in ingest-permits.py.
+
+**Enrichment pipeline re-run on 710K database — COMPLETED:**
+| Script | Patches | Notes |
+|--------|---------|-------|
+| eGRID | 78 | 78 operator + 37 owner (survived Supabase overload via retry logic) |
+| WREGIS | 1,661 | Owner names (CA: 1,658, AZ: 2, NV: 1). Largest single enrichment this session |
+| GEM | 49 | 26 owner + 31 operator via coord matching |
+| LBNL Queued Up | 7 | Developer names via state+capacity |
+| PJM-GATS | 134 | Owner names from MSET utility prefixes |
+| CEC Equipment | 0 | Saturated — all matchable equipment already enriched |
+| CPSC Recalls | 0 | All 3,220 events already exist (correctly deduplicated) |
+| Location Precision | 710,705 | 100% coverage (54 BLM records → state) |
+| Cross-source Dedup | 6,378 | 5,820 location, 261 developer, 294 crossref, 65 installer, 43 address |
+| **Total** | **8,307** | **0 errors across all scripts** |
+
+**Supabase overload lesson**: Running 7 enrichment scripts simultaneously causes HTTP 500 errors. Scripts WITH retry logic (eGRID, location precision) survive. Scripts WITHOUT retry (GEM, LBNL, PJM-GATS, WREGIS) crash. **Always run enrichment scripts sequentially** (not in parallel) to avoid connection overload.
+
+**Droplet batch 3 classification status:**
+- Run 44 of wrapper script (2,000 images per run)
+- 72,000/86,000 images processed (83.7%)
+- 37,832 classified (52.5% detection rate), 0 errors
+- Memory stable at 1.1GB/15GB (wrapper restart fix working)
+- ETA: ~14 hours to completion
+- mount_type in DB: 588,685 (82.8% of installations)
+
+**Next.js site rebuilt**: Static pages regenerated with 710K stats.
+
+**Grand Total (Feb 14, 2026 — Session 20):**
+- **710,705 installations** across 101 data sources (24 primary + 75 permit portals + 3 state programs)
+- **480,192 equipment records** (91% have manufacturer, 55% have model)
+- **3,900,707 events** (2.14M wind + 1.53M hail + 236K severe hail + 3.2K recall + 80 generator)
+- **79.5% with lat/lng coordinates** (564,670)
+- **82.8% with mount_type** (588,685)
+- **81.1% with operator_name** (576,692)
+- **65.5% with installer_name** (465,454)
+- **60.1% with developer_name** (427,101)
+- **26.8% with owner_name** (190,229)
+- **100% location_precision coverage** (0 NULL)
+- **Droplet batch 3**: 83.7% complete, ~14 hours remaining
+
 ### Running New Scripts
 ```bash
 python3 -u scripts/ingest-mn-puc.py                # MN PUC DER data (7K records)
@@ -1650,4 +1699,7 @@ python3 -u scripts/ingest-nc-ncuc.py                # NC NCUC registrations (1.5
 python3 -u scripts/ingest-nc-ncuc.py --dry-run       # Preview
 python3 -u scripts/ingest-permits.py --city hawaii_energy   # Hawaii Energy (93 records)
 python3 -u scripts/ingest-permits.py --city md_clean_energy # Maryland Clean Energy (162 records)
+python3 -u scripts/ingest-blm-solar.py              # BLM Solar Energy ROWs (898 records)
+python3 -u scripts/ingest-blm-solar.py --dry-run    # Preview
+python3 -u scripts/ingest-blm-solar.py --active-only # Authorized + Pending only
 ```
