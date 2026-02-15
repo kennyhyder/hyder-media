@@ -79,6 +79,7 @@ function EquipmentContent() {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("capacity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [includeEmpty, setIncludeEmpty] = useState(false);
 
   // Map frontend sort keys to API column names (RPC handles join sorts)
   const sortColMap: Record<SortKey, string> = {
@@ -105,6 +106,7 @@ function EquipmentContent() {
       const apiSort = sortColMap[sortKey] || "manufacturer";
       params.set("sort", apiSort);
       params.set("order", sortDir);
+      if (includeEmpty) params.set("include_empty", "true");
 
       try {
         const res = await fetch(`${API_BASE}/equipment?${params}`);
@@ -117,7 +119,7 @@ function EquipmentContent() {
         setLoading(false);
       }
     },
-    [filters, sortKey, sortDir]
+    [filters, sortKey, sortDir, includeEmpty]
   );
 
   useEffect(() => {
@@ -239,6 +241,21 @@ function EquipmentContent() {
           </div>
         </div>
       </form>
+
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={includeEmpty}
+            onChange={(e) => {
+              setIncludeEmpty(e.target.checked);
+              setPage(1);
+            }}
+            className="rounded border-gray-300"
+          />
+          Include records without manufacturer/model
+        </label>
+      </div>
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Searching...</div>

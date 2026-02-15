@@ -76,6 +76,7 @@ function SearchContent() {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("capacity_mw");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [showDuplicates, setShowDuplicates] = useState(false);
 
   // Map frontend sort keys to API column names
   const sortColMap: Record<SortKey, string> = {
@@ -98,6 +99,7 @@ function SearchContent() {
     const apiSort = sortColMap[sortKey] || "capacity_mw";
     params.set("sort", apiSort);
     params.set("order", sortDir);
+    if (showDuplicates) params.set("deduplicate", "false");
 
     try {
       const res = await fetch(`${API_BASE}/installations?${params}`);
@@ -109,7 +111,7 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters, sortKey, sortDir]);
+  }, [filters, sortKey, sortDir, showDuplicates]);
 
   useEffect(() => {
     search(page);
@@ -367,9 +369,9 @@ function SearchContent() {
         </div>
       </form>
 
-      {/* Map + Export controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-3">
+      {/* Map + Export + Toggle controls */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex gap-3 items-center">
           <button
             onClick={() => setShowMap(!showMap)}
             className={`px-4 py-2 rounded-md text-sm font-medium border transition ${
@@ -380,6 +382,18 @@ function SearchContent() {
           >
             {showMap ? "Hide Map" : "Show Map"}
           </button>
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={showDuplicates}
+              onChange={(e) => {
+                setShowDuplicates(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Include duplicate records
+          </label>
         </div>
         <button
           onClick={handleExport}

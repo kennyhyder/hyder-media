@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
     const supabase = getSupabase();
-    const { page: pageNum, limit: limitNum, sort, order, manufacturer, model, equipment_type, min_age_years, state, status } = params;
+    const { page: pageNum, limit: limitNum, sort, order, manufacturer, model, equipment_type, min_age_years, state, status, include_empty } = params;
     const offset = (pageNum - 1) * limitNum;
 
     // Use RPC function for proper JOIN + ORDER BY (avoids PostgREST timeout on join sorts)
@@ -41,6 +41,7 @@ export default async function handler(req, res) {
       p_status: status || null,
       p_state: state || null,
       p_min_age_date: minAgeDate,
+      p_include_empty: include_empty === "true",
     });
 
     if (error) return res.status(500).json({ error: error.message });
