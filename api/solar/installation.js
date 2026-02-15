@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { InstallationQuery, validate } from "./_validate.js";
 
 function getSupabase() {
   return createClient(
@@ -13,8 +14,9 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const { id } = req.query;
-  if (!id) return res.status(400).json({ error: "Missing id parameter" });
+  const params = validate(InstallationQuery, req.query, res);
+  if (!params) return;
+  const { id } = params;
 
   try {
     const supabase = getSupabase();

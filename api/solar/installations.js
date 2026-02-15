@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { InstallationsQuery, validate } from "./_validate.js";
 
 function getSupabase() {
   return createClient(
@@ -26,14 +27,16 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
+  const params = validate(InstallationsQuery, req.query, res);
+  if (!params) return;
+
   try {
     const supabase = getSupabase();
     const {
-      page = "1",
-      limit = "50",
-      sort = "install_date",
-      order = "desc",
-      // Search filters
+      page: pageNum,
+      limit: limitNum,
+      sort,
+      order,
       state,
       site_type,
       installer,
@@ -48,12 +51,10 @@ export default async function handler(req, res) {
       near_lat,
       near_lng,
       radius_miles,
-      q, // text search
-      deduplicate, // filter to canonical records only (default: true)
-    } = req.query;
+      q,
+      deduplicate,
+    } = params;
 
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
     const offset = (pageNum - 1) * limitNum;
     const isGeoSearch = near_lat && near_lng && radius_miles;
 
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
     if (deduplicate !== "false") query = query.eq("is_canonical", true);
 
     // Apply filters
-    if (state) query = query.eq("state", state.toUpperCase());
+    if (state) query = query.eq("state", state);
     if (site_type) query = query.eq("site_type", site_type);
     if (site_status) query = query.eq("site_status", site_status);
     if (installer) query = query.ilike("installer_name", `%${installer}%`);

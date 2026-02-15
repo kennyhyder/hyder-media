@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { EquipmentQuery, validate } from "./_validate.js";
 
 function getSupabase() {
   return createClient(
@@ -13,77 +14,45 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
+  const params = validate(EquipmentQuery, req.query, res);
+  if (!params) return;
+
   try {
     const supabase = getSupabase();
-    const {
-      page = "1",
-      limit = "50",
-      sort = "manufacturer",
-      order = "asc",
-      manufacturer,
-      model,
-      equipment_type,
-      min_age_years,
-      state,
-      status,
-    } = req.query;
-
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+    const { page: pageNum, limit: limitNum, sort, order, manufacturer, model, equipment_type, min_age_years, state, status } = params;
     const offset = (pageNum - 1) * limitNum;
 
-    // Query equipment with installation join
-    let query = supabase
-      .from("solar_equipment")
-      .select(
-        `
-        *,
-        installation:solar_installations!inner(
-          id, site_name, state, city, county, capacity_dc_kw, capacity_mw,
-          install_date, site_type, site_status, latitude, longitude, is_canonical
-        )
-      `,
-        { count: "exact" }
-      );
-
-    // Only show equipment from canonical installations (avoid duplicates)
-    query = query.eq("installation.is_canonical", true);
-
-    // Equipment filters
-    if (manufacturer) query = query.ilike("manufacturer", `%${manufacturer}%`);
-    if (model) query = query.ilike("model", `%${model}%`);
-    if (equipment_type) query = query.eq("equipment_type", equipment_type);
-    if (status) query = query.eq("equipment_status", status);
-
-    // Installation filters via join
-    if (state) query = query.eq("installation.state", state.toUpperCase());
-
-    // Age filter (equipment installed more than N years ago)
+    // Use RPC function for proper JOIN + ORDER BY (avoids PostgREST timeout on join sorts)
+    let minAgeDate = null;
     if (min_age_years) {
       const cutoffDate = new Date();
       cutoffDate.setFullYear(cutoffDate.getFullYear() - parseInt(min_age_years));
-      query = query.lte("installation.install_date", cutoffDate.toISOString().split("T")[0]);
+      minAgeDate = cutoffDate.toISOString().split("T")[0];
     }
 
-    // Server-side sorting — only sort by equipment-table columns to avoid timeouts
-    // Sorting 480K+ records by joined installation columns causes statement timeouts
-    const validSorts = ["manufacturer", "model", "equipment_type", "created_at"];
-    const ascending = order !== "desc";
-    const sortCol = validSorts.includes(sort) ? sort : "manufacturer";
-    query = query.order(sortCol, { ascending, nullsFirst: false });
-
-    const { data, error, count } = await query
-      .range(offset, offset + limitNum - 1);
+    const { data: rpcResult, error } = await supabase.rpc("solar_equipment_search", {
+      p_sort: sort || "manufacturer",
+      p_order: order || "asc",
+      p_limit: limitNum,
+      p_offset: offset,
+      p_manufacturer: manufacturer || null,
+      p_model: model || null,
+      p_equipment_type: equipment_type || null,
+      p_status: status || null,
+      p_state: state || null,
+      p_min_age_date: minAgeDate,
+    });
 
     if (error) return res.status(500).json({ error: error.message });
 
+    const total = rpcResult?.total || 0;
     return res.status(200).json({
-      data: data || [],
+      data: rpcResult?.data || [],
       pagination: {
         page: pageNum,
         limit: limitNum,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limitNum),
+        total,
+        totalPages: Math.ceil(total / limitNum),
       },
     });
   } catch (err) {

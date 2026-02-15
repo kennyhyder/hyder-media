@@ -36,6 +36,7 @@ export default function InstallationMap({
 
     (async () => {
       const L = await import("leaflet");
+      await import("leaflet.markercluster");
 
       // Fix default marker icons for webpack
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,10 +92,19 @@ export default function InstallationMap({
         community: "#9333ea",
       };
 
-      // Add markers (limit to 1000 for performance)
+      // Create marker cluster group
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const clusters = new (L as any).MarkerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 14,
+      });
+
       const sitesWithCoords = installations
-        .filter((i) => i.latitude && i.longitude)
-        .slice(0, 1000);
+        .filter((i) => i.latitude && i.longitude);
 
       for (const site of sitesWithCoords) {
         const color = typeColors[site.site_type] || "#6b7280";
@@ -113,7 +123,7 @@ export default function InstallationMap({
             weight: 1,
             fillOpacity: 0.7,
           }
-        ).addTo(map);
+        );
 
         marker.bindPopup(
           `<div style="min-width:180px">
@@ -129,7 +139,11 @@ export default function InstallationMap({
         if (onMarkerClick) {
           marker.on("click", () => onMarkerClick(site.id));
         }
+
+        clusters.addLayer(marker);
       }
+
+      map.addLayer(clusters);
 
       // Fit bounds if we have markers
       if (sitesWithCoords.length > 0) {
@@ -165,6 +179,14 @@ export default function InstallationMap({
       <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
       />
       <div ref={mapRef} style={{ height }} className="rounded-lg z-0" />
     </>

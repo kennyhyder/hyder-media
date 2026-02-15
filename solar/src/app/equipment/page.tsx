@@ -80,12 +80,12 @@ function EquipmentContent() {
   const [sortKey, setSortKey] = useState<SortKey>("manufacturer");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
-  // Map frontend sort keys to API column names
+  // Map frontend sort keys to API column names (RPC handles join sorts)
   const sortColMap: Record<SortKey, string> = {
     equipment_type: "equipment_type",
     manufacturer: "manufacturer",
-    technology: "manufacturer", // fallback
-    site: "manufacturer", // fallback
+    technology: "manufacturer", // fallback — no sortable tech column
+    site: "manufacturer", // fallback — no sortable site name column
     location: "state",
     capacity: "capacity_mw",
     year: "install_date",

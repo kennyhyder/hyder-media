@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { InstallersQuery, validate } from "./_validate.js";
 
 function getSupabase() {
   return createClient(
@@ -13,26 +14,19 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
+  const params = validate(InstallersQuery, req.query, res);
+  if (!params) return;
+
   try {
     const supabase = getSupabase();
-    const {
-      page = "1",
-      limit = "50",
-      state,
-      name,
-      min_installations,
-      sort = "installation_count",
-    } = req.query;
-
-    const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
+    const { page: pageNum, limit: limitNum, state, name, min_installations, sort } = params;
     const offset = (pageNum - 1) * limitNum;
 
     let query = supabase
       .from("solar_installers")
       .select("*", { count: "exact" });
 
-    if (state) query = query.eq("state", state.toUpperCase());
+    if (state) query = query.eq("state", state);
     if (name) query = query.ilike("name", `%${name}%`);
     if (min_installations) query = query.gte("installation_count", parseInt(min_installations));
 

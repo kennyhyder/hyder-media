@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { ExportQuery, validate } from "./_validate.js";
 
 function getSupabase() {
   return createClient(
@@ -12,6 +13,9 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const params = validate(ExportQuery, req.query, res);
+  if (!params) return;
 
   try {
     const supabase = getSupabase();
@@ -28,10 +32,8 @@ export default async function handler(req, res) {
       has_battery,
       site_status,
       include_equipment,
-      limit = "10000",
-    } = req.query;
-
-    const limitNum = Math.min(50000, Math.max(1, parseInt(limit)));
+      limit: limitNum,
+    } = params;
 
     let query = supabase
       .from("solar_installations")
@@ -45,7 +47,7 @@ export default async function handler(req, res) {
     query = query.eq("is_canonical", true);
 
     // Apply same filters as installations endpoint
-    if (state) query = query.eq("state", state.toUpperCase());
+    if (state) query = query.eq("state", state);
     if (site_type) query = query.eq("site_type", site_type);
     if (site_status) query = query.eq("site_status", site_status);
     if (installer) query = query.ilike("installer_name", `%${installer}%`);
