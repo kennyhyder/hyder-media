@@ -1000,18 +1000,8 @@ CITIES = {
         "transform": "cambridge_installations",
     },
     # --- Session 18 additions ---
-    "richmond_va": {
-        "tier": 1,
-        "name": "Richmond, VA",
-        "state": "VA",
-        "county": "RICHMOND CITY",
-        "platform": "socrata",
-        "base_url": "https://www.transparentrichmond.org/resource/pj9s-n7wb.json",
-        "page_size": 1000,
-        "filter": "$where=subtype='SOLAR'",
-        "prefix": "permit_richmond_va",
-        "transform": "richmond_va",
-    },
+    # richmond_va: REMOVED — transparentrichmond.org is Richmond CA, not VA.
+    # Duplicate of richmond_ca entry. 3,723 records deleted in Session 26.
     "cincinnati": {
         "tier": 1,
         "name": "Cincinnati, OH",
@@ -5130,7 +5120,7 @@ TRANSFORMERS = {
     "fort_collins": transform_fort_collins,
     "cambridge_installations": transform_cambridge_installations,
     "san_diego_county": transform_san_diego_county,
-    "richmond_va": transform_richmond_va,
+    # "richmond_va": REMOVED — was duplicate of richmond_ca
     "cincinnati": transform_cincinnati,
     "ny_large_renewable": transform_ny_large_renewable,
     "virginia_deq": transform_virginia_deq,

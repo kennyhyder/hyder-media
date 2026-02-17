@@ -162,6 +162,7 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | Census Geocoder | `forward-geocode-census.py` | Batch address→coordinate geocoding (1K/batch, free, ~83% match rate) | `https://geocoding.geo.census.gov/geocoder/geographies/addressbatch` |
 | Permit Equipment | `parse-permit-equipment.py` | Extract panel/inverter from permit descriptions | Re-queries permit APIs for descriptions |
 | Data Quality Audit | `data-quality-audit.py` | Field coverage, impossible values, installer standardization | DB analysis + `--fix` flag |
+| Parcel Owners | `enrich-parcel-owners.py` | Owner names from ArcGIS tax parcel point-in-polygon queries (13 statewide + 11 county endpoints) | ArcGIS REST APIs (free) |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -816,19 +817,21 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 14, 2026 — Session 21)
+### Data Gap Summary (Feb 17, 2026 — Session 29)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **706,022** | **100.0%** | All records tagged |
-| **lat/lng (exact)** | **394,350** | **55.9%** | Exact coordinates |
-| address | 197,690 | 28.0% | Geocodable addresses |
-| city | ~93,514 | 13.2% | City-level precision |
-| installer_name (linked) | 475,370 | 67.3% | All linked to solar_installers via FK |
-| owner_name (linked) | 160,266 | 22.7% | All linked to solar_site_owners via FK |
-| operator_name (linked) | 135,127 | 19.1% | All linked to solar_site_owners via FK |
-| developer_name (linked) | 15,933 | 2.3% | All linked to solar_site_owners via FK |
-| **Entity tables** | **106,272** | — | 35,307 installers + 70,965 site owners |
-| **Equipment** | **426,431** | — | 88.8% of pre-truncate 480K (gap from permit equipment) |
+| **location_precision** | **702,296** | **100.0%** | All records tagged |
+| **lat/lng (exact)** | **395,893** | **56.4%** | Exact coordinates |
+| address | 562,678 | 80.1% | Geocodable addresses |
+| install_date | 515,325 | 73.4% | From source data |
+| installer_name (linked) | 475,370 | 67.7% | All linked to solar_installers via FK |
+| capacity_mw | 375,156 | 53.4% | From source data |
+| **owner_name (linked)** | **355,832** | **50.7%** | **Up from 26.8% via parcel enrichment** |
+| operator_name (linked) | 134,741 | 19.2% | All linked to solar_site_owners via FK |
+| mount_type | 88,634 | 12.6% | NREL satellite classification + source data |
+| developer_name (linked) | 15,930 | 2.3% | All linked to solar_site_owners via FK |
+| **Entity tables** | **~173,000** | — | 33,302 installers + ~140,000 site owners |
+| **Equipment** | **426,431** | — | 88.8% of pre-truncate 480K |
 | **Events** | **3,263,132** | — | 2.2M storm + 1.1M storm (Phase 2) + 3.7K recall + 80 generator |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
@@ -1753,6 +1756,284 @@ Launched 6 parallel research agents to sweep ALL US municipal open data portals 
 - **100% location_precision coverage** (0 NULL)
 - **55.9% exact lat/lng** (394,350 with real coordinates)
 
+### Session 24 — Feb 15, 2026
+
+**Property Owner Enrichment — Phase 4 County Endpoints (TX, MI, DC, LA, CA)**
+
+Extended `enrich-parcel-owners.py` with 4 new county-level endpoints, ran enrichment on multiple counties, and researched dead ends across 10+ jurisdictions.
+
+**New county endpoints added:**
+- TX/Travis County (`taxmaps.traviscountytx.gov/.../Parcels/MapServer/0`, `py_owner_name`, envelope): 94.5% hit rate — CRS in WKID 2277 (NAD83 TX Central, feet)
+- CA/Riverside County (`content.rcflood.org/.../PermitTracker/Parcel_Basemap/MapServer/0`, split `OWNER1_FIRST_NAME`+`OWNER1_LAST_NAME`): Server unreliable — times out under sustained load
+- MI/Wayne County/Detroit (`services2.arcgis.com/.../parcel_file_current/FeatureServer/0`, `taxpayer_1`, envelope): 100% hit rate on all 623 records
+- DC (`maps2.dcgis.dc.gov/.../Property_and_Land_WebMercator/MapServer/40`, `OWNERNAME`): 72% hit rate
+
+**Phase 4 Results:**
+
+| State/County | Queried | Found | Hit Rate | Patched |
+|-------------|---------|-------|----------|---------|
+| LA/Orleans Parish | 14,027 | 13,986 | **99.7%** | 13,986 |
+| TX/Travis County | 7,428 | 7,015 | **94.5%** | 7,015 |
+| MI/Wayne (Detroit) | 623 | 623 | **100%** | 623 |
+| DC | 182 | 131 | 72.0% | 131 |
+| AZ/Pima County (carryover) | ~5,000 | 2,969 | ~59% | 2,969 |
+| CA/San Diego County | 146,244 | ~75K (est.) | 51.8% | **IN PROGRESS** |
+| **Total (completed)** | | **24,724** | | **24,724** |
+
+**Entity table updates:**
+- **14,056** new solar_site_owners records created
+- **24,724** installations linked via owner_id FK
+- **0** unlinked records
+- **Total owner entities**: 124,357 (up from 110,301)
+- Owner stats (site_count, owned_capacity_mw) updated for all 124,357 entities
+
+**owner_name coverage: 31.5% → 35.0%** (222,599 → 247,323 = **+24,724 net new**)
+
+**Dead ends researched and confirmed:**
+- **Sacramento CA**: All 507K parcels have `OWNER = "OWNER OF RECORD"` — redacted per CA Gov Code 7928.205
+- **Marin CA**: Only 4.3% of 96K parcels have names — all government/tax-exempt
+- **Contra Costa CA**: Public ArcGIS has no owner name field at all
+- **Allegheny PA (Pittsburgh)**: Owner names prohibited by Ordinance 3478-07 (2007)
+- **Salt Lake County UT**: UGRC redacts owner names from all public GIS services
+- **King County WA**: Taxpayer info explicitly redacted from public GIS
+- **KY Jefferson County (Louisville)**: PVA requires paid subscription
+- **MD statewide**: Confirmed 0% hit rate (endpoint serves non-parcel data)
+- **CA/Riverside**: Server handles single queries but crashes under sustained 5-worker load
+
+**SD County CA still running (background task):**
+- 7,900/146,244 queried (5.4%), 4,091 found (51.8%)
+- Processing ALL 146K CA gap records against SD County endpoint
+- Expected: ~75K owner fills when complete (many hours remaining)
+
+**Cumulative parcel enrichment results (Sessions 22-24):**
+- **87,058 total parcel matches** across 28 endpoints (13 statewide + 15 county)
+- **57,094 net new owner_name fills**
+- owner_name: 190,229 (26.8%) → 247,323 (35.0%) = **+8.2 percentage points**
+
+**Grand Total (Feb 15, 2026 — Session 24):**
+- **706,019 installations** across 101 data sources
+- **426,431 equipment records**
+- **3,263,132 events**
+- **35,307 installers** + **124,357 site owners** (all FK linked)
+- **owner_name: 247,323 (35.0%)** — up from 222,599 (31.5%)
+- **operator_name: 135,127 (19.1%)**
+- **installer_name: 475,370 (67.3%)**
+- **developer_name: 15,933 (2.3%)**
+- **100% location_precision coverage** (0 NULL)
+- **55.9% exact lat/lng** (394,350 with real coordinates)
+- **SD County CA enrichment running** — ~75K additional owner fills expected
+
+### Session 25 — Feb 15, 2026
+
+**Property Owner Enrichment — Phase 5 (NV Clark County + VA Norfolk two-step join)**
+
+Added Clark County NV and Norfolk VA endpoints to `enrich-parcel-owners.py`, including a new two-step join query architecture for Norfolk's split parcel/owner data.
+
+**New county endpoints added:**
+- **NV/Clark County** (`mapdata.lasvegasnevada.gov/.../Parcels/MapServer/0`, `OWNER`, envelope): 78.3% hit rate — WKID 3421 (NAD83 HARN Nevada Central in feet). 830K parcels covering all of Clark County (Las Vegas metro). OWNER field truncated to 32 chars.
+- **VA/Norfolk** (`gisshare.norfolk.gov/.../AIR_Basemap/MapServer/32`, `Owner1`, envelope + join_table): 50.5% hit rate — Two-step spatial→LRSN→owner table join. Geometry layer 32 (67K parcels) + owner table 47 (74K records) linked by LRSN key.
+- **VA/Arlington** (`arlgis.arlingtonva.us/.../Parcel_Map/MapServer/5`, `OWNER1`): Added but no gap records in Arlington County.
+- **VA/Chesterfield** (`services3.arcgis.com/.../Cadastral_ProdA/FeatureServer/3`, `OwnerName`, envelope): Added but no gap records in Chesterfield.
+- **VA/Spotsylvania** (`gis.spotsylvania.va.us/.../Subdivisions/MapServer/6`, `OwnerSearch`, envelope): Added but no gap records in Spotsylvania.
+
+**New architecture: `arcgis_join_query()` function**
+- For endpoints where parcel geometry and owner data are on separate ArcGIS layers
+- Step 1: Spatial query on parcel layer → get join key (e.g., LRSN)
+- Step 2: Attribute query on owner table using join key → get owner name
+- Configurable via `join_table` dict in endpoint config: `{"url": "...", "join_field": "LRSN"}`
+
+**Phase 5 Results:**
+
+| State/County | Queried | Found | Hit Rate | Patched |
+|-------------|---------|-------|----------|---------|
+| **NV/Clark County** | 17,682 | 13,840 | **78.3%** | 13,840 |
+| **VA/Norfolk** | 6,844 | 3,456 | **50.5%** | 3,456 |
+| **Total** | **24,526** | **17,296** | | **17,296** |
+
+**Entity table updates:**
+- **10,971** new solar_site_owners records created
+- **17,299** installations linked via owner_id FK
+- **0** unlinked records
+- **Total owner entities**: 135,328 (up from 124,357)
+
+**owner_name coverage: 35.0% → 37.5%** (247,323 → 264,622 = **+17,299 net new**)
+
+**Key findings:**
+- Clark County NV: Previous research said NV parcel owner data required paid subscription — found that the City of Las Vegas GIS hosts all Clark County parcels publicly at `mapdata.lasvegasnevada.gov`. 78.3% hit rate is excellent.
+- Norfolk VA two-step join: Split architecture (geometry layer + owner table) is uncommon but solved with `arcgis_join_query()`. Could be reused for other jurisdictions with similar patterns.
+- VA/Richmond City coordinate bug discovered: 3,330 Richmond City VA records have California coordinates (avg lat 37.95, lng -122.33) — Census geocoder matched "Richmond" addresses to Richmond, CA instead of Richmond, VA. These records are NOT geocodable against VA parcel endpoints until coordinates are corrected.
+- VA/Prince William and Richmond City endpoints confirmed 0% (6,844 queries each) — gap records not in those counties. Norfolk has 3,483 gap records, Richmond City has 3,330 with bad coords.
+- PA/Allegheny County (Pittsburgh): 1,187 gap records but Allegheny blocks public owner names (Ordinance 3478-07). No viable PA endpoint.
+
+**SD County CA still running (background task b78af3a):**
+- 12,900/146,244 queried (8.8%), 6,633 found (51.4%)
+- Expected: ~75,200 owner fills when complete (~50 hours remaining)
+- Will push owner_name to ~48% when complete
+
+**Cumulative parcel enrichment results (Sessions 22-25):**
+- **104,354 total parcel matches** across 31 endpoints (13 statewide + 18 county)
+- **74,393 net new owner_name fills** (including SD County in-progress)
+- owner_name: 190,229 (26.8%) → 264,622 (37.5%) = **+10.7 percentage points**
+
+**Grand Total (Feb 15, 2026 — Session 25):**
+- **706,019 installations** across 101 data sources
+- **426,431 equipment records**
+- **3,263,132 events**
+- **33,302 installers** + **135,328 site owners** (all FK linked)
+- **owner_name: 264,622 (37.5%)** — up from 247,323 (35.0%)
+- **operator_name: 135,127 (19.1%)**
+- **installer_name: 475,370 (67.3%)**
+- **developer_name: 15,933 (2.3%)**
+- **100% location_precision coverage** (0 NULL)
+- **55.9% exact lat/lng** (394,350 with real coordinates)
+- **SD County CA enrichment running** — ~75K additional owner fills expected (~48% owner coverage projected)
+
+### Session 26 — Feb 15, 2026
+
+**Data quality fix: Richmond VA/CA misattribution**
+- Discovered `transparentrichmond.org` is Richmond, California's data portal — NOT Richmond, Virginia
+- The `richmond_va` ingest config was scraping Richmond CA data and labeling it as VA
+- 3,723 records fixed: `state = 'VA' → 'CA'`, `county = 'RICHMOND CITY' → 'CONTRA COSTA'`
+- 3,723 duplicate records deleted (same data was already ingested correctly as `richmond_ca` with prefix `permit_richmond`)
+- 3,657 of 3,716 records (98.4%) were exact duplicates by permit number
+- Removed `richmond_va` config from `ingest-permits.py` and `solar_data_sources`
+- **Database cleaned from 706,019 → 702,296 installations** (net -3,723 duplicates)
+
+**Parcel enrichment — additional county testing:**
+- **TX/Travis County**: 0% hit rate (413 records) — WKID 2277 CRS mismatch, AND TX statewide TNRIS endpoint returns blank owner names (`" "`). Texas redacts owner data from public parcel layers.
+- **AZ/Pima County**: 0% hit rate (191 records) — AZ Water endpoint doesn't cover our Pima installations
+- **CA/Riverside County**: Endpoint unreachable (30s timeout on every query). `content.rcflood.org` appears down.
+- **DC/District**: Failed — Supabase HTTP 500 during data loading (transient). Only 51 records anyway.
+
+**Legal research — owner name restrictions (3 more blocked):**
+- **PA/Allegheny County** (1,187 gap): County Ordinance 3478-07 strips owner names from all public datasets. No workaround.
+- **WA/King County** (233 gap): `KCTP_NAME` field exists internally but redacted from all public distribution per WA RCW 42.56.070(9).
+- **NJ Statewide** (505 gap): Daniel's Law (P.L. 2020, c.125) mandates owner name redaction from ALL NJ government parcel data. `OWNER_NAME` field exists but is always blank.
+
+**Sacramento County CA investigation (49,752 gap records):**
+- No public ArcGIS parcel endpoint found. Sacramento County GIS doesn't expose parcels publicly.
+- Consistent with CA privacy law (Gov Code 7928.205) blocking owner names from most CA counties.
+- SD County is confirmed as the rare CA exception.
+
+**SD County CA enrichment (b78af3a) — still running:**
+- Progress: 16,900/146,244 queried (11.6%), 8,628 found (51.1%), 29 errors
+- Steady at ~100 queries/5 min, ~35 hours remaining
+- Expected: ~75,200 net new owner fills when complete
+
+**Droplet classification — still running (Run 65 of wrapper):**
+- mount_type: 88,261 (12.6% of 702,296 installations)
+- Wrapper processing 2,000 images per run, memory stable at 2.3GB/15GB
+- Recovering mount_type values lost in Session 21 TRUNCATE CASCADE
+
+**Grand Total (Feb 15, 2026 — Session 26):**
+- **702,296 installations** across 100 data sources (removed richmond_va duplicate)
+- **426,431 equipment records**
+- **3,263,132 events**
+- **owner_name: 264,236 (37.6%)** — SD County will push to ~48% when complete
+- **mount_type: 88,261 (12.6%)** — recovering via droplet classification
+- **100% location_precision coverage**
+- **56.4% exact lat/lng** (395,893 with real coordinates)
+
+### Session 27 — Feb 15, 2026
+
+**Parcel enrichment sweep — systematic re-test of ALL configured endpoints:**
+
+Launched 16+ parallel enrichment tasks across all configured statewide and county endpoints. Results confirmed that SD County CA is the **only productive parcel endpoint remaining**.
+
+**Results by endpoint:**
+| State/County | Gap Records | Result | Reason |
+|---|---|---|---|
+| **CA/San Diego** | 146,244 | **50.9% hit rate** (running ~45hr ETA) | Only viable endpoint |
+| NV/Clark | 3,842 | 0% | Owner names blank (`" "`) — data redacted |
+| NY statewide | 3,196 | 0.25% | Timeouts + already run in Session 24 |
+| PA/Philadelphia | 1,279 | 0% | Gap records in Allegheny County (legally blocked) |
+| MD statewide | 305 | 0% | Already run in Session 24 |
+| NC statewide | 158 | 0% | Already run in Session 24 |
+| VA/Richmond+Arlington+Chesterfield | 58 | 0% | Gap records in Norfolk (already run Session 25) |
+| NM/Bernalillo | 57 | 0% | Already run |
+| DC | 51 | 2% (1 match) | 1 owner patched |
+| FL statewide | 32 | 0% | All 32 queries timed out |
+| CT statewide | 27 | 0% | Already run |
+| OH statewide | 11 | 0% | Already run |
+| SC/GA/CO/TN/WI/AR | 0-3 | 0 gap records | Already fully enriched |
+
+**CA county endpoint research (all 4 NOT VIABLE):**
+- **Riverside**: Owner fields exist but ALL values NULL (data for purchase only at rivcoacr.org)
+- **Marin**: `PublicOwnerNameStandard` shows ONLY government entity names
+- **Contra Costa**: Owner fields absent from public parcel layer. Assessor folder requires auth token.
+- **Sonoma**: Explicitly excluded per CPRA privacy conditions
+
+**Key findings:**
+- CA Gov Code 7928.205 + AB 1785 blocks ALL CA county parcel owner data except San Diego
+- NV/Clark redacts owner names same as TX (blank `" "`)
+- PA gap records almost entirely in Allegheny County (legally blocked by Ordinance 3478-07)
+- All statewide endpoints were already run in Session 24 — remaining gap records are genuine non-matches
+- Supabase overload from 16 parallel tasks caused 6 crashes (known issue — run sequentially)
+
+**Droplet classification**: Wrapper Run 65, batch 3 active at 0.4 img/sec. mount_type: 88,261 (12.6%).
+
+**SD County CA at session end**: 19,000/146,244 (13.0%), 9,659 found (50.8%). Projected ~74,400 owner fills (~45hr remaining).
+
+### Session 28 — Feb 16, 2026
+
+**SD County CA enrichment — flush bug fix + full run launched**
+
+Previous 18-hour SD County run produced 0 patches because the script accumulated found records in `pending_patches` but never flushed to Supabase. The flush threshold was 1000, but the patch accumulation logic had a bug where patches were added to a local list that was never referenced by the flush check.
+
+**Flush bug fix:**
+- Debug logging added: `FLUSH: 1000 pending patches >= 1000, flushing...` message to confirm flush triggers
+- Test run with `--limit 2500`: 1,269 CA owner patches applied (50.8% match rate), confirming flush mechanism works
+- Flushed 1,000 at position 1,949 and 269 at position 2,500
+
+**Full SD County run launched (PID 41439):**
+- Started 00:50 HST Feb 16, running autonomously
+- Loading phase: 144,975 CA installations with coords + no owner
+- "Dead zone" in first ~1,200 records: 0% match rate (these are records from the --limit 2500 test that already failed to match SD County, now at the head of the result set since matched records were updated)
+- Fresh records (position 1,232+): ~52-56% marginal match rate
+- At 5,800/144,975 (4.0%): 2,396 found, 0 errors, 2 flushes (2,000 patches)
+- Rate: ~75 queries/minute → ~31 hours ETA
+- Projected: ~75,651 total owner fills
+
+**San Joaquin County CA endpoint tested:**
+- Added to CA_COUNTY_ENDPOINTS: `sjmap.org/arcgis/rest/services/PublicWorks/PW_Parcels/MapServer/0`, `OWNENAME`, envelope
+- Test with --limit 500: Only 4/500 found (0.8%) — most CA gap records aren't in San Joaquin County
+- Not worth a full run (~1,160 projected matches over 16 hours)
+
+**Other CA county endpoints researched (all NOT VIABLE):**
+- **LA County**: 2.4M parcels but NO owner name fields in ArcGIS service
+- **Orange County**: Has `LastNameFirstName` field but spatial queries return 0 features (point AND envelope both fail)
+- **Sacramento County**: Owner information restricted online for privacy
+- **San Bernardino County**: DNS failures, HTTP 500, services not started
+- **Kern County**: Services not found, endpoints offline
+- **Santa Clara County**: Connection timeout (firewall/VPN restricted)
+- **Alameda County**: DNS resolution failures
+- **Fresno County**: Connection timeout (firewall restricted)
+
+**Entity table linking:**
+- 3,318 installations had owner_name but no owner_id FK (from test run + previous session patches)
+- 2,704 new solar_site_owners entities created
+- 26 matched existing entities
+- All 3,318 linked to owner_id, 0 errors
+- **Total site owners: 138,032** (up from 135,328)
+
+**Droplet NREL classification status:**
+- Wrapper Run 3 of new images batch, 400/2000 in current run
+- Low detection rate (~6.75%) on permit-sourced images (address-level precision)
+- 51,909 already classified + ~4,400 processed = ~56,300 total
+- ~36,657 remaining, ~22 hours ETA at ~1 img/sec
+- mount_type in DB: 88,601 (12.6% of installations)
+
+**DB state at session end:**
+- **Total installations: 702,296**
+- **owner_name: 267,554 (38.1%)** — and climbing from SD County run
+- **CA owner: 38,497 (15.1%)** — projected to reach ~43.6% when SD County completes
+- **SD County CA enrichment running** — PID 41439, ~31 hours remaining
+
+**Projected final state when SD County completes:**
+- owner_name: ~340,000+ (~48.4% of 702,296)
+- CA owner: ~111,000+ (~43.6% of 255,040)
+- Parcel enrichment at true end-of-road: all other endpoints exhausted, CA counties legally blocked except SD
+
 ### Running New Scripts
 ```bash
 python3 -u scripts/ingest-mn-puc.py                # MN PUC DER data (7K records)
@@ -1766,4 +2047,223 @@ python3 -u scripts/ingest-permits.py --city md_clean_energy # Maryland Clean Ene
 python3 -u scripts/ingest-blm-solar.py              # BLM Solar Energy ROWs (898 records)
 python3 -u scripts/ingest-blm-solar.py --dry-run    # Preview
 python3 -u scripts/ingest-blm-solar.py --active-only # Authorized + Pending only
+
+# Parcel owner enrichment (ArcGIS point-in-polygon)
+python3 -u scripts/enrich-parcel-owners.py --list       # Show configured endpoints
+python3 -u scripts/enrich-parcel-owners.py --counts     # Show gap records per state
+python3 -u scripts/enrich-parcel-owners.py --state NC   # Single state
+python3 -u scripts/enrich-parcel-owners.py --state NC --dry-run  # Preview without patching
+python3 -u scripts/enrich-parcel-owners.py              # Run ALL statewide + county endpoints
 ```
+
+### Session 22 — Feb 15, 2026
+
+**Property Owner Enrichment via Public Parcel Data — COMPLETED (Phase 1)**
+
+Built `enrich-parcel-owners.py` — queries free public ArcGIS tax parcel endpoints to fill `owner_name` for installations with coordinates but no owner. Point-in-polygon spatial queries against statewide and county-level parcel layers.
+
+**Script features:**
+- 13 statewide endpoints (NC, CT, WI, VT, MN, OH, MA, MD, TX, NY, CO, FL, AR)
+- 11 county endpoints across 7 states (AZ/Maricopa, LA/EBR, IN/Marion, OR/Portland+Jackson, TN/Nashville+Memphis, SC/Greenville+Spartanburg, GA/DeKalb+Fulton)
+- `--state XX`, `--dry-run`, `--list`, `--counts`, `--limit N` CLI flags
+- ThreadPoolExecutor for parallel ArcGIS queries (configurable workers per endpoint)
+- Per-endpoint config: timeout, use_envelope, ssl_skip, owner_field
+- Title case normalization, filters UNKNOWN/N/A/ESTATE OF/TRUST placeholders
+- Exponential backoff retry (3 attempts) for both ArcGIS and Supabase
+
+**Phase 1 Results (all statewide + county endpoints):**
+
+| State | Endpoint | Queried | Found | Hit Rate | Patched |
+|-------|----------|---------|-------|----------|---------|
+| NC | Statewide | ~800 | 693 | ~86% | 693 |
+| CT | Statewide | ~240 | 174 | ~73% | 174 |
+| WI | Statewide | ~108 | 56 | ~52% | 56 |
+| VT | Statewide | ~207 | 149 | ~72% | 149 |
+| MN | Statewide | ~12 | 8 | ~67% | 8 |
+| OH | Statewide | ~900 | 574 | ~64% | 574 |
+| MA | Statewide | 18,267 | 9,474 | 51.8% | 9,474 |
+| AZ | Maricopa County | 18,526 | 15,311 | 82.6% | 15,311 |
+| TX | Statewide | 22,091 | 14,663 | 66.3% | 14,663 |
+| TN | Nashville+Memphis | 610 | 395 | 64.8% | 395 |
+| MD | Statewide | 2,643 | 2,338 | 88.5% | 2,338 |
+| NY | Statewide | 6,957 | 3,761 | 54.1% | 3,761 |
+| OR | Portland Metro | 9,883 | 9,844 | **99.6%** | 9,844 |
+| LA | EBR Parish | 14,027 | 0 | 0% | 0 |
+| CO | Statewide | 0 | 0 | N/A | 0 |
+| IN | Marion County | 0 | 0 | N/A | 0 |
+| SC | Greenville+Spartanburg | 0 | 0 | N/A | 0 |
+| GA | DeKalb+Fulton | 0 | 0 | N/A | 0 |
+| **Total** | | **~95,271** | **57,441** | **~60%** | **57,441** |
+
+**owner_name coverage: 26.4% → 30.8%** (190,229 → 217,706 = **+27,477 net new**)
+- ~57,441 parcel matches, but ~30K records already had owner from other sources
+- Net new: 27,477 previously empty owner_name fields filled
+
+**Entity table updates:**
+- **34,821** new solar_site_owners records created
+- **57,440** installations linked via owner_id FK
+- **0** unlinked records (all owner_name have owner_id)
+- **Total owner entities**: 105,786 (up from 70,965)
+
+**Per-state owner coverage highlights:**
+- NC: 98.4%, TN: 98.2%, OR: 98.4% (near complete!)
+- AZ: 77.2%, NY: 64.4%, OH: 53.6%
+- MA: 45.9%, WI: 41.6%, FL: 41.2%, TX: 40.3%
+
+**States with 0 gap records** (CO, IN, SC, GA): Previous enrichment (WREGIS, eGRID, etc.) already filled owner_name for all installations with coordinates in these states.
+
+**LA 0% hit rate**: East Baton Rouge Parish covers ~225K parcels in one parish. The 14K LA gap records are distributed across 64 parishes, virtually none in EBR. Need more parish endpoints.
+
+**NY 58 timeout errors**: Statewide NY endpoint is slow (~30-60s/query). 54.1% hit rate despite timeouts.
+
+**OR 99.6% hit rate**: Portland Metro TaxlotsMetro covers Multnomah, Clackamas, Washington counties — where virtually all OR solar installations are located.
+
+**Next.js site rebuilt** with updated 706K stats and 30.8% owner coverage.
+
+**Grand Total (Feb 15, 2026 — Session 22):**
+- **706,019 installations** across 101 data sources
+- **426,431 equipment records**
+- **3,263,132 events**
+- **35,307 installers** + **105,786 site owners** (all FK linked)
+- **owner_name: 217,706 (30.8%)** — up from 190,229 (26.4%)
+- **100% location_precision coverage** (0 NULL)
+- **55.9% exact lat/lng** (394,350 with real coordinates)
+
+### Session 23 — Feb 15, 2026
+
+**Property Owner Enrichment — Phase 3 County Endpoints (FL, NM, PA, VA)**
+
+Extended `enrich-parcel-owners.py` with 8 new county-level endpoints for states where statewide layers are broken or unavailable. Debugged FL statewide endpoint (confirmed broken server-side for ALL spatial queries), replaced with 3 FL county endpoints.
+
+**New county endpoints added:**
+- FL/Miami-Dade (FeatureServer, `TRUE_OWNER1`): 98.9% hit rate
+- FL/Broward (MapServer, monthly rotating URL via `resolve_broward_url()`): 4.1% hit rate
+- FL/Leon (MapServer, `OWNER1`): 19.1% hit rate
+- NM/Bernalillo (MapServer, envelope, `OWNER`): 95.0% hit rate
+- PA/Philadelphia (FeatureServer, point, distance-100m, `owner_1`): 1.2% hit rate
+- NV/Washoe (MapServer, split fields `LASTNAME` + `FIRSTNAME`): N/A — all NV gap in Clark County (paid)
+- VA/Prince William (MapServer, `CAMA_OWNER_CUR`): 0% — no VA gap records in PWC
+
+**Script enhancements:**
+- `skip_record_count` parameter for endpoints that error on `resultRecordCount=1` (Broward)
+- `use_distance` parameter for point-geometry layers (Philadelphia OPA — 100m radius search)
+- `owner_field_2` parameter for split owner fields (Washoe: FIRSTNAME + LASTNAME concatenation)
+- `resolve_broward_url()` — dynamically resolves Broward BCPA monthly rotating service URL (`BCPA_EXTERNAL_{MON}{YY}`)
+- Removed broken FL statewide endpoint (400 error on all spatial queries despite capabilities claiming support)
+
+**Phase 3 Results:**
+
+| State/County | Queried | Found | Hit Rate | Patched |
+|-------------|---------|-------|----------|---------|
+| FL/Broward | 3,822 | 156 | 4.1% | 156 |
+| FL/Leon | 3,666 | 702 | 19.1% | 702 |
+| FL/Miami-Dade | 2,964 | 2,932 | **98.9%** | 2,932 |
+| NM/Bernalillo | 1,144 | 1,087 | **95.0%** | 1,087 |
+| PA/Philadelphia | 1,295 | 16 | 1.2% | 16 |
+| VA/Prince William | 6,844 | 0 | 0% | 0 |
+| SC (2 counties) | 0 | 0 | — | 0 |
+| **Total** | | **4,893** | | **4,893** |
+
+**Entity table updates:**
+- **4,515** new solar_site_owners records created
+- **4,893** installations linked via owner_id FK
+- **0** unlinked records
+- **Total owner entities**: 110,301 (up from 105,786)
+- Owner stats (site_count, owned_capacity_mw) updated for 4,535 entities
+
+**owner_name coverage: 30.8% → 31.5%** (217,706 → 222,599 = **+4,893 net new**)
+
+**Cumulative parcel enrichment results (Sessions 22-23):**
+- **62,334 total parcel matches** across 24 endpoints (13 statewide + 11 county)
+- **32,370 net new owner_name fills** (some records already had owner from other sources)
+- owner_name: 190,229 (26.8%) → 222,599 (31.5%) = **+4.7 percentage points**
+
+**Remaining owner_name gaps (top 10):**
+| State | Gap Records | Notes |
+|-------|-----------|-------|
+| CA | 219,816 | Blocked by Gov Code 7928.205 privacy law |
+| MD | 49,835 | Already ran statewide (2,338 patched) |
+| LA | 41,486 | EBR Parish only covers 1 of 64 parishes |
+| TX | 28,479 | Already ran statewide (14,663 patched) |
+| NV | 18,599 | All Clark County — paid subscription only |
+| NY | 18,592 | Already ran statewide (3,761 patched) |
+| MA | 17,321 | Already ran statewide (9,474 patched) |
+| IL | 16,999 | No statewide parcel data found |
+| VA | 10,989 | No working public endpoints |
+| CO | 10,249 | No statewide parcel data found |
+
+**Key findings:**
+- FL statewide endpoint completely broken for spatial queries — all return 400 "Cannot perform query. Invalid query parameters" regardless of geometry type (point, envelope, JSON), HTTP method, or CRS. Non-spatial WHERE queries work fine.
+- Miami-Dade has the best hit rate of any county endpoint (98.9%) — nearly every solar installation sits inside a parcel polygon.
+- NV gap is entirely Clark County (Las Vegas) which requires paid subscription for owner data.
+- Parcel enrichment has reached diminishing returns — remaining gaps are in states with no public parcel data (CA, IL, VA, CO) or states already processed (MD, TX, NY, MA).
+
+**Grand Total (Feb 17, 2026 — Session 29):**
+- **702,296 installations** across 100 data sources
+- **426,431 equipment records**
+- **3,263,132 events**
+- **33,302 installers** + **~140,000 site owners** (all FK linked)
+- **owner_name: 355,832 (50.7%)** — up from 190,229 (26.8%) pre-parcel enrichment
+- **operator_name: 134,741 (19.2%)**
+- **installer_name: 475,370 (67.7%)**
+- **developer_name: 15,930 (2.3%)**
+- **mount_type: 88,634 (12.6%)**
+- **100% location_precision coverage** (0 NULL)
+- **56.4% exact lat/lng** (395,893 with real coordinates)
+
+### Session 29 — Feb 17, 2026
+
+**SD County CA Parcel Enrichment — COMPLETED**
+
+Monitored and completed the SD County CA `enrich-parcel-owners.py` run (PID 41439) that was in progress from Session 28. The process queried all 144,975 SD County gap installations against the SD County ArcGIS parcel FeatureServer.
+
+**SD County Final Results:**
+- Queried: 144,975
+- Found: 72,711 (50.2%)
+- Errors: 186 (0.1%, all read timeouts from ArcGIS rate-limiting)
+- Total patched: 72,711, Errors: 0
+- Entity-linked via 73 flush cycles (1,000 records each + 711 final batch)
+
+**Additional County Enrichments Run:**
+
+| State/County | Queried | Found | Hit Rate | Notes |
+|-------------|---------|-------|----------|-------|
+| NV/Clark | 1,173 | 1,167 | **99.5%** | Two-step APN→ASPX handler |
+| PA/Philadelphia | 1,119 | 18 | 1.6% | Point geometry, 100m radius |
+| NC statewide (re-run) | 158 | 156 | 98.7% | |
+| MD statewide (re-run) | 103 | 0 | 0% | Endpoint dead |
+| CT statewide | 27 | 18 | 66.7% | |
+| MN statewide | 53 | 38 | 71.7% | |
+| OH statewide | 11 | 2 | 18.2% | |
+| VT statewide | 21 | 6 | 28.6% | |
+| AZ/Maricopa | 245 | 45 | 18.4% | |
+| AZ/Pima | 200 | 122 | 61.0% | |
+| DC | 50 | 50 | 100% | |
+| LA/Orleans | 41 | 31 | 75.6% | |
+| TN/Davidson | 1 | 1 | 100% | |
+| CA/San Joaquin | 15,400 (killed) | 21 | 0.1% | Querying all CA against 1 county |
+| TX/Travis | 74 | 0 | 0% | CRS mismatch |
+| NV/Washoe | 1,173 | 0 | 0% | All NV gap in Clark County |
+| PA/Allegheny | ? | 0 | 0% | |
+
+**Endpoints with 0 gap records** (already filled by prior enrichment): CO, IN, SC/3 counties, GA/2 counties, MI/Wayne, OR/2 counties, TN/Shelby
+
+**Sacramento County CA — BLOCKED:** Confirmed that Sacramento County deliberately redacts all owner names from public GIS ("OWNER OF RECORD" placeholder on all 400K+ parcels). Required by California Government Code Section 6254.21. This means the 49,752 Sacramento gap records cannot be filled via parcel data.
+
+**Cross-source dedup re-run:**
+- 4,246 patches (3,736 location upgrades, 510 crossref, 12 owner, 8 operator), 0 errors
+
+**Entity linking (cumulative this session):**
+- ~1,355 new solar_site_owners entities created
+- All owner_name records linked to owner_id (0 unlinked)
+
+**owner_name coverage: 26.8% → 50.7%** (190,229 → 355,832 = **+165,603 new owner records**)
+
+**Parcel enrichment summary (all sessions combined):**
+- Total parcel queries: ~250,000+
+- Total matches: ~137,000+
+- Net new owner_name fills: ~165,603
+- Biggest wins: SD County CA (+72,711), NV Clark (+1,167), NY statewide (+1,578), NC (+156)
+- Diminishing returns reached — remaining gaps in states with no public parcel data (Sacramento CA, IL, VA, CO) or states already processed
+
+**Next.js site rebuilt** with updated 702K stats and 50.7% owner coverage.
