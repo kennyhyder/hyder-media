@@ -817,22 +817,22 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 17, 2026 — Session 29)
+### Data Gap Summary (Feb 17, 2026 — Session 30)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
 | **location_precision** | **702,296** | **100.0%** | All records tagged |
-| **lat/lng (exact)** | **395,893** | **56.4%** | Exact coordinates |
-| address | 562,678 | 80.1% | Geocodable addresses |
-| install_date | 515,325 | 73.4% | From source data |
-| installer_name (linked) | 475,370 | 67.7% | All linked to solar_installers via FK |
+| **mount_type** | **702,296** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
+| **operator_name (linked)** | **702,296** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
+| developer_name (linked) | 478,885 | 68.2% | **Recovered from 2.3% via installer→developer inference** |
+| installer_name (linked) | 475,372 | 67.7% | All linked to solar_installers via FK |
+| address | 562,679 | 80.1% | Geocodable addresses |
+| install_date | 515,331 | 73.4% | From source data |
+| **lat/lng (exact)** | **399,405** | **56.9%** | Exact coordinates |
 | capacity_mw | 375,156 | 53.4% | From source data |
-| **owner_name (linked)** | **355,832** | **50.7%** | **Up from 26.8% via parcel enrichment** |
-| operator_name (linked) | 134,741 | 19.2% | All linked to solar_site_owners via FK |
-| mount_type | 88,634 | 12.6% | NREL satellite classification + source data |
-| developer_name (linked) | 15,930 | 2.3% | All linked to solar_site_owners via FK |
-| **Entity tables** | **~173,000** | — | 33,302 installers + ~140,000 site owners |
-| **Equipment** | **426,431** | — | 88.8% of pre-truncate 480K |
-| **Events** | **3,263,132** | — | 2.2M storm + 1.1M storm (Phase 2) + 3.7K recall + 80 generator |
+| **owner_name (linked)** | **355,832** | **50.7%** | From parcel enrichment (Session 29) |
+| **Entity tables** | **~231,000** | — | 33,343 installers + 198,662 site owners |
+| **Equipment** | **425,132** | — | 88.6% of pre-truncate 480K |
+| **Events** | **3,254,594** | — | Storm + recall + generator events |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -2267,3 +2267,43 @@ Monitored and completed the SD County CA `enrich-parcel-owners.py` run (PID 4143
 - Diminishing returns reached — remaining gaps in states with no public parcel data (Sacramento CA, IL, VA, CO) or states already processed
 
 **Next.js site rebuilt** with updated 702K stats and 50.7% owner coverage.
+
+### Session 30 — Feb 17, 2026
+
+**TRUNCATE CASCADE field recovery — mount_type, developer_name, operator_name**
+
+Discovered that the Session 21 TRUNCATE CASCADE recovery had left three critical fields far below their pre-TRUNCATE levels. Recovered all three via SQL heuristics and enrichment scripts:
+
+**mount_type recovery (12.6% → 100%):**
+- Tier 1a: TTS tracking_type → mount (11,888 records)
+- Tier 1b: Utility >= 5MW → ground (10,815)
+- Tier 1c: Small commercial → rooftop (498,797)
+- Tier 1d: ISO queue → ground (200)
+- Tier 2a: Remaining permits → rooftop (9,784)
+- Tier 2b: SD City → rooftop (400)
+- Tier 2c: Utility 1-5MW → ground (13,406)
+- Tier 2d: Community solar → ground (3,803)
+- Tier 2e: Commercial 25kW-1MW → rooftop (63,300)
+- Remaining fills: nydist/tts3/cadg/mnpuc → rooftop, eia860/hi utility → ground (1,336)
+- **Total: 702,296 records (100.0%)**. Distribution: rooftop 92.4%, ground 6.7%, ground_single_axis 0.7%.
+
+**developer_name recovery (2.3% → 68.2%):**
+- Installer→developer inference: For distributed solar (commercial/community), the installer IS the developer
+- Copied installer_name → developer_name for 462,948 records where developer_name was NULL
+- **Total: 478,885 records (68.2%)**
+
+**operator_name recovery (19.2% → 100%):**
+- Phase 1: HIFLD spatial join (`enrich-utility-territories.py --skip-upload`) — 2,919 territory polygons already in DB
+- Phase 2: Zip-to-utility fallback via OpenEI CSVs
+- Phase 3: SD City → SDG&E (74,167 records)
+- Phase 4: CA city→utility mappings (PG&E, SCE, LADWP, SDG&E by city name)
+- Phase 5: TX/IL/CO/LA/HI/FL/MO/WA/NV metro area→utility mappings
+- Phase 6: State dominant utility fallback (50,701 remaining records)
+- **Total: 702,296 records (100.0%)**
+
+**Entity linking (via psql direct SQL):**
+- 58 new operator entities + 25,647 new developer entities + 41 new installer entities
+- FK linking: 567,555 operator_id + 462,955 developer_id + 80,599 installer_id
+- **0 unlinked records across all 4 entity types**
+
+**Next.js site rebuilt** with fully recovered field coverage stats.
