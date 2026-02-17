@@ -92,6 +92,66 @@ MANUFACTURER_ALIASES = {
     "fronius international": "fronius",
     # Power-One (acquired by ABB)
     "one": "abb",
+    # REC variants
+    "rec solar": "rec group",
+    "rec": "rec group",
+    # Hyundai variants
+    "hyundai heavy industries": "hyundai",
+    "hyundai heavy": "hyundai",
+    "hyundai solutions": "hyundai",
+    # Sharp variants
+    "sharp corporation": "sharp",
+    "sharp electronics": "sharp",
+    # Yingli variants
+    "yingli green": "yingli",
+    "yingli": "yingli",
+    # SMA variants
+    "smaamerica": "sma",
+    "sma america": "sma",
+    "sma solar": "sma",
+    # Jinko variants
+    "jinko solar co": "jinko",
+    "jinkosolar": "jinko",
+    "jinko": "jinko",
+    # LG variants
+    "lg electronics": "lg",
+    "lg": "lg",
+    # Trina variants
+    "trina solar": "trina",
+    "trina": "trina",
+    # JA Solar variants
+    "ja solar": "ja",
+    "jasolar": "ja",
+    # LONGi variants
+    "longi green": "longi",
+    "longi solar": "longi",
+    "longi": "longi",
+    # Silfab variants
+    "silfab solar": "silfab",
+    "silfab": "silfab",
+    # Phono Solar variants
+    "phono solar": "phono",
+    # Mission Solar variants
+    "mission solar": "mission",
+    # Panasonic / Sanyo
+    "sanyo": "panasonic",
+    "panasonic eco solutions": "panasonic",
+    # Schneider Electric variants
+    "schneider electric": "schneider",
+    "schneider": "schneider",
+    # Chint / Astronergy
+    "chint solar": "astronergy",
+    "chint": "astronergy",
+    # Risen Energy
+    "risen": "risen",
+    # Vikram Solar
+    "vikram solar": "vikram",
+    # ZNShine
+    "znshine solar": "znshine",
+    # S-Energy
+    "s energy": "s energy",
+    # Axitec
+    "axitec": "axitec",
 }
 
 
@@ -121,7 +181,7 @@ def resolve_alias(norm_name):
     return norm_name
 
 
-def normalize_model(s):
+def normalize_model(s, manufacturer=None):
     """Normalize a model string - less aggressive than manufacturer normalization."""
     if not s:
         return ""
@@ -131,6 +191,35 @@ def normalize_model(s):
     s = re.sub(r'\(.*?\)', '', s)
     # Remove /BFG suffix (Hanwha bifacial glass variant, not always in CEC)
     s = re.sub(r'/BFG\b', '', s, flags=re.IGNORECASE)
+    # Strip manufacturer brand prefix from model (e.g., "QCELLS Q.PEAK..." → "Q.PEAK...")
+    if manufacturer:
+        mfr_lower = manufacturer.lower().strip()
+        s_lower = s.lower().strip()
+        # Try stripping various brand prefixes
+        brand_prefixes = [mfr_lower]
+        # Add known brand words that appear as model prefixes
+        brand_words = {
+            "hanwha": ["hanwha", "qcells", "q cells", "q.cells"],
+            "canadian solar": ["canadian solar", "cs"],
+            "lg": ["lg electronics", "lg"],
+            "trina": ["trina solar", "trina"],
+            "jinko": ["jinko solar", "jinkosolar", "jinko"],
+            "ja solar": ["ja solar"],
+            "longi": ["longi green", "longi solar", "longi"],
+            "rec": ["rec solar", "rec group", "rec"],
+            "silfab": ["silfab solar", "silfab"],
+            "sunpower": ["sunpower"],
+            "sma": ["sma america", "sma"],
+            "enphase": ["enphase energy", "enphase"],
+            "solaredge": ["solaredge"],
+        }
+        for key, prefixes in brand_words.items():
+            if key in mfr_lower:
+                brand_prefixes.extend(prefixes)
+        for prefix in sorted(brand_prefixes, key=len, reverse=True):
+            if s_lower.startswith(prefix):
+                s = s[len(prefix):].strip().lstrip('-').lstrip('_').strip()
+                break
     s = s.strip()
     s = re.sub(r'\s+', ' ', s)
     return s.lower().strip()
@@ -252,11 +341,23 @@ def load_cec_inverters():
 
 def _search_models(mfr_models, norm_model):
     """Search a manufacturer's models dict for a match."""
+    if not norm_model:
+        return None
+    # 1. Exact match
     if norm_model in mfr_models:
         return mfr_models[norm_model]
+    # 2. Prefix match (DB model starts with CEC model or vice versa)
     for cec_model, cec_data in mfr_models.items():
         if norm_model.startswith(cec_model) or cec_model.startswith(norm_model):
             return cec_data
+    # 3. Base model match — strip trailing wattage number and try again
+    #    e.g., "cs6u-340m" → "cs6u-" matches "cs6u-340p" base "cs6u-"
+    base = re.sub(r'[\-_]?\d{2,4}[a-z]*$', '', norm_model)
+    if base and base != norm_model and len(base) >= 3:
+        for cec_model, cec_data in mfr_models.items():
+            cec_base = re.sub(r'[\-_]?\d{2,4}[a-z]*$', '', cec_model)
+            if base == cec_base and base:
+                return cec_data
     return None
 
 
@@ -264,29 +365,36 @@ def _find_match(lookup, mfr, model):
     """Generic matching logic for both modules and inverters."""
     norm_mfr = normalize(mfr)
     norm_model = normalize_model(model)
+    # Also try with manufacturer prefix stripped from model
+    norm_model_stripped = normalize_model(model, manufacturer=mfr)
     alias_mfr = resolve_alias(norm_mfr)
 
-    # 1. Exact normalized manufacturer match
-    if norm_mfr in lookup:
-        result = _search_models(lookup[norm_mfr], norm_model)
-        if result:
-            return result
+    models_to_try = [norm_model]
+    if norm_model_stripped != norm_model:
+        models_to_try.append(norm_model_stripped)
 
-    # 2. Alias-based match (e.g., "hanwha q cells" -> "qcells" matches CEC's "qcells north")
-    if alias_mfr != norm_mfr:
-        for cec_mfr, cec_models in lookup.items():
-            cec_alias = resolve_alias(cec_mfr)
-            if alias_mfr == cec_alias:
-                result = _search_models(cec_models, norm_model)
-                if result:
-                    return result
-
-    # 3. Substring match on manufacturer
-    for cec_mfr, cec_models in lookup.items():
-        if norm_mfr in cec_mfr or cec_mfr in norm_mfr:
-            result = _search_models(cec_models, norm_model)
+    for nm in models_to_try:
+        # 1. Exact normalized manufacturer match
+        if norm_mfr in lookup:
+            result = _search_models(lookup[norm_mfr], nm)
             if result:
                 return result
+
+        # 2. Alias-based match (e.g., "hanwha q cells" -> "qcells" matches CEC's "qcells north")
+        if alias_mfr != norm_mfr:
+            for cec_mfr, cec_models in lookup.items():
+                cec_alias = resolve_alias(cec_mfr)
+                if alias_mfr == cec_alias:
+                    result = _search_models(cec_models, nm)
+                    if result:
+                        return result
+
+        # 3. Substring match on manufacturer
+        for cec_mfr, cec_models in lookup.items():
+            if norm_mfr in cec_mfr or cec_mfr in norm_mfr:
+                result = _search_models(cec_models, nm)
+                if result:
+                    return result
 
     return None
 
