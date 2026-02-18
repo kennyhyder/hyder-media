@@ -163,6 +163,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | Permit Equipment | `parse-permit-equipment.py` | Extract panel/inverter from permit descriptions | Re-queries permit APIs for descriptions |
 | Data Quality Audit | `data-quality-audit.py` | Field coverage, impossible values, installer standardization | DB analysis + `--fix` flag |
 | Parcel Owners | `enrich-parcel-owners.py` | Owner names from ArcGIS tax parcel point-in-polygon queries (13 statewide + 11 county endpoints) | ArcGIS REST APIs (free) |
+| Google Places | `enrich-google-places.py` | Website, phone, rating, reviews, address for entity tables (installers, owners, manufacturers) | Google Places API (New) Text Search (~$0.04/query) |
+| Entity Portfolio | `enrich-entity-portfolio.py` | avg_project_size_kw, equipment brands, geographic focus, project type distribution | Computed from DB (free) |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -817,7 +819,7 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 17, 2026 — Session 30)
+### Data Gap Summary (Feb 18, 2026 — Session 31)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
 | **location_precision** | **702,296** | **100.0%** | All records tagged |
@@ -830,9 +832,16 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 | **lat/lng (exact)** | **399,405** | **56.9%** | Exact coordinates |
 | capacity_mw | 375,156 | 53.4% | From source data |
 | **owner_name (linked)** | **355,832** | **50.7%** | From parcel enrichment (Session 29) |
-| **Entity tables** | **~231,000** | — | 33,343 installers + 198,662 site owners |
+| **Entity tables** | **~237,000** | — | 33,343 installers + 204,606 site owners + 1,962 manufacturers |
 | **Equipment** | **425,132** | — | 88.6% of pre-truncate 480K |
 | **Events** | **3,254,594** | — | Storm + recall + generator events |
+
+### Entity Enrichment Summary (Session 31)
+| Entity Table | Total | Enriched | Websites | Phones | Ratings | City | State |
+|-------------|------:|--------:|--------:|------:|-------:|-----:|------:|
+| solar_installers | 33,343 | 3,213 | 2,925 | 3,119 | 2,835 | 29,896 (89.7%) | 30,145 (90.4%) |
+| solar_site_owners | 204,606 | 1,490 | 1,311 | 1,359 | 1,237 | 200,210 (97.8%) | 204,606 (100%) |
+| solar_manufacturers | 1,962 | 258 | 227 | 230 | 236 | — | — |
 
 ### PJM-GATS Owner Enrichment - COMPLETED (Feb 10, 2026)
 - **enrich-pjm-gats.py**: Cross-references PJM-GATS generator export (582,419 solar records across 13+ PJM states)
@@ -2307,3 +2316,103 @@ Discovered that the Session 21 TRUNCATE CASCADE recovery had left three critical
 - **0 unlinked records across all 4 entity types**
 
 **Next.js site rebuilt** with fully recovered field coverage stats.
+
+### Session 31 — Feb 18, 2026
+
+**Entity Enrichment: Business Contact Data + Portfolio Analytics — COMPLETED**
+
+Full 6-phase implementation plan executed to transform entity tables from empty shells into rich business profiles.
+
+**Phase 1 — SQL Backfill from Installation Data (FREE):**
+- Derived city/state for entities using `MODE()` aggregate from linked installations via psql
+- Installer state: 13.6% → 90.4%, city: 0% → 89.7%
+- Site owner state: 0% → 100%, city: 0% → 97.8%
+- Hit unique constraint `(normalized_name, state)` on solar_installers — fixed with `NOT EXISTS` subquery
+
+**Phase 2 — Schema Additions:**
+- Added 11 columns to each entity table: google_place_id, rating, review_count, description, business_status, enrichment_status, enriched_at, avg_project_size_kw, primary_equipment_brands, geographic_focus, project_type_distribution
+- Added 4 indexes for enrichment_status and rating DESC
+
+**Phase 3 — Portfolio Analytics (FREE, via direct SQL):**
+- Created `scripts/enrich-entity-portfolio.py` but it was too slow via REST API (~30s per large entity)
+- Switched to bulk SQL aggregation via psql — completed all ~237K entities in ~2 minutes:
+  - `avg_project_size_kw`: AVG(capacity_mw * 1000) per entity
+  - `geographic_focus`: Top 3 states by installation count
+  - `project_type_distribution`: {"commercial": 0.85, "utility": 0.10} JSONB
+  - `primary_equipment_brands`: Top 5 manufacturers from equipment records (LATERAL join)
+
+**Phase 4 — Google Places API Enrichment:**
+- Created `scripts/enrich-google-places.py` — Google Places API (New) Text Search
+- API: POST `https://places.googleapis.com/v1/places:searchText` with X-Goog-FieldMask
+- Features: Non-business name filtering (trusts, estates, government, personal names), fuzzy name matching (>50% word overlap), enrichment_status tracking
+- Cost: ~$0.04/query (Advanced tier for contact fields)
+
+**Installer enrichment (4,626 business entities, ~$185):**
+- 3,213 enriched (69.5%), 784 low match, 589 not found, 17 errors
+- 2,925 websites, 3,119 phones, 2,835 ratings (avg 4.37 stars, avg 211 reviews)
+
+**Site owner enrichment (3,604 business entities, ~$144):**
+- 1,490 enriched (41.3%), 1,469 low match, 645 not found
+- 1,311 websites, 1,359 phones, 1,237 ratings
+- Lower match rate because many owners are holding companies/LLCs without strong Google Places presence
+
+**Manufacturer enrichment (515 entities with 10+ equipment, ~$21):**
+- Created `solar_manufacturers` table (1,962 unique manufacturers from equipment data)
+- 258 enriched (50.1%), 112 not found, 145 low match, 0 errors
+- 227 websites, 230 phones, 236 ratings
+- Some matched to international offices (India, Vietnam, Germany) instead of US HQ
+- Short names (Tesla, REC) get low matches — Google returns local solar installers
+
+**Total Google Places cost: ~$350** (covered by Google's $200/month free credit over 2 months)
+
+**Phase 5 — API + Frontend Updates:**
+
+Files modified:
+- `api/solar/directory.js` — Added rating, review_count, description, avg_project_size_kw, geographic_focus to SELECT queries
+- `api/solar/company.js` — Added all enrichment fields to response object
+- `src/types/solar.ts` — Added enrichment fields to DirectoryEntity and CompanyProfile interfaces
+- `src/app/directory/page.tsx` — Star rating display, geographic focus badges, clickable phone links
+- `src/app/company/page.tsx` — Enhanced header (rating, description, business status badge, phone button), new Portfolio Analytics section (avg project size, geographic focus, top equipment brands with links, project type distribution bar chart)
+- `src/components/StarRating.tsx` — **NEW** shared component: 1-5 stars with partial SVG fill, rating number + review count
+
+**Phase 6 — Build + Deploy:**
+- Static build successful, all pages regenerated
+- 3 commits pushed: `5280d96` (initial implementation), `06b3210` (rebuild after installer enrichment), `f7eec7c` (owners + manufacturers enrichment)
+
+**Schema additions for solar_manufacturers:**
+```sql
+CREATE TABLE solar_manufacturers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  normalized_name TEXT NOT NULL UNIQUE,
+  equipment_count INTEGER DEFAULT 0,
+  equipment_types TEXT[],
+  google_place_id TEXT, website TEXT, phone TEXT,
+  address TEXT, city TEXT, state TEXT, zip_code TEXT, country TEXT,
+  rating NUMERIC(2,1), review_count INTEGER,
+  description TEXT, business_status TEXT,
+  enrichment_status TEXT, enriched_at TIMESTAMPTZ,
+  avg_project_size_kw NUMERIC(12,3), primary_equipment_brands TEXT[],
+  geographic_focus TEXT[], project_type_distribution JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Running enrichment scripts:**
+```bash
+# Google Places (costs ~$0.04/query)
+python3 -u scripts/enrich-google-places.py --table installers --limit 5000 --min-sites 2
+python3 -u scripts/enrich-google-places.py --table owners --limit 5000 --min-sites 2
+python3 -u scripts/enrich-google-places.py --table manufacturers
+python3 -u scripts/enrich-google-places.py --dry-run  # Preview
+
+# Portfolio analytics (free, uses REST API per entity — prefer SQL for bulk)
+python3 -u scripts/enrich-entity-portfolio.py --table installers --dry-run
+```
+
+**Key errors encountered:**
+- **Unique constraint on installer state backfill**: `(normalized_name, state)` collision when updating state. Fixed with `NOT EXISTS` subquery.
+- **Portfolio script too slow**: REST API approach needed multiple calls per entity. Killed it, used direct SQL instead.
+- **Google Places API 403**: API needed to be enabled + added to API key restrictions in Google Cloud Console.
+- **HTTP 400 patch errors**: 17 entities with special characters in data caused Supabase PATCH failures. Script continues past these.
+- **Ambiguous column reference**: SQL portfolio query had ambiguous `cnt` in LATERAL join. Fixed by simplifying to subquery with GROUP BY.
