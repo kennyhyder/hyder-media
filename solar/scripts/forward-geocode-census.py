@@ -68,9 +68,18 @@ def supabase_get(table, params):
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
     }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode())
+    for attempt in range(5):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, OSError) as e:
+            if attempt < 4:
+                wait = 2 ** attempt
+                print(f"    Retry {attempt+1}/5 after {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_patch_batch(table, ids, data):
@@ -94,7 +103,7 @@ def supabase_patch_batch(table, ids, data):
 
 
 def supabase_patch_single(table, record_id, data):
-    """PATCH a single record."""
+    """PATCH a single record with retry."""
     url = f"{SUPABASE_URL}/rest/v1/{table}?id=eq.{record_id}"
     headers = {
         "apikey": SUPABASE_KEY,
@@ -103,13 +112,22 @@ def supabase_patch_single(table, record_id, data):
         "Prefer": "return=minimal",
     }
     body = json.dumps(data).encode()
-    req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
-    try:
-        urllib.request.urlopen(req)
-        return True
-    except urllib.error.HTTPError as e:
-        print(f"  PATCH error ({e.code}): {e.read().decode()[:200]}")
-        return False
+    for attempt in range(5):
+        try:
+            req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
+            urllib.request.urlopen(req, timeout=30)
+            return True
+        except urllib.error.HTTPError as e:
+            print(f"  PATCH error ({e.code}): {e.read().decode()[:200]}")
+            return False
+        except (urllib.error.URLError, OSError) as e:
+            if attempt < 4:
+                wait = 2 ** attempt
+                print(f"    PATCH retry {attempt+1}/5 after {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                print(f"  PATCH failed after 5 retries: {e}")
+                return False
 
 
 # ---------------------------------------------------------------------------
@@ -353,36 +371,49 @@ def main():
     parser = argparse.ArgumentParser(description="Census Bureau batch forward geocoder")
     parser.add_argument("--dry-run", action="store_true", help="Report without patching")
     parser.add_argument("--limit", type=int, default=0, help="Process only first N records")
+    parser.add_argument("--from-file", type=str, help="Load records from CSV file instead of Supabase")
+    parser.add_argument("--skip-records", type=int, default=0, help="Skip first N records (for resuming)")
     args = parser.parse_args()
 
     print("Census Bureau Batch Forward Geocoder")
     print("=" * 60)
 
     # Load records with address but no coordinates
-    print("Loading records with address but no coordinates...")
     all_records = []
-    offset = 0
-    page_size = 1000
 
-    while True:
-        params = {
-            "select": "id,address,city,state,zip_code,source_record_id",
-            "latitude": "is.null",
-            "address": "not.is.null",
-            "limit": str(page_size),
-            "offset": str(offset),
-            "order": "id",
-        }
-        batch = supabase_get("solar_installations", params)
-        if not batch:
-            break
-        all_records.extend(batch)
-        if len(batch) < page_size:
-            break
-        offset += page_size
-        if args.limit and len(all_records) >= args.limit:
-            all_records = all_records[:args.limit]
-            break
+    if args.from_file:
+        print(f"Loading records from {args.from_file}...")
+        with open(args.from_file, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                all_records.append(row)
+                if args.limit and len(all_records) >= args.limit:
+                    break
+        print(f"  Loaded {len(all_records)} records from file")
+    else:
+        print("Loading records with address but no coordinates...")
+        offset = 0
+        page_size = 1000
+
+        while True:
+            params = {
+                "select": "id,address,city,state,zip_code,source_record_id",
+                "latitude": "is.null",
+                "address": "not.is.null",
+                "limit": str(page_size),
+                "offset": str(offset),
+                "order": "id",
+            }
+            batch = supabase_get("solar_installations", params)
+            if not batch:
+                break
+            all_records.extend(batch)
+            if len(batch) < page_size:
+                break
+            offset += page_size
+            if args.limit and len(all_records) >= args.limit:
+                all_records = all_records[:args.limit]
+                break
 
     print(f"  Found {len(all_records)} records with address but no coordinates")
 
@@ -421,6 +452,11 @@ def main():
     total_failed = 0
     total_errors = 0
     batch_num = 0
+
+    # Skip records if resuming
+    if args.skip_records > 0:
+        valid_records = valid_records[args.skip_records:]
+        print(f"  Skipped first {args.skip_records} records, {len(valid_records)} remaining")
 
     for batch_start in range(0, len(valid_records), CENSUS_BATCH_SIZE):
         batch_end = min(batch_start + CENSUS_BATCH_SIZE, len(valid_records))
