@@ -107,6 +107,15 @@ export default async function handler(req, res) {
         capacity_mw: role === "installer" ? (entity.total_capacity_kw ? entity.total_capacity_kw / 1000 : 0) : (profile?.total_capacity_mw || 0),
         first_seen: entity.first_seen || null,
         last_seen: entity.last_seen || null,
+        // Enrichment data
+        rating: entity.rating || null,
+        review_count: entity.review_count || null,
+        description: entity.description || null,
+        business_status: entity.business_status || null,
+        avg_project_size_kw: entity.avg_project_size_kw ? Number(entity.avg_project_size_kw) : null,
+        primary_equipment_brands: entity.primary_equipment_brands || null,
+        geographic_focus: entity.geographic_focus || null,
+        project_type_distribution: entity.project_type_distribution || null,
         // Portfolio data from RPC
         states: profile?.states || [],
         timeline: profile?.timeline || [],

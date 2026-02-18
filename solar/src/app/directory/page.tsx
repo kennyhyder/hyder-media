@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import EntityBadge from "@/components/EntityBadge";
+import StarRating from "@/components/StarRating";
 import type { DirectoryEntity, Pagination } from "@/types/solar";
 
 const API_BASE =
@@ -202,13 +203,27 @@ function DirectoryContent() {
                         {(entity.city || entity.state) && (
                           <span>{[entity.city, entity.state].filter(Boolean).join(", ")}</span>
                         )}
-                        {entity.phone && <span>{entity.phone}</span>}
+                        {entity.phone && (
+                          <a href={`tel:${entity.phone}`} className="hover:text-blue-600">{entity.phone}</a>
+                        )}
                         {entity.equipment_types && (
                           <span className="text-gray-400">
                             {entity.equipment_types.join(", ")}
                           </span>
                         )}
                       </div>
+                      {entity.rating && (
+                        <div className="mt-1">
+                          <StarRating rating={entity.rating} count={entity.review_count} />
+                        </div>
+                      )}
+                      {entity.geographic_focus && entity.geographic_focus.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {entity.geographic_focus.map((s) => (
+                            <span key={s} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">{s}</span>
+                          ))}
+                        </div>
+                      )}
                       <div className="flex flex-wrap items-center gap-2 mt-3">
                         {entity.website && (
                           <a

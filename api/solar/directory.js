@@ -116,6 +116,11 @@ async function handleInstallers(supabase, { name, state, sort, order, limitNum, 
     capacity_mw: r.total_capacity_kw ? r.total_capacity_kw / 1000 : 0,
     first_seen: r.first_seen,
     last_seen: r.last_seen,
+    rating: r.rating || null,
+    review_count: r.review_count || null,
+    description: r.description || null,
+    avg_project_size_kw: r.avg_project_size_kw || null,
+    geographic_focus: r.geographic_focus || null,
   }));
 
   return res.status(200).json({
@@ -157,6 +162,11 @@ async function handleOwners(supabase, { type, name, state, sort, order, limitNum
     site_count: r.site_count || 0,
     capacity_mw: r.owned_capacity_mw || 0,
     developed_capacity_mw: r.developed_capacity_mw || 0,
+    rating: r.rating || null,
+    review_count: r.review_count || null,
+    description: r.description || null,
+    avg_project_size_kw: r.avg_project_size_kw || null,
+    geographic_focus: r.geographic_focus || null,
   }));
 
   return res.status(200).json({
@@ -167,24 +177,26 @@ async function handleOwners(supabase, { type, name, state, sort, order, limitNum
 
 // Helper fetchers for "all" type
 async function fetchInstallers(supabase, { name, state, limit }) {
-  let query = supabase.from("solar_installers").select("id, name, state, city, website, installation_count, total_capacity_kw");
+  let query = supabase.from("solar_installers").select("id, name, state, city, website, installation_count, total_capacity_kw, rating, review_count");
   if (name) query = query.ilike("name", `%${name}%`);
   if (state) query = query.eq("state", state);
   const { data } = await query.order("installation_count", { ascending: false }).limit(limit);
   return (data || []).map(r => ({
     id: r.id, name: r.name, role: "installer", state: r.state, city: r.city, website: r.website,
     site_count: r.installation_count || 0, capacity_mw: r.total_capacity_kw ? r.total_capacity_kw / 1000 : 0,
+    rating: r.rating || null, review_count: r.review_count || null,
   }));
 }
 
 async function fetchOwners(supabase, { name, state, limit }) {
-  let query = supabase.from("solar_site_owners").select("id, name, state, city, website, site_count, owned_capacity_mw").gt("site_count", 0);
+  let query = supabase.from("solar_site_owners").select("id, name, state, city, website, site_count, owned_capacity_mw, rating, review_count").gt("site_count", 0);
   if (name) query = query.ilike("name", `%${name}%`);
   if (state) query = query.eq("state", state);
   const { data } = await query.order("site_count", { ascending: false }).limit(limit);
   return (data || []).map(r => ({
     id: r.id, name: r.name, role: "owner", state: r.state, city: r.city, website: r.website,
     site_count: r.site_count || 0, capacity_mw: r.owned_capacity_mw || 0,
+    rating: r.rating || null, review_count: r.review_count || null,
   }));
 }
 

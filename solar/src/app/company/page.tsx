@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import EntityBadge from "@/components/EntityBadge";
+import StarRating from "@/components/StarRating";
 import type { CompanyProfile } from "@/types/solar";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
@@ -122,24 +123,49 @@ function CompanyContent() {
               {Object.entries(company.cross_roles || {}).map(([r]) => (
                 <EntityBadge key={r} role={r} />
               ))}
+              {company.business_status && company.business_status !== "OPERATIONAL" && (
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                  {company.business_status.replace(/_/g, " ")}
+                </span>
+              )}
             </div>
+            {company.rating && (
+              <div className="mt-2">
+                <StarRating rating={company.rating} count={company.review_count} />
+              </div>
+            )}
+            {company.description && (
+              <p className="mt-2 text-sm text-gray-600 max-w-2xl">{company.description}</p>
+            )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-gray-500">
               {(company.city || company.state) && (
                 <span>{[company.city, company.state].filter(Boolean).join(", ")}</span>
               )}
-              {company.phone && <span>{company.phone}</span>}
+              {company.phone && (
+                <a href={`tel:${company.phone}`} className="hover:text-blue-600">{company.phone}</a>
+              )}
               {company.license_number && <span>License: {company.license_number}</span>}
             </div>
-            {company.website && (
-              <a
-                href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
-              >
-                Visit Website
-              </a>
-            )}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              {company.website && (
+                <a
+                  href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+                >
+                  Visit Website
+                </a>
+              )}
+              {company.phone && (
+                <a
+                  href={`tel:${company.phone}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Call
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -165,6 +191,73 @@ function CompanyContent() {
           <div className="text-3xl font-bold mt-1">{yearsActive || "N/A"}</div>
         </div>
       </div>
+
+      {/* Portfolio Analytics */}
+      {(company.avg_project_size_kw || company.primary_equipment_brands || company.geographic_focus || company.project_type_distribution) && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4">Portfolio Analytics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {company.avg_project_size_kw && (
+              <div>
+                <div className="text-sm text-gray-500 uppercase tracking-wide">Avg Project Size</div>
+                <div className="text-2xl font-bold mt-1">
+                  {company.avg_project_size_kw >= 1000
+                    ? `${(company.avg_project_size_kw / 1000).toFixed(1)} MW`
+                    : `${Math.round(company.avg_project_size_kw)} kW`}
+                </div>
+              </div>
+            )}
+            {company.geographic_focus && company.geographic_focus.length > 0 && (
+              <div>
+                <div className="text-sm text-gray-500 uppercase tracking-wide">Geographic Focus</div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {company.geographic_focus.map((s) => (
+                    <span key={s} className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm font-medium">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {company.primary_equipment_brands && company.primary_equipment_brands.length > 0 && (
+              <div>
+                <div className="text-sm text-gray-500 uppercase tracking-wide">Top Equipment Brands</div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {company.primary_equipment_brands.map((b) => (
+                    <a
+                      key={b}
+                      href={`/solar/company/?name=${encodeURIComponent(b)}&role=manufacturer`}
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium hover:bg-gray-200"
+                    >
+                      {b}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            {company.project_type_distribution && Object.keys(company.project_type_distribution).length > 0 && (
+              <div>
+                <div className="text-sm text-gray-500 uppercase tracking-wide">Project Types</div>
+                <div className="space-y-1 mt-2">
+                  {Object.entries(company.project_type_distribution)
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([type, pct]) => (
+                      <div key={type} className="flex items-center gap-2">
+                        <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${
+                              type === "utility" ? "bg-blue-500" : type === "community" ? "bg-purple-500" : "bg-green-500"
+                            }`}
+                            style={{ width: `${pct * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-gray-500 w-20 capitalize">{type} {Math.round(pct * 100)}%</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Cross-roles */}
       {Object.keys(company.cross_roles || {}).length > 0 && (

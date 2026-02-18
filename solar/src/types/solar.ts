@@ -154,6 +154,11 @@ export interface DirectoryEntity {
   first_seen?: string | null;
   last_seen?: string | null;
   developed_capacity_mw?: number;
+  rating?: number | null;
+  review_count?: number | null;
+  description?: string | null;
+  avg_project_size_kw?: number | null;
+  geographic_focus?: string[] | null;
 }
 
 export interface CompanyProfile {
@@ -170,6 +175,14 @@ export interface CompanyProfile {
   capacity_mw: number;
   first_seen: string | null;
   last_seen: string | null;
+  rating: number | null;
+  review_count: number | null;
+  description: string | null;
+  business_status: string | null;
+  avg_project_size_kw: number | null;
+  primary_equipment_brands: string[] | null;
+  geographic_focus: string[] | null;
+  project_type_distribution: Record<string, number> | null;
   states: { state: string; count: number }[];
   timeline: { year: number; count: number }[];
   top_equipment: { name: string; count: number; type?: string }[];
