@@ -346,29 +346,76 @@ def parse_damage(damage_str):
 # ---------------------------------------------------------------------------
 
 def load_installations_by_state():
-    """Load installations grouped by state + county for matching."""
+    """Load installations grouped by state + county for matching.
+    
+    Uses psql for reliability (REST API returns 500 on 700K+ record pagination).
+    Falls back to REST API if psql is unavailable.
+    """
     print("Loading installations from database...")
     all_records = []
-    offset = 0
-    limit = 1000
 
-    while True:
-        params = {
-            "select": "id,state,county,install_date,latitude,longitude",
-            "state": "not.is.null",
-            "limit": str(limit),
-            "offset": str(offset),
-            "order": "id",
-        }
-        batch = supabase_get("solar_installations", params)
-        if not batch:
-            break
-        all_records.extend(batch)
-        if len(batch) < limit:
-            break
-        offset += limit
+    # Try psql first (much more reliable for 700K+ records)
+    try:
+        import subprocess
+        psql_cmd = [
+            "psql",
+            "-h", "aws-0-us-west-2.pooler.supabase.com",
+            "-p", "6543",
+            "-U", "postgres.ilbovwnhrowvxjdkvrln",
+            "-d", "postgres",
+            "-t", "-A", "-F", "|",
+            "-c", "SELECT id, state, county, install_date, latitude, longitude FROM solar_installations WHERE state IS NOT NULL ORDER BY id"
+        ]
+        env = os.environ.copy()
+        env["PGPASSWORD"] = "#FsW7iqg%EYX&G3M"
+        print("  Using psql for bulk load (REST API unreliable at this scale)...")
+        result = subprocess.run(psql_cmd, capture_output=True, text=True, env=env, timeout=300)
+        if result.returncode == 0 and result.stdout.strip():
+            for line in result.stdout.strip().split("\n"):
+                if "|" in line:
+                    parts = line.split("|")
+                    if len(parts) >= 6:
+                        rec = {
+                            "id": parts[0],
+                            "state": parts[1] if parts[1] else None,
+                            "county": parts[2] if parts[2] else None,
+                            "install_date": parts[3] if parts[3] else None,
+                            "latitude": float(parts[4]) if parts[4] else None,
+                            "longitude": float(parts[5]) if parts[5] else None,
+                        }
+                        all_records.append(rec)
+            print(f"  Loaded {len(all_records):,} installations via psql")
+        else:
+            print(f"  psql returned no data or error: {result.stderr[:200]}")
+            all_records = []  # Force REST fallback
+    except Exception as e:
+        print(f"  psql failed: {e}")
+        all_records = []  # Force REST fallback
 
-    print(f"  Total: {len(all_records)} installations loaded")
+    # Fallback to REST API if psql didn't work
+    if not all_records:
+        print("  Falling back to REST API (may be slow/unreliable)...")
+        offset = 0
+        limit = 1000
+        while True:
+            params = {
+                "select": "id,state,county,install_date,latitude,longitude",
+                "state": "not.is.null",
+                "limit": str(limit),
+                "offset": str(offset),
+                "order": "id",
+            }
+            batch = supabase_get("solar_installations", params, retries=5)
+            if not batch:
+                break
+            all_records.extend(batch)
+            if len(batch) < limit:
+                break
+            offset += limit
+            if offset % 10000 == 0:
+                print(f"    Loaded {offset:,} installations...")
+
+    print(f"  Total: {len(all_records):,} installations loaded")
 
     # Group by state + county (normalized)
     by_state_county = {}
