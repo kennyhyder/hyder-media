@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     let query = supabase
       .from("solar_installers")
-      .select("*", { count: "exact" });
+      .select("*", { count: "estimated" });
 
     if (state) query = query.eq("state", state);
     if (name) query = query.ilike("name", `%${name}%`);
