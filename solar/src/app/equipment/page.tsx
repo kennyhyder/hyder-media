@@ -285,7 +285,16 @@ function EquipmentContent() {
                   <tr key={eq.id} className="border-t hover:bg-gray-50">
                     <td className="px-4 py-3 capitalize">{eq.equipment_type}</td>
                     <td className="px-4 py-3">
-                      {eq.manufacturer || <span className="text-gray-300">-</span>}
+                      {eq.manufacturer ? (
+                        <a
+                          href={`/solar/company/?name=${encodeURIComponent(eq.manufacturer)}&role=manufacturer`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {eq.manufacturer}
+                        </a>
+                      ) : (
+                        <span className="text-gray-300">-</span>
+                      )}
                       {eq.model && (
                         <div className="text-xs text-gray-400">{eq.model}</div>
                       )}

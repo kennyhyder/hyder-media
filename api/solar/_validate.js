@@ -57,6 +57,23 @@ export const InstallersQuery = z.object({
   min_installations: optInt,
 });
 
+export const DirectoryQuery = z.object({
+  page: pageInt,
+  limit: limitInt,
+  type: z.enum(["all", "installer", "owner", "developer", "operator", "manufacturer"]).default("all"),
+  name: optStr,
+  state: z.string().length(2).toUpperCase().optional(),
+  sort: z.enum(["name", "site_count", "capacity", "recent"]).default("site_count"),
+  order: z.enum(["asc", "desc"]).default("desc"),
+  min_sites: optInt,
+});
+
+export const CompanyQuery = z.object({
+  id: z.string().uuid("Invalid entity ID").optional(),
+  name: optStr,
+  role: z.enum(["installer", "owner", "developer", "operator", "manufacturer"]).default("installer"),
+});
+
 export const ExportQuery = z.object({
   limit: z.coerce.number().int().min(1).max(50000).default(10000),
   state: z.string().length(2).toUpperCase().optional(),

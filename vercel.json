@@ -44,6 +44,12 @@
     },
     "api/solar/export.js": {
       "maxDuration": 60
+    },
+    "api/solar/directory.js": {
+      "maxDuration": 30
+    },
+    "api/solar/company.js": {
+      "maxDuration": 30
     }
   }
 }

@@ -181,22 +181,30 @@ function SiteContent() {
               <DetailRow
                 label="Owner"
                 value={site.owner_name}
-                link={site.owner_name ? `/solar/search/?owner=${encodeURIComponent(site.owner_name)}` : undefined}
+                link={site.owner_id
+                  ? `/solar/company/?id=${site.owner_id}&role=owner`
+                  : site.owner_name ? `/solar/directory/?type=owner&name=${encodeURIComponent(site.owner_name)}` : undefined}
               />
               <DetailRow
                 label="Operator"
                 value={site.operator_name}
-                link={site.operator_name ? `/solar/search/?q=${encodeURIComponent(site.operator_name)}` : undefined}
+                link={site.operator_id
+                  ? `/solar/company/?id=${site.operator_id}&role=operator`
+                  : site.operator_name ? `/solar/directory/?type=operator&name=${encodeURIComponent(site.operator_name)}` : undefined}
               />
               <DetailRow
                 label="Developer"
                 value={site.developer_name}
-                link={site.developer_name ? `/solar/search/?q=${encodeURIComponent(site.developer_name)}` : undefined}
+                link={site.developer_id
+                  ? `/solar/company/?id=${site.developer_id}&role=developer`
+                  : site.developer_name ? `/solar/directory/?type=developer&name=${encodeURIComponent(site.developer_name)}` : undefined}
               />
               <DetailRow
                 label="Installer"
                 value={site.installer_name}
-                link={site.installer_name ? `/solar/search/?installer=${encodeURIComponent(site.installer_name)}` : undefined}
+                link={site.installer_id
+                  ? `/solar/company/?id=${site.installer_id}&role=installer`
+                  : site.installer_name ? `/solar/directory/?type=installer&name=${encodeURIComponent(site.installer_name)}` : undefined}
               />
             </dl>
           </div>
@@ -229,7 +237,7 @@ function SiteContent() {
                     <td className="py-2 pr-4">
                       {eq.manufacturer ? (
                         <a
-                          href={`/solar/equipment/?manufacturer=${encodeURIComponent(eq.manufacturer)}&equipment_type=${eq.equipment_type}`}
+                          href={`/solar/company/?name=${encodeURIComponent(eq.manufacturer)}&role=manufacturer`}
                           className="text-blue-600 hover:underline"
                         >
                           {eq.manufacturer}

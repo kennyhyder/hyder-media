@@ -139,6 +139,54 @@ export interface DataSource {
   created_at: string;
 }
 
+export interface DirectoryEntity {
+  id: string | null;
+  name: string;
+  role: "installer" | "owner" | "developer" | "operator" | "manufacturer";
+  state: string | null;
+  city: string | null;
+  website: string | null;
+  phone?: string | null;
+  site_count: number;
+  capacity_mw: number;
+  equipment_count?: number;
+  equipment_types?: string[];
+  first_seen?: string | null;
+  last_seen?: string | null;
+  developed_capacity_mw?: number;
+}
+
+export interface CompanyProfile {
+  id: string | null;
+  name: string;
+  role: string;
+  state: string | null;
+  city: string | null;
+  website: string | null;
+  phone: string | null;
+  license_number: string | null;
+  entity_type: string | null;
+  site_count: number;
+  capacity_mw: number;
+  first_seen: string | null;
+  last_seen: string | null;
+  states: { state: string; count: number }[];
+  timeline: { year: number; count: number }[];
+  top_equipment: { name: string; count: number; type?: string }[];
+  installations: {
+    id: string;
+    site_name: string | null;
+    state: string | null;
+    city: string | null;
+    capacity_mw: number | null;
+    install_date: string | null;
+    site_type: string;
+    latitude: number | null;
+    longitude: number | null;
+  }[];
+  cross_roles: Record<string, number>;
+}
+
 export interface Pagination {
   page: number;
   limit: number;
