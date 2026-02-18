@@ -15,6 +15,7 @@ Usage:
   python3 -u scripts/enrich-google-places.py                          # Both tables, top entities
   python3 -u scripts/enrich-google-places.py --table installers       # Installers only
   python3 -u scripts/enrich-google-places.py --table owners           # Owners only
+  python3 -u scripts/enrich-google-places.py --table manufacturers    # Manufacturers only
   python3 -u scripts/enrich-google-places.py --limit 5000             # Process first N
   python3 -u scripts/enrich-google-places.py --min-sites 5            # Only entities with 5+ sites
   python3 -u scripts/enrich-google-places.py --dry-run                # Preview without patching
@@ -127,13 +128,16 @@ def supabase_patch(table, data, params, retries=3):
 # Google Places API
 # ---------------------------------------------------------------------------
 
-def search_place(entity_name, state=None):
+def search_place(entity_name, state=None, search_type="solar"):
     """Search Google Places for a business entity."""
     query = entity_name
     if state:
         query += f" {state}"
-    # Add "solar" if not already in name for better matching
-    if not re.search(r"\b(solar|energy|power|electric)\b", entity_name, re.I):
+    # Add context keyword if not already in name for better matching
+    if search_type == "manufacturer":
+        if not re.search(r"\b(solar|energy|power|electric|inverter|panel|module|battery)\b", entity_name, re.I):
+            query += " solar manufacturer"
+    elif not re.search(r"\b(solar|energy|power|electric)\b", entity_name, re.I):
         query += " solar"
 
     body = json.dumps({
@@ -221,16 +225,27 @@ def process_table(table_name, min_sites, dry_run=False, limit=None):
     print(f"Processing {table_name}")
     print(f"{'='*60}")
 
+    is_manufacturer = table_name == "solar_manufacturers"
+
     # Load entities that haven't been enriched yet
-    site_count_col = "installation_count" if table_name == "solar_installers" else "site_count"
+    if is_manufacturer:
+        site_count_col = "equipment_count"
+        min_count = 10  # At least 10 equipment records
+    elif table_name == "solar_installers":
+        site_count_col = "installation_count"
+        min_count = min_sites
+    else:
+        site_count_col = "site_count"
+        min_count = min_sites
+
     page = 0
     page_size = 1000
     entities = []
     while True:
         rows = supabase_get(table_name, {
-            "select": "id,name,state,website,phone",
+            "select": "id,name,state,website,phone" if not is_manufacturer else "id,name,website,phone,equipment_count",
             "enrichment_status": "is.null",
-            f"{site_count_col}": f"gte.{min_sites}",
+            f"{site_count_col}": f"gte.{min_count}",
             "order": f"{site_count_col}.desc",
             "offset": str(page * page_size),
             "limit": str(page_size),
@@ -245,13 +260,13 @@ def process_table(table_name, min_sites, dry_run=False, limit=None):
             entities = entities[:limit]
             break
 
-    print(f"Found {len(entities)} entities to enrich (min_sites={min_sites})")
+    print(f"Found {len(entities)} entities to enrich (min_{site_count_col}={min_count})")
 
-    # Filter out non-business names
+    # Filter out non-business names (skip for manufacturers — all are businesses)
     business_entities = []
     skipped_names = 0
     for e in entities:
-        if should_skip(e["name"]):
+        if not is_manufacturer and should_skip(e["name"]):
             skipped_names += 1
         else:
             business_entities.append(e)
@@ -270,11 +285,12 @@ def process_table(table_name, min_sites, dry_run=False, limit=None):
     for idx, entity in enumerate(business_entities):
         eid = entity["id"]
         name = entity["name"]
-        state = entity.get("state")
+        state = entity.get("state") if not is_manufacturer else None
 
         # Search Google Places
         try:
-            place = search_place(name, state)
+            search_type = "manufacturer" if is_manufacturer else "solar"
+            place = search_place(name, state, search_type=search_type)
             api_calls += 1
         except Exception as e:
             print(f"  [{idx+1}/{len(business_entities)}] ERROR searching {name}: {e}")
@@ -375,7 +391,7 @@ def process_table(table_name, min_sites, dry_run=False, limit=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Enrich entities via Google Places API")
-    parser.add_argument("--table", choices=["installers", "owners", "both"], default="both")
+    parser.add_argument("--table", choices=["installers", "owners", "manufacturers", "both", "all"], default="both")
     parser.add_argument("--dry-run", action="store_true", help="Preview without patching")
     parser.add_argument("--limit", type=int, help="Process first N entities per table")
     parser.add_argument("--min-sites", type=int, default=2, help="Min site count to query (default: 2)")
@@ -383,11 +399,14 @@ def main():
 
     start = time.time()
 
-    if args.table in ("installers", "both"):
+    if args.table in ("installers", "both", "all"):
         process_table("solar_installers", args.min_sites, dry_run=args.dry_run, limit=args.limit)
 
-    if args.table in ("owners", "both"):
+    if args.table in ("owners", "both", "all"):
         process_table("solar_site_owners", args.min_sites, dry_run=args.dry_run, limit=args.limit)
+
+    if args.table in ("manufacturers", "all"):
+        process_table("solar_manufacturers", args.min_sites, dry_run=args.dry_run, limit=args.limit)
 
     elapsed = time.time() - start
     print(f"\nTotal time: {elapsed:.1f}s")
