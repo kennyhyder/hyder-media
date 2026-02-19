@@ -1,5 +1,5 @@
 -- Affiliati Clinical Trial Intelligence Platform
--- Run this in your Supabase SQL Editor
+-- Run this in Supabase SQL Editor
 
 -- ============================================
 -- Offers (cached from CAKE API)
