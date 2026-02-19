@@ -8,7 +8,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const CAKE_BASE = 'https://login.affiliati.com/api/1';
+const CAKE_BASE = 'https://login.affiliatinetwork.com/affiliates/api';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,21 +40,25 @@ export default async function handler(req, res) {
 
     try {
         // 1. Fetch offer feed from CAKE
-        const feedUrl = `${CAKE_BASE}/Offers/Feed?affiliate_id=${affiliateId}&api_key=${apiKey}&offer_status_id=1&limit=0`;
+        const feedUrl = `${CAKE_BASE}/Offers/Feed?affiliate_id=${affiliateId}&api_key=${apiKey}&offer_status_id=1`;
         const feedRes = await fetch(feedUrl);
         if (!feedRes.ok) {
             throw new Error(`CAKE Feed API returned ${feedRes.status}: ${await feedRes.text()}`);
         }
         const feedData = await feedRes.json();
 
-        const allOffers = feedData.offers || feedData.data || feedData || [];
+        if (!feedData.success) {
+            throw new Error(`CAKE API error: ${feedData.message || 'Unknown error'}`);
+        }
+
+        const allOffers = feedData.data || [];
         if (!Array.isArray(allOffers)) {
-            throw new Error('Unexpected CAKE response format - offers not found');
+            throw new Error('Unexpected CAKE response format - data not an array');
         }
 
         // 2. Filter for Clinical Research vertical
         const clinicalOffers = allOffers.filter(o =>
-            (o.vertical_name || o.vertical || '').toLowerCase().includes('clinical')
+            (o.vertical_name || '').toLowerCase().includes('clinical')
         );
 
         let created = 0;
@@ -63,37 +67,23 @@ export default async function handler(req, res) {
 
         // 3. For each clinical offer, get full details and upsert
         for (const offer of clinicalOffers) {
-            const offerId = offer.offer_id || offer.id;
+            const offerId = offer.offer_id;
             const campaignId = offer.campaign_id;
             processedOfferIds.push(offerId);
-
-            // Try to get campaign details for richer data
-            let campaignData = null;
-            if (campaignId) {
-                try {
-                    const campUrl = `${CAKE_BASE}/Offers/Campaign?affiliate_id=${affiliateId}&api_key=${apiKey}&campaign_id=${campaignId}`;
-                    const campRes = await fetch(campUrl);
-                    if (campRes.ok) {
-                        campaignData = await campRes.json();
-                    }
-                } catch (e) {
-                    // Non-fatal - continue with basic offer data
-                }
-            }
 
             const offerRecord = {
                 offer_id: offerId,
                 campaign_id: campaignId || null,
-                offer_name: offer.offer_name || offer.name || `Offer ${offerId}`,
-                vertical_name: offer.vertical_name || offer.vertical || 'Clinical Research',
-                status: offer.offer_status?.status_name || offer.status || 'Active',
-                payout: parseFloat(offer.payout?.amount || offer.payout || 0),
-                price_format: offer.price_format?.price_format_name || offer.price_format || null,
-                description: offer.description || campaignData?.description || null,
-                restrictions: offer.restrictions || campaignData?.restrictions || null,
-                preview_link: offer.preview_link || offer.preview_url || campaignData?.preview_link || null,
-                allowed_media_types: extractMediaTypes(offer, campaignData),
-                raw_data: { offer, campaign: campaignData },
+                offer_name: offer.offer_name || `Offer ${offerId}`,
+                vertical_name: offer.vertical_name || 'Clinical Research',
+                status: offer.offer_status?.offer_status_name || 'Active',
+                payout: parseFloat(offer.price || 0),
+                price_format: offer.price_format || null,
+                description: offer.description || null,
+                restrictions: offer.restrictions || null,
+                preview_link: offer.preview_link || null,
+                allowed_media_types: extractMediaTypes(offer),
+                raw_data: offer,
                 is_active: true,
                 last_synced_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
@@ -186,18 +176,10 @@ export default async function handler(req, res) {
 }
 
 /**
- * Extract allowed media types from offer/campaign data
+ * Extract allowed media types from offer data
  */
-function extractMediaTypes(offer, campaign) {
-    const types = [];
-    const mediaData = offer.allowed_media_types || offer.media_types
-        || campaign?.allowed_media_types || campaign?.media_types;
-
-    if (Array.isArray(mediaData)) {
-        for (const m of mediaData) {
-            types.push(m.media_type_name || m.name || m);
-        }
-    }
-
-    return types.length > 0 ? types : null;
+function extractMediaTypes(offer) {
+    const mediaData = offer.allowed_media_types;
+    if (!Array.isArray(mediaData) || mediaData.length === 0) return null;
+    return mediaData.map(m => m.media_type_name || String(m));
 }
