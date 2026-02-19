@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Affiliati Clinical Trial Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'affiliati_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Affiliati Clinical Intel
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+            <span id="alert-nav" style="position: relative; display: inline-block;">
+                <a href="#" class="nav-link" onclick="toggleAlerts(); return false;">
+                    Alerts <span id="alert-count-badge" class="alert-badge hidden">0</span>
+                </a>
+            </span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alert-banner">
+            <div class="alert-banner-header">
+                <span class="alert-banner-title">Notifications</span>
+                <div>
+                    <button class="btn btn-sm btn-secondary" onclick="markAllRead()">Mark All Read</button>
+                    <button class="alert-banner-dismiss" onclick="toggleAlerts()">&times;</button>
+                </div>
+            </div>
+            <div id="alert-list">
+                <div class="text-muted text-center" style="padding: 20px;">No alerts</div>
+            </div>
+        </div>
+
+        <!-- Hero Stats -->
+        <div class="hero">
+            <h1>Clinical Trial Intelligence</h1>
+            <p class="subtitle">Affiliati Offer Analysis, Trial Matching & Ad Generation</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-offers">-</div>
+                    <div class="hero-stat-label">Active Offers</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-matches">-</div>
+                    <div class="hero-stat-label">Trial Matches</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-payout">-</div>
+                    <div class="hero-stat-label">Avg Payout</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-states">-</div>
+                    <div class="hero-stat-label">States Covered</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Controls -->
+        <div class="sync-controls">
+            <button class="btn btn-primary btn-sm" onclick="syncOffers()" id="btn-sync">
+                <span id="sync-icon">&#8635;</span> Sync Offers
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="matchTrials()" id="btn-match">
+                <span id="match-icon">&#128269;</span> Match Trials
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="generateAll()" id="btn-generate">
+                <span id="generate-icon">&#9889;</span> Generate All
+            </button>
+            <div class="sync-info">
+                Last synced: <span id="last-sync">Never</span>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label>Status</label>
+                <select id="filter-status" onchange="applyFilters()">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Condition</label>
+                <input type="text" id="filter-condition" placeholder="Search conditions..." oninput="debounceFilter()">
+            </div>
+            <div class="filter-group">
+                <label>Has Matches</label>
+                <select id="filter-matches" onchange="applyFilters()">
+                    <option value="">Any</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Has Ad Unit</label>
+                <select id="filter-adunit" onchange="applyFilters()">
+                    <option value="">Any</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Offers Grid -->
+        <div id="offers-grid" class="offers-grid">
+            <div class="loading" style="grid-column: 1 / -1;">
+                <div class="spinner"></div>
+                Loading offers...
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="flex justify-between items-center mt-4" style="display: none;">
+            <div class="text-muted" id="pagination-info">Showing 0 of 0</div>
+            <div class="flex gap-2">
+                <button class="btn btn-sm btn-secondary" id="btn-prev" onclick="prevPage()" disabled>Previous</button>
+                <button class="btn btn-sm btn-secondary" id="btn-next" onclick="nextPage()" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Affiliati Clinical Trial Intelligence prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a></p>
+        </footer>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentPage = 1;
+        const pageSize = 20;
+        let filterTimeout = null;
+        let offersData = null;
+
+        // ========================================
+        // Data Loading
+        // ========================================
+
+        async function loadOffers() {
+            const grid = document.getElementById('offers-grid');
+            grid.innerHTML = '<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div>Loading offers...</div>';
+
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: pageSize,
+                status: document.getElementById('filter-status').value,
+            });
+
+            const condition = document.getElementById('filter-condition').value.trim();
+            if (condition) params.set('condition', condition);
+
+            const hasMatches = document.getElementById('filter-matches').value;
+            if (hasMatches) params.set('has_matches', hasMatches);
+
+            const hasAdUnit = document.getElementById('filter-adunit').value;
+            if (hasAdUnit) params.set('has_ad_unit', hasAdUnit);
+
+            try {
+                const res = await fetch(`/api/affiliati/offers?${params}`);
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                offersData = data;
+                renderOffers(data.offers);
+                renderPagination(data.pagination);
+                updateStats(data.offers);
+
+                if (data.last_sync) {
+                    document.getElementById('last-sync').textContent = formatDate(data.last_sync);
+                }
+            } catch (error) {
+                grid.innerHTML = `<div class="alert alert-danger" style="grid-column: 1 / -1;">${error.message}</div>`;
+            }
+        }
+
+        function renderOffers(offers) {
+            const grid = document.getElementById('offers-grid');
+
+            if (!offers || offers.length === 0) {
+                grid.innerHTML = '<div class="alert alert-info" style="grid-column: 1 / -1;">No offers found. Click "Sync Offers" to fetch from CAKE API.</div>';
+                return;
+            }
+
+            grid.innerHTML = offers.map(offer => {
+                const condition = offer.condition_name || 'Not Enriched';
+                const adStatus = offer.ad_unit_status || 'none';
+
+                return `
+                    <div class="offer-card" onclick="viewOffer(${offer.offer_id})">
+                        <div class="offer-card-header">
+                            <h3>${escapeHtml(offer.offer_name)}</h3>
+                            <span class="offer-payout">$${(offer.payout || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="offer-card-meta">
+                            <span class="condition-badge">${escapeHtml(condition)}</span>
+                            <span class="status-badge ${adStatus}">${adStatus === 'none' ? 'No Ad Unit' : adStatus.charAt(0).toUpperCase() + adStatus.slice(1)}</span>
+                        </div>
+                        <div class="offer-card-stats">
+                            <div class="offer-card-stat">
+                                <div class="offer-card-stat-value">${offer.match_count || 0}</div>
+                                <div class="offer-card-stat-label">Matches</div>
+                            </div>
+                            <div class="offer-card-stat">
+                                <div class="offer-card-stat-value">${offer.condition_keywords ? offer.condition_keywords.length : 0}</div>
+                                <div class="offer-card-stat-label">Keywords</div>
+                            </div>
+                            <div class="offer-card-stat">
+                                <div class="offer-card-stat-value">${offer.is_active ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>'}</div>
+                                <div class="offer-card-stat-label">Status</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPagination(pagination) {
+            const paginationEl = document.getElementById('pagination');
+            if (!pagination || pagination.total === 0) {
+                paginationEl.style.display = 'none';
+                return;
+            }
+
+            paginationEl.style.display = 'flex';
+            document.getElementById('pagination-info').textContent =
+                `Showing ${(pagination.page - 1) * pagination.limit + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}`;
+            document.getElementById('btn-prev').disabled = pagination.page <= 1;
+            document.getElementById('btn-next').disabled = pagination.page >= pagination.pages;
+        }
+
+        function updateStats(offers) {
+            if (!offers) return;
+
+            const activeOffers = offers.filter(o => o.is_active).length;
+            const totalMatches = offers.reduce((sum, o) => sum + (o.match_count || 0), 0);
+            const avgPayout = offers.length > 0
+                ? offers.reduce((sum, o) => sum + (o.payout || 0), 0) / offers.length
+                : 0;
+
+            // Collect unique states from offers with conditions
+            const conditions = new Set(offers.filter(o => o.condition_name).map(o => o.condition_name));
+
+            document.getElementById('stat-offers').textContent = activeOffers;
+            document.getElementById('stat-matches').textContent = totalMatches;
+            document.getElementById('stat-payout').textContent = `$${avgPayout.toFixed(0)}`;
+            document.getElementById('stat-states').textContent = conditions.size;
+            // Update the label since we're showing conditions, not states
+            document.querySelector('#stat-states + .hero-stat-label').textContent = 'Conditions';
+        }
+
+        // ========================================
+        // Sync Operations
+        // ========================================
+
+        async function syncOffers() {
+            const btn = document.getElementById('btn-sync');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></div> Syncing...';
+
+            try {
+                const res = await fetch('/api/affiliati/sync-offers', { method: 'POST' });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(`Synced ${data.clinical_offers} offers (${data.created} new, ${data.updated} updated)`, 'success');
+
+                // Auto-enrich new offers
+                if (data.created > 0) {
+                    showToast('Enriching new offers with AI...', 'info');
+                    await enrichAllOffers();
+                }
+
+                await loadOffers();
+            } catch (error) {
+                showToast(`Sync failed: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>&#8635;</span> Sync Offers';
+        }
+
+        async function enrichAllOffers() {
+            try {
+                const res = await fetch('/api/affiliati/offers?status=active&limit=100');
+                const data = await res.json();
+
+                const unenriched = (data.offers || []).filter(o => !o.condition_name);
+
+                for (const offer of unenriched) {
+                    try {
+                        await fetch('/api/affiliati/enrich-offer', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ offer_id: offer.offer_id }),
+                        });
+                    } catch (e) {
+                        console.error(`Failed to enrich offer ${offer.offer_id}:`, e);
+                    }
+                }
+
+                if (unenriched.length > 0) {
+                    showToast(`Enriched ${unenriched.length} offers`, 'success');
+                }
+            } catch (e) {
+                console.error('Enrichment failed:', e);
+            }
+        }
+
+        async function matchTrials() {
+            const btn = document.getElementById('btn-match');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></div> Matching...';
+
+            try {
+                const res = await fetch('/api/affiliati/match-trials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(`Found ${data.total_matches} trial matches across ${data.offers_processed} offers`, 'success');
+                await loadOffers();
+                await loadAlerts();
+            } catch (error) {
+                showToast(`Matching failed: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>&#128269;</span> Match Trials';
+        }
+
+        async function generateAll() {
+            const btn = document.getElementById('btn-generate');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></div> Generating...';
+
+            try {
+                const res = await fetch('/api/affiliati/offers?status=active&has_ad_unit=false&limit=100');
+                const data = await res.json();
+
+                const offers = (data.offers || []).filter(o => o.match_count > 0 && !o.ad_unit_status);
+                let generated = 0;
+
+                for (const offer of offers) {
+                    try {
+                        await fetch('/api/affiliati/generate-ad-unit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ offer_id: offer.offer_id }),
+                        });
+                        generated++;
+                    } catch (e) {
+                        console.error(`Failed to generate for offer ${offer.offer_id}:`, e);
+                    }
+                }
+
+                showToast(`Generated ${generated} ad units`, 'success');
+                await loadOffers();
+            } catch (error) {
+                showToast(`Generation failed: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>&#9889;</span> Generate All';
+        }
+
+        // ========================================
+        // Alerts
+        // ========================================
+
+        async function loadAlerts() {
+            try {
+                const res = await fetch('/api/affiliati/alerts');
+                const data = await res.json();
+
+                const badge = document.getElementById('alert-count-badge');
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+
+                const list = document.getElementById('alert-list');
+                if (data.alerts && data.alerts.length > 0) {
+                    list.innerHTML = data.alerts.map(a => `
+                        <div class="alert-item">
+                            <strong>${escapeHtml(a.title)}</strong>
+                            <div class="text-muted" style="font-size: 0.85rem;">${escapeHtml(a.message || '')}</div>
+                            <div class="alert-item-time">${formatDate(a.created_at)}</div>
+                        </div>
+                    `).join('');
+                    window._alertIds = data.alerts.map(a => a.id);
+                } else {
+                    list.innerHTML = '<div class="text-muted text-center" style="padding: 20px;">No alerts</div>';
+                    window._alertIds = [];
+                }
+            } catch (e) {
+                console.error('Failed to load alerts:', e);
+            }
+        }
+
+        function toggleAlerts() {
+            const banner = document.getElementById('alert-banner');
+            banner.classList.toggle('show');
+        }
+
+        async function markAllRead() {
+            if (!window._alertIds || window._alertIds.length === 0) return;
+
+            try {
+                await fetch('/api/affiliati/alerts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ alert_ids: window._alertIds }),
+                });
+                showToast('All alerts marked as read', 'success');
+                await loadAlerts();
+            } catch (e) {
+                console.error('Failed to mark alerts read:', e);
+            }
+        }
+
+        // ========================================
+        // Filters & Pagination
+        // ========================================
+
+        function applyFilters() {
+            currentPage = 1;
+            loadOffers();
+        }
+
+        function debounceFilter() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(applyFilters, 500);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) { currentPage--; loadOffers(); }
+        }
+
+        function nextPage() {
+            currentPage++;
+            loadOffers();
+        }
+
+        // ========================================
+        // Utilities
+        // ========================================
+
+        function viewOffer(offerId) {
+            window.location.href = `offer-detail.html?id=${offerId}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Never';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        // ========================================
+        // Initialize
+        // ========================================
+        loadOffers();
+        loadAlerts();
+    </script>
+</body>
+</html>

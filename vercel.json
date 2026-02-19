@@ -50,6 +50,21 @@
     },
     "api/solar/company.js": {
       "maxDuration": 30
+    },
+    "api/affiliati/sync-offers.js": {
+      "maxDuration": 60
+    },
+    "api/affiliati/enrich-offer.js": {
+      "maxDuration": 30
+    },
+    "api/affiliati/match-trials.js": {
+      "maxDuration": 60
+    },
+    "api/affiliati/manual-match.js": {
+      "maxDuration": 30
+    },
+    "api/affiliati/generate-ad-unit.js": {
+      "maxDuration": 60
     }
   }
 }

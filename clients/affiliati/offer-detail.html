@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer Detail | Affiliati Clinical Trial Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'affiliati_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Affiliati Clinical Intel
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <span class="nav-link active" id="nav-offer-name">Loading...</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            Loading offer details...
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="alert alert-danger" style="display: none;"></div>
+
+        <!-- Content (hidden until loaded) -->
+        <div id="content" style="display: none;">
+            <!-- Offer Header -->
+            <div class="card mb-6">
+                <div class="card-body" style="padding: 32px;">
+                    <div class="flex justify-between items-center" style="flex-wrap: wrap; gap: 16px;">
+                        <div style="flex: 1;">
+                            <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 8px;" id="offer-title"></h1>
+                            <div class="flex gap-2" style="flex-wrap: wrap;" id="offer-badges"></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: var(--success);" id="offer-payout"></div>
+                            <div class="text-muted" id="offer-format"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="stats-grid" style="margin-top: 24px; margin-bottom: 0;">
+                        <div class="stat-card">
+                            <div class="stat-label">Trial Matches</div>
+                            <div class="stat-value" id="detail-matches">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Trial Sites</div>
+                            <div class="stat-value" id="detail-locations">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">States</div>
+                            <div class="stat-value" id="detail-states">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Ad Unit</div>
+                            <div class="stat-value" id="detail-adunit">None</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Tabs -->
+            <div class="view-tabs">
+                <button class="view-tab active" onclick="switchTab('overview')">Overview</button>
+                <button class="view-tab" onclick="switchTab('trials')">Trials</button>
+                <button class="view-tab" onclick="switchTab('ad-unit')">Ad Unit</button>
+                <button class="view-tab" onclick="switchTab('screening')">Screening</button>
+                <button class="view-tab" onclick="switchTab('compliance')">Compliance</button>
+            </div>
+
+            <!-- ====================== OVERVIEW TAB ====================== -->
+            <div id="tab-overview" class="view-section active">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Offer Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Offer Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="offer-details-body"></div>
+                        </div>
+                    </div>
+
+                    <!-- Patient Persona -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Patient Persona</h2>
+                            <span class="text-muted" style="font-size: 0.8rem;">AI Generated</span>
+                        </div>
+                        <div class="card-body" id="persona-body">
+                            <div class="text-muted">Generate an ad unit to see patient persona</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eligibility -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Eligibility Criteria</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" id="eligibility-body">
+                            <div class="text-muted">Enrich this offer to see eligibility criteria</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geographic Coverage -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Geographic Coverage</h2>
+                    </div>
+                    <div class="card-body" id="geo-body">
+                        <div class="text-muted">Match trials to see geographic coverage</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================== TRIALS TAB ====================== -->
+            <div id="tab-trials" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Matched ClinicalTrials.gov Studies</h2>
+                        <button class="btn btn-sm btn-primary" onclick="matchThisOffer()">
+                            <span id="match-btn-icon">&#128269;</span> Re-Match
+                        </button>
+                    </div>
+                    <div id="trials-table-body">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Match -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Manual Match</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">Link this offer to a specific ClinicalTrials.gov study by NCT ID.</p>
+                        <div class="manual-match-form">
+                            <div class="form-group">
+                                <label class="form-label">NCT ID</label>
+                                <input type="text" class="form-input" id="manual-nct-id" placeholder="NCT12345678" pattern="NCT\d{8}">
+                            </div>
+                            <button class="btn btn-success btn-sm" onclick="addManualMatch()">Add Match</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================== AD UNIT TAB ====================== -->
+            <div id="tab-ad-unit" class="view-section">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 style="font-size: 1.25rem; font-weight: 600;">Ad Unit Breakdown</h2>
+                    <button class="btn btn-primary btn-sm" onclick="generateAdUnit()" id="btn-gen-ad">
+                        <span id="gen-ad-icon">&#9889;</span> Generate Ad Unit
+                    </button>
+                </div>
+
+                <div id="ad-unit-body">
+                    <div class="alert alert-info">No ad unit generated yet. Click "Generate Ad Unit" to create one.</div>
+                </div>
+            </div>
+
+            <!-- ====================== SCREENING TAB ====================== -->
+            <div id="tab-screening" class="view-section">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 24px;">Screening Flow</h2>
+                <div id="screening-body">
+                    <div class="alert alert-info">Generate an ad unit to see the screening flow.</div>
+                </div>
+            </div>
+
+            <!-- ====================== COMPLIANCE TAB ====================== -->
+            <div id="tab-compliance" class="view-section">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 24px;">Compliance Guidelines</h2>
+                <div id="compliance-body">
+                    <div class="alert alert-info">Generate an ad unit to see compliance guidelines.</div>
+                </div>
+
+                <!-- Raw Restrictions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Raw Offer Restrictions</h2>
+                    </div>
+                    <div class="card-body">
+                        <pre id="raw-restrictions" style="white-space: pre-wrap; color: var(--text-secondary); font-size: 0.9rem;">No restrictions specified</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Affiliati Clinical Trial Intelligence prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a></p>
+        </footer>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let offerData = null;
+        let offerId = null;
+
+        // ========================================
+        // Initialization
+        // ========================================
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            offerId = parseInt(params.get('id'));
+
+            if (!offerId) {
+                showError('No offer ID provided');
+                return;
+            }
+
+            loadOffer();
+            handleHashNavigation();
+        }
+
+        // ========================================
+        // Tab Navigation
+        // ========================================
+
+        function switchTab(tab, updateHash = true) {
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            if (updateHash) {
+                history.replaceState(null, null, `#${tab}`);
+            }
+        }
+
+        function handleHashNavigation() {
+            const hash = window.location.hash.replace('#', '');
+            const validTabs = ['overview', 'trials', 'ad-unit', 'screening', 'compliance'];
+            if (hash && validTabs.includes(hash)) {
+                switchTab(hash, false);
+            }
+        }
+
+        window.addEventListener('hashchange', handleHashNavigation);
+
+        // ========================================
+        // Data Loading
+        // ========================================
+
+        async function loadOffer() {
+            try {
+                const res = await fetch(`/api/affiliati/offer?offer_id=${offerId}`);
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                offerData = data;
+                renderOffer();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'flex';
+        }
+
+        // ========================================
+        // Rendering
+        // ========================================
+
+        function renderOffer() {
+            const { offer, matches, locations, ad_unit, summary } = offerData;
+
+            // Title & nav
+            document.title = `${offer.offer_name} | Affiliati`;
+            document.getElementById('nav-offer-name').textContent = offer.offer_name;
+            document.getElementById('offer-title').textContent = offer.offer_name;
+            document.getElementById('offer-payout').textContent = `$${(offer.payout || 0).toFixed(2)}`;
+            document.getElementById('offer-format').textContent = offer.price_format || 'Per Conversion';
+
+            // Badges
+            const badges = [];
+            if (offer.condition_name) badges.push(`<span class="condition-badge">${escapeHtml(offer.condition_name)}</span>`);
+            if (offer.is_active) badges.push('<span class="status-badge active">Active</span>');
+            if (ad_unit) badges.push(`<span class="status-badge ${ad_unit.status}">${ad_unit.status}</span>`);
+            if (offer.gender && offer.gender !== 'All') badges.push(`<span class="condition-badge">${offer.gender}</span>`);
+            if (offer.min_age || offer.max_age) badges.push(`<span class="condition-badge">Age ${offer.min_age || '18'}–${offer.max_age || '99'}</span>`);
+            document.getElementById('offer-badges').innerHTML = badges.join('');
+
+            // Quick stats
+            document.getElementById('detail-matches').textContent = summary.match_count;
+            document.getElementById('detail-locations').textContent = summary.location_count;
+            document.getElementById('detail-states').textContent = summary.state_count;
+            document.getElementById('detail-adunit').innerHTML = ad_unit
+                ? `<span class="text-success">${ad_unit.status}</span>`
+                : '<span class="text-muted">None</span>';
+
+            renderOverview();
+            renderTrials();
+
+            if (ad_unit) {
+                renderAdUnit();
+                renderScreening();
+                renderCompliance();
+            }
+        }
+
+        // --- Overview Tab ---
+        function renderOverview() {
+            const { offer, ad_unit, summary } = offerData;
+
+            // Offer details
+            document.getElementById('offer-details-body').innerHTML = `
+                <table style="width: 100%;">
+                    <tr><td class="text-muted" style="width: 40%; padding: 8px 0;">Offer ID</td><td style="padding: 8px 0;">${offer.offer_id}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Campaign ID</td><td style="padding: 8px 0;">${offer.campaign_id || 'N/A'}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Condition</td><td style="padding: 8px 0;">${offer.condition_name || 'Not enriched'}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Keywords</td><td style="padding: 8px 0;">${(offer.condition_keywords || []).join(', ') || 'None'}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Description</td><td style="padding: 8px 0;">${escapeHtml(offer.description || 'N/A')}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Preview</td><td style="padding: 8px 0;">${offer.preview_link ? `<a href="${offer.preview_link}" target="_blank" style="color: var(--accent);">View &rarr;</a>` : 'N/A'}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Media Types</td><td style="padding: 8px 0;">${(offer.allowed_media_types || []).join(', ') || 'Not specified'}</td></tr>
+                    <tr><td class="text-muted" style="padding: 8px 0;">Last Synced</td><td style="padding: 8px 0;">${formatDate(offer.last_synced_at)}</td></tr>
+                </table>
+            `;
+
+            // Patient Persona (from ad_unit)
+            if (ad_unit?.persona) {
+                const p = ad_unit.persona;
+                document.getElementById('persona-body').innerHTML = `
+                    <div style="margin-bottom: 16px;">
+                        <strong style="font-size: 1.1rem;">${escapeHtml(p.name || 'Target Patient')}</strong>
+                        <div class="text-muted">${escapeHtml(p.demographics || '')}</div>
+                        <div class="text-muted">Age: ${p.age_range || 'N/A'}</div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Pain Points</h4>
+                        <ul style="padding-left: 20px; color: var(--danger);">
+                            ${(p.pain_points || []).map(pp => `<li style="margin-bottom: 4px;">${escapeHtml(pp)}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Motivations</h4>
+                        <ul style="padding-left: 20px; color: var(--success);">
+                            ${(p.motivations || []).map(m => `<li style="margin-bottom: 4px;">${escapeHtml(m)}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Objections</h4>
+                        <ul style="padding-left: 20px; color: var(--warning);">
+                            ${(p.objections || []).map(o => `<li style="margin-bottom: 4px;">${escapeHtml(o)}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Eligibility
+            if (offer.qualifications || offer.exclusions) {
+                document.getElementById('eligibility-body').innerHTML = `
+                    <div>
+                        <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--success); margin-bottom: 12px;">Qualifications</h4>
+                        <ul style="padding-left: 20px;">
+                            ${(offer.qualifications || []).map(q => `<li style="margin-bottom: 6px;">${escapeHtml(q)}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--danger); margin-bottom: 12px;">Exclusions</h4>
+                        <ul style="padding-left: 20px;">
+                            ${(offer.exclusions || []).map(e => `<li style="margin-bottom: 6px;">${escapeHtml(e)}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // Geographic coverage
+            if (summary.state_count > 0) {
+                const { locations } = offerData;
+                const stateCounts = {};
+                for (const loc of locations) {
+                    if (loc.state) stateCounts[loc.state] = (stateCounts[loc.state] || 0) + 1;
+                }
+                const sortedStates = Object.entries(stateCounts).sort((a, b) => b[1] - a[1]);
+
+                document.getElementById('geo-body').innerHTML = `
+                    <div style="margin-bottom: 16px;">
+                        <strong>${summary.state_count} states</strong> with <strong>${summary.location_count} trial sites</strong>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${sortedStates.map(([state, count]) => `
+                            <span class="condition-badge" style="background: rgba(59,130,246,${Math.min(0.1 + count * 0.05, 0.5)});">
+                                ${state} (${count})
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        // --- Trials Tab ---
+        function renderTrials() {
+            const { matches } = offerData;
+            const container = document.getElementById('trials-table-body');
+
+            if (!matches || matches.length === 0) {
+                container.innerHTML = '<div class="card-body"><div class="alert alert-info">No trial matches yet. Click "Re-Match" or "Match Trials" on the dashboard.</div></div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-container" style="border: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NCT ID</th>
+                                <th>Study Title</th>
+                                <th>Phase</th>
+                                <th>Sponsor</th>
+                                <th style="text-align: center;">Score</th>
+                                <th style="text-align: center;">Sites</th>
+                                <th style="text-align: center;">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${matches.map(m => {
+                                const scoreClass = m.match_score >= 70 ? 'score-high' : m.match_score >= 50 ? 'score-medium' : 'score-low';
+                                return `
+                                    <tr>
+                                        <td>
+                                            <a href="https://clinicaltrials.gov/study/${m.nct_id}" target="_blank" style="color: var(--accent); text-decoration: none;">
+                                                ${m.nct_id}
+                                            </a>
+                                        </td>
+                                        <td style="max-width: 300px;">
+                                            <div style="font-weight: 500;">${escapeHtml((m.study_title || '').slice(0, 80))}${(m.study_title || '').length > 80 ? '...' : ''}</div>
+                                            <div class="text-muted" style="font-size: 0.8rem;">${escapeHtml(m.match_reason || '')}</div>
+                                        </td>
+                                        <td>${m.phase || 'N/A'}</td>
+                                        <td style="max-width: 150px; font-size: 0.85rem;">${escapeHtml((m.sponsor || '').slice(0, 40))}</td>
+                                        <td style="text-align: center; min-width: 100px;">
+                                            <div style="font-weight: 600; margin-bottom: 4px;">${m.match_score}</div>
+                                            <div class="score-bar ${scoreClass}">
+                                                <div class="score-bar-fill" style="width: ${m.match_score}%;"></div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align: center;">${m.location_count || 0}</td>
+                                        <td style="text-align: center;">
+                                            <span class="status-badge ${m.match_type === 'manual' ? 'approved' : 'active'}">
+                                                ${m.match_type}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // --- Ad Unit Tab ---
+        function renderAdUnit() {
+            const { ad_unit } = offerData;
+            if (!ad_unit) return;
+
+            const body = document.getElementById('ad-unit-body');
+            const copy = ad_unit.ad_copy || {};
+            const geo = ad_unit.geo_targeting || {};
+
+            body.innerHTML = `
+                <!-- Headlines -->
+                <div class="ad-copy-card">
+                    <h4>Headlines</h4>
+                    ${(copy.headlines || []).map(h => `
+                        <div class="ad-copy-text" onclick="copyText(this)">${escapeHtml(h)}</div>
+                    `).join('')}
+                    <div class="copy-hint">Click to copy</div>
+                </div>
+
+                <!-- Primary Text -->
+                <div class="ad-copy-card">
+                    <h4>Primary Text</h4>
+                    ${(copy.primary_text || []).map(t => `
+                        <div class="ad-copy-text" onclick="copyText(this)">${escapeHtml(t)}</div>
+                    `).join('')}
+                    <div class="copy-hint">Click to copy</div>
+                </div>
+
+                <!-- Descriptions -->
+                <div class="ad-copy-card">
+                    <h4>Link Descriptions</h4>
+                    ${(copy.descriptions || []).map(d => `
+                        <div class="ad-copy-text" onclick="copyText(this)">${escapeHtml(d)}</div>
+                    `).join('')}
+                    <div class="copy-hint">Click to copy</div>
+                </div>
+
+                <!-- CTAs -->
+                <div class="ad-copy-card">
+                    <h4>Call-to-Action Options</h4>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        ${(copy.ctas || []).map(c => `
+                            <button class="btn btn-primary btn-sm" onclick="copyText(this)" style="cursor: copy;">${escapeHtml(c)}</button>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Geo Targeting -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Geo Targeting Strategy</h2>
+                    </div>
+                    <div class="card-body">
+                        <p style="margin-bottom: 16px;">${escapeHtml(geo.strategy || '')}</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Priority States</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    ${(geo.priority_states || []).map(s => `<span class="condition-badge">${escapeHtml(s)}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">Priority Metros</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    ${(geo.priority_metros || []).map(m => `<span class="condition-badge">${escapeHtml(m)}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        ${geo.radius_recommendation ? `<p class="text-muted mt-4">Radius: ${escapeHtml(geo.radius_recommendation)}</p>` : ''}
+                    </div>
+                </div>
+
+                <!-- Video Scripts -->
+                ${(ad_unit.video_scripts || []).length > 0 ? `
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h2 class="card-title">Video Scripts</h2>
+                        </div>
+                        <div class="card-body">
+                            ${(ad_unit.video_scripts || []).map((script, i) => `
+                                <div class="accordion-item${i === 0 ? ' open' : ''}">
+                                    <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                                        <span>${escapeHtml(script.title || `Script ${i + 1}`)} (${script.duration || '30s'})</span>
+                                        <span class="arrow">&#9660;</span>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div style="margin-bottom: 16px;">
+                                            <h4 style="font-size: 0.8rem; color: var(--warning); margin-bottom: 4px;">HOOK (First 3s)</h4>
+                                            <p>${escapeHtml(script.hook || '')}</p>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <h4 style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">BODY</h4>
+                                            <p>${escapeHtml(script.body || '')}</p>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <h4 style="font-size: 0.8rem; color: var(--success); margin-bottom: 4px;">CTA</h4>
+                                            <p>${escapeHtml(script.cta || '')}</p>
+                                        </div>
+                                        ${script.visual_notes ? `
+                                            <div>
+                                                <h4 style="font-size: 0.8rem; color: var(--purple); margin-bottom: 4px;">VISUAL NOTES</h4>
+                                                <p class="text-muted">${escapeHtml(script.visual_notes)}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="text-muted mt-4" style="font-size: 0.8rem;">
+                    Version ${ad_unit.version} | Generated by ${ad_unit.generation_model || 'Claude'} | ${formatDate(ad_unit.created_at)}
+                </div>
+            `;
+        }
+
+        // --- Screening Tab ---
+        function renderScreening() {
+            const { ad_unit } = offerData;
+            if (!ad_unit?.screening_flow) return;
+
+            const flow = ad_unit.screening_flow;
+            if (!Array.isArray(flow) || flow.length === 0) return;
+
+            document.getElementById('screening-body').innerHTML = flow.map(step => `
+                <div class="screening-step">
+                    <div class="screening-step-header">
+                        <div class="step-number">${step.step || ''}</div>
+                        <div>
+                            <div style="font-weight: 600;">${escapeHtml(step.question || '')}</div>
+                            <div class="text-muted" style="font-size: 0.85rem;">${escapeHtml(step.purpose || '')}</div>
+                        </div>
+                    </div>
+                    <div class="screening-outcomes">
+                        <div class="outcome-pass">
+                            <strong>Pass:</strong> ${escapeHtml(step.pass || '')}
+                        </div>
+                        <div class="outcome-fail">
+                            <strong>Fail:</strong> ${escapeHtml(step.fail || '')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Compliance Tab ---
+        function renderCompliance() {
+            const { offer, ad_unit } = offerData;
+            if (!ad_unit?.compliance_notes) return;
+
+            const c = ad_unit.compliance_notes;
+
+            document.getElementById('compliance-body').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div class="card">
+                        <div class="card-header" style="background: rgba(34,197,94,0.1);">
+                            <h2 class="card-title text-success">Allowed Claims</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul style="padding-left: 20px;">
+                                ${(c.allowed_claims || []).map(a => `<li style="margin-bottom: 8px;">${escapeHtml(a)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" style="background: rgba(239,68,68,0.1);">
+                            <h2 class="card-title text-danger">Prohibited Claims</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul style="padding-left: 20px;">
+                                ${(c.prohibited_claims || []).map(p => `<li style="margin-bottom: 8px;">${escapeHtml(p)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Required Disclaimers</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul style="padding-left: 20px;">
+                            ${(c.required_disclaimers || []).map(d => `<li style="margin-bottom: 8px;">${escapeHtml(d)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h2 class="card-title">Platform Policies</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul style="padding-left: 20px;">
+                            ${(c.platform_policies || []).map(p => `<li style="margin-bottom: 8px;">${escapeHtml(p)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            // Raw restrictions
+            if (offer.restrictions) {
+                document.getElementById('raw-restrictions').textContent = offer.restrictions;
+            }
+        }
+
+        // ========================================
+        // Actions
+        // ========================================
+
+        async function matchThisOffer() {
+            const btn = document.getElementById('match-btn-icon');
+            btn.textContent = '';
+            btn.className = 'spinner';
+            btn.style.cssText = 'width:16px;height:16px;margin:0;border-width:2px;display:inline-block;';
+
+            try {
+                const res = await fetch('/api/affiliati/match-trials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offer_id: offerId }),
+                });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(`Found ${data.total_matches} trial matches`, 'success');
+                await loadOffer();
+            } catch (error) {
+                showToast(`Matching failed: ${error.message}`, 'error');
+            }
+
+            btn.textContent = '\u{1F50D}';
+            btn.className = '';
+            btn.style.cssText = '';
+        }
+
+        async function addManualMatch() {
+            const nctId = document.getElementById('manual-nct-id').value.trim();
+            if (!nctId.match(/^NCT\d{8}$/)) {
+                showToast('Enter a valid NCT ID (e.g., NCT12345678)', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/affiliati/manual-match', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offer_id: offerId, nct_id: nctId }),
+                });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(`Matched ${nctId} successfully (${data.locations_count} sites)`, 'success');
+                document.getElementById('manual-nct-id').value = '';
+                await loadOffer();
+            } catch (error) {
+                showToast(`Manual match failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function generateAdUnit() {
+            const btn = document.getElementById('btn-gen-ad');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></div> Generating...';
+
+            try {
+                const regenerate = offerData?.ad_unit !== null;
+                const res = await fetch('/api/affiliati/generate-ad-unit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offer_id: offerId, regenerate }),
+                });
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.error);
+
+                showToast(`Ad unit v${data.version} generated successfully`, 'success');
+                await loadOffer();
+            } catch (error) {
+                showToast(`Generation failed: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>&#9889;</span> Generate Ad Unit';
+        }
+
+        // ========================================
+        // Utilities
+        // ========================================
+
+        function copyText(el) {
+            const text = el.textContent || el.innerText;
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                el.classList.add('copied');
+                showToast('Copied to clipboard', 'success');
+                setTimeout(() => el.classList.remove('copied'), 2000);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        // ========================================
+        // Initialize
+        // ========================================
+        init();
+    </script>
+</body>
+</html>
