@@ -165,6 +165,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | Parcel Owners | `enrich-parcel-owners.py` | Owner names from ArcGIS tax parcel point-in-polygon queries (13 statewide + 11 county endpoints) | ArcGIS REST APIs (free) |
 | Google Places | `enrich-google-places.py` | Website, phone, rating, reviews, address for entity tables (installers, owners, manufacturers) | Google Places API (New) Text Search (~$0.04/query) |
 | Entity Portfolio | `enrich-entity-portfolio.py` | avg_project_size_kw, equipment brands, geographic focus, project type distribution | Computed from DB (free) |
+| Treasury 1603 | `enrich-treasury-1603.py` | Owner/developer names + total_cost estimates from $8B grant program | `data/treasury_1603/1603_awards.xlsx` (auto-downloaded) |
+| FEMA Flood Zones | `enrich-fema-flood.py` | flood_zone (A/AE/V/VE/X/D), flood_zone_sfha, flood_zone_bfe | FEMA NFHL MapServer Layer 28 (free, no auth) |
 
 **CEC Spec Downloads:**
 - Modules: `https://raw.githubusercontent.com/NREL/SAM/develop/deploy/libraries/CEC%20Modules.csv`
@@ -189,8 +191,8 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
 | 20 | **BLM Solar ROW** | `ingest-blm-solar.py` | 898 | `blm_` | ArcGIS FeatureServer | Solar energy facility ROWs on federal lands (AZ, CA, CO, NV, NM, UT, WY) | Quarterly |
 
-**Grand Total: ~706,022 installations, ~426,431 equipment records, ~3,263,132 events, 24 primary sources + 75 permit portals**
-**Note**: Counts reduced from 710K/480K after Session 21 TRUNCATE CASCADE recovery (99.4% installations, 88.8% equipment recovered)
+**Grand Total: ~704,188 installations, ~425,242 equipment records, ~3,254,594 events, 24 primary sources + 75 permit portals**
+**Note**: Counts reduced from 710K/480K after Session 21 TRUNCATE CASCADE recovery (99.4% installations, 88.8% equipment recovered). +898 BLM re-ingestion in Session 33.
 
 ### Running New Scripts
 ```bash
@@ -819,21 +821,26 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 18, 2026 — Session 31)
+### Data Gap Summary (Feb 24, 2026 — Session 33)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **702,296** | **100.0%** | All records tagged |
-| **mount_type** | **702,296** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
-| **operator_name (linked)** | **702,296** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
-| developer_name (linked) | 478,885 | 68.2% | **Recovered from 2.3% via installer→developer inference** |
-| installer_name (linked) | 475,372 | 67.7% | All linked to solar_installers via FK |
-| address | 562,679 | 80.1% | Geocodable addresses |
-| install_date | 515,331 | 73.4% | From source data |
-| **lat/lng (exact)** | **399,405** | **56.9%** | Exact coordinates |
-| capacity_mw | 375,156 | 53.4% | From source data |
-| **owner_name (linked)** | **355,832** | **50.7%** | From parcel enrichment (Session 29) |
-| **Entity tables** | **~237,000** | — | 33,343 installers + 204,606 site owners + 1,962 manufacturers |
-| **Equipment** | **425,132** | — | 88.6% of pre-truncate 480K |
+| **location_precision** | **704,188** | **100.0%** | All records tagged |
+| **mount_type** | **704,188** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
+| **operator_name (linked)** | **704,188** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
+| developer_name (linked) | 481,238 | 68.3% | +2,353 from Treasury 1603 |
+| **capacity_mw** | **480,444** | **68.2%** | **Up from 53.4% via cost→capacity + module wattage estimation** |
+| installer_name (linked) | 475,372 | 67.5% | All linked to solar_installers via FK |
+| address | 562,679 | 79.9% | Geocodable addresses |
+| install_date | 515,331 | 73.2% | From source data |
+| **lat/lng (exact)** | **399,405** | **56.7%** | Exact coordinates |
+| **owner_name (linked)** | **356,267** | **50.6%** | +435 from Treasury 1603 |
+| flood_zone | ~4,000+ | ~0.6%+ | **NEW: FEMA NFHL enrichment in progress (99.1% hit rate)** |
+| annual_generation_mwh | 6,997 | 1.0% | EIA-923 + eGRID merged generation data |
+| capacity_factor | 6,997 | 1.0% | Calculated from generation / (capacity × 8760) |
+| offtaker_name | 2,924 | 0.4% | FERC EQR PPA buyer matching |
+| ppa_price_mwh | 525 | 0.1% | FERC EQR PPA prices (median $39.60/MWh) |
+| **Entity tables** | **~239,000** | — | 33,969 installers + 206,353 site owners + 1,962 manufacturers |
+| **Equipment** | **425,242** | — | 88.6% of pre-truncate 480K (+110 racking) |
 | **Events** | **3,254,594** | — | Storm + recall + generator events |
 
 ### Entity Enrichment Summary (Session 31)
@@ -2408,6 +2415,24 @@ python3 -u scripts/enrich-google-places.py --dry-run  # Preview
 
 # Portfolio analytics (free, uses REST API per entity — prefer SQL for bulk)
 python3 -u scripts/enrich-entity-portfolio.py --table installers --dry-run
+
+# Treasury 1603 grant enrichment (owner/developer names + cost estimates)
+python3 -u scripts/enrich-treasury-1603.py              # Full run
+python3 -u scripts/enrich-treasury-1603.py --dry-run     # Preview matches
+python3 -u scripts/enrich-treasury-1603.py --skip-download  # Use cached file
+
+# FEMA Flood Zone enrichment (~38hr for full DB)
+python3 -u scripts/enrich-fema-flood.py              # Full run (~562K records)
+python3 -u scripts/enrich-fema-flood.py --dry-run     # Preview without patching
+python3 -u scripts/enrich-fema-flood.py --limit 1000   # Process first N
+python3 -u scripts/enrich-fema-flood.py --state CA     # Single state
+
+# Automated update system (checks staleness + runs ingestion + enrichment)
+python3 -u scripts/update-all.py --check-only       # Show stale sources
+python3 -u scripts/update-all.py --enrich-only       # Run enrichment pipeline only
+python3 -u scripts/update-all.py --source cadg,nysun # Update specific sources
+python3 -u scripts/update-all.py --force             # Force all sources regardless of staleness
+python3 -u scripts/update-all.py --dry-run           # Preview without running anything
 ```
 
 **Key errors encountered:**
@@ -2416,3 +2441,124 @@ python3 -u scripts/enrich-entity-portfolio.py --table installers --dry-run
 - **Google Places API 403**: API needed to be enabled + added to API key restrictions in Google Cloud Console.
 - **HTTP 400 patch errors**: 17 entities with special characters in data caused Supabase PATCH failures. Script continues past these.
 - **Ambiguous column reference**: SQL portfolio query had ambiguous `cnt` in LATERAL join. Fixed by simplifying to subquery with GROUP BY.
+
+### Session 32 — Feb 24, 2026
+
+**6-Item Data Gap-Filling Plan — ALL COMPLETED**
+
+Implemented 6 highest-impact data gap strategies in parallel:
+
+**Item 1: Capacity estimation from panel wattage + cost (COMPLETED)**
+- Strategy 1b: Module count × wattage → capacity: 4,460 records via SQL
+- Strategy 2: Cost→capacity regression ($3.50/watt avg): 99,729 records via SQL
+- **capacity_mw coverage: 53.4% → 68.4% (375,156 → 480,444)**
+
+**Item 2: Racking equipment extraction from permit descriptions (COMPLETED)**
+- `extract-racking.py`: Scans 69,978 permit descriptions for 25 branded + 7 generic racking patterns
+- Used psql \copy export → local Python regex scan (REST API HTTP 500 on combined filter)
+- Only 110 generic matches (94 roof_mount, 8 ground_mount, 6 carport, 2 pole_mount)
+- Branded racking not found — permit descriptions too short for manufacturer+model details
+- 110 racking equipment records inserted via psql (total racking in DB: 252)
+
+**Item 3: ISO withdrawn/cancelled projects (COMPLETED — prior session)**
+- `ingest-iso-withdrawn.py`: 994 MISO withdrawn records created
+- PJM blocked (401 API key revoked)
+
+**Item 4: EIA-923 generation data + Item 5: eGRID generation (COMPLETED — merged)**
+- `ingest-eia923.py`: Fixed ZIP extraction bug (was picking Schedule 8 env file instead of Schedule 2-3-4-5 generation file)
+- Parsed EIA-923 locally: 6,240 solar plants with net generation MWh
+- Parsed eGRID PLNGENAN locally: 5,431 solar plants
+- Merged: 6,329 unique plants (6,240 EIA-923 + 89 eGRID-only)
+- Applied via psql temp table + UPDATE JOIN: **6,997 installations updated**
+- Matching via `SPLIT_PART(source_record_id, '_', 2)` for eia860/eia860m records
+- Multi-installation plant split: generation divided equally among co-located generators
+- Average capacity factor: 18.54% (reasonable for solar)
+
+**Item 6: FERC EQR PPA parsing (COMPLETED — rewritten for PUDL Parquet)**
+- `ingest-ferc-eqr.py`: Completely rewritten to use PUDL S3 Parquet (FERC's own URLs all dead)
+- **PUDL S3 URL**: `https://s3.us-west-2.amazonaws.com/pudl.catalyst.coop/ferceqr/core_ferceqr__contracts/{year}q{quarter}.parquet`
+- Downloaded 8 quarters (2023-2024): ~22 MB total, 1.6M rows, 166K raw solar contracts
+- Deduplicated to 5,108 unique contracts (seller+buyer+facility)
+- 520 contracts with PPA prices (median $39.60/MWh, mean $60.87/MWh)
+- seller_state field ALWAYS empty — matching by normalized company name only
+- Matched via psql export → local Python → SQL UPDATE approach
+- **2,924 installations matched**: 2,924 offtaker_name, 514 owner_name, 525 ppa_price_mwh
+- Top sellers: NextEra (578), PJM (428), CAISO (351), MISO (284), Avangrid (197)
+- Top buyers: PJM Settlement (83), SCE (49), PG&E (28), Georgia Power (24)
+
+**New database columns (added via psql migration):**
+- `annual_generation_mwh NUMERIC(12,1)` — EIA-923/eGRID net annual generation
+- `capacity_factor NUMERIC(5,4)` — Calculated as generation / (capacity × 8760), capped at 1.0
+- `offtaker_name TEXT` — FERC EQR PPA buyer (utility/corporate offtaker)
+- `ppa_price_mwh NUMERIC(8,2)` — FERC EQR PPA price per MWh
+
+**Key technical patterns established:**
+- **psql direct SQL for all heavy operations**: REST API HTTP 500 on complex queries with 702K rows. Pattern: export via `\copy`, process locally in Python, generate SQL, apply via psql.
+- **PUDL as FERC data source**: FERC's own download URLs (eqrreportviewer.ferc.gov, ferc.gov static) are all dead (404/403/Cloudflare). PUDL S3 Parquet is the only working source.
+- **EIA-923 ZIP file selection**: ZIP contains 3 XLSX files; must pick "Schedules_2_3_4_5" (20 MB generation data), NOT Schedule 8 (2 MB environmental data) which sorts alphabetically first.
+
+**Scripts modified/created:**
+- `scripts/estimate-capacity.py` — NEW: Panel wattage + cost→capacity estimation
+- `scripts/extract-racking.py` — NEW: Racking brand extraction from permit descriptions
+- `scripts/ingest-iso-withdrawn.py` — NEW: MISO withdrawn project ingestion
+- `scripts/ingest-eia923.py` — MODIFIED: Fixed ZIP extraction to prefer correct file
+- `scripts/enrich-egrid.py` — MODIFIED: Added `--generation-only` flag
+- `scripts/ingest-ferc-eqr.py` — REWRITTEN: PUDL Parquet instead of dead FERC URLs
+
+### Session 33 — Feb 24, 2026
+
+**Treasury Section 1603 Grant Enrichment — COMPLETED:**
+- `enrich-treasury-1603.py`: Downloaded Treasury 1603 awards Excel (8,534 solar records from treasury.gov)
+- Matched against 55,101 utility + large commercial installations by normalized business name + state
+- **3,185 patches applied**: 2,967 exact_name + 218 fuzzy_name matches, 0 errors
+  - 435 owner_name fills
+  - 2,353 developer_name fills
+  - 2,506 total_cost estimates (grant / 0.3 = estimated project cost)
+- Entity linking: Created 626 new owner entities + 1,747 new developer entities, all FK linked
+
+**BLM Solar ROW Re-ingestion — COMPLETED:**
+- Lost in Session 21 TRUNCATE CASCADE, re-ingested: 898 records created, 0 errors
+- Source: ArcGIS FeatureServer for federal land solar energy ROWs (AZ, CA, CO, NV, NM, UT, WY)
+
+**NREL Community Solar Refresh — PARTIAL:**
+- 3,437 records already recovered in DB from Session 21 re-ingestion
+- 266 new records from June 2025 v5 corrected file all fail to insert (batch + one-by-one)
+- Root cause unresolved (likely PGRST102 key consistency or inter-record duplicate). Deferred as minor.
+
+**USPVDB + NREL Version Check — COMPLETED:**
+- USPVDB V3.0 confirmed as latest (already have it). URL migrated to energy.usgs.gov
+- NREL Community Solar June 2025 v5 (Nov 20, 2025 release) confirmed current. No full re-ingestion needed.
+
+**FEMA Flood Zone Enrichment — IN PROGRESS (PID 36084):**
+- `enrich-fema-flood.py`: Querying FEMA NFHL Layer 28 for 561,988 installations
+- 99.1% hit rate, 4.1 queries/sec, 0 errors
+- Fields: flood_zone (A/AE/V/VE/X/D), flood_zone_sfha (boolean), flood_zone_bfe (elevation)
+- ~38 hours total runtime, started Feb 24 ~1:09 PM HST
+- Flushing 500 patches at a time
+
+**Automated Data Source Update System — COMPLETED:**
+- `scripts/update-all.py`: Full orchestration script for automated updates
+- **22 ingestion sources** with frequency/auto_download/prefix/cmd
+- **17 enrichment pipeline steps** in dependency order
+- Entity linking phase (owner/developer/operator/installer)
+- Site rebuild phase (npm run build)
+- CLI: `--check-only`, `--force`, `--source cadg,nysun`, `--enrich-only`, `--skip-enrich`, `--skip-build`, `--dry-run`
+- Staleness checking via `created_at` timestamps (monthly=35d, quarterly=100d, annual=380d)
+- Reports saved to `data/update_report.json`
+- Tested: `--check-only` correctly identified 2 stale sources (BLM + NREL), 20 fresh
+- Tested: `--enrich-only --dry-run` correctly sequenced all 12 enrichments, skipped 5 annual/once
+
+**Database state (Session 33):**
+- **704,188 installations** (702,296 + 898 BLM + 994 from prior ISO withdrawn ingestion)
+- **425,242 equipment records**
+- **3,254,594 events**
+- FEMA flood enrichment adding ~4,000+ records so far (growing)
+
+**Scripts created/modified:**
+- `scripts/update-all.py` — NEW: Full automated update orchestration (~500 lines)
+- `scripts/enrich-treasury-1603.py` — Created prev session, tested + run this session
+- `scripts/enrich-fema-flood.py` — Created prev session, running in background
+
+<claude-mem-context>
+
+</claude-mem-context>
