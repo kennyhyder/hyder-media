@@ -190,8 +190,9 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 18 | **PA AEPS** | `ingest-pa-aeps.py` | 3,460 | `paaeps_` | CSV | SUN fuel, >=25 kW | Quarterly |
 | 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
 | 20 | **BLM Solar ROW** | `ingest-blm-solar.py` | 898 | `blm_` | ArcGIS FeatureServer | Solar energy facility ROWs on federal lands (AZ, CA, CO, NV, NM, UT, WY) | Quarterly |
+| 21 | **SEIA MPL** | `ingest-seia.py` | 8,439 (33 new + 8,406 enriched) | `seia_` | Excel (purchased) | Developer/owner/tracker/module tech for utility-scale. 99.6% cross-ref match | Annual ($1K/yr) |
 
-**Grand Total: ~704,188 installations, ~425,242 equipment records, ~3,254,594 events, 24 primary sources + 75 permit portals**
+**Grand Total: ~704,221 installations, ~425,242 equipment records, ~3,254,594 events, 25 primary sources + 75 permit portals**
 **Note**: Counts reduced from 710K/480K after Session 21 TRUNCATE CASCADE recovery (99.4% installations, 88.8% equipment recovered). +898 BLM re-ingestion in Session 33.
 
 ### Running New Scripts
@@ -821,25 +822,25 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 24, 2026 — Session 33)
+### Data Gap Summary (Feb 24, 2026 — Session 34)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **704,188** | **100.0%** | All records tagged |
-| **mount_type** | **704,188** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
-| **operator_name (linked)** | **704,188** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
-| developer_name (linked) | 481,238 | 68.3% | +2,353 from Treasury 1603 |
+| **location_precision** | **704,221** | **100.0%** | All records tagged |
+| **mount_type** | **704,221** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
+| **operator_name (linked)** | **704,221** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
+| developer_name (linked) | 485,152 | 68.9% | +1,654 from SEIA MPL, +2,353 from Treasury 1603 |
 | **capacity_mw** | **480,444** | **68.2%** | **Up from 53.4% via cost→capacity + module wattage estimation** |
 | installer_name (linked) | 475,372 | 67.5% | All linked to solar_installers via FK |
 | address | 562,679 | 79.9% | Geocodable addresses |
 | install_date | 515,331 | 73.2% | From source data |
 | **lat/lng (exact)** | **399,405** | **56.7%** | Exact coordinates |
-| **owner_name (linked)** | **356,267** | **50.6%** | +435 from Treasury 1603 |
-| flood_zone | ~4,000+ | ~0.6%+ | **NEW: FEMA NFHL enrichment in progress (99.1% hit rate)** |
+| **owner_name (linked)** | **373,658** | **53.1%** | +435 from Treasury 1603 + SEIA cross-ref |
+| flood_zone | 22,864 | 3.2% | **FEMA NFHL enrichment in progress (99.0% hit rate, 23K/562K)** |
 | annual_generation_mwh | 6,997 | 1.0% | EIA-923 + eGRID merged generation data |
 | capacity_factor | 6,997 | 1.0% | Calculated from generation / (capacity × 8760) |
 | offtaker_name | 2,924 | 0.4% | FERC EQR PPA buyer matching |
 | ppa_price_mwh | 525 | 0.1% | FERC EQR PPA prices (median $39.60/MWh) |
-| **Entity tables** | **~239,000** | — | 33,969 installers + 206,353 site owners + 1,962 manufacturers |
+| **Entity tables** | **~240,000** | — | 33,969 installers + 207,091 site owners + 1,962 manufacturers |
 | **Equipment** | **425,242** | — | 88.6% of pre-truncate 480K (+110 racking) |
 | **Events** | **3,254,594** | — | Storm + recall + generator events |
 
@@ -2064,6 +2065,11 @@ python3 -u scripts/ingest-blm-solar.py              # BLM Solar Energy ROWs (898
 python3 -u scripts/ingest-blm-solar.py --dry-run    # Preview
 python3 -u scripts/ingest-blm-solar.py --active-only # Authorized + Pending only
 
+# SEIA Major Projects List (purchased data, $1K/yr)
+python3 -u scripts/ingest-seia.py                   # Full run: cross-ref + insert new
+python3 -u scripts/ingest-seia.py --dry-run          # Preview matches
+python3 -u scripts/ingest-seia.py --enrich-only      # Cross-reference only, no new inserts
+
 # Parcel owner enrichment (ArcGIS point-in-polygon)
 python3 -u scripts/enrich-parcel-owners.py --list       # Show configured endpoints
 python3 -u scripts/enrich-parcel-owners.py --counts     # Show gap records per state
@@ -2558,6 +2564,45 @@ Implemented 6 highest-impact data gap strategies in parallel:
 - `scripts/update-all.py` — NEW: Full automated update orchestration (~500 lines)
 - `scripts/enrich-treasury-1603.py` — Created prev session, tested + run this session
 - `scripts/enrich-fema-flood.py` — Created prev session, running in background
+
+### Session 34 — Feb 24, 2026
+
+**SEIA Major Projects List Ingestion — COMPLETED:**
+- `ingest-seia.py`: Two-phase ingestion — Phase 1 cross-references by lat/lng (2km) + capacity (25% tolerance), Phase 2 inserts remaining as new
+- **Data**: `data/2025-SEIA-MPL-01.26.2026.xlsx` (3.8 MB, 8,439 Solar PV records, 51 columns)
+  - Purchased data ($1K/yr SEIA membership) — best ROI paid source
+  - 100% lat/lng, 100% state, 100% capacity, 95.8% address, 80.4% tracker type, 80.5% module tech
+  - 27.0% developer, 16.0% owner — fills utility-scale entity gaps
+- **Phase 1**: 8,406 cross-referenced to existing (99.6% match), 1,654 developer_name fills, 0 errors
+- **Phase 2**: 33 new installations created, 0 errors
+- **Entity linking**: 738 new developer entities + 883 owner_id linkages, all FK linked, 0 unlinked
+- **Source record ID**: `seia_{name_key}_{state}_{capacity}`, data source: `seia_mpl`
+- **Tracker→mount mapping**: fixed_tilt→ground_fixed, single-axis_tracking→ground_single_axis, dual-axis_tracking→ground_dual_axis
+- **Module tech→equipment**: thin-film_cdte→First Solar manufacturer, crystalline_silicon→"Crystalline Silicon"
+- **CLI**: `--dry-run`, `--enrich-only`, `--insert-only`, `--file`
+- **Bug fix**: First run's 33 inserts failed (transient Supabase error). Improved error logging (show error details even for large batches). Second run: 33/33 created, 0 errors.
+- **Accidental insert-only cleanup**: `--insert-only` bypassed Phase 1, creating 4,750 duplicates. Cleaned up via `DELETE FROM solar_installations WHERE source_record_id LIKE 'seia_%'` then re-ran correctly.
+
+**EIA Open Data API Assessment — NOT NEEDED:**
+- API (eia.gov/opendata) provides same EIA-860/860M data we already ingest from Excel
+- Excel files have MORE fields (owner names, addresses, solar-specific) than API
+- Only net-new data from API: EIA-923 generation (MWh) — already ingested from Excel in Session 32
+- Conclusion: Keep using Excel downloads, no API switch needed
+
+**FEMA Flood Zone Enrichment — STILL RUNNING (PID 36084):**
+- 23K/562K (4.1%), 99.0% hit rate, 0 errors, 3.7 queries/sec, ~39 hours remaining
+- 22,864 flood zones assigned so far: X (21,835, 95.5%), AE (666), A99 (200), D (124), A (49), AH (33), AO (8), VE (3)
+- HIGH VALUE for Blue Water Battery: AE/A/AH/AO/VE = Special Flood Hazard Areas (SFHA) where insurance is required
+
+**Next.js site rebuilt** with updated 704K stats.
+
+**Database state (Session 34):**
+- **704,221 installations** (704,188 + 33 SEIA new)
+- **425,242 equipment records**
+- **3,254,594 events**
+- **developer_name: 485,152 (68.9%)** — up from 481,238 (+3,914 from SEIA + entity linking)
+- **owner_name: 373,658 (53.1%)**
+- FEMA flood adding ~500 flood zones per flush cycle
 
 <claude-mem-context>
 
