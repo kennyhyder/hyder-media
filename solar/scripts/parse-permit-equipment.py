@@ -560,6 +560,317 @@ CITY_CONFIGS = {
         "desc_field": "PROJECT NAME",
         "id_field": "PERMIT #",
     },
+
+    # =========================================================================
+    # Wave 2: Cities from ingest-permits.py not previously in this script
+    # =========================================================================
+
+    # --- ArcGIS cities ---
+    "portland": {
+        "name": "Portland",
+        "prefix": "permit_portland",
+        "platform": "arcgis",
+        "base_url": "https://www.portlandmaps.com/arcgis/rest/services/Public/BDS_Permit/MapServer/4",
+        "oid_paging": True,
+        "desc_field": "DESCRIPTION",
+        "extra_desc_fields": ["WORK_DESCRIPTION"],
+        "id_field": "OBJECTID",
+        "arcgis_filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR UPPER(DESCRIPTION) LIKE '%PHOTOVOLTAIC%'",
+        "out_sr": "4326",
+    },
+    "la_county": {
+        "name": "LA County",
+        "prefix": "permit_lacounty",
+        "platform": "arcgis",
+        "base_url": "https://services.arcgis.com/RmCCgQtiZLDCtblq/arcgis/rest/services/EPIC-LA_Case_History_view/FeatureServer/0",
+        "desc_field": "DESCRIPTION",
+        "id_field": "CASENUMBER",
+        "arcgis_filter": "CASENAME = 'Unincorporated Solar'",
+        "out_sr": "4326",
+    },
+    "las_vegas": {
+        "name": "Las Vegas",
+        "prefix": "permit_lasvegas",
+        "platform": "arcgis",
+        "base_url": "https://mapdata.lasvegasnevada.gov/clvgis/rest/services/DevelopmentServices/BuildingPermits/MapServer/0",
+        "oid_paging": True,
+        "desc_field": "DESCRIPTION",
+        "extra_desc_fields": ["WORKDESC", "FULL_DESC"],
+        "id_field": "PERMIT_NUM",
+        "alt_id_field": "PERMNUM",
+        "arcgis_filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR UPPER(WORKDESC) LIKE '%SOLAR%' OR UPPER(FULL_DESC) LIKE '%SOLAR%'",
+        "out_sr": "4326",
+    },
+    "baltimore": {
+        "name": "Baltimore",
+        "prefix": "permit_baltimore",
+        "platform": "arcgis",
+        "base_url": "https://egisdata.baltimorecity.gov/egis/rest/services/Housing/DHCD_Open_Baltimore_Datasets/FeatureServer/3",
+        "desc_field": "Description",
+        "id_field": "CaseNumber",
+        "arcgis_filter": "UPPER(Description) LIKE '%SOLAR%'",
+        "out_sr": "4326",
+    },
+    "charlotte": {
+        "name": "Charlotte",
+        "prefix": "permit_charlotte",
+        "platform": "arcgis",
+        "base_url": "https://meckgis.mecklenburgcountync.gov/server/rest/services/BuildingPermits/FeatureServer/0",
+        "desc_field": "workdesc",
+        "extra_desc_fields": ["permitdesc"],
+        "id_field": "permitnum",
+        "arcgis_filter": "UPPER(workdesc) LIKE '%SOLAR%' OR UPPER(permitdesc) LIKE '%SOLAR%' OR UPPER(workdesc) LIKE '%PHOTOVOLTAIC%' OR UPPER(permitdesc) LIKE '%PHOTOVOLTAIC%'",
+        "out_sr": "4326",
+    },
+    "nashville": {
+        "name": "Nashville",
+        "prefix": "permit_nashville",
+        "platform": "arcgis",
+        "base_url": "https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Trade_Permits_View/FeatureServer/0",
+        "desc_field": "Purpose",
+        "id_field": "PermitNumber",
+        "arcgis_filter": "UPPER(Permit_Subtype_Description) LIKE '%PHOTOVOLTAIC%'",
+        "out_sr": "4326",
+    },
+    "sacramento_county": {
+        "name": "Sacramento County",
+        "prefix": "permit_saccounty",
+        "platform": "arcgis",
+        "base_url": "https://services1.arcgis.com/5NARefyPVtAeuJPU/arcgis/rest/services/Permits/FeatureServer/0",
+        "desc_field": "WorkDescription",
+        "id_field": "Application",
+        "arcgis_filter": "upper(WorkDescription) LIKE '%SOLAR%' OR Application_Subtype LIKE '%Solar%'",
+        "out_sr": "4326",
+    },
+    "tucson": {
+        "name": "Tucson",
+        "prefix": "permit_tucson",
+        "platform": "arcgis_multilayer",
+        "base_url": "https://mapdata.tucsonaz.gov/arcgis/rest/services/PublicMaps/PermitsCode/MapServer",
+        "layers": [85, 81],
+        "oid_paging": True,
+        "desc_field": "DESCRIPTION",
+        "id_field": "NUMBER",
+        "arcgis_filter": "UPPER(DESCRIPTION) LIKE '%SOLAR%' OR WORKCLASS LIKE '%Solar%'",
+        "out_sr": "4326",
+    },
+    "louisville": {
+        "name": "Louisville",
+        "prefix": "permit_louisville",
+        "platform": "arcgis",
+        "base_url": "https://services1.arcgis.com/79kfd2K6fskCAkyg/arcgis/rest/services/Louisville_Metro_KY_All_Permits_%28Historical%29/FeatureServer/0",
+        "desc_field": "WORKTYPE",
+        "extra_desc_fields": ["CATEGORYNAME"],
+        "id_field": "PERMITNUM",
+        "arcgis_filter": "UPPER(WORKTYPE) LIKE '%SOLAR%' OR UPPER(CATEGORYNAME) LIKE '%SOLAR%' OR UPPER(CONTRACTOR) LIKE '%SOLAR%'",
+        "out_sr": "4326",
+    },
+    "riverside": {
+        "name": "Riverside",
+        "prefix": "permit_riverside",
+        "platform": "arcgis",
+        "base_url": "https://gis.countyofriverside.us/arcgis_mapping/rest/services/OpenData/General/MapServer/280",
+        "oid_paging": True,
+        "desc_field": "CASE_DESCR",
+        "id_field": "CASE_ID",
+        "arcgis_filter": "CASE_WORK_CLASS LIKE 'SLRC%' OR CASE_WORK_CLASS LIKE 'DA03%' OR CASE_WORK_CLASS LIKE 'FCN59%' OR CASE_WORK_CLASS LIKE 'GSLRR%'",
+        "out_sr": "4326",
+    },
+
+    # --- CKAN cities ---
+    "virginia_beach": {
+        "name": "Virginia Beach",
+        "prefix": "permit_vabeach",
+        "platform": "ckan",
+        "base_url": "https://data.virginia.gov/api/3/action/datastore_search",
+        "resource_id": "d66e8fbe-ce6f-431b-873b-b017a8c42861",
+        "page_size": 100,
+        "desc_field": "WorkDesc",
+        "alt_desc_field": "workdesc",
+        "id_field": "PermitNumber",
+        "alt_id_field": "permitnumber",
+    },
+    "boston_ckan": {
+        "name": "Boston (CKAN)",
+        "prefix": "permit_boston_ckan",
+        "platform": "ckan",
+        "base_url": "https://data.boston.gov/api/3/action/datastore_search",
+        "resource_id": "6ddcd912-32a0-43df-9908-63574f8c7e77",
+        "page_size": 100,
+        "desc_field": "Comments",
+        "extra_desc_fields": ["WorkType"],
+        "alt_desc_field": "comments",
+        "id_field": "PermitNumber",
+        "alt_id_field": "permitnumber",
+    },
+    "tampa": {
+        "name": "Tampa",
+        "prefix": "permit_tampa",
+        "platform": "ckan",
+        "base_url": "https://www.civicdata.com/api/3/action/datastore_search",
+        "resource_id": "474844a7-3bd1-4722-bc8b-9ec5a5f82508",
+        "page_size": 100,
+        "desc_field": "Description",
+        "alt_desc_field": "description",
+        "id_field": "PermitNum",
+        "alt_id_field": "permitnum",
+    },
+    "leon_county": {
+        "name": "Leon County",
+        "prefix": "permit_leon",
+        "platform": "ckan",
+        "base_url": "https://www.civicdata.com/api/3/action/datastore_search",
+        "resource_id": "4e34687e-deba-428b-9509-921516df6208",
+        "page_size": 100,
+        "desc_field": "Description",
+        "alt_desc_field": "description",
+        "id_field": "PermitNum",
+        "alt_id_field": "permitnum",
+    },
+    "pittsburgh": {
+        "name": "Pittsburgh",
+        "prefix": "permit_pittsburgh",
+        "platform": "ckan",
+        "base_url": "https://data.wprdc.org/api/3/action/datastore_search",
+        "resource_id": "f4d1177a-f597-4c32-8cbf-7885f56253f6",
+        "page_size": 100,
+        "desc_field": "work_description",
+        "id_field": "permit_id",
+    },
+
+    # --- Socrata cities ---
+    "henderson": {
+        "name": "Henderson",
+        "prefix": "permit_henderson",
+        "platform": "socrata",
+        "base_url": "https://performance.cityofhenderson.com/resource/fpc9-568j.json",
+        "desc_field": "permitdescription",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num"],
+        "filter": "$where=UPPER(permitdescription) LIKE '%25SOLAR%25' OR UPPER(permittype) LIKE '%25PHOTOVOLTAIC%25' OR UPPER(permittype) LIKE '%25PV%25'",
+    },
+    "richmond_ca": {
+        "name": "Richmond CA",
+        "prefix": "permit_richmond",
+        "platform": "socrata",
+        "base_url": "https://data.ci.richmond.ca.us/resource/u29e-xr5h.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "filter": "$where=" + SOLAR_WHERE.format(desc="description"),
+    },
+    "corona": {
+        "name": "Corona",
+        "prefix": "permit_corona",
+        "platform": "socrata",
+        "base_url": "https://corstat.coronaca.gov/resource/2agx-camz.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num"],
+        "filter": "$where=" + SOLAR_WHERE.format(desc="description") + " OR UPPER(permitsubtype) LIKE '%25SOLAR%25'",
+    },
+    "marin": {
+        "name": "Marin County",
+        "prefix": "permit_marin",
+        "platform": "socrata",
+        "base_url": "https://data.marincounty.gov/resource/mkbn-caye.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num"],
+        "filter": "$where=" + SOLAR_WHERE.format(desc="description"),
+    },
+    "sonoma": {
+        "name": "Sonoma County",
+        "prefix": "permit_sonoma",
+        "platform": "socrata",
+        "base_url": "https://data.sonomacounty.ca.gov/resource/88ms-k5e7.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "objectid"],
+        "filter": "$where=" + SOLAR_WHERE.format(desc="description"),
+    },
+    "pierce_county": {
+        "name": "Pierce County",
+        "prefix": "permit_pierce",
+        "platform": "socrata",
+        "base_url": "https://open.piercecountywa.gov/resource/rcj9-mkn4.json",
+        "desc_field": "workdescription",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "objectid"],
+        "filter": "$where=UPPER(workdescription) LIKE '%25SOLAR%25'",
+    },
+    "little_rock": {
+        "name": "Little Rock",
+        "prefix": "permit_littlerock",
+        "platform": "socrata",
+        "base_url": "https://data.littlerock.gov/resource/mkfu-qap3.json",
+        "desc_field": "projectdesc",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "objectid"],
+        "filter": "$where=UPPER(projectdesc) LIKE '%25SOLAR%25'",
+    },
+    "pgcounty": {
+        "name": "Prince George's County",
+        "prefix": "permit_pgcounty",
+        "platform": "socrata",
+        "base_url": "https://data.princegeorgescountymd.gov/resource/weik-ttee.json",
+        "desc_field": "case_name",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "case_number", "objectid"],
+        "filter": "$where=UPPER(case_name) LIKE '%25SOLAR%25'",
+    },
+    "framingham": {
+        "name": "Framingham",
+        "prefix": "permit_framingham",
+        "platform": "socrata",
+        "base_url": "https://data.framinghamma.gov/resource/2vzw-yean.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "objectid"],
+        "filter": "$where=" + SOLAR_WHERE.format(desc="description") + " OR UPPER(sub_type) LIKE '%25SOLAR%25'",
+    },
+    "somerville": {
+        "name": "Somerville",
+        "prefix": "permit_somerville",
+        "platform": "socrata",
+        "base_url": "https://data.somervillema.gov/resource/vxgw-vmky.json",
+        "desc_field": "work",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num", "objectid"],
+        "filter": "$where=UPPER(work) LIKE '%25SOLAR%25'",
+    },
+    "collin_tx": {
+        "name": "Collin County TX",
+        "prefix": "permit_collintx",
+        "platform": "socrata",
+        "base_url": "https://data.texas.gov/resource/82ee-gbj5.json",
+        "desc_field": "permittypedescr",
+        "id_field": "permitnumber",
+        "id_fields": ["permitnumber", "permit_number", "permit_num"],
+        "filter": "$where=UPPER(permittypedescr) LIKE '%25SOLAR%25'",
+    },
+    "cincinnati": {
+        "name": "Cincinnati",
+        "prefix": "permit_cincinnati",
+        "platform": "socrata",
+        "base_url": "https://data.cincinnati-oh.gov/resource/cfkj-xb9y.json",
+        "desc_field": "description",
+        "id_field": "permit_number",
+        "id_fields": ["permitnumber", "permit_number", "permit_num"],
+        "filter": "$where=UPPER(companyname) LIKE '%25SOLAR%25' OR UPPER(companyname) LIKE '%25SUNRUN%25' OR UPPER(companyname) LIKE '%25TESLA%25' OR UPPER(companyname) LIKE '%25PHOTOVOLTAIC%25'",
+    },
+
+    # --- OpenDataSoft ---
+    "memphis": {
+        "name": "Memphis",
+        "prefix": "permit_memphis",
+        "platform": "opendatasoft",
+        "base_url": "https://datamidsouth.opendatasoft.com/api/explore/v2.1/catalog/datasets/shelby-county-building-and-demolition-permits/records",
+        "page_size": 100,
+        "desc_field": "description",
+        "id_field": "record_id",
+        "alt_id_field": "permit_key",
+        "filter": "where=description%20like%20%27SOLAR%27%20OR%20description%20like%20%27solar%27%20OR%20description%20like%20%27Solar%27%20OR%20description%20like%20%27PHOTOVOLTAIC%27",
+    },
 }
 
 
@@ -712,6 +1023,9 @@ def fetch_ckan(config):
             params["q"] = "solar"
         url = f"{config['base_url']}?{urllib.parse.urlencode(params)}"
         req = urllib.request.Request(url)
+        # CivicData CKAN returns 403 without User-Agent header
+        if "civicdata.com" in config["base_url"]:
+            req.add_header("User-Agent", "SolarTrack/1.0")
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
                 data = json.loads(resp.read().decode())
@@ -725,6 +1039,41 @@ def fetch_ckan(config):
         records.extend(rows)
         offset += len(rows)
         total = result.get("total", 0)
+        if offset >= total:
+            break
+        time.sleep(RATE_LIMIT)
+    return records
+
+
+def fetch_opendatasoft(config):
+    """Fetch all records from OpenDataSoft API (v2.1)."""
+    records = []
+    offset = 0
+    page_size = config.get("page_size", 100)
+    while True:
+        url = f"{config['base_url']}?limit={page_size}&offset={offset}"
+        if config.get("filter"):
+            url += "&" + config["filter"]
+        req = urllib.request.Request(url)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read().decode())
+        except Exception as e:
+            print(f"    API error at offset {offset}: {e}")
+            break
+        batch = data.get("results", data.get("records", []))
+        if not batch:
+            break
+        for rec in batch:
+            if "record" in rec and "fields" in rec.get("record", {}):
+                fields = rec["record"]["fields"]
+            elif "fields" in rec:
+                fields = rec["fields"]
+            else:
+                fields = rec
+            records.append(fields)
+        offset += len(batch)
+        total = data.get("total_count", 0)
         if offset >= total:
             break
         time.sleep(RATE_LIMIT)
@@ -864,6 +1213,8 @@ def process_city(city_key, config, dry_run=False):
             raw_records = fetch_carto(config)
         elif platform == "ckan":
             raw_records = fetch_ckan(config)
+        elif platform == "opendatasoft":
+            raw_records = fetch_opendatasoft(config)
         else:
             print(f"  Unknown platform: {platform}")
             return 0, 0, 0
@@ -886,6 +1237,12 @@ def process_city(city_key, config, dry_run=False):
         if not permit_id and alt_id:
             permit_id = raw.get(alt_id, "")
         if not permit_id:
+            for fallback in config.get("id_fields", []):
+                val = raw.get(fallback)
+                if val and str(val).strip():
+                    permit_id = str(val).strip()
+                    break
+        if not permit_id:
             continue
         if suffix_field:
             suffix = raw.get(suffix_field, "01")
@@ -896,6 +1253,11 @@ def process_city(city_key, config, dry_run=False):
         desc = raw.get(desc_field, "")
         if not desc and alt_desc:
             desc = raw.get(alt_desc, "")
+        # Concatenate additional description fields
+        for extra_field in config.get("extra_desc_fields", []):
+            extra = raw.get(extra_field, "")
+            if extra and str(extra).strip() and str(extra).strip() != str(desc).strip():
+                desc = f"{desc}. {extra}" if desc else str(extra)
         if desc:
             desc_map[source_id] = str(desc)
 
