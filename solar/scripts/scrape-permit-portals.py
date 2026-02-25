@@ -127,6 +127,41 @@ PORTALS = {
         "search_keywords": ["solar"],
         "prefix": "permit_lewistonme",
     },
+
+    # =========================================================================
+    # Tyler EnerGov - Gap State Expansion (Feb 24, 2026)
+    # Top 10 portals by population and gap-filling value
+    # =========================================================================
+    "st_lucie_county": {
+        "platform": "tyler",
+        "name": "St. Lucie County, FL",
+        "state": "FL",
+        "county": "ST. LUCIE",
+        "base_url": "https://stluciecountyfl-energovpub.tylerhost.net/apps/SelfService",
+        "search_keywords": ["solar"],
+        "prefix": "permit_stlucie",
+    },
+    # REMOVED (0 results or no search): cameron_county TX, denton_county TX, pembroke_pines FL (N/A data),
+    #   west_palm_beach FL (N/A data), spartanburg_county SC (no search page)
+    "boca_raton": {
+        "platform": "tyler",
+        "name": "Boca Raton, FL",
+        "state": "FL",
+        "county": "PALM BEACH",
+        "base_url": "https://bocaratonfl-energovpub.tylerhost.net/apps/SelfService",
+        "search_keywords": ["solar"],
+        "prefix": "permit_bocaraton",
+    },
+    "kissimmee": {
+        "platform": "tyler",
+        "name": "Kissimmee, FL",
+        "state": "FL",
+        "county": "OSCEOLA",
+        "base_url": "https://cityofkissimmeefl-energovweb.tylerhost.net/apps/SelfService",
+        "search_keywords": ["solar"],
+        "prefix": "permit_kissimmee",
+    },
+    # REMOVED (0 results): roswell_ga (no search page), leander_tx (0 results)
 }
 
 
@@ -339,9 +374,14 @@ def parse_equipment_from_description(desc):
             "model": m.group(2).strip(),
         })
 
-    # Racking: "Unirac NXT" or "IronRidge XR100"
+    # Racking: 25 branded manufacturers
     rack_pattern = re.compile(
-        r'(Unirac|IronRidge|SnapNrack|Quick\s*Mount|Pegasus|Everest|K2)\s+'
+        r'(Unirac|Iron\s*Ridge|SnapN?Rack|Quick\s*Mount(?:\s*PV)?|Pegasus\s*Solar|'
+        r'Everest|K2\s*Systems|Ecolibrium|Terra\s*Smart|Game\s*Change(?:\s*Solar)?|'
+        r'Array\s+Technolog(?:y|ies)|NEX\s*Tracker|Solar\s*Flex\s*Rack|Panel\s*Claw|'
+        r'Schletter|RBI\s+Solar|Arctech|Soltec|FTC\s+Solar|S[\:\-]?FLEX|'
+        r'Mounting\s+Systems|ProSolar|EcoFasten|DPW\s+Solar|Roof\s*Tech|'
+        r'Kinetic\s+Solar|SunModo|AEROCOMPACT|Opsun|Renusol|AP\s+Alternatives)\s+'
         r'([A-Z0-9][\w\-\.]+)',
         re.IGNORECASE
     )

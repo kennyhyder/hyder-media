@@ -75,6 +75,9 @@ def supabase_post(table, records):
     try:
         with urllib.request.urlopen(req) as resp:
             return True, None
+    except urllib.error.HTTPError as e:
+        resp_body = e.read().decode() if e.fp else ""
+        return False, f"{e} | {resp_body}"
     except Exception as e:
         return False, str(e)
 
@@ -331,6 +334,9 @@ def make_installation(record, headers, data_source_id):
     name = get(["Name", "Project Name"])
     commercial_name = get(["Commercial Name"])
     state = get(["State", "Location State"])
+    # State must be exactly 2 chars (char(2) column) — filter N/A, empty, etc.
+    if state and (len(state) != 2 or state.upper() == "N/"):
+        state = None
     county = get(["County", "Location County"])
     trans_owner = get(["Transmission Owner", "TO"])
 
@@ -454,7 +460,7 @@ def main():
         print("  No new records to ingest.")
         return
 
-    # Batch insert
+    # Batch insert with one-by-one fallback
     print(f"\n  Inserting {len(installations)} records...")
     created = 0
     errors = 0
@@ -464,8 +470,15 @@ def main():
         if ok:
             created += len(batch)
         else:
-            errors += len(batch)
-            print(f"    Batch error at {i}: {err}")
+            # Retry one-by-one to save good records
+            for rec in batch:
+                ok2, err2 = supabase_post("solar_installations", [rec])
+                if ok2:
+                    created += 1
+                else:
+                    errors += 1
+                    if errors <= 5:
+                        print(f"    Error for {rec.get('source_record_id', '?')}: {err2}")
         if (i + BATCH_SIZE) % 200 == 0:
             print(f"    Progress: {created} created, {errors} errors")
 

@@ -19,6 +19,7 @@ import sys
 import json
 import time
 import uuid
+import ssl
 import argparse
 import urllib.request
 import urllib.parse
@@ -229,14 +230,13 @@ def fetch_pjm_withdrawn():
     url = "https://services.pjm.com/PJMPlanningApi/api/Queue/ExportToXls"
     headers = {
         "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Key": "E29477D0-70E0-4825-89B0-43F460BF9AB4",
-        "User-Agent": "SolarTrack/1.0",
+        "Host": "services.pjm.com",
+        "Origin": "https://www.pjm.com",
+        "Referer": "https://www.pjm.com/",
+        "api-subscription-key": "E29477D0-70E0-4825-89B0-43F460BF9AB4",
+        "User-Agent": "Mozilla/5.0",
     }
-    body = json.dumps({
-        "queueId": None, "projectName": None, "state": None,
-        "fuelType": "Solar", "status": "Withdrawn",
-        "county": None, "transmissionOwner": None,
-    }).encode()
+    body = json.dumps({}).encode()
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
 
     try:
@@ -271,19 +271,22 @@ def fetch_pjm_withdrawn():
         if "withdraw" not in status:
             continue
 
-        queue_id = safe_str(rec.get("Queue Number") or rec.get("Queue ID") or rec.get("QueueId"))
+        queue_id = safe_str(rec.get("Project ID") or rec.get("Queue Number") or rec.get("Queue ID") or rec.get("QueueId"))
         if not queue_id:
             continue
 
-        cap = safe_float(rec.get("MFO") or rec.get("MW In Service") or rec.get("Max Facility Output (MFO)"))
+        cap = safe_float(rec.get("MW Capacity") or rec.get("MFO") or rec.get("MW In Service") or rec.get("Max Facility Output (MFO)"))
         if not cap:
             cap = safe_float(rec.get("MW Energy") or rec.get("MW"))
         if cap and cap < 1.0:
             continue
 
         state = safe_str(rec.get("State"))
+        # State must be exactly 2 chars (char(2) column)
+        if state and len(state) != 2:
+            state = None
         county = safe_str(rec.get("County"))
-        developer = safe_str(rec.get("Commercial Name") or rec.get("Projected In Service Date"))
+        developer = safe_str(rec.get("Commercial Name"))
 
         records.append({
             "source_record_id": f"iso_pjm_wd_{queue_id}",
@@ -306,10 +309,256 @@ def fetch_pjm_withdrawn():
 # Main processing
 # ---------------------------------------------------------------------------
 
+def fetch_caiso_withdrawn():
+    """Fetch withdrawn solar from CAISO Excel queue."""
+    print("\n  Fetching CAISO queue data...")
+
+    xlsx_path = DATA_DIR / "caiso" / "PublicQueueReport.xlsx"
+    if not xlsx_path.exists():
+        # Download fresh copy
+        url = "http://www.caiso.com/PublishedDocuments/PublicQueueReport.xlsx"
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(url, headers={"User-Agent": "SolarTrack/1.0"})
+        try:
+            with urllib.request.urlopen(req, context=ctx, timeout=60) as resp:
+                xlsx_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(xlsx_path, "wb") as f:
+                    f.write(resp.read())
+        except Exception as e:
+            print(f"  Error downloading CAISO: {e}")
+            return []
+
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_path), read_only=True)
+    except Exception as e:
+        print(f"  Error reading CAISO Excel: {e}")
+        return []
+
+    records = []
+    seen = set()
+
+    # CAISO Excel has 3+ title rows before actual header. Header row contains "Queue Position"
+    for sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+        header = None
+        for row in ws.iter_rows(values_only=True):
+            cells = [str(c or "").strip().replace("\n", " ") for c in row]
+            # Find header row by looking for "Queue Position"
+            if header is None:
+                if any("Queue Position" in c for c in cells):
+                    header = cells
+                continue
+            rec = dict(zip(header, row))
+
+            # Check if solar fuel
+            is_solar = False
+            for col in header:
+                if "fuel" in col.lower() or "type" in col.lower():
+                    val = str(rec.get(col, "")).lower()
+                    if "solar" in val or "photovoltaic" in val:
+                        is_solar = True
+                        break
+            if not is_solar:
+                continue
+
+            # Withdrawn sheet — all records are withdrawn. Also check status column
+            status = str(rec.get("Application Status", "")).lower()
+            if "withdrawn" in sheet_name.lower():
+                pass  # all records in this sheet are withdrawn
+            elif "withdraw" not in status and "cancel" not in status:
+                continue
+
+            queue_pos = safe_str(rec.get("Queue Position"))
+            if not queue_pos or queue_pos in seen:
+                continue
+            seen.add(queue_pos)
+
+            # Capacity from MW columns
+            cap = None
+            for col in header:
+                if "mw" in col.lower() and "net" in col.lower():
+                    cap = safe_float(rec.get(col))
+                    if cap:
+                        break
+            if not cap:
+                for col in header:
+                    if "mw" in col.lower():
+                        cap = safe_float(rec.get(col))
+                        if cap:
+                            break
+            if cap and cap < 1.0:
+                continue
+
+            state = safe_str(rec.get("State"))
+            if state and len(state) != 2:
+                state = "CA"  # CAISO is all California
+
+            records.append({
+                "source_record_id": f"iso_caiso_wd_{queue_pos}",
+                "site_name": safe_str(rec.get("Project Name - Confidential") or rec.get("Project Name")),
+                "site_type": "utility" if (cap and cap >= 1.0) else "commercial",
+                "site_status": "canceled",
+                "state": state or "CA",
+                "county": safe_str(rec.get("County")),
+                "capacity_mw": cap,
+                "developer_name": safe_str(rec.get("Developer") or rec.get("Interconnecting Entity")),
+                "operator_name": safe_str(rec.get("Transmission Owner")),
+                "install_date": parse_date(rec.get("Queue Date") or rec.get("Interconnection Request Receive Date")),
+            })
+
+    wb.close()
+    print(f"  CAISO withdrawn solar: {len(records)}")
+    return records
+
+
+def fetch_nyiso_withdrawn():
+    """Fetch withdrawn solar from NYISO Excel queue."""
+    print("\n  Fetching NYISO queue data...")
+
+    xlsx_path = DATA_DIR / "nyiso" / "NYISO-Interconnection-Queue.xlsx"
+    if not xlsx_path.exists():
+        url = "https://www.nyiso.com/documents/20142/1407078/NYISO-Interconnection-Queue.xlsx"
+        req = urllib.request.Request(url, headers={"User-Agent": "SolarTrack/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                xlsx_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(xlsx_path, "wb") as f:
+                    f.write(resp.read())
+        except Exception as e:
+            print(f"  Error downloading NYISO: {e}")
+            return []
+
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_path), read_only=True)
+    except Exception as e:
+        print(f"  Error reading NYISO Excel: {e}")
+        return []
+
+    records = []
+    seen = set()
+
+    for sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+        header = None
+        for row in ws.iter_rows(values_only=True):
+            cells = [str(c or "").strip().replace("\n", " ") for c in row]
+            if header is None:
+                if any("Queue Pos" in c for c in cells):
+                    header = cells
+                continue
+            rec = dict(zip(header, row))
+
+            # Check if solar
+            fuel = str(rec.get("Type/ Fuel", "") or rec.get("Fuel", "")).lower()
+            if "solar" not in fuel and "s" != fuel.strip():
+                continue
+
+            # Check if withdrawn/cancelled — by status or by sheet name
+            status = str(rec.get("S", "") or rec.get("Status", "") or rec.get("Availability of Studies", "")).lower()
+            if "w" == status.strip() or "withdraw" in status or "cancel" in status:
+                pass
+            elif "withdraw" in sheet_name.lower():
+                pass
+            else:
+                continue
+
+            queue_pos = safe_str(rec.get("Queue Pos.") or rec.get("Queue Position"))
+            if not queue_pos or queue_pos in seen:
+                continue
+            seen.add(queue_pos)
+
+            # Capacity
+            cap = safe_float(rec.get("SP (MW)") or rec.get("Summer (MW)") or rec.get("Capacity (MW)"))
+            if not cap:
+                cap = safe_float(rec.get("WP (MW)") or rec.get("Winter (MW)"))
+            if cap and cap < 1.0:
+                continue
+
+            state = safe_str(rec.get("State"))
+            if state and len(state) != 2:
+                state = "NY"
+            county = safe_str(rec.get("County"))
+
+            records.append({
+                "source_record_id": f"iso_nyiso_wd_{queue_pos}",
+                "site_name": safe_str(rec.get("Project Name")),
+                "site_type": "utility" if (cap and cap >= 1.0) else "commercial",
+                "site_status": "canceled",
+                "state": state or "NY",
+                "county": county,
+                "capacity_mw": cap,
+                "developer_name": safe_str(rec.get("Developer/Interconnection Customer") or rec.get("Developer")),
+                "operator_name": safe_str(rec.get("Transmission Owner") or rec.get("T.O.")),
+                "install_date": parse_date(rec.get("Date of IR") or rec.get("Queue Date")),
+            })
+
+    wb.close()
+    print(f"  NYISO withdrawn solar: {len(records)}")
+    return records
+
+
+def fetch_ercot_withdrawn():
+    """Fetch withdrawn solar from ERCOT via gridstatus."""
+    print("\n  Fetching ERCOT queue data via gridstatus...")
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        import gridstatus
+        iso = gridstatus.Ercot()
+        df = iso.get_interconnection_queue()
+    except Exception as e:
+        print(f"  Error fetching ERCOT: {e}")
+        print("  Note: ERCOT withdrawn requires .venv with gridstatus. Skipping.")
+        return []
+
+    records = []
+    for _, row in df.iterrows():
+        gen_type = str(row.get("Generation Type", "")).lower()
+        if "solar" not in gen_type:
+            continue
+
+        status = str(row.get("Status", "")).lower()
+        if "withdraw" not in status and "cancel" not in status:
+            continue
+
+        queue_id = str(row.get("Queue ID", "")).strip()
+        if not queue_id:
+            continue
+
+        cap = safe_float(row.get("Capacity (MW)") or row.get("Summer Capacity (MW)"))
+        if cap and cap < 1.0:
+            continue
+
+        state = safe_str(row.get("State"))
+        if state and len(state) != 2:
+            state = "TX"
+
+        records.append({
+            "source_record_id": f"iso_ercot_wd_{queue_id}",
+            "site_name": safe_str(row.get("Project Name")),
+            "site_type": "utility" if (cap and cap >= 1.0) else "commercial",
+            "site_status": "canceled",
+            "state": state or "TX",
+            "county": safe_str(row.get("County")),
+            "capacity_mw": cap,
+            "developer_name": safe_str(row.get("Interconnecting Entity")),
+            "operator_name": safe_str(row.get("Transmission Owner")),
+        })
+
+    print(f"  ERCOT withdrawn solar: {len(records)}")
+    return records
+
+
 ISO_FETCHERS = {
     "miso": ("MISO Withdrawn Queue", fetch_miso_withdrawn),
     "spp": ("SPP Withdrawn Queue", fetch_spp_withdrawn),
     "pjm": ("PJM Withdrawn Queue", fetch_pjm_withdrawn),
+    "caiso": ("CAISO Withdrawn Queue", fetch_caiso_withdrawn),
+    "nyiso": ("NYISO Withdrawn Queue", fetch_nyiso_withdrawn),
+    "ercot": ("ERCOT Withdrawn Queue", fetch_ercot_withdrawn),
 }
 
 
