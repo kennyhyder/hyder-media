@@ -162,6 +162,68 @@ PORTALS = {
         "prefix": "permit_kissimmee",
     },
     # REMOVED (0 results): roswell_ga (no search page), leander_tx (0 results)
+
+    # =========================================================================
+    # Tyler EnerGov - Tier 2 Expansion (Feb 25, 2026)
+    # New portals discovered by research agent. Focus: gap states + large FL cities.
+    # REMOVED (DNS dead): tolleson_az, lawrenceville_ga, waxahachie_tx, leawood_ks
+    # REMOVED (0 results): miramar_fl, columbia_sc
+    # REMOVED (<3 results): clarksville_tn (2 contractor regs), doral_fl (1), ormond_beach_fl (4)
+    # =========================================================================
+    "barrow_county_ga": {
+        "platform": "tyler",
+        "name": "Barrow County, GA",
+        "state": "GA",
+        "county": "BARROW",
+        "base_url": "https://barrowcountyga-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_barrowga",
+    },
+    "walton_county_fl": {
+        "platform": "tyler",
+        "name": "Walton County, FL",
+        "state": "FL",
+        "county": "WALTON",
+        "base_url": "https://waltoncountyfl-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_waltonfl",
+    },
+    "prosper_tx": {
+        "platform": "tyler",
+        "name": "Prosper, TX",
+        "state": "TX",
+        "county": "COLLIN",
+        "base_url": "https://prospertx-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_prospertx",
+    },
+    "new_smyrna_beach_fl": {
+        "platform": "tyler",
+        "name": "New Smyrna Beach, FL",
+        "state": "FL",
+        "county": "VOLUSIA",
+        "base_url": "https://newsmyrnabeachfl-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_nsbfl",
+    },
+    "deltona_fl": {
+        "platform": "tyler",
+        "name": "Deltona, FL",
+        "state": "FL",
+        "county": "VOLUSIA",
+        "base_url": "https://deltonafl-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_deltonafl",
+    },
+    "largo_fl": {
+        "platform": "tyler",
+        "name": "Largo, FL",
+        "state": "FL",
+        "county": "PINELLAS",
+        "base_url": "https://cityoflargofl-energovweb.tylerhost.net/apps/selfservice",
+        "search_keywords": ["solar"],
+        "prefix": "permit_largofl",
+    },
 }
 
 
@@ -179,9 +241,18 @@ def supabase_get(table, params):
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
     }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read().decode())
+    for attempt in range(5):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode())
+        except Exception as e:
+            if attempt < 4:
+                wait = 2 ** attempt
+                print(f"    Retry {attempt+1}/5 after {e} (waiting {wait}s)", file=sys.stderr)
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_post(table, records):
@@ -202,58 +273,75 @@ def supabase_post(table, records):
                 if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
                     r[k] = None
         body = json.dumps(records).encode()
-    req = urllib.request.Request(url, data=body, headers=headers, method="POST")
-    try:
-        with urllib.request.urlopen(req) as resp:
-            return True, None
-    except Exception as e:
-        err_body = ""
-        if hasattr(e, 'read'):
-            try:
-                err_body = e.read().decode()[:200]
-            except Exception:
-                pass
-        return False, f"{e} | {err_body}" if err_body else str(e)
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, data=body, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return True, None
+        except Exception as e:
+            err_body = ""
+            if hasattr(e, 'read'):
+                try:
+                    err_body = e.read().decode()[:200]
+                except Exception:
+                    pass
+            err_msg = f"{e} | {err_body}" if err_body else str(e)
+            if attempt < 2 and "500" in str(e):
+                time.sleep(2 ** attempt)
+                continue
+            return False, err_msg
 
 
 def get_existing_source_ids(prefix):
     """Get existing source_record_ids with given prefix."""
     existing = set()
     offset = 0
-    while True:
-        batch = supabase_get("solar_installations", {
-            "select": "source_record_id",
-            "source_record_id": f"like.{prefix}_*",
-            "offset": offset,
-            "limit": 1000,
-        })
-        if not batch:
-            break
-        for r in batch:
-            existing.add(r["source_record_id"])
-        offset += len(batch)
-        if len(batch) < 1000:
-            break
+    try:
+        while True:
+            batch = supabase_get("solar_installations", {
+                "select": "source_record_id",
+                "source_record_id": f"like.{prefix}_*",
+                "offset": offset,
+                "limit": 1000,
+            })
+            if not batch:
+                break
+            for r in batch:
+                existing.add(r["source_record_id"])
+            offset += len(batch)
+            if len(batch) < 1000:
+                break
+    except Exception as e:
+        print(f"    WARNING: Could not check existing IDs ({e}). Relying on UNIQUE constraint.", file=sys.stderr)
     return existing
 
 
 def get_data_source_id(name):
     """Get or create data source ID."""
-    rows = supabase_get("solar_data_sources", {"name": f"eq.{name}", "select": "id"})
-    if rows:
-        return rows[0]["id"]
-    url = f"{SUPABASE_URL}/rest/v1/solar_data_sources"
-    headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-    }
-    body = json.dumps({"name": name, "url": "Proprietary permit portal (Playwright scrape)"}).encode()
-    req = urllib.request.Request(url, data=body, headers=headers, method="POST")
-    with urllib.request.urlopen(req) as resp:
-        data = json.loads(resp.read().decode())
-        return data[0]["id"] if isinstance(data, list) else data["id"]
+    for attempt in range(5):
+        try:
+            rows = supabase_get("solar_data_sources", {"name": f"eq.{name}", "select": "id"})
+            if rows:
+                return rows[0]["id"]
+            url = f"{SUPABASE_URL}/rest/v1/solar_data_sources"
+            headers = {
+                "apikey": SUPABASE_KEY,
+                "Authorization": f"Bearer {SUPABASE_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "return=representation",
+            }
+            body = json.dumps({"name": name, "url": "Proprietary permit portal (Playwright scrape)"}).encode()
+            req = urllib.request.Request(url, data=body, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read().decode())
+                return data[0]["id"] if isinstance(data, list) else data["id"]
+        except Exception as e:
+            if attempt < 4:
+                wait = 2 ** attempt
+                print(f"    Retry get_data_source_id {attempt+1}/5: {e} (waiting {wait}s)")
+                time.sleep(wait)
+            else:
+                raise
 
 
 def supabase_patch(table, record_id, updates):
