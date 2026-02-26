@@ -256,6 +256,24 @@ def get_data_source_id(name):
         return data[0]["id"] if isinstance(data, list) else data["id"]
 
 
+def supabase_patch(table, record_id, updates):
+    """PATCH a single record by ID."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}?id=eq.{record_id}"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal",
+    }
+    body = json.dumps(updates, allow_nan=False).encode()
+    req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return True, None
+    except Exception as e:
+        return False, str(e)
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -1024,6 +1042,377 @@ async def scrape_tyler(page, config):
     return results
 
 
+# ---------------------------------------------------------------------------
+# Tyler EnerGov detail page scraper
+# ---------------------------------------------------------------------------
+
+async def scrape_tyler_detail_pages(portal_key, config, dry_run=False):
+    """Scrape detail pages for existing Tyler EnerGov records to extract equipment.
+
+    For each installation record with this portal's prefix:
+    1. Navigate to {base_url}#/permit/{permit_number}
+    2. Wait for Angular to render
+    3. Extract description, contractor, owner, valuation
+    4. Parse equipment from description (panels, inverters, racking)
+    5. Update installation record + create equipment records
+
+    Supports resume via progress file.
+    """
+    from playwright.async_api import async_playwright
+
+    prefix = config["prefix"]
+    base_url = config["base_url"]
+    progress_file = f"/tmp/tyler_details_progress_{portal_key}.json"
+
+    print(f"\n{'=' * 60}")
+    print(f"Detail Pages: {config['name']} ({portal_key})")
+    print(f"{'=' * 60}")
+    print(f"  Base URL: {base_url}")
+    print(f"  Prefix: {prefix}")
+
+    # Load progress
+    processed = set()
+    if os.path.exists(progress_file):
+        with open(progress_file) as f:
+            processed = set(json.load(f))
+        print(f"  Resuming: {len(processed)} already processed")
+
+    # Load existing records from DB
+    print(f"  Loading existing records...")
+    records = []
+    offset = 0
+    while True:
+        batch = supabase_get("solar_installations", {
+            "select": "id,source_record_id,site_name,installer_name,owner_name,total_cost,capacity_mw",
+            "source_record_id": f"like.{prefix}_*",
+            "offset": offset,
+            "limit": 1000,
+            "order": "source_record_id",
+        })
+        if not batch:
+            break
+        records.extend(batch)
+        offset += len(batch)
+        if len(batch) < 1000:
+            break
+
+    print(f"  Found {len(records)} records in DB")
+    if not records:
+        print("  No records to process.")
+        return 0, 0, 0
+
+    # Filter out already processed
+    to_process = [r for r in records if r["source_record_id"] not in processed]
+    print(f"  To process: {len(to_process)} (skipping {len(records) - len(to_process)} already done)")
+
+    if not to_process:
+        print("  All records already processed!")
+        return 0, 0, 0
+
+    if dry_run:
+        print(f"\n  [DRY RUN] Would process {len(to_process)} detail pages")
+        return len(to_process), 0, 0
+
+    # Get data source ID for equipment records
+    ds_name = f"municipal_permits_{portal_key}"
+    data_source_id = get_data_source_id(ds_name)
+
+    # Launch browser
+    updated = 0
+    eq_created = 0
+    errors = 0
+
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch(headless=True)
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+        )
+        page = await context.new_page()
+        page.set_default_timeout(30000)
+
+        # Navigate to base URL first to establish Angular context
+        try:
+            await page.goto(base_url, wait_until="networkidle", timeout=45000)
+            await page.wait_for_timeout(3000)
+        except Exception as e:
+            print(f"  Error loading portal: {e}")
+            await browser.close()
+            return 0, 0, 0
+
+        for i, record in enumerate(to_process):
+            source_id = record["source_record_id"]
+            # Extract permit number from source_record_id: prefix_PERMITNUMBER
+            permit_number = source_id[len(prefix) + 1:]  # skip prefix_
+
+            try:
+                # Navigate to detail page
+                detail_url = f"{base_url}#/permit/{urllib.parse.quote(permit_number)}"
+                await page.goto(detail_url, wait_until="networkidle", timeout=30000)
+                await page.wait_for_timeout(2500)  # Wait for Angular render
+
+                # Extract fields from detail page
+                details = await extract_tyler_detail_fields(page)
+
+                if not details.get("description") and not details.get("contractor"):
+                    # Maybe the URL format is different — try #/record/
+                    detail_url2 = f"{base_url}#/record/{urllib.parse.quote(permit_number)}"
+                    await page.goto(detail_url2, wait_until="networkidle", timeout=30000)
+                    await page.wait_for_timeout(2500)
+                    details = await extract_tyler_detail_fields(page)
+
+                desc = details.get("description", "")
+                contractor = details.get("contractor")
+                applicant = details.get("applicant")
+                owner = details.get("owner")
+                valuation = details.get("valuation")
+
+                # Build updates for installation record
+                inst_updates = {}
+
+                # Only update fields that are currently NULL
+                if desc and not record.get("site_name"):
+                    # Truncate long descriptions for site_name
+                    inst_updates["site_name"] = desc[:500] if len(desc) > 500 else desc
+
+                installer = contractor or applicant
+                # Filter out placeholder/button text
+                CONTRACTOR_SKIP = {"view registered contractors", "view contractors",
+                                   "view contacts", "view applicant", "n/a", "none", ""}
+                if installer and installer.lower().strip() in CONTRACTOR_SKIP:
+                    installer = None
+                if installer and not record.get("installer_name"):
+                    inst_updates["installer_name"] = installer.title()
+
+                if owner and not record.get("owner_name"):
+                    inst_updates["owner_name"] = owner.title()
+
+                if valuation and not record.get("total_cost"):
+                    cost = safe_float(re.sub(r'[,$]', '', str(valuation)))
+                    if cost and cost > 0:
+                        inst_updates["total_cost"] = cost
+
+                # Extract capacity from description if missing
+                if desc and not record.get("capacity_mw"):
+                    cap_kw = parse_capacity_kw(desc)
+                    if cap_kw:
+                        inst_updates["capacity_dc_kw"] = cap_kw
+                        inst_updates["capacity_mw"] = round(cap_kw / 1000, 3)
+
+                # Patch installation if we have updates
+                if inst_updates:
+                    ok, err = supabase_patch("solar_installations", record["id"], inst_updates)
+                    if ok:
+                        updated += 1
+                    else:
+                        print(f"    PATCH error for {permit_number}: {err}")
+
+                # Parse and create equipment records
+                equipment = parse_equipment_from_description(desc)
+                if equipment:
+                    for eq in equipment:
+                        eq_record = {
+                            "installation_id": record["id"],
+                            "equipment_type": eq.get("equipment_type"),
+                            "manufacturer": eq.get("manufacturer"),
+                            "model": eq.get("model"),
+                            "quantity": eq.get("quantity", 1),
+                            "data_source_id": data_source_id,
+                        }
+                        ok, _ = supabase_post("solar_equipment", [eq_record])
+                        if ok:
+                            eq_created += 1
+
+                # Log progress
+                fields_found = []
+                if desc:
+                    fields_found.append(f"desc={len(desc)}ch")
+                if contractor:
+                    fields_found.append(f"contractor={contractor[:30]}")
+                if owner:
+                    fields_found.append(f"owner={owner[:30]}")
+                if equipment:
+                    fields_found.append(f"equip={len(equipment)}")
+                if valuation:
+                    fields_found.append(f"val={valuation}")
+
+                if fields_found and (i < 20 or i % 100 == 0):
+                    print(f"    [{i+1}/{len(to_process)}] {permit_number}: {', '.join(fields_found)}")
+                elif i % 100 == 0:
+                    print(f"    [{i+1}/{len(to_process)}] {permit_number}: (no new data)")
+
+            except Exception as e:
+                errors += 1
+                if errors <= 20:
+                    print(f"    [{i+1}] ERROR {permit_number}: {e}")
+
+            # Mark as processed and save progress periodically
+            processed.add(source_id)
+            if (i + 1) % 25 == 0 or (i + 1) == len(to_process):
+                with open(progress_file, 'w') as f:
+                    json.dump(list(processed), f)
+
+            # Rate limit between pages
+            await page.wait_for_timeout(2500)
+
+        await browser.close()
+
+    print(f"\n  Detail scraping complete:")
+    print(f"    Processed: {len(to_process)}")
+    print(f"    Installations updated: {updated}")
+    print(f"    Equipment created: {eq_created}")
+    print(f"    Errors: {errors}")
+
+    return updated, eq_created, errors
+
+
+async def extract_tyler_detail_fields(page):
+    """Extract structured fields from a Tyler EnerGov permit detail page.
+
+    Tyler EnerGov detail pages render field labels and values as Angular-bound elements.
+    Common patterns:
+    - <label>Description</label> <span ng-bind="...">value</span>
+    - <div class="col-..."><strong>Description:</strong> value</div>
+    - Sections: General Info, Location, Contacts, Custom Fields, Inspections
+    """
+    details = {}
+
+    try:
+        # Strategy 1: Get all label-value pairs from the page
+        # Tyler uses various DOM structures — extract all visible text and parse
+        page_text = await page.evaluate("""
+            () => {
+                // Collect all text content organized by sections
+                const result = {};
+                const body = document.body;
+                if (!body) return result;
+
+                // Get all text nodes with their labels
+                const allText = body.innerText || '';
+
+                // Look for specific field patterns in the full page text
+                result._fullText = allText;
+
+                // Try to find description field specifically
+                const descEls = document.querySelectorAll(
+                    '[ng-bind*="Description"], [ng-bind*="description"], ' +
+                    '[data-ng-bind*="Description"], [id*="Description"], ' +
+                    '[class*="description"], span[ng-bind*="WorkDesc"]'
+                );
+                for (const el of descEls) {
+                    const text = (el.textContent || el.innerText || '').trim();
+                    if (text && text.length > 5) {
+                        result.description = text;
+                        break;
+                    }
+                }
+
+                // Try to find contractor/applicant
+                const contactEls = document.querySelectorAll(
+                    '[ng-bind*="Contact"], [ng-bind*="Applicant"], ' +
+                    '[ng-bind*="Contractor"], [id*="Contractor"], ' +
+                    '[id*="Applicant"], [data-ng-bind*="Contact"]'
+                );
+                for (const el of contactEls) {
+                    const text = (el.textContent || el.innerText || '').trim();
+                    if (text && text.length > 2) {
+                        result.contractor = text;
+                        break;
+                    }
+                }
+
+                // Try to find owner
+                const ownerEls = document.querySelectorAll(
+                    '[ng-bind*="Owner"], [id*="Owner"], ' +
+                    '[data-ng-bind*="Owner"]'
+                );
+                for (const el of ownerEls) {
+                    const text = (el.textContent || el.innerText || '').trim();
+                    if (text && text.length > 2) {
+                        result.owner = text;
+                        break;
+                    }
+                }
+
+                // Try to find valuation/cost
+                const valEls = document.querySelectorAll(
+                    '[ng-bind*="Valuation"], [ng-bind*="EstCost"], ' +
+                    '[ng-bind*="JobValue"], [ng-bind*="Cost"], ' +
+                    '[id*="Valuation"], [id*="Cost"]'
+                );
+                for (const el of valEls) {
+                    const text = (el.textContent || el.innerText || '').trim();
+                    if (text && /\\d/.test(text)) {
+                        result.valuation = text;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        """)
+
+        # Extract fields from JavaScript result
+        if page_text.get("description"):
+            details["description"] = page_text["description"]
+        if page_text.get("contractor"):
+            details["contractor"] = page_text["contractor"]
+        if page_text.get("owner"):
+            details["owner"] = page_text["owner"]
+        if page_text.get("valuation"):
+            details["valuation"] = page_text["valuation"]
+
+        # Strategy 2: Parse from full text if specific selectors didn't find fields
+        full_text = page_text.get("_fullText", "")
+        if full_text and not details.get("description"):
+            # Look for "Description" followed by text
+            m = re.search(r'Description\s*[:\n]\s*(.+?)(?:\n|$)', full_text, re.IGNORECASE)
+            if m:
+                desc = m.group(1).strip()
+                if len(desc) > 5 and "solar" in desc.lower():
+                    details["description"] = desc
+
+            # Also try "Work Description" or "Project Description"
+            if not details.get("description"):
+                m = re.search(r'(?:Work|Project|Scope)\s*Description\s*[:\n]\s*(.+?)(?:\n|$)', full_text, re.IGNORECASE)
+                if m:
+                    desc = m.group(1).strip()
+                    if len(desc) > 5:
+                        details["description"] = desc
+
+        if full_text and not details.get("contractor"):
+            m = re.search(r'(?:Contractor|Applicant|Licensed Professional)\s*[:\n]\s*(.+?)(?:\n|$)', full_text, re.IGNORECASE)
+            if m:
+                name = m.group(1).strip()
+                if len(name) > 2 and not re.match(r'^\d+$', name):
+                    details["contractor"] = name
+
+        if full_text and not details.get("owner"):
+            m = re.search(r'(?:Property\s+)?Owner\s*[:\n]\s*(.+?)(?:\n|$)', full_text, re.IGNORECASE)
+            if m:
+                name = m.group(1).strip()
+                if len(name) > 2 and not re.match(r'^\d+$', name):
+                    details["owner"] = name
+
+        if full_text and not details.get("valuation"):
+            m = re.search(r'(?:Valuation|Estimated\s+Cost|Job\s+Value|Project\s+Value)\s*[:\n$]\s*([\d,.$]+)', full_text, re.IGNORECASE)
+            if m:
+                details["valuation"] = m.group(1).strip()
+
+        # Also look for applicant separately from contractor
+        if full_text and not details.get("contractor"):
+            m = re.search(r'Applicant\s+Name\s*[:\n]\s*(.+?)(?:\n|$)', full_text, re.IGNORECASE)
+            if m:
+                name = m.group(1).strip()
+                if len(name) > 2:
+                    details["applicant"] = name
+
+    except Exception as e:
+        pass
+
+    return details
+
+
 async def parse_tyler_results(page, config):
     """Parse Tyler EnerGov search results.
 
@@ -1418,6 +1807,10 @@ def main():
     parser.add_argument("--platform", type=str, choices=["accela", "tyler"], help="Platform type filter")
     parser.add_argument("--list", action="store_true", help="List available portals")
     parser.add_argument("--test", type=str, help="Test single portal (saves screenshots)")
+    parser.add_argument("--details", action="store_true",
+                        help="Scrape detail pages for existing Tyler records to extract equipment")
+    parser.add_argument("--reset-progress", action="store_true",
+                        help="Reset detail page progress (re-process all records)")
 
     args = parser.parse_args()
 
@@ -1438,6 +1831,58 @@ def main():
             sys.exit(1)
         config = PORTALS[portal_key]
         asyncio.run(scrape_portal(portal_key, config, dry_run=True, test_mode=True))
+        return
+
+    # --details mode: scrape detail pages for existing Tyler records
+    if args.details:
+        print("Tyler EnerGov Detail Page Scraper")
+        print("=" * 60)
+        print(f"  Dry run: {args.dry_run}")
+
+        # Select Tyler portals only
+        if args.portal:
+            keys = [k.strip() for k in args.portal.split(",")]
+            portals_to_process = {}
+            for k in keys:
+                if k not in PORTALS:
+                    print(f"  Error: Unknown portal '{k}'. Use --list.")
+                    sys.exit(1)
+                if PORTALS[k]["platform"] != "tyler":
+                    print(f"  Warning: Skipping {k} (not a Tyler portal)")
+                    continue
+                portals_to_process[k] = PORTALS[k]
+        else:
+            portals_to_process = {k: v for k, v in PORTALS.items() if v["platform"] == "tyler"}
+
+        print(f"  Tyler portals ({len(portals_to_process)}): {', '.join(portals_to_process.keys())}")
+
+        # Optionally reset progress
+        if args.reset_progress:
+            for key in portals_to_process:
+                pf = f"/tmp/tyler_details_progress_{key}.json"
+                if os.path.exists(pf):
+                    os.remove(pf)
+                    print(f"  Reset progress: {key}")
+
+        total_updated = 0
+        total_equipment = 0
+        total_errors = 0
+
+        for key, config in portals_to_process.items():
+            upd, eq, err = asyncio.run(
+                scrape_tyler_detail_pages(key, config, dry_run=args.dry_run)
+            )
+            total_updated += upd
+            total_equipment += eq
+            total_errors += err
+
+        print(f"\n{'=' * 60}")
+        print(f"Detail Scraping Summary")
+        print(f"{'=' * 60}")
+        print(f"  Installations updated: {total_updated}")
+        print(f"  Equipment created: {total_equipment}")
+        print(f"  Errors: {total_errors}")
+        print(f"\nDone!")
         return
 
     print("Proprietary Permit Portal Scraper")

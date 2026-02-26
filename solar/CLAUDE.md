@@ -191,9 +191,10 @@ bash scripts/deploy-nrel-to-droplet.sh status           # Check classification p
 | 19 | **NC NCUC** | `ingest-nc-ncuc.py` | 1,536 | `ncncuc_` | Excel | Solar/PV, >=25 kW | Annual |
 | 20 | **BLM Solar ROW** | `ingest-blm-solar.py` | 898 | `blm_` | ArcGIS FeatureServer | Solar energy facility ROWs on federal lands (AZ, CA, CO, NV, NM, UT, WY) | Quarterly |
 | 21 | **SEIA MPL** | `ingest-seia.py` | 8,439 (33 new + 8,406 enriched) | `seia_` | Excel (purchased) | Developer/owner/tracker/module tech for utility-scale. 99.6% cross-ref match | Annual ($1K/yr) |
+| 22 | **GRW Microsoft** | `crossref-grw.py` | 6,137 new + 5,075 cross-ref | `grw_` | GeoPackage | Satellite-detected solar polygons (>=0.5 MW). MIT license, Planet Labs imagery | Quarterly |
 
-**Grand Total: ~704,221 installations, ~425,242 equipment records, ~3,254,594 events, 25 primary sources + 75 permit portals**
-**Note**: Counts reduced from 710K/480K after Session 21 TRUNCATE CASCADE recovery (99.4% installations, 88.8% equipment recovered). +898 BLM re-ingestion in Session 33.
+**Grand Total: ~723,491 installations, ~448,401 equipment records, ~3,339,536 events, 26 primary sources + 75 permit portals**
+**Note**: +19K from GRW satellite cross-reference (Session 35) + Census geocoding.
 
 ### Running New Scripts
 ```bash
@@ -822,27 +823,25 @@ Direct SQL operations to maximize field coverage across all 125,389 records:
 16. **PJM-GATS Playwright automation**: Automate XLSX export for repeatable owner enrichment
 17. **Equipment extraction NLP**: Run parse-permit-equipment.py on all permit cities
 
-### Data Gap Summary (Feb 24, 2026 — Session 34)
+### Data Gap Summary (Feb 25, 2026 — Session 35)
 | Field | Count | Coverage | Notes |
 |-------|------:|----------|-------|
-| **location_precision** | **704,221** | **100.0%** | All records tagged |
-| **mount_type** | **704,221** | **100.0%** | **Recovered from 12.6% via tiered heuristics** |
-| **operator_name (linked)** | **704,221** | **100.0%** | **Recovered from 19.2% via HIFLD spatial join + city/state fallback** |
-| developer_name (linked) | 485,152 | 68.9% | +1,654 from SEIA MPL, +2,353 from Treasury 1603 |
-| **capacity_mw** | **480,444** | **68.2%** | **Up from 53.4% via cost→capacity + module wattage estimation** |
-| installer_name (linked) | 475,372 | 67.5% | All linked to solar_installers via FK |
-| address | 562,679 | 79.9% | Geocodable addresses |
-| install_date | 515,331 | 73.2% | From source data |
-| **lat/lng (exact)** | **399,405** | **56.7%** | Exact coordinates |
-| **owner_name (linked)** | **373,658** | **53.1%** | +435 from Treasury 1603 + SEIA cross-ref |
-| flood_zone | 22,864 | 3.2% | **FEMA NFHL enrichment in progress (99.0% hit rate, 23K/562K)** |
+| **location_precision** | **723,491** | **100.0%** | All records tagged |
+| **mount_type** | **723,491** | **100.0%** | Tiered heuristics + GRW satellite ground-mount |
+| **operator_name (linked)** | **722,547** | **99.9%** | HIFLD spatial join + city/state fallback |
+| developer_name (linked) | 486,051 | 67.2% | +1,654 SEIA + 2,353 Treasury 1603 |
+| **capacity_mw** | **494,969** | **68.4%** | Cost→capacity + module wattage + GRW area estimation |
+| installer_name (linked) | 475,474 | 65.7% | All linked to solar_installers via FK |
+| **lat/lng** | **583,743** | **80.7%** | +16,168 Census geocoding + 6,137 GRW satellite |
+| **owner_name (linked)** | **373,659** | **51.6%** | Parcel + WREGIS + eGRID + SEIA + Treasury |
+| **flood_zone** | **138,303** | **19.1%** | **FEMA NFHL completed (6,903 in SFHA)** |
 | annual_generation_mwh | 6,997 | 1.0% | EIA-923 + eGRID merged generation data |
 | capacity_factor | 6,997 | 1.0% | Calculated from generation / (capacity × 8760) |
 | offtaker_name | 2,924 | 0.4% | FERC EQR PPA buyer matching |
 | ppa_price_mwh | 525 | 0.1% | FERC EQR PPA prices (median $39.60/MWh) |
 | **Entity tables** | **~240,000** | — | 33,969 installers + 207,091 site owners + 1,962 manufacturers |
-| **Equipment** | **425,242** | — | 88.6% of pre-truncate 480K (+110 racking) |
-| **Events** | **3,254,594** | — | Storm + recall + generator events |
+| **Equipment** | **448,401** | — | Modules + inverters + racking |
+| **Events** | **3,339,536** | — | Storm + recall + generator events |
 
 ### Entity Enrichment Summary (Session 31)
 | Entity Table | Total | Enriched | Websites | Phones | Ratings | City | State |
@@ -2603,6 +2602,57 @@ Implemented 6 highest-impact data gap strategies in parallel:
 - **developer_name: 485,152 (68.9%)** — up from 481,238 (+3,914 from SEIA + entity linking)
 - **owner_name: 373,658 (53.1%)**
 - FEMA flood adding ~500 flood zones per flush cycle
+
+### Session 35 — Feb 25, 2026
+
+**Microsoft Global Renewables Watch (GRW) Cross-Reference — COMPLETED:**
+- `crossref-grw.py`: Cross-references 11,212 US satellite-detected solar polygons from Microsoft GRW dataset
+- **Data**: `data/grw/solar_all_2024q2_v1.gpkg` (377 MB GeoPackage, MIT license, Planet Labs satellite imagery)
+- **Phase 1 matching**: Grid-based spatial index (0.025-degree cells, ~2.5km) replaces O(N*M) brute force
+  - 5,075 matched to existing installations via 2km proximity + 50% capacity tolerance
+  - 4,670 patches applied (area_m2, construction_year, crossref_ids), 0 errors
+- **Phase 3 insertion**: 6,137 new satellite-detected installations created
+  - Capacity estimated from polygon area at ~20,000 m2/MW (LBNL 2024 benchmark)
+  - All have exact lat/lng (polygon centroids), mount_type='ground'
+  - Data source: `grw_microsoft` (id: ef5e4dd5-0a03-4474-b1c7-19ee3292f604)
+
+**GRW Enrichment Pipeline — COMPLETED:**
+- State/county from nearest-neighbor grid lookup: 4,270 matched
+- Census reverse geocoding for remaining 1,867: 100% match rate (1,867/1,867), 0 errors
+- HIFLD spatial join: 6,091 operator_name assigned (99.3%)
+- Site type: 4,120 utility + 2,017 commercial (based on capacity threshold)
+- Entity linking: 6,091 operator_id linked, 0 unlinked
+- Top states: CA (864), TX (562), NC (551), MA (365), GA (362), VA (315), FL (292)
+
+**Census Batch Forward Geocoding — COMPLETED (from previous session):**
+- 45,456 valid addresses submitted in 46 batches
+- 16,168 geocoded (35.6% match rate), 29,287 no match, 1 error
+- Hit Census API 502 errors but retry logic handled them
+
+**Cross-Source Dedup — COMPLETED:**
+- 4,221 match pairs, 546 patches (362 crossref, 196 developer, 57 location, 16 installer, 28 cost, 1 owner)
+
+**FEMA Flood Zone Enrichment — COMPLETED (from background PID 36084):**
+- 138,303 installations have flood zone data (up from 22,864)
+- Breakdown: X (131,616), AE (4,032), A99 (1,288), D (784), A (271), AH (195), AO (72), VE (41)
+- 6,903 in Special Flood Hazard Areas — HIGH VALUE for equipment replacement leads
+
+**Location Precision — 100% coverage restored:**
+- Fixed 425 NULL records from new permit/BLM sources
+
+**Database state (Session 35):**
+- **723,491 installations** (+19,270 from GRW + Census geocoding + dedup effects)
+- **448,401 equipment records**
+- **3,339,536 events**
+- **operator_name: 722,547 (99.9%)**
+- **developer_name: 486,051 (67.2%)**
+- **installer_name: 475,474 (65.7%)**
+- **capacity_mw: 494,969 (68.4%)**
+- **owner_name: 373,659 (51.6%)**
+- **lat/lng: 583,743 (80.7%)**
+- **flood_zone: 138,303 (19.1%)**
+- **mount_type: 723,491 (100.0%)**
+- **100% location_precision coverage**
 
 <claude-mem-context>
 
