@@ -9,8 +9,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const CUSTOMER_ID = '8357769782';
-// Auto Addiction is under Kenny Hyder MCC
-const LOGIN_CUSTOMER_ID = '6736988718';
+// Direct access (not via MCC)
+const LOGIN_CUSTOMER_ID = '8357769782';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
