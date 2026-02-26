@@ -9,8 +9,8 @@ with area (m2) and construction dates (quarterly 2017-2024).
 Strategy:
   Phase 1: Coordinate proximity match (2km) + capacity tolerance (50%)
            For installations WITH coordinates
-  Phase 2: State + county + capacity match
-           For installations WITHOUT coordinates (county-level precision)
+  Phase 2: Zip + capacity match for city/zip-precision records
+           Using Census ZCTA shapefile for point-in-polygon zip assignment
   Phase 3: Insert remaining GRW records as new installations
            (Solar farms detected by satellite not in any government database)
 
@@ -54,6 +54,9 @@ GRW_FILE = Path(__file__).parent.parent / "data" / "grw" / "solar_all_2024q2_v1.
 # Ground-mount: ~5 acres/MW average = ~20,234 m2/MW
 # We use 20,000 m2/MW as a round number
 M2_PER_MW = 20000
+
+ZCTA_DIR = Path(__file__).parent.parent / "data" / "zcta_shapes"
+ZCTA_URL = "https://www2.census.gov/geo/tiger/TIGER2023/ZCTA520/tl_2023_us_zcta520.zip"
 
 
 def supabase_get(table, params, retries=3):
@@ -163,7 +166,7 @@ def load_db_installations():
         "PGPASSWORD='#FsW7iqg%EYX&G3M' psql "
         "-h aws-0-us-west-2.pooler.supabase.com -p 6543 "
         "-U postgres.ilbovwnhrowvxjdkvrln -d postgres "
-        f"-c \"\\copy (SELECT id, source_record_id, site_name, state, county, city, "
+        f"-c \"\\copy (SELECT id, source_record_id, site_name, state, county, city, zip_code, "
         f"capacity_mw, latitude, longitude, location_precision, install_date, crossref_ids "
         f"FROM solar_installations WHERE is_canonical = true) "
         f"TO '{csv_path}' WITH CSV HEADER\""
@@ -201,12 +204,21 @@ def load_db_installations():
 
 def reverse_geocode_state(lat, lng):
     """Simple state lookup from coordinates using bounding boxes."""
-    # Rough bounding boxes for US states (lat, lng)
-    # For accurate reverse geocoding we'd use a spatial index,
-    # but for GRW cross-ref we just need approximate state
-    # We'll use the Census geocoder or Nominatim if needed
-    # For now, return None and rely on DB matching
     return None
+
+
+def download_zcta_shapefile():
+    """Download Census ZCTA shapefile for zip code polygon boundaries."""
+    import zipfile
+    ZCTA_DIR.mkdir(parents=True, exist_ok=True)
+    zip_path = ZCTA_DIR / "zcta.zip"
+    print(f"    Downloading ZCTA shapefile from {ZCTA_URL}...")
+    urllib.request.urlretrieve(ZCTA_URL, zip_path)
+    print(f"    Extracting ({zip_path.stat().st_size / 1024 / 1024:.0f} MB)...")
+    with zipfile.ZipFile(zip_path, 'r') as zf:
+        zf.extractall(ZCTA_DIR)
+    zip_path.unlink()
+    print(f"    ZCTA shapefile saved to {ZCTA_DIR}")
 
 
 def phase1_coord_match(grw_records, db_records, dry_run=False):
@@ -330,83 +342,173 @@ def phase1_coord_match(grw_records, db_records, dry_run=False):
     return matched_grw_ids
 
 
-def phase2_county_match(grw_records, db_records, matched_ids, dry_run=False):
-    """Phase 2: Match unmatched GRW records to DB records without coords by state+county+capacity."""
+def phase2_zip_capacity_match(grw_records, db_records, matched_ids, dry_run=False):
+    """Phase 2: Match unmatched GRW to city/zip-precision targets by zip+capacity."""
     print("\n" + "="*60)
-    print("Phase 2: State + county + capacity matching (no-coord records)")
+    print("Phase 2: Zip + capacity matching (city/zip-precision records)")
     print("="*60)
+
+    import geopandas as gpd
+    from shapely.geometry import Point
+    import warnings
+    warnings.filterwarnings('ignore')
 
     unmatched_grw = grw_records[~grw_records.index.isin(matched_ids)]
     print(f"  Unmatched GRW records: {len(unmatched_grw):,}")
 
-    # We need to reverse-geocode GRW centroids to get state/county
-    # Use geopandas with a US states shapefile or just load from Census
-    import geopandas as gpd
-    import warnings
-    warnings.filterwarnings('ignore')
+    # --- Step 1: Load ZCTA shapefile ---
+    zcta_shp = ZCTA_DIR / "tl_2023_us_zcta520.shp"
+    if not zcta_shp.exists():
+        download_zcta_shapefile()
 
-    # Get DB records without coordinates
-    db_no_coords = [r for r in db_records
-                    if not r.get('latitude') and r.get('county')
-                    and r.get('capacity_mw')]
+    print("  Loading ZCTA shapefile...")
+    zcta = gpd.read_file(zcta_shp)
+    zcta = zcta.to_crs(epsg=4326)
+    print(f"  ZCTA polygons: {len(zcta):,}")
 
-    print(f"  DB records without coords + have county + capacity: {len(db_no_coords):,}")
-
-    # Group DB records by state+county
-    db_by_county = {}
-    for r in db_no_coords:
-        key = (r.get('state', '').upper(), r.get('county', '').upper())
-        if key not in db_by_county:
-            db_by_county[key] = []
-        db_by_county[key].append(r)
-
-    # For each unmatched GRW record, try Nominatim reverse geocode to get state/county
-    # But that's slow (1 req/sec). Instead, use a state boundary lookup.
-    # Since we have geopandas, use Census state boundaries
-    print("  Reverse-geocoding GRW centroids to states...")
-
-    # Create GeoDataFrame of unmatched GRW
-    from shapely.geometry import Point
-    unmatched_points = gpd.GeoDataFrame(
+    # --- Step 2: Spatial join GRW centroids → zip codes ---
+    print("  Spatial joining GRW centroids to ZCTA polygons...")
+    grw_gdf = gpd.GeoDataFrame(
         unmatched_grw,
         geometry=[Point(row['lng'], row['lat']) for _, row in unmatched_grw.iterrows()],
         crs="EPSG:4326"
     )
 
-    # Download US states from Census (or use a simple lookup)
-    # For efficiency, do a simple lat/lng to state lookup using reverse geocoding API
-    # Actually, let's just check which GRW records fall near DB county records
+    grw_with_zip = gpd.sjoin(grw_gdf, zcta[['ZCTA5CE20', 'geometry']], how='left', predicate='within')
+    grw_valid = grw_with_zip[grw_with_zip['ZCTA5CE20'].notna()].copy()
+    grw_valid['zip5'] = grw_valid['ZCTA5CE20'].astype(str).str[:5]
+    print(f"  GRW records with zip: {len(grw_valid):,} / {len(unmatched_grw):,}")
+
+    # --- Step 3: Get target records (city/zip precision, have zip + capacity) ---
+    targets = [r for r in db_records
+               if r.get('location_precision') in ('city', 'zip', 'county')
+               and r.get('zip_code')
+               and r.get('capacity_mw')
+               and float(r['capacity_mw']) > 0]
+
+    targets_by_zip = {}
+    for t in targets:
+        z = str(t['zip_code']).strip()[:5]
+        if z:
+            targets_by_zip.setdefault(z, []).append(t)
+
+    print(f"  Target records (city/zip precision + zip + capacity): {len(targets):,}")
+    print(f"  Unique target zips: {len(targets_by_zip):,}")
+
+    # --- Step 4: Group GRW by zip and find common zips ---
+    grw_by_zip = {}
+    for _, grw in grw_valid.iterrows():
+        z = str(grw['zip5']).strip()
+        grw_by_zip.setdefault(z, []).append(grw)
+
+    common_zips = set(grw_by_zip.keys()) & set(targets_by_zip.keys())
+    print(f"  Common zips (GRW ∩ targets): {len(common_zips):,}")
+
+    # --- Step 5: Match by zip + capacity ---
     matched = 0
     patches = 0
+    errors = 0
+    high_conf = 0
+    med_conf = 0
     new_matched_ids = set()
+    matched_target_ids = set()
 
-    # For each county group in DB, check if any unmatched GRW record is nearby
-    for (state, county), db_recs in db_by_county.items():
-        if not state or not county:
+    for zip_code in sorted(common_zips):
+        grw_list = grw_by_zip[zip_code]
+        target_list = [t for t in targets_by_zip[zip_code] if t['id'] not in matched_target_ids]
+
+        if not target_list:
             continue
 
-        for _, grw in unmatched_grw.iterrows():
-            if grw.name in new_matched_ids:
+        for grw in grw_list:
+            grw_mw = grw['capacity_mw_est']
+            grw_idx = grw.name
+
+            if grw_idx in new_matched_ids:
                 continue
 
-            grw_mw = grw['capacity_mw_est']
-
-            # Try to match by capacity with each DB record
-            for db_rec in db_recs:
-                db_mw = float(db_rec['capacity_mw'])
-                if db_mw <= 0 or grw_mw <= 0:
+            # Find best capacity match among unmatched targets
+            best = None
+            best_ratio = 999
+            for t in target_list:
+                if t['id'] in matched_target_ids:
                     continue
-
-                ratio = max(db_mw, grw_mw) / max(min(db_mw, grw_mw), 0.001)
-                if ratio > 1.5:  # Tighter tolerance for county-only matching
+                t_mw = float(t['capacity_mw'])
+                if t_mw <= 0 or grw_mw <= 0:
                     continue
+                ratio = max(t_mw, grw_mw) / max(min(t_mw, grw_mw), 0.001)
+                if ratio <= 2.0 and ratio < best_ratio:
+                    best = t
+                    best_ratio = ratio
 
-                # This is a potential match — we need state to confirm
-                # For now, just collect candidates
-                # TODO: Add state reverse-geocode
+            if not best:
+                continue
 
-    print(f"  Phase 2: County matching requires state reverse-geocoding")
-    print(f"  Skipping for now — Phase 1 coord matching is the primary value")
+            # Determine confidence based on uniqueness
+            n_grw_in_zip = len(grw_list)
+            n_targets_in_zip = len([t for t in target_list if t['id'] not in matched_target_ids])
+
+            if n_grw_in_zip == 1 and n_targets_in_zip == 1:
+                confidence = 'HIGH'
+                precision = 'exact'
+                high_conf += 1
+            elif best_ratio <= 1.25:
+                confidence = 'HIGH'
+                precision = 'exact'
+                high_conf += 1
+            else:
+                confidence = 'MEDIUM'
+                precision = 'address'
+                med_conf += 1
+
+            # Build patch
+            patch = {
+                'latitude': round(float(grw['lat']), 7),
+                'longitude': round(float(grw['lng']), 7),
+                'location_precision': precision,
+            }
+
+            # Fill capacity from GRW area estimate if missing
+            if not best.get('capacity_mw'):
+                patch['capacity_mw'] = round(float(grw_mw), 3)
+
+            # Fill install_date from construction year/quarter
+            grw_year = grw.get('construction_year')
+            grw_quarter = grw.get('construction_quarter')
+            if not best.get('install_date') and grw_year:
+                month = (grw_quarter - 1) * 3 + 1 if grw_quarter else 1
+                patch['install_date'] = f"{int(grw_year)}-{int(month):02d}-01"
+
+            # Add crossref ID
+            crossref_ids = best.get('crossref_ids') or []
+            grw_ref = f"grw_{grw_idx}"
+            if grw_ref not in crossref_ids:
+                crossref_ids.append(grw_ref)
+                patch['crossref_ids'] = crossref_ids
+
+            if not dry_run:
+                ok = supabase_patch("solar_installations", "id", best['id'], patch)
+                if ok:
+                    patches += 1
+                else:
+                    errors += 1
+            else:
+                patches += 1
+
+            matched += 1
+            new_matched_ids.add(grw_idx)
+            matched_target_ids.add(best['id'])
+
+            if matched <= 10:
+                print(f"  Match: GRW {grw_mw:.2f}MW zip={zip_code} → {best['source_record_id']} "
+                      f"({best['capacity_mw']}MW) ratio={best_ratio:.2f} conf={confidence}")
+
+        if matched > 0 and matched % 500 == 0:
+            print(f"  Progress: {matched:,} matched, {patches:,} patches, {errors} errors")
+
+    print(f"\n  Phase 2 results: {matched:,} matched, {patches:,} patches, {errors} errors")
+    print(f"    HIGH confidence: {high_conf:,}")
+    print(f"    MEDIUM confidence: {med_conf:,}")
     return new_matched_ids
 
 
@@ -577,7 +679,7 @@ def main():
 
     # Phase 2: County matching (for records without coords)
     if not args.phase or args.phase == 2:
-        phase2_ids = phase2_county_match(grw, db, matched_ids, dry_run=args.dry_run)
+        phase2_ids = phase2_zip_capacity_match(grw, db, matched_ids, dry_run=args.dry_run)
         matched_ids.update(phase2_ids)
 
     # If running Phase 3 alone, recover matched IDs from DB crossref_ids
