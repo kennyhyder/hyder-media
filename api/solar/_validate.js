@@ -46,6 +46,8 @@ export const EquipmentQuery = z.object({
   state: z.string().length(2).toUpperCase().optional(),
   status: optStr,
   min_age_years: optInt,
+  include_empty: z.enum(["true", "false"]).optional(),
+  has_model: z.enum(["true", "false"]).optional(),
 });
 
 export const InstallersQuery = z.object({

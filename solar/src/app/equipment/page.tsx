@@ -80,6 +80,7 @@ function EquipmentContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [includeEmpty, setIncludeEmpty] = useState(false);
+  const [hasModel, setHasModel] = useState(false);
 
   // Map frontend sort keys to API column names (RPC handles join sorts)
   const sortColMap: Record<SortKey, string> = {
@@ -107,6 +108,7 @@ function EquipmentContent() {
       params.set("sort", apiSort);
       params.set("order", sortDir);
       if (includeEmpty) params.set("include_empty", "true");
+      if (hasModel) params.set("has_model", "true");
 
       try {
         const res = await fetch(`${API_BASE}/equipment?${params}`);
@@ -119,7 +121,7 @@ function EquipmentContent() {
         setLoading(false);
       }
     },
-    [filters, sortKey, sortDir, includeEmpty]
+    [filters, sortKey, sortDir, includeEmpty, hasModel]
   );
 
   useEffect(() => {
@@ -242,7 +244,19 @@ function EquipmentContent() {
         </div>
       </form>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hasModel}
+            onChange={(e) => {
+              setHasModel(e.target.checked);
+              setPage(1);
+            }}
+            className="rounded border-gray-300"
+          />
+          Only show records with model numbers
+        </label>
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
           <input
             type="checkbox"
