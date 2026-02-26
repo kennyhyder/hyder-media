@@ -184,7 +184,7 @@ INGESTION_SOURCES = [
         "cmd": "python3 -u scripts/ingest-nrel-community.py",
         "frequency": "annual",
         "auto_download": True,
-        "prefix": "nrel_cs_",
+        "prefix": "nrelcs_",
     },
     # --- State programs ---
     {

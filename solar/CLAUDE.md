@@ -2693,6 +2693,54 @@ Implemented 6 highest-impact data gap strategies in parallel:
 - **100% location_precision, mount_type, state coverage**
 - All entity linking gaps resolved (0 unlinked records)
 
+### Session 37 — Feb 25, 2026
+
+**Data Quality Cleanup (continued) — COMPLETED:**
+- Cleaned 68,037 empty-string installer_name records → NULL
+- Cleaned 10,265 junk installer names (TBD, individual names: ESTEPHANY ARREOLA, ZACHER PAUL K, ALEX GUERRA, NA NA MARGO RICKS)
+- Cleaned 439 empty-string owner_name records → NULL
+- Cleaned 68,036 empty-string developer_name records → NULL
+- Cleaned 9 junk developer names (na, tbd) and 1 junk operator name (Unknown)
+- **Real coverage after cleanup**: installer 53.4%, developer 56.9%, owner 48.4% (lower % but all real data)
+
+**Entity Maintenance — COMPLETED:**
+- Fixed 69,685 installer_id linking gaps (from name cleanup)
+- Fixed 452 owner_id linking gaps (3 new entities created)
+- Fixed 68,084 developer_id linking gaps (matched to existing entities)
+- Deleted 4,546 orphaned installer entities + 3 orphaned owner entities
+- Updated portfolio analytics: geographic_focus + avg_project_size for 28,778 installers
+- All entity gaps: 0 (installer, owner, developer, operator)
+
+**Enrichment Pipeline Refresh — COMPLETED:**
+- CEC Equipment Specs: 1,774 enriched (560 modules + 1,214 inverters)
+- CPSC Recalls: 12 new events (3,395 total)
+- Cross-source dedup: 33 patches (22 crossref, 11 installer, 8 developer, 1 total_cost)
+- ISO Queue Refresh (all 7 ISOs): 0 net new records (all data current)
+- Monthly source refresh (CA DGStats, NY-Sun, EIA-860M): 0 net new records
+
+**update-all.py fix**: Changed NREL Community Solar prefix from `nrel_cs_` to `nrelcs_` (matching actual DB records)
+
+**FEMA Flood Zone Enrichment — IN PROGRESS (PID 20087):**
+- 445,518 records to process, running at ~4.1 queries/sec, 94.4% hit rate, 0 errors
+- At 7.2% (32K/445K) ~25 hours remaining
+- Will push flood_zone from 21.6% to ~80%+
+
+**Next.js site rebuilt and deployed.**
+
+**Database state (Session 37):**
+- **723,491 installations** across 101 data sources
+- **448,401 equipment records**
+- **3,368,318 events** (+12 CPSC recalls)
+- **installer_name: 386,332 (53.4%)** — cleaned (was 464K/64.2% with junk)
+- **developer_name: 411,723 (56.9%)** — cleaned (was 480K/66.3% with empties)
+- **owner_name: 350,397 (48.4%)** — cleaned (was 351K with empties)
+- **operator_name: 722,546 (99.9%)**
+- **capacity_mw: 494,852 (68.4%)**
+- **flood_zone: 156,338 (21.6%)** — FEMA running, ~25hr remaining
+- **county: 689,336 (95.3%)** | **zip_code: 683,223 (94.4%)**
+- **28,778 installer entities** | **206,373 owner entities** (cleaned)
+- **100% location_precision, mount_type coverage**
+
 <claude-mem-context>
 
 </claude-mem-context>
