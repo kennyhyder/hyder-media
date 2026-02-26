@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Auto Addiction OC</title>
+    <script>
+        (function() {
+            const AUTH_KEY = 'autoaddiction_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .top-stats {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 1200px) {
+            .top-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .top-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .dashboard-actions select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-refresh:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.live {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .status-badge.demo {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Campaign table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        thead th.num {
+            text-align: right;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody td.num {
+            text-align: right;
+            font-family: 'SF Mono', SFMono-Regular, Consolas, monospace;
+            font-size: 0.85rem;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .campaign-status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .campaign-status.enabled { background: var(--success); }
+        .campaign-status.paused { background: var(--warning); }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--info);
+            color: var(--info);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .tracking-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .tracking-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .tracking-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tracking-dot.active { background: var(--success); }
+        .tracking-dot.pending { background: var(--warning); }
+        .tracking-dot.inactive { background: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Auto Addiction OC
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1 class="dashboard-title">
+                    Performance Dashboard
+                    <span class="status-badge demo" id="data-badge">LOADING...</span>
+                </h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">
+                    Google Ads account 835-776-9782 &middot; <span id="date-range-label">--</span>
+                </p>
+            </div>
+            <div class="dashboard-actions">
+                <select id="days-selector" onchange="loadDashboard()">
+                    <option value="7">Last 7 Days</option>
+                    <option value="14">Last 14 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+                <button class="btn-sm btn-refresh" onclick="loadDashboard()">
+                    &#8635; Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert area -->
+        <div id="alert-area"></div>
+
+        <!-- Top Stats -->
+        <div class="top-stats">
+            <div class="stat-card">
+                <div class="stat-label">Spend</div>
+                <div class="stat-value" id="stat-spend">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Clicks</div>
+                <div class="stat-value" id="stat-clicks">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Impressions</div>
+                <div class="stat-value" id="stat-impressions">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversions</div>
+                <div class="stat-value" id="stat-conversions">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg CPC</div>
+                <div class="stat-value" id="stat-cpc">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cost / Lead</div>
+                <div class="stat-value" id="stat-cpa">--</div>
+            </div>
+        </div>
+
+        <!-- Daily Trend Chart -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h2>Daily Performance</h2>
+            <div class="chart-container">
+                <canvas id="daily-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Secondary Charts -->
+        <div class="charts-grid">
+            <div class="card">
+                <h2>Clicks vs Conversions</h2>
+                <div class="chart-container">
+                    <canvas id="clicks-conv-chart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h2>CPC Trend</h2>
+                <div class="chart-container">
+                    <canvas id="cpc-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Breakdown -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h2>Campaign Breakdown</h2>
+            <div class="table-container" id="campaign-table-area">
+                <p style="color: var(--text-secondary); padding: 20px 0;">Loading campaign data...</p>
+            </div>
+        </div>
+
+        <!-- Tracking & Configuration -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h2>Tracking Configuration</h2>
+            <div class="tracking-status">
+                <div class="tracking-item">
+                    <span class="tracking-dot active"></span>
+                    GTM: GTM-T2DHRD3Q
+                </div>
+                <div class="tracking-item">
+                    <span class="tracking-dot active"></span>
+                    GA4: G-KH9L5L7GQ2
+                </div>
+                <div class="tracking-item">
+                    <span class="tracking-dot active"></span>
+                    Google Ads: AW-17603940601
+                </div>
+                <div class="tracking-item">
+                    <span class="tracking-dot pending" id="dot-generate-lead"></span>
+                    <span id="label-generate-lead">generate_lead event (pending import)</span>
+                </div>
+                <div class="tracking-item">
+                    <span class="tracking-dot active"></span>
+                    Facebook: 314192535267336
+                </div>
+                <div class="tracking-item">
+                    <span class="tracking-dot active"></span>
+                    reCAPTCHA Enterprise
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'https://hyder.me/api/google-ads/autoaddiction-data';
+
+        // Chart instances
+        let dailyChart = null;
+        let clicksConvChart = null;
+        let cpcChart = null;
+
+        // Chart.js defaults for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#334155';
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+        // Format helpers
+        const fmt = {
+            currency: (v) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            number: (v) => v.toLocaleString('en-US'),
+            pct: (v) => (v * 100).toFixed(2) + '%',
+            shortDate: (d) => {
+                const parts = d.split('-');
+                return parseInt(parts[1]) + '/' + parseInt(parts[2]);
+            }
+        };
+
+        async function loadDashboard() {
+            const days = document.getElementById('days-selector').value;
+            const badge = document.getElementById('data-badge');
+            const alertArea = document.getElementById('alert-area');
+
+            badge.textContent = 'LOADING...';
+            badge.className = 'status-badge demo';
+            alertArea.innerHTML = '';
+
+            try {
+                // Fetch all three data views in parallel
+                const [summaryRes, dailyRes, campaignRes] = await Promise.all([
+                    fetch(`${API_BASE}?days=${days}`),
+                    fetch(`${API_BASE}?days=${days}&breakdown=daily`),
+                    fetch(`${API_BASE}?days=${days}&breakdown=campaign`)
+                ]);
+
+                const summaryData = await summaryRes.json();
+                const dailyData = await dailyRes.json();
+                const campaignData = await campaignRes.json();
+
+                // Check for API errors - fall back to demo if needed
+                if (summaryData.status === 'error' || dailyData.status === 'error') {
+                    badge.textContent = 'API ERROR';
+                    badge.className = 'status-badge error';
+                    alertArea.innerHTML = `
+                        <div class="alert alert-warning">
+                            Google Ads API returned an error. Displaying demo data.
+                            ${summaryData.errors?.[0]?.error ? '<br>Error: ' + summaryData.errors[0].error : ''}
+                        </div>`;
+                    loadDemoData(parseInt(days));
+                    return;
+                }
+
+                badge.textContent = 'LIVE';
+                badge.className = 'status-badge live';
+
+                // Update date range label
+                document.getElementById('date-range-label').textContent =
+                    summaryData.dateRange.start + ' to ' + summaryData.dateRange.end;
+
+                // Update stats
+                const s = summaryData.summary || {};
+                document.getElementById('stat-spend').textContent = fmt.currency(s.spend || 0);
+                document.getElementById('stat-clicks').textContent = fmt.number(s.clicks || 0);
+                document.getElementById('stat-impressions').textContent = fmt.number(s.impressions || 0);
+                document.getElementById('stat-conversions').textContent = fmt.number(Math.round(s.conversions || 0));
+                document.getElementById('stat-cpc').textContent = fmt.currency(s.cpc || 0);
+                document.getElementById('stat-cpa').textContent = s.cpa > 0 ? fmt.currency(s.cpa) : '--';
+
+                // Render charts
+                renderDailyChart(dailyData.daily || []);
+                renderClicksConvChart(dailyData.daily || []);
+                renderCpcChart(dailyData.daily || []);
+
+                // Render campaign table
+                renderCampaignTable(campaignData.campaigns || []);
+
+            } catch (err) {
+                badge.textContent = 'OFFLINE';
+                badge.className = 'status-badge error';
+                alertArea.innerHTML = `
+                    <div class="alert alert-error">
+                        Could not connect to API. Displaying demo data.<br>
+                        ${err.message}
+                    </div>`;
+                loadDemoData(parseInt(days));
+            }
+        }
+
+        function loadDemoData(days) {
+            const badge = document.getElementById('data-badge');
+            badge.textContent = 'DEMO DATA';
+            badge.className = 'status-badge demo';
+
+            const end = new Date();
+            const start = new Date();
+            start.setDate(start.getDate() - days);
+
+            document.getElementById('date-range-label').textContent =
+                start.toISOString().split('T')[0] + ' to ' + end.toISOString().split('T')[0];
+
+            // Generate demo daily data
+            const daily = [];
+            const d = new Date(start);
+            while (d <= end) {
+                const dayOfWeek = d.getDay();
+                const weekdayMultiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.6 : 1.0;
+                const spend = (15 + Math.random() * 25) * weekdayMultiplier;
+                const clicks = Math.round((8 + Math.random() * 15) * weekdayMultiplier);
+                const impressions = Math.round(clicks * (8 + Math.random() * 6));
+                const conversions = Math.random() < 0.25 ? 1 : 0;
+
+                daily.push({
+                    date: d.toISOString().split('T')[0],
+                    spend: Math.round(spend * 100) / 100,
+                    clicks,
+                    impressions,
+                    conversions,
+                    cpc: clicks > 0 ? spend / clicks : 0
+                });
+                d.setDate(d.getDate() + 1);
+            }
+
+            // Aggregate stats
+            const totals = daily.reduce((acc, d) => ({
+                spend: acc.spend + d.spend,
+                clicks: acc.clicks + d.clicks,
+                impressions: acc.impressions + d.impressions,
+                conversions: acc.conversions + d.conversions,
+            }), { spend: 0, clicks: 0, impressions: 0, conversions: 0 });
+
+            document.getElementById('stat-spend').textContent = fmt.currency(totals.spend);
+            document.getElementById('stat-clicks').textContent = fmt.number(totals.clicks);
+            document.getElementById('stat-impressions').textContent = fmt.number(totals.impressions);
+            document.getElementById('stat-conversions').textContent = fmt.number(totals.conversions);
+            document.getElementById('stat-cpc').textContent = fmt.currency(totals.clicks > 0 ? totals.spend / totals.clicks : 0);
+            document.getElementById('stat-cpa').textContent = totals.conversions > 0 ? fmt.currency(totals.spend / totals.conversions) : '--';
+
+            renderDailyChart(daily);
+            renderClicksConvChart(daily);
+            renderCpcChart(daily);
+
+            // Demo campaigns
+            renderCampaignTable([
+                { name: 'Auto Addiction - Search', status: 'ENABLED', spend: totals.spend * 0.65, clicks: Math.round(totals.clicks * 0.6), impressions: Math.round(totals.impressions * 0.55), conversions: Math.round(totals.conversions * 0.7), cpc: 0, ctr: 0, cpa: 0 },
+                { name: 'Auto Addiction - Local', status: 'ENABLED', spend: totals.spend * 0.25, clicks: Math.round(totals.clicks * 0.3), impressions: Math.round(totals.impressions * 0.3), conversions: Math.round(totals.conversions * 0.3), cpc: 0, ctr: 0, cpa: 0 },
+                { name: 'Auto Addiction - Display', status: 'PAUSED', spend: totals.spend * 0.1, clicks: Math.round(totals.clicks * 0.1), impressions: Math.round(totals.impressions * 0.15), conversions: 0, cpc: 0, ctr: 0, cpa: 0 },
+            ].map(c => ({
+                ...c,
+                cpc: c.clicks > 0 ? c.spend / c.clicks : 0,
+                ctr: c.impressions > 0 ? c.clicks / c.impressions : 0,
+                cpa: c.conversions > 0 ? c.spend / c.conversions : 0,
+            })));
+        }
+
+        function renderDailyChart(data) {
+            const ctx = document.getElementById('daily-chart').getContext('2d');
+            if (dailyChart) dailyChart.destroy();
+
+            dailyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => fmt.shortDate(d.date)),
+                    datasets: [
+                        {
+                            label: 'Spend',
+                            data: data.map(d => d.spend),
+                            backgroundColor: 'rgba(220, 38, 38, 0.6)',
+                            borderRadius: 3,
+                            yAxisID: 'y',
+                            order: 2
+                        },
+                        {
+                            label: 'Clicks',
+                            data: data.map(d => d.clicks),
+                            type: 'line',
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.3,
+                            pointRadius: 2,
+                            yAxisID: 'y1',
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            position: 'left',
+                            title: { display: true, text: 'Spend ($)' },
+                            ticks: { callback: v => '$' + v }
+                        },
+                        y1: {
+                            position: 'right',
+                            title: { display: true, text: 'Clicks' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: {
+                            ticks: {
+                                maxTicksLimit: 15,
+                                maxRotation: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    if (ctx.dataset.label === 'Spend') return 'Spend: $' + ctx.raw.toFixed(2);
+                                    return ctx.dataset.label + ': ' + ctx.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderClicksConvChart(data) {
+            const ctx = document.getElementById('clicks-conv-chart').getContext('2d');
+            if (clicksConvChart) clicksConvChart.destroy();
+
+            clicksConvChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => fmt.shortDate(d.date)),
+                    datasets: [
+                        {
+                            label: 'Clicks',
+                            data: data.map(d => d.clicks),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Conversions',
+                            data: data.map(d => d.conversions),
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.3)',
+                            type: 'bar',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { position: 'left', title: { display: true, text: 'Clicks' } },
+                        y1: {
+                            position: 'right',
+                            title: { display: true, text: 'Conversions' },
+                            grid: { drawOnChartArea: false },
+                            beginAtZero: true
+                        },
+                        x: { ticks: { maxTicksLimit: 10, maxRotation: 0 } }
+                    },
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        function renderCpcChart(data) {
+            const ctx = document.getElementById('cpc-chart').getContext('2d');
+            if (cpcChart) cpcChart.destroy();
+
+            cpcChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => fmt.shortDate(d.date)),
+                    datasets: [{
+                        label: 'CPC',
+                        data: data.map(d => d.cpc),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'CPC ($)' },
+                            ticks: { callback: v => '$' + v.toFixed(2) }
+                        },
+                        x: { ticks: { maxTicksLimit: 10, maxRotation: 0 } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => 'CPC: $' + ctx.raw.toFixed(2)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderCampaignTable(campaigns) {
+            const area = document.getElementById('campaign-table-area');
+
+            if (!campaigns || campaigns.length === 0) {
+                area.innerHTML = '<p style="color: var(--text-secondary); padding: 20px 0;">No campaign data available.</p>';
+                return;
+            }
+
+            let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th class="num">Spend</th>
+                        <th class="num">Clicks</th>
+                        <th class="num">Impr.</th>
+                        <th class="num">CTR</th>
+                        <th class="num">CPC</th>
+                        <th class="num">Conv.</th>
+                        <th class="num">Cost/Lead</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            for (const c of campaigns) {
+                const statusClass = (c.status || '').toLowerCase().includes('enabled') ? 'enabled' : 'paused';
+                html += `
+                    <tr>
+                        <td><span class="campaign-status ${statusClass}"></span>${c.name}</td>
+                        <td class="num">${fmt.currency(c.spend)}</td>
+                        <td class="num">${fmt.number(c.clicks)}</td>
+                        <td class="num">${fmt.number(c.impressions)}</td>
+                        <td class="num">${fmt.pct(c.ctr)}</td>
+                        <td class="num">${fmt.currency(c.cpc)}</td>
+                        <td class="num">${fmt.number(Math.round(c.conversions))}</td>
+                        <td class="num">${c.cpa > 0 ? fmt.currency(c.cpa) : '--'}</td>
+                    </tr>`;
+            }
+
+            // Totals row
+            const totals = campaigns.reduce((acc, c) => ({
+                spend: acc.spend + c.spend,
+                clicks: acc.clicks + c.clicks,
+                impressions: acc.impressions + c.impressions,
+                conversions: acc.conversions + c.conversions,
+            }), { spend: 0, clicks: 0, impressions: 0, conversions: 0 });
+
+            html += `
+                    <tr style="font-weight: 600; border-top: 2px solid var(--border);">
+                        <td>Total</td>
+                        <td class="num">${fmt.currency(totals.spend)}</td>
+                        <td class="num">${fmt.number(totals.clicks)}</td>
+                        <td class="num">${fmt.number(totals.impressions)}</td>
+                        <td class="num">${fmt.pct(totals.impressions > 0 ? totals.clicks / totals.impressions : 0)}</td>
+                        <td class="num">${fmt.currency(totals.clicks > 0 ? totals.spend / totals.clicks : 0)}</td>
+                        <td class="num">${fmt.number(Math.round(totals.conversions))}</td>
+                        <td class="num">${totals.conversions > 0 ? fmt.currency(totals.spend / totals.conversions) : '--'}</td>
+                    </tr>
+                </tbody>
+            </table>`;
+
+            area.innerHTML = html;
+        }
+
+        // Load on page ready
+        loadDashboard();
+    </script>
+</body>
+</html>

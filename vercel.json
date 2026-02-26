@@ -65,6 +65,9 @@
     },
     "api/affiliati/generate-ad-unit.js": {
       "maxDuration": 60
+    },
+    "api/google-ads/autoaddiction-data.js": {
+      "maxDuration": 30
     }
   }
 }
