@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
+  ],
   "functions": {
     "api/contact.js": {
       "maxDuration": 10
