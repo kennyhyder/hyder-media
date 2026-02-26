@@ -426,14 +426,26 @@
                 const dailyData = await dailyRes.json();
                 const campaignData = await campaignRes.json();
 
-                // Check for API errors - fall back to demo if needed
-                if (summaryData.status === 'error' || dailyData.status === 'error') {
+                // Validate API responses - check status AND that data fields are arrays
+                const hasErrors = summaryData.status === 'error'
+                    || dailyData.status === 'error'
+                    || campaignData.status === 'error'
+                    || (summaryData.summary && summaryData.summary.error)
+                    || !Array.isArray(dailyData.daily)
+                    || !Array.isArray(campaignData.campaigns);
+
+                if (hasErrors) {
+                    const errMsg = summaryData.errors?.[0]?.error
+                        || summaryData.summary?.error
+                        || dailyData.daily?.error
+                        || campaignData.campaigns?.error
+                        || 'Unknown API error';
                     badge.textContent = 'API ERROR';
                     badge.className = 'status-badge error';
                     alertArea.innerHTML = `
                         <div class="alert alert-warning">
                             Google Ads API returned an error. Displaying demo data.
-                            ${summaryData.errors?.[0]?.error ? '<br>Error: ' + summaryData.errors[0].error : ''}
+                            <br>Error: ${errMsg}
                         </div>`;
                     loadDemoData(parseInt(days));
                     return;
@@ -455,13 +467,13 @@
                 document.getElementById('stat-cpc').textContent = fmt.currency(s.cpc || 0);
                 document.getElementById('stat-cpa').textContent = s.cpa > 0 ? fmt.currency(s.cpa) : '--';
 
-                // Render charts
-                renderDailyChart(dailyData.daily || []);
-                renderClicksConvChart(dailyData.daily || []);
-                renderCpcChart(dailyData.daily || []);
+                // Render charts with validated arrays
+                renderDailyChart(dailyData.daily);
+                renderClicksConvChart(dailyData.daily);
+                renderCpcChart(dailyData.daily);
 
                 // Render campaign table
-                renderCampaignTable(campaignData.campaigns || []);
+                renderCampaignTable(campaignData.campaigns);
 
             } catch (err) {
                 badge.textContent = 'OFFLINE';
