@@ -1,32 +1,33 @@
 #!/usr/bin/env python3
 """
-Download NAIP aerial imagery tiles for zip codes containing solar targets.
+Download satellite imagery tiles for zip codes containing solar targets.
 
-Downloads free NAIP (National Agriculture Imagery Program) imagery from the USGS
-ImageServer for zip codes that contain solar installations with city/zip-level
-coordinates but no exact lat/lng. These tiles will be scanned by NREL model
-to detect solar panels and assign precise coordinates.
+Supports two sources:
+  - NAIP: Free 0.6m resolution USGS aerial imagery (ML allowed, no API key)
+  - Google Maps: ~0.15m resolution satellite tiles (proven NREL detection, $2/1K tiles)
 
-NAIP: 0.6m resolution, public domain, ML use allowed.
-USGS ImageServer: free, no API key, no daily limits.
+Downloads tiles centered on zip code centroids for zips with city/zip-level
+coordinate installations. Tiles are scanned by NREL Panel-Segmentation model.
 
 Usage:
-    python3 -u scripts/fetch-naip-tiles.py                  # Download Tier A + B
-    python3 -u scripts/fetch-naip-tiles.py --tier A          # Tier A only (1 target/zip)
-    python3 -u scripts/fetch-naip-tiles.py --tier B          # Tier B (2-3 targets/zip)
-    python3 -u scripts/fetch-naip-tiles.py --dry-run         # Count tiles only
-    python3 -u scripts/fetch-naip-tiles.py --zip 94102       # Specific zip
-    python3 -u scripts/fetch-naip-tiles.py --state CA        # Specific state
-    python3 -u scripts/fetch-naip-tiles.py --limit 1000      # Max tiles
-    python3 -u scripts/fetch-naip-tiles.py --workers 3       # Parallel downloads
-    python3 -u scripts/fetch-naip-tiles.py --use-grw         # Center tiles on GRW detections
+    python3 -u scripts/fetch-naip-tiles.py --source google   # Google Maps (recommended)
+    python3 -u scripts/fetch-naip-tiles.py --source naip     # NAIP (free but low detection)
+    python3 -u scripts/fetch-naip-tiles.py --tier A           # Tier A only (1 target/zip)
+    python3 -u scripts/fetch-naip-tiles.py --dry-run          # Count tiles only
+    python3 -u scripts/fetch-naip-tiles.py --zip 94102        # Specific zip
+    python3 -u scripts/fetch-naip-tiles.py --state CA         # Specific state
+    python3 -u scripts/fetch-naip-tiles.py --limit 1000       # Max tiles
+    python3 -u scripts/fetch-naip-tiles.py --workers 3        # Parallel downloads
+    python3 -u scripts/fetch-naip-tiles.py --use-grw          # Center tiles on GRW detections
 
-Cost: $0 (NAIP is public domain, USGS ImageServer is free)
-Tile specs: 640x640 PNG, ~384m x 384m at 0.6m/pixel
+Google Maps cost: ~$2 per 1,000 tiles ($200/mo free credit covers ~100K tiles)
 """
 
 import argparse
+import base64
 import csv
+import hashlib
+import hmac
 import json
 import math
 import os
@@ -52,6 +53,9 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("Error: SUPABASE_URL and SUPABASE_SERVICE_KEY must be set")
     sys.exit(1)
 
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "").strip()
+GOOGLE_MAPS_SIGNING_SECRET = os.environ.get("GOOGLE_MAPS_SIGNING_SECRET", "").strip()
+
 NAIP_URL = "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPPlus/ImageServer/exportImage"
 ZCTA_DIR = Path(__file__).parent.parent / "data" / "zcta_shapes"
 ZCTA_URL = "https://www2.census.gov/geo/tiger/TIGER2023/ZCTA520/tl_2023_us_zcta520.zip"
@@ -59,9 +63,11 @@ TILE_DIR = Path(__file__).parent.parent / "data" / "naip_tiles"
 GRW_FILE = Path(__file__).parent.parent / "data" / "grw" / "solar_all_2024q2_v1.gpkg"
 
 TILE_SIZE = 640       # pixels
+OVERLAP = 0.25        # 25% overlap between adjacent tiles
+
+# Default NAIP resolution (overridden for Google Maps in main())
 PIXEL_M = 0.6         # meters per pixel at NAIP native resolution
 TILE_SPAN_M = TILE_SIZE * PIXEL_M  # 384m
-OVERLAP = 0.25        # 25% overlap between adjacent tiles
 STRIDE_M = TILE_SPAN_M * (1 - OVERLAP)  # 288m
 
 # Convert meters to approximate degrees at mid-latitudes (~38N for US average)
@@ -71,6 +77,19 @@ TILE_SPAN_LAT = TILE_SPAN_M / M_PER_DEG_LAT   # ~0.00345 degrees
 TILE_SPAN_LNG = TILE_SPAN_M / M_PER_DEG_LNG_38  # ~0.00438 degrees
 STRIDE_LAT = STRIDE_M / M_PER_DEG_LAT
 STRIDE_LNG = STRIDE_M / M_PER_DEG_LNG_38
+
+
+def recalc_tile_params(pixel_m):
+    """Recalculate tile geometry globals for a given pixel resolution."""
+    global PIXEL_M, TILE_SPAN_M, STRIDE_M
+    global TILE_SPAN_LAT, TILE_SPAN_LNG, STRIDE_LAT, STRIDE_LNG
+    PIXEL_M = pixel_m
+    TILE_SPAN_M = TILE_SIZE * PIXEL_M
+    STRIDE_M = TILE_SPAN_M * (1 - OVERLAP)
+    TILE_SPAN_LAT = TILE_SPAN_M / M_PER_DEG_LAT
+    TILE_SPAN_LNG = TILE_SPAN_M / M_PER_DEG_LNG_38
+    STRIDE_LAT = STRIDE_M / M_PER_DEG_LAT
+    STRIDE_LNG = STRIDE_M / M_PER_DEG_LNG_38
 
 MAX_TILES_PER_ZIP = 200   # Large zips get centered grid capped at this
 DOWNLOAD_WORKERS = 3
@@ -307,8 +326,52 @@ def download_naip_tile(tile_bbox, save_path, retries=3):
                 return False, str(e)
 
 
+def sign_url(input_url, secret):
+    """Sign a Google Maps URL with HMAC-SHA1."""
+    url = urllib.parse.urlparse(input_url)
+    url_to_sign = url.path + "?" + url.query
+    decoded_key = base64.urlsafe_b64decode(secret)
+    signature = hmac.new(decoded_key, url_to_sign.encode(), hashlib.sha1)
+    encoded_sig = base64.urlsafe_b64encode(signature.digest()).decode()
+    return input_url + "&signature=" + encoded_sig
+
+
+def download_google_tile(center_lat, center_lng, zoom, save_path, retries=3):
+    """Download a single satellite tile from Google Maps Static API."""
+    url = (
+        f"https://maps.googleapis.com/maps/api/staticmap"
+        f"?center={center_lat},{center_lng}&zoom={zoom}&size={TILE_SIZE}x{TILE_SIZE}"
+        f"&maptype=satellite&key={GOOGLE_MAPS_API_KEY}"
+    )
+    if GOOGLE_MAPS_SIGNING_SECRET:
+        url = sign_url(url, GOOGLE_MAPS_SIGNING_SECRET)
+
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url)
+            resp = urllib.request.urlopen(req, timeout=30)
+            content = resp.read()
+
+            if len(content) < 1000:
+                return False, f"Too small ({len(content)} bytes)"
+
+            save_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(save_path, 'wb') as f:
+                f.write(content)
+            return True, None
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+            else:
+                return False, str(e)
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Download NAIP tiles for solar detection")
+    parser = argparse.ArgumentParser(description="Download satellite tiles for solar detection")
+    parser.add_argument("--source", type=str, default="google", choices=["google", "naip"],
+                        help="Tile source: google (recommended, $2/1K) or naip (free but low detection)")
+    parser.add_argument("--zoom", type=int, default=18,
+                        help="Google Maps zoom level (default: 18, proven 65%% detection)")
     parser.add_argument("--dry-run", action="store_true", help="Count tiles without downloading")
     parser.add_argument("--tier", type=str, default="AB", help="Tiers to process: A, B, AB (default)")
     parser.add_argument("--zip", type=str, help="Specific zip code(s), comma-separated")
@@ -323,8 +386,19 @@ def main():
                         help=f"Max tiles per zip — large zips get centered grid (default: {MAX_TILES_PER_ZIP})")
     args = parser.parse_args()
 
-    print("NAIP Tile Downloader for Solar Detection")
+    # Recalculate tile geometry for Google Maps zoom level
+    if args.source == 'google':
+        if not GOOGLE_MAPS_API_KEY:
+            print("Error: GOOGLE_MAPS_API_KEY must be set in .env.local for --source google")
+            sys.exit(1)
+        # Google Maps resolution: 156543.03392 * cos(lat) / 2^zoom  m/pixel
+        pixel_m = 156543.03392 * math.cos(math.radians(38)) / (2 ** args.zoom)
+        recalc_tile_params(pixel_m)
+
+    src_label = f"Google Maps (zoom {args.zoom})" if args.source == 'google' else "NAIP (0.6m)"
+    print("Satellite Tile Downloader for Solar Detection")
     print("=" * 60)
+    print(f"  Source: {src_label}")
     print(f"  Tile size: {TILE_SIZE}x{TILE_SIZE} px ({TILE_SPAN_M:.0f}m x {TILE_SPAN_M:.0f}m)")
     print(f"  Overlap: {OVERLAP*100:.0f}% (stride: {STRIDE_M:.0f}m)")
     print(f"  Tiers: {args.tier}")
@@ -332,6 +406,9 @@ def main():
     print(f"  Max tiles/zip: {args.max_tiles_per_zip}")
     print(f"  Workers: {args.workers}")
     print(f"  Dry run: {args.dry_run}")
+    if args.source == 'google':
+        cost_est = len([]) # placeholder, calculated later
+        print(f"  URL signing: {'yes' if GOOGLE_MAPS_SIGNING_SECRET else 'no'}")
     print()
 
     # --- Load target records ---
@@ -462,10 +539,14 @@ def main():
         manifest_path = TILE_DIR / "plan.json"
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
         plan = {
+            'source': args.source,
+            'zoom': args.zoom if args.source == 'google' else None,
+            'tile_span_m': round(TILE_SPAN_M, 1),
             'total_tiles': len(all_tiles),
             'to_download': len(tiles_to_download),
             'zips': zips_with_tiles,
             'tiers': args.tier,
+            'est_cost': round(len(tiles_to_download) * 0.002, 2) if args.source == 'google' else 0,
         }
         with open(manifest_path, 'w') as f:
             json.dump(plan, f, indent=2)
@@ -477,7 +558,11 @@ def main():
         return
 
     # --- Download tiles ---
-    print(f"\nDownloading {len(tiles_to_download):,} NAIP tiles...")
+    cost_str = ""
+    if args.source == 'google':
+        est_cost = len(tiles_to_download) * 0.002
+        cost_str = f" (est. ${est_cost:.2f})"
+    print(f"\nDownloading {len(tiles_to_download):,} {args.source} tiles{cost_str}...")
     downloaded = 0
     errors = 0
     error_samples = []
@@ -490,7 +575,12 @@ def main():
         zip_code, tile_idx, tile_bbox = item
         save_path = TILE_DIR / zip_code / f"{tile_idx}.png"
         time.sleep(RATE_LIMIT)
-        ok, err = download_naip_tile(tile_bbox, save_path)
+        if args.source == 'google':
+            center_lat = (tile_bbox['min_lat'] + tile_bbox['max_lat']) / 2
+            center_lng = (tile_bbox['min_lng'] + tile_bbox['max_lng']) / 2
+            ok, err = download_google_tile(center_lat, center_lng, args.zoom, save_path)
+        else:
+            ok, err = download_naip_tile(tile_bbox, save_path)
         return zip_code, tile_idx, tile_bbox, ok, err
 
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
@@ -523,6 +613,9 @@ def main():
         n_targets = len(process_zips.get(zip_code, []))
         manifest = {
             'zip_code': zip_code,
+            'source': args.source,
+            'zoom': args.zoom if args.source == 'google' else None,
+            'tile_span_m': round(TILE_SPAN_M, 1),
             'target_count': n_targets,
             'tier': 'A' if n_targets == 1 else ('B' if n_targets <= 3 else 'C'),
             'tiles': tiles,

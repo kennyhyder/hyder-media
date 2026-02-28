@@ -136,6 +136,7 @@ def main():
     parser.add_argument("--api-key", type=str, default=GOOGLE_MAPS_API_KEY, help="Google Maps API key")
     parser.add_argument("--workers", type=int, default=DOWNLOAD_WORKERS, help="Parallel download workers")
     parser.add_argument("--location-precision", type=str, help="Filter by location_precision (exact/address/city/zip)")
+    parser.add_argument("--source", type=str, help="Filter by source_record_id prefix (e.g., 'grw_' for GRW records)")
     args = parser.parse_args()
 
     api_key = args.api_key
@@ -154,6 +155,8 @@ def main():
         print(f"  Filter: state = {args.state}")
     if args.location_precision:
         print(f"  Filter: location_precision = {args.location_precision}")
+    if args.source:
+        print(f"  Filter: source_record_id LIKE {args.source}%")
     if args.limit:
         print(f"  Limit: {args.limit}")
     print(f"  URL signing: {'enabled' if GOOGLE_MAPS_SIGNING_SECRET else 'disabled (no daily limit with signing)'}")
@@ -190,6 +193,8 @@ def main():
             params["state"] = f"eq.{args.state}"
         if args.location_precision:
             params["location_precision"] = f"eq.{args.location_precision}"
+        if args.source:
+            params["source_record_id"] = f"like.{args.source}*"
 
         batch, total = supabase_get("solar_installations", params)
         if not batch:
