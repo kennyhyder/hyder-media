@@ -104,27 +104,50 @@ def fema_query(lat, lng, retries=3):
             return None
 
 
-def supabase_patch(table, data, match_filter, retries=3):
-    """PATCH a single record in Supabase."""
-    url = f"{SUPABASE_URL}/rest/v1/{table}?{match_filter}"
-    headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal",
-    }
-    body = json.dumps(data, allow_nan=False).encode()
+def psql_bulk_patch(patches):
+    """Bulk UPDATE via psql temp table — much faster and more reliable than REST API."""
+    if not patches:
+        return 0
 
-    for attempt in range(retries):
-        try:
-            req = urllib.request.Request(url, data=body, headers=headers, method="PATCH")
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                return True
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
-            if attempt < retries - 1:
-                time.sleep(2 ** (attempt + 1))
-            else:
-                return False
+    # Build VALUES list for temp table
+    values = []
+    for inst_id, data in patches:
+        fz = data.get("flood_zone", "").replace("'", "''")
+        sfha = "TRUE" if data.get("flood_zone_sfha") else "FALSE"
+        bfe = data.get("flood_zone_bfe")
+        bfe_str = str(bfe) if bfe is not None else "NULL"
+        values.append(f"('{inst_id}', '{fz}', {sfha}, {bfe_str})")
+
+    sql = f"""
+    CREATE TEMP TABLE _fema_patch (
+      id UUID, flood_zone TEXT, flood_zone_sfha BOOLEAN, flood_zone_bfe NUMERIC
+    );
+    INSERT INTO _fema_patch VALUES {', '.join(values)};
+    UPDATE solar_installations si
+    SET flood_zone = fp.flood_zone,
+        flood_zone_sfha = fp.flood_zone_sfha,
+        flood_zone_bfe = fp.flood_zone_bfe
+    FROM _fema_patch fp
+    WHERE si.id = fp.id;
+    DROP TABLE _fema_patch;
+    """
+
+    escaped_sql = sql.replace('"', '\\"')
+    cmd = f'{PSQL_CMD} -c "{escaped_sql}"'
+    result = subprocess.run(
+        cmd, shell=True, capture_output=True, text=True, timeout=120,
+    )
+    if result.returncode != 0:
+        print(f"    psql error: {result.stderr.strip()[:200]}")
+        return -1
+    # Parse "UPDATE N" from output
+    for line in result.stdout.strip().split("\n"):
+        if line.startswith("UPDATE"):
+            try:
+                return int(line.split()[1])
+            except (IndexError, ValueError):
+                pass
+    return len(patches)
 
 
 def process_installation(inst):
@@ -215,11 +238,13 @@ def main():
 
             # Flush patches periodically
             if len(patches) >= BATCH_SIZE and not args.dry_run:
-                print(f"  FLUSH: {len(patches)} patches at position {queried}...")
-                for inst_id, patch in patches:
-                    ok = supabase_patch("solar_installations", patch, f"id=eq.{inst_id}")
-                    if not ok:
-                        patch_errors += 1
+                print(f"  FLUSH: {len(patches)} patches at position {queried}...", end=" ", flush=True)
+                result = psql_bulk_patch(patches)
+                if result < 0:
+                    patch_errors += len(patches)
+                    print("FAILED")
+                else:
+                    print(f"OK ({result} updated)")
                 patches = []
 
             if queried % 1000 == 0:
@@ -228,15 +253,17 @@ def main():
                 pct = queried / len(work_items) * 100
                 print(f"  [{pct:.1f}%] {queried}/{len(work_items)} queried, "
                       f"{found} found ({found/queried*100:.1f}%), "
-                      f"{errors} errors, {rate:.1f} queries/sec")
+                      f"{errors} errors, {rate:.1f} queries/sec", flush=True)
 
     # Final flush
     if patches and not args.dry_run:
-        print(f"  FLUSH: {len(patches)} remaining patches...")
-        for inst_id, patch in patches:
-            ok = supabase_patch("solar_installations", patch, f"id=eq.{inst_id}")
-            if not ok:
-                patch_errors += 1
+        print(f"  FLUSH: {len(patches)} remaining patches...", end=" ", flush=True)
+        result = psql_bulk_patch(patches)
+        if result < 0:
+            patch_errors += len(patches)
+            print("FAILED")
+        else:
+            print(f"OK ({result} updated)")
         patches = []
 
     elapsed = time.time() - start_time

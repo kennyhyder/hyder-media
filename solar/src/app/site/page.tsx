@@ -100,7 +100,7 @@ function SiteContent() {
         <InstallationMap
           installations={[site]}
           center={[Number(site.latitude), Number(site.longitude)]}
-          zoom={14}
+          zoom={17}
           height="300px"
         />
       ) : (
