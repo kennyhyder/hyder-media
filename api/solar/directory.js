@@ -151,8 +151,9 @@ async function handleOwners(supabase, { type, name, state, sort, order, limitNum
   if (state) query = query.eq("state", state);
 
   // Filter by entity_type matching the role
-  if (type === "owner") query = query.gt("site_count", 0);
-  if (type === "developer") query = query.gt("developed_capacity_mw", 0);
+  if (type === "owner") query = query.eq("entity_type", "owner");
+  if (type === "developer") query = query.eq("entity_type", "developer");
+  if (type === "operator") query = query.eq("entity_type", "operator");
 
   if (min_sites) query = query.gte("site_count", min_sites);
 

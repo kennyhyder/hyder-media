@@ -99,6 +99,7 @@ export default async function handler(req, res) {
       const primaryFk = role === "installer" ? "installer_id" : `${role}_id`;
       const entityId = id || entity.id;
       const allFkCols = ["owner_id", "operator_id", "developer_id", "installer_id"];
+      let usedFk = primaryFk;
 
       const { data: instData } = await supabase
         .from("solar_installations")
@@ -120,6 +121,7 @@ export default async function handler(req, res) {
             .limit(200);
           if (fallbackData && fallbackData.length > 0) {
             installations = fallbackData;
+            usedFk = fk;
             break;
           }
         }
@@ -166,50 +168,65 @@ export default async function handler(req, res) {
       .sort((a, b) => a.year - b.year);
 
     // --- Phase 3: Cross-role check (non-manufacturer only) ---
+    // Count installations for ALL FK columns, including the primary one
     let cross_roles = {};
+    let primaryRoleCount = 0;
     if (role !== "manufacturer" && entity.id) {
       const entityId = entity.id;
       const roleChecks = ["owner_id", "operator_id", "developer_id", "installer_id"];
-      const fkCol = role === "installer" ? "installer_id" : `${role}_id`;
 
-      const crossPromises = roleChecks
-        .filter(col => col !== fkCol)
-        .map(async (col) => {
-          const { count } = await supabase
-            .from("solar_installations")
-            .select("id", { count: "exact", head: true })
-            .eq(col, entityId);
-          return [col.replace("_id", ""), count || 0];
-        });
+      const crossPromises = roleChecks.map(async (col) => {
+        const { count } = await supabase
+          .from("solar_installations")
+          .select("id", { count: "exact", head: true })
+          .eq(col, entityId);
+        return [col.replace("_id", ""), count || 0];
+      });
 
       const crossResults = await Promise.all(crossPromises);
+      const usedRole = usedFk.replace("_id", "");
       for (const [r, count] of crossResults) {
-        if (count > 0) cross_roles[r] = count;
+        if (r === usedRole) {
+          primaryRoleCount = count;
+        } else if (count > 0) {
+          cross_roles[r] = count;
+        }
       }
     }
 
-    // --- Compute site_count and capacity_mw from entity data ---
+    // --- Compute site_count and capacity_mw ---
+    // Use pre-computed entity data when available, fall back to computed values
     let site_count = 0;
     let capacity_mw = 0;
 
     if (role === "installer") {
-      site_count = entity.installation_count || installations.length;
+      site_count = entity.installation_count || primaryRoleCount || installations.length;
       capacity_mw = entity.total_capacity_kw ? entity.total_capacity_kw / 1000 : 0;
     } else if (role === "manufacturer") {
       site_count = entity.equipment_count || installations.length;
       capacity_mw = installations.reduce((sum, i) => sum + (Number(i.capacity_mw) || 0), 0);
     } else {
-      // owner, developer, operator
-      site_count = entity.site_count || installations.length;
+      // owner, developer, operator — use entity pre-computed data, or cross-role count
+      site_count = entity.site_count || primaryRoleCount || installations.length;
       capacity_mw = entity.owned_capacity_mw || entity.developed_capacity_mw || 0;
+      // If entity has no pre-computed capacity, compute from installations
+      if (!capacity_mw && installations.length > 0) {
+        capacity_mw = installations.reduce((sum, i) => sum + (Number(i.capacity_mw) || 0), 0);
+      }
     }
 
     // --- Format response ---
+    // actual_role reflects the FK column that found installations (may differ from requested role)
+    const actualRole = role === "manufacturer" ? "manufacturer"
+      : role === "installer" ? "installer"
+      : usedFk.replace("_id", "");
+
     const response = {
       data: {
         id: entity.id || null,
         name: entity.name,
         role: entity.role,
+        actual_role: actualRole,
         state: entity.state || null,
         city: entity.city || null,
         website: entity.website || null,
