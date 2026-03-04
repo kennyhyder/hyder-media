@@ -228,6 +228,112 @@ echo "Images on droplet: $IMG_COUNT"
 STATUS_EOF
 }
 
+sync_naip() {
+    local tile_dir="$PROJECT_DIR/data/naip_tiles"
+    local count=$(find "$tile_dir" -name "*.png" 2>/dev/null | wc -l | tr -d ' ')
+    log "Syncing $count NAIP tiles to droplet..."
+
+    if [ "$count" -eq "0" ]; then
+        warn "No tiles found in $tile_dir/"
+        warn "Run fetch-naip-tiles.py first"
+        exit 1
+    fi
+
+    # Rsync entire naip_tiles directory (preserves zip subdirectory structure)
+    rsync -avz --progress \
+        "$tile_dir/" \
+        "$DROPLET:$REMOTE_DIR/naip_tiles/"
+
+    # Copy scan script and env
+    log "Copying scan script and credentials..."
+    scp "$SCRIPT_DIR/scan-naip-solar.py" "$DROPLET:$REMOTE_DIR/scan-naip-solar.py"
+
+    ssh $DROPLET bash -s << ENV_EOF
+cat > /root/solar-nrel/.env.local << 'INNEREOF'
+$(grep -E "^(SUPABASE_|NEXT_PUBLIC_SUPABASE_)" "$PROJECT_DIR/.env.local")
+INNEREOF
+echo "Env file updated"
+ENV_EOF
+
+    log "NAIP tiles synced!"
+}
+
+run_naip_scan() {
+    log "Starting NAIP scan on droplet..."
+
+    ssh $DROPLET bash -s << 'SCAN_EOF'
+cd /root/solar-nrel
+
+# Count tiles
+TILE_COUNT=$(find naip_tiles -name "*.png" 2>/dev/null | wc -l)
+echo "NAIP tiles available: $TILE_COUNT"
+
+if [ "$TILE_COUNT" -eq "0" ]; then
+    echo "ERROR: No tiles found. Run 'deploy sync-naip' first."
+    exit 1
+fi
+
+# Run in screen session
+if screen -list | grep -q "naip"; then
+    echo "NAIP scan already running! Use 'deploy naip-status' to check."
+    exit 0
+fi
+
+echo "Starting NAIP scan in screen session 'naip'..."
+screen -dmS naip bash -c '
+    /root/miniconda3/envs/nrel/bin/python -u /root/solar-nrel/scan-naip-solar.py \
+        --confidence 0.5 \
+        2>&1 | tee /root/solar-nrel/results/naip_scan.log
+    echo "DONE at $(date)" >> /root/solar-nrel/results/naip_scan.log
+'
+
+echo ""
+echo "NAIP scan started in background screen session 'naip'"
+echo "Monitor: ssh root@104.131.105.89 'tail -f /root/solar-nrel/results/naip_scan.log'"
+SCAN_EOF
+
+    log "NAIP scan started on droplet!"
+}
+
+naip_status() {
+    log "Checking NAIP scan status..."
+    ssh $DROPLET bash -s << 'NSTATUS_EOF'
+echo "=== NAIP Scan Status ==="
+echo "RAM: $(free -h | awk '/Mem:/{print $3 "/" $2}')"
+echo "Disk: $(df -h / | awk 'NR==2{print $3 "/" $2 " (" $5 " used)"}')"
+echo ""
+
+# Tiles
+TILE_COUNT=$(find /root/solar-nrel/naip_tiles -name "*.png" 2>/dev/null | wc -l)
+echo "NAIP tiles: $TILE_COUNT"
+
+# Detections
+DET_COUNT=$(ls -1 /root/solar-nrel/naip_detections/*.json 2>/dev/null | wc -l)
+echo "Detection files: $DET_COUNT"
+
+if screen -list 2>/dev/null | grep -q "naip"; then
+    echo "Scan: RUNNING"
+else
+    echo "Scan: NOT RUNNING"
+fi
+
+if [ -f /root/solar-nrel/results/naip_scan.log ]; then
+    echo ""
+    echo "=== Last 20 lines of log ==="
+    tail -20 /root/solar-nrel/results/naip_scan.log
+fi
+NSTATUS_EOF
+}
+
+fetch_naip_results() {
+    log "Fetching NAIP detection results from droplet..."
+    local det_dir="$PROJECT_DIR/data/naip_detections"
+    mkdir -p "$det_dir"
+    rsync -avz "$DROPLET:$REMOTE_DIR/naip_detections/" "$det_dir/"
+    local count=$(ls -1 "$det_dir"/*.json 2>/dev/null | wc -l | tr -d ' ')
+    log "Fetched $count detection files to $det_dir/"
+}
+
 # Main
 case "${1:-help}" in
     setup)
@@ -247,13 +353,37 @@ case "${1:-help}" in
         sync_images
         run_classify
         ;;
+    sync-naip)
+        sync_naip
+        ;;
+    scan-naip)
+        run_naip_scan
+        ;;
+    naip-status)
+        naip_status
+        ;;
+    fetch-naip)
+        fetch_naip_results
+        ;;
+    naip-all)
+        sync_naip
+        run_naip_scan
+        ;;
     *)
-        echo "Usage: $0 {setup|sync|classify|status|all}"
+        echo "Usage: $0 {setup|sync|classify|status|all|sync-naip|scan-naip|naip-status|fetch-naip|naip-all}"
         echo ""
+        echo "  === Original satellite classification ==="
         echo "  setup    - Install Python 3.10, NREL model, and deps on droplet"
         echo "  sync     - Rsync satellite images and scripts to droplet"
         echo "  classify - Start classification in background screen session"
         echo "  status   - Check classification progress"
         echo "  all      - Run setup + sync + classify"
+        echo ""
+        echo "  === NAIP tile scanning ==="
+        echo "  sync-naip   - Rsync NAIP tiles to droplet"
+        echo "  scan-naip   - Start NAIP panel detection in screen session"
+        echo "  naip-status - Check NAIP scan progress"
+        echo "  fetch-naip  - Download detection results from droplet"
+        echo "  naip-all    - sync-naip + scan-naip"
         ;;
 esac

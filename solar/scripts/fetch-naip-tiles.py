@@ -366,6 +366,29 @@ def download_google_tile(center_lat, center_lng, zoom, save_path, retries=3):
                 return False, str(e)
 
 
+def _write_manifests(all_manifests, process_zips, args, tile_span_m):
+    """Write manifest.json for each zip directory."""
+    for zip_code, tiles in all_manifests.items():
+        n_targets = len(process_zips.get(zip_code, []))
+        manifest = {
+            'zip_code': zip_code,
+            'source': args.source,
+            'zoom': args.zoom if args.source == 'google' else None,
+            'tile_span_m': round(tile_span_m, 1),
+            'target_count': n_targets,
+            'tier': 'A' if n_targets == 1 else ('B' if n_targets <= 3 else 'C'),
+            'tiles': tiles,
+            'targets': [
+                {'id': t['id'], 'capacity_mw': t['capacity_mw'],
+                 'source_record_id': t['source_record_id']}
+                for t in process_zips.get(zip_code, [])
+            ],
+        }
+        manifest_path = TILE_DIR / zip_code / "manifest.json"
+        with open(manifest_path, 'w') as f:
+            json.dump(manifest, f, indent=2)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Download satellite tiles for solar detection")
     parser.add_argument("--source", type=str, default="google", choices=["google", "naip"],
@@ -553,8 +576,18 @@ def main():
         print(f"  Plan saved to {manifest_path}")
         return
 
+    # Build manifests from ALL tiles (existing + to download)
+    all_manifests = {}
+    for zip_code, tile_idx, tile_bbox in all_tiles:
+        all_manifests.setdefault(zip_code, []).append({
+            'file': f"{tile_idx}.png",
+            'bbox': tile_bbox,
+        })
+
     if not tiles_to_download:
         print("\n  All tiles already downloaded!")
+        # Still write manifests for existing tiles
+        _write_manifests(all_manifests, process_zips, args, TILE_SPAN_M)
         return
 
     # --- Download tiles ---
@@ -568,8 +601,7 @@ def main():
     error_samples = []
     start_time = time.time()
 
-    # Write manifests per zip as we go
-    manifests = {}  # zip -> list of tile info
+    # Track download success (manifests built from all_manifests above)
 
     def _download_one(item):
         zip_code, tile_idx, tile_bbox = item
@@ -590,10 +622,6 @@ def main():
             zip_code, tile_idx, tile_bbox, ok, err = future.result()
             if ok:
                 downloaded += 1
-                manifests.setdefault(zip_code, []).append({
-                    'file': f"{tile_idx}.png",
-                    'bbox': tile_bbox,
-                })
             else:
                 errors += 1
                 if len(error_samples) < 10:
@@ -608,26 +636,8 @@ def main():
                       f"({total_done:,}/{len(tiles_to_download):,}, "
                       f"{rate:.1f}/sec, ETA: {eta/60:.0f}min)")
 
-    # Write manifests
-    for zip_code, tiles in manifests.items():
-        n_targets = len(process_zips.get(zip_code, []))
-        manifest = {
-            'zip_code': zip_code,
-            'source': args.source,
-            'zoom': args.zoom if args.source == 'google' else None,
-            'tile_span_m': round(TILE_SPAN_M, 1),
-            'target_count': n_targets,
-            'tier': 'A' if n_targets == 1 else ('B' if n_targets <= 3 else 'C'),
-            'tiles': tiles,
-            'targets': [
-                {'id': t['id'], 'capacity_mw': t['capacity_mw'],
-                 'source_record_id': t['source_record_id']}
-                for t in process_zips.get(zip_code, [])
-            ],
-        }
-        manifest_path = TILE_DIR / zip_code / "manifest.json"
-        with open(manifest_path, 'w') as f:
-            json.dump(manifest, f, indent=2)
+    # Write manifests for ALL tiles (existing + newly downloaded)
+    _write_manifests(all_manifests, process_zips, args, TILE_SPAN_M)
 
     elapsed = time.time() - start_time
     print(f"\n{'='*60}")
@@ -635,7 +645,7 @@ def main():
     print(f"{'='*60}")
     print(f"  Downloaded: {downloaded:,}")
     print(f"  Errors: {errors}")
-    print(f"  Manifests written: {len(manifests):,}")
+    print(f"  Manifests written: {len(all_manifests):,}")
     print(f"  Time: {elapsed:.0f}s ({elapsed/60:.1f}min)")
     if error_samples:
         print(f"\n  Sample errors:")

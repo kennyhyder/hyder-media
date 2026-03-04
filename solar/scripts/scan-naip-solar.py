@@ -140,41 +140,32 @@ def scan_tile(pd, tile_path, tile_bbox, confidence_cutoff):
 
     Returns list of detections: [{lat, lng, area_m2, capacity_mw_est, mount_type, confidence}]
     """
-    import numpy as np
     import matplotlib.pyplot as plt
-    from tensorflow.keras.preprocessing import image as imagex
 
-    img = imagex.load_img(str(tile_path), color_mode="rgb", target_size=(640, 640))
-    img_array = np.array(img)
-
-    # Step 1: Quick screen
-    has_panels = pd.hasPanels(img_array)
-    if not has_panels:
-        del img, img_array
-        plt.close('all')
-        return []
-
-    # Step 2: Classify with bounding boxes
+    # Skip hasPanels() binary classifier — it was trained on installation-centered
+    # images and returns False for grid tiles where panels are a small fraction.
+    # Go straight to classifyMountingConfiguration() which uses Faster R-CNN
+    # object detection designed to find objects at any location/scale.
     try:
         scores, labels, boxes = pd.classifyMountingConfiguration(
             str(tile_path),
             acc_cutoff=confidence_cutoff,
         )
     except Exception:
-        del img, img_array
         plt.close('all')
         return []
 
-    del img, img_array
     plt.close('all')
 
-    if not labels or not boxes:
+    if not labels or boxes is None or (hasattr(boxes, '__len__') and len(boxes) == 0):
         return []
 
     detections = []
-    for score, label, box in zip(scores or [confidence_cutoff]*len(labels), labels, boxes):
-        # box format: [x1, y1, x2, y2] (pixel coordinates)
-        if len(box) < 4:
+    if scores is None:
+        scores = [confidence_cutoff] * len(labels)
+    for score, label, box in zip(scores, labels, boxes):
+        # box format: [x1, y1, x2, y2] (pixel coordinates, may be tensor)
+        if hasattr(box, '__len__') and len(box) < 4:
             continue
         x1, y1, x2, y2 = float(box[0]), float(box[1]), float(box[2]), float(box[3])
 
