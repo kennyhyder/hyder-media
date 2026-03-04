@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Car Mechanic & Restoration | Auto Addiction OC | Orange County, CA</title>
+    <meta name="description" content="Expert classic car repair, restoration & custom paint for pre-1975 vehicles. BASF certified. Lake Forest, CA. Free estimates. Call (949) 299-2499.">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --black: #0A1212;
+            --dark: #111A1A;
+            --charcoal: #1A2424;
+            --gold: #D4A843;
+            --gold-light: #E8C876;
+            --white: #FFFFFF;
+            --off-white: #F8F7F4;
+            --gray-100: #F0EFEC;
+            --gray-200: #E0DED8;
+            --gray-400: #9CA3AF;
+            --gray-600: #6B7280;
+            --gray-800: #374151;
+            --red: #C0392B;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            color: var(--black);
+            background: var(--off-white);
+        }
+
+        /* ===== STICKY HEADER ===== */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .sticky-header img {
+            height: 42px;
+            width: auto;
+        }
+
+        .sticky-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sticky-phone {
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 24px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-gold { background: var(--gold); color: var(--black); }
+        .btn-gold:hover { background: var(--gold-light); }
+        .btn-black { background: var(--black); color: var(--white); }
+        .btn-black:hover { background: var(--charcoal); }
+        .btn-red { background: var(--red); color: var(--white); font-size: 1rem; padding: 14px 32px; }
+        .btn-red:hover { background: #A93226; }
+        .btn-lg { padding: 16px 36px; font-size: 1rem; }
+
+        /* ===== HERO ===== */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 80vh;
+        }
+
+        .hero-image {
+            background: url('https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/0d21d534-02da-4c0f-b0df-e9472ed5dd8d/2024_AutoAddiction_Mural-8.jpg') center/cover no-repeat;
+            position: relative;
+        }
+
+        .hero-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent 60%, var(--off-white) 100%);
+        }
+
+        .hero-copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 5% 60px 48px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--gold);
+            color: var(--black);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .hero-copy h1 {
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--black);
+            margin-bottom: 16px;
+        }
+
+        .hero-copy h1 span {
+            color: var(--red);
+        }
+
+        .hero-copy .hero-sub {
+            font-size: 1.15rem;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .hero-copy .hero-location {
+            font-size: 0.95rem;
+            color: var(--gray-400);
+            margin-bottom: 28px;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .hero-phone-mobile {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .hero-phone-mobile a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--black);
+            border: 2px solid var(--gold);
+            border-radius: 6px;
+            padding: 14px;
+            color: var(--gold);
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .proof-strip {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .proof-item {
+            text-align: center;
+        }
+
+        .proof-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--black);
+            line-height: 1;
+        }
+
+        .proof-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .proof-divider {
+            width: 1px;
+            height: 36px;
+            background: var(--gray-200);
+        }
+
+        /* ===== WHAT WE DO ===== */
+        .what-we-do {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 5%;
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .service-block {
+            background: var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .service-block img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+        }
+
+        .service-block-body {
+            padding: 28px;
+        }
+
+        .service-block h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .service-block p {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .service-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 16px;
+        }
+
+        .service-list li {
+            font-size: 0.85rem;
+            color: var(--gray-200);
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .service-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+        }
+
+        /* ===== WHY US ===== */
+        .why-us {
+            background: var(--off-white);
+            padding: 80px 5%;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .why-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 32px 24px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .why-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.5rem;
+        }
+
+        .why-card h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--black);
+        }
+
+        .why-card p {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            background: var(--white);
+            padding: 80px 5%;
+        }
+
+        .testimonial-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .t-card {
+            padding: 28px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+        }
+
+        .t-stars {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .t-card blockquote {
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .t-card cite {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* ===== FORM SECTION ===== */
+        .form-section {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 5%;
+        }
+
+        .form-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .form-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .form-info h2 span {
+            color: var(--gold);
+        }
+
+        .form-info p {
+            color: var(--gray-400);
+            font-size: 1rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .form-info-phone {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .form-info-phone .phone-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .form-info-phone a {
+            color: var(--white);
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .form-info-phone a:hover { color: var(--gold); }
+
+        .form-info-phone small {
+            display: block;
+            color: var(--gray-400);
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+
+        .partner-logos {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .partner-logos span {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .partner-logos img {
+            height: 30px;
+            filter: brightness(0) invert(1);
+            opacity: 0.5;
+        }
+
+        .form-card {
+            background: var(--dark);
+            border: 1px solid rgba(212,168,67,0.2);
+            border-radius: 8px;
+            padding: 36px;
+        }
+
+        .form-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .form-card .form-sub {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--gray-400);
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--charcoal);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            color: var(--white);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .form-group select option {
+            background: var(--charcoal);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--red);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 4px;
+        }
+
+        .form-submit-btn:hover { background: #A93226; }
+
+        .form-note {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--gray-400);
+            margin-top: 10px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--charcoal);
+            color: var(--gray-400);
+            padding: 40px 5%;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero-image { min-height: 300px; }
+            .hero-image::after {
+                background: linear-gradient(to bottom, transparent 60%, var(--off-white) 100%);
+            }
+            .hero-copy { padding: 40px 5%; }
+            .two-col { grid-template-columns: 1fr; }
+            .why-grid { grid-template-columns: repeat(2, 1fr); }
+            .testimonial-cards { grid-template-columns: 1fr; }
+            .form-layout { grid-template-columns: 1fr; gap: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            .sticky-phone { display: none; }
+            .hero-phone-mobile { display: block; }
+            .proof-strip { gap: 16px; }
+            .proof-number { font-size: 1.2rem; }
+            .why-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .service-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sticky Header -->
+<header class="sticky-header">
+    <a href="https://autoaddictionoc.com">
+        <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/7610fc30-dfb5-4935-8c9d-2bcc633157ec/FINAL_Logo-07.png" alt="Auto Addiction OC">
+    </a>
+    <div class="sticky-header-right">
+        <a href="tel:+19492992499" class="sticky-phone">(949) 299-2499</a>
+        <a href="#get-estimate" class="btn btn-gold">Free Estimate</a>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-image"></div>
+    <div class="hero-copy">
+        <div class="hero-badge">&#9733; Pre-1975 Specialists</div>
+        <h1>Classic Car <span>Mechanic & Restoration</span> in Orange County</h1>
+        <p class="hero-sub">Expert mechanical repair, custom paint &amp; bodywork, and complete restoration for classic cars, hot rods, muscle cars, and collector vehicles.</p>
+        <p class="hero-location">26862 Vista Terrace, Lake Forest, CA 92630 &mdash; Serving all of Southern California</p>
+
+        <div class="hero-phone-mobile">
+            <a href="tel:+19492992499">&#9742; Call (949) 299-2499</a>
+        </div>
+
+        <div class="hero-ctas">
+            <a href="#get-estimate" class="btn btn-red btn-lg">Get a Free Estimate</a>
+            <a href="tel:+19492992499" class="btn btn-black btn-lg">Call (949) 299-2499</a>
+        </div>
+
+        <div class="proof-strip">
+            <div class="proof-item">
+                <div class="proof-number">10K+</div>
+                <div class="proof-label">Sq Ft Facility</div>
+            </div>
+            <div class="proof-divider"></div>
+            <div class="proof-item">
+                <div class="proof-number">Pre-'75</div>
+                <div class="proof-label">Exclusively</div>
+            </div>
+            <div class="proof-divider"></div>
+            <div class="proof-item">
+                <div class="proof-number">BASF</div>
+                <div class="proof-label">Certified</div>
+            </div>
+            <div class="proof-divider"></div>
+            <div class="proof-item">
+                <div class="proof-number">5 &#9733;</div>
+                <div class="proof-label">Rated</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services -->
+<section class="what-we-do">
+    <div class="section-inner">
+        <p class="section-label">Complete Classic Car Services</p>
+        <h2 class="section-title">Mechanical Repair, Paint & Bodywork, Full Restoration</h2>
+
+        <div class="two-col">
+            <div class="service-block">
+                <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/d9f67c3e-3c2c-486f-9faf-2ed0c64612b7/services-mechanical.jpg" alt="Classic car mechanical repair shop">
+                <div class="service-block-body">
+                    <h3>Mechanical Repair & Performance</h3>
+                    <p>Our old-school gearheads specialize exclusively in pre-1975 engines, drivetrains, brakes, and suspension systems.</p>
+                    <ul class="service-list">
+                        <li>Engine rebuilds & swaps</li>
+                        <li>Brake restoration</li>
+                        <li>Suspension upgrades</li>
+                        <li>Electrical & wiring</li>
+                        <li>Transmission work</li>
+                        <li>Windshield installation</li>
+                        <li>Performance tuning</li>
+                        <li>AC & cooling systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-block">
+                <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/3b14cbf7-f483-4015-88e5-f8ee63f4fdcc/services-paint.jpg" alt="Classic car custom paint and bodywork">
+                <div class="service-block-body">
+                    <h3>Custom Paint & Bodywork</h3>
+                    <p>BASF &amp; Valspar Auto Refinish certified craftsmen delivering collision repair to concours show-quality finishes.</p>
+                    <ul class="service-list">
+                        <li>Complete paint jobs</li>
+                        <li>Color matching</li>
+                        <li>Rust & metal repair</li>
+                        <li>Collision repair</li>
+                        <li>Panel fabrication</li>
+                        <li>Show-quality finish</li>
+                        <li>Body restoration</li>
+                        <li>Frame-off builds</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="why-us">
+    <div class="section-inner">
+        <p class="section-label" style="color: var(--red);">Why Auto Addiction</p>
+        <h2 class="section-title" style="margin-bottom: 40px;">The Classic Car Shop Orange County Trusts</h2>
+
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon">&#128295;</div>
+                <h4>Pre-1975 Only</h4>
+                <p>We focus exclusively on classic cars. No modern vehicles, no distractions. Your classic gets the dedicated attention it deserves.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">&#127942;</div>
+                <h4>Certified Craftsmen</h4>
+                <p>BASF &amp; Valspar certified paint technicians and experienced old-school mechanics with decades of hands-on expertise.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">&#127968;</div>
+                <h4>World-Class Facility</h4>
+                <p>Professional shop with dedicated paint booth, full mechanical bays, and climate-controlled storage — all under one roof.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">&#129309;</div>
+                <h4>Trusted Partners</h4>
+                <p>Proud partners with Hagerty, Ruffian Cars, and Old Anvil Speed Shop. Trusted by collectors across Southern California.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+    <div class="section-inner">
+        <p class="section-label" style="color: var(--gold);">Client Reviews</p>
+        <h2 class="section-title" style="margin-bottom: 40px;">What Classic Car Owners Say</h2>
+
+        <div class="testimonial-cards">
+            <div class="t-card">
+                <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"I searched all over Orange County for a premium auto facility until I discovered Auto Addiction. What an epiphany. The staff is fantastic and the facility is world-class."</blockquote>
+                <cite>Classic Car Collector, Orange County</cite>
+            </div>
+            <div class="t-card">
+                <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"Fantastic facility with a spacious, clean environment. Max, Amanda, and the team deliver exceptional work and truly care about every vehicle that comes through their doors."</blockquote>
+                <cite>Hot Rod Owner, Lake Forest</cite>
+            </div>
+            <div class="t-card">
+                <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <blockquote>"Trustworthy, professional, and exceptional quality. They treated my '67 Mustang like their own. The paint came out better than factory. Highly recommend for any classic car work."</blockquote>
+                <cite>Mustang Owner, South OC</cite>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form -->
+<section class="form-section" id="get-estimate">
+    <div class="form-layout">
+        <div class="form-info">
+            <h2>Get a <span>Free Estimate</span> for Your Classic Car</h2>
+            <p>Whether you need a tune-up, a full restoration, or a show-quality paint job — we've got you covered. Tell us about your project and we'll respond within 1 business day.</p>
+
+            <div class="form-info-phone">
+                <div class="phone-icon">&#9742;</div>
+                <div>
+                    <a href="tel:+19492992499">(949) 299-2499</a>
+                    <small>Mon-Fri 8am-5pm &bull; Sat-Sun by appt</small>
+                </div>
+            </div>
+
+            <div class="partner-logos">
+                <span>Partners:</span>
+                <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/f152605f-0b90-4c87-b3cc-7fe88061c64b/logo-hagerty.png" alt="Hagerty">
+                <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/89a1133b-1677-4de0-8d87-5f9707770a93/logo-ruffian-cars.png" alt="Ruffian Cars">
+                <img src="https://images.squarespace-cdn.com/content/v1/65e623c94971dd668f6bcbed/aa050883-e4dc-4b63-814e-2c05c74a7e8e/logo-old-anvil-speed-shop.png" alt="Old Anvil Speed Shop">
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>Request Your Free Estimate</h3>
+            <p class="form-sub">No obligation. We respond within 1 business day.</p>
+
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" placeholder="Your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" name="phone" placeholder="(555) 123-4567" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="you@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Service Needed</label>
+                    <select name="service">
+                        <option value="">Select...</option>
+                        <option value="mechanical">Mechanical Repair</option>
+                        <option value="paint">Paint & Bodywork</option>
+                        <option value="restoration">Full Restoration</option>
+                        <option value="both">Mechanical + Paint/Body</option>
+                        <option value="other">Other / Not Sure</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Vehicle & Project Details</label>
+                    <textarea name="message" placeholder="Year, make, model, and what work you need..."></textarea>
+                </div>
+                <button type="submit" class="form-submit-btn">Get My Free Estimate</button>
+                <p class="form-note">26862 Vista Terrace, Lake Forest, CA 92630</p>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>
+        <strong>Auto Addiction OC</strong> &mdash; 26862 Vista Terrace, Lake Forest, CA 92630<br>
+        <a href="tel:+19492992499">(949) 299-2499</a> &bull;
+        <a href="mailto:Inquire@AutoAddictionOC.com">Inquire@AutoAddictionOC.com</a> &bull;
+        Mon-Fri 8am-5pm, Sat-Sun by Appointment<br>
+        <a href="https://www.instagram.com/autoaddictionoc/" target="_blank">Instagram</a> &bull;
+        <a href="https://www.facebook.com/autoaddictionoc" target="_blank">Facebook</a>
+    </p>
+</footer>
+
+</body>
+</html>
