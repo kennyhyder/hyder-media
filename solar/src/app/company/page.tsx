@@ -1,25 +1,44 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import EntityBadge from "@/components/EntityBadge";
 import StarRating from "@/components/StarRating";
 import type { CompanyProfile } from "@/types/solar";
-
-const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[300px] bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-      Loading map...
-    </div>
-  ),
-});
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
+import DemoContactModal from "@/components/DemoContactModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
     ? "http://localhost:3000/api/solar"
     : "/api/solar";
+
+type InstSortKey = "name" | "location" | "type" | "capacity" | "date";
+type SortDir = "asc" | "desc";
+
+function SortHeader({ label, sortKey, currentSort, currentDir, onSort, align }: {
+  label: string;
+  sortKey: InstSortKey;
+  currentSort: InstSortKey;
+  currentDir: SortDir;
+  onSort: (key: InstSortKey) => void;
+  align?: "right";
+}) {
+  const active = currentSort === sortKey;
+  return (
+    <th
+      className={`${align === "right" ? "text-right" : "text-left"} pb-2 pr-4 font-medium text-gray-500 cursor-pointer hover:text-gray-900 select-none`}
+      onClick={() => onSort(sortKey)}
+    >
+      {label}{" "}
+      <span className={active ? "text-blue-600" : "text-gray-300"}>
+        {active ? (currentDir === "asc" ? "\u25B2" : "\u25BC") : "\u25B4"}
+      </span>
+    </th>
+  );
+}
 
 function CompanyContent() {
   const searchParams = useSearchParams();
@@ -29,7 +48,15 @@ function CompanyContent() {
   const [company, setCompany] = useState<CompanyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showMap, setShowMap] = useState(false);
+
+  // Installations table state
+  const [sortKey, setSortKey] = useState<InstSortKey>("date");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [filterState, setFilterState] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [filterText, setFilterText] = useState("");
+  const [showContactModal, setShowContactModal] = useState(false);
+  const isDemo = isDemoMode();
 
   useEffect(() => {
     if (!id && !name) return;
@@ -38,7 +65,7 @@ function CompanyContent() {
     if (name) params.set("name", name);
     params.set("role", role);
 
-    fetch(`${API_BASE}/company?${params}`)
+    fetch(withDemoToken(`${API_BASE}/company?${params}`))
       .then((res) => res.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -48,8 +75,74 @@ function CompanyContent() {
       .finally(() => setLoading(false));
   }, [id, name, role]);
 
+  // Compute filtered + sorted installations
+  const filteredInstallations = useMemo(() => {
+    if (!company) return [];
+    let list = [...company.installations];
+
+    // Apply filters (only for non-demo)
+    if (!isDemo) {
+      if (filterState) list = list.filter(i => i.state === filterState);
+      if (filterType) list = list.filter(i => i.site_type === filterType);
+      if (filterText) {
+        const q = filterText.toLowerCase();
+        list = list.filter(i =>
+          (i.site_name || "").toLowerCase().includes(q) ||
+          (i.city || "").toLowerCase().includes(q)
+        );
+      }
+    }
+
+    // Sort
+    list.sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "name":
+          cmp = (a.site_name || "").localeCompare(b.site_name || "");
+          break;
+        case "location":
+          cmp = (a.state || "").localeCompare(b.state || "") || (a.city || "").localeCompare(b.city || "");
+          break;
+        case "type":
+          cmp = (a.site_type || "").localeCompare(b.site_type || "");
+          break;
+        case "capacity":
+          cmp = (Number(a.capacity_mw) || 0) - (Number(b.capacity_mw) || 0);
+          break;
+        case "date":
+          cmp = (a.install_date || "").localeCompare(b.install_date || "");
+          break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+
+    return list;
+  }, [company, sortKey, sortDir, filterState, filterType, filterText, isDemo]);
+
+  // Get unique states and types for filter dropdowns
+  const uniqueStates = useMemo(() => {
+    if (!company) return [];
+    const s = new Set(company.installations.map(i => i.state).filter(Boolean));
+    return [...s].sort() as string[];
+  }, [company]);
+
+  const uniqueTypes = useMemo(() => {
+    if (!company) return [];
+    const t = new Set(company.installations.map(i => i.site_type).filter(Boolean));
+    return [...t].sort() as string[];
+  }, [company]);
+
+  const handleSort = (key: InstSortKey) => {
+    if (sortKey === key) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir(key === "capacity" ? "desc" : "asc");
+    }
+  };
+
   if (!id && !name) return <div className="text-gray-500">No entity ID or name provided</div>;
-  if (loading) return <div className="text-gray-500 py-12 text-center">Loading profile...</div>;
+  if (loading) return <LoadingSpinner text="Loading profile..." />;
   if (error) return <div className="text-red-600">Error: {error}</div>;
   if (!company) return <div className="text-gray-500">Entity not found</div>;
 
@@ -66,46 +159,11 @@ function CompanyContent() {
     return `${Math.round(mw * 1000)} kW`;
   };
 
-  const mapInstallations = company.installations
-    .filter(inst => inst.latitude && inst.longitude)
-    .map(inst => ({
-      ...inst,
-      id: inst.id,
-      site_name: inst.site_name,
-      site_type: inst.site_type as "commercial" | "utility" | "community",
-      site_status: "active" as const,
-      has_battery_storage: false,
-      address: null,
-      zip_code: null,
-      county: null,
-      capacity_dc_kw: null,
-      capacity_ac_kw: null,
-      mount_type: null,
-      tracking_type: null,
-      num_modules: null,
-      num_inverters: null,
-      battery_capacity_kwh: null,
-      owner_id: null,
-      owner_name: null,
-      developer_id: null,
-      developer_name: null,
-      operator_id: null,
-      operator_name: null,
-      installer_id: null,
-      installer_name: null,
-      interconnection_date: null,
-      permit_date: null,
-      decommission_date: null,
-      total_cost: null,
-      cost_per_watt: null,
-      data_source_id: null,
-      source_record_id: null,
-      created_at: "",
-      updated_at: "",
-    }));
-
   return (
     <div className="space-y-6">
+      <DemoBanner />
+      {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
+
       {/* Breadcrumb */}
       <div className="text-sm">
         <a href="/solar/directory/" className="text-blue-600 hover:underline">Directory</a>
@@ -173,7 +231,9 @@ function CompanyContent() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow p-5">
-          <div className="text-sm text-gray-500 uppercase tracking-wide">Installations</div>
+          <div className="text-sm text-gray-500 uppercase tracking-wide">
+            {company.role === "manufacturer" ? "Equipment Records" : "Installations"}
+          </div>
           <div className="text-3xl font-bold mt-1">{company.site_count.toLocaleString()}</div>
         </div>
         <div className="bg-white rounded-lg shadow p-5">
@@ -361,56 +421,86 @@ function CompanyContent() {
         </div>
       )}
 
-      {/* Map toggle */}
-      {mapInstallations.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Installation Map</h2>
-            <button
-              onClick={() => setShowMap(!showMap)}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              {showMap ? "Hide Map" : "Show Map"}
-            </button>
-          </div>
-          {showMap && (
-            <InstallationMap
-              installations={mapInstallations}
-              height="400px"
-            />
-          )}
-        </div>
-      )}
-
-      {/* Installations table */}
+      {/* Installations table with sort + filter */}
       {company.installations.length > 0 && (
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">
-              Recent Installations ({company.installations.length} of {company.site_count.toLocaleString()})
+              Installations ({filteredInstallations.length}{filterState || filterType || filterText ? ` of ${company.installations.length}` : ""})
             </h2>
             {company.role !== "manufacturer" && company.id && (
               <a
                 href={`/solar/search/?${company.role === "installer" ? "installer" : company.role === "owner" ? "owner" : "q"}=${encodeURIComponent(company.name)}`}
                 className="text-sm text-blue-600 hover:underline"
               >
-                View all {company.site_count.toLocaleString()} installations
+                View all {company.site_count.toLocaleString()} &rarr;
               </a>
             )}
           </div>
+
+          {/* Filters (hidden for demo users) */}
+          {!isDemo ? (
+            <div className="flex flex-wrap gap-3 mb-4">
+              <input
+                type="text"
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                placeholder="Search by name or city..."
+                className="border rounded-md px-3 py-1.5 text-sm w-48"
+              />
+              <select
+                value={filterState}
+                onChange={(e) => setFilterState(e.target.value)}
+                className="border rounded-md px-3 py-1.5 text-sm"
+              >
+                <option value="">All States</option>
+                {uniqueStates.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="border rounded-md px-3 py-1.5 text-sm"
+              >
+                <option value="">All Types</option>
+                {uniqueTypes.map(t => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+              {(filterState || filterType || filterText) && (
+                <button
+                  onClick={() => { setFilterState(""); setFilterType(""); setFilterText(""); }}
+                  className="text-sm text-gray-500 hover:text-gray-700 underline"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 mb-4 text-sm text-amber-600">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <button onClick={() => setShowContactModal(true)} className="underline hover:text-amber-700">
+                Filters available with full access
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-gray-500 border-b">
-                  <th className="pb-2 pr-4">Name</th>
-                  <th className="pb-2 pr-4">Location</th>
-                  <th className="pb-2 pr-4">Type</th>
-                  <th className="pb-2 pr-4 text-right">Capacity</th>
-                  <th className="pb-2">Date</th>
+                  <SortHeader label="Name" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortHeader label="Location" sortKey="location" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortHeader label="Type" sortKey="type" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortHeader label="Capacity" sortKey="capacity" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} align="right" />
+                  <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
                 </tr>
               </thead>
               <tbody>
-                {company.installations.map((inst) => (
+                {filteredInstallations.map((inst) => (
                   <tr key={inst.id} className="border-b last:border-0 hover:bg-gray-50">
                     <td className="py-2 pr-4">
                       <a href={`/solar/site/?id=${inst.id}`} className="text-blue-600 hover:underline">
@@ -427,6 +517,13 @@ function CompanyContent() {
                     <td className="py-2 text-gray-500">{inst.install_date?.substring(0, 4) || "-"}</td>
                   </tr>
                 ))}
+                {filteredInstallations.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-gray-400">
+                      No installations match the current filters.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -438,7 +535,7 @@ function CompanyContent() {
 
 export default function CompanyPage() {
   return (
-    <Suspense fallback={<div className="text-gray-500 py-12 text-center">Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner text="Loading profile..." />}>
       <CompanyContent />
     </Suspense>
   );
