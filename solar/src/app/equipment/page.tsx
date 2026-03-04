@@ -103,7 +103,7 @@ function EquipmentContent() {
       setLoading(true);
       const params = new URLSearchParams({
         page: String(pageNum),
-        limit: "25",
+        limit: isDemo ? "10" : "25",
       });
       Object.entries(filters).forEach(([k, v]) => {
         if (v) params.set(k, v);
@@ -284,7 +284,14 @@ function EquipmentContent() {
         <>
           {pagination && (
             <div className="text-sm text-gray-500">
-              {pagination.total.toLocaleString()} equipment records found
+              {isDemo ? (
+                <span>
+                  Showing {Math.min(pagination.total, 10)} of {pagination.total.toLocaleString()} equipment records
+                  <span className="ml-2 text-amber-600 font-medium">(demo limit)</span>
+                </span>
+              ) : (
+                <span>{pagination.total.toLocaleString()} equipment records found</span>
+              )}
             </div>
           )}
 

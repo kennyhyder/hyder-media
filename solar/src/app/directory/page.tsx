@@ -48,7 +48,7 @@ function DirectoryContent() {
   const search = useCallback(
     async (pageNum: number) => {
       setLoading(true);
-      const params = new URLSearchParams({ page: String(pageNum), limit: "50" });
+      const params = new URLSearchParams({ page: String(pageNum), limit: isDemo ? "10" : "50" });
       Object.entries(filters).forEach(([k, v]) => {
         if (v) params.set(k, v);
       });
@@ -183,7 +183,14 @@ function DirectoryContent() {
         <>
           {pagination && (
             <div className="text-sm text-gray-500">
-              {pagination.total.toLocaleString()} entities found
+              {isDemo ? (
+                <span>
+                  Showing {Math.min(pagination.total, 10)} of {pagination.total.toLocaleString()} entities
+                  <span className="ml-2 text-amber-600 font-medium">(demo limit)</span>
+                </span>
+              ) : (
+                <span>{pagination.total.toLocaleString()} entities found</span>
+              )}
             </div>
           )}
 

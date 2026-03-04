@@ -96,7 +96,7 @@ function SearchContent() {
 
   const search = useCallback(async (pageNum: number) => {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(pageNum), limit: "25" });
+    const params = new URLSearchParams({ page: String(pageNum), limit: isDemo ? "10" : "25" });
     Object.entries(filters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
@@ -425,7 +425,14 @@ function SearchContent() {
         <>
           {pagination && (
             <div className="text-sm text-gray-500">
-              {pagination.total.toLocaleString()} results found
+              {isDemo ? (
+                <span>
+                  Showing {Math.min(pagination.total, 10)} of {pagination.total.toLocaleString()} results
+                  <span className="ml-2 text-amber-600 font-medium">(demo limit)</span>
+                </span>
+              ) : (
+                <span>{pagination.total.toLocaleString()} results found</span>
+              )}
             </div>
           )}
 

@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   if (!access) return;
 
   if (access.mode === "demo") {
-    params.limit = Math.min(params.limit || 25, 25);
+    params.limit = Math.min(params.limit || 10, 10);
     if (params.page > 1) {
       return res.status(403).json({
         error: "Demo access limited to first page",

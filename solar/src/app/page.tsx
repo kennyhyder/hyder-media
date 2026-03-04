@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 
 const API_BASE =
@@ -48,8 +47,11 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(withDemoToken(`${API_BASE}/stats`))
-      .then((res) => res.json())
+    fetch(`${API_BASE}/stats`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        return res.json();
+      })
       .then(setStats)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
