@@ -80,6 +80,7 @@ function SearchContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity_mw");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showDuplicates, setShowDuplicates] = useState(false);
+  const [hasModel, setHasModel] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
 
@@ -105,6 +106,7 @@ function SearchContent() {
     params.set("sort", apiSort);
     params.set("order", sortDir);
     if (showDuplicates) params.set("deduplicate", "false");
+    if (hasModel) params.set("has_model", "true");
 
     try {
       const res = await fetch(withDemoToken(`${API_BASE}/installations?${params}`));
@@ -116,7 +118,7 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters, sortKey, sortDir, showDuplicates]);
+  }, [filters, sortKey, sortDir, showDuplicates, hasModel]);
 
   useEffect(() => {
     search(page);
@@ -393,6 +395,18 @@ function SearchContent() {
           >
             {showMap ? "Hide Map" : "Show Map"}
           </button>
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hasModel}
+              onChange={(e) => {
+                setHasModel(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Only show sites with equipment model data
+          </label>
           <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
             <input
               type="checkbox"

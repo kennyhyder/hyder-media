@@ -68,6 +68,7 @@ export default async function handler(req, res) {
       radius_miles,
       q,
       deduplicate,
+      has_model,
     } = params;
 
     const offset = (pageNum - 1) * limitNum;
@@ -92,6 +93,7 @@ export default async function handler(req, res) {
     if (end_date) query = query.lte("install_date", end_date);
     if (has_battery === "true") query = query.eq("has_battery_storage", true);
     if (q) query = query.or(`site_name.ilike.%${q}%,county.ilike.%${q}%,installer_name.ilike.%${q}%`);
+    if (has_model === "true") query = query.eq("has_equipment_model", true);
 
     // Geospatial search: bounding box filter + Haversine distance
     if (isGeoSearch) {

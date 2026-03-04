@@ -29,6 +29,7 @@ export const InstallationsQuery = z.object({
   radius_miles: optFloat,
   q: optStr,
   deduplicate: z.enum(["true", "false"]).optional(),
+  has_model: z.enum(["true", "false"]).optional(),
 });
 
 export const InstallationQuery = z.object({

@@ -83,7 +83,7 @@ function EquipmentContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [includeEmpty, setIncludeEmpty] = useState(false);
-  const [hasModel, setHasModel] = useState(false);
+  const [hasModel, setHasModel] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
 
