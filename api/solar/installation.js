@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { InstallationQuery, validate } from "./_validate.js";
+import { checkDemoAccess } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -16,6 +17,10 @@ export default async function handler(req, res) {
 
   const params = validate(InstallationQuery, req.query, res);
   if (!params) return;
+
+  const access = await checkDemoAccess(req, res);
+  if (!access) return;
+
   const { id } = params;
 
   try {

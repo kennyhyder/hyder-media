@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -46,7 +48,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/stats`)
+    fetch(withDemoToken(`${API_BASE}/stats`))
       .then((res) => res.json())
       .then(setStats)
       .catch((err) => setError(err.message))
@@ -78,6 +80,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">SolarTrack Dashboard</h1>
         <p className="text-gray-500 mt-1">

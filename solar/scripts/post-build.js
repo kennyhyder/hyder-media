@@ -16,7 +16,8 @@ const ROOT_DIR = path.join(__dirname, "..");
 const AUTH_SNIPPET = `<script>
 (function() {
     const AUTH_KEY = 'solartrack_auth';
-    if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+    const auth = sessionStorage.getItem(AUTH_KEY);
+    if (auth !== 'authenticated' && auth !== 'demo') {
         window.location.href = '/solar/password.html';
     }
 })();

@@ -4,6 +4,9 @@ import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { Installation, Pagination } from "@/types/solar";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
+import DemoContactModal from "@/components/DemoContactModal";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
   ssr: false,
@@ -77,6 +80,8 @@ function SearchContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity_mw");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showDuplicates, setShowDuplicates] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const isDemo = isDemoMode();
 
   // Map frontend sort keys to API column names
   const sortColMap: Record<SortKey, string> = {
@@ -102,7 +107,7 @@ function SearchContent() {
     if (showDuplicates) params.set("deduplicate", "false");
 
     try {
-      const res = await fetch(`${API_BASE}/installations?${params}`);
+      const res = await fetch(withDemoToken(`${API_BASE}/installations?${params}`));
       const data = await res.json();
       setResults(data.data || []);
       setPagination(data.pagination);
@@ -135,6 +140,10 @@ function SearchContent() {
   };
 
   const handleExport = async () => {
+    if (isDemo) {
+      setShowContactModal(true);
+      return;
+    }
     setExporting(true);
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([k, v]) => {
@@ -182,6 +191,8 @@ function SearchContent() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
+      {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
       <h1 className="text-2xl font-bold">Search Installations</h1>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
@@ -509,8 +520,11 @@ function SearchContent() {
                 Page {page} of {pagination.totalPages.toLocaleString()}
               </span>
               <button
-                onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
-                disabled={page >= pagination.totalPages}
+                onClick={() => {
+                  if (isDemo) { setShowContactModal(true); return; }
+                  setPage((p) => Math.min(pagination.totalPages, p + 1));
+                }}
+                disabled={!isDemo && page >= pagination.totalPages}
                 className="px-4 py-2 border rounded-md text-sm disabled:opacity-50"
               >
                 Next

@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import type { Installation, Equipment, SiteEvent } from "@/types/solar";
+import { withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
   ssr: false,
@@ -50,7 +52,7 @@ function SiteContent() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`${API_BASE}/installation?id=${id}`)
+    fetch(withDemoToken(`${API_BASE}/installation?id=${id}`))
       .then((res) => res.json())
       .then((data) => setSite(data.data))
       .catch((err) => setError(err.message))
@@ -68,6 +70,7 @@ function SiteContent() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
       <div>
         <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">
           &larr; Back to search

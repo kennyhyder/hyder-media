@@ -5,6 +5,9 @@ import { useSearchParams } from "next/navigation";
 import EntityBadge from "@/components/EntityBadge";
 import StarRating from "@/components/StarRating";
 import type { DirectoryEntity, Pagination } from "@/types/solar";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
+import DemoContactModal from "@/components/DemoContactModal";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -39,6 +42,8 @@ function DirectoryContent() {
     min_sites: searchParams.get("min_sites") || "",
   });
   const [page, setPage] = useState(1);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const isDemo = isDemoMode();
 
   const search = useCallback(
     async (pageNum: number) => {
@@ -48,7 +53,7 @@ function DirectoryContent() {
         if (v) params.set(k, v);
       });
       try {
-        const res = await fetch(`${API_BASE}/directory?${params}`);
+        const res = await fetch(withDemoToken(`${API_BASE}/directory?${params}`));
         const data = await res.json();
         setResults(data.data || []);
         setPagination(data.pagination);
@@ -85,6 +90,8 @@ function DirectoryContent() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
+      {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
       <div>
         <h1 className="text-2xl font-bold">Business Directory</h1>
         <p className="text-gray-500 mt-1">
@@ -289,8 +296,11 @@ function DirectoryContent() {
                 Page {page} of {pagination.totalPages.toLocaleString()}
               </span>
               <button
-                onClick={() => setPage((p) => Math.min(pagination!.totalPages, p + 1))}
-                disabled={page >= pagination.totalPages}
+                onClick={() => {
+                  if (isDemo) { setShowContactModal(true); return; }
+                  setPage((p) => Math.min(pagination!.totalPages, p + 1));
+                }}
+                disabled={!isDemo && page >= pagination.totalPages}
                 className="px-4 py-2 border rounded-md text-sm disabled:opacity-50"
               >
                 Next

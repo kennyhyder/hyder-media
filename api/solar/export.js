@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { ExportQuery, validate } from "./_validate.js";
+import { checkDemoAccess } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -16,6 +17,17 @@ export default async function handler(req, res) {
 
   const params = validate(ExportQuery, req.query, res);
   if (!params) return;
+
+  const access = await checkDemoAccess(req, res);
+  if (!access) return;
+
+  if (access.mode === "demo") {
+    return res.status(403).json({
+      error: "CSV export is not available in demo mode",
+      demo_restricted: true,
+      contact: "kenny@hyder.me",
+    });
+  }
 
   try {
     const supabase = getSupabase();

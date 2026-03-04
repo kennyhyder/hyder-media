@@ -3,6 +3,9 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Pagination } from "@/types/solar";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import DemoBanner from "@/components/DemoBanner";
+import DemoContactModal from "@/components/DemoContactModal";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -81,6 +84,8 @@ function EquipmentContent() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [includeEmpty, setIncludeEmpty] = useState(false);
   const [hasModel, setHasModel] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const isDemo = isDemoMode();
 
   // Map frontend sort keys to API column names (RPC handles join sorts)
   const sortColMap: Record<SortKey, string> = {
@@ -111,7 +116,7 @@ function EquipmentContent() {
       if (hasModel) params.set("has_model", "true");
 
       try {
-        const res = await fetch(`${API_BASE}/equipment?${params}`);
+        const res = await fetch(withDemoToken(`${API_BASE}/equipment?${params}`));
         const data = await res.json();
         setResults(data.data || []);
         setPagination(data.pagination);
@@ -149,6 +154,8 @@ function EquipmentContent() {
 
   return (
     <div className="space-y-6">
+      <DemoBanner />
+      {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
       <div>
         <h1 className="text-2xl font-bold">Equipment Search</h1>
         <p className="text-gray-500 mt-1">
@@ -372,10 +379,11 @@ function EquipmentContent() {
                 Page {page} of {pagination.totalPages.toLocaleString()}
               </span>
               <button
-                onClick={() =>
-                  setPage((p) => Math.min(pagination.totalPages, p + 1))
-                }
-                disabled={page >= pagination.totalPages}
+                onClick={() => {
+                  if (isDemo) { setShowContactModal(true); return; }
+                  setPage((p) => Math.min(pagination.totalPages, p + 1));
+                }}
+                disabled={!isDemo && page >= pagination.totalPages}
                 className="px-4 py-2 border rounded-md text-sm disabled:opacity-50"
               >
                 Next

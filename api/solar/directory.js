@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { DirectoryQuery, validate } from "./_validate.js";
+import { checkDemoAccess } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -16,6 +17,20 @@ export default async function handler(req, res) {
 
   const params = validate(DirectoryQuery, req.query, res);
   if (!params) return;
+
+  const access = await checkDemoAccess(req, res);
+  if (!access) return;
+
+  if (access.mode === "demo") {
+    params.limit = Math.min(params.limit || 25, 25);
+    if (params.page > 1) {
+      return res.status(403).json({
+        error: "Demo access limited to first page",
+        demo_restricted: true,
+        contact: "kenny@hyder.me",
+      });
+    }
+  }
 
   try {
     const supabase = getSupabase();
