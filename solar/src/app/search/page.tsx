@@ -7,6 +7,7 @@ import type { Installation, Pagination } from "@/types/solar";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 import DemoContactModal from "@/components/DemoContactModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
   ssr: false,
@@ -68,9 +69,13 @@ function SearchContent() {
     start_date: searchParams.get("start_date") || "",
     end_date: searchParams.get("end_date") || "",
     site_type: searchParams.get("site_type") || "",
-    site_status: searchParams.get("site_status") || "active",
+    site_status: searchParams.has("site_status") ? (searchParams.get("site_status") || "") : "active",
     installer: searchParams.get("installer") || "",
     owner: searchParams.get("owner") || "",
+    installer_id: searchParams.get("installer_id") || "",
+    owner_id: searchParams.get("owner_id") || "",
+    developer_id: searchParams.get("developer_id") || "",
+    operator_id: searchParams.get("operator_id") || "",
     q: searchParams.get("q") || "",
     near_lat: searchParams.get("near_lat") || "",
     near_lng: searchParams.get("near_lng") || "",
@@ -80,7 +85,7 @@ function SearchContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity_mw");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showDuplicates, setShowDuplicates] = useState(false);
-  const [hasModel, setHasModel] = useState(true);
+  const [hasModel, setHasModel] = useState(false);
   const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
@@ -197,7 +202,12 @@ function SearchContent() {
     <div className="space-y-6">
       <DemoBanner />
       {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
-      <h1 className="text-2xl font-bold">Search Installations</h1>
+      <div>
+        <h1 className="text-2xl font-bold">Installations</h1>
+        <p className="text-gray-500 mt-1">
+          Browse and filter solar installations by location, capacity, date, owner, and installer. Use the map and export features to analyze results.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -448,7 +458,7 @@ function SearchContent() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Searching...</div>
+        <LoadingSpinner text="Searching installations..." />
       ) : (
         <>
           {pagination && (
@@ -574,7 +584,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="text-gray-500">Loading search...</div>}>
+    <Suspense fallback={<LoadingSpinner text="Loading installations..." />}>
       <SearchContent />
     </Suspense>
   );

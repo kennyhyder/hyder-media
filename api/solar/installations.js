@@ -56,6 +56,10 @@ export default async function handler(req, res) {
       site_type,
       installer,
       owner,
+      installer_id,
+      owner_id,
+      developer_id,
+      operator_id,
       min_size,
       max_size,
       start_date,
@@ -86,8 +90,12 @@ export default async function handler(req, res) {
     if (state) query = query.eq("state", state);
     if (site_type) query = query.eq("site_type", site_type);
     if (site_status) query = query.eq("site_status", site_status);
-    if (installer) query = query.ilike("installer_name", `%${installer}%`);
-    if (owner) query = query.ilike("owner_name", `%${owner}%`);
+    if (installer_id) query = query.eq("installer_id", installer_id);
+    else if (installer) query = query.ilike("installer_name", `%${installer}%`);
+    if (owner_id) query = query.eq("owner_id", owner_id);
+    else if (owner) query = query.ilike("owner_name", `%${owner}%`);
+    if (developer_id) query = query.eq("developer_id", developer_id);
+    if (operator_id) query = query.eq("operator_id", operator_id);
     if (min_size) query = query.gte("capacity_dc_kw", parseFloat(min_size));
     if (max_size) query = query.lte("capacity_dc_kw", parseFloat(max_size));
     if (start_date) query = query.gte("install_date", start_date);

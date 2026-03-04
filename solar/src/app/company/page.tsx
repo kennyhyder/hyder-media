@@ -430,7 +430,7 @@ function CompanyContent() {
             </h2>
             {company.role !== "manufacturer" && company.id && (
               <a
-                href={`/solar/search/?${company.role === "installer" ? "installer" : company.role === "owner" ? "owner" : "q"}=${encodeURIComponent(company.name)}`}
+                href={`/solar/search/?${company.role}_id=${company.id}&site_status=`}
                 className="text-sm text-blue-600 hover:underline"
               >
                 View all {company.site_count.toLocaleString()} &rarr;
