@@ -81,6 +81,7 @@ function SearchContent() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [hasModel, setHasModel] = useState(true);
+  const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
 
@@ -107,6 +108,7 @@ function SearchContent() {
     params.set("order", sortDir);
     if (showDuplicates) params.set("deduplicate", "false");
     if (hasModel) params.set("has_model", "true");
+    if (hasLocation) params.set("has_location", "true");
 
     try {
       const res = await fetch(withDemoToken(`${API_BASE}/installations?${params}`));
@@ -118,7 +120,7 @@ function SearchContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters, sortKey, sortDir, showDuplicates, hasModel]);
+  }, [filters, sortKey, sortDir, showDuplicates, hasModel, hasLocation]);
 
   useEffect(() => {
     search(page);
@@ -406,6 +408,18 @@ function SearchContent() {
               className="rounded border-gray-300"
             />
             Only show sites with equipment model data
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hasLocation}
+              onChange={(e) => {
+                setHasLocation(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Only show sites with coordinates
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
             <input

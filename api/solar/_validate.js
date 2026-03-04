@@ -30,6 +30,7 @@ export const InstallationsQuery = z.object({
   q: optStr,
   deduplicate: z.enum(["true", "false"]).optional(),
   has_model: z.enum(["true", "false"]).optional(),
+  has_location: z.enum(["true", "false"]).optional(),
 });
 
 export const InstallationQuery = z.object({
@@ -49,6 +50,7 @@ export const EquipmentQuery = z.object({
   min_age_years: optInt,
   include_empty: z.enum(["true", "false"]).optional(),
   has_model: z.enum(["true", "false"]).optional(),
+  has_location: z.enum(["true", "false"]).optional(),
 });
 
 export const InstallersQuery = z.object({

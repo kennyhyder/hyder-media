@@ -84,6 +84,7 @@ function EquipmentContent() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [includeEmpty, setIncludeEmpty] = useState(false);
   const [hasModel, setHasModel] = useState(true);
+  const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
 
@@ -114,6 +115,7 @@ function EquipmentContent() {
       params.set("order", sortDir);
       if (includeEmpty) params.set("include_empty", "true");
       if (hasModel) params.set("has_model", "true");
+      if (hasLocation) params.set("has_location", "true");
 
       try {
         const res = await fetch(withDemoToken(`${API_BASE}/equipment?${params}`));
@@ -126,7 +128,7 @@ function EquipmentContent() {
         setLoading(false);
       }
     },
-    [filters, sortKey, sortDir, includeEmpty, hasModel]
+    [filters, sortKey, sortDir, includeEmpty, hasModel, hasLocation]
   );
 
   useEffect(() => {
@@ -263,6 +265,18 @@ function EquipmentContent() {
             className="rounded border-gray-300"
           />
           Only show records with model numbers
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hasLocation}
+            onChange={(e) => {
+              setHasLocation(e.target.checked);
+              setPage(1);
+            }}
+            className="rounded border-gray-300"
+          />
+          Only show sites with coordinates
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
           <input

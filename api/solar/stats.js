@@ -16,15 +16,15 @@ export default async function handler(req, res) {
   try {
     const supabase = getSupabase();
 
-    // Single RPC call replaces 55+ sequential queries
-    const [statsResult, sourcesResult] = await Promise.all([
-      supabase.rpc("solar_dashboard_stats"),
+    // Read pre-computed stats from cache table (instant) + data sources list
+    const [cacheResult, sourcesResult] = await Promise.all([
+      supabase.from("solar_stats_cache").select("stats").eq("id", 1).single(),
       supabase.from("solar_data_sources").select("name, record_count, last_import"),
     ]);
 
-    if (statsResult.error) return res.status(500).json({ error: statsResult.error.message });
+    if (cacheResult.error) return res.status(500).json({ error: cacheResult.error.message });
 
-    const stats = statsResult.data;
+    const stats = cacheResult.data.stats;
     stats.data_sources = sourcesResult.data || [];
 
     return res.status(200).json(stats);

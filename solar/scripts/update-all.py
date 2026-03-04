@@ -565,6 +565,20 @@ def link_entities(dry_run=False):
                     print(f"  WARNING: {parts[0].strip()}: {parts[1].strip()}")
 
 
+def refresh_stats_cache(dry_run=False):
+    """Refresh the solar_stats_cache table used by the dashboard API."""
+    print("\nRefreshing dashboard stats cache...")
+    if dry_run:
+        print("  [DRY RUN] Would refresh solar_stats_cache")
+        return True
+    success, _, _ = run_script(
+        f"PGPASSWORD='{os.environ.get('SUPABASE_DB_PASSWORD', '')}' psql -h aws-0-us-west-2.pooler.supabase.com -p 6543 -U postgres.ilbovwnhrowvxjdkvrln -d postgres -c \"SELECT refresh_solar_stats_cache();\"",
+        "Stats cache refresh",
+        timeout=60,
+    )
+    return success
+
+
 def rebuild_site(dry_run=False):
     """Rebuild the Next.js static site."""
     print("\nRebuilding Next.js site...")
@@ -766,8 +780,10 @@ def main():
         link_entities(dry_run=args.dry_run)
 
     # ========================================================================
-    # Phase 4: Site rebuild
+    # Phase 4: Refresh stats cache + Site rebuild
     # ========================================================================
+    if not args.check_only:
+        refresh_stats_cache(dry_run=args.dry_run)
     if not args.skip_build and not args.check_only:
         rebuild_site(dry_run=args.dry_run)
 
