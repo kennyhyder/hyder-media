@@ -61,6 +61,7 @@ export default async function handler(req, res) {
     // --- Phase 2: Get portfolio data (replaces RPC) ---
     let installations = [];
     let top_equipment = [];
+    let usedFk = role === "installer" ? "installer_id" : `${role}_id`;
 
     if (role === "manufacturer") {
       // Manufacturer path: query through equipment table
@@ -99,7 +100,6 @@ export default async function handler(req, res) {
       const primaryFk = role === "installer" ? "installer_id" : `${role}_id`;
       const entityId = id || entity.id;
       const allFkCols = ["owner_id", "operator_id", "developer_id", "installer_id"];
-      let usedFk = primaryFk;
 
       const { data: instData } = await supabase
         .from("solar_installations")
