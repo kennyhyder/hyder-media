@@ -95,16 +95,35 @@ export default async function handler(req, res) {
       }
     } else {
       // Non-manufacturer path: direct FK query (indexed, fast)
-      const fkCol = role === "installer" ? "installer_id" : `${role}_id`;
+      // Try primary role first, then fall back to other roles if no results
+      const primaryFk = role === "installer" ? "installer_id" : `${role}_id`;
       const entityId = id || entity.id;
+      const allFkCols = ["owner_id", "operator_id", "developer_id", "installer_id"];
 
       const { data: instData } = await supabase
         .from("solar_installations")
         .select("id, site_name, state, city, capacity_mw, install_date, site_type, latitude, longitude")
-        .eq(fkCol, entityId)
+        .eq(primaryFk, entityId)
         .order("install_date", { ascending: false, nullsFirst: false })
         .limit(200);
       installations = instData || [];
+
+      // If primary role returned nothing, try other FK columns
+      if (installations.length === 0) {
+        for (const fk of allFkCols) {
+          if (fk === primaryFk) continue;
+          const { data: fallbackData } = await supabase
+            .from("solar_installations")
+            .select("id, site_name, state, city, capacity_mw, install_date, site_type, latitude, longitude")
+            .eq(fk, entityId)
+            .order("install_date", { ascending: false, nullsFirst: false })
+            .limit(200);
+          if (fallbackData && fallbackData.length > 0) {
+            installations = fallbackData;
+            break;
+          }
+        }
+      }
 
       // Top equipment brands from sample installations
       if (installations.length > 0) {
