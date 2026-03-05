@@ -8,6 +8,7 @@ import type { CompanyProfile } from "@/types/solar";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 import DemoContactModal from "@/components/DemoContactModal";
+import DemoAlert from "@/components/DemoAlert";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
@@ -48,6 +49,7 @@ function CompanyContent() {
   const [company, setCompany] = useState<CompanyProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string } | null>(null);
 
   // Installations table state
   const [sortKey, setSortKey] = useState<InstSortKey>("date");
@@ -66,7 +68,15 @@ function CompanyContent() {
     params.set("role", role);
 
     fetch(withDemoToken(`${API_BASE}/company?${params}`))
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok && isDemo && [429, 403, 503, 401].includes(res.status)) {
+          return res.json().then((data) => {
+            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after });
+            return { data: null };
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setCompany(data.data);
@@ -143,6 +153,13 @@ function CompanyContent() {
 
   if (!id && !name) return <div className="text-gray-500">No entity ID or name provided</div>;
   if (loading) return <LoadingSpinner text="Loading profile..." />;
+  if (demoError) return (
+    <div className="space-y-6">
+      <DemoBanner />
+      <a href="/solar/directory/" className="text-blue-600 hover:underline text-sm">&larr; Back to directory</a>
+      <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} />
+    </div>
+  );
   if (error) return <div className="text-red-600">Error: {error}</div>;
   if (!company) return <div className="text-gray-500">Entity not found</div>;
 

@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import type { Installation, Equipment, SiteEvent } from "@/types/solar";
-import { withDemoToken } from "@/lib/demoAccess";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
+import DemoAlert from "@/components/DemoAlert";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
@@ -50,11 +51,21 @@ function SiteContent() {
   const [site, setSite] = useState<SiteDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string } | null>(null);
+  const isDemo = isDemoMode();
 
   useEffect(() => {
     if (!id) return;
     fetch(withDemoToken(`${API_BASE}/installation?id=${id}`))
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok && isDemo && [429, 403, 503, 401].includes(res.status)) {
+          return res.json().then((data) => {
+            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after });
+            return { data: null };
+          });
+        }
+        return res.json();
+      })
       .then((data) => setSite(data.data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -62,6 +73,13 @@ function SiteContent() {
 
   if (!id) return <div className="text-gray-500">No site ID provided</div>;
   if (loading) return <LoadingSpinner text="Loading site details..." />;
+  if (demoError) return (
+    <div className="space-y-6">
+      <DemoBanner />
+      <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">&larr; Back to installations</a>
+      <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} />
+    </div>
+  );
   if (error) return <div className="text-red-600">Error: {error}</div>;
   if (!site) return <div className="text-gray-500">Site not found</div>;
 

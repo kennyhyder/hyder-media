@@ -6,6 +6,7 @@ import type { Pagination } from "@/types/solar";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 import DemoContactModal from "@/components/DemoContactModal";
+import DemoAlert from "@/components/DemoAlert";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
@@ -87,6 +88,7 @@ function EquipmentContent() {
   const [hasModel, setHasModel] = useState(false);
   const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string } | null>(null);
   const isDemo = isDemoMode();
 
   // Map frontend sort keys to API column names (RPC handles join sorts)
@@ -119,8 +121,17 @@ function EquipmentContent() {
       if (hasLocation) params.set("has_location", "true");
 
       try {
+        setDemoError(null);
         const res = await fetch(withDemoToken(`${API_BASE}/equipment?${params}`));
         const data = await res.json();
+        if (!res.ok) {
+          if (isDemo && (res.status === 429 || res.status === 403 || res.status === 503 || res.status === 401)) {
+            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after });
+            setResults([]);
+            setPagination(null);
+          }
+          return;
+        }
         setResults(data.data || []);
         setPagination(data.pagination);
       } catch (err) {
@@ -292,6 +303,15 @@ function EquipmentContent() {
           Include records without manufacturer/model
         </label>
       </div>
+
+      {demoError && (
+        <DemoAlert
+          error={demoError.error}
+          status={demoError.status}
+          retryAfter={demoError.retryAfter}
+          onDismiss={() => setDemoError(null)}
+        />
+      )}
 
       {loading ? (
         <LoadingSpinner text="Searching equipment..." />
