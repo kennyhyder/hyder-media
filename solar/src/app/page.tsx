@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DemoBanner from "@/components/DemoBanner";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -60,7 +61,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-500">Loading dashboard...</div>
+        <LoadingSpinner text="Loading dashboard..." />
       </div>
     );
   }
@@ -186,7 +187,7 @@ export default function HomePage() {
           href="/solar/search/"
           className="bg-blue-600 text-white rounded-lg p-6 hover:bg-blue-700 transition"
         >
-          <h3 className="font-bold text-lg">Search Sites</h3>
+          <h3 className="font-bold text-lg">Browse Installations</h3>
           <p className="text-blue-100 text-sm mt-1">
             Filter by state, capacity, date, and equipment
           </p>

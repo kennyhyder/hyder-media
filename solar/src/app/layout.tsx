@@ -38,7 +38,7 @@ export default function RootLayout({
             </a>
             <div className="flex gap-6 text-sm">
               <a href="/solar/" className="text-gray-600 hover:text-blue-600">Dashboard</a>
-              <a href="/solar/search/" className="text-gray-600 hover:text-blue-600">Search</a>
+              <a href="/solar/search/" className="text-gray-600 hover:text-blue-600">Installations</a>
               <a href="/solar/equipment/" className="text-gray-600 hover:text-blue-600">Equipment</a>
               <a href="/solar/directory/" className="text-gray-600 hover:text-blue-600">Directory</a>
             </div>

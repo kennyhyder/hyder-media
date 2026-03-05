@@ -8,6 +8,7 @@ import type { DirectoryEntity, Pagination } from "@/types/solar";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 import DemoContactModal from "@/components/DemoContactModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -178,7 +179,7 @@ function DirectoryContent() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading directory...</div>
+        <LoadingSpinner text="Loading directory..." />
       ) : (
         <>
           {pagination && (
@@ -322,7 +323,7 @@ function DirectoryContent() {
 
 export default function DirectoryPage() {
   return (
-    <Suspense fallback={<div className="text-gray-500 py-12 text-center">Loading directory...</div>}>
+    <Suspense fallback={<LoadingSpinner text="Loading directory..." />}>
       <DirectoryContent />
     </Suspense>
   );
