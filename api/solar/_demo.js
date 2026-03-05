@@ -1,10 +1,54 @@
 import { createClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
 
 function getSupabase() {
   return createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY
   );
+}
+
+/**
+ * Fire-and-forget email alert for demo usage milestones.
+ * Never awaited — doesn't slow down API responses.
+ */
+const ALERT_MILESTONES = [1, 25, 50, 100, 250, 400, 475, 500];
+
+function maybeSendDemoAlert(label, token, lifetimeTotal, lifetimeLimit, eventType) {
+  // Check milestone alerts
+  let subject, body;
+
+  if (eventType === "limit_hit") {
+    subject = `SolarTrack Demo: ${label} hit lifetime limit (${lifetimeLimit} requests)`;
+    body = `Demo token "${label}" has reached its lifetime limit of ${lifetimeLimit} requests.\n\nToken: ${token.slice(0, 8)}...\nTotal requests: ${lifetimeTotal}\n\nThey will no longer be able to access the platform with this token.`;
+  } else if (eventType === "rate_limit") {
+    subject = `SolarTrack Demo: ${label} hit rate limit (${lifetimeTotal} lifetime)`;
+    body = `Demo token "${label}" just hit an hourly or daily rate limit.\n\nToken: ${token.slice(0, 8)}...\nLifetime requests so far: ${lifetimeTotal}${lifetimeLimit ? ` / ${lifetimeLimit}` : ""}`;
+  } else if (ALERT_MILESTONES.includes(lifetimeTotal)) {
+    const pct = lifetimeLimit ? Math.round((lifetimeTotal / lifetimeLimit) * 100) : null;
+    const pctStr = pct ? ` (${pct}% of limit)` : "";
+    if (lifetimeTotal === 1) {
+      subject = `SolarTrack Demo: ${label} just started using the platform`;
+      body = `Demo token "${label}" was just used for the first time.\n\nToken: ${token.slice(0, 8)}...\nLifetime limit: ${lifetimeLimit || "none"}`;
+    } else {
+      subject = `SolarTrack Demo: ${label} — ${lifetimeTotal} requests${pctStr}`;
+      body = `Demo token "${label}" has now made ${lifetimeTotal} requests${pctStr}.\n\nToken: ${token.slice(0, 8)}...\nLifetime limit: ${lifetimeLimit || "none"}\nRemaining: ${lifetimeLimit ? lifetimeLimit - lifetimeTotal : "unlimited"}`;
+    }
+  } else {
+    return; // Not a milestone, skip
+  }
+
+  // Fire and forget — no await
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+  transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+    subject,
+    text: body,
+  }).catch((err) => console.error("Demo alert email failed:", err.message));
 }
 
 /**
@@ -65,6 +109,7 @@ export async function checkDemoAccess(req, res) {
 
   // Check lifetime limit (permanent expiry)
   if (lifetimeLimit && lifetimeTotal > lifetimeLimit) {
+    maybeSendDemoAlert(tokenRow.label, token, lifetimeTotal, lifetimeLimit, "limit_hit");
     res.status(403).json({
       error: "Demo access has expired (lifetime limit reached)",
       contact: "kenny@hyder.me",
@@ -74,6 +119,7 @@ export async function checkDemoAccess(req, res) {
   }
 
   if (hourlyTotal > tokenRow.hourly_limit) {
+    maybeSendDemoAlert(tokenRow.label, token, lifetimeTotal, lifetimeLimit, "rate_limit");
     res.status(429).json({
       error: "Hourly rate limit exceeded",
       contact: "kenny@hyder.me",
@@ -84,6 +130,7 @@ export async function checkDemoAccess(req, res) {
   }
 
   if (dailyTotal > tokenRow.daily_limit) {
+    maybeSendDemoAlert(tokenRow.label, token, lifetimeTotal, lifetimeLimit, "rate_limit");
     res.status(429).json({
       error: "Daily rate limit exceeded",
       contact: "kenny@hyder.me",
@@ -92,6 +139,9 @@ export async function checkDemoAccess(req, res) {
     });
     return null;
   }
+
+  // Send milestone alerts (fire-and-forget)
+  maybeSendDemoAlert(tokenRow.label, token, lifetimeTotal, lifetimeLimit, "milestone");
 
   return {
     mode: "demo",
