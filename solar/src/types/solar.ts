@@ -35,6 +35,8 @@ export interface Installation {
   cost_per_watt: number | null;
   data_source_id: string | null;
   source_record_id: string | null;
+  site_boundary?: { type: string; coordinates: number[][][] } | null;
+  area_m2?: number | null;
   created_at: string;
   updated_at: string;
   equipment?: Equipment[];
