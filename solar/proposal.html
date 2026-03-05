@@ -567,8 +567,8 @@
             </div>
             <div class="compare-card ours">
                 <div class="compare-label">Actual Investment</div>
-                <div class="compare-amount">~$48K</div>
-                <div class="compare-note">160+ hours of expert-level development</div>
+                <div class="compare-amount">~$50K</div>
+                <div class="compare-note">160+ hours of development + infrastructure costs</div>
             </div>
         </div>
 
@@ -597,16 +597,21 @@
         </details>
 
         <details>
-            <summary>What was actually built</summary>
+            <summary>How the actual investment breaks down</summary>
             <div class="details-content">
-                <ul>
-                    <li><strong>60+ data ingestion scripts</strong> &mdash; 26 primary sources, 75 municipal permit scrapers, all idempotent and re-runnable</li>
-                    <li><strong>30+ enrichment pipelines</strong> &mdash; Cross-referencing, geocoding, reverse geocoding, entity linking, storm matching, parcel ownership lookups</li>
-                    <li><strong>7 API endpoints</strong> &mdash; Search, detail, equipment, installers, stats, export, and demo access management</li>
-                    <li><strong>5-page web interface</strong> &mdash; Dashboard, search, equipment, site detail, and installer directory with Leaflet satellite maps</li>
-                    <li><strong>NREL satellite classification pipeline</strong> &mdash; Faster R-CNN model classifying 86K+ satellite images for mount type (ground vs rooftop vs carport)</li>
-                    <li><strong>Automated update system</strong> &mdash; Single command to check data freshness, run stale ingestion, and re-enrich the full database</li>
-                </ul>
+                <table>
+                    <thead>
+                        <tr><th>Item</th><th>Description</th><th class="right">Cost</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="bold">Development (160+ hours)</td><td>60+ ingestion scripts, 30+ enrichment pipelines, 7 API endpoints, 5-page web interface, satellite classification pipeline, automated update system</td><td class="right">$38,400</td></tr>
+                        <tr><td class="bold">Development Overhead</td><td>AI-augmented tooling, compute resources, development environment, DigitalOcean droplet for NREL model classification</td><td class="right">$5,200</td></tr>
+                        <tr><td class="bold">API &amp; Token Costs</td><td>Google Maps Static API (86K satellite tiles), Google Places API (entity enrichment), Supabase database hosting, Vercel deployment</td><td class="right">$3,100</td></tr>
+                        <tr><td class="bold">Data Purchases</td><td>SEIA Major Projects List ($1K/yr membership)</td><td class="right">$1,000</td></tr>
+                        <tr><td class="bold">Research &amp; Data Sourcing</td><td>101 data source identification, API reverse-engineering, permit portal discovery, enrichment layer research</td><td class="right">$2,300</td></tr>
+                        <tr class="total-row"><td>Total Actual Investment</td><td></td><td class="right">~$50,000</td></tr>
+                    </tbody>
+                </table>
             </div>
         </details>
 
