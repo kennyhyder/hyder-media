@@ -212,6 +212,8 @@
         .tier-card.featured .tier-label { color: var(--blue); }
         .tier-icon { font-size: 2rem; margin-bottom: 12px; }
         .tier-title { font-size: 1.15rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+        .tier-price { font-size: 2rem; font-weight: 700; color: var(--blue); margin-bottom: 16px; line-height: 1.2; }
+        .tier-card.featured .tier-price { color: var(--green); }
         .tier-desc { font-size: 0.9rem; color: var(--gray-500); line-height: 1.5; }
         .tier-desc ul { text-align: left; padding-left: 16px; margin-top: 12px; }
         .tier-desc li { font-size: 0.85rem; margin-bottom: 4px; }
@@ -708,49 +710,37 @@
         <h2>Working Together</h2>
         <p class="lead">SolarTrack was built with Blue Water Battery in mind. The question isn't whether this data has value &mdash; it's how we want to structure access and continued development.</p>
 
-        <p>There are several ways this could work, each with different levels of access, customization, and ongoing investment. These aren't fixed packages &mdash; they're starting points for a conversation.</p>
-
-        <div class="tier-cards">
-            <div class="tier-card">
-                <div class="tier-icon">&#128272;</div>
-                <div class="tier-label">Option A</div>
-                <div class="tier-title">Data License</div>
-                <div class="tier-desc">
-                    Annual access to the full database with regular data refreshes and updates.
-                    <ul>
-                        <li>Full search, filter, and export access</li>
-                        <li>Monthly data refreshes (automated)</li>
-                        <li>Ongoing enrichment as new sources emerge</li>
-                        <li>Support and training</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="tier-cards" style="grid-template-columns: 1fr 1fr;">
             <div class="tier-card featured">
                 <div class="tier-icon">&#129309;</div>
-                <div class="tier-label">Option B</div>
-                <div class="tier-title">Development Partnership</div>
+                <div class="tier-label">Recommended</div>
+                <div class="tier-title">Founding Development Partnership</div>
+                <div class="tier-price">$24,000</div>
                 <div class="tier-desc">
-                    Co-invest in building out the platform with shared direction over the roadmap and mutual ownership.
+                    Blue Water Battery becomes the founding partner of SolarTrack &mdash; full platform access, direct input on the roadmap, and preferential terms as the platform grows.
                     <ul>
-                        <li>Everything in Option A</li>
-                        <li>Priority feature development</li>
-                        <li>API access for CRM integration</li>
-                        <li>Input on development roadmap</li>
-                        <li>Revenue sharing on future SaaS licensing</li>
+                        <li>Full unlimited search, filter, and export access</li>
+                        <li>Automated monthly data refreshes and enrichment</li>
+                        <li>Priority feature development for Blue Water Battery's equipment sourcing needs</li>
+                        <li>API access for CRM / outreach tool integration</li>
+                        <li>Input on the development roadmap</li>
+                        <li>Year 1 platform maintenance and updates included</li>
+                        <li>Founding partner pricing locked in &mdash; any future licensing to other companies will be at market rates ($20K+/yr)</li>
                     </ul>
                 </div>
             </div>
             <div class="tier-card">
                 <div class="tier-icon">&#127969;</div>
-                <div class="tier-label">Option C</div>
+                <div class="tier-label">Alternative</div>
                 <div class="tier-title">Platform Acquisition</div>
+                <div class="tier-price" style="color: var(--gray-500);">Inquire</div>
                 <div class="tier-desc">
                     Full ownership of the codebase, data pipeline, and all intellectual property.
                     <ul>
                         <li>Complete source code transfer</li>
-                        <li>All 60+ ingestion scripts</li>
+                        <li>All 60+ ingestion scripts and 30+ enrichment pipelines</li>
                         <li>Database and pipeline documentation</li>
-                        <li>Transition support period</li>
+                        <li>Transition support and training period</li>
                         <li>No ongoing licensing fees</li>
                     </ul>
                 </div>
@@ -758,8 +748,9 @@
         </div>
 
         <div class="callout callout-green">
-            <div class="callout-title">The Partnership Option</div>
-            <p>Option B is where the most value gets created for both sides. Blue Water Battery gets a platform purpose-built for its equipment resale business, with direct influence over what gets built next. I continue to develop and maintain the platform with the solar aftermarket in mind. And if SolarTrack becomes a product that other companies want access to, we both benefit from that growth.</p>
+            <div class="callout-title">Why the Partnership Makes Sense</div>
+            <p>For context: comparable data products cost $20,000&ndash;$30,000 <em>per year</em>, and none of them offer the storm damage tracking, equipment aging intelligence, or parcel owner data that SolarTrack has. At $24K as a one-time founding partnership, Blue Water Battery gets a custom-built competitive advantage at a fraction of what the data alone would cost annually from existing providers.</p>
+            <p>I retain ownership of the platform and continue developing it. Blue Water Battery gets full access, founding partner pricing, and a say in what gets built. If SolarTrack becomes a product that other companies want &mdash; and at these data volumes, it will &mdash; Blue Water Battery is already in the door at the best terms anyone will ever get.</p>
         </div>
 
         <p>The original <a href="https://hyder.me/tokens/capex-12/business-plan" target="_blank" style="color: var(--blue); font-weight: 500;">SolarScore business plan</a> outlines the broader market opportunity for a solar data intelligence platform. SolarTrack is that vision, already in production.</p>
@@ -771,11 +762,11 @@
     <div class="section">
         <div class="section-number">Section 08</div>
         <h2>Next Steps</h2>
-        <p>This is a conversation, not a contract. Take the demo tokens for a spin, explore the data, and let's talk about which direction makes sense.</p>
+        <p>Take the demo tokens for a spin, explore the data, and let's talk.</p>
 
         <div class="get-started-card">
-            <h3>Let's Find the Right Structure</h3>
-            <p>Whether it's a subscription, a partnership, or something else entirely &mdash; the first step is the same.</p>
+            <h3>Let's Make This Happen</h3>
+            <p>The platform is built, the data is live, and the demo tokens are ready. The next step is a conversation about getting Blue Water Battery full access.</p>
             <a href="mailto:kenny@hyder.me?subject=SolarTrack%20%E2%80%94%20Blue%20Water%20Battery" class="cta-btn">Schedule a Call</a>
             <div class="contact-line">
                 <p><a href="mailto:kenny@hyder.me">kenny@hyder.me</a></p>
