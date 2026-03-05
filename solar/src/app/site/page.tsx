@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import type { Installation, Equipment, SiteEvent } from "@/types/solar";
 import { withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const InstallationMap = dynamic(() => import("@/components/InstallationMap"), {
   ssr: false,
@@ -60,7 +61,7 @@ function SiteContent() {
   }, [id]);
 
   if (!id) return <div className="text-gray-500">No site ID provided</div>;
-  if (loading) return <div className="text-gray-500 py-12 text-center">Loading site details...</div>;
+  if (loading) return <LoadingSpinner text="Loading site details..." />;
   if (error) return <div className="text-red-600">Error: {error}</div>;
   if (!site) return <div className="text-gray-500">Site not found</div>;
 
@@ -73,10 +74,10 @@ function SiteContent() {
       <DemoBanner />
       <div>
         <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">
-          &larr; Back to search
+          &larr; Back to installations
         </a>
         <h1 className="text-2xl font-bold mt-2">
-          {site.site_name || `${site.county || "Unknown"}, ${site.state}`}
+          {site.site_name || [site.city, site.county, site.state].filter(Boolean).join(", ") || "Unnamed Site"}
         </h1>
         <div className="flex flex-wrap gap-2 mt-2">
           <span className="capitalize bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-sm">
@@ -301,7 +302,7 @@ function SiteContent() {
 
 export default function SitePage() {
   return (
-    <Suspense fallback={<div className="text-gray-500 py-12 text-center">Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <SiteContent />
     </Suspense>
   );

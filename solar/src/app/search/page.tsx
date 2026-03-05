@@ -498,9 +498,9 @@ function SearchContent() {
                         href={`/solar/site/?id=${inst.id}`}
                         className="text-blue-600 hover:underline font-medium"
                       >
-                        {inst.site_name || inst.county || "Unknown"}
+                        {inst.site_name || [inst.city, inst.county, inst.state].filter(Boolean).join(", ") || "Unnamed Site"}
                       </a>
-                      {inst.county && inst.site_name && (
+                      {inst.site_name && inst.county && (
                         <div className="text-xs text-gray-400">{inst.county}</div>
                       )}
                     </td>

@@ -221,6 +221,9 @@ export default async function handler(req, res) {
       : role === "installer" ? "installer"
       : usedFk.replace("_id", "");
 
+    const isDemo = access.mode === "demo";
+    const instLimit = isDemo ? 10 : 100;
+
     const response = {
       data: {
         id: entity.id || null,
@@ -248,10 +251,10 @@ export default async function handler(req, res) {
         geographic_focus: entity.geographic_focus || null,
         project_type_distribution: entity.project_type_distribution || null,
         // Portfolio data
-        states,
-        timeline,
-        top_equipment,
-        installations: installations.slice(0, 100),
+        states: isDemo ? states.slice(0, 5) : states,
+        timeline: isDemo ? timeline.slice(-5) : timeline,
+        top_equipment: isDemo ? top_equipment.slice(0, 5) : top_equipment,
+        installations: installations.slice(0, instLimit),
         // Cross-role appearances
         cross_roles,
       },

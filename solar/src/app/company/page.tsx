@@ -426,15 +426,28 @@ function CompanyContent() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">
-              Installations ({filteredInstallations.length}{filterState || filterType || filterText ? ` of ${company.installations.length}` : ""})
+              Installations
+              {isDemo
+                ? ` (showing ${Math.min(filteredInstallations.length, 10)} of ${company.site_count.toLocaleString()})`
+                : ` (${filteredInstallations.length}${filterState || filterType || filterText ? ` of ${company.installations.length}` : ""})`
+              }
             </h2>
             {company.role !== "manufacturer" && company.id && (
-              <a
-                href={`/solar/search/?${(company as any).actual_role || company.role}_id=${company.id}&site_status=`}
-                className="text-sm text-blue-600 hover:underline"
-              >
-                View all {company.site_count.toLocaleString()} &rarr;
-              </a>
+              isDemo ? (
+                <button
+                  onClick={() => setShowContactModal(true)}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  View all {company.site_count.toLocaleString()} &rarr;
+                </button>
+              ) : (
+                <a
+                  href={`/solar/search/?${(company as any).actual_role || company.role}_id=${company.id}&site_status=`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  View all {company.site_count.toLocaleString()} &rarr;
+                </a>
+              )
             )}
           </div>
 
@@ -500,15 +513,15 @@ function CompanyContent() {
                 </tr>
               </thead>
               <tbody>
-                {filteredInstallations.map((inst) => (
+                {filteredInstallations.slice(0, isDemo ? 10 : undefined).map((inst) => (
                   <tr key={inst.id} className="border-b last:border-0 hover:bg-gray-50">
                     <td className="py-2 pr-4">
                       <a href={`/solar/site/?id=${inst.id}`} className="text-blue-600 hover:underline">
-                        {inst.site_name || "Unknown"}
+                        {inst.site_name || [inst.city, inst.state].filter(Boolean).join(", ") || "Unnamed Site"}
                       </a>
                     </td>
                     <td className="py-2 pr-4 text-gray-500">
-                      {[inst.city, inst.state].filter(Boolean).join(", ") || "-"}
+                      {inst.site_name ? ([inst.city, inst.state].filter(Boolean).join(", ") || "-") : (inst.state || "-")}
                     </td>
                     <td className="py-2 pr-4 capitalize">{inst.site_type}</td>
                     <td className="py-2 pr-4 text-right font-mono">

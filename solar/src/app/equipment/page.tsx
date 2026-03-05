@@ -6,6 +6,7 @@ import type { Pagination } from "@/types/solar";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import DemoBanner from "@/components/DemoBanner";
 import DemoContactModal from "@/components/DemoContactModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE =
   typeof window !== "undefined" && window.location.hostname === "localhost"
@@ -83,7 +84,7 @@ function EquipmentContent() {
   const [sortKey, setSortKey] = useState<SortKey>("capacity");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [includeEmpty, setIncludeEmpty] = useState(false);
-  const [hasModel, setHasModel] = useState(true);
+  const [hasModel, setHasModel] = useState(false);
   const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const isDemo = isDemoMode();
@@ -161,7 +162,7 @@ function EquipmentContent() {
       <div>
         <h1 className="text-2xl font-bold">Equipment Search</h1>
         <p className="text-gray-500 mt-1">
-          Search solar equipment across all installations by manufacturer, model, and age
+          Find specific panels, inverters, and other equipment across all installations. Search by manufacturer, model number, equipment type, and age to identify replacement and resale opportunities.
         </p>
       </div>
 
@@ -293,7 +294,7 @@ function EquipmentContent() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Searching...</div>
+        <LoadingSpinner text="Searching equipment..." />
       ) : (
         <>
           {pagination && (
@@ -352,7 +353,7 @@ function EquipmentContent() {
                         href={`/solar/site/?id=${eq.installation.id}`}
                         className="text-blue-600 hover:underline"
                       >
-                        {eq.installation.site_name || "Unknown"}
+                        {eq.installation.site_name || [eq.installation.city, eq.installation.state].filter(Boolean).join(", ") || "Unnamed Site"}
                       </a>
                     </td>
                     <td className="px-4 py-3">
@@ -419,7 +420,7 @@ function EquipmentContent() {
 
 export default function EquipmentPage() {
   return (
-    <Suspense fallback={<div className="text-gray-500">Loading equipment search...</div>}>
+    <Suspense fallback={<LoadingSpinner text="Loading equipment search..." />}>
       <EquipmentContent />
     </Suspense>
   );
