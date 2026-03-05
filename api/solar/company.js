@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { CompanyQuery, validate } from "./_validate.js";
-import { checkDemoAccess } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -232,9 +232,9 @@ export default async function handler(req, res) {
         actual_role: actualRole,
         state: entity.state || null,
         city: entity.city || null,
-        website: entity.website || null,
-        phone: entity.phone || null,
-        license_number: entity.license_number || null,
+        website: isDemo ? null : (entity.website || null),
+        phone: isDemo ? null : (entity.phone || null),
+        license_number: isDemo ? null : (entity.license_number || null),
         entity_type: entity.entity_type || null,
         // Stats
         site_count,
@@ -254,7 +254,7 @@ export default async function handler(req, res) {
         states: isDemo ? states.slice(0, 5) : states,
         timeline: isDemo ? timeline.slice(-5) : timeline,
         top_equipment: isDemo ? top_equipment.slice(0, 5) : top_equipment,
-        installations: installations.slice(0, instLimit),
+        installations: isDemo ? redactArrayForDemo(installations.slice(0, instLimit)) : installations.slice(0, instLimit),
         // Cross-role appearances
         cross_roles,
       },

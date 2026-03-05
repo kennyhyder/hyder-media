@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { InstallationQuery, validate } from "./_validate.js";
-import { checkDemoAccess } from "./_demo.js";
+import { checkDemoAccess, redactForDemo } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -49,12 +49,14 @@ export default async function handler(req, res) {
       .eq("installation_id", id)
       .order("event_date", { ascending: false });
 
+    const record = {
+      ...installation,
+      equipment: equipment || [],
+      events: events || [],
+    };
+
     return res.status(200).json({
-      data: {
-        ...installation,
-        equipment: equipment || [],
-        events: events || [],
-      },
+      data: access.mode === "demo" ? redactForDemo(record) : record,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

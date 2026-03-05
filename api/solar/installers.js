@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { InstallersQuery, validate } from "./_validate.js";
-import { checkDemoAccess } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error: error.message });
 
     return res.status(200).json({
-      data: data || [],
+      data: access.mode === "demo" ? redactArrayForDemo(data || []) : (data || []),
       pagination: {
         page: pageNum,
         limit: limitNum,

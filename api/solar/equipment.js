@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { EquipmentQuery, validate } from "./_validate.js";
-import { checkDemoAccess } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -64,8 +64,9 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ error: error.message });
 
     const total = rpcResult?.total || 0;
+    const eqData = rpcResult?.data || [];
     return res.status(200).json({
-      data: rpcResult?.data || [],
+      data: access.mode === "demo" ? redactArrayForDemo(eqData) : eqData,
       pagination: {
         page: pageNum,
         limit: limitNum,

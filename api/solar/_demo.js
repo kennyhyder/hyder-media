@@ -46,9 +46,10 @@ export async function checkDemoAccess(req, res) {
     .rpc("increment_demo_usage", { p_token: token });
 
   if (usageError) {
-    // If RPC fails, allow the request but log
+    // If RPC fails, block the request — don't silently allow unlimited access
     console.error("Demo usage tracking error:", usageError.message);
-    return { mode: "demo", label: tokenRow.label, dailyRemaining: 999, hourlyRemaining: 999 };
+    res.status(503).json({ error: "Demo access temporarily unavailable", contact: "kenny@hyder.me" });
+    return null;
   }
 
   const dailyTotal = usage?.[0]?.daily_total || 0;
@@ -78,4 +79,41 @@ export async function checkDemoAccess(req, res) {
     dailyRemaining: tokenRow.daily_limit - dailyTotal,
     hourlyRemaining: tokenRow.hourly_limit - hourlyTotal,
   };
+}
+
+/**
+ * Fields redacted from demo responses to protect commercial value.
+ * Demo users see site_type, state, county, capacity, dates, site_status —
+ * enough to evaluate the product, not enough to extract the database.
+ */
+const REDACTED_FIELDS = [
+  "owner_name", "developer_name", "installer_name", "operator_name",
+  "address", "zip_code",
+  "owner_id", "developer_id", "installer_id", "operator_id",
+  "total_cost", "cost_per_watt", "offtaker_name", "ppa_price_mwh",
+  "source_record_id", "crossref_ids", "data_source_id",
+];
+
+/**
+ * Redact sensitive fields from an installation record for demo mode.
+ * Replaces values with null and adds a demo_redacted flag.
+ */
+export function redactForDemo(record) {
+  if (!record) return record;
+  const redacted = { ...record };
+  for (const field of REDACTED_FIELDS) {
+    if (field in redacted && redacted[field] != null) {
+      redacted[field] = null;
+    }
+  }
+  redacted._demo_redacted = true;
+  return redacted;
+}
+
+/**
+ * Redact an array of records for demo mode.
+ */
+export function redactArrayForDemo(records) {
+  if (!records) return records;
+  return records.map(redactForDemo);
 }

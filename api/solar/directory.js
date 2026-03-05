@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { DirectoryQuery, validate } from "./_validate.js";
-import { checkDemoAccess } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -37,16 +37,19 @@ export default async function handler(req, res) {
     const { page: pageNum, limit: limitNum, type, name, state, sort, order, min_sites } = params;
     const offset = (pageNum - 1) * limitNum;
 
+    const isDemo = access.mode === "demo";
+    const redact = (arr) => isDemo ? redactArrayForDemo(arr) : arr;
+
     if (type === "manufacturer") {
-      return await handleManufacturers(supabase, { name, limitNum, offset, min_sites }, res, pageNum);
+      return await handleManufacturers(supabase, { name, limitNum, offset, min_sites }, res, pageNum, redact);
     }
 
     if (type === "installer") {
-      return await handleInstallers(supabase, { name, state, sort, order, limitNum, offset, min_sites }, res, pageNum);
+      return await handleInstallers(supabase, { name, state, sort, order, limitNum, offset, min_sites }, res, pageNum, redact);
     }
 
     if (type === "owner" || type === "developer" || type === "operator") {
-      return await handleOwners(supabase, { type, name, state, sort, order, limitNum, offset, min_sites }, res, pageNum);
+      return await handleOwners(supabase, { type, name, state, sort, order, limitNum, offset, min_sites }, res, pageNum, redact);
     }
 
     // type === "all" — run installer + owner + manufacturer in parallel, merge
@@ -67,7 +70,7 @@ export default async function handler(req, res) {
     const page_data = merged.slice(offset, offset + limitNum);
 
     return res.status(200).json({
-      data: page_data,
+      data: redact(page_data),
       pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) },
     });
   } catch (err) {
@@ -75,7 +78,7 @@ export default async function handler(req, res) {
   }
 }
 
-async function handleManufacturers(supabase, { name, limitNum, offset, min_sites }, res, pageNum) {
+async function handleManufacturers(supabase, { name, limitNum, offset, min_sites }, res, pageNum, redact) {
   const { data, error } = await supabase.rpc("solar_manufacturer_directory", {
     p_name: name || null,
     p_limit: limitNum,
@@ -98,12 +101,12 @@ async function handleManufacturers(supabase, { name, limitNum, offset, min_sites
   }));
 
   return res.status(200).json({
-    data: results,
+    data: redact(results),
     pagination: { page: pageNum, limit: limitNum, total: results.length < limitNum ? offset + results.length : offset + limitNum + 1, totalPages: results.length < limitNum ? pageNum : pageNum + 1 },
   });
 }
 
-async function handleInstallers(supabase, { name, state, sort, order, limitNum, offset, min_sites }, res, pageNum) {
+async function handleInstallers(supabase, { name, state, sort, order, limitNum, offset, min_sites }, res, pageNum, redact) {
   let query = supabase.from("solar_installers").select("*", { count: "estimated" });
   if (name) query = query.ilike("name", `%${name}%`);
   if (state) query = query.eq("state", state);
@@ -139,12 +142,12 @@ async function handleInstallers(supabase, { name, state, sort, order, limitNum, 
   }));
 
   return res.status(200).json({
-    data: results,
+    data: redact(results),
     pagination: { page: pageNum, limit: limitNum, total: count || 0, totalPages: Math.ceil((count || 0) / limitNum) },
   });
 }
 
-async function handleOwners(supabase, { type, name, state, sort, order, limitNum, offset, min_sites }, res, pageNum) {
+async function handleOwners(supabase, { type, name, state, sort, order, limitNum, offset, min_sites }, res, pageNum, redact) {
   // solar_site_owners has site_count and owned_capacity_mw pre-computed
   let query = supabase.from("solar_site_owners").select("*", { count: "estimated" });
   if (name) query = query.ilike("name", `%${name}%`);
@@ -186,7 +189,7 @@ async function handleOwners(supabase, { type, name, state, sort, order, limitNum
   }));
 
   return res.status(200).json({
-    data: results,
+    data: redact(results),
     pagination: { page: pageNum, limit: limitNum, total: count || 0, totalPages: Math.ceil((count || 0) / limitNum) },
   });
 }
