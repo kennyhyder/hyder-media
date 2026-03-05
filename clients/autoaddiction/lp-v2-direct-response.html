@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classic Car Mechanic & Restoration | Auto Addiction OC | Orange County, CA</title>
     <meta name="description" content="Expert classic car repair, restoration & custom paint for pre-1975 vehicles. BASF certified. Lake Forest, CA. Free estimates. Call (949) 299-2499.">
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T2DHRD3Q');</script>
+
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -605,6 +613,9 @@
     </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2DHRD3Q"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Sticky Header -->
 <header class="sticky-header">
@@ -837,6 +848,46 @@
         <a href="https://www.facebook.com/autoaddictionoc" target="_blank">Facebook</a>
     </p>
 </footer>
+
+<script>
+document.querySelector('.form-card form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('.form-submit-btn');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    const data = {
+        name: form.querySelector('[name="name"]').value,
+        phone: form.querySelector('[name="phone"]').value,
+        email: form.querySelector('[name="email"]').value,
+        service: form.querySelector('[name="service"]').value,
+        message: form.querySelector('[name="message"]').value,
+    };
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'generate_lead',
+        'lead_source': 'landing_page_v2',
+        'service_type': data.service
+    });
+
+    const subject = encodeURIComponent('LP Inquiry: ' + data.service + ' - ' + data.name);
+    const body = encodeURIComponent(
+        'Name: ' + data.name + '\nPhone: ' + data.phone + '\nEmail: ' + data.email +
+        '\nService: ' + data.service + '\nMessage: ' + data.message + '\nSource: Landing Page V2'
+    );
+
+    form.innerHTML = '<div style="text-align:center;padding:40px 0;">' +
+        '<div style="font-size:2.5rem;margin-bottom:16px;">&#9989;</div>' +
+        '<h3 style="color:#fff;margin-bottom:8px;">Thank You!</h3>' +
+        '<p style="color:#9CA3AF;margin-bottom:20px;">We\'ll contact you within 1 business day.<br>For immediate help, call us directly.</p>' +
+        '<a href="tel:+19492992499" style="color:#D4A843;font-size:1.2rem;font-weight:700;text-decoration:none;">(949) 299-2499</a>' +
+        '</div>';
+
+    window.open('mailto:Inquire@AutoAddictionOC.com?subject=' + subject + '&body=' + body, '_self');
+});
+</script>
 
 </body>
 </html>
