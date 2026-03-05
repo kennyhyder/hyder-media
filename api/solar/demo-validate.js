@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from("solar_demo_tokens")
-      .select("label, expires_at, is_active")
+      .select("label, expires_at, is_active, lifetime_limit")
       .eq("token", token)
       .eq("is_active", true)
       .single();
@@ -31,6 +31,18 @@ export default async function handler(req, res) {
 
     if (data.expires_at && new Date(data.expires_at) < new Date()) {
       return res.status(200).json({ valid: false, error: "Token expired" });
+    }
+
+    // Check lifetime limit
+    if (data.lifetime_limit) {
+      const { data: usageRows } = await supabase
+        .from("solar_demo_usage")
+        .select("request_count")
+        .eq("token", token);
+      const lifetime = (usageRows || []).reduce((sum, r) => sum + r.request_count, 0);
+      if (lifetime >= data.lifetime_limit) {
+        return res.status(200).json({ valid: false, error: "Demo access expired (lifetime limit reached)" });
+      }
     }
 
     return res.status(200).json({ valid: true, label: data.label });

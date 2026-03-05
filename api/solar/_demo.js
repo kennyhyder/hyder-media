@@ -54,13 +54,31 @@ export async function checkDemoAccess(req, res) {
 
   const dailyTotal = usage?.[0]?.daily_total || 0;
   const hourlyTotal = usage?.[0]?.hourly_total || 0;
+  const lifetimeTotal = Number(usage?.[0]?.lifetime_total || 0);
+  const lifetimeLimit = tokenRow.lifetime_limit || null;
+
+  const limitsPayload = {
+    hourly_limit: tokenRow.hourly_limit, daily_limit: tokenRow.daily_limit,
+    hourly_used: hourlyTotal, daily_used: dailyTotal,
+    lifetime_limit: lifetimeLimit, lifetime_used: lifetimeTotal,
+  };
+
+  // Check lifetime limit (permanent expiry)
+  if (lifetimeLimit && lifetimeTotal > lifetimeLimit) {
+    res.status(403).json({
+      error: "Demo access has expired (lifetime limit reached)",
+      contact: "kenny@hyder.me",
+      demo_limits: limitsPayload,
+    });
+    return null;
+  }
 
   if (hourlyTotal > tokenRow.hourly_limit) {
     res.status(429).json({
       error: "Hourly rate limit exceeded",
       contact: "kenny@hyder.me",
       retry_after: "in about an hour",
-      demo_limits: { hourly_limit: tokenRow.hourly_limit, daily_limit: tokenRow.daily_limit, hourly_used: hourlyTotal, daily_used: dailyTotal },
+      demo_limits: limitsPayload,
     });
     return null;
   }
@@ -70,7 +88,7 @@ export async function checkDemoAccess(req, res) {
       error: "Daily rate limit exceeded",
       contact: "kenny@hyder.me",
       retry_after: "tomorrow",
-      demo_limits: { hourly_limit: tokenRow.hourly_limit, daily_limit: tokenRow.daily_limit, hourly_used: hourlyTotal, daily_used: dailyTotal },
+      demo_limits: limitsPayload,
     });
     return null;
   }
@@ -82,6 +100,9 @@ export async function checkDemoAccess(req, res) {
     dailyLimit: tokenRow.daily_limit,
     dailyRemaining: tokenRow.daily_limit - dailyTotal,
     hourlyRemaining: tokenRow.hourly_limit - hourlyTotal,
+    lifetimeLimit: lifetimeLimit,
+    lifetimeUsed: lifetimeTotal,
+    lifetimeRemaining: lifetimeLimit ? lifetimeLimit - lifetimeTotal : null,
   };
 }
 
@@ -133,5 +154,7 @@ export function demoLimitsPayload(access) {
     daily_limit: access.dailyLimit,
     hourly_remaining: access.hourlyRemaining,
     daily_remaining: access.dailyRemaining,
+    lifetime_limit: access.lifetimeLimit,
+    lifetime_remaining: access.lifetimeRemaining,
   };
 }
