@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { InstallationsQuery, validate } from "./_validate.js";
-import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo, demoLimitsPayload } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -41,6 +41,7 @@ export default async function handler(req, res) {
         error: "Demo access limited to first page",
         demo_restricted: true,
         contact: "kenny@hyder.me",
+        demo_limits: demoLimitsPayload(access),
       });
     }
   }
@@ -147,6 +148,7 @@ export default async function handler(req, res) {
           total,
           totalPages: Math.ceil(total / limitNum),
         },
+        demo_limits: demoLimitsPayload(access),
       });
     }
 
@@ -175,6 +177,7 @@ export default async function handler(req, res) {
         total: count || 0,
         totalPages: Math.ceil((count || 0) / limitNum),
       },
+      demo_limits: demoLimitsPayload(access),
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

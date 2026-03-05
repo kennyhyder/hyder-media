@@ -45,7 +45,7 @@ function DirectoryContent() {
   });
   const [page, setPage] = useState(1);
   const [showContactModal, setShowContactModal] = useState(false);
-  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string } | null>(null);
+  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string; limits?: { hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } } | null>(null);
   const isDemo = isDemoMode();
 
   const search = useCallback(
@@ -61,7 +61,7 @@ function DirectoryContent() {
         const data = await res.json();
         if (!res.ok) {
           if (isDemo && (res.status === 429 || res.status === 403 || res.status === 503 || res.status === 401)) {
-            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after });
+            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after, limits: data.demo_limits || null });
             setResults([]);
             setPagination(null);
           }
@@ -194,6 +194,7 @@ function DirectoryContent() {
           error={demoError.error}
           status={demoError.status}
           retryAfter={demoError.retryAfter}
+          limits={demoError.limits}
           onDismiss={() => setDemoError(null)}
         />
       )}

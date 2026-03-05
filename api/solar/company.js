@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { CompanyQuery, validate } from "./_validate.js";
-import { checkDemoAccess, redactArrayForDemo } from "./_demo.js";
+import { checkDemoAccess, redactArrayForDemo, demoLimitsPayload } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -225,6 +225,7 @@ export default async function handler(req, res) {
     const instLimit = isDemo ? 10 : 100;
 
     const response = {
+      demo_limits: demoLimitsPayload(access),
       data: {
         id: entity.id || null,
         name: entity.name,

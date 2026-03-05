@@ -59,7 +59,8 @@ export async function checkDemoAccess(req, res) {
     res.status(429).json({
       error: "Hourly rate limit exceeded",
       contact: "kenny@hyder.me",
-      retry_after: "1 hour",
+      retry_after: "in about an hour",
+      demo_limits: { hourly_limit: tokenRow.hourly_limit, daily_limit: tokenRow.daily_limit, hourly_used: hourlyTotal, daily_used: dailyTotal },
     });
     return null;
   }
@@ -69,6 +70,7 @@ export async function checkDemoAccess(req, res) {
       error: "Daily rate limit exceeded",
       contact: "kenny@hyder.me",
       retry_after: "tomorrow",
+      demo_limits: { hourly_limit: tokenRow.hourly_limit, daily_limit: tokenRow.daily_limit, hourly_used: hourlyTotal, daily_used: dailyTotal },
     });
     return null;
   }
@@ -76,6 +78,8 @@ export async function checkDemoAccess(req, res) {
   return {
     mode: "demo",
     label: tokenRow.label,
+    hourlyLimit: tokenRow.hourly_limit,
+    dailyLimit: tokenRow.daily_limit,
     dailyRemaining: tokenRow.daily_limit - dailyTotal,
     hourlyRemaining: tokenRow.hourly_limit - hourlyTotal,
   };
@@ -116,4 +120,18 @@ export function redactForDemo(record) {
 export function redactArrayForDemo(records) {
   if (!records) return records;
   return records.map(redactForDemo);
+}
+
+/**
+ * Build demo_limits object to include in successful API responses.
+ * Returns undefined for full-access users (omitted from JSON).
+ */
+export function demoLimitsPayload(access) {
+  if (!access || access.mode !== "demo") return undefined;
+  return {
+    hourly_limit: access.hourlyLimit,
+    daily_limit: access.dailyLimit,
+    hourly_remaining: access.hourlyRemaining,
+    daily_remaining: access.dailyRemaining,
+  };
 }

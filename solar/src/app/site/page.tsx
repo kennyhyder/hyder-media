@@ -51,7 +51,7 @@ function SiteContent() {
   const [site, setSite] = useState<SiteDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string } | null>(null);
+  const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string; limits?: { hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } } | null>(null);
   const isDemo = isDemoMode();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function SiteContent() {
       .then((res) => {
         if (!res.ok && isDemo && [429, 403, 503, 401].includes(res.status)) {
           return res.json().then((data) => {
-            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after });
+            setDemoError({ error: data.error || "Demo access limited", status: res.status, retryAfter: data.retry_after, limits: data.demo_limits || null });
             return { data: null };
           });
         }
@@ -77,7 +77,7 @@ function SiteContent() {
     <div className="space-y-6">
       <DemoBanner />
       <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">&larr; Back to installations</a>
-      <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} />
+      <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} limits={demoError.limits} />
     </div>
   );
   if (error) return <div className="text-red-600">Error: {error}</div>;

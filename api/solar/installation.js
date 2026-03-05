@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { InstallationQuery, validate } from "./_validate.js";
-import { checkDemoAccess, redactForDemo } from "./_demo.js";
+import { checkDemoAccess, redactForDemo, demoLimitsPayload } from "./_demo.js";
 
 function getSupabase() {
   return createClient(
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       data: access.mode === "demo" ? redactForDemo(record) : record,
+      demo_limits: demoLimitsPayload(access),
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

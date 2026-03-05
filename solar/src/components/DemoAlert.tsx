@@ -1,13 +1,21 @@
 "use client";
 
+interface DemoLimits {
+  hourly_limit: number;
+  daily_limit: number;
+  hourly_remaining: number;
+  daily_remaining: number;
+}
+
 interface DemoAlertProps {
   error: string;
   status?: number;
   retryAfter?: string;
+  limits?: DemoLimits | null;
   onDismiss?: () => void;
 }
 
-export default function DemoAlert({ error, status, retryAfter, onDismiss }: DemoAlertProps) {
+export default function DemoAlert({ error, status, retryAfter, limits, onDismiss }: DemoAlertProps) {
   const isRateLimit = status === 429;
   const isPageLimit = status === 403;
   const isUnavailable = status === 503;
@@ -36,6 +44,16 @@ export default function DemoAlert({ error, status, retryAfter, onDismiss }: Demo
           <p className="text-sm text-amber-700 mt-1">{error}</p>
           {retryAfter && (
             <p className="text-xs text-amber-600 mt-1">Try again {retryAfter}.</p>
+          )}
+          {limits && (
+            <div className="mt-2 flex gap-4 text-xs text-amber-600">
+              <span>
+                Hourly: {limits.hourly_remaining}/{limits.hourly_limit} remaining
+              </span>
+              <span>
+                Daily: {limits.daily_remaining}/{limits.daily_limit} remaining
+              </span>
+            </div>
           )}
           <div className="mt-3 flex gap-2">
             <a
