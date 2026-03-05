@@ -71,12 +71,29 @@ export default async function handler(req, res) {
     if (end_date) query = query.lte("install_date", end_date);
     if (has_battery === "true") query = query.eq("has_battery_storage", true);
 
-    const { data, error } = await query
+    // When filtering by module_manufacturer with equipment included, fetch more rows
+    // since we'll filter post-query (PostgREST can't filter parents by embedded children)
+    const fetchLimit = module_manufacturer && include_equipment === "true" ? limitNum * 3 : limitNum;
+
+    const { data: rawData, error } = await query
       .order("install_date", { ascending: false })
-      .limit(limitNum);
+      .limit(fetchLimit);
 
     if (error) return res.status(500).json({ error: error.message });
-    if (!data || data.length === 0) return res.status(200).send("No results");
+    if (!rawData || rawData.length === 0) return res.status(200).send("No results");
+
+    // Filter by module_manufacturer if specified (post-query since equipment is embedded)
+    let data = rawData;
+    if (module_manufacturer && include_equipment === "true") {
+      const mfr = module_manufacturer.toLowerCase();
+      data = rawData.filter(inst => {
+        const equip = inst.equipment || [];
+        return equip.some(e => e.manufacturer && e.manufacturer.toLowerCase().includes(mfr));
+      }).slice(0, limitNum);
+    } else if (module_manufacturer) {
+      // Without include_equipment, we can't filter — just return as-is
+      data = rawData;
+    }
 
     // Build CSV
     const installationCols = [
