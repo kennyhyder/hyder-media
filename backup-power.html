@@ -847,7 +847,7 @@
                     pros: ["No electrician needed", "Move between rooms/locations", "Silent operation", "Indoor safe"],
                     cons: ["Higher $/kWh than installed systems", "Limited to ~7.2 kWh per unit"],
                     best: dailyKwh <= 8,
-                };
+                });
                 if (needs240 && numStations >= 2) {
                     configs[configs.length - 1].note240 = "Two DELTA Pro units + Double Voltage Hub provide 240V split-phase output.";
                 }
