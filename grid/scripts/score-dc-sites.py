@@ -180,10 +180,16 @@ def score_speed_to_power(site, queue_data):
 
     # Find queue summary for this state/ISO
     queue_depth = None
+    avg_wait = None
     for q in queue_data:
         if q.get('state') == state or q.get('iso') == iso:
             queue_depth = q.get('total_projects')
+            avg_wait = q.get('avg_wait_years')
             break
+
+    # Store queue info on site for patch output
+    site['_queue_depth'] = queue_depth
+    site['_avg_queue_wait_years'] = avg_wait
 
     # Fewer projects in queue = faster connection
     # 0 queue = 100, 30+ = 10
@@ -491,6 +497,12 @@ def main():
                 patch['nearest_dc_id'] = site['_nearest_dc_id']
                 patch['nearest_dc_name'] = site.get('_nearest_dc_name')
                 patch['nearest_dc_distance_km'] = site.get('_nearest_dc_distance_km')
+
+            # Add queue data from speed_to_power scoring
+            if site.get('_queue_depth') is not None:
+                patch['queue_depth'] = site['_queue_depth']
+            if site.get('_avg_queue_wait_years') is not None:
+                patch['avg_queue_wait_years'] = site['_avg_queue_wait_years']
 
             patches.append(patch)
             scored += 1

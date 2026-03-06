@@ -108,6 +108,12 @@
     },
     "api/grid/dc-export.js": {
       "maxDuration": 60
+    },
+    "api/grid/brownfield.js": {
+      "maxDuration": 30
+    },
+    "api/grid/corridor.js": {
+      "maxDuration": 30
     }
   }
 }

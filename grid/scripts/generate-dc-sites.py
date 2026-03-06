@@ -297,6 +297,8 @@ def main():
                     voltage = float(sub['max_voltage_kv']) if sub.get('max_voltage_kv') else None
                     break
 
+        existing_cap = float(bf['existing_capacity_mw']) if bf.get('existing_capacity_mw') else None
+
         candidates.append({
             'source_record_id': f'bf_{bf["id"][:12]}',
             'name': bf.get('name') or 'Brownfield Site',
@@ -307,9 +309,10 @@ def main():
             'nearest_substation_id': sub_id,
             'nearest_substation_distance_km': float(sub_dist) if sub_dist else None,
             'substation_voltage_kv': voltage,
+            'available_capacity_mw': existing_cap,  # Brownfield: available = existing grid connection
             'brownfield_id': bf['id'],
             'former_use': bf.get('former_use'),
-            'existing_capacity_mw': float(bf['existing_capacity_mw']) if bf.get('existing_capacity_mw') else None,
+            'existing_capacity_mw': existing_cap,
             'retirement_date': bf.get('retirement_date'),
             'cleanup_status': bf.get('cleanup_status'),
             'acreage': float(bf['acreage']) if bf.get('acreage') else None,
