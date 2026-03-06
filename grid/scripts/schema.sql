@@ -156,22 +156,27 @@ CREATE TABLE IF NOT EXISTS grid_wecc_paths (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ERCOT binding constraint history
+-- ERCOT binding constraint history (SCED shadow prices)
 CREATE TABLE IF NOT EXISTS grid_ercot_constraints (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  source_record_id TEXT NOT NULL UNIQUE,
-  constraint_name TEXT,
-  constraint_type TEXT,
-  hifld_id INTEGER,                     -- FK join to grid_transmission_lines.hifld_id
+  constraint_id TEXT,
+  constraint_name TEXT NOT NULL,
+  contingency_name TEXT,
+  from_station TEXT,
+  to_station TEXT,
+  from_station_kv NUMERIC(8,2),
+  to_station_kv NUMERIC(8,2),
   shadow_price NUMERIC(12,2),
-  mw_limit NUMERIC(10,2),
-  actual_mw NUMERIC(10,2),
-  binding_datetime TIMESTAMPTZ,
-  interval_count INTEGER,
-  state TEXT DEFAULT 'TX',
+  max_shadow_price NUMERIC(12,2),
+  limit_mw NUMERIC(10,2),
+  value_mw NUMERIC(10,2),
+  violated_mw NUMERIC(10,2),
+  interval_start TIMESTAMPTZ NOT NULL,
+  interval_end TIMESTAMPTZ,
 
   data_source_id UUID REFERENCES grid_data_sources(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(constraint_name, interval_start)
 );
 
 -- Indexes for performance
@@ -192,8 +197,9 @@ CREATE INDEX IF NOT EXISTS idx_grid_parcels_line ON grid_parcels(transmission_li
 CREATE INDEX IF NOT EXISTS idx_grid_parcels_state ON grid_parcels(state);
 CREATE INDEX IF NOT EXISTS idx_grid_parcels_geom ON grid_parcels USING GIST(geom);
 
-CREATE INDEX IF NOT EXISTS idx_grid_ercot_hifld ON grid_ercot_constraints(hifld_id);
+CREATE INDEX IF NOT EXISTS idx_grid_ercot_constraint ON grid_ercot_constraints(constraint_name);
 CREATE INDEX IF NOT EXISTS idx_grid_ercot_shadow ON grid_ercot_constraints(shadow_price DESC);
+CREATE INDEX IF NOT EXISTS idx_grid_ercot_interval ON grid_ercot_constraints(interval_start);
 
 -- Seed data sources
 INSERT INTO grid_data_sources (name, url, description) VALUES
