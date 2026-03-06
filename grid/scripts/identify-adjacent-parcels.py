@@ -66,75 +66,64 @@ DEG_PER_MILE_LON = 1.0 / 54.6  # ~0.0183 degrees (varies by latitude)
 
 PARCEL_ENDPOINTS = {
     "TX": {
-        "travis": {
-            "url": "https://taxmaps.traviscountytx.gov/arcgis/rest/services/Tax_Data/Parcels/MapServer/0",
-            "owner_field": "py_owner_name",
-            "parcel_id_field": "py_prop_id",
-            "acreage_field": "py_legal_acreage",
-            "address_field": "py_situs_addr",
-            "city_field": "py_situs_city",
-            "zip_field": "py_situs_zip",
-            "type": "MapServer",
-            "use_envelope": True,
-            "county": "TRAVIS",
-            "note": "Travis County (Austin). 373K parcels. CRS WKID 2277.",
-        },
         "statewide": {
-            "url": "https://feature.tnris.org/arcgis/rest/services/Parcels/stratmap25_land_parcels_48/MapServer/0",
+            "url": "https://feature.tnris.org/arcgis/rest/services/Parcels/stratmap_land_parcels_48_most_recent/MapServer/0",
             "owner_field": "owner_name",
-            "parcel_id_field": "parcel_id",
-            "acreage_field": "acreage",
-            "address_field": "situs_address",
+            "parcel_id_field": "prop_id",
+            "acreage_field": "legal_area",  # Text field like "15.9688 AC" — needs parsing
+            "address_field": "situs_addr",
             "city_field": "situs_city",
             "zip_field": "situs_zip",
             "type": "MapServer",
             "use_envelope": True,
-            "note": "TX statewide TNRIS parcels. Envelope queries required.",
+            "note": "TX statewide TNRIS parcels (stratmap most_recent). All 254 counties.",
         },
     },
     "NV": {
-        "clark": {
-            "url": "https://mapdata.lasvegasnevada.gov/arcgis/rest/services/AssessorParcelViewer/Parcels/MapServer/0",
-            "owner_field": "OWNER",
-            "parcel_id_field": "APN",
-            "acreage_field": None,
-            "address_field": "SITUS_ADDR",
-            "city_field": None,
-            "zip_field": None,
-            "type": "MapServer",
-            "use_envelope": True,
-            "county": "CLARK",
-            "note": "Clark County (Las Vegas). 830K parcels. WKID 3421.",
-        },
+        # Clark County owner names redacted from ALL public ArcGIS services.
+        # mapdata.lasvegasnevada.gov is dead (404), sandgate.clarkcountynv.gov DNS gone.
     },
     "AZ": {
         "maricopa": {
-            "url": "https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Basemaps/Parcel_Boundaries/MapServer/0",
-            "owner_field": "OwnerName",
+            "url": "https://gis.mcassessor.maricopa.gov/arcgis/rest/services/Parcels/MapServer/0",
+            "owner_field": "OWNER_NAME",
             "parcel_id_field": "APN",
-            "acreage_field": "LegalAcres",
-            "address_field": "SitusAddress",
-            "city_field": "SitusCity",
-            "zip_field": "SitusZip",
+            "acreage_field": "LAND_SIZE",  # Square feet, not acres
+            "address_field": "PHYSICAL_ADDRESS",
+            "city_field": "PHYSICAL_CITY",
+            "zip_field": "PHYSICAL_ZIP",
             "type": "MapServer",
             "use_envelope": True,
             "county": "MARICOPA",
-            "note": "Maricopa County (Phoenix). Largest AZ county.",
+            "note": "Maricopa County (Phoenix metro). ~60% of AZ installations.",
         },
     },
     "NM": {
         "bernalillo": {
             "url": "https://coagisweb.cabq.gov/arcgis/rest/services/public/BernCoParcels/MapServer/0",
             "owner_field": "OWNER",
-            "parcel_id_field": "TAXID",
-            "acreage_field": "ACRES",
-            "address_field": "SITEADDR",
-            "city_field": None,
-            "zip_field": None,
+            "parcel_id_field": "UPC",
+            "acreage_field": "ACREAGE",
+            "address_field": "SITUSADD",
+            "city_field": "SITUSCITY",
+            "zip_field": "SITUSZIP",
             "type": "MapServer",
             "use_envelope": True,
             "county": "BERNALILLO",
             "note": "Bernalillo County (Albuquerque).",
+        },
+        "las_cruces": {
+            "url": "https://maps.las-cruces.org/gis/rest/services/AccelaAPO/MapServer/3",
+            "owner_field": "NAME_1",
+            "parcel_id_field": "Account_Num",
+            "acreage_field": None,
+            "address_field": "MailADDRESS1",  # Mailing address, not situs
+            "city_field": "CITY",
+            "zip_field": "ZIP",
+            "type": "MapServer",
+            "use_envelope": True,
+            "county": "DONA ANA",
+            "note": "Las Cruces city (Dona Ana County).",
         },
     },
     "CA": {
@@ -153,21 +142,34 @@ PARCEL_ENDPOINTS = {
         },
     },
     "CO": {
-        "statewide": {
-            "url": "https://gis.colorado.gov/public/rest/services/Address_and_Parcel/Colorado_Public_Parcels/FeatureServer/0",
-            "owner_field": "owner",
-            "parcel_id_field": "parcelid",
-            "acreage_field": None,
-            "address_field": "physical_address",
-            "city_field": "physical_city",
-            "zip_field": "physical_zip",
+        "arapahoe": {
+            "url": "https://gis.arapahoegov.com/arcgis/rest/services/ACDA/ACDA/FeatureServer/0",
+            "owner_field": "Owner",
+            "parcel_id_field": "PARCEL_ID",
+            "acreage_field": "GIS_AREA",  # Square feet, not acres
+            "address_field": "Situs_Address",
+            "city_field": None,  # Situs_City_State_Zip is combined
+            "zip_field": None,
             "type": "FeatureServer",
             "use_envelope": True,
-            "note": "CO statewide composite (32 counties). Envelope required.",
+            "county": "ARAPAHOE",
+            "note": "Arapahoe County (Littleton/Centennial). CO has 0 upgrade candidates.",
         },
     },
     "UT": {
-        # No statewide parcel endpoint discovered yet
+        "utah_county": {
+            "url": "https://maps.utahcounty.gov/arcgis/rest/services/Parcels/Parcel_TaxParcels/MapServer/2",
+            "owner_field": "OWNER_NAME",
+            "parcel_id_field": "PARCELID",
+            "acreage_field": "ACREAGE",
+            "address_field": "SITE_FULL_ADDRESS",
+            "city_field": "SITE_CITY",
+            "zip_field": "SITE_ZIP5",
+            "type": "MapServer",
+            "use_envelope": True,
+            "county": "UTAH",
+            "note": "Utah County (Provo/Orem). UGRC statewide lacks owner names.",
+        },
     },
     "WY": {
         # No statewide parcel endpoint discovered yet
@@ -395,7 +397,7 @@ def arcgis_envelope_query(endpoint_url, lat, lng, out_fields, timeout=ARCGIS_TIM
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
-    for attempt in range(2):
+    for attempt in range(3):
         try:
             req = urllib.request.Request(query_url, headers={
                 "User-Agent": "GridScout/1.0",
@@ -414,9 +416,9 @@ def arcgis_envelope_query(endpoint_url, lat, lng, out_fields, timeout=ARCGIS_TIM
             return data.get("features", [])
 
         except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError,
-                json.JSONDecodeError, ConnectionResetError) as e:
-            if attempt < 1:
-                time.sleep(1)
+                json.JSONDecodeError, ConnectionResetError, OSError) as e:
+            if attempt < 2:
+                time.sleep(2 ** attempt)
             else:
                 return []
 
@@ -895,7 +897,7 @@ def main():
 
             print(f"  Line {li+1}/{len(lines)}: id={line['id'][:8]}... "
                   f"voltage={line.get('voltage_kv')}kV capacity={line.get('capacity_mw')}MW "
-                  f"owner={line.get('owner', 'unknown')[:30]} "
+                  f"owner={(line.get('owner') or 'unknown')[:30]} "
                   f"length~{line_length_approx:.1f}mi samples={len(sample_points)}")
 
             # Query parcels for all sample points along this line
