@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "redirects": [
     { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
