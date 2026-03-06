@@ -87,6 +87,27 @@
     },
     "api/grid/substations.js": {
       "maxDuration": 30
+    },
+    "api/grid/dc-sites.js": {
+      "maxDuration": 30
+    },
+    "api/grid/dc-site.js": {
+      "maxDuration": 30
+    },
+    "api/grid/dc-stats.js": {
+      "maxDuration": 60
+    },
+    "api/grid/brownfields.js": {
+      "maxDuration": 30
+    },
+    "api/grid/ixps.js": {
+      "maxDuration": 30
+    },
+    "api/grid/county-data.js": {
+      "maxDuration": 30
+    },
+    "api/grid/dc-export.js": {
+      "maxDuration": 60
     }
   }
 }

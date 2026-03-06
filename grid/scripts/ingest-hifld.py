@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-Ingest HIFLD Electric Power Transmission Lines for target western states.
+Ingest HIFLD Electric Power Transmission Lines for all 50 US states.
 Source: ArcGIS REST API (free, no auth)
 Target: grid_transmission_lines table
 
 Downloads line segments with voltage, owner, substations, and geometry.
 Uses spatial bounding box queries per state (HIFLD has no STATE field).
+
+Usage:
+  python3 -u scripts/ingest-hifld.py              # All 50 states
+  python3 -u scripts/ingest-hifld.py --states TX CA NY  # Specific states
+  python3 -u scripts/ingest-hifld.py --new-only    # Only states not yet ingested
 """
 
 import os
@@ -26,8 +31,9 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 HIFLD_URL = "https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Electric_Power_Transmission_Lines/FeatureServer/0"
 
-# State bounding boxes (xmin, ymin, xmax, ymax) in WGS84
+# State bounding boxes (xmin, ymin, xmax, ymax) in WGS84 — All 50 states + DC
 STATE_BBOXES = {
+    # Western states (original 8)
     'TX': (-106.65, 25.84, -93.51, 36.50),
     'NM': (-109.05, 31.33, -103.00, 37.00),
     'AZ': (-114.82, 31.33, -109.04, 37.00),
@@ -36,6 +42,59 @@ STATE_BBOXES = {
     'UT': (-114.05, 37.00, -109.04, 42.00),
     'WY': (-111.06, 40.99, -104.05, 45.01),
     'CA': (-124.41, 32.53, -114.13, 42.01),
+    # Pacific Northwest
+    'OR': (-124.57, 41.99, -116.46, 46.29),
+    'WA': (-124.85, 45.54, -116.92, 49.00),
+    # Mountain West
+    'MT': (-116.05, 44.36, -104.04, 49.00),
+    'ID': (-117.24, 41.99, -111.04, 49.00),
+    # Great Plains
+    'ND': (-104.05, 45.93, -96.55, 49.00),
+    'SD': (-104.06, 42.48, -96.44, 45.95),
+    'NE': (-104.06, 39.99, -95.31, 43.00),
+    'KS': (-102.05, 36.99, -94.59, 40.00),
+    'OK': (-103.00, 33.62, -94.43, 37.00),
+    # Upper Midwest
+    'MN': (-97.24, 43.50, -89.49, 49.38),
+    'IA': (-96.64, 40.37, -90.14, 43.50),
+    'WI': (-92.89, 42.49, -86.25, 47.08),
+    'MI': (-90.42, 41.70, -82.12, 48.31),
+    # Great Lakes / Midwest
+    'IL': (-91.51, 36.97, -87.02, 42.51),
+    'IN': (-88.10, 37.77, -84.78, 41.76),
+    'OH': (-84.82, 38.40, -80.52, 42.33),
+    'MO': (-95.77, 35.99, -89.10, 40.61),
+    # South Central
+    'AR': (-94.62, 33.00, -89.64, 36.50),
+    'LA': (-94.04, 28.93, -88.82, 33.02),
+    'MS': (-91.66, 30.17, -88.10, 35.00),
+    'AL': (-88.47, 30.22, -84.89, 35.01),
+    # Southeast
+    'TN': (-90.31, 34.98, -81.65, 36.68),
+    'KY': (-89.57, 36.50, -81.96, 39.15),
+    'WV': (-82.64, 37.20, -77.72, 40.64),
+    'VA': (-83.68, 36.54, -75.24, 39.47),
+    'NC': (-84.32, 33.84, -75.46, 36.59),
+    'SC': (-83.35, 32.03, -78.54, 35.22),
+    'GA': (-85.61, 30.36, -80.84, 35.00),
+    'FL': (-87.63, 24.52, -80.03, 31.00),
+    # Mid-Atlantic
+    'PA': (-80.52, 39.72, -74.69, 42.27),
+    'NY': (-79.76, 40.50, -71.86, 45.02),
+    'NJ': (-75.56, 38.93, -73.89, 41.36),
+    'DE': (-75.79, 38.45, -75.05, 39.84),
+    'MD': (-79.49, 37.91, -75.05, 39.72),
+    'DC': (-77.12, 38.79, -76.91, 38.99),
+    # New England
+    'CT': (-73.73, 40.98, -71.79, 42.05),
+    'RI': (-71.86, 41.15, -71.12, 42.02),
+    'MA': (-73.51, 41.24, -69.93, 42.89),
+    'VT': (-73.44, 42.73, -71.50, 45.02),
+    'NH': (-72.56, 42.70, -70.70, 45.31),
+    'ME': (-71.08, 43.06, -66.95, 47.46),
+    # Hawaii and Alaska (large bboxes, may have limited HIFLD data)
+    'HI': (-160.25, 18.91, -154.81, 22.24),
+    'AK': (-179.15, 51.21, -129.98, 71.39),
 }
 
 BATCH_SIZE = 50
@@ -270,10 +329,28 @@ def get_existing_ids():
     return existing
 
 
+def get_ingested_states(existing_ids):
+    """Return set of states that already have records in the DB."""
+    states = set()
+    result = supabase_request('GET', 'grid_transmission_lines?select=state&limit=1000')
+    if result:
+        for r in result:
+            if r.get('state'):
+                states.add(r['state'])
+    return states
+
+
 def main():
     print("=" * 60)
     print("GridScout HIFLD Transmission Line Ingestion")
     print("=" * 60)
+
+    # Parse CLI args
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--states', nargs='+', help='Specific states to ingest (e.g., --states TX CA NY)')
+    parser.add_argument('--new-only', action='store_true', help='Only ingest states not yet in DB')
+    args = parser.parse_args()
 
     data_source_id = get_data_source_id()
     print(f"Data source ID: {data_source_id}")
@@ -282,12 +359,28 @@ def main():
     existing_ids = get_existing_ids()
     print(f"  {len(existing_ids)} existing records in DB")
 
+    # Determine which states to process
+    states_to_process = dict(STATE_BBOXES)
+    if args.states:
+        requested = [s.upper() for s in args.states]
+        states_to_process = {s: b for s, b in STATE_BBOXES.items() if s in requested}
+        invalid = [s for s in requested if s not in STATE_BBOXES]
+        if invalid:
+            print(f"WARNING: Unknown states ignored: {invalid}")
+    if args.new_only:
+        ingested = get_ingested_states(existing_ids)
+        before = len(states_to_process)
+        states_to_process = {s: b for s, b in states_to_process.items() if s not in ingested}
+        print(f"  Skipping {before - len(states_to_process)} already-ingested states")
+
+    print(f"  Processing {len(states_to_process)} states: {', '.join(states_to_process.keys())}")
+
     total_created = 0
     total_skipped = 0
     total_errors = 0
     seen_hifld_ids = set()  # Prevent cross-state duplicates
 
-    for state, bbox in STATE_BBOXES.items():
+    for state, bbox in states_to_process.items():
         print(f"\n--- {state} (bbox: {bbox}) ---")
         offset = 0
         state_count = 0
