@@ -480,6 +480,54 @@
         }
         .bp-empty__icon { font-size: 3rem; margin-bottom: 12px; }
 
+        /* Share/export actions */
+        .bp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .bp-actions__btn {
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: inherit;
+            transition: all 0.2s;
+        }
+        .bp-actions__btn:hover { background: rgba(255,255,255,0.2); }
+        .bp-actions__feedback {
+            margin-top: 8px;
+            font-size: 0.82rem;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: rgba(45, 106, 46, 0.25);
+            color: #4ade80;
+        }
+
+        /* Print styles */
+        @media print {
+            .header, .footer, .hero--section, #share-actions,
+            .bp-solar-input, .bp-col-headers, .bp-empty,
+            .bp-climate-select, .bp-actions { display: none !important; }
+            .bp-appliance:not(.active) { display: none !important; }
+            .bp-appliance input { border: none !important; background: none !important; pointer-events: none; }
+            .bp-summary { position: static !important; }
+            .bp--section { padding: 16px 0 !important; }
+            .bp-config { break-inside: avoid; page-break-inside: avoid; }
+            .bp-runtime__bar-wrap { break-inside: avoid; }
+            .col-lg-4 { display: none !important; }
+            body::before {
+                content: "Emergency Backup Power Calculator - hyder.me/backup-power";
+                display: block;
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin-bottom: 16px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid #000;
+            }
+        }
+
         /* Step numbers */
         .bp-step-num {
             display: inline-flex;
@@ -685,6 +733,14 @@
                                         </div>
                                     </div>
                                     <div id="summary-solar-status" style="margin-top: 16px;"></div>
+                                    <div id="share-actions" style="display: none; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.12);">
+                                        <div class="bp-actions">
+                                            <button class="bp-actions__btn" id="btn-share">Copy Share Link</button>
+                                            <button class="bp-actions__btn" id="btn-print">Print / PDF</button>
+                                            <button class="bp-actions__btn" id="btn-reset" style="opacity: 0.7;">Reset</button>
+                                        </div>
+                                        <div class="bp-actions__feedback" id="share-feedback" style="display: none;"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -740,7 +796,6 @@
     </footer>
 
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/script.js"></script>
     <script>
     (function() {
         // ===== APPLIANCE DATABASE =====
@@ -802,55 +857,119 @@
         // ===== EQUIPMENT CONFIGURATIONS =====
         function getConfigs(dailyKwh, peakW, surgeW, needs240, existingSolarKw, existingBatteryKwh) {
             const configs = [];
-            const nightKwh = dailyKwh * 0.45; // ~45% of usage at night
-            const batteryNeeded = Math.max(nightKwh * 1.2, 2); // 20% buffer
+            const nightKwh = dailyKwh * 0.45;
+            const batteryNeeded = Math.max(nightKwh * 1.2, 2);
 
-            // Config 1: Portable Power Stations
+            // Config 1: Portable Power Stations (battery-based, no fuel)
             if (dailyKwh <= 25) {
-                const numStations = dailyKwh <= 5 ? 1 : dailyKwh <= 12 ? 2 : 3;
                 const solarPanels = Math.ceil((dailyKwh - existingSolarKw * getPeakSunHours()) / 0.4 / getPeakSunHours());
                 const solarPanelsNeeded = Math.max(0, solarPanels);
-                const expansionBatteries = batteryNeeded > 7.2 ? Math.ceil((batteryNeeded - 3.6 * numStations) / 3.6) : 0;
+
+                // Best match: recommend specific products by tier
                 const products = [];
-                if (dailyKwh <= 3) {
-                    products.push({ name: "EcoFlow DELTA 2 Max (2,048 Wh)", price: "$1,699" });
-                    if (batteryNeeded > 2) products.push({ name: "DELTA 2 Max Extra Battery", price: "$1,099", qty: Math.min(2, Math.ceil((batteryNeeded - 2) / 2)) });
-                } else if (dailyKwh <= 8) {
-                    products.push({ name: "EcoFlow DELTA Pro (3,600 Wh, 3600W)", price: "$2,699" });
-                    if (batteryNeeded > 3.6) products.push({ name: "DELTA Pro Extra Battery (3,600 Wh)", price: "$2,099", qty: Math.ceil((batteryNeeded - 3.6) / 3.6) });
+                if (dailyKwh <= 1.5) {
+                    // Small load — budget portable
+                    products.push({ name: "Bluetti AC70 (768 Wh, 1000W, LiFePO4)", price: "$399" });
+                    if (solarPanelsNeeded > 0) products.push({ name: "Renogy 200W Portable Solar Panel", price: "$200", qty: Math.min(solarPanelsNeeded, 2) });
+                } else if (dailyKwh <= 4) {
+                    // Medium — mid-range
+                    products.push({ name: "Jackery Explorer 2000 Plus (2,042 Wh, 3000W, LiFePO4)", price: "$1,499" });
+                    if (batteryNeeded > 2) products.push({ name: "Jackery Battery Pack 2042 Wh", price: "$899", qty: Math.min(2, Math.ceil((batteryNeeded - 2) / 2)) });
+                    if (solarPanelsNeeded > 0) products.push({ name: "Jackery SolarSaga 200W Panel", price: "$449", qty: Math.min(solarPanelsNeeded, 4) });
+                } else if (dailyKwh <= 10) {
+                    // Large — premium
+                    products.push({ name: "EcoFlow DELTA Pro 3 (4,096 Wh, 4000W, LiFePO4)", price: "$2,299" });
+                    if (batteryNeeded > 4) products.push({ name: "DELTA Pro 3 Extra Battery (4,096 Wh)", price: "$1,599", qty: Math.ceil((batteryNeeded - 4) / 4) });
+                    if (needs240) products.push({ name: "Built-in 240V split-phase (included)", price: "$0" });
+                    if (solarPanelsNeeded > 0) products.push({ name: "EcoFlow 400W Portable Solar Panel", price: "$599", qty: solarPanelsNeeded });
                 } else {
-                    products.push({ name: "EcoFlow DELTA Pro (3,600 Wh, 3600W)", price: "$2,699", qty: numStations });
-                    if (needs240) products.push({ name: "EcoFlow Double Voltage Hub (240V)", price: "$149" });
-                    const totalBase = numStations * 3.6;
-                    if (batteryNeeded > totalBase) products.push({ name: "DELTA Pro Extra Battery (3,600 Wh)", price: "$2,099", qty: Math.ceil((batteryNeeded - totalBase) / 3.6) });
+                    // Very large — premium multi-unit or Bluetti Apex 300
+                    if (needs240) {
+                        products.push({ name: "Bluetti Apex 300 (2,764 Wh, 3840W, 120V/240V, LiFePO4)", price: "$1,499" });
+                        if (batteryNeeded > 2.7) products.push({ name: "Bluetti B300K Battery (2,764 Wh)", price: "$1,299", qty: Math.ceil((batteryNeeded - 2.7) / 2.7) });
+                        if (solarPanelsNeeded > 0) products.push({ name: "Bluetti PV420 (420W Solar Panel)", price: "$799", qty: solarPanelsNeeded });
+                    } else {
+                        const numStations = Math.ceil(dailyKwh / 10);
+                        products.push({ name: "EcoFlow DELTA Pro 3 (4,096 Wh, 4000W, LiFePO4)", price: "$2,299", qty: numStations });
+                        const totalBase = numStations * 4.096;
+                        if (batteryNeeded > totalBase) products.push({ name: "DELTA Pro 3 Extra Battery (4,096 Wh)", price: "$1,599", qty: Math.ceil((batteryNeeded - totalBase) / 4) });
+                        if (solarPanelsNeeded > 0) products.push({ name: "EcoFlow 400W Portable Solar Panel", price: "$599", qty: solarPanelsNeeded });
+                    }
                 }
-                if (solarPanelsNeeded > 0) {
-                    products.push({ name: "EcoFlow 400W Rigid Solar Panel", price: "$649", qty: solarPanelsNeeded });
-                }
+
                 const totalCost = products.reduce((sum, p) => {
                     const price = parseInt(p.price.replace(/[$,]/g, ''));
                     return sum + price * (p.qty || 1);
                 }, 0);
 
+                const totalBatteryKwh = products.reduce((sum, p) => {
+                    if (p.name.includes("4,096 Wh")) return sum + 4.096 * (p.qty || 1);
+                    if (p.name.includes("2,764 Wh")) return sum + 2.764 * (p.qty || 1);
+                    if (p.name.includes("2,042 Wh")) return sum + 2.042 * (p.qty || 1);
+                    if (p.name.includes("768 Wh")) return sum + 0.768 * (p.qty || 1);
+                    return sum;
+                }, existingBatteryKwh);
+
+                const totalInverterW = products.reduce((sum, p) => {
+                    if (p.name.includes("4000W")) return sum + 4000 * (p.qty || 1);
+                    if (p.name.includes("3840W")) return sum + 3840 * (p.qty || 1);
+                    if (p.name.includes("3000W")) return sum + 3000 * (p.qty || 1);
+                    if (p.name.includes("1000W")) return sum + 1000 * (p.qty || 1);
+                    return sum;
+                }, 0);
+
                 configs.push({
                     title: "Portable Power Station System",
-                    subtitle: "Expandable, no installation required. Plug-and-play emergency power.",
-                    batteryKwh: products.reduce((sum, p) => {
-                        if (p.name.includes("3,600 Wh")) return sum + 3.6 * (p.qty || 1);
-                        if (p.name.includes("2,048 Wh")) return sum + 2.048 * (p.qty || 1);
-                        return sum;
-                    }, existingBatteryKwh),
+                    subtitle: "Expandable LiFePO4 battery. No installation, plug-and-play. 3,000+ cycle lifespan.",
+                    batteryKwh: totalBatteryKwh,
                     solarKw: solarPanelsNeeded * 0.4 + existingSolarKw,
-                    inverterW: dailyKwh <= 3 ? 2400 : 3600 * numStations,
+                    inverterW: totalInverterW,
                     products,
                     totalCost: `$${totalCost.toLocaleString()}`,
-                    pros: ["No electrician needed", "Move between rooms/locations", "Silent operation", "Indoor safe"],
-                    cons: ["Higher $/kWh than installed systems", "Limited to ~7.2 kWh per unit"],
+                    pros: ["No electrician needed", "Move between rooms/locations", "Silent operation", "Indoor safe", "LiFePO4 lasts 10+ years"],
+                    cons: ["Higher $/kWh than installed systems", "Limited to ~4 kWh per unit (expandable)"],
                     best: dailyKwh <= 8,
                 });
-                if (needs240 && numStations >= 2) {
-                    configs[configs.length - 1].note240 = "Two DELTA Pro units + Double Voltage Hub provide 240V split-phase output.";
+                if (needs240 && dailyKwh > 4) {
+                    configs[configs.length - 1].note240 = dailyKwh <= 10
+                        ? "EcoFlow DELTA Pro 3 has built-in 240V split-phase output from a single unit."
+                        : "Bluetti Apex 300 provides simultaneous 120V/240V from a single unit with 12kW bypass for EV charging/HVAC.";
                 }
+            }
+
+            // Config 1B: Budget Alternative — portable power station
+            if (dailyKwh <= 10 && dailyKwh > 1.5) {
+                const products = [];
+                if (dailyKwh <= 4) {
+                    products.push({ name: "Bluetti AC70 (768 Wh, 1000W, LiFePO4)", price: "$399" });
+                    if (solarPanelsNeeded > 0) products.push({ name: "Renogy 200W Portable Solar Panel", price: "$200", qty: Math.min(2, Math.max(0, Math.ceil((dailyKwh - existingSolarKw * getPeakSunHours()) / 0.2 / getPeakSunHours()))) });
+                } else {
+                    products.push({ name: "Anker SOLIX F2600 (2,560 Wh, 2400W, LiFePO4)", price: "$1,399" });
+                    if (batteryNeeded > 2.5) products.push({ name: "Anker SOLIX BP2600 Battery (2,048 Wh)", price: "$1,499" });
+                    const solarNeed = Math.max(0, Math.ceil((dailyKwh - existingSolarKw * getPeakSunHours()) / 0.2 / getPeakSunHours()));
+                    if (solarNeed > 0) products.push({ name: "Renogy 200W Portable Solar Panel", price: "$200", qty: Math.min(4, solarNeed) });
+                }
+                const totalCost = products.reduce((sum, p) => {
+                    const price = parseInt(p.price.replace(/[$,]/g, ''));
+                    return sum + price * (p.qty || 1);
+                }, 0);
+                configs.push({
+                    title: "Budget Portable Power Station",
+                    subtitle: "Cost-competitive alternative. Same LiFePO4 chemistry, lower upfront cost.",
+                    batteryKwh: products.reduce((sum, p) => {
+                        if (p.name.includes("2,560 Wh")) return sum + 2.56 * (p.qty || 1);
+                        if (p.name.includes("2,048 Wh")) return sum + 2.048 * (p.qty || 1);
+                        if (p.name.includes("768 Wh")) return sum + 0.768 * (p.qty || 1);
+                        return sum;
+                    }, existingBatteryKwh),
+                    solarKw: existingSolarKw,
+                    inverterW: dailyKwh <= 4 ? 1000 : 2400,
+                    products,
+                    totalCost: `$${totalCost.toLocaleString()}`,
+                    pros: ["Lower upfront cost", "LiFePO4 3,000+ cycles", "Fast AC charging (0-80% in 1 hr)", "Portable"],
+                    cons: ["Less expandable", "120V only", "Lower continuous output"],
+                    best: false,
+                });
             }
 
             // Config 2: Whole-Home Battery (installed)
@@ -858,34 +977,41 @@
                 const pwCount = Math.ceil(batteryNeeded / 13.5);
                 const solarNeeded = Math.max(0, Math.ceil((dailyKwh - existingSolarKw * getPeakSunHours()) / (0.4 * getPeakSunHours())));
                 const products = [];
-                if (dailyKwh <= 20) {
-                    products.push({ name: "Tesla Powerwall 3 (13.5 kWh, 11.5kW)", price: "$9,200", qty: pwCount });
+
+                // Best: Tesla Powerwall 3 for most homes, FranklinWH for larger
+                if (batteryNeeded <= 27) {
+                    products.push({ name: "Tesla Powerwall 3 (13.5 kWh, 11.5kW, built-in solar inverter)", price: "$9,200", qty: pwCount });
                 } else {
-                    const enphaseCount = Math.ceil(batteryNeeded / 5);
-                    products.push({ name: "Enphase IQ Battery 5P (5 kWh, 3.84kW)", price: "$4,500", qty: enphaseCount });
+                    // Larger systems — FranklinWH aPower 2 ($600-733/kWh, best value per kWh)
+                    const fwCount = Math.ceil(batteryNeeded / 15);
+                    products.push({ name: "FranklinWH aPower 2 (15 kWh, 10kW, LFP)", price: "$10,000", qty: fwCount });
+                    products.push({ name: "FranklinWH aGate (energy management hub)", price: "$2,500" });
                 }
                 if (solarNeeded > 0) {
-                    products.push({ name: "400W Solar Panel (installed)", price: "$400", qty: solarNeeded });
-                    products.push({ name: "Mounting & wiring", price: "$1,500" });
+                    products.push({ name: "400W Solar Panel (roof-mount, installed)", price: "$400", qty: solarNeeded });
+                    products.push({ name: "Mounting, wiring & microinverters", price: "$1,500" });
                 }
-                products.push({ name: "Installation & permitting", price: "$3,000" });
+                products.push({ name: "Installation, permitting & inspection", price: "$3,000" });
                 const totalCost = products.reduce((sum, p) => {
                     const price = parseInt(p.price.replace(/[$,]/g, ''));
                     return sum + price * (p.qty || 1);
                 }, 0);
 
+                const battKwh = batteryNeeded <= 27 ? pwCount * 13.5 : Math.ceil(batteryNeeded / 15) * 15;
+                const invW = batteryNeeded <= 27 ? pwCount * 11500 : Math.ceil(batteryNeeded / 15) * 10000;
+
                 configs.push({
                     title: "Whole-Home Battery System",
-                    subtitle: "Professionally installed. Automatic grid failover. ITC tax credit eligible (30%).",
-                    batteryKwh: (dailyKwh <= 20 ? pwCount * 13.5 : Math.ceil(batteryNeeded / 5) * 5) + existingBatteryKwh,
+                    subtitle: "Professionally installed. Automatic grid failover. 30% federal tax credit (ITC) through 2032.",
+                    batteryKwh: battKwh + existingBatteryKwh,
                     solarKw: solarNeeded * 0.4 + existingSolarKw,
-                    inverterW: dailyKwh <= 20 ? pwCount * 11500 : Math.ceil(batteryNeeded / 5) * 3840,
+                    inverterW: invW,
                     products,
                     totalCost: `$${totalCost.toLocaleString()}`,
                     afterCredit: `$${Math.round(totalCost * 0.7).toLocaleString()} after 30% ITC`,
-                    pros: ["Automatic switchover", "No refueling", "Silent", "30% federal tax credit", "Increases home value"],
+                    pros: ["Automatic switchover", "No refueling", "Silent", "30% federal tax credit", "Increases home value", "10-15 year warranty"],
                     cons: ["Higher upfront cost", "Requires professional install", "2-6 week lead time"],
-                    best: dailyKwh >= 8 && dailyKwh <= 20,
+                    best: dailyKwh >= 8 && dailyKwh <= 25,
                 });
             }
 
@@ -893,19 +1019,25 @@
             if (peakW >= 500) {
                 const genSize = surgeW <= 3500 ? 3500 : surgeW <= 5500 ? 5500 : surgeW <= 7500 ? 7500 : 12000;
                 const products = [];
+
+                // Recommend best + budget option per size bracket
                 if (genSize <= 3500) {
-                    products.push({ name: "Honda EU3200i Inverter Generator (3200W)", price: "$2,349" });
+                    products.push({ name: "Honda EU3000iS Inverter (2800W/3000W, 50-57 dB)", price: "$2,299" });
                 } else if (genSize <= 5500) {
-                    products.push({ name: "Champion 5500W Dual Fuel Generator", price: "$899" });
+                    products.push({ name: "Champion 4500W Dual Fuel Inverter (3500W gas, 64 dB)", price: "$729" });
                 } else if (genSize <= 7500) {
-                    products.push({ name: "Westinghouse WGen7500 (7500W/9500W surge)", price: "$949" });
+                    if (needs240) {
+                        products.push({ name: "Honda EU7000iS Inverter (5500W/7000W, 120V/240V, EFI, 52-58 dB)", price: "$4,999" });
+                    } else {
+                        products.push({ name: "Champion 9375W Dual Fuel (7500W gas, 120V/240V, 74 dB)", price: "$899" });
+                    }
                 } else {
-                    products.push({ name: "Generac GP12000E (12000W/15000W surge)", price: "$1,499" });
+                    products.push({ name: "Westinghouse WGen9500DF Dual Fuel (9500W gas, 120V/240V)", price: "$1,299" });
                 }
                 products.push({ name: "Heavy-duty extension cord (10 gauge, 50ft)", price: "$65" });
                 products.push({ name: "Manual transfer switch (30A)", price: "$300" });
-                if (needs240) products.push({ name: "240V outlet adapter / L14-30", price: "$35" });
-                const gallonsPerDay = (dailyKwh / 8).toFixed(1); // ~8 kWh per gallon typical
+                if (needs240 && genSize <= 5500) products.push({ name: "240V outlet adapter / L14-30", price: "$35" });
+                const gallonsPerDay = (dailyKwh / 8).toFixed(1);
                 const totalCost = products.reduce((sum, p) => {
                     const price = parseInt(p.price.replace(/[$,]/g, ''));
                     return sum + price * (p.qty || 1);
@@ -913,26 +1045,28 @@
 
                 configs.push({
                     title: "Portable Generator",
-                    subtitle: `Runs on gasoline or propane. Burns ~${gallonsPerDay} gal/day at your load.`,
+                    subtitle: `Runs on gasoline${genSize > 3500 ? ' or propane (dual fuel)' : ''}. Burns ~${gallonsPerDay} gal/day at your load.`,
                     batteryKwh: 0,
                     solarKw: 0,
                     inverterW: genSize,
                     fuelPerDay: gallonsPerDay,
                     products,
                     totalCost: `$${totalCost.toLocaleString()}`,
-                    pros: ["Lowest upfront cost", "Available immediately", "Unlimited runtime with fuel", "240V capable"],
-                    cons: ["Noisy (60-75 dB)", "Must run outdoors (CO risk)", "Requires fuel storage", "Ongoing fuel cost"],
+                    pros: ["Lowest upfront cost", "Available immediately", "Unlimited runtime with fuel", genSize > 5500 ? "240V capable" : "Quiet inverter technology"],
+                    cons: ["Noisy (52-74 dB)", "Must run outdoors (CO risk)", "Requires fuel storage", `~$${(gallonsPerDay * 3.5).toFixed(0)}/day fuel cost`],
                     best: false,
                 });
             }
 
-            // Config 4: Standby Generator (if big load)
+            // Config 4: Standby Generator (permanently installed, auto-start)
             if (peakW >= 3000) {
-                const genKw = peakW <= 10000 ? 14 : peakW <= 16000 ? 22 : 26;
+                const genKw = peakW <= 10000 ? 14 : peakW <= 16000 ? 22 : peakW <= 20000 ? 24 : 26;
                 const products = [];
-                products.push({ name: `Generac Guardian ${genKw}kW Standby Generator`, price: genKw <= 14 ? "$4,500" : genKw <= 22 ? "$6,200" : "$7,800" });
-                products.push({ name: "200A Automatic Transfer Switch", price: "$800" });
-                products.push({ name: "Concrete pad + gas line + installation", price: "$4,000" });
+                // Generac Guardian — largest dealer network, best value
+                const genPrices = { 14: 4299, 22: 5999, 24: 7399, 26: 7999 };
+                products.push({ name: `Generac Guardian ${genKw}kW Standby Generator (NG/LP, WiFi)`, price: `$${genPrices[genKw].toLocaleString()}` });
+                products.push({ name: genKw <= 14 ? "16-circuit automatic transfer switch (included)" : "200A whole-house automatic transfer switch (included)", price: "$0" });
+                products.push({ name: "Concrete pad, gas line, electrical & installation", price: genKw <= 14 ? "$3,500" : "$4,500" });
                 const totalCost = products.reduce((sum, p) => {
                     const price = parseInt(p.price.replace(/[$,]/g, ''));
                     return sum + price * (p.qty || 1);
@@ -940,14 +1074,14 @@
 
                 configs.push({
                     title: "Whole-Home Standby Generator",
-                    subtitle: `${genKw}kW natural gas/propane. Automatic start within 10 seconds of outage.`,
+                    subtitle: `Generac Guardian ${genKw}kW. Natural gas or propane. Auto-starts within 10 seconds of outage.`,
                     batteryKwh: 0,
                     solarKw: 0,
                     inverterW: genKw * 1000,
                     products,
                     totalCost: `$${totalCost.toLocaleString()}`,
-                    pros: ["Fully automatic", "Powers entire home", "Unlimited runtime (natural gas)", "240V native"],
-                    cons: ["Highest upfront cost", "Requires professional install", "Requires natural gas or large propane tank", "Maintenance needed"],
+                    pros: ["Fully automatic", "Powers entire home", "Unlimited runtime (natural gas)", "240V native", "WiFi monitoring"],
+                    cons: [`$${totalCost.toLocaleString()} installed`, "Requires professional install", "Requires natural gas or large propane tank", "Weekly exercise cycle"],
                     best: peakW >= 8000,
                 });
             }
@@ -961,7 +1095,7 @@
 
         // ===== RENDER APPLIANCES =====
         const listEl = document.getElementById('appliance-list');
-        const state = {}; // { "Refrigerator": { qty: 1, hours: 24, ... } }
+        const state = {};
 
         Object.entries(APPLIANCES).forEach(([category, items]) => {
             const catDiv = document.createElement('div');
@@ -975,37 +1109,36 @@
                 state[key] = { ...item, qty: 0 };
                 const row = document.createElement('div');
                 row.className = 'bp-appliance';
-                row.dataset.key = key;
                 row.innerHTML = `
                     <div class="bp-appliance__name">
                         ${item.name}${item.note ? ` <small>${item.note}</small>` : ''}
                         ${item.needs240 ? ' <span class="bp-tip" title="Requires 240V">240V</span>' : ''}
                     </div>
                     <div class="bp-appliance__watts">${item.watts.toLocaleString()}W</div>
-                    <input type="number" class="qty-input" min="0" max="20" value="0" data-key="${key}" />
-                    <input type="number" class="hrs-input" min="0" max="24" step="0.1" value="${item.hours}" data-key="${key}" />
-                    <div class="bp-appliance__daily" data-daily="${key}">-</div>
+                    <input type="number" class="qty-input" min="0" max="20" value="0" />
+                    <input type="number" class="hrs-input" min="0" max="24" step="0.1" value="${item.hours}" />
+                    <div class="bp-appliance__daily">-</div>
                 `;
                 body.appendChild(row);
+                // Store direct DOM refs (avoids querySelector issues with special chars in names)
+                state[key].rowEl = row;
+                state[key].dailyEl = row.querySelector('.bp-appliance__daily');
+                state[key].qtyInput = row.querySelector('.qty-input');
+                state[key].hrsInput = row.querySelector('.hrs-input');
             });
             catDiv.appendChild(body);
             listEl.appendChild(catDiv);
         });
 
         // ===== EVENT LISTENERS =====
-        document.querySelectorAll('.qty-input').forEach(input => {
-            input.addEventListener('input', e => {
-                const key = e.target.dataset.key;
-                state[key].qty = parseInt(e.target.value) || 0;
-                const row = e.target.closest('.bp-appliance');
-                row.classList.toggle('active', state[key].qty > 0);
+        Object.entries(state).forEach(([key, item]) => {
+            item.qtyInput.addEventListener('input', () => {
+                item.qty = parseInt(item.qtyInput.value) || 0;
+                item.rowEl.classList.toggle('active', item.qty > 0);
                 recalculate();
             });
-        });
-        document.querySelectorAll('.hrs-input').forEach(input => {
-            input.addEventListener('input', e => {
-                const key = e.target.dataset.key;
-                state[key].hours = parseFloat(e.target.value) || 0;
+            item.hrsInput.addEventListener('input', () => {
+                item.hours = parseFloat(item.hrsInput.value) || 0;
                 recalculate();
             });
         });
@@ -1031,7 +1164,7 @@
             const activeItems = [];
 
             Object.entries(state).forEach(([key, item]) => {
-                const dailyEl = document.querySelector(`[data-daily="${key}"]`);
+                const dailyEl = item.dailyEl;
                 if (item.qty > 0) {
                     // Fridges/freezers: compressor runs ~33% duty cycle, watts listed are running watts
                     let effectiveHours = item.hours;
@@ -1105,6 +1238,12 @@
                 document.getElementById('runtime-list').style.display = 'none';
                 document.getElementById('solar-projection').style.display = 'none';
             }
+
+            // Show/hide share actions
+            document.getElementById('share-actions').style.display = dailyKwh > 0 ? 'block' : 'none';
+
+            // Auto-save to localStorage
+            try { localStorage.setItem('bp_config', serializeState()); } catch(e) {}
         }
 
         // ===== RENDER CONFIGURATIONS =====
@@ -1159,16 +1298,18 @@
             const el = document.getElementById('runtime-list');
             if (avgW <= 0) { el.innerHTML = ''; return; }
 
-            // Battery systems
+            // Battery systems — current 2025-2026 products
             const batteryRuntimes = [
-                { label: "1 kWh Portable (Jackery / Bluetti)", kwh: 1 },
-                { label: "2 kWh Portable (EcoFlow DELTA 2 Max)", kwh: 2.048 },
-                { label: "3.6 kWh (EcoFlow DELTA Pro)", kwh: 3.6 },
-                { label: "7.2 kWh (2x DELTA Pro)", kwh: 7.2 },
-                { label: "10.8 kWh (3x DELTA Pro)", kwh: 10.8 },
-                { label: "13.5 kWh (Tesla Powerwall 3)", kwh: 13.5 },
-                { label: "27 kWh (2x Tesla Powerwall 3)", kwh: 27 },
-                { label: "40 kWh (3x Tesla Powerwall 3)", kwh: 40.5 },
+                { label: "Bluetti AC70 (768 Wh, $399)", kwh: 0.768 },
+                { label: "Jackery 2000 Plus (2,042 Wh, $1,499)", kwh: 2.042 },
+                { label: "Anker SOLIX F2600 (2,560 Wh, $1,399)", kwh: 2.56 },
+                { label: "Bluetti Apex 300 (2,764 Wh, $1,499)", kwh: 2.764 },
+                { label: "EcoFlow DELTA Pro 3 (4,096 Wh, $2,299)", kwh: 4.096 },
+                { label: "2x DELTA Pro 3 (8,192 Wh)", kwh: 8.192 },
+                { label: "Tesla Powerwall 3 (13.5 kWh, ~$15K installed)", kwh: 13.5 },
+                { label: "FranklinWH aPower 2 (15 kWh, ~$17K installed)", kwh: 15 },
+                { label: "2x Tesla Powerwall 3 (27 kWh)", kwh: 27 },
+                { label: "DELTA Pro 3 + 2 Batteries (12.3 kWh, $5,497)", kwh: 12.288 },
             ];
 
             // Filter to relevant sizes
@@ -1203,9 +1344,11 @@
             // Generator runtime per tank
             html += '<h4 style="font-family: var(--pt-sans); font-weight: 700; margin: 24px 0 16px;">Generator Runtime (per tank)</h4>';
             const generators = [
-                { label: "Honda EU3200i (3.4 gal tank)", gallons: 3.4, efficiency: 7 },
-                { label: "Champion 5500W (5 gal tank)", gallons: 5, efficiency: 7.5 },
-                { label: "Westinghouse 7500W (6.6 gal tank)", gallons: 6.6, efficiency: 8 },
+                { label: "Honda EU3000iS (3.4 gal, 50-57 dB, $2,299)", gallons: 3.4, efficiency: 7 },
+                { label: "Champion 4500W Dual Fuel (2.3 gal gas, 64 dB, $729)", gallons: 2.3, efficiency: 7.5 },
+                { label: "Predator 3500 (2.6 gal, 56 dB, $699)", gallons: 2.64, efficiency: 7 },
+                { label: "Honda EU7000iS (5.1 gal, 240V, EFI, 52-58 dB, $4,999)", gallons: 5.1, efficiency: 8 },
+                { label: "Champion 9375W Dual Fuel (7.7 gal, 240V, 74 dB, $899)", gallons: 7.7, efficiency: 8 },
             ];
             generators.forEach(g => {
                 const tankKwh = g.gallons * g.efficiency;
@@ -1264,8 +1407,106 @@
             }
         }
 
-        // Initial state
-        recalculate();
+        // ===== SAVE / SHARE / EXPORT =====
+        function serializeState() {
+            const sel = {};
+            Object.entries(state).forEach(([key, item]) => {
+                if (item.qty > 0) sel[key] = [item.qty, item.hours];
+            });
+            return btoa(JSON.stringify({
+                a: sel,
+                s: parseFloat(document.getElementById('existing-solar-kw').value) || 0,
+                b: parseFloat(document.getElementById('existing-battery-kwh').value) || 0,
+                c: peakSunHours
+            }));
+        }
+
+        function loadState(encoded) {
+            try {
+                const data = JSON.parse(atob(encoded));
+                if (data.a) {
+                    Object.entries(data.a).forEach(([key, val]) => {
+                        if (state[key] && Array.isArray(val)) {
+                            state[key].qty = val[0];
+                            state[key].hours = val[1];
+                            state[key].qtyInput.value = val[0];
+                            state[key].hrsInput.value = val[1];
+                            state[key].rowEl.classList.toggle('active', val[0] > 0);
+                        }
+                    });
+                }
+                if (data.s) document.getElementById('existing-solar-kw').value = data.s;
+                if (data.b) document.getElementById('existing-battery-kwh').value = data.b;
+                if (data.c) {
+                    peakSunHours = data.c;
+                    document.querySelectorAll('.bp-climate-btn').forEach(btn => {
+                        btn.classList.toggle('active', parseFloat(btn.dataset.peak) === data.c);
+                    });
+                }
+                recalculate();
+            } catch(e) { console.error('Failed to load config:', e); }
+        }
+
+        // Share link
+        document.getElementById('btn-share').addEventListener('click', () => {
+            const hash = serializeState();
+            const url = window.location.origin + window.location.pathname + '#' + hash;
+            navigator.clipboard.writeText(url).then(() => {
+                history.replaceState(null, '', '#' + hash);
+                const fb = document.getElementById('share-feedback');
+                fb.textContent = 'Link copied to clipboard! Anyone with this link will see your exact configuration.';
+                fb.style.display = 'block';
+                setTimeout(() => fb.style.display = 'none', 4000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                history.replaceState(null, '', '#' + hash);
+                const fb = document.getElementById('share-feedback');
+                fb.textContent = 'Link copied!';
+                fb.style.display = 'block';
+                setTimeout(() => fb.style.display = 'none', 4000);
+            });
+        });
+
+        // Print
+        document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+        // Reset
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            Object.values(state).forEach(item => {
+                item.qty = 0;
+                item.qtyInput.value = 0;
+                item.hrsInput.value = item.hours; // restore default hours
+                item.hours = item.hours; // keep default
+                item.rowEl.classList.remove('active');
+            });
+            document.getElementById('existing-solar-kw').value = 0;
+            document.getElementById('existing-battery-kwh').value = 0;
+            peakSunHours = 5.5;
+            document.querySelectorAll('.bp-climate-btn').forEach(btn => {
+                btn.classList.toggle('active', parseFloat(btn.dataset.peak) === 5.5);
+            });
+            try { localStorage.removeItem('bp_config'); } catch(e) {}
+            history.replaceState(null, '', window.location.pathname);
+            recalculate();
+        });
+
+        // ===== INITIALIZE =====
+        // Priority: URL hash > localStorage > defaults
+        if (window.location.hash.length > 1) {
+            loadState(window.location.hash.substring(1));
+        } else {
+            try {
+                const saved = localStorage.getItem('bp_config');
+                if (saved) loadState(saved);
+                else recalculate();
+            } catch(e) { recalculate(); }
+        }
     })();
     </script>
 </body>
