@@ -186,7 +186,15 @@ def format_timestamp(val):
 # ---------------------------------------------------------------------------
 
 def fetch_gridstatus(date_start, date_end):
-    """Fetch ERCOT shadow prices via gridstatus library."""
+    """Fetch ERCOT shadow prices via gridstatus library.
+
+    Uses gridstatus's low-level _get_documents() + read_doc() to fetch the
+    NP6-86-CD (SCED Binding Transmission Constraints) report directly.
+    Report Type ID 12302 = SCEDBTCNP686_csv.
+
+    gridstatus does NOT have a dedicated high-level method for this data product,
+    so we use the internal document API with parse=False to get the raw CSV data.
+    """
     try:
         from gridstatus import Ercot
     except ImportError:
@@ -197,27 +205,53 @@ def fetch_gridstatus(date_start, date_end):
 
     import pandas as pd
 
+    SCED_BTC_REPORT_TYPE_ID = 12302  # NP6-86-CD Shadow Prices & Binding Constraints
+
     ercot = Ercot()
     all_rows = []
 
-    # gridstatus get_shadow_prices_sced accepts a single date string,
-    # so iterate day by day over the range.
-    current = date_start
-    while current <= date_end:
-        date_str = current.strftime("%Y-%m-%d")
-        print(f"  Fetching shadow prices for {date_str}...")
+    # Fetch available documents for the date range.
+    # ERCOT publishes these reports every ~5 minutes, so there are many per day.
+    # _get_documents returns the full list; we filter by date.
+    print(f"  Fetching document list for report type 12302 (NP6-86-CD)...")
+    try:
+        docs = ercot._get_documents(
+            report_type_id=SCED_BTC_REPORT_TYPE_ID,
+            verbose=False,
+        )
+        print(f"  {len(docs)} documents available in listing")
+    except Exception as e:
+        print(f"  ERROR fetching document list: {e}")
+        return []
+
+    # Filter documents to our date range using the publish_date
+    # Documents are published with timestamps; filter to those within our range
+    start_ts = pd.Timestamp(date_start.strftime('%Y-%m-%d')).tz_localize('US/Central')
+    end_ts = pd.Timestamp((date_end + timedelta(days=1)).strftime('%Y-%m-%d')).tz_localize('US/Central')
+
+    filtered_docs = [
+        d for d in docs
+        if d.publish_date >= start_ts and d.publish_date < end_ts
+    ]
+    print(f"  {len(filtered_docs)} documents in date range {date_start.strftime('%Y-%m-%d')} to {date_end.strftime('%Y-%m-%d')}")
+
+    if not filtered_docs:
+        print("  No documents found for date range.")
+        return []
+
+    # Read each document (each is a small CSV inside a zip, ~200 rows)
+    for i, doc in enumerate(filtered_docs):
         try:
-            df = ercot.get_shadow_prices_sced(date=date_str)
+            df = ercot.read_doc(doc, parse=False, verbose=False)
             if df is not None and len(df) > 0:
-                print(f"    {len(df)} rows returned")
                 all_rows.append(df)
-            else:
-                print(f"    No data for {date_str}")
+            if (i + 1) % 50 == 0:
+                print(f"    Read {i + 1}/{len(filtered_docs)} documents ({sum(len(d) for d in all_rows)} rows)...")
         except Exception as e:
-            print(f"    ERROR fetching {date_str}: {e}")
-        current += timedelta(days=1)
-        # Be polite — small delay between requests
-        time.sleep(1.0)
+            print(f"    ERROR reading doc {doc.constructed_name}: {e}")
+        # Small delay to be polite (these are cached CDN downloads, usually fast)
+        if (i + 1) % 20 == 0:
+            time.sleep(0.5)
 
     if not all_rows:
         return []
@@ -227,29 +261,45 @@ def fetch_gridstatus(date_start, date_end):
     if len(combined) > 0:
         print(f"  Columns: {list(combined.columns)}")
 
+    # Column mapping from raw ERCOT CSV to our schema
+    # Raw columns: SCEDTimeStamp, RepeatedHourFlag, ConstraintID, ConstraintName,
+    #              ContingencyName, ShadowPrice, MaxShadowPrice, Limit, Value,
+    #              ViolatedMW, FromStation, ToStation, FromStationkV, ToStationkV,
+    #              CCTStatus
     records = []
     for _, row in combined.iterrows():
-        constraint_name = safe_str(row.get('Constraint Name'))
-        interval_start = format_timestamp(row.get('Interval Start'))
+        constraint_name = safe_str(row.get('ConstraintName'))
+        sced_timestamp = safe_str(row.get('SCEDTimeStamp'))
 
-        if not constraint_name or not interval_start:
+        if not constraint_name or not sced_timestamp:
+            continue
+
+        # Parse ERCOT timestamp format: "MM/DD/YYYY HH:MM:SS" to ISO 8601
+        interval_start = None
+        try:
+            dt = datetime.strptime(sced_timestamp, '%m/%d/%Y %H:%M:%S')
+            interval_start = dt.isoformat()
+        except (ValueError, TypeError):
+            interval_start = sced_timestamp
+
+        if not interval_start:
             continue
 
         record = {
             'constraint_name': constraint_name,
-            'constraint_id': safe_str(row.get('Constraint ID')),
-            'contingency_name': safe_str(row.get('Contingency Name')),
-            'from_station': safe_str(row.get('From Station')),
-            'to_station': safe_str(row.get('To Station')),
-            'from_station_kv': safe_float(row.get('From Station kV')),
-            'to_station_kv': safe_float(row.get('To Station kV')),
-            'shadow_price': safe_float(row.get('Shadow Price')),
-            'max_shadow_price': safe_float(row.get('Max Shadow Price')),
+            'constraint_id': safe_str(row.get('ConstraintID')),
+            'contingency_name': safe_str(row.get('ContingencyName')),
+            'from_station': safe_str(row.get('FromStation')),
+            'to_station': safe_str(row.get('ToStation')),
+            'from_station_kv': safe_float(row.get('FromStationkV')),
+            'to_station_kv': safe_float(row.get('ToStationkV')),
+            'shadow_price': safe_float(row.get('ShadowPrice')),
+            'max_shadow_price': safe_float(row.get('MaxShadowPrice')),
             'limit_mw': safe_float(row.get('Limit')),
             'value_mw': safe_float(row.get('Value')),
-            'violated_mw': safe_float(row.get('Violated MW')),
+            'violated_mw': safe_float(row.get('ViolatedMW')),
             'interval_start': interval_start,
-            'interval_end': format_timestamp(row.get('Interval End')),
+            'interval_end': None,  # NP6-86-CD doesn't have an explicit end column
         }
         records.append(record)
 

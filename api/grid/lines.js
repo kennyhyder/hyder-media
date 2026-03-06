@@ -29,15 +29,20 @@ export default async function handler(req, res) {
       order,
       limit,
       offset,
+      with_geometry,
     } = req.query;
 
-    const limitNum = Math.min(parseInt(limit) || 50, 200);
+    const limitNum = Math.min(parseInt(limit) || 50, with_geometry === "true" ? 500 : 200);
     const offsetNum = parseInt(offset) || 0;
 
-    // Exclude geometry_wkt from list view (too large for list responses)
+    // Include geometry_wkt only when explicitly requested (for map rendering)
+    const columns = with_geometry === "true"
+      ? "id,hifld_id,geometry_wkt,voltage_kv,capacity_mw,upgrade_candidate,owner,state,sub_1,sub_2,naession"
+      : "id,hifld_id,source_record_id,voltage_kv,volt_class,owner,status,line_type,sub_1,sub_2,naession,static_rating_amps,capacity_mw,upgrade_candidate,ercot_shadow_price,ercot_binding_count,ercot_mw_limit,state,county,length_miles,data_source_id,created_at,updated_at";
+
     let query = supabase
       .from("grid_transmission_lines")
-      .select("id,hifld_id,source_record_id,voltage_kv,volt_class,owner,status,line_type,sub_1,sub_2,naession,static_rating_amps,capacity_mw,upgrade_candidate,ercot_shadow_price,ercot_binding_count,ercot_mw_limit,state,county,length_miles,data_source_id,created_at,updated_at", { count: "exact" });
+      .select(columns, { count: "exact" });
 
     // Apply filters
     if (state) query = query.eq("state", state.toUpperCase());
