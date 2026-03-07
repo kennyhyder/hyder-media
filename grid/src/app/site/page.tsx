@@ -432,6 +432,103 @@ function SiteDetailContent() {
         </div>
       </div>
 
+      {/* Land Acquisition */}
+      <div className="bg-white rounded-lg border border-purple-200 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Land Acquisition</h2>
+        <p className="text-xs text-gray-500 mb-4">Contact information for inquiring about land availability at this site.</p>
+        {s.site_type === "brownfield" ? (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Brownfield Redevelopment</span>
+            </div>
+            <p className="text-sm text-gray-700 mb-3">
+              This is a retired power plant site with existing grid infrastructure. Brownfield redevelopment typically involves
+              working with the property owner (often the former utility) and the state environmental agency for any required cleanup.
+            </p>
+            {data.brownfield && (data.brownfield as Record<string, unknown>).operator_name ? (
+              <div className="mb-3">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Property Owner / Former Operator</div>
+                <div className="text-sm font-medium text-gray-900">{String((data.brownfield as Record<string, unknown>).operator_name)}</div>
+                {(data.brownfield as Record<string, unknown>).operator_address ? (
+                  <div className="text-xs text-gray-600">{String((data.brownfield as Record<string, unknown>).operator_address)}</div>
+                ) : null}
+              </div>
+            ) : null}
+            <div className="space-y-2">
+              <a href="https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> EPA State Brownfield Programs Directory
+              </a>
+              {s.state && (
+                <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.state} state brownfield redevelopment program`)}`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> {String(s.state)} Brownfield Program
+                </a>
+              )}
+            </div>
+          </div>
+        ) : s.land_contact_type === "blm_office" ? (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Federal Land — BLM ROW Application</span>
+            </div>
+            <p className="text-sm text-gray-700 mb-3">
+              This site is on federal land managed by the Bureau of Land Management. Development requires a Right-of-Way (ROW)
+              grant application — land is leased, not purchased.
+            </p>
+            {s.land_contact_name && (
+              <div className="mb-3">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">BLM Office</div>
+                <div className="text-sm font-medium text-gray-900">{String(s.land_contact_name)}</div>
+                {s.land_contact_phone && <div className="text-xs text-gray-600"><a href={`tel:${s.land_contact_phone}`} className="text-purple-600 hover:underline">{String(s.land_contact_phone)}</a></div>}
+              </div>
+            )}
+            <div className="space-y-2">
+              {s.land_contact_url && (
+                <a href={String(s.land_contact_url)} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> BLM State Office Website
+                </a>
+              )}
+              <a href="https://www.blm.gov/programs/lands-and-realty/right-of-way" target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> BLM Right-of-Way Application Process
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">Private Land</span>
+            </div>
+            <p className="text-sm text-gray-700 mb-3">
+              This site is on or near private land. Property ownership records are maintained by the county assessor&apos;s office.
+              Contact the county assessor to identify the current property owner.
+            </p>
+            {s.county && s.state && (
+              <div className="mb-3">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">County Assessor</div>
+                <div className="text-sm font-medium text-gray-900">{String(s.county)} County Assessor&apos;s Office</div>
+                <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} assessor property records`)}`} target="_blank" rel="noopener noreferrer"
+                  className="text-xs text-purple-600 hover:underline">
+                  Search for county assessor website
+                </a>
+              </div>
+            )}
+            <div className="space-y-2">
+              <a href={`https://www.loopnet.com/search/land/${s.state ? `${s.county ? s.county + '-county-' : ''}${s.state}` : 'united-states'}/for-sale/`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> LoopNet Commercial Land Listings
+              </a>
+              <a href={`https://www.landwatch.com/search?state=${String(s.state || '').toLowerCase()}`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> LandWatch Rural Land Listings
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Nearby Facilities with Contacts */}
       {data.nearbyFacilities && data.nearbyFacilities.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">

@@ -50,6 +50,56 @@ function scoreBg(score: number): string {
   return "bg-red-500";
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  substation: "#7c3aed",
+  brownfield: "#d97706",
+  greenfield: "#059669",
+};
+
+function SiteTypeDonut({ breakdown, total }: { breakdown: Record<string, number>; total: number }) {
+  const entries = Object.entries(breakdown);
+  const r = 70, cx = 90, cy = 90, strokeWidth = 28;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+
+  return (
+    <div className="flex items-center gap-4">
+      <svg width={180} height={180} viewBox="0 0 180 180">
+        {entries.map(([type, count]) => {
+          const pct = count / Math.max(total, 1);
+          const dash = pct * circumference;
+          const currentOffset = offset;
+          offset += dash;
+          return (
+            <circle
+              key={type}
+              cx={cx} cy={cy} r={r}
+              fill="none"
+              stroke={TYPE_COLORS[type] || "#6b7280"}
+              strokeWidth={strokeWidth}
+              strokeDasharray={`${dash} ${circumference - dash}`}
+              strokeDashoffset={-currentOffset}
+              transform={`rotate(-90 ${cx} ${cy})`}
+            />
+          );
+        })}
+        <text x={cx} y={cy - 6} textAnchor="middle" className="text-2xl font-bold" fill="#1f2937" fontSize="22">{fmt(total)}</text>
+        <text x={cx} y={cy + 14} textAnchor="middle" fill="#6b7280" fontSize="11">total sites</text>
+      </svg>
+      <div className="space-y-2">
+        {entries.map(([type, count]) => (
+          <div key={type} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ background: TYPE_COLORS[type] || "#6b7280" }} />
+            <span className="text-sm capitalize text-gray-700">{type}</span>
+            <span className="text-sm font-semibold text-gray-900 ml-auto">{fmt(count)}</span>
+            <span className="text-xs text-gray-400 w-10 text-right">{((count / Math.max(total, 1)) * 100).toFixed(1)}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<DCStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -196,15 +246,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Site type breakdown */}
+        {/* Site type donut chart */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Site Types</h2>
-          {Object.entries(stats.siteTypeBreakdown).map(([type, count]) => (
-            <div key={type} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <span className="text-sm capitalize text-gray-700">{type}</span>
-              <span className="text-sm font-semibold text-gray-900">{fmt(count)}</span>
-            </div>
-          ))}
+          <SiteTypeDonut breakdown={stats.siteTypeBreakdown} total={t.dc_sites} />
         </div>
 
         {/* State averages (top 15) */}

@@ -22,6 +22,7 @@ const NAV_LINKS = [
   { href: "/grid/search/", label: "Lines", match: "/grid/search" },
   { href: "/grid/corridors/", label: "Corridors", match: "/grid/corridors" },
   { href: "/grid/market/", label: "Market", match: "/grid/market" },
+  { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs" },
 ];
 
 export default function RootLayout({

@@ -38,12 +38,32 @@ interface IXP {
   network_count?: number;
 }
 
+interface TransmissionLine {
+  id: string;
+  voltage_kv: number | null;
+  owner?: string;
+  sub_1?: string;
+  sub_2?: string;
+  geometry_wkt?: string;
+}
+
+interface Substation {
+  id: string;
+  name: string;
+  state: string | null;
+  latitude: number;
+  longitude: number;
+  max_voltage_kv: number | null;
+}
+
 interface MapData {
   sites: MapSite[];
   total: number;
   returned: number;
   datacenters?: ExistingDC[];
   ixps?: IXP[];
+  lines?: TransmissionLine[];
+  substations?: Substation[];
 }
 
 function scoreColor(score: number): string {
@@ -71,6 +91,20 @@ function siteTypeLabel(type: string): string {
   }
 }
 
+function parseWKTLineString(wkt: string): [number, number][] | null {
+  // Handle LINESTRING and MULTILINESTRING WKT
+  const match = wkt.match(/LINESTRING\s*\(([^)]+)\)/i) || wkt.match(/MULTILINESTRING\s*\(\(([^)]+)\)/i);
+  if (!match) return null;
+  try {
+    return match[1].split(",").map(pair => {
+      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+      return [lat, lng] as [number, number];
+    });
+  } catch {
+    return null;
+  }
+}
+
 const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
   "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
@@ -88,6 +122,10 @@ export default function MapPage() {
   const dcLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ixpLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lineLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const subLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LRef = useRef<any>(null);
   const fetchControllerRef = useRef<AbortController | null>(null);
@@ -111,6 +149,10 @@ export default function MapPage() {
   const [showDCs, setShowDCs] = useState(true);
   const [showIXPs, setShowIXPs] = useState(true);
   const [showSites, setShowSites] = useState(true);
+  const [showLines, setShowLines] = useState(false);
+  const [showSubstations, setShowSubstations] = useState(false);
+  const [totalLines, setTotalLines] = useState(0);
+  const [totalSubstations, setTotalSubstations] = useState(0);
   const [colorBy, setColorBy] = useState<"score" | "type">("score");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -200,10 +242,13 @@ export default function MapPage() {
       siteLayerRef.current = createCluster();
       dcLayerRef.current = L.layerGroup();
       ixpLayerRef.current = L.layerGroup();
+      lineLayerRef.current = L.layerGroup();
+      subLayerRef.current = L.layerGroup();
 
       map.addLayer(siteLayerRef.current);
       map.addLayer(dcLayerRef.current);
       map.addLayer(ixpLayerRef.current);
+      // Lines and substations not added by default (toggled on by user)
 
       // Add legend
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -220,6 +265,8 @@ export default function MapPage() {
           <div style="border-top:1px solid #444;margin:6px 0;padding-top:6px">
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #1d4ed8"></div> Existing DC</div>
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#06b6d4;border:2px solid #0891b2"></div> IXP / Interconnect</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:3px;background:#f59e0b"></div> Transmission Line</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:#f59e0b;border:2px solid #d97706;transform:rotate(45deg)"></div> Substation</div>
           </div>
         `;
         return div;
@@ -262,6 +309,8 @@ export default function MapPage() {
       if (filterMaxScore) params.set("max_score", filterMaxScore);
       params.set("include_dcs", "1");
       params.set("include_ixps", "1");
+      if (showLines) params.set("include_lines", "1");
+      if (showSubstations) params.set("include_substations", "1");
       params.set("lite", "1");
 
       // Use viewport bounds for re-fetches (not initial load)
@@ -390,6 +439,62 @@ export default function MapPage() {
         setTotalIXPs(json.ixps.length);
       }
 
+      // Update transmission line polylines
+      lineLayerRef.current.clearLayers();
+      if (json.lines) {
+        for (const line of json.lines) {
+          if (!line.geometry_wkt) continue;
+          const coords = parseWKTLineString(line.geometry_wkt);
+          if (!coords || coords.length < 2) continue;
+
+          const voltage = line.voltage_kv ?? 0;
+          const weight = voltage >= 345 ? 3 : voltage >= 230 ? 2 : 1;
+          const opacity = voltage >= 345 ? 0.8 : voltage >= 230 ? 0.6 : 0.4;
+
+          const polyline = L.polyline(coords, {
+            color: "#f59e0b",
+            weight,
+            opacity,
+          });
+          polyline.bindPopup(`
+            <div style="min-width:180px;font-family:system-ui;font-size:13px">
+              <strong style="font-size:14px">${voltage ? voltage + ' kV Line' : 'Transmission Line'}</strong><br/>
+              ${line.owner ? `<b>Owner:</b> ${line.owner}<br/>` : ""}
+              ${line.sub_1 ? `<b>From:</b> ${line.sub_1}<br/>` : ""}
+              ${line.sub_2 ? `<b>To:</b> ${line.sub_2}<br/>` : ""}
+            </div>
+          `);
+          lineLayerRef.current.addLayer(polyline);
+        }
+        setTotalLines(json.lines.length);
+      }
+
+      // Update substation markers
+      subLayerRef.current.clearLayers();
+      if (json.substations) {
+        for (const sub of json.substations) {
+          if (!sub.latitude || !sub.longitude) continue;
+          const marker = L.marker([sub.latitude, sub.longitude], {
+            icon: L.divIcon({
+              html: `<div style="width:10px;height:10px;background:#f59e0b;border:2px solid #d97706;transform:rotate(45deg)"></div>`,
+              className: "",
+              iconSize: [10, 10],
+              iconAnchor: [5, 5],
+            }),
+          });
+          const voltageStr = sub.max_voltage_kv ? `${Number(sub.max_voltage_kv).toFixed(0)} kV` : "";
+          marker.bindPopup(`
+            <div style="min-width:180px;font-family:system-ui;font-size:13px">
+              <strong style="font-size:14px">${sub.name || "Substation"}</strong><br/>
+              <span style="color:#f59e0b;font-weight:600">Substation</span> · ${sub.state || ""}<br/>
+              ${voltageStr ? `<b>Max Voltage:</b> ${voltageStr}<br/>` : ""}
+            </div>
+          `);
+          subLayerRef.current.addLayer(marker);
+        }
+        setTotalSubstations(json.substations.length);
+      }
+
       setTotalSites(json.total);
       setReturnedSites(json.returned);
       setInitialLoad(false);
@@ -399,13 +504,13 @@ export default function MapPage() {
     } finally {
       setLoading(false);
     }
-  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy]);
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy, showLines, showSubstations]);
 
   // Initial data load
   useEffect(() => {
     if (mapReady) fetchAndRender(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore]);
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, showLines, showSubstations]);
 
   // Re-fetch on viewport change (debounced)
   useEffect(() => {
@@ -453,6 +558,24 @@ export default function MapPage() {
     }
   }, [showIXPs]);
 
+  useEffect(() => {
+    if (!leafletMap.current || !lineLayerRef.current) return;
+    if (showLines) {
+      if (!leafletMap.current.hasLayer(lineLayerRef.current)) leafletMap.current.addLayer(lineLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(lineLayerRef.current);
+    }
+  }, [showLines]);
+
+  useEffect(() => {
+    if (!leafletMap.current || !subLayerRef.current) return;
+    if (showSubstations) {
+      if (!leafletMap.current.hasLayer(subLayerRef.current)) leafletMap.current.addLayer(subLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(subLayerRef.current);
+    }
+  }, [showSubstations]);
+
   // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
   useEffect(() => {
     if (mapReady && !initialLoad) {
@@ -478,6 +601,8 @@ export default function MapPage() {
                   <>
                     {returnedSites.toLocaleString()}{returnedSites < totalSites ? ` of ${totalSites.toLocaleString()}` : ""} sites
                     {" · "}{totalDCs} DCs · {totalIXPs} IXPs
+                    {totalLines > 0 && ` · ${totalLines.toLocaleString()} lines`}
+                    {totalSubstations > 0 && ` · ${totalSubstations.toLocaleString()} subs`}
                     {returnedSites < totalSites && <span className="text-purple-600"> · zoom in for more</span>}
                   </>
                 )}
@@ -503,6 +628,16 @@ export default function MapPage() {
                     <input type="checkbox" checked={showIXPs} onChange={e => setShowIXPs(e.target.checked)} className="accent-cyan-600" />
                     <span className="w-3 h-3 rounded-full bg-cyan-500 inline-block"></span>
                     Interconnection Facilities ({totalIXPs})
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={showLines} onChange={e => setShowLines(e.target.checked)} className="accent-amber-600" />
+                    <span className="w-3 h-0.5 bg-amber-500 inline-block"></span>
+                    Transmission Lines {totalLines > 0 && `(${totalLines.toLocaleString()})`}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={showSubstations} onChange={e => setShowSubstations(e.target.checked)} className="accent-amber-600" />
+                    <span className="w-3 h-3 bg-amber-500 inline-block rotate-45"></span>
+                    Substations {totalSubstations > 0 && `(${totalSubstations.toLocaleString()})`}
                   </label>
                 </div>
               </div>

@@ -23,6 +23,8 @@ export default async function handler(req, res) {
       max_score,
       include_dcs,
       include_ixps,
+      include_lines,
+      include_substations,
       bounds, // "sw_lat,sw_lng,ne_lat,ne_lng"
       lite, // "1" for minimal columns (faster initial load)
       limit, // max sites to return (default 5000)
@@ -137,6 +139,52 @@ export default async function handler(req, res) {
         .order("network_count", { ascending: false, nullsFirst: true })
         .limit(1000);
       result.ixps = ixps || [];
+    }
+
+    // Optionally include transmission lines (with geometry for polylines)
+    if (include_lines === "true" || include_lines === "1") {
+      let lineQuery = supabase
+        .from("grid_transmission_lines")
+        .select("id,voltage_kv,owner,sub_1,sub_2,geometry_wkt")
+        .not("geometry_wkt", "is", null);
+
+      // Only load lines at higher zoom levels (require bounds)
+      if (bounds) {
+        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
+        if (!isNaN(swLat)) {
+          // Filter lines whose substations fall within bounds (approximate)
+          // Lines table doesn't have lat/lng directly, but we can use sub coords
+          // For now, return top lines by voltage within limit
+        }
+      }
+
+      const { data: lines } = await lineQuery
+        .order("voltage_kv", { ascending: false, nullsFirst: true })
+        .limit(2000);
+      result.lines = lines || [];
+    }
+
+    // Optionally include substations
+    if (include_substations === "true" || include_substations === "1") {
+      let subQuery = supabase
+        .from("grid_substations")
+        .select("id,name,state,latitude,longitude,max_voltage_kv")
+        .not("latitude", "is", null)
+        .not("longitude", "is", null);
+
+      if (bounds) {
+        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
+        if (!isNaN(swLat)) {
+          subQuery = subQuery
+            .gte("latitude", swLat).lte("latitude", neLat)
+            .gte("longitude", swLng).lte("longitude", neLng);
+        }
+      }
+
+      const { data: subs } = await subQuery
+        .order("max_voltage_kv", { ascending: false, nullsFirst: true })
+        .limit(2000);
+      result.substations = subs || [];
     }
 
     res.status(200).json(result);
