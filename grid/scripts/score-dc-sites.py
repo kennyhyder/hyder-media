@@ -21,6 +21,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.local'))
@@ -31,14 +32,18 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 BATCH_SIZE = 50
 
 # Sub-score weights (must sum to 1.0)
+# Recalibrated per I Squared Capital feedback:
+# - Water dropped from 10% to 3% ("helpful but much lower weighted")
+# - Power and fiber increased (core requirements)
+# - Existing DC cluster value increased
 WEIGHTS = {
-    'power': 0.25,
+    'power': 0.30,
     'speed_to_power': 0.20,
-    'fiber': 0.15,
-    'water': 0.10,
-    'hazard': 0.10,
+    'fiber': 0.18,
+    'water': 0.03,
+    'hazard': 0.07,
     'labor': 0.05,
-    'existing_dc': 0.05,
+    'existing_dc': 0.07,
     'land': 0.05,
     'tax': 0.03,
     'climate': 0.02,
@@ -550,27 +555,28 @@ def main():
         print(f"\n[DRY RUN] Would update {len(patches)} sites with scores")
         return
 
-    # Apply patches
-    print(f"\n  Applying {len(patches)} score patches...")
+    # Apply patches with concurrent workers for speed
+    print(f"\n  Applying {len(patches)} score patches (20 workers)...")
     patched = 0
     patch_errors = 0
 
-    for i, patch in enumerate(patches):
+    def apply_patch(patch):
         site_id = patch.pop('id')
-        try:
-            supabase_request(
-                'PATCH',
-                f'grid_dc_sites?id=eq.{site_id}',
-                patch
-            )
-            patched += 1
-        except Exception as e:
-            patch_errors += 1
-            if patch_errors <= 10:
-                print(f"  Patch error: {e}")
+        supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
+        return True
 
-        if (i + 1) % 1000 == 0:
-            print(f"  Patched {i + 1}/{len(patches)}...")
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        futures = {executor.submit(apply_patch, p): p for p in patches}
+        for i, future in enumerate(as_completed(futures)):
+            try:
+                future.result()
+                patched += 1
+            except Exception as e:
+                patch_errors += 1
+                if patch_errors <= 10:
+                    print(f"  Patch error: {e}")
+            if (i + 1) % 2000 == 0:
+                print(f"  Patched {i + 1}/{len(patches)}...")
 
     print(f"\n{'=' * 60}")
     print(f"DC Site Scoring Complete")
