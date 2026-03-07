@@ -6,11 +6,36 @@ import dynamic from "next/dynamic";
 
 const TransmissionMap = dynamic(() => import("../../components/TransmissionMap"), { ssr: false });
 
+interface NearbyFacility {
+  id: string;
+  name: string;
+  facility_type: "ixp" | "datacenter";
+  org_name?: string;
+  operator?: string;
+  city?: string;
+  state?: string;
+  latitude: number;
+  longitude: number;
+  website?: string;
+  sales_email?: string;
+  sales_phone?: string;
+  tech_email?: string;
+  tech_phone?: string;
+  address?: string;
+  zipcode?: string;
+  ix_count?: number;
+  network_count?: number;
+  capacity_mw?: number;
+  sqft?: number;
+  dc_type?: string;
+}
+
 interface SiteDetail {
   site: Record<string, unknown>;
   county: Record<string, unknown> | null;
   nearbyLines: Record<string, unknown>[];
   brownfield: Record<string, unknown> | null;
+  nearbyFacilities?: NearbyFacility[];
 }
 
 function scoreBar(label: string, value: number, weight: string) {
@@ -358,6 +383,13 @@ function SiteDetailContent() {
             {infoRow("Cleanup Status", (data.brownfield as Record<string, unknown>).cleanup_status)}
             {infoRow("EIA Plant ID", (data.brownfield as Record<string, unknown>).eia_plant_id)}
             {infoRow("Acreage", (data.brownfield as Record<string, unknown>).acreage)}
+            {String((data.brownfield as Record<string, unknown>).operator_name || "") && (
+              <div className="mt-3 pt-3 border-t border-amber-200">
+                <h3 className="text-sm font-medium text-amber-700 mb-2">Operator Contact</h3>
+                {infoRow("Operator", (data.brownfield as Record<string, unknown>).operator_name)}
+                {infoRow("Address", (data.brownfield as Record<string, unknown>).operator_address)}
+              </div>
+            )}
           </div>
         )}
 
@@ -398,6 +430,74 @@ function SiteDetailContent() {
           </div>
         </div>
       </div>
+
+      {/* Nearby Facilities with Contacts */}
+      {data.nearbyFacilities && data.nearbyFacilities.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Nearby Facilities</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Facility</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Website</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.nearbyFacilities as NearbyFacility[]).map((f) => (
+                  <tr key={f.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-2 px-3">
+                      <div className="font-medium text-gray-900 text-xs">{f.name}</div>
+                      {f.org_name && f.org_name !== f.name && (
+                        <div className="text-xs text-gray-500">{f.org_name}</div>
+                      )}
+                      {f.operator && f.operator !== f.name && (
+                        <div className="text-xs text-gray-500">{f.operator}</div>
+                      )}
+                    </td>
+                    <td className="py-2 px-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        f.facility_type === "ixp"
+                          ? "bg-cyan-100 text-cyan-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {f.facility_type === "ixp" ? "IXP" : "DC"}
+                      </span>
+                    </td>
+                    <td className="py-2 px-3 text-xs text-gray-600">
+                      {f.city && `${f.city}, `}{f.state}
+                    </td>
+                    <td className="py-2 px-3 text-xs">
+                      {f.sales_email && (
+                        <a href={`mailto:${f.sales_email}`} className="text-purple-600 hover:underline block">{f.sales_email}</a>
+                      )}
+                      {f.sales_phone && (
+                        <a href={`tel:${f.sales_phone}`} className="text-gray-600 block">{f.sales_phone}</a>
+                      )}
+                      {!f.sales_email && !f.sales_phone && f.tech_email && (
+                        <a href={`mailto:${f.tech_email}`} className="text-purple-600 hover:underline block">{f.tech_email}</a>
+                      )}
+                      {!f.sales_email && !f.sales_phone && !f.tech_email && (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-3 text-xs">
+                      {f.website ? (
+                        <a href={f.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                          Visit
+                        </a>
+                      ) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Nearby transmission lines */}
       {data.nearbyLines.length > 0 && (
