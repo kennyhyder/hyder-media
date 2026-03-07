@@ -25,16 +25,19 @@ export default async function handler(req, res) {
       include_ixps,
       bounds, // "sw_lat,sw_lng,ne_lat,ne_lng"
       lite, // "1" for minimal columns (faster initial load)
+      limit, // max sites to return (default 5000)
     } = req.query;
 
-    // Lite mode: minimal columns for fast initial map render (~3MB vs 30MB)
+    const maxSites = Math.min(parseInt(limit) || 5000, 20000);
+
+    // Lite mode: minimal columns for fast initial map render
     const siteColumns = lite === "1"
       ? "id,name,site_type,state,latitude,longitude,dc_score"
       : "id,name,site_type,state,county,latitude,longitude,dc_score,available_capacity_mw,former_use,substation_voltage_kv,nearest_ixp_distance_km,nearest_dc_distance_km,acreage,score_power,score_speed_to_power,score_fiber,score_water,score_hazard,score_labor,score_existing_dc,score_land,score_tax,score_climate";
 
     let query = supabase
       .from("grid_dc_sites")
-      .select(siteColumns);
+      .select(siteColumns, { count: "exact" });
 
     // Must have coordinates
     query = query.not("latitude", "is", null).not("longitude", "is", null);
@@ -56,40 +59,56 @@ export default async function handler(req, res) {
       }
     }
 
-    // Supabase max 1000 per request — paginate
+    // Paginate up to maxSites (ordered by score desc — best sites first)
     const allSites = [];
     let offset = 0;
     const pageSize = 1000;
-    let hasMore = true;
+    let totalCount = 0;
 
-    while (hasMore) {
-      const { data, error } = await query
-        .range(offset, offset + pageSize - 1)
+    while (allSites.length < maxSites) {
+      const remaining = maxSites - allSites.length;
+      const batchSize = Math.min(pageSize, remaining);
+      const { data, error, count } = await query
+        .range(offset, offset + batchSize - 1)
         .order("dc_score", { ascending: false, nullsFirst: false });
 
       if (error) throw error;
-      if (data && data.length > 0) {
-        allSites.push(...data);
-        offset += data.length;
-        hasMore = data.length === pageSize;
-      } else {
-        hasMore = false;
-      }
+      if (!data || data.length === 0) break;
+
+      allSites.push(...data);
+      offset += data.length;
+
+      if (count != null) totalCount = count;
+      if (data.length < batchSize) break;
     }
 
-    const result = { sites: allSites, total: allSites.length };
+    if (!totalCount) totalCount = allSites.length;
+    const result = { sites: allSites, total: totalCount, returned: allSites.length };
 
     // Optionally include existing datacenters
     if (include_dcs === "true" || include_dcs === "1") {
       const dcColumns = lite === "1"
         ? "id,name,state,latitude,longitude,dc_type"
         : "id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built";
-      const { data: dcs } = await supabase
+
+      let dcQuery = supabase
         .from("grid_datacenters")
         .select(dcColumns)
         .not("latitude", "is", null)
-        .not("longitude", "is", null)
-        .order("capacity_mw", { ascending: false, nullsFirst: true });
+        .not("longitude", "is", null);
+
+      if (bounds) {
+        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
+        if (!isNaN(swLat)) {
+          dcQuery = dcQuery
+            .gte("latitude", swLat).lte("latitude", neLat)
+            .gte("longitude", swLng).lte("longitude", neLng);
+        }
+      }
+
+      const { data: dcs } = await dcQuery
+        .order("capacity_mw", { ascending: false, nullsFirst: true })
+        .limit(1000);
       result.datacenters = dcs || [];
     }
 
@@ -98,12 +117,25 @@ export default async function handler(req, res) {
       const ixpColumns = lite === "1"
         ? "id,name,state,latitude,longitude"
         : "id,name,org_name,city,state,latitude,longitude,ix_count,network_count";
-      const { data: ixps } = await supabase
+
+      let ixpQuery = supabase
         .from("grid_ixp_facilities")
         .select(ixpColumns)
         .not("latitude", "is", null)
-        .not("longitude", "is", null)
-        .order("network_count", { ascending: false, nullsFirst: true });
+        .not("longitude", "is", null);
+
+      if (bounds) {
+        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
+        if (!isNaN(swLat)) {
+          ixpQuery = ixpQuery
+            .gte("latitude", swLat).lte("latitude", neLat)
+            .gte("longitude", swLng).lte("longitude", neLng);
+        }
+      }
+
+      const { data: ixps } = await ixpQuery
+        .order("network_count", { ascending: false, nullsFirst: true })
+        .limit(1000);
       result.ixps = ixps || [];
     }
 

@@ -7,114 +7,43 @@ interface MapSite {
   name: string;
   site_type: string;
   state: string;
-  county: string | null;
   latitude: number;
   longitude: number;
   dc_score: number | null;
-  available_capacity_mw: number | null;
-  former_use: string | null;
-  substation_voltage_kv: number | null;
-  nearest_ixp_distance_km: number | null;
-  nearest_dc_distance_km: number | null;
-  acreage: number | null;
-  // Sub-scores for custom weighting
-  score_power: number | null;
-  score_speed_to_power: number | null;
-  score_fiber: number | null;
-  score_water: number | null;
-  score_hazard: number | null;
-  score_labor: number | null;
-  score_existing_dc: number | null;
-  score_land: number | null;
-  score_tax: number | null;
-  score_climate: number | null;
-  // Computed client-side
-  custom_score?: number;
 }
 
 interface ExistingDC {
   id: string;
   name: string;
-  operator: string | null;
-  city: string | null;
+  operator?: string;
+  city?: string;
   state: string | null;
   latitude: number;
   longitude: number;
-  capacity_mw: number | null;
-  sqft: number | null;
-  dc_type: string | null;
-  year_built: number | null;
+  capacity_mw?: number;
+  sqft?: number;
+  dc_type?: string;
+  year_built?: number;
 }
 
 interface IXP {
   id: string;
   name: string;
-  org_name: string | null;
-  city: string | null;
+  org_name?: string;
+  city?: string;
   state: string | null;
   latitude: number;
   longitude: number;
-  ix_count: number | null;
-  network_count: number | null;
+  ix_count?: number;
+  network_count?: number;
 }
 
 interface MapData {
   sites: MapSite[];
   total: number;
+  returned: number;
   datacenters?: ExistingDC[];
   ixps?: IXP[];
-}
-
-// Default weights matching server-side score-dc-sites.py
-const DEFAULT_WEIGHTS: Record<string, number> = {
-  power: 30,
-  speed_to_power: 20,
-  fiber: 18,
-  water: 3,
-  hazard: 7,
-  labor: 5,
-  existing_dc: 7,
-  land: 5,
-  tax: 3,
-  climate: 2,
-};
-
-const WEIGHT_LABELS: Record<string, string> = {
-  power: "Power Availability",
-  speed_to_power: "Speed to Power",
-  fiber: "Fiber Connectivity",
-  water: "Water Access",
-  hazard: "Low Hazard Risk",
-  labor: "Labor Pool",
-  existing_dc: "DC Ecosystem",
-  land: "Land Suitability",
-  tax: "Tax Incentives",
-  climate: "Climate/Cooling",
-};
-
-function computeCustomScore(site: MapSite, weights: Record<string, number>): number {
-  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
-  if (totalWeight === 0) return 0;
-
-  const subScores: Record<string, number | null> = {
-    power: site.score_power,
-    speed_to_power: site.score_speed_to_power,
-    fiber: site.score_fiber,
-    water: site.score_water,
-    hazard: site.score_hazard,
-    labor: site.score_labor,
-    existing_dc: site.score_existing_dc,
-    land: site.score_land,
-    tax: site.score_tax,
-    climate: site.score_climate,
-  };
-
-  let weighted = 0;
-  for (const [key, w] of Object.entries(weights)) {
-    const sub = subScores[key] ?? 50;
-    weighted += (w / totalWeight) * sub;
-  }
-  return Math.round(weighted * 10) / 10;
 }
 
 function scoreColor(score: number): string {
@@ -133,28 +62,13 @@ function siteTypeColor(type: string): string {
   }
 }
 
-function siteTypeLabel(type: string, formerUse?: string | null): string {
+function siteTypeLabel(type: string): string {
   switch (type) {
     case "substation": return "Substation Site";
-    case "brownfield": {
-      if (formerUse) {
-        const use = formerUse.toLowerCase();
-        if (use.includes("coal")) return "Retired Coal Plant";
-        if (use.includes("gas") || use.includes("natural")) return "Retired Gas Plant";
-        if (use.includes("nuclear")) return "Retired Nuclear Plant";
-        if (use.includes("oil") || use.includes("petrol")) return "Retired Oil Plant";
-        return `Retired ${formerUse.charAt(0).toUpperCase() + formerUse.slice(1)} Plant`;
-      }
-      return "Retired Power Plant";
-    }
+    case "brownfield": return "Retired Power Plant";
     case "greenfield": return "Greenfield Corridor";
     default: return type;
   }
-}
-
-function kmToMiles(km: number | null): string {
-  if (km === null || km === undefined) return "N/A";
-  return (km * 0.621371).toFixed(1) + " mi";
 }
 
 const US_STATES = [
@@ -169,10 +83,24 @@ export default function MapPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leafletMap = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<any>(null);
+  const siteLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dcLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ixpLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const LRef = useRef<any>(null);
+  const fetchControllerRef = useRef<AbortController | null>(null);
+  const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [mounted, setMounted] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<MapData | null>(null);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [totalSites, setTotalSites] = useState(0);
+  const [returnedSites, setReturnedSites] = useState(0);
+  const [totalDCs, setTotalDCs] = useState(0);
+  const [totalIXPs, setTotalIXPs] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   // Filters
@@ -185,73 +113,17 @@ export default function MapPage() {
   const [showSites, setShowSites] = useState(true);
   const [colorBy, setColorBy] = useState<"score" | "type">("score");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [scoringOpen, setScoringOpen] = useState(false);
 
-  // Custom scoring weights (0-100 each, normalized at compute time)
-  const [weights, setWeights] = useState<Record<string, number>>({ ...DEFAULT_WEIGHTS });
-  const [useCustomScoring, setUseCustomScoring] = useState(false);
+  // Score distribution
+  const [scoreDistribution, setScoreDistribution] = useState({ excellent: 0, good: 0, fair: 0, poor: 0 });
+  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0 });
 
+  useEffect(() => { setMounted(true); }, []);
+
+  // Initialize map once
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!mounted || !mapRef.current || mapReady) return;
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const baseUrl = window.location.origin;
-      const params = new URLSearchParams();
-      if (filterState) params.set("state", filterState);
-      if (filterType) params.set("site_type", filterType);
-      if (filterMinScore) params.set("min_score", filterMinScore);
-      if (filterMaxScore) params.set("max_score", filterMaxScore);
-      params.set("include_dcs", "1");
-      params.set("include_ixps", "1");
-      params.set("lite", "1");
-
-      const res = await fetch(`${baseUrl}/api/grid/map-data?${params}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      setData(json);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, [filterState, filterType, filterMinScore, filterMaxScore]);
-
-  useEffect(() => {
-    if (mounted) fetchData();
-  }, [mounted, fetchData]);
-
-  // Compute custom scores when weights change
-  const scoredSites = useMemo(() => {
-    if (!data?.sites) return [];
-    if (!useCustomScoring) return data.sites;
-    return data.sites.map(s => ({
-      ...s,
-      custom_score: computeCustomScore(s, weights),
-    }));
-  }, [data, weights, useCustomScoring]);
-
-  // Score distribution for sidebar
-  const scoreDistribution = useMemo(() => {
-    const sites = scoredSites;
-    const getScore = (s: MapSite) => useCustomScoring ? (s.custom_score ?? 0) : (s.dc_score ?? 0);
-    return {
-      excellent: sites.filter(s => getScore(s) >= 70).length,
-      good: sites.filter(s => getScore(s) >= 50 && getScore(s) < 70).length,
-      fair: sites.filter(s => getScore(s) >= 30 && getScore(s) < 50).length,
-      poor: sites.filter(s => getScore(s) < 30).length,
-    };
-  }, [scoredSites, useCustomScoring]);
-
-  // Render map markers
-  useEffect(() => {
-    if (!mounted || !mapRef.current || !data) return;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let map: any;
     let cleanup = false;
 
     (async () => {
@@ -259,12 +131,13 @@ export default function MapPage() {
       await import("leaflet.markercluster");
 
       if (cleanup || !mapRef.current) return;
+      LRef.current = L;
 
       if (leafletMap.current) {
         leafletMap.current.remove();
       }
 
-      map = L.map(mapRef.current, {
+      const map = L.map(mapRef.current, {
         preferCanvas: true,
         zoomControl: false,
       }).setView([39.0, -98.0], 5);
@@ -292,26 +165,30 @@ export default function MapPage() {
         { position: "topright" }
       ).addTo(map);
 
+      // Create persistent layer groups
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clusterGroup = (window as any).L.markerClusterGroup({
+      const createCluster = () => (window as any).L.markerClusterGroup({
         chunkedLoading: true,
+        chunkInterval: 100,
+        chunkDelay: 10,
         maxClusterRadius: 50,
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 14,
         iconCreateFunction: function(cluster: { getChildCount: () => number }) {
           const count = cluster.getChildCount();
-          let size = "small";
           let dim = 30;
-          if (count > 100) { size = "large"; dim = 50; }
-          else if (count > 10) { size = "medium"; dim = 40; }
+          let fontSize = "11";
+          if (count > 100) { dim = 50; fontSize = "14"; }
+          else if (count > 10) { dim = 40; fontSize = "12"; }
 
           return L.divIcon({
             html: `<div style="
               width:${dim}px;height:${dim}px;border-radius:50%;
               background:rgba(124,58,237,0.8);border:2px solid rgba(255,255,255,0.6);
               display:flex;align-items:center;justify-content:center;
-              color:white;font-weight:700;font-size:${size === 'large' ? '14' : size === 'medium' ? '12' : '11'}px;
+              color:white;font-weight:700;font-size:${fontSize}px;
               font-family:system-ui;
             ">${count >= 1000 ? Math.round(count/1000) + 'K' : count}</div>`,
             className: "",
@@ -320,142 +197,36 @@ export default function MapPage() {
         },
       });
 
-      // DC site markers
-      if (showSites) {
-        for (const site of scoredSites) {
-          if (!site.latitude || !site.longitude) continue;
+      siteLayerRef.current = createCluster();
+      dcLayerRef.current = L.layerGroup();
+      ixpLayerRef.current = L.layerGroup();
 
-          const score = useCustomScoring ? (site.custom_score ?? 0) : (site.dc_score ?? 0);
-          const color = colorBy === "score"
-            ? scoreColor(score)
-            : siteTypeColor(site.site_type);
+      map.addLayer(siteLayerRef.current);
+      map.addLayer(dcLayerRef.current);
+      map.addLayer(ixpLayerRef.current);
 
-          const marker = L.circleMarker([site.latitude, site.longitude], {
-            radius: 5,
-            fillColor: color,
-            color: "rgba(255,255,255,0.5)",
-            weight: 1,
-            fillOpacity: 0.8,
-          });
-
-          const scoreLabel = score.toFixed(1);
-          const typeDesc = siteTypeLabel(site.site_type, site.former_use);
-
-          marker.bindPopup(`
-            <div style="min-width:220px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${site.name || "Unnamed Site"}</strong><br/>
-              <span style="color:${siteTypeColor(site.site_type)};font-weight:600">${typeDesc}</span>
-              · ${site.state}<br/>
-              <div style="margin:6px 0;padding:6px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">
-                <span style="font-size:20px;font-weight:700;color:${scoreColor(score)}">${scoreLabel}</span>
-                <span style="color:#666;font-size:11px">/100 DC Score</span>
-              </div>
-              <a href="/grid/site/?id=${site.id}" style="color:#7c3aed;text-decoration:underline;font-weight:600">View Details →</a>
-            </div>
-          `);
-
-          clusterGroup.addLayer(marker);
-        }
-      }
-
-      // Existing datacenter markers (blue, larger)
-      if (showDCs && data.datacenters) {
-        for (const dc of data.datacenters) {
-          if (!dc.latitude || !dc.longitude) continue;
-
-          const marker = L.circleMarker([dc.latitude, dc.longitude], {
-            radius: 8,
-            fillColor: "#3b82f6",
-            color: "#1d4ed8",
-            weight: 2,
-            fillOpacity: 0.9,
-          });
-
-          const capacityStr = dc.capacity_mw ? `${Number(dc.capacity_mw).toFixed(0)} MW` : "";
-          const sqftStr = dc.sqft ? `${Number(dc.sqft).toLocaleString()} sqft` : "";
-
-          marker.bindPopup(`
-            <div style="min-width:200px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${dc.name || "Datacenter"}</strong><br/>
-              <span style="color:#3b82f6;font-weight:600">Existing Datacenter</span><br/>
-              ${dc.operator ? `<b>Operator:</b> ${dc.operator}<br/>` : ""}
-              ${dc.city ? `${dc.city}, ` : ""}${dc.state || ""}<br/>
-              ${capacityStr ? `<b>Capacity:</b> ${capacityStr}<br/>` : ""}
-              ${sqftStr ? `<b>Size:</b> ${sqftStr}<br/>` : ""}
-              ${dc.dc_type ? `<b>Type:</b> ${dc.dc_type}<br/>` : ""}
-              ${dc.year_built ? `<b>Built:</b> ${dc.year_built}<br/>` : ""}
-            </div>
-          `);
-
-          clusterGroup.addLayer(marker);
-        }
-      }
-
-      // IXP markers (cyan — labeled as DC interconnection facilities)
-      if (showIXPs && data.ixps) {
-        for (const ixp of data.ixps) {
-          if (!ixp.latitude || !ixp.longitude) continue;
-
-          const marker = L.circleMarker([ixp.latitude, ixp.longitude], {
-            radius: 7,
-            fillColor: "#06b6d4",
-            color: "#0891b2",
-            weight: 2,
-            fillOpacity: 0.9,
-          });
-
-          marker.bindPopup(`
-            <div style="min-width:200px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${ixp.name}</strong><br/>
-              <span style="color:#06b6d4;font-weight:600">Interconnection Facility (IXP)</span><br/>
-              ${ixp.org_name ? `<b>Operator:</b> ${ixp.org_name}<br/>` : ""}
-              ${ixp.city ? `${ixp.city}, ` : ""}${ixp.state || ""}<br/>
-              ${ixp.ix_count ? `<b>Exchanges:</b> ${ixp.ix_count}<br/>` : ""}
-              ${ixp.network_count ? `<b>Networks:</b> ${ixp.network_count}<br/>` : ""}
-            </div>
-          `);
-
-          clusterGroup.addLayer(marker);
-        }
-      }
-
-      markersRef.current = clusterGroup;
-      map.addLayer(clusterGroup);
-
-      // Legend
+      // Add legend
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const legend = new (L.Control as any)({ position: "bottomright" });
       legend.onAdd = () => {
         const div = L.DomUtil.create("div", "");
         div.style.cssText = "background:rgba(0,0,0,0.85);padding:10px 14px;border-radius:8px;font-size:11px;color:#fff;font-family:system-ui;line-height:1.6";
-
-        if (colorBy === "score") {
-          div.innerHTML = `
-            <div style="font-weight:700;margin-bottom:4px">${useCustomScoring ? 'Custom' : 'DC Readiness'} Score</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#22c55e"></div> 70-100 Excellent</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#eab308"></div> 50-70 Good</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#f97316"></div> 30-50 Fair</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#ef4444"></div> 0-30 Poor</div>
-            <div style="border-top:1px solid #444;margin:6px 0;padding-top:6px">
-              <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #1d4ed8"></div> Existing DC</div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#06b6d4;border:2px solid #0891b2"></div> IXP / Interconnect</div>
-            </div>
-          `;
-        } else {
-          div.innerHTML = `
-            <div style="font-weight:700;margin-bottom:4px">Site Type</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#7c3aed"></div> Substation Site</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#d97706"></div> Retired Power Plant</div>
-            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#059669"></div> Greenfield Corridor</div>
-            <div style="border-top:1px solid #444;margin:6px 0;padding-top:6px">
-              <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #1d4ed8"></div> Existing DC</div>
-              <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#06b6d4;border:2px solid #0891b2"></div> IXP / Interconnect</div>
-            </div>
-          `;
-        }
+        div.innerHTML = `
+          <div style="font-weight:700;margin-bottom:4px">DC Readiness Score</div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#22c55e"></div> 70-100 Excellent</div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#eab308"></div> 50-70 Good</div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#f97316"></div> 30-50 Fair</div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#ef4444"></div> 0-30 Poor</div>
+          <div style="border-top:1px solid #444;margin:6px 0;padding-top:6px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;border:2px solid #1d4ed8"></div> Existing DC</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#06b6d4;border:2px solid #0891b2"></div> IXP / Interconnect</div>
+          </div>
+        `;
         return div;
       };
       legend.addTo(map);
+
+      setMapReady(true);
     })();
 
     return () => {
@@ -466,19 +237,229 @@ export default function MapPage() {
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, scoredSites, showSites, showDCs, showIXPs, colorBy, useCustomScoring]);
+  }, [mounted]);
 
-  const totalDCs = data?.datacenters?.length || 0;
-  const totalIXPs = data?.ixps?.length || 0;
-  const totalSites = scoredSites.length;
+  // Fetch data and render markers
+  const fetchAndRender = useCallback(async (useBounds = false) => {
+    if (!mapReady || !LRef.current) return;
 
-  const updateWeight = (key: string, val: number) => {
-    setWeights(prev => ({ ...prev, [key]: val }));
-  };
+    // Cancel any in-flight request
+    if (fetchControllerRef.current) {
+      fetchControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    fetchControllerRef.current = controller;
 
-  const resetWeights = () => {
-    setWeights({ ...DEFAULT_WEIGHTS });
-  };
+    setLoading(true);
+    setError(null);
+
+    try {
+      const baseUrl = window.location.origin;
+      const params = new URLSearchParams();
+      if (filterState) params.set("state", filterState);
+      if (filterType) params.set("site_type", filterType);
+      if (filterMinScore) params.set("min_score", filterMinScore);
+      if (filterMaxScore) params.set("max_score", filterMaxScore);
+      params.set("include_dcs", "1");
+      params.set("include_ixps", "1");
+      params.set("lite", "1");
+
+      // Use viewport bounds for re-fetches (not initial load)
+      if (useBounds && leafletMap.current) {
+        const b = leafletMap.current.getBounds();
+        const sw = b.getSouthWest();
+        const ne = b.getNorthEast();
+        params.set("bounds", `${sw.lat},${sw.lng},${ne.lat},${ne.lng}`);
+        params.set("limit", "8000");
+      } else {
+        params.set("limit", "5000");
+      }
+
+      const res = await fetch(`${baseUrl}/api/grid/map-data?${params}`, {
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json: MapData = await res.json();
+
+      if (controller.signal.aborted) return;
+
+      const L = LRef.current;
+
+      // Update site markers
+      siteLayerRef.current.clearLayers();
+      let excellent = 0, good = 0, fair = 0, poor = 0;
+      let sub = 0, bf = 0, gf = 0;
+
+      for (const site of json.sites) {
+        if (!site.latitude || !site.longitude) continue;
+
+        const score = site.dc_score ?? 0;
+        if (score >= 70) excellent++;
+        else if (score >= 50) good++;
+        else if (score >= 30) fair++;
+        else poor++;
+
+        if (site.site_type === "substation") sub++;
+        else if (site.site_type === "brownfield") bf++;
+        else if (site.site_type === "greenfield") gf++;
+
+        const color = colorBy === "score"
+          ? scoreColor(score)
+          : siteTypeColor(site.site_type);
+
+        const marker = L.circleMarker([site.latitude, site.longitude], {
+          radius: 5,
+          fillColor: color,
+          color: "rgba(255,255,255,0.5)",
+          weight: 1,
+          fillOpacity: 0.8,
+        });
+
+        const typeDesc = siteTypeLabel(site.site_type);
+        marker.bindPopup(`
+          <div style="min-width:220px;font-family:system-ui;font-size:13px">
+            <strong style="font-size:14px">${site.name || "Unnamed Site"}</strong><br/>
+            <span style="color:${siteTypeColor(site.site_type)};font-weight:600">${typeDesc}</span>
+            · ${site.state}<br/>
+            <div style="margin:6px 0;padding:6px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">
+              <span style="font-size:20px;font-weight:700;color:${scoreColor(score)}">${score.toFixed(1)}</span>
+              <span style="color:#666;font-size:11px">/100 DC Score</span>
+            </div>
+            <a href="/grid/site/?id=${site.id}" style="color:#7c3aed;text-decoration:underline;font-weight:600">View Details →</a>
+          </div>
+        `);
+
+        siteLayerRef.current.addLayer(marker);
+      }
+
+      setScoreDistribution({ excellent, good, fair, poor });
+      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf });
+
+      // Update DC markers
+      dcLayerRef.current.clearLayers();
+      if (json.datacenters) {
+        for (const dc of json.datacenters) {
+          if (!dc.latitude || !dc.longitude) continue;
+          const marker = L.circleMarker([dc.latitude, dc.longitude], {
+            radius: 8,
+            fillColor: "#3b82f6",
+            color: "#1d4ed8",
+            weight: 2,
+            fillOpacity: 0.9,
+          });
+          const capacityStr = dc.capacity_mw ? `${Number(dc.capacity_mw).toFixed(0)} MW` : "";
+          marker.bindPopup(`
+            <div style="min-width:200px;font-family:system-ui;font-size:13px">
+              <strong style="font-size:14px">${dc.name || "Datacenter"}</strong><br/>
+              <span style="color:#3b82f6;font-weight:600">Existing Datacenter</span><br/>
+              ${dc.operator ? `<b>Operator:</b> ${dc.operator}<br/>` : ""}
+              ${dc.city ? `${dc.city}, ` : ""}${dc.state || ""}<br/>
+              ${capacityStr ? `<b>Capacity:</b> ${capacityStr}<br/>` : ""}
+              ${dc.dc_type ? `<b>Type:</b> ${dc.dc_type}<br/>` : ""}
+            </div>
+          `);
+          dcLayerRef.current.addLayer(marker);
+        }
+        setTotalDCs(json.datacenters.length);
+      }
+
+      // Update IXP markers
+      ixpLayerRef.current.clearLayers();
+      if (json.ixps) {
+        for (const ixp of json.ixps) {
+          if (!ixp.latitude || !ixp.longitude) continue;
+          const marker = L.circleMarker([ixp.latitude, ixp.longitude], {
+            radius: 7,
+            fillColor: "#06b6d4",
+            color: "#0891b2",
+            weight: 2,
+            fillOpacity: 0.9,
+          });
+          marker.bindPopup(`
+            <div style="min-width:200px;font-family:system-ui;font-size:13px">
+              <strong style="font-size:14px">${ixp.name}</strong><br/>
+              <span style="color:#06b6d4;font-weight:600">Interconnection Facility (IXP)</span><br/>
+              ${ixp.org_name ? `<b>Operator:</b> ${ixp.org_name}<br/>` : ""}
+              ${ixp.city ? `${ixp.city}, ` : ""}${ixp.state || ""}<br/>
+              ${ixp.ix_count ? `<b>Exchanges:</b> ${ixp.ix_count}<br/>` : ""}
+              ${ixp.network_count ? `<b>Networks:</b> ${ixp.network_count}<br/>` : ""}
+            </div>
+          `);
+          ixpLayerRef.current.addLayer(marker);
+        }
+        setTotalIXPs(json.ixps.length);
+      }
+
+      setTotalSites(json.total);
+      setReturnedSites(json.returned);
+      setInitialLoad(false);
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy]);
+
+  // Initial data load
+  useEffect(() => {
+    if (mapReady) fetchAndRender(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore]);
+
+  // Re-fetch on viewport change (debounced)
+  useEffect(() => {
+    if (!mapReady || !leafletMap.current || initialLoad) return;
+
+    const onMoveEnd = () => {
+      if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+      moveTimeoutRef.current = setTimeout(() => {
+        fetchAndRender(true);
+      }, 400);
+    };
+
+    leafletMap.current.on("moveend", onMoveEnd);
+    return () => {
+      leafletMap.current?.off("moveend", onMoveEnd);
+      if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+    };
+  }, [mapReady, initialLoad, fetchAndRender]);
+
+  // Toggle layer visibility without re-fetching
+  useEffect(() => {
+    if (!leafletMap.current || !siteLayerRef.current) return;
+    if (showSites) {
+      if (!leafletMap.current.hasLayer(siteLayerRef.current)) leafletMap.current.addLayer(siteLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(siteLayerRef.current);
+    }
+  }, [showSites]);
+
+  useEffect(() => {
+    if (!leafletMap.current || !dcLayerRef.current) return;
+    if (showDCs) {
+      if (!leafletMap.current.hasLayer(dcLayerRef.current)) leafletMap.current.addLayer(dcLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(dcLayerRef.current);
+    }
+  }, [showDCs]);
+
+  useEffect(() => {
+    if (!leafletMap.current || !ixpLayerRef.current) return;
+    if (showIXPs) {
+      if (!leafletMap.current.hasLayer(ixpLayerRef.current)) leafletMap.current.addLayer(ixpLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(ixpLayerRef.current);
+    }
+  }, [showIXPs]);
+
+  // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
+  useEffect(() => {
+    if (mapReady && !initialLoad) {
+      fetchAndRender(leafletMap.current?.getZoom() > 5);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colorBy]);
 
   return (
     <>
@@ -493,7 +474,13 @@ export default function MapPage() {
             <div className="p-4 border-b border-gray-200">
               <h2 className="text-lg font-bold text-gray-900">Site Explorer</h2>
               <p className="text-xs text-gray-500 mt-1">
-                {loading ? "Loading..." : `${totalSites.toLocaleString()} prospects · ${totalDCs} existing DCs · ${totalIXPs} IXPs`}
+                {loading && initialLoad ? "Loading..." : (
+                  <>
+                    {returnedSites.toLocaleString()}{returnedSites < totalSites ? ` of ${totalSites.toLocaleString()}` : ""} sites
+                    {" · "}{totalDCs} DCs · {totalIXPs} IXPs
+                    {returnedSites < totalSites && <span className="text-purple-600"> · zoom in for more</span>}
+                  </>
+                )}
               </p>
             </div>
 
@@ -505,7 +492,7 @@ export default function MapPage() {
                   <label className="flex items-center gap-2 text-sm">
                     <input type="checkbox" checked={showSites} onChange={e => setShowSites(e.target.checked)} className="accent-purple-600" />
                     <span className="w-3 h-3 rounded-full bg-purple-600 inline-block"></span>
-                    Prospect Sites ({totalSites.toLocaleString()})
+                    Prospect Sites ({returnedSites.toLocaleString()})
                   </label>
                   <label className="flex items-center gap-2 text-sm">
                     <input type="checkbox" checked={showDCs} onChange={e => setShowDCs(e.target.checked)} className="accent-blue-600" />
@@ -596,71 +583,8 @@ export default function MapPage() {
                 </div>
               </div>
 
-              {/* Custom Scoring */}
-              <div className="border-t border-gray-200 pt-4">
-                <button
-                  onClick={() => setScoringOpen(!scoringOpen)}
-                  className="flex items-center justify-between w-full text-left"
-                >
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide cursor-pointer">
-                    Custom Scoring
-                  </label>
-                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${scoringOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                {scoringOpen && (
-                  <div className="mt-3 space-y-3">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={useCustomScoring}
-                        onChange={e => setUseCustomScoring(e.target.checked)}
-                        className="accent-purple-600"
-                      />
-                      <span className="font-medium">Enable custom weights</span>
-                    </label>
-
-                    {useCustomScoring && (
-                      <>
-                        <p className="text-xs text-gray-500">
-                          Adjust weights to prioritize what matters most. Scores recompute instantly.
-                        </p>
-
-                        <div className="space-y-2">
-                          {Object.entries(WEIGHT_LABELS).map(([key, label]) => (
-                            <div key={key}>
-                              <div className="flex items-center justify-between mb-0.5">
-                                <span className="text-xs text-gray-700">{label}</span>
-                                <span className="text-xs font-mono text-gray-500 w-8 text-right">{weights[key]}</span>
-                              </div>
-                              <input
-                                type="range"
-                                min={0}
-                                max={50}
-                                value={weights[key]}
-                                onChange={e => updateWeight(key, parseInt(e.target.value))}
-                                className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
-                              />
-                            </div>
-                          ))}
-                        </div>
-
-                        <button
-                          onClick={resetWeights}
-                          className="text-xs text-purple-600 hover:text-purple-800 font-medium"
-                        >
-                          Reset to defaults
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
               {/* Score Distribution */}
-              {data && !loading && (
+              {!initialLoad && (
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Score Distribution</label>
                   <div className="mt-2 space-y-1">
@@ -676,7 +600,7 @@ export default function MapPage() {
                         <div className="flex-1 bg-gray-100 rounded-full h-2">
                           <div className="h-2 rounded-full" style={{
                             background: band.color,
-                            width: `${Math.max(1, (band.count / totalSites) * 100)}%`,
+                            width: `${Math.max(1, (band.count / Math.max(returnedSites, 1)) * 100)}%`,
                           }}></div>
                         </div>
                         <span className="text-gray-500 w-12 text-right">{band.count.toLocaleString()}</span>
@@ -687,24 +611,21 @@ export default function MapPage() {
               )}
 
               {/* Site Type Breakdown */}
-              {data && !loading && (
+              {!initialLoad && (
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">By Type</label>
                   <div className="mt-2 space-y-1">
                     {[
-                      { type: "substation", label: "Substation Sites", color: "#7c3aed" },
-                      { type: "greenfield", label: "Greenfield Corridors", color: "#059669" },
-                      { type: "brownfield", label: "Retired Power Plants", color: "#d97706" },
-                    ].map(t => {
-                      const count = scoredSites.filter(s => s.site_type === t.type).length;
-                      return (
-                        <div key={t.type} className="flex items-center gap-2 text-xs">
-                          <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>
-                          <span className="flex-1 text-gray-700">{t.label}</span>
-                          <span className="text-gray-500">{count.toLocaleString()}</span>
-                        </div>
-                      );
-                    })}
+                      { type: "substation", label: "Substation Sites", color: "#7c3aed", count: typeBreakdown.substation },
+                      { type: "greenfield", label: "Greenfield Corridors", color: "#059669", count: typeBreakdown.greenfield },
+                      { type: "brownfield", label: "Retired Power Plants", color: "#d97706", count: typeBreakdown.brownfield },
+                    ].map(t => (
+                      <div key={t.type} className="flex items-center gap-2 text-xs">
+                        <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>
+                        <span className="flex-1 text-gray-700">{t.label}</span>
+                        <span className="text-gray-500">{t.count.toLocaleString()}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -725,12 +646,18 @@ export default function MapPage() {
               </svg>
             </button>
 
-            {loading && (
+            {loading && initialLoad && (
               <div className="absolute inset-0 bg-gray-900/50 z-[1000] flex items-center justify-center">
                 <div className="bg-white rounded-xl px-6 py-4 shadow-xl">
-                  <div className="text-gray-700 font-medium">Loading {filterState ? `${filterState} ` : ""}sites...</div>
-                  <div className="text-gray-500 text-sm mt-1">~40K sites across all 50 states</div>
+                  <div className="text-gray-700 font-medium">Loading top-scored sites...</div>
+                  <div className="text-gray-500 text-sm mt-1">Zoom in to explore more</div>
                 </div>
+              </div>
+            )}
+
+            {loading && !initialLoad && (
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 border border-gray-200 rounded-full px-4 py-1.5 shadow text-xs text-gray-600">
+                Updating...
               </div>
             )}
 

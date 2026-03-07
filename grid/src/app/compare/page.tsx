@@ -106,6 +106,45 @@ function CompareContent() {
     window.print();
   };
 
+  const handleExportCSV = () => {
+    if (sites.length === 0) return;
+    const siteRecs = sites.map((d) => d.site as Record<string, number | string | null>);
+    const countyRecs = sites.map((d) => d.county as Record<string, number | string | null> | null);
+    const headers = [
+      "Name", "State", "County", "Site Type", "DC Score",
+      ...SCORE_FACTORS.map(f => f.label),
+      "Nearest Substation", "Substation Distance (mi)", "Voltage (kV)", "Available Capacity (MW)",
+      "Nearest IXP", "IXP Distance (mi)", "Nearest DC", "DC Distance (mi)",
+      "ISO Region", "Queue Depth", "Acreage",
+      "NRI Score", "NRI Rating", "Water Stress", "Land Value ($/acre)", "DC Tax Incentive",
+    ];
+    const rows = siteRecs.map((s, i) => {
+      const c = countyRecs[i];
+      return [
+        s.name, s.state, s.county, s.site_type, s.dc_score,
+        ...SCORE_FACTORS.map(f => s[f.key] ?? ""),
+        s.nearest_substation_name, s.nearest_substation_distance_km ? (Number(s.nearest_substation_distance_km) * 0.621371).toFixed(1) : "",
+        s.substation_voltage_kv, s.available_capacity_mw,
+        s.nearest_ixp_name, s.nearest_ixp_distance_km ? (Number(s.nearest_ixp_distance_km) * 0.621371).toFixed(1) : "",
+        s.nearest_dc_name, s.nearest_dc_distance_km ? (Number(s.nearest_dc_distance_km) * 0.621371).toFixed(1) : "",
+        s.iso_region, s.queue_depth, s.acreage,
+        c?.nri_score, c?.nri_rating, c?.water_stress_label,
+        c?.avg_land_value_per_acre_usd, c?.has_dc_tax_incentive ? "Yes" : "No",
+      ].map(v => {
+        const str = String(v ?? "");
+        return str.includes(",") ? `"${str}"` : str;
+      });
+    });
+    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gridscout-comparison-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div>
@@ -176,6 +215,12 @@ function CompareContent() {
             className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
           >
             Export PDF
+          </button>
+          <button
+            onClick={handleExportCSV}
+            className="px-4 py-2 text-sm text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50"
+          >
+            Export CSV
           </button>
           <button
             onClick={handleClearAll}
