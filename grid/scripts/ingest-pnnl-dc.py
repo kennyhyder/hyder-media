@@ -21,6 +21,7 @@ import csv
 import time
 import math
 import io
+import sqlite3
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -93,6 +94,68 @@ def safe_str(val, max_len=500):
     if not s or s.lower() in ('none', 'null', 'n/a', 'unknown', ''):
         return None
     return s[:max_len] if len(s) > max_len else s
+
+
+GPKG_PATH = '/tmp/pnnl_dc.gpkg'
+
+
+def parse_geopackage(gpkg_path):
+    """Parse PNNL IM3 GeoPackage (SQLite) into datacenter records."""
+    records = []
+    conn = sqlite3.connect(gpkg_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    for layer in ('point', 'building', 'campus'):
+        cur.execute(f'SELECT COUNT(*) FROM "{layer}"')
+        count = cur.fetchone()[0]
+        print(f"  {layer}: {count} records")
+
+        cur.execute(f'SELECT * FROM "{layer}"')
+        for row in cur.fetchall():
+            lat = row['lat']
+            lon = row['lon']
+            if not lat or not lon:
+                continue
+
+            state = row['state_abb']
+            if not state or len(state) != 2:
+                continue
+
+            name = safe_str(row['name'])
+            operator = safe_str(row['operator'])
+            sqft = safe_float(row['sqft'])
+            dc_id = row['id'] or ''
+
+            # Classify dc_type from operator name
+            dc_type = None
+            if operator:
+                op_lower = operator.lower()
+                if any(h in op_lower for h in ['amazon', 'aws', 'google', 'microsoft', 'azure', 'meta', 'facebook', 'apple', 'oracle']):
+                    dc_type = 'hyperscale'
+                elif any(c in op_lower for c in ['equinix', 'digital realty', 'coresite', 'cyrusone', 'qts', 'switch', 'databank']):
+                    dc_type = 'colocation'
+                else:
+                    dc_type = 'enterprise'
+
+            source_id = f"pnnl_gpkg_{layer[0]}_{dc_id}" if dc_id else f"pnnl_gpkg_{layer[0]}_{len(records)}"
+
+            records.append({
+                'source_record_id': source_id,
+                'name': name or (f"{operator} DC" if operator else f"Datacenter {dc_id}"),
+                'operator': operator,
+                'city': None,  # GeoPackage has county but not city
+                'state': state,
+                'latitude': round(lat, 6),
+                'longitude': round(lon, 6),
+                'capacity_mw': None,
+                'sqft': int(sqft) if sqft else None,
+                'dc_type': dc_type,
+                'year_built': None,
+            })
+
+    conn.close()
+    return records
 
 
 def try_download_pnnl():
@@ -587,13 +650,19 @@ def main():
     records = []
 
     if not force_fallback:
-        # Try downloading PNNL data
-        print("\nAttempting PNNL IM3 datacenter download...")
-        csv_path = try_download_pnnl()
-        if csv_path:
-            print("Parsing PNNL CSV...")
-            records = parse_pnnl_csv(csv_path)
-            print(f"  {len(records)} records from PNNL data")
+        # Try GeoPackage first (local file from PNNL IM3)
+        if os.path.exists(GPKG_PATH):
+            print(f"\nParsing PNNL IM3 GeoPackage ({os.path.getsize(GPKG_PATH)/1024:.0f} KB)...")
+            records = parse_geopackage(GPKG_PATH)
+            print(f"  {len(records)} total records from GeoPackage")
+        else:
+            # Try downloading PNNL CSV from Zenodo
+            print("\nAttempting PNNL IM3 datacenter download...")
+            csv_path = try_download_pnnl()
+            if csv_path:
+                print("Parsing PNNL CSV...")
+                records = parse_pnnl_csv(csv_path)
+                print(f"  {len(records)} records from PNNL data")
 
     if not records:
         print("\nUsing hardcoded fallback datacenter data...")
