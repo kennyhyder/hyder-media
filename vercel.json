@@ -114,6 +114,9 @@
     },
     "api/grid/corridor.js": {
       "maxDuration": 30
+    },
+    "api/grid/map-data.js": {
+      "maxDuration": 120
     }
   }
 }

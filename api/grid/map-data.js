@@ -24,14 +24,20 @@ export default async function handler(req, res) {
       include_dcs,
       include_ixps,
       bounds, // "sw_lat,sw_lng,ne_lat,ne_lng"
+      lite, // "1" for minimal columns (faster initial load)
     } = req.query;
 
-    // Columns for map markers + sub-scores for client-side custom scoring
-    const siteColumns = "id,name,site_type,state,county,latitude,longitude,dc_score,available_capacity_mw,former_use,substation_voltage_kv,nearest_ixp_distance_km,nearest_dc_distance_km,acreage,score_power,score_speed_to_power,score_fiber,score_water,score_hazard,score_labor,score_existing_dc,score_land,score_tax,score_climate";
+    // Lite mode: minimal columns for fast initial map render (~3MB vs 30MB)
+    const siteColumns = lite === "1"
+      ? "id,name,site_type,state,latitude,longitude,dc_score"
+      : "id,name,site_type,state,county,latitude,longitude,dc_score,available_capacity_mw,former_use,substation_voltage_kv,nearest_ixp_distance_km,nearest_dc_distance_km,acreage,score_power,score_speed_to_power,score_fiber,score_water,score_hazard,score_labor,score_existing_dc,score_land,score_tax,score_climate";
 
     let query = supabase
       .from("grid_dc_sites")
       .select(siteColumns);
+
+    // Must have coordinates
+    query = query.not("latitude", "is", null).not("longitude", "is", null);
 
     if (state) query = query.eq("state", state.toUpperCase());
     if (site_type) query = query.eq("site_type", site_type);
@@ -75,18 +81,28 @@ export default async function handler(req, res) {
 
     // Optionally include existing datacenters
     if (include_dcs === "true" || include_dcs === "1") {
+      const dcColumns = lite === "1"
+        ? "id,name,state,latitude,longitude,dc_type"
+        : "id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built";
       const { data: dcs } = await supabase
         .from("grid_datacenters")
-        .select("id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built")
+        .select(dcColumns)
+        .not("latitude", "is", null)
+        .not("longitude", "is", null)
         .order("capacity_mw", { ascending: false, nullsFirst: true });
       result.datacenters = dcs || [];
     }
 
     // Optionally include IXPs
     if (include_ixps === "true" || include_ixps === "1") {
+      const ixpColumns = lite === "1"
+        ? "id,name,state,latitude,longitude"
+        : "id,name,org_name,city,state,latitude,longitude,ix_count,network_count";
       const { data: ixps } = await supabase
         .from("grid_ixp_facilities")
-        .select("id,name,org_name,city,state,latitude,longitude,ix_count,network_count")
+        .select(ixpColumns)
+        .not("latitude", "is", null)
+        .not("longitude", "is", null)
         .order("network_count", { ascending: false, nullsFirst: true });
       result.ixps = ixps || [];
     }
