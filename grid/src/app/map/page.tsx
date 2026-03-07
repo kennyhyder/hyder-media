@@ -256,11 +256,6 @@ export default function MapPage() {
 
     (async () => {
       const L = await import("leaflet");
-      // Ensure L is available globally for leaflet.markercluster plugin
-      if (typeof window !== "undefined") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).L = L;
-      }
       await import("leaflet.markercluster");
 
       if (cleanup || !mapRef.current) return;
@@ -298,7 +293,7 @@ export default function MapPage() {
       ).addTo(map);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const clusterGroup = (L as any).markerClusterGroup({
+      const clusterGroup = (window as any).L.markerClusterGroup({
         chunkedLoading: true,
         maxClusterRadius: 50,
         spiderfyOnMaxZoom: true,
