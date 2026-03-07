@@ -361,6 +361,7 @@ function SiteDetailContent() {
             {infoRow("Cooling Degree Days", county.cooling_degree_days)}
             {infoRow("Has Fiber", county.has_fiber ? "Yes" : "No")}
             {infoRow("Fiber Providers", county.fiber_provider_count)}
+            {county.avg_land_value_per_acre_usd && infoRow("Land Value", `$${Number(county.avg_land_value_per_acre_usd).toLocaleString()}/acre`)}
             {infoRow("DC Tax Incentive", county.has_dc_tax_incentive ? "Yes" : "No")}
             {county.dc_incentive_type && infoRow("Incentive Type", county.dc_incentive_type)}
           </div>

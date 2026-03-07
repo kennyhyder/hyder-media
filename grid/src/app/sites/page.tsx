@@ -107,6 +107,7 @@ function DCSitesContent() {
   const [stateFilter, setStateFilter] = useState(searchParams.get("state") || "");
   const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "");
   const [minScore, setMinScore] = useState(searchParams.get("min_score") || "");
+  const [isoFilter, setIsoFilter] = useState(searchParams.get("iso_region") || "");
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState("dc_score");
   const [sortOrder, setSortOrder] = useState("desc");
@@ -120,6 +121,7 @@ function DCSitesContent() {
     if (stateFilter) params.set("state", stateFilter);
     if (typeFilter) params.set("site_type", typeFilter);
     if (minScore) params.set("min_score", minScore);
+    if (isoFilter) params.set("iso_region", isoFilter);
     if (search) params.set("search", search);
     params.set("sort", sortBy);
     params.set("order", sortOrder);
@@ -134,7 +136,7 @@ function DCSitesContent() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [stateFilter, typeFilter, minScore, search, sortBy, sortOrder, page]);
+  }, [stateFilter, typeFilter, minScore, isoFilter, search, sortBy, sortOrder, page]);
 
   useEffect(() => {
     fetchSites();
@@ -158,6 +160,7 @@ function DCSitesContent() {
     if (stateFilter) params.set("state", stateFilter);
     if (typeFilter) params.set("site_type", typeFilter);
     if (minScore) params.set("min_score", minScore);
+    if (isoFilter) params.set("iso_region", isoFilter);
     window.open(`${baseUrl}/api/grid/dc-export?${params}`, "_blank");
   };
 
@@ -255,7 +258,7 @@ function DCSitesContent() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <input
             type="text"
             placeholder="Search name, county..."
@@ -293,8 +296,24 @@ function DCSitesContent() {
             <option value="60">60+</option>
             <option value="70">70+</option>
           </select>
+          <select
+            value={isoFilter}
+            onChange={(e) => { setIsoFilter(e.target.value); setPage(0); }}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
+            <option value="">All ISOs</option>
+            <option value="PJM">PJM</option>
+            <option value="MISO">MISO</option>
+            <option value="ERCOT">ERCOT</option>
+            <option value="CAISO">CAISO</option>
+            <option value="SPP">SPP</option>
+            <option value="ISO-NE">ISO-NE</option>
+            <option value="NYISO">NYISO</option>
+            <option value="SERC">SERC</option>
+            <option value="WECC">WECC</option>
+          </select>
           <button
-            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setPage(0); }}
+            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setIsoFilter(""); setPage(0); }}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg"
           >
             Clear
@@ -318,6 +337,7 @@ function DCSitesContent() {
                   { key: "available_capacity_mw", label: "MW" },
                   { key: "nearest_ixp_distance_km", label: "IXP Dist" },
                   { key: "nearest_dc_distance_km", label: "DC Dist" },
+                  { key: "iso_region", label: "ISO" },
                 ].map((col) => (
                   <th
                     key={col.key}
@@ -334,9 +354,9 @@ function DCSitesContent() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={9} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={10} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
-                <tr><td colSpan={9} className="py-8 text-center text-gray-400">No sites found</td></tr>
+                <tr><td colSpan={10} className="py-8 text-center text-gray-400">No sites found</td></tr>
               ) : (
                 sites.map((site) => (
                   <tr key={site.id} className="border-b border-gray-100 hover:bg-gray-50">
@@ -390,6 +410,9 @@ function DCSitesContent() {
                       {site.nearest_dc_distance_km != null
                         ? `${(site.nearest_dc_distance_km * 0.621371).toFixed(1)} mi`
                         : "—"}
+                    </td>
+                    <td className="py-2 px-3 text-gray-500 text-xs">
+                      {site.iso_region || "—"}
                     </td>
                   </tr>
                 ))

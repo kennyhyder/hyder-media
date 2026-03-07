@@ -81,7 +81,7 @@ export default async function handler(req, res) {
 
     const validSorts = [
       "dc_score", "available_capacity_mw", "substation_voltage_kv",
-      "nearest_ixp_distance_km", "nearest_dc_distance_km", "state",
+      "nearest_ixp_distance_km", "nearest_dc_distance_km", "state", "name", "site_type",
     ];
     const sortCol = validSorts.includes(sort) ? sort : "dc_score";
     const ascending = order === "asc";

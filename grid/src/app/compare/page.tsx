@@ -318,6 +318,7 @@ function CompareContent() {
                   { label: "Water Stress", fn: (c: Record<string, number | string | null> | null) => c ? String(c.water_stress_label || "—") : "—" },
                   { label: "Cooling Degree Days", fn: (c: Record<string, number | string | null> | null) => c?.cooling_degree_days != null ? String(c.cooling_degree_days) : "—" },
                   { label: "Fiber Providers", fn: (c: Record<string, number | string | null> | null) => c?.fiber_provider_count != null ? String(c.fiber_provider_count) : "—" },
+                  { label: "Land Value", fn: (c: Record<string, number | string | null> | null) => c?.avg_land_value_per_acre_usd != null ? `$${Number(c.avg_land_value_per_acre_usd).toLocaleString()}/acre` : "—" },
                   { label: "DC Tax Incentive", fn: (c: Record<string, number | string | null> | null) => c?.has_dc_tax_incentive ? "Yes" : "No" },
                 ].map((row) => (
                   <tr key={row.label} className="border-b border-gray-100">
