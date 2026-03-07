@@ -58,6 +58,20 @@ function DCSitesContent() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
+  const [compareIds, setCompareIds] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(localStorage.getItem("gridscout_compare") || "[]"); } catch { return []; }
+    }
+    return [];
+  });
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 5 ? [...prev, id] : prev;
+      localStorage.setItem("gridscout_compare", JSON.stringify(next));
+      return next;
+    });
+  };
 
   const [stateFilter, setStateFilter] = useState(searchParams.get("state") || "");
   const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "");
@@ -125,12 +139,22 @@ function DCSitesContent() {
             {total > 0 ? `${total.toLocaleString()} scored datacenter candidate sites` : "Search scored sites"}
           </p>
         </div>
-        <button
-          onClick={handleExport}
-          className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
-        >
-          Export CSV
-        </button>
+        <div className="flex gap-2">
+          {compareIds.length > 0 && (
+            <a
+              href={`/grid/compare/?ids=${compareIds.join(",")}`}
+              className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
+            >
+              Compare ({compareIds.length})
+            </a>
+          )}
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -188,6 +212,7 @@ function DCSitesContent() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="py-2 px-2 w-8"></th>
                 {[
                   { key: "dc_score", label: "Score" },
                   { key: "name", label: "Site" },
@@ -213,12 +238,21 @@ function DCSitesContent() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={9} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
-                <tr><td colSpan={8} className="py-8 text-center text-gray-400">No sites found</td></tr>
+                <tr><td colSpan={9} className="py-8 text-center text-gray-400">No sites found</td></tr>
               ) : (
                 sites.map((site) => (
                   <tr key={site.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-2 px-2">
+                      <input
+                        type="checkbox"
+                        checked={compareIds.includes(site.id)}
+                        onChange={() => toggleCompare(site.id)}
+                        className="accent-purple-600"
+                        title={compareIds.includes(site.id) ? "Remove from compare" : compareIds.length >= 5 ? "Max 5 sites" : "Add to compare"}
+                      />
+                    </td>
                     <td className={`py-2 px-3 font-bold ${scoreColor(site.dc_score)}`}>
                       {site.dc_score}
                     </td>

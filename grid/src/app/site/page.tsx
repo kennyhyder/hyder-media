@@ -201,12 +201,19 @@ function SiteDetailContent() {
         <div className="text-right">
           <div className="text-xs text-gray-500 uppercase tracking-wide">DC Score</div>
           <div className={`text-4xl font-bold ${scoreColorClass}`}>{dcScore}</div>
+          <button
+            onClick={() => window.print()}
+            className="mt-2 px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 print:hidden"
+          >
+            Print / PDF
+          </button>
         </div>
       </div>
 
       {/* Map */}
       {s.latitude && s.longitude && (
-        <div className="mb-6 rounded-lg overflow-hidden border border-gray-200">
+        <div className="mb-6">
+          <div className="rounded-lg overflow-hidden border border-gray-200">
           <TransmissionMap
             lines={data.nearbyLines.filter((l) => l.geometry_wkt) as Array<{ id: string; hifld_id: number; geometry_wkt: string | null; voltage_kv: number | null; capacity_mw: number | null; upgrade_candidate: boolean; owner: string | null; state: string | null; sub_1: string | null; sub_2: string | null; naession: string | null }>}
             center={[Number(s.latitude), Number(s.longitude)]}
@@ -220,6 +227,8 @@ function SiteDetailContent() {
             }}
             onLineClick={(id) => { window.location.href = `/grid/line/?id=${id}`; }}
           />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Map pin shows approximate site location. Nearby transmission lines shown in context.</p>
         </div>
       )}
 
@@ -368,7 +377,7 @@ function SiteDetailContent() {
             )}
             {s.latitude && s.longitude && (
               <a
-                href={`https://www.google.com/maps/@${s.latitude},${s.longitude},15z/data=!3m1!1e1`}
+                href={`https://www.google.com/maps/@${s.latitude},${s.longitude},500m/data=!3m1!1e3`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
