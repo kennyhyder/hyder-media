@@ -1,8 +1,8 @@
-# GridScout - Transmission Infrastructure Intelligence
+# GridScout - Datacenter Site Selection Intelligence
 
 ## Project Overview
 
-**Product**: GridScout - Database of underutilized transmission lines and transmission-ready land parcels
+**Product**: GridScout - Nationwide datacenter site selection intelligence platform
 **Target Customer**: I Squared Capital (isquaredcapital.com) - $55B infrastructure investment firm
 **Location**: `/Users/kennyhyder/Desktop/hyder-media/grid/`
 **URL**: https://hyder.me/grid/ (password: GRIDSCOUT)
@@ -10,59 +10,114 @@
 **Deployment**: Vercel (auto-deploy from GitHub via parent hyder-media repo)
 **Accent Color**: Purple (#7c3aed)
 
-## What We're Building
+## What We Built
 
-A searchable database of transmission infrastructure in the western United States, focused on identifying:
-- **69-138 kV transmission lines** rated ~50-100 MW (candidates for 150 MW reconductoring/upgrade)
-- **Land parcels** adjacent to those lines with identified owners
-- **Pre-approved federal energy corridors** (BLM Section 368, NIETC) where permitting is streamlined
-- **ERCOT congestion data** showing which Texas lines are economically constrained (high shadow prices)
-- **BLM Solar Designated Leasing Areas** near identified transmission lines
-- **WECC path ratings** showing western interconnection transfer limits
+A scored database of **~40,000 datacenter candidate sites** across the United States, each rated 0-100 on DC Readiness based on 10 weighted factors. Built on top of a nationwide transmission infrastructure foundation (52K+ lines, 38K+ substations).
+
+### Three Layers
+
+1. **Transmission Infrastructure** (original GridScout): 52,098 HIFLD transmission lines across all 50 states, 38,701 substations (expanded nationwide Mar 2026), BLM ROW grants, energy corridors, ERCOT congestion data, WECC path ratings, adjacent land parcels
+2. **Infrastructure Sites** (expansion): ~30,769 scored candidate sites at existing substations (>=69 kV) and brownfield sites (retired power plants), scored using county-level risk/labor/climate/water data, IXP proximity, existing datacenter density, and ISO queue analysis
+3. **Greenfield Sites** (newest): ~9,000 candidate sites sampled along high-voltage (230+ kV) transmission corridors every 15 km, representing undeveloped land with existing power infrastructure access
 
 ### Target User
 
 I Squared Capital needs this data to:
-- Identify underutilized transmission assets for infrastructure investment
-- Find land with existing transmission access for renewable energy development
-- Target 75 MW lines in west Texas that could be upgraded to 150 MW via reconductoring
-- Evaluate transmission corridors in the Southwest (NM, AZ, NV, CO, UT)
-- Understand congestion economics (which upgrades create the most value)
+- Evaluate datacenter development potential for any US location
+- Compare states and regions on power, fiber, water, hazard, and tax factors
+- Identify brownfield sites (retired power plants) with existing grid connections
+- Understand interconnection queue backlogs by ISO region
+- Export scored site lists for investment committee review
 
-### Geographic Focus (8 Target States)
+### DC Readiness Score (0-100)
 
-| State | Priority | Key Focus Areas |
-|-------|----------|----------------|
-| **Texas (ERCOT)** | PRIMARY | West TX / Permian Basin -- 102+ GW generation in queue, massive transmission bottleneck |
-| **New Mexico** | PRIMARY | BLM lands + NIETC Southwestern Grid Connector corridor |
-| **Arizona** | SECONDARY | BLM solar zones, WECC paths |
-| **Nevada** | SECONDARY | BLM lands, Clark County corridor |
-| **Colorado** | SECONDARY | NIETC corridor, BLM lands |
-| **Utah** | SECONDARY | BLM ROW grants |
-| **Wyoming** | TERTIARY | BLM ROW grants |
-| **California** | TERTIARY | CAISO queue congestion analysis |
+**Weighted formula:**
+```
+DC_Score = 0.25 * power + 0.20 * speed_to_power + 0.15 * fiber
+         + 0.10 * water + 0.10 * hazard + 0.05 * labor
+         + 0.05 * existing_dc + 0.05 * land + 0.03 * tax + 0.02 * climate
+```
+
+| Sub-Score | Weight | Inputs | Scoring Logic |
+|-----------|--------|--------|---------------|
+| **Power** | 25% | Substation distance, voltage, capacity | 0km=100, 10km=0; 500kV=100; 200MW+=100 |
+| **Speed to Power** | 20% | ISO queue depth, brownfield grid bonus | 0 queue=100, 30+=10; brownfield bonus |
+| **Fiber** | 15% | IXP distance, county fiber presence | 0km=100, 50km=0; fiber=100, no fiber=30 |
+| **Water** | 10% | WRI stress score (0-5) | Low(0)=100, Extreme(5)=0 |
+| **Hazard** | 10% | FEMA NRI composite | <5=100, >40=15 |
+| **Labor** | 5% | Construction + IT employment per capita | Percentile rank * 100 |
+| **Existing DC** | 5% | Nearest datacenter distance | <5km=100, >250km=10 |
+| **Land** | 5% | Acreage, land type | 100ac+=100; brownfield bonus |
+| **Tax Incentive** | 3% | State has DC incentive | Yes=100, No=0 |
+| **Climate** | 2% | Cooling degree days | <500=100, >2500=20 |
+
+### Current Score Distribution (~40,000 sites, Mar 2026)
+
+**Infrastructure sites (30,769 substation + brownfield):**
+- Mean: 56.5 | Median: 58.4 | Range: ~28 - 86.4
+- 20-40: 2,123 | **40-60: 14,214** | **60-80: 14,300** | 80-100: 132
+- Top site: UNKNOWN124436, MI (86.4) -- near Detroit fiber/DC hub
+- Top states: TX (4,216), NC (2,050), AL (1,685), NY (1,277), WA (1,044)
+
+**Greenfield sites (~9,000 along 230+ kV corridors):**
+- Generated by sampling points every 15 km along 10,467 high-voltage transmission lines
+- 5 km exclusion zone around all existing substation/brownfield sites
+- Top states: TX (1,310), AZ (538), CA (516), NV (505), ND (461)
+- 45 states covered
 
 ## Database Schema (Supabase PostgreSQL + PostGIS)
 
 All tables prefixed `grid_` to avoid conflicts with `solar_` and other hyder-media tables.
 Uses same Supabase project as SolarTrack: `ilbovwnhrowvxjdkvrln.supabase.co`
 
-### Tables (8 total)
+### Tables (15 total)
 
-| # | Table | Purpose | Source Script | Defined In |
-|---|-------|---------|---------------|------------|
-| 1 | `grid_data_sources` | Provenance tracking (8 registered sources) | schema.sql seed | `schema.sql` |
-| 2 | `grid_transmission_lines` | HIFLD line segments + NREL ratings + ERCOT congestion | `ingest-hifld.py` | `schema.sql` |
-| 3 | `grid_blm_row` | BLM right-of-way grants for transmission | `ingest-blm-row.py` | `schema.sql` |
-| 4 | `grid_corridors` | Section 368 + NIETC + BLM Solar DLA boundaries | `ingest-corridors.py` | `schema.sql` |
-| 5 | `grid_parcels` | Land parcels adjacent to transmission lines | `identify-adjacent-parcels.py` | `schema.sql` |
-| 6 | `grid_wecc_paths` | WECC path ratings (62 paths) | `seed-wecc-paths.py` | `schema.sql` |
-| 7 | `grid_ercot_constraints` | ERCOT SCED binding constraint history | `ingest-ercot-sced.py` | `schema.sql` |
-| 8 | `grid_substations` | Substations extracted from line endpoints | `extract-substations.py` | **Dynamic** (created by script via psql, NOT in schema.sql) |
+#### Original Infrastructure Tables (8)
 
-### Key Columns
+| # | Table | Records | Purpose | Source Script |
+|---|-------|---------|---------|---------------|
+| 1 | `grid_data_sources` | — | Provenance tracking | schema.sql seed |
+| 2 | `grid_transmission_lines` | 52,098 | HIFLD line segments + NREL ratings + ERCOT congestion | `ingest-hifld.py` |
+| 3 | `grid_blm_row` | 765 | BLM right-of-way grants for transmission | `ingest-blm-row.py` |
+| 4 | `grid_corridors` | 164 | Section 368 + NIETC + BLM Solar DLA boundaries | `ingest-corridors.py` |
+| 5 | `grid_parcels` | 15,561 | Land parcels adjacent to transmission lines | `identify-adjacent-parcels.py` |
+| 6 | `grid_wecc_paths` | 62 | WECC path ratings | `seed-wecc-paths.py` |
+| 7 | `grid_ercot_constraints` | 17,813 | ERCOT SCED binding constraint history | `ingest-ercot-sced.py` |
+| 8 | `grid_substations` | 38,701 | Substations extracted from line endpoints (all 50 states) | `extract-substations.py` |
 
-**grid_transmission_lines** (30+ columns):
+#### DC Site Selection Tables (7 new)
+
+| # | Table | Records | Purpose | Source Script |
+|---|-------|---------|---------|---------------|
+| 9 | `grid_dc_sites` | ~40,000 | Scored DC candidate sites (substation + brownfield + greenfield) | `generate-dc-sites.py` + `generate-greenfield-sites.py` + `score-dc-sites.py` |
+| 10 | `grid_county_data` | 3,222 | County-level risk/labor/climate/water/tax data | 6 ingestion scripts |
+| 11 | `grid_brownfield_sites` | 2,087 | Retired plants + EPA brownfields | `ingest-brownfields.py` |
+| 12 | `grid_ixp_facilities` | 1,381 | Internet exchange points + colocation | `ingest-peeringdb.py` |
+| 13 | `grid_datacenters` | 223 | Existing US datacenter locations | `ingest-pnnl-dc.py` |
+| 14 | `grid_queue_summary` | 138 | ISO queue depth by substation/POI | `ingest-iso-queues-dc.py` |
+| 15 | `grid_fiber_coverage` | 0 | County-level fiber presence (merged into county_data) | — |
+
+### Key Columns — grid_dc_sites
+
+- `name`, `site_type` (substation/brownfield/greenfield), `state`, `county`, `latitude`, `longitude`
+- `dc_score` (0-100 composite), plus 10 sub-scores: `score_power`, `score_speed_to_power`, `score_fiber`, `score_water`, `score_hazard`, `score_labor`, `score_existing_dc`, `score_land`, `score_tax`, `score_climate`
+- `nearest_substation_name`, `nearest_substation_distance_km`, `substation_voltage_kv`, `available_capacity_mw`
+- `nearest_ixp_name`, `nearest_ixp_distance_km`
+- `nearest_dc_name`, `nearest_dc_distance_km`
+- `iso_region`, `acreage`, `former_use`, `brownfield_id`
+
+### Key Columns — grid_county_data
+
+- `fips_code`, `state`, `county_name`, `centroid_lat`, `centroid_lng`
+- FEMA NRI: `nri_score`, `nri_rating`, 18 hazard-specific scores
+- BLS: `construction_employment`, `it_employment`, `construction_wages_avg`, `it_wages_avg`
+- NOAA: `cooling_degree_days`, `heating_degree_days`, `avg_temp_f`
+- WRI: `water_stress_score` (0-5), `water_stress_category`
+- FCC: `has_fiber` (boolean), `fiber_provider_count`
+- Tax: `has_dc_tax_incentive`, `dc_incentive_type`, `dc_incentive_details`
+
+### Key Columns — grid_transmission_lines (30+)
+
 - `hifld_id` INTEGER - HIFLD OBJECTID (NOT the same as HIFLD "ID" field -- see gotchas)
 - `voltage_kv`, `capacity_mw`, `static_rating_amps` - Line ratings
 - `upgrade_candidate` BOOLEAN - True when 50 <= capacity_mw <= 100
@@ -72,228 +127,240 @@ Uses same Supabase project as SolarTrack: `ilbovwnhrowvxjdkvrln.supabase.co`
 - `sub_1`, `sub_2` - Endpoint substation names
 - `naession` - Line name from HIFLD
 
-**grid_blm_row** (cross-reference columns added by `crossref-blm-lines.py` via ALTER TABLE):
-- `nearest_line_id`, `nearest_line_distance_km`, `nearest_line_voltage_kv`
-- `nearest_line_capacity_mw`, `nearest_line_owner`, `near_upgrade_candidate`
-
-**grid_corridors** (cross-reference columns added by `crossref-corridor-lines.py` via ALTER TABLE):
-- `transmission_line_count`, `upgrade_candidate_count`
-- `transmission_line_ids` TEXT[], `total_capacity_mw`
-
-**grid_substations** (created dynamically by `extract-substations.py`):
-- `name` TEXT, `state` TEXT, `lat`/`lng` NUMERIC
-- `max_voltage_kv`, `min_voltage_kv` NUMERIC
-- `owners` TEXT[], `connected_line_count` INTEGER, `connected_line_ids` UUID[]
-- UNIQUE(name, state)
-
 ### Key Relationships
+
+- `grid_dc_sites` -> `grid_county_data` via FIPS code
+- `grid_dc_sites` -> `grid_brownfield_sites` via `brownfield_id`
+- `grid_dc_sites` -> nearest `grid_substations`, `grid_ixp_facilities`, `grid_datacenters` (precomputed distances)
 - `grid_parcels.transmission_line_id` -> `grid_transmission_lines.id`
 - `grid_ercot_constraints` linked via constraint_name matching to line substations
 - Spatial joins: line geometry <-> parcel geometry, line geometry <-> corridor boundary
-- BLM ROW -> nearest transmission line via `crossref-blm-lines.py`
-- Corridors -> nearby transmission lines via `crossref-corridor-lines.py`
 
 ### Indexes
+
 - GIST indexes on all `geom` columns for spatial queries
 - B-tree indexes on state, voltage_kv, capacity_mw, upgrade_candidate, hifld_id
 - Partial index: `idx_grid_tl_upgrade` WHERE `upgrade_candidate = TRUE`
 - ERCOT: indexes on constraint_name, shadow_price DESC, interval_start
-- Unique: `(constraint_name, interval_start)` on grid_ercot_constraints
+- DC sites: indexes on dc_score DESC, state, site_type
 
-## Scripts (10 Python + 1 Node.js)
+## Scripts (25 Python + 1 Node.js)
 
-### Primary Ingestion (4 scripts)
+### Phase 1: Infrastructure Foundation (10 scripts)
 
-#### 1. `ingest-hifld.py` - HIFLD Transmission Lines
+#### 1. `ingest-hifld.py` - HIFLD Transmission Lines (ALL 50 states)
 - **Source**: ArcGIS REST API at `services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Electric_Power_Transmission_Lines/FeatureServer/0`
-- **Method**: Spatial bounding box queries for each of 8 target states
+- **Method**: Spatial bounding box queries for all 50 states (~42 bounding boxes)
 - **Dedup**: `seen_hifld_ids` set prevents cross-state boundary duplicates
+- **Records**: 52,098 lines
 - **Capacity estimation**: Voltage-to-capacity lookup when NREL data unavailable:
-  - 69 kV -> 72 MW, 115 kV -> 140 MW, 138 kV -> 200 MW, 161 kV -> 270 MW
-  - 230 kV -> 420 MW, 345 kV -> 1,230 MW, 500 kV -> 2,600 MW, 765 kV -> 5,500 MW
+  - 69 kV -> 72 MW, 115 kV -> 140 MW, 138 kV -> 200 MW, 230 kV -> 420 MW, 345 kV -> 1,230 MW, 500 kV -> 2,600 MW, 765 kV -> 5,500 MW
 - **Upgrade candidate**: `True` when 50 <= capacity_mw <= 100
-- **Note**: HIFLD has no STATE field -- relies on spatial bounding box queries per state
-- **Source record prefix**: `hifld_`
 
-#### 2. `ingest-blm-row.py` - BLM ROW Grants
-- **Source**: BLM NLSDB ArcGIS FeatureServer at `gis.blm.gov/nlsdb/rest/services/HUB/BLM_Natl_MLRS_LUA_ROW/FeatureServer/0`
-- **Target states**: NM, AZ, NV, CO, UT, WY, CA (7 states -- **Texas excluded**, no BLM land)
-- **Filters**: TRANSMISSION LINE + DISTRIBUTION LINE commodities, excludes TELEPHONE/TELEGRAPH
-- **Fields**: blm_case_id, holder_name, commodity, product, disposition, width/length/acreage, PLSS
-- **Source record prefix**: `blm_row_`
-
-#### 3. `ingest-corridors.py` - Energy Corridors (3 types)
-Single script handles all three corridor types:
-
-| Type | Source | Format | Prefix | Fallback |
-|------|--------|--------|--------|----------|
-| **BLM Solar DLAs** | ArcGIS REST | FeatureServer | `blm_dla_` | None (reliable) |
-| **NIETC Phase 3** | `gem.anl.gov` | Shapefile ZIP | `nietc3_` | 3 placeholder records |
-| **Section 368** | `corridoreis.anl.gov` | GeoJSON | `s368_` | Shapefile -> 8 placeholders |
-
-- NIETC and Section 368 downloads are unreliable (Cloudflare blocks, URL changes)
-- Script falls back to shapefile format, then hardcoded placeholder records
-- Requires `geopandas` for shapefile parsing (NIETC only)
-- **Source record prefix**: `blm_dla_`, `nietc3_`, `s368_`
-
-#### 4. `ingest-ercot-sced.py` - ERCOT Binding Constraints
-- **Two modes**:
-  1. **gridstatus mode** (default): Uses `gridstatus` Python library. Requires `.venv/bin/python3.13`
-  2. **API mode** (`--api`): ERCOT B2C OAuth. Token URL: `ercotb2c.b2clogin.com`, client_id: `fec253ea-0d06-4272-a5e6-b478baeecd70`. Report Type ID: 12302 (SCEDBTCNP686_csv)
-- **CLI**: `--date YYYY-MM-DD`, `--days N` (default 7), `--api`, `--dry-run`
-- **Analytics**: Prints top 10 most-frequently-binding and highest shadow price constraints
-- **Dedup**: UNIQUE(constraint_name, interval_start)
-- **Env vars for API mode**: `ERCOT_CLIENT_ID`, `ERCOT_CLIENT_SECRET`, `ERCOT_SUBSCRIPTION_KEY`
-
-#### 5. `crossref-ercot-lines.py` - ERCOT Constraint → Line Cross-Reference
-- **Pre-computes** ERCOT→HIFLD station name mapping (144 ERCOT stations vs 5,243 HIFLD subs)
-- **Multi-strategy matching**: exact, manual mapping table, suffix stripping (SW/SRC/SWT), prefix (40% coverage), Levenshtein (≤2 edits)
-- **Manual mapping table** for compressed ERCOT abbreviations (NELRIO→NELSON RIO GRANDE, SANMIGL→SAN MIGUEL, etc.)
-- **Connecting-only logic**: prefers lines where BOTH endpoints match, strict single-station fallback
-- **Updates**: `ercot_shadow_price` (avg $/MW), `ercot_binding_count`, `ercot_mw_limit` on `grid_transmission_lines`
-- **CLI**: `--dry-run`
-- **Match rate**: ~10% (34/144 ERCOT stations mapped). Most unmapped stations use internal ERCOT codes with no HIFLD equivalent.
-- **Key insight**: ERCOT uses max-8-char abbreviated codes (ASHERTON, CATARINA, BRUNI) that fundamentally differ from HIFLD descriptive names. A comprehensive ERCOT→HIFLD mapping table (not publicly available) would dramatically improve match rate.
-
-### Enrichment (3 scripts)
-
-#### 6. `enrich-dlr-capacity.py` - NREL Dynamic Line Ratings
+#### 2. `enrich-dlr-capacity.py` - NREL Dynamic Line Ratings
 - **Data file**: `data/nrel_dlr/SLR_A-75C.h5` (HDF5 format, 19 GB)
 - **Requires**: `pip3 install h5py numpy`
 - **Formula**: `capacity_mw = sqrt(3) * voltage_kv * slr_amps / 1000`
-- **Critical gotcha**: OBJECTID vs HIFLD ID mapping
-  - DB stores OBJECTID in `hifld_id` column (this is what ArcGIS returns as the feature ID)
-  - NREL HDF5 indexes by the HIFLD "ID" field (different from OBJECTID)
-  - Script queries ArcGIS API to map OBJECTID -> ID for each line, then looks up NREL data by ID
-- **Updates**: `capacity_mw`, `static_rating_amps`, `upgrade_candidate`
+- **Critical**: Maps OBJECTID -> HIFLD "ID" via ArcGIS query before looking up NREL data
 
-#### 6. `seed-wecc-paths.py` - WECC Path Ratings
-- **62 WECC paths** hardcoded from 2024 Path Rating Catalog
-- Each path: path_number, path_name, dir1_label (forward), mw1, dir2_label (reverse), mw2, states
-- Uses `Prefer: resolution=ignore-duplicates` for idempotent reruns
-- **Source record prefix**: `wecc_path_`
-- **No external download** -- data manually transcribed from WECC PDF
+#### 3. `ingest-blm-row.py` - BLM ROW Grants (765 records)
+- **Source**: BLM NLSDB ArcGIS FeatureServer
+- **States**: NM, AZ, NV, CO, UT, WY, CA (7 states -- **Texas excluded**, no BLM land)
 
-#### 7. `extract-substations.py` - Substation Extraction
-- **Creates table dynamically** via psql (grid_substations is NOT in schema.sql)
-- Extracts from SUB_1/SUB_2 fields of transmission lines
-- Gets coordinates from line start/end vertices via `parse_endpoint()` function on geometry_wkt
-- Aggregates: max/min voltage, owners array, connected line count + IDs
-- **UNIQUE(name, state)** constraint
-- **DB password hardcoded**: `#FsW7iqg%EYX&G3M`
+#### 4. `ingest-corridors.py` - Energy Corridors (164 records)
+- BLM Solar DLAs + NIETC Phase 3 + Section 368
+- NIETC/Section 368 downloads unreliable — scripts fall back to placeholder records
 
-### Cross-Reference (3 scripts)
+#### 5. `ingest-ercot-sced.py` - ERCOT Binding Constraints (17,813 records)
+- **Two modes**: gridstatus (`.venv/bin/python3.13`) or ERCOT B2C API (`--api`)
+- **CLI**: `--date YYYY-MM-DD`, `--days N` (default 7), `--api`, `--dry-run`
 
-#### 8. `crossref-blm-lines.py` - BLM ROW -> Nearest Line
-- Links each BLM ROW to its nearest transmission line (10 km max distance)
-- **Adds columns** to grid_blm_row via psql ALTER TABLE:
-  - `nearest_line_id`, `nearest_line_distance_km`, `nearest_line_voltage_kv`
-  - `nearest_line_capacity_mw`, `nearest_line_owner`, `near_upgrade_candidate`
-- State-based pre-filtering + Haversine distance calculation
-- **DB password hardcoded**: `#FsW7iqg%EYX&G3M`
+#### 6. `seed-wecc-paths.py` - WECC Path Ratings (62 paths)
+- Hardcoded from 2024 WECC Path Rating Catalog
 
-#### 9. `crossref-corridor-lines.py` - Corridor -> Nearby Lines
-- Cross-references corridors with nearby transmission lines (5 km threshold)
-- **Adds columns** to grid_corridors via psql ALTER TABLE:
-  - `transmission_line_count`, `upgrade_candidate_count`
-  - `transmission_line_ids` TEXT[], `total_capacity_mw`
-- Uses bounding box rough filter then Haversine fine filter
+#### 7. `extract-substations.py` - Substations (38,701)
+- Creates `grid_substations` table dynamically via psql (NOT in schema.sql)
+- Extracts from SUB_1/SUB_2 fields + line geometry endpoints
 
-#### 10. `identify-adjacent-parcels.py` - Parcel Identification
-- For each upgrade candidate line (50-100 MW), samples points every ~1 mile
-- Queries public ArcGIS parcel endpoints to find nearby parcels
-- Inserts matched parcels into `grid_parcels` table
-- **6 states configured** with ArcGIS parcel endpoints:
-  - TX: Travis County + statewide TNRIS
-  - NV: Clark County (Las Vegas)
-  - AZ: Maricopa County
-  - NM: Bernalillo County (Albuquerque)
-  - CA: San Diego County
-  - CO: statewide
-  - (UT + WY: pending -- no public parcel endpoints found)
-- **CLI**: `--state TX`, `--limit 10`, `--dry-run`, `--list`
-- ThreadPoolExecutor: ARCGIS_WORKERS=3, SUPABASE_WORKERS=10
-- Sample interval: 1 mile. Parcel search radius: ~500m bounding box
+#### 8-10. Cross-Reference Scripts
+- `crossref-blm-lines.py` - BLM ROW -> nearest transmission line (10 km max)
+- `crossref-corridor-lines.py` - Corridors -> nearby lines (5 km threshold)
+- `crossref-ercot-lines.py` - ERCOT constraint -> HIFLD line mapping (34/144 stations matched)
+- `identify-adjacent-parcels.py` - Land parcels near upgrade-candidate lines (15,561 parcels)
+
+### Phase 2: DC Intelligence Data (7 new scripts)
+
+#### 11. `ingest-fema-nri.py` - FEMA National Risk Index (3,222 counties)
+- **Source**: Census Gazetteer + FEMA NRI CSV from `hazards.fema.gov`
+- **Table**: `grid_county_data` (creates base records with FIPS, state, county name, centroid)
+- **Data**: Risk scores for 18 hazard types per county
+
+#### 12. `ingest-bls-qcew.py` - BLS Employment Data (patches county_data)
+- **Source**: `data.bls.gov/cew/data/files/{year}/csv/*.zip`
+- **Data**: Construction + IT employment counts, average wages per county
+
+#### 13. `ingest-noaa-climate.py` - NOAA Climate Normals (patches county_data)
+- **Source**: State-level hardcoded values from NOAA Climate Normals
+- **Data**: Cooling degree days, heating degree days, average temperature
+
+#### 14. `ingest-wri-water.py` - WRI Water Stress (patches county_data)
+- **Source**: State-level hardcoded values from WRI Aqueduct
+- **Data**: Water stress score (0-5), water stress category
+
+#### 15. `ingest-dc-incentives.py` - State DC Tax Incentives (patches county_data)
+- **Source**: Hardcoded dict from state economic development agencies
+- **Data**: 37 states + DC with datacenter tax incentive programs
+
+#### 16. `ingest-fcc-fiber.py` - FCC Fiber Coverage (patches county_data)
+- **Source**: State-level estimates from FCC Broadband Data Collection
+- **Data**: has_fiber (boolean), fiber_provider_count
+
+#### 17. `ingest-iso-queues-dc.py` - ISO Queue Summary (138 records)
+- **Source**: Cross-references SolarTrack's `solar_installations` (ISO queue data)
+- **Table**: `grid_queue_summary`
+- **Data**: Queue depth, average wait months per ISO region + POI
+
+### Phase 3: New Data Layers (4 new scripts)
+
+#### 18. `ingest-peeringdb.py` - PeeringDB IXPs (1,381 facilities)
+- **Source**: `https://www.peeringdb.com/api` (free, no auth)
+- **Table**: `grid_ixp_facilities`
+- **Data**: Name, city, state, lat/lng, ix_count, network_count
+
+#### 19. `ingest-pnnl-dc.py` - PNNL Datacenter Atlas (223 DCs)
+- **Source**: Zenodo PNNL IM3 Atlas (fallback: hardcoded ~200 major DCs)
+- **Table**: `grid_datacenters`
+- **Data**: Name, operator, lat/lng, capacity_mw, cooling_type, founding_year
+
+#### 20. `ingest-brownfields.py` - Brownfield Sites (2,087 sites)
+- **Source**: EIA-860 retired plants + EPA RE-Powering tracker
+- **Table**: `grid_brownfield_sites`
+- **Data**: Name, lat/lng, former_use, existing_capacity_mw, retirement_date, acreage, cleanup_status
+
+#### 21. `crossref-brownfield-substations.py` - Brownfield -> Nearest Substation
+- Links each brownfield to its nearest substation (precomputes distance)
+
+### Phase 4: Site Generation + Scoring (3 scripts)
+
+#### 22. `generate-dc-sites.py` - Create Infrastructure Sites (~30,769 sites)
+- **Sources**: Every substation >= 69 kV + every brownfield site
+- **Dedup**: Sites within 1 km consolidated (keeps highest-voltage substation)
+- **Table**: `grid_dc_sites` (site_type = 'substation' or 'brownfield')
+- **Attaches**: Nearest IXP, nearest datacenter, county FIPS, ISO region, queue depth
+
+#### 23. `generate-greenfield-sites.py` - Create Greenfield Sites (~9,000 sites)
+- **Sources**: Samples points every 15 km along 230+ kV transmission lines (10,467 lines)
+- **Exclusion**: Skips points within 5 km of any existing DC site (substation/brownfield)
+- **Dedup**: Sites within 1 km consolidated (keeps highest voltage)
+- **Table**: `grid_dc_sites` (site_type = 'greenfield')
+- **CLI**: `--dry-run` to preview without inserting
+- **Voltage distribution**: 230 kV (7,062 lines), 345 kV (2,540), 500 kV (795), 765 kV (46)
+
+#### 24. `score-dc-sites.py` - Compute DC Readiness Score
+- **Loads**: All DC sites + county data + IXP/DC distances
+- **Computes**: 10 sub-scores (0-100 each) + weighted composite dc_score
+- **CLI**: `--rescore` to re-score all sites (default: only unscored sites with `dc_score=is.null`)
+- **Grid-based spatial indexing** for nearest-neighbor lookups (configurable cell_size)
 
 ### Build Script (Node.js)
 
-#### 11. `post-build.js` - Auth Injection + Output Move
+#### 25. `post-build.js` - Auth Injection + Output Move
 - Copies `password.html` from `public/` to `out/`
-- Injects sessionStorage auth check into ALL HTML `<head>` tags (except password.html):
-  ```javascript
-  (function() {
-      const AUTH_KEY = 'gridscout_auth';
-      if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
-          window.location.href = '/grid/password.html';
-      }
-  })();
-  ```
-- Moves build output from `out/` to grid root, removes `out/` directory
+- Injects sessionStorage auth check into ALL HTML `<head>` tags
+- Moves build output from `out/` to grid root, removes `out/`
 
-## API Endpoints (5 Vercel Serverless Functions)
+## API Endpoints (12 Vercel Serverless Functions)
 
 All endpoints in `/Users/kennyhyder/Desktop/hyder-media/api/grid/`.
 
-### GET `/api/grid/lines`
-- **Paginated list** of transmission lines with filters
-- **Filters**: `state`, `min_voltage`, `max_voltage`, `min_capacity`, `max_capacity`, `upgrade_only`, `owner`, `search`
-- **Search**: Matches against naession, sub_1, sub_2 (ilike)
-- **Geometry**: `with_geometry=true` includes `geometry_wkt` (for map rendering). Excludes by default.
-- **Limits**: 500 max with geometry, 200 max without; default 50
-- **Sort**: `voltage_kv` (default), `capacity_mw`, `length_miles`, `state`, `owner`, `created_at`
+### Original Infrastructure APIs (5)
+
+| Endpoint | Purpose | Key Filters | Timeout |
+|----------|---------|-------------|---------|
+| `GET /api/grid/lines` | Paginated line search | state, voltage, capacity, upgrade_only, search, with_geometry | 30s |
+| `GET /api/grid/line` | Single line detail | id, hifld_id | 30s |
+| `GET /api/grid/stats` | Infrastructure stats (lines, substations, BLM, corridors) | — | 60s |
+| `GET /api/grid/corridors` | Corridor search | type, state | 30s |
+| `GET /api/grid/substations` | Substation search | state, min_voltage, search | 30s |
+
+### DC Site Selection APIs (7 new)
+
+#### `GET /api/grid/dc-sites` — Scored Site Search
+- **Filters**: `state`, `site_type`, `min_score`, `max_score`, `min_capacity`, `iso_region`, `search` (name/county/former_use)
+- **Geospatial**: `near_lat`, `near_lng`, `radius_miles` (default 50)
+- **Sort**: Any column via `sort` + `order` params
+- **Pagination**: `limit` (default 50, max 200), `offset`
 - **Response**: `{ data: [...], pagination: { limit, offset, total, totalPages } }`
 - **Timeout**: 30s
 
-### GET `/api/grid/line`
-- **Single line detail** by `id` (UUID) or `hifld_id` (integer)
-- Returns full `SELECT *` including `geometry_wkt`
+#### `GET /api/grid/dc-site` — Single Site Detail
+- **Params**: `id` (required)
+- **Response**: `{ site, county, nearbyLines (max 20), brownfield }`
+- Nearby lines within ~25km sorted by voltage DESC
+- County data joined via FIPS code
 - **Timeout**: 30s
 
-### GET `/api/grid/stats`
-- **10 parallel queries** for aggregate statistics
-- Returns: `total_lines`, `total_upgrade_candidates`, `total_blm_rows`, `total_corridors`, `total_substations`, `total_wecc_paths`, `lines_by_state` (top 20), `voltage_distribution` (5 buckets), `capacity_distribution` (5 buckets), `top_owners` (top 20)
-- **Voltage buckets**: 0-100, 100-230, 230-345, 345-500, 500+
-- **Capacity buckets**: 0-100, 100-500, 500-1000, 1000-2000, 2000+
-- **Note**: Fetches up to 50,000 rows per aggregation (in-JS grouping, not SQL GROUP BY)
+#### `GET /api/grid/dc-stats` — Dashboard Statistics
+- **Response**: `{ totals, topSites (top 25), scoreDistribution, stateAverages, scoreStats, siteTypeBreakdown }`
+- Parallel queries to 7+ tables
 - **Timeout**: 60s
 
-### GET `/api/grid/corridors`
-- **Filters**: `type` (section_368, nietc, blm_row), `state` (ilike against states column)
-- Returns full records with geometry
-- Sorted by corridor_type ascending
-- Max 200 per page
+#### `GET /api/grid/brownfields` — Brownfield Search
+- **Filters**: `state`, `site_type`, `cleanup_status`, `has_substation`, `search`
+- **Sort**: `existing_capacity_mw` (default), `acreage`, `nearest_substation_distance_km`, `state`, `retirement_date`
 - **Timeout**: 30s
 
-### GET `/api/grid/substations`
-- **Filters**: `state`, `min_voltage` (against max_voltage_kv), `search` (ilike against name)
-- Sorted by max_voltage_kv DESC
-- Max 200 per page
+#### `GET /api/grid/ixps` — IXP Facility Search
+- **Filters**: `state`, `search` (name/city)
+- **Sort**: `network_count` (default), `ix_count`, `state`, `city`, `name`
 - **Timeout**: 30s
+
+#### `GET /api/grid/county-data` — County Intelligence
+- **Filters**: `fips`, `state`, `search` (county_name)
+- **Sort**: state ASC, county_name ASC (hardcoded)
+- **Timeout**: 30s
+
+#### `GET /api/grid/dc-export` — CSV/JSON Export
+- **Filters**: Same as dc-sites (state, site_type, min/max_score, min_capacity, iso_region)
+- **Format**: CSV (default) or `format=json`
+- **Max**: 10,000 records
+- **Sort**: dc_score DESC
+- **Timeout**: 60s
 
 ## Web Interface (Next.js + Tailwind)
 
-5 pages built and deployed as static export.
+11 pages built and deployed as static export.
+
+### Navigation
+`Dashboard | DC Sites | Brownfields | Lines | Corridors | Market`
+
+### DC Site Selection Pages (4 new + 1 modified)
 
 | Page | Route | File | Features |
 |------|-------|------|----------|
-| Dashboard | `/grid/` | `src/app/page.tsx` | Stats cards (lines, upgrade candidates, BLM ROWs, corridors, substations, WECC paths), state bar chart, voltage/capacity distribution, top owners |
-| Lines/Search | `/grid/search/` | `src/app/search/page.tsx` | 6 filters (state, voltage range, capacity range, upgrade only, owner search, text search), sortable table, TransmissionMap with polylines, pagination |
-| Corridors | `/grid/corridors/` | `src/app/corridors/page.tsx` | Type filter (Section 368 / NIETC / BLM ROW), state filter, paginated table |
-| Parcels | `/grid/parcels/` | `src/app/parcels/page.tsx` | Placeholder page with disabled filter UI (state, capacity, land type, owner search) |
-| Line Detail | `/grid/line/?id=X` | `src/app/line/page.tsx` | Full detail view: all line properties, upgrade candidate badge, ERCOT congestion data, TransmissionMap showing single line geometry |
+| **Dashboard** | `/grid/` | `page.tsx` | National hero stats (sites, lines, substations, IXPs, DCs, brownfields, counties), top 25 sites table, score distribution chart, state averages (top 15) |
+| **DC Sites** | `/grid/sites/` | `sites/page.tsx` | 5 filters (search, state, type, min score, clear), 8-column sortable table, score color-coding, pagination, CSV export button |
+| **Site Detail** | `/grid/site/?id=X` | `site/page.tsx` | Score breakdown bars (10 sub-scores with weights), power/connectivity/risk sections, brownfield details (conditional), nearby transmission lines table |
+| **Brownfields** | `/grid/brownfields/` | `brownfields/page.tsx` | Brownfield-specific filters (search, state, has_substation), sortable table with former use/capacity/acreage, pagination |
+| **Market Analysis** | `/grid/market/` | `market/page.tsx` | State comparison table (all 50 states, avg score + site count), IXP density by state + top facilities, scoring methodology reference |
+
+### Original Infrastructure Pages (4 + 1 placeholder)
+
+| Page | Route | File | Features |
+|------|-------|------|----------|
+| Lines/Search | `/grid/search/` | `search/page.tsx` | All 50 states in dropdown, voltage/capacity filters, sortable table, TransmissionMap |
+| Corridors | `/grid/corridors/` | `corridors/page.tsx` | Type filter (Section 368/NIETC/BLM), state filter |
+| Line Detail | `/grid/line/?id=X` | `line/page.tsx` | Full properties, ERCOT data, TransmissionMap |
+| Parcels | `/grid/parcels/` | `parcels/page.tsx` | Placeholder (disabled UI) |
 
 ### Key Components
 
-- **TransmissionMap** (`src/components/TransmissionMap.tsx`) - Leaflet map rendering WKT polylines. Color-coded by capacity (upgrade candidates highlighted). Uses `next/dynamic` with `ssr: false`.
-- **Layout** (`src/app/layout.tsx`) - Purple accent (#7c3aed), lightning bolt SVG icon, Geist/Geist_Mono fonts. 4 nav links: Dashboard, Lines, Corridors, Parcels.
-
-### UI Details
-- **State dropdown** includes: AZ, CA, CO, ID, MT, NM, NV, OR, TX, UT, WA, WY
-- **Voltage ranges**: All, 0-100, 100-230, 230-345, 345-500, 500+ kV
-- **Capacity ranges**: All, 0-100, 50-100 (Upgrade), 100-500, 500-1000, 1000+ MW
-- **Sort options**: Voltage (asc/desc), Capacity (asc/desc), Length (longest), State (A-Z)
+- **TransmissionMap** (`src/components/TransmissionMap.tsx`) - Leaflet map rendering WKT polylines. Color-coded by capacity.
+- **Layout** (`src/app/layout.tsx`) - Purple accent (#7c3aed), lightning bolt SVG icon, 6 nav links. Metadata: "Datacenter site selection intelligence."
+- **Suspense boundaries** - `sites/page.tsx` and `site/page.tsx` wrap `useSearchParams()` in `<Suspense>` (required for Next.js 16 static export)
 
 ### Authentication
+
 - SessionStorage-based password gate (same pattern as SolarTrack/AG2020)
 - Password: **GRIDSCOUT**
 - Auth key: `gridscout_auth`
@@ -301,18 +368,26 @@ All endpoints in `/Users/kennyhyder/Desktop/hyder-media/api/grid/`.
 
 ## Data Sources
 
-### Primary Sources (8 registered in grid_data_sources)
+### Primary Sources
 
-| # | Source | Format | Key Data | Script |
-|---|--------|--------|----------|--------|
-| 1 | **HIFLD Transmission Lines** | ArcGIS REST API | Line geometry, voltage, owner, substations | `ingest-hifld.py` |
-| 2 | **NREL Dynamic Line Ratings** | HDF5 (19 GB) | Per-line ampacity (amps) -> MW | `enrich-dlr-capacity.py` |
-| 3 | **BLM ROW Grants** | ArcGIS FeatureServer | Federal land transmission corridor rights | `ingest-blm-row.py` |
-| 4 | **Section 368 Corridors** | GeoJSON/Shapefile | 5,000 mi pre-approved energy corridors | `ingest-corridors.py` |
-| 5 | **ERCOT SCED Constraints** | CSV/API | Actual MW limits, shadow prices on congested lines | `ingest-ercot-sced.py` |
-| 6 | **WECC Path Ratings** | Hardcoded from PDF | MW capacity for 62 western paths | `seed-wecc-paths.py` |
-| 7 | **BLM Solar DLAs** | ArcGIS FeatureServer | 31M acres pre-approved for solar | `ingest-corridors.py` |
-| 8 | **NIETC Phase 3** | Shapefile ZIP | Southwestern Grid Connector corridor | `ingest-corridors.py` |
+| # | Source | Format | Key Data | Script | Records |
+|---|--------|--------|----------|--------|---------|
+| 1 | **HIFLD Transmission Lines** | ArcGIS REST API | Line geometry, voltage, owner, substations | `ingest-hifld.py` | 52,098 |
+| 2 | **NREL Dynamic Line Ratings** | HDF5 (19 GB) | Per-line ampacity (amps) -> MW | `enrich-dlr-capacity.py` | — |
+| 3 | **BLM ROW Grants** | ArcGIS FeatureServer | Federal land transmission corridor rights | `ingest-blm-row.py` | 765 |
+| 4 | **Section 368 / NIETC / BLM Solar DLAs** | GeoJSON/Shapefile | Pre-approved energy corridors | `ingest-corridors.py` | 164 |
+| 5 | **ERCOT SCED Constraints** | CSV/API | Actual MW limits, shadow prices | `ingest-ercot-sced.py` | 17,813 |
+| 6 | **WECC Path Ratings** | Hardcoded from PDF | MW capacity for 62 western paths | `seed-wecc-paths.py` | 62 |
+| 7 | **PeeringDB** | JSON API (free, no auth) | IXP facilities + network counts | `ingest-peeringdb.py` | 1,381 |
+| 8 | **PNNL IM3 Atlas** | Zenodo CSV / hardcoded | Existing datacenter locations | `ingest-pnnl-dc.py` | 223 |
+| 9 | **EIA-860 Retired + EPA RE-Powering** | Excel + CSV | Brownfield sites with grid connections | `ingest-brownfields.py` | 2,087 |
+| 10 | **FEMA NRI** | CSV | County-level risk scores (18 hazard types) | `ingest-fema-nri.py` | 3,222 |
+| 11 | **BLS QCEW** | ZIP CSV | County employment + wages | `ingest-bls-qcew.py` | 3,222 |
+| 12 | **NOAA Climate Normals** | Hardcoded state-level | Cooling/heating degree days | `ingest-noaa-climate.py` | 3,222 |
+| 13 | **WRI Aqueduct** | Hardcoded state-level | Water stress scores | `ingest-wri-water.py` | 3,222 |
+| 14 | **FCC Broadband Data** | Hardcoded state-level | Fiber coverage | `ingest-fcc-fiber.py` | 3,222 |
+| 15 | **State DC Incentives** | Hardcoded (37 states) | Tax incentive programs | `ingest-dc-incentives.py` | 3,222 |
+| 16 | **SolarTrack ISO Queues** | Cross-reference | Queue depth by ISO + POI | `ingest-iso-queues-dc.py` | 138 |
 
 ### Download URLs
 
@@ -322,31 +397,11 @@ All endpoints in `/Users/kennyhyder/Desktop/hyder-media/api/grid/`.
 | NREL DLR | `https://data.openei.org/submissions/6231` (HDF5 files) |
 | BLM ROW | `https://gis.blm.gov/nlsdb/rest/services/HUB/BLM_Natl_MLRS_LUA_ROW/FeatureServer/0` |
 | Section 368 | `https://corridoreis.anl.gov/maps/` (Shapefile download) |
-| ERCOT SCED | `https://www.ercot.com/mp/data-products/data-product-details?id=NP6-86-CD` (requires free registration) |
+| ERCOT SCED | `https://www.ercot.com/mp/data-products/data-product-details?id=NP6-86-CD` |
 | WECC Paths | `https://www.wecc.org/wecc-document/19476` (2025 PDF) |
-| BLM Solar DLA | `https://gbp-blm-egis.hub.arcgis.com/datasets/1d98d82820df49e5916aeb79837b69ab` |
-| NIETC Phase 3 | `https://gem.anl.gov/tool/layers/potential_nietcs_phase3_241216/versions/1/download.zip` |
-
-### Key Formulas
-
-**MW from NREL ampacity + HIFLD voltage:**
-```
-capacity_mw = voltage_kv * static_rating_amps * sqrt(3) / 1000
-```
-
-**Voltage-to-capacity approximation (when NREL data unavailable):**
-| Voltage | Typical MW | Used in Script |
-|---------|-----------|---------------|
-| 69 kV | ~70-75 MW | 72 MW |
-| 115 kV | ~120-175 MW | 140 MW |
-| 138 kV | ~200-300 MW | 200 MW |
-| 161 kV | ~270 MW | 270 MW |
-| 230 kV | ~420 MW | 420 MW |
-| 345 kV | ~1,230 MW | 1,230 MW |
-| 500 kV | ~2,600 MW | 2,600 MW |
-| 765 kV | ~5,500 MW | 5,500 MW |
-
-**Upgrade candidate filter:** Lines with `capacity_mw BETWEEN 50 AND 100`
+| PeeringDB | `https://www.peeringdb.com/api` (free, no auth) |
+| FEMA NRI | `https://hazards.fema.gov/nri/data-resources` |
+| BLS QCEW | `https://data.bls.gov/cew/data/files/{year}/csv/` |
 
 ## Data File Locations
 
@@ -368,13 +423,7 @@ npm install
 npm run build   # next build + post-build auth injection + move to grid/
 ```
 
-Build generates static HTML at: `grid/index.html`, `grid/search/index.html`, `grid/corridors/index.html`, `grid/parcels/index.html`, `grid/line/index.html`.
-
-**Post-build steps** (handled by `scripts/post-build.js`):
-1. Copies `password.html` from `public/` to `out/`
-2. Injects sessionStorage auth check into all HTML `<head>` tags (except password.html)
-3. Moves `out/` contents to grid root directory
-4. Removes `out/` directory
+Build generates static HTML for 11 pages including: `index.html`, `sites/index.html`, `site/index.html`, `brownfields/index.html`, `market/index.html`, `search/index.html`, `corridors/index.html`, `line/index.html`, `parcels/index.html`.
 
 ### Build Configuration
 
@@ -398,6 +447,7 @@ git push origin main   # Vercel auto-deploys
 **Never use `vercel --prod` locally** -- always push to GitHub for auto-deploy.
 
 ### Vercel Function Timeouts (in `vercel.json`)
+
 | Function | Timeout |
 |----------|---------|
 | `api/grid/lines.js` | 30s |
@@ -405,6 +455,13 @@ git push origin main   # Vercel auto-deploys
 | `api/grid/stats.js` | 60s |
 | `api/grid/corridors.js` | 30s |
 | `api/grid/substations.js` | 30s |
+| `api/grid/dc-sites.js` | 30s |
+| `api/grid/dc-site.js` | 30s |
+| `api/grid/dc-stats.js` | 60s |
+| `api/grid/brownfields.js` | 30s |
+| `api/grid/ixps.js` | 30s |
+| `api/grid/county-data.js` | 30s |
+| `api/grid/dc-export.js` | 60s |
 
 ## Environment Variables
 
@@ -443,71 +500,78 @@ pip3 install geopandas shapely
 
 ## Running Scripts (Complete Run Order)
 
-### Phase 1: Schema + Core Data
+### Phase 1: Schema + Transmission Infrastructure
 ```bash
 cd /Users/kennyhyder/Desktop/hyder-media/grid
 
 # 1. Create tables (run schema.sql in Supabase SQL Editor or via psql)
-# All 7 tables + 8 data source seeds
-
-# 2. Ingest HIFLD transmission lines (8 states, spatial queries)
+# 2. Ingest HIFLD transmission lines (all 50 states)
 python3 -u scripts/ingest-hifld.py
-
 # 3. Enrich with NREL DLR capacity ratings
 python3 -u scripts/enrich-dlr-capacity.py
-
 # 4. Ingest BLM ROW grants (7 states, no TX)
 python3 -u scripts/ingest-blm-row.py
-
-# 5. Ingest corridors (3 types: BLM Solar DLA + NIETC + Section 368)
+# 5. Ingest corridors (BLM Solar DLA + NIETC + Section 368)
 python3 -u scripts/ingest-corridors.py
-```
-
-### Phase 2: Supplementary Data
-```bash
-# 6. Seed WECC paths (62 hardcoded paths, idempotent)
+# 6. Seed WECC paths
 python3 -u scripts/seed-wecc-paths.py
-
-# 7. Ingest ERCOT SCED constraints (default: last 7 days via gridstatus)
+# 7. Ingest ERCOT SCED constraints
 .venv/bin/python3.13 -u scripts/ingest-ercot-sced.py
-# Or specify date range:
-.venv/bin/python3.13 -u scripts/ingest-ercot-sced.py --date 2026-02-01 --days 30
-# Or use ERCOT B2C API instead of gridstatus:
-python3 -u scripts/ingest-ercot-sced.py --api --date 2026-02-01 --days 7
-
-# 8. Extract substations from line endpoints (creates grid_substations table)
+# 8. Extract substations from line endpoints
 python3 -u scripts/extract-substations.py
 ```
 
-### Phase 3: Cross-References
+### Phase 2: Cross-References
 ```bash
-# 9. Link BLM ROWs to nearest transmission lines (adds columns via ALTER TABLE)
+# 9. Link BLM ROWs to nearest transmission lines
 python3 -u scripts/crossref-blm-lines.py
-
-# 10. Link corridors to nearby transmission lines (adds columns via ALTER TABLE)
+# 10. Link corridors to nearby transmission lines
 python3 -u scripts/crossref-corridor-lines.py
-
-# 11. Aggregate ERCOT constraints onto transmission lines (shadow price, binding count, MW limit)
+# 11. Aggregate ERCOT constraints onto lines
 python3 -u scripts/crossref-ercot-lines.py
-python3 -u scripts/crossref-ercot-lines.py --dry-run  # Preview without updating
+# 12. Identify parcels adjacent to upgrade-candidate lines
+python3 -u scripts/identify-adjacent-parcels.py
 ```
 
-### Phase 4: Land Parcels
+### Phase 3: County + DC Intelligence Data
 ```bash
-# 11. Identify parcels adjacent to upgrade-candidate lines
-python3 -u scripts/identify-adjacent-parcels.py                  # All states
-python3 -u scripts/identify-adjacent-parcels.py --state TX       # Single state
-python3 -u scripts/identify-adjacent-parcels.py --limit 10       # Limit lines
-python3 -u scripts/identify-adjacent-parcels.py --dry-run        # Preview
-python3 -u scripts/identify-adjacent-parcels.py --list           # Show endpoints
+# 13. FEMA NRI county risk (creates base county records)
+python3 -u scripts/ingest-fema-nri.py
+# 14-18. Patch county data (run after FEMA creates base records)
+python3 -u scripts/ingest-bls-qcew.py
+python3 -u scripts/ingest-noaa-climate.py
+python3 -u scripts/ingest-wri-water.py
+python3 -u scripts/ingest-dc-incentives.py
+python3 -u scripts/ingest-fcc-fiber.py
+# 19. IXPs, DCs, brownfields (can run in parallel)
+python3 -u scripts/ingest-peeringdb.py
+python3 -u scripts/ingest-pnnl-dc.py
+python3 -u scripts/ingest-brownfields.py
+# 20. ISO queue summary
+python3 -u scripts/ingest-iso-queues-dc.py
+# 21. Cross-reference brownfields to nearest substations
+python3 -u scripts/crossref-brownfield-substations.py
 ```
 
-### Build & Deploy
+### Phase 4: Site Generation + Scoring
 ```bash
-# 12. Build static site
+# 22. Generate DC candidate sites from substations + brownfields
+python3 -u scripts/generate-dc-sites.py
+# 23. Generate greenfield sites along 230+ kV transmission lines
+python3 -u scripts/generate-greenfield-sites.py
+# 23b. Dry run (preview without inserting)
+python3 -u scripts/generate-greenfield-sites.py --dry-run
+# 24. Score all DC sites (default: unscored only)
+python3 -u scripts/score-dc-sites.py
+# To re-score ALL sites:
+python3 -u scripts/score-dc-sites.py --rescore
+```
+
+### Phase 5: Build & Deploy
+```bash
+# 25. Build static site
 npm run build
-
-# 13. Deploy
+# 26. Deploy
 git add <files>
 git commit -m "grid: description"
 git push origin main
@@ -515,17 +579,33 @@ git push origin main
 
 ## Script Gotchas (Critical)
 
+### Infrastructure Scripts
 - **OBJECTID vs HIFLD ID**: DB `hifld_id` stores OBJECTID (what ArcGIS returns). NREL HDF5 indexes by the separate "ID" field. `enrich-dlr-capacity.py` must query ArcGIS to map between them.
-- **grid_substations NOT in schema.sql**: 8th table created dynamically by `extract-substations.py` via psql. If you re-run schema.sql, substations table won't exist until the script runs.
-- **Cross-reference scripts ALTER TABLE**: `crossref-blm-lines.py` and `crossref-corridor-lines.py` add columns to existing tables via psql. Run them after the base tables are populated.
-- **DB password hardcoded in scripts**: Several scripts have the Supabase pooler password inline for psql operations: `#FsW7iqg%EYX&G3M`
-- **Texas has NO BLM land**: `ingest-blm-row.py` excludes TX. BLM Section 368 and Solar DLAs also don't cover TX.
+- **grid_substations NOT in schema.sql**: Created dynamically by `extract-substations.py` via psql. If you re-run schema.sql, substations table won't exist until the script runs.
+- **Cross-reference scripts ALTER TABLE**: `crossref-blm-lines.py` and `crossref-corridor-lines.py` add columns to existing tables via psql.
+- **Texas has NO BLM land**: `ingest-blm-row.py` excludes TX.
 - **ERCOT is isolated**: Not part of Western Interconnection. WECC paths don't apply to TX.
 - **NIETC/Section 368 downloads unreliable**: Shapefile URLs change, Cloudflare blocks. Scripts fall back to placeholder records.
-- **gridstatus needs Python 3.13 venv**: `ingest-ercot-sced.py` gridstatus mode requires `.venv/bin/python3.13` because gridstatus needs Python >= 3.10. System Python is 3.9.6.
-- **HDF5 is 19 GB**: `SLR_A-75C.h5` must be processed locally, never in serverless functions. Gets iCloud-evicted frequently.
-- **stats API fetches 50K rows**: In-JS aggregation, not SQL GROUP BY. Works but could be slow with large datasets.
-- **Geometry excluded by default**: Lines API omits `geometry_wkt` unless `with_geometry=true` is passed. Map mode requests geometry separately.
+- **gridstatus needs Python 3.13 venv**: `ingest-ercot-sced.py` gridstatus mode requires `.venv/bin/python3.13`.
+- **HDF5 is 19 GB**: `SLR_A-75C.h5` must be processed locally, never in serverless. Gets iCloud-evicted frequently.
+
+### DC Site Selection Scripts
+- **County data is layered**: `ingest-fema-nri.py` MUST run first (creates base county records). All other county scripts PATCH existing records.
+- **score-dc-sites.py defaults to unscored only**: Pass `--rescore` to re-score all ~40K sites. Without it, only scores sites where `dc_score IS NULL`.
+- **PNNL datacenter data is sparse**: Zenodo download may fail; script falls back to ~200 hardcoded major US DCs.
+- **ISO queue summary cross-references SolarTrack**: `ingest-iso-queues-dc.py` reads from `solar_installations` table (different table prefix).
+- **generate-dc-sites.py deduplicates within 1km**: Brownfield and substation sites near each other are consolidated.
+- **generate-greenfield-sites.py must run AFTER generate-dc-sites.py**: Greenfield uses existing DC sites as exclusion zones. Running in wrong order will create duplicate sites near substations.
+- **Greenfield scoring**: Greenfield sites score lower on power (no substation at 0km) but may score well on fiber/water/hazard depending on corridor location. Run `score-dc-sites.py` after greenfield generation.
+
+### General
+- **DB password hardcoded in scripts**: Several scripts have `#FsW7iqg%EYX&G3M` for psql operations.
+- **Geometry excluded by default**: Lines API omits `geometry_wkt` unless `with_geometry=true`.
+- **stats API fetches many rows**: In-JS aggregation, not SQL GROUP BY.
+- **All Python scripts use `python3 -u`** for real-time output.
+- **BATCH_SIZE = 50** for all Supabase inserts.
+- **source_record_id UNIQUE** prevents duplicate records on rerun.
+- **Suspense boundaries required**: Next.js 16 static export requires `useSearchParams()` inside `<Suspense>` wrapper.
 
 ## Texas-Specific Notes
 
@@ -534,11 +614,10 @@ git push origin main
 - **Best TX data sources**: HIFLD lines + ERCOT SCED constraints + county parcel data
 - **West Texas export constraint** is the #1 grid bottleneck -- extremely high shadow prices
 - **102+ GW** of wind, solar, and battery in ERCOT queue as of 2025
+- **4,222 DC candidate sites** in TX (49.8% of all scored sites) -- dominant state by count
 
 ### ERCOT SCED Results (Mar 5, 2026)
 - **17,813 constraint records** ingested (7 days: Feb 26 - Mar 4, 2026)
-- **Source**: ERCOT NP6-86-CD report (type 12302) via gridstatus library
-- **Cross-referenced** to 9 transmission lines (1,721 constraints matched, 9.7% rate)
 - **34/144 ERCOT stations** mapped to HIFLD substations (12 exact, 22 fuzzy/manual)
 - **110 unmapped** ERCOT stations use internal abbreviated codes with no HIFLD equivalent
 
@@ -555,16 +634,17 @@ git push origin main
 
 | Aspect | SolarTrack | GridScout |
 |--------|-----------|-----------|
-| Focus | Solar installations | Transmission lines + land |
-| Data shape | Point data (lat/lng) | Line data (polylines) + polygons |
-| Primary value | Equipment aging/replacement | Upgrade potential + land access |
+| Focus | Solar installations | DC site selection + transmission |
+| Data shape | Point data (lat/lng) | Points + lines (polylines) + polygons |
+| Primary value | Equipment aging/replacement | DC readiness scoring + investment analysis |
 | Map display | Marker clusters | Polylines with color-coding by capacity |
-| Target buyer | Equipment reseller | Infrastructure investor |
-| Geographic scope | All US | Western US (8 states) |
+| Target buyer | Equipment reseller | Infrastructure investor ($55B AUM) |
+| Geographic scope | All US | All US (50 states, 38K+ substations, ~40K scored sites) |
 | Table prefix | `solar_` | `grid_` |
 | Auth key | `solartrack_auth` | `gridscout_auth` |
 | Accent color | Blue (#2563eb) | Purple (#7c3aed) |
 | Password | BLUEWATER | GRIDSCOUT |
+| Scored entities | — | ~40,000 sites (0-100 DC Readiness Score) |
 
 ## Important Notes
 
@@ -574,7 +654,9 @@ git push origin main
 4. **Vercel auto-deploys** from GitHub push to main branch
 5. **FERC Form 715** has the best line rating data but is CEII-restricted (requires NDA). All our sources are free/public.
 6. **NREL HDF5 files are 19 GB each** -- need to process locally, not in serverless functions
-7. **Line geometry** is polylines (not points like SolarTrack) -- requires different Leaflet rendering (TransmissionMap component)
+7. **Line geometry** is polylines (not points) -- requires different Leaflet rendering (TransmissionMap component)
 8. **All Python scripts use `python3 -u`** flag for real-time output
 9. **BATCH_SIZE = 50** for all Supabase inserts (same pattern as SolarTrack)
 10. **source_record_id UNIQUE** constraint prevents duplicate records on rerun (all scripts idempotent)
+11. **Suspense boundary required** for `useSearchParams()` in Next.js 16 static export (sites/ and site/ pages)
+12. **County data scripts are layered** -- FEMA NRI must run first to create base records, then BLS/NOAA/WRI/FCC/incentives patch them

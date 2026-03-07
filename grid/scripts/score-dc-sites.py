@@ -327,10 +327,12 @@ def score_existing_dc(site, dc_index, dc_cell_size):
     return 10
 
 
-def score_land(site):
-    """Land suitability: acreage, land type."""
+def score_land(site, county_data):
+    """Land suitability: acreage, land type, land cost."""
     acreage = site.get('acreage')
     site_type = site.get('site_type', '')
+    fips = site.get('fips_code')
+    county = county_data.get(fips, {})
 
     # Acreage: 100+ acres = 100, 0 acres = 30
     acreage_score = 50
@@ -340,7 +342,13 @@ def score_land(site):
     # Type bonus: brownfield = 80 (pre-cleared), substation = 50 (may need land acquisition)
     type_score = 80 if site_type == 'brownfield' else 50
 
-    return clamp(acreage_score * 0.5 + type_score * 0.5)
+    # Land cost: cheaper land = better ($/acre: $500=100, $15000=0)
+    land_value = county.get('avg_land_value_per_acre_usd')
+    cost_score = 50
+    if land_value is not None:
+        cost_score = clamp(linear_score(float(land_value), 500, 15000))
+
+    return clamp(acreage_score * 0.35 + type_score * 0.35 + cost_score * 0.30)
 
 
 def score_tax(site, county_data):
@@ -459,7 +467,7 @@ def main():
             s_hazard = round(score_hazard(site, county_data), 1)
             s_labor = round(score_labor(site, county_data, percentiles), 1)
             s_dc = round(score_existing_dc(site, dc_index, 0.5), 1)
-            s_land = round(score_land(site), 1)
+            s_land = round(score_land(site, county_data), 1)
             s_tax = round(score_tax(site, county_data), 1)
             s_climate = round(score_climate(site, county_data), 1)
 
