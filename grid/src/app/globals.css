@@ -22,6 +22,10 @@ body {
   nav { display: none !important; }
   .print\:hidden { display: none !important; }
   .print\:block { display: block !important; }
+  .print\:flex { display: flex !important; }
   body { background: white; }
   main { padding: 0 !important; max-width: none !important; }
+  @page { margin: 0.75in; size: landscape; }
+  table { page-break-inside: avoid; }
+  .bg-white { box-shadow: none !important; }
 }

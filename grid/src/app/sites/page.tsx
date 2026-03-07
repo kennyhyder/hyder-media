@@ -73,6 +73,37 @@ function DCSitesContent() {
     });
   };
 
+  // Saved shortlists
+  interface Shortlist { name: string; ids: string[]; created: string; }
+  const [shortlists, setShortlists] = useState<Shortlist[]>(() => {
+    if (typeof window !== "undefined") {
+      try { return JSON.parse(localStorage.getItem("gridscout_shortlists") || "[]"); } catch { return []; }
+    }
+    return [];
+  });
+  const [showShortlists, setShowShortlists] = useState(false);
+  const [newListName, setNewListName] = useState("");
+
+  const saveShortlist = () => {
+    if (!newListName.trim() || compareIds.length === 0) return;
+    const updated = [...shortlists, { name: newListName.trim(), ids: [...compareIds], created: new Date().toISOString() }];
+    setShortlists(updated);
+    localStorage.setItem("gridscout_shortlists", JSON.stringify(updated));
+    setNewListName("");
+  };
+
+  const loadShortlist = (list: Shortlist) => {
+    setCompareIds(list.ids);
+    localStorage.setItem("gridscout_compare", JSON.stringify(list.ids));
+    setShowShortlists(false);
+  };
+
+  const deleteShortlist = (idx: number) => {
+    const updated = shortlists.filter((_, i) => i !== idx);
+    setShortlists(updated);
+    localStorage.setItem("gridscout_shortlists", JSON.stringify(updated));
+  };
+
   const [stateFilter, setStateFilter] = useState(searchParams.get("state") || "");
   const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "");
   const [minScore, setMinScore] = useState(searchParams.get("min_score") || "");
@@ -141,12 +172,28 @@ function DCSitesContent() {
         </div>
         <div className="flex gap-2">
           {compareIds.length > 0 && (
-            <a
-              href={`/grid/compare/?ids=${compareIds.join(",")}`}
-              className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
+            <>
+              <a
+                href={`/grid/compare/?ids=${compareIds.join(",")}`}
+                className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
+              >
+                Compare ({compareIds.length})
+              </a>
+              <button
+                onClick={() => setShowShortlists(!showShortlists)}
+                className="px-4 py-2 text-sm text-purple-700 border border-purple-300 rounded-lg hover:bg-purple-50"
+              >
+                Save List
+              </button>
+            </>
+          )}
+          {shortlists.length > 0 && compareIds.length === 0 && (
+            <button
+              onClick={() => setShowShortlists(!showShortlists)}
+              className="px-4 py-2 text-sm text-purple-700 border border-purple-300 rounded-lg hover:bg-purple-50"
             >
-              Compare ({compareIds.length})
-            </a>
+              Saved Lists ({shortlists.length})
+            </button>
           )}
           <button
             onClick={handleExport}
@@ -156,6 +203,55 @@ function DCSitesContent() {
           </button>
         </div>
       </div>
+
+      {/* Saved Shortlists Panel */}
+      {showShortlists && (
+        <div className="bg-white rounded-lg border border-purple-200 p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Saved Shortlists</h3>
+            <button onClick={() => setShowShortlists(false)} className="text-gray-400 hover:text-gray-600 text-xs">Close</button>
+          </div>
+          {compareIds.length > 0 && (
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && saveShortlist()}
+                placeholder="Name this shortlist..."
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm focus:ring-purple-500 focus:border-purple-500"
+              />
+              <button
+                onClick={saveShortlist}
+                disabled={!newListName.trim()}
+                className="px-3 py-1.5 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 disabled:opacity-50"
+              >
+                Save ({compareIds.length} sites)
+              </button>
+            </div>
+          )}
+          {shortlists.length === 0 ? (
+            <p className="text-xs text-gray-500">No saved shortlists yet. Select sites and save a list.</p>
+          ) : (
+            <div className="space-y-2">
+              {shortlists.map((list, i) => (
+                <div key={i} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-sm font-medium text-gray-900">{list.name}</span>
+                    <span className="text-xs text-gray-500 ml-2">{list.ids.length} sites</span>
+                    <span className="text-xs text-gray-400 ml-2">{new Date(list.created).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => loadShortlist(list)} className="text-xs text-purple-600 hover:underline">Load</button>
+                    <a href={`/grid/compare/?ids=${list.ids.join(",")}`} className="text-xs text-purple-600 hover:underline">Compare</a>
+                    <button onClick={() => deleteShortlist(i)} className="text-xs text-red-500 hover:underline">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">

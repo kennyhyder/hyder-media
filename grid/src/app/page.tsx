@@ -116,34 +116,52 @@ export default function DashboardPage() {
 
       {/* Hero stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-purple-600 uppercase tracking-wide">DC Sites</div>
-          <div className="text-2xl font-bold text-purple-700 mt-1">{fmt(t.dc_sites)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Lines</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.transmission_lines)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Substations</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.substations)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">IXPs</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.ixp_facilities)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Datacenters</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.datacenters)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Brownfields</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.brownfield_sites)}</div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Counties</div>
-          <div className="text-xl font-bold text-gray-900 mt-1">{fmt(t.counties)}</div>
-        </div>
+        {[
+          { label: "DC Sites", value: t.dc_sites, large: true },
+          { label: "Lines", value: t.transmission_lines },
+          { label: "Substations", value: t.substations },
+          { label: "IXPs", value: t.ixp_facilities },
+          { label: "Datacenters", value: t.datacenters },
+          { label: "Brownfields", value: t.brownfield_sites },
+          { label: "Counties", value: t.counties },
+        ].map((card) => (
+          <div key={card.label} className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="text-xs font-medium text-purple-600 uppercase tracking-wide">{card.label}</div>
+            <div className={`${card.large ? "text-2xl" : "text-xl"} font-bold text-purple-700 mt-1`}>{fmt(card.value)}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <a href="/grid/map/" className="bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-300 hover:shadow-sm transition-all group">
+          <div className="text-purple-600 mb-2">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+          </div>
+          <div className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Interactive Map</div>
+          <div className="text-xs text-gray-500 mt-0.5">Explore all sites on a national map</div>
+        </a>
+        <a href="/grid/sites/?min_score=70" className="bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-300 hover:shadow-sm transition-all group">
+          <div className="text-green-600 mb-2">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <div className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Top Rated Sites</div>
+          <div className="text-xs text-gray-500 mt-0.5">Score 70+ — ready for deep evaluation</div>
+        </a>
+        <a href="/grid/brownfields/" className="bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-300 hover:shadow-sm transition-all group">
+          <div className="text-amber-600 mb-2">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+          </div>
+          <div className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Brownfield Sites</div>
+          <div className="text-xs text-gray-500 mt-0.5">Retired plants with grid connections</div>
+        </a>
+        <a href="/grid/market/" className="bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-300 hover:shadow-sm transition-all group">
+          <div className="text-blue-600 mb-2">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          </div>
+          <div className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Market Analysis</div>
+          <div className="text-xs text-gray-500 mt-0.5">County-level market intelligence</div>
+        </a>
       </div>
 
       {/* Score overview */}
@@ -211,7 +229,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Top 25 sites table */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Top 25 Sites</h2>
           <a
@@ -278,6 +296,44 @@ export default function DashboardPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+      {/* Data Sources */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Data Sources</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Transmission</div>
+            <div className="text-gray-700">HIFLD — DHS Homeland Infrastructure</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Hazard Risk</div>
+            <div className="text-gray-700">FEMA National Risk Index</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Water Stress</div>
+            <div className="text-gray-700">WRI Aqueduct 4.0</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Labor Market</div>
+            <div className="text-gray-700">BLS Quarterly Census (QCEW)</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Fiber / IXP</div>
+            <div className="text-gray-700">FCC + PeeringDB</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Brownfield Sites</div>
+            <div className="text-gray-700">EIA-860 Retired Generators</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Datacenters</div>
+            <div className="text-gray-700">OSM + PNNL IM3</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Climate</div>
+            <div className="text-gray-700">NOAA Climate Normals</div>
+          </div>
         </div>
       </div>
     </div>
