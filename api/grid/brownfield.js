@@ -57,25 +57,18 @@ export default async function handler(req, res) {
       county = countyData;
     }
 
-    // Get nearby transmission lines (within ~25km)
+    // Get nearby transmission lines by state (lines lack lat/lng columns)
     let nearbyLines = [];
-    if (brownfield.latitude && brownfield.longitude) {
-      const latDelta = 25 / 69.0;
-      const lngDelta =
-        25 / (69.0 * Math.cos((brownfield.latitude * Math.PI) / 180));
+    if (brownfield.state) {
       const { data: lines, error: lineErr } = await supabase
         .from("grid_transmission_lines")
         .select(
           "id,hifld_id,voltage_kv,capacity_mw,owner,sub_1,sub_2,naession,state,geometry_wkt"
         )
-        .gte("latitude", brownfield.latitude - latDelta)
-        .lte("latitude", brownfield.latitude + latDelta)
-        .gte("longitude", brownfield.longitude - lngDelta)
-        .lte("longitude", brownfield.longitude + lngDelta)
+        .eq("state", brownfield.state)
         .order("voltage_kv", { ascending: false })
         .limit(20);
-      if (lineErr) return res.status(500).json({ error: lineErr.message });
-      nearbyLines = lines || [];
+      if (!lineErr) nearbyLines = lines || [];
     }
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
