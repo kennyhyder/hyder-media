@@ -32,6 +32,7 @@ interface MapProps {
   showSubstations?: boolean;
   singleLine?: boolean;
   siteMarker?: SiteMarker;
+  boldLines?: boolean;
 }
 
 function parseWKT(wkt: string): [number, number][][] {
@@ -82,6 +83,7 @@ export default function TransmissionMap({
   onLineClick,
   singleLine = false,
   siteMarker,
+  boldLines = false,
 }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -149,9 +151,9 @@ export default function TransmissionMap({
         const polylines = parseWKT(line.geometry_wkt);
         if (polylines.length === 0) continue;
 
-        const color = line.upgrade_candidate ? "#a855f7" : "#6b7280";
-        const weight = line.upgrade_candidate ? 3 : 1.5;
-        const opacity = line.upgrade_candidate ? 0.9 : 0.5;
+        const color = line.upgrade_candidate ? "#a855f7" : boldLines ? "#3b82f6" : "#6b7280";
+        const weight = line.upgrade_candidate ? (boldLines ? 4 : 3) : (boldLines ? 2.5 : 1.5);
+        const opacity = line.upgrade_candidate ? 0.9 : (boldLines ? 0.8 : 0.5);
 
         for (const coords of polylines) {
           allCoords.push(...coords);
@@ -249,7 +251,7 @@ export default function TransmissionMap({
         leafletMap.current = null;
       }
     };
-  }, [mounted, lines, center, zoom, onLineClick, singleLine, siteMarker]);
+  }, [mounted, lines, center, zoom, onLineClick, singleLine, siteMarker, boldLines]);
 
   if (!mounted) {
     return (
