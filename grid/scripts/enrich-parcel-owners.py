@@ -105,8 +105,12 @@ STATEWIDE_ENDPOINTS = {
         "owner_field": "OwnerName", "type": "FeatureServer", "require_where": True,
     },
     "WV": {
-        "url": "https://gis.transportation.wv.gov/arcgis/rest/services/Economic/FeatureServer/7",
-        "owner_field": "FullOwnerName", "type": "FeatureServer", "use_envelope": True,
+        "url": "https://services.wvgis.wvu.edu/arcgis/rest/services/Planning_Cadastre/WV_Parcels/MapServer/0",
+        "owner_field": "FullOwnerName", "type": "MapServer", "use_envelope": True, "ssl_skip": True,
+    },
+    "ID": {
+        "url": "https://gis1.idl.idaho.gov/arcgis/rest/services/Portal/WhiteStar_Parcels/FeatureServer/0",
+        "owner_field": "owner1", "type": "FeatureServer", "use_envelope": True,
     },
 }
 
@@ -232,10 +236,6 @@ COUNTY_ENDPOINTS = {
         },
     },
     "KS": {
-        "johnson": {
-            "url": "https://maps.jocogov.org/arcgis/rest/services/Parcels/Parcels/MapServer/0",
-            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
-        },
         "douglas": {
             "url": "https://gis.dgcoks.gov/server/rest/services/Tax_Parcel/FeatureServer/0",
             "owner_field": "owner1", "type": "FeatureServer", "use_envelope": True,
@@ -296,6 +296,16 @@ COUNTY_ENDPOINTS = {
         "oklahoma_county": {
             "url": "https://okassessor.oklahomacounty.org/server/rest/services/OnlineMapping/Property_Information/MapServer/3",
             "owner_field": "name1", "type": "MapServer", "use_envelope": True,
+        },
+    },
+    "MS": {
+        "west": {
+            "url": "https://gis.mississippi.edu/server/rest/services/Cadastral/MS_West_Parcels/MapServer/0",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True, "skip_record_count": True,
+        },
+        "east": {
+            "url": "https://gis.mississippi.edu/server/rest/services/Cadastral/MS_East_Parcels/MapServer/0",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True, "skip_record_count": True,
         },
     },
     "WA": {
