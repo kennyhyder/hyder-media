@@ -224,28 +224,31 @@ def enrich_site(site):
     if not lat or not lng:
         return (site_id, None)
 
-    # Step 1: Try FCC Broadband Map API
-    result = fcc_broadband_availability(lat, lng)
+    # NOTE: FCC Broadband Map API (405) and Census Block API (302 loop)
+    # are both down as of 2026-03-07. Skip directly to state fallback.
+    # When APIs recover, uncomment Steps 1-2 below.
 
-    if result is not None:
-        patch = {
-            'fcc_fiber_providers': result['fiber_providers'],
-        }
-        if result['max_down_mbps'] is not None:
-            patch['fcc_max_down_mbps'] = result['max_down_mbps']
-        if result['max_up_mbps'] is not None:
-            patch['fcc_max_up_mbps'] = result['max_up_mbps']
-        return (site_id, patch)
+    # # Step 1: Try FCC Broadband Map API
+    # result = fcc_broadband_availability(lat, lng)
+    # if result is not None:
+    #     patch = {
+    #         'fcc_fiber_providers': result['fiber_providers'],
+    #     }
+    #     if result['max_down_mbps'] is not None:
+    #         patch['fcc_max_down_mbps'] = result['max_down_mbps']
+    #     if result['max_up_mbps'] is not None:
+    #         patch['fcc_max_up_mbps'] = result['max_up_mbps']
+    #     return (site_id, patch)
 
-    # Step 2: Try Census block lookup (confirms location is valid)
-    fips = fcc_census_block(lat, lng)
-    if fips:
-        estimated_providers = estimate_from_state(state)
-        return (site_id, {
-            'fcc_fiber_providers': estimated_providers,
-        })
+    # # Step 2: Try Census block lookup (confirms location is valid)
+    # fips = fcc_census_block(lat, lng)
+    # if fips:
+    #     estimated_providers = estimate_from_state(state)
+    #     return (site_id, {
+    #         'fcc_fiber_providers': estimated_providers,
+    #     })
 
-    # Step 3: Pure state fallback
+    # Step 3: Pure state fallback (only active path while APIs are down)
     if state:
         estimated_providers = estimate_from_state(state)
         return (site_id, {

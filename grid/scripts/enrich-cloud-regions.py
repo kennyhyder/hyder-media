@@ -198,32 +198,44 @@ def main():
         print(f"\n  Would patch: {len(patches):,} sites")
         return
 
-    # Batch PATCH to Supabase
+    # Batch PATCH to Supabase — group by identical values, patch in bulk
     total_patched = 0
     total_errors = 0
 
-    for i in range(0, len(patches), BATCH_SIZE):
-        batch = patches[i:i + BATCH_SIZE]
-        for patch in batch:
-            site_id = patch['id']
-            patch_data = {
-                'nearest_cloud_provider': patch['nearest_cloud_provider'],
-                'nearest_cloud_region': patch['nearest_cloud_region'],
-                'nearest_cloud_distance_km': patch['nearest_cloud_distance_km'],
-            }
+    # Group sites by (provider, region, distance) to batch by shared values
+    from collections import defaultdict
+    value_groups = defaultdict(list)
+    for p in patches:
+        key = (p['nearest_cloud_provider'], p['nearest_cloud_region'], p['nearest_cloud_distance_km'])
+        value_groups[key].append(p['id'])
+
+    print(f"\n  Grouped into {len(value_groups)} unique (provider, region, distance) combos")
+
+    group_num = 0
+    for (provider, region, dist_km), site_ids in value_groups.items():
+        group_num += 1
+        patch_data = {
+            'nearest_cloud_provider': provider,
+            'nearest_cloud_region': region,
+            'nearest_cloud_distance_km': dist_km,
+        }
+        # Patch in sub-batches of IDs (Supabase URL length limit)
+        for i in range(0, len(site_ids), BATCH_SIZE):
+            batch_ids = site_ids[i:i + BATCH_SIZE]
+            id_filter = ','.join(batch_ids)
             try:
-                eid = urllib.parse.quote(site_id, safe='')
                 supabase_request('PATCH',
-                    f"grid_dc_sites?id=eq.{eid}",
+                    f"grid_dc_sites?id=in.({urllib.parse.quote(id_filter, safe=',.-')})",
                     patch_data,
                     headers_extra={'Prefer': 'return=minimal'})
-                total_patched += 1
+                total_patched += len(batch_ids)
             except Exception as e:
-                print(f"  Error patching {site_id}: {e}")
-                total_errors += 1
+                print(f"  Error patching batch: {e}")
+                total_errors += len(batch_ids)
 
-        pct = min(100, (i + len(batch)) / len(patches) * 100)
-        print(f"  Progress: {i + len(batch):,}/{len(patches):,} ({pct:.1f}%) — {total_patched:,} patched, {total_errors} errors")
+        if group_num % 100 == 0 or group_num == len(value_groups):
+            pct = total_patched / len(patches) * 100
+            print(f"  Progress: {total_patched:,}/{len(patches):,} ({pct:.1f}%) — {total_errors} errors")
 
     print(f"\n  Patched: {total_patched:,}, Errors: {total_errors}")
     print("\nDone!")
