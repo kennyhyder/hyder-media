@@ -162,6 +162,14 @@ COUNTY_ENDPOINTS = {
             "url": "https://gis.shelbycountytn.gov/arcgis/rest/services/Parcel/CERT_Parcel/MapServer/0",
             "owner_field": "OWNER", "type": "MapServer", "use_envelope": True,
         },
+        "hamilton": {
+            "url": "https://gis.hamiltontn.gov/arcgis/rest/services/Parcels/FeatureServer/0",
+            "owner_field": "OWNERNAME1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "knox": {
+            "url": "https://knoxgis.knoxcountytn.gov/kgis/rest/services/Parcels/MapServer/0",
+            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
+        },
     },
     "GA": {
         "dekalb": {
@@ -187,6 +195,10 @@ COUNTY_ENDPOINTS = {
             "url": "https://gis.horrycounty.org/arcgis/rest/services/Public/HorryCountyParcels/MapServer/0",
             "owner_field": "OWNER", "type": "MapServer", "use_envelope": True,
             "transform_wkid": 6543,  # NAD83(2011) South Carolina (feet)
+        },
+        "berkeley": {
+            "url": "https://services.arcgis.com/RFISBXo2FuPSa3vu/arcgis/rest/services/Berkeley_County_Parcels/FeatureServer/0",
+            "owner_field": "OwnerName", "type": "FeatureServer", "use_envelope": True,
         },
     },
     "MI": {
@@ -224,6 +236,14 @@ COUNTY_ENDPOINTS = {
             "url": "https://maps.jocogov.org/arcgis/rest/services/Parcels/Parcels/MapServer/0",
             "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
         },
+        "douglas": {
+            "url": "https://gis.dgcoks.gov/server/rest/services/Tax_Parcel/FeatureServer/0",
+            "owner_field": "owner1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "riley": {
+            "url": "https://services.arcgis.com/6WmEmDp2YlKJjhJt/arcgis/rest/services/Parcels/FeatureServer/0",
+            "owner_field": "Party_Name", "type": "FeatureServer", "use_envelope": True,
+        },
     },
     "AL": {
         "jefferson": {
@@ -235,6 +255,10 @@ COUNTY_ENDPOINTS = {
         "henrico": {
             "url": "https://services.arcgis.com/LxWK4CxNTBBlLshT/arcgis/rest/services/Henrico_County_Tax_Parcels_0322/FeatureServer/0",
             "owner_field": "OWNER_CURRENT", "type": "FeatureServer", "use_envelope": True,
+        },
+        "chesterfield": {
+            "url": "https://services3.arcgis.com/TsynfzBSE6sXfoLq/arcgis/rest/services/Cadastral_ProdA/FeatureServer/3",
+            "owner_field": "OwnerName", "type": "FeatureServer", "use_envelope": True,
         },
     },
     "MO": {
@@ -259,11 +283,61 @@ COUNTY_ENDPOINTS = {
             "owner_field": "Owner1", "type": "MapServer", "use_envelope": True,
             "transform_wkid": 3435,  # NAD83 Illinois East (feet)
         },
+        "lake": {
+            "url": "https://maps.lakecountyil.gov/arcgis/rest/services/Parcels/Parcels/MapServer/0",
+            "owner_field": "taxpayer_name", "type": "MapServer", "use_envelope": True,
+        },
+        "cook": {
+            "url": "https://gis12.cookcountyil.gov/arcgis/rest/services/cookVwrDynmc/MapServer/44",
+            "owner_field": "TAXPAYER_NAME", "type": "MapServer", "use_envelope": True,
+        },
     },
     "OK": {
         "oklahoma_county": {
             "url": "https://okassessor.oklahomacounty.org/server/rest/services/OnlineMapping/Property_Information/MapServer/3",
             "owner_field": "name1", "type": "MapServer", "use_envelope": True,
+        },
+    },
+    "WA": {
+        "whatcom": {
+            "url": "https://gis2.whatcomcounty.org/arcgis/rest/services/public/Parcels/MapServer/0",
+            "owner_field": "title_owner_name", "type": "MapServer", "use_envelope": True,
+        },
+        "grant": {
+            "url": "https://gis.grantcountywa.gov/arcgis/rest/services/Parcels/MapServer/0",
+            "owner_field": "OwnerName", "type": "MapServer", "use_envelope": True,
+        },
+        "thurston": {
+            "url": "https://maps.co.thurston.wa.us/arcgis/rest/services/Parcels/FeatureServer/0",
+            "owner_field": "OWNER_NAME", "type": "FeatureServer", "use_envelope": True,
+        },
+        "clark": {
+            "url": "https://gis.clark.wa.gov/arcgis/rest/services/Cadastral/Parcels/MapServer/0",
+            "owner_field": "OWNER1", "type": "MapServer", "use_envelope": True,
+        },
+        "spokane": {
+            "url": "https://gismaps.spokanecounty.org/arcgis/rest/services/OpenData/OpenDataParcels/MapServer/0",
+            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
+        },
+    },
+    "NE": {
+        "douglas": {
+            "url": "https://maps.dcassessor.org/arcgis/rest/services/Parcels/MapServer/0",
+            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
+        },
+        "lancaster": {
+            "url": "https://maps.lancaster.ne.gov/arcgis/rest/services/Parcels/MapServer/0",
+            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
+        },
+    },
+    "UT": {
+        "utah_county": {
+            "url": "https://maps.utahcounty.gov/arcgis/rest/services/Parcels/FeatureServer/0",
+            "owner_field": "OWNER_NAME", "type": "FeatureServer", "use_envelope": True,
+        },
+        "salt_lake": {
+            "url": "https://slco.org/arcgis/rest/services/SLCoMaps/Parcels/MapServer/0",
+            "owner_field": "OWNER", "type": "MapServer", "use_envelope": True,
         },
     },
     "FL": {
