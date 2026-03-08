@@ -540,7 +540,7 @@ function SiteDetailContent() {
       {/* Land Acquisition */}
       <div className="bg-white rounded-lg border border-purple-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Land Acquisition</h2>
-        <p className="text-xs text-gray-500 mb-4">Contact information for inquiring about land availability at this site.</p>
+        <p className="text-xs text-gray-500 mb-4">Property ownership and land availability information for this site.</p>
         {s.site_type === "brownfield" ? (
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -559,6 +559,14 @@ function SiteDetailContent() {
                 ) : null}
               </div>
             ) : null}
+            {s.parcel_owner && (
+              <div className="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tax Parcel Owner (County Records)</div>
+                <div className="text-sm font-semibold text-gray-900">{String(s.parcel_owner)}</div>
+                {s.parcel_apn && <div className="text-xs text-gray-500 mt-0.5">Parcel #: {String(s.parcel_apn)}</div>}
+                {s.parcel_address && <div className="text-xs text-gray-600 mt-0.5">{String(s.parcel_address)}</div>}
+              </div>
+            )}
             <div className="space-y-2">
               <a href="https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
@@ -606,29 +614,68 @@ function SiteDetailContent() {
             <div className="flex items-center gap-2 mb-3">
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">Private Land</span>
             </div>
-            <p className="text-sm text-gray-700 mb-3">
-              This site is on or near private land. Property ownership records are maintained by the county assessor&apos;s office.
-              Contact the county assessor to identify the current property owner.
-            </p>
-            {s.county && s.state && (
-              <div className="mb-3">
-                <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">County Assessor</div>
-                <div className="text-sm font-medium text-gray-900">{String(s.county)} County Assessor&apos;s Office</div>
-                <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} assessor property records`)}`} target="_blank" rel="noopener noreferrer"
-                  className="text-xs text-purple-600 hover:underline">
-                  Search for county assessor website
-                </a>
-              </div>
+            {s.parcel_owner ? (
+              <>
+                <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Property Owner (County Tax Records)</div>
+                  <div className="text-base font-semibold text-gray-900">{String(s.parcel_owner)}</div>
+                  {s.parcel_apn && <div className="text-xs text-gray-500 mt-1">Parcel #: {String(s.parcel_apn)}</div>}
+                  {s.parcel_address && <div className="text-xs text-gray-600 mt-0.5">{String(s.parcel_address)}</div>}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`"${s.parcel_owner}" ${s.county ? s.county + ' County' : ''} ${s.state || ''} property`)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline bg-white px-2 py-1 rounded border border-purple-200">
+                      <span>&#8599;</span> Search Owner
+                    </a>
+                    {s.county && s.state && (
+                      <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} assessor property records${s.parcel_apn ? ' ' + s.parcel_apn : ''}`)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline bg-white px-2 py-1 rounded border border-purple-200">
+                        <span>&#8599;</span> County Records
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                  Owner information sourced from county tax assessor parcel records. Contact the property owner or their representative to discuss land lease or acquisition.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-gray-700 mb-3">
+                  This site is on or near private land. Property ownership records are maintained by the county assessor&apos;s office.
+                </p>
+                {s.county && s.state && (
+                  <div className="mb-3">
+                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">County Assessor</div>
+                    <div className="text-sm font-medium text-gray-900">{String(s.county)} County Assessor&apos;s Office</div>
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} assessor property records`)}`} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-purple-600 hover:underline">
+                      Search for county assessor website
+                    </a>
+                  </div>
+                )}
+              </>
             )}
             <div className="space-y-2">
-              <a href={`https://www.loopnet.com/search/land/${s.state ? `${s.county ? s.county + '-county-' : ''}${s.state}` : 'united-states'}/for-sale/`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                <span>&#8599;</span> LoopNet Commercial Land Listings
-              </a>
-              <a href={`https://www.landwatch.com/search?state=${String(s.state || '').toLowerCase()}`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                <span>&#8599;</span> LandWatch Rural Land Listings
-              </a>
+              {s.county && s.state && (
+                <a href={`https://www.loopnet.com/search/land/${encodeURIComponent(String(s.county).toLowerCase().replace(/\s+/g, '-'))}-county-${encodeURIComponent(String(s.state).toLowerCase().replace(/\s+/g, '-'))}/for-sale/`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> LoopNet — {String(s.county)} County Land for Sale
+                </a>
+              )}
+              {s.state && (
+                <a href={`https://www.landwatch.com/${encodeURIComponent(String(s.state).toLowerCase().replace(/\s+/g, '-'))}-land-for-sale`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> LandWatch — {String(s.state)} Land for Sale
+                </a>
+              )}
+              {s.county && s.state && (
+                <a href={`https://www.google.com/search?q=${encodeURIComponent(`land for sale ${s.county} County ${s.state} acreage commercial`)}`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> Search Commercial Land Listings
+                </a>
+              )}
             </div>
           </div>
         )}
