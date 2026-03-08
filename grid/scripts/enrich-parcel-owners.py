@@ -16,6 +16,14 @@ import os, sys, json, time, argparse, urllib.parse, re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 
+try:
+    from pyproj import Transformer
+    HAS_PYPROJ = True
+except ImportError:
+    HAS_PYPROJ = False
+    print("WARNING: pyproj not installed — endpoints with transform_wkid will be skipped")
+    print("  Install with: pip3 install pyproj")
+
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.local'))
 # Fallback to parent .env.local (hyder-media root)
 if not os.environ.get("SUPABASE_URL"):
@@ -58,10 +66,8 @@ STATEWIDE_ENDPOINTS = {
         "url": "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/FS_VCGI_OPENDATA_Cadastral_VTPARCELS_poly_standardized_parcels_SP_v1/FeatureServer/0",
         "owner_field": "OWNER1", "type": "FeatureServer",
     },
-    "FL": {
-        "url": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0",
-        "owner_field": "OWN_NAME", "type": "FeatureServer",
-    },
+    # FL: Statewide Cadastral has spatial queries DISABLED server-side.
+    # Use county endpoints in COUNTY_ENDPOINTS["FL"] instead.
     "AR": {
         "url": "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6",
         "owner_field": "ownername", "type": "FeatureServer",
@@ -94,6 +100,14 @@ STATEWIDE_ENDPOINTS = {
         "url": "https://gis.colorado.gov/public/rest/services/Address_and_Parcel/Colorado_Public_Parcels/FeatureServer/0",
         "owner_field": "owner", "type": "FeatureServer",
     },
+    "ND": {
+        "url": "https://services1.arcgis.com/GOcSXpzwBHyk2nog/arcgis/rest/services/NDGISHUB_Parcels/FeatureServer/1",
+        "owner_field": "OwnerName", "type": "FeatureServer", "require_where": True,
+    },
+    "WV": {
+        "url": "https://gis.transportation.wv.gov/arcgis/rest/services/Economic/FeatureServer/7",
+        "owner_field": "FullOwnerName", "type": "FeatureServer", "use_envelope": True,
+    },
 }
 
 COUNTY_ENDPOINTS = {
@@ -106,6 +120,11 @@ COUNTY_ENDPOINTS = {
             "url": "https://azwatermaps.azwater.gov/arcgis/rest/services/General/Parcels_for_TEST/FeatureServer/6",
             "owner_field": "OWNER_NAME", "type": "FeatureServer",
         },
+        "yavapai": {
+            "url": "https://gis.yavapai.us/arcgis/rest/services/Parcels/FeatureServer/0",
+            "owner_field": "NAME", "type": "FeatureServer", "use_envelope": True,
+            "ssl_skip": True,
+        },
     },
     "LA": {
         "orleans": {
@@ -116,6 +135,10 @@ COUNTY_ENDPOINTS = {
         "east_baton_rouge": {
             "url": "https://maps.brla.gov/gis/rest/services/Cadastral/Tax_Parcel/MapServer/0",
             "owner_field": "OWNER", "type": "MapServer", "use_envelope": True,
+        },
+        "acadia": {
+            "url": "https://services3.arcgis.com/cWVjJ3EL88oVeYPk/arcgis/rest/services/Tax_Parcel_CAMA_Joined_View/FeatureServer/0",
+            "owner_field": "primary_owner", "type": "FeatureServer", "use_envelope": True,
         },
     },
     "IN": {
@@ -149,11 +172,21 @@ COUNTY_ENDPOINTS = {
             "url": "https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11",
             "owner_field": "Owner", "type": "MapServer", "use_envelope": True,
         },
+        "gwinnett": {
+            "url": "https://gismaps.gwinnettcounty.com/arcgis/rest/services/ParcelData/FeatureServer/0",
+            "owner_field": "OWNNAM", "type": "FeatureServer", "use_envelope": True,
+            "transform_wkid": 2240,  # NAD83 Georgia West (feet)
+        },
     },
     "SC": {
         "charleston": {
             "url": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/GIS_VIEWER/Public_Search/MapServer/4",
             "owner_field": "OWNER1", "type": "MapServer", "use_envelope": True,
+        },
+        "horry": {
+            "url": "https://gis.horrycounty.org/arcgis/rest/services/Public/HorryCountyParcels/MapServer/0",
+            "owner_field": "OWNER", "type": "MapServer", "use_envelope": True,
+            "transform_wkid": 6543,  # NAD83(2011) South Carolina (feet)
         },
     },
     "MI": {
@@ -194,14 +227,77 @@ COUNTY_ENDPOINTS = {
     },
     "AL": {
         "jefferson": {
-            "url": "https://jeffcoal.maps.arcgis.com/apps/instant/basic/index.html",
-            "owner_field": "OWNER", "type": "skip",
+            "url": "https://jccgis.jccal.org/server/rest/services/Basemap/Parcels/MapServer/0",
+            "owner_field": "OWNERNAME", "type": "MapServer", "use_envelope": True,
         },
     },
-    "ND": {
-        "cass": {
-            "url": "https://gis.casscountynd.gov/arcgis/rest/services/CassCounty/CASS_CadastreParcels/MapServer/0",
-            "owner_field": "OWNER1", "type": "MapServer", "use_envelope": True,
+    "VA": {
+        "henrico": {
+            "url": "https://services.arcgis.com/LxWK4CxNTBBlLshT/arcgis/rest/services/Henrico_County_Tax_Parcels_0322/FeatureServer/0",
+            "owner_field": "OWNER_CURRENT", "type": "FeatureServer", "use_envelope": True,
+        },
+    },
+    "MO": {
+        "st_louis": {
+            "url": "https://maps.stlouisco.com/hosting/rest/services/Maps/AGS_Parcels/MapServer/0",
+            "owner_field": "OWNER_NAME", "type": "MapServer", "use_envelope": True,
+        },
+        "independence": {
+            "url": "https://services.arcgis.com/sbDzK061dd6DNPHv/arcgis/rest/services/COI_Parcels_2_view/FeatureServer/0",
+            "owner_field": "owner", "type": "FeatureServer", "use_envelope": True,
+        },
+    },
+    "IA": {
+        "linn": {
+            "url": "https://services.arcgis.com/i14SLLmXo7Hn9vNc/arcgis/rest/services/RealEstateParcel/FeatureServer/0",
+            "owner_field": "OwnerDeed", "type": "FeatureServer", "use_envelope": True,
+        },
+    },
+    "IL": {
+        "dupage": {
+            "url": "https://gis.dupageco.org/arcgis/rest/services/Public/Parcels/MapServer/0",
+            "owner_field": "Owner1", "type": "MapServer", "use_envelope": True,
+            "transform_wkid": 3435,  # NAD83 Illinois East (feet)
+        },
+    },
+    "OK": {
+        "oklahoma_county": {
+            "url": "https://okassessor.oklahomacounty.org/server/rest/services/OnlineMapping/Property_Information/MapServer/3",
+            "owner_field": "name1", "type": "MapServer", "use_envelope": True,
+        },
+    },
+    "FL": {
+        "lee": {
+            "url": "https://services2.arcgis.com/LvWGAAhHwbCJ2GMP/arcgis/rest/services/Lee_County_Parcels/FeatureServer/0",
+            "owner_field": "O_NAME", "type": "FeatureServer", "use_envelope": True,
+        },
+        "miami_dade": {
+            "url": "https://gis.miamidade.gov/arcgis/rest/services/MD_LandInformation/MapServer/24",
+            "owner_field": "TRUE_OWNER1", "type": "MapServer", "use_envelope": True,
+        },
+        "hillsborough": {
+            "url": "https://gis.hcpafl.org/arcgis/rest/services/Webmaps/HillsboroughFL_WebParcels/MapServer/0",
+            "owner_field": "Owner1", "type": "MapServer", "use_envelope": True,
+        },
+        "palm_beach": {
+            "url": "https://gis.pbcgov.org/arcgis/rest/services/Parcels/PARCEL_INFO/FeatureServer/4",
+            "owner_field": "OWNER_NAME1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "volusia": {
+            "url": "https://maps5.vcgov.org/arcgis/rest/services/Open_Data/Open_Data_3/FeatureServer/34",
+            "owner_field": "OWNER1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "pinellas": {
+            "url": "https://egis.pinellas.gov/gis/rest/services/AGO/Parcels/MapServer/0",
+            "owner_field": "PGIS.PGIS.PAOGENERAL.OWNER1", "type": "MapServer", "use_envelope": True,
+        },
+        "polk": {
+            "url": "https://gis.polk-county.net/server/rest/services/Map_Property_Appraiser/MapServer/1",
+            "owner_field": "NAME", "type": "MapServer", "use_envelope": True,
+        },
+        "orange": {
+            "url": "https://services1.arcgis.com/0U8EQ1FrumPeIqDb/arcgis/rest/services/Parcels_BCC/FeatureServer/5",
+            "owner_field": "NAME1", "type": "FeatureServer", "use_envelope": True,
         },
     },
 }
@@ -263,9 +359,21 @@ def query_arcgis(lat, lng, cfg):
     owner_field = cfg["owner_field"]
     out_fields = "*"  # Request all fields to capture APN/address variants
 
+    # Coordinate reprojection for endpoints that require a local CRS
+    transform_wkid = cfg.get("transform_wkid")
+    if transform_wkid:
+        if not HAS_PYPROJ:
+            return None
+        transformer = Transformer.from_crs("EPSG:4326", f"EPSG:{transform_wkid}", always_xy=True)
+        proj_x, proj_y = transformer.transform(lng, lat)
+        in_sr = str(transform_wkid)
+    else:
+        proj_x, proj_y = lng, lat
+        in_sr = "4326"
+
     if cfg.get("use_distance"):
         params = {
-            "geometry": f"{lng},{lat}",
+            "geometry": f"{proj_x},{proj_y}",
             "geometryType": "esriGeometryPoint",
             "spatialRel": "esriSpatialRelIntersects",
             "distance": 100,
@@ -273,39 +381,46 @@ def query_arcgis(lat, lng, cfg):
             "outFields": out_fields,
             "returnGeometry": "false",
             "f": "json",
-            "inSR": "4326",
-            "outSR": "4326",
+            "inSR": in_sr,
+            "outSR": in_sr,
         }
     elif cfg.get("use_envelope"):
-        delta = 0.0005  # ~55m envelope
+        if transform_wkid:
+            # For projected CRS in feet, use ~50m ≈ 164 feet envelope
+            delta = 164.0
+        else:
+            delta = 0.0005  # ~55m envelope in degrees
         params = {
             "geometry": json.dumps({
-                "xmin": lng - delta, "ymin": lat - delta,
-                "xmax": lng + delta, "ymax": lat + delta,
-                "spatialReference": {"wkid": 4326}
+                "xmin": proj_x - delta, "ymin": proj_y - delta,
+                "xmax": proj_x + delta, "ymax": proj_y + delta,
+                "spatialReference": {"wkid": int(in_sr) if in_sr != "4326" else 4326}
             }),
             "geometryType": "esriGeometryEnvelope",
             "spatialRel": "esriSpatialRelIntersects",
             "outFields": out_fields,
             "returnGeometry": "false",
             "f": "json",
-            "inSR": "4326",
-            "outSR": "4326",
+            "inSR": in_sr,
+            "outSR": in_sr,
         }
     else:
         params = {
-            "geometry": f"{lng},{lat}",
+            "geometry": f"{proj_x},{proj_y}",
             "geometryType": "esriGeometryPoint",
             "spatialRel": "esriSpatialRelIntersects",
             "outFields": out_fields,
             "returnGeometry": "false",
             "f": "json",
-            "inSR": "4326",
-            "outSR": "4326",
+            "inSR": in_sr,
+            "outSR": in_sr,
         }
 
     if not cfg.get("skip_record_count"):
         params["resultRecordCount"] = "1"
+
+    if cfg.get("require_where"):
+        params["where"] = "1=1"
 
     query_str = urllib.parse.urlencode(params)
     full_url = f"{url}?{query_str}"
