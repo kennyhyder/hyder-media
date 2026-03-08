@@ -87,12 +87,12 @@ STATEWIDE_ENDPOINTS = {
         "owner_field": "OWNER1", "type": "MapServer", "ssl_skip": True,
     },
     "NY": {
-        "url": "https://services6.arcgis.com/EbVsqZ18sv1kVJ3k/arcgis/rest/services/NYS_Tax_Parcels_Public/FeatureServer/0",
-        "owner_field": "NAME", "type": "FeatureServer", "timeout": 45,
+        "url": "https://services6.arcgis.com/EbVsqZ18sv1kVJ3k/arcgis/rest/services/NYS_Tax_Parcels_Public/FeatureServer/1",
+        "owner_field": "PRIMARY_OWNER", "type": "FeatureServer", "timeout": 45,
     },
     "CO": {
-        "url": "https://services1.arcgis.com/SyUSN23vbs1XT5ql/arcgis/rest/services/Colorado_Parcels/FeatureServer/0",
-        "owner_field": "Owner", "type": "FeatureServer",
+        "url": "https://gis.colorado.gov/public/rest/services/Address_and_Parcel/Colorado_Public_Parcels/FeatureServer/0",
+        "owner_field": "owner", "type": "FeatureServer",
     },
 }
 
@@ -165,7 +165,7 @@ COUNTY_ENDPOINTS = {
     "NV": {
         "clark": {
             "url": "https://maps.clarkcountynv.gov/arcgis/rest/services/GISMO/AssessorMapv2/MapServer/1",
-            "owner_field": "APN", "type": "MapServer",
+            "owner_field": "APN", "type": "skip",  # Two-step lookup needed (ArcGIS→APN→ASPX scraper)
         },
     },
     "PA": {
