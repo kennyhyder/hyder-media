@@ -38,23 +38,26 @@ export default async function handler(req, res) {
 
     if (topErr) return res.status(500).json({ error: topErr.message });
 
-    // Fetch score + state + site_type in a single paginated query instead of 3 full table scans
-    const allRows = [];
-    let fetchOffset = 0;
+    // Fetch score + state + site_type — parallel pages for speed
+    const totalSites = sitesRes.count || 0;
     const pageSize = 1000;
-    while (true) {
-      const { data: batch, error: batchErr } = await supabase
-        .from("grid_dc_sites")
-        .select("dc_score,state,site_type")
-        .not("dc_score", "is", null)
-        .range(fetchOffset, fetchOffset + pageSize - 1)
-        .order("id", { ascending: true });
-
-      if (batchErr) return res.status(500).json({ error: batchErr.message });
-      if (!batch || batch.length === 0) break;
-      allRows.push(...batch);
-      if (batch.length < pageSize) break;
-      fetchOffset += batch.length;
+    const pageCount = Math.ceil(totalSites / pageSize);
+    const pagePromises = [];
+    for (let i = 0; i < pageCount; i++) {
+      pagePromises.push(
+        supabase
+          .from("grid_dc_sites")
+          .select("dc_score,state,site_type")
+          .not("dc_score", "is", null)
+          .range(i * pageSize, (i + 1) * pageSize - 1)
+          .order("id", { ascending: true })
+      );
+    }
+    const pageResults = await Promise.all(pagePromises);
+    const allRows = [];
+    for (const pr of pageResults) {
+      if (pr.error) return res.status(500).json({ error: pr.error.message });
+      if (pr.data) allRows.push(...pr.data);
     }
 
     // Score distribution + stats
