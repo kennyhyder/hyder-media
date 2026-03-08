@@ -206,14 +206,14 @@ export default function TransmissionMap({
         allCoords.push([siteMarker.lat, siteMarker.lng]);
       }
 
-      // Fit bounds — for site detail (non-singleLine), stay zoomed in on the site
+      // Fit bounds — for site detail, stay zoomed in on the site marker
       if (allCoords.length > 0) {
-        if (singleLine) {
+        if (siteMarker) {
+          // Site detail: always stay zoomed on the site marker
+          map.setView([siteMarker.lat, siteMarker.lng], zoom);
+        } else if (singleLine) {
           const bounds = L.latLngBounds(allCoords);
           map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
-        } else if (siteMarker && lines.length <= 5) {
-          // Site detail: keep tight zoom on site marker
-          map.setView([siteMarker.lat, siteMarker.lng], zoom);
         } else {
           const bounds = L.latLngBounds(allCoords);
           map.fitBounds(bounds, { padding: [20, 20], maxZoom: 10 });
