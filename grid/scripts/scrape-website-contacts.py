@@ -108,7 +108,11 @@ SKIP_EMAIL_PREFIXES = {
 SKIP_EMAIL_DOMAINS = {
     'example.com', 'example.org', 'example.net',
     'test.com', 'localhost', 'sentry.io',
+    'doe.com', 'domain.com', 'email.com',
+    'yourcompany.com', 'company.com', 'yourdomain.com',
     'schema.org', 'w3.org', 'wix.com',
+    'lewispr.com',  # PR firm, not actual sales contacts
+    'newsletters.nasa.gov',
     'wordpress.com', 'wordpress.org', 'gravatar.com',
     'cloudflare.com', 'googleapis.com', 'google.com',
     'facebook.com', 'twitter.com', 'instagram.com',
@@ -268,13 +272,16 @@ def extract_emails(html_text, hrefs):
 
     # From mailto: links (highest confidence)
     for href in hrefs:
-        m = MAILTO_RE.match(href)
+        # URL-decode first to handle %20 and other encoded chars
+        decoded_href = urllib.parse.unquote(href).strip()
+        m = MAILTO_RE.match(decoded_href)
         if m:
-            emails.add(m.group(1).lower())
+            emails.add(m.group(1).strip().lower())
 
     # From mailto: in raw HTML (catches JS-generated links too)
     for m in MAILTO_RE.finditer(html_text):
-        emails.add(m.group(1).lower())
+        email = urllib.parse.unquote(m.group(1)).strip().lower()
+        emails.add(email)
 
     # From visible text patterns
     for m in EMAIL_RE.finditer(html_text):

@@ -65,6 +65,7 @@ function CompareContent() {
 
   const [sites, setSites] = useState<SiteData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     if (ids.length === 0) {
@@ -104,6 +105,14 @@ function CompareContent() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleShareLink = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
   };
 
   const handleExportCSV = () => {
@@ -210,6 +219,12 @@ function CompareContent() {
           <p className="text-gray-600 text-sm mt-1">{sites.length} sites compared side-by-side</p>
         </div>
         <div className="flex gap-2 print:hidden">
+          <button
+            onClick={handleShareLink}
+            className="px-4 py-2 text-sm text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50"
+          >
+            {shareCopied ? "Link Copied!" : "Share Link"}
+          </button>
           <button
             onClick={handlePrint}
             className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"

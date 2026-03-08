@@ -179,29 +179,51 @@ def score_power(site):
 
 
 def score_speed_to_power(site, queue_data):
-    """Speed to energization: ISO queue depth, congestion."""
+    """Speed to energization: ISO queue depth, wait time, congestion."""
     state = site.get('state', '')
     iso = site.get('iso_region', '')
 
-    # Find queue summary for this state/ISO
+    # Find best queue summary for this state/ISO — prefer state match with wait data
     queue_depth = None
     avg_wait = None
+    best_match = None
     for q in queue_data:
-        if q.get('state') == state or q.get('iso') == iso:
-            queue_depth = q.get('total_projects')
-            avg_wait = q.get('avg_wait_years')
-            break
+        if q.get('state') == state and q.get('iso') == iso:
+            if q.get('avg_wait_years') is not None:
+                best_match = q
+                break
+            elif best_match is None:
+                best_match = q
+        elif q.get('iso') == iso and best_match is None:
+            best_match = q
+
+    if best_match:
+        queue_depth = best_match.get('total_projects')
+        avg_wait = best_match.get('avg_wait_years')
+
+    # Fall back to site's own avg_queue_wait_years (set by enrich-queue-wait-times.py)
+    if avg_wait is None:
+        avg_wait = site.get('avg_queue_wait_years')
 
     # Store queue info on site for patch output
     site['_queue_depth'] = queue_depth
     site['_avg_queue_wait_years'] = avg_wait
 
-    # Fewer projects in queue = faster connection
-    # 0 queue = 100, 30+ = 10
+    # Queue depth score: fewer projects = faster (0 projects = 100, 30+ = 0)
     if queue_depth is not None:
-        queue_score = linear_score(queue_depth, 0, 30)
+        depth_score = linear_score(queue_depth, 0, 30)
     else:
-        queue_score = 50
+        depth_score = 50
+
+    # Wait time score: shorter wait = better (1 year = 100, 6+ years = 0)
+    # LBNL data: ERCOT ~2.5yr (fast), PJM ~4.5yr (slow), CAISO ~5yr (slowest)
+    if avg_wait is not None:
+        wait_score = linear_score(float(avg_wait), 1.0, 6.0)
+    else:
+        wait_score = 50
+
+    # Combine: 40% depth + 60% wait time (wait time is more actionable)
+    queue_score = 0.4 * depth_score + 0.6 * wait_score
 
     # Brownfield bonus: existing grid connection = faster
     brownfield_bonus = 20 if site.get('brownfield_id') else 0
