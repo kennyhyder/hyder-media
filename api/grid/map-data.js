@@ -158,24 +158,21 @@ export default async function handler(req, res) {
     }
 
     // Optionally include transmission lines (with geometry for polylines)
+    // Note: lines lack lat/lng columns — filter by state if provided, otherwise return top by voltage
     if (include_lines === "true" || include_lines === "1") {
       let lineQuery = supabase
         .from("grid_transmission_lines")
-        .select("id,voltage_kv,owner,sub_1,sub_2,geometry_wkt,latitude,longitude")
+        .select("id,voltage_kv,owner,sub_1,sub_2,geometry_wkt,state")
         .not("geometry_wkt", "is", null);
 
-      // Filter lines by bounding box using their midpoint lat/lng
-      if (parsedBounds) {
-        lineQuery = lineQuery
-          .gte("latitude", parsedBounds.swLat).lte("latitude", parsedBounds.neLat)
-          .gte("longitude", parsedBounds.swLng).lte("longitude", parsedBounds.neLng);
+      if (state) {
+        lineQuery = lineQuery.eq("state", state.toUpperCase());
       }
 
       const { data: lines, error: lineErr } = await lineQuery
         .order("voltage_kv", { ascending: false, nullsFirst: true })
         .limit(2000);
-      if (lineErr) return res.status(500).json({ error: lineErr.message });
-      result.lines = lines || [];
+      if (!lineErr) result.lines = lines || [];
     }
 
     // Optionally include substations

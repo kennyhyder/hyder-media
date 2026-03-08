@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     let query = supabase
       .from("grid_corridors")
-      .select("id,corridor_type,name,states,total_lines,total_length_miles,avg_voltage_kv,max_voltage_kv,total_capacity_mw,upgrade_candidate_count,created_at", { count: "exact" });
+      .select("id,corridor_type,name,states,transmission_line_count,total_capacity_mw,upgrade_candidate_count,created_at", { count: "exact" });
 
     // Apply filters
     if (type) query = query.eq("corridor_type", type);
