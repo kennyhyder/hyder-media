@@ -225,7 +225,10 @@ function SiteDetailContent() {
         </div>
         <div className="text-right">
           <div className="text-xs text-gray-500 uppercase tracking-wide">DC Score</div>
-          <div className={`text-4xl font-bold ${scoreColorClass}`}>{dcScore}</div>
+          <div className={`text-4xl font-bold ${scoreColorClass}`}>{dcScore.toFixed(1)}</div>
+          <div className={`text-xs font-medium ${scoreColorClass}`}>
+            {dcScore >= 70 ? "Excellent" : dcScore >= 50 ? "Good" : dcScore >= 30 ? "Fair" : "Poor"}
+          </div>
           <button
             onClick={() => window.print()}
             className="mt-2 px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 print:hidden"
@@ -316,14 +319,14 @@ function SiteDetailContent() {
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Score Breakdown</h2>
         <div className="space-y-1">
-          {scoreBar("Power Availability", powerScore, "25%")}
+          {scoreBar("Power Availability", powerScore, "30%")}
           {scoreBar("Speed to Power", speedScore, "20%")}
-          {scoreBar("Fiber Connectivity", fiberScore, "15%")}
-          {scoreBar("Water Risk", waterScore, "10%")}
-          {scoreBar("Natural Hazard", hazardScore, "10%")}
-          {scoreBar("Labor Market", Number(s.score_labor) || 0, "5%")}
-          {scoreBar("Existing DC Cluster", dcClusterScore, "5%")}
+          {scoreBar("Fiber Connectivity", fiberScore, "18%")}
+          {scoreBar("Natural Hazard", hazardScore, "7%")}
+          {scoreBar("Existing DC Cluster", dcClusterScore, "7%")}
           {scoreBar("Land / Acreage", landScore, "5%")}
+          {scoreBar("Labor Market", Number(s.score_labor) || 0, "5%")}
+          {scoreBar("Water Risk", waterScore, "3%")}
           {scoreBar("Tax Incentive", taxScore, "3%")}
           {scoreBar("Climate / Cooling", Number(s.score_climate) || 0, "2%")}
         </div>

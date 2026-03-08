@@ -27,6 +27,8 @@ SUPABASE_URL = os.environ.get('SUPABASE_URL') or os.environ.get('NEXT_PUBLIC_SUP
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 # State-average annual Cooling Degree Days (NOAA 1991-2020 normals, base 65 deg F)
+# Source: NOAA US Climate Normals 1991-2020 (https://www.ncei.noaa.gov/products/land-based-station/us-climate-normals)
+# Last updated: 2026-03-01
 # Lower CDD = cooler climate = better for datacenter cooling efficiency
 STATE_CDD = {
     'AL': 2100, 'AK': 0, 'AZ': 3400, 'AR': 1900, 'CA': 1000, 'CO': 700,
@@ -41,6 +43,8 @@ STATE_CDD = {
 }
 
 # State-average annual Heating Degree Days (NOAA 1991-2020 normals, base 65 deg F)
+# Source: NOAA US Climate Normals 1991-2020
+# Last updated: 2026-03-01
 STATE_HDD = {
     'AL': 2800, 'AK': 10000, 'AZ': 1500, 'AR': 3400, 'CA': 2500, 'CO': 6200,
     'CT': 5800, 'DE': 4500, 'DC': 4200, 'FL': 700, 'GA': 2400, 'HI': 0,
@@ -54,6 +58,8 @@ STATE_HDD = {
 }
 
 # State-average annual mean temperature (deg F, NOAA 1991-2020 normals)
+# Source: NOAA US Climate Normals 1991-2020
+# Last updated: 2026-03-01
 STATE_MEAN_TEMP = {
     'AL': 63, 'AK': 27, 'AZ': 63, 'AR': 60, 'CA': 59, 'CO': 46,
     'CT': 50, 'DE': 55, 'DC': 57, 'FL': 72, 'GA': 64, 'HI': 77,

@@ -27,7 +27,8 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 # State-level water stress scores (0-5 scale, WRI Aqueduct 2019 baseline)
 # 0=Low (<10%), 1=Low-Medium (10-20%), 2=Medium-High (20-40%),
 # 3=High (40-80%), 4=Extremely High (>80%), 5=Arid/Low Water Use
-# Sources: WRI Aqueduct Water Risk Atlas, state-weighted averages
+# Source: WRI Aqueduct Water Risk Atlas (https://www.wri.org/aqueduct), state-weighted averages
+# Last updated: 2026-03-01
 STATE_WATER_STRESS = {
     'AL': (0.4, 'Low'),
     'AK': (0.2, 'Low'),

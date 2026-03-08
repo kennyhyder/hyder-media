@@ -1,10 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+/** Escape special PostgREST characters for use in .or() / .ilike() filters */
+function sanitizeSearch(str) {
+  if (!str) return "";
+  return str.replace(/[%_.*()]/g, (ch) => "\\" + ch);
 }
 
 export default async function handler(req, res) {
@@ -15,7 +19,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const supabase = getSupabase();
     const {
       state,
       min_voltage,
@@ -32,8 +35,20 @@ export default async function handler(req, res) {
       with_geometry,
     } = req.query;
 
-    const limitNum = Math.min(parseInt(limit) || 50, with_geometry === "true" ? 500 : 200);
-    const offsetNum = parseInt(offset) || 0;
+    // Input validation
+    if (state && !/^[A-Za-z]{2}$/.test(state))
+      return res.status(400).json({ error: "state must be a 2-letter code" });
+    if (min_voltage && (isNaN(parseFloat(min_voltage)) || parseFloat(min_voltage) < 0))
+      return res.status(400).json({ error: "min_voltage must be a non-negative number" });
+    if (max_voltage && (isNaN(parseFloat(max_voltage)) || parseFloat(max_voltage) < 0))
+      return res.status(400).json({ error: "max_voltage must be a non-negative number" });
+    if (min_capacity && (isNaN(parseFloat(min_capacity)) || parseFloat(min_capacity) < 0))
+      return res.status(400).json({ error: "min_capacity must be a non-negative number" });
+    if (max_capacity && (isNaN(parseFloat(max_capacity)) || parseFloat(max_capacity) < 0))
+      return res.status(400).json({ error: "max_capacity must be a non-negative number" });
+
+    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), with_geometry === "true" ? 500 : 200);
+    const offsetNum = Math.max(parseInt(offset) || 0, 0);
 
     // Include geometry_wkt only when explicitly requested (for map rendering)
     const columns = with_geometry === "true"
@@ -53,11 +68,16 @@ export default async function handler(req, res) {
     if (max_capacity)
       query = query.lte("capacity_mw", parseFloat(max_capacity));
     if (upgrade_only === "true") query = query.eq("upgrade_candidate", true);
-    if (owner) query = query.ilike("owner", `%${owner}%`);
-    if (search)
+    if (owner) {
+      const safeOwner = sanitizeSearch(owner);
+      query = query.ilike("owner", `%${safeOwner}%`);
+    }
+    if (search) {
+      const safe = sanitizeSearch(search);
       query = query.or(
-        `naession.ilike.%${search}%,sub_1.ilike.%${search}%,sub_2.ilike.%${search}%`
+        `naession.ilike.%${safe}%,sub_1.ilike.%${safe}%,sub_2.ilike.%${safe}%`
       );
+    }
 
     // Sort
     const validSorts = [
@@ -79,6 +99,7 @@ export default async function handler(req, res) {
 
     if (error) return res.status(500).json({ error: error.message });
 
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     return res.status(200).json({
       data: data || [],
       pagination: {

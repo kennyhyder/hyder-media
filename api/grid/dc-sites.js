@@ -1,10 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
+/** Escape special PostgREST characters for use in .or() / .ilike() filters */
+function sanitizeSearch(str) {
+  if (!str) return "";
+  return str.replace(/[%_.*()]/g, (ch) => "\\" + ch);
 }
 
 export default async function handler(req, res) {
@@ -15,7 +19,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const supabase = getSupabase();
     const {
       state,
       site_type,
@@ -33,8 +36,26 @@ export default async function handler(req, res) {
       offset,
     } = req.query;
 
-    const limitNum = Math.min(parseInt(limit) || 50, 200);
-    const offsetNum = parseInt(offset) || 0;
+    // Input validation
+    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), 200);
+    const offsetNum = Math.max(parseInt(offset) || 0, 0);
+
+    if (state && !/^[A-Za-z]{2}$/.test(state))
+      return res.status(400).json({ error: "state must be a 2-letter code" });
+    if (site_type && !["substation", "brownfield", "greenfield"].includes(site_type))
+      return res.status(400).json({ error: "site_type must be substation, brownfield, or greenfield" });
+    if (min_score && (isNaN(parseFloat(min_score)) || parseFloat(min_score) < 0 || parseFloat(min_score) > 100))
+      return res.status(400).json({ error: "min_score must be a number between 0 and 100" });
+    if (max_score && (isNaN(parseFloat(max_score)) || parseFloat(max_score) < 0 || parseFloat(max_score) > 100))
+      return res.status(400).json({ error: "max_score must be a number between 0 and 100" });
+    if (min_capacity && (isNaN(parseFloat(min_capacity)) || parseFloat(min_capacity) < 0))
+      return res.status(400).json({ error: "min_capacity must be a non-negative number" });
+    if (near_lat && (isNaN(parseFloat(near_lat)) || parseFloat(near_lat) < -90 || parseFloat(near_lat) > 90))
+      return res.status(400).json({ error: "near_lat must be between -90 and 90" });
+    if (near_lng && (isNaN(parseFloat(near_lng)) || parseFloat(near_lng) < -180 || parseFloat(near_lng) > 180))
+      return res.status(400).json({ error: "near_lng must be between -180 and 180" });
+    if (radius_miles && (isNaN(parseFloat(radius_miles)) || parseFloat(radius_miles) <= 0 || parseFloat(radius_miles) > 500))
+      return res.status(400).json({ error: "radius_miles must be between 0 and 500" });
 
     const columns = [
       "id", "source_record_id", "name", "site_type", "state", "county",
@@ -60,13 +81,16 @@ export default async function handler(req, res) {
     if (max_score) query = query.lte("dc_score", parseFloat(max_score));
     if (min_capacity) query = query.gte("available_capacity_mw", parseFloat(min_capacity));
     if (iso_region) query = query.eq("iso_region", iso_region);
-    if (search)
+    if (search) {
+      const safe = sanitizeSearch(search);
       query = query.or(
-        `name.ilike.%${search}%,county.ilike.%${search}%,former_use.ilike.%${search}%`
+        `name.ilike.%${safe}%,county.ilike.%${safe}%,former_use.ilike.%${safe}%`
       );
+    }
 
     // Geospatial bounding box filter
-    if (near_lat && near_lng) {
+    const hasGeo = near_lat && near_lng;
+    if (hasGeo) {
       const lat = parseFloat(near_lat);
       const lng = parseFloat(near_lng);
       const radius = parseFloat(radius_miles) || 50;
@@ -86,9 +110,12 @@ export default async function handler(req, res) {
     const sortCol = validSorts.includes(sort) ? sort : "dc_score";
     const ascending = order === "asc";
 
-    query = query
-      .order(sortCol, { ascending, nullsFirst: false })
-      .range(offsetNum, offsetNum + limitNum - 1);
+    // When geospatial search is active, skip DB sort (JS will re-sort by distance)
+    if (!hasGeo) {
+      query = query.order(sortCol, { ascending, nullsFirst: false });
+    }
+
+    query = query.range(offsetNum, offsetNum + limitNum - 1);
 
     const { data, error, count } = await query;
 
@@ -96,7 +123,7 @@ export default async function handler(req, res) {
 
     // Compute distance if geospatial search
     let results = data || [];
-    if (near_lat && near_lng) {
+    if (hasGeo) {
       const lat = parseFloat(near_lat);
       const lng = parseFloat(near_lng);
       results = results.map((site) => ({
@@ -106,6 +133,7 @@ export default async function handler(req, res) {
       results.sort((a, b) => a.distance_miles - b.distance_miles);
     }
 
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     return res.status(200).json({
       data: results,
       pagination: {

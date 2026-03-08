@@ -44,6 +44,13 @@ function scoreColor(score: number): string {
   return "text-red-600";
 }
 
+function scoreLabel(score: number): string {
+  if (score >= 70) return "Excellent";
+  if (score >= 50) return "Good";
+  if (score >= 30) return "Fair";
+  return "Poor";
+}
+
 export default function DCSitesPage() {
   return (
     <Suspense fallback={<div className="animate-pulse"><div className="h-8 bg-gray-200 rounded w-64 mb-4" /><div className="h-48 bg-gray-200 rounded" /></div>}>
@@ -265,11 +272,13 @@ function DCSitesContent() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-purple-500 focus:border-purple-500"
+            aria-label="Search sites by name or county"
           />
           <select
             value={stateFilter}
             onChange={(e) => { setStateFilter(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            aria-label="Filter by state"
           >
             <option value="">All States</option>
             {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -278,6 +287,7 @@ function DCSitesContent() {
             value={typeFilter}
             onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            aria-label="Filter by site type"
           >
             <option value="">All Types</option>
             <option value="substation">Substation</option>
@@ -288,6 +298,7 @@ function DCSitesContent() {
             value={minScore}
             onChange={(e) => { setMinScore(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            aria-label="Filter by minimum DC readiness score"
           >
             <option value="">Min Score</option>
             <option value="30">30+</option>
@@ -300,6 +311,7 @@ function DCSitesContent() {
             value={isoFilter}
             onChange={(e) => { setIsoFilter(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            aria-label="Filter by ISO region"
           >
             <option value="">All ISOs</option>
             <option value="PJM">PJM</option>
@@ -356,7 +368,10 @@ function DCSitesContent() {
               {loading ? (
                 <tr><td colSpan={10} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
-                <tr><td colSpan={10} className="py-8 text-center text-gray-400">No sites found</td></tr>
+                <tr><td colSpan={10} className="py-12 text-center">
+                  <p className="text-gray-400 mb-2">No DC sites found matching your filters.</p>
+                  <p className="text-gray-400 text-xs">Try broadening your search, adjusting the min score, or clearing filters.</p>
+                </td></tr>
               ) : (
                 sites.map((site) => (
                   <tr key={site.id} className="border-b border-gray-100 hover:bg-gray-50">
@@ -369,8 +384,9 @@ function DCSitesContent() {
                         title={compareIds.includes(site.id) ? "Remove from compare" : compareIds.length >= 5 ? "Max 5 sites" : "Add to compare"}
                       />
                     </td>
-                    <td className={`py-2 px-3 font-bold ${scoreColor(site.dc_score)}`}>
-                      {site.dc_score}
+                    <td className={`py-2 px-3 font-bold ${scoreColor(site.dc_score)}`} title={scoreLabel(site.dc_score)}>
+                      {site.dc_score.toFixed(1)}
+                      <span className="text-xs font-normal text-gray-400 ml-1">{scoreLabel(site.dc_score)}</span>
                     </td>
                     <td className="py-2 px-3">
                       <a

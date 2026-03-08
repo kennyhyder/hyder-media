@@ -1,29 +1,30 @@
 import { createClient } from "@supabase/supabase-js";
+import { validatePagination, setCacheHeaders, handleError } from "./_utils.js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET")
-    return res.status(405).json({ error: "Method not allowed" });
+    return handleError(res, "Method not allowed", 405);
 
   try {
-    const supabase = getSupabase();
-    const { type, state, limit, offset } = req.query;
+    const { type, state } = req.query;
 
-    const limitNum = Math.min(parseInt(limit) || 50, 200);
-    const offsetNum = parseInt(offset) || 0;
+    // Input validation
+    if (state && !/^[A-Za-z]{2}$/.test(state))
+      return handleError(res, "state must be a 2-letter code", 400);
+
+    const { limit: limitNum, offset: offsetNum } = validatePagination(req.query);
 
     let query = supabase
       .from("grid_corridors")
-      .select("*", { count: "exact" });
+      .select("id,corridor_type,name,states,total_lines,total_length_miles,avg_voltage_kv,max_voltage_kv,total_capacity_mw,upgrade_candidate_count,created_at", { count: "exact" });
 
     // Apply filters
     if (type) query = query.eq("corridor_type", type);
@@ -35,8 +36,9 @@ export default async function handler(req, res) {
 
     const { data, error, count } = await query;
 
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return handleError(res, error);
 
+    setCacheHeaders(res);
     return res.status(200).json({
       data: data || [],
       pagination: {
@@ -47,6 +49,6 @@ export default async function handler(req, res) {
       },
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return handleError(res, err);
   }
 }

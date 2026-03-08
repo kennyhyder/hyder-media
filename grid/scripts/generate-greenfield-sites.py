@@ -421,7 +421,10 @@ def main():
             total_raw_points += len(samples)
 
             for lat, lng in samples:
-                # Skip if in continental US bounds check
+                # Skip points outside continental US bounds.
+                # Alaska and Hawaii excluded: HIFLD transmission line dataset
+                # has limited coverage outside CONUS, and federal energy corridor
+                # data does not extend to AK/HI, making greenfield sampling unreliable.
                 if lat < 24 or lat > 50 or lng < -125 or lng > -66:
                     excluded_points += 1
                     continue
@@ -432,7 +435,7 @@ def main():
                     continue
 
                 candidates.append({
-                    'source_record_id': f'gf_{line_id[:8]}_{len(candidates)}',
+                    'source_record_id': f'gf_{line_id[:8]}_{lat:.4f}_{lng:.4f}',
                     'name': f'Greenfield ({line_name[:30]})',
                     'site_type': 'greenfield',
                     'state': state,

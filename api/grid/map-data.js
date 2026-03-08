@@ -1,11 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,7 +13,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const supabase = getSupabase();
     const {
       state,
       site_type,
@@ -30,7 +27,33 @@ export default async function handler(req, res) {
       limit, // max sites to return (default 5000)
     } = req.query;
 
-    const maxSites = Math.min(parseInt(limit) || 5000, 20000);
+    // Input validation
+    if (state && !/^[A-Za-z]{2}$/.test(state))
+      return res.status(400).json({ error: "state must be a 2-letter code" });
+    if (site_type && !["substation", "brownfield", "greenfield"].includes(site_type))
+      return res.status(400).json({ error: "site_type must be substation, brownfield, or greenfield" });
+    if (min_score && (isNaN(parseFloat(min_score)) || parseFloat(min_score) < 0 || parseFloat(min_score) > 100))
+      return res.status(400).json({ error: "min_score must be a number between 0 and 100" });
+    if (max_score && (isNaN(parseFloat(max_score)) || parseFloat(max_score) < 0 || parseFloat(max_score) > 100))
+      return res.status(400).json({ error: "max_score must be a number between 0 and 100" });
+
+    const maxSites = Math.min(Math.max(parseInt(limit) || 5000, 1), 20000);
+
+    // Parse bounds ONCE and reuse everywhere
+    let parsedBounds = null;
+    if (bounds) {
+      const parts = bounds.split(",").map(Number);
+      if (parts.length === 4 && parts.every(n => !isNaN(n))) {
+        const [swLat, swLng, neLat, neLng] = parts;
+        if (swLat >= -90 && swLat <= 90 && neLat >= -90 && neLat <= 90 &&
+            swLng >= -180 && swLng <= 180 && neLng >= -180 && neLng <= 180) {
+          parsedBounds = { swLat, swLng, neLat, neLng };
+        }
+      }
+      if (!parsedBounds) {
+        return res.status(400).json({ error: "bounds must be sw_lat,sw_lng,ne_lat,ne_lng with valid coordinates" });
+      }
+    }
 
     // Lite mode: minimal columns for fast initial map render
     const siteColumns = lite === "1"
@@ -50,15 +73,12 @@ export default async function handler(req, res) {
     if (max_score) query = query.lte("dc_score", parseFloat(max_score));
 
     // Bounding box filter
-    if (bounds) {
-      const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
-      if (!isNaN(swLat) && !isNaN(swLng) && !isNaN(neLat) && !isNaN(neLng)) {
-        query = query
-          .gte("latitude", swLat)
-          .lte("latitude", neLat)
-          .gte("longitude", swLng)
-          .lte("longitude", neLng);
-      }
+    if (parsedBounds) {
+      query = query
+        .gte("latitude", parsedBounds.swLat)
+        .lte("latitude", parsedBounds.neLat)
+        .gte("longitude", parsedBounds.swLng)
+        .lte("longitude", parsedBounds.neLng);
     }
 
     // Paginate up to maxSites (ordered by score desc — best sites first)
@@ -74,7 +94,7 @@ export default async function handler(req, res) {
         .range(offset, offset + batchSize - 1)
         .order("dc_score", { ascending: false, nullsFirst: false });
 
-      if (error) throw error;
+      if (error) return res.status(500).json({ error: error.message });
       if (!data || data.length === 0) break;
 
       allSites.push(...data);
@@ -99,18 +119,16 @@ export default async function handler(req, res) {
         .not("latitude", "is", null)
         .not("longitude", "is", null);
 
-      if (bounds) {
-        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
-        if (!isNaN(swLat)) {
-          dcQuery = dcQuery
-            .gte("latitude", swLat).lte("latitude", neLat)
-            .gte("longitude", swLng).lte("longitude", neLng);
-        }
+      if (parsedBounds) {
+        dcQuery = dcQuery
+          .gte("latitude", parsedBounds.swLat).lte("latitude", parsedBounds.neLat)
+          .gte("longitude", parsedBounds.swLng).lte("longitude", parsedBounds.neLng);
       }
 
-      const { data: dcs } = await dcQuery
+      const { data: dcs, error: dcErr } = await dcQuery
         .order("capacity_mw", { ascending: false, nullsFirst: true })
         .limit(1000);
+      if (dcErr) return res.status(500).json({ error: dcErr.message });
       result.datacenters = dcs || [];
     }
 
@@ -126,18 +144,16 @@ export default async function handler(req, res) {
         .not("latitude", "is", null)
         .not("longitude", "is", null);
 
-      if (bounds) {
-        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
-        if (!isNaN(swLat)) {
-          ixpQuery = ixpQuery
-            .gte("latitude", swLat).lte("latitude", neLat)
-            .gte("longitude", swLng).lte("longitude", neLng);
-        }
+      if (parsedBounds) {
+        ixpQuery = ixpQuery
+          .gte("latitude", parsedBounds.swLat).lte("latitude", parsedBounds.neLat)
+          .gte("longitude", parsedBounds.swLng).lte("longitude", parsedBounds.neLng);
       }
 
-      const { data: ixps } = await ixpQuery
+      const { data: ixps, error: ixpErr } = await ixpQuery
         .order("network_count", { ascending: false, nullsFirst: true })
         .limit(1000);
+      if (ixpErr) return res.status(500).json({ error: ixpErr.message });
       result.ixps = ixps || [];
     }
 
@@ -145,22 +161,20 @@ export default async function handler(req, res) {
     if (include_lines === "true" || include_lines === "1") {
       let lineQuery = supabase
         .from("grid_transmission_lines")
-        .select("id,voltage_kv,owner,sub_1,sub_2,geometry_wkt")
+        .select("id,voltage_kv,owner,sub_1,sub_2,geometry_wkt,latitude,longitude")
         .not("geometry_wkt", "is", null);
 
-      // Only load lines at higher zoom levels (require bounds)
-      if (bounds) {
-        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
-        if (!isNaN(swLat)) {
-          // Filter lines whose substations fall within bounds (approximate)
-          // Lines table doesn't have lat/lng directly, but we can use sub coords
-          // For now, return top lines by voltage within limit
-        }
+      // Filter lines by bounding box using their midpoint lat/lng
+      if (parsedBounds) {
+        lineQuery = lineQuery
+          .gte("latitude", parsedBounds.swLat).lte("latitude", parsedBounds.neLat)
+          .gte("longitude", parsedBounds.swLng).lte("longitude", parsedBounds.neLng);
       }
 
-      const { data: lines } = await lineQuery
+      const { data: lines, error: lineErr } = await lineQuery
         .order("voltage_kv", { ascending: false, nullsFirst: true })
         .limit(2000);
+      if (lineErr) return res.status(500).json({ error: lineErr.message });
       result.lines = lines || [];
     }
 
@@ -172,21 +186,20 @@ export default async function handler(req, res) {
         .not("latitude", "is", null)
         .not("longitude", "is", null);
 
-      if (bounds) {
-        const [swLat, swLng, neLat, neLng] = bounds.split(",").map(Number);
-        if (!isNaN(swLat)) {
-          subQuery = subQuery
-            .gte("latitude", swLat).lte("latitude", neLat)
-            .gte("longitude", swLng).lte("longitude", neLng);
-        }
+      if (parsedBounds) {
+        subQuery = subQuery
+          .gte("latitude", parsedBounds.swLat).lte("latitude", parsedBounds.neLat)
+          .gte("longitude", parsedBounds.swLng).lte("longitude", parsedBounds.neLng);
       }
 
-      const { data: subs } = await subQuery
+      const { data: subs, error: subErr } = await subQuery
         .order("max_voltage_kv", { ascending: false, nullsFirst: true })
         .limit(2000);
+      if (subErr) return res.status(500).json({ error: subErr.message });
       result.substations = subs || [];
     }
 
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     res.status(200).json(result);
   } catch (err) {
     console.error("Map data error:", err);

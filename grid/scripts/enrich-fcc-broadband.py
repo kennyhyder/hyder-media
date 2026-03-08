@@ -34,6 +34,7 @@ BATCH_SIZE = 50
 
 # State-level fiber availability fallback (% of locations with fiber access)
 # Source: FCC Broadband Deployment Report 2024, BroadbandNow 2024
+# Last updated: 2026-03-01
 # Used when FCC API is unreliable or returns errors
 STATE_FIBER_FALLBACK = {
     'AL': 0.55, 'AK': 0.35, 'AZ': 0.65, 'AR': 0.45, 'CA': 0.70,

@@ -1,11 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,9 +13,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const supabase = getSupabase();
-
-    // Totals
+    // Totals (head:true = count only, no data transfer)
     const [sitesRes, linesRes, subsRes, ixpRes, dcRes, bfRes, countyRes] = await Promise.all([
       supabase.from("grid_dc_sites").select("id", { count: "exact", head: true }),
       supabase.from("grid_transmission_lines").select("id", { count: "exact", head: true }),
@@ -28,23 +24,47 @@ export default async function handler(req, res) {
       supabase.from("grid_county_data").select("id", { count: "exact", head: true }),
     ]);
 
+    // Check for Supabase errors on totals
+    for (const r of [sitesRes, linesRes, subsRes, ixpRes, dcRes, bfRes, countyRes]) {
+      if (r.error) return res.status(500).json({ error: r.error.message });
+    }
+
     // Top 25 sites by score
-    const { data: topSites } = await supabase
+    const { data: topSites, error: topErr } = await supabase
       .from("grid_dc_sites")
       .select("id,name,site_type,state,county,dc_score,score_power,score_fiber,substation_voltage_kv,available_capacity_mw,latitude,longitude")
       .order("dc_score", { ascending: false, nullsFirst: false })
       .limit(25);
 
-    // Score distribution
-    const { data: allScores } = await supabase
-      .from("grid_dc_sites")
-      .select("dc_score")
-      .not("dc_score", "is", null);
+    if (topErr) return res.status(500).json({ error: topErr.message });
 
+    // Fetch score + state + site_type in a single paginated query instead of 3 full table scans
+    const allRows = [];
+    let fetchOffset = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data: batch, error: batchErr } = await supabase
+        .from("grid_dc_sites")
+        .select("dc_score,state,site_type")
+        .not("dc_score", "is", null)
+        .range(fetchOffset, fetchOffset + pageSize - 1)
+        .order("id", { ascending: true });
+
+      if (batchErr) return res.status(500).json({ error: batchErr.message });
+      if (!batch || batch.length === 0) break;
+      allRows.push(...batch);
+      if (batch.length < pageSize) break;
+      fetchOffset += batch.length;
+    }
+
+    // Score distribution + stats
     const distribution = { "0-20": 0, "20-40": 0, "40-60": 0, "60-80": 0, "80-100": 0 };
     let totalScore = 0;
     const scores = [];
-    for (const s of allScores || []) {
+    const stateAgg = {};
+    const typeBreakdown = {};
+
+    for (const s of allRows) {
       const score = s.dc_score;
       scores.push(score);
       totalScore += score;
@@ -53,29 +73,23 @@ export default async function handler(req, res) {
       else if (score < 60) distribution["40-60"]++;
       else if (score < 80) distribution["60-80"]++;
       else distribution["80-100"]++;
+
+      // State averages
+      if (s.state) {
+        if (!stateAgg[s.state]) stateAgg[s.state] = { total: 0, count: 0 };
+        stateAgg[s.state].total += score;
+        stateAgg[s.state].count++;
+      }
+
+      // Site type breakdown
+      if (s.site_type) {
+        typeBreakdown[s.site_type] = (typeBreakdown[s.site_type] || 0) + 1;
+      }
     }
+
     scores.sort((a, b) => a - b);
 
-    // State averages
-    const stateScores = {};
-    const stateCounts = {};
-    for (const s of allScores || []) {
-      // We need state for this — fetch separately
-    }
-
-    // State summary from top sites data + a dedicated query
-    const { data: stateSummary } = await supabase
-      .from("grid_dc_sites")
-      .select("state,dc_score")
-      .not("dc_score", "is", null);
-
-    const stateAverages = {};
-    for (const s of stateSummary || []) {
-      if (!stateAverages[s.state]) stateAverages[s.state] = { total: 0, count: 0 };
-      stateAverages[s.state].total += s.dc_score;
-      stateAverages[s.state].count++;
-    }
-    const stateAvgList = Object.entries(stateAverages)
+    const stateAvgList = Object.entries(stateAgg)
       .map(([state, { total, count }]) => ({
         state,
         avg_score: Math.round((total / count) * 10) / 10,
@@ -83,15 +97,7 @@ export default async function handler(req, res) {
       }))
       .sort((a, b) => b.avg_score - a.avg_score);
 
-    // Site type breakdown
-    const typeBreakdown = {};
-    const { data: typeSummary } = await supabase
-      .from("grid_dc_sites")
-      .select("site_type");
-    for (const s of typeSummary || []) {
-      typeBreakdown[s.site_type] = (typeBreakdown[s.site_type] || 0) + 1;
-    }
-
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     return res.status(200).json({
       totals: {
         dc_sites: sitesRes.count || 0,

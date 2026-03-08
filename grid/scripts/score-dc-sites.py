@@ -225,15 +225,38 @@ def score_speed_to_power(site, queue_data):
     # Combine: 40% depth + 60% wait time (wait time is more actionable)
     queue_score = 0.4 * depth_score + 0.6 * wait_score
 
-    # Brownfield bonus: existing grid connection = faster
-    brownfield_bonus = 20 if site.get('brownfield_id') else 0
+    if site.get('brownfield_id'):
+        # Brownfield sites get a bonus for existing grid connection, but scale
+        # the base queue_score down so the bonus creates differentiation rather
+        # than saturating all brownfields at 100.
+        # Base: 60% of queue_score (max 60) + brownfield bonus (10)
+        # + capacity bonus (0-20 based on existing infrastructure size)
+        # + substation proximity bonus (0-10 based on distance)
+        # Result range: ~20 to ~100 depending on queue, capacity, and substation distance
+        brownfield_bonus = 10
 
-    # Existing capacity bonus (brownfield with intact grid connection)
-    capacity_bonus = 0
-    if site.get('existing_capacity_mw') and site['existing_capacity_mw'] > 0:
-        capacity_bonus = min(20, float(site['existing_capacity_mw']) / 10)
+        capacity_bonus = 0
+        existing_cap = site.get('existing_capacity_mw')
+        if existing_cap and float(existing_cap) > 0:
+            # 500+ MW = full 20 points, scales linearly from 0
+            capacity_bonus = min(20, float(existing_cap) / 25)
 
-    return clamp(queue_score + brownfield_bonus + capacity_bonus)
+        # Substation proximity bonus: closer substation = faster energization
+        sub_dist = site.get('nearest_substation_distance_km')
+        proximity_bonus = 0
+        if sub_dist is not None:
+            if float(sub_dist) < 1:
+                proximity_bonus = 10
+            elif float(sub_dist) < 5:
+                proximity_bonus = 7
+            elif float(sub_dist) < 15:
+                proximity_bonus = 4
+            elif float(sub_dist) < 30:
+                proximity_bonus = 2
+
+        return clamp(queue_score * 0.6 + brownfield_bonus + capacity_bonus + proximity_bonus)
+    else:
+        return clamp(queue_score)
 
 
 def score_fiber(site, ixp_index, ixp_cell_size, county_data):
@@ -592,8 +615,15 @@ def main():
 
     def apply_patch(patch):
         site_id = patch.pop('id')
-        supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
-        return True
+        for attempt in range(3):
+            try:
+                supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
+                return True
+            except Exception:
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise
 
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(apply_patch, p): p for p in patches}

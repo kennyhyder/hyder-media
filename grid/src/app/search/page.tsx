@@ -219,6 +219,7 @@ export default function SearchPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
               value={state}
               onChange={(e) => { setState(e.target.value); setPage(0); }}
+              aria-label="Filter lines by state"
             >
               <option value="">All States</option>
               {STATES.map((s) => (
@@ -232,6 +233,7 @@ export default function SearchPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
               value={voltageRange}
               onChange={(e) => { setVoltageRange(parseInt(e.target.value)); setPage(0); }}
+              aria-label="Filter by voltage class"
             >
               {VOLTAGE_RANGES.map((v, i) => (
                 <option key={i} value={i}>{v.label}</option>
@@ -244,6 +246,7 @@ export default function SearchPage() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
               value={capacityRange}
               onChange={(e) => { setCapacityRange(parseInt(e.target.value)); setPage(0); }}
+              aria-label="Filter by capacity range"
             >
               {CAPACITY_RANGES.map((c, i) => (
                 <option key={i} value={i}>{c.label}</option>
@@ -259,6 +262,7 @@ export default function SearchPage() {
               value={ownerSearch}
               onChange={(e) => setOwnerSearch(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") applyFilters(); }}
+              aria-label="Search by line owner"
             />
           </div>
         </div>
@@ -271,6 +275,7 @@ export default function SearchPage() {
               value={textSearch}
               onChange={(e) => setTextSearch(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") applyFilters(); }}
+              aria-label="Search by line name or substation"
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
@@ -287,6 +292,7 @@ export default function SearchPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none"
               value={sortIndex}
               onChange={(e) => { setSortIndex(parseInt(e.target.value)); setPage(0); }}
+              aria-label="Sort order"
             >
               {SORT_OPTIONS.map((s, i) => (
                 <option key={i} value={i}>Sort: {s.label}</option>

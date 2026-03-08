@@ -30,6 +30,9 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 BATCH_SIZE = 50
 
 # --- US Cloud Region Locations (lat, lng) ---
+# Source: AWS/Azure/GCP region documentation and known datacenter locations
+# Last updated: 2026-03-01
+# Coordinates represent approximate datacenter cluster locations, not exact addresses
 
 CLOUD_REGIONS = [
     # AWS

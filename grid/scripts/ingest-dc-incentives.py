@@ -22,7 +22,8 @@ SUPABASE_URL = os.environ.get('SUPABASE_URL') or os.environ.get('NEXT_PUBLIC_SUP
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 # State-level DC incentive data (37 states + DC with incentives as of 2025)
-# Sources: state economic development agencies, CBRE DC Tax Incentive Guide 2024
+# Source: State economic development agencies, CBRE DC Tax Incentive Guide 2024
+# Last updated: 2026-03-01
 DC_INCENTIVES = {
     'AL': {'type': 'sales_tax_exemption', 'details': 'Sales & use tax abatement on qualifying equipment. $400M+ investment threshold.'},
     'AZ': {'type': 'property_tax_reduction', 'details': 'Government Property Lease Excise Tax (GPLET) for qualified facilities on government land.'},

@@ -357,19 +357,13 @@ def main():
             print(f"  {s['source_record_id']} {s['state']} {s['name'][:40]} ({s['site_type']}, {s.get('substation_voltage_kv')} kV)")
         return
 
-    # Step 9: Clear existing generated sites and insert new ones
-    print(f"\n[Step 9] Inserting {len(deduped)} DC sites...")
+    # Step 9: Insert new sites, then clean up stale ones (swap pattern for atomicity)
+    # Instead of DELETE-then-INSERT (which leaves data unavailable between operations),
+    # we INSERT with ignore-duplicates first, then DELETE any old records whose
+    # source_record_id is no longer in the new set.
+    print(f"\n[Step 9] Upserting {len(deduped)} DC sites...")
 
-    # Check for existing records
-    existing = supabase_request('GET', 'grid_dc_sites?select=id&limit=1')
-    if existing:
-        print(f"  Clearing existing DC sites...")
-        # Delete in batches by source_record_id prefix
-        for prefix in ['sub_', 'bf_']:
-            supabase_request(
-                'DELETE',
-                f'grid_dc_sites?source_record_id=like.{prefix}*'
-            )
+    new_source_ids = {rec['source_record_id'] for rec in deduped}
 
     created = 0
     errors = 0
@@ -413,6 +407,28 @@ def main():
 
         if (i // BATCH_SIZE) % 50 == 0:
             print(f"  Progress: {min(i + BATCH_SIZE, len(deduped))}/{len(deduped)} ({created} ok, {errors} err)")
+
+    # Clean up stale records that are no longer in the new candidate set
+    print("  Cleaning up stale records...")
+    stale_deleted = 0
+    for prefix in ['sub_', 'bf_']:
+        old_records = load_paginated(
+            'grid_dc_sites',
+            'id,source_record_id',
+            f'&source_record_id=like.{prefix}*'
+        )
+        stale_ids = [r['id'] for r in old_records if r['source_record_id'] not in new_source_ids]
+        for j in range(0, len(stale_ids), BATCH_SIZE):
+            batch_ids = stale_ids[j:j + BATCH_SIZE]
+            id_filter = ','.join(batch_ids)
+            try:
+                supabase_request('DELETE',
+                    f'grid_dc_sites?id=in.({urllib.parse.quote(id_filter, safe=",.-")})')
+                stale_deleted += len(batch_ids)
+            except Exception as e:
+                print(f"  Error deleting stale batch: {e}")
+    if stale_deleted:
+        print(f"  Deleted {stale_deleted} stale records")
 
     # Update data source
     if data_source_id:

@@ -32,10 +32,9 @@ export default function MarketPage() {
     const baseUrl = window.location.origin;
     Promise.all([
       fetch(`${baseUrl}/api/grid/dc-stats`).then((r) => r.json()),
-      fetch(`${baseUrl}/api/grid/county-data?limit=1`).then((r) => r.json()),
       fetch(`${baseUrl}/api/grid/ixps?limit=200&sort=network_count&order=desc`).then((r) => r.json()),
     ])
-      .then(([statsData, , ixpData]) => {
+      .then(([statsData, ixpData]) => {
         setStats(statsData);
         setIxps(ixpData.data || []);
         setLoading(false);
@@ -110,7 +109,7 @@ export default function MarketPage() {
                     s.avg_score >= 50 ? "text-green-600" :
                     s.avg_score >= 40 ? "text-yellow-600" : "text-orange-600"
                   }`}>
-                    {s.avg_score}
+                    {Number(s.avg_score).toFixed(1)}
                   </td>
                   <td className="py-2 px-3 text-right text-gray-600">{fmt(s.site_count)}</td>
                   <td className="py-2 px-3">
@@ -181,14 +180,14 @@ export default function MarketPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { factor: "Power Availability", weight: "25%", desc: "Substation distance, voltage, available capacity" },
+            { factor: "Power Availability", weight: "30%", desc: "Substation distance, voltage, available capacity" },
             { factor: "Speed to Power", weight: "20%", desc: "ISO queue depth, brownfield grid bonus, existing capacity" },
-            { factor: "Fiber Connectivity", weight: "15%", desc: "IXP distance, county-level fiber presence" },
-            { factor: "Water Risk", weight: "10%", desc: "WRI Aqueduct water stress score" },
-            { factor: "Natural Hazard", weight: "10%", desc: "FEMA NRI composite risk score" },
-            { factor: "Labor Market", weight: "5%", desc: "Construction + IT employment per capita" },
-            { factor: "Existing DC Cluster", weight: "5%", desc: "Distance to nearest operational datacenter" },
+            { factor: "Fiber Connectivity", weight: "18%", desc: "IXP distance, county-level fiber presence" },
+            { factor: "Natural Hazard", weight: "7%", desc: "FEMA NRI composite risk score" },
+            { factor: "Existing DC Cluster", weight: "7%", desc: "Distance to nearest operational datacenter" },
             { factor: "Land / Acreage", weight: "5%", desc: "Available acreage and site type (brownfield bonus)" },
+            { factor: "Labor Market", weight: "5%", desc: "Construction + IT employment per capita" },
+            { factor: "Water Risk", weight: "3%", desc: "WRI Aqueduct water stress score" },
             { factor: "Tax Incentive", weight: "3%", desc: "State datacenter tax incentive programs" },
             { factor: "Climate / Cooling", weight: "2%", desc: "NOAA cooling degree days (lower = better)" },
           ].map((f) => (

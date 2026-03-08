@@ -91,6 +91,16 @@ function siteTypeLabel(type: string): string {
   }
 }
 
+function escapeHtml(str: string | number | null | undefined): string {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function parseWKTLineString(wkt: string): [number, number][] | null {
   // Handle LINESTRING and MULTILINESTRING WKT
   const match = wkt.match(/LINESTRING\s*\(([^)]+)\)/i) || wkt.match(/MULTILINESTRING\s*\(\(([^)]+)\)/i);
@@ -113,6 +123,7 @@ const US_STATES = [
 ];
 
 export default function MapPage() {
+  // === State & Refs ===
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const leafletMap = useRef<any>(null);
@@ -162,7 +173,7 @@ export default function MapPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Initialize map once
+  // === Map Initialization ===
   useEffect(() => {
     if (!mounted || !mapRef.current || mapReady) return;
 
@@ -286,7 +297,7 @@ export default function MapPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
-  // Fetch data and render markers
+  // === Data Fetching ===
   const fetchAndRender = useCallback(async (useBounds = false) => {
     if (!mapReady || !LRef.current) return;
 
@@ -367,14 +378,14 @@ export default function MapPage() {
         const typeDesc = siteTypeLabel(site.site_type);
         marker.bindPopup(`
           <div style="min-width:220px;font-family:system-ui;font-size:13px">
-            <strong style="font-size:14px">${site.name || "Unnamed Site"}</strong><br/>
-            <span style="color:${siteTypeColor(site.site_type)};font-weight:600">${typeDesc}</span>
-            · ${site.state}<br/>
+            <strong style="font-size:14px">${escapeHtml(site.name) || "Unnamed Site"}</strong><br/>
+            <span style="color:${siteTypeColor(site.site_type)};font-weight:600">${escapeHtml(typeDesc)}</span>
+            · ${escapeHtml(site.state)}<br/>
             <div style="margin:6px 0;padding:6px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">
               <span style="font-size:20px;font-weight:700;color:${scoreColor(score)}">${score.toFixed(1)}</span>
               <span style="color:#666;font-size:11px">/100 DC Score</span>
             </div>
-            <a href="/grid/site/?id=${site.id}" style="color:#7c3aed;text-decoration:underline;font-weight:600">View Details →</a>
+            <a href="/grid/site/?id=${encodeURIComponent(site.id)}" style="color:#7c3aed;text-decoration:underline;font-weight:600">View Details &rarr;</a>
           </div>
         `);
 
@@ -399,12 +410,12 @@ export default function MapPage() {
           const capacityStr = dc.capacity_mw ? `${Number(dc.capacity_mw).toFixed(0)} MW` : "";
           marker.bindPopup(`
             <div style="min-width:200px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${dc.name || "Datacenter"}</strong><br/>
+              <strong style="font-size:14px">${escapeHtml(dc.name) || "Datacenter"}</strong><br/>
               <span style="color:#3b82f6;font-weight:600">Existing Datacenter</span><br/>
-              ${dc.operator ? `<b>Operator:</b> ${dc.operator}<br/>` : ""}
-              ${dc.city ? `${dc.city}, ` : ""}${dc.state || ""}<br/>
-              ${capacityStr ? `<b>Capacity:</b> ${capacityStr}<br/>` : ""}
-              ${dc.dc_type ? `<b>Type:</b> ${dc.dc_type}<br/>` : ""}
+              ${dc.operator ? `<b>Operator:</b> ${escapeHtml(dc.operator)}<br/>` : ""}
+              ${dc.city ? `${escapeHtml(dc.city)}, ` : ""}${escapeHtml(dc.state)}<br/>
+              ${capacityStr ? `<b>Capacity:</b> ${escapeHtml(capacityStr)}<br/>` : ""}
+              ${dc.dc_type ? `<b>Type:</b> ${escapeHtml(dc.dc_type)}<br/>` : ""}
             </div>
           `);
           dcLayerRef.current.addLayer(marker);
@@ -426,12 +437,12 @@ export default function MapPage() {
           });
           marker.bindPopup(`
             <div style="min-width:200px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${ixp.name}</strong><br/>
+              <strong style="font-size:14px">${escapeHtml(ixp.name)}</strong><br/>
               <span style="color:#06b6d4;font-weight:600">Interconnection Facility (IXP)</span><br/>
-              ${ixp.org_name ? `<b>Operator:</b> ${ixp.org_name}<br/>` : ""}
-              ${ixp.city ? `${ixp.city}, ` : ""}${ixp.state || ""}<br/>
-              ${ixp.ix_count ? `<b>Exchanges:</b> ${ixp.ix_count}<br/>` : ""}
-              ${ixp.network_count ? `<b>Networks:</b> ${ixp.network_count}<br/>` : ""}
+              ${ixp.org_name ? `<b>Operator:</b> ${escapeHtml(ixp.org_name)}<br/>` : ""}
+              ${ixp.city ? `${escapeHtml(ixp.city)}, ` : ""}${escapeHtml(ixp.state)}<br/>
+              ${ixp.ix_count ? `<b>Exchanges:</b> ${escapeHtml(ixp.ix_count)}<br/>` : ""}
+              ${ixp.network_count ? `<b>Networks:</b> ${escapeHtml(ixp.network_count)}<br/>` : ""}
             </div>
           `);
           ixpLayerRef.current.addLayer(marker);
@@ -458,10 +469,10 @@ export default function MapPage() {
           });
           polyline.bindPopup(`
             <div style="min-width:180px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${voltage ? voltage + ' kV Line' : 'Transmission Line'}</strong><br/>
-              ${line.owner ? `<b>Owner:</b> ${line.owner}<br/>` : ""}
-              ${line.sub_1 ? `<b>From:</b> ${line.sub_1}<br/>` : ""}
-              ${line.sub_2 ? `<b>To:</b> ${line.sub_2}<br/>` : ""}
+              <strong style="font-size:14px">${voltage ? escapeHtml(voltage) + ' kV Line' : 'Transmission Line'}</strong><br/>
+              ${line.owner ? `<b>Owner:</b> ${escapeHtml(line.owner)}<br/>` : ""}
+              ${line.sub_1 ? `<b>From:</b> ${escapeHtml(line.sub_1)}<br/>` : ""}
+              ${line.sub_2 ? `<b>To:</b> ${escapeHtml(line.sub_2)}<br/>` : ""}
             </div>
           `);
           lineLayerRef.current.addLayer(polyline);
@@ -485,9 +496,9 @@ export default function MapPage() {
           const voltageStr = sub.max_voltage_kv ? `${Number(sub.max_voltage_kv).toFixed(0)} kV` : "";
           marker.bindPopup(`
             <div style="min-width:180px;font-family:system-ui;font-size:13px">
-              <strong style="font-size:14px">${sub.name || "Substation"}</strong><br/>
-              <span style="color:#f59e0b;font-weight:600">Substation</span> · ${sub.state || ""}<br/>
-              ${voltageStr ? `<b>Max Voltage:</b> ${voltageStr}<br/>` : ""}
+              <strong style="font-size:14px">${escapeHtml(sub.name) || "Substation"}</strong><br/>
+              <span style="color:#f59e0b;font-weight:600">Substation</span> · ${escapeHtml(sub.state)}<br/>
+              ${voltageStr ? `<b>Max Voltage:</b> ${escapeHtml(voltageStr)}<br/>` : ""}
             </div>
           `);
           subLayerRef.current.addLayer(marker);
@@ -506,6 +517,7 @@ export default function MapPage() {
     }
   }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy, showLines, showSubstations]);
 
+  // === Layer Management ===
   // Initial data load
   useEffect(() => {
     if (mapReady) fetchAndRender(false);
@@ -576,6 +588,7 @@ export default function MapPage() {
     }
   }, [showSubstations]);
 
+  // === Filter Controls ===
   // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
   useEffect(() => {
     if (mapReady && !initialLoad) {
@@ -584,6 +597,7 @@ export default function MapPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colorBy]);
 
+  // === Render ===
   return (
     <>
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -671,6 +685,7 @@ export default function MapPage() {
                       value={filterState}
                       onChange={e => setFilterState(e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                      aria-label="Filter by state"
                     >
                       <option value="">All States</option>
                       {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -683,6 +698,7 @@ export default function MapPage() {
                       value={filterType}
                       onChange={e => setFilterType(e.target.value)}
                       className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                      aria-label="Filter by site type"
                     >
                       <option value="">All Types</option>
                       <option value="substation">Substation Sites</option>
@@ -701,6 +717,7 @@ export default function MapPage() {
                         placeholder="0"
                         min={0} max={100}
                         className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                        aria-label="Minimum DC readiness score"
                       />
                     </div>
                     <div>
@@ -712,6 +729,7 @@ export default function MapPage() {
                         placeholder="100"
                         min={0} max={100}
                         className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                        aria-label="Maximum DC readiness score"
                       />
                     </div>
                   </div>
