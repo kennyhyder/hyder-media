@@ -400,36 +400,138 @@ function SiteDetailContent() {
         {/* External Resources */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">External Resources</h2>
-          <div className="space-y-2">
-            {s.iso_region && isoQueueUrls[String(s.iso_region)] && (
-              <a
-                href={isoQueueUrls[String(s.iso_region)]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> {String(s.iso_region)} Interconnection Queue
-              </a>
-            )}
+          <div className="space-y-4">
+            {/* Location & Imagery */}
             {s.latitude && s.longitude && (
-              <a
-                href={`https://www.google.com/maps/@${s.latitude},${s.longitude},500m/data=!3m1!1e3`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> Google Maps Satellite View
-              </a>
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Location &amp; Imagery</div>
+                <div className="space-y-1.5">
+                  <a href={`https://www.google.com/maps/@${s.latitude},${s.longitude},500m/data=!3m1!1e3`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> Google Maps Satellite View
+                  </a>
+                  <a href={`https://earth.google.com/web/@${s.latitude},${s.longitude},0a,1000d,35y,0h,0t,0r`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> Google Earth 3D View
+                  </a>
+                  {s.county && s.state && (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} GIS parcel map`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> {String(s.county)} County GIS / Parcel Map
+                    </a>
+                  )}
+                </div>
+              </div>
             )}
+
+            {/* Grid & Power */}
+            {(s.iso_region || s.state) && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Grid &amp; Power</div>
+                <div className="space-y-1.5">
+                  {s.iso_region && isoQueueUrls[String(s.iso_region)] && (
+                    <a href={isoQueueUrls[String(s.iso_region)]}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> {String(s.iso_region)} Interconnection Queue
+                    </a>
+                  )}
+                  {s.state && (
+                    <a href={`/grid/lines/?state=${s.state}`}
+                      className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> All Transmission Lines in {String(s.state)}
+                    </a>
+                  )}
+                  {s.state && (
+                    <a href={`https://www.eia.gov/electricity/state/${String(s.state).toLowerCase()}/`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> EIA State Electricity Profile — {String(s.state)}
+                    </a>
+                  )}
+                  {s.nearest_substation_name && (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`"${s.nearest_substation_name}" substation utility`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> Search: {String(s.nearest_substation_name)} Substation
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Risk & Environment */}
+            {s.latitude && s.longitude && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Risk &amp; Environment</div>
+                <div className="space-y-1.5">
+                  <a href={`https://msc.fema.gov/portal/search?AddressQuery=${s.latitude}%2C${s.longitude}#searchresultsanchor`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> FEMA Flood Map{s.flood_zone ? ` (Zone ${s.flood_zone})` : ""}
+                  </a>
+                  <a href={`https://ejscreen.epa.gov/mapper/mobile/?latitude=${s.latitude}&longitude=${s.longitude}&zoomLevel=14`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> EPA EJScreen Environmental Justice
+                  </a>
+                  <a href={`https://hazards.fema.gov/nri/map#checks=true&layers=false&stateZoom=${String(s.state || "").toLowerCase()}`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> FEMA National Risk Index — {String(s.state)}
+                  </a>
+                  {s.wri_basin_name && (
+                    <a href={`https://www.wri.org/applications/aqueduct/water-risk-atlas/#/?basemap=hydro&indicator=w_awr_def_tot_cat&lat=${s.latitude}&lng=${s.longitude}&zoom=10`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> WRI Aqueduct Water Risk — {String(s.wri_basin_name)}
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Connectivity */}
+            {(s.nearest_ixp_name || s.fcc_fiber_providers) && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Connectivity</div>
+                <div className="space-y-1.5">
+                  {s.nearest_ixp_name && (
+                    <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(String(s.nearest_ixp_name))}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> PeeringDB: {String(s.nearest_ixp_name)}
+                    </a>
+                  )}
+                  {s.latitude && s.longitude && (
+                    <a href={`https://broadbandmap.fcc.gov/location-summary/fixed?speed=1000&latlon=${s.latitude},${s.longitude}&zoom=14`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> FCC Broadband Map{s.fcc_fiber_providers ? ` (${s.fcc_fiber_providers} fiber providers)` : ""}
+                    </a>
+                  )}
+                  {s.nearest_cloud_provider && (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.nearest_cloud_provider} ${s.nearest_cloud_region || ""} cloud region`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> Nearest Cloud: {String(s.nearest_cloud_provider)}{s.nearest_cloud_region ? ` (${s.nearest_cloud_region})` : ""}
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Incentives & Policy */}
             {s.state && (
-              <a
-                href={`https://www.dsireusa.org/resources/detailed-summary-maps/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> State Incentive Programs (DSIRE)
-              </a>
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Incentives &amp; Policy</div>
+                <div className="space-y-1.5">
+                  <a href={`https://programs.dsireusa.org/system/program?state=${String(s.state)}&technology=105&sector=3`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> DSIRE Incentives — {String(s.state)}
+                  </a>
+                  <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.state} datacenter tax incentive abatement`)}`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> {String(s.state)} DC Tax Incentive Programs
+                  </a>
+                  {s.county && (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} economic development incentive`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> {String(s.county)} County Economic Development
+                    </a>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
