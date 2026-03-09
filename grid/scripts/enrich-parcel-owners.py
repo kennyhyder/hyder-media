@@ -66,8 +66,10 @@ STATEWIDE_ENDPOINTS = {
         "url": "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/FS_VCGI_OPENDATA_Cadastral_VTPARCELS_poly_standardized_parcels_SP_v1/FeatureServer/0",
         "owner_field": "OWNER1", "type": "FeatureServer",
     },
-    # FL: Statewide Cadastral has spatial queries DISABLED server-side.
-    # Use county endpoints in COUNTY_ENDPOINTS["FL"] instead.
+    "FL": {
+        "url": "https://services5.arcgis.com/GcvM6vDlR2gM4x31/arcgis/rest/services/Florida_Parcels/FeatureServer/0",
+        "owner_field": "OWN_NAME", "type": "FeatureServer", "use_envelope": True,
+    },
     "AR": {
         "url": "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6",
         "owner_field": "ownername", "type": "FeatureServer",
