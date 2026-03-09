@@ -30,7 +30,7 @@ INGESTION_SOURCES = [
     ("BLS QCEW", "ingest-bls-qcew.py", 90, "Labor market data by county"),
     ("NOAA Climate", "ingest-noaa-climate.py", 365, "Climate normals"),
     ("WRI Water", "ingest-wri-water.py", 365, "Water stress by county"),
-    ("FCC Fiber", "ingest-fcc-fiber.py", 180, "Fiber availability"),
+    ("FCC Fiber", "enrich-fiber-providers.py", 180, "FCC BDC fiber provider data"),
     ("PeeringDB", "ingest-peeringdb.py", 30, "IXP facilities"),
     ("OSM Datacenters", "ingest-osm-datacenters.py", 90, "Existing datacenter locations"),
     ("EIA Brownfields", "ingest-brownfields.py", 365, "Retired power plants"),
@@ -52,7 +52,7 @@ ENRICHMENT_PIPELINE = [
     ("Enrich Cloud Regions", "enrich-cloud-regions.py", "Nearest cloud region proximity"),
     ("Enrich FEMA Flood", "enrich-fema-flood.py", "FEMA flood zone data"),
     ("Enrich WRI Water", "enrich-wri-water.py", "WRI Aqueduct water stress"),
-    ("Enrich FCC Broadband", "enrich-fcc-broadband.py", "FCC broadband/fiber data"),
+    ("Enrich FCC Fiber", "enrich-fiber-providers.py", "FCC BDC fiber provider data + score recalc"),
     ("Score DC Sites", "score-dc-sites.py --rescore", "Recalculate all DC readiness scores"),
 ]
 

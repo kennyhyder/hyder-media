@@ -2,14 +2,16 @@
 """
 Score DC candidate sites with composite DC Readiness Score (0-100).
 
-Phase 3b of the GridScout DC plan. Weighted formula:
-  DC_Score = 0.25*power + 0.20*speed_to_power + 0.15*fiber
-           + 0.10*water + 0.10*hazard + 0.05*labor
-           + 0.05*existing_dc + 0.05*land + 0.03*tax + 0.02*climate
+Phase 3b of the GridScout DC plan. Weighted formula (14 factors):
+  DC_Score = 0.20*power + 0.15*speed_to_power + 0.12*fiber
+           + 0.10*energy_cost + 0.08*water + 0.08*hazard
+           + 0.07*buildability + 0.04*labor + 0.04*existing_dc
+           + 0.03*land + 0.03*construction_cost + 0.02*gas_pipeline
+           + 0.02*tax + 0.02*climate
 
 Each sub-score is 0-100. Higher = better for DC development.
 
-Target: grid_dc_sites (updates dc_score + 10 sub-scores)
+Target: grid_dc_sites (updates dc_score + 14 sub-scores)
 """
 
 import os
@@ -32,20 +34,22 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 BATCH_SIZE = 50
 
 # Sub-score weights (must sum to 1.0)
-# Recalibrated per I Squared Capital feedback:
-# - Water dropped from 10% to 3% ("helpful but much lower weighted")
-# - Power and fiber increased (core requirements)
-# - Existing DC cluster value increased
+# v3: Added energy_cost, gas_pipeline, buildability, construction_cost
+# Redistributed from power/speed/fiber to accommodate new data layers
 WEIGHTS = {
-    'power': 0.30,
-    'speed_to_power': 0.20,
-    'fiber': 0.18,
-    'water': 0.03,
-    'hazard': 0.07,
-    'labor': 0.05,
-    'existing_dc': 0.07,
-    'land': 0.05,
-    'tax': 0.03,
+    'power': 0.20,
+    'speed_to_power': 0.15,
+    'fiber': 0.12,
+    'energy_cost': 0.10,
+    'water': 0.08,
+    'hazard': 0.08,
+    'buildability': 0.07,
+    'labor': 0.04,
+    'existing_dc': 0.04,
+    'land': 0.03,
+    'construction_cost': 0.03,
+    'gas_pipeline': 0.02,
+    'tax': 0.02,
     'climate': 0.02,
 }
 
@@ -275,17 +279,26 @@ def score_fiber(site, ixp_index, ixp_cell_size, county_data):
         site['_nearest_ixp_name'] = nearest_ixp.get('name')
         site['_nearest_ixp_distance_km'] = ixp_dist
 
-    # County fiber: has_fiber = 100, no fiber = 30
-    fips = site.get('fips_code')
-    county = county_data.get(fips, {})
-    has_fiber = county.get('has_fiber')
-    fiber_providers = county.get('fiber_provider_count') or 0
+    # Fiber availability: prefer site-level FCC BDC data, fall back to county
+    fcc_pct = site.get('fcc_fiber_pct')
+    fcc_providers = site.get('fcc_fiber_providers') or 0
 
-    fiber_score = 30
-    if has_fiber:
-        fiber_score = min(100, 60 + fiber_providers * 4)  # More providers = better
-    elif has_fiber is False:
-        fiber_score = 20
+    if fcc_pct is not None:
+        # FCC BDC: 0% fiber = 10, 100% fiber = 100
+        fiber_score = clamp(10 + float(fcc_pct) * 0.9)
+        # Bonus for multiple providers (redundancy)
+        fiber_score = clamp(fiber_score + min(10, fcc_providers * 2))
+    else:
+        # Fall back to county-level fiber
+        fips = site.get('fips_code')
+        county = county_data.get(fips, {})
+        has_fiber = county.get('has_fiber')
+        fiber_providers = county.get('fiber_provider_count') or 0
+        fiber_score = 30
+        if has_fiber:
+            fiber_score = min(100, 60 + fiber_providers * 4)
+        elif has_fiber is False:
+            fiber_score = 20
 
     return clamp(ixp_score * 0.6 + fiber_score * 0.4)
 
@@ -417,6 +430,53 @@ def score_climate(site, county_data):
     return 50
 
 
+def score_energy_cost(site):
+    """Energy cost: lower electricity price = higher score.
+    Uses EIA retail electricity price (energy_price_mwh).
+    Range: $81-375/MWh. Median ~$110/MWh."""
+    price = site.get('energy_price_mwh')
+    if price is None:
+        return 50  # Neutral for missing data
+    # $80/MWh = 100, $200/MWh = 0 (caps extremes)
+    return clamp(linear_score(float(price), 80, 200))
+
+
+def score_gas_pipeline(site):
+    """Gas pipeline proximity: closer = better for backup power.
+    Uses nearest_gas_pipeline_km. NULL if >200km."""
+    dist = site.get('nearest_gas_pipeline_km')
+    if dist is None:
+        return 10  # Far from gas = low score
+    dist = float(dist)
+    # 0 km = 100, 50 km = 0
+    return clamp(linear_score(dist, 0, 50))
+
+
+def score_buildability(site):
+    """Buildability: direct from buildability_score (0-100).
+    Based on NLCD land cover + flood zone. Pre-computed."""
+    bs = site.get('buildability_score')
+    if bs is not None:
+        return clamp(float(bs))
+    # Fallback heuristic for sites without NLCD data
+    site_type = site.get('site_type', '')
+    if site_type == 'brownfield':
+        return 75  # Previously developed land
+    elif site_type == 'substation':
+        return 60  # Near existing infrastructure
+    return 50  # Neutral
+
+
+def score_construction_cost(site):
+    """Construction cost: lower index = cheaper to build = higher score.
+    Uses construction_cost_index (national avg = 100). Range 27-206."""
+    cci = site.get('construction_cost_index')
+    if cci is None:
+        return 50  # Neutral for missing data
+    # Index 60 = 100 (cheap), Index 180 = 0 (expensive)
+    return clamp(linear_score(float(cci), 60, 180))
+
+
 # ═══════════════════════════════════════════════════════════
 
 def compute_percentiles(county_data):
@@ -504,28 +564,36 @@ def main():
 
     for i, site in enumerate(sites):
         try:
-            # Compute all 10 sub-scores
+            # Compute all 14 sub-scores
             s_power = round(score_power(site), 1)
             s_speed = round(score_speed_to_power(site, queue_data), 1)
             s_fiber = round(score_fiber(site, ixp_index, 0.5, county_data), 1)
+            s_energy = round(score_energy_cost(site), 1)
             s_water = round(score_water(site, county_data), 1)
             s_hazard = round(score_hazard(site, county_data), 1)
+            s_build = round(score_buildability(site), 1)
             s_labor = round(score_labor(site, county_data, percentiles), 1)
             s_dc = round(score_existing_dc(site, dc_index, 0.5), 1)
             s_land = round(score_land(site, county_data), 1)
+            s_constr = round(score_construction_cost(site), 1)
+            s_gas = round(score_gas_pipeline(site), 1)
             s_tax = round(score_tax(site, county_data), 1)
             s_climate = round(score_climate(site, county_data), 1)
 
-            # Weighted composite
+            # Weighted composite (14 factors)
             dc_score = round(
                 WEIGHTS['power'] * s_power +
                 WEIGHTS['speed_to_power'] * s_speed +
                 WEIGHTS['fiber'] * s_fiber +
+                WEIGHTS['energy_cost'] * s_energy +
                 WEIGHTS['water'] * s_water +
                 WEIGHTS['hazard'] * s_hazard +
+                WEIGHTS['buildability'] * s_build +
                 WEIGHTS['labor'] * s_labor +
                 WEIGHTS['existing_dc'] * s_dc +
                 WEIGHTS['land'] * s_land +
+                WEIGHTS['construction_cost'] * s_constr +
+                WEIGHTS['gas_pipeline'] * s_gas +
                 WEIGHTS['tax'] * s_tax +
                 WEIGHTS['climate'] * s_climate,
                 1
@@ -537,11 +605,15 @@ def main():
                 'score_power': s_power,
                 'score_speed_to_power': s_speed,
                 'score_fiber': s_fiber,
+                'score_energy_cost': s_energy,
                 'score_water': s_water,
                 'score_hazard': s_hazard,
+                'score_buildability': s_build,
                 'score_labor': s_labor,
                 'score_existing_dc': s_dc,
                 'score_land': s_land,
+                'score_construction_cost': s_constr,
+                'score_gas_pipeline': s_gas,
                 'score_tax': s_tax,
                 'score_climate': s_climate,
             }
@@ -601,8 +673,9 @@ def main():
             site = next((s for s in sites if s['id'] == t['id']), {})
             print(f"    {t['dc_score']:.1f} — {site.get('name', '?')[:40]} ({site.get('state')})"
                   f" | pwr={t['score_power']} spd={t['score_speed_to_power']}"
-                  f" fib={t['score_fiber']} wtr={t['score_water']}"
-                  f" haz={t['score_hazard']}")
+                  f" fib={t['score_fiber']} nrg={t['score_energy_cost']}"
+                  f" haz={t['score_hazard']} bld={t['score_buildability']}"
+                  f" gas={t['score_gas_pipeline']} con={t['score_construction_cost']}")
 
     if dry_run:
         print(f"\n[DRY RUN] Would update {len(patches)} sites with scores")

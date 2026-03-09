@@ -211,9 +211,20 @@ Uses same Supabase project as SolarTrack: `ilbovwnhrowvxjdkvrln.supabase.co`
 - **Source**: Hardcoded dict from state economic development agencies
 - **Data**: 37 states + DC with datacenter tax incentive programs
 
-#### 16. `ingest-fcc-fiber.py` - FCC Fiber Coverage (patches county_data)
-- **Source**: State-level estimates from FCC Broadband Data Collection
+#### 16. `ingest-fcc-fiber.py` - FCC Fiber Coverage (patches county_data) [SUPERSEDED]
+- **Superseded by**: `enrich-fiber-providers.py` (uses real FCC BDC ArcGIS data instead of hardcoded estimates)
+- **Source**: State-level estimates from FCC Broadband Data Collection (hardcoded)
 - **Data**: has_fiber (boolean), fiber_provider_count
+
+#### 16b. `enrich-fiber-providers.py` - FCC BDC Fiber Provider Enrichment (replaces ingest-fcc-fiber.py)
+- **Source**: FCC Broadband Data Collection December 2024 ArcGIS FeatureServer (Layer 1: Counties)
+- **URL**: `https://services8.arcgis.com/peDZJliSvYims39Q/arcgis/rest/services/FCC_Broadband_Data_Collection_December_2024_View/FeatureServer/1`
+- **Data**: Real county-level fiber provider counts (avg 5.9, max 29), fiber coverage % (ServedBSLsFiber / TotalBSLs)
+- **Updates**: `grid_county_data` (fiber_provider_count, has_fiber, fiber_served_pct) + `grid_dc_sites` (fcc_fiber_providers, fcc_fiber_pct) via fips_code JOIN
+- **Fallback**: State-level averages for 8,133 sites without fips_code
+- **Rescoring**: Recalculates score_fiber and dc_score using real provider counts
+- **CLI**: `--dry-run`
+- **Results**: 73,994 sites enriched (100%), avg 7.6 providers, 53.7% avg fiber coverage
 
 #### 17. `ingest-iso-queues-dc.py` - ISO Queue Summary (138 records)
 - **Source**: Cross-references SolarTrack's `solar_installations` (ISO queue data)
@@ -385,7 +396,7 @@ All endpoints in `/Users/kennyhyder/Desktop/hyder-media/api/grid/`.
 | 11 | **BLS QCEW** | ZIP CSV | County employment + wages | `ingest-bls-qcew.py` | 3,222 |
 | 12 | **NOAA Climate Normals** | Hardcoded state-level | Cooling/heating degree days | `ingest-noaa-climate.py` | 3,222 |
 | 13 | **WRI Aqueduct** | Hardcoded state-level | Water stress scores | `ingest-wri-water.py` | 3,222 |
-| 14 | **FCC Broadband Data** | Hardcoded state-level | Fiber coverage | `ingest-fcc-fiber.py` | 3,222 |
+| 14 | **FCC BDC Dec 2024** | ArcGIS FeatureServer | Fiber provider count + coverage % per county | `enrich-fiber-providers.py` | 3,234 |
 | 15 | **State DC Incentives** | Hardcoded (37 states) | Tax incentive programs | `ingest-dc-incentives.py` | 3,222 |
 | 16 | **SolarTrack ISO Queues** | Cross-reference | Queue depth by ISO + POI | `ingest-iso-queues-dc.py` | 138 |
 
@@ -542,7 +553,7 @@ python3 -u scripts/ingest-bls-qcew.py
 python3 -u scripts/ingest-noaa-climate.py
 python3 -u scripts/ingest-wri-water.py
 python3 -u scripts/ingest-dc-incentives.py
-python3 -u scripts/ingest-fcc-fiber.py
+python3 -u scripts/enrich-fiber-providers.py       # FCC BDC real fiber data (replaces ingest-fcc-fiber.py)
 # 19. IXPs, DCs, brownfields (can run in parallel)
 python3 -u scripts/ingest-peeringdb.py
 python3 -u scripts/ingest-pnnl-dc.py

@@ -1,11 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-function getSupabase() {
-  return createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  );
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -15,7 +13,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const supabase = getSupabase();
     const {
       state,
       site_type,
@@ -25,6 +22,18 @@ export default async function handler(req, res) {
       iso_region,
       format,
     } = req.query;
+
+    // Input validation
+    if (state && !/^[A-Za-z]{2}$/.test(state))
+      return res.status(400).json({ error: "state must be a 2-letter code" });
+    if (site_type && !["substation", "brownfield", "greenfield"].includes(site_type))
+      return res.status(400).json({ error: "site_type must be substation, brownfield, or greenfield" });
+    if (min_score && (isNaN(parseFloat(min_score)) || parseFloat(min_score) < 0 || parseFloat(min_score) > 100))
+      return res.status(400).json({ error: "min_score must be a number between 0 and 100" });
+    if (max_score && (isNaN(parseFloat(max_score)) || parseFloat(max_score) < 0 || parseFloat(max_score) > 100))
+      return res.status(400).json({ error: "max_score must be a number between 0 and 100" });
+    if (min_capacity && (isNaN(parseFloat(min_capacity)) || parseFloat(min_capacity) < 0))
+      return res.status(400).json({ error: "min_capacity must be a non-negative number" });
 
     const columns = [
       "name", "site_type", "state", "county", "fips_code",
@@ -62,6 +71,7 @@ export default async function handler(req, res) {
     const rows = data || [];
 
     if (format === "json") {
+      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
       return res.status(200).json({ data: rows, total: rows.length });
     }
 
@@ -118,6 +128,7 @@ export default async function handler(req, res) {
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", `attachment; filename="gridscout-dc-sites.csv"`);
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     return res.status(200).send(csvRows.join("\n"));
   } catch (err) {
     return res.status(500).json({ error: err.message });

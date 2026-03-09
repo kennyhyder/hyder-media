@@ -372,7 +372,7 @@ def main():
             "owner_field": "OWNER1", "apn_field": None, "address_field": None,
         },
         "WV": {
-            "url": "https://gis.transportation.wv.gov/arcgis/rest/services/Economic/FeatureServer/7",
+            "url": "https://services.wvgis.wvu.edu/arcgis/rest/services/Planning_Cadastre/WV_Parcels/MapServer/0",
             "owner_field": "FullOwnerName", "apn_field": "CleanParcelID", "address_field": "FullPhysicalAddress",
         },
     }

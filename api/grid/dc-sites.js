@@ -68,7 +68,10 @@ export default async function handler(req, res) {
       "dc_score", "score_power", "score_speed_to_power", "score_fiber",
       "score_water", "score_hazard", "score_labor", "score_existing_dc",
       "score_land", "score_tax", "score_climate",
-      "iso_region", "acreage"
+      "score_energy_cost", "score_gas_pipeline", "score_buildability", "score_construction_cost",
+      "iso_region", "acreage",
+      "energy_price_mwh", "buildability_score", "construction_cost_index",
+      "nearest_gas_pipeline_km", "nlcd_class", "fcc_fiber_pct"
     ].join(",");
 
     let query = supabase
@@ -106,6 +109,8 @@ export default async function handler(req, res) {
     const validSorts = [
       "dc_score", "available_capacity_mw", "substation_voltage_kv",
       "nearest_ixp_distance_km", "nearest_dc_distance_km", "state", "name", "site_type",
+      "energy_price_mwh", "buildability_score", "construction_cost_index",
+      "nearest_gas_pipeline_km", "fcc_fiber_pct",
     ];
     const sortCol = validSorts.includes(sort) ? sort : "dc_score";
     const ascending = order === "asc";

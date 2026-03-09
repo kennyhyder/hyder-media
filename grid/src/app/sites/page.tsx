@@ -28,6 +28,12 @@ interface DCSite {
   former_use: string;
   iso_region: string;
   acreage: number;
+  energy_price_mwh: number;
+  buildability_score: number;
+  construction_cost_index: number;
+  nearest_gas_pipeline_km: number;
+  nlcd_class: string;
+  fcc_fiber_pct: number;
 }
 
 const STATES = [
@@ -349,6 +355,8 @@ function DCSitesContent() {
                   { key: "available_capacity_mw", label: "MW" },
                   { key: "nearest_ixp_distance_km", label: "IXP Dist" },
                   { key: "nearest_dc_distance_km", label: "DC Dist" },
+                  { key: "energy_price_mwh", label: "$/MWh" },
+                  { key: "buildability_score", label: "Build" },
                   { key: "iso_region", label: "ISO" },
                 ].map((col) => (
                   <th
@@ -366,9 +374,9 @@ function DCSitesContent() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={10} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={12} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
-                <tr><td colSpan={10} className="py-12 text-center">
+                <tr><td colSpan={12} className="py-12 text-center">
                   <p className="text-gray-400 mb-2">No DC sites found matching your filters.</p>
                   <p className="text-gray-400 text-xs">Try broadening your search, adjusting the min score, or clearing filters.</p>
                 </td></tr>
@@ -425,6 +433,16 @@ function DCSitesContent() {
                     <td className="py-2 px-3 text-gray-600">
                       {site.nearest_dc_distance_km != null
                         ? `${(site.nearest_dc_distance_km * 0.621371).toFixed(1)} mi`
+                        : "—"}
+                    </td>
+                    <td className="py-2 px-3 text-gray-600">
+                      {site.energy_price_mwh != null
+                        ? `$${Number(site.energy_price_mwh).toFixed(0)}`
+                        : "—"}
+                    </td>
+                    <td className="py-2 px-3 text-gray-600">
+                      {site.buildability_score != null
+                        ? Number(site.buildability_score).toFixed(0)
                         : "—"}
                     </td>
                     <td className="py-2 px-3 text-gray-500 text-xs">

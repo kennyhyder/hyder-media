@@ -149,6 +149,10 @@ function SiteDetailContent() {
   const taxScore = Number(s.score_tax) || 0;
   const dcClusterScore = Number(s.score_existing_dc) || 0;
   const landScore = Number(s.score_land) || 0;
+  const energyCostScore = Number(s.score_energy_cost) || 0;
+  const gasPipelineScore = Number(s.score_gas_pipeline) || 0;
+  const buildabilityScoreVal = Number(s.score_buildability) || 0;
+  const constructionCostScore = Number(s.score_construction_cost) || 0;
 
   // Speed to energization callout
   const speedLabel = speedScore >= 70 ? "Fast" : speedScore >= 40 ? "Moderate" : "Slow";
@@ -187,6 +191,17 @@ function SiteDetailContent() {
   if (dcClusterScore >= 70) strengths.push("Existing datacenter cluster nearby — benefits from shared ecosystem and workforce.");
 
   if (landScore >= 70) strengths.push("Ample land available for campus-scale development.");
+
+  if (energyCostScore >= 70) strengths.push("Low energy costs — competitive electricity pricing for the region.");
+  else if (energyCostScore < 30) risks.push("High energy costs — above-average electricity pricing may impact operating margins.");
+
+  if (gasPipelineScore >= 70) strengths.push("Gas pipeline access — nearby pipeline supports on-site backup generation.");
+
+  if (buildabilityScoreVal >= 70) strengths.push("Highly buildable land — favorable terrain and land cover for development.");
+  else if (buildabilityScoreVal < 30) risks.push("Challenging buildability — terrain or land cover may increase construction costs.");
+
+  if (constructionCostScore >= 70) strengths.push("Below-average construction costs for this region.");
+  else if (constructionCostScore < 30) risks.push("Above-average construction costs — labor and materials premium in this market.");
 
   if (s.site_type === "brownfield") {
     strengths.push("Brownfield advantage — existing grid connection, cleared land, and road access may reduce time-to-power by 2-4 years.");
@@ -329,6 +344,10 @@ function SiteDetailContent() {
           {scoreBar("Water Risk", waterScore, "3%")}
           {scoreBar("Tax Incentive", taxScore, "3%")}
           {scoreBar("Climate / Cooling", Number(s.score_climate) || 0, "2%")}
+          {scoreBar("Energy Cost", energyCostScore, "—")}
+          {scoreBar("Gas Pipeline", gasPipelineScore, "—")}
+          {scoreBar("Buildability", buildabilityScoreVal, "—")}
+          {scoreBar("Construction Cost", constructionCostScore, "—")}
         </div>
       </div>
 
@@ -351,6 +370,19 @@ function SiteDetailContent() {
           {infoRow("IXP Distance", s.nearest_ixp_distance_km != null ? `${(Number(s.nearest_ixp_distance_km) * 0.621371).toFixed(1)} mi` : null)}
           {infoRow("Nearest Datacenter", s.nearest_dc_name)}
           {infoRow("DC Distance", s.nearest_dc_distance_km != null ? `${(Number(s.nearest_dc_distance_km) * 0.621371).toFixed(1)} mi` : null)}
+          {infoRow("Fiber Coverage", s.fcc_fiber_pct != null ? `${Number(s.fcc_fiber_pct).toFixed(1)}%` : null)}
+        </div>
+
+        {/* Site Characteristics section */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Site Characteristics</h2>
+          {infoRow("Energy Price", s.energy_price_mwh != null ? `$${Number(s.energy_price_mwh).toFixed(2)}/MWh` : null)}
+          {s.energy_price_source && infoRow("Price Source", s.energy_price_source)}
+          {infoRow("Construction Cost Index", s.construction_cost_index != null ? `${Number(s.construction_cost_index).toFixed(1)} (avg = 100)` : null)}
+          {infoRow("Gas Pipeline Distance", s.nearest_gas_pipeline_km != null ? `${(Number(s.nearest_gas_pipeline_km) * 0.621371).toFixed(1)} mi` : null)}
+          {infoRow("Land Cover", s.nlcd_class)}
+          {s.nlcd_code && infoRow("NLCD Code", s.nlcd_code)}
+          {infoRow("Buildability Score", s.buildability_score != null ? `${Number(s.buildability_score).toFixed(1)} / 100` : null)}
         </div>
 
         {/* County risk section */}
