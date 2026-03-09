@@ -102,6 +102,63 @@ ARCGIS_FIBER_SOURCES = [
         'operator_field': 'subgrantee_name',
         'out_sr': 4326,
     },
+    {
+        'name': 'Nevada OSIT Middle Mile Fiber',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/fiber_routes/FeatureServer/123',
+        'prefix': 'nv_osit',
+        'state': 'NV',
+        'name_field': None,
+        'operator_field': 'provider',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'Nevada Zayo Open Access Routes',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/Zayo_Region_10_May_2024/FeatureServer/605',
+        'prefix': 'nv_zayo',
+        'state': 'NV',
+        'name_field': None,
+        'operator_field': None,
+        'fiber_type_override': 'middle_mile',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'Charlotte NC DOT Fiber Network',
+        'url': 'https://services3.arcgis.com/KeHpkB2z2Rm4PO4O/arcgis/rest/services/CDOT_ITS_Asset_ToolPublish_WFL1/FeatureServer/14',
+        'prefix': 'nc_cdot',
+        'state': 'NC',
+        'name_field': 'CableID',
+        'operator_field': 'Owner',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'Seattle DOT Fiber Routes',
+        'url': 'https://services.arcgis.com/ZOyb2t4B0UYuYNYH/arcgis/rest/services/Fiber_Routes_CDL/FeatureServer/0',
+        'prefix': 'wa_sdot',
+        'state': 'WA',
+        'name_field': 'CABLE__',
+        'operator_field': 'OWNER',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'California CAMMBI Middle Mile',
+        'url': 'https://services6.arcgis.com/sAv98EYUZbLCVPW0/arcgis/rest/services/MMBI_Statewide_Network_High_All/FeatureServer/1',
+        'prefix': 'ca_mmbi',
+        'state': 'CA',
+        'name_field': 'County_Name',
+        'operator_field': None,
+        'fiber_type_override': 'middle_mile',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'Utah DOT Fiber',
+        'url': 'https://services9.arcgis.com/xdpm0FCzFgMkMhqo/arcgis/rest/services/UDOT_Fiber/FeatureServer/0',
+        'prefix': 'ut_udot',
+        'state': 'UT',
+        'name_field': None,
+        'operator_field': None,
+        'fiber_type_override': 'dot_fiber',
+        'out_sr': 4326,
+    },
 ]
 
 # US regions (bounding boxes) to query separately to avoid Overpass timeout
@@ -472,8 +529,12 @@ def fetch_arcgis_fiber(source):
 
         # Case-insensitive field lookup
         props_lower = {k.lower(): v for k, v in props.items()}
-        route_name = props.get(name_field) or props.get(name_field.lower()) or props_lower.get(name_field.lower()) or None
-        operator = props.get(operator_field) or props.get(operator_field.lower()) or props_lower.get(operator_field.lower()) or None
+        route_name = None
+        if name_field:
+            route_name = props.get(name_field) or props.get(name_field.lower()) or props_lower.get(name_field.lower()) or None
+        operator = None
+        if operator_field:
+            operator = props.get(operator_field) or props.get(operator_field.lower()) or props_lower.get(operator_field.lower()) or None
 
         # Clean up name/operator
         if route_name and str(route_name).strip() in ('None', 'null', '', 'N/A'):
@@ -485,7 +546,7 @@ def fetch_arcgis_fiber(source):
             'source_record_id': src_id,
             'name': str(route_name).strip() if route_name else None,
             'operator': str(operator).strip() if operator else None,
-            'fiber_type': 'fibre',
+            'fiber_type': source.get('fiber_type_override', 'fibre'),
             'location_type': None,
             'source': prefix,
             'state': source.get('state'),
@@ -567,7 +628,7 @@ END $$;
         ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
          '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
          '-c', sql],
-        capture_output=True, text=True, env=env, timeout=30
+        capture_output=True, text=True, env=env, timeout=120
     )
     if result.returncode != 0:
         print(f"  psql table creation error: {result.stderr[:500]}")
@@ -999,7 +1060,10 @@ def main():
     if not skip_insert:
         if not dry_run:
             print("\n  Creating table if needed...")
-            create_table_if_needed()
+            try:
+                create_table_if_needed()
+            except Exception as e:
+                print(f"  Table creation skipped (likely already exists): {e}")
             # Assign states to OSM routes that don't have them
             osm_no_state = [r for r in all_routes if r.get('source', 'osm') == 'osm' and not r.get('state')]
             if osm_no_state:

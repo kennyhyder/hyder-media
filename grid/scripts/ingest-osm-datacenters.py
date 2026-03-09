@@ -34,13 +34,16 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 # Overpass query for US datacenters
 OVERPASS_QUERY = """
 [out:json][timeout:120];
-area["ISO3166-1"="US"][admin_level=2]->.us;
+area["ISO3166-1"="US"]->.us;
 (
-  nwr["man_made"="data_centre"](area.us);
-  nwr["building"="data_center"](area.us);
   nwr["building"="data_centre"](area.us);
+  nwr["building"="data_center"](area.us);
+  nwr["telecom"="data_centre"](area.us);
+  nwr["telecom"="data_center"](area.us);
+  nwr["man_made"="data_centre"](area.us);
+  nwr["man_made"="data_center"](area.us);
 );
-out center tags;
+out center body;
 """
 
 
@@ -211,12 +214,28 @@ def parse_osm_elements(data):
             op_lower = operator.lower()
             if any(h in op_lower for h in ['amazon', 'aws', 'google', 'microsoft', 'azure', 'meta', 'facebook', 'apple', 'oracle']):
                 dc_type = 'hyperscale'
-            elif any(c in op_lower for c in ['equinix', 'digital realty', 'coresite', 'cyrusone', 'qts', 'switch', 'databank']):
+            elif any(c in op_lower for c in [
+                'equinix', 'digital realty', 'coresite', 'cyrusone', 'qts',
+                'switch', 'databank', 'vantage', 't5', 'flexential', 'tierpoint',
+                'compass', 'stack infrastructure', 'cologix', 'aligned',
+                'serverfarm', 'h5', 'prime data centers', 'evoque',
+            ]):
                 dc_type = 'colocation'
             else:
                 dc_type = 'enterprise'
 
         source_id = f"osm_{osm_type[0]}{osm_id}"
+
+        # Extract address and website from OSM tags
+        address_parts = []
+        for akey in ('addr:housenumber', 'addr:street'):
+            av = safe_str(tags.get(akey))
+            if av:
+                address_parts.append(av)
+        address = ' '.join(address_parts) if address_parts else None
+
+        website = safe_str(tags.get('website')) or safe_str(tags.get('contact:website'))
+        zipcode = safe_str(tags.get('addr:postcode'))
 
         records.append({
             'source_record_id': source_id,
@@ -230,6 +249,9 @@ def parse_osm_elements(data):
             'sqft': None,
             'dc_type': dc_type,
             'year_built': None,
+            'address': address,
+            'website': website,
+            'zipcode': zipcode,
         })
 
     return records
