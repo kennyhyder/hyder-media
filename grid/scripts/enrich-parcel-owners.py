@@ -383,6 +383,30 @@ COUNTY_ENDPOINTS = {
             "url": "https://services1.arcgis.com/0U8EQ1FrumPeIqDb/arcgis/rest/services/Parcels_BCC/FeatureServer/5",
             "owner_field": "NAME1", "type": "FeatureServer", "use_envelope": True,
         },
+        "sarasota": {
+            "url": "https://services3.arcgis.com/icrWMv7eBkctFu1f/arcgis/rest/services/ParcelHosted/FeatureServer/0",
+            "owner_field": "NAME1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "collier_naples": {
+            "url": "https://g.naplesgov.com/arcgis/rest/services/City/Parcels/FeatureServer/0",
+            "owner_field": "NAME_1", "type": "FeatureServer", "use_envelope": True,
+        },
+        "lake_swfwmd": {
+            "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/8",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True,
+        },
+        "manatee_swfwmd": {
+            "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/10",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True,
+        },
+        "marion_swfwmd": {
+            "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/11",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True,
+        },
+        "pasco_swfwmd": {
+            "url": "https://www25.swfwmd.state.fl.us/arcgis12/rest/services/BaseVector/parcel_search/MapServer/12",
+            "owner_field": "OWNNAME", "type": "MapServer", "use_envelope": True,
+        },
     },
 }
 
