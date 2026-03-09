@@ -227,6 +227,72 @@ function SiteDetailContent() {
     "ISO-NE": "https://www.iso-ne.com/system-planning/interconnection-service/interconnection-request-queue/",
   };
 
+  // State DC tax incentive direct URLs
+  const stateTaxIncentiveUrls: Record<string, string> = {
+    VA: "https://www.vedp.org/incentive/data-center-sales-and-use-tax-exemption",
+    TX: "https://gov.texas.gov/business/page/tax-exemptions-and-tax-incentives",
+    GA: "https://www.georgia.org/competitive-advantages/incentives",
+    NC: "https://edpnc.com/incentives/",
+    OH: "https://development.ohio.gov/business/state-incentives",
+    IN: "https://www.iedc.in.gov/incentives",
+    NV: "https://goed.nv.gov/key-industries/information-technology/",
+    IA: "https://www.iowaeda.com/tax-credits-exemptions/",
+    TN: "https://www.tnecd.com/advantages/incentives/",
+    SC: "https://www.sccommerce.com/incentives",
+    MS: "https://mississippi.org/incentives/",
+    NE: "https://opportunity.nebraska.gov/incentives-financing/",
+    ND: "https://www.commerce.nd.gov/economic-development-finance/incentives-programs",
+    SD: "https://sdgoed.com/investors/tax-incentives/",
+    WY: "https://wyomingbusiness.org/industries/data-centers/",
+    OR: "https://www.oregon4biz.com/Oregon-Business/Tax-Incentives/",
+    WA: "https://choosewashingtonstate.com/why-washington-state/tax-incentives/",
+    IL: "https://dceo.illinois.gov/business-incentives.html",
+    NY: "https://esd.ny.gov/doing-business-ny/business-incentives",
+    NJ: "https://www.njeda.gov/economicrecoveryact/",
+    PA: "https://dced.pa.gov/programs-funding/",
+    MD: "https://commerce.maryland.gov/fund/programs-for-businesses",
+    CT: "https://portal.ct.gov/decd/services/business-incentives",
+  };
+
+  // Cloud provider region direct URLs
+  const cloudRegionUrls: Record<string, Record<string, string>> = {
+    AWS: {
+      "us-east-1": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/?p=ngi&loc=2#Northern%20Virginia",
+      "us-east-2": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/?p=ngi&loc=2#Ohio",
+      "us-west-1": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/?p=ngi&loc=2#Northern%20California",
+      "us-west-2": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/?p=ngi&loc=2#Oregon",
+    },
+    GCP: {
+      "us-east1": "https://cloud.google.com/about/locations#south-carolina",
+      "us-east4": "https://cloud.google.com/about/locations#northern-virginia",
+      "us-east5": "https://cloud.google.com/about/locations#columbus",
+      "us-central1": "https://cloud.google.com/about/locations#iowa",
+      "us-south1": "https://cloud.google.com/about/locations#dallas",
+      "us-west1": "https://cloud.google.com/about/locations#oregon",
+      "us-west2": "https://cloud.google.com/about/locations#los-angeles",
+      "us-west3": "https://cloud.google.com/about/locations#salt-lake-city",
+      "us-west4": "https://cloud.google.com/about/locations#las-vegas",
+    },
+    Azure: {
+      "eastus": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "eastus2": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "centralus": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "westus": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "westus2": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "westus3": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "southcentralus": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+      "northcentralus": "https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies/#geographies",
+    },
+  };
+
+  // Get cloud region URL
+  const getCloudRegionUrl = (provider: string, region: string): string | null => {
+    const providerKey = Object.keys(cloudRegionUrls).find(k => provider?.toLowerCase().includes(k.toLowerCase()));
+    if (!providerKey) return null;
+    const regionMap = cloudRegionUrls[providerKey];
+    return regionMap[region] || Object.values(regionMap)[0] || null;
+  };
+
   return (
     <div>
       {/* Header */}
@@ -365,30 +431,98 @@ function SiteDetailContent() {
         {/* Power section */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Power</h2>
-          {infoRow("Nearest Substation", s.nearest_substation_name)}
+          {s.nearest_substation_name && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Nearest Substation</span>
+              <a href={`/grid/search/?q=${encodeURIComponent(String(s.nearest_substation_name))}`}
+                className="text-sm font-medium text-purple-600 hover:underline">
+                {String(s.nearest_substation_name)}
+              </a>
+            </div>
+          )}
           {infoRow("Distance", s.nearest_substation_distance_km != null ? `${(Number(s.nearest_substation_distance_km) * 0.621371).toFixed(1)} mi` : null)}
           {infoRow("Voltage", s.substation_voltage_kv ? `${s.substation_voltage_kv} kV` : null)}
           {infoRow("Available Capacity", s.available_capacity_mw ? `${s.available_capacity_mw} MW` : null)}
           {infoRow("Queue Depth", s.queue_depth)}
           {infoRow("Avg Queue Wait", s.avg_queue_wait_years ? `${s.avg_queue_wait_years} years` : null)}
+          {s.iso_region && isoQueueUrls[String(s.iso_region)] && (
+            <div className="mt-2 pt-2 border-t border-gray-100">
+              <a href={isoQueueUrls[String(s.iso_region)]} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-purple-600 hover:underline">
+                {String(s.iso_region)} Queue Tracker &#8599;
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Connectivity section */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Connectivity</h2>
-          {infoRow("Nearest IXP", s.nearest_ixp_name)}
+          {s.nearest_ixp_name && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Nearest IXP</span>
+              <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(String(s.nearest_ixp_name))}`}
+                target="_blank" rel="noopener noreferrer"
+                className="text-sm font-medium text-purple-600 hover:underline">
+                {String(s.nearest_ixp_name)} &#8599;
+              </a>
+            </div>
+          )}
           {infoRow("IXP Distance", s.nearest_ixp_distance_km != null ? `${(Number(s.nearest_ixp_distance_km) * 0.621371).toFixed(1)} mi` : null)}
-          {infoRow("Nearest Datacenter", s.nearest_dc_name)}
+          {s.nearest_dc_name && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Nearest Datacenter</span>
+              <a href={`https://www.google.com/maps/search/${encodeURIComponent(String(s.nearest_dc_name) + ' datacenter')}`}
+                target="_blank" rel="noopener noreferrer"
+                className="text-sm font-medium text-purple-600 hover:underline">
+                {String(s.nearest_dc_name)} &#8599;
+              </a>
+            </div>
+          )}
           {infoRow("DC Distance", s.nearest_dc_distance_km != null ? `${(Number(s.nearest_dc_distance_km) * 0.621371).toFixed(1)} mi` : null)}
-          {infoRow("Fiber Coverage", s.fcc_fiber_pct != null ? `${Number(s.fcc_fiber_pct).toFixed(1)}%` : null)}
+          {s.fcc_fiber_pct != null && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Fiber Coverage</span>
+              <span className="text-sm font-medium text-gray-900">
+                {Number(s.fcc_fiber_pct).toFixed(1)}%
+                <a href={`https://broadbandmap.fcc.gov/location-summary/fixed?speed=1000&latlon=${s.latitude},${s.longitude}&zoom=14`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-purple-600 hover:underline ml-1 text-xs">(FCC BDC &#8599;)</a>
+              </span>
+            </div>
+          )}
+          {s.nearest_fiber_km != null && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+              <span className="text-xs text-gray-500">Nearest Fiber Route</span>
+              <span className="text-sm font-medium text-gray-900">{(Number(s.nearest_fiber_km) * 0.621371).toFixed(1)} mi</span>
+            </div>
+          )}
         </div>
 
         {/* Site Characteristics section */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Site Characteristics</h2>
-          {infoRow("Energy Price", s.energy_price_mwh != null ? `$${Number(s.energy_price_mwh).toFixed(2)}/MWh` : null)}
-          {s.energy_price_source && infoRow("Price Source", s.energy_price_source)}
-          {infoRow("Construction Cost Index", s.construction_cost_index != null ? `${Number(s.construction_cost_index).toFixed(1)} (avg = 100)` : null)}
+          {s.energy_price_mwh != null && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Energy Price</span>
+              <span className="text-sm font-medium text-gray-900">
+                ${Number(s.energy_price_mwh).toFixed(2)}/MWh
+                {s.energy_price_source && (
+                  <a href={`https://www.eia.gov/electricity/state/${String(s.state || "").toLowerCase()}/`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-purple-600 hover:underline ml-1 text-xs">({String(s.energy_price_source)} &#8599;)</a>
+                )}
+              </span>
+            </div>
+          )}
+          {s.construction_cost_index != null && (
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Construction Cost Index</span>
+              <span className="text-sm font-medium text-gray-900">
+                {Number(s.construction_cost_index).toFixed(1)} <span className="text-xs text-gray-400">(avg = 100, RSMeans)</span>
+              </span>
+            </div>
+          )}
           {infoRow("Gas Pipeline Distance", s.nearest_gas_pipeline_km != null ? `${(Number(s.nearest_gas_pipeline_km) * 0.621371).toFixed(1)} mi` : null)}
           {infoRow("Land Cover", s.nlcd_class)}
           {s.nlcd_code && infoRow("NLCD Code", s.nlcd_code)}
@@ -400,15 +534,93 @@ function SiteDetailContent() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-3">County Risk Profile</h2>
             {infoRow("County", county.county_name)}
-            {infoRow("NRI Score", county.nri_score)}
-            {infoRow("NRI Rating", county.nri_rating)}
-            {infoRow("Water Stress", county.water_stress_label)}
-            {infoRow("Cooling Degree Days", county.cooling_degree_days)}
-            {infoRow("Has Fiber", county.has_fiber ? "Yes" : "No")}
-            {infoRow("Fiber Providers", county.fiber_provider_count)}
-            {county.avg_land_value_per_acre_usd && infoRow("Land Value", `$${Number(county.avg_land_value_per_acre_usd).toLocaleString()}/acre`)}
-            {infoRow("DC Tax Incentive", county.has_dc_tax_incentive ? "Yes" : "No")}
-            {county.dc_incentive_type && infoRow("Incentive Type", county.dc_incentive_type)}
+
+            {/* NRI with source */}
+            {county.nri_score != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">NRI Score / Rating</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.nri_score)}{county.nri_rating ? ` (${county.nri_rating})` : ""}
+                  <a href={`https://hazards.fema.gov/nri/map#checks=true&layers=false&stateZoom=${String(s.state || "").toLowerCase()}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-purple-600 hover:underline ml-1 text-xs">(FEMA NRI &#8599;)</a>
+                </span>
+              </div>
+            )}
+
+            {/* Water stress with source */}
+            {county.water_stress_label && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Water Stress</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.water_stress_label)}
+                  {s.latitude && s.longitude && (
+                    <a href={`https://www.wri.org/applications/aqueduct/water-risk-atlas/#/?basemap=hydro&indicator=w_awr_def_tot_cat&lat=${s.latitude}&lng=${s.longitude}&zoom=10`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="text-purple-600 hover:underline ml-1 text-xs">(WRI Aqueduct &#8599;)</a>
+                  )}
+                </span>
+              </div>
+            )}
+
+            {/* CDD with source */}
+            {county.cooling_degree_days != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Cooling Degree Days</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.cooling_degree_days)}
+                  <span className="text-xs text-gray-400 ml-1">(NOAA)</span>
+                </span>
+              </div>
+            )}
+
+            {/* Fiber with provider details */}
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Fiber Infrastructure</span>
+              <span className="text-sm font-medium text-gray-900">
+                {county.has_fiber ? (
+                  <span className="text-green-600">
+                    {county.fiber_provider_count ? `${county.fiber_provider_count} providers` : "Available"}
+                  </span>
+                ) : (
+                  <span className="text-red-500">No fiber</span>
+                )}
+                {s.latitude && s.longitude && (
+                  <a href={`https://broadbandmap.fcc.gov/location-summary/fixed?speed=1000&latlon=${s.latitude},${s.longitude}&zoom=14`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-purple-600 hover:underline ml-1 text-xs">(FCC BDC &#8599;)</a>
+                )}
+              </span>
+            </div>
+
+            {/* Land value with source */}
+            {county.avg_land_value_per_acre_usd && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Land Value</span>
+                <span className="text-sm font-medium text-gray-900">
+                  ${Number(county.avg_land_value_per_acre_usd).toLocaleString()}/acre
+                  <span className="text-xs text-gray-400 ml-1">(USDA)</span>
+                </span>
+              </div>
+            )}
+
+            {/* Tax incentive */}
+            <div className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+              <span className="text-xs text-gray-500">DC Tax Incentive</span>
+              <span className="text-sm font-medium text-gray-900">
+                {county.has_dc_tax_incentive ? (
+                  <>
+                    <span className="text-green-600">Yes</span>
+                    {county.dc_incentive_type && <span className="text-gray-500 text-xs ml-1">({String(county.dc_incentive_type)})</span>}
+                    {s.state && stateTaxIncentiveUrls[String(s.state)] && (
+                      <a href={stateTaxIncentiveUrls[String(s.state)]}
+                        target="_blank" rel="noopener noreferrer"
+                        className="text-purple-600 hover:underline ml-1 text-xs">(Details &#8599;)</a>
+                    )}
+                  </>
+                ) : "No"}
+              </span>
+            </div>
           </div>
         )}
 
@@ -490,11 +702,15 @@ function SiteDetailContent() {
                     </a>
                   )}
                   {s.nearest_substation_name && (
-                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`"${s.nearest_substation_name}" substation utility`)}`}
-                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                      <span>&#8599;</span> Search: {String(s.nearest_substation_name)} Substation
+                    <a href={`/grid/search/?q=${encodeURIComponent(String(s.nearest_substation_name))}`}
+                      className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> GridScout: {String(s.nearest_substation_name)} Substation
                     </a>
                   )}
+                  <a href="https://hifld-geoplatform.opendata.arcgis.com/datasets/electric-substations"
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> HIFLD Substation Database
+                  </a>
                 </div>
               </div>
             )}
@@ -543,12 +759,15 @@ function SiteDetailContent() {
                       <span>&#8599;</span> FCC Broadband Map{s.fcc_fiber_providers ? ` (${s.fcc_fiber_providers} fiber providers)` : ""}
                     </a>
                   )}
-                  {s.nearest_cloud_provider && (
-                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.nearest_cloud_provider} ${s.nearest_cloud_region || ""} cloud region`)}`}
-                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                      <span>&#8599;</span> Nearest Cloud: {String(s.nearest_cloud_provider)}{s.nearest_cloud_region ? ` (${s.nearest_cloud_region})` : ""}
-                    </a>
-                  )}
+                  {s.nearest_cloud_provider && (() => {
+                    const directUrl = getCloudRegionUrl(String(s.nearest_cloud_provider), String(s.nearest_cloud_region || ""));
+                    return (
+                      <a href={directUrl || `https://www.google.com/search?q=${encodeURIComponent(`${s.nearest_cloud_provider} ${s.nearest_cloud_region || ""} cloud region`)}`}
+                        target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                        <span>&#8599;</span> Nearest Cloud: {String(s.nearest_cloud_provider)}{s.nearest_cloud_region ? ` (${s.nearest_cloud_region})` : ""}
+                      </a>
+                    );
+                  })()}
                 </div>
               </div>
             )}
@@ -562,14 +781,21 @@ function SiteDetailContent() {
                     target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
                     <span>&#8599;</span> DSIRE Incentives — {String(s.state)}
                   </a>
-                  <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.state} datacenter tax incentive abatement`)}`}
-                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                    <span>&#8599;</span> {String(s.state)} DC Tax Incentive Programs
-                  </a>
-                  {s.county && (
-                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.county} County ${s.state} economic development incentive`)}`}
+                  {stateTaxIncentiveUrls[String(s.state)] ? (
+                    <a href={stateTaxIncentiveUrls[String(s.state)]}
                       target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                      <span>&#8599;</span> {String(s.county)} County Economic Development
+                      <span>&#8599;</span> {String(s.state)} Economic Development &amp; Incentives
+                    </a>
+                  ) : (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.state} datacenter tax incentive abatement`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> {String(s.state)} DC Tax Incentive Programs
+                    </a>
+                  )}
+                  {s.county && (
+                    <a href={`https://selectusa.gov/programs-incentives?state=${encodeURIComponent(String(s.state))}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> SelectUSA — {String(s.state)} Programs &amp; Incentives
                     </a>
                   )}
                 </div>
@@ -615,9 +841,9 @@ function SiteDetailContent() {
                 <span>&#8599;</span> EPA State Brownfield Programs Directory
               </a>
               {s.state && (
-                <a href={`https://www.google.com/search?q=${encodeURIComponent(`${s.state} state brownfield redevelopment program`)}`} target="_blank" rel="noopener noreferrer"
+                <a href={`https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs`} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                  <span>&#8599;</span> {String(s.state)} Brownfield Program
+                  <span>&#8599;</span> {String(s.state)} Brownfield Program (EPA Directory)
                 </a>
               )}
             </div>
@@ -742,7 +968,20 @@ function SiteDetailContent() {
                 {(data.nearbyFacilities as NearbyFacility[]).map((f) => (
                   <tr key={f.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 px-3">
-                      <div className="font-medium text-gray-900 text-xs">{f.name}</div>
+                      <div className="font-medium text-gray-900 text-xs">
+                        {f.facility_type === "ixp" ? (
+                          <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(f.name)}`}
+                            target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                            {f.name} &#8599;
+                          </a>
+                        ) : f.website ? (
+                          <a href={f.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                            {f.name} &#8599;
+                          </a>
+                        ) : (
+                          f.name
+                        )}
+                      </div>
                       {f.org_name && f.org_name !== f.name && (
                         <div className="text-xs text-gray-500">{f.org_name}</div>
                       )}
