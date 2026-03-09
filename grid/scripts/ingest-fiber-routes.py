@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """
-Ingest fiber optic routes from OpenStreetMap and compute nearest-fiber
-distance for all grid_dc_sites.
+Ingest fiber optic routes from OpenStreetMap + state ArcGIS sources,
+and compute nearest-fiber distance for all grid_dc_sites.
 
-Phase 1: Fetch fiber routes from OSM Overpass API (by US region)
+Phase 1a: Fetch fiber routes from OSM Overpass API (by US region)
+Phase 1b: Fetch fiber routes from state ArcGIS FeatureServer endpoints
 Phase 2: Store in grid_fiber_routes table (Supabase)
 Phase 3: Compute nearest_fiber_km for each grid_dc_sites record (psql bulk)
 
-Source: OpenStreetMap Overpass API
-  - way["telecom:medium"="fibre"]
-  - way["communication"="line"]["substance"="fibre_optic"]
-  - way["utility"="telecom"]["cables"]
+Sources:
+  - OpenStreetMap Overpass API (nationwide)
+  - California CPUC BB4ALL fiber corridors (ArcGIS)
+  - Vermont PSD fiber routes 2025 (ArcGIS)
+  - Maine 3 Ring Binder fiber network (ArcGIS)
+  - NTIA Middle Mile broadband awards (ArcGIS)
 
 Usage:
   python3 -u scripts/ingest-fiber-routes.py
   python3 -u scripts/ingest-fiber-routes.py --dry-run
   python3 -u scripts/ingest-fiber-routes.py --skip-download
   python3 -u scripts/ingest-fiber-routes.py --skip-download --skip-insert
+  python3 -u scripts/ingest-fiber-routes.py --arcgis-only   # Skip OSM, only fetch ArcGIS
 """
 
 import os
@@ -58,6 +62,47 @@ GRID_CELL_DEG = 1.0  # ~111 km at equator
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 CACHE_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'fiber_routes.json')
+ARCGIS_CACHE_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'fiber_routes_arcgis.json')
+
+# ArcGIS FeatureServer endpoints for state-level fiber data
+ARCGIS_FIBER_SOURCES = [
+    {
+        'name': 'California CPUC BB4ALL',
+        'url': 'https://services2.arcgis.com/VofPZYDe2pLxSP5G/arcgis/rest/services/BB4ALL_Intersect_v3_Public/FeatureServer/0',
+        'prefix': 'ca_cpuc',
+        'state': 'CA',
+        'name_field': 'ROUTE',
+        'operator_field': 'NAMELSAD20',  # County name as operator proxy
+        'out_sr': 4326,  # Request WGS84
+    },
+    {
+        'name': 'Vermont Fiber 2025',
+        'url': 'https://services3.arcgis.com/5tLOjexclC0TuD0h/arcgis/rest/services/BBStatus2025_Routes_Fiber/FeatureServer/0',
+        'prefix': 'vt_fiber',
+        'state': 'VT',
+        'name_field': 'Name',
+        'operator_field': 'Provider',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'Maine 3 Ring Binder',
+        'url': 'https://services1.arcgis.com/RbMX0mRVOFNTdLzd/arcgis/rest/services/Maine_3_Ring_Binder/FeatureServer/0',
+        'prefix': 'me_3rb',
+        'state': 'ME',
+        'name_field': 'Name',
+        'operator_field': 'Owner',
+        'out_sr': 4326,
+    },
+    {
+        'name': 'NTIA Middle Mile Awards',
+        'url': 'https://utility.arcgis.com/usrsvcs/servers/53d104cecb964033a75c5cd05cab3657/rest/services/MM_Dashboard_Layers_ForPublic/FeatureServer/1',
+        'prefix': 'ntia_mm',
+        'state': None,  # National — derive state from centroid
+        'name_field': 'project_name',
+        'operator_field': 'subgrantee_name',
+        'out_sr': 4326,
+    },
+]
 
 # US regions (bounding boxes) to query separately to avoid Overpass timeout
 # Format: (name, south, west, north, east)
@@ -312,6 +357,182 @@ def load_cached_routes():
     return routes
 
 
+# ── Phase 1b: Download from ArcGIS FeatureServer ─────────────
+
+def fetch_arcgis_fiber(source):
+    """Fetch all fiber routes from an ArcGIS FeatureServer endpoint."""
+    base_url = source['url']
+    name = source['name']
+    prefix = source['prefix']
+    out_sr = source.get('out_sr', 4326)
+    name_field = source.get('name_field', 'Name')
+    operator_field = source.get('operator_field', 'Provider')
+
+    print(f"\n  Fetching {name}...")
+
+    # First get record count
+    count_url = f"{base_url}/query?where=1%3D1&returnCountOnly=true&f=json"
+    req = urllib.request.Request(count_url, headers={'User-Agent': 'GridScout/1.0'})
+    try:
+        with urllib.request.urlopen(req, timeout=30, context=SSL_CTX) as resp:
+            count_data = json.loads(resp.read().decode())
+        total = count_data.get('count', 0)
+        print(f"    Total records: {total}")
+    except Exception as e:
+        print(f"    Failed to get count: {e}")
+        total = 0
+
+    # Fetch in pages of 1000 (ArcGIS default max)
+    all_features = []
+    offset = 0
+    page_size = 1000
+
+    while True:
+        params = urllib.parse.urlencode({
+            'where': '1=1',
+            'outFields': '*',
+            'outSR': out_sr,
+            'f': 'geojson',
+            'resultOffset': offset,
+            'resultRecordCount': page_size,
+        })
+        query_url = f"{base_url}/query?{params}"
+        req = urllib.request.Request(query_url, headers={'User-Agent': 'GridScout/1.0'})
+
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=120, context=SSL_CTX) as resp:
+                    data = json.loads(resp.read().decode())
+                break
+            except Exception as e:
+                if attempt < 2:
+                    wait = 10 * (attempt + 1)
+                    print(f"    Error at offset {offset}: {e}. Retrying in {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"    FAILED at offset {offset}: {e}")
+                    data = {'features': []}
+
+        features = data.get('features', [])
+        if not features:
+            break
+
+        all_features.extend(features)
+        offset += len(features)
+
+        if offset % 5000 == 0 or len(features) < page_size:
+            print(f"    Fetched {offset} features...")
+
+        if len(features) < page_size:
+            break
+
+        time.sleep(0.5)  # Be kind to the server
+
+    print(f"    Total features fetched: {len(all_features)}")
+
+    # Convert to route format
+    routes = []
+    for feat in all_features:
+        geom = feat.get('geometry')
+        props = feat.get('properties', {})
+        if not geom:
+            continue
+
+        geom_type = geom.get('type', '')
+        coords = geom.get('coordinates', [])
+
+        if geom_type == 'LineString':
+            if len(coords) < 2:
+                continue
+        elif geom_type == 'MultiLineString':
+            # Flatten to longest segment for centroid, keep full geom
+            if not coords or all(len(line) < 2 for line in coords):
+                continue
+        else:
+            continue  # Skip points/polygons
+
+        # Get centroid from geometry
+        if geom_type == 'LineString':
+            mid_idx = len(coords) // 2
+            centroid_lng, centroid_lat = coords[mid_idx][0], coords[mid_idx][1]
+        else:
+            # MultiLineString — use midpoint of longest segment
+            longest = max(coords, key=len) if coords else coords[0]
+            mid_idx = len(longest) // 2
+            centroid_lng, centroid_lat = longest[mid_idx][0], longest[mid_idx][1]
+
+        # Generate unique source record ID
+        # Use feature OID if available, otherwise hash of coords
+        oid = props.get('OBJECTID') or props.get('FID') or props.get('objectid')
+        if oid:
+            src_id = f"{prefix}_fiber_{oid}"
+        else:
+            coord_hash = hash(json.dumps(coords[:3]))
+            src_id = f"{prefix}_fiber_{abs(coord_hash)}"
+
+        # Case-insensitive field lookup
+        props_lower = {k.lower(): v for k, v in props.items()}
+        route_name = props.get(name_field) or props.get(name_field.lower()) or props_lower.get(name_field.lower()) or None
+        operator = props.get(operator_field) or props.get(operator_field.lower()) or props_lower.get(operator_field.lower()) or None
+
+        # Clean up name/operator
+        if route_name and str(route_name).strip() in ('None', 'null', '', 'N/A'):
+            route_name = None
+        if operator and str(operator).strip() in ('None', 'null', '', 'N/A'):
+            operator = None
+
+        route = {
+            'source_record_id': src_id,
+            'name': str(route_name).strip() if route_name else None,
+            'operator': str(operator).strip() if operator else None,
+            'fiber_type': 'fibre',
+            'location_type': None,
+            'source': prefix,
+            'state': source.get('state'),
+            'centroid_lat': centroid_lat,
+            'centroid_lng': centroid_lng,
+            'geometry': geom,  # Full GeoJSON geometry
+        }
+
+        routes.append(route)
+
+    print(f"    Converted {len(routes)} valid routes")
+    return routes
+
+
+def download_arcgis_fiber():
+    """Fetch fiber routes from all ArcGIS FeatureServer endpoints."""
+    print("\n[Phase 1b] Downloading fiber routes from ArcGIS FeatureServer endpoints...")
+
+    all_routes = []
+    for source in ARCGIS_FIBER_SOURCES:
+        try:
+            routes = fetch_arcgis_fiber(source)
+            all_routes.extend(routes)
+        except Exception as e:
+            print(f"  FAILED {source['name']}: {e}")
+            continue
+
+    print(f"\n  Total ArcGIS routes: {len(all_routes)}")
+
+    # Cache to file
+    os.makedirs(os.path.dirname(ARCGIS_CACHE_FILE), exist_ok=True)
+    with open(ARCGIS_CACHE_FILE, 'w') as f:
+        json.dump(all_routes, f)
+    file_mb = os.path.getsize(ARCGIS_CACHE_FILE) / (1024 * 1024)
+    print(f"  Cached to {ARCGIS_CACHE_FILE} ({file_mb:.1f} MB)")
+
+    return all_routes
+
+
+def load_cached_arcgis_routes():
+    print(f"\n[Phase 1b] Loading cached ArcGIS fiber routes from {ARCGIS_CACHE_FILE}...")
+    with open(ARCGIS_CACHE_FILE, 'r') as f:
+        routes = json.load(f)
+    print(f"  Loaded {len(routes)} routes from cache")
+    return routes
+
+
 # ── Phase 2: Insert into Supabase ──────────────────────────────
 
 def create_table_if_needed():
@@ -411,30 +632,44 @@ def insert_routes(routes, dry_run=False):
     if dry_run:
         print(f"  DRY RUN: Would insert {len(routes)} routes")
         for r in routes[:5]:
-            print(f"    osm_{r['osm_id']}: {r.get('name', 'unnamed')} ({r.get('operator', 'unknown')}), "
-                  f"{len(r['coords'])} coords, state={r.get('state')}")
+            label = r.get('source_record_id') or f"osm_{r.get('osm_id', '?')}"
+            print(f"    {label}: {r.get('name', 'unnamed')} ({r.get('operator', 'unknown')}), "
+                  f"source={r.get('source', 'osm')}, state={r.get('state')}")
         return
 
     # Use psql COPY via temp CSV approach
     sql_file = os.path.join(os.path.dirname(__file__), '..', 'data', '_fiber_insert.sql')
 
+    chunk_size = 5000  # Commit every 5000 rows to avoid long transactions
     with open(sql_file, 'w') as f:
         f.write("-- Fiber routes bulk insert\n")
         f.write("BEGIN;\n")
 
         for i, route in enumerate(routes):
-            src_id = f"osm_fiber_{route['osm_id']}"
-            geojson = json.dumps({
-                "type": "LineString",
-                "coordinates": route['coords']
-            })
-            name = (route.get('name') or '').replace("'", "''")
-            operator = (route.get('operator') or '').replace("'", "''")
+            # Determine source_record_id and geometry based on route source
+            if 'osm_id' in route:
+                # OSM route
+                src_id = f"osm_fiber_{route['osm_id']}"
+                source = 'osm'
+                geojson = json.dumps({
+                    "type": "LineString",
+                    "coordinates": route['coords']
+                })
+            else:
+                # ArcGIS route
+                src_id = route['source_record_id']
+                source = route.get('source', 'arcgis')
+                geojson = json.dumps(route['geometry'])
+
+            name = (route.get('name') or '').replace("'", "''").replace("\\", "\\\\")
+            operator = (route.get('operator') or '').replace("'", "''").replace("\\", "\\\\")
             fiber_type = (route.get('fiber_type') or '').replace("'", "''")
             location_type = (route.get('location_type') or '').replace("'", "''")
             state = route.get('state') or ''
             centroid_lat = route.get('centroid_lat') or 'NULL'
             centroid_lng = route.get('centroid_lng') or 'NULL'
+            # Escape the geojson for SQL (single quotes)
+            geojson_escaped = geojson.replace("'", "''")
 
             f.write(
                 f"INSERT INTO grid_fiber_routes "
@@ -445,45 +680,94 @@ def insert_routes(routes, dry_run=False):
                 f"NULLIF('{operator}',''), "
                 f"NULLIF('{fiber_type}',''), "
                 f"NULLIF('{location_type}',''), "
-                f"'osm', "
+                f"'{source}', "
                 f"'{src_id}', "
-                f"'{geojson}'::jsonb, "
+                f"'{geojson_escaped}'::jsonb, "
                 f"{centroid_lat}, "
                 f"{centroid_lng}, "
                 f"NULLIF('{state}','')) "
                 f"ON CONFLICT (source_record_id) DO NOTHING;\n"
             )
 
-            if (i + 1) % 5000 == 0:
+            # Commit in chunks to avoid long transactions
+            if (i + 1) % chunk_size == 0:
+                f.write("COMMIT;\nBEGIN;\n")
                 print(f"  Generated SQL for {i + 1}/{len(routes)} routes...")
 
         f.write("COMMIT;\n")
         f.write("SELECT COUNT(*) AS total_routes FROM grid_fiber_routes;\n")
 
-    print(f"  Running SQL ({os.path.getsize(sql_file) / (1024*1024):.1f} MB)...")
+    # Split into chunk files and run sequentially for reliability
+    chunk_files = []
+    file_idx = 0
+    current_file = None
+    current_count = 0
+    chunk_limit = 5000  # rows per file
 
-    env = os.environ.copy()
-    env['PGPASSWORD'] = os.environ.get('SUPABASE_DB_PASSWORD', '#FsW7iqg%EYX&G3M')
-    result = subprocess.run(
-        ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-         '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
-         '-f', sql_file],
-        capture_output=True, text=True, env=env, timeout=600
-    )
+    with open(sql_file, 'r') as f:
+        for line in f:
+            if current_file is None:
+                chunk_name = sql_file.replace('.sql', f'_{file_idx}.sql')
+                current_file = open(chunk_name, 'w')
+                current_file.write("BEGIN;\n")
+                chunk_files.append(chunk_name)
+                current_count = 0
 
-    if result.returncode != 0:
-        print(f"  psql error: {result.stderr[:1000]}")
-    else:
-        # Show last few lines of output
-        lines = result.stdout.strip().split('\n')
-        for line in lines[-5:]:
-            print(f"  {line}")
+            if line.startswith('INSERT INTO'):
+                current_count += 1
 
-    # Cleanup
+            if line.startswith('COMMIT;') and current_count >= chunk_limit:
+                current_file.write("COMMIT;\n")
+                current_file.close()
+                current_file = None
+                file_idx += 1
+                continue
+
+            if not line.startswith('BEGIN;') and not line.startswith('--'):
+                current_file.write(line)
+
+    if current_file:
+        current_file.write("COMMIT;\n")
+        current_file.close()
+
+    # Remove original large file
     try:
         os.remove(sql_file)
     except OSError:
         pass
+
+    # Add count query to last chunk
+    if chunk_files:
+        with open(chunk_files[-1], 'a') as f:
+            f.write("SELECT COUNT(*) AS total_routes FROM grid_fiber_routes;\n")
+
+    env = os.environ.copy()
+    env['PGPASSWORD'] = os.environ.get('SUPABASE_DB_PASSWORD', '#FsW7iqg%EYX&G3M')
+
+    total_inserted = 0
+    for ci, chunk_file in enumerate(chunk_files):
+        chunk_mb = os.path.getsize(chunk_file) / (1024 * 1024)
+        print(f"  Running chunk {ci + 1}/{len(chunk_files)} ({chunk_mb:.1f} MB)...")
+
+        result = subprocess.run(
+            ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
+             '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
+             '-f', chunk_file],
+            capture_output=True, text=True, env=env, timeout=600
+        )
+
+        if result.returncode != 0:
+            print(f"    psql error: {result.stderr[:500]}")
+        else:
+            lines = result.stdout.strip().split('\n')
+            for line in lines[-3:]:
+                if line.strip():
+                    print(f"    {line.strip()}")
+
+        try:
+            os.remove(chunk_file)
+        except OSError:
+            pass
 
 
 # ── Phase 3: Compute nearest fiber distance ───────────────────
@@ -646,39 +930,23 @@ def compute_fiber_proximity(routes, dry_run=False):
 
 # ── Main ──────────────────────────────────────────────────────
 
-def main():
-    dry_run = '--dry-run' in sys.argv
-    skip_download = '--skip-download' in sys.argv
-    skip_insert = '--skip-insert' in sys.argv
-
-    if dry_run:
-        print("=== DRY RUN -- no changes will be made ===\n")
-
-    print("GridScout: Ingest Fiber Optic Routes from OSM")
-    print("=" * 55)
-
-    # Phase 1: Get fiber routes
-    if skip_download and os.path.exists(CACHE_FILE):
-        routes = load_cached_routes()
-    else:
-        routes = download_fiber_routes()
-
-    if not routes:
-        print("ERROR: No fiber routes found.")
-        return
-
-    # Coverage stats
+def print_coverage_stats(routes, label=""):
     from collections import Counter
     states = Counter(r.get('state') for r in routes if r.get('state'))
     operators = Counter(r.get('operator') for r in routes if r.get('operator'))
+    sources = Counter(r.get('source', 'osm') for r in routes)
     named = sum(1 for r in routes if r.get('name'))
     with_operator = sum(1 for r in routes if r.get('operator'))
 
-    print(f"\n  Coverage summary:")
+    print(f"\n  Coverage summary{' (' + label + ')' if label else ''}:")
     print(f"    Total routes:    {len(routes)}")
     print(f"    Named routes:    {named}")
     print(f"    With operator:   {with_operator}")
     print(f"    States covered:  {len(states)}")
+    if sources:
+        print(f"    By source:")
+        for src, cnt in sources.most_common():
+            print(f"      {src}: {cnt}")
     if states:
         print(f"    Top 10 states:")
         for st, cnt in states.most_common(10):
@@ -688,16 +956,74 @@ def main():
         for op, cnt in operators.most_common(10):
             print(f"      {op}: {cnt}")
 
+
+def main():
+    dry_run = '--dry-run' in sys.argv
+    skip_download = '--skip-download' in sys.argv
+    skip_insert = '--skip-insert' in sys.argv
+    arcgis_only = '--arcgis-only' in sys.argv
+
+    if dry_run:
+        print("=== DRY RUN -- no changes will be made ===\n")
+
+    print("GridScout: Ingest Fiber Optic Routes")
+    print("=" * 55)
+
+    all_routes = []
+
+    # Phase 1a: OSM routes (unless --arcgis-only)
+    if not arcgis_only:
+        if skip_download and os.path.exists(CACHE_FILE):
+            osm_routes = load_cached_routes()
+        else:
+            osm_routes = download_fiber_routes()
+        all_routes.extend(osm_routes)
+        print_coverage_stats(osm_routes, "OSM")
+
+    # Phase 1b: ArcGIS FeatureServer routes
+    if skip_download and os.path.exists(ARCGIS_CACHE_FILE):
+        arcgis_routes = load_cached_arcgis_routes()
+    else:
+        arcgis_routes = download_arcgis_fiber()
+    all_routes.extend(arcgis_routes)
+    print_coverage_stats(arcgis_routes, "ArcGIS")
+
+    if not all_routes:
+        print("ERROR: No fiber routes found.")
+        return
+
+    # Combined stats
+    print_coverage_stats(all_routes, "Combined")
+
     # Phase 2: Store in DB
     if not skip_insert:
         if not dry_run:
             print("\n  Creating table if needed...")
             create_table_if_needed()
-            assign_states_from_db(routes)
-        insert_routes(routes, dry_run=dry_run)
+            # Assign states to OSM routes that don't have them
+            osm_no_state = [r for r in all_routes if r.get('source', 'osm') == 'osm' and not r.get('state')]
+            if osm_no_state:
+                assign_states_from_db(osm_no_state)
+            # Assign states to NTIA/national routes that don't have them
+            national_no_state = [r for r in all_routes if not r.get('state') and r.get('source') != 'osm']
+            if national_no_state:
+                assign_states_from_db(national_no_state)
+        insert_routes(all_routes, dry_run=dry_run)
 
-    # Phase 3: Compute proximity
-    compute_fiber_proximity(routes, dry_run=dry_run)
+    # Phase 3: Compute proximity (need all routes for spatial index)
+    # For ArcGIS routes, convert geometry to coords format for spatial index
+    for route in all_routes:
+        if 'coords' not in route and 'geometry' in route:
+            geom = route['geometry']
+            if geom.get('type') == 'LineString':
+                route['coords'] = geom['coordinates']
+            elif geom.get('type') == 'MultiLineString':
+                # Flatten all segments into one coordinate list for proximity
+                route['coords'] = [c for line in geom['coordinates'] for c in line]
+            else:
+                route['coords'] = []
+
+    compute_fiber_proximity(all_routes, dry_run=dry_run)
 
 
 if __name__ == '__main__':
