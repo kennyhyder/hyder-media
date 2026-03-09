@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       include_ixps,
       include_lines,
       include_substations,
+      include_fiber,
       bounds, // "sw_lat,sw_lng,ne_lat,ne_lng"
       lite, // "1" for minimal columns (faster initial load)
       limit, // max sites to return (default 5000)
@@ -173,6 +174,27 @@ export default async function handler(req, res) {
         .order("voltage_kv", { ascending: false, nullsFirst: true })
         .limit(2000);
       if (!lineErr) result.lines = lines || [];
+    }
+
+    // Optionally include fiber routes
+    if (include_fiber === "true" || include_fiber === "1") {
+      let fiberQuery = supabase
+        .from("grid_fiber_routes")
+        .select("id,name,operator,fiber_type,location_type,geometry_json,state")
+        .not("geometry_json", "is", null);
+
+      if (state) {
+        fiberQuery = fiberQuery.eq("state", state.toUpperCase());
+      }
+
+      if (parsedBounds) {
+        fiberQuery = fiberQuery
+          .gte("centroid_lat", parsedBounds.swLat).lte("centroid_lat", parsedBounds.neLat)
+          .gte("centroid_lng", parsedBounds.swLng).lte("centroid_lng", parsedBounds.neLng);
+      }
+
+      const { data: fiber, error: fiberErr } = await fiberQuery.limit(5000);
+      if (!fiberErr) result.fiber = fiber || [];
     }
 
     // Optionally include substations

@@ -183,7 +183,14 @@ def score_power(site):
 
 
 def score_speed_to_power(site, queue_data):
-    """Speed to energization: ISO queue depth, wait time, congestion."""
+    """Speed to energization: queue depth, wait time, completion rate, trend.
+
+    Updated formula (v2): incorporates LBNL-derived per-state metrics:
+      0.25 * depth_score       — fewer queued projects = faster
+      0.35 * wait_score        — shorter median wait = better
+      0.25 * completion_score  — higher completion rate = more likely to succeed
+      0.15 * trend_score       — improving recent wait vs historical = bonus
+    """
     state = site.get('state', '')
     iso = site.get('iso_region', '')
 
@@ -205,38 +212,73 @@ def score_speed_to_power(site, queue_data):
         queue_depth = best_match.get('total_projects')
         avg_wait = best_match.get('avg_wait_years')
 
-    # Fall back to site's own avg_queue_wait_years (set by enrich-queue-wait-times.py)
+    # Fall back to site-level fields (set by compute-queue-metrics.py)
     if avg_wait is None:
         avg_wait = site.get('avg_queue_wait_years')
+
+    # Get completion rate and recent wait from site-level fields
+    completion_rate = site.get('queue_completion_rate')
+    recent_wait = site.get('recent_queue_wait_years')
 
     # Store queue info on site for patch output
     site['_queue_depth'] = queue_depth
     site['_avg_queue_wait_years'] = avg_wait
 
-    # Queue depth score: fewer projects = faster (0 projects = 100, 30+ = 0)
+    # --- Sub-component 1: Queue depth (25%) ---
+    # Fewer projects = faster (0 projects = 100, 30+ = 0)
     if queue_depth is not None:
         depth_score = linear_score(queue_depth, 0, 30)
     else:
         depth_score = 50
 
-    # Wait time score: shorter wait = better (1 year = 100, 6+ years = 0)
-    # LBNL data: ERCOT ~2.5yr (fast), PJM ~4.5yr (slow), CAISO ~5yr (slowest)
+    # --- Sub-component 2: Wait time (35%) ---
+    # Shorter wait = better (1 year = 100, 6+ years = 0)
     if avg_wait is not None:
         wait_score = linear_score(float(avg_wait), 1.0, 6.0)
     else:
         wait_score = 50
 
-    # Combine: 40% depth + 60% wait time (wait time is more actionable)
-    queue_score = 0.4 * depth_score + 0.6 * wait_score
+    # --- Sub-component 3: Completion rate (25%) ---
+    # Higher rate = more likely project succeeds (>30% = 100, 0% = 0)
+    if completion_rate is not None:
+        # Scale: 30%+ completion rate = 100, 0% = 0
+        completion_score = clamp(float(completion_rate) * 100 / 0.30 * 100 / 100)
+    else:
+        completion_score = 50
+
+    # --- Sub-component 4: Trend (15%) ---
+    # Bonus if recent wait < historical (queue getting faster)
+    # Penalty if recent wait > historical (queue getting slower)
+    if avg_wait is not None and recent_wait is not None and float(avg_wait) > 0:
+        ratio = float(recent_wait) / float(avg_wait)
+        if ratio < 0.8:
+            # Significant improvement: recent 20%+ faster than historical
+            trend_score = 100
+        elif ratio < 1.0:
+            # Moderate improvement
+            trend_score = 70
+        elif ratio < 1.2:
+            # Roughly stable
+            trend_score = 50
+        elif ratio < 1.5:
+            # Getting worse
+            trend_score = 25
+        else:
+            # Much worse
+            trend_score = 0
+    else:
+        trend_score = 50
+
+    # Weighted combination (v2 formula)
+    queue_score = (0.25 * depth_score +
+                   0.35 * wait_score +
+                   0.25 * completion_score +
+                   0.15 * trend_score)
 
     if site.get('brownfield_id'):
         # Brownfield sites get a bonus for existing grid connection, but scale
         # the base queue_score down so the bonus creates differentiation rather
         # than saturating all brownfields at 100.
-        # Base: 60% of queue_score (max 60) + brownfield bonus (10)
-        # + capacity bonus (0-20 based on existing infrastructure size)
-        # + substation proximity bonus (0-10 based on distance)
-        # Result range: ~20 to ~100 depending on queue, capacity, and substation distance
         brownfield_bonus = 10
 
         capacity_bonus = 0
@@ -628,11 +670,10 @@ def main():
                 patch['nearest_dc_name'] = site.get('_nearest_dc_name')
                 patch['nearest_dc_distance_km'] = site.get('_nearest_dc_distance_km')
 
-            # Add queue data from speed_to_power scoring
+            # Add queue depth from speed_to_power scoring (don't overwrite
+            # avg_queue_wait_years — that's set by compute-queue-metrics.py)
             if site.get('_queue_depth') is not None:
                 patch['queue_depth'] = site['_queue_depth']
-            if site.get('_avg_queue_wait_years') is not None:
-                patch['avg_queue_wait_years'] = site['_avg_queue_wait_years']
 
             patches.append(patch)
             scored += 1
@@ -681,42 +722,157 @@ def main():
         print(f"\n[DRY RUN] Would update {len(patches)} sites with scores")
         return
 
-    # Apply patches with concurrent workers for speed
-    print(f"\n  Applying {len(patches)} score patches (20 workers)...")
-    patched = 0
-    patch_errors = 0
+    # Bulk apply via psql temp table (much faster than REST API for 74K+ records)
+    import csv
+    import tempfile
+    import subprocess
 
-    def apply_patch(patch):
-        site_id = patch.pop('id')
-        for attempt in range(3):
-            try:
-                supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
-                return True
-            except Exception:
-                if attempt < 2:
-                    time.sleep(2 ** attempt)
-                    continue
-                raise
+    PSQL_CMD = [
+        'psql',
+        '-h', 'aws-0-us-west-2.pooler.supabase.com',
+        '-p', '6543',
+        '-U', 'postgres.ilbovwnhrowvxjdkvrln',
+        '-d', 'postgres',
+    ]
+    PSQL_ENV = {**os.environ, 'PGPASSWORD': '#FsW7iqg%EYX&G3M'}
 
-    with ThreadPoolExecutor(max_workers=20) as executor:
-        futures = {executor.submit(apply_patch, p): p for p in patches}
-        for i, future in enumerate(as_completed(futures)):
-            try:
-                future.result()
-                patched += 1
-            except Exception as e:
-                patch_errors += 1
-                if patch_errors <= 10:
-                    print(f"  Patch error: {e}")
-            if (i + 1) % 2000 == 0:
-                print(f"  Patched {i + 1}/{len(patches)}...")
+    print(f"\n  Applying {len(patches)} score patches via psql bulk update...")
+
+    # Write patches to temp CSV
+    csv_columns = [
+        'id', 'dc_score',
+        'score_power', 'score_speed_to_power', 'score_fiber',
+        'score_energy_cost', 'score_water', 'score_hazard',
+        'score_buildability', 'score_labor', 'score_existing_dc',
+        'score_land', 'score_construction_cost', 'score_gas_pipeline',
+        'score_tax', 'score_climate',
+        'queue_depth', 'avg_queue_wait_years',
+        'nearest_ixp_id', 'nearest_ixp_name', 'nearest_ixp_distance_km',
+        'nearest_dc_id', 'nearest_dc_name', 'nearest_dc_distance_km',
+    ]
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=csv_columns, extrasaction='ignore')
+        writer.writeheader()
+        for p in patches:
+            # Replace None with empty string for CSV
+            row = {k: ('' if p.get(k) is None else p.get(k)) for k in csv_columns}
+            writer.writerow(row)
+        csv_path = f.name
+
+    # Build SQL: create temp table, COPY from CSV, UPDATE JOIN
+    sql = f"""
+    CREATE TEMP TABLE _score_import (
+        id UUID,
+        dc_score NUMERIC(5,1),
+        score_power NUMERIC(5,1),
+        score_speed_to_power NUMERIC(5,1),
+        score_fiber NUMERIC(5,1),
+        score_energy_cost NUMERIC(5,1),
+        score_water NUMERIC(5,1),
+        score_hazard NUMERIC(5,1),
+        score_buildability NUMERIC(5,1),
+        score_labor NUMERIC(5,1),
+        score_existing_dc NUMERIC(5,1),
+        score_land NUMERIC(5,1),
+        score_construction_cost NUMERIC(5,1),
+        score_gas_pipeline NUMERIC(5,1),
+        score_tax NUMERIC(5,1),
+        score_climate NUMERIC(5,1),
+        queue_depth INTEGER,
+        avg_queue_wait_years NUMERIC(4,1),
+        nearest_ixp_id TEXT,
+        nearest_ixp_name TEXT,
+        nearest_ixp_distance_km NUMERIC(8,2),
+        nearest_dc_id TEXT,
+        nearest_dc_name TEXT,
+        nearest_dc_distance_km NUMERIC(8,2)
+    );
+
+    \\copy _score_import FROM '{csv_path}' WITH (FORMAT csv, HEADER true, NULL '');
+
+    UPDATE grid_dc_sites g SET
+        dc_score = s.dc_score,
+        score_power = s.score_power,
+        score_speed_to_power = s.score_speed_to_power,
+        score_fiber = s.score_fiber,
+        score_energy_cost = s.score_energy_cost,
+        score_water = s.score_water,
+        score_hazard = s.score_hazard,
+        score_buildability = s.score_buildability,
+        score_labor = s.score_labor,
+        score_existing_dc = s.score_existing_dc,
+        score_land = s.score_land,
+        score_construction_cost = s.score_construction_cost,
+        score_gas_pipeline = s.score_gas_pipeline,
+        score_tax = s.score_tax,
+        score_climate = s.score_climate,
+        queue_depth = COALESCE(s.queue_depth, g.queue_depth),
+        avg_queue_wait_years = COALESCE(s.avg_queue_wait_years, g.avg_queue_wait_years),
+        nearest_ixp_id = COALESCE(s.nearest_ixp_id::uuid, g.nearest_ixp_id),
+        nearest_ixp_name = COALESCE(s.nearest_ixp_name, g.nearest_ixp_name),
+        nearest_ixp_distance_km = COALESCE(s.nearest_ixp_distance_km, g.nearest_ixp_distance_km),
+        nearest_dc_id = COALESCE(s.nearest_dc_id::uuid, g.nearest_dc_id),
+        nearest_dc_name = COALESCE(s.nearest_dc_name, g.nearest_dc_name),
+        nearest_dc_distance_km = COALESCE(s.nearest_dc_distance_km, g.nearest_dc_distance_km)
+    FROM _score_import s
+    WHERE g.id = s.id;
+
+    DROP TABLE _score_import;
+    """
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.sql', delete=False) as f:
+        f.write(sql)
+        sql_path = f.name
+
+    try:
+        result = subprocess.run(
+            PSQL_CMD + ['-f', sql_path],
+            env=PSQL_ENV,
+            capture_output=True, text=True, timeout=300
+        )
+        if result.returncode == 0:
+            print(f"  Bulk update successful ({len(patches)} records)")
+        else:
+            print(f"  psql error: {result.stderr[:1000]}")
+            # Fallback to REST API if psql fails
+            print(f"  Falling back to REST API (20 workers)...")
+            patched_rest = 0
+            patch_errors_rest = 0
+
+            def apply_patch(patch):
+                site_id = patch.pop('id')
+                for attempt in range(3):
+                    try:
+                        supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
+                        return True
+                    except Exception:
+                        if attempt < 2:
+                            time.sleep(2 ** attempt)
+                            continue
+                        raise
+
+            with ThreadPoolExecutor(max_workers=20) as executor:
+                futures = {executor.submit(apply_patch, p): p for p in patches}
+                for i, future in enumerate(as_completed(futures)):
+                    try:
+                        future.result()
+                        patched_rest += 1
+                    except Exception as e:
+                        patch_errors_rest += 1
+                        if patch_errors_rest <= 10:
+                            print(f"  Patch error: {e}")
+                    if (i + 1) % 2000 == 0:
+                        print(f"  Patched {i + 1}/{len(patches)}...")
+            print(f"  REST API: {patched_rest} patched, {patch_errors_rest} errors")
+    finally:
+        os.unlink(csv_path)
+        os.unlink(sql_path)
 
     print(f"\n{'=' * 60}")
     print(f"DC Site Scoring Complete")
     print(f"  Sites scored: {scored}")
-    print(f"  Patches applied: {patched}")
     print(f"  Scoring errors: {errors}")
-    print(f"  Patch errors: {patch_errors}")
     print(f"  Score distribution: {score_dist}")
     if all_scores:
         print(f"  Average: {avg:.1f}, Median: {median:.1f}")
