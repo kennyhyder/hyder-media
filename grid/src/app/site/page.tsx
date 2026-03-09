@@ -30,10 +30,19 @@ interface NearbyFacility {
   dc_type?: string;
 }
 
+interface FiberRoute {
+  id: string;
+  geometry_json: unknown;
+  name?: string;
+  operator?: string;
+  fiber_type?: string;
+}
+
 interface SiteDetail {
   site: Record<string, unknown>;
   county: Record<string, unknown> | null;
   nearbyLines: Record<string, unknown>[];
+  nearbyFiber?: FiberRoute[];
   brownfield: Record<string, unknown> | null;
   nearbyFacilities?: NearbyFacility[];
 }
@@ -269,6 +278,7 @@ function SiteDetailContent() {
               type: s.site_type === "brownfield" ? "brownfield" : "site",
             }}
             onLineClick={(id) => { window.location.href = `/grid/line/?id=${id}`; }}
+            fiberRoutes={data.nearbyFiber?.map(f => ({ geometry_json: f.geometry_json, name: f.name, operator: f.operator, fiber_type: f.fiber_type }))}
           />
           </div>
           <p className="text-xs text-gray-400 mt-1">Map pin shows approximate site location. Nearby transmission lines shown in context.</p>

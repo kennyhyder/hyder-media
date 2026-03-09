@@ -23,6 +23,13 @@ interface SiteMarker {
   type?: "site" | "brownfield";
 }
 
+interface FiberRouteGeometry {
+  geometry_json: unknown;
+  name?: string;
+  operator?: string;
+  fiber_type?: string;
+}
+
 interface MapProps {
   lines: LineGeometry[];
   center?: [number, number];
@@ -33,6 +40,7 @@ interface MapProps {
   singleLine?: boolean;
   siteMarker?: SiteMarker;
   boldLines?: boolean;
+  fiberRoutes?: FiberRouteGeometry[];
 }
 
 function parseWKT(wkt: string): [number, number][][] {
@@ -84,6 +92,7 @@ export default function TransmissionMap({
   singleLine = false,
   siteMarker,
   boldLines = false,
+  fiberRoutes,
 }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -208,6 +217,44 @@ export default function TransmissionMap({
         allCoords.push([siteMarker.lat, siteMarker.lng]);
       }
 
+      // Draw fiber routes
+      if (fiberRoutes && fiberRoutes.length > 0) {
+        for (const fiber of fiberRoutes) {
+          if (!fiber.geometry_json) continue;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const geom: any = typeof fiber.geometry_json === "string" ? JSON.parse(fiber.geometry_json as string) : fiber.geometry_json;
+          if (!geom || !geom.coordinates) continue;
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const drawFiber = (coordsRaw: any[]) => {
+            const coords: [number, number][] = coordsRaw.map(c => [c[1], c[0]]);
+            if (coords.length < 2) return;
+            const polyline = L.polyline(coords, {
+              color: "#10b981",
+              weight: 2,
+              opacity: 0.7,
+            });
+            polyline.bindPopup(
+              `<div style="min-width:180px;font-family:system-ui;font-size:13px">
+                <strong style="font-size:14px">${fiber.name || "Fiber Route"}</strong><br/>
+                <span style="color:#10b981;font-weight:600">Fiber Route</span><br/>
+                ${fiber.operator ? `<b>Operator:</b> ${fiber.operator}<br/>` : ""}
+                ${fiber.fiber_type ? `<b>Type:</b> ${fiber.fiber_type}<br/>` : ""}
+              </div>`
+            );
+            polyline.addTo(map);
+          };
+
+          if (geom.type === "LineString") {
+            drawFiber(geom.coordinates);
+          } else if (geom.type === "MultiLineString") {
+            for (const line of geom.coordinates) {
+              drawFiber(line);
+            }
+          }
+        }
+      }
+
       // Fit bounds — for site detail, stay zoomed in on the site marker
       if (allCoords.length > 0) {
         if (siteMarker) {
@@ -238,6 +285,10 @@ export default function TransmissionMap({
             <div style="width:20px;height:2px;background:#6b7280;border-radius:2px"></div>
             <span>Other</span>
           </div>
+          ${fiberRoutes && fiberRoutes.length > 0 ? `<div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+            <div style="width:20px;height:2px;background:#10b981;border-radius:2px"></div>
+            <span>Fiber Route</span>
+          </div>` : ""}
         `;
         return div;
       };
@@ -251,7 +302,7 @@ export default function TransmissionMap({
         leafletMap.current = null;
       }
     };
-  }, [mounted, lines, center, zoom, onLineClick, singleLine, siteMarker, boldLines]);
+  }, [mounted, lines, center, zoom, onLineClick, singleLine, siteMarker, boldLines, fiberRoutes]);
 
   if (!mounted) {
     return (

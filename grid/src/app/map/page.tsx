@@ -56,6 +56,15 @@ interface Substation {
   max_voltage_kv: number | null;
 }
 
+interface FiberRoute {
+  id: string;
+  name?: string;
+  operator?: string;
+  fiber_type?: string;
+  state?: string;
+  geometry_json?: unknown;
+}
+
 interface MapData {
   sites: MapSite[];
   total: number;
@@ -64,6 +73,7 @@ interface MapData {
   ixps?: IXP[];
   lines?: TransmissionLine[];
   substations?: Substation[];
+  fiber?: FiberRoute[];
 }
 
 function scoreColor(score: number): string {
@@ -138,6 +148,8 @@ export default function MapPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const subLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fiberLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LRef = useRef<any>(null);
   const fetchControllerRef = useRef<AbortController | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -162,8 +174,10 @@ export default function MapPage() {
   const [showSites, setShowSites] = useState(true);
   const [showLines, setShowLines] = useState(false);
   const [showSubstations, setShowSubstations] = useState(false);
+  const [showFiber, setShowFiber] = useState(false);
   const [totalLines, setTotalLines] = useState(0);
   const [totalSubstations, setTotalSubstations] = useState(0);
+  const [totalFiber, setTotalFiber] = useState(0);
   const [colorBy, setColorBy] = useState<"score" | "type">("score");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -255,11 +269,12 @@ export default function MapPage() {
       ixpLayerRef.current = L.layerGroup();
       lineLayerRef.current = L.layerGroup();
       subLayerRef.current = L.layerGroup();
+      fiberLayerRef.current = L.layerGroup();
 
       map.addLayer(siteLayerRef.current);
       map.addLayer(dcLayerRef.current);
       map.addLayer(ixpLayerRef.current);
-      // Lines and substations not added by default (toggled on by user)
+      // Lines, substations, and fiber not added by default (toggled on by user)
 
       // Add legend
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -278,6 +293,7 @@ export default function MapPage() {
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:50%;background:#06b6d4;border:2px solid #0891b2"></div> IXP / Interconnect</div>
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:3px;background:#f59e0b"></div> Transmission Line</div>
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:#f59e0b;border:2px solid #d97706;transform:rotate(45deg)"></div> Substation</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:3px;background:#10b981"></div> Fiber Route</div>
           </div>
         `;
         return div;
@@ -322,6 +338,7 @@ export default function MapPage() {
       params.set("include_ixps", "1");
       if (showLines) params.set("include_lines", "1");
       if (showSubstations) params.set("include_substations", "1");
+      if (showFiber) params.set("include_fiber", "1");
       params.set("lite", "1");
 
       // Use viewport bounds for re-fetches (not initial load)
@@ -506,6 +523,50 @@ export default function MapPage() {
         setTotalSubstations(json.substations.length);
       }
 
+      // Update fiber route polylines
+      fiberLayerRef.current.clearLayers();
+      if (json.fiber) {
+        for (const fiber of json.fiber) {
+          if (!fiber.geometry_json) continue;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const geom: any = typeof fiber.geometry_json === "string" ? JSON.parse(fiber.geometry_json) : fiber.geometry_json;
+          if (!geom || !geom.coordinates) continue;
+
+          const drawFiberLine = (coords: [number, number][]) => {
+            if (coords.length < 2) return;
+            const polyline = L.polyline(coords, {
+              color: "#10b981",
+              weight: 2,
+              opacity: 0.7,
+            });
+            polyline.bindPopup(`
+              <div style="min-width:180px;font-family:system-ui;font-size:13px">
+                <strong style="font-size:14px">${escapeHtml(fiber.name) || 'Fiber Route'}</strong><br/>
+                <span style="color:#10b981;font-weight:600">Fiber Route</span><br/>
+                ${fiber.operator ? `<b>Operator:</b> ${escapeHtml(fiber.operator)}<br/>` : ""}
+                ${fiber.fiber_type ? `<b>Type:</b> ${escapeHtml(fiber.fiber_type)}<br/>` : ""}
+                ${fiber.state ? `${escapeHtml(fiber.state)}` : ""}
+              </div>
+            `);
+            fiberLayerRef.current.addLayer(polyline);
+          };
+
+          if (geom.type === "LineString") {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const coords = geom.coordinates.map((c: any) => [c[1], c[0]] as [number, number]);
+            drawFiberLine(coords);
+          } else if (geom.type === "MultiLineString") {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            for (const line of geom.coordinates) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const coords = line.map((c: any) => [c[1], c[0]] as [number, number]);
+              drawFiberLine(coords);
+            }
+          }
+        }
+        setTotalFiber(json.fiber.length);
+      }
+
       setTotalSites(json.total);
       setReturnedSites(json.returned);
       setInitialLoad(false);
@@ -515,14 +576,14 @@ export default function MapPage() {
     } finally {
       setLoading(false);
     }
-  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy, showLines, showSubstations]);
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, colorBy, showLines, showSubstations, showFiber]);
 
   // === Layer Management ===
   // Initial data load
   useEffect(() => {
     if (mapReady) fetchAndRender(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, showLines, showSubstations]);
+  }, [mapReady, filterState, filterType, filterMinScore, filterMaxScore, showLines, showSubstations, showFiber]);
 
   // Re-fetch on viewport change (debounced)
   useEffect(() => {
@@ -588,6 +649,15 @@ export default function MapPage() {
     }
   }, [showSubstations]);
 
+  useEffect(() => {
+    if (!leafletMap.current || !fiberLayerRef.current) return;
+    if (showFiber) {
+      if (!leafletMap.current.hasLayer(fiberLayerRef.current)) leafletMap.current.addLayer(fiberLayerRef.current);
+    } else {
+      leafletMap.current.removeLayer(fiberLayerRef.current);
+    }
+  }, [showFiber]);
+
   // === Filter Controls ===
   // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
   useEffect(() => {
@@ -617,6 +687,7 @@ export default function MapPage() {
                     {" · "}{totalDCs} DCs · {totalIXPs} IXPs
                     {totalLines > 0 && ` · ${totalLines.toLocaleString()} lines`}
                     {totalSubstations > 0 && ` · ${totalSubstations.toLocaleString()} subs`}
+                    {totalFiber > 0 && ` · ${totalFiber.toLocaleString()} fiber`}
                     {returnedSites < totalSites && <span className="text-purple-600"> · zoom in for more</span>}
                   </>
                 )}
@@ -652,6 +723,11 @@ export default function MapPage() {
                     <input type="checkbox" checked={showSubstations} onChange={e => setShowSubstations(e.target.checked)} className="accent-amber-600" />
                     <span className="w-3 h-3 bg-amber-500 inline-block rotate-45"></span>
                     Substations {totalSubstations > 0 && `(${totalSubstations.toLocaleString()})`}
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={showFiber} onChange={e => setShowFiber(e.target.checked)} className="accent-emerald-600" />
+                    <span className="w-3 h-0.5 bg-emerald-500 inline-block"></span>
+                    Fiber Routes {totalFiber > 0 && `(${totalFiber.toLocaleString()})`}
                   </label>
                 </div>
               </div>
