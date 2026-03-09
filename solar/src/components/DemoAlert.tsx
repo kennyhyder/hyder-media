@@ -5,6 +5,8 @@ interface DemoLimits {
   daily_limit: number;
   hourly_remaining: number;
   daily_remaining: number;
+  lifetime_limit?: number | null;
+  lifetime_remaining?: number | null;
 }
 
 interface DemoAlertProps {
@@ -53,6 +55,11 @@ export default function DemoAlert({ error, status, retryAfter, limits, onDismiss
               <span>
                 Daily: {limits.daily_remaining}/{limits.daily_limit} remaining
               </span>
+              {limits.lifetime_limit != null && limits.lifetime_remaining != null && (
+                <span>
+                  Lifetime: {limits.lifetime_remaining}/{limits.lifetime_limit} remaining
+                </span>
+              )}
             </div>
           )}
           <div className="mt-3 flex gap-2">

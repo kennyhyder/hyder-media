@@ -50,6 +50,7 @@ function CompanyContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string; limits?: { hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } } | null>(null);
+  const [demoLimits, setDemoLimits] = useState<{ hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } | null>(null);
 
   // Installations table state
   const [sortKey, setSortKey] = useState<InstSortKey>("date");
@@ -80,6 +81,7 @@ function CompanyContent() {
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setCompany(data.data);
+        if (data.demo_limits) setDemoLimits(data.demo_limits);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -155,7 +157,7 @@ function CompanyContent() {
   if (loading) return <LoadingSpinner text="Loading profile..." />;
   if (demoError) return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       <a href="/solar/directory/" className="text-blue-600 hover:underline text-sm">&larr; Back to directory</a>
       <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} limits={demoError.limits} />
     </div>
@@ -178,7 +180,7 @@ function CompanyContent() {
 
   return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
 
       {/* Breadcrumb */}

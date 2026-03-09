@@ -88,6 +88,8 @@ function EquipmentContent() {
   const [hasModel, setHasModel] = useState(false);
   const [hasLocation, setHasLocation] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [demoLimits, setDemoLimits] = useState<{ hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } | null>(null);
   const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string; limits?: { hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } } | null>(null);
   const isDemo = isDemoMode();
 
@@ -134,6 +136,7 @@ function EquipmentContent() {
         }
         setResults(data.data || []);
         setPagination(data.pagination);
+        if (data.demo_limits) setDemoLimits(data.demo_limits);
       } catch (err) {
         console.error(err);
       } finally {
@@ -142,6 +145,34 @@ function EquipmentContent() {
     },
     [filters, sortKey, sortDir, includeEmpty, hasModel, hasLocation]
   );
+
+  const handleExport = async () => {
+    if (isDemo) {
+      setShowContactModal(true);
+      return;
+    }
+    setExporting(true);
+    const params = new URLSearchParams();
+    if (filters.state) params.set("state", filters.state);
+    if (filters.manufacturer) params.set("module_manufacturer", filters.manufacturer);
+    params.set("include_equipment", "true");
+    params.set("limit", "10000");
+
+    try {
+      const res = await fetch(`${API_BASE}/export?${params}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `solar_equipment_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export failed:", err);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   useEffect(() => {
     search(page);
@@ -168,7 +199,7 @@ function EquipmentContent() {
 
   return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
       <div>
         <h1 className="text-2xl font-bold">Equipment Search</h1>
@@ -265,43 +296,59 @@ function EquipmentContent() {
         </div>
       </form>
 
-      <div className="flex items-center gap-4 flex-wrap">
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={hasModel}
-            onChange={(e) => {
-              setHasModel(e.target.checked);
-              setPage(1);
-            }}
-            className="rounded border-gray-300"
-          />
-          Only show records with model numbers
-        </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={hasLocation}
-            onChange={(e) => {
-              setHasLocation(e.target.checked);
-              setPage(1);
-            }}
-            className="rounded border-gray-300"
-          />
-          Only show sites with coordinates
-        </label>
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={includeEmpty}
-            onChange={(e) => {
-              setIncludeEmpty(e.target.checked);
-              setPage(1);
-            }}
-            className="rounded border-gray-300"
-          />
-          Include records without manufacturer/model
-        </label>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex gap-4 items-center flex-wrap">
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hasModel}
+              onChange={(e) => {
+                setHasModel(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Only show records with model numbers
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={hasLocation}
+              onChange={(e) => {
+                setHasLocation(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Only show sites with coordinates
+          </label>
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={includeEmpty}
+              onChange={(e) => {
+                setIncludeEmpty(e.target.checked);
+                setPage(1);
+              }}
+              className="rounded border-gray-300"
+            />
+            Include records without manufacturer/model
+          </label>
+        </div>
+        <button
+          onClick={handleExport}
+          disabled={exporting || !pagination?.total}
+          className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          {isDemo ? (
+            <span className="flex items-center gap-1">
+              <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              Export CSV
+            </span>
+          ) : (
+            exporting ? "Exporting..." : `Export CSV${pagination?.total ? ` (${Math.min(pagination.total, 10000).toLocaleString()})` : ""}`
+          )}
+        </button>
       </div>
 
       {demoError && (

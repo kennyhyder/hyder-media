@@ -52,6 +52,7 @@ function SiteContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [demoError, setDemoError] = useState<{ error: string; status: number; retryAfter?: string; limits?: { hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } } | null>(null);
+  const [demoLimits, setDemoLimits] = useState<{ hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } | null>(null);
   const isDemo = isDemoMode();
 
   useEffect(() => {
@@ -66,7 +67,10 @@ function SiteContent() {
         }
         return res.json();
       })
-      .then((data) => setSite(data.data))
+      .then((data) => {
+        setSite(data.data);
+        if (data.demo_limits) setDemoLimits(data.demo_limits);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
@@ -75,7 +79,7 @@ function SiteContent() {
   if (loading) return <LoadingSpinner text="Loading site details..." />;
   if (demoError) return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">&larr; Back to installations</a>
       <DemoAlert error={demoError.error} status={demoError.status} retryAfter={demoError.retryAfter} limits={demoError.limits} />
     </div>
@@ -89,7 +93,7 @@ function SiteContent() {
 
   return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       <div>
         <a href="/solar/search/" className="text-blue-600 hover:underline text-sm">
           &larr; Back to installations

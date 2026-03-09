@@ -62,6 +62,7 @@ function SearchContent() {
   const [loading, setLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [demoLimits, setDemoLimits] = useState<{ hourly_limit: number; daily_limit: number; hourly_remaining: number; daily_remaining: number } | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [filters, setFilters] = useState({
     state: searchParams.get("state") || "",
@@ -131,6 +132,7 @@ function SearchContent() {
       }
       setResults(data.data || []);
       setPagination(data.pagination);
+      if (data.demo_limits) setDemoLimits(data.demo_limits);
     } catch (err) {
       console.error(err);
     } finally {
@@ -211,7 +213,7 @@ function SearchContent() {
 
   return (
     <div className="space-y-6">
-      <DemoBanner />
+      <DemoBanner limits={demoLimits} />
       {showContactModal && <DemoContactModal onClose={() => setShowContactModal(false)} />}
       <div>
         <h1 className="text-2xl font-bold">Installations</h1>
