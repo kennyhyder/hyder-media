@@ -307,19 +307,178 @@ function BrownfieldDetailContent() {
           </div>
         )}
 
+        {/* Power section */}
+        {dc && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Power</h2>
+            {dc.nearest_substation_name && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Nearest Substation</span>
+                <a href={`/grid/search/?q=${encodeURIComponent(String(dc.nearest_substation_name))}`}
+                  className="text-sm font-medium text-purple-600 hover:underline">
+                  {String(dc.nearest_substation_name)}
+                </a>
+              </div>
+            )}
+            {infoRow("Distance", dc.nearest_substation_distance_km != null ? `${(Number(dc.nearest_substation_distance_km) * 0.621371).toFixed(1)} mi` : null)}
+            {infoRow("Voltage", dc.substation_voltage_kv ? `${dc.substation_voltage_kv} kV` : bf.grid_connection_voltage_kv ? `${bf.grid_connection_voltage_kv} kV` : null)}
+            {infoRow("Former Capacity", bf.existing_capacity_mw ? `${bf.existing_capacity_mw} MW` : null)}
+            {infoRow("Available Capacity", dc.available_capacity_mw ? `${dc.available_capacity_mw} MW` : null)}
+            {infoRow("Queue Depth", dc.queue_depth)}
+            {infoRow("Avg Queue Wait", dc.avg_queue_wait_years ? `${dc.avg_queue_wait_years} years` : null)}
+          </div>
+        )}
+
+        {/* Connectivity section */}
+        {dc && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Connectivity</h2>
+            {dc.nearest_ixp_name && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Nearest IXP</span>
+                <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(String(dc.nearest_ixp_name))}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-sm font-medium text-purple-600 hover:underline">
+                  {String(dc.nearest_ixp_name)} &#8599;
+                </a>
+              </div>
+            )}
+            {infoRow("IXP Distance", dc.nearest_ixp_distance_km != null ? `${(Number(dc.nearest_ixp_distance_km) * 0.621371).toFixed(1)} mi` : null)}
+            {dc.nearest_dc_name && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Nearest Datacenter</span>
+                <a href={`https://www.google.com/maps/search/${encodeURIComponent(String(dc.nearest_dc_name) + ' datacenter')}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-sm font-medium text-purple-600 hover:underline">
+                  {String(dc.nearest_dc_name)} &#8599;
+                </a>
+              </div>
+            )}
+            {infoRow("DC Distance", dc.nearest_dc_distance_km != null ? `${(Number(dc.nearest_dc_distance_km) * 0.621371).toFixed(1)} mi` : null)}
+            {dc.fcc_fiber_pct != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Fiber Coverage</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {Number(dc.fcc_fiber_pct).toFixed(1)}%
+                  {bf.latitude && bf.longitude && (
+                    <a href={`https://broadbandmap.fcc.gov/location-summary/fixed?speed=1000&latlon=${bf.latitude},${bf.longitude}&zoom=14`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="text-purple-600 hover:underline ml-1 text-xs">(FCC BDC &#8599;)</a>
+                  )}
+                </span>
+              </div>
+            )}
+            {dc.nearest_fiber_km != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+                <span className="text-xs text-gray-500">Nearest Fiber Route</span>
+                <span className="text-sm font-medium text-gray-900">{(Number(dc.nearest_fiber_km) * 0.621371).toFixed(1)} mi</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Site Characteristics section */}
+        {dc && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Site Characteristics</h2>
+            {dc.energy_price_mwh != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Energy Price</span>
+                <span className="text-sm font-medium text-gray-900">
+                  ${Number(dc.energy_price_mwh).toFixed(2)}/MWh
+                  {dc.energy_price_source && (
+                    <a href={`https://www.eia.gov/electricity/state/${String(bf.state || "").toLowerCase()}/`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="text-purple-600 hover:underline ml-1 text-xs">({String(dc.energy_price_source)} &#8599;)</a>
+                  )}
+                </span>
+              </div>
+            )}
+            {dc.construction_cost_index != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Construction Cost Index</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {Number(dc.construction_cost_index).toFixed(1)} <span className="text-xs text-gray-400">(avg = 100, RSMeans)</span>
+                </span>
+              </div>
+            )}
+            {infoRow("Gas Pipeline Distance", dc.nearest_gas_pipeline_km != null ? `${(Number(dc.nearest_gas_pipeline_km) * 0.621371).toFixed(1)} mi` : null)}
+            {infoRow("Land Cover", dc.nlcd_class)}
+            {dc.nlcd_code && infoRow("NLCD Code", dc.nlcd_code)}
+            {infoRow("Buildability Score", dc.buildability_score != null ? `${Number(dc.buildability_score).toFixed(1)} / 100` : null)}
+          </div>
+        )}
+
         {/* County Risk Profile */}
         {county && (
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-3">County Risk Profile</h2>
             {infoRow("County", county.county_name)}
-            {infoRow("NRI Score", county.nri_score)}
-            {infoRow("NRI Rating", county.nri_rating)}
-            {infoRow("Water Stress", county.water_stress_label)}
-            {infoRow("Cooling Degree Days", county.cooling_degree_days)}
-            {infoRow("Has Fiber", county.has_fiber ? "Yes" : "No")}
-            {infoRow("Fiber Providers", county.fiber_provider_count)}
-            {infoRow("DC Tax Incentive", county.has_dc_tax_incentive ? "Yes" : "No")}
-            {county.dc_incentive_type && infoRow("Incentive Type", county.dc_incentive_type)}
+            {county.nri_score != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">NRI Score / Rating</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.nri_score)}{county.nri_rating ? ` (${county.nri_rating})` : ""}
+                  <a href={`https://hazards.fema.gov/nri/map#checks=true&layers=false&stateZoom=${String(bf.state || "").toLowerCase()}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="text-purple-600 hover:underline ml-1 text-xs">(FEMA NRI &#8599;)</a>
+                </span>
+              </div>
+            )}
+            {county.water_stress_label && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Water Stress</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.water_stress_label)}
+                  {bf.latitude && bf.longitude && (
+                    <a href={`https://www.wri.org/applications/aqueduct/water-risk-atlas/#/?basemap=hydro&indicator=w_awr_def_tot_cat&lat=${bf.latitude}&lng=${bf.longitude}&zoom=10`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="text-purple-600 hover:underline ml-1 text-xs">(WRI Aqueduct &#8599;)</a>
+                  )}
+                </span>
+              </div>
+            )}
+            {county.cooling_degree_days != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Cooling Degree Days</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {String(county.cooling_degree_days)}
+                  <span className="text-xs text-gray-400 ml-1">(NOAA)</span>
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between py-1.5 border-b border-gray-100">
+              <span className="text-xs text-gray-500">Fiber Infrastructure</span>
+              <span className="text-sm font-medium text-gray-900">
+                {county.has_fiber ? (
+                  <span className="text-green-600">
+                    {county.fiber_provider_count ? `${county.fiber_provider_count} providers` : "Available"}
+                  </span>
+                ) : (
+                  <span className="text-red-500">No fiber</span>
+                )}
+              </span>
+            </div>
+            {county.avg_land_value_per_acre_usd && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Land Value</span>
+                <span className="text-sm font-medium text-gray-900">
+                  ${Number(county.avg_land_value_per_acre_usd).toLocaleString()}/acre
+                  <span className="text-xs text-gray-400 ml-1">(USDA)</span>
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+              <span className="text-xs text-gray-500">DC Tax Incentive</span>
+              <span className="text-sm font-medium text-gray-900">
+                {county.has_dc_tax_incentive ? (
+                  <>
+                    <span className="text-green-600">Yes</span>
+                    {county.dc_incentive_type && <span className="text-gray-500 text-xs ml-1">({String(county.dc_incentive_type)})</span>}
+                  </>
+                ) : "No"}
+              </span>
+            </div>
           </div>
         )}
 
@@ -336,40 +495,203 @@ function BrownfieldDetailContent() {
           {infoRow("Grid Voltage", bf.grid_connection_voltage_kv ? `${bf.grid_connection_voltage_kv} kV` : null)}
           {infoRow("EIA Plant ID", bf.eia_plant_id)}
           {infoRow("EPA ID", bf.epa_id)}
+          {String(bf.operator_name || "") && (
+            <div className="mt-3 pt-3 border-t border-amber-200">
+              <h3 className="text-sm font-medium text-amber-700 mb-2">Operator Contact</h3>
+              {infoRow("Operator", bf.operator_name)}
+              {infoRow("Address", bf.operator_address)}
+            </div>
+          )}
         </div>
 
         {/* External Resources */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">External Resources</h2>
-          <div className="space-y-2">
-            {bf.eia_plant_id && (
-              <a
-                href={`https://www.eia.gov/electricity/data/browser/#/plant/${bf.eia_plant_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> EIA Plant Profile
-              </a>
-            )}
-            {bf.epa_id && (
-              <a
-                href={`https://enviro.epa.gov/enviro/fii_query_dtl.disp_program_facility?p_registry_id=${bf.epa_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> EPA Facility Report
-              </a>
-            )}
+          <div className="space-y-4">
+            {/* Location & Imagery */}
             {bf.latitude && bf.longitude && (
-              <a
-                href={`https://www.google.com/maps/@${bf.latitude},${bf.longitude},15z/data=!3m1!1e1`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-purple-600 hover:underline"
-              >
-                <span>&#8599;</span> Google Maps Satellite View
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Location &amp; Imagery</div>
+                <div className="space-y-1.5">
+                  <a href={`https://www.google.com/maps/@${bf.latitude},${bf.longitude},500m/data=!3m1!1e3`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> Google Maps Satellite View
+                  </a>
+                  <a href={`https://earth.google.com/web/@${bf.latitude},${bf.longitude},0a,1000d,35y,0h,0t,0r`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> Google Earth 3D View
+                  </a>
+                  {bf.county && bf.state && (
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(`${bf.county} County ${bf.state} GIS parcel map`)}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> {String(bf.county)} County GIS / Parcel Map
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Grid & Power */}
+            <div>
+              <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Grid &amp; Power</div>
+              <div className="space-y-1.5">
+                {bf.eia_plant_id && (
+                  <a href={`https://www.eia.gov/electricity/data/browser/#/plant/${bf.eia_plant_id}`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> EIA Plant Profile
+                  </a>
+                )}
+                {dc && dc.iso_region && (
+                  <a href={
+                    dc.iso_region === "ERCOT" ? "https://www.ercot.com/gridinfo/resource" :
+                    dc.iso_region === "CAISO" ? "https://www.caiso.com/planning/Pages/GeneratorInterconnection/Default.aspx" :
+                    dc.iso_region === "PJM" ? "https://www.pjm.com/planning/services-requests/interconnection-queues" :
+                    dc.iso_region === "MISO" ? "https://www.misoenergy.org/planning/generator-interconnection/GI_Queue/" :
+                    dc.iso_region === "SPP" ? "https://opsportal.spp.org/Studies/GIActive" :
+                    dc.iso_region === "NYISO" ? "https://www.nyiso.com/interconnections" :
+                    dc.iso_region === "ISO-NE" ? "https://www.iso-ne.com/system-planning/interconnection-service/interconnection-request-queue/" :
+                    "#"
+                  } target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> {String(dc.iso_region)} Interconnection Queue
+                  </a>
+                )}
+                {bf.state && (
+                  <a href={`/grid/lines/?state=${bf.state}`}
+                    className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> All Transmission Lines in {String(bf.state)}
+                  </a>
+                )}
+                {bf.state && (
+                  <a href={`https://www.eia.gov/electricity/state/${String(bf.state).toLowerCase()}/`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> EIA State Electricity Profile — {String(bf.state)}
+                  </a>
+                )}
+                <a href="https://hifld-geoplatform.opendata.arcgis.com/datasets/electric-substations"
+                  target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                  <span>&#8599;</span> HIFLD Substation Database
+                </a>
+              </div>
+            </div>
+
+            {/* Risk & Environment */}
+            {bf.latitude && bf.longitude && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Risk &amp; Environment</div>
+                <div className="space-y-1.5">
+                  <a href={`https://msc.fema.gov/portal/search?AddressQuery=${bf.latitude}%2C${bf.longitude}#searchresultsanchor`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> FEMA Flood Map{dc && dc.flood_zone ? ` (Zone ${dc.flood_zone})` : ""}
+                  </a>
+                  {bf.epa_id && (
+                    <a href={`https://enviro.epa.gov/enviro/fii_query_dtl.disp_program_facility?p_registry_id=${bf.epa_id}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> EPA Facility Report
+                    </a>
+                  )}
+                  <a href={`https://ejscreen.epa.gov/mapper/mobile/?latitude=${bf.latitude}&longitude=${bf.longitude}&zoomLevel=14`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> EPA EJScreen Environmental Justice
+                  </a>
+                  <a href={`https://hazards.fema.gov/nri/map#checks=true&layers=false&stateZoom=${String(bf.state || "").toLowerCase()}`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> FEMA National Risk Index — {String(bf.state)}
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Connectivity */}
+            {dc && (dc.nearest_ixp_name || dc.fcc_fiber_providers) && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Connectivity</div>
+                <div className="space-y-1.5">
+                  {dc.nearest_ixp_name && (
+                    <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(String(dc.nearest_ixp_name))}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> PeeringDB: {String(dc.nearest_ixp_name)}
+                    </a>
+                  )}
+                  {bf.latitude && bf.longitude && (
+                    <a href={`https://broadbandmap.fcc.gov/location-summary/fixed?speed=1000&latlon=${bf.latitude},${bf.longitude}&zoom=14`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> FCC Broadband Map{dc.fcc_fiber_providers ? ` (${dc.fcc_fiber_providers} fiber providers)` : ""}
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Incentives & Policy */}
+            {bf.state && (
+              <div>
+                <div className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Incentives &amp; Policy</div>
+                <div className="space-y-1.5">
+                  <a href={`https://programs.dsireusa.org/system/program?state=${String(bf.state)}&technology=105&sector=3`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> DSIRE Incentives — {String(bf.state)}
+                  </a>
+                  <a href={`https://www.google.com/search?q=${encodeURIComponent(`${bf.state} datacenter tax incentive abatement`)}`}
+                    target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                    <span>&#8599;</span> {String(bf.state)} DC Tax Incentive Programs
+                  </a>
+                  {bf.county && (
+                    <a href={`https://selectusa.gov/programs-incentives?state=${encodeURIComponent(String(bf.state))}`}
+                      target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                      <span>&#8599;</span> SelectUSA — {String(bf.state)} Programs &amp; Incentives
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Land Acquisition */}
+      <div className="bg-white rounded-lg border border-purple-200 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Land Acquisition</h2>
+        <p className="text-xs text-gray-500 mb-4">Property ownership and land availability information for this brownfield site.</p>
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Brownfield Redevelopment</span>
+          </div>
+          <p className="text-sm text-gray-700 mb-3">
+            This is a retired power plant site with existing grid infrastructure. Brownfield redevelopment typically involves
+            working with the property owner (often the former utility) and the state environmental agency for any required cleanup.
+          </p>
+          {bf.operator_name ? (
+            <div className="mb-3">
+              <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Property Owner / Former Operator</div>
+              <div className="text-sm font-medium text-gray-900">{String(bf.operator_name)}</div>
+              {bf.operator_address ? (
+                <div className="text-xs text-gray-600">{String(bf.operator_address)}</div>
+              ) : null}
+            </div>
+          ) : null}
+          {dc && dc.parcel_owner && (
+            <div className="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+              <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">Tax Parcel Owner (County Records)</div>
+              <div className="text-sm font-semibold text-gray-900">{String(dc.parcel_owner)}</div>
+              {dc.parcel_apn && <div className="text-xs text-gray-500 mt-0.5">Parcel #: {String(dc.parcel_apn)}</div>}
+              {dc.parcel_address && <div className="text-xs text-gray-600 mt-0.5">{String(dc.parcel_address)}</div>}
+            </div>
+          )}
+          <div className="space-y-2">
+            <a href="https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+              <span>&#8599;</span> EPA State Brownfield Programs Directory
+            </a>
+            {bf.state && (
+              <a href={`https://www.google.com/search?q=${encodeURIComponent(`${bf.state} brownfield voluntary cleanup program`)}`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> {String(bf.state)} Brownfield Program
+              </a>
+            )}
+            {bf.county && bf.state && (
+              <a href={`https://www.loopnet.com/search/land/${encodeURIComponent(String(bf.county).toLowerCase().replace(/\s+/g, '-'))}-county-${encodeURIComponent(String(bf.state).toLowerCase().replace(/\s+/g, '-'))}/for-sale/`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
+                <span>&#8599;</span> LoopNet — {String(bf.county)} County Land for Sale
               </a>
             )}
           </div>
