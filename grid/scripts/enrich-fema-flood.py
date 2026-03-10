@@ -32,7 +32,7 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 BATCH_SIZE = 50
 
-FEMA_URL = "https://hazards.fema.gov/gis/nfhl/rest/services/public/NFHL/MapServer/28/query"
+FEMA_URL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query"
 
 
 def supabase_request(method, path, data=None, headers_extra=None):

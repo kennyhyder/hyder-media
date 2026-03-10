@@ -100,7 +100,7 @@ def main():
     offset = 0
     while True:
         batch = supabase_request('GET',
-            f'grid_ixp_facilities?select=id,peeringdb_id,name,sales_email&limit=1000&offset={offset}')
+            f'grid_ixp_facilities?select=id,peeringdb_id,name,sales_email,sales_phone,tech_email,tech_phone,website,address,zipcode&limit=1000&offset={offset}')
         if not batch:
             break
         ixps.extend(batch)
@@ -113,6 +113,7 @@ def main():
     print("\nEnriching IXP facilities...")
     ixp_patched = 0
     ixp_skipped = 0
+    field_counts = {'sales_email': 0, 'sales_phone': 0, 'tech_email': 0, 'tech_phone': 0, 'website': 0, 'address': 0, 'zipcode': 0}
     for ixp in ixps:
         pdb_id = ixp.get('peeringdb_id')
         if not pdb_id or pdb_id not in pdb_by_id:
@@ -122,21 +123,23 @@ def main():
         pdb = pdb_by_id[pdb_id]
         patch = {}
 
-        # Only patch fields that have data and aren't already set
+        # Only patch fields that have PeeringDB data AND aren't already set in DB
         if pdb.get('sales_email') and not ixp.get('sales_email'):
             patch['sales_email'] = pdb['sales_email'].strip()
-        if pdb.get('sales_phone'):
+        if pdb.get('sales_phone') and not ixp.get('sales_phone'):
             patch['sales_phone'] = pdb['sales_phone'].strip()
-        if pdb.get('tech_email'):
+        if pdb.get('tech_email') and not ixp.get('tech_email'):
             patch['tech_email'] = pdb['tech_email'].strip()
-        if pdb.get('tech_phone'):
+        if pdb.get('tech_phone') and not ixp.get('tech_phone'):
             patch['tech_phone'] = pdb['tech_phone'].strip()
-        if pdb.get('address1'):
+        if pdb.get('website') and not ixp.get('website'):
+            patch['website'] = pdb['website'].strip()
+        if pdb.get('address1') and not ixp.get('address'):
             addr = pdb['address1'].strip()
             if pdb.get('address2'):
                 addr += ', ' + pdb['address2'].strip()
             patch['address'] = addr
-        if pdb.get('zipcode'):
+        if pdb.get('zipcode') and not ixp.get('zipcode'):
             patch['zipcode'] = pdb['zipcode'].strip()
 
         if not patch:
@@ -151,9 +154,15 @@ def main():
                 print(f"  Error patching IXP {ixp['id']}: {e}")
                 continue
 
+        for field in patch:
+            field_counts[field] = field_counts.get(field, 0) + 1
         ixp_patched += 1
 
     print(f"  Patched: {ixp_patched}, Skipped: {ixp_skipped}")
+    print(f"  Field fills:")
+    for field, count in sorted(field_counts.items(), key=lambda x: -x[1]):
+        if count > 0:
+            print(f"    {field}: {count}")
 
     # Step 4: Cross-reference PeeringDB against grid_datacenters
     print("\nLoading grid_datacenters for cross-reference...")
