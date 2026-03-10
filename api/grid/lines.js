@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     if (max_capacity && (isNaN(parseFloat(max_capacity)) || parseFloat(max_capacity) < 0))
       return res.status(400).json({ error: "max_capacity must be a non-negative number" });
 
-    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), with_geometry === "true" ? 500 : 200);
+    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), with_geometry === "true" ? 2500 : 200);
     const offsetNum = Math.max(parseInt(offset) || 0, 0);
 
     // Include geometry_wkt only when explicitly requested (for map rendering)
