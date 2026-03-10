@@ -306,7 +306,7 @@ def score_speed_to_power(site, queue_data):
 
 
 def score_fiber(site, ixp_index, ixp_cell_size, county_data):
-    """Fiber connectivity: IXP distance + county fiber presence."""
+    """Fiber connectivity: IXP distance + fiber route proximity + county fiber coverage."""
     lat, lng = site['latitude'], site['longitude']
 
     # Find nearest IXP
@@ -321,28 +321,42 @@ def score_fiber(site, ixp_index, ixp_cell_size, county_data):
         site['_nearest_ixp_name'] = nearest_ixp.get('name')
         site['_nearest_ixp_distance_km'] = ixp_dist
 
-    # Fiber availability: prefer site-level FCC BDC data, fall back to county
+    # Fiber route proximity (from nearest_fiber_km — actual fiber route distance)
+    fiber_route_km = site.get('nearest_fiber_km')
+    if fiber_route_km is not None:
+        # 0 km = 100, 25 km = 50, 100 km = 0
+        fiber_route_score = linear_score(float(fiber_route_km), 0, 100)
+    else:
+        fiber_route_score = None  # No data — will be excluded from weighting
+
+    # Fiber coverage: prefer site-level FCC BDC data, fall back to county
     fcc_pct = site.get('fcc_fiber_pct')
     fcc_providers = site.get('fcc_fiber_providers') or 0
 
     if fcc_pct is not None:
         # FCC BDC: 0% fiber = 10, 100% fiber = 100
-        fiber_score = clamp(10 + float(fcc_pct) * 0.9)
+        coverage_score = clamp(10 + float(fcc_pct) * 0.9)
         # Bonus for multiple providers (redundancy)
-        fiber_score = clamp(fiber_score + min(10, fcc_providers * 2))
+        coverage_score = clamp(coverage_score + min(10, fcc_providers * 2))
     else:
         # Fall back to county-level fiber
         fips = site.get('fips_code')
         county = county_data.get(fips, {})
         has_fiber = county.get('has_fiber')
         fiber_providers = county.get('fiber_provider_count') or 0
-        fiber_score = 30
+        coverage_score = 30
         if has_fiber:
-            fiber_score = min(100, 60 + fiber_providers * 4)
+            coverage_score = min(100, 60 + fiber_providers * 4)
         elif has_fiber is False:
-            fiber_score = 20
+            coverage_score = 20
 
-    return clamp(ixp_score * 0.6 + fiber_score * 0.4)
+    # Weighted combination — use fiber route proximity when available
+    if fiber_route_score is not None:
+        # IXP 25% + fiber route proximity 45% + FCC coverage 30%
+        return clamp(ixp_score * 0.25 + fiber_route_score * 0.45 + coverage_score * 0.30)
+    else:
+        # No fiber route data — fall back to IXP + coverage only
+        return clamp(ixp_score * 0.55 + coverage_score * 0.45)
 
 
 def score_water(site, county_data):
