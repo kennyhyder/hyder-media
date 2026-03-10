@@ -144,36 +144,40 @@ export default async function handler(req, res) {
       brownfield = bf;
     }
 
-    // Get nearby IXPs and DCs with contact info (within ~50km)
+    // Get nearby IXPs and DCs with contact info — expand radius until results found
     let nearbyFacilities = [];
     if (site.latitude && site.longitude) {
-      const latDelta = 50 / 69.0;
-      const lngDelta = 50 / (69.0 * Math.cos((site.latitude * Math.PI) / 180));
+      const radii = [50, 100, 200]; // miles
+      for (const radius of radii) {
+        const latDelta = radius / 69.0;
+        const lngDelta = radius / (69.0 * Math.cos((site.latitude * Math.PI) / 180));
 
-      const { data: ixps, error: ixpErr } = await supabase
-        .from("grid_ixp_facilities")
-        .select("id,name,org_name,city,state,latitude,longitude,ix_count,network_count,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
-        .gte("latitude", site.latitude - latDelta)
-        .lte("latitude", site.latitude + latDelta)
-        .gte("longitude", site.longitude - lngDelta)
-        .lte("longitude", site.longitude + lngDelta)
-        .limit(20);
-      if (ixpErr) return res.status(500).json({ error: ixpErr.message });
+        const { data: ixps, error: ixpErr } = await supabase
+          .from("grid_ixp_facilities")
+          .select("id,name,org_name,city,state,latitude,longitude,ix_count,network_count,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
+          .gte("latitude", site.latitude - latDelta)
+          .lte("latitude", site.latitude + latDelta)
+          .gte("longitude", site.longitude - lngDelta)
+          .lte("longitude", site.longitude + lngDelta)
+          .limit(20);
+        if (ixpErr) return res.status(500).json({ error: ixpErr.message });
 
-      const { data: dcs, error: dcErr } = await supabase
-        .from("grid_datacenters")
-        .select("id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
-        .gte("latitude", site.latitude - latDelta)
-        .lte("latitude", site.latitude + latDelta)
-        .gte("longitude", site.longitude - lngDelta)
-        .lte("longitude", site.longitude + lngDelta)
-        .limit(20);
-      if (dcErr) return res.status(500).json({ error: dcErr.message });
+        const { data: dcs, error: dcErr } = await supabase
+          .from("grid_datacenters")
+          .select("id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
+          .gte("latitude", site.latitude - latDelta)
+          .lte("latitude", site.latitude + latDelta)
+          .gte("longitude", site.longitude - lngDelta)
+          .lte("longitude", site.longitude + lngDelta)
+          .limit(20);
+        if (dcErr) return res.status(500).json({ error: dcErr.message });
 
-      nearbyFacilities = [
-        ...(ixps || []).map(f => ({ ...f, facility_type: "ixp" })),
-        ...(dcs || []).map(f => ({ ...f, facility_type: "datacenter" })),
-      ];
+        nearbyFacilities = [
+          ...(ixps || []).map(f => ({ ...f, facility_type: "ixp" })),
+          ...(dcs || []).map(f => ({ ...f, facility_type: "datacenter" })),
+        ];
+        if (nearbyFacilities.length > 0) break;
+      }
     }
 
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");

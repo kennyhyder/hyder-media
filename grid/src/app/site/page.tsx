@@ -30,6 +30,14 @@ interface NearbyFacility {
   dc_type?: string;
 }
 
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3959;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 interface FiberRoute {
   id: string;
   geometry_json: unknown;
@@ -959,13 +967,17 @@ function SiteDetailContent() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Facility</th>
                   <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Distance</th>
                   <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Location</th>
                   <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
                   <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Website</th>
                 </tr>
               </thead>
               <tbody>
-                {(data.nearbyFacilities as NearbyFacility[]).map((f) => (
+                {(data.nearbyFacilities as NearbyFacility[])
+                  .map((f) => ({ ...f, _dist: haversine(Number(s.latitude), Number(s.longitude), f.latitude, f.longitude) }))
+                  .sort((a, b) => a._dist - b._dist)
+                  .map((f) => (
                   <tr key={f.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 px-3">
                       <div className="font-medium text-gray-900 text-xs">
@@ -997,6 +1009,9 @@ function SiteDetailContent() {
                       }`}>
                         {f.facility_type === "ixp" ? "IXP" : "DC"}
                       </span>
+                    </td>
+                    <td className="py-2 px-3 text-xs text-right text-gray-600 font-medium">
+                      {f._dist.toFixed(0)} mi
                     </td>
                     <td className="py-2 px-3 text-xs text-gray-600">
                       {f.city && `${f.city}, `}{f.state}
