@@ -71,12 +71,49 @@ export default async function handler(req, res) {
       if (!lineErr) nearbyLines = lines || [];
     }
 
+    // Get nearby IXPs and DCs — expand radius until results found
+    let nearbyFacilities = [];
+    if (brownfield.latitude && brownfield.longitude) {
+      const radii = [50, 100, 200];
+      for (const radius of radii) {
+        const latDelta = radius / 69.0;
+        const lngDelta = radius / (69.0 * Math.cos((brownfield.latitude * Math.PI) / 180));
+
+        const { data: ixps, error: ixpErr } = await supabase
+          .from("grid_ixp_facilities")
+          .select("id,name,org_name,city,state,latitude,longitude,ix_count,network_count,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
+          .gte("latitude", brownfield.latitude - latDelta)
+          .lte("latitude", brownfield.latitude + latDelta)
+          .gte("longitude", brownfield.longitude - lngDelta)
+          .lte("longitude", brownfield.longitude + lngDelta)
+          .limit(20);
+        if (ixpErr) return res.status(500).json({ error: ixpErr.message });
+
+        const { data: dcs, error: dcErr } = await supabase
+          .from("grid_datacenters")
+          .select("id,name,operator,city,state,latitude,longitude,capacity_mw,sqft,dc_type,year_built,website,sales_email,sales_phone,tech_email,tech_phone,address,zipcode")
+          .gte("latitude", brownfield.latitude - latDelta)
+          .lte("latitude", brownfield.latitude + latDelta)
+          .gte("longitude", brownfield.longitude - lngDelta)
+          .lte("longitude", brownfield.longitude + lngDelta)
+          .limit(20);
+        if (dcErr) return res.status(500).json({ error: dcErr.message });
+
+        nearbyFacilities = [
+          ...(ixps || []).map(f => ({ ...f, facility_type: "ixp" })),
+          ...(dcs || []).map(f => ({ ...f, facility_type: "datacenter" })),
+        ];
+        if (nearbyFacilities.length > 0) break;
+      }
+    }
+
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
     return res.status(200).json({
       brownfield,
       dcSite,
       county,
       nearbyLines,
+      nearbyFacilities,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

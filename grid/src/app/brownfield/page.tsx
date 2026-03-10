@@ -6,11 +6,42 @@ import dynamic from "next/dynamic";
 
 const TransmissionMap = dynamic(() => import("../../components/TransmissionMap"), { ssr: false });
 
+interface NearbyFacility {
+  id: string;
+  name: string;
+  facility_type: "ixp" | "datacenter";
+  org_name?: string;
+  operator?: string;
+  city?: string;
+  state?: string;
+  latitude: number;
+  longitude: number;
+  website?: string;
+  sales_email?: string;
+  sales_phone?: string;
+  tech_email?: string;
+  tech_phone?: string;
+  ix_count?: number;
+  network_count?: number;
+  capacity_mw?: number;
+  sqft?: number;
+  dc_type?: string;
+}
+
 interface BrownfieldDetail {
   brownfield: Record<string, unknown>;
   dcSite: Record<string, unknown> | null;
   county: Record<string, unknown> | null;
   nearbyLines: Record<string, unknown>[];
+  nearbyFacilities?: NearbyFacility[];
+}
+
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3959;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function scoreBar(label: string, value: number, weight: string) {
@@ -344,6 +375,84 @@ function BrownfieldDetailContent() {
           </div>
         </div>
       </div>
+
+      {/* Nearby Facilities */}
+      {data.nearbyFacilities && data.nearbyFacilities.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Nearby Facilities</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Facility</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Distance</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Website</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(data.nearbyFacilities as NearbyFacility[])
+                  .map((f) => ({ ...f, _dist: haversine(Number(bf.latitude), Number(bf.longitude), f.latitude, f.longitude) }))
+                  .sort((a, b) => a._dist - b._dist)
+                  .map((f) => (
+                  <tr key={f.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-2 px-3">
+                      <div className="font-medium text-gray-900 text-xs">
+                        {f.facility_type === "ixp" ? (
+                          <a href={`https://www.peeringdb.com/search?q=${encodeURIComponent(f.name)}`}
+                            target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                            {f.name} &#8599;
+                          </a>
+                        ) : f.website ? (
+                          <a href={f.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                            {f.name} &#8599;
+                          </a>
+                        ) : (
+                          f.name
+                        )}
+                      </div>
+                      {f.operator && f.operator !== f.name && (
+                        <div className="text-xs text-gray-500">{f.operator}</div>
+                      )}
+                    </td>
+                    <td className="py-2 px-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        f.facility_type === "ixp" ? "bg-cyan-100 text-cyan-700" : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {f.facility_type === "ixp" ? "IXP" : "DC"}
+                      </span>
+                    </td>
+                    <td className="py-2 px-3 text-xs text-right text-gray-600 font-medium">
+                      {f._dist.toFixed(0)} mi
+                    </td>
+                    <td className="py-2 px-3 text-xs text-gray-600">
+                      {f.city && `${f.city}, `}{f.state}
+                    </td>
+                    <td className="py-2 px-3 text-xs">
+                      {f.sales_email ? (
+                        <a href={`mailto:${f.sales_email}`} className="text-purple-600 hover:underline block">{f.sales_email}</a>
+                      ) : f.sales_phone ? (
+                        <a href={`tel:${f.sales_phone}`} className="text-gray-600 block">{f.sales_phone}</a>
+                      ) : f.tech_email ? (
+                        <a href={`mailto:${f.tech_email}`} className="text-purple-600 hover:underline block">{f.tech_email}</a>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-3 text-xs">
+                      {f.website ? (
+                        <a href={f.website} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">Visit</a>
+                      ) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Nearby transmission lines */}
       {data.nearbyLines.length > 0 && (
