@@ -160,9 +160,9 @@ export default function TransmissionMap({
         const polylines = parseWKT(line.geometry_wkt);
         if (polylines.length === 0) continue;
 
-        const color = line.upgrade_candidate ? "#a855f7" : boldLines ? "#3b82f6" : "#6b7280";
-        const weight = line.upgrade_candidate ? (boldLines ? 4 : 3) : (boldLines ? 2.5 : 1.5);
-        const opacity = line.upgrade_candidate ? 0.9 : (boldLines ? 0.8 : 0.5);
+        const color = line.upgrade_candidate ? "#f59e0b" : "#3b82f6";
+        const weight = line.upgrade_candidate ? (boldLines ? 5 : 4) : (boldLines ? 3.5 : 3);
+        const opacity = line.upgrade_candidate ? 1.0 : (boldLines ? 0.9 : 0.8);
 
         for (const coords of polylines) {
           allCoords.push(...coords);
@@ -231,8 +231,8 @@ export default function TransmissionMap({
             if (coords.length < 2) return;
             const polyline = L.polyline(coords, {
               color: "#10b981",
-              weight: 2,
-              opacity: 0.7,
+              weight: 3,
+              opacity: 0.9,
             });
             polyline.bindPopup(
               `<div style="min-width:180px;font-family:system-ui;font-size:13px">
@@ -276,17 +276,17 @@ export default function TransmissionMap({
         const div = L.DomUtil.create("div", "");
         div.style.cssText = "background:rgba(0,0,0,0.8);padding:8px 12px;border-radius:6px;font-size:11px;color:#fff;font-family:system-ui";
         div.innerHTML = `
-          <div style="margin-bottom:4px;font-weight:600">Line Capacity</div>
+          <div style="margin-bottom:4px;font-weight:600">Infrastructure</div>
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-            <div style="width:20px;height:3px;background:#a855f7;border-radius:2px"></div>
-            <span>Upgrade (50-100 MW)</span>
+            <div style="width:20px;height:4px;background:#f59e0b;border-radius:2px"></div>
+            <span>Upgrade Candidate</span>
           </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:20px;height:2px;background:#6b7280;border-radius:2px"></div>
-            <span>Other</span>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <div style="width:20px;height:3px;background:#3b82f6;border-radius:2px"></div>
+            <span>Transmission Line</span>
           </div>
-          ${fiberRoutes && fiberRoutes.length > 0 ? `<div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-            <div style="width:20px;height:2px;background:#10b981;border-radius:2px"></div>
+          ${fiberRoutes && fiberRoutes.length > 0 ? `<div style="display:flex;align-items:center;gap:6px">
+            <div style="width:20px;height:3px;background:#10b981;border-radius:2px"></div>
             <span>Fiber Route</span>
           </div>` : ""}
         `;

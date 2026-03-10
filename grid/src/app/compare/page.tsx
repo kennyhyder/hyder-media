@@ -9,15 +9,19 @@ interface SiteData {
 }
 
 const SCORE_FACTORS = [
-  { key: "score_power", label: "Power Availability", weight: "25%" },
-  { key: "score_speed_to_power", label: "Speed to Power", weight: "20%" },
-  { key: "score_fiber", label: "Fiber Connectivity", weight: "15%" },
-  { key: "score_water", label: "Water Risk", weight: "10%" },
-  { key: "score_hazard", label: "Natural Hazard", weight: "10%" },
-  { key: "score_labor", label: "Labor Market", weight: "5%" },
-  { key: "score_existing_dc", label: "DC Cluster", weight: "5%" },
-  { key: "score_land", label: "Land / Acreage", weight: "5%" },
-  { key: "score_tax", label: "Tax Incentive", weight: "3%" },
+  { key: "score_power", label: "Power Availability", weight: "20%" },
+  { key: "score_speed_to_power", label: "Speed to Power", weight: "15%" },
+  { key: "score_fiber", label: "Fiber Connectivity", weight: "12%" },
+  { key: "score_energy_cost", label: "Energy Cost", weight: "10%" },
+  { key: "score_water", label: "Water Risk", weight: "8%" },
+  { key: "score_hazard", label: "Natural Hazard", weight: "8%" },
+  { key: "score_buildability", label: "Buildability", weight: "7%" },
+  { key: "score_labor", label: "Labor Market", weight: "4%" },
+  { key: "score_existing_dc", label: "DC Cluster", weight: "4%" },
+  { key: "score_land", label: "Land / Acreage", weight: "3%" },
+  { key: "score_construction_cost", label: "Construction Cost", weight: "3%" },
+  { key: "score_gas_pipeline", label: "Gas Pipeline", weight: "2%" },
+  { key: "score_tax", label: "Tax Incentive", weight: "2%" },
   { key: "score_climate", label: "Climate / Cooling", weight: "2%" },
 ];
 
@@ -338,6 +342,10 @@ function CompareContent() {
                 { label: "DC Distance", fn: (s: Record<string, number | string | null>) => kmToMi(s.nearest_dc_distance_km) },
                 { label: "ISO Region", fn: (s: Record<string, number | string | null>) => String(s.iso_region || "—") },
                 { label: "Queue Depth", fn: (s: Record<string, number | string | null>) => s.queue_depth != null ? String(s.queue_depth) : "—" },
+                { label: "Energy Price", fn: (s: Record<string, number | string | null>) => s.energy_price_mwh ? `$${Number(s.energy_price_mwh).toFixed(2)}/MWh` : "—" },
+                { label: "Buildability", fn: (s: Record<string, number | string | null>) => s.buildability_score != null ? `${Number(s.buildability_score).toFixed(0)}/100` : "—" },
+                { label: "Flood Zone", fn: (s: Record<string, number | string | null>) => s.flood_zone ? `${s.flood_zone}${s.flood_zone_sfha ? " (SFHA)" : ""}` : "—" },
+                { label: "Gas Pipeline", fn: (s: Record<string, number | string | null>) => s.nearest_gas_pipeline_km != null ? `${(Number(s.nearest_gas_pipeline_km) * 0.621371).toFixed(1)} mi` : "> 50 mi" },
                 { label: "Acreage", fn: (s: Record<string, number | string | null>) => s.acreage ? String(s.acreage) : "—" },
               ].map((row) => (
                 <tr key={row.label} className="border-b border-gray-100">

@@ -372,15 +372,25 @@ def score_water(site, county_data):
 
 
 def score_hazard(site, county_data):
-    """Natural hazard risk: FEMA NRI composite (lower risk = higher score)."""
+    """Natural hazard risk: FEMA NRI composite (lower risk = higher score) + flood zone penalty."""
     fips = site.get('fips_code')
     county = county_data.get(fips, {})
     nri = county.get('nri_score')
 
     if nri is not None:
         # Low risk (0) = 100, Very high risk (100) = 0
-        return clamp(100 - float(nri))
-    return 50
+        base = 100 - float(nri)
+    else:
+        base = 50
+
+    # Flood zone penalty: SFHA or high-risk flood zones are dangerous for DCs
+    HIGH_RISK_ZONES = {'A', 'AE', 'AH', 'AO', 'V', 'VE'}
+    flood_sfha = site.get('flood_zone_sfha')
+    flood_zone = site.get('flood_zone')
+    if flood_sfha is True or (flood_zone and str(flood_zone).upper() in HIGH_RISK_ZONES):
+        base -= 15
+
+    return clamp(base)
 
 
 def score_labor(site, county_data, percentiles):

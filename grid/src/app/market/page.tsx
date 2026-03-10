@@ -172,27 +172,60 @@ export default function MarketPage() {
         </div>
       </div>
 
+      {/* Score distribution */}
+      {stats.scoreDistribution && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Score Distribution</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Distribution of DC Readiness Scores across all {fmt(Object.values(stats.scoreDistribution).reduce((a, b) => a + b, 0))} evaluated sites.
+          </p>
+          <div className="flex items-end gap-1 h-32">
+            {Object.entries(stats.scoreDistribution).sort(([a], [b]) => Number(a) - Number(b)).map(([bucket, count]) => {
+              const maxCount = Math.max(...Object.values(stats.scoreDistribution));
+              const pct = (count / maxCount) * 100;
+              const score = Number(bucket);
+              const color = score >= 70 ? "bg-green-400" : score >= 50 ? "bg-yellow-400" : score >= 30 ? "bg-orange-400" : "bg-red-400";
+              return (
+                <div key={bucket} className="flex-1 flex flex-col items-center gap-1" title={`${bucket}: ${fmt(count)} sites`}>
+                  <div className={`w-full ${color} rounded-t`} style={{ height: `${pct}%`, minHeight: count > 0 ? "2px" : "0" }} />
+                  <span className="text-[9px] text-gray-400">{bucket}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <span>Avg: {stats.scoreStats.average.toFixed(1)}</span>
+            <span>Median: {stats.scoreStats.median.toFixed(1)}</span>
+            <span>Range: {stats.scoreStats.min.toFixed(0)}–{stats.scoreStats.max.toFixed(0)}</span>
+          </div>
+        </div>
+      )}
+
       {/* Score methodology */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Scoring Methodology</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Each candidate site receives a DC Readiness Score (0-100) based on 10 weighted factors:
+          Each candidate site receives a DC Readiness Score (0-100) based on 14 weighted factors:
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
-            { factor: "Power Availability", weight: "30%", desc: "Substation distance, voltage, available capacity" },
-            { factor: "Speed to Power", weight: "20%", desc: "ISO queue depth, brownfield grid bonus, existing capacity" },
-            { factor: "Fiber Connectivity", weight: "18%", desc: "IXP distance, county-level fiber presence" },
-            { factor: "Natural Hazard", weight: "7%", desc: "FEMA NRI composite risk score" },
-            { factor: "Existing DC Cluster", weight: "7%", desc: "Distance to nearest operational datacenter" },
-            { factor: "Land / Acreage", weight: "5%", desc: "Available acreage and site type (brownfield bonus)" },
-            { factor: "Labor Market", weight: "5%", desc: "Construction + IT employment per capita" },
-            { factor: "Water Risk", weight: "3%", desc: "WRI Aqueduct water stress score" },
-            { factor: "Tax Incentive", weight: "3%", desc: "State datacenter tax incentive programs" },
-            { factor: "Climate / Cooling", weight: "2%", desc: "NOAA cooling degree days (lower = better)" },
+            { factor: "Power Availability", weight: "20%", desc: "Substation distance, voltage, available capacity" },
+            { factor: "Speed to Power", weight: "15%", desc: "ISO queue depth, brownfield grid bonus, existing capacity" },
+            { factor: "Fiber Connectivity", weight: "12%", desc: "IXP distance, fiber route proximity, county fiber providers" },
+            { factor: "Energy Cost", weight: "10%", desc: "EIA state-level commercial electricity price ($/MWh)" },
+            { factor: "Water Risk", weight: "8%", desc: "WRI Aqueduct water stress score" },
+            { factor: "Natural Hazard", weight: "8%", desc: "FEMA NRI composite risk + flood zone SFHA penalty" },
+            { factor: "Buildability", weight: "7%", desc: "NLCD land cover suitability + flood zone constraints" },
+            { factor: "Labor Market", weight: "4%", desc: "Construction + IT employment per capita (BLS QCEW)" },
+            { factor: "DC Cluster", weight: "4%", desc: "Proximity to existing operational datacenters" },
+            { factor: "Land / Acreage", weight: "3%", desc: "Available acreage and site type (brownfield bonus)" },
+            { factor: "Construction Cost", weight: "3%", desc: "RSMeans regional construction cost index" },
+            { factor: "Gas Pipeline", weight: "2%", desc: "Distance to nearest natural gas pipeline (backup power)" },
+            { factor: "Tax Incentive", weight: "2%", desc: "State datacenter-specific tax incentive programs" },
+            { factor: "Climate / Cooling", weight: "2%", desc: "NOAA cooling degree days (lower CDD = cheaper cooling)" },
           ].map((f) => (
             <div key={f.factor} className="flex gap-3 p-3 bg-gray-50 rounded">
-              <span className="text-xs font-bold text-purple-600 w-8">{f.weight}</span>
+              <span className="text-xs font-bold text-purple-600 w-8 shrink-0">{f.weight}</span>
               <div>
                 <div className="text-sm font-medium text-gray-900">{f.factor}</div>
                 <div className="text-xs text-gray-500">{f.desc}</div>

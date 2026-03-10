@@ -34,6 +34,8 @@ interface DCSite {
   nearest_gas_pipeline_km: number;
   nlcd_class: string;
   fcc_fiber_pct: number;
+  flood_zone: string;
+  flood_zone_sfha: boolean;
 }
 
 const STATES = [
@@ -121,6 +123,7 @@ function DCSitesContent() {
   const [typeFilter, setTypeFilter] = useState(searchParams.get("type") || "");
   const [minScore, setMinScore] = useState(searchParams.get("min_score") || "");
   const [isoFilter, setIsoFilter] = useState(searchParams.get("iso_region") || "");
+  const [floodFilter, setFloodFilter] = useState(searchParams.get("flood") || "");
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState("dc_score");
   const [sortOrder, setSortOrder] = useState("desc");
@@ -135,6 +138,7 @@ function DCSitesContent() {
     if (typeFilter) params.set("site_type", typeFilter);
     if (minScore) params.set("min_score", minScore);
     if (isoFilter) params.set("iso_region", isoFilter);
+    if (floodFilter) params.set("flood", floodFilter);
     if (search) params.set("search", search);
     params.set("sort", sortBy);
     params.set("order", sortOrder);
@@ -330,8 +334,19 @@ function DCSitesContent() {
             <option value="SERC">SERC</option>
             <option value="WECC">WECC</option>
           </select>
+          <select
+            value={floodFilter}
+            onChange={(e) => { setFloodFilter(e.target.value); setPage(0); }}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            aria-label="Filter by flood zone"
+          >
+            <option value="">Flood Zone</option>
+            <option value="no_sfha">No SFHA</option>
+            <option value="sfha">In SFHA</option>
+            <option value="X">Zone X (Low Risk)</option>
+          </select>
           <button
-            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setIsoFilter(""); setPage(0); }}
+            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setIsoFilter(""); setFloodFilter(""); setPage(0); }}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg"
           >
             Clear
@@ -357,6 +372,7 @@ function DCSitesContent() {
                   { key: "nearest_dc_distance_km", label: "DC Dist" },
                   { key: "energy_price_mwh", label: "$/MWh" },
                   { key: "buildability_score", label: "Build" },
+                  { key: "flood_zone", label: "Flood" },
                   { key: "iso_region", label: "ISO" },
                 ].map((col) => (
                   <th
@@ -374,9 +390,9 @@ function DCSitesContent() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={12} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={13} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
-                <tr><td colSpan={12} className="py-12 text-center">
+                <tr><td colSpan={13} className="py-12 text-center">
                   <p className="text-gray-400 mb-2">No DC sites found matching your filters.</p>
                   <p className="text-gray-400 text-xs">Try broadening your search, adjusting the min score, or clearing filters.</p>
                 </td></tr>
@@ -444,6 +460,13 @@ function DCSitesContent() {
                       {site.buildability_score != null
                         ? Number(site.buildability_score).toFixed(0)
                         : "—"}
+                    </td>
+                    <td className="py-2 px-3 text-xs">
+                      {site.flood_zone ? (
+                        <span className={site.flood_zone_sfha ? "text-red-600 font-medium" : "text-gray-500"}>
+                          {site.flood_zone}{site.flood_zone_sfha ? " !" : ""}
+                        </span>
+                      ) : "—"}
                     </td>
                     <td className="py-2 px-3 text-gray-500 text-xs">
                       {site.iso_region || "—"}

@@ -26,6 +26,7 @@ export default async function handler(req, res) {
       max_score,
       min_capacity,
       iso_region,
+      flood,
       search,
       near_lat,
       near_lng,
@@ -71,7 +72,8 @@ export default async function handler(req, res) {
       "score_energy_cost", "score_gas_pipeline", "score_buildability", "score_construction_cost",
       "iso_region", "acreage",
       "energy_price_mwh", "buildability_score", "construction_cost_index",
-      "nearest_gas_pipeline_km", "nlcd_class", "fcc_fiber_pct"
+      "nearest_gas_pipeline_km", "nlcd_class", "fcc_fiber_pct",
+      "flood_zone", "flood_zone_sfha"
     ].join(",");
 
     let query = supabase
@@ -84,6 +86,9 @@ export default async function handler(req, res) {
     if (max_score) query = query.lte("dc_score", parseFloat(max_score));
     if (min_capacity) query = query.gte("available_capacity_mw", parseFloat(min_capacity));
     if (iso_region) query = query.eq("iso_region", iso_region);
+    if (flood === "no_sfha") query = query.or("flood_zone_sfha.is.null,flood_zone_sfha.eq.false");
+    if (flood === "sfha") query = query.eq("flood_zone_sfha", true);
+    if (flood === "X") query = query.eq("flood_zone", "X");
     if (search) {
       const safe = sanitizeSearch(search);
       query = query.or(
