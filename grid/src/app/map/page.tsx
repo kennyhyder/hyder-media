@@ -88,6 +88,7 @@ function siteTypeColor(type: string): string {
     case "substation": return "#7c3aed";
     case "brownfield": return "#d97706";
     case "greenfield": return "#059669";
+    case "warehouse": return "#ea580c";
     default: return "#6b7280";
   }
 }
@@ -97,6 +98,7 @@ function siteTypeLabel(type: string): string {
     case "substation": return "Substation Site";
     case "brownfield": return "Retired Power Plant";
     case "greenfield": return "Greenfield Corridor";
+    case "warehouse": return "Warehouse / Industrial";
     default: return type;
   }
 }
@@ -183,7 +185,7 @@ export default function MapPage() {
 
   // Score distribution
   const [scoreDistribution, setScoreDistribution] = useState({ excellent: 0, good: 0, fair: 0, poor: 0 });
-  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0 });
+  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0, warehouse: 0 });
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -365,7 +367,7 @@ export default function MapPage() {
       // Update site markers
       siteLayerRef.current.clearLayers();
       let excellent = 0, good = 0, fair = 0, poor = 0;
-      let sub = 0, bf = 0, gf = 0;
+      let sub = 0, bf = 0, gf = 0, wh = 0;
 
       for (const site of json.sites) {
         if (!site.latitude || !site.longitude) continue;
@@ -379,6 +381,7 @@ export default function MapPage() {
         if (site.site_type === "substation") sub++;
         else if (site.site_type === "brownfield") bf++;
         else if (site.site_type === "greenfield") gf++;
+        else if (site.site_type === "warehouse") wh++;
 
         const color = colorBy === "score"
           ? scoreColor(score)
@@ -410,7 +413,7 @@ export default function MapPage() {
       }
 
       setScoreDistribution({ excellent, good, fair, poor });
-      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf });
+      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf, warehouse: wh });
 
       // Update DC markers
       dcLayerRef.current.clearLayers();
@@ -848,6 +851,7 @@ export default function MapPage() {
                       { type: "substation", label: "Substation Sites", color: "#7c3aed", count: typeBreakdown.substation },
                       { type: "greenfield", label: "Greenfield Corridors", color: "#059669", count: typeBreakdown.greenfield },
                       { type: "brownfield", label: "Retired Power Plants", color: "#d97706", count: typeBreakdown.brownfield },
+                      { type: "warehouse", label: "Warehouse / Industrial", color: "#ea580c", count: typeBreakdown.warehouse || 0 },
                     ].map(t => (
                       <div key={t.type} className="flex items-center gap-2 text-xs">
                         <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>

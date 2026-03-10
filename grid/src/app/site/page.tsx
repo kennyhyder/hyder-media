@@ -311,6 +311,10 @@ function SiteDetailContent() {
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
               s.site_type === "brownfield"
                 ? "bg-amber-100 text-amber-700"
+                : s.site_type === "warehouse"
+                ? "bg-orange-100 text-orange-700"
+                : s.site_type === "greenfield"
+                ? "bg-green-100 text-green-700"
                 : "bg-blue-100 text-blue-700"
             }`}>
               {String(s.site_type)}
@@ -629,6 +633,92 @@ function SiteDetailContent() {
                 ) : "No"}
               </span>
             </div>
+
+            {/* USGS Water Availability */}
+            {county.total_water_mgd != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Water Withdrawal</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {Number(county.total_water_mgd).toLocaleString(undefined, {maximumFractionDigits: 0})} Mgal/day
+                  <span className="text-xs text-gray-400 ml-1">(USGS 2015)</span>
+                </span>
+              </div>
+            )}
+
+            {/* Rail proximity */}
+            {s.nearest_rail_km != null && (
+              <div className="flex justify-between py-1.5 border-b border-gray-100">
+                <span className="text-xs text-gray-500">Nearest Rail</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {(Number(s.nearest_rail_km) * 0.621371).toFixed(1)} mi
+                  <span className="text-xs text-gray-400 ml-1">(FRA)</span>
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Environmental Constraints */}
+        {(s.critical_habitat != null || s.wetland_present != null || s.superfund_nearby != null) && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Environmental Constraints</h2>
+            <div className="divide-y divide-gray-100">
+              {s.critical_habitat != null && (
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">Critical Habitat (USFWS)</span>
+                  <span className={`text-sm font-medium ${s.critical_habitat ? 'text-red-600' : 'text-green-600'}`}>
+                    {s.critical_habitat ? (
+                      <>
+                        Present
+                        {s.critical_habitat_species && (
+                          <span className="text-xs text-red-400 ml-1">({String(s.critical_habitat_species)})</span>
+                        )}
+                      </>
+                    ) : 'Clear'}
+                  </span>
+                </div>
+              )}
+              {s.wetland_present != null && (
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">Wetlands (NWI)</span>
+                  <span className={`text-sm font-medium ${s.wetland_present ? 'text-amber-600' : 'text-green-600'}`}>
+                    {s.wetland_present ? (
+                      <>
+                        Present
+                        {s.wetland_type && <span className="text-xs text-amber-400 ml-1">({String(s.wetland_type)})</span>}
+                      </>
+                    ) : 'Clear'}
+                  </span>
+                </div>
+              )}
+              {s.superfund_nearby != null && (
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">Superfund Site (EPA)</span>
+                  <span className={`text-sm font-medium ${s.superfund_nearby ? 'text-red-600' : 'text-green-600'}`}>
+                    {s.superfund_nearby ? (
+                      <>
+                        Nearby
+                        {s.superfund_site_name && <span className="text-xs text-red-400 ml-1">({String(s.superfund_site_name)})</span>}
+                      </>
+                    ) : 'Clear'}
+                  </span>
+                </div>
+              )}
+              {s.flood_zone && (
+                <div className="flex justify-between py-2">
+                  <span className="text-sm text-gray-600">FEMA Flood Zone</span>
+                  <span className={`text-sm font-medium ${
+                    ['A', 'AE', 'AH', 'AO', 'V', 'VE'].includes(String(s.flood_zone)) ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    Zone {String(s.flood_zone)}
+                    {s.flood_zone_sfha && <span className="text-xs text-red-400 ml-1">(SFHA)</span>}
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              Environmental flags may require additional permitting: Section 7 (ESA) for critical habitat, Section 404 (CWA) for wetlands, CERCLA for superfund sites.
+            </p>
           </div>
         )}
 

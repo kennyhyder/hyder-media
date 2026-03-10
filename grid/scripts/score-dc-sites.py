@@ -372,7 +372,7 @@ def score_water(site, county_data):
 
 
 def score_hazard(site, county_data):
-    """Natural hazard risk: FEMA NRI composite (lower risk = higher score) + flood zone penalty."""
+    """Natural hazard risk: FEMA NRI composite (lower risk = higher score) + flood zone + environmental constraints."""
     fips = site.get('fips_code')
     county = county_data.get(fips, {})
     nri = county.get('nri_score')
@@ -389,6 +389,14 @@ def score_hazard(site, county_data):
     flood_zone = site.get('flood_zone')
     if flood_sfha is True or (flood_zone and str(flood_zone).upper() in HIGH_RISK_ZONES):
         base -= 15
+
+    # Environmental constraint penalties
+    if site.get('critical_habitat') is True:
+        base -= 20  # Critical habitat = major permitting risk
+    if site.get('wetland_present') is True:
+        base -= 10  # Wetlands = Section 404 permit required
+    if site.get('superfund_nearby') is True:
+        base -= 10  # Superfund = contamination risk
 
     return clamp(base)
 
@@ -463,8 +471,8 @@ def score_land(site, county_data):
     if acreage is not None:
         acreage_score = clamp(linear_score(float(acreage), 100, 0))
 
-    # Type bonus: brownfield = 80 (pre-cleared), substation = 50 (may need land acquisition)
-    type_score = 80 if site_type == 'brownfield' else 50
+    # Type bonus: warehouse = 90 (existing building), brownfield = 80 (pre-cleared), substation = 50 (may need land acquisition)
+    type_score = 90 if site_type == 'warehouse' else 80 if site_type == 'brownfield' else 50
 
     # Land cost: cheaper land = better ($/acre: $500=100, $15000=0)
     land_value = county.get('avg_land_value_per_acre_usd')
@@ -526,7 +534,9 @@ def score_buildability(site):
         return clamp(float(bs))
     # Fallback heuristic for sites without NLCD data
     site_type = site.get('site_type', '')
-    if site_type == 'brownfield':
+    if site_type == 'warehouse':
+        return 85  # Existing building, ready for conversion
+    elif site_type == 'brownfield':
         return 75  # Previously developed land
     elif site_type == 'substation':
         return 60  # Near existing infrastructure

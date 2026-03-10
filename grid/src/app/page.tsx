@@ -321,6 +321,8 @@ export default function DashboardPage() {
                         ? "bg-amber-100 text-amber-700"
                         : site.site_type === "greenfield"
                         ? "bg-emerald-100 text-emerald-700"
+                        : site.site_type === "warehouse"
+                        ? "bg-orange-100 text-orange-700"
                         : "bg-blue-100 text-blue-700"
                     }`}>
                       {site.site_type}
