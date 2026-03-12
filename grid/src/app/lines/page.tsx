@@ -170,7 +170,7 @@ export default function SearchPage() {
     const baseUrl = window.location.origin;
     const params = new URLSearchParams();
     params.set("with_geometry", "true");
-    params.set("limit", "500");
+    params.set("limit", "2500");
 
     if (state) params.set("state", state);
     const vr = VOLTAGE_RANGES[voltageRange];
@@ -349,7 +349,7 @@ export default function SearchPage() {
             />
           )}
           <p className="text-xs text-gray-400 mt-1">
-            Showing up to 500 lines matching current filters. Purple = upgrade candidates (50-100 MW). Blue = other lines.
+            Showing up to 2,500 lines matching current filters. Purple = upgrade candidates (50-100 MW). Blue = other lines.
           </p>
         </div>
       )}

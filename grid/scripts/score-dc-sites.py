@@ -9,6 +9,14 @@ Phase 3b of the GridScout DC plan. Weighted formula (14 factors):
            + 0.03*land + 0.03*construction_cost + 0.02*gas_pipeline
            + 0.02*tax + 0.02*climate
 
+v4 scoring improvements (enrichment data integration):
+  - water: +nearest_water_system_km (EPA proximity)
+  - energy_cost: blends utility_rate_commercial + iso_lmp_avg + state retail
+  - fiber: prefers nearest_fiber_route_km (OSM) over nearest_fiber_km (FCC)
+  - existing_dc: +cloud region proximity bonus (Epoch AI)
+  - land: +industrial/commercial zone bonus (OSM landuse)
+  - speed_to_power: +FERC 714 load growth factor
+
 Each sub-score is 0-100. Higher = better for DC development.
 
 Target: grid_dc_sites (updates dc_score + 14 sub-scores)
@@ -182,14 +190,15 @@ def score_power(site):
     return clamp(dist_score * 0.4 + voltage_score * 0.35 + capacity_score * 0.25)
 
 
-def score_speed_to_power(site, queue_data):
-    """Speed to energization: queue depth, wait time, completion rate, trend.
+def score_speed_to_power(site, queue_data, county_data):
+    """Speed to energization: queue depth, wait time, completion rate, trend, load growth.
 
-    Updated formula (v2): incorporates LBNL-derived per-state metrics:
-      0.25 * depth_score       — fewer queued projects = faster
-      0.35 * wait_score        — shorter median wait = better
-      0.25 * completion_score  — higher completion rate = more likely to succeed
+    v4: incorporates LBNL-derived per-state metrics + FERC 714 load growth:
+      0.20 * depth_score       — fewer queued projects = faster
+      0.30 * wait_score        — shorter median wait = better
+      0.20 * completion_score  — higher completion rate = more likely to succeed
       0.15 * trend_score       — improving recent wait vs historical = bonus
+      0.15 * load_growth_score — growing demand = more investment in grid
     """
     state = site.get('state', '')
     iso = site.get('iso_region', '')
@@ -269,11 +278,23 @@ def score_speed_to_power(site, queue_data):
     else:
         trend_score = 50
 
-    # Weighted combination (v2 formula)
-    queue_score = (0.25 * depth_score +
-                   0.35 * wait_score +
-                   0.25 * completion_score +
-                   0.15 * trend_score)
+    # --- Sub-component 5: Load growth (15%) ---
+    # Higher demand growth = more grid investment = faster energization
+    fips = site.get('fips_code')
+    county = county_data.get(fips, {})
+    load_growth = county.get('ferc714_load_growth_pct')
+    if load_growth is not None:
+        # High growth (5%+) = 100, negative growth = 0
+        load_growth_score = clamp(linear_score(float(load_growth), 5.0, -2.0))
+    else:
+        load_growth_score = 50
+
+    # Weighted combination (v4 formula)
+    queue_score = (0.20 * depth_score +
+                   0.30 * wait_score +
+                   0.20 * completion_score +
+                   0.15 * trend_score +
+                   0.15 * load_growth_score)
 
     if site.get('brownfield_id'):
         # Brownfield sites get a bonus for existing grid connection, but scale
@@ -321,8 +342,10 @@ def score_fiber(site, ixp_index, ixp_cell_size, county_data):
         site['_nearest_ixp_name'] = nearest_ixp.get('name')
         site['_nearest_ixp_distance_km'] = ixp_dist
 
-    # Fiber route proximity (from nearest_fiber_km — actual fiber route distance)
-    fiber_route_km = site.get('nearest_fiber_km')
+    # Fiber route proximity — use best available data
+    # nearest_fiber_route_km: OSM fiber optic routes (56.9% coverage, more accurate)
+    # nearest_fiber_km: FCC broadband data (98.8% coverage, county-level)
+    fiber_route_km = site.get('nearest_fiber_route_km') or site.get('nearest_fiber_km')
     if fiber_route_km is not None:
         # 0 km = 100, 25 km = 50, 100 km = 0
         fiber_route_score = linear_score(float(fiber_route_km), 0, 100)
@@ -360,15 +383,29 @@ def score_fiber(site, ixp_index, ixp_cell_size, county_data):
 
 
 def score_water(site, county_data):
-    """Water availability: WRI stress score (0=low stress=good, 5=extreme=bad)."""
+    """Water availability: WRI stress + nearest water system proximity.
+
+    v4: Added nearest_water_system_km from EPA Envirofacts enrichment.
+    Closer to community water system = easier water supply for cooling.
+    """
     fips = site.get('fips_code')
     county = county_data.get(fips, {})
     stress = county.get('water_stress_score')
 
+    # County-level WRI stress: Low (0) = 100, Extreme (5) = 0
     if stress is not None:
-        # Low stress (0) = 100, Extreme stress (5) = 0
-        return clamp(linear_score(float(stress), 0, 5))
-    return 50
+        stress_score = linear_score(float(stress), 0, 5)
+    else:
+        stress_score = 50
+
+    # Site-level water system proximity: 0 km = 100, 50 km = 0
+    water_dist = site.get('nearest_water_system_km')
+    if water_dist is not None:
+        proximity_score = linear_score(float(water_dist), 0, 50)
+        # Blend: 60% stress (regional), 40% proximity (site-specific)
+        return clamp(stress_score * 0.6 + proximity_score * 0.4)
+
+    return clamp(stress_score)
 
 
 def score_hazard(site, county_data):
@@ -432,7 +469,12 @@ def score_labor(site, county_data, percentiles):
 
 
 def score_existing_dc(site, dc_index, dc_cell_size):
-    """Existing DC proximity: near existing DCs is good (ecosystem)."""
+    """Existing DC proximity: near existing DCs + cloud regions is good (ecosystem).
+
+    v4: Added cloud region proximity bonus from Epoch AI enrichment.
+    Being near a hyperscaler cloud region (AWS/Azure/GCP) signals
+    strong infrastructure ecosystem and potential customer base.
+    """
     lat, lng = site['latitude'], site['longitude']
     nearest_dc, dc_dist = find_nearest(lat, lng, dc_index, dc_cell_size, max_km=250)
 
@@ -442,25 +484,44 @@ def score_existing_dc(site, dc_index, dc_cell_size):
         site['_nearest_dc_name'] = nearest_dc.get('name')
         site['_nearest_dc_distance_km'] = dc_dist
 
+    # Base score from nearest datacenter
     if dc_dist is not None:
-        # < 5 km = 100 (in existing DC cluster), > 250 km = 10
         if dc_dist < 5:
-            return 100
+            dc_score = 100
         elif dc_dist < 25:
-            return 80
+            dc_score = 80
         elif dc_dist < 50:
-            return 60
+            dc_score = 60
         elif dc_dist < 100:
-            return 40
+            dc_score = 40
         elif dc_dist < 250:
-            return 20
+            dc_score = 20
         else:
-            return 10
-    return 10
+            dc_score = 10
+    else:
+        dc_score = 10
+
+    # Cloud region proximity bonus (0-15 points)
+    cloud_km = site.get('nearest_cloud_region_km')
+    cloud_bonus = 0
+    if cloud_km is not None:
+        cloud_km = float(cloud_km)
+        if cloud_km < 50:
+            cloud_bonus = 15  # In a major cloud metro
+        elif cloud_km < 150:
+            cloud_bonus = 10  # Near a cloud region
+        elif cloud_km < 300:
+            cloud_bonus = 5   # Within reach
+
+    return clamp(dc_score + cloud_bonus)
 
 
 def score_land(site, county_data):
-    """Land suitability: acreage, land type, land cost."""
+    """Land suitability: acreage, land type, land cost, industrial zoning.
+
+    v4: Added OSM landuse bonus from industrial/commercial zone enrichment.
+    Sites in industrial zones have fewer zoning hurdles and compatible neighbors.
+    """
     acreage = site.get('acreage')
     site_type = site.get('site_type', '')
     fips = site.get('fips_code')
@@ -480,7 +541,17 @@ def score_land(site, county_data):
     if land_value is not None:
         cost_score = clamp(linear_score(float(land_value), 500, 15000))
 
-    return clamp(acreage_score * 0.35 + type_score * 0.35 + cost_score * 0.30)
+    base = acreage_score * 0.30 + type_score * 0.30 + cost_score * 0.25
+
+    # Industrial/commercial zone bonus (0-15 points)
+    # Sites in industrial zones = ideal for DC (zoning, noise, truck access)
+    osm_landuse = site.get('osm_landuse')
+    if site.get('in_industrial_zone') is True or osm_landuse == 'industrial':
+        base += 15  # Strong industrial zone bonus
+    elif osm_landuse == 'commercial':
+        base += 8   # Commercial zone is good but less ideal
+
+    return clamp(base)
 
 
 def score_tax(site, county_data):
@@ -506,13 +577,44 @@ def score_climate(site, county_data):
 
 def score_energy_cost(site):
     """Energy cost: lower electricity price = higher score.
-    Uses EIA retail electricity price (energy_price_mwh).
-    Range: $81-375/MWh. Median ~$110/MWh."""
-    price = site.get('energy_price_mwh')
-    if price is None:
-        return 50  # Neutral for missing data
-    # $80/MWh = 100, $200/MWh = 0 (caps extremes)
-    return clamp(linear_score(float(price), 80, 200))
+
+    v4: Blends up to 3 price signals when available:
+    - energy_price_mwh: EIA state-level retail rate (always available)
+    - utility_rate_commercial: EIA utility-specific commercial rate (98.5%)
+    - iso_lmp_avg: ISO wholesale locational marginal price (44.1%)
+
+    More granular sources get higher weight when present.
+    """
+    state_price = site.get('energy_price_mwh')
+    utility_rate = site.get('utility_rate_commercial')
+    iso_lmp = site.get('iso_lmp_avg')
+
+    scores = []
+    weights = []
+
+    # State-level retail rate ($80/MWh = 100, $200/MWh = 0)
+    if state_price is not None:
+        scores.append(linear_score(float(state_price), 80, 200))
+        weights.append(0.3)
+
+    # Utility-specific commercial rate (more granular than state avg)
+    # Range: ~$60-300/MWh. $60 = 100, $180 = 0
+    if utility_rate is not None:
+        scores.append(linear_score(float(utility_rate), 60, 180))
+        weights.append(0.5)
+
+    # ISO wholesale LMP (most granular — actual nodal pricing)
+    # Range: ~$20-80/MWh. $20 = 100, $70 = 0
+    if iso_lmp is not None:
+        scores.append(linear_score(float(iso_lmp), 20, 70))
+        weights.append(0.4)
+
+    if not scores:
+        return 50
+
+    # Weighted average (normalize weights)
+    total_weight = sum(weights)
+    return clamp(sum(s * w for s, w in zip(scores, weights)) / total_weight)
 
 
 def score_gas_pipeline(site):
@@ -642,7 +744,7 @@ def main():
         try:
             # Compute all 14 sub-scores
             s_power = round(score_power(site), 1)
-            s_speed = round(score_speed_to_power(site, queue_data), 1)
+            s_speed = round(score_speed_to_power(site, queue_data, county_data), 1)
             s_fiber = round(score_fiber(site, ixp_index, 0.5, county_data), 1)
             s_energy = round(score_energy_cost(site), 1)
             s_water = round(score_water(site, county_data), 1)
