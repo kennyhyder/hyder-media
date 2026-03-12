@@ -158,16 +158,10 @@ export async function checkDemoAccess(req, res) {
 
 /**
  * Fields redacted from demo responses to protect commercial value.
- * Demo users see site_type, state, county, capacity, dates, site_status —
- * enough to evaluate the product, not enough to extract the database.
+ * v2: All fields visible so prospects can evaluate full data quality.
+ * Protection via 10-row limit + no CSV export + lifetime request caps.
  */
-const REDACTED_FIELDS = [
-  "owner_name", "developer_name", "installer_name", "operator_name",
-  "address", "zip_code",
-  "owner_id", "developer_id", "installer_id", "operator_id",
-  "total_cost", "cost_per_watt", "offtaker_name", "ppa_price_mwh",
-  "source_record_id", "crossref_ids", "data_source_id",
-];
+const REDACTED_FIELDS = [];
 
 /**
  * Redact sensitive fields from an installation record for demo mode.
