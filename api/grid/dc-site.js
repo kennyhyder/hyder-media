@@ -68,7 +68,7 @@ export default async function handler(req, res) {
         if (subNames.length > 0) {
           const { data: lines1 } = await supabase
             .from("grid_transmission_lines")
-            .select("id,hifld_id,voltage_kv,capacity_mw,owner,sub_1,sub_2,naession,geometry_wkt,state")
+            .select("id,hifld_id,voltage_kv,capacity_mw,estimated_capacity_mva,capacity_band,owner,sub_1,sub_2,naession,geometry_wkt,state")
             .not("geometry_wkt", "is", null)
             .in("sub_1", subNames.slice(0, 30))
             .order("voltage_kv", { ascending: false })
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
 
           const { data: lines2 } = await supabase
             .from("grid_transmission_lines")
-            .select("id,hifld_id,voltage_kv,capacity_mw,owner,sub_1,sub_2,naession,geometry_wkt,state")
+            .select("id,hifld_id,voltage_kv,capacity_mw,estimated_capacity_mva,capacity_band,owner,sub_1,sub_2,naession,geometry_wkt,state")
             .not("geometry_wkt", "is", null)
             .in("sub_2", subNames.slice(0, 30))
             .order("voltage_kv", { ascending: false })
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
       if (nearbyLines.length === 0 && site.state) {
         const { data: fallbackLines } = await supabase
           .from("grid_transmission_lines")
-          .select("id,hifld_id,voltage_kv,capacity_mw,owner,sub_1,sub_2,naession,geometry_wkt,state")
+          .select("id,hifld_id,voltage_kv,capacity_mw,estimated_capacity_mva,capacity_band,owner,sub_1,sub_2,naession,geometry_wkt,state")
           .not("geometry_wkt", "is", null)
           .eq("state", site.state)
           .order("voltage_kv", { ascending: false })
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       // No coordinates — fall back to state query
       const { data: lines } = await supabase
         .from("grid_transmission_lines")
-        .select("id,hifld_id,voltage_kv,capacity_mw,owner,sub_1,sub_2,naession,geometry_wkt,state")
+        .select("id,hifld_id,voltage_kv,capacity_mw,estimated_capacity_mva,capacity_band,owner,sub_1,sub_2,naession,geometry_wkt,state")
         .not("geometry_wkt", "is", null)
         .eq("state", site.state)
         .order("voltage_kv", { ascending: false })

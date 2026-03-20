@@ -173,7 +173,23 @@ def linear_score(val, best_val, worst_val):
 # ═══════════════════════════════════════════════════════════
 
 def score_power(site):
-    """Power availability: substation distance, voltage, capacity."""
+    """Power availability: substation distance, voltage, capacity.
+
+    The available_capacity_mw field is derived from nearby transmission line
+    voltage using industry-standard heuristics (see migration
+    20260319_transmission_capacity.sql):
+      765 kV → ~2000 MVA, 500 kV → ~900 MVA, 345 kV → ~400 MVA,
+      230 kV → ~200 MVA, 138 kV → ~100 MVA, 115 kV → ~80 MVA,
+      69 kV → ~35 MVA, <69 kV → ~15 MVA.
+    These are conservative estimates based on surge impedance loading (SIL)
+    and typical thermal limits. Actual capacity depends on conductor size,
+    line length, ambient temperature, and system operating conditions.
+
+    Future enhancement: incorporate congestion_score from LMP data
+    (enrich-congestion-score.py) to penalize sites near congested nodes,
+    as high congestion indicates transmission constraints that limit
+    available capacity for new loads.
+    """
     dist = site.get('nearest_substation_distance_km')
     voltage = site.get('substation_voltage_kv')
     capacity = site.get('available_capacity_mw')
