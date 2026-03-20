@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridScout DC | Datacenter Site Selection Intelligence</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/logos/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --inter: 'Inter', -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+            --purple: #7c3aed;
+            --purple-dark: #5b21b6;
+            --purple-deeper: #3b0764;
+            --purple-light: #a78bfa;
+            --purple-glow: rgba(124, 58, 237, 0.3);
+            --bg-dark: #0f0a1a;
+            --bg-card: rgba(255,255,255,0.06);
+            --bg-card-hover: rgba(255,255,255,0.1);
+            --text-primary: #f1f0f5;
+            --text-secondary: rgba(241,240,245,0.7);
+            --text-muted: rgba(241,240,245,0.45);
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --white: #ffffff;
+            --gradient-hero: linear-gradient(135deg, #1e0a3c 0%, #0f0a1a 40%, #0a0f1a 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            font-family: var(--inter);
+            background: var(--bg-dark);
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        .deck-container {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .slide.active { opacity: 1; visibility: visible; }
+
+        .slide-hero {
+            background: var(--gradient-hero);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -30%;
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .slide-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40%; left: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .slide-dark {
+            background: var(--bg-dark);
+        }
+
+        .slide-purple {
+            background: linear-gradient(135deg, var(--purple-deeper) 0%, var(--bg-dark) 100%);
+        }
+
+        .slide-gradient {
+            background: linear-gradient(135deg, #0a0f1a 0%, var(--purple-deeper) 50%, #0f0a1a 100%);
+        }
+
+        .logo-bar {
+            position: absolute;
+            top: 28px; left: 36px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .logo-bar img {
+            height: 32px;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(240deg) brightness(118%) contrast(91%);
+        }
+
+        .logo-bar span {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--purple-light);
+            letter-spacing: 1px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 28px; right: 36px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        h1 {
+            font-family: var(--inter);
+            font-size: 58px;
+            font-weight: 800;
+            line-height: 1.08;
+            margin-bottom: 20px;
+            letter-spacing: -1.5px;
+        }
+
+        h2 {
+            font-family: var(--inter);
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            font-family: var(--inter);
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.5;
+        }
+
+        .content {
+            max-width: 1100px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            width: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(124,58,237,0.15);
+            border-radius: 14px;
+            padding: 24px;
+            transition: background 0.2s;
+        }
+
+        .card:hover { background: var(--bg-card-hover); }
+
+        .card h3 { color: var(--purple-light); }
+
+        .card p, .card li {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .card-accent {
+            border-color: var(--purple);
+            background: rgba(124,58,237,0.08);
+        }
+
+        .stat-block {
+            text-align: center;
+            padding: 20px 12px;
+        }
+
+        .stat-number {
+            font-family: var(--mono);
+            font-size: 44px;
+            font-weight: 700;
+            color: var(--purple-light);
+            line-height: 1;
+        }
+
+        .stat-number.green { color: var(--accent-green); }
+        .stat-number.blue { color: var(--accent-blue); }
+        .stat-number.amber { color: var(--accent-amber); }
+        .stat-number.cyan { color: var(--accent-cyan); }
+
+        .stat-label {
+            font-size: 13px;
+            margin-top: 6px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--mono);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .badge-purple { background: rgba(124,58,237,0.25); color: var(--purple-light); }
+        .badge-green { background: rgba(34,197,94,0.2); color: var(--accent-green); }
+        .badge-blue { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
+        .badge-amber { background: rgba(245,158,11,0.2); color: var(--accent-amber); }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+        }
+
+        .score-bar-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            min-width: 120px;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--purple-light) 100%);
+        }
+
+        .score-bar-value {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--purple-light);
+            min-width: 36px;
+            text-align: right;
+        }
+
+        /* GIF screenshot container */
+        .demo-frame {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(124,58,237,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px var(--purple-glow);
+            position: relative;
+            background: #1a1225;
+        }
+
+        .demo-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .demo-frame-bar {
+            height: 32px;
+            background: rgba(15,10,26,0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 6px;
+        }
+
+        .demo-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .demo-dot.red { background: #ef4444; }
+        .demo-dot.yellow { background: #eab308; }
+        .demo-dot.green { background: #22c55e; }
+
+        .demo-url {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 12px;
+        }
+
+        .demo-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a1225, #0f0a1a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            gap: 8px;
+        }
+
+        .demo-placeholder .icon { font-size: 32px; opacity: 0.5; }
+
+        /* Comparison table */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .compare-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(124,58,237,0.2);
+        }
+
+        .compare-table th.highlight-col {
+            color: var(--purple-light);
+            background: rgba(124,58,237,0.08);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .compare-table td {
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .compare-table td.highlight-col {
+            background: rgba(124,58,237,0.05);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .compare-table tr:last-child td { border-bottom: none; }
+
+        .check { color: var(--accent-green); font-weight: 700; }
+        .cross { color: rgba(255,255,255,0.15); }
+        .partial { color: var(--accent-amber); }
+
+        /* Data source pills */
+        .source-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: var(--bg-card);
+            border: 1px solid rgba(124,58,237,0.12);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 3px;
+        }
+
+        .source-pill .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(124,58,237,0.3);
+            border: 1px solid rgba(124,58,237,0.4);
+            color: var(--white);
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-btn:hover {
+            background: var(--purple);
+            border-color: var(--purple);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--purple), var(--purple-light));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        ul { list-style: none; padding-left: 0; }
+        ul li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        ul li::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 14px;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--purple-light);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--purple-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .divider {
+            width: 60px; height: 3px;
+            background: var(--purple);
+            border-radius: 2px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            h1 { font-size: 38px; }
+            h2 { font-size: 30px; }
+            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            .stat-number { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="deck-container">
+
+        <!-- ============ SLIDE 1: TITLE ============ -->
+        <div class="slide slide-hero active" data-slide="1">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <h1 style="text-align:center;">Datacenter Site Selection<br><span class="text-gradient">Intelligence Platform</span></h1>
+            <p class="subtitle" style="text-align:center; margin-top: 8px;">
+                Identify, score, and compare every viable datacenter site in the United States&mdash;powered by 16 federal and industry data sources.
+            </p>
+            <div style="margin-top: 40px; display:flex; gap: 12px;">
+                <span class="badge badge-purple">40,000+ Scored Sites</span>
+                <span class="badge badge-green">52,000+ Transmission Lines</span>
+                <span class="badge badge-blue">3,200+ Counties Analyzed</span>
+            </div>
+            <span class="slide-number">1 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 2: THE PROBLEM ============ -->
+        <div class="slide slide-dark" data-slide="2">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="divider"></div>
+                <h2>The Site Selection Challenge</h2>
+                <div class="grid-2" style="margin-top: 12px;">
+                    <div>
+                        <p style="font-size: 17px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                            Datacenter developers evaluate hundreds of potential locations across dozens of variables&mdash;power availability, fiber connectivity, water access, natural hazard risk, labor markets, and tax incentives.
+                        </p>
+                        <p style="font-size: 17px; line-height: 1.7; color: var(--text-secondary);">
+                            Today this process relies on fragmented data, expensive consultants, and months of manual research. Critical sites are missed. Bad sites consume resources.
+                        </p>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap: 16px;">
+                        <div class="card">
+                            <h3 style="color: var(--accent-amber); font-size: 16px;">Fragmented Data</h3>
+                            <p style="font-size: 14px;">Power, fiber, water, and risk data live in 16+ separate federal databases with incompatible formats</p>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: var(--accent-amber); font-size: 16px;">Slow Process</h3>
+                            <p style="font-size: 14px;">Traditional site selection takes 6-12 months of consultant-driven analysis per geography</p>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: var(--accent-amber); font-size: 16px;">Missed Opportunities</h3>
+                            <p style="font-size: 14px;">Greenfield sites near retired power plants and brownfield sites on decommissioned land go undetected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">2 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 3: PRODUCT OVERVIEW / INTERACTIVE MAP ============ -->
+        <div class="slide slide-purple" data-slide="3">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="grid-2" style="align-items: center;">
+                    <div>
+                        <div class="divider"></div>
+                        <h2 style="font-size: 36px;">Interactive<br>Site Explorer</h2>
+                        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+                            Full-screen map with every transmission line, substation, brownfield, and greenfield site in the U.S. Filter by score, state, site type, power capacity, and more.
+                        </p>
+                        <ul>
+                            <li>Satellite imagery base layer with street view toggle</li>
+                            <li>Color-coded markers by DC Readiness Score</li>
+                            <li>Click any site for instant detail panel</li>
+                            <li>Location search with fly-to navigation</li>
+                            <li>Transmission line overlay with voltage data</li>
+                        </ul>
+                    </div>
+                    <div class="demo-frame">
+                        <div class="demo-frame-bar">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                            <span class="demo-url">hyder.me/grid/map</span>
+                        </div>
+                        <!-- REPLACE: Record a GIF of the map page showing:
+                             1. Pan across the US showing clustered markers
+                             2. Zoom into a region to show individual sites
+                             3. Click a site to show the popup
+                             4. Toggle the transmission line overlay
+                             Save as: decks/gridscout/assets/demo-map.gif (640-800px wide) -->
+                        <div class="demo-placeholder">
+                            <div class="icon">&#127758;</div>
+                            <div>Interactive Map Demo</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">3 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 4: DC READINESS SCORE ============ -->
+        <div class="slide slide-dark" data-slide="4">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="divider"></div>
+                <h2>DC Readiness Score</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 28px; max-width: 700px;">
+                    Every site is scored 0&ndash;100 across 10 weighted infrastructure factors. Scores are fully transparent&mdash;users can adjust weights to match their priorities.
+                </p>
+                <div class="grid-2" style="gap: 40px;">
+                    <div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Power Access</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:100%"></div></div>
+                            <span class="score-bar-value">25%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Speed to Power</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:80%"></div></div>
+                            <span class="score-bar-value">20%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Fiber Connectivity</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:60%"></div></div>
+                            <span class="score-bar-value">15%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Water Availability</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div>
+                            <span class="score-bar-value">10%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Natural Hazard Risk</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div>
+                            <span class="score-bar-value">10%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Existing DC Proximity</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
+                            <span class="score-bar-value">5%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Labor Market</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
+                            <span class="score-bar-value">5%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Land Availability</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
+                            <span class="score-bar-value">5%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Tax Incentives</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:12%"></div></div>
+                            <span class="score-bar-value">3%</span>
+                        </div>
+                        <div class="score-bar">
+                            <span class="score-bar-label">Climate / Cooling</span>
+                            <div class="score-bar-track"><div class="score-bar-fill" style="width:8%"></div></div>
+                            <span class="score-bar-value">2%</span>
+                        </div>
+                    </div>
+                    <div class="demo-frame">
+                        <div class="demo-frame-bar">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                            <span class="demo-url">hyder.me/grid/site?id=...</span>
+                        </div>
+                        <!-- REPLACE: Record a GIF of a high-scoring site detail page showing:
+                             1. The score breakdown radar chart / factors
+                             2. Scroll to show power, fiber, water details
+                             3. Show the satellite map of the site
+                             Save as: decks/gridscout/assets/demo-score.gif -->
+                        <div class="demo-placeholder">
+                            <div class="icon">&#128202;</div>
+                            <div>Score Breakdown Demo</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">4 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 5: THREE SITE TYPES ============ -->
+        <div class="slide slide-purple" data-slide="5">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content" style="text-align: center;">
+                <div class="divider" style="margin: 0 auto 24px;"></div>
+                <h2>Three Pathways to Power</h2>
+                <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 36px; max-width: 700px; margin-left: auto; margin-right: auto;">
+                    GridScout identifies sites across three distinct development strategies, each with unique advantages.
+                </p>
+                <div class="grid-3">
+                    <div class="card" style="text-align: left; border-top: 3px solid var(--accent-blue);">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="color: var(--accent-blue); margin-bottom: 0;">Substation</h3>
+                            <span class="badge badge-blue">~30,000</span>
+                        </div>
+                        <p style="font-size: 14px; margin-bottom: 16px;">
+                            Sites adjacent to existing grid substations with known power capacity, voltage, and interconnection infrastructure.
+                        </p>
+                        <ul>
+                            <li style="font-size: 13px;">Known power capacity (MW)</li>
+                            <li style="font-size: 13px;">Existing transmission access</li>
+                            <li style="font-size: 13px;">Fastest speed to power</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="text-align: left; border-top: 3px solid var(--accent-green);">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="color: var(--accent-green); margin-bottom: 0;">Greenfield</h3>
+                            <span class="badge badge-green">~9,000</span>
+                        </div>
+                        <p style="font-size: 14px; margin-bottom: 16px;">
+                            Undeveloped corridor land near high-voltage transmission with IRA Energy Community and Opportunity Zone tax benefits.
+                        </p>
+                        <ul>
+                            <li style="font-size: 13px;">IRA tax credit eligibility</li>
+                            <li style="font-size: 13px;">Opportunity Zone overlays</li>
+                            <li style="font-size: 13px;">Clean development canvas</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="text-align: left; border-top: 3px solid var(--accent-amber);">
+                        <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 12px;">
+                            <h3 style="color: var(--accent-amber); margin-bottom: 0;">Brownfield</h3>
+                            <span class="badge badge-amber">~900</span>
+                        </div>
+                        <p style="font-size: 14px; margin-bottom: 16px;">
+                            Retired power plants and industrial sites with existing grid connections, water infrastructure, and cleared land.
+                        </p>
+                        <ul>
+                            <li style="font-size: 13px;">Pre-existing grid tie-in</li>
+                            <li style="font-size: 13px;">Water cooling already on-site</li>
+                            <li style="font-size: 13px;">Reduced permitting timeline</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">5 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 6: DATA SOURCES & QUALITY ============ -->
+        <div class="slide slide-dark" data-slide="6">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="divider"></div>
+                <h2>16 Authoritative Data Sources</h2>
+                <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 24px;">
+                    Every data point is sourced from official federal agencies and industry databases&mdash;no estimates, no scraping.
+                </p>
+                <div class="grid-2" style="gap: 32px;">
+                    <div>
+                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Infrastructure</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="source-pill"><span class="dot"></span>HIFLD Transmission Lines</span>
+                            <span class="source-pill"><span class="dot"></span>HIFLD Substations</span>
+                            <span class="source-pill"><span class="dot"></span>FCC Broadband (Fiber)</span>
+                            <span class="source-pill"><span class="dot"></span>PeeringDB IXPs</span>
+                            <span class="source-pill"><span class="dot"></span>PNNL Datacenters</span>
+                            <span class="source-pill"><span class="dot"></span>OSM Datacenters</span>
+                        </div>
+                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Risk & Environment</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="source-pill"><span class="dot"></span>FEMA NRI (Hazards)</span>
+                            <span class="source-pill"><span class="dot"></span>WRI Aqueduct (Water)</span>
+                            <span class="source-pill"><span class="dot"></span>NOAA Climate Normals</span>
+                        </div>
+                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Economic & Policy</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <span class="source-pill"><span class="dot"></span>BLS QCEW (Labor)</span>
+                            <span class="source-pill"><span class="dot"></span>EIA Brownfield Sites</span>
+                            <span class="source-pill"><span class="dot"></span>State DC Tax Incentives</span>
+                            <span class="source-pill"><span class="dot"></span>IRA Energy Communities</span>
+                            <span class="source-pill"><span class="dot"></span>Opportunity Zones</span>
+                            <span class="source-pill"><span class="dot"></span>Census ZCTA</span>
+                            <span class="source-pill"><span class="dot"></span>BLM Federal Land</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card card-accent" style="margin-bottom: 20px;">
+                            <h3 style="font-size: 18px;">Data Scale</h3>
+                            <div class="grid-2" style="gap: 8px; margin-top: 12px;">
+                                <div class="stat-block">
+                                    <div class="stat-number" style="font-size: 32px;">40K+</div>
+                                    <div class="stat-label">Scored DC Sites</div>
+                                </div>
+                                <div class="stat-block">
+                                    <div class="stat-number blue" style="font-size: 32px;">52K</div>
+                                    <div class="stat-label">Transmission Lines</div>
+                                </div>
+                                <div class="stat-block">
+                                    <div class="stat-number green" style="font-size: 32px;">38K</div>
+                                    <div class="stat-label">Substations</div>
+                                </div>
+                                <div class="stat-block">
+                                    <div class="stat-number amber" style="font-size: 32px;">3.2K</div>
+                                    <div class="stat-label">Counties Analyzed</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3 style="font-size: 18px;">Coverage</h3>
+                            <ul>
+                                <li style="font-size: 14px;">All 50 states + territories</li>
+                                <li style="font-size: 14px;">Every voltage class (69kV to 765kV)</li>
+                                <li style="font-size: 14px;">2,000+ brownfield sites evaluated</li>
+                                <li style="font-size: 14px;">1,400+ Internet Exchange Points</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">6 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 7: SEARCH & ANALYSIS TOOLS ============ -->
+        <div class="slide slide-gradient" data-slide="7">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="grid-2" style="align-items: center;">
+                    <div class="demo-frame">
+                        <div class="demo-frame-bar">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                            <span class="demo-url">hyder.me/grid/search</span>
+                        </div>
+                        <!-- REPLACE: Record a GIF of the search page showing:
+                             1. Filter by state, then by minimum score
+                             2. Sort by DC score descending
+                             3. Click into a top-scored site
+                             Save as: decks/gridscout/assets/demo-search.gif -->
+                        <div class="demo-placeholder">
+                            <div class="icon">&#128269;</div>
+                            <div>Search & Filter Demo</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="divider"></div>
+                        <h2 style="font-size: 36px;">Search, Filter &<br>Compare</h2>
+                        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+                            Powerful multi-criteria search across all 40,000+ sites with real-time filtering and sortable results.
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="card" style="padding: 16px 20px;">
+                                <h3 style="font-size: 15px; margin-bottom: 4px;">Multi-Factor Filtering</h3>
+                                <p style="font-size: 13px;">State, site type, minimum score, voltage class, BLM status, power capacity range</p>
+                            </div>
+                            <div class="card" style="padding: 16px 20px;">
+                                <h3 style="font-size: 15px; margin-bottom: 4px;">Custom Score Weights</h3>
+                                <p style="font-size: 13px;">Adjust the 10-factor weighting to match your specific site requirements</p>
+                            </div>
+                            <div class="card" style="padding: 16px 20px;">
+                                <h3 style="font-size: 15px; margin-bottom: 4px;">Market Analysis</h3>
+                                <p style="font-size: 13px;">State-by-state market reports with top corridors, power capacity, and labor metrics</p>
+                            </div>
+                            <div class="card" style="padding: 16px 20px;">
+                                <h3 style="font-size: 15px; margin-bottom: 4px;">Parcel-Level Data</h3>
+                                <p style="font-size: 13px;">Land ownership, acreage, and zoning information for shortlisted sites</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">7 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 8: SITE DETAIL DEEP DIVE ============ -->
+        <div class="slide slide-dark" data-slide="8">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="grid-2" style="align-items: center;">
+                    <div>
+                        <div class="divider"></div>
+                        <h2 style="font-size: 36px;">Complete Site<br>Intelligence</h2>
+                        <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
+                            Every site detail page delivers a full infrastructure profile&mdash;everything needed for initial site qualification in one view.
+                        </p>
+                        <div class="grid-2" style="gap: 12px;">
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--accent-blue);">Power</h3>
+                                <p style="font-size: 12px;">Voltage, capacity MW, nearest lines, distance to substation</p>
+                            </div>
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--accent-green);">Fiber</h3>
+                                <p style="font-size: 12px;">Provider count, nearest IXP, lit building proximity</p>
+                            </div>
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--accent-cyan);">Water</h3>
+                                <p style="font-size: 12px;">WRI stress score, cooling feasibility, watershed data</p>
+                            </div>
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--accent-amber);">Risk</h3>
+                                <p style="font-size: 12px;">FEMA NRI composite, flood, earthquake, tornado, hurricane</p>
+                            </div>
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--purple-light);">Labor</h3>
+                                <p style="font-size: 12px;">Construction + IT employment, wage levels, workforce density</p>
+                            </div>
+                            <div class="card" style="padding: 16px;">
+                                <h3 style="font-size: 14px; color: var(--accent-red);">Incentives</h3>
+                                <p style="font-size: 12px;">DC tax incentives, IRA credits, Opportunity Zone status</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="demo-frame">
+                        <div class="demo-frame-bar">
+                            <div class="demo-dot red"></div>
+                            <div class="demo-dot yellow"></div>
+                            <div class="demo-dot green"></div>
+                            <span class="demo-url">hyder.me/grid/site?id=...</span>
+                        </div>
+                        <!-- REPLACE: Record a GIF of a site detail page showing:
+                             1. Satellite map of the site
+                             2. Score breakdown with factor details
+                             3. Scroll through infrastructure data (power, fiber, water, risk)
+                             4. Show nearby transmission lines and substations
+                             Save as: decks/gridscout/assets/demo-detail.gif -->
+                        <div class="demo-placeholder">
+                            <div class="icon">&#128196;</div>
+                            <div>Site Detail Demo</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">8 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 9: COMPETITIVE COMPARISON ============ -->
+        <div class="slide slide-purple" data-slide="9">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <div class="content">
+                <div class="divider"></div>
+                <h2>Feature Comparison</h2>
+                <div style="background: var(--bg-card); border-radius: 14px; padding: 4px; border: 1px solid rgba(124,58,237,0.15); margin-top: 8px;">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 240px;">Capability</th>
+                                <th class="highlight-col" style="width: 160px;">GridScout DC</th>
+                                <th>Traditional Consultants</th>
+                                <th>GIS Platforms</th>
+                                <th>Public Data (DIY)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nationwide scored sites</td>
+                                <td class="highlight-col"><span class="check">40,000+</span></td>
+                                <td>50&ndash;200 per engagement</td>
+                                <td><span class="cross">&mdash;</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                            </tr>
+                            <tr>
+                                <td>Multi-factor DC scoring</td>
+                                <td class="highlight-col"><span class="check">10 factors, adjustable</span></td>
+                                <td><span class="partial">Custom, manual</span></td>
+                                <td><span class="cross">Not DC-specific</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                            </tr>
+                            <tr>
+                                <td>Interactive map explorer</td>
+                                <td class="highlight-col"><span class="check">&#10003;</span></td>
+                                <td><span class="cross">Static reports</span></td>
+                                <td><span class="check">&#10003;</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                            </tr>
+                            <tr>
+                                <td>Transmission line overlay</td>
+                                <td class="highlight-col"><span class="check">52K lines</span></td>
+                                <td><span class="partial">Limited</span></td>
+                                <td><span class="partial">Separate layer</span></td>
+                                <td><span class="partial">Raw HIFLD</span></td>
+                            </tr>
+                            <tr>
+                                <td>Brownfield + greenfield sites</td>
+                                <td class="highlight-col"><span class="check">&#10003;</span></td>
+                                <td><span class="partial">By request</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                            </tr>
+                            <tr>
+                                <td>IRA / Opportunity Zone overlay</td>
+                                <td class="highlight-col"><span class="check">&#10003;</span></td>
+                                <td><span class="partial">Manual check</span></td>
+                                <td><span class="cross">&mdash;</span></td>
+                                <td><span class="partial">Separate lookup</span></td>
+                            </tr>
+                            <tr>
+                                <td>Time to initial shortlist</td>
+                                <td class="highlight-col"><span class="check">Minutes</span></td>
+                                <td>Weeks to months</td>
+                                <td>Days</td>
+                                <td>Weeks</td>
+                            </tr>
+                            <tr>
+                                <td>Typical cost</td>
+                                <td class="highlight-col"><span class="check">Platform access</span></td>
+                                <td>$50K&ndash;$500K+</td>
+                                <td>$10K&ndash;$50K/yr</td>
+                                <td>Staff time</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <span class="slide-number">9 / 10</span>
+        </div>
+
+        <!-- ============ SLIDE 10: CLOSING / CTA ============ -->
+        <div class="slide slide-hero" data-slide="10">
+            <div class="logo-bar">
+                <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                <span>GRIDSCOUT DC</span>
+            </div>
+            <h2 style="text-align: center; font-size: 48px; margin-bottom: 12px;">
+                Find Your Next<br><span class="text-gradient">Datacenter Site</span>
+            </h2>
+            <p class="subtitle" style="text-align: center; margin-bottom: 40px;">
+                40,000+ scored sites. 16 data sources. Every state.<br>One platform.
+            </p>
+            <div class="grid-4" style="max-width: 800px; margin-bottom: 48px;">
+                <div class="stat-block">
+                    <div class="stat-number" style="font-size: 28px;">40K+</div>
+                    <div class="stat-label">Sites Scored</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-number green" style="font-size: 28px;">50</div>
+                    <div class="stat-label">States Covered</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-number blue" style="font-size: 28px;">10</div>
+                    <div class="stat-label">Scoring Factors</div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-number amber" style="font-size: 28px;">16</div>
+                    <div class="stat-label">Data Sources</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                <a href="https://hyder.me/grid" style="display: inline-block; padding: 14px 36px; background: var(--purple); color: var(--white); text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 16px; border: 1px solid var(--purple-light); transition: all 0.2s;">Explore GridScout DC</a>
+                <a href="mailto:kenny@hyder.me" style="color: var(--purple-light); font-size: 16px; text-decoration: none; font-weight: 500;">kenny@hyder.me</a>
+            </div>
+            <span class="slide-number">10 / 10</span>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+        <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelector(`[data-slide="${n}"]`).classList.add('active');
+            currentSlide = n;
+            document.getElementById('progress').style.width = `${(n / totalSlides) * 100}%`;
+            history.replaceState(null, null, `#${n}`);
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        window.addEventListener('load', () => {
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (hash >= 1 && hash <= totalSlides) showSlide(hash);
+        });
+    </script>
+</body>
+</html>
