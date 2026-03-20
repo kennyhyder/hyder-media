@@ -1196,7 +1196,6 @@ export default function MapPage() {
               <HeatMapLayer
                 map={leafletMap.current}
                 visible={viewMode === "heatmap"}
-                zoomLevel={zoomLevel}
               />
             )}
           </div>
