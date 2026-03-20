@@ -18,7 +18,6 @@ interface HeatMapLayerProps {
 export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMapLayerProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const heatLayerRef = useRef<any>(null);
-  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!map || !visible) {
@@ -31,8 +30,11 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
     }
 
     const initHeat = async () => {
-      // Dynamically import leaflet and leaflet.heat
+      // Dynamically import leaflet — must set window.L BEFORE importing leaflet.heat
+      // because leaflet.heat is a UMD plugin that references bare `L` global
       const L = await import("leaflet");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).L = L.default || L;
       await import("leaflet.heat");
 
       if (heatLayerRef.current) {
@@ -49,7 +51,6 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
         for (const site of sites) {
           if (!site.latitude || !site.longitude) continue;
           const score = site.dc_score ?? 0;
-          // Round to 0.5 degree grid for county-level aggregation
           const gridLat = Math.round(site.latitude * 2) / 2;
           const gridLng = Math.round(site.longitude * 2) / 2;
           const key = `${gridLat},${gridLng}`;
@@ -75,9 +76,12 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
           .map(s => [s.latitude, s.longitude, (s.dc_score ?? 0) / 100]);
       }
 
-      // Create heat layer — L.heatLayer is added by leaflet.heat plugin
+      if (heatData.length === 0) return;
+
+      // Create heat layer using the global L (now has heatLayer from plugin)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const heatLayer = (L as any).heatLayer(heatData, {
+      const globalL = (window as any).L;
+      const heatLayer = globalL.heatLayer(heatData, {
         radius: 25,
         blur: 15,
         maxZoom: 12,
@@ -94,10 +98,9 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
 
       heatLayer.addTo(map);
       heatLayerRef.current = heatLayer;
-      initializedRef.current = true;
     };
 
-    initHeat();
+    initHeat().catch(err => console.error("HeatMapLayer init error:", err));
 
     return () => {
       if (heatLayerRef.current && map) {
