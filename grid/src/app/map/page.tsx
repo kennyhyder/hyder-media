@@ -68,6 +68,20 @@ interface FiberRoute {
   geometry_json?: unknown;
 }
 
+interface QueueRegion {
+  iso: string;
+  wait_years: number;
+  completion_rate: number;
+  total_projects: number;
+  total_gw: number;
+  solar_projects: number;
+  color: string;
+  polygon: {
+    type: string;
+    coordinates: number[][][];
+  };
+}
+
 interface MapData {
   sites: MapSite[];
   total: number;
@@ -94,6 +108,8 @@ function siteTypeColor(type: string): string {
     case "federal_excess": return "#8b5cf6";
     case "mine": return "#ea580c";
     case "military_brac": return "#dc2626";
+    case "shovel_ready": return "#0891b2";
+    case "manufacturing": return "#475569";
     default: return "#6b7280";
   }
 }
@@ -106,6 +122,8 @@ function siteTypeLabel(type: string): string {
     case "federal_excess": return "Federal Surplus Property";
     case "mine": return "Abandoned Mine";
     case "military_brac": return "BRAC Military Base";
+    case "shovel_ready": return "Shovel-Ready Site";
+    case "manufacturing": return "Manufacturing Site";
     default: return type;
   }
 }
@@ -159,6 +177,8 @@ export default function MapPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fiberLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const queueLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const LRef = useRef<any>(null);
   const fetchControllerRef = useRef<AbortController | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -184,6 +204,7 @@ export default function MapPage() {
   const [showLines, setShowLines] = useState(false);
   const [showSubstations, setShowSubstations] = useState(false);
   const [showFiber, setShowFiber] = useState(false);
+  const [showQueueOverlay, setShowQueueOverlay] = useState(false);
   const [totalLines, setTotalLines] = useState(0);
   const [totalSubstations, setTotalSubstations] = useState(0);
   const [totalFiber, setTotalFiber] = useState(0);
@@ -199,7 +220,7 @@ export default function MapPage() {
 
   // Score distribution
   const [scoreDistribution, setScoreDistribution] = useState({ excellent: 0, good: 0, fair: 0, poor: 0 });
-  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0, federal_excess: 0, mine: 0, military_brac: 0 });
+  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0, federal_excess: 0, mine: 0, military_brac: 0, shovel_ready: 0, manufacturing: 0 });
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -286,6 +307,7 @@ export default function MapPage() {
       lineLayerRef.current = L.layerGroup();
       subLayerRef.current = L.layerGroup();
       fiberLayerRef.current = L.layerGroup();
+      queueLayerRef.current = L.layerGroup();
 
       map.addLayer(siteLayerRef.current);
       map.addLayer(dcLayerRef.current);
@@ -310,6 +332,7 @@ export default function MapPage() {
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:3px;background:#f59e0b"></div> Transmission Line</div>
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:#f59e0b;border:2px solid #d97706;transform:rotate(45deg)"></div> Substation</div>
             <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:3px;background:#10b981"></div> Fiber Route</div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:rgba(239,68,68,0.2);border:2px dashed #ef4444;border-radius:2px"></div> ISO Queue Region</div>
           </div>
         `;
         return div;
@@ -381,7 +404,7 @@ export default function MapPage() {
       // Update site markers
       siteLayerRef.current.clearLayers();
       let excellent = 0, good = 0, fair = 0, poor = 0;
-      let sub = 0, bf = 0, gf = 0, fed = 0, mine = 0, mil = 0;
+      let sub = 0, bf = 0, gf = 0, fed = 0, mine = 0, mil = 0, sr = 0, mfg = 0;
 
       for (const site of json.sites) {
         if (!site.latitude || !site.longitude) continue;
@@ -398,6 +421,8 @@ export default function MapPage() {
         else if (site.site_type === "federal_excess") fed++;
         else if (site.site_type === "mine") mine++;
         else if (site.site_type === "military_brac") mil++;
+        else if (site.site_type === "shovel_ready") sr++;
+        else if (site.site_type === "manufacturing") mfg++;
 
         const color = colorBy === "score"
           ? scoreColor(score)
@@ -429,7 +454,7 @@ export default function MapPage() {
       }
 
       setScoreDistribution({ excellent, good, fair, poor });
-      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf, federal_excess: fed, mine: mine, military_brac: mil });
+      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf, federal_excess: fed, mine: mine, military_brac: mil, shovel_ready: sr, manufacturing: mfg });
 
       // Update DC markers
       dcLayerRef.current.clearLayers();
@@ -680,6 +705,87 @@ export default function MapPage() {
     }
   }, [showFiber]);
 
+  // Queue overlay layer toggle + fetch
+  useEffect(() => {
+    if (!leafletMap.current || !queueLayerRef.current || !LRef.current) return;
+
+    if (showQueueOverlay) {
+      // Fetch queue overlay data and render polygons
+      const fetchQueue = async () => {
+        try {
+          const baseUrl = window.location.origin;
+          const res = await fetch(withDemoToken(`${baseUrl}/api/grid/queue-overlay`));
+          if (!res.ok) return;
+          const json = await res.json();
+          const L = LRef.current;
+
+          queueLayerRef.current.clearLayers();
+
+          for (const region of (json.regions || []) as QueueRegion[]) {
+            if (!region.polygon || !region.polygon.coordinates) continue;
+
+            // GeoJSON coordinates are [lng, lat] — convert to [lat, lng] for Leaflet
+            const ring = region.polygon.coordinates[0];
+            const latLngs = ring.map((c: number[]) => [c[1], c[0]] as [number, number]);
+
+            const polygon = L.polygon(latLngs, {
+              color: region.color,
+              fillColor: region.color,
+              fillOpacity: 0.12,
+              weight: 2,
+              opacity: 0.6,
+              dashArray: "6 4",
+            });
+
+            const completionPct = Math.round(region.completion_rate * 100);
+            const withdrawalPct = 100 - completionPct;
+            polygon.bindPopup(`
+              <div style="min-width:220px;font-family:system-ui;font-size:13px">
+                <strong style="font-size:15px;color:${region.color}">${escapeHtml(region.iso)}</strong>
+                <span style="color:#666;font-size:11px;margin-left:6px">Interconnection Queue</span>
+                <div style="margin:8px 0;padding:8px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                    <span style="color:#666">Avg Wait</span>
+                    <strong style="color:${region.color};font-size:16px">${region.wait_years} years</strong>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                    <span style="color:#666">Completion Rate</span>
+                    <strong>${completionPct}%</strong>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                    <span style="color:#666">Withdrawal Rate</span>
+                    <strong style="color:#ef4444">${withdrawalPct}%</strong>
+                  </div>
+                </div>
+                ${region.total_projects > 0 ? `
+                  <div style="font-size:12px;color:#555">
+                    <div>${region.total_projects.toLocaleString()} queued projects &middot; ${region.total_gw} GW</div>
+                    ${region.solar_projects > 0 ? `<div>${region.solar_projects.toLocaleString()} solar</div>` : ""}
+                  </div>
+                ` : ""}
+              </div>
+            `);
+
+            queueLayerRef.current.addLayer(polygon);
+          }
+
+          if (!leafletMap.current.hasLayer(queueLayerRef.current)) {
+            leafletMap.current.addLayer(queueLayerRef.current);
+          }
+        } catch (err) {
+          console.error("Queue overlay fetch error:", err);
+        }
+      };
+
+      fetchQueue();
+    } else {
+      queueLayerRef.current.clearLayers();
+      if (leafletMap.current.hasLayer(queueLayerRef.current)) {
+        leafletMap.current.removeLayer(queueLayerRef.current);
+      }
+    }
+  }, [showQueueOverlay, mapReady]);
+
   // Track zoom level for heat map county aggregation
   useEffect(() => {
     if (!mapReady || !leafletMap.current) return;
@@ -824,6 +930,11 @@ export default function MapPage() {
                     <span className="w-3 h-0.5 bg-emerald-500 inline-block"></span>
                     Fiber Routes {totalFiber > 0 && `(${totalFiber.toLocaleString()})`}
                   </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={showQueueOverlay} onChange={e => setShowQueueOverlay(e.target.checked)} className="accent-red-600" />
+                    <span className="w-3 h-3 rounded-full bg-red-500 inline-block" style={{ opacity: 0.6 }}></span>
+                    Queue Regions (7 ISOs)
+                  </label>
                 </div>
               </div>
 
@@ -899,6 +1010,8 @@ export default function MapPage() {
                       <option value="federal_excess">Federal Surplus</option>
                       <option value="mine">Abandoned Mines</option>
                       <option value="military_brac">BRAC Military</option>
+                      <option value="shovel_ready">Shovel-Ready</option>
+                      <option value="manufacturing">Manufacturing</option>
                     </select>
                   </div>
 
@@ -970,6 +1083,8 @@ export default function MapPage() {
                       { type: "federal_excess", label: "Federal Surplus", color: "#8b5cf6", count: typeBreakdown.federal_excess },
                       { type: "mine", label: "Abandoned Mines", color: "#ea580c", count: typeBreakdown.mine },
                       { type: "military_brac", label: "BRAC Military", color: "#dc2626", count: typeBreakdown.military_brac },
+                      { type: "shovel_ready", label: "Shovel-Ready Sites", color: "#0891b2", count: typeBreakdown.shovel_ready },
+                      { type: "manufacturing", label: "Manufacturing Sites", color: "#475569", count: typeBreakdown.manufacturing },
                     ].filter(t => t.count > 0).map(t => (
                       <div key={t.type} className="flex items-center gap-2 text-xs">
                         <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>

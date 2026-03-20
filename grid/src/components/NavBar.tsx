@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/grid/brownfields/", label: "Industrial", match: "/grid/brownfields" },
   { href: "/grid/lines/", label: "Transmission", match: "/grid/lines" },
   { href: "/grid/corridors/", label: "Corridors", match: "/grid/corridors" },
+  { href: "/grid/hyperscale/", label: "Hyperscale", match: "/grid/hyperscale" },
   { href: "/grid/market/", label: "Market", match: "/grid/market" },
   { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs", fullOnly: true },
 ];

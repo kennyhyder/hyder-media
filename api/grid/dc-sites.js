@@ -47,7 +47,7 @@ export default async function handler(req, res) {
 
     if (state && !/^[A-Za-z]{2}$/.test(state))
       return res.status(400).json({ error: "state must be a 2-letter code" });
-    if (site_type && !["substation", "brownfield", "greenfield", "industrial", "federal_excess", "mine", "military_brac"].includes(site_type))
+    if (site_type && !["substation", "brownfield", "greenfield", "industrial", "federal_excess", "mine", "military_brac", "shovel_ready"].includes(site_type))
       return res.status(400).json({ error: "Invalid site_type" });
     if (min_score && (isNaN(parseFloat(min_score)) || parseFloat(min_score) < 0 || parseFloat(min_score) > 100))
       return res.status(400).json({ error: "min_score must be a number between 0 and 100" });

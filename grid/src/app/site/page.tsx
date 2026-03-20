@@ -805,12 +805,14 @@ function SiteDetailContent() {
             </div>
 
             {/* Land value with source */}
-            {county.avg_land_value_per_acre_usd && (
+            {(county.land_price_per_acre || county.avg_land_value_per_acre_usd) && (
               <div className="flex justify-between py-1.5 border-b border-gray-100">
                 <span className="text-xs text-gray-500">Land Value</span>
                 <span className="text-sm font-medium text-gray-900">
-                  ${Number(county.avg_land_value_per_acre_usd).toLocaleString()}/acre
-                  <span className="text-xs text-gray-400 ml-1">(USDA)</span>
+                  ${Number(county.land_price_per_acre || county.avg_land_value_per_acre_usd).toLocaleString()}/acre
+                  <span className="text-xs text-gray-400 ml-1">
+                    ({county.land_price_source || "USDA"}{county.land_price_year ? ` ${county.land_price_year}` : ""})
+                  </span>
                 </span>
               </div>
             )}

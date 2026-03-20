@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
     let query = supabase
       .from("grid_county_data")
-      .select("id,fips_code,county_name,state,population,median_income,labor_force,unemployment_rate,avg_electricity_rate,water_stress_score,fiber_availability,hazard_risk_score,dc_tax_incentives,created_at", { count: "exact" });
+      .select("id,fips_code,county_name,state,population,median_income,labor_force,unemployment_rate,avg_electricity_rate,water_stress_score,fiber_availability,hazard_risk_score,dc_tax_incentives,land_price_per_acre,land_price_source,land_price_year,created_at", { count: "exact" });
 
     if (fips) query = query.eq("fips_code", fips);
     if (state) query = query.eq("state", state.toUpperCase());

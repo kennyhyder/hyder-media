@@ -117,6 +117,9 @@
     },
     "api/grid/map-data.js": {
       "maxDuration": 120
+    },
+    "api/grid/hyperscale.js": {
+      "maxDuration": 30
     }
   }
 }

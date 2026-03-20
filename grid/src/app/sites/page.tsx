@@ -1,8 +1,14 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import {
+  DEFAULT_WEIGHTS,
+  recalcCustomScore,
+  isCustomWeights,
+} from "@/lib/customScoring";
+import WeightEditor from "@/components/WeightEditor";
 
 interface DCSite {
   id: string;
@@ -83,7 +89,7 @@ function DCSitesContent() {
 
   const toggleCompare = (id: string) => {
     setCompareIds((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 5 ? [...prev, id] : prev;
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 10 ? [...prev, id] : prev;
       localStorage.setItem("gridscout_compare", JSON.stringify(next));
       return next;
     });
@@ -128,6 +134,23 @@ function DCSitesContent() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [sortBy, setSortBy] = useState("dc_score");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [showWeights, setShowWeights] = useState(false);
+  const [weights, setWeights] = useState<Record<string, number>>({ ...DEFAULT_WEIGHTS });
+
+  const hasCustomWeights = isCustomWeights(weights);
+
+  // Re-score and re-sort sites client-side when custom weights are active
+  const displaySites = useMemo(() => {
+    if (!hasCustomWeights) return sites;
+    const scored = sites.map((site) => ({
+      ...site,
+      dc_score: recalcCustomScore(site as unknown as Record<string, number | string | null>, weights),
+    }));
+    if (sortBy === "dc_score") {
+      scored.sort((a, b) => sortOrder === "desc" ? b.dc_score - a.dc_score : a.dc_score - b.dc_score);
+    }
+    return scored;
+  }, [sites, weights, hasCustomWeights, sortBy, sortOrder]);
 
   const pageSize = 50;
 
@@ -216,6 +239,16 @@ function DCSitesContent() {
               Saved Lists ({shortlists.length})
             </button>
           )}
+          <button
+            onClick={() => setShowWeights(!showWeights)}
+            className={`px-4 py-2 text-sm rounded-lg border ${
+              hasCustomWeights
+                ? "text-purple-700 border-purple-400 bg-purple-50"
+                : "text-gray-700 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            {hasCustomWeights ? "Custom Weights" : "Weights"}
+          </button>
           {!isDemoMode() && (
             <button
               onClick={handleExport}
@@ -276,6 +309,11 @@ function DCSitesContent() {
         </div>
       )}
 
+      {/* Custom Weights Editor */}
+      {showWeights && (
+        <WeightEditor weights={weights} onChange={setWeights} defaultCollapsed={false} />
+      )}
+
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -309,6 +347,8 @@ function DCSitesContent() {
             <option value="federal_excess">Federal Surplus</option>
             <option value="mine">Abandoned Mine</option>
             <option value="military_brac">BRAC Military</option>
+            <option value="shovel_ready">Shovel-Ready</option>
+            <option value="manufacturing">Manufacturing</option>
           </select>
           <select
             value={minScore}
@@ -397,13 +437,13 @@ function DCSitesContent() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={13} className="py-8 text-center text-gray-400">Loading...</td></tr>
-              ) : sites.length === 0 ? (
+              ) : displaySites.length === 0 ? (
                 <tr><td colSpan={13} className="py-12 text-center">
                   <p className="text-gray-400 mb-2">No greenfield sites found matching your filters.</p>
                   <p className="text-gray-400 text-xs">Try broadening your search, adjusting the min score, or clearing filters.</p>
                 </td></tr>
               ) : (
-                sites.map((site) => (
+                displaySites.map((site) => (
                   <tr key={site.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 px-2">
                       <input
@@ -411,7 +451,7 @@ function DCSitesContent() {
                         checked={compareIds.includes(site.id)}
                         onChange={() => toggleCompare(site.id)}
                         className="accent-purple-600"
-                        title={compareIds.includes(site.id) ? "Remove from compare" : compareIds.length >= 5 ? "Max 5 sites" : "Add to compare"}
+                        title={compareIds.includes(site.id) ? "Remove from compare" : compareIds.length >= 10 ? "Max 10 sites" : "Add to compare"}
                       />
                     </td>
                     <td className={`py-2 px-3 font-bold ${scoreColor(site.dc_score)}`} title={scoreLabel(site.dc_score)}>

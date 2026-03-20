@@ -1,30 +1,21 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import {
+  SCORE_FACTOR_KEYS,
+  DEFAULT_WEIGHTS,
+  recalcCustomScore,
+  normalizedWeightPct,
+  isCustomWeights,
+} from "@/lib/customScoring";
+import WeightEditor from "@/components/WeightEditor";
 
 interface SiteData {
   site: Record<string, number | string | null>;
   county: Record<string, number | string | null> | null;
 }
-
-const SCORE_FACTORS = [
-  { key: "score_power", label: "Power Availability", weight: "20%" },
-  { key: "score_speed_to_power", label: "Speed to Power", weight: "15%" },
-  { key: "score_fiber", label: "Fiber Connectivity", weight: "12%" },
-  { key: "score_energy_cost", label: "Energy Cost", weight: "10%" },
-  { key: "score_water", label: "Water Risk", weight: "8%" },
-  { key: "score_hazard", label: "Natural Hazard", weight: "8%" },
-  { key: "score_buildability", label: "Buildability", weight: "7%" },
-  { key: "score_labor", label: "Labor Market", weight: "4%" },
-  { key: "score_existing_dc", label: "DC Cluster", weight: "4%" },
-  { key: "score_land", label: "Land / Acreage", weight: "3%" },
-  { key: "score_construction_cost", label: "Construction Cost", weight: "3%" },
-  { key: "score_gas_pipeline", label: "Gas Pipeline", weight: "2%" },
-  { key: "score_tax", label: "Tax Incentive", weight: "2%" },
-  { key: "score_climate", label: "Climate / Cooling", weight: "2%" },
-];
 
 function scoreColor(score: number): string {
   if (score >= 70) return "text-green-600";
@@ -66,11 +57,14 @@ export default function ComparePage() {
 function CompareContent() {
   const searchParams = useSearchParams();
   const idsParam = searchParams.get("ids") || "";
-  const ids = idsParam.split(",").filter(Boolean).slice(0, 5);
+  const ids = idsParam.split(",").filter(Boolean).slice(0, 10);
 
   const [sites, setSites] = useState<SiteData[]>([]);
   const [loading, setLoading] = useState(true);
   const [shareCopied, setShareCopied] = useState(false);
+  const [weights, setWeights] = useState<Record<string, number>>({ ...DEFAULT_WEIGHTS });
+
+  const hasCustom = isCustomWeights(weights);
 
   useEffect(() => {
     if (ids.length === 0) {
@@ -90,6 +84,18 @@ function CompareContent() {
       setLoading(false);
     });
   }, [idsParam]);
+
+  // Compute custom scores and sort indices by custom score descending
+  const sortedIndices = useMemo(() => {
+    const recs = sites.map((d) => d.site as Record<string, number | string | null>);
+    const customScores = recs.map((s) => recalcCustomScore(s, weights));
+    const indices = recs.map((_, i) => i);
+    indices.sort((a, b) => customScores[b] - customScores[a]);
+    return indices;
+  }, [sites, weights]);
+
+  const getCustomScore = (site: Record<string, number | string | null>) =>
+    recalcCustomScore(site, weights);
 
   const handleRemove = (idx: number) => {
     const newIds = [...ids];
@@ -126,7 +132,8 @@ function CompareContent() {
     const countyRecs = sites.map((d) => d.county as Record<string, number | string | null> | null);
     const headers = [
       "Name", "State", "County", "Site Type", "DC Score",
-      ...SCORE_FACTORS.map(f => f.label),
+      ...(hasCustom ? ["Custom Score"] : []),
+      ...SCORE_FACTOR_KEYS.map(f => f.label),
       "Nearest Substation", "Substation Distance (mi)", "Voltage (kV)", "Available Capacity (MW)",
       "Nearest IXP", "IXP Distance (mi)", "Nearest DC", "DC Distance (mi)",
       "ISO Region", "Queue Depth", "Acreage",
@@ -136,7 +143,8 @@ function CompareContent() {
       const c = countyRecs[i];
       return [
         s.name, s.state, s.county, s.site_type, s.dc_score,
-        ...SCORE_FACTORS.map(f => s[f.key] ?? ""),
+        ...(hasCustom ? [getCustomScore(s)] : []),
+        ...SCORE_FACTOR_KEYS.map(f => s[f.key] ?? ""),
         s.nearest_substation_name, s.nearest_substation_distance_km ? (Number(s.nearest_substation_distance_km) * 0.621371).toFixed(1) : "",
         s.substation_voltage_kv, s.available_capacity_mw,
         s.nearest_ixp_name, s.nearest_ixp_distance_km ? (Number(s.nearest_ixp_distance_km) * 0.621371).toFixed(1) : "",
@@ -255,42 +263,56 @@ function CompareContent() {
         </div>
       </div>
 
-      {/* Overview cards */}
-      <div className={`grid gap-4 mb-6 ${sites.length <= 2 ? "grid-cols-2" : sites.length === 3 ? "grid-cols-3" : sites.length === 4 ? "grid-cols-4" : "grid-cols-5"}`}>
-        {siteRecords.map((s, i) => (
-          <div key={ids[i]} className="bg-white rounded-lg border border-gray-200 p-4 relative">
-            <button
-              onClick={() => handleRemove(i)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xs print:hidden"
-              title="Remove from comparison"
-            >
-              &#10005;
-            </button>
-            <div className={`text-3xl font-bold mb-1 ${scoreColor(Number(s.dc_score) || 0)}`}>
-              {Number(s.dc_score) || 0}
+      {/* Weight Editor */}
+      <WeightEditor weights={weights} onChange={setWeights} defaultCollapsed={true} />
+
+      {/* Overview cards — sorted by custom score when active */}
+      <div className={`grid gap-4 mb-6 ${sites.length <= 2 ? "grid-cols-2" : sites.length === 3 ? "grid-cols-3" : sites.length === 4 ? "grid-cols-4" : sites.length === 5 ? "grid-cols-5" : sites.length <= 8 ? "grid-cols-4" : "grid-cols-5"}`}>
+        {sortedIndices.map((i) => {
+          const s = siteRecords[i];
+          const customScore = getCustomScore(s);
+          const defaultScore = Number(s.dc_score) || 0;
+          return (
+            <div key={ids[i]} className="bg-white rounded-lg border border-gray-200 p-4 relative">
+              <button
+                onClick={() => handleRemove(i)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xs print:hidden"
+                title="Remove from comparison"
+              >
+                &#10005;
+              </button>
+              <div className={`text-3xl font-bold mb-1 ${scoreColor(hasCustom ? customScore : defaultScore)}`}>
+                {hasCustom ? customScore : defaultScore}
+              </div>
+              {hasCustom && (
+                <div className="text-xs text-gray-400 mb-1">
+                  Default: <span className={scoreColor(defaultScore)}>{defaultScore}</span>
+                </div>
+              )}
+              <a href={`/grid/site/?id=${ids[i]}`} className="text-sm font-semibold text-purple-600 hover:underline print:text-gray-900 print:no-underline">
+                {String(s.name)}
+              </a>
+              <div className="text-xs text-gray-500 mt-0.5">
+                {s.county && `${s.county}, `}{s.state}
+              </div>
+              <div className="mt-2">{typeBadge(String(s.site_type))}</div>
             </div>
-            <a href={`/grid/site/?id=${ids[i]}`} className="text-sm font-semibold text-purple-600 hover:underline print:text-gray-900 print:no-underline">
-              {String(s.name)}
-            </a>
-            <div className="text-xs text-gray-500 mt-0.5">
-              {s.county && `${s.county}, `}{s.state}
-            </div>
-            <div className="mt-2">{typeBadge(String(s.site_type))}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Score Breakdown — horizontal bars */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Score Breakdown</h2>
         <div className="space-y-4">
-          {SCORE_FACTORS.map((factor) => {
+          {SCORE_FACTOR_KEYS.map((factor) => {
             const bestIdx = bestForFactor(factor.key);
+            const weightPct = normalizedWeightPct(factor.key, weights);
             return (
               <div key={factor.key}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-600">{factor.label}</span>
-                  <span className="text-xs text-gray-400">{factor.weight}</span>
+                  <span className={`text-xs ${hasCustom ? "text-purple-600 font-medium" : "text-gray-400"}`}>{weightPct}</span>
                 </div>
                 <div className="space-y-1">
                   {siteRecords.map((s, i) => {
@@ -408,6 +430,117 @@ function CompareContent() {
           </div>
         </div>
       )}
+
+      {/* Portfolio Analysis */}
+      {sites.length >= 2 && (() => {
+        // Compute portfolio metrics
+        const uniqueStates = new Set(siteRecords.map(s => String(s.state)).filter(Boolean));
+        const uniqueISOs = new Set(siteRecords.map(s => String(s.iso_region || "")).filter(Boolean));
+        const geoDiversityScore = Math.min(100, uniqueStates.size * 20 + uniqueISOs.size * 15);
+
+        const hazardScores = siteRecords.map(s => Number(s.score_hazard) || 0);
+        const avgHazard = hazardScores.reduce((a, b) => a + b, 0) / hazardScores.length;
+        const anySFHA = siteRecords.some(s => s.flood_zone_sfha);
+
+        const avgDCScore = siteRecords.reduce((a, s) => a + (Number(s.dc_score) || 0), 0) / siteRecords.length;
+
+        const geoLabel = geoDiversityScore >= 70 ? "good" : geoDiversityScore >= 40 ? "moderate" : "limited";
+        const powerLabel = avgDCScore >= 60 ? "strong" : avgDCScore >= 40 ? "adequate" : "weak";
+
+        // Group by ISO for risk diversification table
+        const isoGroups: Record<string, { sites: typeof siteRecords; indices: number[] }> = {};
+        siteRecords.forEach((s, i) => {
+          const iso = String(s.iso_region || "Unknown");
+          if (!isoGroups[iso]) isoGroups[iso] = { sites: [], indices: [] };
+          isoGroups[iso].sites.push(s);
+          isoGroups[iso].indices.push(i);
+        });
+        const isoEntries = Object.entries(isoGroups).sort((a, b) => b[1].sites.length - a[1].sites.length);
+        const allSameISO = uniqueISOs.size <= 1;
+
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mt-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Portfolio Analysis</h2>
+
+            {/* Summary metrics row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className={`text-2xl font-bold ${geoDiversityScore >= 70 ? "text-green-600" : geoDiversityScore >= 40 ? "text-yellow-600" : "text-red-600"}`}>
+                  {geoDiversityScore}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">Geographic Diversity</div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-purple-700">
+                  {uniqueISOs.size}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">ISO Regions</div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className={`text-2xl font-bold ${avgHazard >= 60 ? "text-green-600" : avgHazard >= 40 ? "text-yellow-600" : "text-red-600"}`}>
+                  {avgHazard.toFixed(0)}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">Avg Hazard Score</div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className={`text-2xl font-bold ${anySFHA ? "text-red-600" : "text-green-600"}`}>
+                  {anySFHA ? "Yes" : "No"}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">SFHA Flood Risk</div>
+              </div>
+            </div>
+
+            {/* Summary paragraph */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 text-sm text-gray-700">
+              This portfolio spans <span className="font-semibold">{uniqueStates.size} state{uniqueStates.size !== 1 ? "s" : ""}</span> across <span className="font-semibold">{uniqueISOs.size} ISO region{uniqueISOs.size !== 1 ? "s" : ""}</span>, providing <span className="font-semibold">{geoLabel}</span> geographic diversification. Average DC readiness score is <span className="font-semibold">{avgDCScore.toFixed(1)}</span> with <span className="font-semibold">{powerLabel}</span> power infrastructure.
+              {anySFHA && (
+                <span className="text-red-600 font-medium"> Warning: {siteRecords.filter(s => s.flood_zone_sfha).length} site{siteRecords.filter(s => s.flood_zone_sfha).length !== 1 ? "s are" : " is"} in a Special Flood Hazard Area (SFHA).</span>
+              )}
+              {allSameISO && uniqueISOs.size === 1 && (
+                <span className="text-amber-600 font-medium"> Note: All sites are in the same ISO region ({Array.from(uniqueISOs)[0]}), creating a single point of failure for grid reliability.</span>
+              )}
+            </div>
+
+            {/* Risk Diversification by ISO */}
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Risk Diversification by ISO Region</h3>
+            {allSameISO && (
+              <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.999L13.732 4.001c-.77-1.333-2.694-1.333-3.464 0L3.34 16.001c-.77 1.332.192 2.999 1.732 2.999z" /></svg>
+                <span>Single ISO concentration — consider adding sites in different grid regions to reduce correlated outage risk.</span>
+              </div>
+            )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">ISO Region</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Sites</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Avg Score</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Avg Hazard</th>
+                    <th className="text-right py-2 px-3 text-xs font-medium text-gray-500 uppercase">Avg Water</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isoEntries.map(([iso, group]) => {
+                    const avgScore = group.sites.reduce((a, s) => a + (Number(s.dc_score) || 0), 0) / group.sites.length;
+                    const avgHaz = group.sites.reduce((a, s) => a + (Number(s.score_hazard) || 0), 0) / group.sites.length;
+                    const avgWater = group.sites.reduce((a, s) => a + (Number(s.score_water) || 0), 0) / group.sites.length;
+                    return (
+                      <tr key={iso} className="border-b border-gray-100">
+                        <td className="py-2 px-3 font-medium text-gray-900">{iso}</td>
+                        <td className="py-2 px-3 text-right text-gray-600">{group.sites.length}</td>
+                        <td className={`py-2 px-3 text-right font-medium ${scoreColor(avgScore)}`}>{avgScore.toFixed(1)}</td>
+                        <td className={`py-2 px-3 text-right font-medium ${scoreColor(avgHaz)}`}>{avgHaz.toFixed(0)}</td>
+                        <td className={`py-2 px-3 text-right font-medium ${scoreColor(avgWater)}`}>{avgWater.toFixed(0)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Print footer */}
       <div className="hidden print:block mt-8 pt-4 border-t border-gray-300">
