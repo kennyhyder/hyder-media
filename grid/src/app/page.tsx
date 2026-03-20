@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { withDemoToken } from "@/lib/demoAccess";
 
 interface DCStats {
   totals: {
@@ -107,7 +108,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const baseUrl = window.location.origin;
-    fetch(`${baseUrl}/api/grid/dc-stats`)
+    fetch(withDemoToken(`${baseUrl}/api/grid/dc-stats`))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { isDemoMode } from "@/lib/demoAccess";
 
 const NAV_LINKS = [
   { href: "/grid/", label: "Dashboard", match: "/grid" },
@@ -11,12 +12,13 @@ const NAV_LINKS = [
   { href: "/grid/lines/", label: "Lines", match: "/grid/lines" },
   { href: "/grid/corridors/", label: "Corridors", match: "/grid/corridors" },
   { href: "/grid/market/", label: "Market", match: "/grid/market" },
-  { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs" },
+  { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs", fullOnly: true },
 ];
 
 export default function NavBar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const demo = isDemoMode();
 
   const isActive = (match: string) => {
     if (match === "/grid") return pathname === "/grid" || pathname === "/grid/";
@@ -50,7 +52,7 @@ export default function NavBar() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex gap-4 text-sm">
-          {NAV_LINKS.map((link) => (
+          {NAV_LINKS.filter(link => !demo || !link.fullOnly).map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -69,7 +71,7 @@ export default function NavBar() {
       {/* Mobile nav links */}
       {menuOpen && (
         <div className="md:hidden mt-3 pt-3 border-t border-gray-200 flex flex-col gap-2 text-sm">
-          {NAV_LINKS.map((link) => (
+          {NAV_LINKS.filter(link => !demo || !link.fullOnly).map((link) => (
             <a
               key={link.href}
               href={link.href}

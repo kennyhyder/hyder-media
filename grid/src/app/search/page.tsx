@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { withDemoToken } from "@/lib/demoAccess";
 
 const TransmissionMap = dynamic(() => import("../../components/TransmissionMap"), { ssr: false });
 
@@ -141,7 +142,7 @@ export default function SearchPage() {
     params.set("limit", String(PAGE_SIZE));
     params.set("offset", String(page * PAGE_SIZE));
 
-    fetch(`${baseUrl}/api/grid/lines?${params.toString()}`)
+    fetch(withDemoToken(`${baseUrl}/api/grid/lines?${params.toString()}`))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -183,7 +184,7 @@ export default function SearchPage() {
     if (ownerSearch.trim()) params.set("owner", ownerSearch.trim());
     if (textSearch.trim()) params.set("search", textSearch.trim());
 
-    fetch(`${baseUrl}/api/grid/lines?${params.toString()}`)
+    fetch(withDemoToken(`${baseUrl}/api/grid/lines?${params.toString()}`))
       .then((res) => res.json())
       .then((json) => {
         setMapLines(json.data || []);

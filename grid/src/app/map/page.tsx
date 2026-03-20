@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { withDemoToken } from "@/lib/demoAccess";
 
 interface MapSite {
   id: string;
@@ -352,7 +353,7 @@ export default function MapPage() {
         params.set("limit", "5000");
       }
 
-      const res = await fetch(`${baseUrl}/api/grid/map-data?${params}`, {
+      const res = await fetch(withDemoToken(`${baseUrl}/api/grid/map-data?${params}`), {
         signal: controller.signal,
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

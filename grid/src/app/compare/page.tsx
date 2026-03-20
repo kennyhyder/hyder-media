@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 
 interface SiteData {
   site: Record<string, number | string | null>;
@@ -80,7 +81,7 @@ function CompareContent() {
     const baseUrl = window.location.origin;
     Promise.all(
       ids.map((id) =>
-        fetch(`${baseUrl}/api/grid/dc-site?id=${id}`)
+        fetch(withDemoToken(`${baseUrl}/api/grid/dc-site?id=${id}`))
           .then((r) => (r.ok ? r.json() : null))
           .catch(() => null)
       )
@@ -229,18 +230,22 @@ function CompareContent() {
           >
             {shareCopied ? "Link Copied!" : "Share Link"}
           </button>
-          <button
-            onClick={handlePrint}
-            className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
-          >
-            Export PDF
-          </button>
-          <button
-            onClick={handleExportCSV}
-            className="px-4 py-2 text-sm text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50"
-          >
-            Export CSV
-          </button>
+          {!isDemoMode() && (
+            <>
+              <button
+                onClick={handlePrint}
+                className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
+              >
+                Export PDF
+              </button>
+              <button
+                onClick={handleExportCSV}
+                className="px-4 py-2 text-sm text-purple-600 border border-purple-300 rounded-lg hover:bg-purple-50"
+              >
+                Export CSV
+              </button>
+            </>
+          )}
           <button
             onClick={handleClearAll}
             className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"

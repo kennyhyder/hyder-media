@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkDemoAccess, demoLimitsPayload } from "./_demo.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -19,6 +20,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
+    const access = await checkDemoAccess(req, res);
+    if (!access) return; // Response already sent (401/429/403)
     const {
       state,
       site_type,
@@ -38,7 +41,8 @@ export default async function handler(req, res) {
     } = req.query;
 
     // Input validation
-    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), 200);
+    const maxLimit = access.mode === "demo" ? 10 : 200;
+    const limitNum = Math.min(Math.max(parseInt(limit) || 50, 1), maxLimit);
     const offsetNum = Math.max(parseInt(offset) || 0, 0);
 
     if (state && !/^[A-Za-z]{2}$/.test(state))
@@ -152,6 +156,7 @@ export default async function handler(req, res) {
         total: count || 0,
         totalPages: Math.ceil((count || 0) / limitNum),
       },
+      demo_limits: demoLimitsPayload(access),
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

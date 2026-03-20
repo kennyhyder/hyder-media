@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkDemoAccess } from "./_demo.js";
 import { sanitizeSearch, validatePagination, setCacheHeaders, handleError } from "./_utils.js";
 
 const supabase = createClient(
@@ -14,6 +15,9 @@ export default async function handler(req, res) {
     return handleError(res, "Method not allowed", 405);
 
   try {
+    const access = await checkDemoAccess(req, res);
+    if (!access) return;
+
     const {
       state,
       site_type,

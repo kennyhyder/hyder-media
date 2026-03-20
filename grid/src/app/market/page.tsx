@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { withDemoToken } from "@/lib/demoAccess";
 
 interface DCStats {
   totals: Record<string, number>;
@@ -31,8 +32,8 @@ export default function MarketPage() {
   useEffect(() => {
     const baseUrl = window.location.origin;
     Promise.all([
-      fetch(`${baseUrl}/api/grid/dc-stats`).then((r) => r.json()),
-      fetch(`${baseUrl}/api/grid/ixps?limit=200&sort=network_count&order=desc`).then((r) => r.json()),
+      fetch(withDemoToken(`${baseUrl}/api/grid/dc-stats`)).then((r) => r.json()),
+      fetch(withDemoToken(`${baseUrl}/api/grid/ixps?limit=200&sort=network_count&order=desc`)).then((r) => r.json()),
     ])
       .then(([statsData, ixpData]) => {
         setStats(statsData);

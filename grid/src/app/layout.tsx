@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import NavBar from "../components/NavBar";
 import ErrorBoundary from "../components/ErrorBoundary";
+import DemoWrapper from "../components/DemoWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
         <main className="max-w-7xl mx-auto px-4 py-6">
           <ErrorBoundary>{children}</ErrorBoundary>
         </main>
+        <DemoWrapper />
       </body>
     </html>
   );

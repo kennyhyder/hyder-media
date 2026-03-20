@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 
 interface DCSite {
   id: string;
@@ -145,7 +146,7 @@ function DCSitesContent() {
     params.set("limit", String(pageSize));
     params.set("offset", String(page * pageSize));
 
-    fetch(`${baseUrl}/api/grid/dc-sites?${params}`)
+    fetch(withDemoToken(`${baseUrl}/api/grid/dc-sites?${params}`))
       .then((r) => r.json())
       .then((data) => {
         setSites(data.data || []);
@@ -178,7 +179,7 @@ function DCSitesContent() {
     if (typeFilter) params.set("site_type", typeFilter);
     if (minScore) params.set("min_score", minScore);
     if (isoFilter) params.set("iso_region", isoFilter);
-    window.open(`${baseUrl}/api/grid/dc-export?${params}`, "_blank");
+    window.open(withDemoToken(`${baseUrl}/api/grid/dc-export?${params}`), "_blank");
   };
 
   return (
@@ -215,12 +216,14 @@ function DCSitesContent() {
               Saved Lists ({shortlists.length})
             </button>
           )}
-          <button
-            onClick={handleExport}
-            className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            Export CSV
-          </button>
+          {!isDemoMode() && (
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Export CSV
+            </button>
+          )}
         </div>
       </div>
 

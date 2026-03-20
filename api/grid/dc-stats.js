@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkDemoAccess, demoLimitsPayload } from "./_demo.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -13,6 +14,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
+    const access = await checkDemoAccess(req, res);
+    if (!access) return;
     // Totals (head:true = count only, no data transfer)
     const [sitesRes, linesRes, subsRes, ixpRes, dcRes, bfRes, countyRes] = await Promise.all([
       supabase.from("grid_dc_sites").select("id", { count: "exact", head: true }),

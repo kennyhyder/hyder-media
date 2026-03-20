@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { withDemoToken } from "@/lib/demoAccess";
 
 const TransmissionMap = dynamic(() => import("../../components/TransmissionMap"), { ssr: false });
 
@@ -40,7 +41,7 @@ function CorridorDetailContent() {
   useEffect(() => {
     if (!id) return;
     const baseUrl = window.location.origin;
-    fetch(`${baseUrl}/api/grid/corridor?id=${id}`)
+    fetch(withDemoToken(`${baseUrl}/api/grid/corridor?id=${id}`))
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

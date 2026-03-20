@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkDemoAccess } from "./_demo.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -13,6 +14,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
 
   try {
+    // Demo users cannot export data
+    const access = await checkDemoAccess(req, res);
+    if (!access) return; // Response already sent (401/429/403)
+    if (access.mode === "demo") {
+      return res.status(403).json({
+        error: "Export is not available in demo mode",
+        contact: "kenny@hyder.me",
+      });
+    }
     const {
       state,
       site_type,
