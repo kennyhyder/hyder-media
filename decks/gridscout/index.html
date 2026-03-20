@@ -87,17 +87,9 @@
             pointer-events: none;
         }
 
-        .slide-dark {
-            background: var(--bg-dark);
-        }
-
-        .slide-purple {
-            background: linear-gradient(135deg, var(--purple-deeper) 0%, var(--bg-dark) 100%);
-        }
-
-        .slide-gradient {
-            background: linear-gradient(135deg, #0a0f1a 0%, var(--purple-deeper) 50%, #0f0a1a 100%);
-        }
+        .slide-dark { background: var(--bg-dark); }
+        .slide-purple { background: linear-gradient(135deg, var(--purple-deeper) 0%, var(--bg-dark) 100%); }
+        .slide-gradient { background: linear-gradient(135deg, #0a0f1a 0%, var(--purple-deeper) 50%, #0f0a1a 100%); }
 
         .logo-bar {
             position: absolute;
@@ -167,61 +159,22 @@
             z-index: 1;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 28px;
-            width: 100%;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 24px;
-            width: 100%;
-        }
-
-        .grid-4 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 20px;
-            width: 100%;
-        }
-
-        .grid-5 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            gap: 16px;
-            width: 100%;
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; width: 100%; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; width: 100%; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; width: 100%; }
 
         .card {
             background: var(--bg-card);
             border: 1px solid rgba(124,58,237,0.15);
             border-radius: 14px;
             padding: 24px;
-            transition: background 0.2s;
         }
-
-        .card:hover { background: var(--bg-card-hover); }
 
         .card h3 { color: var(--purple-light); }
+        .card p, .card li { font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+        .card-accent { border-color: var(--purple); background: rgba(124,58,237,0.08); }
 
-        .card p, .card li {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text-secondary);
-        }
-
-        .card-accent {
-            border-color: var(--purple);
-            background: rgba(124,58,237,0.08);
-        }
-
-        .stat-block {
-            text-align: center;
-            padding: 20px 12px;
-        }
+        .stat-block { text-align: center; padding: 20px 12px; }
 
         .stat-number {
             font-family: var(--mono);
@@ -259,141 +212,422 @@
         .badge-blue { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
         .badge-amber { background: rgba(245,158,11,0.2); color: var(--accent-amber); }
 
-        .score-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 6px 0;
-        }
+        .score-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+        .score-bar-label { font-size: 13px; color: var(--text-secondary); min-width: 120px; }
+        .score-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--purple) 0%, var(--purple-light) 100%); }
+        .score-bar-value { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--purple-light); min-width: 36px; text-align: right; }
 
-        .score-bar-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            min-width: 120px;
-        }
+        /* ========== ANIMATED MOCKUP STYLES ========== */
 
-        .score-bar-track {
-            flex: 1;
-            height: 8px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .score-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            background: linear-gradient(90deg, var(--purple) 0%, var(--purple-light) 100%);
-        }
-
-        .score-bar-value {
-            font-family: var(--mono);
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--purple-light);
-            min-width: 36px;
-            text-align: right;
-        }
-
-        /* GIF screenshot container */
-        .demo-frame {
+        .mockup-window {
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(124,58,237,0.3);
             box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 60px var(--purple-glow);
+            background: #111;
             position: relative;
-            background: #1a1225;
         }
 
-        .demo-frame img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .demo-frame-bar {
+        .mockup-bar {
             height: 32px;
-            background: rgba(15,10,26,0.9);
+            background: rgba(15,10,26,0.95);
             display: flex;
             align-items: center;
             padding: 0 12px;
             gap: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .demo-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-        }
+        .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .mockup-dot.r { background: #ef4444; }
+        .mockup-dot.y { background: #eab308; }
+        .mockup-dot.g { background: #22c55e; }
 
-        .demo-dot.red { background: #ef4444; }
-        .demo-dot.yellow { background: #eab308; }
-        .demo-dot.green { background: #22c55e; }
-
-        .demo-url {
+        .mockup-url {
             font-family: var(--mono);
             font-size: 11px;
             color: var(--text-muted);
             margin-left: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 2px 10px;
+            border-radius: 4px;
         }
 
-        .demo-placeholder {
+        .mockup-body {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- MAP MOCKUP --- */
+        .map-mock {
             width: 100%;
-            aspect-ratio: 16/9;
-            background: linear-gradient(135deg, #1a1225, #0f0a1a);
+            height: 320px;
+            background: linear-gradient(180deg, #1a2332 0%, #0d1821 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-grid-line {
+            position: absolute;
+            background: rgba(59,130,246,0.06);
+        }
+
+        .map-grid-line.h { width: 100%; height: 1px; }
+        .map-grid-line.v { width: 1px; height: 100%; }
+
+        .map-land {
+            position: absolute;
+            border-radius: 40% 60% 50% 40% / 50% 40% 60% 50%;
+            background: rgba(34,197,94,0.06);
+            border: 1px solid rgba(34,197,94,0.08);
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: markerPop 0.4s ease forwards;
+        }
+
+        .map-marker.blue { background: var(--accent-blue); box-shadow: 0 0 8px rgba(59,130,246,0.6); }
+        .map-marker.green { background: var(--accent-green); box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+        .map-marker.amber { background: var(--accent-amber); box-shadow: 0 0 8px rgba(245,158,11,0.6); }
+        .map-marker.purple { background: var(--purple); box-shadow: 0 0 8px var(--purple-glow); }
+
+        .map-marker.lg { width: 14px; height: 14px; }
+        .map-marker.sm { width: 7px; height: 7px; }
+
+        @keyframes markerPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+            70% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .map-line {
+            position: absolute;
+            height: 1px;
+            background: rgba(245,158,11,0.3);
+            transform-origin: left center;
+            opacity: 0;
+            animation: lineGrow 0.6s ease forwards;
+        }
+
+        @keyframes lineGrow {
+            0% { opacity: 0; transform: scaleX(0); }
+            100% { opacity: 1; transform: scaleX(1); }
+        }
+
+        .map-popup {
+            position: absolute;
+            background: rgba(15,10,26,0.95);
+            border: 1px solid var(--purple);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 11px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(5px);
+            animation: popupIn 0.3s ease forwards;
+            z-index: 5;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        @keyframes popupIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .map-popup .popup-score {
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--accent-green);
+            font-size: 14px;
+        }
+
+        .map-popup .popup-label {
+            color: var(--text-muted);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .map-zoom-ring {
+            position: absolute;
+            border: 2px solid rgba(124,58,237,0.4);
+            border-radius: 50%;
+            opacity: 0;
+            animation: zoomRing 2s ease-in-out infinite;
+        }
+
+        @keyframes zoomRing {
+            0% { opacity: 0; transform: translate(-50%,-50%) scale(1); }
+            30% { opacity: 0.6; }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(2.5); }
+        }
+
+        .map-overlay-label {
+            position: absolute;
+            bottom: 10px; left: 10px;
+            display: flex; gap: 12px;
+            font-size: 10px;
+            font-family: var(--mono);
+            color: var(--text-muted);
+        }
+
+        .map-legend-dot {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        /* --- SCORE MOCKUP --- */
+        .score-mock {
+            width: 100%;
+            min-height: 320px;
+            background: #0f0a1a;
+            padding: 20px;
+        }
+
+        .score-mock-header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .score-mock-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            gap: 8px;
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 700;
+            position: relative;
         }
 
-        .demo-placeholder .icon { font-size: 32px; opacity: 0.5; }
+        .score-mock-circle svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
 
-        /* Comparison table */
-        .compare-table {
+        .score-mock-circle .track { stroke: rgba(255,255,255,0.08); fill: none; stroke-width: 3; }
+        .score-mock-circle .fill { stroke: var(--accent-green); fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 175; stroke-dashoffset: 175; }
+
+        .score-anim .fill { animation: scoreFill 1.5s ease forwards; }
+
+        @keyframes scoreFill {
+            to { stroke-dashoffset: 30; }
+        }
+
+        .score-mock-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .score-row-anim { animation: scoreRowIn 0.4s ease forwards; }
+
+        @keyframes scoreRowIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .score-mock-label { color: var(--text-secondary); min-width: 100px; }
+        .score-mock-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+        .score-mock-bar-fill { height: 100%; border-radius: 3px; width: 0; }
+        .score-bar-anim { animation: barGrow 0.8s ease forwards; }
+
+        @keyframes barGrow { to { width: var(--w); } }
+
+        .score-mock-val { font-family: var(--mono); font-weight: 600; min-width: 24px; text-align: right; font-size: 11px; }
+
+        /* --- SEARCH MOCKUP --- */
+        .search-mock {
+            width: 100%;
+            min-height: 320px;
+            background: #0f0a1a;
+            padding: 16px;
+        }
+
+        .search-mock-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .search-mock-filter {
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .search-mock-filter.active {
+            background: rgba(124,58,237,0.2);
+            border-color: var(--purple);
+            color: var(--purple-light);
+        }
+
+        .search-mock-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
         }
 
-        .compare-table th {
-            padding: 12px 16px;
+        .search-mock-table th {
             text-align: left;
+            font-size: 10px;
             font-weight: 600;
-            font-size: 13px;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(124,58,237,0.2);
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .compare-table th.highlight-col {
-            color: var(--purple-light);
-            background: rgba(124,58,237,0.08);
-            border-radius: 8px 8px 0 0;
-        }
-
-        .compare-table td {
-            padding: 10px 16px;
+        .search-mock-table td {
+            padding: 8px;
+            font-size: 11px;
             color: var(--text-secondary);
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
 
-        .compare-table td.highlight-col {
-            background: rgba(124,58,237,0.05);
-            color: var(--text-primary);
-            font-weight: 500;
+        .search-mock-table .score-cell {
+            font-family: var(--mono);
+            font-weight: 700;
         }
 
-        .compare-table tr:last-child td { border-bottom: none; }
+        .search-row-anim {
+            opacity: 0;
+            animation: searchRowIn 0.3s ease forwards;
+        }
 
-        .check { color: var(--accent-green); font-weight: 700; }
-        .cross { color: rgba(255,255,255,0.15); }
-        .partial { color: var(--accent-amber); }
+        @keyframes searchRowIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Data source pills */
+        .search-highlight-row td {
+            background: rgba(124,58,237,0.08);
+        }
+
+        .mini-bar {
+            display: inline-block;
+            height: 4px;
+            border-radius: 2px;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+
+        /* --- DETAIL MOCKUP --- */
+        .detail-mock {
+            width: 100%;
+            min-height: 320px;
+            background: #0f0a1a;
+            overflow: hidden;
+        }
+
+        .detail-mock-map {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #1a2332, #0d1821);
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .detail-mock-pin {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: var(--purple);
+            box-shadow: 0 0 20px var(--purple-glow);
+            animation: pinPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pinPulse {
+            0%, 100% { box-shadow: 0 0 20px var(--purple-glow); }
+            50% { box-shadow: 0 0 40px var(--purple-glow), 0 0 60px rgba(124,58,237,0.15); }
+        }
+
+        .detail-mock-grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .detail-mock-line {
+            position: absolute;
+            height: 1px;
+            background: rgba(245,158,11,0.25);
+        }
+
+        .detail-mock-content {
+            padding: 16px;
+        }
+
+        .detail-mock-section {
+            margin-bottom: 14px;
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        .detail-section-anim { animation: detailSectionIn 0.4s ease forwards; }
+
+        @keyframes detailSectionIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-mock-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-mock-section-title .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+
+        .detail-mock-kv {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 11px;
+        }
+
+        .detail-mock-kv .k { color: var(--text-muted); }
+        .detail-mock-kv .v { font-family: var(--mono); font-weight: 600; }
+
+        /* Source pills */
         .source-pill {
             display: inline-flex;
             align-items: center;
@@ -413,59 +647,20 @@
             background: var(--accent-green);
         }
 
-        /* Navigation */
-        .nav-controls {
-            position: fixed;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 100;
+        /* Comparison table */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .compare-table th {
+            padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(124,58,237,0.2);
         }
-
-        .nav-btn {
-            background: rgba(124,58,237,0.3);
-            border: 1px solid rgba(124,58,237,0.4);
-            color: var(--white);
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            backdrop-filter: blur(8px);
-        }
-
-        .nav-btn:hover {
-            background: var(--purple);
-            border-color: var(--purple);
-        }
-
-        .progress-bar {
-            position: fixed;
-            top: 0; left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--purple), var(--purple-light));
-            transition: width 0.3s ease;
-            z-index: 100;
-        }
-
-        ul { list-style: none; padding-left: 0; }
-        ul li {
-            padding: 6px 0 6px 20px;
-            position: relative;
-            font-size: 15px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-        ul li::before {
-            content: "";
-            position: absolute;
-            left: 0; top: 14px;
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--purple-light);
-        }
+        .compare-table th.hl { color: var(--purple-light); background: rgba(124,58,237,0.08); border-radius: 8px 8px 0 0; }
+        .compare-table td { padding: 10px 16px; color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .compare-table td.hl { background: rgba(124,58,237,0.05); color: var(--text-primary); font-weight: 500; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .check { color: var(--accent-green); font-weight: 700; }
+        .cross { color: rgba(255,255,255,0.15); }
+        .partial { color: var(--accent-amber); }
 
         .text-gradient {
             background: linear-gradient(135deg, var(--purple-light), var(--accent-cyan));
@@ -474,19 +669,38 @@
             background-clip: text;
         }
 
-        .divider {
-            width: 60px; height: 3px;
-            background: var(--purple);
-            border-radius: 2px;
-            margin-bottom: 24px;
+        .divider { width: 60px; height: 3px; background: var(--purple); border-radius: 2px; margin-bottom: 24px; }
+
+        ul { list-style: none; padding-left: 0; }
+        ul li { padding: 6px 0 6px 20px; position: relative; font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+        ul li::before { content: ""; position: absolute; left: 0; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: var(--purple-light); }
+
+        /* Navigation */
+        .nav-controls {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(124,58,237,0.3); border: 1px solid rgba(124,58,237,0.4);
+            color: var(--white); width: 42px; height: 42px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; transition: all 0.2s; backdrop-filter: blur(8px);
+        }
+        .nav-btn:hover { background: var(--purple); border-color: var(--purple); }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--purple), var(--purple-light));
+            transition: width 0.3s ease; z-index: 100;
         }
 
         @media (max-width: 1024px) {
             .slide { padding: 40px; }
             h1 { font-size: 38px; }
             h2 { font-size: 30px; }
-            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
             .stat-number { font-size: 32px; }
+            .map-mock, .score-mock, .search-mock, .detail-mock { min-height: 240px; }
         }
     </style>
 </head>
@@ -505,10 +719,11 @@
             <p class="subtitle" style="text-align:center; margin-top: 8px;">
                 Identify, score, and compare every viable datacenter site in the United States&mdash;powered by 16 federal and industry data sources.
             </p>
-            <div style="margin-top: 40px; display:flex; gap: 12px;">
+            <div style="margin-top: 40px; display:flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                 <span class="badge badge-purple">40,000+ Scored Sites</span>
                 <span class="badge badge-green">52,000+ Transmission Lines</span>
                 <span class="badge badge-blue">3,200+ Counties Analyzed</span>
+                <span class="badge badge-amber">All 50 States</span>
             </div>
             <span class="slide-number">1 / 10</span>
         </div>
@@ -538,7 +753,7 @@
                         </div>
                         <div class="card">
                             <h3 style="color: var(--accent-amber); font-size: 16px;">Slow Process</h3>
-                            <p style="font-size: 14px;">Traditional site selection takes 6-12 months of consultant-driven analysis per geography</p>
+                            <p style="font-size: 14px;">Traditional site selection takes 6&ndash;12 months of consultant-driven analysis per geography</p>
                         </div>
                         <div class="card">
                             <h3 style="color: var(--accent-amber); font-size: 16px;">Missed Opportunities</h3>
@@ -550,7 +765,7 @@
             <span class="slide-number">2 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 3: PRODUCT OVERVIEW / INTERACTIVE MAP ============ -->
+        <!-- ============ SLIDE 3: INTERACTIVE MAP ============ -->
         <div class="slide slide-purple" data-slide="3">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -562,33 +777,80 @@
                         <div class="divider"></div>
                         <h2 style="font-size: 36px;">Interactive<br>Site Explorer</h2>
                         <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
-                            Full-screen map with every transmission line, substation, brownfield, and greenfield site in the U.S. Filter by score, state, site type, power capacity, and more.
+                            Full-screen map with every transmission line, substation, brownfield, and greenfield site in the U.S.
                         </p>
                         <ul>
-                            <li>Satellite imagery base layer with street view toggle</li>
+                            <li>Satellite imagery with street view toggle</li>
                             <li>Color-coded markers by DC Readiness Score</li>
                             <li>Click any site for instant detail panel</li>
                             <li>Location search with fly-to navigation</li>
                             <li>Transmission line overlay with voltage data</li>
                         </ul>
                     </div>
-                    <div class="demo-frame">
-                        <div class="demo-frame-bar">
-                            <div class="demo-dot red"></div>
-                            <div class="demo-dot yellow"></div>
-                            <div class="demo-dot green"></div>
-                            <span class="demo-url">hyder.me/grid/map</span>
+                    <div class="mockup-window">
+                        <div class="mockup-bar">
+                            <div class="mockup-dot r"></div>
+                            <div class="mockup-dot y"></div>
+                            <div class="mockup-dot g"></div>
+                            <span class="mockup-url">hyder.me/grid/map</span>
                         </div>
-                        <!-- REPLACE: Record a GIF of the map page showing:
-                             1. Pan across the US showing clustered markers
-                             2. Zoom into a region to show individual sites
-                             3. Click a site to show the popup
-                             4. Toggle the transmission line overlay
-                             Save as: decks/gridscout/assets/demo-map.gif (640-800px wide) -->
-                        <div class="demo-placeholder">
-                            <div class="icon">&#127758;</div>
-                            <div>Interactive Map Demo</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        <div class="mockup-body">
+                            <div class="map-mock" id="mapMock">
+                                <!-- Grid lines -->
+                                <div class="map-grid-line h" style="top:20%"></div>
+                                <div class="map-grid-line h" style="top:40%"></div>
+                                <div class="map-grid-line h" style="top:60%"></div>
+                                <div class="map-grid-line h" style="top:80%"></div>
+                                <div class="map-grid-line v" style="left:20%"></div>
+                                <div class="map-grid-line v" style="left:40%"></div>
+                                <div class="map-grid-line v" style="left:60%"></div>
+                                <div class="map-grid-line v" style="left:80%"></div>
+                                <!-- Landmasses -->
+                                <div class="map-land" style="width:70%;height:55%;top:18%;left:12%"></div>
+                                <div class="map-land" style="width:15%;height:18%;top:65%;left:62%;border-radius:30% 70% 40% 60%"></div>
+                                <!-- Transmission lines (animated) -->
+                                <div class="map-line" style="top:35%;left:25%;width:30%;transform:rotate(-8deg)" data-delay="800"></div>
+                                <div class="map-line" style="top:42%;left:35%;width:25%;transform:rotate(5deg)" data-delay="1000"></div>
+                                <div class="map-line" style="top:50%;left:20%;width:40%;transform:rotate(-3deg)" data-delay="1200"></div>
+                                <div class="map-line" style="top:30%;left:55%;width:20%;transform:rotate(12deg)" data-delay="1400"></div>
+                                <div class="map-line" style="top:55%;left:45%;width:22%;transform:rotate(-6deg)" data-delay="1100"></div>
+                                <!-- Site markers (animated) -->
+                                <!-- Blue = substation -->
+                                <div class="map-marker blue" style="top:30%;left:28%" data-delay="400"></div>
+                                <div class="map-marker blue sm" style="top:35%;left:32%" data-delay="500"></div>
+                                <div class="map-marker blue" style="top:38%;left:45%" data-delay="600"></div>
+                                <div class="map-marker blue sm" style="top:42%;left:52%" data-delay="700"></div>
+                                <div class="map-marker blue lg" style="top:33%;left:62%" data-delay="550"></div>
+                                <div class="map-marker blue sm" style="top:48%;left:38%" data-delay="650"></div>
+                                <div class="map-marker blue" style="top:55%;left:55%" data-delay="750"></div>
+                                <div class="map-marker blue sm" style="top:28%;left:48%" data-delay="850"></div>
+                                <div class="map-marker blue" style="top:45%;left:68%" data-delay="500"></div>
+                                <div class="map-marker blue sm" style="top:52%;left:30%" data-delay="900"></div>
+                                <div class="map-marker blue" style="top:36%;left:72%" data-delay="680"></div>
+                                <!-- Green = greenfield -->
+                                <div class="map-marker green" style="top:40%;left:25%" data-delay="800"></div>
+                                <div class="map-marker green sm" style="top:50%;left:42%" data-delay="900"></div>
+                                <div class="map-marker green" style="top:44%;left:58%" data-delay="1000"></div>
+                                <div class="map-marker green sm" style="top:32%;left:38%" data-delay="1050"></div>
+                                <!-- Amber = brownfield -->
+                                <div class="map-marker amber lg" style="top:46%;left:35%" data-delay="1100"></div>
+                                <div class="map-marker amber" style="top:38%;left:55%" data-delay="1200"></div>
+                                <div class="map-marker amber" style="top:53%;left:65%" data-delay="1300"></div>
+                                <!-- Popup (appears last) -->
+                                <div class="map-popup" style="top:22%;left:55%;display:none" id="mapPopup">
+                                    <div style="font-weight:600; font-size:12px; margin-bottom:2px;">Loudoun County Sub.</div>
+                                    <div class="popup-score">Score: 87</div>
+                                    <div class="popup-label">345kV &bull; 1,200 MW &bull; Virginia</div>
+                                </div>
+                                <!-- Zoom ring -->
+                                <div class="map-zoom-ring" style="top:33%;left:62%;width:50px;height:50px;display:none" id="mapZoom"></div>
+                                <!-- Legend -->
+                                <div class="map-overlay-label">
+                                    <span><span class="map-legend-dot" style="background:var(--accent-blue)"></span>Substation</span>
+                                    <span><span class="map-legend-dot" style="background:var(--accent-green)"></span>Greenfield</span>
+                                    <span><span class="map-legend-dot" style="background:var(--accent-amber)"></span>Brownfield</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -610,73 +872,50 @@
                 </p>
                 <div class="grid-2" style="gap: 40px;">
                     <div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Power Access</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:100%"></div></div>
-                            <span class="score-bar-value">25%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Speed to Power</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:80%"></div></div>
-                            <span class="score-bar-value">20%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Fiber Connectivity</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:60%"></div></div>
-                            <span class="score-bar-value">15%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Water Availability</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div>
-                            <span class="score-bar-value">10%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Natural Hazard Risk</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div>
-                            <span class="score-bar-value">10%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Existing DC Proximity</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
-                            <span class="score-bar-value">5%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Labor Market</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
-                            <span class="score-bar-value">5%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Land Availability</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div>
-                            <span class="score-bar-value">5%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Tax Incentives</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:12%"></div></div>
-                            <span class="score-bar-value">3%</span>
-                        </div>
-                        <div class="score-bar">
-                            <span class="score-bar-label">Climate / Cooling</span>
-                            <div class="score-bar-track"><div class="score-bar-fill" style="width:8%"></div></div>
-                            <span class="score-bar-value">2%</span>
-                        </div>
+                        <div class="score-bar"><span class="score-bar-label">Power Access</span><div class="score-bar-track"><div class="score-bar-fill" style="width:100%"></div></div><span class="score-bar-value">25%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Speed to Power</span><div class="score-bar-track"><div class="score-bar-fill" style="width:80%"></div></div><span class="score-bar-value">20%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Fiber Connectivity</span><div class="score-bar-track"><div class="score-bar-fill" style="width:60%"></div></div><span class="score-bar-value">15%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Water Availability</span><div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div><span class="score-bar-value">10%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Hazard Risk</span><div class="score-bar-track"><div class="score-bar-fill" style="width:40%"></div></div><span class="score-bar-value">10%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Existing DC Prox.</span><div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div><span class="score-bar-value">5%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Labor Market</span><div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div><span class="score-bar-value">5%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Land Availability</span><div class="score-bar-track"><div class="score-bar-fill" style="width:20%"></div></div><span class="score-bar-value">5%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Tax Incentives</span><div class="score-bar-track"><div class="score-bar-fill" style="width:12%"></div></div><span class="score-bar-value">3%</span></div>
+                        <div class="score-bar"><span class="score-bar-label">Climate / Cooling</span><div class="score-bar-track"><div class="score-bar-fill" style="width:8%"></div></div><span class="score-bar-value">2%</span></div>
                     </div>
-                    <div class="demo-frame">
-                        <div class="demo-frame-bar">
-                            <div class="demo-dot red"></div>
-                            <div class="demo-dot yellow"></div>
-                            <div class="demo-dot green"></div>
-                            <span class="demo-url">hyder.me/grid/site?id=...</span>
+                    <div class="mockup-window">
+                        <div class="mockup-bar">
+                            <div class="mockup-dot r"></div>
+                            <div class="mockup-dot y"></div>
+                            <div class="mockup-dot g"></div>
+                            <span class="mockup-url">hyder.me/grid/site?id=...</span>
                         </div>
-                        <!-- REPLACE: Record a GIF of a high-scoring site detail page showing:
-                             1. The score breakdown radar chart / factors
-                             2. Scroll to show power, fiber, water details
-                             3. Show the satellite map of the site
-                             Save as: decks/gridscout/assets/demo-score.gif -->
-                        <div class="demo-placeholder">
-                            <div class="icon">&#128202;</div>
-                            <div>Score Breakdown Demo</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        <div class="mockup-body">
+                            <div class="score-mock" id="scoreMock">
+                                <div class="score-mock-header">
+                                    <div class="score-mock-circle" id="scoreCircle">
+                                        <svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="28"/><circle class="fill" cx="32" cy="32" r="28"/></svg>
+                                        <span id="scoreNum" style="color:var(--accent-green)">0</span>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:700; font-size:15px;">Loudoun Co. Substation #4218</div>
+                                        <div style="font-size:11px; color:var(--text-muted);">Ashburn, Virginia &bull; 345kV</div>
+                                    </div>
+                                    <div style="margin-left:auto;">
+                                        <span class="badge badge-green" style="font-size:10px;">Top 5%</span>
+                                    </div>
+                                </div>
+                                <div class="score-mock-row" data-delay="300"><span class="score-mock-label">Power Access</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:95%;background:var(--accent-green)" data-delay="500"></div></div><span class="score-mock-val" style="color:var(--accent-green)">95</span></div>
+                                <div class="score-mock-row" data-delay="450"><span class="score-mock-label">Speed to Power</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:90%;background:var(--accent-green)" data-delay="650"></div></div><span class="score-mock-val" style="color:var(--accent-green)">90</span></div>
+                                <div class="score-mock-row" data-delay="600"><span class="score-mock-label">Fiber</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:98%;background:var(--accent-green)" data-delay="800"></div></div><span class="score-mock-val" style="color:var(--accent-green)">98</span></div>
+                                <div class="score-mock-row" data-delay="750"><span class="score-mock-label">Water</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:72%;background:var(--accent-blue)" data-delay="950"></div></div><span class="score-mock-val" style="color:var(--accent-blue)">72</span></div>
+                                <div class="score-mock-row" data-delay="900"><span class="score-mock-label">Hazard Risk</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:85%;background:var(--accent-green)" data-delay="1100"></div></div><span class="score-mock-val" style="color:var(--accent-green)">85</span></div>
+                                <div class="score-mock-row" data-delay="1050"><span class="score-mock-label">DC Proximity</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:100%;background:var(--accent-green)" data-delay="1250"></div></div><span class="score-mock-val" style="color:var(--accent-green)">100</span></div>
+                                <div class="score-mock-row" data-delay="1200"><span class="score-mock-label">Labor</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:88%;background:var(--accent-green)" data-delay="1400"></div></div><span class="score-mock-val" style="color:var(--accent-green)">88</span></div>
+                                <div class="score-mock-row" data-delay="1350"><span class="score-mock-label">Land</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:55%;background:var(--accent-amber)" data-delay="1550"></div></div><span class="score-mock-val" style="color:var(--accent-amber)">55</span></div>
+                                <div class="score-mock-row" data-delay="1500"><span class="score-mock-label">Tax Incentives</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:80%;background:var(--accent-blue)" data-delay="1700"></div></div><span class="score-mock-val" style="color:var(--accent-blue)">80</span></div>
+                                <div class="score-mock-row" data-delay="1650"><span class="score-mock-label">Climate</span><div class="score-mock-bar"><div class="score-mock-bar-fill" style="--w:68%;background:var(--accent-blue)" data-delay="1850"></div></div><span class="score-mock-val" style="color:var(--accent-blue)">68</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -702,49 +941,31 @@
                             <h3 style="color: var(--accent-blue); margin-bottom: 0;">Substation</h3>
                             <span class="badge badge-blue">~30,000</span>
                         </div>
-                        <p style="font-size: 14px; margin-bottom: 16px;">
-                            Sites adjacent to existing grid substations with known power capacity, voltage, and interconnection infrastructure.
-                        </p>
-                        <ul>
-                            <li style="font-size: 13px;">Known power capacity (MW)</li>
-                            <li style="font-size: 13px;">Existing transmission access</li>
-                            <li style="font-size: 13px;">Fastest speed to power</li>
-                        </ul>
+                        <p style="font-size: 14px; margin-bottom: 16px;">Sites adjacent to existing grid substations with known power capacity, voltage, and interconnection infrastructure.</p>
+                        <ul><li style="font-size: 13px;">Known power capacity (MW)</li><li style="font-size: 13px;">Existing transmission access</li><li style="font-size: 13px;">Fastest speed to power</li></ul>
                     </div>
                     <div class="card" style="text-align: left; border-top: 3px solid var(--accent-green);">
                         <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="color: var(--accent-green); margin-bottom: 0;">Greenfield</h3>
                             <span class="badge badge-green">~9,000</span>
                         </div>
-                        <p style="font-size: 14px; margin-bottom: 16px;">
-                            Undeveloped corridor land near high-voltage transmission with IRA Energy Community and Opportunity Zone tax benefits.
-                        </p>
-                        <ul>
-                            <li style="font-size: 13px;">IRA tax credit eligibility</li>
-                            <li style="font-size: 13px;">Opportunity Zone overlays</li>
-                            <li style="font-size: 13px;">Clean development canvas</li>
-                        </ul>
+                        <p style="font-size: 14px; margin-bottom: 16px;">Undeveloped corridor land near high-voltage transmission with IRA Energy Community and Opportunity Zone tax benefits.</p>
+                        <ul><li style="font-size: 13px;">IRA tax credit eligibility</li><li style="font-size: 13px;">Opportunity Zone overlays</li><li style="font-size: 13px;">Clean development canvas</li></ul>
                     </div>
                     <div class="card" style="text-align: left; border-top: 3px solid var(--accent-amber);">
                         <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 12px;">
                             <h3 style="color: var(--accent-amber); margin-bottom: 0;">Brownfield</h3>
                             <span class="badge badge-amber">~900</span>
                         </div>
-                        <p style="font-size: 14px; margin-bottom: 16px;">
-                            Retired power plants and industrial sites with existing grid connections, water infrastructure, and cleared land.
-                        </p>
-                        <ul>
-                            <li style="font-size: 13px;">Pre-existing grid tie-in</li>
-                            <li style="font-size: 13px;">Water cooling already on-site</li>
-                            <li style="font-size: 13px;">Reduced permitting timeline</li>
-                        </ul>
+                        <p style="font-size: 14px; margin-bottom: 16px;">Retired power plants and industrial sites with existing grid connections, water infrastructure, and cleared land.</p>
+                        <ul><li style="font-size: 13px;">Pre-existing grid tie-in</li><li style="font-size: 13px;">Water cooling already on-site</li><li style="font-size: 13px;">Reduced permitting timeline</li></ul>
                     </div>
                 </div>
             </div>
             <span class="slide-number">5 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 6: DATA SOURCES & QUALITY ============ -->
+        <!-- ============ SLIDE 6: DATA SOURCES ============ -->
         <div class="slide slide-dark" data-slide="6">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -753,32 +974,30 @@
             <div class="content">
                 <div class="divider"></div>
                 <h2>16 Authoritative Data Sources</h2>
-                <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 24px;">
-                    Every data point is sourced from official federal agencies and industry databases&mdash;no estimates, no scraping.
-                </p>
+                <p style="font-size: 15px; color: var(--text-secondary); margin-bottom: 24px;">Every data point sourced from official federal agencies and industry databases.</p>
                 <div class="grid-2" style="gap: 32px;">
                     <div>
-                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Infrastructure</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                            <span class="source-pill"><span class="dot"></span>HIFLD Transmission Lines</span>
+                        <h3 style="font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Infrastructure</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;">
+                            <span class="source-pill"><span class="dot"></span>HIFLD Transmission</span>
                             <span class="source-pill"><span class="dot"></span>HIFLD Substations</span>
-                            <span class="source-pill"><span class="dot"></span>FCC Broadband (Fiber)</span>
+                            <span class="source-pill"><span class="dot"></span>FCC Broadband</span>
                             <span class="source-pill"><span class="dot"></span>PeeringDB IXPs</span>
                             <span class="source-pill"><span class="dot"></span>PNNL Datacenters</span>
                             <span class="source-pill"><span class="dot"></span>OSM Datacenters</span>
                         </div>
-                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Risk & Environment</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                            <span class="source-pill"><span class="dot"></span>FEMA NRI (Hazards)</span>
-                            <span class="source-pill"><span class="dot"></span>WRI Aqueduct (Water)</span>
-                            <span class="source-pill"><span class="dot"></span>NOAA Climate Normals</span>
+                        <h3 style="font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Risk & Environment</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;">
+                            <span class="source-pill"><span class="dot"></span>FEMA NRI Hazards</span>
+                            <span class="source-pill"><span class="dot"></span>WRI Aqueduct Water</span>
+                            <span class="source-pill"><span class="dot"></span>NOAA Climate</span>
                         </div>
-                        <h3 style="font-size: 15px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">Economic & Policy</h3>
+                        <h3 style="font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Economic & Policy</h3>
                         <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                            <span class="source-pill"><span class="dot"></span>BLS QCEW (Labor)</span>
-                            <span class="source-pill"><span class="dot"></span>EIA Brownfield Sites</span>
-                            <span class="source-pill"><span class="dot"></span>State DC Tax Incentives</span>
-                            <span class="source-pill"><span class="dot"></span>IRA Energy Communities</span>
+                            <span class="source-pill"><span class="dot"></span>BLS QCEW Labor</span>
+                            <span class="source-pill"><span class="dot"></span>EIA Brownfields</span>
+                            <span class="source-pill"><span class="dot"></span>DC Tax Incentives</span>
+                            <span class="source-pill"><span class="dot"></span>IRA Energy Comm.</span>
                             <span class="source-pill"><span class="dot"></span>Opportunity Zones</span>
                             <span class="source-pill"><span class="dot"></span>Census ZCTA</span>
                             <span class="source-pill"><span class="dot"></span>BLM Federal Land</span>
@@ -788,22 +1007,10 @@
                         <div class="card card-accent" style="margin-bottom: 20px;">
                             <h3 style="font-size: 18px;">Data Scale</h3>
                             <div class="grid-2" style="gap: 8px; margin-top: 12px;">
-                                <div class="stat-block">
-                                    <div class="stat-number" style="font-size: 32px;">40K+</div>
-                                    <div class="stat-label">Scored DC Sites</div>
-                                </div>
-                                <div class="stat-block">
-                                    <div class="stat-number blue" style="font-size: 32px;">52K</div>
-                                    <div class="stat-label">Transmission Lines</div>
-                                </div>
-                                <div class="stat-block">
-                                    <div class="stat-number green" style="font-size: 32px;">38K</div>
-                                    <div class="stat-label">Substations</div>
-                                </div>
-                                <div class="stat-block">
-                                    <div class="stat-number amber" style="font-size: 32px;">3.2K</div>
-                                    <div class="stat-label">Counties Analyzed</div>
-                                </div>
+                                <div class="stat-block"><div class="stat-number" style="font-size: 32px;">40K+</div><div class="stat-label">Scored DC Sites</div></div>
+                                <div class="stat-block"><div class="stat-number blue" style="font-size: 32px;">52K</div><div class="stat-label">Transmission Lines</div></div>
+                                <div class="stat-block"><div class="stat-number green" style="font-size: 32px;">38K</div><div class="stat-label">Substations</div></div>
+                                <div class="stat-block"><div class="stat-number amber" style="font-size: 32px;">3.2K</div><div class="stat-label">Counties</div></div>
                             </div>
                         </div>
                         <div class="card">
@@ -821,7 +1028,7 @@
             <span class="slide-number">6 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 7: SEARCH & ANALYSIS TOOLS ============ -->
+        <!-- ============ SLIDE 7: SEARCH & FILTER ============ -->
         <div class="slide slide-gradient" data-slide="7">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -829,22 +1036,28 @@
             </div>
             <div class="content">
                 <div class="grid-2" style="align-items: center;">
-                    <div class="demo-frame">
-                        <div class="demo-frame-bar">
-                            <div class="demo-dot red"></div>
-                            <div class="demo-dot yellow"></div>
-                            <div class="demo-dot green"></div>
-                            <span class="demo-url">hyder.me/grid/search</span>
+                    <div class="mockup-window">
+                        <div class="mockup-bar">
+                            <div class="mockup-dot r"></div>
+                            <div class="mockup-dot y"></div>
+                            <div class="mockup-dot g"></div>
+                            <span class="mockup-url">hyder.me/grid/search</span>
                         </div>
-                        <!-- REPLACE: Record a GIF of the search page showing:
-                             1. Filter by state, then by minimum score
-                             2. Sort by DC score descending
-                             3. Click into a top-scored site
-                             Save as: decks/gridscout/assets/demo-search.gif -->
-                        <div class="demo-placeholder">
-                            <div class="icon">&#128269;</div>
-                            <div>Search & Filter Demo</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        <div class="mockup-body">
+                            <div class="search-mock" id="searchMock">
+                                <div class="search-mock-filters" id="searchFilters">
+                                    <div class="search-mock-filter" data-delay="0">State: <strong>All</strong></div>
+                                    <div class="search-mock-filter" data-delay="0">Type: <strong>All</strong></div>
+                                    <div class="search-mock-filter" data-delay="0">Min Score: <strong>0</strong></div>
+                                    <div class="search-mock-filter" data-delay="0">Voltage: <strong>Any</strong></div>
+                                </div>
+                                <table class="search-mock-table">
+                                    <thead><tr>
+                                        <th>Site</th><th>State</th><th>Type</th><th>Score</th><th>Power</th>
+                                    </tr></thead>
+                                    <tbody id="searchBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -854,22 +1067,10 @@
                             Powerful multi-criteria search across all 40,000+ sites with real-time filtering and sortable results.
                         </p>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div class="card" style="padding: 16px 20px;">
-                                <h3 style="font-size: 15px; margin-bottom: 4px;">Multi-Factor Filtering</h3>
-                                <p style="font-size: 13px;">State, site type, minimum score, voltage class, BLM status, power capacity range</p>
-                            </div>
-                            <div class="card" style="padding: 16px 20px;">
-                                <h3 style="font-size: 15px; margin-bottom: 4px;">Custom Score Weights</h3>
-                                <p style="font-size: 13px;">Adjust the 10-factor weighting to match your specific site requirements</p>
-                            </div>
-                            <div class="card" style="padding: 16px 20px;">
-                                <h3 style="font-size: 15px; margin-bottom: 4px;">Market Analysis</h3>
-                                <p style="font-size: 13px;">State-by-state market reports with top corridors, power capacity, and labor metrics</p>
-                            </div>
-                            <div class="card" style="padding: 16px 20px;">
-                                <h3 style="font-size: 15px; margin-bottom: 4px;">Parcel-Level Data</h3>
-                                <p style="font-size: 13px;">Land ownership, acreage, and zoning information for shortlisted sites</p>
-                            </div>
+                            <div class="card" style="padding: 16px 20px;"><h3 style="font-size: 15px; margin-bottom: 4px;">Multi-Factor Filtering</h3><p style="font-size: 13px;">State, site type, minimum score, voltage class, BLM status, power capacity range</p></div>
+                            <div class="card" style="padding: 16px 20px;"><h3 style="font-size: 15px; margin-bottom: 4px;">Custom Score Weights</h3><p style="font-size: 13px;">Adjust the 10-factor weighting to match your specific site requirements</p></div>
+                            <div class="card" style="padding: 16px 20px;"><h3 style="font-size: 15px; margin-bottom: 4px;">Market Analysis</h3><p style="font-size: 13px;">State-by-state reports with top corridors, power capacity, and labor metrics</p></div>
+                            <div class="card" style="padding: 16px 20px;"><h3 style="font-size: 15px; margin-bottom: 4px;">Parcel Data</h3><p style="font-size: 13px;">Land ownership, acreage, and zoning for shortlisted sites</p></div>
                         </div>
                     </div>
                 </div>
@@ -877,7 +1078,7 @@
             <span class="slide-number">7 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 8: SITE DETAIL DEEP DIVE ============ -->
+        <!-- ============ SLIDE 8: SITE DETAIL ============ -->
         <div class="slide slide-dark" data-slide="8">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -889,52 +1090,60 @@
                         <div class="divider"></div>
                         <h2 style="font-size: 36px;">Complete Site<br>Intelligence</h2>
                         <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px;">
-                            Every site detail page delivers a full infrastructure profile&mdash;everything needed for initial site qualification in one view.
+                            Every site detail page delivers a full infrastructure profile&mdash;everything needed for initial qualification in one view.
                         </p>
                         <div class="grid-2" style="gap: 12px;">
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--accent-blue);">Power</h3>
-                                <p style="font-size: 12px;">Voltage, capacity MW, nearest lines, distance to substation</p>
-                            </div>
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--accent-green);">Fiber</h3>
-                                <p style="font-size: 12px;">Provider count, nearest IXP, lit building proximity</p>
-                            </div>
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--accent-cyan);">Water</h3>
-                                <p style="font-size: 12px;">WRI stress score, cooling feasibility, watershed data</p>
-                            </div>
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--accent-amber);">Risk</h3>
-                                <p style="font-size: 12px;">FEMA NRI composite, flood, earthquake, tornado, hurricane</p>
-                            </div>
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--purple-light);">Labor</h3>
-                                <p style="font-size: 12px;">Construction + IT employment, wage levels, workforce density</p>
-                            </div>
-                            <div class="card" style="padding: 16px;">
-                                <h3 style="font-size: 14px; color: var(--accent-red);">Incentives</h3>
-                                <p style="font-size: 12px;">DC tax incentives, IRA credits, Opportunity Zone status</p>
-                            </div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--accent-blue);">Power</h3><p style="font-size: 12px;">Voltage, capacity MW, nearest lines, substation distance</p></div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--accent-green);">Fiber</h3><p style="font-size: 12px;">Provider count, nearest IXP, lit building proximity</p></div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--accent-cyan);">Water</h3><p style="font-size: 12px;">WRI stress score, cooling feasibility, watershed data</p></div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--accent-amber);">Risk</h3><p style="font-size: 12px;">FEMA NRI composite, flood, earthquake, tornado</p></div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--purple-light);">Labor</h3><p style="font-size: 12px;">Construction + IT employment, wages, density</p></div>
+                            <div class="card" style="padding: 16px;"><h3 style="font-size: 14px; color: var(--accent-red);">Incentives</h3><p style="font-size: 12px;">DC tax incentives, IRA credits, OZ status</p></div>
                         </div>
                     </div>
-                    <div class="demo-frame">
-                        <div class="demo-frame-bar">
-                            <div class="demo-dot red"></div>
-                            <div class="demo-dot yellow"></div>
-                            <div class="demo-dot green"></div>
-                            <span class="demo-url">hyder.me/grid/site?id=...</span>
+                    <div class="mockup-window">
+                        <div class="mockup-bar">
+                            <div class="mockup-dot r"></div>
+                            <div class="mockup-dot y"></div>
+                            <div class="mockup-dot g"></div>
+                            <span class="mockup-url">hyder.me/grid/site?id=4218</span>
                         </div>
-                        <!-- REPLACE: Record a GIF of a site detail page showing:
-                             1. Satellite map of the site
-                             2. Score breakdown with factor details
-                             3. Scroll through infrastructure data (power, fiber, water, risk)
-                             4. Show nearby transmission lines and substations
-                             Save as: decks/gridscout/assets/demo-detail.gif -->
-                        <div class="demo-placeholder">
-                            <div class="icon">&#128196;</div>
-                            <div>Site Detail Demo</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Replace with animated GIF</div>
+                        <div class="mockup-body">
+                            <div class="detail-mock" id="detailMock">
+                                <div class="detail-mock-map">
+                                    <div class="detail-mock-grid-bg"></div>
+                                    <div class="detail-mock-line" style="top:40%;left:10%;width:35%;transform:rotate(-5deg)"></div>
+                                    <div class="detail-mock-line" style="top:55%;left:40%;width:45%;transform:rotate(8deg)"></div>
+                                    <div class="detail-mock-line" style="top:35%;left:55%;width:30%;transform:rotate(-12deg)"></div>
+                                    <div class="detail-mock-pin"></div>
+                                </div>
+                                <div class="detail-mock-content" id="detailContent">
+                                    <div class="detail-mock-section" data-delay="200">
+                                        <div class="detail-mock-section-title"><span class="dot" style="background:var(--accent-blue)"></span>Power Infrastructure</div>
+                                        <div class="detail-mock-kv"><span class="k">Voltage</span><span class="v" style="color:var(--accent-blue)">345 kV</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Capacity</span><span class="v" style="color:var(--accent-green)">1,200 MW</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Nearest Line</span><span class="v">0.3 mi</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Speed to Power</span><span class="v" style="color:var(--accent-green)">Fast</span></div>
+                                    </div>
+                                    <div class="detail-mock-section" data-delay="600">
+                                        <div class="detail-mock-section-title"><span class="dot" style="background:var(--accent-green)"></span>Fiber Connectivity</div>
+                                        <div class="detail-mock-kv"><span class="k">Providers</span><span class="v" style="color:var(--accent-green)">12</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Nearest IXP</span><span class="v">Equinix Ashburn (2.1 mi)</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Lit Buildings</span><span class="v" style="color:var(--accent-green)">8 within 5 mi</span></div>
+                                    </div>
+                                    <div class="detail-mock-section" data-delay="1000">
+                                        <div class="detail-mock-section-title"><span class="dot" style="background:var(--accent-cyan)"></span>Water &amp; Climate</div>
+                                        <div class="detail-mock-kv"><span class="k">Water Stress</span><span class="v" style="color:var(--accent-amber)">Medium (2.1/5)</span></div>
+                                        <div class="detail-mock-kv"><span class="k">Cooling Degree Days</span><span class="v">1,184</span></div>
+                                    </div>
+                                    <div class="detail-mock-section" data-delay="1400">
+                                        <div class="detail-mock-section-title"><span class="dot" style="background:var(--accent-amber)"></span>Risk &amp; Incentives</div>
+                                        <div class="detail-mock-kv"><span class="k">FEMA NRI Score</span><span class="v" style="color:var(--accent-green)">Low (12.4)</span></div>
+                                        <div class="detail-mock-kv"><span class="k">DC Tax Incentive</span><span class="v" style="color:var(--accent-green)">Yes</span></div>
+                                        <div class="detail-mock-kv"><span class="k">IRA Energy Comm.</span><span class="v" style="color:var(--accent-amber)">No</span></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -942,7 +1151,7 @@
             <span class="slide-number">8 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 9: COMPETITIVE COMPARISON ============ -->
+        <!-- ============ SLIDE 9: COMPARISON ============ -->
         <div class="slide slide-purple" data-slide="9">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -953,72 +1162,22 @@
                 <h2>Feature Comparison</h2>
                 <div style="background: var(--bg-card); border-radius: 14px; padding: 4px; border: 1px solid rgba(124,58,237,0.15); margin-top: 8px;">
                     <table class="compare-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 240px;">Capability</th>
-                                <th class="highlight-col" style="width: 160px;">GridScout DC</th>
-                                <th>Traditional Consultants</th>
-                                <th>GIS Platforms</th>
-                                <th>Public Data (DIY)</th>
-                            </tr>
-                        </thead>
+                        <thead><tr>
+                            <th style="width: 220px;">Capability</th>
+                            <th class="hl" style="width: 150px;">GridScout DC</th>
+                            <th>Consultants</th>
+                            <th>GIS Platforms</th>
+                            <th>DIY / Public</th>
+                        </tr></thead>
                         <tbody>
-                            <tr>
-                                <td>Nationwide scored sites</td>
-                                <td class="highlight-col"><span class="check">40,000+</span></td>
-                                <td>50&ndash;200 per engagement</td>
-                                <td><span class="cross">&mdash;</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                            </tr>
-                            <tr>
-                                <td>Multi-factor DC scoring</td>
-                                <td class="highlight-col"><span class="check">10 factors, adjustable</span></td>
-                                <td><span class="partial">Custom, manual</span></td>
-                                <td><span class="cross">Not DC-specific</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                            </tr>
-                            <tr>
-                                <td>Interactive map explorer</td>
-                                <td class="highlight-col"><span class="check">&#10003;</span></td>
-                                <td><span class="cross">Static reports</span></td>
-                                <td><span class="check">&#10003;</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                            </tr>
-                            <tr>
-                                <td>Transmission line overlay</td>
-                                <td class="highlight-col"><span class="check">52K lines</span></td>
-                                <td><span class="partial">Limited</span></td>
-                                <td><span class="partial">Separate layer</span></td>
-                                <td><span class="partial">Raw HIFLD</span></td>
-                            </tr>
-                            <tr>
-                                <td>Brownfield + greenfield sites</td>
-                                <td class="highlight-col"><span class="check">&#10003;</span></td>
-                                <td><span class="partial">By request</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                            </tr>
-                            <tr>
-                                <td>IRA / Opportunity Zone overlay</td>
-                                <td class="highlight-col"><span class="check">&#10003;</span></td>
-                                <td><span class="partial">Manual check</span></td>
-                                <td><span class="cross">&mdash;</span></td>
-                                <td><span class="partial">Separate lookup</span></td>
-                            </tr>
-                            <tr>
-                                <td>Time to initial shortlist</td>
-                                <td class="highlight-col"><span class="check">Minutes</span></td>
-                                <td>Weeks to months</td>
-                                <td>Days</td>
-                                <td>Weeks</td>
-                            </tr>
-                            <tr>
-                                <td>Typical cost</td>
-                                <td class="highlight-col"><span class="check">Platform access</span></td>
-                                <td>$50K&ndash;$500K+</td>
-                                <td>$10K&ndash;$50K/yr</td>
-                                <td>Staff time</td>
-                            </tr>
+                            <tr><td>Nationwide scored sites</td><td class="hl"><span class="check">40,000+</span></td><td>50&ndash;200 per engagement</td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+                            <tr><td>Multi-factor DC scoring</td><td class="hl"><span class="check">10 factors, adjustable</span></td><td><span class="partial">Custom, manual</span></td><td><span class="cross">Not DC-specific</span></td><td><span class="cross">&mdash;</span></td></tr>
+                            <tr><td>Interactive map explorer</td><td class="hl"><span class="check">&#10003;</span></td><td><span class="cross">Static reports</span></td><td><span class="check">&#10003;</span></td><td><span class="cross">&mdash;</span></td></tr>
+                            <tr><td>Transmission line overlay</td><td class="hl"><span class="check">52K lines</span></td><td><span class="partial">Limited</span></td><td><span class="partial">Separate layer</span></td><td><span class="partial">Raw HIFLD</span></td></tr>
+                            <tr><td>Brownfield + greenfield sites</td><td class="hl"><span class="check">&#10003;</span></td><td><span class="partial">By request</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+                            <tr><td>IRA / Opportunity Zone overlay</td><td class="hl"><span class="check">&#10003;</span></td><td><span class="partial">Manual check</span></td><td><span class="cross">&mdash;</span></td><td><span class="partial">Separate lookup</span></td></tr>
+                            <tr><td>Time to initial shortlist</td><td class="hl"><span class="check">Minutes</span></td><td>Weeks to months</td><td>Days</td><td>Weeks</td></tr>
+                            <tr><td>Typical cost</td><td class="hl"><span class="check">Platform access</span></td><td>$50K&ndash;$500K+</td><td>$10K&ndash;$50K/yr</td><td>Staff time</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1026,7 +1185,7 @@
             <span class="slide-number">9 / 10</span>
         </div>
 
-        <!-- ============ SLIDE 10: CLOSING / CTA ============ -->
+        <!-- ============ SLIDE 10: CLOSING ============ -->
         <div class="slide slide-hero" data-slide="10">
             <div class="logo-bar">
                 <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
@@ -1039,22 +1198,10 @@
                 40,000+ scored sites. 16 data sources. Every state.<br>One platform.
             </p>
             <div class="grid-4" style="max-width: 800px; margin-bottom: 48px;">
-                <div class="stat-block">
-                    <div class="stat-number" style="font-size: 28px;">40K+</div>
-                    <div class="stat-label">Sites Scored</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number green" style="font-size: 28px;">50</div>
-                    <div class="stat-label">States Covered</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number blue" style="font-size: 28px;">10</div>
-                    <div class="stat-label">Scoring Factors</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number amber" style="font-size: 28px;">16</div>
-                    <div class="stat-label">Data Sources</div>
-                </div>
+                <div class="stat-block"><div class="stat-number" style="font-size: 28px;">40K+</div><div class="stat-label">Sites Scored</div></div>
+                <div class="stat-block"><div class="stat-number green" style="font-size: 28px;">50</div><div class="stat-label">States</div></div>
+                <div class="stat-block"><div class="stat-number blue" style="font-size: 28px;">10</div><div class="stat-label">Scoring Factors</div></div>
+                <div class="stat-block"><div class="stat-number amber" style="font-size: 28px;">16</div><div class="stat-label">Data Sources</div></div>
             </div>
             <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;">
                 <a href="https://hyder.me/grid" style="display: inline-block; padding: 14px 36px; background: var(--purple); color: var(--white); text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 16px; border: 1px solid var(--purple-light); transition: all 0.2s;">Explore GridScout DC</a>
@@ -1073,6 +1220,7 @@
     <script>
         let currentSlide = 1;
         const totalSlides = 10;
+        const animatedSlides = {};
 
         function showSlide(n) {
             if (n < 1) n = 1;
@@ -1082,6 +1230,15 @@
             currentSlide = n;
             document.getElementById('progress').style.width = `${(n / totalSlides) * 100}%`;
             history.replaceState(null, null, `#${n}`);
+
+            // Trigger slide-specific animations
+            if (!animatedSlides[n]) {
+                animatedSlides[n] = true;
+                if (n === 3) animateMap();
+                if (n === 4) animateScore();
+                if (n === 7) animateSearch();
+                if (n === 8) animateDetail();
+            }
         }
 
         function nextSlide() { showSlide(currentSlide + 1); }
@@ -1103,6 +1260,133 @@
             const hash = parseInt(window.location.hash.replace('#', ''));
             if (hash >= 1 && hash <= totalSlides) showSlide(hash);
         });
+
+        // ===== SLIDE 3: MAP ANIMATION =====
+        function animateMap() {
+            const mock = document.getElementById('mapMock');
+            if (!mock) return;
+
+            // Animate markers with staggered delays
+            mock.querySelectorAll('.map-marker').forEach(m => {
+                const delay = parseInt(m.dataset.delay) || 0;
+                m.style.animationDelay = delay + 'ms';
+            });
+
+            // Animate transmission lines
+            mock.querySelectorAll('.map-line').forEach(l => {
+                const delay = parseInt(l.dataset.delay) || 0;
+                l.style.animationDelay = delay + 'ms';
+            });
+
+            // Show popup after markers appear
+            setTimeout(() => {
+                const popup = document.getElementById('mapPopup');
+                if (popup) popup.style.display = 'block';
+            }, 1800);
+
+            // Show zoom ring
+            setTimeout(() => {
+                const zoom = document.getElementById('mapZoom');
+                if (zoom) zoom.style.display = 'block';
+            }, 2200);
+        }
+
+        // ===== SLIDE 4: SCORE ANIMATION =====
+        function animateScore() {
+            const mock = document.getElementById('scoreMock');
+            if (!mock) return;
+
+            // Animate circle fill
+            const circle = document.getElementById('scoreCircle');
+            circle.querySelector('.fill').classList.add('score-anim');
+
+            // Count up the score number
+            const scoreNum = document.getElementById('scoreNum');
+            let count = 0;
+            const target = 87;
+            const interval = setInterval(() => {
+                count += 2;
+                if (count >= target) { count = target; clearInterval(interval); }
+                scoreNum.textContent = count;
+            }, 30);
+
+            // Animate rows
+            mock.querySelectorAll('.score-mock-row').forEach(row => {
+                const delay = parseInt(row.dataset.delay) || 0;
+                setTimeout(() => {
+                    row.classList.add('score-row-anim');
+                }, delay);
+            });
+
+            // Animate bar fills
+            mock.querySelectorAll('.score-mock-bar-fill').forEach(fill => {
+                const delay = parseInt(fill.dataset.delay) || 0;
+                setTimeout(() => {
+                    fill.classList.add('score-bar-anim');
+                }, delay);
+            });
+        }
+
+        // ===== SLIDE 7: SEARCH ANIMATION =====
+        function animateSearch() {
+            const body = document.getElementById('searchBody');
+            const filters = document.getElementById('searchFilters');
+            if (!body) return;
+
+            const sites = [
+                { name: 'Loudoun Co. Sub #4218', state: 'VA', type: 'Substation', score: 87, power: '345kV', color: 'var(--accent-green)' },
+                { name: 'Ashburn Corridor G-112', state: 'VA', type: 'Greenfield', score: 84, power: '230kV', color: 'var(--accent-green)' },
+                { name: 'Henrico Retired Plant', state: 'VA', type: 'Brownfield', score: 82, power: '500kV', color: 'var(--accent-green)' },
+                { name: 'Prince William Sub #891', state: 'VA', type: 'Substation', score: 79, power: '230kV', color: 'var(--accent-blue)' },
+                { name: 'Manassas Corridor G-445', state: 'VA', type: 'Greenfield', score: 76, power: '138kV', color: 'var(--accent-blue)' },
+                { name: 'Fauquier Co. Sub #2103', state: 'VA', type: 'Substation', score: 74, power: '138kV', color: 'var(--accent-blue)' },
+                { name: 'Stafford Industrial BF', state: 'VA', type: 'Brownfield', score: 71, power: '230kV', color: 'var(--accent-blue)' },
+            ];
+
+            // Phase 1: Show initial "All" state
+            setTimeout(() => {
+                // Phase 2: Activate Virginia filter
+                const stateFilter = filters.children[0];
+                stateFilter.classList.add('active');
+                stateFilter.innerHTML = 'State: <strong>Virginia</strong>';
+
+                // Phase 3: Populate rows with stagger
+                sites.forEach((site, i) => {
+                    setTimeout(() => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'search-row-anim' + (i === 0 ? ' search-highlight-row' : '');
+                        tr.innerHTML = `
+                            <td style="font-weight:500; color:var(--text-primary)">${site.name}</td>
+                            <td>${site.state}</td>
+                            <td><span class="badge badge-${site.type === 'Substation' ? 'blue' : site.type === 'Greenfield' ? 'green' : 'amber'}" style="font-size:9px">${site.type}</span></td>
+                            <td class="score-cell" style="color:${site.color}">${site.score}<span class="mini-bar" style="width:${site.score * 0.6}px; background:${site.color}"></span></td>
+                            <td style="font-family:var(--mono); font-size:10px;">${site.power}</td>
+                        `;
+                        body.appendChild(tr);
+                    }, i * 120);
+                });
+            }, 500);
+
+            // Phase 4: Activate score filter
+            setTimeout(() => {
+                const scoreFilter = filters.children[2];
+                scoreFilter.classList.add('active');
+                scoreFilter.innerHTML = 'Min Score: <strong>70+</strong>';
+            }, 1600);
+        }
+
+        // ===== SLIDE 8: DETAIL ANIMATION =====
+        function animateDetail() {
+            const content = document.getElementById('detailContent');
+            if (!content) return;
+
+            content.querySelectorAll('.detail-mock-section').forEach(section => {
+                const delay = parseInt(section.dataset.delay) || 0;
+                setTimeout(() => {
+                    section.classList.add('detail-section-anim');
+                }, delay);
+            });
+        }
     </script>
 </body>
 </html>
