@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { withDemoToken } from "@/lib/demoAccess";
 import HeatMapLayer from "@/components/HeatMapLayer";
-import GeoSearch from "@/components/GeoSearch";
+import LocationFilter from "@/components/LocationFilter";
 
 interface MapSite {
   id: string;
@@ -837,15 +837,33 @@ export default function MapPage() {
   }, [viewMode, mapReady]);
 
   // Geo search handler
-  const handleLocationSelect = useCallback((lat: number, lng: number, radius: number, displayName: string) => {
-    if (!lat && !lng) {
-      // Cleared search
-      setGeoSearchActive(false);
-      setGeoSearchSiteCount(0);
-      return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const geoCircleRef = useRef<any>(null);
+
+  const handleLocationSelect = useCallback(async (lat: number, lng: number, radius: number) => {
+    if (!leafletMap.current) return;
+    const L = await import("leaflet");
+
+    // Remove existing circle
+    if (geoCircleRef.current) {
+      leafletMap.current.removeLayer(geoCircleRef.current);
+      geoCircleRef.current = null;
     }
 
     setGeoSearchActive(true);
+
+    // Fly to location
+    leafletMap.current.flyTo([lat, lng], 10, { duration: 1.5 });
+
+    // Draw radius circle
+    geoCircleRef.current = L.circle([lat, lng], {
+      radius: radius * 1609.34,
+      color: "#7c3aed",
+      fillColor: "#7c3aed",
+      fillOpacity: 0.06,
+      weight: 2,
+      dashArray: "6 4",
+    }).addTo(leafletMap.current);
 
     // Count sites within radius
     const radiusKm = radius * 1.60934;
@@ -858,6 +876,20 @@ export default function MapPage() {
     }
     setGeoSearchSiteCount(count);
   }, [sitesData]);
+
+  const handleLocationClear = useCallback(async () => {
+    setGeoSearchActive(false);
+    setGeoSearchSiteCount(0);
+
+    if (geoCircleRef.current && leafletMap.current) {
+      leafletMap.current.removeLayer(geoCircleRef.current);
+      geoCircleRef.current = null;
+    }
+
+    if (leafletMap.current) {
+      leafletMap.current.flyTo([39.0, -98.0], 5, { duration: 1 });
+    }
+  }, []);
 
   // === Filter Controls ===
   // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
@@ -977,6 +1009,22 @@ export default function MapPage() {
                 </div>
               </div>
               )}
+
+              {/* Location Search */}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</label>
+                <div className="mt-2">
+                  <LocationFilter
+                    onLocationChange={(lat, lng, radius) => handleLocationSelect(lat, lng, radius)}
+                    onClear={handleLocationClear}
+                  />
+                  {geoSearchActive && geoSearchSiteCount > 0 && (
+                    <p className="text-xs text-purple-600 font-medium mt-1.5">
+                      {geoSearchSiteCount.toLocaleString()} sites in range
+                    </p>
+                  )}
+                </div>
+              </div>
 
               {/* Filters */}
               <div>
@@ -1135,14 +1183,6 @@ export default function MapPage() {
 
             <div ref={mapRef} className="h-full w-full" />
 
-            {/* Geographic Search - rendered AFTER map div to be above Leaflet's z-index layers */}
-            {mapReady && (
-              <GeoSearch
-                map={leafletMap.current}
-                onLocationSelect={handleLocationSelect}
-                siteCount={geoSearchSiteCount}
-              />
-            )}
 
             {/* Heat Map Layer */}
             {mapReady && (
