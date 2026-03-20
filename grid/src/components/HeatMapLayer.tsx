@@ -74,10 +74,19 @@ export default function HeatMapLayer({ map, visible }: HeatMapLayerProps) {
     if (!globalL || !globalL.heatLayer) return;
 
     const zoom = map.getZoom();
-    // Keep radius large enough that county centroids (~50-80km apart) always overlap.
-    // At high zoom, increase radius so heat stays visible even when few centroids are in view.
-    const radius = zoom < 6 ? 55 : zoom < 8 ? 45 : zoom < 10 ? 40 : zoom < 12 ? 35 : 30;
-    const blur = zoom < 6 ? 40 : zoom < 8 ? 30 : zoom < 10 ? 25 : 20;
+    // County centroids are ~50-80km apart. At higher zoom, each centroid covers
+    // more pixels on screen, so we need LARGER radius to maintain continuous coverage.
+    // The radius is in pixels — at zoom 5 the whole US fits, at zoom 10 it's one state.
+    let radius: number, blur: number;
+    if (zoom <= 5) { radius = 50; blur = 35; }
+    else if (zoom <= 6) { radius = 55; blur = 35; }
+    else if (zoom <= 7) { radius = 65; blur = 40; }
+    else if (zoom <= 8) { radius = 80; blur = 50; }
+    else if (zoom <= 9) { radius = 100; blur = 60; }
+    else if (zoom <= 10) { radius = 130; blur = 70; }
+    else if (zoom <= 11) { radius = 170; blur = 90; }
+    else if (zoom <= 12) { radius = 220; blur = 110; }
+    else { radius = 300; blur = 150; }
 
     const heatLayer = globalL.heatLayer(countyHeat, {
       radius,
