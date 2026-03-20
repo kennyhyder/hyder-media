@@ -2,8 +2,9 @@
 """
 Enrich grid_dc_sites with nearest fiber optic route distance.
 
-Source: OpenStreetMap via Overpass API
-  https://overpass-api.de/api/interpreter
+Sources:
+  1. OpenStreetMap via Overpass API (fiber cable geometries)
+  2. grid_fiber_routes table (railroad ROW, DOT fiber, NTIA middle mile — centroids)
 
 Fields populated:
 - nearest_fiber_route_km  (numeric 8,2) — distance to nearest fiber optic cable route
@@ -12,7 +13,7 @@ Usage:
   python3 -u scripts/enrich-osm-fiber.py
   python3 -u scripts/enrich-osm-fiber.py --dry-run
   python3 -u scripts/enrich-osm-fiber.py --skip-download
-  python3 -u scripts/enrich-osm-fiber.py --skip-download --dry-run
+  python3 -u scripts/enrich-osm-fiber.py --force    # Recompute all (not just NULLs)
 """
 
 import os
@@ -63,6 +64,7 @@ OVERPASS_QUERY = """[out:json][timeout:300];
 out geom;
 """
 CACHE_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'osm_fiber_routes.json')
+DB_FIBER_CACHE = os.path.join(os.path.dirname(__file__), '..', 'data', 'db_fiber_centroids.json')
 
 
 def supabase_request(method, path, data=None, headers_extra=None):
@@ -226,10 +228,54 @@ def download_fiber_routes():
 
 def load_cached_fiber_routes():
     """Load fiber route data from cache file."""
-    print(f"\n[Phase 1] Loading cached fiber route data from {CACHE_FILE}...")
+    print(f"\n[Phase 1a] Loading cached OSM fiber route data from {CACHE_FILE}...")
     with open(CACHE_FILE, 'r') as f:
         routes = json.load(f)
-    print(f"  Loaded {len(routes)} fiber route segments from cache")
+    print(f"  Loaded {len(routes)} OSM fiber route segments from cache")
+    return routes
+
+
+def load_db_fiber_centroids(skip_download=False):
+    """
+    Load fiber route centroids from grid_fiber_routes table.
+
+    These include railroad ROW (~492K), DOT fiber, NTIA middle mile routes.
+    We use centroids as point proxies — segments are typically short (1-5 miles)
+    so centroid error is small.
+    """
+    if skip_download and os.path.exists(DB_FIBER_CACHE):
+        print(f"\n[Phase 1b] Loading cached DB fiber centroids from {DB_FIBER_CACHE}...")
+        with open(DB_FIBER_CACHE, 'r') as f:
+            centroids = json.load(f)
+        print(f"  Loaded {len(centroids)} DB fiber centroids from cache")
+        return centroids
+
+    print(f"\n[Phase 1b] Loading fiber route centroids from grid_fiber_routes...")
+    centroids = load_paginated(
+        'grid_fiber_routes',
+        'id,centroid_lat,centroid_lng',
+        '&centroid_lat=not.is.null&centroid_lng=not.is.null'
+    )
+    print(f"  Loaded {len(centroids)} fiber route centroids from DB")
+
+    # Convert to route format: each centroid becomes a degenerate 1-point "segment"
+    routes = []
+    for c in centroids:
+        lat = c.get('centroid_lat')
+        lng = c.get('centroid_lng')
+        if lat and lng:
+            routes.append({
+                'id': c['id'],
+                'coords': [[float(lng), float(lat)]],
+            })
+
+    # Cache to file
+    os.makedirs(os.path.dirname(DB_FIBER_CACHE), exist_ok=True)
+    with open(DB_FIBER_CACHE, 'w') as f:
+        json.dump(routes, f)
+    file_mb = os.path.getsize(DB_FIBER_CACHE) / (1024 * 1024)
+    print(f"  Cached {len(routes)} centroids to {DB_FIBER_CACHE} ({file_mb:.1f} MB)")
+
     return routes
 
 
@@ -283,15 +329,22 @@ def find_nearest_fiber_route(lat, lng, routes, grid_index):
     min_dist = float('inf')
     for idx in nearby_indices:
         coords = routes[idx]['coords']
-        # Check each consecutive pair of coordinates as a segment
-        for i in range(len(coords) - 1):
-            lng1, lat1 = coords[i][0], coords[i][1]
-            lng2, lat2 = coords[i + 1][0], coords[i + 1][1]
-            d = point_to_segment_distance(lat, lng, lat1, lng1, lat2, lng2)
-            if d < min_dist:
-                min_dist = d
-                if min_dist < 0.01:  # Close enough, no need to keep checking
-                    return round(min_dist, 2)
+        if len(coords) == 1:
+            # Single-point centroid (DB fiber routes) — use direct distance
+            d = haversine(lat, lng, coords[0][1], coords[0][0])
+        else:
+            # Multi-point line — check each consecutive segment
+            d = float('inf')
+            for i in range(len(coords) - 1):
+                lng1, lat1 = coords[i][0], coords[i][1]
+                lng2, lat2 = coords[i + 1][0], coords[i + 1][1]
+                seg_d = point_to_segment_distance(lat, lng, lat1, lng1, lat2, lng2)
+                if seg_d < d:
+                    d = seg_d
+        if d < min_dist:
+            min_dist = d
+            if min_dist < 0.01:  # Close enough, no need to keep checking
+                return round(min_dist, 2)
 
     return round(min_dist, 2) if min_dist < float('inf') else None
 
@@ -299,6 +352,7 @@ def find_nearest_fiber_route(lat, lng, routes, grid_index):
 def main():
     dry_run = '--dry-run' in sys.argv
     skip_download = '--skip-download' in sys.argv
+    force = '--force' in sys.argv
 
     if dry_run:
         print("=== DRY RUN -- no changes will be made ===\n")
@@ -306,11 +360,21 @@ def main():
     print("GridScout: Enrich Fiber Optic Route Proximity")
     print("=" * 50)
 
-    # Phase 1: Get fiber route data
+    # Phase 1a: Get OSM fiber route data
     if skip_download and os.path.exists(CACHE_FILE):
-        routes = load_cached_fiber_routes()
+        osm_routes = load_cached_fiber_routes()
     else:
-        routes = download_fiber_routes()
+        osm_routes = download_fiber_routes()
+
+    if not osm_routes:
+        osm_routes = []
+
+    # Phase 1b: Get DB fiber route centroids (railroad ROW, DOT, NTIA)
+    db_routes = load_db_fiber_centroids(skip_download=skip_download)
+
+    # Merge both sources
+    routes = osm_routes + db_routes
+    print(f"\n  Combined fiber data: {len(osm_routes)} OSM + {len(db_routes)} DB = {len(routes)} total")
 
     if not routes:
         print("ERROR: No fiber route data available.")
@@ -328,9 +392,13 @@ def main():
     )
     print(f"  Loaded {len(sites)} sites with coordinates")
 
-    # Filter to sites not yet enriched
-    sites_to_process = [s for s in sites if s.get('nearest_fiber_route_km') is None]
-    print(f"  {len(sites_to_process)} sites need fiber route distance")
+    # Filter to sites to process
+    if force:
+        sites_to_process = sites
+        print(f"  --force: recomputing all {len(sites_to_process)} sites")
+    else:
+        sites_to_process = [s for s in sites if s.get('nearest_fiber_route_km') is None]
+        print(f"  {len(sites_to_process)} sites need fiber route distance")
 
     if not sites_to_process:
         print("  Nothing to do. All sites already enriched.")
@@ -394,7 +462,9 @@ def main():
         for site_id, dist in results.items():
             f.write(f"{site_id}\t{dist}\n")
         f.write("\\.\n")
-        f.write("UPDATE grid_dc_sites SET nearest_fiber_route_km = _fiber_dist.dist "
+        f.write("UPDATE grid_dc_sites SET nearest_fiber_route_km = LEAST("
+                "COALESCE(grid_dc_sites.nearest_fiber_route_km, _fiber_dist.dist), "
+                "_fiber_dist.dist) "
                 "FROM _fiber_dist WHERE grid_dc_sites.id = _fiber_dist.id;\n")
         f.write("SELECT COUNT(*) AS updated FROM grid_dc_sites "
                 "WHERE nearest_fiber_route_km IS NOT NULL;\n")
