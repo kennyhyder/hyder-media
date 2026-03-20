@@ -625,33 +625,33 @@ export default function MapPage() {
     };
   }, [mapReady, initialLoad, fetchAndRender]);
 
-  // Toggle layer visibility without re-fetching
+  // Toggle layer visibility without re-fetching (respect heatmap mode)
   useEffect(() => {
     if (!leafletMap.current || !siteLayerRef.current) return;
-    if (showSites) {
+    if (showSites && viewMode !== "heatmap") {
       if (!leafletMap.current.hasLayer(siteLayerRef.current)) leafletMap.current.addLayer(siteLayerRef.current);
     } else {
       leafletMap.current.removeLayer(siteLayerRef.current);
     }
-  }, [showSites]);
+  }, [showSites, viewMode]);
 
   useEffect(() => {
     if (!leafletMap.current || !dcLayerRef.current) return;
-    if (showDCs) {
+    if (showDCs && viewMode !== "heatmap") {
       if (!leafletMap.current.hasLayer(dcLayerRef.current)) leafletMap.current.addLayer(dcLayerRef.current);
     } else {
       leafletMap.current.removeLayer(dcLayerRef.current);
     }
-  }, [showDCs]);
+  }, [showDCs, viewMode]);
 
   useEffect(() => {
     if (!leafletMap.current || !ixpLayerRef.current) return;
-    if (showIXPs) {
+    if (showIXPs && viewMode !== "heatmap") {
       if (!leafletMap.current.hasLayer(ixpLayerRef.current)) leafletMap.current.addLayer(ixpLayerRef.current);
     } else {
       leafletMap.current.removeLayer(ixpLayerRef.current);
     }
-  }, [showIXPs]);
+  }, [showIXPs, viewMode]);
 
   useEffect(() => {
     if (!leafletMap.current || !lineLayerRef.current) return;
@@ -688,21 +688,31 @@ export default function MapPage() {
     return () => { leafletMap.current?.off("zoomend", onZoom); };
   }, [mapReady]);
 
-  // Toggle marker layer visibility based on view mode
+  // Toggle ALL marker layers based on view mode (heat map = clean canvas)
   useEffect(() => {
-    if (!leafletMap.current || !siteLayerRef.current) return;
+    if (!leafletMap.current) return;
+    const map = leafletMap.current;
+    const layers = [siteLayerRef, dcLayerRef, ixpLayerRef];
     if (viewMode === "heatmap") {
-      // Hide markers in heat map mode
-      if (leafletMap.current.hasLayer(siteLayerRef.current)) {
-        leafletMap.current.removeLayer(siteLayerRef.current);
+      // Hide all marker layers in heat map mode
+      for (const ref of layers) {
+        if (ref.current && map.hasLayer(ref.current)) {
+          map.removeLayer(ref.current);
+        }
       }
-    } else if (showSites) {
-      // Show markers in marker mode (if showSites is on)
-      if (!leafletMap.current.hasLayer(siteLayerRef.current)) {
-        leafletMap.current.addLayer(siteLayerRef.current);
+    } else {
+      // Restore marker layers in marker mode
+      if (showSites && siteLayerRef.current && !map.hasLayer(siteLayerRef.current)) {
+        map.addLayer(siteLayerRef.current);
+      }
+      if (showDCs && dcLayerRef.current && !map.hasLayer(dcLayerRef.current)) {
+        map.addLayer(dcLayerRef.current);
+      }
+      if (showIXPs && ixpLayerRef.current && !map.hasLayer(ixpLayerRef.current)) {
+        map.addLayer(ixpLayerRef.current);
       }
     }
-  }, [viewMode, showSites]);
+  }, [viewMode, showSites, showDCs, showIXPs]);
 
   // Manage heat map gradient legend
   useEffect(() => {
