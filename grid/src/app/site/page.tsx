@@ -56,20 +56,41 @@ interface SiteDetail {
   nearbyFacilities?: NearbyFacility[];
 }
 
-function scoreBar(label: string, value: number, weight: string) {
+interface ScoreFactorInfo {
+  source: string;
+  rawValue: string | null;
+  criteria: string;
+}
+
+function ScoreBarWithDetail({ label, value, weight, detail }: { label: string; value: number; weight: string; detail: ScoreFactorInfo }) {
+  const [open, setOpen] = useState(false);
   const color =
     value >= 70 ? "bg-green-500" :
     value >= 50 ? "bg-yellow-500" :
     value >= 30 ? "bg-orange-500" : "bg-red-500";
 
   return (
-    <div className="flex items-center gap-3 py-1">
-      <span className="text-xs text-gray-600 w-32 truncate" title={label}>{label}</span>
-      <span className="text-xs text-gray-400 w-8">{weight}</span>
-      <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
-        <div className={`h-full rounded ${color}`} style={{ width: `${value}%` }} />
-      </div>
-      <span className="text-xs font-semibold text-gray-700 w-8 text-right">{value}</span>
+    <div className="border-b border-gray-50 last:border-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-3 py-1.5 hover:bg-gray-50 rounded transition-colors text-left"
+      >
+        <span className="text-[10px] text-gray-400 w-3 flex-shrink-0">{open ? "\u25BE" : "\u25B8"}</span>
+        <span className="text-xs text-gray-600 w-32 truncate" title={label}>{label}</span>
+        <span className="text-xs text-gray-400 w-8">{weight}</span>
+        <div className="flex-1 h-4 bg-gray-100 rounded overflow-hidden">
+          <div className={`h-full rounded ${color}`} style={{ width: `${value}%` }} />
+        </div>
+        <span className="text-xs font-semibold text-gray-700 w-8 text-right">{value}</span>
+      </button>
+      {open && (
+        <div className="ml-6 mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100 text-xs space-y-1">
+          <div><span className="text-gray-400">Source:</span> <span className="text-gray-600">{detail.source}</span></div>
+          {detail.rawValue && <div><span className="text-gray-400">Value:</span> <span className="text-gray-700 font-medium">{detail.rawValue}</span></div>}
+          <div><span className="text-gray-400">Criteria:</span> <span className="text-gray-600">{detail.criteria}</span></div>
+        </div>
+      )}
     </div>
   );
 }
@@ -222,7 +243,7 @@ function SiteDetailContent() {
   else if (constructionCostScore < 30) risks.push("Above-average construction costs — labor and materials premium in this market.");
 
   if (s.site_type === "brownfield") {
-    strengths.push("Brownfield advantage — existing grid connection, cleared land, and road access may reduce time-to-power by 2-4 years.");
+    strengths.push("Industrial site advantage — existing grid connection, cleared land, and road access may reduce time-to-power by 2-4 years.");
   }
 
   // ISO queue tracker URLs
@@ -316,7 +337,7 @@ function SiteDetailContent() {
                 ? "bg-green-100 text-green-700"
                 : "bg-blue-100 text-blue-700"
             }`}>
-              {String(s.site_type)}
+              {s.site_type === "brownfield" ? "Industrial Site" : s.site_type === "substation" ? "Greenfield Site" : String(s.site_type)}
             </span>
           </div>
           <p className="text-gray-600">
@@ -377,7 +398,7 @@ function SiteDetailContent() {
                 ? `${s.queue_depth} projects in the ${s.iso_region || "regional"} interconnection queue`
                 : `${s.iso_region || "Regional"} interconnection queue data`}
               {s.avg_queue_wait_years != null && ` with an average ${s.avg_queue_wait_years}-year wait`}.
-              {s.site_type === "brownfield" && " Brownfield sites with existing grid connections can bypass much of the queue."}
+              {s.site_type === "brownfield" && " Industrial sites with existing grid connections can bypass much of the queue."}
             </p>
           </div>
           <div className="text-3xl font-bold ml-4">{speedScore}</div>
@@ -420,23 +441,202 @@ function SiteDetailContent() {
       {/* Score breakdown */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Score Breakdown</h2>
-        <div className="space-y-1">
-          {scoreBar("Power Availability", powerScore, "30%")}
-          {scoreBar("Speed to Power", speedScore, "20%")}
-          {scoreBar("Fiber Connectivity", fiberScore, "18%")}
-          {scoreBar("Natural Hazard", hazardScore, "7%")}
-          {scoreBar("Existing DC Cluster", dcClusterScore, "7%")}
-          {scoreBar("Land / Acreage", landScore, "5%")}
-          {scoreBar("Labor Market", Number(s.score_labor) || 0, "5%")}
-          {scoreBar("Water Risk", waterScore, "3%")}
-          {scoreBar("Tax Incentive", taxScore, "3%")}
-          {scoreBar("Climate / Cooling", Number(s.score_climate) || 0, "2%")}
-          {scoreBar("Energy Cost", energyCostScore, "—")}
-          {scoreBar("Gas Pipeline", gasPipelineScore, "—")}
-          {scoreBar("Buildability", buildabilityScoreVal, "—")}
-          {scoreBar("Construction Cost", constructionCostScore, "—")}
+        <p className="text-xs text-gray-400 mb-3">Click any factor to see data source, raw value, and scoring criteria.</p>
+        <div>
+          <ScoreBarWithDetail label="Power Availability" value={powerScore} weight="20%" detail={{
+            source: "HIFLD Transmission Lines & Substations",
+            rawValue: s.nearest_substation_distance_km != null ? `${(Number(s.nearest_substation_distance_km) * 0.621371).toFixed(1)} mi to nearest substation${s.substation_voltage_kv ? `, ${s.substation_voltage_kv} kV` : ""}` : null,
+            criteria: "<1 mi / 345kV+ = 100, 1-5 mi = 80, 5-10 mi = 60, 10-25 mi = 40, >25 mi = 20"
+          }} />
+          <ScoreBarWithDetail label="Speed to Power" value={speedScore} weight="15%" detail={{
+            source: "ISO Interconnection Queues (7 ISOs)",
+            rawValue: s.queue_depth != null ? `Queue depth: ${s.queue_depth}${s.avg_queue_wait_years ? `, avg wait: ${s.avg_queue_wait_years} yrs` : ""}` : (s.iso_region ? `${s.iso_region} region` : null),
+            criteria: "Low queue + fast completion = 100, high backlog = 20"
+          }} />
+          <ScoreBarWithDetail label="Fiber Connectivity" value={fiberScore} weight="12%" detail={{
+            source: "FCC BDC + PeeringDB + OSM Fiber Routes",
+            rawValue: (() => {
+              const parts: string[] = [];
+              if (s.nearest_ixp_distance_km != null) parts.push(`${(Number(s.nearest_ixp_distance_km) * 0.621371).toFixed(1)} mi to nearest IXP`);
+              if (county?.fiber_provider_count != null) parts.push(`${county.fiber_provider_count} fiber providers in county`);
+              return parts.length > 0 ? parts.join(", ") : null;
+            })(),
+            criteria: "<5 mi to IXP + 5+ providers = 100, >50 mi + 0 providers = 0"
+          }} />
+          <ScoreBarWithDetail label="Energy Cost" value={energyCostScore} weight="10%" detail={{
+            source: "EIA Utility Rates + ISO LMP",
+            rawValue: s.energy_price_mwh != null ? `$${Number(s.energy_price_mwh).toFixed(2)}/MWh (${(Number(s.energy_price_mwh) / 10).toFixed(1)} cents/kWh)` : null,
+            criteria: "<6 cents/kWh = 100, 6-8 = 80, 8-10 = 60, 10-12 = 40, >12 = 20"
+          }} />
+          <ScoreBarWithDetail label="Water Risk" value={waterScore} weight="8%" detail={{
+            source: "WRI Aqueduct",
+            rawValue: county?.water_stress_label ? `${county.water_stress_label}${county.water_stress_score != null ? ` (score: ${county.water_stress_score})` : ""}` : null,
+            criteria: "Score <1.0 = 100, 1-2 = 80, 2-3 = 60, 3-4 = 40, >4 = 20"
+          }} />
+          <ScoreBarWithDetail label="Natural Hazard" value={hazardScore} weight="8%" detail={{
+            source: "FEMA National Risk Index",
+            rawValue: county?.nri_rating ? `${county.nri_rating}${county.nri_score != null ? ` (score: ${county.nri_score})` : ""}` : null,
+            criteria: "Very Low = 100, Relatively Low = 80, Moderate = 60, Relatively High = 40, Very High = 20"
+          }} />
+          <ScoreBarWithDetail label="Buildability" value={buildabilityScoreVal} weight="7%" detail={{
+            source: "NLCD Land Cover + FEMA Flood",
+            rawValue: (() => {
+              const parts: string[] = [];
+              if (s.nlcd_class) parts.push(`Land cover: ${s.nlcd_class}`);
+              if (s.flood_zone) parts.push(`Flood zone: ${s.flood_zone}`);
+              return parts.length > 0 ? parts.join(", ") : null;
+            })(),
+            criteria: "Developed/barren + no flood = 100, forest/wetland + SFHA = 0"
+          }} />
+          <ScoreBarWithDetail label="Labor Market" value={Number(s.score_labor) || 0} weight="4%" detail={{
+            source: "BLS QCEW",
+            rawValue: county?.construction_employment != null ? `Construction + IT employment in ${county.county_name || "county"}` : null,
+            criteria: "Top quartile = 100, bottom quartile = 25"
+          }} />
+          <ScoreBarWithDetail label="DC Cluster" value={dcClusterScore} weight="4%" detail={{
+            source: "PNNL + OSM Datacenters",
+            rawValue: s.nearest_dc_distance_km != null ? `${(Number(s.nearest_dc_distance_km) * 0.621371).toFixed(1)} mi to nearest operational DC` : null,
+            criteria: "<5 mi = 100, 5-25 mi = 80, 25-50 mi = 60, >100 mi = 20"
+          }} />
+          <ScoreBarWithDetail label="Land / Acreage" value={landScore} weight="3%" detail={{
+            source: "Site data + brownfield records",
+            rawValue: (() => {
+              const bf = data.brownfield as Record<string, unknown> | null;
+              if (bf?.acreage) return `${bf.acreage} acres`;
+              if (s.acreage) return `${s.acreage} acres`;
+              return null;
+            })(),
+            criteria: ">100 ac = 100, 50-100 = 80, 20-50 = 60, 10-20 = 40, <10 = 20"
+          }} />
+          <ScoreBarWithDetail label="Construction Cost" value={constructionCostScore} weight="3%" detail={{
+            source: "RSMeans Regional Factors",
+            rawValue: s.construction_cost_index != null ? `Regional cost index: ${Number(s.construction_cost_index).toFixed(1)} (national avg = 100)` : null,
+            criteria: "<85 = 100, 85-95 = 80, 95-105 = 60, 105-115 = 40, >115 = 20"
+          }} />
+          <ScoreBarWithDetail label="Gas Pipeline" value={gasPipelineScore} weight="2%" detail={{
+            source: "EIA Natural Gas Pipelines",
+            rawValue: s.nearest_gas_pipeline_km != null ? `${(Number(s.nearest_gas_pipeline_km) * 0.621371).toFixed(1)} mi to nearest pipeline` : null,
+            criteria: "<5 mi = 100, 5-15 mi = 75, 15-30 mi = 50, >30 mi = 25"
+          }} />
+          <ScoreBarWithDetail label="Tax Incentive" value={taxScore} weight="2%" detail={{
+            source: "State DC Incentive Programs",
+            rawValue: county?.has_dc_tax_incentive ? `Yes${county.dc_incentive_type ? ` (${county.dc_incentive_type})` : ""}` : "No incentive program",
+            criteria: "Full program = 100, partial = 60, none = 0"
+          }} />
+          <ScoreBarWithDetail label="Climate / Cooling" value={Number(s.score_climate) || 0} weight="2%" detail={{
+            source: "NOAA Climate Data",
+            rawValue: county?.cooling_degree_days != null ? `${county.cooling_degree_days} Cooling Degree Days` : null,
+            criteria: "<1000 CDD = 100, 1000-2000 = 80, 2000-3000 = 60, >3000 = 40"
+          }} />
         </div>
       </div>
+
+      {/* Due Diligence Assessment */}
+      {(() => {
+        const verified: { label: string; detail?: string }[] = [];
+        const flagged: { label: string; detail?: string }[] = [];
+        const manual: { label: string }[] = [
+          { label: "Phase I Environmental Site Assessment" },
+          { label: "Utility interconnection feasibility study" },
+          { label: "Zoning verification for datacenter use" },
+          { label: "Title & easement review" },
+          { label: "Geotechnical assessment" },
+        ];
+
+        // Auto-verified checks
+        const subDistMi = s.nearest_substation_distance_km != null ? Number(s.nearest_substation_distance_km) * 0.621371 : null;
+        if (subDistMi != null && subDistMi < 10) {
+          verified.push({ label: "Power source within 10 miles", detail: `${subDistMi.toFixed(1)} mi to nearest substation` });
+        }
+        const lineCount = data.nearbyLines?.length || 0;
+        if (lineCount >= 2) {
+          verified.push({ label: "Multiple transmission feeds available", detail: `${lineCount} nearby transmission lines` });
+        } else if (lineCount === 1) {
+          flagged.push({ label: "Single power feed risk", detail: "Only 1 nearby transmission line detected" });
+        }
+        const ixpDistMi = s.nearest_ixp_distance_km != null ? Number(s.nearest_ixp_distance_km) * 0.621371 : null;
+        const fiberProviders = Number(county?.fiber_provider_count) || 0;
+        if ((ixpDistMi != null && ixpDistMi < 50) || fiberProviders > 0) {
+          verified.push({ label: "Fiber connectivity confirmed", detail: ixpDistMi != null ? `${ixpDistMi.toFixed(1)} mi to IXP, ${fiberProviders} providers` : `${fiberProviders} fiber providers` });
+        }
+        const floodZone = String(s.flood_zone || "");
+        const isSFHA = ["A", "AE", "AH", "AO", "V", "VE"].includes(floodZone);
+        if (!isSFHA) {
+          verified.push({ label: "Not in flood hazard area", detail: floodZone ? `Zone ${floodZone}` : "No flood zone data (assumed clear)" });
+        }
+        if (hazardScore >= 60) {
+          verified.push({ label: "Low natural hazard risk", detail: `Hazard score: ${hazardScore}/100` });
+        } else if (hazardScore >= 30 && hazardScore < 60) {
+          flagged.push({ label: "Moderate hazard exposure", detail: `Hazard score: ${hazardScore}/100` });
+        }
+        if (county?.has_dc_tax_incentive) {
+          verified.push({ label: "State tax incentive available", detail: county.dc_incentive_type ? String(county.dc_incentive_type) : "DC tax incentive program" });
+        }
+        if (waterScore >= 60) {
+          verified.push({ label: "Adequate water supply", detail: county?.water_stress_label ? String(county.water_stress_label) : `Water score: ${waterScore}/100` });
+        }
+        const acreage = Number((data.brownfield as Record<string, unknown> | null)?.acreage) || Number(s.acreage) || 0;
+        if (acreage >= 10) {
+          verified.push({ label: "Sufficient land area", detail: `${acreage} acres` });
+        }
+
+        // Flagged checks
+        if (s.site_type === "brownfield") {
+          flagged.push({ label: "Environmental assessment needed", detail: "Industrial site may require environmental remediation" });
+        }
+        if (speedScore < 40) {
+          flagged.push({ label: "High interconnection queue", detail: `Speed to power score: ${speedScore}/100` });
+        }
+
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Due Diligence Assessment</h2>
+            <p className="text-xs text-gray-400 mb-4">Automated checks based on available site data. Items marked for manual verification require on-the-ground assessment.</p>
+
+            {verified.length > 0 && (
+              <div className="mb-5">
+                <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2">Verified</h3>
+                <ul className="space-y-1.5">
+                  {verified.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <span className="text-green-500 mt-0.5 flex-shrink-0">&#10003;</span>
+                      <span className="text-gray-700">{item.label}</span>
+                      {item.detail && <span className="text-xs text-gray-400 ml-auto flex-shrink-0">{item.detail}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {flagged.length > 0 && (
+              <div className="mb-5">
+                <h3 className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-2">Flagged for Review</h3>
+                <ul className="space-y-1.5">
+                  {flagged.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <span className="text-yellow-500 mt-0.5 flex-shrink-0">&#9888;</span>
+                      <span className="text-gray-700">{item.label}</span>
+                      {item.detail && <span className="text-xs text-gray-400 ml-auto flex-shrink-0">{item.detail}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div>
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Manual Verification Required</h3>
+              <ul className="space-y-1.5">
+                {manual.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-gray-300 mt-0.5 flex-shrink-0">&#9675;</span>
+                    <span className="text-gray-500">{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Power section */}
@@ -725,7 +925,7 @@ function SiteDetailContent() {
         {data.brownfield && (
           <div className="bg-white rounded-lg border border-amber-200 bg-amber-50 p-6">
             <h2 className="text-lg font-semibold text-amber-800 mb-3">
-              Brownfield Details
+              Industrial Site Details
               <a href={`/grid/brownfield/?id=${(data.brownfield as Record<string, unknown>).id}`}
                 className="text-sm font-normal text-purple-600 hover:underline ml-2">
                 View full detail
@@ -909,10 +1109,10 @@ function SiteDetailContent() {
         {s.site_type === "brownfield" ? (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Brownfield Redevelopment</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Industrial Site Redevelopment</span>
             </div>
             <p className="text-sm text-gray-700 mb-3">
-              This is a retired power plant site with existing grid infrastructure. Brownfield redevelopment typically involves
+              This is a retired power plant site with existing grid infrastructure. Industrial site redevelopment typically involves
               working with the property owner (often the former utility) and the state environmental agency for any required cleanup.
             </p>
             {data.brownfield && (data.brownfield as Record<string, unknown>).operator_name ? (
@@ -935,12 +1135,12 @@ function SiteDetailContent() {
             <div className="space-y-2">
               <a href="https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs" target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                <span>&#8599;</span> EPA State Brownfield Programs Directory
+                <span>&#8599;</span> EPA State Industrial Cleanup Programs Directory
               </a>
               {s.state && (
                 <a href={`https://www.epa.gov/brownfields/state-brownfields-and-voluntary-response-programs`} target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-purple-600 hover:underline">
-                  <span>&#8599;</span> {String(s.state)} Brownfield Program (EPA Directory)
+                  <span>&#8599;</span> {String(s.state)} Industrial Site Program (EPA Directory)
                 </a>
               )}
             </div>
