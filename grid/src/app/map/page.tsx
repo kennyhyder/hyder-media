@@ -809,15 +809,13 @@ export default function MapPage() {
         const div = L.DomUtil.create("div", "");
         div.style.cssText = "background:rgba(0,0,0,0.9);padding:10px 14px;border-radius:8px;font-size:11px;color:#fff;font-family:system-ui";
         div.innerHTML = `
-          <div style="font-weight:700;margin-bottom:6px">Heat Map: DC Score</div>
+          <div style="font-weight:700;margin-bottom:6px">Infrastructure Suitability</div>
           <div style="display:flex;align-items:center;gap:8px">
             <span>Low</span>
-            <div style="width:120px;height:12px;border-radius:6px;background:linear-gradient(to right, #3b82f6, #06b6d4, #eab308, #f97316, #ef4444)"></div>
+            <div style="width:120px;height:12px;border-radius:6px;background:linear-gradient(to right, #1e3a5f, #3b82f6, #06b6d4, #22c55e, #eab308, #f97316, #ef4444)"></div>
             <span>High</span>
           </div>
-          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:9px;color:#aaa;width:162px">
-            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
-          </div>
+          <div style="font-size:9px;color:#aaa;margin-top:3px">Power · Fiber · Water · Labor · Climate</div>
         `;
         return div;
       };
@@ -1188,7 +1186,6 @@ export default function MapPage() {
             {mapReady && (
               <HeatMapLayer
                 map={leafletMap.current}
-                sites={sitesData}
                 visible={viewMode === "heatmap"}
                 zoomLevel={zoomLevel}
               />

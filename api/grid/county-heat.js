@@ -107,17 +107,17 @@ export default async function handler(req, res) {
 
 /**
  * Compute a DC readiness proxy score (0-100) from county-level data.
- * Uses the same factors as score-dc-sites.py but at county granularity.
- * Factors without county-level data use neutral defaults (50).
+ * Weights are redistributed so ALL weight goes to factors we can actually measure,
+ * creating real differentiation between counties instead of flat neutral values.
  */
 function computeCountyProxyScore(county) {
-  // Fiber: has_fiber + provider count → score_fiber proxy
-  let fiberScore = 40; // default
+  // Fiber: has_fiber + provider count (strong differentiator)
+  let fiberScore = 30;
   if (county.has_fiber === true) {
     const providers = county.fiber_provider_count || 0;
-    fiberScore = Math.min(100, 60 + providers * 4);
+    fiberScore = Math.min(100, 50 + providers * 5);
   } else if (county.has_fiber === false) {
-    fiberScore = 20;
+    fiberScore = 10;
   }
 
   // Water: stress score (0=low stress=good, 5=extreme=bad)
@@ -133,15 +133,15 @@ function computeCountyProxyScore(county) {
   }
 
   // Labor: construction + IT employment density
-  let laborScore = 50;
+  let laborScore = 30;
   const pop = county.population || 1;
   const construction = county.construction_employment || 0;
   const it = county.it_employment || 0;
   const laborDensity = ((construction + it) / pop) * 1000;
   if (laborDensity > 80) laborScore = 100;
-  else if (laborDensity > 50) laborScore = 80;
-  else if (laborDensity > 30) laborScore = 60;
-  else if (laborDensity > 15) laborScore = 40;
+  else if (laborDensity > 50) laborScore = 85;
+  else if (laborDensity > 30) laborScore = 65;
+  else if (laborDensity > 15) laborScore = 45;
   else laborScore = 20;
 
   // Climate: CDD (lower is better for DC cooling)
@@ -149,43 +149,47 @@ function computeCountyProxyScore(county) {
   if (county.cooling_degree_days != null) {
     const cdd = county.cooling_degree_days;
     if (cdd < 500) climateScore = 100;
-    else if (cdd < 1000) climateScore = 80;
+    else if (cdd < 1000) climateScore = 85;
     else if (cdd < 2000) climateScore = 60;
-    else if (cdd < 3000) climateScore = 40;
-    else climateScore = 20;
+    else if (cdd < 3000) climateScore = 35;
+    else climateScore = 15;
   }
 
-  // Tax: binary incentive
-  const taxScore = county.has_dc_tax_incentive ? 100 : 30;
+  // Tax: binary incentive (strong differentiator)
+  const taxScore = county.has_dc_tax_incentive ? 100 : 20;
 
-  // Energy cost: lower is better
+  // Energy cost: lower is better (strong differentiator)
   let energyScore = 50;
   if (county.avg_electricity_rate != null) {
     const rate = county.avg_electricity_rate; // cents/kWh
     if (rate < 6) energyScore = 100;
-    else if (rate < 8) energyScore = 80;
-    else if (rate < 10) energyScore = 60;
+    else if (rate < 8) energyScore = 85;
+    else if (rate < 10) energyScore = 65;
     else if (rate < 14) energyScore = 40;
-    else energyScore = 20;
+    else energyScore = 15;
   }
 
-  // Weighted composite — use same relative weights as score-dc-sites.py
-  // Power (20%) and speed_to_power (15%) need site-level data, use neutral 50
-  // existing_dc (4%), buildability (7%), gas (2%), construction_cost (3%), land (3%) also neutral
+  // Population density as proxy for "developable land" — mid-range is ideal
+  // (too rural = no labor/fiber, too urban = no land/expensive)
+  let landScore = 50;
+  if (county.population != null) {
+    const popDensity = county.population / 600; // rough per-sq-mile estimate
+    if (popDensity < 10) landScore = 35;         // too rural
+    else if (popDensity < 50) landScore = 70;    // semi-rural — good
+    else if (popDensity < 200) landScore = 90;   // suburban — ideal
+    else if (popDensity < 1000) landScore = 65;  // urban — land constrained
+    else landScore = 30;                          // dense urban — very constrained
+  }
+
+  // Weighted composite — ALL weight on measurable factors, no neutral defaults
   return (
-    0.20 * 50 +            // power (neutral — no county proxy)
-    0.15 * 50 +            // speed_to_power (neutral)
-    0.12 * fiberScore +    // fiber
-    0.10 * energyScore +   // energy cost
-    0.08 * waterScore +    // water
-    0.08 * hazardScore +   // hazard
-    0.07 * 50 +            // buildability (neutral)
-    0.04 * laborScore +    // labor
-    0.04 * 50 +            // existing_dc (neutral)
-    0.03 * 50 +            // land (neutral)
-    0.03 * 50 +            // construction_cost (neutral)
-    0.02 * 50 +            // gas_pipeline (neutral)
-    0.02 * taxScore +      // tax
-    0.02 * climateScore    // climate
+    0.25 * fiberScore +     // fiber connectivity (most critical for DC)
+    0.20 * energyScore +    // energy cost
+    0.15 * waterScore +     // water availability
+    0.12 * hazardScore +    // natural hazard risk
+    0.10 * laborScore +     // workforce availability
+    0.08 * landScore +      // land availability proxy
+    0.05 * taxScore +       // tax incentives
+    0.05 * climateScore     // cooling climate
   );
 }

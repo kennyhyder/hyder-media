@@ -6,21 +6,22 @@ import { withDemoToken } from "@/lib/demoAccess";
 interface HeatMapLayerProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   map: any; // Leaflet map instance
-  sites: { latitude: number; longitude: number; dc_score: number | null }[];
   visible: boolean;
   zoomLevel: number;
 }
 
 /**
- * Renders a continuous heat map layer across ALL US land using county-level
- * DC readiness scores (3,222 counties). At higher zoom levels, blends in
- * individual site scores for finer granularity.
+ * Renders a continuous infrastructure suitability heat map across ALL US land
+ * using county-level DC readiness scores (3,222 counties).
+ *
+ * This layer shows WHERE development could happen based on infrastructure
+ * (power, fiber, water, labor, climate, energy cost, tax incentives) —
+ * independent of where existing prospect sites are. Sites render as markers
+ * on top of this surface.
  *
  * County data is fetched once from /api/grid/county-heat and cached.
- * This ensures heat coverage everywhere — not just where sites exist —
- * so investors can evaluate ANY land parcel.
  */
-export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMapLayerProps) {
+export default function HeatMapLayer({ map, visible, zoomLevel }: HeatMapLayerProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const heatLayerRef = useRef<any>(null);
   const [countyHeat, setCountyHeat] = useState<[number, number, number][]>([]);
@@ -70,67 +71,29 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
         heatLayerRef.current = null;
       }
 
-      // Build heat data: county base layer + site detail overlay
-      let heatData: [number, number, number][];
+      // Pure county infrastructure data — no site overlay
+      if (countyHeat.length === 0) return;
 
-      if (zoomLevel < 8) {
-        // Use county centroids as primary heat source for full US coverage
-        // This covers ALL land, not just where sites exist
-        heatData = [...countyHeat];
-
-        // Also add site-level data aggregated to grid cells for areas with dense sites
-        const grid = new Map<string, { lat: number; lng: number; totalScore: number; count: number }>();
-        for (const site of sites) {
-          if (!site.latitude || !site.longitude) continue;
-          const score = site.dc_score ?? 0;
-          const gridLat = Math.round(site.latitude * 2) / 2;
-          const gridLng = Math.round(site.longitude * 2) / 2;
-          const key = `${gridLat},${gridLng}`;
-          const existing = grid.get(key);
-          if (existing) {
-            existing.totalScore += score;
-            existing.count += 1;
-            existing.lat += site.latitude;
-            existing.lng += site.longitude;
-          } else {
-            grid.set(key, { lat: site.latitude, lng: site.longitude, totalScore: score, count: 1 });
-          }
-        }
-        // Add aggregated site data with slight boost (sites are more precise)
-        for (const g of grid.values()) {
-          const avgScore = (g.totalScore / g.count) / 100;
-          heatData.push([g.lat / g.count, g.lng / g.count, Math.min(1, avgScore * 1.1)]);
-        }
-      } else {
-        // At higher zoom: county base + individual sites for precision
-        heatData = [...countyHeat];
-        for (const s of sites) {
-          if (s.latitude && s.longitude) {
-            heatData.push([s.latitude, s.longitude, (s.dc_score ?? 0) / 100]);
-          }
-        }
-      }
-
-      if (heatData.length === 0) return;
-
-      // Adjust radius based on zoom — larger at low zoom for continuous coverage
-      const radius = zoomLevel < 6 ? 40 : zoomLevel < 8 ? 30 : 25;
-      const blur = zoomLevel < 6 ? 30 : zoomLevel < 8 ? 20 : 15;
+      // Larger radius for smooth continuous coverage from county centroids
+      const radius = zoomLevel < 6 ? 55 : zoomLevel < 8 ? 45 : zoomLevel < 10 ? 35 : 25;
+      const blur = zoomLevel < 6 ? 40 : zoomLevel < 8 ? 30 : zoomLevel < 10 ? 20 : 15;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const globalL = (window as any).L;
-      const heatLayer = globalL.heatLayer(heatData, {
+      const heatLayer = globalL.heatLayer(countyHeat, {
         radius,
         blur,
         maxZoom: 12,
         max: 1.0,
-        minOpacity: 0.2,
+        minOpacity: 0.15,
         gradient: {
-          0.0: "#3b82f6",   // blue (low score)
-          0.25: "#06b6d4",  // cyan
-          0.5: "#eab308",   // yellow (mid score)
-          0.75: "#f97316",  // orange
-          1.0: "#ef4444",   // red (high score)
+          0.0: "#1e3a5f",   // dark blue (poor infrastructure)
+          0.3: "#3b82f6",   // blue
+          0.45: "#06b6d4",  // cyan
+          0.55: "#22c55e",  // green (moderate)
+          0.7: "#eab308",   // yellow (good)
+          0.85: "#f97316",  // orange (very good)
+          1.0: "#ef4444",   // red (excellent infrastructure)
         },
       });
 
@@ -146,7 +109,7 @@ export default function HeatMapLayer({ map, sites, visible, zoomLevel }: HeatMap
         heatLayerRef.current = null;
       }
     };
-  }, [map, sites, visible, zoomLevel, countyHeat]);
+  }, [map, visible, zoomLevel, countyHeat]);
 
   return null;
 }
