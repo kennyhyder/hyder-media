@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     while (true) {
       const { data, error } = await supabase
         .from("grid_county_data")
-        .select("fips_code,state,latitude,longitude,nri_score,water_stress_score,has_fiber,fiber_provider_count,construction_employment,it_employment,population,cooling_degree_days,has_dc_tax_incentive,avg_electricity_rate")
+        .select("fips_code,state,latitude,longitude,nri_score,water_stress_score,has_fiber,fiber_provider_count,construction_employment,it_employment,population,cooling_degree_days,has_dc_tax_incentive")
         .not("latitude", "is", null)
         .not("longitude", "is", null)
         .range(offset, offset + pageSize - 1);
@@ -158,17 +158,6 @@ function computeCountyProxyScore(county) {
   // Tax: binary incentive (strong differentiator)
   const taxScore = county.has_dc_tax_incentive ? 100 : 20;
 
-  // Energy cost: lower is better (strong differentiator)
-  let energyScore = 50;
-  if (county.avg_electricity_rate != null) {
-    const rate = county.avg_electricity_rate; // cents/kWh
-    if (rate < 6) energyScore = 100;
-    else if (rate < 8) energyScore = 85;
-    else if (rate < 10) energyScore = 65;
-    else if (rate < 14) energyScore = 40;
-    else energyScore = 15;
-  }
-
   // Population density as proxy for "developable land" — mid-range is ideal
   // (too rural = no labor/fiber, too urban = no land/expensive)
   let landScore = 50;
@@ -183,13 +172,12 @@ function computeCountyProxyScore(county) {
 
   // Weighted composite — ALL weight on measurable factors, no neutral defaults
   return (
-    0.25 * fiberScore +     // fiber connectivity (most critical for DC)
-    0.20 * energyScore +    // energy cost
-    0.15 * waterScore +     // water availability
-    0.12 * hazardScore +    // natural hazard risk
-    0.10 * laborScore +     // workforce availability
-    0.08 * landScore +      // land availability proxy
-    0.05 * taxScore +       // tax incentives
-    0.05 * climateScore     // cooling climate
+    0.30 * fiberScore +     // fiber connectivity (most critical for DC)
+    0.20 * waterScore +     // water availability
+    0.15 * hazardScore +    // natural hazard risk
+    0.12 * laborScore +     // workforce availability
+    0.10 * landScore +      // land availability proxy
+    0.06 * taxScore +       // tax incentives
+    0.07 * climateScore     // cooling climate
   );
 }
