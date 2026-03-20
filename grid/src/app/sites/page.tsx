@@ -186,9 +186,9 @@ function DCSitesContent() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">DC Site Search</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Greenfield Site Search</h1>
           <p className="text-gray-600 text-sm mt-1">
-            {total > 0 ? `${total.toLocaleString()} scored datacenter candidate sites` : "Search scored sites"}
+            {total > 0 ? `${total.toLocaleString()} scored greenfield candidate sites` : "Search scored sites"}
           </p>
         </div>
         <div className="flex gap-2">
@@ -304,7 +304,7 @@ function DCSitesContent() {
           >
             <option value="">All Types</option>
             <option value="substation">Substation</option>
-            <option value="brownfield">Brownfield</option>
+            <option value="brownfield">Industrial</option>
             <option value="greenfield">Greenfield</option>
           </select>
           <select
@@ -396,7 +396,7 @@ function DCSitesContent() {
                 <tr><td colSpan={13} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
                 <tr><td colSpan={13} className="py-12 text-center">
-                  <p className="text-gray-400 mb-2">No DC sites found matching your filters.</p>
+                  <p className="text-gray-400 mb-2">No greenfield sites found matching your filters.</p>
                   <p className="text-gray-400 text-xs">Try broadening your search, adjusting the min score, or clearing filters.</p>
                 </td></tr>
               ) : (
@@ -435,7 +435,7 @@ function DCSitesContent() {
                           ? "bg-emerald-100 text-emerald-700"
                           : "bg-blue-100 text-blue-700"
                       }`}>
-                        {site.site_type}
+                        {site.site_type === "brownfield" ? "Industrial" : site.site_type === "greenfield" ? "Greenfield" : "Substation"}
                       </span>
                     </td>
                     <td className="py-2 px-3 text-gray-600">

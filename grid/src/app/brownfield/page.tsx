@@ -109,8 +109,8 @@ function BrownfieldDetailContent() {
   if (!id) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Brownfield Detail</h1>
-        <p className="text-gray-600">No brownfield ID provided. <a href="/grid/brownfields/" className="text-purple-600 hover:underline">Browse brownfields</a></p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Industrial Site Detail</h1>
+        <p className="text-gray-600">No industrial site ID provided. <a href="/grid/brownfields/" className="text-purple-600 hover:underline">Browse industrial sites</a></p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ function BrownfieldDetailContent() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Loading brownfield...</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Loading industrial site...</h1>
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-64" />
           <div className="h-48 bg-gray-200 rounded" />
@@ -130,9 +130,9 @@ function BrownfieldDetailContent() {
   if (error || !data) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Brownfield Not Found</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Industrial Site Not Found</h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          {error || "Brownfield not found"}
+          {error || "Industrial site not found"}
         </div>
       </div>
     );
@@ -294,15 +294,19 @@ function BrownfieldDetailContent() {
               </a>
             </h2>
             <div className="space-y-1">
-              {scoreBar("Power Availability", Number(dc.score_power) || 0, "25%")}
-              {scoreBar("Speed to Power", Number(dc.score_speed_to_power) || 0, "20%")}
-              {scoreBar("Fiber Connectivity", Number(dc.score_fiber) || 0, "15%")}
-              {scoreBar("Water Risk", Number(dc.score_water) || 0, "10%")}
-              {scoreBar("Natural Hazard", Number(dc.score_hazard) || 0, "10%")}
-              {scoreBar("Labor Market", Number(dc.score_labor) || 0, "5%")}
-              {scoreBar("Existing DC Cluster", Number(dc.score_existing_dc) || 0, "5%")}
-              {scoreBar("Land / Acreage", Number(dc.score_land) || 0, "5%")}
-              {scoreBar("Tax Incentive", Number(dc.score_tax) || 0, "3%")}
+              {scoreBar("Power Availability", Number(dc.score_power) || 0, "20%")}
+              {scoreBar("Speed to Power", Number(dc.score_speed_to_power) || 0, "15%")}
+              {scoreBar("Fiber Connectivity", Number(dc.score_fiber) || 0, "12%")}
+              {scoreBar("Energy Cost", Number(dc.score_energy_cost) || 0, "10%")}
+              {scoreBar("Water Risk", Number(dc.score_water) || 0, "8%")}
+              {scoreBar("Natural Hazard", Number(dc.score_hazard) || 0, "8%")}
+              {scoreBar("Buildability", Number(dc.score_buildability) || 0, "7%")}
+              {scoreBar("Labor Market", Number(dc.score_labor) || 0, "4%")}
+              {scoreBar("DC Cluster", Number(dc.score_existing_dc) || 0, "4%")}
+              {scoreBar("Land / Acreage", Number(dc.score_land) || 0, "3%")}
+              {scoreBar("Construction Cost", Number(dc.score_construction_cost) || 0, "3%")}
+              {scoreBar("Gas Pipeline", Number(dc.score_gas_pipeline) || 0, "2%")}
+              {scoreBar("Tax Incentive", Number(dc.score_tax) || 0, "2%")}
               {scoreBar("Climate / Cooling", Number(dc.score_climate) || 0, "2%")}
             </div>
           </div>
@@ -485,7 +489,7 @@ function BrownfieldDetailContent() {
 
         {/* Brownfield Details */}
         <div className="bg-white rounded-lg border border-amber-200 bg-amber-50/30 p-6">
-          <h2 className="text-lg font-semibold text-amber-800 mb-3">Brownfield Details</h2>
+          <h2 className="text-lg font-semibold text-amber-800 mb-3">Industrial Site Details</h2>
           {infoRow("Site Type", typeLabel[String(bf.site_type)] || bf.site_type)}
           {infoRow("Former Use", bf.former_use)}
           {infoRow("Existing Capacity", bf.existing_capacity_mw ? `${bf.existing_capacity_mw} MW` : null)}
@@ -652,13 +656,13 @@ function BrownfieldDetailContent() {
       {/* Land Acquisition */}
       <div className="bg-white rounded-lg border border-purple-200 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Land Acquisition</h2>
-        <p className="text-xs text-gray-500 mb-4">Property ownership and land availability information for this brownfield site.</p>
+        <p className="text-xs text-gray-500 mb-4">Property ownership and land availability information for this industrial site.</p>
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Brownfield Redevelopment</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Industrial Redevelopment</span>
           </div>
           <p className="text-sm text-gray-700 mb-3">
-            This is a retired power plant site with existing grid infrastructure. Brownfield redevelopment typically involves
+            This is a retired power plant site with existing grid infrastructure. Industrial site redevelopment typically involves
             working with the property owner (often the former utility) and the state environmental agency for any required cleanup.
           </p>
           {bf.operator_name ? (

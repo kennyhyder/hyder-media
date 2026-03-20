@@ -305,7 +305,7 @@ function CorridorDetailContent() {
       {/* Nearby DC Sites */}
       {data.nearbySites.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Top DC Sites in Corridor States</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Greenfield Sites in Corridor States</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -337,7 +337,7 @@ function CorridorDetailContent() {
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                           site.site_type === "brownfield" ? "bg-amber-100 text-amber-700" : site.site_type === "greenfield" ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-blue-700"
                         }`}>
-                          {String(site.site_type)}
+                          {site.site_type === "brownfield" ? "Industrial" : site.site_type === "greenfield" ? "Greenfield" : "Substation"}
                         </span>
                       </td>
                       <td className={`py-2 px-3 text-right font-bold ${scoreColor}`}>{score}</td>

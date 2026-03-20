@@ -7,9 +7,9 @@ import { isDemoMode } from "@/lib/demoAccess";
 const NAV_LINKS = [
   { href: "/grid/", label: "Dashboard", match: "/grid" },
   { href: "/grid/map/", label: "Map", match: "/grid/map" },
-  { href: "/grid/sites/", label: "DC Sites", match: "/grid/sites" },
-  { href: "/grid/brownfields/", label: "Brownfields", match: "/grid/brownfields" },
-  { href: "/grid/lines/", label: "Lines", match: "/grid/lines" },
+  { href: "/grid/sites/", label: "Greenfields", match: "/grid/sites" },
+  { href: "/grid/brownfields/", label: "Industrial", match: "/grid/brownfields" },
+  { href: "/grid/lines/", label: "Transmission", match: "/grid/lines" },
   { href: "/grid/corridors/", label: "Corridors", match: "/grid/corridors" },
   { href: "/grid/market/", label: "Market", match: "/grid/market" },
   { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs", fullOnly: true },

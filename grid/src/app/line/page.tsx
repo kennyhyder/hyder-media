@@ -86,7 +86,7 @@ export default function LineDetailPage() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Line Detail</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Transmission Line Detail</h1>
         <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
           <div className="space-y-4">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -106,10 +106,10 @@ export default function LineDetailPage() {
       <div>
         <div className="flex items-center gap-3 mb-6">
           <a href="/grid/search/" className="text-sm text-purple-600 hover:text-purple-800 hover:underline">
-            &larr; Back to Lines
+            &larr; Back to Transmission
           </a>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Line Detail</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Transmission Line Detail</h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           {error}
         </div>
@@ -126,7 +126,7 @@ export default function LineDetailPage() {
       {/* Breadcrumb */}
       <div className="flex items-center gap-3 mb-6">
         <a href="/grid/search/" className="text-sm text-purple-600 hover:text-purple-800 hover:underline">
-          &larr; Back to Lines
+          &larr; Back to Transmission
         </a>
       </div>
 

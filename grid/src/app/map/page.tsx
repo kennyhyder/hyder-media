@@ -96,7 +96,7 @@ function siteTypeColor(type: string): string {
 function siteTypeLabel(type: string): string {
   switch (type) {
     case "substation": return "Substation Site";
-    case "brownfield": return "Retired Power Plant";
+    case "brownfield": return "Industrial Site";
     case "greenfield": return "Greenfield Corridor";
     default: return type;
   }
@@ -779,7 +779,7 @@ export default function MapPage() {
                     >
                       <option value="">All Types</option>
                       <option value="substation">Substation Sites</option>
-                      <option value="brownfield">Retired Power Plants</option>
+                      <option value="brownfield">Industrial Sites</option>
                       <option value="greenfield">Greenfield Corridors</option>
                     </select>
                   </div>
@@ -848,7 +848,7 @@ export default function MapPage() {
                     {[
                       { type: "substation", label: "Substation Sites", color: "#7c3aed", count: typeBreakdown.substation },
                       { type: "greenfield", label: "Greenfield Corridors", color: "#059669", count: typeBreakdown.greenfield },
-                      { type: "brownfield", label: "Retired Power Plants", color: "#d97706", count: typeBreakdown.brownfield },
+                      { type: "brownfield", label: "Industrial Sites", color: "#d97706", count: typeBreakdown.brownfield },
                     ].map(t => (
                       <div key={t.type} className="flex items-center gap-2 text-xs">
                         <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>

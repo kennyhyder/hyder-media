@@ -178,7 +178,7 @@ function CompareContent() {
         <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
           <p className="text-gray-600 mb-4">No sites selected for comparison.</p>
           <p className="text-sm text-gray-500 mb-6">
-            Go to <a href="/grid/sites/" className="text-purple-600 hover:underline">DC Sites</a> and
+            Go to <a href="/grid/sites/" className="text-purple-600 hover:underline">Greenfield Sites</a> and
             click the checkbox next to sites you want to compare, then click &ldquo;Compare&rdquo;.
           </p>
           <a href="/grid/sites/" className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
@@ -212,7 +212,7 @@ function CompareContent() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <span className="text-lg font-bold text-purple-600">GridScout</span>
-          <span className="text-sm text-gray-500 ml-2">DC Site Comparison Report</span>
+          <span className="text-sm text-gray-500 ml-2">Greenfield Site Comparison Report</span>
         </div>
         <div className="text-xs text-gray-400">{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
       </div>

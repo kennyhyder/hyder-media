@@ -105,7 +105,7 @@ export default function BrownfieldsPage() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            aria-label="Search brownfield sites by name or former use"
+            aria-label="Search industrial sites by name or former use"
           />
           <select
             value={stateFilter}
@@ -138,7 +138,7 @@ export default function BrownfieldsPage() {
       {/* Error */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-4">
-          Failed to load brownfield sites: {error}
+          Failed to load industrial sites: {error}
         </div>
       )}
 
@@ -174,7 +174,7 @@ export default function BrownfieldsPage() {
                 <tr><td colSpan={8} className="py-8 text-center text-gray-400">Loading...</td></tr>
               ) : sites.length === 0 ? (
                 <tr><td colSpan={8} className="py-12 text-center">
-                  <p className="text-gray-400 mb-2">No brownfield sites found matching your filters.</p>
+                  <p className="text-gray-400 mb-2">No industrial sites found matching your filters.</p>
                   <p className="text-gray-400 text-xs">Try adjusting your search criteria or clearing filters.</p>
                 </td></tr>
               ) : (
