@@ -786,12 +786,21 @@ export default function MapPage() {
     }
   }, [showQueueOverlay, mapReady]);
 
-  // Track zoom level for heat map county aggregation
+  // Track zoom level for heat map — debounced to avoid rapid teardown during flyTo
   useEffect(() => {
     if (!mapReady || !leafletMap.current) return;
-    const onZoom = () => setZoomLevel(leafletMap.current?.getZoom() ?? 5);
+    let timer: ReturnType<typeof setTimeout>;
+    const onZoom = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setZoomLevel(leafletMap.current?.getZoom() ?? 5);
+      }, 300);
+    };
     leafletMap.current.on("zoomend", onZoom);
-    return () => { leafletMap.current?.off("zoomend", onZoom); };
+    return () => {
+      clearTimeout(timer);
+      leafletMap.current?.off("zoomend", onZoom);
+    };
   }, [mapReady]);
 
   // No need to hide markers in heatmap mode — heat overlays on top

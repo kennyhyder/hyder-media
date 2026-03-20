@@ -60,11 +60,15 @@ export default function HeatMapLayer({ map, visible, zoomLevel }: HeatMapLayerPr
       return;
     }
 
+    let cancelled = false;
+
     const initHeat = async () => {
       const L = await import("leaflet");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).L = L.default || L;
       await import("leaflet.heat");
+
+      if (cancelled) return;
 
       if (heatLayerRef.current) {
         map.removeLayer(heatLayerRef.current);
@@ -97,6 +101,7 @@ export default function HeatMapLayer({ map, visible, zoomLevel }: HeatMapLayerPr
         },
       });
 
+      if (cancelled) return;
       heatLayer.addTo(map);
       heatLayerRef.current = heatLayer;
     };
@@ -104,10 +109,7 @@ export default function HeatMapLayer({ map, visible, zoomLevel }: HeatMapLayerPr
     initHeat().catch(err => console.error("HeatMapLayer init error:", err));
 
     return () => {
-      if (heatLayerRef.current && map) {
-        map.removeLayer(heatLayerRef.current);
-        heatLayerRef.current = null;
-      }
+      cancelled = true;
     };
   }, [map, visible, zoomLevel, countyHeat]);
 
