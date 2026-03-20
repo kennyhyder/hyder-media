@@ -1102,7 +1102,7 @@ export default function MapPage() {
           <div className="flex-1 relative">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="absolute top-3 left-3 z-[1000] bg-white border border-gray-300 rounded-lg px-2 py-1.5 shadow-md hover:bg-gray-50"
+              className="absolute top-3 left-3 z-[1100] bg-white border border-gray-300 rounded-lg px-2 py-1.5 shadow-md hover:bg-gray-50"
               title={sidebarOpen ? "Hide filters" : "Show filters"}
             >
               <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1111,15 +1111,6 @@ export default function MapPage() {
                   : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
               </svg>
             </button>
-
-            {/* Geographic Search */}
-            {mapReady && (
-              <GeoSearch
-                map={leafletMap.current}
-                onLocationSelect={handleLocationSelect}
-                siteCount={geoSearchSiteCount}
-              />
-            )}
 
             {loading && initialLoad && (
               <div className="absolute inset-0 bg-gray-900/50 z-[1000] flex items-center justify-center">
@@ -1143,6 +1134,15 @@ export default function MapPage() {
             )}
 
             <div ref={mapRef} className="h-full w-full" />
+
+            {/* Geographic Search - rendered AFTER map div to be above Leaflet's z-index layers */}
+            {mapReady && (
+              <GeoSearch
+                map={leafletMap.current}
+                onLocationSelect={handleLocationSelect}
+                siteCount={geoSearchSiteCount}
+              />
+            )}
 
             {/* Heat Map Layer */}
             {mapReady && (
