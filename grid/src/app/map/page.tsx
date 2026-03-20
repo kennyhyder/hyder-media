@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { withDemoToken } from "@/lib/demoAccess";
+import HeatMapLayer from "@/components/HeatMapLayer";
+import GeoSearch from "@/components/GeoSearch";
 
 interface MapSite {
   id: string;
@@ -181,6 +183,13 @@ export default function MapPage() {
   const [totalFiber, setTotalFiber] = useState(0);
   const [colorBy, setColorBy] = useState<"score" | "type">("score");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<"markers" | "heatmap">("markers");
+  const [zoomLevel, setZoomLevel] = useState(5);
+  const [sitesData, setSitesData] = useState<MapSite[]>([]);
+  const [geoSearchSiteCount, setGeoSearchSiteCount] = useState(0);
+  const [geoSearchActive, setGeoSearchActive] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const heatLegendRef = useRef<any>(null);
 
   // Score distribution
   const [scoreDistribution, setScoreDistribution] = useState({ excellent: 0, good: 0, fair: 0, poor: 0 });
@@ -568,6 +577,9 @@ export default function MapPage() {
         setTotalFiber(json.fiber.length);
       }
 
+      // Store sites data for heat map
+      setSitesData(json.sites.filter(s => s.latitude && s.longitude));
+
       setTotalSites(json.total);
       setReturnedSites(json.returned);
       setInitialLoad(false);
@@ -659,6 +671,93 @@ export default function MapPage() {
     }
   }, [showFiber]);
 
+  // Track zoom level for heat map county aggregation
+  useEffect(() => {
+    if (!mapReady || !leafletMap.current) return;
+    const onZoom = () => setZoomLevel(leafletMap.current?.getZoom() ?? 5);
+    leafletMap.current.on("zoomend", onZoom);
+    return () => { leafletMap.current?.off("zoomend", onZoom); };
+  }, [mapReady]);
+
+  // Toggle marker layer visibility based on view mode
+  useEffect(() => {
+    if (!leafletMap.current || !siteLayerRef.current) return;
+    if (viewMode === "heatmap") {
+      // Hide markers in heat map mode
+      if (leafletMap.current.hasLayer(siteLayerRef.current)) {
+        leafletMap.current.removeLayer(siteLayerRef.current);
+      }
+    } else if (showSites) {
+      // Show markers in marker mode (if showSites is on)
+      if (!leafletMap.current.hasLayer(siteLayerRef.current)) {
+        leafletMap.current.addLayer(siteLayerRef.current);
+      }
+    }
+  }, [viewMode, showSites]);
+
+  // Manage heat map gradient legend
+  useEffect(() => {
+    if (!leafletMap.current || !LRef.current) return;
+    const L = LRef.current;
+    const map = leafletMap.current;
+
+    if (viewMode === "heatmap" && !heatLegendRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const legend = new (L.Control as any)({ position: "bottomleft" });
+      legend.onAdd = () => {
+        const div = L.DomUtil.create("div", "");
+        div.style.cssText = "background:rgba(0,0,0,0.9);padding:10px 14px;border-radius:8px;font-size:11px;color:#fff;font-family:system-ui";
+        div.innerHTML = `
+          <div style="font-weight:700;margin-bottom:6px">Heat Map: DC Score</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span>Low</span>
+            <div style="width:120px;height:12px;border-radius:6px;background:linear-gradient(to right, #3b82f6, #06b6d4, #eab308, #f97316, #ef4444)"></div>
+            <span>High</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:2px;font-size:9px;color:#aaa;width:162px">
+            <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+          </div>
+        `;
+        return div;
+      };
+      legend.addTo(map);
+      heatLegendRef.current = legend;
+    } else if (viewMode !== "heatmap" && heatLegendRef.current) {
+      map.removeControl(heatLegendRef.current);
+      heatLegendRef.current = null;
+    }
+
+    return () => {
+      if (heatLegendRef.current && map) {
+        try { map.removeControl(heatLegendRef.current); } catch { /* map may be destroyed */ }
+        heatLegendRef.current = null;
+      }
+    };
+  }, [viewMode, mapReady]);
+
+  // Geo search handler
+  const handleLocationSelect = useCallback((lat: number, lng: number, radius: number, displayName: string) => {
+    if (!lat && !lng) {
+      // Cleared search
+      setGeoSearchActive(false);
+      setGeoSearchSiteCount(0);
+      return;
+    }
+
+    setGeoSearchActive(true);
+
+    // Count sites within radius
+    const radiusKm = radius * 1.60934;
+    let count = 0;
+    for (const site of sitesData) {
+      const dLat = (site.latitude - lat) * 111.32;
+      const dLng = (site.longitude - lng) * 111.32 * Math.cos(lat * Math.PI / 180);
+      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+      if (dist <= radiusKm) count++;
+    }
+    setGeoSearchSiteCount(count);
+  }, [sitesData]);
+
   // === Filter Controls ===
   // Re-render markers when colorBy changes (no re-fetch needed, but need to recreate markers)
   useEffect(() => {
@@ -733,7 +832,27 @@ export default function MapPage() {
                 </div>
               </div>
 
+              {/* View Mode */}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">View Mode</label>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={() => setViewMode("markers")}
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium ${viewMode === "markers" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  >
+                    Markers
+                  </button>
+                  <button
+                    onClick={() => setViewMode("heatmap")}
+                    className={`px-3 py-1.5 text-xs rounded-lg font-medium ${viewMode === "heatmap" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  >
+                    Heat Map
+                  </button>
+                </div>
+              </div>
+
               {/* Color By */}
+              {viewMode === "markers" && (
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Color By</label>
                 <div className="mt-2 flex gap-2">
@@ -751,6 +870,7 @@ export default function MapPage() {
                   </button>
                 </div>
               </div>
+              )}
 
               {/* Filters */}
               <div>
@@ -876,6 +996,15 @@ export default function MapPage() {
               </svg>
             </button>
 
+            {/* Geographic Search */}
+            {mapReady && (
+              <GeoSearch
+                map={leafletMap.current}
+                onLocationSelect={handleLocationSelect}
+                siteCount={geoSearchSiteCount}
+              />
+            )}
+
             {loading && initialLoad && (
               <div className="absolute inset-0 bg-gray-900/50 z-[1000] flex items-center justify-center">
                 <div className="bg-white rounded-xl px-6 py-4 shadow-xl">
@@ -898,6 +1027,16 @@ export default function MapPage() {
             )}
 
             <div ref={mapRef} className="h-full w-full" />
+
+            {/* Heat Map Layer */}
+            {mapReady && (
+              <HeatMapLayer
+                map={leafletMap.current}
+                sites={sitesData}
+                visible={viewMode === "heatmap"}
+                zoomLevel={zoomLevel}
+              />
+            )}
           </div>
         </div>
       </div>
