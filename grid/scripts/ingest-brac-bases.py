@@ -35,11 +35,15 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 BATCH_SIZE = 50
 
-# Primary endpoint: Esri Living Atlas Military Bases
+# Primary endpoint: Esri US Federal Data (MIRTA - Military Installations, Ranges, and Training Areas)
+# Points have lat/lng, Polygons have Shape__Area for acreage
 ARCGIS_URLS = [
-    'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/Military_Bases/FeatureServer/0/query',
-    'https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Military_Installations_Ranges_and_Training_Areas/FeatureServer/0/query',
+    'https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/MIRTA_Points_A_view/FeatureServer/0/query',
 ]
+ARCGIS_POLYGON_URL = 'https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/MIRTA_Polygons_A_view/FeatureServer/0/query'
+
+# Status values: act=active, clsd=closed, care=caretaker, Excs=excess, semi=semi-active
+BRAC_STATUSES = {'clsd', 'care', 'Excs', 'semi'}
 
 US_STATES = {
     'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI',
@@ -190,7 +194,12 @@ def get_centroid(geometry):
 
 def is_brac_or_closed(attrs):
     """Check if a military installation is closed/BRAC/realigning."""
-    # Check explicit status fields
+    # Check siteOperationalStatus (MIRTA field)
+    status = safe_str(attrs.get('siteOperationalStatus') or attrs.get('SITEOPERATIONALSTATUS'))
+    if status and status in BRAC_STATUSES:
+        return True
+
+    # Fallback: check legacy status fields
     for field in ['STATUS', 'CLOSURE_STATUS', 'OPER_STAT', 'BRAC_STATUS',
                   'JOINTBASE', 'SITE_STATUS', 'INSTALLATIONSTATUS']:
         val = safe_str(attrs.get(field))
@@ -201,7 +210,8 @@ def is_brac_or_closed(attrs):
                     return True
 
     # Check name for BRAC keywords
-    name = safe_str(attrs.get('SITE_NAME') or attrs.get('NAME') or
+    name = safe_str(attrs.get('siteName') or attrs.get('SITENAME') or
+                    attrs.get('SITE_NAME') or attrs.get('NAME') or
                     attrs.get('INSTALLATIONNAME') or attrs.get('FULLNAME'))
     if name:
         name_lower = name.lower()
@@ -232,33 +242,57 @@ def main():
 
     dry_run = '--dry-run' in sys.argv
 
-    # Step 1: Fetch from ArcGIS endpoints
+    # Step 1: Fetch from ArcGIS endpoints (Points for coords, Polygons for acreage)
     print("\n[Step 1] Fetching military installations...")
+
+    # Fetch points (has lat/lng)
+    print("\n  Fetching MIRTA Points...")
     all_features = []
-
     for url in ARCGIS_URLS:
-        print(f"\n  Trying: {url.split('/services/')[1].split('/')[0]}...")
+        svc_name = url.split('/services/')[1].split('/')[0]
+        print(f"  Trying: {svc_name}...")
         try:
-            # First check what fields are available
-            meta_url = url.replace('/query', '') + '?f=json'
-            req = urllib.request.Request(meta_url, headers={'User-Agent': 'GridScout/1.0'})
-            try:
-                with urllib.request.urlopen(req, timeout=30) as resp:
-                    meta = json.loads(resp.read().decode())
-                    field_names = [f['name'] for f in meta.get('fields', [])]
-                    print(f"  Fields: {field_names[:15]}...")
-            except Exception:
-                print(f"  Could not fetch metadata, trying queries anyway...")
+            # Filter to non-active statuses directly in ArcGIS query
+            where = "siteOperationalStatus IN ('clsd','care','Excs','semi')"
+            features = fetch_all_features(url, where=where)
+            print(f"  Fetched {len(features)} non-active features")
 
-            features = fetch_all_features(url)
-            print(f"  Fetched {len(features)} features")
+            if not features:
+                # Fallback: fetch all and filter locally
+                print("  Trying unfiltered fetch...")
+                features = fetch_all_features(url)
+                print(f"  Fetched {len(features)} total features")
 
             if features:
                 all_features.extend(features)
-                break  # Use first successful endpoint
+                break
         except Exception as e:
             print(f"  Failed: {e}")
             continue
+
+    # Also fetch polygons for acreage data
+    polygon_acres = {}
+    print("\n  Fetching MIRTA Polygons for acreage...")
+    try:
+        where = "SITEOPERATIONALSTATUS IN ('clsd','care','Excs','semi')"
+        poly_features = fetch_all_features(ARCGIS_POLYGON_URL, where=where)
+        if not poly_features:
+            poly_features = fetch_all_features(ARCGIS_POLYGON_URL)
+        print(f"  Fetched {len(poly_features)} polygon features")
+        for pf in poly_features:
+            pa = pf.get('attributes', {})
+            pname = safe_str(pa.get('SITENAME') or pa.get('siteName'))
+            area = safe_float(pa.get('Shape__Area') or pa.get('SHAPE__AREA'))
+            if pname and area:
+                # Shape__Area is in sq meters — convert to acres
+                acres = area / 4046.86
+                pname_key = pname.lower().strip()
+                # Keep largest polygon per site name
+                if pname_key not in polygon_acres or acres > polygon_acres[pname_key]:
+                    polygon_acres[pname_key] = acres
+        print(f"  Acreage data for {len(polygon_acres)} sites")
+    except Exception as e:
+        print(f"  Polygon fetch failed (non-fatal): {e}")
 
     if not all_features:
         print("\nERROR: Could not fetch military base data from any endpoint")
@@ -294,9 +328,12 @@ def main():
             skipped_coords += 1
             continue
 
-        # Get state
-        state = safe_str(attrs.get('STATE') or attrs.get('STATE_TERR') or
+        # Get state (MIRTA uses 'stateNameCode' or 'STATENAMECODE' - lowercase 2-letter)
+        state = safe_str(attrs.get('stateNameCode') or attrs.get('STATENAMECODE') or
+                        attrs.get('STATE') or attrs.get('STATE_TERR') or
                         attrs.get('STATENAME'))
+        if state:
+            state = state.upper()
         if state and len(state) > 2:
             # Full state name → abbreviation mapping
             state_map = {
@@ -322,8 +359,12 @@ def main():
 
         # Build unique ID
         obj_id = safe_str(attrs.get('OBJECTID') or attrs.get('FID') or
+                         attrs.get('mirtaLocationsIdpk') or attrs.get('MIRTALOCATIONSIDPK') or
+                         attrs.get('sdsId') or attrs.get('SDSID') or
                          attrs.get('FACILITYID') or attrs.get('SITE_ID'))
-        name = safe_str(attrs.get('SITE_NAME') or attrs.get('NAME') or
+        name = safe_str(attrs.get('siteName') or attrs.get('SITENAME') or
+                       attrs.get('featureName') or attrs.get('FEATURENAME') or
+                       attrs.get('SITE_NAME') or attrs.get('NAME') or
                        attrs.get('INSTALLATIONNAME') or attrs.get('FULLNAME'))
         if not obj_id:
             obj_id = f"{lat:.4f}_{lng:.4f}"
@@ -335,15 +376,36 @@ def main():
         if not name:
             name = 'Military Installation'
 
-        branch = safe_str(attrs.get('BRANCH') or attrs.get('COMPONENT') or
+        branch = safe_str(attrs.get('siteReportingComponent') or attrs.get('SITEREPORTINGCOMPONENT') or
+                         attrs.get('BRANCH') or attrs.get('COMPONENT') or
                          attrs.get('SERVICE'))
-        acres = safe_float(attrs.get('ACRES') or attrs.get('AREAACRES') or
-                          attrs.get('SHAPE__AREA'))
-        # Convert sq meters to acres if needed
-        if acres and acres > 100000:
-            acres = acres / 4046.86
+        # Map MIRTA component codes to readable names
+        branch_map = {
+            'usa': 'Army', 'usaf': 'Air Force', 'usn': 'Navy', 'usmc': 'Marine Corps',
+            'usar': 'Army Reserve', 'usnr': 'Navy Reserve', 'usafr': 'Air Force Reserve',
+            'armyNationalGuard': 'Army National Guard', 'airNationalGuard': 'Air National Guard',
+            'uscg': 'Coast Guard', 'dod': 'DoD', 'dla': 'DLA',
+        }
+        if branch and branch.lower() in branch_map:
+            branch = branch_map[branch.lower()]
+        elif branch:
+            branch = branch_map.get(branch, branch)
+
+        # Get acreage — prefer polygon data (more accurate area), fall back to point attrs
+        acres = None
+        if name:
+            acres = polygon_acres.get(name.lower().strip())
+        if not acres:
+            acres = safe_float(attrs.get('Shape__Area') or attrs.get('SHAPE__AREA') or
+                              attrs.get('ACRES') or attrs.get('AREAACRES'))
+            # Shape__Area is in sq meters for polygon endpoint — convert to acres
+            if acres and acres > 100000:
+                acres = acres / 4046.86
 
         county = safe_str(attrs.get('COUNTY') or attrs.get('COUNTYNAME'))
+
+        status_raw = safe_str(attrs.get('siteOperationalStatus') or attrs.get('SITEOPERATIONALSTATUS'))
+        status_label = {'clsd': 'Closed', 'care': 'Caretaker', 'Excs': 'Excess', 'semi': 'Semi-active'}.get(status_raw, status_raw)
 
         former_use = f"Military ({branch})" if branch else 'Military installation'
 
@@ -357,7 +419,7 @@ def main():
             'longitude': lng,
             'acreage': acres,
             'former_use': former_use[:300] if former_use else None,
-            'cleanup_status': safe_str(attrs.get('STATUS') or attrs.get('OPER_STAT')),
+            'cleanup_status': status_label,
             'iso_region': STATE_ISO.get(state),
             'data_source_id': data_source_id,
         })

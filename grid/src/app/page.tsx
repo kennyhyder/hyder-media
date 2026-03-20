@@ -318,13 +318,19 @@ export default function DashboardPage() {
                   <td className="py-2 px-3 text-gray-600">{site.state}</td>
                   <td className="py-2 px-3">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                      site.site_type === "brownfield"
+                      site.site_type === "brownfield" || site.site_type === "industrial"
                         ? "bg-amber-100 text-amber-700"
                         : site.site_type === "greenfield"
                         ? "bg-emerald-100 text-emerald-700"
+                        : site.site_type === "federal_excess"
+                        ? "bg-purple-100 text-purple-700"
+                        : site.site_type === "mine"
+                        ? "bg-orange-100 text-orange-700"
+                        : site.site_type === "military_brac"
+                        ? "bg-red-100 text-red-700"
                         : "bg-blue-100 text-blue-700"
                     }`}>
-                      {site.site_type}
+                      {site.site_type === "brownfield" ? "industrial" : site.site_type === "federal_excess" ? "federal" : site.site_type === "military_brac" ? "military" : site.site_type}
                     </span>
                   </td>
                   <td className={`py-2 px-3 text-right font-bold ${scoreColor(site.dc_score)}`}>

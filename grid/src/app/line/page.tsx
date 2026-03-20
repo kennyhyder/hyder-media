@@ -20,6 +20,8 @@ interface LineDetail {
   naession: string | null;
   static_rating_amps: number | null;
   capacity_mw: number | null;
+  estimated_capacity_mva: number | null;
+  capacity_band: string | null;
   upgrade_candidate: boolean;
   ercot_shadow_price: number | null;
   ercot_binding_count: number | null;
@@ -174,7 +176,7 @@ export default function LineDetailPage() {
         <div className={`bg-white rounded-lg border p-4 ${line.upgrade_candidate ? "border-purple-200 bg-purple-50" : "border-gray-200"}`}>
           <div className="text-xs text-gray-500 uppercase tracking-wide">Capacity</div>
           <div className={`text-xl font-bold mt-1 ${line.upgrade_candidate ? "text-purple-700" : "text-gray-900"}`}>
-            {line.capacity_mw != null ? `${line.capacity_mw.toFixed(1)} MW` : "--"}
+            {line.estimated_capacity_mva != null ? `${line.estimated_capacity_mva} MVA` : line.capacity_mw != null ? `${line.capacity_mw.toFixed(1)} MW` : "--"}
           </div>
           {line.upgrade_candidate && <div className="text-xs text-purple-500 mt-0.5">50-100 MW range</div>}
         </div>
@@ -238,7 +240,8 @@ export default function LineDetailPage() {
             <dl>
               <DetailRow label="Voltage (kV)" value={line.voltage_kv != null ? line.voltage_kv.toFixed(1) : null} />
               <DetailRow label="Static Rating (A)" value={line.static_rating_amps != null ? line.static_rating_amps.toFixed(0) : null} />
-              <DetailRow label="Capacity (MW)" value={line.capacity_mw != null ? line.capacity_mw.toFixed(1) : null} highlight={line.upgrade_candidate} />
+              <DetailRow label="Estimated Capacity" value={line.estimated_capacity_mva != null ? `${line.estimated_capacity_mva} MVA` : line.capacity_mw != null ? `${line.capacity_mw.toFixed(1)} MW` : null} highlight={line.upgrade_candidate} />
+              {line.capacity_band && <DetailRow label="Capacity Band" value={line.capacity_band.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())} />}
               <DetailRow label="Upgrade Candidate" value={line.upgrade_candidate ? "Yes (50-100 MW)" : "No"} highlight={line.upgrade_candidate} />
               <DetailRow label="Length (miles)" value={line.length_miles != null ? line.length_miles.toFixed(2) : null} />
             </dl>

@@ -33,8 +33,8 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 BATCH_SIZE = 50
 
 ARCGIS_URL = (
-    'https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/'
-    'ACRES_Brownfield_Assessments/FeatureServer/0/query'
+    'https://services.arcgis.com/cJ9YHowT8TU7DUyn/ArcGIS/rest/services/'
+    'All%20ACRES%20Properties%208_30_2021/FeatureServer/0/query'
 )
 
 US_STATES = {
@@ -185,28 +185,29 @@ def main():
     for feat in all_features:
         attrs = feat.get('attributes', {})
 
-        lat = safe_float(attrs.get('LATITUDE'))
-        lng = safe_float(attrs.get('LONGITUDE'))
+        lat = safe_float(attrs.get('LATITUDE_MEASURE'))
+        lng = safe_float(attrs.get('LONGITUDE_MEASURE'))
 
         # Fall back to geometry if no explicit lat/lng
+        # Note: geometry is Web Mercator (EPSG:3857), not WGS84
         if (lat is None or lng is None) and feat.get('geometry'):
-            lng = safe_float(feat['geometry'].get('x'))
-            lat = safe_float(feat['geometry'].get('y'))
+            # Skip Web Mercator geometry — not directly usable as lat/lng
+            pass
 
         if lat is None or lng is None or abs(lat) > 90 or abs(lng) > 180:
             skipped_no_coords += 1
             continue
 
-        state = safe_str(attrs.get('STATE_ABBR'))
+        state = safe_str(attrs.get('LABEL_STATE'))
         if not state or state not in US_STATES:
             skipped_no_state += 1
             continue
 
-        # Build unique ID from HANDLER_ID or OBJECTID
-        handler_id = safe_str(attrs.get('HANDLER_ID')) or safe_str(attrs.get('OBJECTID'))
-        if not handler_id:
+        # Build unique ID from PROPERTY_ID or ObjectId
+        prop_id = safe_str(attrs.get('PROPERTY_ID')) or safe_str(attrs.get('ObjectId'))
+        if not prop_id:
             continue
-        source_id = f"epa_acres_{handler_id}"
+        source_id = f"epa_acres_{prop_id}"
 
         if source_id in seen_ids:
             continue
@@ -214,8 +215,8 @@ def main():
 
         name = safe_str(attrs.get('PROPERTY_NAME')) or 'EPA Brownfield Site'
         address_parts = []
-        street = safe_str(attrs.get('STREET_ADDRESS'))
-        city = safe_str(attrs.get('CITY_NAME'))
+        street = safe_str(attrs.get('ADDRESS1'))
+        city = safe_str(attrs.get('CITY'))
         if street:
             address_parts.append(street)
         if city:
@@ -227,26 +228,15 @@ def main():
             address_parts.append(zip_code)
         address = ', '.join(address_parts) if address_parts else None
 
-        acreage = safe_float(attrs.get('PROPERTY_ACRES'))
-        contaminant = safe_str(attrs.get('CONTAMINANT_NAME'))
-        cleanup = safe_str(attrs.get('CLEANUP_STATUS'))
-        entity = safe_str(attrs.get('ENTITY_NAME'))
-
-        # Build former_use from contaminant info
-        former_use = contaminant if contaminant else None
-
         candidates.append({
             'source_record_id': source_id,
             'name': name[:200] if name else None,
             'site_type': 'industrial',
             'state': state,
-            'county': safe_str(attrs.get('COUNTY_NAME')),
+            'county': safe_str(attrs.get('COUNTY')),
             'address': address[:300] if address else None,
             'latitude': lat,
             'longitude': lng,
-            'acreage': acreage,
-            'former_use': former_use[:300] if former_use else None,
-            'cleanup_status': cleanup[:100] if cleanup else None,
             'iso_region': STATE_ISO.get(state),
             'data_source_id': data_source_id,
         })

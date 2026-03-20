@@ -105,9 +105,8 @@ def fetch_nass_land_values(year=2024):
     params = {
         'key': NASS_API_KEY,
         'commodity_desc': 'AG LAND',
-        'statisticcat_desc': 'VALUE',
+        'statisticcat_desc': 'ASSET VALUE',
         'unit_desc': '$ / ACRE',
-        'domain_desc': 'TOTAL',
         'agg_level_desc': 'COUNTY',
         'year': year,
         'format': 'JSON',
@@ -122,11 +121,14 @@ def fetch_nass_land_values(year=2024):
                 data = json.loads(resp.read().decode())
                 return data.get('data', [])
         except urllib.error.HTTPError as e:
+            error_body = e.read().decode() if e.fp else ''
+            if e.code == 400 and 'bad request' in error_body.lower():
+                # NASS returns 400 when no data matches the query
+                return []
             if e.code == 429:
                 print(f"  Rate limited. Waiting 60s...")
                 time.sleep(60)
                 continue
-            error_body = e.read().decode() if e.fp else ''
             print(f"  HTTP {e.code}: {error_body[:300]}")
             if attempt < 2:
                 time.sleep(5)

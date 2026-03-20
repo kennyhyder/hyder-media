@@ -56,8 +56,8 @@ export default async function handler(req, res) {
 
     // Include geometry_wkt only when explicitly requested (for map rendering)
     const columns = with_geometry === "true"
-      ? "id,hifld_id,geometry_wkt,voltage_kv,capacity_mw,upgrade_candidate,owner,state,sub_1,sub_2,naession"
-      : "id,hifld_id,source_record_id,voltage_kv,volt_class,owner,status,line_type,sub_1,sub_2,naession,static_rating_amps,capacity_mw,upgrade_candidate,ercot_shadow_price,ercot_binding_count,ercot_mw_limit,state,county,length_miles,data_source_id,created_at,updated_at";
+      ? "id,hifld_id,geometry_wkt,voltage_kv,capacity_mw,estimated_capacity_mva,capacity_band,upgrade_candidate,owner,state,sub_1,sub_2,naession"
+      : "id,hifld_id,source_record_id,voltage_kv,volt_class,owner,status,line_type,sub_1,sub_2,naession,static_rating_amps,capacity_mw,estimated_capacity_mva,capacity_band,upgrade_candidate,ercot_shadow_price,ercot_binding_count,ercot_mw_limit,state,county,length_miles,data_source_id,created_at,updated_at";
 
     let query = supabase
       .from("grid_transmission_lines")

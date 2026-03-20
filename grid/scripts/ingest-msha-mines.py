@@ -36,7 +36,7 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 
 BATCH_SIZE = 50
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'msha')
-MSHA_URL = 'https://arlweb.msha.gov/OpenGovernmentData/OGIMSHA/MinesPub.zip'
+MSHA_URL = 'https://arlweb.msha.gov/opengovernmentdata/DataSets/Mines.zip'
 
 # Mine statuses indicating closed/abandoned
 TARGET_STATUS = {'Abandoned', 'NonProducing', 'Temporarily Idled'}
@@ -120,19 +120,34 @@ def safe_str(val):
 def download_msha():
     """Download and extract MSHA mines ZIP."""
     os.makedirs(DATA_DIR, exist_ok=True)
-    zip_path = os.path.join(DATA_DIR, 'MinesPub.zip')
+    zip_path = os.path.join(DATA_DIR, 'Mines.zip')
 
     if not os.path.exists(zip_path):
         print(f"  Downloading from {MSHA_URL}...")
-        req = urllib.request.Request(MSHA_URL, headers={'User-Agent': 'GridScout/1.0'})
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            with open(zip_path, 'wb') as f:
-                while True:
-                    chunk = resp.read(65536)
-                    if not chunk:
-                        break
-                    f.write(chunk)
+        # Akamai CDN requires full browser headers to avoid 403
+        import subprocess
+        result = subprocess.run([
+            'curl', '-L', '-o', zip_path, MSHA_URL,
+            '-H', 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            '-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            '-H', 'Accept-Language: en-US,en;q=0.9',
+            '-H', 'Accept-Encoding: gzip, deflate, br',
+            '-H', 'Sec-Fetch-Dest: document',
+            '-H', 'Sec-Fetch-Mode: navigate',
+            '-H', 'Sec-Fetch-Site: none',
+            '--compressed',
+            '--max-time', '120',
+        ], capture_output=True, text=True)
+        if result.returncode != 0 or not os.path.exists(zip_path):
+            print(f"  ERROR: Download failed (exit {result.returncode})")
+            if result.stderr:
+                print(f"  {result.stderr[:200]}")
+            sys.exit(1)
         size_mb = os.path.getsize(zip_path) / (1024 * 1024)
+        if size_mb < 1:
+            os.remove(zip_path)
+            print(f"  ERROR: Downloaded file too small ({size_mb:.2f} MB) - likely blocked by CDN")
+            sys.exit(1)
         print(f"  Downloaded {size_mb:.1f} MB")
     else:
         size_mb = os.path.getsize(zip_path) / (1024 * 1024)
@@ -148,7 +163,7 @@ def get_or_create_data_source():
     supabase_request('POST', 'grid_data_sources', [{
         'name': 'msha_mines',
         'description': 'MSHA abandoned/idle surface mines database',
-        'url': 'https://arlweb.msha.gov/OpenGovernmentData/OGIMSHA/MinesPub.zip',
+        'url': 'https://arlweb.msha.gov/opengovernmentdata/DataSets/Mines.zip',
     }], {'Prefer': 'return=representation'})
     ds = supabase_request('GET', 'grid_data_sources?name=eq.msha_mines&select=id')
     return ds[0]['id'] if ds else None
@@ -165,7 +180,7 @@ def main():
     # Step 1: Download data
     print("\n[Step 1] Getting MSHA data...")
     if skip_download:
-        zip_path = os.path.join(DATA_DIR, 'MinesPub.zip')
+        zip_path = os.path.join(DATA_DIR, 'Mines.zip')
         if not os.path.exists(zip_path):
             print(f"  File not found: {zip_path}")
             sys.exit(1)

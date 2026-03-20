@@ -1366,7 +1366,9 @@ function SiteDetailContent() {
                       {line.voltage_kv ? `${line.voltage_kv} kV` : "—"}
                     </td>
                     <td className="py-2 px-3 text-right text-gray-600">
-                      {line.capacity_mw ? `${line.capacity_mw} MW` : "—"}
+                      {(line as Record<string, unknown>).estimated_capacity_mva
+                        ? `${(line as Record<string, unknown>).estimated_capacity_mva} MVA`
+                        : line.capacity_mw ? `${line.capacity_mw} MW` : "—"}
                     </td>
                     <td className="py-2 px-3 text-gray-600 text-xs">{String(line.sub_1 || "—")}</td>
                     <td className="py-2 px-3 text-gray-600 text-xs">{String(line.sub_2 || "—")}</td>

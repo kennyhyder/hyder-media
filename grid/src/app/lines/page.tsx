@@ -18,6 +18,8 @@ interface TransmissionLine {
   sub_2: string | null;
   naession: string | null;
   capacity_mw: number | null;
+  estimated_capacity_mva: number | null;
+  capacity_band: string | null;
   upgrade_candidate: boolean;
   ercot_shadow_price: number | null;
   ercot_binding_count: number | null;
@@ -406,7 +408,9 @@ export default function SearchPage() {
                       {line.voltage_kv != null ? line.voltage_kv.toFixed(0) : "--"}
                     </td>
                     <td className="py-2.5 px-3 text-right text-gray-700">
-                      {line.capacity_mw != null ? line.capacity_mw.toFixed(1) : "--"}
+                      {line.estimated_capacity_mva != null
+                        ? `${line.estimated_capacity_mva} MVA`
+                        : line.capacity_mw != null ? `${line.capacity_mw.toFixed(1)} MW` : "--"}
                     </td>
                     <td className="py-2.5 px-3 text-gray-700 max-w-48 truncate" title={line.owner || ""}>
                       {line.owner || "--"}

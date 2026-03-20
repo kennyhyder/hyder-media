@@ -33,7 +33,7 @@ BATCH_SIZE = 50
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'gsa_frpp')
 
 # Known download URL for FRPP (may need updating annually)
-FRPP_URL = 'https://www.gsa.gov/system/files/FY2024-FRPP-Public-Dataset.xlsx'
+FRPP_URL = 'https://inventory.data.gov/dataset/5752ee7f-9e8b-467a-aa5a-274b4bd1bc29/resource/1a94a302-b3c9-433d-ac97-43db73fa6d04/download/frpp_public_dataset_fy24_07022025.xlsx'
 
 # Utilization statuses to include
 TARGET_UTILIZATION = {'Excess', 'Not Utilized', 'Underutilized', 'Unutilized'}

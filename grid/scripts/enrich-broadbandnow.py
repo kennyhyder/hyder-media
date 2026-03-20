@@ -43,9 +43,9 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'broadbandnow')
 
 # BroadbandNow raw CSV URLs (try in order)
 BROADBAND_CSV_URLS = [
+    'https://raw.githubusercontent.com/BroadbandNow/Open-Data/master/broadband_data_opendatachallenge.csv',
     'https://raw.githubusercontent.com/BroadbandNow/Open-Data/master/broadband_data.csv',
     'https://raw.githubusercontent.com/BroadbandNow/Open-Data/master/broadband_data_zipcode.csv',
-    'https://raw.githubusercontent.com/BroadbandNow/Open-Data/master/data/broadband_data.csv',
 ]
 
 
@@ -180,7 +180,7 @@ def parse_broadband_csv(filepath):
     """
     zip_data = {}
 
-    with open(filepath, 'r', encoding='utf-8-sig') as f:
+    with open(filepath, 'r', encoding='latin-1') as f:
         reader = csv.reader(f)
         headers = next(reader)
         headers = [h.strip() for h in headers]
@@ -192,23 +192,36 @@ def parse_broadband_csv(filepath):
         col_fiber = find_col_idx(headers, [
             'fiber_providers', 'fiber_count', 'num_fiber_providers',
             'fiber_provider_count', 'providers_fiber',
+            'Fwcount_2020',  # BroadbandNow Open Data Challenge format (fixed wireless, proxy for fiber)
         ])
         col_total = find_col_idx(headers, [
             'total_providers', 'provider_count', 'num_providers',
             'providers', 'broadband_providers',
+            'AllProviderCount_2020',  # BroadbandNow Open Data Challenge format
         ])
         col_max_down = find_col_idx(headers, [
             'max_download', 'max_down_mbps', 'max_dl_speed',
             'max_advertised_download', 'download_speed',
+            'AverageMbps',  # BroadbandNow — average download speed
+            'FastestAverageMbps',  # BroadbandNow — fastest average
         ])
         col_max_up = find_col_idx(headers, [
             'max_upload', 'max_up_mbps', 'max_ul_speed',
             'max_advertised_upload', 'upload_speed',
         ])
+        # Also look for wired provider count as a better proxy for fiber
+        col_wired = find_col_idx(headers, ['WiredCount_2020'])
 
         if col_zip is None:
             print(f"  ERROR: Cannot find zip code column in headers: {headers}")
             return {}
+
+        # Prefer wired count over fixed wireless for fiber proxy
+        if col_wired is not None and col_fiber is not None:
+            # If we matched Fwcount (fixed wireless), prefer WiredCount instead
+            col_fiber = col_wired
+        elif col_wired is not None and col_fiber is None:
+            col_fiber = col_wired
 
         print(f"  Column indices: zip={col_zip}, fiber={col_fiber}, total={col_total}, "
               f"max_down={col_max_down}, max_up={col_max_up}")
@@ -270,31 +283,39 @@ def main():
     for z, d in sample_zips:
         print(f"  Sample: {z} → {d}")
 
-    # Step 3: Load DC sites with zip codes
+    import re
+
+    # Step 3: Load DC sites
     print("\n[Step 3] Loading DC sites...")
-    # Load sites that have a zip code (extracted from address or fips_code)
-    # We need to match on zip — sites may have zip in address field
+    # Try zip_code first, then fall back to extracting from address
     sites = load_paginated(
         'grid_dc_sites',
         'id,address,fips_code,state',
-        '&address=not.is.null'
+        ''
     )
-    print(f"  {len(sites)} sites with addresses loaded")
+    print(f"  {len(sites)} total DC sites loaded")
 
-    # Step 4: Match sites to zip data
+    # Step 4: Match sites to broadband data
     print("\n[Step 4] Matching sites to broadband data...")
     patches = []
+    matched_via_zip = 0
+    matched_via_address = 0
+
+    # Build FIPS→zip lookup from BroadbandNow data (county-level aggregation)
+    # BroadbandNow CSV has County+State columns — build fips mapping if available
+    # For now, match via address zip extraction
 
     for site in sites:
-        # Extract zip from address (last 5 digits if present)
-        address = site.get('address', '') or ''
         zip_code = None
 
-        # Try to find 5-digit zip in address
-        import re
-        zip_match = re.search(r'\b(\d{5})\b', address)
+        # Extract zip from address field (5-digit pattern)
+        address = site.get('address', '') or ''
+        zip_match = re.search(r'\b(\d{5})(?:-\d{4})?\b', address)
         if zip_match:
-            zip_code = zip_match.group(1)
+            candidate = zip_match.group(1)
+            if candidate in zip_data:
+                zip_code = candidate
+                matched_via_address += 1
 
         if not zip_code:
             continue
@@ -314,7 +335,7 @@ def main():
         if len(patch) > 1:  # Has at least one data field beyond 'id'
             patches.append(patch)
 
-    print(f"  Matched: {len(patches)} sites")
+    print(f"  Matched: {len(patches)} sites (zip_code: {matched_via_zip}, address: {matched_via_address})")
 
     if dry_run:
         print(f"\n[DRY RUN] Would update {len(patches)} DC sites with broadband data")

@@ -89,8 +89,11 @@ function scoreColor(score: number): string {
 function siteTypeColor(type: string): string {
   switch (type) {
     case "substation": return "#7c3aed";
-    case "brownfield": return "#d97706";
+    case "brownfield": case "industrial": return "#d97706";
     case "greenfield": return "#059669";
+    case "federal_excess": return "#8b5cf6";
+    case "mine": return "#ea580c";
+    case "military_brac": return "#dc2626";
     default: return "#6b7280";
   }
 }
@@ -98,8 +101,11 @@ function siteTypeColor(type: string): string {
 function siteTypeLabel(type: string): string {
   switch (type) {
     case "substation": return "Substation Site";
-    case "brownfield": return "Industrial Site";
+    case "brownfield": case "industrial": return "Industrial Site";
     case "greenfield": return "Greenfield Corridor";
+    case "federal_excess": return "Federal Surplus Property";
+    case "mine": return "Abandoned Mine";
+    case "military_brac": return "BRAC Military Base";
     default: return type;
   }
 }
@@ -193,7 +199,7 @@ export default function MapPage() {
 
   // Score distribution
   const [scoreDistribution, setScoreDistribution] = useState({ excellent: 0, good: 0, fair: 0, poor: 0 });
-  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0 });
+  const [typeBreakdown, setTypeBreakdown] = useState({ substation: 0, brownfield: 0, greenfield: 0, federal_excess: 0, mine: 0, military_brac: 0 });
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -375,7 +381,7 @@ export default function MapPage() {
       // Update site markers
       siteLayerRef.current.clearLayers();
       let excellent = 0, good = 0, fair = 0, poor = 0;
-      let sub = 0, bf = 0, gf = 0;
+      let sub = 0, bf = 0, gf = 0, fed = 0, mine = 0, mil = 0;
 
       for (const site of json.sites) {
         if (!site.latitude || !site.longitude) continue;
@@ -387,8 +393,11 @@ export default function MapPage() {
         else poor++;
 
         if (site.site_type === "substation") sub++;
-        else if (site.site_type === "brownfield") bf++;
+        else if (site.site_type === "brownfield" || site.site_type === "industrial") bf++;
         else if (site.site_type === "greenfield") gf++;
+        else if (site.site_type === "federal_excess") fed++;
+        else if (site.site_type === "mine") mine++;
+        else if (site.site_type === "military_brac") mil++;
 
         const color = colorBy === "score"
           ? scoreColor(score)
@@ -420,7 +429,7 @@ export default function MapPage() {
       }
 
       setScoreDistribution({ excellent, good, fair, poor });
-      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf });
+      setTypeBreakdown({ substation: sub, brownfield: bf, greenfield: gf, federal_excess: fed, mine: mine, military_brac: mil });
 
       // Update DC markers
       dcLayerRef.current.clearLayers();
@@ -901,6 +910,9 @@ export default function MapPage() {
                       <option value="substation">Substation Sites</option>
                       <option value="brownfield">Industrial Sites</option>
                       <option value="greenfield">Greenfield Corridors</option>
+                      <option value="federal_excess">Federal Surplus</option>
+                      <option value="mine">Abandoned Mines</option>
+                      <option value="military_brac">BRAC Military</option>
                     </select>
                   </div>
 
@@ -969,7 +981,10 @@ export default function MapPage() {
                       { type: "substation", label: "Substation Sites", color: "#7c3aed", count: typeBreakdown.substation },
                       { type: "greenfield", label: "Greenfield Corridors", color: "#059669", count: typeBreakdown.greenfield },
                       { type: "brownfield", label: "Industrial Sites", color: "#d97706", count: typeBreakdown.brownfield },
-                    ].map(t => (
+                      { type: "federal_excess", label: "Federal Surplus", color: "#8b5cf6", count: typeBreakdown.federal_excess },
+                      { type: "mine", label: "Abandoned Mines", color: "#ea580c", count: typeBreakdown.mine },
+                      { type: "military_brac", label: "BRAC Military", color: "#dc2626", count: typeBreakdown.military_brac },
+                    ].filter(t => t.count > 0).map(t => (
                       <div key={t.type} className="flex items-center gap-2 text-xs">
                         <div className="w-3 h-3 rounded-full" style={{ background: t.color }}></div>
                         <span className="flex-1 text-gray-700">{t.label}</span>
