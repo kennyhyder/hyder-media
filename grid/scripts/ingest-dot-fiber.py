@@ -163,6 +163,206 @@ DOT_FIBER_SOURCES = [
     # ── NORTH CAROLINA ──
     # Harnett County NC Fiber — BROKEN: 404 Service not found (may come back)
     # URL: https://gis.harnett.org/arcgis/rest/services/Public_Utilities/Fiber/FeatureServer/1
+
+    # ══════════════════════════════════════════════════════════════
+    # BATCH 2: Research agent discoveries (Mar 2026)
+    # ══════════════════════════════════════════════════════════════
+
+    # ── VERMONT (fiber route polylines from PSD) ──
+    {
+        'name': 'Vermont PSD Fiber Routes 2022',
+        'url': 'https://maps.vcgi.vermont.gov/arcgis/rest/services/PSD_services/OPENDATA_PSD_LAYERS_SP_NOCACHE_v1/MapServer/56',
+        'prefix': 'vt_psd_fiber',
+        'state': 'VT',
+        'name_field': 'PRIMARYNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'state_fiber',
+    },
+    {
+        'name': 'Vermont Cable Routes 2021',
+        'url': 'https://maps.vcgi.vermont.gov/arcgis/rest/services/PSD_services/OPENDATA_PSD_LAYERS_SP_NOCACHE_v1/MapServer/49',
+        'prefix': 'vt_cable_routes',
+        'state': 'VT',
+        'name_field': 'PRIMARYNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'cable_route',
+    },
+
+    # ── CALIFORNIA (CAMMBI middle-mile broadband) ──
+    {
+        'name': 'California CAMMBI All Routes',
+        'url': 'https://services6.arcgis.com/sAv98EYUZbLCVPW0/arcgis/rest/services/MMBI_Statewide_Network_High_All/FeatureServer/1',
+        'prefix': 'ca_cammbi',
+        'state': 'CA',
+        'name_field': 'County_Name',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+
+    # ── ARIZONA (ADOT + Yavapai County fiber) ──
+    {
+        'name': 'ADOT State-Owned Fiber Optic Conduit',
+        'url': 'https://services8.arcgis.com/bspqcASG7WIqqFvk/arcgis/rest/services/ADOT_State_Owned_Fiber_Optic_Conduit_Routes/FeatureServer/117',
+        'prefix': 'az_adot_fiber',
+        'state': 'AZ',
+        'name_field': 'Name',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'dot_fiber',
+    },
+    {
+        'name': 'Yavapai County AZ Sparklight Fiber',
+        'url': 'https://services1.arcgis.com/BajuNXbtZNiBKFkx/arcgis/rest/services/Fiber_optic_infrastructure/FeatureServer/0',
+        'prefix': 'az_yavapai_sparklight',
+        'state': 'AZ',
+        'name_field': 'FULLST_NAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'isp_fiber',
+    },
+    {
+        'name': 'Yavapai County AZ ADOT Fiber',
+        'url': 'https://services1.arcgis.com/BajuNXbtZNiBKFkx/arcgis/rest/services/Fiber_optic_infrastructure/FeatureServer/1',
+        'prefix': 'az_yavapai_adot',
+        'state': 'AZ',
+        'name_field': 'FULLST_NAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'dot_fiber',
+    },
+
+    # ── UTAH (UETN fiber network) ──
+    {
+        'name': 'Utah UETN Fiber Network',
+        'url': 'https://gis.horrocks.com/arcgis/rest/services/UETN_Fiber_SDE/MapServer/8',
+        'prefix': 'ut_uetn_fiber',
+        'state': 'UT',
+        'name_field': 'DESCR',
+        'operator_field': 'OWNER',
+        'out_sr': 4326,
+        'fiber_type_override': 'state_fiber',
+    },
+    {
+        'name': 'Utah UETN Conduit',
+        'url': 'https://gis.horrocks.com/arcgis/rest/services/UETN_Fiber_SDE/MapServer/7',
+        'prefix': 'ut_uetn_conduit',
+        'state': 'UT',
+        'name_field': 'DESCR',
+        'operator_field': 'OWNER',
+        'out_sr': 4326,
+        'fiber_type_override': 'conduit',
+    },
+
+    # ── NEVADA (HSNV middle-mile routes) ──
+    {
+        'name': 'Nevada HSNV I-80 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/I_80_Route/FeatureServer/89',
+        'prefix': 'nv_hsnv_i80',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+    {
+        'name': 'Nevada HSNV I-15 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/I_15_Route/FeatureServer/0',
+        'prefix': 'nv_hsnv_i15',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+    {
+        'name': 'Nevada HSNV US-93 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/US_93_Route/FeatureServer/0',
+        'prefix': 'nv_hsnv_us93',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+    {
+        'name': 'Nevada HSNV US-50 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/US_50_Route/FeatureServer/0',
+        'prefix': 'nv_hsnv_us50',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+    {
+        'name': 'Nevada HSNV US-95 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/US_95_Route/FeatureServer/0',
+        'prefix': 'nv_hsnv_us95',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+    {
+        'name': 'Nevada HSNV I-580 Fiber Route',
+        'url': 'https://services8.arcgis.com/6zoy8FhqGf9FaeLx/arcgis/rest/services/I_580_Route/FeatureServer/0',
+        'prefix': 'nv_hsnv_i580',
+        'state': 'NV',
+        'name_field': 'FULLNAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'middle_mile',
+    },
+
+    # ── MASSACHUSETTS (Boston municipal fiber) ──
+    {
+        'name': 'Boston Lit Fiber',
+        'url': 'https://gisportal.boston.gov/arcgis/rest/services/Infrastructure/fiber/MapServer/8',
+        'prefix': 'ma_boston_lit',
+        'state': 'MA',
+        'name_field': 'Type',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'municipal_fiber',
+    },
+    {
+        'name': 'Boston Core Fiber',
+        'url': 'https://gisportal.boston.gov/arcgis/rest/services/Infrastructure/fiber/MapServer/9',
+        'prefix': 'ma_boston_core',
+        'state': 'MA',
+        'name_field': None,
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'municipal_fiber',
+    },
+
+    # ── ILLINOIS (Decatur municipal fiber) ──
+    {
+        'name': 'Decatur IL Municipal Fiber',
+        'url': 'https://maps.decaturil.gov/arcgis/rest/services/PublicWorks/FiberInfrastructure/FeatureServer/1',
+        'prefix': 'il_decatur_fiber',
+        'state': 'IL',
+        'name_field': 'CABLETYPE',
+        'operator_field': 'CABLEOWNER',
+        'out_sr': 4326,
+        'fiber_type_override': 'municipal_fiber',
+    },
+
+    # ── WESTERN US (existing long-haul fiber routes) ──
+    {
+        'name': 'Western US Long-Haul Fiber Routes',
+        'url': 'https://services5.arcgis.com/aYs2RC3pluEvAuE3/ArcGIS/rest/services/Existing_Fiber_Routes/FeatureServer/0',
+        'prefix': 'west_longhaul',
+        'state': None,  # Multi-state — compute from centroid
+        'name_field': 'NAME',
+        'operator_field': None,
+        'out_sr': 4326,
+        'fiber_type_override': 'long_haul',
+    },
 ]
 
 
@@ -439,6 +639,27 @@ def convert_esri_features(features):
     return result
 
 
+def state_from_coords(lat, lng):
+    """Rough state lookup from coordinates using centroid bounding boxes."""
+    # Approximate state centroids — good enough for fiber route assignment
+    states = [
+        ('CA', 36.8, -119.4, 3.5), ('NV', 38.8, -116.4, 3.0), ('OR', 43.8, -120.6, 2.5),
+        ('WA', 47.4, -120.7, 2.0), ('AZ', 34.0, -111.1, 3.0), ('UT', 39.3, -111.1, 2.5),
+        ('CO', 39.0, -105.5, 2.0), ('NM', 34.5, -106.0, 2.5), ('WY', 43.0, -107.6, 2.0),
+        ('MT', 47.0, -109.6, 3.0), ('ID', 44.1, -114.7, 2.5), ('TX', 31.5, -99.0, 5.0),
+        ('OK', 35.5, -97.5, 2.0), ('KS', 38.5, -98.3, 2.0), ('NE', 41.5, -99.8, 2.0),
+        ('SD', 44.0, -100.2, 2.0), ('ND', 47.5, -100.5, 2.0),
+    ]
+    best = None
+    best_dist = float('inf')
+    for st, slat, slng, _ in states:
+        d = ((lat - slat)**2 + (lng - slng)**2)**0.5
+        if d < best_dist:
+            best_dist = d
+            best = st
+    return best
+
+
 def features_to_routes(features, source):
     """Convert GeoJSON features to route records for DB insertion."""
     prefix = source['prefix']
@@ -511,6 +732,11 @@ def features_to_routes(features, source):
         if operator and str(operator).strip() in ('None', 'null', '', 'N/A', 'Null', '<Null>'):
             operator = None
 
+        # Derive state from centroid if not specified
+        route_state = state
+        if not route_state:
+            route_state = state_from_coords(centroid_lat, centroid_lng)
+
         routes.append({
             'source_record_id': src_id,
             'name': str(route_name).strip()[:500] if route_name else None,
@@ -518,7 +744,7 @@ def features_to_routes(features, source):
             'fiber_type': source.get('fiber_type_override', 'dot_fiber'),
             'location_type': None,
             'source': prefix,
-            'state': state,
+            'state': route_state,
             'centroid_lat': round(centroid_lat, 7),
             'centroid_lng': round(centroid_lng, 7),
             'geometry_json': geom,
@@ -746,7 +972,8 @@ def main():
     print(f"\nPer-endpoint results:")
     for r in results:
         status_icon = '✓' if r['status'] == 'ok' and r['count'] > 0 else '—' if r['status'] in ('no_data', 'no_valid_routes') else '✗'
-        print(f"  {status_icon} {r['state']:2s} | {r['name']:40s} | {r['status']:16s} | {r.get('count', 0):,} routes")
+        st = r.get('state') or '??'
+        print(f"  {status_icon} {st:2s} | {r['name']:40s} | {r['status']:16s} | {r.get('count', 0):,} routes")
 
 
 if __name__ == '__main__':
