@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { withDemoToken } from "@/lib/demoAccess";
 import LocationFilter from "@/components/LocationFilter";
+
+const ResultsMap = dynamic(() => import("@/components/ResultsMap"), { ssr: false });
 
 interface Brownfield {
   id: string;
@@ -45,6 +48,7 @@ export default function BrownfieldsPage() {
   const [geoLat, setGeoLat] = useState<number | null>(null);
   const [geoLng, setGeoLng] = useState<number | null>(null);
   const [geoRadius, setGeoRadius] = useState<number>(50);
+  const [showMap, setShowMap] = useState(false);
 
   const pageSize = 50;
 
@@ -100,10 +104,20 @@ export default function BrownfieldsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Retired Power Plants &amp; Industrial Sites</h1>
-      <p className="text-gray-600 text-sm mb-6">
-        {total > 0 ? `${total.toLocaleString()} decommissioned power plants with existing grid connections` : "Loading..."}
-      </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Retired Power Plants &amp; Industrial Sites</h1>
+          <p className="text-gray-600 text-sm">
+            {total > 0 ? `${total.toLocaleString()} decommissioned power plants with existing grid connections` : "Loading..."}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowMap(!showMap)}
+          className={`px-4 py-2 text-sm rounded-lg border ${showMap ? "text-purple-700 border-purple-400 bg-purple-50" : "text-gray-700 border-gray-300 hover:bg-gray-50"}`}
+        >
+          {showMap ? "Hide Map" : "Show Map"}
+        </button>
+      </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
@@ -154,6 +168,23 @@ export default function BrownfieldsPage() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-4">
           Failed to load industrial sites: {error}
+        </div>
+      )}
+
+      {/* Map view */}
+      {showMap && (
+        <div className="mb-6">
+          <ResultsMap
+            points={sites.filter(s => s.latitude && s.longitude).map(s => ({
+              id: s.id,
+              name: s.name,
+              latitude: s.latitude,
+              longitude: s.longitude,
+              label: s.former_use ? `Retired ${s.former_use} plant` : s.state,
+              href: `/grid/brownfield/?id=${s.id}`,
+            }))}
+            geoCenter={geoLat != null && geoLng != null ? { lat: geoLat, lng: geoLng, radius: geoRadius } : null}
+          />
         </div>
       )}
 

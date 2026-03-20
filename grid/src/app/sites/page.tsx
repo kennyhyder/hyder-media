@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
 import {
   DEFAULT_WEIGHTS,
@@ -10,6 +11,8 @@ import {
 } from "@/lib/customScoring";
 import WeightEditor from "@/components/WeightEditor";
 import LocationFilter from "@/components/LocationFilter";
+
+const ResultsMap = dynamic(() => import("@/components/ResultsMap"), { ssr: false });
 
 interface DCSite {
   id: string;
@@ -141,6 +144,7 @@ function DCSitesContent() {
   const [geoLng, setGeoLng] = useState<number | null>(null);
   const [geoRadius, setGeoRadius] = useState<number>(50);
   const [geoLabel, setGeoLabel] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const hasCustomWeights = isCustomWeights(weights);
 
@@ -258,6 +262,12 @@ function DCSitesContent() {
             }`}
           >
             {hasCustomWeights ? "Custom Weights" : "Weights"}
+          </button>
+          <button
+            onClick={() => setShowMap(!showMap)}
+            className={`px-4 py-2 text-sm rounded-lg border ${showMap ? "text-purple-700 border-purple-400 bg-purple-50" : "text-gray-700 border-gray-300 hover:bg-gray-50"}`}
+          >
+            {showMap ? "Hide Map" : "Show Map"}
           </button>
           {!isDemoMode() && (
             <button
@@ -415,6 +425,24 @@ function DCSitesContent() {
           />
         </div>
       </div>
+
+      {/* Map view */}
+      {showMap && (
+        <div className="mb-6">
+          <ResultsMap
+            points={displaySites.filter(s => s.latitude && s.longitude).map(s => ({
+              id: s.id,
+              name: s.name,
+              latitude: s.latitude,
+              longitude: s.longitude,
+              label: `${s.state} · ${s.site_type}`,
+              score: s.dc_score,
+              href: `/grid/site/?id=${s.id}`,
+            }))}
+            geoCenter={geoLat != null && geoLng != null ? { lat: geoLat, lng: geoLng, radius: geoRadius } : null}
+          />
+        </div>
+      )}
 
       {/* Results table */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">

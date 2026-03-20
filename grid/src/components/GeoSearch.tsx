@@ -172,8 +172,8 @@ export default function GeoSearch({ map, onLocationSelect, siteCount }: GeoSearc
   return (
     <div
       ref={containerRef}
-      className="absolute top-3 left-14 z-[1000]"
-      style={{ width: "340px" }}
+      className="absolute top-3 left-14 z-[1001]"
+      style={{ width: "360px" }}
     >
       <div className="bg-white rounded-lg shadow-lg border border-gray-200">
         {/* Search input */}
