@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { withDemoToken } from "@/lib/demoAccess";
+import LocationFilter from "@/components/LocationFilter";
 
 interface Brownfield {
   id: string;
@@ -41,6 +42,9 @@ export default function BrownfieldsPage() {
   const [hasSubstation, setHasSubstation] = useState("");
   const [sortBy, setSortBy] = useState("existing_capacity_mw");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [geoLat, setGeoLat] = useState<number | null>(null);
+  const [geoLng, setGeoLng] = useState<number | null>(null);
+  const [geoRadius, setGeoRadius] = useState<number>(50);
 
   const pageSize = 50;
 
@@ -52,6 +56,11 @@ export default function BrownfieldsPage() {
     if (stateFilter) params.set("state", stateFilter);
     if (search) params.set("search", search);
     if (hasSubstation) params.set("has_substation", hasSubstation);
+    if (geoLat !== null && geoLng !== null) {
+      params.set("near_lat", String(geoLat));
+      params.set("near_lng", String(geoLng));
+      params.set("radius_miles", String(geoRadius));
+    }
     params.set("sort", sortBy);
     params.set("order", sortOrder);
     params.set("limit", String(pageSize));
@@ -71,7 +80,7 @@ export default function BrownfieldsPage() {
         setError(err.message);
         setLoading(false);
       });
-  }, [stateFilter, search, hasSubstation, sortBy, sortOrder, page]);
+  }, [stateFilter, search, hasSubstation, sortBy, sortOrder, page, geoLat, geoLng, geoRadius]);
 
   useEffect(() => {
     fetchData();
@@ -127,11 +136,17 @@ export default function BrownfieldsPage() {
             <option value="false">No Nearby Substation</option>
           </select>
           <button
-            onClick={() => { setSearch(""); setStateFilter(""); setHasSubstation(""); setPage(0); }}
+            onClick={() => { setSearch(""); setStateFilter(""); setHasSubstation(""); setGeoLat(null); setGeoLng(null); setPage(0); }}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg"
           >
             Clear
           </button>
+        </div>
+        <div className="mt-3 max-w-md">
+          <LocationFilter
+            onLocationChange={(lat, lng, radius) => { setGeoLat(lat); setGeoLng(lng); setGeoRadius(radius); setPage(0); }}
+            onClear={() => { setGeoLat(null); setGeoLng(null); }}
+          />
         </div>
       </div>
 

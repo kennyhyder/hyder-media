@@ -26,6 +26,9 @@ export default async function handler(req, res) {
       search,
       sort,
       order,
+      near_lat,
+      near_lng,
+      radius_miles,
     } = req.query;
 
     // Input validation
@@ -50,6 +53,21 @@ export default async function handler(req, res) {
       query = query.or(
         `name.ilike.%${safe}%,former_use.ilike.%${safe}%,city.ilike.%${safe}%`
       );
+    }
+
+    // Geospatial bounding-box filter
+    if (near_lat && near_lng) {
+      const lat = parseFloat(near_lat);
+      const lng = parseFloat(near_lng);
+      const radius = parseFloat(radius_miles) || 50;
+      if (isNaN(lat) || isNaN(lng)) return handleError(res, "Invalid near_lat/near_lng", 400);
+      const latDelta = radius / 69.0;
+      const lngDelta = radius / (69.0 * Math.cos((lat * Math.PI) / 180));
+      query = query
+        .gte("latitude", lat - latDelta)
+        .lte("latitude", lat + latDelta)
+        .gte("longitude", lng - lngDelta)
+        .lte("longitude", lng + lngDelta);
     }
 
     const validSorts = [

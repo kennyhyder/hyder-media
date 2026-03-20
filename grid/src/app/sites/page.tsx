@@ -9,6 +9,7 @@ import {
   isCustomWeights,
 } from "@/lib/customScoring";
 import WeightEditor from "@/components/WeightEditor";
+import LocationFilter from "@/components/LocationFilter";
 
 interface DCSite {
   id: string;
@@ -136,6 +137,10 @@ function DCSitesContent() {
   const [sortOrder, setSortOrder] = useState("desc");
   const [showWeights, setShowWeights] = useState(false);
   const [weights, setWeights] = useState<Record<string, number>>({ ...DEFAULT_WEIGHTS });
+  const [geoLat, setGeoLat] = useState<number | null>(null);
+  const [geoLng, setGeoLng] = useState<number | null>(null);
+  const [geoRadius, setGeoRadius] = useState<number>(50);
+  const [geoLabel, setGeoLabel] = useState<string | null>(null);
 
   const hasCustomWeights = isCustomWeights(weights);
 
@@ -164,6 +169,11 @@ function DCSitesContent() {
     if (isoFilter) params.set("iso_region", isoFilter);
     if (floodFilter) params.set("flood", floodFilter);
     if (search) params.set("search", search);
+    if (geoLat !== null && geoLng !== null) {
+      params.set("near_lat", String(geoLat));
+      params.set("near_lng", String(geoLng));
+      params.set("radius_miles", String(geoRadius));
+    }
     params.set("sort", sortBy);
     params.set("order", sortOrder);
     params.set("limit", String(pageSize));
@@ -177,7 +187,7 @@ function DCSitesContent() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [stateFilter, typeFilter, minScore, isoFilter, search, sortBy, sortOrder, page]);
+  }, [stateFilter, typeFilter, minScore, isoFilter, search, sortBy, sortOrder, page, geoLat, geoLng, geoRadius]);
 
   useEffect(() => {
     fetchSites();
@@ -392,11 +402,17 @@ function DCSitesContent() {
             <option value="X">Zone X (Low Risk)</option>
           </select>
           <button
-            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setIsoFilter(""); setFloodFilter(""); setPage(0); }}
+            onClick={() => { setSearch(""); setStateFilter(""); setTypeFilter(""); setMinScore(""); setIsoFilter(""); setFloodFilter(""); setGeoLat(null); setGeoLng(null); setGeoLabel(null); setPage(0); }}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg"
           >
             Clear
           </button>
+        </div>
+        <div className="mt-3 max-w-md">
+          <LocationFilter
+            onLocationChange={(lat, lng, radius, label) => { setGeoLat(lat); setGeoLng(lng); setGeoRadius(radius); setGeoLabel(label); setPage(0); }}
+            onClear={() => { setGeoLat(null); setGeoLng(null); setGeoLabel(null); }}
+          />
         </div>
       </div>
 
