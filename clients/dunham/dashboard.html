@@ -105,7 +105,10 @@
                 const data = await resp.json();
 
                 if (!resp.ok || data.error) {
-                    throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+                    const msg = data.details
+                        ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
+                        : (data.error || `HTTP ${resp.status}`);
+                    throw new Error(msg);
                 }
 
                 loadingEl.style.display = 'none';

@@ -99,8 +99,7 @@ export default async function handler(req, res) {
                     asset.callout_asset.callout_text,
                     asset.structured_snippet_asset.header,
                     asset.structured_snippet_asset.values,
-                    asset.final_urls,
-                    campaign_asset.campaign,
+                    campaign.id, campaign.name,
                     campaign_asset.field_type,
                     campaign_asset.status
                 FROM campaign_asset
@@ -116,7 +115,6 @@ export default async function handler(req, res) {
                     asset.callout_asset.callout_text,
                     asset.structured_snippet_asset.header,
                     asset.structured_snippet_asset.values,
-                    asset.final_urls,
                     customer_asset.field_type,
                     customer_asset.status
                 FROM customer_asset
@@ -223,10 +221,8 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows) {
     for (const row of campaignAssetRows) {
         const asset = row.asset || {};
         const campaignAsset = row.campaignAsset || {};
-        const campaignResource = campaignAsset.campaign || '';
-        // Extract campaign ID from resource name: customers/XXX/campaigns/YYY
-        const campIdMatch = campaignResource.match(/campaigns\/(\d+)/);
-        const campId = campIdMatch ? campIdMatch[1] : null;
+        const campaign = row.campaign || {};
+        const campId = campaign.id;
 
         if (campId && campaignMap.has(campId)) {
             campaignMap.get(campId).assets.push(formatAsset(asset, campaignAsset));
@@ -269,7 +265,7 @@ function formatAsset(asset, parentAsset) {
 
     if (type === 'SITELINK') {
         const sl = asset.sitelinkAsset || {};
-        return { ...base, linkText: sl.linkText, desc1: sl.description1, desc2: sl.description2, finalUrls: asset.finalUrls || [] };
+        return { ...base, linkText: sl.linkText, desc1: sl.description1, desc2: sl.description2 };
     }
     if (type === 'CALLOUT') {
         const co = asset.calloutAsset || {};
