@@ -158,9 +158,12 @@
             let html = '';
 
             for (const camp of data.campaigns) {
+                const isPMax = camp.type === 'PERFORMANCE_MAX';
+                const typeBadge = isPMax ? '<span class="badge badge-pmax">PMAX</span>' : '';
+
                 html += `<div class="campaign-section">`;
                 html += `<div class="campaign-header">
-                    <div class="campaign-name">${esc(camp.name)}</div>
+                    <div class="campaign-name">${esc(camp.name)} ${typeBadge}</div>
                     <span class="badge badge-enabled">${camp.status}</span>
                 </div>`;
                 html += `<div class="campaign-body">`;
@@ -168,7 +171,7 @@
                 // Collect campaign sitelinks for ad previews
                 const campSitelinks = (camp.assets || []).filter(a => a.type === 'SITELINK');
 
-                // Ad groups
+                // Regular ad groups (Search campaigns)
                 for (const ag of camp.adGroups) {
                     html += `<div class="ad-group">`;
                     html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
@@ -178,6 +181,13 @@
                     }
 
                     html += `</div>`;
+                }
+
+                // PMax asset groups
+                if (camp.assetGroups && camp.assetGroups.length > 0) {
+                    for (const ag of camp.assetGroups) {
+                        html += renderAssetGroup(ag);
+                    }
                 }
 
                 // Campaign-level extensions
@@ -322,6 +332,118 @@
                 html += `</div>`;
             }
 
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderAssetGroup(ag) {
+            let html = `<div class="ad-group">`;
+            html += `<div class="ad-group-name">${esc(ag.name)} <span class="badge badge-pmax">Asset Group</span></div>`;
+
+            // PMax ad preview
+            if (ag.headlines.length > 0) {
+                html += renderPMaxPreview(ag);
+            }
+
+            // Headlines
+            if (ag.headlines.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Headlines (${ag.headlines.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ag.headlines.forEach((h, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(h.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Long Headlines
+            if (ag.longHeadlines.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Long Headlines (${ag.longHeadlines.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ag.longHeadlines.forEach((h, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(h.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Descriptions
+            if (ag.descriptions.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Descriptions (${ag.descriptions.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ag.descriptions.forEach((d, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(d.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Business Name
+            if (ag.businessName) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Business Name</div>`;
+                html += `<div style="font-size: 0.9rem; padding: 4px 0;">${esc(ag.businessName)}</div>`;
+                html += `</div>`;
+            }
+
+            // Images
+            if (ag.images.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Images (${ag.images.length})</div>`;
+                html += `<div class="pmax-images-grid">`;
+                for (const img of ag.images) {
+                    if (img.imageUrl) {
+                        html += `<div class="pmax-image-card">
+                            <img src="${esc(img.imageUrl)}" alt="${esc(img.name || '')}" loading="lazy">
+                            ${img.name ? `<div class="pmax-image-name">${esc(img.name)}</div>` : ''}
+                        </div>`;
+                    }
+                }
+                html += `</div></div>`;
+            }
+
+            // Logos
+            if (ag.logos.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Logos (${ag.logos.length})</div>`;
+                html += `<div class="pmax-images-grid">`;
+                for (const logo of ag.logos) {
+                    if (logo.imageUrl) {
+                        html += `<div class="pmax-image-card pmax-logo-card">
+                            <img src="${esc(logo.imageUrl)}" alt="${esc(logo.name || '')}" loading="lazy">
+                        </div>`;
+                    }
+                }
+                html += `</div></div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderPMaxPreview(ag) {
+            const headline = ag.headlines[0] ? ag.headlines[0].text : '';
+            const longHeadline = ag.longHeadlines[0] ? ag.longHeadlines[0].text : '';
+            const desc = ag.descriptions[0] ? ag.descriptions[0].text : '';
+            const bizName = ag.businessName || '';
+            const displayUrl = ag.finalUrl || bizName;
+
+            let html = `<div class="ad-preview">`;
+            html += `<div class="ad-preview-label">PMax Ad Preview (example combination)</div>`;
+            html += `<div class="ad-preview-card">`;
+            html += `<div class="ad-preview-sponsored">Sponsored</div>`;
+            html += `<div class="ad-preview-url">${esc(displayUrl)}</div>`;
+            html += `<div class="ad-preview-headline">${esc(longHeadline || headline)}</div>`;
+            html += `<div class="ad-preview-description">${esc(desc)}</div>`;
             html += `</div></div>`;
             return html;
         }

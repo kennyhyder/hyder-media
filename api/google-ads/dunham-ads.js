@@ -115,9 +115,33 @@ export default async function handler(req, res) {
         `);
         if (customerAssetLinks.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetLinks.error, query: customerAssetLinks.query });
 
-        // Query 4: Fetch full asset details per type
+        // Query 4: PMax asset groups
+        const assetGroupsData = await fetchQuery(CUSTOMER_ID, headers, `
+            SELECT
+                campaign.id, campaign.name, campaign.status,
+                asset_group.id, asset_group.name, asset_group.status
+            FROM asset_group
+            WHERE campaign.status = 'ENABLED'
+                AND asset_group.status = 'ENABLED'
+        `);
+
+        // Query 5: PMax asset group → asset links
+        const assetGroupAssetsData = await fetchQuery(CUSTOMER_ID, headers, `
+            SELECT
+                campaign.id, campaign.status,
+                asset_group.id, asset_group.status,
+                asset.id, asset.name, asset.type,
+                asset_group_asset.field_type,
+                asset_group_asset.status
+            FROM asset_group_asset
+            WHERE campaign.status = 'ENABLED'
+                AND asset_group.status = 'ENABLED'
+                AND asset_group_asset.status = 'ENABLED'
+        `);
+
+        // Query 6: Fetch full asset details per type
         let assetDetails = new Map();
-        const [sitelinks, callouts, snippets, images] = await Promise.all([
+        const [sitelinks, callouts, snippets, images, textAssets] = await Promise.all([
             fetchQuery(CUSTOMER_ID, headers, `
                 SELECT
                     asset.id,
@@ -151,10 +175,17 @@ export default async function handler(req, res) {
                 FROM asset
                 WHERE asset.type = 'IMAGE'
             `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    asset.id,
+                    asset.text_asset.text
+                FROM asset
+                WHERE asset.type = 'TEXT'
+            `),
         ]);
 
         // Build lookup map from asset details
-        for (const result of [sitelinks, callouts, snippets, images]) {
+        for (const result of [sitelinks, callouts, snippets, images, textAssets]) {
             if (result.results) {
                 for (const row of result.results) {
                     if (row.asset) assetDetails.set(row.asset.id, row.asset);
@@ -167,7 +198,9 @@ export default async function handler(req, res) {
             adsData.results || [],
             campaignAssetLinks.results || [],
             customerAssetLinks.results || [],
-            assetDetails
+            assetDetails,
+            assetGroupsData.results || [],
+            assetGroupAssetsData.results || []
         );
 
         return res.status(200).json(response);
@@ -203,7 +236,7 @@ async function fetchQuery(customerId, headers, query) {
     }
 }
 
-function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetails) {
+function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetails, assetGroupRows, assetGroupAssetRows) {
     // Build campaigns → adGroups → ads hierarchy
     const campaignMap = new Map();
 
@@ -219,7 +252,9 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetai
                 id: campId,
                 name: campaign.name,
                 status: campaign.status,
+                type: 'SEARCH',
                 adGroups: new Map(),
+                assetGroups: [],
                 assets: [],
             });
         }
@@ -262,6 +297,78 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetai
         });
     }
 
+    // Build PMax asset groups
+    const assetGroupMap = new Map(); // assetGroupId → { ... }
+    for (const row of assetGroupRows) {
+        const campaign = row.campaign || {};
+        const ag = row.assetGroup || {};
+        const campId = campaign.id;
+
+        if (!campaignMap.has(campId)) {
+            campaignMap.set(campId, {
+                id: campId,
+                name: campaign.name,
+                status: campaign.status,
+                type: 'PERFORMANCE_MAX',
+                adGroups: new Map(),
+                assetGroups: [],
+                assets: [],
+            });
+        } else {
+            campaignMap.get(campId).type = 'PERFORMANCE_MAX';
+        }
+
+        const agObj = {
+            id: ag.id,
+            name: ag.name,
+            status: ag.status,
+            headlines: [],
+            longHeadlines: [],
+            descriptions: [],
+            businessName: null,
+            images: [],
+            logos: [],
+            finalUrl: null,
+        };
+        assetGroupMap.set(ag.id, agObj);
+        campaignMap.get(campId).assetGroups.push(agObj);
+    }
+
+    // Attach assets to their asset groups
+    for (const row of assetGroupAssetRows) {
+        const agId = (row.assetGroup || {}).id;
+        const asset = row.asset || {};
+        const fieldType = (row.assetGroupAsset || {}).fieldType;
+        const agObj = assetGroupMap.get(agId);
+        if (!agObj) continue;
+
+        // Merge in detailed asset info
+        const details = assetDetails.get(asset.id) || {};
+        const merged = { ...asset, ...details };
+
+        const textVal = (merged.textAsset || {}).text || merged.name || '';
+        const imgInfo = formatAsset(merged, { fieldType });
+
+        switch (fieldType) {
+            case 'HEADLINE':
+                agObj.headlines.push({ text: textVal }); break;
+            case 'LONG_HEADLINE':
+                agObj.longHeadlines.push({ text: textVal }); break;
+            case 'DESCRIPTION':
+                agObj.descriptions.push({ text: textVal }); break;
+            case 'BUSINESS_NAME':
+                agObj.businessName = textVal; break;
+            case 'MARKETING_IMAGE':
+            case 'SQUARE_MARKETING_IMAGE':
+                agObj.images.push(imgInfo); break;
+            case 'LOGO':
+            case 'LANDSCAPE_LOGO':
+                agObj.logos.push(imgInfo); break;
+            case 'FINAL_URL':
+                agObj.finalUrl = textVal; break;
+        }
+    }
+
     // Attach campaign-level assets
     for (const row of campaignAssetRows) {
         const asset = row.asset || {};
@@ -290,6 +397,7 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetai
     const campaigns = Array.from(campaignMap.values()).map(c => ({
         ...c,
         adGroups: Array.from(c.adGroups.values()),
+        assetGroups: c.assetGroups || [],
     }));
 
     // Sort campaigns by name

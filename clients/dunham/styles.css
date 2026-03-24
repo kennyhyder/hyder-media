@@ -421,6 +421,48 @@ body {
     object-fit: contain;
 }
 
+/* PMax Badge */
+.badge-pmax {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+}
+
+/* PMax Images Grid */
+.pmax-images-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.pmax-image-card {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.pmax-image-card img {
+    display: block;
+    max-width: 200px;
+    max-height: 150px;
+    object-fit: contain;
+}
+
+.pmax-logo-card img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.pmax-image-name {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Account-level Assets */
 .account-assets-section {
     margin-top: 40px;
@@ -669,6 +711,14 @@ body {
 
     .extension-image {
         max-height: 80px;
+    }
+
+    .pmax-image-card img {
+        max-height: 100px;
+    }
+
+    .pmax-logo-card img {
+        max-height: 60px;
     }
 
     a {
