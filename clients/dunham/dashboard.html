@@ -165,13 +165,16 @@
                 </div>`;
                 html += `<div class="campaign-body">`;
 
+                // Collect campaign sitelinks for ad previews
+                const campSitelinks = (camp.assets || []).filter(a => a.type === 'SITELINK');
+
                 // Ad groups
                 for (const ag of camp.adGroups) {
                     html += `<div class="ad-group">`;
                     html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
 
                     for (const ad of ag.ads) {
-                        html += renderAd(ad);
+                        html += renderAd(ad, campSitelinks);
                     }
 
                     html += `</div>`;
@@ -198,16 +201,19 @@
             contentEl.style.display = 'block';
         }
 
-        function renderAd(ad) {
+        function renderAd(ad, campaignSitelinks) {
             const typeName = (ad.type || 'UNKNOWN').replace(/_/g, ' ');
-            const statusClass = ad.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
 
             let html = `<div class="ad-card">`;
             html += `<div class="ad-card-header">
                 <span class="badge badge-type">${typeName}</span>
-                <span class="badge ${statusClass}">${ad.status}</span>
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
+
+            // Ad Preview (Google SERP mockup)
+            if (ad.type === 'RESPONSIVE_SEARCH_AD' && ad.headlines && ad.headlines.length > 0) {
+                html += renderAdPreview(ad, campaignSitelinks);
+            }
 
             if (ad.finalUrls && ad.finalUrls.length > 0) {
                 html += `<div class="ad-final-url">${esc(ad.finalUrls[0])}</div>`;
@@ -249,6 +255,77 @@
             return html;
         }
 
+        function renderAdPreview(ad, campaignSitelinks) {
+            // Build display URL from final URL
+            let displayUrl = '';
+            if (ad.finalUrls && ad.finalUrls.length > 0) {
+                try {
+                    const url = new URL(ad.finalUrls[0]);
+                    displayUrl = url.hostname + (url.pathname !== '/' ? url.pathname : '');
+                } catch(e) {
+                    displayUrl = ad.finalUrls[0];
+                }
+            }
+
+            // Pick headlines: use pinned ones in their slots, fill rest in order
+            const pinnedH = {};
+            const unpinnedH = [];
+            for (const h of ad.headlines) {
+                if (h.pinnedField) {
+                    const match = h.pinnedField.match(/HEADLINE_(\d+)/);
+                    if (match) { pinnedH[parseInt(match[1])] = h.text; continue; }
+                }
+                unpinnedH.push(h.text);
+            }
+            const previewHeadlines = [];
+            let uIdx = 0;
+            for (let i = 1; i <= 3; i++) {
+                if (pinnedH[i]) { previewHeadlines.push(pinnedH[i]); }
+                else if (uIdx < unpinnedH.length) { previewHeadlines.push(unpinnedH[uIdx++]); }
+            }
+
+            // Pick descriptions similarly
+            const pinnedD = {};
+            const unpinnedD = [];
+            for (const d of ad.descriptions) {
+                if (d.pinnedField) {
+                    const match = d.pinnedField.match(/DESCRIPTION_(\d+)/);
+                    if (match) { pinnedD[parseInt(match[1])] = d.text; continue; }
+                }
+                unpinnedD.push(d.text);
+            }
+            const previewDescs = [];
+            let dIdx = 0;
+            for (let i = 1; i <= 2; i++) {
+                if (pinnedD[i]) { previewDescs.push(pinnedD[i]); }
+                else if (dIdx < unpinnedD.length) { previewDescs.push(unpinnedD[dIdx++]); }
+            }
+
+            let html = `<div class="ad-preview">`;
+            html += `<div class="ad-preview-label">Ad Preview</div>`;
+            html += `<div class="ad-preview-card">`;
+            html += `<div class="ad-preview-sponsored">Sponsored</div>`;
+            html += `<div class="ad-preview-url">${esc(displayUrl)}</div>`;
+            html += `<div class="ad-preview-headline">${previewHeadlines.map(h => esc(h)).join(' | ')}</div>`;
+            html += `<div class="ad-preview-description">${previewDescs.map(d => esc(d)).join(' ')}</div>`;
+
+            // Sitelinks
+            const sitelinks = (campaignSitelinks || []).slice(0, 4);
+            if (sitelinks.length > 0) {
+                html += `<div class="ad-preview-sitelinks">`;
+                for (const sl of sitelinks) {
+                    html += `<div class="ad-preview-sitelink">
+                        <div class="ad-preview-sitelink-title">${esc(sl.linkText || sl.name || '')}</div>
+                        ${sl.desc1 ? `<div class="ad-preview-sitelink-desc">${esc(sl.desc1)}</div>` : ''}
+                    </div>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `</div></div>`;
+            return html;
+        }
+
         function renderExtensions(title, assets) {
             let html = `<div class="extensions-section">`;
             html += `<div class="extensions-title">${title}</div>`;
@@ -262,7 +339,8 @@
             const sitelinks = assets.filter(a => a.type === 'SITELINK');
             const callouts = assets.filter(a => a.type === 'CALLOUT');
             const snippets = assets.filter(a => a.type === 'STRUCTURED_SNIPPET');
-            const others = assets.filter(a => !['SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET'].includes(a.type));
+            const imageAssets = assets.filter(a => a.type === 'IMAGE');
+            const others = assets.filter(a => !['SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET', 'IMAGE'].includes(a.type));
 
             let html = `<div class="extensions-grid">`;
 
@@ -287,6 +365,16 @@
                 html += `<div class="extension-card">
                     <div class="extension-type">Structured Snippet — ${esc(ss.header || '')}</div>
                     <div class="extension-text">${esc(vals)}</div>
+                </div>`;
+            }
+
+            for (const img of imageAssets) {
+                html += `<div class="extension-card extension-card-image">
+                    <div class="extension-type">Image${img.width && img.height ? ` (${img.width}x${img.height})` : ''}</div>
+                    ${img.imageUrl
+                        ? `<img class="extension-image" src="${esc(img.imageUrl)}" alt="${esc(img.name || 'Image extension')}" loading="lazy">`
+                        : `<div class="extension-text">${esc(img.name || '—')}</div>`}
+                    ${img.name ? `<div class="extension-desc">${esc(img.name)}</div>` : ''}
                 </div>`;
             }
 

@@ -87,7 +87,7 @@ export default async function handler(req, res) {
             FROM ad_group_ad
             WHERE campaign.status = 'ENABLED'
                 AND ad_group.status = 'ENABLED'
-                AND ad_group_ad.status IN ('ENABLED', 'PAUSED')
+                AND ad_group_ad.status = 'ENABLED'
         `);
         if (adsData.error) return res.status(500).json({ error: 'Ads query failed', details: adsData.error, query: adsData.query });
 
@@ -115,52 +115,49 @@ export default async function handler(req, res) {
         `);
         if (customerAssetLinks.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetLinks.error, query: customerAssetLinks.query });
 
-        // Collect unique asset IDs from campaign + customer assets that are sitelinks/callouts/snippets
-        const assetIds = new Set();
-        const relevantTypes = new Set(['SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET']);
-        for (const row of [...(campaignAssetLinks.results || []), ...(customerAssetLinks.results || [])]) {
-            if (row.asset && relevantTypes.has(row.asset.type)) {
-                assetIds.add(row.asset.id);
-            }
-        }
-
-        // Query 4: Fetch full asset details for relevant assets via ad_group_asset (broadest field access)
-        // We use a separate approach: query each asset type individually
+        // Query 4: Fetch full asset details per type
         let assetDetails = new Map();
-        if (assetIds.size > 0) {
-            const [sitelinks, callouts, snippets] = await Promise.all([
-                fetchQuery(CUSTOMER_ID, headers, `
-                    SELECT
-                        asset.id,
-                        asset.sitelink_asset.description1,
-                        asset.sitelink_asset.description2,
-                        asset.sitelink_asset.link_text
-                    FROM asset
-                    WHERE asset.type = 'SITELINK'
-                `),
-                fetchQuery(CUSTOMER_ID, headers, `
-                    SELECT
-                        asset.id,
-                        asset.callout_asset.callout_text
-                    FROM asset
-                    WHERE asset.type = 'CALLOUT'
-                `),
-                fetchQuery(CUSTOMER_ID, headers, `
-                    SELECT
-                        asset.id,
-                        asset.structured_snippet_asset.header,
-                        asset.structured_snippet_asset.values
-                    FROM asset
-                    WHERE asset.type = 'STRUCTURED_SNIPPET'
-                `),
-            ]);
+        const [sitelinks, callouts, snippets, images] = await Promise.all([
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    asset.id,
+                    asset.sitelink_asset.description1,
+                    asset.sitelink_asset.description2,
+                    asset.sitelink_asset.link_text
+                FROM asset
+                WHERE asset.type = 'SITELINK'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    asset.id,
+                    asset.callout_asset.callout_text
+                FROM asset
+                WHERE asset.type = 'CALLOUT'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    asset.id,
+                    asset.structured_snippet_asset.header,
+                    asset.structured_snippet_asset.values
+                FROM asset
+                WHERE asset.type = 'STRUCTURED_SNIPPET'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    asset.id, asset.name,
+                    asset.image_asset.full_size.url,
+                    asset.image_asset.full_size.width_pixels,
+                    asset.image_asset.full_size.height_pixels
+                FROM asset
+                WHERE asset.type = 'IMAGE'
+            `),
+        ]);
 
-            // Build lookup map from asset details
-            for (const result of [sitelinks, callouts, snippets]) {
-                if (result.results) {
-                    for (const row of result.results) {
-                        if (row.asset) assetDetails.set(row.asset.id, row.asset);
-                    }
+        // Build lookup map from asset details
+        for (const result of [sitelinks, callouts, snippets, images]) {
+            if (result.results) {
+                for (const row of result.results) {
+                    if (row.asset) assetDetails.set(row.asset.id, row.asset);
                 }
             }
         }
@@ -327,6 +324,11 @@ function formatAsset(asset, parentAsset) {
     if (type === 'STRUCTURED_SNIPPET') {
         const ss = asset.structuredSnippetAsset || {};
         return { ...base, header: ss.header, values: ss.values || [] };
+    }
+    if (type === 'IMAGE') {
+        const img = asset.imageAsset || {};
+        const fullSize = img.fullSize || {};
+        return { ...base, imageUrl: fullSize.url || null, width: fullSize.widthPixels, height: fullSize.heightPixels };
     }
     return base;
 }
