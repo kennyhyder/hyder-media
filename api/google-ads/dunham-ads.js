@@ -73,62 +73,105 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json',
         };
 
-        // Run all three queries in parallel
-        const [adsData, campaignAssetsData, customerAssetsData] = await Promise.all([
-            fetchQuery(CUSTOMER_ID, headers, `
-                SELECT
-                    campaign.id, campaign.name, campaign.status,
-                    ad_group.id, ad_group.name, ad_group.status,
-                    ad_group_ad.ad.id, ad_group_ad.ad.type,
-                    ad_group_ad.ad.name, ad_group_ad.status,
-                    ad_group_ad.ad.responsive_search_ad.headlines,
-                    ad_group_ad.ad.responsive_search_ad.descriptions,
-                    ad_group_ad.ad.final_urls,
-                    ad_group_ad.ad.final_url_suffix
-                FROM ad_group_ad
-                WHERE campaign.status = 'ENABLED'
-                    AND ad_group.status = 'ENABLED'
-                    AND ad_group_ad.status IN ('ENABLED', 'PAUSED')
-            `),
-            fetchQuery(CUSTOMER_ID, headers, `
-                SELECT
-                    asset.id, asset.name, asset.type,
-                    asset.sitelink_asset.description1,
-                    asset.sitelink_asset.description2,
-                    asset.sitelink_asset.link_text,
-                    asset.callout_asset.callout_text,
-                    asset.structured_snippet_asset.header,
-                    asset.structured_snippet_asset.values,
-                    campaign.id, campaign.name,
-                    campaign_asset.field_type,
-                    campaign_asset.status
-                FROM campaign_asset
-                WHERE campaign_asset.status != 'REMOVED'
-                    AND campaign.status = 'ENABLED'
-            `),
-            fetchQuery(CUSTOMER_ID, headers, `
-                SELECT
-                    asset.id, asset.name, asset.type,
-                    asset.sitelink_asset.description1,
-                    asset.sitelink_asset.description2,
-                    asset.sitelink_asset.link_text,
-                    asset.callout_asset.callout_text,
-                    asset.structured_snippet_asset.header,
-                    asset.structured_snippet_asset.values,
-                    customer_asset.field_type,
-                    customer_asset.status
-                FROM customer_asset
-                WHERE customer_asset.status != 'REMOVED'
-            `),
-        ]);
-
-        // Check for errors
+        // Query 1: Active ads
+        const adsData = await fetchQuery(CUSTOMER_ID, headers, `
+            SELECT
+                campaign.id, campaign.name, campaign.status,
+                ad_group.id, ad_group.name, ad_group.status,
+                ad_group_ad.ad.id, ad_group_ad.ad.type,
+                ad_group_ad.ad.name, ad_group_ad.status,
+                ad_group_ad.ad.responsive_search_ad.headlines,
+                ad_group_ad.ad.responsive_search_ad.descriptions,
+                ad_group_ad.ad.final_urls,
+                ad_group_ad.ad.final_url_suffix
+            FROM ad_group_ad
+            WHERE campaign.status = 'ENABLED'
+                AND ad_group.status = 'ENABLED'
+                AND ad_group_ad.status IN ('ENABLED', 'PAUSED')
+        `);
         if (adsData.error) return res.status(500).json({ error: 'Ads query failed', details: adsData.error });
-        if (campaignAssetsData.error) return res.status(500).json({ error: 'Campaign assets query failed', details: campaignAssetsData.error });
-        if (customerAssetsData.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetsData.error });
+
+        // Query 2: Campaign-level asset links (minimal fields)
+        const campaignAssetLinks = await fetchQuery(CUSTOMER_ID, headers, `
+            SELECT
+                asset.id, asset.name, asset.type,
+                campaign.id,
+                campaign_asset.field_type,
+                campaign_asset.status
+            FROM campaign_asset
+            WHERE campaign_asset.status != 'REMOVED'
+                AND campaign.status = 'ENABLED'
+        `);
+        if (campaignAssetLinks.error) return res.status(500).json({ error: 'Campaign assets query failed', details: campaignAssetLinks.error });
+
+        // Query 3: Customer-level asset links (minimal fields)
+        const customerAssetLinks = await fetchQuery(CUSTOMER_ID, headers, `
+            SELECT
+                asset.id, asset.name, asset.type,
+                customer_asset.field_type,
+                customer_asset.status
+            FROM customer_asset
+            WHERE customer_asset.status != 'REMOVED'
+        `);
+        if (customerAssetLinks.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetLinks.error });
+
+        // Collect unique asset IDs from campaign + customer assets that are sitelinks/callouts/snippets
+        const assetIds = new Set();
+        const relevantTypes = new Set(['SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET']);
+        for (const row of [...(campaignAssetLinks.results || []), ...(customerAssetLinks.results || [])]) {
+            if (row.asset && relevantTypes.has(row.asset.type)) {
+                assetIds.add(row.asset.id);
+            }
+        }
+
+        // Query 4: Fetch full asset details for relevant assets via ad_group_asset (broadest field access)
+        // We use a separate approach: query each asset type individually
+        let assetDetails = new Map();
+        if (assetIds.size > 0) {
+            const [sitelinks, callouts, snippets] = await Promise.all([
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.sitelink_asset.description1,
+                        asset.sitelink_asset.description2,
+                        asset.sitelink_asset.link_text
+                    FROM asset
+                    WHERE asset.type = 'SITELINK'
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.callout_asset.callout_text
+                    FROM asset
+                    WHERE asset.type = 'CALLOUT'
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.structured_snippet_asset.header,
+                        asset.structured_snippet_asset.values
+                    FROM asset
+                    WHERE asset.type = 'STRUCTURED_SNIPPET'
+                `),
+            ]);
+
+            // Build lookup map from asset details
+            for (const result of [sitelinks, callouts, snippets]) {
+                if (result.results) {
+                    for (const row of result.results) {
+                        if (row.asset) assetDetails.set(row.asset.id, row.asset);
+                    }
+                }
+            }
+        }
 
         // Build structured response
-        const response = buildResponse(adsData.results || [], campaignAssetsData.results || [], customerAssetsData.results || []);
+        const response = buildResponse(
+            adsData.results || [],
+            campaignAssetLinks.results || [],
+            customerAssetLinks.results || [],
+            assetDetails
+        );
 
         return res.status(200).json(response);
 
@@ -158,7 +201,7 @@ async function fetchQuery(customerId, headers, query) {
     }
 }
 
-function buildResponse(adsRows, campaignAssetRows, customerAssetRows) {
+function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetails) {
     // Build campaigns → adGroups → ads hierarchy
     const campaignMap = new Map();
 
@@ -223,9 +266,12 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows) {
         const campaignAsset = row.campaignAsset || {};
         const campaign = row.campaign || {};
         const campId = campaign.id;
+        // Merge in full asset details from separate queries
+        const details = assetDetails.get(asset.id) || {};
+        const mergedAsset = { ...asset, ...details };
 
         if (campId && campaignMap.has(campId)) {
-            campaignMap.get(campId).assets.push(formatAsset(asset, campaignAsset));
+            campaignMap.get(campId).assets.push(formatAsset(mergedAsset, campaignAsset));
         }
     }
 
@@ -233,7 +279,9 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows) {
     const accountAssets = customerAssetRows.map(row => {
         const asset = row.asset || {};
         const customerAsset = row.customerAsset || {};
-        return formatAsset(asset, customerAsset);
+        const details = assetDetails.get(asset.id) || {};
+        const mergedAsset = { ...asset, ...details };
+        return formatAsset(mergedAsset, customerAsset);
     });
 
     // Convert maps to arrays
