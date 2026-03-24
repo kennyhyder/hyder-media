@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunham & Jones — Ad Copy Audit</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham & Jones Ad Copy Audit
+        </a>
+        <div class="nav-actions">
+            <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
+            <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Dunham & Jones — Ad Copy Audit</h1>
+            <p class="subtitle">Complete inventory of active ad headlines, descriptions, and extensions</p>
+            <div class="report-meta">
+                <span>Account: 840-838-5870</span>
+                <span id="report-date">Generated: —</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="stats-row" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Campaigns</div>
+                <div class="stat-value" id="stat-campaigns">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ad Groups</div>
+                <div class="stat-value" id="stat-adgroups">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ads</div>
+                <div class="stat-value" id="stat-ads">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Headlines</div>
+                <div class="stat-value" id="stat-headlines">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Descriptions</div>
+                <div class="stat-value" id="stat-descriptions">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Extensions</div>
+                <div class="stat-value" id="stat-extensions">0</div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading-state">
+            <div class="spinner"></div>
+            <div>Loading ad copy from Google Ads...</div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-state" id="error-state" style="display: none;">
+            <h2>Failed to Load Data</h2>
+            <p id="error-message"></p>
+            <button class="btn btn-primary" onclick="loadData()">Retry</button>
+        </div>
+
+        <!-- Report Content -->
+        <div id="report-content" style="display: none;"></div>
+    </div>
+
+    <div class="footer">
+        Prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a>
+    </div>
+
+    <script>
+        const API_URL = '/api/google-ads/dunham-ads';
+
+        async function loadData() {
+            const loadingEl = document.getElementById('loading-state');
+            const errorEl = document.getElementById('error-state');
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+
+            loadingEl.style.display = 'flex';
+            errorEl.style.display = 'none';
+            contentEl.style.display = 'none';
+            statsEl.style.display = 'none';
+
+            try {
+                const resp = await fetch(API_URL);
+                const data = await resp.json();
+
+                if (!resp.ok || data.error) {
+                    throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+                }
+
+                loadingEl.style.display = 'none';
+                renderReport(data);
+
+            } catch (err) {
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                document.getElementById('error-message').textContent = err.message;
+            }
+        }
+
+        function renderReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+
+            // Update date
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            // Count totals
+            let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0;
+            let totalExtensions = (data.accountAssets || []).length;
+
+            for (const camp of data.campaigns) {
+                totalAdGroups += camp.adGroups.length;
+                totalExtensions += (camp.assets || []).length;
+                for (const ag of camp.adGroups) {
+                    totalAds += ag.ads.length;
+                    for (const ad of ag.ads) {
+                        totalHeadlines += (ad.headlines || []).length;
+                        totalDescriptions += (ad.descriptions || []).length;
+                    }
+                }
+            }
+
+            document.getElementById('stat-campaigns').textContent = data.campaigns.length;
+            document.getElementById('stat-adgroups').textContent = totalAdGroups;
+            document.getElementById('stat-ads').textContent = totalAds;
+            document.getElementById('stat-headlines').textContent = totalHeadlines;
+            document.getElementById('stat-descriptions').textContent = totalDescriptions;
+            document.getElementById('stat-extensions').textContent = totalExtensions;
+            statsEl.style.display = 'flex';
+
+            // Render campaigns
+            let html = '';
+
+            for (const camp of data.campaigns) {
+                html += `<div class="campaign-section">`;
+                html += `<div class="campaign-header">
+                    <div class="campaign-name">${esc(camp.name)}</div>
+                    <span class="badge badge-enabled">${camp.status}</span>
+                </div>`;
+                html += `<div class="campaign-body">`;
+
+                // Ad groups
+                for (const ag of camp.adGroups) {
+                    html += `<div class="ad-group">`;
+                    html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
+
+                    for (const ad of ag.ads) {
+                        html += renderAd(ad);
+                    }
+
+                    html += `</div>`;
+                }
+
+                // Campaign-level extensions
+                if (camp.assets && camp.assets.length > 0) {
+                    html += renderExtensions('Campaign Extensions', camp.assets);
+                }
+
+                html += `</div></div>`;
+            }
+
+            // Account-level assets
+            if (data.accountAssets && data.accountAssets.length > 0) {
+                html += `<div class="account-assets-section">`;
+                html += `<h2>Account-Level Extensions</h2>`;
+                html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These extensions can appear on any ad in the account.</p>`;
+                html += renderExtensionsGrid(data.accountAssets);
+                html += `</div>`;
+            }
+
+            contentEl.innerHTML = html;
+            contentEl.style.display = 'block';
+        }
+
+        function renderAd(ad) {
+            const typeName = (ad.type || 'UNKNOWN').replace(/_/g, ' ');
+            const statusClass = ad.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
+
+            let html = `<div class="ad-card">`;
+            html += `<div class="ad-card-header">
+                <span class="badge badge-type">${typeName}</span>
+                <span class="badge ${statusClass}">${ad.status}</span>
+                ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
+            </div>`;
+
+            if (ad.finalUrls && ad.finalUrls.length > 0) {
+                html += `<div class="ad-final-url">${esc(ad.finalUrls[0])}</div>`;
+            }
+
+            // Headlines
+            if (ad.headlines && ad.headlines.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Headlines (${ad.headlines.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                for (const h of ad.headlines) {
+                    const pin = h.pinnedField ? `<span class="badge badge-pin">${formatPin(h.pinnedField)}</span>` : '';
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${h.position}.</span>
+                        <span class="ad-copy-text">${esc(h.text)}</span>
+                        ${pin}
+                    </li>`;
+                }
+                html += `</ul></div>`;
+            }
+
+            // Descriptions
+            if (ad.descriptions && ad.descriptions.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Descriptions (${ad.descriptions.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                for (const d of ad.descriptions) {
+                    const pin = d.pinnedField ? `<span class="badge badge-pin">${formatPin(d.pinnedField)}</span>` : '';
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${d.position}.</span>
+                        <span class="ad-copy-text">${esc(d.text)}</span>
+                        ${pin}
+                    </li>`;
+                }
+                html += `</ul></div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderExtensions(title, assets) {
+            let html = `<div class="extensions-section">`;
+            html += `<div class="extensions-title">${title}</div>`;
+            html += renderExtensionsGrid(assets);
+            html += `</div>`;
+            return html;
+        }
+
+        function renderExtensionsGrid(assets) {
+            // Group by type
+            const sitelinks = assets.filter(a => a.type === 'SITELINK');
+            const callouts = assets.filter(a => a.type === 'CALLOUT');
+            const snippets = assets.filter(a => a.type === 'STRUCTURED_SNIPPET');
+            const others = assets.filter(a => !['SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET'].includes(a.type));
+
+            let html = `<div class="extensions-grid">`;
+
+            for (const sl of sitelinks) {
+                html += `<div class="extension-card">
+                    <div class="extension-type">Sitelink</div>
+                    <div class="extension-text">${esc(sl.linkText || '')}</div>
+                    ${sl.desc1 ? `<div class="extension-desc">${esc(sl.desc1)}</div>` : ''}
+                    ${sl.desc2 ? `<div class="extension-desc">${esc(sl.desc2)}</div>` : ''}
+                </div>`;
+            }
+
+            for (const co of callouts) {
+                html += `<div class="extension-card">
+                    <div class="extension-type">Callout</div>
+                    <div class="extension-text">${esc(co.text || '')}</div>
+                </div>`;
+            }
+
+            for (const ss of snippets) {
+                const vals = (ss.values || []).join(', ');
+                html += `<div class="extension-card">
+                    <div class="extension-type">Structured Snippet — ${esc(ss.header || '')}</div>
+                    <div class="extension-text">${esc(vals)}</div>
+                </div>`;
+            }
+
+            for (const o of others) {
+                html += `<div class="extension-card">
+                    <div class="extension-type">${esc((o.type || 'ASSET').replace(/_/g, ' '))}</div>
+                    <div class="extension-text">${esc(o.name || o.text || '—')}</div>
+                </div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function formatPin(pinnedField) {
+            if (!pinnedField) return '';
+            // e.g. HEADLINE_1 → Pin H1, DESCRIPTION_2 → Pin D2
+            const match = pinnedField.match(/(HEADLINE|DESCRIPTION)_(\d+)/);
+            if (match) {
+                const prefix = match[1] === 'HEADLINE' ? 'H' : 'D';
+                return `Pin ${prefix}${match[2]}`;
+            }
+            return pinnedField;
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Load on page ready
+        loadData();
+    </script>
+</body>
+</html>
