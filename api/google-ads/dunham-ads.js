@@ -95,7 +95,7 @@ export default async function handler(req, res) {
         const campaignAssetLinks = await fetchQuery(CUSTOMER_ID, headers, `
             SELECT
                 asset.id, asset.name, asset.type,
-                campaign.id,
+                campaign.id, campaign.status,
                 campaign_asset.field_type,
                 campaign_asset.status
             FROM campaign_asset
