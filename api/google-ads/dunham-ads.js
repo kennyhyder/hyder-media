@@ -89,7 +89,7 @@ export default async function handler(req, res) {
                 AND ad_group.status = 'ENABLED'
                 AND ad_group_ad.status IN ('ENABLED', 'PAUSED')
         `);
-        if (adsData.error) return res.status(500).json({ error: 'Ads query failed', details: adsData.error });
+        if (adsData.error) return res.status(500).json({ error: 'Ads query failed', details: adsData.error, query: adsData.query });
 
         // Query 2: Campaign-level asset links (minimal fields)
         const campaignAssetLinks = await fetchQuery(CUSTOMER_ID, headers, `
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
             WHERE campaign_asset.status != 'REMOVED'
                 AND campaign.status = 'ENABLED'
         `);
-        if (campaignAssetLinks.error) return res.status(500).json({ error: 'Campaign assets query failed', details: campaignAssetLinks.error });
+        if (campaignAssetLinks.error) return res.status(500).json({ error: 'Campaign assets query failed', details: campaignAssetLinks.error, query: campaignAssetLinks.query });
 
         // Query 3: Customer-level asset links (minimal fields)
         const customerAssetLinks = await fetchQuery(CUSTOMER_ID, headers, `
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
             FROM customer_asset
             WHERE customer_asset.status != 'REMOVED'
         `);
-        if (customerAssetLinks.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetLinks.error });
+        if (customerAssetLinks.error) return res.status(500).json({ error: 'Customer assets query failed', details: customerAssetLinks.error, query: customerAssetLinks.query });
 
         // Collect unique asset IDs from campaign + customer assets that are sitelinks/callouts/snippets
         const assetIds = new Set();
@@ -193,11 +193,16 @@ async function fetchQuery(customerId, headers, query) {
 
         const data = await response.json();
         if (data.error) {
-            return { error: data.error.message || JSON.stringify(data.error) };
+            // Include full error details for debugging
+            const details = data.error.details
+                ? data.error.details.map(d => JSON.stringify(d)).join('; ')
+                : '';
+            const msg = `${data.error.message || 'Unknown error'}${details ? ' | ' + details : ''} [status: ${data.error.status || data.error.code}]`;
+            return { error: msg, query: query.trim() };
         }
         return { results: data.results || [] };
     } catch (e) {
-        return { error: e.message };
+        return { error: e.message, query: query.trim() };
     }
 }
 
