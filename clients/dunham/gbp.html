@@ -822,19 +822,22 @@ if(m)cats=m[1].replace(/\\nPrimary\\n/g,' (Primary), ').replace(/\\nPrimary/g,' 
 var desc='';m=text.match(/Description\\n([\\s\\S]*?)(?=\\nOpening date|\\nContact information)/);if(m)desc=m[1].trim();
 var phone='';m=text.match(/Phone number\\n([^\\n]+)/);if(m)phone=m[1].trim();
 var website='';m=text.match(/Website\\n([^\\n]+)/);if(m)website=m[1].trim();
+var social='';m=text.match(/Social profiles[\\s\\S]*?(?:Current\\n)?(?:https?:\\/\\/[^\\n]+)/);if(m){var su=m[0].match(/https?:\\/\\/[^\\n]+/);if(su)social=su[0].trim()}
+var shortName='';m=text.match(/Short name\\n([^\\n]+)/);if(m)shortName=m[1].trim();
 var addr='';m=text.match(/Business location\\n([^\\n]+)/);if(m)addr=m[1].trim();
 var svcArea='';m=text.match(/Service area\\n([\\s\\S]*?)(?=\\nBusiness hours)/);if(m)svcArea=m[1].trim();
 var openDate='';m=text.match(/Opening date\\n([^\\n]+)/);if(m)openDate=m[1].trim();
 var attrs=[];
 m=text.match(/Accessibility\\n([\\s\\S]*?)(?=\\nAmenities|\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Accessibility: '+m[1].replace(/\\n/g,', ').trim());
 m=text.match(/Amenities\\n([\\s\\S]*?)(?=\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Amenities: '+m[1].replace(/\\n/g,', ').trim());
-m=text.match(/Service options\\n([\\s\\S]*?)(?=\\nLearn|\\nSpanish|$)/);if(m)attrs.push('Service options: '+m[1].replace(/\\n/g,', ').trim());
+m=text.match(/Crowd\\n([\\s\\S]*?)(?=\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m){var ct=m[1].replace(/Let customers[\\s\\S]*?Learn more\\n?/,'').trim();if(ct)attrs.push('Crowd: '+ct.replace(/\\n/g,', '))}
+m=text.match(/Service options\\n([\\s\\S]*?)(?=\\nSpanish|\\nLearn how|$)/);if(m)attrs.push('Service options: '+m[1].replace(/\\n/g,', ').trim());
 var hours=parseHours(text);
 var data={
-info:{address:addr,phone:phone,website:website,categories:cats,maps_url:'',screenshots:[]},
+info:{address:addr,phone:phone,website:website,categories:cats,social_profiles:social,short_name:shortName,maps_url:'',screenshots:[]},
 description:{text:desc,screenshots:[]},
 hours:{hours:hours,screenshots:[]},
-services:{text:'',screenshots:[]},
+services:{text:svcArea?'Service areas: '+svcArea.replace(/\\n/g,', '):'',screenshots:[]},
 attributes:{text:attrs.join('\\n'),screenshots:[]},
 reviews:{total_count:'',avg_rating:'',notes:'',screenshots:[]},
 photos:{owner_count:'',customer_count:'',notes:'',screenshots:[]},
@@ -846,7 +849,7 @@ _raw:{raw_text:text,extracted_at:new Date().toISOString(),service_area:svcArea,o
 this.textContent='Sending...';this.disabled=true;
 try{var r=await fetch('https://hyder.me/api/gbp/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_key:'dunham',location_name:name,data:data})});
 var j=await r.json();if(j.error)throw new Error(j.error);
-alert('Saved: '+name+'\\n\\nAddress: '+addr+'\\nPhone: '+phone+'\\nCategories: '+cats+'\\nHours: '+hours.length+' days parsed\\n\\nView at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
+alert('Saved: '+name+'\\n\\nAddress: '+addr+'\\nPhone: '+phone+'\\nWebsite: '+website+'\\nCategories: '+cats+'\\nSocial: '+social+'\\nShort name: '+shortName+'\\nOpening: '+openDate+'\\nService areas: '+(svcArea?svcArea.split('\\n').length+' areas':'none')+'\\nHours: '+hours.length+' days parsed'+'\\nAttributes: '+attrs.length+' sections\\n\\nView at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
 this.textContent='Send to Hyder Media';this.disabled=false});
 mb('Copy All Text','Copy panel text to clipboard',function(){var t=ext();if(!t)return;navigator.clipboard.writeText(t).then(function(){alert('Copied to clipboard!')}).catch(function(){prompt('Copy this text:',t)})});
 var hr=document.createElement('hr');hr.style.cssText='border:none;border-top:1px solid #475569;margin:10px 0';d.appendChild(hr);
