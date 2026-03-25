@@ -754,6 +754,160 @@ body {
     letter-spacing: 0.3px;
 }
 
+/* ==================== */
+/* GBP Form / Edit Mode */
+/* ==================== */
+
+.gbp-form {
+    max-width: 900px;
+}
+
+.gbp-form-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 24px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gbp-form-section-title:first-child {
+    margin-top: 0;
+}
+
+.gbp-form-group {
+    margin-bottom: 14px;
+}
+
+.gbp-form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.gbp-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.gbp-form input[type="text"],
+.gbp-form textarea,
+.gbp-form select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+}
+
+.gbp-form input:focus,
+.gbp-form textarea:focus,
+.gbp-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.gbp-form input:disabled {
+    opacity: 0.4;
+}
+
+.gbp-form select {
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* Hours edit grid */
+.gbp-hours-edit-grid {
+    display: grid;
+    gap: 6px;
+}
+
+.gbp-hours-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gbp-hours-edit-day {
+    min-width: 90px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.gbp-hours-input {
+    width: 110px !important;
+    flex: none !important;
+    text-align: center;
+}
+
+.gbp-hours-dash {
+    color: var(--text-secondary);
+}
+
+.gbp-hours-closed-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    margin-bottom: 0 !important;
+}
+
+/* Repeatable items (reviews, photos) */
+.gbp-repeatable-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.gbp-repeatable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Small / XS buttons */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+/* Notes section (screen only) */
+.gbp-notes-section {
+    border-left: 3px solid var(--warning);
+    background: rgba(245, 158, 11, 0.05);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .report-header h1 {
@@ -782,6 +936,15 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .gbp-form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .gbp-hours-edit-row {
+        flex-wrap: wrap;
     }
 }
 
@@ -908,6 +1071,15 @@ body {
 
     .pmax-logo-card img {
         max-height: 60px;
+    }
+
+    /* Hide edit mode and notes in print */
+    #edit-content,
+    #empty-state,
+    .gbp-notes-section,
+    .gbp-form,
+    .btn-danger {
+        display: none !important;
     }
 
     /* GBP print styles */

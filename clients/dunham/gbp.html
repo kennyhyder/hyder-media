@@ -23,8 +23,8 @@
         </a>
         <div class="nav-actions">
             <a href="dashboard.html" class="btn btn-secondary">Ad Copy Audit</a>
-            <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
-            <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+            <button class="btn btn-secondary" id="btn-toggle-mode">Edit Mode</button>
+            <button class="btn btn-primary" id="btn-print" onclick="window.print()">Print Report</button>
         </div>
     </nav>
 
@@ -60,20 +60,115 @@
         <!-- Loading -->
         <div class="loading" id="loading-state">
             <div class="spinner"></div>
-            <div>Loading business profile data...</div>
+            <div>Loading locations...</div>
         </div>
 
-        <!-- Error -->
-        <div class="error-state" id="error-state" style="display: none;">
-            <h2>Failed to Load Data</h2>
-            <p id="error-message"></p>
-            <p id="error-hint" style="margin-bottom: 20px; font-size: 0.85rem;"></p>
-            <button class="btn btn-primary" onclick="loadData()">Retry</button>
-            <a href="/api/google-ads/auth?returnUrl=/clients/dunham/gbp" class="btn btn-secondary" style="margin-left: 8px;">Re-authorize</a>
+        <!-- View Mode Content -->
+        <div id="view-content" style="display: none;"></div>
+
+        <!-- Edit Mode Content -->
+        <div id="edit-content" style="display: none;">
+            <div class="gbp-form">
+                <!-- Location selector -->
+                <div class="gbp-form-group">
+                    <label>Location</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select id="location-selector" style="flex: 1;">
+                            <option value="__new__">+ Add New Location</option>
+                        </select>
+                        <button class="btn btn-danger btn-sm" id="btn-delete-location" style="display: none;">Delete</button>
+                    </div>
+                </div>
+
+                <hr style="border-color: var(--border); margin: 20px 0;">
+
+                <!-- Basic Info -->
+                <h3 class="gbp-form-section-title">Basic Information</h3>
+                <div class="gbp-form-group">
+                    <label for="f-name">Location Name *</label>
+                    <input type="text" id="f-name" placeholder="e.g. Dunham & Jones — San Antonio">
+                </div>
+                <div class="gbp-form-row">
+                    <div class="gbp-form-group" style="flex: 2;">
+                        <label for="f-address">Address</label>
+                        <input type="text" id="f-address" placeholder="123 Main St, San Antonio, TX 78201">
+                    </div>
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label for="f-phone">Phone</label>
+                        <input type="text" id="f-phone" placeholder="(210) 555-1234">
+                    </div>
+                </div>
+                <div class="gbp-form-row">
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label for="f-website">Website</label>
+                        <input type="text" id="f-website" placeholder="https://dunhamjones.com">
+                    </div>
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label for="f-categories">Categories</label>
+                        <input type="text" id="f-categories" placeholder="Criminal Defense Attorney, DWI Attorney">
+                    </div>
+                </div>
+                <div class="gbp-form-group">
+                    <label for="f-maps-url">Google Maps URL</label>
+                    <input type="text" id="f-maps-url" placeholder="https://maps.google.com/...">
+                </div>
+
+                <!-- Description -->
+                <h3 class="gbp-form-section-title">Description</h3>
+                <div class="gbp-form-group">
+                    <textarea id="f-description" rows="4" placeholder="Full business description..."></textarea>
+                </div>
+
+                <!-- Hours -->
+                <h3 class="gbp-form-section-title">Hours of Operation</h3>
+                <div id="hours-grid" class="gbp-hours-edit-grid"></div>
+
+                <!-- Services / Attributes -->
+                <h3 class="gbp-form-section-title">Services</h3>
+                <div class="gbp-form-group">
+                    <textarea id="f-services" rows="3" placeholder="List services offered..."></textarea>
+                </div>
+
+                <h3 class="gbp-form-section-title">Attributes</h3>
+                <div class="gbp-form-group">
+                    <textarea id="f-attributes" rows="3" placeholder="Wheelchair accessible, Free parking, etc."></textarea>
+                </div>
+
+                <!-- Reviews -->
+                <h3 class="gbp-form-section-title">
+                    Reviews
+                    <button class="btn btn-secondary btn-sm" onclick="addReview()">+ Add Review</button>
+                </h3>
+                <div id="reviews-container"></div>
+
+                <!-- Photos -->
+                <h3 class="gbp-form-section-title">
+                    Photos
+                    <button class="btn btn-secondary btn-sm" onclick="addPhoto()">+ Add Photo</button>
+                </h3>
+                <div id="photos-container"></div>
+
+                <!-- Notes -->
+                <h3 class="gbp-form-section-title">Internal Notes</h3>
+                <div class="gbp-form-group">
+                    <textarea id="f-notes" rows="3" placeholder="Internal notes (not shown in print)..."></textarea>
+                </div>
+
+                <!-- Save -->
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button class="btn btn-primary" id="btn-save" onclick="saveLocation()">Save Location</button>
+                    <button class="btn btn-secondary" id="btn-done-editing">Done Editing</button>
+                </div>
+                <div id="save-status" style="margin-top: 12px; font-size: 0.85rem;"></div>
+            </div>
         </div>
 
-        <!-- Report Content -->
-        <div id="report-content" style="display: none;"></div>
+        <!-- Empty state -->
+        <div id="empty-state" style="display: none; text-align: center; padding: 60px 20px;">
+            <h2 style="color: var(--text-secondary); margin-bottom: 12px;">No Locations Yet</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">Switch to Edit Mode to add your first location.</p>
+            <button class="btn btn-primary" onclick="switchToEdit()">Start Adding Locations</button>
+        </div>
     </div>
 
     <div class="footer">
@@ -81,381 +176,526 @@
     </div>
 
     <script>
-        const API_URL = '/api/gbp/export';
+        const API_URL = '/api/gbp/locations';
+        let locations = [];
+        let currentMode = 'view';
+        let currentLocationId = null;
 
-        async function loadData() {
-            const loadingEl = document.getElementById('loading-state');
-            const errorEl = document.getElementById('error-state');
-            const contentEl = document.getElementById('report-content');
-            const statsEl = document.getElementById('stats-row');
+        // ─── Mode Toggle ───
+        const btnToggle = document.getElementById('btn-toggle-mode');
+        const btnDone = document.getElementById('btn-done-editing');
+        const btnPrint = document.getElementById('btn-print');
 
-            loadingEl.style.display = 'flex';
-            errorEl.style.display = 'none';
-            contentEl.style.display = 'none';
-            statsEl.style.display = 'none';
+        btnToggle.addEventListener('click', () => {
+            if (currentMode === 'view') switchToEdit();
+            else switchToView();
+        });
 
-            try {
-                const resp = await fetch(API_URL);
-                const data = await resp.json();
+        btnDone.addEventListener('click', () => switchToView());
 
-                if (!resp.ok || data.error) {
-                    const msg = data.details
-                        ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
-                        : (data.error || `HTTP ${resp.status}`);
-                    const hint = data.hint || '';
-                    throw { message: msg, hint };
-                }
-
-                loadingEl.style.display = 'none';
-                renderReport(data);
-
-            } catch (err) {
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'block';
-                document.getElementById('error-message').textContent = err.message || String(err);
-                document.getElementById('error-hint').textContent = err.hint || '';
-            }
+        function switchToEdit() {
+            currentMode = 'edit';
+            btnToggle.textContent = 'View Mode';
+            btnPrint.style.display = 'none';
+            document.getElementById('view-content').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('edit-content').style.display = 'block';
+            populateSelector();
+            loadLocationIntoForm(currentLocationId);
         }
 
-        function renderReport(data) {
-            const contentEl = document.getElementById('report-content');
-            const statsEl = document.getElementById('stats-row');
+        function switchToView() {
+            currentMode = 'view';
+            btnToggle.textContent = 'Edit Mode';
+            btnPrint.style.display = '';
+            document.getElementById('edit-content').style.display = 'none';
+            renderViewMode();
+        }
 
-            // Update date
-            const fetchDate = new Date(data.fetchedAt);
-            document.getElementById('report-date').textContent =
-                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        // ─── Data Loading ───
+        async function loadData() {
+            const loadingEl = document.getElementById('loading-state');
+            loadingEl.style.display = 'flex';
+            document.getElementById('view-content').style.display = 'none';
+            document.getElementById('edit-content').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
 
-            // Count totals
-            const locations = data.locations || [];
-            let totalReviews = 0, totalPhotos = 0, avgRating = null;
-            for (const loc of locations) {
-                totalReviews += (loc.reviews || []).length;
-                totalPhotos += (loc.media || []).length;
-                if (loc.averageRating) avgRating = loc.averageRating;
+            try {
+                const resp = await fetch(`${API_URL}?client=dunham`);
+                const json = await resp.json();
+                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
+                locations = json.locations || [];
+            } catch (err) {
+                console.error('Load error:', err);
+                locations = [];
             }
 
+            loadingEl.style.display = 'none';
+            document.getElementById('report-date').textContent =
+                'Generated: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            if (currentMode === 'view') renderViewMode();
+            else { populateSelector(); loadLocationIntoForm(currentLocationId); }
+        }
+
+        // ─── View Mode ───
+        function renderViewMode() {
+            const contentEl = document.getElementById('view-content');
+            const statsEl = document.getElementById('stats-row');
+            const emptyEl = document.getElementById('empty-state');
+
+            if (locations.length === 0) {
+                contentEl.style.display = 'none';
+                statsEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+
+            // Stats
+            let totalReviews = 0, totalPhotos = 0, ratingSum = 0, ratingCount = 0;
+            for (const loc of locations) {
+                const d = loc.data || {};
+                const reviews = d.reviews || [];
+                totalReviews += reviews.length;
+                totalPhotos += (d.photos || []).length;
+                for (const r of reviews) {
+                    if (r.rating) { ratingSum += r.rating; ratingCount++; }
+                }
+            }
             document.getElementById('stat-locations').textContent = locations.length;
-            document.getElementById('stat-rating').textContent = avgRating ? avgRating.toFixed(1) : '—';
-            document.getElementById('stat-reviews').textContent = totalReviews || (locations[0]?.totalReviewCount || 0);
+            document.getElementById('stat-rating').textContent = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '—';
+            document.getElementById('stat-reviews').textContent = totalReviews;
             document.getElementById('stat-photos').textContent = totalPhotos;
             statsEl.style.display = 'flex';
 
             let html = '';
-
-            if (locations.length === 0) {
-                html = `<div class="error-state"><h2>No Locations Found</h2><p>No business locations are associated with this account.</p></div>`;
-            }
-
             for (const loc of locations) {
-                html += renderLocation(loc);
+                html += renderLocationView(loc);
             }
-
-            // Show API errors if any
-            if (data.errors && data.errors.length > 0) {
-                html += `<div class="gbp-section" style="margin-top: 24px;">
-                    <div class="gbp-section-title" style="color: var(--warning);">API Warnings</div>
-                    <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.85rem;">`;
-                for (const err of data.errors) {
-                    html += `<li>${esc(err.account || '')}: ${esc(err.error)}</li>`;
-                }
-                html += `</ul></div>`;
-            }
-
             contentEl.innerHTML = html;
             contentEl.style.display = 'block';
         }
 
-        function renderLocation(loc) {
+        function renderLocationView(loc) {
+            const d = loc.data || {};
             let html = `<div class="campaign-section">`;
 
             // Header
             html += `<div class="campaign-header">
-                <div class="campaign-name">${esc(loc.title || 'Unnamed Location')}</div>
-                <span class="badge ${loc.openStatus === 'OPEN' ? 'badge-enabled' : 'badge-paused'}">${esc(loc.openStatus || 'UNKNOWN')}</span>
+                <div class="campaign-name">${esc(loc.location_name)}</div>
             </div>`;
 
             html += `<div class="campaign-body">`;
 
             // Business Info
-            html += `<div class="gbp-info-section">`;
-            html += `<div class="gbp-section-title">Business Information</div>`;
-            html += `<div class="gbp-info-grid">`;
-
-            // Address
-            const addrParts = [];
-            if (loc.address.lines.length > 0) addrParts.push(loc.address.lines.join(', '));
-            if (loc.address.locality) addrParts.push(loc.address.locality);
-            if (loc.address.state) addrParts.push(loc.address.state);
-            if (loc.address.postalCode) addrParts.push(loc.address.postalCode);
-            if (addrParts.length > 0) {
-                html += renderInfoRow('Address', addrParts.join(', '));
-            }
-
-            // Phone
-            if (loc.phone) {
-                html += renderInfoRow('Phone', loc.phone);
-            }
-            if (loc.additionalPhones && loc.additionalPhones.length > 0) {
-                html += renderInfoRow('Additional Phones', loc.additionalPhones.join(', '));
-            }
-
-            // Website
-            if (loc.website) {
-                html += renderInfoRow('Website', `<a href="${esc(loc.website)}" target="_blank" style="color: var(--accent);">${esc(loc.website)}</a>`);
-            }
-
-            // Categories
-            if (loc.primaryCategory) {
-                const cats = [loc.primaryCategory.name];
-                if (loc.additionalCategories) {
-                    cats.push(...loc.additionalCategories.map(c => c.name));
-                }
-                html += renderInfoRow('Categories', cats.join(', '));
-            }
-
-            // Maps link
-            if (loc.mapsUri) {
-                html += renderInfoRow('Google Maps', `<a href="${esc(loc.mapsUri)}" target="_blank" style="color: var(--accent);">View on Maps</a>`);
-            }
-
-            // Labels
-            if (loc.labels && loc.labels.length > 0) {
-                html += renderInfoRow('Labels', loc.labels.join(', '));
-            }
-
-            // Opening date
-            if (loc.openDate) {
-                const d = loc.openDate;
-                html += renderInfoRow('Opening Date', `${d.month || ''}/${d.day || ''}/${d.year || ''}`);
-            }
-
-            // Account info
-            html += renderInfoRow('Account', `${esc(loc.accountName || '')} (${esc(loc.accountRole || '')})`);
-
+            html += `<div class="gbp-info-section"><div class="gbp-section-title">Business Information</div><div class="gbp-info-grid">`;
+            if (d.address) html += infoRow('Address', d.address);
+            if (d.phone) html += infoRow('Phone', d.phone);
+            if (d.website) html += infoRow('Website', `<a href="${esc(d.website)}" target="_blank" style="color: var(--accent);">${esc(d.website)}</a>`);
+            if (d.categories) html += infoRow('Categories', d.categories);
+            if (d.maps_url) html += infoRow('Google Maps', `<a href="${esc(d.maps_url)}" target="_blank" style="color: var(--accent);">View on Maps</a>`);
             html += `</div></div>`;
 
             // Description
-            if (loc.description) {
-                html += `<div class="gbp-info-section">`;
-                html += `<div class="gbp-section-title">Business Description</div>`;
-                html += `<div class="gbp-description">${esc(loc.description)}</div>`;
-                html += `</div>`;
+            if (d.description) {
+                html += `<div class="gbp-info-section">
+                    <div class="gbp-section-title">Business Description</div>
+                    <div class="gbp-description">${esc(d.description)}</div>
+                </div>`;
             }
 
             // Hours
-            if (loc.regularHours && loc.regularHours.length > 0) {
-                html += `<div class="gbp-info-section">`;
-                html += `<div class="gbp-section-title">Hours of Operation</div>`;
-                html += `<div class="gbp-hours-grid">`;
-                const dayOrder = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-                const hoursByDay = {};
-                for (const h of loc.regularHours) {
-                    hoursByDay[h.day] = h;
-                }
-                for (const day of dayOrder) {
-                    const h = hoursByDay[day];
-                    if (h) {
-                        html += `<div class="gbp-hours-row">
-                            <span class="gbp-hours-day">${day.charAt(0) + day.slice(1).toLowerCase()}</span>
-                            <span class="gbp-hours-time">${formatTime(h.open)} – ${formatTime(h.close)}</span>
-                        </div>`;
-                    } else {
-                        html += `<div class="gbp-hours-row">
-                            <span class="gbp-hours-day">${day.charAt(0) + day.slice(1).toLowerCase()}</span>
-                            <span class="gbp-hours-time gbp-closed">Closed</span>
-                        </div>`;
+            if (d.hours && d.hours.length > 0) {
+                html += `<div class="gbp-info-section"><div class="gbp-section-title">Hours of Operation</div><div class="gbp-hours-grid">`;
+                for (const h of d.hours) {
+                    if (h.closed) {
+                        html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time gbp-closed">Closed</span></div>`;
+                    } else if (h.open && h.close) {
+                        html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time">${esc(h.open)} – ${esc(h.close)}</span></div>`;
                     }
                 }
                 html += `</div></div>`;
             }
 
-            // Special Hours
-            if (loc.specialHours && loc.specialHours.length > 0) {
-                html += `<div class="gbp-info-section">`;
-                html += `<div class="gbp-section-title">Special Hours</div>`;
-                for (const sh of loc.specialHours) {
-                    const date = sh.startDate ? `${sh.startDate.month}/${sh.startDate.day}/${sh.startDate.year}` : 'Unknown';
-                    const status = sh.closed ? 'Closed' : `${formatTime(sh.openTime)} – ${formatTime(sh.closeTime)}`;
-                    html += `<div class="gbp-hours-row">
-                        <span class="gbp-hours-day">${date}</span>
-                        <span class="gbp-hours-time ${sh.closed ? 'gbp-closed' : ''}">${status}</span>
-                    </div>`;
-                }
-                html += `</div>`;
+            // Services
+            if (d.services) {
+                html += `<div class="gbp-info-section"><div class="gbp-section-title">Services</div><div class="gbp-description">${esc(d.services)}</div></div>`;
             }
 
-            // More Hours (additional hour types)
-            if (loc.moreHours && loc.moreHours.length > 0) {
-                for (const mh of loc.moreHours) {
-                    html += `<div class="gbp-info-section">`;
-                    html += `<div class="gbp-section-title">${esc(mh.hoursTypeId || 'Additional Hours')}</div>`;
-                    if (mh.periods) {
-                        for (const p of mh.periods) {
-                            html += `<div class="gbp-hours-row">
-                                <span class="gbp-hours-day">${(p.openDay || '').charAt(0) + (p.openDay || '').slice(1).toLowerCase()}</span>
-                                <span class="gbp-hours-time">${formatTimeObj(p.openTime)} – ${formatTimeObj(p.closeTime)}</span>
-                            </div>`;
-                        }
-                    }
-                    html += `</div>`;
-                }
-            }
-
-            // Service Area
-            if (loc.serviceArea) {
-                html += `<div class="gbp-info-section">`;
-                html += `<div class="gbp-section-title">Service Area</div>`;
-                html += `<div class="gbp-description">${esc(JSON.stringify(loc.serviceArea, null, 2))}</div>`;
-                html += `</div>`;
+            // Attributes
+            if (d.attributes) {
+                html += `<div class="gbp-info-section"><div class="gbp-section-title">Attributes</div><div class="gbp-description">${esc(d.attributes)}</div></div>`;
             }
 
             // Reviews
-            html += renderReviews(loc);
-
-            // Media/Photos
-            html += renderMedia(loc);
-
-            html += `</div></div>`;
-            return html;
-        }
-
-        function renderReviews(loc) {
-            let html = `<div class="gbp-info-section">`;
-            html += `<div class="gbp-section-title">Reviews`;
-            if (loc.totalReviewCount) {
-                html += ` (${loc.totalReviewCount} total`;
-                if (loc.averageRating) html += `, ${loc.averageRating.toFixed(1)} avg`;
-                html += `)`;
-            }
-            html += `</div>`;
-
-            if (!loc.reviews || loc.reviews.length === 0) {
-                html += `<div class="gbp-empty">No reviews loaded. The reviews API may require additional authorization.</div>`;
-                html += `</div>`;
-                return html;
-            }
-
-            for (const review of loc.reviews) {
-                html += `<div class="gbp-review-card">`;
-
-                // Reviewer info + stars
-                html += `<div class="gbp-review-header">`;
-                if (review.reviewer) {
-                    html += `<span class="gbp-reviewer-name">${esc(review.reviewer.displayName || 'Anonymous')}</span>`;
-                }
-                html += `<span class="gbp-review-stars">${renderStars(review.starRating)}</span>`;
-                if (review.createTime) {
-                    html += `<span class="gbp-review-date">${formatDate(review.createTime)}</span>`;
-                }
-                html += `</div>`;
-
-                // Comment
-                if (review.comment) {
-                    html += `<div class="gbp-review-comment">${esc(review.comment)}</div>`;
-                }
-
-                // Reply
-                if (review.reply) {
-                    html += `<div class="gbp-review-reply">`;
-                    html += `<div class="gbp-reply-label">Response from owner${review.reply.updateTime ? ' — ' + formatDate(review.reply.updateTime) : ''}</div>`;
-                    html += `<div class="gbp-reply-text">${esc(review.reply.comment)}</div>`;
+            const reviews = d.reviews || [];
+            if (reviews.length > 0) {
+                html += `<div class="gbp-info-section"><div class="gbp-section-title">Reviews (${reviews.length})</div>`;
+                for (const r of reviews) {
+                    html += `<div class="gbp-review-card">`;
+                    html += `<div class="gbp-review-header">`;
+                    html += `<span class="gbp-reviewer-name">${esc(r.reviewer || 'Anonymous')}</span>`;
+                    html += `<span class="gbp-review-stars">${renderStars(r.rating || 0)}</span>`;
+                    if (r.date) html += `<span class="gbp-review-date">${esc(r.date)}</span>`;
+                    html += `</div>`;
+                    if (r.comment) html += `<div class="gbp-review-comment">${esc(r.comment)}</div>`;
+                    if (r.reply) {
+                        html += `<div class="gbp-review-reply">
+                            <div class="gbp-reply-label">Response from owner</div>
+                            <div class="gbp-reply-text">${esc(r.reply)}</div>
+                        </div>`;
+                    }
                     html += `</div>`;
                 }
-
                 html += `</div>`;
             }
 
-            html += `</div>`;
-            return html;
-        }
-
-        function renderMedia(loc) {
-            if (!loc.media || loc.media.length === 0) {
-                return `<div class="gbp-info-section">
-                    <div class="gbp-section-title">Photos & Media</div>
-                    <div class="gbp-empty">No media loaded. The media API may require additional authorization.</div>
-                </div>`;
+            // Photos
+            const photos = d.photos || [];
+            if (photos.length > 0) {
+                html += `<div class="gbp-info-section"><div class="gbp-section-title">Photos & Media (${photos.length})</div><div class="gbp-media-grid">`;
+                for (const p of photos) {
+                    if (!p.url) continue;
+                    html += `<div class="gbp-media-card">
+                        <img src="${esc(p.url)}" alt="${esc(p.caption || 'Photo')}" loading="lazy">
+                        ${p.caption ? `<div class="gbp-media-desc">${esc(p.caption)}</div>` : ''}
+                    </div>`;
+                }
+                html += `</div></div>`;
             }
 
-            let html = `<div class="gbp-info-section">`;
-            html += `<div class="gbp-section-title">Photos & Media (${loc.media.length})</div>`;
-            html += `<div class="gbp-media-grid">`;
-
-            for (const m of loc.media) {
-                const url = m.googleUrl || m.thumbnailUrl || '';
-                if (!url) continue;
-
-                html += `<div class="gbp-media-card">`;
-                html += `<img src="${esc(url)}" alt="${esc(m.description || 'Business photo')}" loading="lazy">`;
-                if (m.description) {
-                    html += `<div class="gbp-media-desc">${esc(m.description)}</div>`;
-                }
-                if (m.locationAssociation) {
-                    const category = m.locationAssociation.category || '';
-                    if (category) {
-                        html += `<div class="gbp-media-category">${esc(category.replace(/_/g, ' '))}</div>`;
-                    }
-                }
-                html += `</div>`;
+            // Notes (view mode — screen only, hidden in print)
+            if (d.notes) {
+                html += `<div class="gbp-info-section gbp-notes-section"><div class="gbp-section-title">Internal Notes</div><div class="gbp-description">${esc(d.notes)}</div></div>`;
             }
 
             html += `</div></div>`;
             return html;
         }
 
-        function renderInfoRow(label, value) {
-            return `<div class="gbp-info-row">
-                <div class="gbp-info-label">${esc(label)}</div>
-                <div class="gbp-info-value">${value}</div>
-            </div>`;
-        }
-
-        function renderStars(rating) {
-            const ratingMap = { 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5 };
-            const num = ratingMap[rating] || 0;
-            let stars = '';
+        function renderStars(num) {
+            let s = '';
             for (let i = 0; i < 5; i++) {
-                stars += i < num ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
+                s += i < num ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
             }
-            return stars;
+            return s;
         }
 
-        function formatTime(timeStr) {
-            if (!timeStr) return '';
-            const parts = timeStr.split(':');
-            let h = parseInt(parts[0]);
-            const m = parts[1] || '00';
-            const ampm = h >= 12 ? 'PM' : 'AM';
-            if (h > 12) h -= 12;
-            if (h === 0) h = 12;
-            return `${h}:${m} ${ampm}`;
-        }
-
-        function formatTimeObj(timeObj) {
-            if (!timeObj) return '';
-            const h = timeObj.hours || 0;
-            const m = String(timeObj.minutes || 0).padStart(2, '0');
-            return formatTime(`${h}:${m}`);
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            try {
-                return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-            } catch (e) {
-                return dateStr;
-            }
+        function infoRow(label, value) {
+            return `<div class="gbp-info-row"><div class="gbp-info-label">${esc(label)}</div><div class="gbp-info-value">${value}</div></div>`;
         }
 
         function esc(str) {
-            if (!str) return '';
+            if (str == null) return '';
             const div = document.createElement('div');
-            div.textContent = str;
+            div.textContent = String(str);
             return div.innerHTML;
         }
 
-        // Load on page ready
+        // ─── Edit Mode ───
+        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        function initHoursGrid() {
+            const grid = document.getElementById('hours-grid');
+            grid.innerHTML = '';
+            for (const day of DAYS) {
+                const id = day.toLowerCase();
+                grid.innerHTML += `
+                    <div class="gbp-hours-edit-row">
+                        <span class="gbp-hours-edit-day">${day}</span>
+                        <input type="text" id="h-${id}-open" placeholder="8:00 AM" class="gbp-hours-input">
+                        <span class="gbp-hours-dash">–</span>
+                        <input type="text" id="h-${id}-close" placeholder="5:00 PM" class="gbp-hours-input">
+                        <label class="gbp-hours-closed-label">
+                            <input type="checkbox" id="h-${id}-closed" onchange="toggleClosed('${id}')"> Closed
+                        </label>
+                    </div>`;
+            }
+        }
+
+        function toggleClosed(dayId) {
+            const closed = document.getElementById(`h-${dayId}-closed`).checked;
+            document.getElementById(`h-${dayId}-open`).disabled = closed;
+            document.getElementById(`h-${dayId}-close`).disabled = closed;
+        }
+
+        function populateSelector() {
+            const sel = document.getElementById('location-selector');
+            sel.innerHTML = '<option value="__new__">+ Add New Location</option>';
+            for (const loc of locations) {
+                const opt = document.createElement('option');
+                opt.value = loc.id;
+                opt.textContent = loc.location_name;
+                sel.appendChild(opt);
+            }
+            if (currentLocationId) sel.value = currentLocationId;
+            else if (locations.length > 0) { sel.value = locations[0].id; currentLocationId = locations[0].id; }
+            else sel.value = '__new__';
+
+            document.getElementById('btn-delete-location').style.display = sel.value === '__new__' ? 'none' : '';
+        }
+
+        document.getElementById('location-selector').addEventListener('change', function() {
+            currentLocationId = this.value === '__new__' ? null : this.value;
+            document.getElementById('btn-delete-location').style.display = this.value === '__new__' ? 'none' : '';
+            loadLocationIntoForm(currentLocationId);
+        });
+
+        function loadLocationIntoForm(id) {
+            clearForm();
+            if (!id) return;
+            const loc = locations.find(l => l.id === id);
+            if (!loc) return;
+
+            const d = loc.data || {};
+            document.getElementById('f-name').value = loc.location_name || '';
+            document.getElementById('f-address').value = d.address || '';
+            document.getElementById('f-phone').value = d.phone || '';
+            document.getElementById('f-website').value = d.website || '';
+            document.getElementById('f-categories').value = d.categories || '';
+            document.getElementById('f-maps-url').value = d.maps_url || '';
+            document.getElementById('f-description').value = d.description || '';
+            document.getElementById('f-services').value = d.services || '';
+            document.getElementById('f-attributes').value = d.attributes || '';
+            document.getElementById('f-notes').value = d.notes || '';
+
+            // Hours
+            if (d.hours) {
+                for (const h of d.hours) {
+                    const dayId = h.day.toLowerCase();
+                    const openEl = document.getElementById(`h-${dayId}-open`);
+                    const closeEl = document.getElementById(`h-${dayId}-close`);
+                    const closedEl = document.getElementById(`h-${dayId}-closed`);
+                    if (!openEl) continue;
+                    if (h.closed) {
+                        closedEl.checked = true;
+                        openEl.disabled = true;
+                        closeEl.disabled = true;
+                    } else {
+                        openEl.value = h.open || '';
+                        closeEl.value = h.close || '';
+                    }
+                }
+            }
+
+            // Reviews
+            const container = document.getElementById('reviews-container');
+            container.innerHTML = '';
+            if (d.reviews) {
+                for (const r of d.reviews) addReview(r);
+            }
+
+            // Photos
+            const photosContainer = document.getElementById('photos-container');
+            photosContainer.innerHTML = '';
+            if (d.photos) {
+                for (const p of d.photos) addPhoto(p);
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('f-name').value = '';
+            document.getElementById('f-address').value = '';
+            document.getElementById('f-phone').value = '';
+            document.getElementById('f-website').value = '';
+            document.getElementById('f-categories').value = '';
+            document.getElementById('f-maps-url').value = '';
+            document.getElementById('f-description').value = '';
+            document.getElementById('f-services').value = '';
+            document.getElementById('f-attributes').value = '';
+            document.getElementById('f-notes').value = '';
+            document.getElementById('reviews-container').innerHTML = '';
+            document.getElementById('photos-container').innerHTML = '';
+            document.getElementById('save-status').textContent = '';
+            initHoursGrid();
+        }
+
+        // ─── Repeatable: Reviews ───
+        let reviewCounter = 0;
+        function addReview(data) {
+            const c = document.getElementById('reviews-container');
+            const idx = reviewCounter++;
+            const div = document.createElement('div');
+            div.className = 'gbp-repeatable-item';
+            div.innerHTML = `
+                <div class="gbp-repeatable-header">
+                    <span>Review #${c.children.length + 1}</span>
+                    <button class="btn btn-danger btn-xs" onclick="this.closest('.gbp-repeatable-item').remove()">Remove</button>
+                </div>
+                <div class="gbp-form-row">
+                    <div class="gbp-form-group" style="flex: 2;">
+                        <label>Reviewer Name</label>
+                        <input type="text" class="r-reviewer" value="${esc(data?.reviewer || '')}">
+                    </div>
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label>Rating</label>
+                        <select class="r-rating">
+                            <option value="5" ${(data?.rating || 5) === 5 ? 'selected' : ''}>5 Stars</option>
+                            <option value="4" ${data?.rating === 4 ? 'selected' : ''}>4 Stars</option>
+                            <option value="3" ${data?.rating === 3 ? 'selected' : ''}>3 Stars</option>
+                            <option value="2" ${data?.rating === 2 ? 'selected' : ''}>2 Stars</option>
+                            <option value="1" ${data?.rating === 1 ? 'selected' : ''}>1 Star</option>
+                        </select>
+                    </div>
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label>Date</label>
+                        <input type="text" class="r-date" placeholder="2026-01-15" value="${esc(data?.date || '')}">
+                    </div>
+                </div>
+                <div class="gbp-form-group">
+                    <label>Comment</label>
+                    <textarea class="r-comment" rows="2">${esc(data?.comment || '')}</textarea>
+                </div>
+                <div class="gbp-form-group">
+                    <label>Owner Reply</label>
+                    <textarea class="r-reply" rows="2">${esc(data?.reply || '')}</textarea>
+                </div>`;
+            c.appendChild(div);
+        }
+
+        // ─── Repeatable: Photos ───
+        function addPhoto(data) {
+            const c = document.getElementById('photos-container');
+            const div = document.createElement('div');
+            div.className = 'gbp-repeatable-item';
+            div.innerHTML = `
+                <div class="gbp-repeatable-header">
+                    <span>Photo #${c.children.length + 1}</span>
+                    <button class="btn btn-danger btn-xs" onclick="this.closest('.gbp-repeatable-item').remove()">Remove</button>
+                </div>
+                <div class="gbp-form-row">
+                    <div class="gbp-form-group" style="flex: 2;">
+                        <label>Image URL</label>
+                        <input type="text" class="p-url" placeholder="https://..." value="${esc(data?.url || '')}">
+                    </div>
+                    <div class="gbp-form-group" style="flex: 1;">
+                        <label>Caption</label>
+                        <input type="text" class="p-caption" placeholder="Office exterior" value="${esc(data?.caption || '')}">
+                    </div>
+                </div>`;
+            c.appendChild(div);
+        }
+
+        // ─── Save ───
+        async function saveLocation() {
+            const name = document.getElementById('f-name').value.trim();
+            if (!name) {
+                showStatus('Location name is required.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            // Collect hours
+            const hours = [];
+            for (const day of DAYS) {
+                const dayId = day.toLowerCase();
+                const closed = document.getElementById(`h-${dayId}-closed`).checked;
+                const open = document.getElementById(`h-${dayId}-open`).value.trim();
+                const close = document.getElementById(`h-${dayId}-close`).value.trim();
+                if (closed) {
+                    hours.push({ day, closed: true });
+                } else if (open || close) {
+                    hours.push({ day, open, close });
+                }
+            }
+
+            // Collect reviews
+            const reviews = [];
+            document.querySelectorAll('#reviews-container .gbp-repeatable-item').forEach(el => {
+                reviews.push({
+                    reviewer: el.querySelector('.r-reviewer').value.trim(),
+                    rating: parseInt(el.querySelector('.r-rating').value),
+                    date: el.querySelector('.r-date').value.trim(),
+                    comment: el.querySelector('.r-comment').value.trim(),
+                    reply: el.querySelector('.r-reply').value.trim()
+                });
+            });
+
+            // Collect photos
+            const photos = [];
+            document.querySelectorAll('#photos-container .gbp-repeatable-item').forEach(el => {
+                const url = el.querySelector('.p-url').value.trim();
+                if (url) {
+                    photos.push({
+                        url,
+                        caption: el.querySelector('.p-caption').value.trim()
+                    });
+                }
+            });
+
+            const payload = {
+                id: currentLocationId || undefined,
+                client_key: 'dunham',
+                location_name: name,
+                data: {
+                    address: document.getElementById('f-address').value.trim(),
+                    phone: document.getElementById('f-phone').value.trim(),
+                    website: document.getElementById('f-website').value.trim(),
+                    categories: document.getElementById('f-categories').value.trim(),
+                    maps_url: document.getElementById('f-maps-url').value.trim(),
+                    description: document.getElementById('f-description').value.trim(),
+                    hours,
+                    reviews,
+                    photos,
+                    services: document.getElementById('f-services').value.trim(),
+                    attributes: document.getElementById('f-attributes').value.trim(),
+                    notes: document.getElementById('f-notes').value.trim()
+                }
+            };
+
+            try {
+                const resp = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const json = await resp.json();
+                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
+
+                // Update local data
+                currentLocationId = json.location.id;
+                await loadData();
+                showStatus('Saved successfully!', 'success');
+            } catch (err) {
+                showStatus('Save failed: ' + err.message, 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Save Location';
+        }
+
+        // ─── Delete ───
+        document.getElementById('btn-delete-location').addEventListener('click', async function() {
+            if (!currentLocationId) return;
+            const loc = locations.find(l => l.id === currentLocationId);
+            if (!confirm(`Delete "${loc?.location_name || 'this location'}"? This cannot be undone.`)) return;
+
+            try {
+                const resp = await fetch(`${API_URL}?id=${currentLocationId}`, { method: 'DELETE' });
+                const json = await resp.json();
+                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
+
+                currentLocationId = null;
+                await loadData();
+                showStatus('Location deleted.', 'success');
+            } catch (err) {
+                showStatus('Delete failed: ' + err.message, 'error');
+            }
+        });
+
+        function showStatus(msg, type) {
+            const el = document.getElementById('save-status');
+            el.textContent = msg;
+            el.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+        }
+
+        // ─── Init ───
+        initHoursGrid();
         loadData();
     </script>
 </body>

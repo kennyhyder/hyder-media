@@ -127,6 +127,9 @@
     },
     "api/gbp/export.js": {
       "maxDuration": 60
+    },
+    "api/gbp/locations.js": {
+      "maxDuration": 30
     }
   }
 }
