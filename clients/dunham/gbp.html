@@ -35,72 +35,37 @@
             <div>Loading locations...</div>
         </div>
 
-        <!-- ===== BOOKMARKLET SETUP ===== -->
-        <div id="setup-section" style="display:none;">
-            <div class="setup-banner">
-                <div class="setup-banner-header">
-                    <h2>Quick Setup — GBP Auto-Extract</h2>
-                    <button class="btn btn-secondary btn-xs" onclick="document.getElementById('setup-section').style.display='none'">Hide</button>
+        <!-- ===== IMPORT MODAL ===== -->
+        <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;">
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h2 style="margin:0;font-size:1.1rem;">Import from Google Business Profile</h2>
+                    <button onclick="closeImportModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;padding:0 4px;">×</button>
                 </div>
-                <p>Extract data directly from your Google Business Profile Manager — no manual copy/paste needed.</p>
-
-                <div class="setup-steps">
-                    <div class="setup-step">
-                        <div class="setup-step-num">1</div>
-                        <div>
-                            <strong>Drag this to your bookmarks bar:</strong><br>
-                            <a class="bookmarklet-link" id="bookmarklet-drag"
-                               onclick="event.preventDefault();alert('Drag this link to your bookmarks bar — don\'t click it!');">
-                                GBP Extract
-                            </a>
-                            <span class="setup-hint">Drag it, don't click it!</span>
-                        </div>
-                    </div>
-                    <div class="setup-step">
-                        <div class="setup-step-num">2</div>
-                        <div>
-                            <strong>Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a></strong> and click the pencil icon to edit a location
-                        </div>
-                    </div>
-                    <div class="setup-step">
-                        <div class="setup-step-num">3</div>
-                        <div>
-                            <strong>Click the "GBP Extract" bookmark.</strong> A toolbar appears with options:
-                            <ul class="setup-options">
-                                <li><strong>Send to Hyder Media</strong> — extracts text data and saves it here automatically</li>
-                                <li><strong>Copy All Text</strong> — copies the panel text to your clipboard</li>
-                                <li><strong>Fix Scroll</strong> — expands the panel so you can take a full screenshot</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="setup-step">
-                        <div class="setup-step-num">4</div>
-                        <div>
-                            <strong>Repeat for each location.</strong> Click through each tab (About, Contact, Hours, etc.) before extracting to capture more data.
-                        </div>
+                <div style="margin-bottom:12px;font-size:0.9rem;color:var(--text-secondary);line-height:1.5;">
+                    <strong>Steps:</strong>
+                    1. Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a> →
+                    2. Click pencil to edit a location →
+                    3. Select all text on the page (<strong>Ctrl+A</strong>) →
+                    4. Copy (<strong>Ctrl+C</strong>) →
+                    5. Paste below (<strong>Ctrl+V</strong>)
+                </div>
+                <textarea id="import-textarea" style="flex:1;min-height:300px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);padding:12px;font-size:13px;font-family:monospace;resize:vertical;" placeholder="Paste the copied text from Google Business Profile here..."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                    <span id="import-status" style="font-size:0.85rem;color:var(--text-secondary);"></span>
+                    <div>
+                        <button class="btn btn-secondary btn-sm" onclick="closeImportModal()">Cancel</button>
+                        <button class="btn btn-primary btn-sm" onclick="parseAndImport()" style="margin-left:8px;">Parse & Import</button>
                     </div>
                 </div>
-
-                <hr style="border-color: var(--border); margin: 20px 0;">
-                <details>
-                    <summary style="cursor:pointer;color:var(--text-secondary);font-size:0.85rem;"><strong>Alternative: Console paste method</strong></summary>
-                    <p style="font-size:0.85rem;color:var(--text-secondary);margin:8px 0;">If the bookmarklet doesn't work, you can paste the script directly into the browser console:</p>
-                    <ol style="font-size:0.85rem;color:var(--text-secondary);padding-left:20px;margin-bottom:12px;">
-                        <li>On business.google.com, press <strong>F12</strong> (or Cmd+Option+J on Mac) to open DevTools</li>
-                        <li>Click the <strong>Console</strong> tab</li>
-                        <li>Click the button below to copy the script, then paste it in the console and press Enter</li>
-                    </ol>
-                    <button class="btn btn-secondary btn-sm" onclick="copyConsoleScript()">Copy Script to Clipboard</button>
-                    <span id="copy-status" style="margin-left:8px;font-size:0.8rem;"></span>
-                </details>
             </div>
         </div>
 
         <!-- ===== CAPTURE MODE ===== -->
         <div id="capture-mode" style="display:none;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('setup-section').style.display=document.getElementById('setup-section').style.display==='none'?'block':'none'">
-                    Setup: Auto-Extract Bookmarklet
+                <button class="btn btn-primary btn-sm" onclick="openImportModal()">
+                    Import from GBP
                 </button>
             </div>
 
@@ -119,8 +84,7 @@
                     <!-- No location selected -->
                     <div id="no-location" class="empty-prompt">
                         <h2>Select a location to begin capturing</h2>
-                        <p>Choose a location from the sidebar, or add a new one.</p>
-                        <p style="margin-top:12px;font-size:0.85rem;">Or use the <strong>GBP Extract bookmarklet</strong> to auto-import from business.google.com</p>
+                        <p>Choose a location from the sidebar, or click <strong>Import from GBP</strong> to paste data from business.google.com</p>
                     </div>
 
                     <!-- Location capture -->
@@ -136,10 +100,8 @@
                         <div id="save-status" class="save-status"></div>
 
                         <div class="capture-instructions-banner">
-                            <strong>How to use:</strong> Open this location in your
-                            <a href="https://business.google.com/" target="_blank">Google Business Profile dashboard</a>.
-                            Work through each section below — paste screenshots (Ctrl+V / Cmd+V) and fill in key data.
-                            Or use the <strong>GBP Extract bookmarklet</strong> to auto-import.
+                            <strong>How to use:</strong> Click <strong>Import from GBP</strong> to auto-fill from a copy-paste, or manually fill in each section below.
+                            You can also paste screenshots (Ctrl+V / Cmd+V) into any section.
                         </div>
 
                         <div id="sections-container"></div>
@@ -783,91 +745,208 @@
         return div.innerHTML;
     }
 
-    // ─── Bookmarklet / Console Script ───
-    // The full extraction script that runs on business.google.com
-    // Finds the edit panel by content (not scroll heuristics), extracts fields by known text patterns
-    const GBP_SCRIPT = `(function(){
-if(!location.hostname.includes('business.google.com')){alert('Navigate to business.google.com first');return}
-if(document.getElementById('gx')){document.getElementById('gx').remove()}
-function fp(){
-var all=document.querySelectorAll('*');var best=null;var bestLen=1e9;
-for(var i=0;i<all.length;i++){var el=all[i];
-if(el.offsetWidth<300||el.offsetHeight<200||el===document.body||el===document.documentElement)continue;
-var t=el.innerText||el.textContent||'';
-if(t.indexOf('Business name')>-1&&(t.indexOf('Business category')>-1||t.indexOf('Description')>-1)){
-if(t.length<bestLen){best=el;bestLen=t.length}}}
-return best}
-function ext(){var p=fp();if(p)return p.innerText||p.textContent;
-var t=document.body.innerText||document.body.textContent||'';
-if(t.indexOf('Business name')>-1||t.indexOf('Business category')>-1)return t;
-alert('No GBP data found on this page. Make sure a location panel is open.');return null}
-function parseHours(text){
-var hm=text.match(/Business hours[\\s\\S]*?Hours\\n(?:Open with main hours\\n)?((?:Sunday|Monday)[\\s\\S]*?)(?=Special hours|Add more hours|\\nMore\\n)/);
-if(!hm)return[];var lines=hm[1].split('\\n');var hrs=[];var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(days.indexOf(line)>-1){var next=(lines[i+1]||'').trim();
-if(next==='Open 24 hours')hrs.push({day:line,open:'12:00 AM',close:'11:59 PM'});
-else if(next==='Closed')hrs.push({day:line,closed:true});
-else if(next.match(/[AP]M/))hrs.push({day:line,open:next.split(/\\s*[\\u2013-]\\s*/)[0],close:next.split(/\\s*[\\u2013-]\\s*/)[1]||''});
-i++}}return hrs}
-var d=document.createElement('div');d.id='gx';
-d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:999999;background:#1e293b;border:1px solid #475569;border-radius:12px;padding:16px;font-family:system-ui;color:#f1f5f9;box-shadow:0 8px 32px rgba(0,0,0,.4);width:270px;font-size:13px;line-height:1.4';
-function mb(l,desc,fn){var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px;margin-bottom:6px;border-radius:6px;border:1px solid #475569;background:#334155;color:#f1f5f9;cursor:pointer;font-size:13px;font-weight:600;text-align:left';b.innerHTML=l+'<br><small style=\\"font-weight:400;color:#94a3b8;font-size:11px\\">'+desc+'</small>';b.onclick=fn;d.appendChild(b)}
-d.innerHTML='<div style=\\"display:flex;justify-content:space-between;align-items:center;margin-bottom:12px\\"><b style=\\"color:#3b82f6;font-size:14px\\">GBP Extract</b><button onclick=\\"document.getElementById(\\'gx\\').remove()\\" style=\\"background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:0 4px\\">\\u00d7</button></div>';
-mb('Send to Hyder Media','Extract data & save to capture tool',async function(){
-var text=ext();if(!text)return;
-var m,name='Unknown';
-m=text.match(/Business name\\n([^\\n]+)/);if(m)name=m[1].trim();
-var cats='';m=text.match(/Business category\\n([\\s\\S]*?)(?=\\nDescription)/);
-if(m)cats=m[1].replace(/\\nPrimary\\n/g,' (Primary), ').replace(/\\nPrimary/g,' (Primary)').replace(/\\n/g,', ').trim();
-var desc='';m=text.match(/Description\\n([\\s\\S]*?)(?=\\nOpening date|\\nContact information)/);if(m)desc=m[1].trim();
-var phone='';m=text.match(/Phone number\\n([^\\n]+)/);if(m)phone=m[1].trim();
-var website='';m=text.match(/Website\\n([^\\n]+)/);if(m)website=m[1].trim();
-var social='';m=text.match(/Social profiles[\\s\\S]*?(?:Current\\n)?(?:https?:\\/\\/[^\\n]+)/);if(m){var su=m[0].match(/https?:\\/\\/[^\\n]+/);if(su)social=su[0].trim()}
-var shortName='';m=text.match(/Short name\\n([^\\n]+)/);if(m)shortName=m[1].trim();
-var addr='';m=text.match(/Business location\\n([^\\n]+)/);if(m)addr=m[1].trim();
-var svcArea='';m=text.match(/Service area\\n([\\s\\S]*?)(?=\\nBusiness hours)/);if(m)svcArea=m[1].trim();
-var openDate='';m=text.match(/Opening date\\n([^\\n]+)/);if(m)openDate=m[1].trim();
-var attrs=[];
-m=text.match(/Accessibility\\n([\\s\\S]*?)(?=\\nAmenities|\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Accessibility: '+m[1].replace(/\\n/g,', ').trim());
-m=text.match(/Amenities\\n([\\s\\S]*?)(?=\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Amenities: '+m[1].replace(/\\n/g,', ').trim());
-m=text.match(/Crowd\\n([\\s\\S]*?)(?=\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m){var ct=m[1].replace(/Let customers[\\s\\S]*?Learn more\\n?/,'').trim();if(ct)attrs.push('Crowd: '+ct.replace(/\\n/g,', '))}
-m=text.match(/Service options\\n([\\s\\S]*?)(?=\\nSpanish|\\nLearn how|$)/);if(m)attrs.push('Service options: '+m[1].replace(/\\n/g,', ').trim());
-var hours=parseHours(text);
-var data={
-info:{address:addr,phone:phone,website:website,categories:cats,social_profiles:social,short_name:shortName,maps_url:'',screenshots:[]},
-description:{text:desc,screenshots:[]},
-hours:{hours:hours,screenshots:[]},
-services:{text:svcArea?'Service areas: '+svcArea.replace(/\\n/g,', '):'',screenshots:[]},
-attributes:{text:attrs.join('\\n'),screenshots:[]},
-reviews:{total_count:'',avg_rating:'',notes:'',screenshots:[]},
-photos:{owner_count:'',customer_count:'',notes:'',screenshots:[]},
-posts:{text:'',screenshots:[]},
-performance:{views:'',searches:'',direction_requests:'',calls:'',website_clicks:'',notes:'',screenshots:[]},
-qa:{text:'',screenshots:[]},
-_raw:{raw_text:text,extracted_at:new Date().toISOString(),service_area:svcArea,opening_date:openDate}
-};
-this.textContent='Sending...';this.disabled=true;
-try{var r=await fetch('https://hyder.me/api/gbp/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_key:'dunham',location_name:name,data:data})});
-var j=await r.json();if(j.error)throw new Error(j.error);
-alert('Saved: '+name+'\\n\\nAddress: '+addr+'\\nPhone: '+phone+'\\nWebsite: '+website+'\\nCategories: '+cats+'\\nSocial: '+social+'\\nShort name: '+shortName+'\\nOpening: '+openDate+'\\nService areas: '+(svcArea?svcArea.split('\\n').length+' areas':'none')+'\\nHours: '+hours.length+' days parsed'+'\\nAttributes: '+attrs.length+' sections\\n\\nView at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
-this.textContent='Send to Hyder Media';this.disabled=false});
-mb('Copy All Text','Copy panel text to clipboard',function(){var t=ext();if(!t)return;navigator.clipboard.writeText(t).then(function(){alert('Copied to clipboard!')}).catch(function(){prompt('Copy this text:',t)})});
-var hr=document.createElement('hr');hr.style.cssText='border:none;border-top:1px solid #475569;margin:10px 0';d.appendChild(hr);
-mb('Fix Scroll for Screenshot','Expand panel to full height',function(){var p=fp();if(!p){var all=document.querySelectorAll('*');for(var i=0;i<all.length;i++){var s=getComputedStyle(all[i]);if((s.overflowY==='auto'||s.overflowY==='scroll')&&all[i].scrollHeight>all[i].clientHeight+50&&all[i].clientHeight>200&&all[i].clientWidth>300){var t=(all[i].innerText||all[i].textContent||'');if(t.indexOf('Business name')>-1||t.indexOf('Business category')>-1){p=all[i];break}}}};if(!p){alert('Open a location first');return}
-var el=p;for(var i=0;i<15&&el&&el!==document.body;i++){el.style.overflow='visible';el.style.overflowY='visible';el.style.maxHeight='none';el.style.height='auto';el=el.parentElement}
-alert('Panel expanded! You can now take a full screenshot.')});
-document.body.appendChild(d)})()`;
+    // ─── Import from GBP (Paste-based) ───
+    function openImportModal() {
+        const modal = document.getElementById('import-modal');
+        modal.style.display = 'flex';
+        document.getElementById('import-textarea').value = '';
+        document.getElementById('import-status').textContent = '';
+        document.getElementById('import-textarea').focus();
+    }
 
-    // Set the bookmarklet href (inline all code)
-    document.getElementById('bookmarklet-drag').href = 'javascript:' + encodeURIComponent(GBP_SCRIPT);
+    function closeImportModal() {
+        document.getElementById('import-modal').style.display = 'none';
+    }
 
-    function copyConsoleScript() {
-        navigator.clipboard.writeText(GBP_SCRIPT).then(() => {
-            const el = document.getElementById('copy-status');
-            el.textContent = 'Copied!';
-            el.style.color = 'var(--success)';
-            setTimeout(() => el.textContent = '', 3000);
-        });
+    function parseGBPHours(text) {
+        const hm = text.match(/Business hours[\s\S]*?Hours\n(?:Open with main hours\n)?((?:Sunday|Monday)[\s\S]*?)(?=Special hours|Add more hours|\nMore\n|\n\n\n)/);
+        if (!hm) return [];
+        const lines = hm[1].split('\n');
+        const hours = [];
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (days.includes(line)) {
+                const next = (lines[i + 1] || '').trim();
+                if (next === 'Open 24 hours') {
+                    hours.push({ day: line, open: '12:00 AM', close: '11:59 PM' });
+                } else if (next === 'Closed') {
+                    hours.push({ day: line, closed: true });
+                } else if (/[AP]M/.test(next)) {
+                    const parts = next.split(/\s*[\u2013–-]\s*/);
+                    hours.push({ day: line, open: parts[0], close: parts[1] || '' });
+                }
+                i++;
+            }
+        }
+        return hours;
+    }
+
+    function parseGBPText(text) {
+        let m;
+        const result = { name: 'Unknown', data: {} };
+
+        // Business name
+        m = text.match(/Business name\n([^\n]+)/);
+        if (m) result.name = m[1].trim();
+
+        // Categories
+        let cats = '';
+        m = text.match(/Business category\n([\s\S]*?)(?=\nDescription)/);
+        if (m) {
+            cats = m[1]
+                .replace(/Your edit was not approved\.\n?/g, '')
+                .replace(/Current\n/g, '')
+                .replace(/Not approved\n/g, '')
+                .replace(/\nPrimary\n/g, ' (Primary), ')
+                .replace(/\nPrimary/g, ' (Primary)')
+                .replace(/\n/g, ', ')
+                .replace(/, ,/g, ',')
+                .trim();
+        }
+
+        // Description
+        let desc = '';
+        m = text.match(/Description\n([\s\S]*?)(?=\nOpening date|\nContact information)/);
+        if (m) desc = m[1].trim();
+
+        // Opening date
+        let openDate = '';
+        m = text.match(/Opening date\n([^\n]+)/);
+        if (m) openDate = m[1].trim();
+
+        // Phone
+        let phone = '';
+        m = text.match(/Phone number\n([^\n]+)/);
+        if (m) phone = m[1].trim();
+
+        // Website
+        let website = '';
+        m = text.match(/Website\n([^\n]+)/);
+        if (m) website = m[1].trim();
+
+        // Social profiles
+        let social = '';
+        m = text.match(/Social profiles[\s\S]*?(?:Current\n)?(https?:\/\/[^\n]+)/);
+        if (m) social = m[1].trim();
+
+        // Short name
+        let shortName = '';
+        m = text.match(/Short name\n([^\n]+)/);
+        if (m) shortName = m[1].trim();
+
+        // Address
+        let addr = '';
+        m = text.match(/Business location\n([^\n]+)/);
+        if (m) addr = m[1].trim();
+
+        // Service area
+        let svcArea = '';
+        m = text.match(/Service area\n([\s\S]*?)(?=\nBusiness hours)/);
+        if (m) svcArea = m[1].trim();
+
+        // Hours
+        const hours = parseGBPHours(text);
+
+        // Attributes
+        const attrs = [];
+        m = text.match(/Accessibility\n([\s\S]*?)(?=\nAmenities|\nCrowd|\nParking|\nPlace page|\nPlanning|\nService options)/);
+        if (m) attrs.push('Accessibility: ' + m[1].replace(/\n/g, ', ').trim());
+
+        m = text.match(/Amenities\n([\s\S]*?)(?=\nCrowd|\nParking|\nPlace page|\nPlanning|\nService options)/);
+        if (m) attrs.push('Amenities: ' + m[1].replace(/\n/g, ', ').trim());
+
+        m = text.match(/Crowd\n([\s\S]*?)(?=\nParking|\nPlace page|\nPlanning|\nService options)/);
+        if (m) {
+            const ct = m[1].replace(/Let customers[\s\S]*?Learn more\n?/, '').trim();
+            if (ct) attrs.push('Crowd: ' + ct.replace(/\n/g, ', '));
+        }
+
+        m = text.match(/Service options\n([\s\S]*?)(?=\nSpanish|\nLearn how|$)/);
+        if (m) attrs.push('Service options: ' + m[1].replace(/\n/g, ', ').trim());
+
+        result.data = {
+            info: { address: addr, phone, website, categories: cats, social_profiles: social, short_name: shortName, maps_url: '', screenshots: [] },
+            description: { text: desc, screenshots: [] },
+            hours: { hours, screenshots: [] },
+            services: { text: svcArea ? 'Service areas: ' + svcArea.replace(/\n/g, ', ') : '', screenshots: [] },
+            attributes: { text: attrs.join('\n'), screenshots: [] },
+            reviews: { total_count: '', avg_rating: '', notes: '', screenshots: [] },
+            photos: { owner_count: '', customer_count: '', notes: '', screenshots: [] },
+            posts: { text: '', screenshots: [] },
+            performance: { views: '', searches: '', direction_requests: '', calls: '', website_clicks: '', notes: '', screenshots: [] },
+            qa: { text: '', screenshots: [] },
+            _raw: { raw_text: text, extracted_at: new Date().toISOString(), service_area: svcArea, opening_date: openDate }
+        };
+
+        return result;
+    }
+
+    async function parseAndImport() {
+        const text = document.getElementById('import-textarea').value.trim();
+        const statusEl = document.getElementById('import-status');
+
+        if (!text) {
+            statusEl.textContent = 'Paste some text first.';
+            statusEl.style.color = 'var(--danger)';
+            return;
+        }
+
+        if (!text.includes('Business name')) {
+            statusEl.textContent = 'This doesn\'t look like GBP data (no "Business name" found).';
+            statusEl.style.color = 'var(--danger)';
+            return;
+        }
+
+        const parsed = parseGBPText(text);
+        statusEl.textContent = `Parsed: ${parsed.name}. Saving...`;
+        statusEl.style.color = 'var(--text-secondary)';
+
+        // Check if location already exists
+        const existing = locations.find(l => l.location_name === parsed.name);
+
+        try {
+            const payload = {
+                client_key: 'dunham',
+                location_name: parsed.name,
+                data: parsed.data
+            };
+            if (existing) payload.id = existing.id;
+
+            const resp = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const json = await resp.json();
+            if (!resp.ok || json.error) throw new Error(json.error);
+
+            closeImportModal();
+            currentLocationId = json.location.id;
+            await loadData();
+
+            // Show what was imported
+            const d = parsed.data;
+            const summary = [
+                d.info.address && `Address: ${d.info.address}`,
+                d.info.phone && `Phone: ${d.info.phone}`,
+                d.info.website && `Website: ${d.info.website}`,
+                d.info.categories && `Categories: ${d.info.categories}`,
+                d.info.social_profiles && `Social: ${d.info.social_profiles}`,
+                d.info.short_name && `Short name: ${d.info.short_name}`,
+                d.description.text && `Description: ${d.description.text.substring(0, 60)}...`,
+                d.hours.hours.length && `Hours: ${d.hours.hours.length} days`,
+                d.services.text && `Services: captured`,
+                d.attributes.text && `Attributes: captured`,
+                d._raw.opening_date && `Opening date: ${d._raw.opening_date}`,
+                d._raw.service_area && `Service areas: ${d._raw.service_area.split('\n').length} areas`
+            ].filter(Boolean).join('\n');
+
+            alert(`Imported: ${parsed.name}\n\n${summary}`);
+        } catch (err) {
+            statusEl.textContent = 'Save failed: ' + err.message;
+            statusEl.style.color = 'var(--danger)';
+        }
     }
 
     // ─── Init ───
