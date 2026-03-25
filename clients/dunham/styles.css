@@ -755,6 +755,121 @@ body {
 }
 
 /* ========================= */
+/* GBP Setup / Bookmarklet   */
+/* ========================= */
+
+.setup-banner {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.setup-banner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.setup-banner h2 {
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin: 0;
+}
+
+.setup-banner > p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.setup-steps {
+    display: grid;
+    gap: 16px;
+}
+
+.setup-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.setup-step-num {
+    background: var(--accent);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.setup-step > div {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.setup-step a {
+    color: var(--accent);
+}
+
+.bookmarklet-link {
+    display: inline-block;
+    margin: 8px 0;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.15s;
+}
+
+.bookmarklet-link:hover {
+    transform: scale(1.03);
+}
+
+.bookmarklet-link:active {
+    cursor: grabbing;
+}
+
+.setup-hint {
+    font-size: 0.75rem;
+    color: var(--warning);
+    margin-left: 8px;
+}
+
+.setup-options {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+}
+
+.setup-options li {
+    padding: 4px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.setup-options li::before {
+    content: "→ ";
+    color: var(--accent);
+}
+
+.setup-options li strong {
+    color: var(--text-primary);
+}
+
+/* ========================= */
 /* GBP Capture Tool Styles   */
 /* ========================= */
 
@@ -1355,6 +1470,7 @@ body {
 
     /* Hide capture mode in print, show print mode */
     #capture-mode,
+    #setup-section,
     .btn-danger,
     .capture-instructions-banner {
         display: none !important;

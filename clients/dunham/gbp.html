@@ -35,8 +35,63 @@
             <div>Loading locations...</div>
         </div>
 
+        <!-- ===== BOOKMARKLET SETUP ===== -->
+        <div id="setup-section" style="display:none;">
+            <div class="setup-banner">
+                <div class="setup-banner-header">
+                    <h2>Quick Setup — GBP Auto-Extract</h2>
+                    <button class="btn btn-secondary btn-xs" onclick="document.getElementById('setup-section').style.display='none'">Hide</button>
+                </div>
+                <p>Extract data directly from your Google Business Profile Manager — no manual copy/paste needed.</p>
+
+                <div class="setup-steps">
+                    <div class="setup-step">
+                        <div class="setup-step-num">1</div>
+                        <div>
+                            <strong>Drag this to your bookmarks bar:</strong><br>
+                            <a class="bookmarklet-link"
+                               href="javascript:void((function(){var s=document.createElement('script');s.src='https://hyder.me/clients/dunham/gbp-extract.js?v='+Date.now();document.body.appendChild(s);})())"
+                               onclick="event.preventDefault();alert('Drag this link to your bookmarks bar — don\'t click it!');">
+                                GBP Extract
+                            </a>
+                            <span class="setup-hint">Drag it, don't click it!</span>
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="setup-step-num">2</div>
+                        <div>
+                            <strong>Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a></strong> and open a location's "Edit profile"
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="setup-step-num">3</div>
+                        <div>
+                            <strong>Click the "GBP Extract" bookmark.</strong> A toolbar appears with options:
+                            <ul class="setup-options">
+                                <li><strong>Send to Hyder Media</strong> — extracts text data and saves it here automatically</li>
+                                <li><strong>Copy All Text</strong> — copies the extracted text to your clipboard</li>
+                                <li><strong>Fix Scroll for Screenshot</strong> — expands the panel so you can take a full screenshot</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="setup-step">
+                        <div class="setup-step-num">4</div>
+                        <div>
+                            <strong>Repeat for each location.</strong> Click through each tab (About, Contact, Hours, etc.) before extracting to capture more data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== CAPTURE MODE ===== -->
         <div id="capture-mode" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('setup-section').style.display=document.getElementById('setup-section').style.display==='none'?'block':'none'">
+                    Setup: Auto-Extract Bookmarklet
+                </button>
+            </div>
+
             <div class="capture-layout">
                 <!-- Location sidebar -->
                 <div class="capture-sidebar">
@@ -52,7 +107,8 @@
                     <!-- No location selected -->
                     <div id="no-location" class="empty-prompt">
                         <h2>Select a location to begin capturing</h2>
-                        <p>Choose a location from the sidebar, or add a new one to get started.</p>
+                        <p>Choose a location from the sidebar, or add a new one.</p>
+                        <p style="margin-top:12px;font-size:0.85rem;">Or use the <strong>GBP Extract bookmarklet</strong> to auto-import from business.google.com</p>
                     </div>
 
                     <!-- Location capture -->
@@ -71,6 +127,7 @@
                             <strong>How to use:</strong> Open this location in your
                             <a href="https://business.google.com/" target="_blank">Google Business Profile dashboard</a>.
                             Work through each section below — paste screenshots (Ctrl+V / Cmd+V) and fill in key data.
+                            Or use the <strong>GBP Extract bookmarklet</strong> to auto-import.
                         </div>
 
                         <div id="sections-container"></div>
