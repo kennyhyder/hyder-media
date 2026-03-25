@@ -49,8 +49,7 @@
                         <div class="setup-step-num">1</div>
                         <div>
                             <strong>Drag this to your bookmarks bar:</strong><br>
-                            <a class="bookmarklet-link"
-                               href="javascript:void((function(){var s=document.createElement('script');s.src='https://hyder.me/clients/dunham/gbp-extract.js?v='+Date.now();document.body.appendChild(s);})())"
+                            <a class="bookmarklet-link" id="bookmarklet-drag"
                                onclick="event.preventDefault();alert('Drag this link to your bookmarks bar — don\'t click it!');">
                                 GBP Extract
                             </a>
@@ -60,7 +59,7 @@
                     <div class="setup-step">
                         <div class="setup-step-num">2</div>
                         <div>
-                            <strong>Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a></strong> and open a location's "Edit profile"
+                            <strong>Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a></strong> and click the pencil icon to edit a location
                         </div>
                     </div>
                     <div class="setup-step">
@@ -69,8 +68,8 @@
                             <strong>Click the "GBP Extract" bookmark.</strong> A toolbar appears with options:
                             <ul class="setup-options">
                                 <li><strong>Send to Hyder Media</strong> — extracts text data and saves it here automatically</li>
-                                <li><strong>Copy All Text</strong> — copies the extracted text to your clipboard</li>
-                                <li><strong>Fix Scroll for Screenshot</strong> — expands the panel so you can take a full screenshot</li>
+                                <li><strong>Copy All Text</strong> — copies the panel text to your clipboard</li>
+                                <li><strong>Fix Scroll</strong> — expands the panel so you can take a full screenshot</li>
                             </ul>
                         </div>
                     </div>
@@ -81,6 +80,19 @@
                         </div>
                     </div>
                 </div>
+
+                <hr style="border-color: var(--border); margin: 20px 0;">
+                <details>
+                    <summary style="cursor:pointer;color:var(--text-secondary);font-size:0.85rem;"><strong>Alternative: Console paste method</strong></summary>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin:8px 0;">If the bookmarklet doesn't work, you can paste the script directly into the browser console:</p>
+                    <ol style="font-size:0.85rem;color:var(--text-secondary);padding-left:20px;margin-bottom:12px;">
+                        <li>On business.google.com, press <strong>F12</strong> (or Cmd+Option+J on Mac) to open DevTools</li>
+                        <li>Click the <strong>Console</strong> tab</li>
+                        <li>Click the button below to copy the script, then paste it in the console and press Enter</li>
+                    </ol>
+                    <button class="btn btn-secondary btn-sm" onclick="copyConsoleScript()">Copy Script to Clipboard</button>
+                    <span id="copy-status" style="margin-left:8px;font-size:0.8rem;"></span>
+                </details>
             </div>
         </div>
 
@@ -769,6 +781,44 @@
         const div = document.createElement('div');
         div.textContent = String(str);
         return div.innerHTML;
+    }
+
+    // ─── Bookmarklet / Console Script ───
+    // The full extraction script that runs on business.google.com
+    const GBP_SCRIPT = `(function(){
+if(!location.hostname.includes('business.google.com')){alert('Navigate to business.google.com first');return}
+if(document.getElementById('gx')){alert('GBP Extract is already running');return}
+function fp(){var a=document.querySelectorAll('*'),r=[];for(var i=0;i<a.length;i++){var s=getComputedStyle(a[i]),oy=s.overflowY;if((oy==='auto'||oy==='scroll')&&a[i].scrollHeight>a[i].clientHeight+50&&a[i].clientHeight>150&&a[i].clientWidth>250){var t=a[i].textContent||'';if(t.includes('Business name')||t.includes('category')||t.includes('Description')||t.includes('Phone')||t.includes('Hours')||t.includes('Website'))return a[i];r.push(a[i]);}}return r[0]||null}
+function fr(){var p=document.querySelector('[role="dialog"]');if(p)return p;var s=fp();return s?(s.parentElement||s):null}
+function ext(){var p=fr();if(!p){alert('Open a location\\'s edit panel first (click the pencil icon).');return null}return p.innerText||''}
+var d=document.createElement('div');d.id='gx';
+d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:999999;background:#1e293b;border:1px solid #475569;border-radius:12px;padding:16px;font-family:system-ui;color:#f1f5f9;box-shadow:0 8px 32px rgba(0,0,0,.4);width:270px;font-size:13px;line-height:1.4';
+function mb(l,desc,fn){var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px;margin-bottom:6px;border-radius:6px;border:1px solid #475569;background:#334155;color:#f1f5f9;cursor:pointer;font-size:13px;font-weight:600;text-align:left';b.innerHTML=l+'<br><small style=\"font-weight:400;color:#94a3b8;font-size:11px\">'+desc+'</small>';b.onclick=fn;d.appendChild(b)}
+d.innerHTML='<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:12px\"><b style=\"color:#3b82f6;font-size:14px\">GBP Extract</b><button onclick=\"document.getElementById(\\'gx\\').remove()\" style=\"background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:0 4px\">\\u00d7</button></div>';
+mb('Send to Hyder Media','Extract data & save to capture tool',async function(){
+var text=ext();if(!text)return;
+var name='Unknown';var m=text.match(/Business name\\n(.+)/i);if(m)name=m[1].trim();
+var data={info:{screenshots:[]},description:{screenshots:[]},hours:{hours:[],screenshots:[]},_raw:{raw_text:text,extracted_at:new Date().toISOString()}};
+var px={address:[/(?:Business location|Address)\\n([^\\n]+)/i,'info'],phone:[/(?:Primary phone|Phone number|Phone)\\n([^\\n]+)/i,'info'],website:[/Website\\n([^\\n]+)/i,'info'],categories:[/Business category\\n([\\s\\S]*?)(?=\\nDescription|\\n\\n)/i,'info'],text:[/Description\\n([\\s\\S]*?)(?=\\nOpening|\\nService|\\nBusiness location|$)/i,'description']};
+for(var k in px){var pp=px[k];var mm=text.match(pp[0]);if(mm)data[pp[1]][k]=mm[1].trim()}
+this.textContent='Sending...';this.disabled=true;
+try{var r=await fetch('https://hyder.me/api/gbp/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_key:'dunham',location_name:name,data:data})});var j=await r.json();if(j.error)throw new Error(j.error);alert('Saved \"'+name+'\"! View at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
+this.textContent='Send to Hyder Media';this.disabled=false});
+mb('Copy All Text','Copy panel text to clipboard',function(){var t=ext();if(!t)return;navigator.clipboard.writeText(t).then(function(){alert('Copied to clipboard!')}).catch(function(){prompt('Copy this text:',t)})});
+var hr=document.createElement('hr');hr.style.cssText='border:none;border-top:1px solid #475569;margin:10px 0';d.appendChild(hr);
+mb('Fix Scroll for Screenshot','Expand panel to full height',function(){var p=fp();if(!p){alert('Open a location first');return}var el=p;for(var i=0;i<10&&el;i++){el.style.overflow='visible';el.style.overflowY='visible';el.style.maxHeight='none';el.style.height='auto';if(el.getAttribute&&el.getAttribute('role')==='dialog')break;el=el.parentElement}alert('Panel expanded! You can now take a full screenshot.')});
+document.body.appendChild(d)})()`;
+
+    // Set the bookmarklet href (inline all code)
+    document.getElementById('bookmarklet-drag').href = 'javascript:' + encodeURIComponent(GBP_SCRIPT);
+
+    function copyConsoleScript() {
+        navigator.clipboard.writeText(GBP_SCRIPT).then(() => {
+            const el = document.getElementById('copy-status');
+            el.textContent = 'Copied!';
+            el.style.color = 'var(--success)';
+            setTimeout(() => el.textContent = '', 3000);
+        });
     }
 
     // ─── Init ───
