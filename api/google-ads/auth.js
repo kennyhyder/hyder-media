@@ -30,7 +30,7 @@ export default function handler(req, res) {
     authUrl.searchParams.set('client_id', clientId);
     authUrl.searchParams.set('redirect_uri', redirectUri);
     authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('scope', 'https://www.googleapis.com/auth/adwords email profile');
+    authUrl.searchParams.set('scope', 'https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/business.manage email profile');
     authUrl.searchParams.set('access_type', 'offline');
     authUrl.searchParams.set('prompt', 'consent');
 

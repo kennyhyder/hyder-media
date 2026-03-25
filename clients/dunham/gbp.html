@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunham & Jones — Google Business Profile Export</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="gbp.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham & Jones GBP Export
+        </a>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn btn-secondary">Ad Copy Audit</a>
+            <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
+            <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Google Business Profile Export</h1>
+            <p class="subtitle">Complete export of business information, reviews, and media</p>
+            <div class="report-meta">
+                <span id="report-date">Generated: —</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="stats-row" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Locations</div>
+                <div class="stat-value" id="stat-locations">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Rating</div>
+                <div class="stat-value" id="stat-rating">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Reviews</div>
+                <div class="stat-value" id="stat-reviews">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Photos</div>
+                <div class="stat-value" id="stat-photos">0</div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading-state">
+            <div class="spinner"></div>
+            <div>Loading business profile data...</div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-state" id="error-state" style="display: none;">
+            <h2>Failed to Load Data</h2>
+            <p id="error-message"></p>
+            <p id="error-hint" style="margin-bottom: 20px; font-size: 0.85rem;"></p>
+            <button class="btn btn-primary" onclick="loadData()">Retry</button>
+            <a href="/api/google-ads/auth?returnUrl=/clients/dunham/gbp" class="btn btn-secondary" style="margin-left: 8px;">Re-authorize</a>
+        </div>
+
+        <!-- Report Content -->
+        <div id="report-content" style="display: none;"></div>
+    </div>
+
+    <div class="footer">
+        Prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a>
+    </div>
+
+    <script>
+        const API_URL = '/api/gbp/export';
+
+        async function loadData() {
+            const loadingEl = document.getElementById('loading-state');
+            const errorEl = document.getElementById('error-state');
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+
+            loadingEl.style.display = 'flex';
+            errorEl.style.display = 'none';
+            contentEl.style.display = 'none';
+            statsEl.style.display = 'none';
+
+            try {
+                const resp = await fetch(API_URL);
+                const data = await resp.json();
+
+                if (!resp.ok || data.error) {
+                    const msg = data.details
+                        ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
+                        : (data.error || `HTTP ${resp.status}`);
+                    const hint = data.hint || '';
+                    throw { message: msg, hint };
+                }
+
+                loadingEl.style.display = 'none';
+                renderReport(data);
+
+            } catch (err) {
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+                document.getElementById('error-message').textContent = err.message || String(err);
+                document.getElementById('error-hint').textContent = err.hint || '';
+            }
+        }
+
+        function renderReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+
+            // Update date
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            // Count totals
+            const locations = data.locations || [];
+            let totalReviews = 0, totalPhotos = 0, avgRating = null;
+            for (const loc of locations) {
+                totalReviews += (loc.reviews || []).length;
+                totalPhotos += (loc.media || []).length;
+                if (loc.averageRating) avgRating = loc.averageRating;
+            }
+
+            document.getElementById('stat-locations').textContent = locations.length;
+            document.getElementById('stat-rating').textContent = avgRating ? avgRating.toFixed(1) : '—';
+            document.getElementById('stat-reviews').textContent = totalReviews || (locations[0]?.totalReviewCount || 0);
+            document.getElementById('stat-photos').textContent = totalPhotos;
+            statsEl.style.display = 'flex';
+
+            let html = '';
+
+            if (locations.length === 0) {
+                html = `<div class="error-state"><h2>No Locations Found</h2><p>No business locations are associated with this account.</p></div>`;
+            }
+
+            for (const loc of locations) {
+                html += renderLocation(loc);
+            }
+
+            // Show API errors if any
+            if (data.errors && data.errors.length > 0) {
+                html += `<div class="gbp-section" style="margin-top: 24px;">
+                    <div class="gbp-section-title" style="color: var(--warning);">API Warnings</div>
+                    <ul style="padding-left: 20px; color: var(--text-secondary); font-size: 0.85rem;">`;
+                for (const err of data.errors) {
+                    html += `<li>${esc(err.account || '')}: ${esc(err.error)}</li>`;
+                }
+                html += `</ul></div>`;
+            }
+
+            contentEl.innerHTML = html;
+            contentEl.style.display = 'block';
+        }
+
+        function renderLocation(loc) {
+            let html = `<div class="campaign-section">`;
+
+            // Header
+            html += `<div class="campaign-header">
+                <div class="campaign-name">${esc(loc.title || 'Unnamed Location')}</div>
+                <span class="badge ${loc.openStatus === 'OPEN' ? 'badge-enabled' : 'badge-paused'}">${esc(loc.openStatus || 'UNKNOWN')}</span>
+            </div>`;
+
+            html += `<div class="campaign-body">`;
+
+            // Business Info
+            html += `<div class="gbp-info-section">`;
+            html += `<div class="gbp-section-title">Business Information</div>`;
+            html += `<div class="gbp-info-grid">`;
+
+            // Address
+            const addrParts = [];
+            if (loc.address.lines.length > 0) addrParts.push(loc.address.lines.join(', '));
+            if (loc.address.locality) addrParts.push(loc.address.locality);
+            if (loc.address.state) addrParts.push(loc.address.state);
+            if (loc.address.postalCode) addrParts.push(loc.address.postalCode);
+            if (addrParts.length > 0) {
+                html += renderInfoRow('Address', addrParts.join(', '));
+            }
+
+            // Phone
+            if (loc.phone) {
+                html += renderInfoRow('Phone', loc.phone);
+            }
+            if (loc.additionalPhones && loc.additionalPhones.length > 0) {
+                html += renderInfoRow('Additional Phones', loc.additionalPhones.join(', '));
+            }
+
+            // Website
+            if (loc.website) {
+                html += renderInfoRow('Website', `<a href="${esc(loc.website)}" target="_blank" style="color: var(--accent);">${esc(loc.website)}</a>`);
+            }
+
+            // Categories
+            if (loc.primaryCategory) {
+                const cats = [loc.primaryCategory.name];
+                if (loc.additionalCategories) {
+                    cats.push(...loc.additionalCategories.map(c => c.name));
+                }
+                html += renderInfoRow('Categories', cats.join(', '));
+            }
+
+            // Maps link
+            if (loc.mapsUri) {
+                html += renderInfoRow('Google Maps', `<a href="${esc(loc.mapsUri)}" target="_blank" style="color: var(--accent);">View on Maps</a>`);
+            }
+
+            // Labels
+            if (loc.labels && loc.labels.length > 0) {
+                html += renderInfoRow('Labels', loc.labels.join(', '));
+            }
+
+            // Opening date
+            if (loc.openDate) {
+                const d = loc.openDate;
+                html += renderInfoRow('Opening Date', `${d.month || ''}/${d.day || ''}/${d.year || ''}`);
+            }
+
+            // Account info
+            html += renderInfoRow('Account', `${esc(loc.accountName || '')} (${esc(loc.accountRole || '')})`);
+
+            html += `</div></div>`;
+
+            // Description
+            if (loc.description) {
+                html += `<div class="gbp-info-section">`;
+                html += `<div class="gbp-section-title">Business Description</div>`;
+                html += `<div class="gbp-description">${esc(loc.description)}</div>`;
+                html += `</div>`;
+            }
+
+            // Hours
+            if (loc.regularHours && loc.regularHours.length > 0) {
+                html += `<div class="gbp-info-section">`;
+                html += `<div class="gbp-section-title">Hours of Operation</div>`;
+                html += `<div class="gbp-hours-grid">`;
+                const dayOrder = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+                const hoursByDay = {};
+                for (const h of loc.regularHours) {
+                    hoursByDay[h.day] = h;
+                }
+                for (const day of dayOrder) {
+                    const h = hoursByDay[day];
+                    if (h) {
+                        html += `<div class="gbp-hours-row">
+                            <span class="gbp-hours-day">${day.charAt(0) + day.slice(1).toLowerCase()}</span>
+                            <span class="gbp-hours-time">${formatTime(h.open)} – ${formatTime(h.close)}</span>
+                        </div>`;
+                    } else {
+                        html += `<div class="gbp-hours-row">
+                            <span class="gbp-hours-day">${day.charAt(0) + day.slice(1).toLowerCase()}</span>
+                            <span class="gbp-hours-time gbp-closed">Closed</span>
+                        </div>`;
+                    }
+                }
+                html += `</div></div>`;
+            }
+
+            // Special Hours
+            if (loc.specialHours && loc.specialHours.length > 0) {
+                html += `<div class="gbp-info-section">`;
+                html += `<div class="gbp-section-title">Special Hours</div>`;
+                for (const sh of loc.specialHours) {
+                    const date = sh.startDate ? `${sh.startDate.month}/${sh.startDate.day}/${sh.startDate.year}` : 'Unknown';
+                    const status = sh.closed ? 'Closed' : `${formatTime(sh.openTime)} – ${formatTime(sh.closeTime)}`;
+                    html += `<div class="gbp-hours-row">
+                        <span class="gbp-hours-day">${date}</span>
+                        <span class="gbp-hours-time ${sh.closed ? 'gbp-closed' : ''}">${status}</span>
+                    </div>`;
+                }
+                html += `</div>`;
+            }
+
+            // More Hours (additional hour types)
+            if (loc.moreHours && loc.moreHours.length > 0) {
+                for (const mh of loc.moreHours) {
+                    html += `<div class="gbp-info-section">`;
+                    html += `<div class="gbp-section-title">${esc(mh.hoursTypeId || 'Additional Hours')}</div>`;
+                    if (mh.periods) {
+                        for (const p of mh.periods) {
+                            html += `<div class="gbp-hours-row">
+                                <span class="gbp-hours-day">${(p.openDay || '').charAt(0) + (p.openDay || '').slice(1).toLowerCase()}</span>
+                                <span class="gbp-hours-time">${formatTimeObj(p.openTime)} – ${formatTimeObj(p.closeTime)}</span>
+                            </div>`;
+                        }
+                    }
+                    html += `</div>`;
+                }
+            }
+
+            // Service Area
+            if (loc.serviceArea) {
+                html += `<div class="gbp-info-section">`;
+                html += `<div class="gbp-section-title">Service Area</div>`;
+                html += `<div class="gbp-description">${esc(JSON.stringify(loc.serviceArea, null, 2))}</div>`;
+                html += `</div>`;
+            }
+
+            // Reviews
+            html += renderReviews(loc);
+
+            // Media/Photos
+            html += renderMedia(loc);
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderReviews(loc) {
+            let html = `<div class="gbp-info-section">`;
+            html += `<div class="gbp-section-title">Reviews`;
+            if (loc.totalReviewCount) {
+                html += ` (${loc.totalReviewCount} total`;
+                if (loc.averageRating) html += `, ${loc.averageRating.toFixed(1)} avg`;
+                html += `)`;
+            }
+            html += `</div>`;
+
+            if (!loc.reviews || loc.reviews.length === 0) {
+                html += `<div class="gbp-empty">No reviews loaded. The reviews API may require additional authorization.</div>`;
+                html += `</div>`;
+                return html;
+            }
+
+            for (const review of loc.reviews) {
+                html += `<div class="gbp-review-card">`;
+
+                // Reviewer info + stars
+                html += `<div class="gbp-review-header">`;
+                if (review.reviewer) {
+                    html += `<span class="gbp-reviewer-name">${esc(review.reviewer.displayName || 'Anonymous')}</span>`;
+                }
+                html += `<span class="gbp-review-stars">${renderStars(review.starRating)}</span>`;
+                if (review.createTime) {
+                    html += `<span class="gbp-review-date">${formatDate(review.createTime)}</span>`;
+                }
+                html += `</div>`;
+
+                // Comment
+                if (review.comment) {
+                    html += `<div class="gbp-review-comment">${esc(review.comment)}</div>`;
+                }
+
+                // Reply
+                if (review.reply) {
+                    html += `<div class="gbp-review-reply">`;
+                    html += `<div class="gbp-reply-label">Response from owner${review.reply.updateTime ? ' — ' + formatDate(review.reply.updateTime) : ''}</div>`;
+                    html += `<div class="gbp-reply-text">${esc(review.reply.comment)}</div>`;
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderMedia(loc) {
+            if (!loc.media || loc.media.length === 0) {
+                return `<div class="gbp-info-section">
+                    <div class="gbp-section-title">Photos & Media</div>
+                    <div class="gbp-empty">No media loaded. The media API may require additional authorization.</div>
+                </div>`;
+            }
+
+            let html = `<div class="gbp-info-section">`;
+            html += `<div class="gbp-section-title">Photos & Media (${loc.media.length})</div>`;
+            html += `<div class="gbp-media-grid">`;
+
+            for (const m of loc.media) {
+                const url = m.googleUrl || m.thumbnailUrl || '';
+                if (!url) continue;
+
+                html += `<div class="gbp-media-card">`;
+                html += `<img src="${esc(url)}" alt="${esc(m.description || 'Business photo')}" loading="lazy">`;
+                if (m.description) {
+                    html += `<div class="gbp-media-desc">${esc(m.description)}</div>`;
+                }
+                if (m.locationAssociation) {
+                    const category = m.locationAssociation.category || '';
+                    if (category) {
+                        html += `<div class="gbp-media-category">${esc(category.replace(/_/g, ' '))}</div>`;
+                    }
+                }
+                html += `</div>`;
+            }
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderInfoRow(label, value) {
+            return `<div class="gbp-info-row">
+                <div class="gbp-info-label">${esc(label)}</div>
+                <div class="gbp-info-value">${value}</div>
+            </div>`;
+        }
+
+        function renderStars(rating) {
+            const ratingMap = { 'ONE': 1, 'TWO': 2, 'THREE': 3, 'FOUR': 4, 'FIVE': 5 };
+            const num = ratingMap[rating] || 0;
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += i < num ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
+            }
+            return stars;
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            const parts = timeStr.split(':');
+            let h = parseInt(parts[0]);
+            const m = parts[1] || '00';
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            if (h > 12) h -= 12;
+            if (h === 0) h = 12;
+            return `${h}:${m} ${ampm}`;
+        }
+
+        function formatTimeObj(timeObj) {
+            if (!timeObj) return '';
+            const h = timeObj.hours || 0;
+            const m = String(timeObj.minutes || 0).padStart(2, '0');
+            return formatTime(`${h}:${m}`);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Load on page ready
+        loadData();
+    </script>
+</body>
+</html>

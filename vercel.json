@@ -124,6 +124,9 @@
     },
     "api/google-ads/dunham-ads.js": {
       "maxDuration": 30
+    },
+    "api/gbp/export.js": {
+      "maxDuration": 60
     }
   }
 }
