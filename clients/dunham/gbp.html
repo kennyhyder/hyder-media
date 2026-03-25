@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunham & Jones — Google Business Profile Export</title>
+    <title>Dunham & Jones — GBP Capture Tool</title>
     <link rel="icon" href="../../favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -19,155 +19,77 @@
     <nav class="main-nav">
         <a href="gbp.html" class="nav-brand">
             <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
-            Dunham & Jones GBP Export
+            Dunham & Jones GBP Capture
         </a>
         <div class="nav-actions">
             <a href="dashboard.html" class="btn btn-secondary">Ad Copy Audit</a>
-            <button class="btn btn-secondary" id="btn-toggle-mode">Edit Mode</button>
-            <button class="btn btn-primary" id="btn-print" onclick="window.print()">Print Report</button>
+            <button class="btn btn-secondary" id="btn-toggle-mode">Print View</button>
+            <button class="btn btn-primary" id="btn-print" style="display:none;" onclick="window.print()">Print Report</button>
         </div>
     </nav>
 
     <div class="container">
-        <div class="report-header">
-            <h1>Google Business Profile Export</h1>
-            <p class="subtitle">Complete export of business information, reviews, and media</p>
-            <div class="report-meta">
-                <span id="report-date">Generated: —</span>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-row" id="stats-row" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-label">Locations</div>
-                <div class="stat-value" id="stat-locations">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg Rating</div>
-                <div class="stat-value" id="stat-rating">—</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Reviews</div>
-                <div class="stat-value" id="stat-reviews">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Photos</div>
-                <div class="stat-value" id="stat-photos">0</div>
-            </div>
-        </div>
-
         <!-- Loading -->
         <div class="loading" id="loading-state">
             <div class="spinner"></div>
             <div>Loading locations...</div>
         </div>
 
-        <!-- View Mode Content -->
-        <div id="view-content" style="display: none;"></div>
+        <!-- ===== CAPTURE MODE ===== -->
+        <div id="capture-mode" style="display:none;">
+            <div class="capture-layout">
+                <!-- Location sidebar -->
+                <div class="capture-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Locations</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="addLocation()">+ Add</button>
+                    </div>
+                    <div id="location-list"></div>
+                </div>
 
-        <!-- Edit Mode Content -->
-        <div id="edit-content" style="display: none;">
-            <div class="gbp-form">
-                <!-- Location selector -->
-                <div class="gbp-form-group">
-                    <label>Location</label>
-                    <div style="display: flex; gap: 8px;">
-                        <select id="location-selector" style="flex: 1;">
-                            <option value="__new__">+ Add New Location</option>
-                        </select>
-                        <button class="btn btn-danger btn-sm" id="btn-delete-location" style="display: none;">Delete</button>
+                <!-- Main capture area -->
+                <div class="capture-main">
+                    <!-- No location selected -->
+                    <div id="no-location" class="empty-prompt">
+                        <h2>Select a location to begin capturing</h2>
+                        <p>Choose a location from the sidebar, or add a new one to get started.</p>
+                    </div>
+
+                    <!-- Location capture -->
+                    <div id="location-capture" style="display:none;">
+                        <div class="capture-header">
+                            <h2 id="capture-location-name"></h2>
+                            <div class="capture-header-actions">
+                                <span id="capture-progress" class="capture-progress-badge"></span>
+                                <button class="btn btn-primary btn-sm" onclick="saveCurrentLocation()">Save</button>
+                                <button class="btn btn-danger btn-xs" onclick="deleteCurrentLocation()">Delete</button>
+                            </div>
+                        </div>
+                        <div id="save-status" class="save-status"></div>
+
+                        <div class="capture-instructions-banner">
+                            <strong>How to use:</strong> Open this location in your
+                            <a href="https://business.google.com/" target="_blank">Google Business Profile dashboard</a>.
+                            Work through each section below — paste screenshots (Ctrl+V / Cmd+V) and fill in key data.
+                        </div>
+
+                        <div id="sections-container"></div>
                     </div>
                 </div>
-
-                <hr style="border-color: var(--border); margin: 20px 0;">
-
-                <!-- Basic Info -->
-                <h3 class="gbp-form-section-title">Basic Information</h3>
-                <div class="gbp-form-group">
-                    <label for="f-name">Location Name *</label>
-                    <input type="text" id="f-name" placeholder="e.g. Dunham & Jones — San Antonio">
-                </div>
-                <div class="gbp-form-row">
-                    <div class="gbp-form-group" style="flex: 2;">
-                        <label for="f-address">Address</label>
-                        <input type="text" id="f-address" placeholder="123 Main St, San Antonio, TX 78201">
-                    </div>
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label for="f-phone">Phone</label>
-                        <input type="text" id="f-phone" placeholder="(210) 555-1234">
-                    </div>
-                </div>
-                <div class="gbp-form-row">
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label for="f-website">Website</label>
-                        <input type="text" id="f-website" placeholder="https://dunhamjones.com">
-                    </div>
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label for="f-categories">Categories</label>
-                        <input type="text" id="f-categories" placeholder="Criminal Defense Attorney, DWI Attorney">
-                    </div>
-                </div>
-                <div class="gbp-form-group">
-                    <label for="f-maps-url">Google Maps URL</label>
-                    <input type="text" id="f-maps-url" placeholder="https://maps.google.com/...">
-                </div>
-
-                <!-- Description -->
-                <h3 class="gbp-form-section-title">Description</h3>
-                <div class="gbp-form-group">
-                    <textarea id="f-description" rows="4" placeholder="Full business description..."></textarea>
-                </div>
-
-                <!-- Hours -->
-                <h3 class="gbp-form-section-title">Hours of Operation</h3>
-                <div id="hours-grid" class="gbp-hours-edit-grid"></div>
-
-                <!-- Services / Attributes -->
-                <h3 class="gbp-form-section-title">Services</h3>
-                <div class="gbp-form-group">
-                    <textarea id="f-services" rows="3" placeholder="List services offered..."></textarea>
-                </div>
-
-                <h3 class="gbp-form-section-title">Attributes</h3>
-                <div class="gbp-form-group">
-                    <textarea id="f-attributes" rows="3" placeholder="Wheelchair accessible, Free parking, etc."></textarea>
-                </div>
-
-                <!-- Reviews -->
-                <h3 class="gbp-form-section-title">
-                    Reviews
-                    <button class="btn btn-secondary btn-sm" onclick="addReview()">+ Add Review</button>
-                </h3>
-                <div id="reviews-container"></div>
-
-                <!-- Photos -->
-                <h3 class="gbp-form-section-title">
-                    Photos
-                    <button class="btn btn-secondary btn-sm" onclick="addPhoto()">+ Add Photo</button>
-                </h3>
-                <div id="photos-container"></div>
-
-                <!-- Notes -->
-                <h3 class="gbp-form-section-title">Internal Notes</h3>
-                <div class="gbp-form-group">
-                    <textarea id="f-notes" rows="3" placeholder="Internal notes (not shown in print)..."></textarea>
-                </div>
-
-                <!-- Save -->
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <button class="btn btn-primary" id="btn-save" onclick="saveLocation()">Save Location</button>
-                    <button class="btn btn-secondary" id="btn-done-editing">Done Editing</button>
-                </div>
-                <div id="save-status" style="margin-top: 12px; font-size: 0.85rem;"></div>
             </div>
         </div>
 
-        <!-- Empty state -->
-        <div id="empty-state" style="display: none; text-align: center; padding: 60px 20px;">
-            <h2 style="color: var(--text-secondary); margin-bottom: 12px;">No Locations Yet</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">Switch to Edit Mode to add your first location.</p>
-            <button class="btn btn-primary" onclick="switchToEdit()">Start Adding Locations</button>
+        <!-- ===== PRINT / VIEW MODE ===== -->
+        <div id="print-mode" style="display:none;">
+            <div class="report-header">
+                <h1>Google Business Profile Audit</h1>
+                <p class="subtitle">Dunham & Jones — All Locations</p>
+                <div class="report-meta">
+                    <span id="report-date"></span>
+                    <span id="report-stat"></span>
+                </div>
+            </div>
+            <div id="print-content"></div>
         </div>
     </div>
 
@@ -176,527 +98,624 @@
     </div>
 
     <script>
-        const API_URL = '/api/gbp/locations';
-        let locations = [];
-        let currentMode = 'view';
-        let currentLocationId = null;
-
-        // ─── Mode Toggle ───
-        const btnToggle = document.getElementById('btn-toggle-mode');
-        const btnDone = document.getElementById('btn-done-editing');
-        const btnPrint = document.getElementById('btn-print');
-
-        btnToggle.addEventListener('click', () => {
-            if (currentMode === 'view') switchToEdit();
-            else switchToView();
-        });
-
-        btnDone.addEventListener('click', () => switchToView());
-
-        function switchToEdit() {
-            currentMode = 'edit';
-            btnToggle.textContent = 'View Mode';
-            btnPrint.style.display = 'none';
-            document.getElementById('view-content').style.display = 'none';
-            document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('edit-content').style.display = 'block';
-            populateSelector();
-            loadLocationIntoForm(currentLocationId);
+    // ─── Config ───
+    const API_URL = '/api/gbp/locations';
+    const SECTIONS = [
+        {
+            id: 'info',
+            title: 'Business Information',
+            icon: 'ℹ️',
+            instruction: 'Go to <strong>Edit profile → Business information</strong>. Copy address, phone, website, and categories.',
+            fields: [
+                { id: 'address', label: 'Address', type: 'text' },
+                { id: 'phone', label: 'Phone', type: 'text' },
+                { id: 'website', label: 'Website', type: 'text' },
+                { id: 'categories', label: 'Categories', type: 'text', placeholder: 'Primary, Additional 1, Additional 2...' },
+                { id: 'maps_url', label: 'Google Maps URL', type: 'text', placeholder: 'Search the business on Google Maps → copy URL' }
+            ]
+        },
+        {
+            id: 'description',
+            title: 'Business Description',
+            icon: '📝',
+            instruction: 'Go to <strong>Edit profile → Description</strong>. Copy the full "From the business" text.',
+            fields: [
+                { id: 'text', label: 'Description', type: 'textarea', rows: 4 }
+            ]
+        },
+        {
+            id: 'hours',
+            title: 'Hours of Operation',
+            icon: '🕐',
+            instruction: 'Go to <strong>Edit profile → Hours</strong>. Enter regular business hours below.',
+            fields: 'hours'
+        },
+        {
+            id: 'services',
+            title: 'Services',
+            icon: '⚙️',
+            instruction: 'Go to <strong>Edit profile → Services</strong>. List all service categories and items.',
+            fields: [
+                { id: 'text', label: 'Services', type: 'textarea', rows: 4, placeholder: 'e.g. Criminal Defense: DWI Defense, Drug Charges, Assault...' }
+            ]
+        },
+        {
+            id: 'attributes',
+            title: 'Attributes',
+            icon: '🏷️',
+            instruction: 'Go to <strong>Edit profile → More</strong>. Capture all attributes (accessibility, amenities, etc.).',
+            fields: [
+                { id: 'text', label: 'Attributes', type: 'textarea', rows: 3, placeholder: 'e.g. Wheelchair accessible, Free parking, Online appointments...' }
+            ]
+        },
+        {
+            id: 'reviews',
+            title: 'Reviews',
+            icon: '⭐',
+            instruction: 'Go to the <strong>Reviews</strong> tab. Capture total count, average rating, and notable reviews. Screenshot the reviews list.',
+            fields: [
+                { id: 'total_count', label: 'Total Review Count', type: 'text', placeholder: 'e.g. 847' },
+                { id: 'avg_rating', label: 'Average Rating', type: 'text', placeholder: 'e.g. 4.9' },
+                { id: 'notes', label: 'Review Notes', type: 'textarea', rows: 3, placeholder: 'Notable reviews, common themes, issues...' }
+            ]
+        },
+        {
+            id: 'photos',
+            title: 'Photos & Media',
+            icon: '📷',
+            instruction: 'Go to the <strong>Photos</strong> tab. Screenshot the photo grid. Note total counts by category (by owner, by customer).',
+            fields: [
+                { id: 'owner_count', label: 'Owner Photos', type: 'text', placeholder: 'e.g. 24' },
+                { id: 'customer_count', label: 'Customer Photos', type: 'text', placeholder: 'e.g. 58' },
+                { id: 'notes', label: 'Photo Notes', type: 'textarea', rows: 2, placeholder: 'Cover photo description, logo, categories...' }
+            ]
+        },
+        {
+            id: 'posts',
+            title: 'Google Posts',
+            icon: '📢',
+            instruction: 'Go to <strong>Add update</strong> or check existing posts. Capture recent posts and their performance.',
+            fields: [
+                { id: 'text', label: 'Recent Posts', type: 'textarea', rows: 3, placeholder: 'List recent posts with dates and engagement...' }
+            ]
+        },
+        {
+            id: 'performance',
+            title: 'Performance / Insights',
+            icon: '📊',
+            instruction: 'Go to the <strong>Performance</strong> tab. Screenshot the overview charts. Note key metrics.',
+            fields: [
+                { id: 'views', label: 'Business Profile Views (last 28 days)', type: 'text' },
+                { id: 'searches', label: 'Searches (last 28 days)', type: 'text' },
+                { id: 'direction_requests', label: 'Direction Requests', type: 'text' },
+                { id: 'calls', label: 'Phone Calls', type: 'text' },
+                { id: 'website_clicks', label: 'Website Clicks', type: 'text' },
+                { id: 'notes', label: 'Insights Notes', type: 'textarea', rows: 2 }
+            ]
+        },
+        {
+            id: 'qa',
+            title: 'Questions & Answers',
+            icon: '❓',
+            instruction: 'Search for the business on Google and check the <strong>Questions & answers</strong> section on the listing.',
+            fields: [
+                { id: 'text', label: 'Q&A Content', type: 'textarea', rows: 3, placeholder: 'Copy any questions and answers from the public listing...' }
+            ]
         }
+    ];
 
-        function switchToView() {
-            currentMode = 'view';
-            btnToggle.textContent = 'Edit Mode';
+    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+    // ─── State ───
+    let locations = [];
+    let currentLocationId = null;
+    let currentMode = 'capture';
+    let unsavedChanges = false;
+    let activePasteSection = null;
+
+    // ─── Mode Toggle ───
+    const btnToggle = document.getElementById('btn-toggle-mode');
+    const btnPrint = document.getElementById('btn-print');
+
+    btnToggle.addEventListener('click', () => {
+        if (currentMode === 'capture') {
+            if (unsavedChanges && !confirm('You have unsaved changes. Switch to Print View anyway?')) return;
+            currentMode = 'print';
+            btnToggle.textContent = 'Capture Mode';
             btnPrint.style.display = '';
-            document.getElementById('edit-content').style.display = 'none';
-            renderViewMode();
+            document.getElementById('capture-mode').style.display = 'none';
+            renderPrintView();
+            document.getElementById('print-mode').style.display = 'block';
+        } else {
+            currentMode = 'capture';
+            btnToggle.textContent = 'Print View';
+            btnPrint.style.display = 'none';
+            document.getElementById('print-mode').style.display = 'none';
+            document.getElementById('capture-mode').style.display = 'block';
         }
+    });
 
-        // ─── Data Loading ───
-        async function loadData() {
-            const loadingEl = document.getElementById('loading-state');
-            loadingEl.style.display = 'flex';
-            document.getElementById('view-content').style.display = 'none';
-            document.getElementById('edit-content').style.display = 'none';
-            document.getElementById('empty-state').style.display = 'none';
-
-            try {
-                const resp = await fetch(`${API_URL}?client=dunham`);
-                const json = await resp.json();
-                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
-                locations = json.locations || [];
-            } catch (err) {
-                console.error('Load error:', err);
-                locations = [];
-            }
-
-            loadingEl.style.display = 'none';
-            document.getElementById('report-date').textContent =
-                'Generated: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-            if (currentMode === 'view') renderViewMode();
-            else { populateSelector(); loadLocationIntoForm(currentLocationId); }
+    // ─── Data Loading ───
+    async function loadData() {
+        document.getElementById('loading-state').style.display = 'flex';
+        try {
+            const resp = await fetch(`${API_URL}?client=dunham`);
+            const json = await resp.json();
+            if (!resp.ok || json.error) throw new Error(json.error);
+            locations = json.locations || [];
+        } catch (err) {
+            console.error('Load error:', err);
+            locations = [];
         }
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('capture-mode').style.display = currentMode === 'capture' ? 'block' : 'none';
+        document.getElementById('print-mode').style.display = currentMode === 'print' ? 'block' : 'none';
+        renderLocationList();
+        if (currentLocationId) loadLocationCapture(currentLocationId);
+    }
 
-        // ─── View Mode ───
-        function renderViewMode() {
-            const contentEl = document.getElementById('view-content');
-            const statsEl = document.getElementById('stats-row');
-            const emptyEl = document.getElementById('empty-state');
-
-            if (locations.length === 0) {
-                contentEl.style.display = 'none';
-                statsEl.style.display = 'none';
-                emptyEl.style.display = 'block';
-                return;
-            }
-
-            emptyEl.style.display = 'none';
-
-            // Stats
-            let totalReviews = 0, totalPhotos = 0, ratingSum = 0, ratingCount = 0;
-            for (const loc of locations) {
-                const d = loc.data || {};
-                const reviews = d.reviews || [];
-                totalReviews += reviews.length;
-                totalPhotos += (d.photos || []).length;
-                for (const r of reviews) {
-                    if (r.rating) { ratingSum += r.rating; ratingCount++; }
-                }
-            }
-            document.getElementById('stat-locations').textContent = locations.length;
-            document.getElementById('stat-rating').textContent = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '—';
-            document.getElementById('stat-reviews').textContent = totalReviews;
-            document.getElementById('stat-photos').textContent = totalPhotos;
-            statsEl.style.display = 'flex';
-
-            let html = '';
-            for (const loc of locations) {
-                html += renderLocationView(loc);
-            }
-            contentEl.innerHTML = html;
-            contentEl.style.display = 'block';
+    // ─── Location List ───
+    function renderLocationList() {
+        const list = document.getElementById('location-list');
+        if (locations.length === 0) {
+            list.innerHTML = '<div class="sidebar-empty">No locations yet. Click "+ Add" to start.</div>';
+            return;
         }
-
-        function renderLocationView(loc) {
+        list.innerHTML = locations.map(loc => {
             const d = loc.data || {};
-            let html = `<div class="campaign-section">`;
-
-            // Header
-            html += `<div class="campaign-header">
-                <div class="campaign-name">${esc(loc.location_name)}</div>
+            const sectionCount = SECTIONS.filter(s => isSectionCaptured(d, s.id)).length;
+            const active = loc.id === currentLocationId ? ' active' : '';
+            return `<div class="location-item${active}" onclick="selectLocation('${loc.id}')">
+                <div class="location-item-name">${esc(loc.location_name)}</div>
+                <div class="location-item-progress">${sectionCount}/${SECTIONS.length}</div>
             </div>`;
+        }).join('');
+    }
 
-            html += `<div class="campaign-body">`;
+    function isSectionCaptured(data, sectionId) {
+        const s = data[sectionId];
+        if (!s) return false;
+        // Has screenshots?
+        if (s.screenshots && s.screenshots.length > 0) return true;
+        // Has any non-empty field?
+        for (const [k, v] of Object.entries(s)) {
+            if (k === 'screenshots') continue;
+            if (Array.isArray(v) && v.length > 0) return true;
+            if (typeof v === 'string' && v.trim()) return true;
+        }
+        return false;
+    }
 
-            // Business Info
-            html += `<div class="gbp-info-section"><div class="gbp-section-title">Business Information</div><div class="gbp-info-grid">`;
-            if (d.address) html += infoRow('Address', d.address);
-            if (d.phone) html += infoRow('Phone', d.phone);
-            if (d.website) html += infoRow('Website', `<a href="${esc(d.website)}" target="_blank" style="color: var(--accent);">${esc(d.website)}</a>`);
-            if (d.categories) html += infoRow('Categories', d.categories);
-            if (d.maps_url) html += infoRow('Google Maps', `<a href="${esc(d.maps_url)}" target="_blank" style="color: var(--accent);">View on Maps</a>`);
-            html += `</div></div>`;
+    function selectLocation(id) {
+        if (unsavedChanges && !confirm('You have unsaved changes. Switch locations anyway?')) return;
+        currentLocationId = id;
+        renderLocationList();
+        loadLocationCapture(id);
+    }
 
-            // Description
-            if (d.description) {
-                html += `<div class="gbp-info-section">
-                    <div class="gbp-section-title">Business Description</div>
-                    <div class="gbp-description">${esc(d.description)}</div>
-                </div>`;
-            }
+    async function addLocation() {
+        const name = prompt('Location name (e.g. "Dunham & Jones — San Antonio"):');
+        if (!name || !name.trim()) return;
 
-            // Hours
-            if (d.hours && d.hours.length > 0) {
-                html += `<div class="gbp-info-section"><div class="gbp-section-title">Hours of Operation</div><div class="gbp-hours-grid">`;
-                for (const h of d.hours) {
-                    if (h.closed) {
-                        html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time gbp-closed">Closed</span></div>`;
-                    } else if (h.open && h.close) {
-                        html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time">${esc(h.open)} – ${esc(h.close)}</span></div>`;
-                    }
-                }
-                html += `</div></div>`;
-            }
+        try {
+            const resp = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ client_key: 'dunham', location_name: name.trim(), data: {} })
+            });
+            const json = await resp.json();
+            if (!resp.ok || json.error) throw new Error(json.error);
+            currentLocationId = json.location.id;
+            await loadData();
+        } catch (err) {
+            alert('Failed to add location: ' + err.message);
+        }
+    }
 
-            // Services
-            if (d.services) {
-                html += `<div class="gbp-info-section"><div class="gbp-section-title">Services</div><div class="gbp-description">${esc(d.services)}</div></div>`;
-            }
+    async function deleteCurrentLocation() {
+        if (!currentLocationId) return;
+        const loc = locations.find(l => l.id === currentLocationId);
+        if (!confirm(`Delete "${loc?.location_name}"? This cannot be undone.`)) return;
 
-            // Attributes
-            if (d.attributes) {
-                html += `<div class="gbp-info-section"><div class="gbp-section-title">Attributes</div><div class="gbp-description">${esc(d.attributes)}</div></div>`;
-            }
+        try {
+            const resp = await fetch(`${API_URL}?id=${currentLocationId}`, { method: 'DELETE' });
+            const json = await resp.json();
+            if (!resp.ok || json.error) throw new Error(json.error);
+            currentLocationId = null;
+            unsavedChanges = false;
+            await loadData();
+            document.getElementById('location-capture').style.display = 'none';
+            document.getElementById('no-location').style.display = 'block';
+        } catch (err) {
+            alert('Failed to delete: ' + err.message);
+        }
+    }
 
-            // Reviews
-            const reviews = d.reviews || [];
-            if (reviews.length > 0) {
-                html += `<div class="gbp-info-section"><div class="gbp-section-title">Reviews (${reviews.length})</div>`;
-                for (const r of reviews) {
-                    html += `<div class="gbp-review-card">`;
-                    html += `<div class="gbp-review-header">`;
-                    html += `<span class="gbp-reviewer-name">${esc(r.reviewer || 'Anonymous')}</span>`;
-                    html += `<span class="gbp-review-stars">${renderStars(r.rating || 0)}</span>`;
-                    if (r.date) html += `<span class="gbp-review-date">${esc(r.date)}</span>`;
-                    html += `</div>`;
-                    if (r.comment) html += `<div class="gbp-review-comment">${esc(r.comment)}</div>`;
-                    if (r.reply) {
-                        html += `<div class="gbp-review-reply">
-                            <div class="gbp-reply-label">Response from owner</div>
-                            <div class="gbp-reply-text">${esc(r.reply)}</div>
-                        </div>`;
-                    }
-                    html += `</div>`;
-                }
-                html += `</div>`;
-            }
+    // ─── Location Capture ───
+    function loadLocationCapture(id) {
+        const loc = locations.find(l => l.id === id);
+        if (!loc) return;
 
-            // Photos
-            const photos = d.photos || [];
-            if (photos.length > 0) {
-                html += `<div class="gbp-info-section"><div class="gbp-section-title">Photos & Media (${photos.length})</div><div class="gbp-media-grid">`;
-                for (const p of photos) {
-                    if (!p.url) continue;
-                    html += `<div class="gbp-media-card">
-                        <img src="${esc(p.url)}" alt="${esc(p.caption || 'Photo')}" loading="lazy">
-                        ${p.caption ? `<div class="gbp-media-desc">${esc(p.caption)}</div>` : ''}
+        unsavedChanges = false;
+        document.getElementById('no-location').style.display = 'none';
+        document.getElementById('location-capture').style.display = 'block';
+        document.getElementById('capture-location-name').textContent = loc.location_name;
+        document.getElementById('save-status').textContent = '';
+
+        const data = loc.data || {};
+        const container = document.getElementById('sections-container');
+        container.innerHTML = '';
+
+        for (const section of SECTIONS) {
+            const sData = data[section.id] || {};
+            const captured = isSectionCaptured(data, section.id);
+            container.innerHTML += renderSectionPanel(section, sData, captured);
+        }
+
+        updateProgress();
+    }
+
+    function renderSectionPanel(section, sData, captured) {
+        const checkmark = captured ? ' captured' : '';
+        let html = `<div class="section-panel${checkmark}" id="panel-${section.id}">
+            <div class="section-panel-header" onclick="toggleSection('${section.id}')">
+                <span class="section-icon">${section.icon}</span>
+                <span class="section-title">${section.title}</span>
+                <span class="section-check">${captured ? '✓' : ''}</span>
+                <span class="section-chevron">▸</span>
+            </div>
+            <div class="section-panel-body" id="body-${section.id}" style="display:none;">
+                <div class="section-instruction">${section.instruction}</div>`;
+
+        // Screenshot area
+        const screenshots = sData.screenshots || [];
+        html += `<div class="screenshot-area" data-section="${section.id}">
+            <div class="screenshot-drop" onclick="document.getElementById('file-${section.id}').click()" onfocus="activePasteSection='${section.id}'">
+                <div class="screenshot-drop-text">
+                    Click to upload or <strong>paste a screenshot</strong> (Ctrl+V / Cmd+V)
+                </div>
+                <input type="file" id="file-${section.id}" accept="image/*" multiple style="display:none;" onchange="handleFiles('${section.id}', this.files)">
+            </div>
+            <div class="screenshot-grid" id="screenshots-${section.id}">`;
+        for (let i = 0; i < screenshots.length; i++) {
+            html += `<div class="screenshot-thumb">
+                <img src="${screenshots[i]}" alt="Screenshot" onclick="viewScreenshot(this.src)">
+                <button class="screenshot-remove" onclick="removeScreenshot('${section.id}', ${i})">×</button>
+            </div>`;
+        }
+        html += `</div></div>`;
+
+        // Fields
+        if (section.fields === 'hours') {
+            html += renderHoursFields(sData);
+        } else {
+            for (const f of section.fields) {
+                const val = esc(sData[f.id] || '');
+                if (f.type === 'textarea') {
+                    html += `<div class="gbp-form-group">
+                        <label>${f.label}</label>
+                        <textarea data-section="${section.id}" data-field="${f.id}" rows="${f.rows || 3}" placeholder="${f.placeholder || ''}" onchange="markUnsaved()">${val}</textarea>
+                    </div>`;
+                } else {
+                    html += `<div class="gbp-form-group">
+                        <label>${f.label}</label>
+                        <input type="text" data-section="${section.id}" data-field="${f.id}" value="${val}" placeholder="${f.placeholder || ''}" onchange="markUnsaved()">
                     </div>`;
                 }
-                html += `</div></div>`;
-            }
-
-            // Notes (view mode — screen only, hidden in print)
-            if (d.notes) {
-                html += `<div class="gbp-info-section gbp-notes-section"><div class="gbp-section-title">Internal Notes</div><div class="gbp-description">${esc(d.notes)}</div></div>`;
-            }
-
-            html += `</div></div>`;
-            return html;
-        }
-
-        function renderStars(num) {
-            let s = '';
-            for (let i = 0; i < 5; i++) {
-                s += i < num ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
-            }
-            return s;
-        }
-
-        function infoRow(label, value) {
-            return `<div class="gbp-info-row"><div class="gbp-info-label">${esc(label)}</div><div class="gbp-info-value">${value}</div></div>`;
-        }
-
-        function esc(str) {
-            if (str == null) return '';
-            const div = document.createElement('div');
-            div.textContent = String(str);
-            return div.innerHTML;
-        }
-
-        // ─── Edit Mode ───
-        const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-        function initHoursGrid() {
-            const grid = document.getElementById('hours-grid');
-            grid.innerHTML = '';
-            for (const day of DAYS) {
-                const id = day.toLowerCase();
-                grid.innerHTML += `
-                    <div class="gbp-hours-edit-row">
-                        <span class="gbp-hours-edit-day">${day}</span>
-                        <input type="text" id="h-${id}-open" placeholder="8:00 AM" class="gbp-hours-input">
-                        <span class="gbp-hours-dash">–</span>
-                        <input type="text" id="h-${id}-close" placeholder="5:00 PM" class="gbp-hours-input">
-                        <label class="gbp-hours-closed-label">
-                            <input type="checkbox" id="h-${id}-closed" onchange="toggleClosed('${id}')"> Closed
-                        </label>
-                    </div>`;
             }
         }
 
-        function toggleClosed(dayId) {
-            const closed = document.getElementById(`h-${dayId}-closed`).checked;
-            document.getElementById(`h-${dayId}-open`).disabled = closed;
-            document.getElementById(`h-${dayId}-close`).disabled = closed;
+        html += `</div></div>`;
+        return html;
+    }
+
+    function renderHoursFields(sData) {
+        const hours = sData.hours || [];
+        const hourMap = {};
+        for (const h of hours) hourMap[h.day] = h;
+
+        let html = '<div class="gbp-hours-edit-grid">';
+        for (const day of DAYS) {
+            const h = hourMap[day] || {};
+            const closed = h.closed || false;
+            html += `<div class="gbp-hours-edit-row">
+                <span class="gbp-hours-edit-day">${day}</span>
+                <input type="text" class="gbp-hours-input" data-section="hours" data-day="${day}" data-which="open"
+                    value="${esc(h.open || '')}" placeholder="8:00 AM" ${closed ? 'disabled' : ''} onchange="markUnsaved()">
+                <span class="gbp-hours-dash">–</span>
+                <input type="text" class="gbp-hours-input" data-section="hours" data-day="${day}" data-which="close"
+                    value="${esc(h.close || '')}" placeholder="5:00 PM" ${closed ? 'disabled' : ''} onchange="markUnsaved()">
+                <label class="gbp-hours-closed-label">
+                    <input type="checkbox" data-section="hours" data-day="${day}" data-which="closed"
+                        ${closed ? 'checked' : ''} onchange="toggleHoursClosed(this, '${day}'); markUnsaved()"> Closed
+                </label>
+            </div>`;
         }
+        html += '</div>';
+        return html;
+    }
 
-        function populateSelector() {
-            const sel = document.getElementById('location-selector');
-            sel.innerHTML = '<option value="__new__">+ Add New Location</option>';
-            for (const loc of locations) {
-                const opt = document.createElement('option');
-                opt.value = loc.id;
-                opt.textContent = loc.location_name;
-                sel.appendChild(opt);
-            }
-            if (currentLocationId) sel.value = currentLocationId;
-            else if (locations.length > 0) { sel.value = locations[0].id; currentLocationId = locations[0].id; }
-            else sel.value = '__new__';
+    function toggleSection(sectionId) {
+        const body = document.getElementById('body-' + sectionId);
+        const panel = document.getElementById('panel-' + sectionId);
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
+        panel.classList.toggle('open', !isOpen);
+        if (!isOpen) activePasteSection = sectionId;
+    }
 
-            document.getElementById('btn-delete-location').style.display = sel.value === '__new__' ? 'none' : '';
-        }
+    function toggleHoursClosed(cb, day) {
+        const row = cb.closest('.gbp-hours-edit-row');
+        const inputs = row.querySelectorAll('input[type="text"]');
+        inputs.forEach(inp => inp.disabled = cb.checked);
+    }
 
-        document.getElementById('location-selector').addEventListener('change', function() {
-            currentLocationId = this.value === '__new__' ? null : this.value;
-            document.getElementById('btn-delete-location').style.display = this.value === '__new__' ? 'none' : '';
-            loadLocationIntoForm(currentLocationId);
-        });
+    function markUnsaved() {
+        unsavedChanges = true;
+        document.getElementById('save-status').textContent = 'Unsaved changes';
+        document.getElementById('save-status').style.color = 'var(--warning)';
+    }
 
-        function loadLocationIntoForm(id) {
-            clearForm();
-            if (!id) return;
-            const loc = locations.find(l => l.id === id);
-            if (!loc) return;
+    function updateProgress() {
+        const loc = locations.find(l => l.id === currentLocationId);
+        if (!loc) return;
+        const d = loc.data || {};
+        const count = SECTIONS.filter(s => isSectionCaptured(d, s.id)).length;
+        document.getElementById('capture-progress').textContent = `${count}/${SECTIONS.length} sections`;
+    }
 
-            const d = loc.data || {};
-            document.getElementById('f-name').value = loc.location_name || '';
-            document.getElementById('f-address').value = d.address || '';
-            document.getElementById('f-phone').value = d.phone || '';
-            document.getElementById('f-website').value = d.website || '';
-            document.getElementById('f-categories').value = d.categories || '';
-            document.getElementById('f-maps-url').value = d.maps_url || '';
-            document.getElementById('f-description').value = d.description || '';
-            document.getElementById('f-services').value = d.services || '';
-            document.getElementById('f-attributes').value = d.attributes || '';
-            document.getElementById('f-notes').value = d.notes || '';
+    // ─── Screenshots ───
+    // Global paste handler
+    document.addEventListener('paste', (e) => {
+        if (currentMode !== 'capture' || !currentLocationId) return;
+        const items = e.clipboardData?.items;
+        if (!items) return;
 
-            // Hours
-            if (d.hours) {
-                for (const h of d.hours) {
-                    const dayId = h.day.toLowerCase();
-                    const openEl = document.getElementById(`h-${dayId}-open`);
-                    const closeEl = document.getElementById(`h-${dayId}-close`);
-                    const closedEl = document.getElementById(`h-${dayId}-closed`);
-                    if (!openEl) continue;
-                    if (h.closed) {
-                        closedEl.checked = true;
-                        openEl.disabled = true;
-                        closeEl.disabled = true;
-                    } else {
-                        openEl.value = h.open || '';
-                        closeEl.value = h.close || '';
-                    }
-                }
-            }
-
-            // Reviews
-            const container = document.getElementById('reviews-container');
-            container.innerHTML = '';
-            if (d.reviews) {
-                for (const r of d.reviews) addReview(r);
-            }
-
-            // Photos
-            const photosContainer = document.getElementById('photos-container');
-            photosContainer.innerHTML = '';
-            if (d.photos) {
-                for (const p of d.photos) addPhoto(p);
-            }
-        }
-
-        function clearForm() {
-            document.getElementById('f-name').value = '';
-            document.getElementById('f-address').value = '';
-            document.getElementById('f-phone').value = '';
-            document.getElementById('f-website').value = '';
-            document.getElementById('f-categories').value = '';
-            document.getElementById('f-maps-url').value = '';
-            document.getElementById('f-description').value = '';
-            document.getElementById('f-services').value = '';
-            document.getElementById('f-attributes').value = '';
-            document.getElementById('f-notes').value = '';
-            document.getElementById('reviews-container').innerHTML = '';
-            document.getElementById('photos-container').innerHTML = '';
-            document.getElementById('save-status').textContent = '';
-            initHoursGrid();
-        }
-
-        // ─── Repeatable: Reviews ───
-        let reviewCounter = 0;
-        function addReview(data) {
-            const c = document.getElementById('reviews-container');
-            const idx = reviewCounter++;
-            const div = document.createElement('div');
-            div.className = 'gbp-repeatable-item';
-            div.innerHTML = `
-                <div class="gbp-repeatable-header">
-                    <span>Review #${c.children.length + 1}</span>
-                    <button class="btn btn-danger btn-xs" onclick="this.closest('.gbp-repeatable-item').remove()">Remove</button>
-                </div>
-                <div class="gbp-form-row">
-                    <div class="gbp-form-group" style="flex: 2;">
-                        <label>Reviewer Name</label>
-                        <input type="text" class="r-reviewer" value="${esc(data?.reviewer || '')}">
-                    </div>
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label>Rating</label>
-                        <select class="r-rating">
-                            <option value="5" ${(data?.rating || 5) === 5 ? 'selected' : ''}>5 Stars</option>
-                            <option value="4" ${data?.rating === 4 ? 'selected' : ''}>4 Stars</option>
-                            <option value="3" ${data?.rating === 3 ? 'selected' : ''}>3 Stars</option>
-                            <option value="2" ${data?.rating === 2 ? 'selected' : ''}>2 Stars</option>
-                            <option value="1" ${data?.rating === 1 ? 'selected' : ''}>1 Star</option>
-                        </select>
-                    </div>
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label>Date</label>
-                        <input type="text" class="r-date" placeholder="2026-01-15" value="${esc(data?.date || '')}">
-                    </div>
-                </div>
-                <div class="gbp-form-group">
-                    <label>Comment</label>
-                    <textarea class="r-comment" rows="2">${esc(data?.comment || '')}</textarea>
-                </div>
-                <div class="gbp-form-group">
-                    <label>Owner Reply</label>
-                    <textarea class="r-reply" rows="2">${esc(data?.reply || '')}</textarea>
-                </div>`;
-            c.appendChild(div);
-        }
-
-        // ─── Repeatable: Photos ───
-        function addPhoto(data) {
-            const c = document.getElementById('photos-container');
-            const div = document.createElement('div');
-            div.className = 'gbp-repeatable-item';
-            div.innerHTML = `
-                <div class="gbp-repeatable-header">
-                    <span>Photo #${c.children.length + 1}</span>
-                    <button class="btn btn-danger btn-xs" onclick="this.closest('.gbp-repeatable-item').remove()">Remove</button>
-                </div>
-                <div class="gbp-form-row">
-                    <div class="gbp-form-group" style="flex: 2;">
-                        <label>Image URL</label>
-                        <input type="text" class="p-url" placeholder="https://..." value="${esc(data?.url || '')}">
-                    </div>
-                    <div class="gbp-form-group" style="flex: 1;">
-                        <label>Caption</label>
-                        <input type="text" class="p-caption" placeholder="Office exterior" value="${esc(data?.caption || '')}">
-                    </div>
-                </div>`;
-            c.appendChild(div);
-        }
-
-        // ─── Save ───
-        async function saveLocation() {
-            const name = document.getElementById('f-name').value.trim();
-            if (!name) {
-                showStatus('Location name is required.', 'error');
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const blob = item.getAsFile();
+                // Determine which section to paste into
+                const targetSection = activePasteSection || SECTIONS[0].id;
+                resizeAndAddScreenshot(targetSection, blob);
                 return;
             }
+        }
+    });
 
-            const btn = document.getElementById('btn-save');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
+    // Click on screenshot area sets active section
+    document.addEventListener('click', (e) => {
+        const area = e.target.closest('.screenshot-area');
+        if (area) activePasteSection = area.dataset.section;
+    });
 
-            // Collect hours
-            const hours = [];
-            for (const day of DAYS) {
-                const dayId = day.toLowerCase();
-                const closed = document.getElementById(`h-${dayId}-closed`).checked;
-                const open = document.getElementById(`h-${dayId}-open`).value.trim();
-                const close = document.getElementById(`h-${dayId}-close`).value.trim();
-                if (closed) {
-                    hours.push({ day, closed: true });
-                } else if (open || close) {
-                    hours.push({ day, open, close });
+    function handleFiles(sectionId, files) {
+        for (const file of files) {
+            if (file.type.startsWith('image/')) {
+                resizeAndAddScreenshot(sectionId, file);
+            }
+        }
+    }
+
+    function resizeAndAddScreenshot(sectionId, blob) {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxW = 1400;
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = h * maxW / w; w = maxW; }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+            // Add to DOM
+            const grid = document.getElementById('screenshots-' + sectionId);
+            const idx = grid.children.length;
+            const div = document.createElement('div');
+            div.className = 'screenshot-thumb';
+            div.innerHTML = `<img src="${dataUrl}" alt="Screenshot" onclick="viewScreenshot(this.src)">
+                <button class="screenshot-remove" onclick="removeScreenshot('${sectionId}', ${idx})">×</button>`;
+            grid.appendChild(div);
+
+            markUnsaved();
+            URL.revokeObjectURL(img.src);
+        };
+        img.src = URL.createObjectURL(blob);
+    }
+
+    function removeScreenshot(sectionId, index) {
+        const grid = document.getElementById('screenshots-' + sectionId);
+        if (grid.children[index]) {
+            grid.children[index].remove();
+            markUnsaved();
+        }
+    }
+
+    function viewScreenshot(src) {
+        const overlay = document.createElement('div');
+        overlay.className = 'screenshot-overlay';
+        overlay.onclick = () => overlay.remove();
+        overlay.innerHTML = `<img src="${src}" alt="Screenshot">`;
+        document.body.appendChild(overlay);
+    }
+
+    // ─── Save ───
+    async function saveCurrentLocation() {
+        const loc = locations.find(l => l.id === currentLocationId);
+        if (!loc) return;
+
+        const btn = document.querySelector('#location-capture .btn-primary');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        // Collect data from all sections
+        const data = {};
+
+        for (const section of SECTIONS) {
+            const sData = {};
+
+            // Collect screenshots
+            const grid = document.getElementById('screenshots-' + section.id);
+            if (grid) {
+                const imgs = grid.querySelectorAll('img');
+                sData.screenshots = Array.from(imgs).map(img => img.src);
+            }
+
+            // Collect fields
+            if (section.fields === 'hours') {
+                const hours = [];
+                for (const day of DAYS) {
+                    const openEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="open"]`);
+                    const closeEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="close"]`);
+                    const closedEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="closed"]`);
+                    if (closedEl?.checked) {
+                        hours.push({ day, closed: true });
+                    } else if (openEl?.value.trim() || closeEl?.value.trim()) {
+                        hours.push({ day, open: openEl.value.trim(), close: closeEl.value.trim() });
+                    }
+                }
+                sData.hours = hours;
+            } else {
+                for (const f of section.fields) {
+                    const el = document.querySelector(`[data-section="${section.id}"][data-field="${f.id}"]`);
+                    if (el) sData[f.id] = el.value.trim();
                 }
             }
 
-            // Collect reviews
-            const reviews = [];
-            document.querySelectorAll('#reviews-container .gbp-repeatable-item').forEach(el => {
-                reviews.push({
-                    reviewer: el.querySelector('.r-reviewer').value.trim(),
-                    rating: parseInt(el.querySelector('.r-rating').value),
-                    date: el.querySelector('.r-date').value.trim(),
-                    comment: el.querySelector('.r-comment').value.trim(),
-                    reply: el.querySelector('.r-reply').value.trim()
-                });
-            });
-
-            // Collect photos
-            const photos = [];
-            document.querySelectorAll('#photos-container .gbp-repeatable-item').forEach(el => {
-                const url = el.querySelector('.p-url').value.trim();
-                if (url) {
-                    photos.push({
-                        url,
-                        caption: el.querySelector('.p-caption').value.trim()
-                    });
-                }
-            });
-
-            const payload = {
-                id: currentLocationId || undefined,
-                client_key: 'dunham',
-                location_name: name,
-                data: {
-                    address: document.getElementById('f-address').value.trim(),
-                    phone: document.getElementById('f-phone').value.trim(),
-                    website: document.getElementById('f-website').value.trim(),
-                    categories: document.getElementById('f-categories').value.trim(),
-                    maps_url: document.getElementById('f-maps-url').value.trim(),
-                    description: document.getElementById('f-description').value.trim(),
-                    hours,
-                    reviews,
-                    photos,
-                    services: document.getElementById('f-services').value.trim(),
-                    attributes: document.getElementById('f-attributes').value.trim(),
-                    notes: document.getElementById('f-notes').value.trim()
-                }
-            };
-
-            try {
-                const resp = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const json = await resp.json();
-                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
-
-                // Update local data
-                currentLocationId = json.location.id;
-                await loadData();
-                showStatus('Saved successfully!', 'success');
-            } catch (err) {
-                showStatus('Save failed: ' + err.message, 'error');
-            }
-
-            btn.disabled = false;
-            btn.textContent = 'Save Location';
+            data[section.id] = sData;
         }
 
-        // ─── Delete ───
-        document.getElementById('btn-delete-location').addEventListener('click', async function() {
-            if (!currentLocationId) return;
-            const loc = locations.find(l => l.id === currentLocationId);
-            if (!confirm(`Delete "${loc?.location_name || 'this location'}"? This cannot be undone.`)) return;
+        try {
+            const resp = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: currentLocationId,
+                    client_key: 'dunham',
+                    location_name: loc.location_name,
+                    data
+                })
+            });
+            const json = await resp.json();
+            if (!resp.ok || json.error) throw new Error(json.error);
 
-            try {
-                const resp = await fetch(`${API_URL}?id=${currentLocationId}`, { method: 'DELETE' });
-                const json = await resp.json();
-                if (!resp.ok || json.error) throw new Error(json.error || `HTTP ${resp.status}`);
+            unsavedChanges = false;
+            // Update local data
+            const idx = locations.findIndex(l => l.id === currentLocationId);
+            if (idx >= 0) locations[idx].data = data;
+            renderLocationList();
+            updateProgress();
 
-                currentLocationId = null;
-                await loadData();
-                showStatus('Location deleted.', 'success');
-            } catch (err) {
-                showStatus('Delete failed: ' + err.message, 'error');
+            document.getElementById('save-status').textContent = 'Saved!';
+            document.getElementById('save-status').style.color = 'var(--success)';
+
+            // Update section checkmarks
+            for (const section of SECTIONS) {
+                const panel = document.getElementById('panel-' + section.id);
+                const check = panel.querySelector('.section-check');
+                if (isSectionCaptured(data, section.id)) {
+                    panel.classList.add('captured');
+                    check.textContent = '✓';
+                } else {
+                    panel.classList.remove('captured');
+                    check.textContent = '';
+                }
             }
-        });
-
-        function showStatus(msg, type) {
-            const el = document.getElementById('save-status');
-            el.textContent = msg;
-            el.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+        } catch (err) {
+            document.getElementById('save-status').textContent = 'Save failed: ' + err.message;
+            document.getElementById('save-status').style.color = 'var(--danger)';
         }
 
-        // ─── Init ───
-        initHoursGrid();
-        loadData();
+        btn.disabled = false;
+        btn.textContent = 'Save';
+    }
+
+    // ─── Print View ───
+    function renderPrintView() {
+        document.getElementById('report-date').textContent = 'Generated: ' +
+            new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('report-stat').textContent = locations.length + ' locations';
+
+        if (locations.length === 0) {
+            document.getElementById('print-content').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px;">No locations captured yet.</p>';
+            return;
+        }
+
+        let html = '';
+        for (const loc of locations) {
+            html += renderLocationPrint(loc);
+        }
+        document.getElementById('print-content').innerHTML = html;
+    }
+
+    function renderLocationPrint(loc) {
+        const d = loc.data || {};
+        let html = `<div class="campaign-section print-location">
+            <div class="campaign-header"><div class="campaign-name">${esc(loc.location_name)}</div></div>
+            <div class="campaign-body">`;
+
+        for (const section of SECTIONS) {
+            const sData = d[section.id];
+            if (!sData || !isSectionCaptured(d, section.id)) continue;
+
+            html += `<div class="gbp-info-section">
+                <div class="gbp-section-title">${section.icon} ${section.title}</div>`;
+
+            // Screenshots
+            if (sData.screenshots && sData.screenshots.length > 0) {
+                html += '<div class="print-screenshots">';
+                for (const src of sData.screenshots) {
+                    html += `<img src="${src}" alt="${section.title} screenshot" class="print-screenshot">`;
+                }
+                html += '</div>';
+            }
+
+            // Fields
+            if (section.fields === 'hours') {
+                if (sData.hours && sData.hours.length > 0) {
+                    html += '<div class="gbp-hours-grid">';
+                    for (const h of sData.hours) {
+                        if (h.closed) {
+                            html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time gbp-closed">Closed</span></div>`;
+                        } else if (h.open || h.close) {
+                            html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time">${esc(h.open)} – ${esc(h.close)}</span></div>`;
+                        }
+                    }
+                    html += '</div>';
+                }
+            } else {
+                html += '<div class="gbp-info-grid">';
+                for (const f of section.fields) {
+                    const val = sData[f.id];
+                    if (val && val.trim()) {
+                        if (f.type === 'textarea') {
+                            html += `<div class="gbp-description" style="margin-bottom:8px;">${esc(val)}</div>`;
+                        } else {
+                            html += `<div class="gbp-info-row"><div class="gbp-info-label">${f.label}</div><div class="gbp-info-value">${esc(val)}</div></div>`;
+                        }
+                    }
+                }
+                html += '</div>';
+            }
+
+            html += '</div>';
+        }
+
+        html += '</div></div>';
+        return html;
+    }
+
+    // ─── Util ───
+    function esc(str) {
+        if (str == null) return '';
+        const div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
+
+    // ─── Init ───
+    loadData();
     </script>
 </body>
 </html>
