@@ -785,28 +785,73 @@
 
     // ─── Bookmarklet / Console Script ───
     // The full extraction script that runs on business.google.com
+    // Finds the edit panel by content (not scroll heuristics), extracts fields by known text patterns
     const GBP_SCRIPT = `(function(){
 if(!location.hostname.includes('business.google.com')){alert('Navigate to business.google.com first');return}
-if(document.getElementById('gx')){alert('GBP Extract is already running');return}
-function fp(){var a=document.querySelectorAll('*'),r=[];for(var i=0;i<a.length;i++){var s=getComputedStyle(a[i]),oy=s.overflowY;if((oy==='auto'||oy==='scroll')&&a[i].scrollHeight>a[i].clientHeight+50&&a[i].clientHeight>150&&a[i].clientWidth>250){var t=a[i].textContent||'';if(t.includes('Business name')||t.includes('category')||t.includes('Description')||t.includes('Phone')||t.includes('Hours')||t.includes('Website'))return a[i];r.push(a[i]);}}return r[0]||null}
-function fr(){var p=document.querySelector('[role="dialog"]');if(p)return p;var s=fp();return s?(s.parentElement||s):null}
-function ext(){var p=fr();if(!p){alert('Open a location\\'s edit panel first (click the pencil icon).');return null}return p.innerText||''}
+if(document.getElementById('gx')){document.getElementById('gx').remove()}
+function fp(){
+var all=document.querySelectorAll('*');var best=null;var bestLen=1e9;
+for(var i=0;i<all.length;i++){var el=all[i];
+if(el.offsetWidth<300||el.offsetHeight<200||el===document.body||el===document.documentElement)continue;
+var t=el.innerText||'';
+if(t.indexOf('Business information')>-1&&t.indexOf('Business name')>-1&&t.indexOf('About')>-1){
+if(t.length<bestLen){best=el;bestLen=t.length}}}
+return best}
+function ext(){var p=fp();if(p)return p.innerText;
+var t=document.body.innerText;if(t.indexOf('Business name')>-1)return t;
+alert('Open a location edit panel first (click the pencil icon).');return null}
+function parseHours(text){
+var hm=text.match(/Business hours[\\s\\S]*?Hours\\n(?:Open with main hours\\n)?((?:Sunday|Monday)[\\s\\S]*?)(?=Special hours|Add more hours|\\nMore\\n)/);
+if(!hm)return[];var lines=hm[1].split('\\n');var hrs=[];var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(days.indexOf(line)>-1){var next=(lines[i+1]||'').trim();
+if(next==='Open 24 hours')hrs.push({day:line,open:'12:00 AM',close:'11:59 PM'});
+else if(next==='Closed')hrs.push({day:line,closed:true});
+else if(next.match(/[AP]M/))hrs.push({day:line,open:next.split(/\\s*[\\u2013-]\\s*/)[0],close:next.split(/\\s*[\\u2013-]\\s*/)[1]||''});
+i++}}return hrs}
 var d=document.createElement('div');d.id='gx';
 d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:999999;background:#1e293b;border:1px solid #475569;border-radius:12px;padding:16px;font-family:system-ui;color:#f1f5f9;box-shadow:0 8px 32px rgba(0,0,0,.4);width:270px;font-size:13px;line-height:1.4';
-function mb(l,desc,fn){var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px;margin-bottom:6px;border-radius:6px;border:1px solid #475569;background:#334155;color:#f1f5f9;cursor:pointer;font-size:13px;font-weight:600;text-align:left';b.innerHTML=l+'<br><small style=\"font-weight:400;color:#94a3b8;font-size:11px\">'+desc+'</small>';b.onclick=fn;d.appendChild(b)}
-d.innerHTML='<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:12px\"><b style=\"color:#3b82f6;font-size:14px\">GBP Extract</b><button onclick=\"document.getElementById(\\'gx\\').remove()\" style=\"background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:0 4px\">\\u00d7</button></div>';
+function mb(l,desc,fn){var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px;margin-bottom:6px;border-radius:6px;border:1px solid #475569;background:#334155;color:#f1f5f9;cursor:pointer;font-size:13px;font-weight:600;text-align:left';b.innerHTML=l+'<br><small style=\\"font-weight:400;color:#94a3b8;font-size:11px\\">'+desc+'</small>';b.onclick=fn;d.appendChild(b)}
+d.innerHTML='<div style=\\"display:flex;justify-content:space-between;align-items:center;margin-bottom:12px\\"><b style=\\"color:#3b82f6;font-size:14px\\">GBP Extract</b><button onclick=\\"document.getElementById(\\'gx\\').remove()\\" style=\\"background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:0 4px\\">\\u00d7</button></div>';
 mb('Send to Hyder Media','Extract data & save to capture tool',async function(){
 var text=ext();if(!text)return;
-var name='Unknown';var m=text.match(/Business name\\n(.+)/i);if(m)name=m[1].trim();
-var data={info:{screenshots:[]},description:{screenshots:[]},hours:{hours:[],screenshots:[]},_raw:{raw_text:text,extracted_at:new Date().toISOString()}};
-var px={address:[/(?:Business location|Address)\\n([^\\n]+)/i,'info'],phone:[/(?:Primary phone|Phone number|Phone)\\n([^\\n]+)/i,'info'],website:[/Website\\n([^\\n]+)/i,'info'],categories:[/Business category\\n([\\s\\S]*?)(?=\\nDescription|\\n\\n)/i,'info'],text:[/Description\\n([\\s\\S]*?)(?=\\nOpening|\\nService|\\nBusiness location|$)/i,'description']};
-for(var k in px){var pp=px[k];var mm=text.match(pp[0]);if(mm)data[pp[1]][k]=mm[1].trim()}
+var m,name='Unknown';
+m=text.match(/Business name\\n([^\\n]+)/);if(m)name=m[1].trim();
+var cats='';m=text.match(/Business category\\n([\\s\\S]*?)(?=\\nDescription)/);
+if(m)cats=m[1].replace(/\\nPrimary\\n/g,' (Primary), ').replace(/\\nPrimary/g,' (Primary)').replace(/\\n/g,', ').trim();
+var desc='';m=text.match(/Description\\n([\\s\\S]*?)(?=\\nOpening date|\\nContact information)/);if(m)desc=m[1].trim();
+var phone='';m=text.match(/Phone number\\n([^\\n]+)/);if(m)phone=m[1].trim();
+var website='';m=text.match(/Website\\n([^\\n]+)/);if(m)website=m[1].trim();
+var addr='';m=text.match(/Business location\\n([^\\n]+)/);if(m)addr=m[1].trim();
+var svcArea='';m=text.match(/Service area\\n([\\s\\S]*?)(?=\\nBusiness hours)/);if(m)svcArea=m[1].trim();
+var openDate='';m=text.match(/Opening date\\n([^\\n]+)/);if(m)openDate=m[1].trim();
+var attrs=[];
+m=text.match(/Accessibility\\n([\\s\\S]*?)(?=\\nAmenities|\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Accessibility: '+m[1].replace(/\\n/g,', ').trim());
+m=text.match(/Amenities\\n([\\s\\S]*?)(?=\\nCrowd|\\nParking|\\nPlace page|\\nPlanning|\\nService options)/);if(m)attrs.push('Amenities: '+m[1].replace(/\\n/g,', ').trim());
+m=text.match(/Service options\\n([\\s\\S]*?)(?=\\nLearn|\\nSpanish|$)/);if(m)attrs.push('Service options: '+m[1].replace(/\\n/g,', ').trim());
+var hours=parseHours(text);
+var data={
+info:{address:addr,phone:phone,website:website,categories:cats,maps_url:'',screenshots:[]},
+description:{text:desc,screenshots:[]},
+hours:{hours:hours,screenshots:[]},
+services:{text:'',screenshots:[]},
+attributes:{text:attrs.join('\\n'),screenshots:[]},
+reviews:{total_count:'',avg_rating:'',notes:'',screenshots:[]},
+photos:{owner_count:'',customer_count:'',notes:'',screenshots:[]},
+posts:{text:'',screenshots:[]},
+performance:{views:'',searches:'',direction_requests:'',calls:'',website_clicks:'',notes:'',screenshots:[]},
+qa:{text:'',screenshots:[]},
+_raw:{raw_text:text,extracted_at:new Date().toISOString(),service_area:svcArea,opening_date:openDate}
+};
 this.textContent='Sending...';this.disabled=true;
-try{var r=await fetch('https://hyder.me/api/gbp/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_key:'dunham',location_name:name,data:data})});var j=await r.json();if(j.error)throw new Error(j.error);alert('Saved \"'+name+'\"! View at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
+try{var r=await fetch('https://hyder.me/api/gbp/locations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_key:'dunham',location_name:name,data:data})});
+var j=await r.json();if(j.error)throw new Error(j.error);
+alert('Saved: '+name+'\\n\\nAddress: '+addr+'\\nPhone: '+phone+'\\nCategories: '+cats+'\\nHours: '+hours.length+' days parsed\\n\\nView at hyder.me/clients/dunham/gbp')}catch(e){alert('Save failed: '+e.message)}
 this.textContent='Send to Hyder Media';this.disabled=false});
 mb('Copy All Text','Copy panel text to clipboard',function(){var t=ext();if(!t)return;navigator.clipboard.writeText(t).then(function(){alert('Copied to clipboard!')}).catch(function(){prompt('Copy this text:',t)})});
 var hr=document.createElement('hr');hr.style.cssText='border:none;border-top:1px solid #475569;margin:10px 0';d.appendChild(hr);
-mb('Fix Scroll for Screenshot','Expand panel to full height',function(){var p=fp();if(!p){alert('Open a location first');return}var el=p;for(var i=0;i<10&&el;i++){el.style.overflow='visible';el.style.overflowY='visible';el.style.maxHeight='none';el.style.height='auto';if(el.getAttribute&&el.getAttribute('role')==='dialog')break;el=el.parentElement}alert('Panel expanded! You can now take a full screenshot.')});
+mb('Fix Scroll for Screenshot','Expand panel to full height',function(){var p=fp();if(!p){var all=document.querySelectorAll('*');for(var i=0;i<all.length;i++){var s=getComputedStyle(all[i]);if((s.overflowY==='auto'||s.overflowY==='scroll')&&all[i].scrollHeight>all[i].clientHeight+50&&all[i].clientHeight>200&&all[i].clientWidth>300){var t=all[i].innerText||'';if(t.indexOf('Business name')>-1){p=all[i];break}}}};if(!p){alert('Open a location first');return}
+var el=p;for(var i=0;i<15&&el&&el!==document.body;i++){el.style.overflow='visible';el.style.overflowY='visible';el.style.maxHeight='none';el.style.height='auto';el=el.parentElement}
+alert('Panel expanded! You can now take a full screenshot.')});
 document.body.appendChild(d)})()`;
 
     // Set the bookmarklet href (inline all code)
