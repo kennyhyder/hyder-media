@@ -111,7 +111,14 @@ async function fetchHistorical(accessToken, year) {
     const untilDate = isCurrentYear
         ? now.toISOString().slice(0, 10)
         : `${year}-12-31`;
-    const timeRange = JSON.stringify({ since: `${year}-01-01`, until: untilDate });
+
+    // Meta retains ~37 months of insights data — clamp start date
+    const minDate = new Date(now);
+    minDate.setMonth(minDate.getMonth() - 37);
+    const minDateStr = minDate.toISOString().slice(0, 10);
+    const sinceDate = `${year}-01-01` < minDateStr ? minDateStr : `${year}-01-01`;
+
+    const timeRange = JSON.stringify({ since: sinceDate, until: untilDate });
 
     // Paginate through all insights for the year
     let allInsights = [];
@@ -159,6 +166,7 @@ async function fetchHistorical(accessToken, year) {
     // For current year, also fetch active/paused ads directly
     // (insights can lag 24-48h for newly launched ads)
     let directAds = [];
+    let directAdsError = null;
     if (isCurrentYear) {
         try {
             const adsResp = await graphGet(
@@ -170,14 +178,14 @@ async function fetchHistorical(accessToken, year) {
                         'campaign{name}', 'adset{name}',
                         'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
                     ].join(','),
-                    effective_status: '["ACTIVE","PAUSED","CAMPAIGN_PAUSED","ADSET_PAUSED"]',
+                    effective_status: '["ACTIVE"]',
                     limit: 200,
                 },
                 accessToken
             );
             directAds = adsResp.data || [];
         } catch (e) {
-            // Non-fatal: insights data still works
+            directAdsError = e.message;
         }
     }
 
@@ -195,7 +203,8 @@ async function fetchHistorical(accessToken, year) {
         creativesFound: creativeMap.size,
         directAdsFetched: directAds.length,
         directAdsMerged: directAds.filter(a => !insightAdIds.has(a.id)).length,
-        timeRange: { since: `${year}-01-01`, until: untilDate },
+        directAdsError: directAdsError,
+        timeRange: { since: sinceDate, until: untilDate },
     };
     return response;
 }
