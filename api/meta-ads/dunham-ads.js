@@ -140,9 +140,9 @@ async function fetchHistorical(accessToken, year, supabase) {
     const currentYear = now.getFullYear();
     const isCurrentYear = year >= currentYear;
 
-    // Check cache: 1h for current year, 24h for past years
+    // Check cache: 1h for current year, indefinite for past years
     const cacheKey = `dunham:meta:${year}`;
-    const maxAgeMin = isCurrentYear ? 60 : 1440;
+    const maxAgeMin = isCurrentYear ? 60 : Infinity;
     const cached = await getCached(supabase, cacheKey, maxAgeMin);
     if (cached) {
         cached._cached = true;
@@ -186,22 +186,24 @@ async function fetchHistorical(accessToken, year, supabase) {
 
     const insights = allInsights.filter(r => parseInt(r.impressions || 0) > 0);
 
-    // 2. Fetch creative details for insight ads
+    // 2. Fetch creative details in bulk using multi-ID endpoint
+    //    GET /?ids=id1,id2,...&fields=creative{...} — up to 50 IDs per call
     const insightAdIds = new Set(insights.map(r => r.ad_id));
     const creativeMap = new Map();
 
     const adIdsToFetch = [...insightAdIds];
-    for (let i = 0; i < adIdsToFetch.length; i += 10) {
-        const batch = adIdsToFetch.slice(i, i + 10);
-        await Promise.allSettled(
-            batch.map(adId =>
-                graphGet(adId, {
-                    fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
-                }, accessToken).then(resp => {
-                    if (resp.creative) creativeMap.set(adId, resp.creative);
-                })
-            )
-        );
+    for (let i = 0; i < adIdsToFetch.length; i += 50) {
+        const batch = adIdsToFetch.slice(i, i + 50);
+        try {
+            const resp = await graphGet('', {
+                ids: batch.join(','),
+                fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+            }, accessToken);
+            // Response is keyed by ad ID
+            for (const [adId, adData] of Object.entries(resp)) {
+                if (adData && adData.creative) creativeMap.set(adId, adData.creative);
+            }
+        } catch { /* batch may partially fail, continue */ }
     }
 
     // 3. For current year, also fetch active ads directly
