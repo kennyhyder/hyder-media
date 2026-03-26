@@ -4,9 +4,6 @@
  *
  * Active mode (no year param): fetches currently active campaigns/ads
  * Historical mode (?year=YYYY): fetches ads that received impressions that year
- *
- * Requires META_APP_ID, META_APP_SECRET env vars and a valid token in meta_ads_connections.
- * The ad account ID is hardcoded below — update when Kenny provides it.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -28,7 +25,6 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_KEY
         );
 
-        // Get most recent Meta connection
         const { data: connection, error: connError } = await supabase
             .from('meta_ads_connections')
             .select('*')
@@ -43,7 +39,6 @@ export default async function handler(req, res) {
             });
         }
 
-        // Check token expiry
         if (connection.token_expires_at && new Date(connection.token_expires_at) < new Date()) {
             return res.status(401).json({
                 error: 'Meta token expired. Please re-authorize.',
@@ -52,8 +47,6 @@ export default async function handler(req, res) {
         }
 
         const accessToken = connection.access_token;
-
-        // Check for year parameter (historical mode)
         const year = parseInt(req.query.year);
         const currentYear = new Date().getFullYear();
         const isHistorical = year && year >= 2020 && year <= currentYear;
@@ -76,99 +69,97 @@ export default async function handler(req, res) {
  * Fetch currently active campaigns and ads
  */
 async function fetchActive(accessToken) {
-    // 1. Fetch active campaigns
+    // Use effective_status param (not filtering) to get active campaigns
     const campaignsResp = await graphGet(
         `${AD_ACCOUNT_ID}/campaigns`,
         {
             fields: 'id,name,status,objective',
-            filtering: JSON.stringify([{ field: 'status', operator: 'IN', value: ['ACTIVE'] }]),
+            effective_status: '["ACTIVE"]',
             limit: 100,
         },
         accessToken
     );
-
     const campaigns = campaignsResp.data || [];
 
-    // 2. Fetch active ads with creative details
+    // Use effective_status param for ads too
     const adsResp = await graphGet(
         `${AD_ACCOUNT_ID}/ads`,
         {
             fields: [
-                'id', 'name', 'status',
+                'id', 'name', 'status', 'effective_status',
                 'campaign_id', 'adset_id',
                 'adset{name,status}',
                 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
             ].join(','),
-            filtering: JSON.stringify([{ field: 'status', operator: 'IN', value: ['ACTIVE'] }]),
+            effective_status: '["ACTIVE"]',
             limit: 200,
         },
         accessToken
     );
-
     const ads = adsResp.data || [];
 
     return buildActiveResponse(campaigns, ads);
 }
 
 /**
- * Fetch historical ads for a given year using insights
+ * Fetch historical ads for a given year using insights.
+ * Only ads with impressions > 0 are included.
  */
 async function fetchHistorical(accessToken, year) {
     const timeRange = JSON.stringify({ since: `${year}-01-01`, until: `${year}-12-31` });
 
-    // Get ad-level insights for the year
-    const insightsResp = await graphGet(
-        `${AD_ACCOUNT_ID}/insights`,
-        {
-            level: 'ad',
-            time_range: timeRange,
-            fields: [
-                'campaign_name', 'campaign_id',
-                'adset_name', 'adset_id',
-                'ad_name', 'ad_id',
-                'impressions', 'clicks', 'spend', 'ctr',
-            ].join(','),
-            limit: 500,
-        },
-        accessToken
-    );
+    // Paginate through all insights for the year
+    let allInsights = [];
+    let nextUrl = null;
+    const baseParams = {
+        level: 'ad',
+        time_range: timeRange,
+        fields: 'campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions',
+        limit: 500,
+    };
 
-    const insights = insightsResp.data || [];
+    const firstResp = await graphGet(`${AD_ACCOUNT_ID}/insights`, baseParams, accessToken);
+    allInsights = firstResp.data || [];
+    nextUrl = firstResp.paging?.next || null;
 
-    // For each ad with impressions, try to fetch creative details
+    while (nextUrl) {
+        const pageResp = await fetch(nextUrl);
+        const pageData = await pageResp.json();
+        if (pageData.error) break;
+        allInsights = allInsights.concat(pageData.data || []);
+        nextUrl = pageData.paging?.next || null;
+    }
+
+    // Only keep ads with actual impressions
+    const insights = allInsights.filter(r => parseInt(r.impressions || 0) > 0);
+
+    // Fetch creative details for each unique ad
     const adIds = [...new Set(insights.map(r => r.ad_id))];
     const creativeMap = new Map();
 
-    // Batch fetch creative details (Meta API doesn't have a batch creative endpoint,
-    // so we fetch each ad's creative individually — capped to avoid timeout)
-    const batchSize = 20;
-    for (let i = 0; i < Math.min(adIds.length, batchSize); i++) {
-        try {
-            const adResp = await graphGet(
-                adIds[i],
-                {
+    // Fetch all creatives in parallel batches of 10
+    for (let i = 0; i < adIds.length; i += 10) {
+        const batch = adIds.slice(i, i + 10);
+        const results = await Promise.allSettled(
+            batch.map(adId =>
+                graphGet(adId, {
                     fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
-                },
-                accessToken
-            );
-            if (adResp.creative) {
-                creativeMap.set(adIds[i], adResp.creative);
-            }
-        } catch (e) {
-            // Some historical ads may no longer be accessible
-        }
+                }, accessToken).then(resp => {
+                    if (resp.creative) creativeMap.set(adId, resp.creative);
+                })
+            )
+        );
     }
 
     return buildHistoricalResponse(insights, creativeMap, year);
 }
 
 /**
- * Build response for active ads — groups by campaign > adSet > ads
+ * Build response for active ads
  */
 function buildActiveResponse(campaigns, ads) {
     const campaignMap = new Map();
 
-    // Seed campaign map
     for (const c of campaigns) {
         campaignMap.set(c.id, {
             id: c.id,
@@ -179,7 +170,6 @@ function buildActiveResponse(campaigns, ads) {
         });
     }
 
-    // Group ads into campaigns > ad sets
     for (const ad of ads) {
         const campId = ad.campaign_id;
         if (!campaignMap.has(campId)) {
@@ -206,6 +196,11 @@ function buildActiveResponse(campaigns, ads) {
         }
 
         camp.adSets.get(adsetId).ads.push(parseAd(ad));
+    }
+
+    // Remove campaigns with no ads
+    for (const [id, camp] of campaignMap) {
+        if (camp.adSets.size === 0) campaignMap.delete(id);
     }
 
     const result = Array.from(campaignMap.values()).map(c => ({
@@ -259,14 +254,13 @@ function buildHistoricalResponse(insights, creativeMap, year) {
         const existing = adSetObj.ads.find(a => a.id === row.ad_id);
         if (existing) {
             existing.impressions += parseInt(row.impressions || 0);
-            existing.clicks += parseInt(row.clicks || 0);
-            existing.spend += parseFloat(row.spend || 0);
             continue;
         }
 
-        // Parse creative from map if available
         const creative = creativeMap.get(row.ad_id);
-        const parsed = creative ? parseCreative(creative) : { primaryTexts: [], headlines: [], descriptions: [], imageUrl: null, thumbnailUrl: null, linkUrl: null };
+        const parsed = creative
+            ? parseCreative(creative)
+            : { primaryTexts: [], headlines: [], descriptions: [], imageUrl: null, thumbnailUrl: null, linkUrl: null };
 
         adSetObj.ads.push({
             id: row.ad_id,
@@ -274,9 +268,6 @@ function buildHistoricalResponse(insights, creativeMap, year) {
             status: 'HISTORICAL',
             ...parsed,
             impressions: parseInt(row.impressions || 0),
-            clicks: parseInt(row.clicks || 0),
-            spend: parseFloat(row.spend || 0),
-            ctr: parseFloat(row.ctr || 0),
         });
     }
 
@@ -302,7 +293,6 @@ function buildHistoricalResponse(insights, creativeMap, year) {
 function parseAd(ad) {
     const creative = ad.creative || {};
     const parsed = parseCreative(creative);
-
     return {
         id: ad.id,
         name: ad.name,
@@ -312,41 +302,59 @@ function parseAd(ad) {
 }
 
 /**
- * Parse creative object into primaryTexts/headlines/descriptions/imageUrl
- * Handles both asset_feed_spec (dynamic creative) and single creative
+ * Parse creative into primaryTexts/headlines/descriptions/imageUrl.
+ * Handles asset_feed_spec (dynamic creative), object_story_spec (standard),
+ * and legacy body/title fields.
  */
 function parseCreative(creative) {
     const result = {
         primaryTexts: [],
         headlines: [],
         descriptions: [],
-        imageUrl: creative.image_url || null,
+        imageUrl: creative.image_url || creative.thumbnail_url || null,
         thumbnailUrl: creative.thumbnail_url || null,
         linkUrl: null,
     };
 
-    // Dynamic creative (asset_feed_spec)
+    // 1. Dynamic creative (asset_feed_spec) — highest priority
     const afs = creative.asset_feed_spec;
     if (afs) {
-        if (afs.bodies) {
-            result.primaryTexts = afs.bodies.map(b => ({ text: b.text || '' }));
-        }
-        if (afs.titles) {
-            result.headlines = afs.titles.map(t => ({ text: t.text || '' }));
-        }
-        if (afs.descriptions) {
-            result.descriptions = afs.descriptions.map(d => ({ text: d.text || '' }));
-        }
-        if (afs.link_urls) {
-            result.linkUrl = afs.link_urls[0]?.website_url || null;
-        }
-        // If dynamic creative has images, use first one
+        if (afs.bodies) result.primaryTexts = afs.bodies.map(b => ({ text: b.text || '' }));
+        if (afs.titles) result.headlines = afs.titles.map(t => ({ text: t.text || '' }));
+        if (afs.descriptions) result.descriptions = afs.descriptions.map(d => ({ text: d.text || '' }));
+        if (afs.link_urls) result.linkUrl = afs.link_urls[0]?.website_url || null;
         if (afs.images && afs.images.length > 0) {
             result.imageUrl = result.imageUrl || afs.images[0].url || null;
         }
     }
 
-    // Fallback: single creative body/title
+    // 2. object_story_spec — standard ads (link ads, video ads)
+    const oss = creative.object_story_spec;
+    if (oss) {
+        const linkData = oss.link_data || {};
+        const videoData = oss.video_data || {};
+
+        if (result.primaryTexts.length === 0) {
+            const msg = linkData.message || videoData.message || '';
+            if (msg) result.primaryTexts = [{ text: msg }];
+        }
+        if (result.headlines.length === 0) {
+            const name = linkData.name || videoData.title || '';
+            if (name) result.headlines = [{ text: name }];
+        }
+        if (result.descriptions.length === 0) {
+            const desc = linkData.description || videoData.description || '';
+            if (desc) result.descriptions = [{ text: desc }];
+        }
+        if (!result.linkUrl) {
+            result.linkUrl = linkData.link || null;
+        }
+        if (!result.imageUrl) {
+            result.imageUrl = linkData.picture || videoData.image_url || null;
+        }
+    }
+
+    // 3. Legacy fallbacks
     if (result.primaryTexts.length === 0 && creative.body) {
         result.primaryTexts = [{ text: creative.body }];
     }
@@ -354,18 +362,11 @@ function parseCreative(creative) {
         result.headlines = [{ text: creative.title }];
     }
 
-    // Extract link from object_story_spec if available
-    if (!result.linkUrl && creative.object_story_spec) {
-        const oss = creative.object_story_spec;
-        const linkData = oss.link_data || oss.video_data || {};
-        result.linkUrl = linkData.link || null;
-    }
-
     return result;
 }
 
 /**
- * Helper: GET request to Graph API
+ * Helper: GET request to Graph API with pagination support
  */
 async function graphGet(endpoint, params, accessToken) {
     const url = new URL(endpoint.startsWith('http') ? endpoint : `${GRAPH_BASE}/${endpoint}`);

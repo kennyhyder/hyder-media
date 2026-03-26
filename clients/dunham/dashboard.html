@@ -620,8 +620,7 @@
             document.getElementById('report-date').textContent =
                 'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            let totalAdSets = 0, totalAds = 0, totalPrimaryTexts = 0, totalImages = 0;
-            let totalSpend = 0;
+            let totalAdSets = 0, totalAds = 0, totalPrimaryTexts = 0, totalHeadlines = 0, totalImages = 0;
 
             for (const camp of data.campaigns) {
                 totalAdSets += (camp.adSets || []).length;
@@ -629,38 +628,23 @@
                     totalAds += adSet.ads.length;
                     for (const ad of adSet.ads) {
                         totalPrimaryTexts += (ad.primaryTexts || []).length;
+                        totalHeadlines += (ad.headlines || []).length;
                         if (ad.imageUrl || ad.thumbnailUrl) totalImages++;
-                        if (isHistorical) totalSpend += ad.spend || 0;
                     }
                 }
             }
 
             document.getElementById('label-adgroups').textContent = 'Ad Sets';
             document.getElementById('label-headlines').textContent = 'Primary Texts';
-            document.getElementById('label-descriptions').textContent = 'Images';
-            document.getElementById('label-extensions').textContent = isHistorical ? 'Total Spend' : 'Headlines';
+            document.getElementById('label-descriptions').textContent = 'Headlines';
+            document.getElementById('label-extensions').textContent = 'Images';
 
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdSets;
             document.getElementById('stat-ads').textContent = totalAds;
             document.getElementById('stat-headlines').textContent = totalPrimaryTexts;
-            document.getElementById('stat-descriptions').textContent = totalImages;
-
-            if (isHistorical) {
-                document.getElementById('stat-extensions').textContent =
-                    '$' + totalSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            } else {
-                // Count total headlines across all ads
-                let totalHL = 0;
-                for (const camp of data.campaigns) {
-                    for (const adSet of (camp.adSets || [])) {
-                        for (const ad of adSet.ads) {
-                            totalHL += (ad.headlines || []).length;
-                        }
-                    }
-                }
-                document.getElementById('stat-extensions').textContent = totalHL;
-            }
+            document.getElementById('stat-descriptions').textContent = totalHeadlines;
+            document.getElementById('stat-extensions').textContent = totalImages;
             statsEl.style.display = 'flex';
 
             if (data.campaigns.length === 0) {
@@ -712,16 +696,6 @@
                 ${isHistorical ? `<span class="badge ${statusClass}" style="font-size:0.7rem;">${ad.status}</span>` : ''}
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
-
-            // Metrics for historical
-            if (isHistorical && (ad.impressions || ad.clicks || ad.spend)) {
-                html += `<div class="ad-metrics-row">
-                    <span class="ad-metric"><strong>${formatNum(ad.impressions)}</strong> impressions</span>
-                    <span class="ad-metric"><strong>${formatNum(ad.clicks)}</strong> clicks</span>
-                    <span class="ad-metric"><strong>$${parseFloat(ad.spend || 0).toFixed(2)}</strong> spend</span>
-                    <span class="ad-metric"><strong>${parseFloat(ad.ctr || 0).toFixed(2)}%</strong> CTR</span>
-                </div>`;
-            }
 
             // Meta feed-style ad preview
             html += renderMetaAdPreview(ad);

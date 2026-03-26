@@ -94,6 +94,7 @@ export default async function handler(req, res) {
                     metrics.impressions, metrics.clicks, metrics.cost_micros
                 FROM ad_group_ad
                 WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND metrics.impressions > 0
             `);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
