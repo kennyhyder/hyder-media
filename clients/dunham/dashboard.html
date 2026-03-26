@@ -221,7 +221,6 @@
 
             let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0;
             let totalExtensions = (data.accountAssets || []).length;
-            let totalImpressions = 0, totalClicks = 0, totalCostMicros = 0;
 
             for (const camp of data.campaigns) {
                 totalAdGroups += camp.adGroups.length;
@@ -231,11 +230,6 @@
                     for (const ad of ag.ads) {
                         totalHeadlines += (ad.headlines || []).length;
                         totalDescriptions += (ad.descriptions || []).length;
-                        if (isHistorical) {
-                            totalImpressions += ad.impressions || 0;
-                            totalClicks += ad.clicks || 0;
-                            totalCostMicros += ad.costMicros || 0;
-                        }
                     }
                 }
             }
@@ -243,15 +237,14 @@
             document.getElementById('label-adgroups').textContent = 'Ad Groups';
             document.getElementById('label-headlines').textContent = 'Headlines';
             document.getElementById('label-descriptions').textContent = 'Descriptions';
-            document.getElementById('label-extensions').textContent = isHistorical ? 'Total Spend' : 'Extensions';
+            document.getElementById('label-extensions').textContent = 'Extensions';
 
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdGroups;
             document.getElementById('stat-ads').textContent = totalAds;
             document.getElementById('stat-headlines').textContent = totalHeadlines;
             document.getElementById('stat-descriptions').textContent = totalDescriptions;
-            document.getElementById('stat-extensions').textContent = isHistorical
-                ? formatCost(totalCostMicros) : totalExtensions;
+            document.getElementById('stat-extensions').textContent = totalExtensions;
             statsEl.style.display = 'flex';
 
             if (data.campaigns.length === 0) {
@@ -322,15 +315,6 @@
                 ${isHistorical ? `<span class="badge ${statusClass}" style="font-size:0.7rem;">${ad.status}</span>` : ''}
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
-
-            if (isHistorical && (ad.impressions || ad.clicks || ad.costMicros)) {
-                html += `<div class="ad-metrics-row">
-                    <span class="ad-metric"><strong>${formatNum(ad.impressions)}</strong> impressions</span>
-                    <span class="ad-metric"><strong>${formatNum(ad.clicks)}</strong> clicks</span>
-                    <span class="ad-metric"><strong>${formatCost(ad.costMicros)}</strong> spend</span>
-                    <span class="ad-metric"><strong>${ad.impressions > 0 ? ((ad.clicks / ad.impressions) * 100).toFixed(1) + '%' : '0%'}</strong> CTR</span>
-                </div>`;
-            }
 
             if (ad.type === 'RESPONSIVE_SEARCH_AD' && ad.headlines && ad.headlines.length > 0) {
                 html += renderAdPreview(ad, campaignSitelinks);

@@ -106,7 +106,12 @@ async function fetchActive(accessToken) {
  * Only ads with impressions > 0 are included.
  */
 async function fetchHistorical(accessToken, year) {
-    const timeRange = JSON.stringify({ since: `${year}-01-01`, until: `${year}-12-31` });
+    // For current year, use today's date as end (Meta API doesn't handle future dates)
+    const now = new Date();
+    const untilDate = year >= now.getFullYear()
+        ? now.toISOString().slice(0, 10)
+        : `${year}-12-31`;
+    const timeRange = JSON.stringify({ since: `${year}-01-01`, until: untilDate });
 
     // Paginate through all insights for the year
     let allInsights = [];
