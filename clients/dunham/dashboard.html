@@ -41,6 +41,7 @@
         <!-- Platform Toggle -->
         <div class="platform-tabs">
             <button class="platform-tab active" data-platform="google" onclick="switchPlatform('google')">Google Ads</button>
+            <button class="platform-tab" data-platform="keywords" onclick="switchPlatform('keywords')">Google Keywords</button>
             <button class="platform-tab" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
         </div>
 
@@ -49,27 +50,27 @@
 
         <!-- Stats -->
         <div class="stats-row" id="stats-row" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-label">Campaigns</div>
+            <div class="stat-card" id="card-campaigns">
+                <div class="stat-label" id="label-campaigns">Campaigns</div>
                 <div class="stat-value" id="stat-campaigns">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="card-adgroups">
                 <div class="stat-label" id="label-adgroups">Ad Groups</div>
                 <div class="stat-value" id="stat-adgroups">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Ads</div>
+            <div class="stat-card" id="card-ads">
+                <div class="stat-label" id="label-ads">Ads</div>
                 <div class="stat-value" id="stat-ads">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="card-headlines">
                 <div class="stat-label" id="label-headlines">Headlines</div>
                 <div class="stat-value" id="stat-headlines">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="card-descriptions">
                 <div class="stat-label" id="label-descriptions">Descriptions</div>
                 <div class="stat-value" id="stat-descriptions">0</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="card-extensions">
                 <div class="stat-label" id="label-extensions">Extensions</div>
                 <div class="stat-value" id="stat-extensions">0</div>
             </div>
@@ -106,7 +107,11 @@
         let activeYear = 'active';
         let dataCache = {}; // keyed by "platform:year"
 
-        function cacheKey(year) { return `${activePlatform}:${year}`; }
+        // Keywords shares cache with google (same API response)
+        function cacheKey(year) {
+            const p = activePlatform === 'keywords' ? 'google' : activePlatform;
+            return `${p}:${year}`;
+        }
 
         // Platform toggle
         function switchPlatform(platform) {
@@ -117,21 +122,24 @@
 
             // Update account label
             document.getElementById('report-account').textContent =
-                platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
+                platform === 'meta' ? 'Meta Ads' : 'Account: 840-838-5870';
 
-            // Rebuild year tabs for this platform
-            activeYear = 'active';
+            // Keywords has no "active" mode — default to current year
+            activeYear = platform === 'keywords' ? CURRENT_YEAR : 'active';
             buildYearTabs();
-            dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
+            dataCache[cacheKey(activeYear)] ? renderReport(dataCache[cacheKey(activeYear)]) : loadData(activeYear);
         }
 
         // Build year tabs
         function buildYearTabs() {
             const container = document.getElementById('year-tabs');
             const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
-            let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
+            let html = '';
+            if (activePlatform !== 'keywords') {
+                html += `<button class="year-tab${activeYear === 'active' ? ' active' : ''}" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
+            }
             for (let y = CURRENT_YEAR; y >= startYear; y--) {
-                html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
+                html += `<button class="year-tab${activeYear === y ? ' active' : ''}" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
             }
             container.innerHTML = html;
         }
@@ -141,10 +149,14 @@
             document.querySelectorAll('.year-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
-            const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
-            document.querySelector('.subtitle').textContent = year === 'active'
-                ? `Complete inventory of active ${platformLabel} ad copy`
-                : `${platformLabel} ad copy that ran during ${year}`;
+            if (activePlatform === 'keywords') {
+                document.querySelector('.subtitle').textContent = `All keywords bid on during ${year}`;
+            } else {
+                const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
+                document.querySelector('.subtitle').textContent = year === 'active'
+                    ? `Complete inventory of active ${platformLabel} ad copy`
+                    : `${platformLabel} ad copy that ran during ${year}`;
+            }
             if (dataCache[cacheKey(year)]) {
                 renderReport(dataCache[cacheKey(year)]);
             } else {
@@ -168,7 +180,8 @@
             const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
             const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
             document.getElementById('loading-text').textContent =
-                `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
+                activePlatform === 'keywords' ? 'Loading keywords from Google Ads...'
+                : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
             try {
                 const resp = await fetch(url);
@@ -197,6 +210,7 @@
         }
 
         function renderReport(data) {
+            if (activePlatform === 'keywords') return renderKeywordsReport(data);
             const isMeta = data.platform === 'meta';
             if (isMeta) return renderMetaReport(data);
             return renderGoogleReport(data);
@@ -229,17 +243,18 @@
                 }
             }
 
+            document.getElementById('label-campaigns').textContent = 'Campaigns';
             document.getElementById('label-adgroups').textContent = 'Ad Groups';
-            document.getElementById('label-headlines').textContent = isHistorical ? 'Keywords' : 'Headlines';
+            document.getElementById('label-ads').textContent = 'Ads';
+            document.getElementById('label-headlines').textContent = 'Headlines';
             document.getElementById('label-descriptions').textContent = 'Descriptions';
             document.getElementById('label-extensions').textContent = 'Extensions';
-
-            const totalKeywords = (data.keywords || []).length;
+            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
 
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdGroups;
             document.getElementById('stat-ads').textContent = totalAds;
-            document.getElementById('stat-headlines').textContent = isHistorical ? totalKeywords : totalHeadlines;
+            document.getElementById('stat-headlines').textContent = totalHeadlines;
             document.getElementById('stat-descriptions').textContent = totalDescriptions;
             document.getElementById('stat-extensions').textContent = totalExtensions;
             statsEl.style.display = 'flex';
@@ -290,20 +305,6 @@
                 html += `</div></div>`;
             }
 
-            // Keywords section (historical only)
-            if (isHistorical && data.keywords && data.keywords.length > 0) {
-                html += `<div class="keywords-section">`;
-                html += `<h2>Keywords (${data.keywords.length})</h2>`;
-                html += `<p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">All keywords the account bid on during ${data.year}, sorted by impressions.</p>`;
-                html += `<table class="keywords-table">`;
-                html += `<thead><tr><th>Keyword</th><th>Impressions</th><th>Clicks</th></tr></thead>`;
-                html += `<tbody>`;
-                for (const kw of data.keywords) {
-                    html += `<tr><td>${esc(kw.keyword)}</td><td>${formatNum(kw.impressions)}</td><td>${formatNum(kw.clicks)}</td></tr>`;
-                }
-                html += `</tbody></table></div>`;
-            }
-
             if (!isHistorical && data.accountAssets && data.accountAssets.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Account-Level Extensions</h2>`;
@@ -311,6 +312,62 @@
                 html += renderExtensionsGrid(data.accountAssets);
                 html += `</div>`;
             }
+
+            contentEl.innerHTML = html;
+            contentEl.style.display = 'block';
+        }
+
+        // ============================================================
+        // Google Keywords rendering (own tab)
+        // ============================================================
+        function renderKeywordsReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+            const keywords = data.keywords || [];
+
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            let totalImpressions = 0, totalClicks = 0;
+            for (const kw of keywords) {
+                totalImpressions += kw.impressions;
+                totalClicks += kw.clicks;
+            }
+            const ctr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) + '%' : '0%';
+
+            // Show 4 stat cards, hide 2
+            document.getElementById('label-campaigns').textContent = 'Keywords';
+            document.getElementById('label-adgroups').textContent = 'Impressions';
+            document.getElementById('label-ads').textContent = 'Clicks';
+            document.getElementById('label-headlines').textContent = 'Avg CTR';
+            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
+            document.getElementById('card-descriptions').style.display = 'none';
+            document.getElementById('card-extensions').style.display = 'none';
+
+            document.getElementById('stat-campaigns').textContent = formatNum(keywords.length);
+            document.getElementById('stat-adgroups').textContent = formatNum(totalImpressions);
+            document.getElementById('stat-ads').textContent = formatNum(totalClicks);
+            document.getElementById('stat-headlines').textContent = ctr;
+            statsEl.style.display = 'flex';
+
+            if (keywords.length === 0) {
+                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
+                    <h2>No keyword data for ${data.year || 'this period'}</h2>
+                    <p style="color:var(--text-secondary);">No keywords received impressions during this year, or the account wasn't active yet.</p>
+                </div>`;
+                contentEl.style.display = 'block';
+                return;
+            }
+
+            let html = `<div class="keywords-section">`;
+            html += `<table class="keywords-table">`;
+            html += `<thead><tr><th>Keyword</th><th>Impressions</th><th>Clicks</th></tr></thead>`;
+            html += `<tbody>`;
+            for (const kw of keywords) {
+                html += `<tr><td>${esc(kw.keyword)}</td><td>${formatNum(kw.impressions)}</td><td>${formatNum(kw.clicks)}</td></tr>`;
+            }
+            html += `</tbody></table></div>`;
 
             contentEl.innerHTML = html;
             contentEl.style.display = 'block';
