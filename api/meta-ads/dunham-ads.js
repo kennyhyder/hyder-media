@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         const isHistorical = year && year >= 2020 && year <= currentYear;
 
         if (isHistorical) {
-            const data = await fetchHistorical(accessToken, year, supabase);
+            const data = await fetchHistorical(accessToken, year, supabase, req);
             return res.status(200).json(data);
         }
 
@@ -135,18 +135,22 @@ async function fetchActive(accessToken) {
  * Fetch historical ads for a given year.
  * Uses Supabase cache to avoid rate limiting.
  */
-async function fetchHistorical(accessToken, year, supabase) {
+async function fetchHistorical(accessToken, year, supabase, req) {
     const now = new Date();
     const currentYear = now.getFullYear();
     const isCurrentYear = year >= currentYear;
 
     // Check cache: 1h for current year, indefinite for past years
+    // ?refresh=true bypasses cache and re-fetches
     const cacheKey = `dunham:meta:${year}`;
-    const maxAgeMin = isCurrentYear ? 60 : Infinity;
-    const cached = await getCached(supabase, cacheKey, maxAgeMin);
-    if (cached) {
-        cached._cached = true;
-        return cached;
+    const forceRefresh = req && req.query && req.query.refresh === 'true';
+    if (!forceRefresh) {
+        const maxAgeMin = isCurrentYear ? 60 : Infinity;
+        const cached = await getCached(supabase, cacheKey, maxAgeMin);
+        if (cached) {
+            cached._cached = true;
+            return cached;
+        }
     }
 
     // Determine date range
