@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunham & Jones — Ad Copy Audit</title>
+    <title>Dunham & Jones — Ad Audit</title>
     <link rel="icon" href="../../favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -23,6 +23,7 @@
         </a>
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
+            <a href="/api/meta-ads/auth?returnUrl=/clients/dunham/dashboard.html" class="btn btn-secondary" id="connect-meta-btn">Connect Meta</a>
             <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
             <button class="btn btn-primary" onclick="window.print()">Print Report</button>
         </div>
@@ -30,12 +31,18 @@
 
     <div class="container">
         <div class="report-header">
-            <h1>Dunham & Jones — Ad Copy Audit</h1>
+            <h1>Dunham & Jones — Ad Audit</h1>
             <p class="subtitle">Complete inventory of ad headlines, descriptions, and extensions</p>
             <div class="report-meta">
-                <span>Account: 840-838-5870</span>
+                <span id="report-account">Account: 840-838-5870</span>
                 <span id="report-date">Generated: —</span>
             </div>
+        </div>
+
+        <!-- Platform Toggle -->
+        <div class="platform-tabs">
+            <button class="platform-tab active" data-platform="google" onclick="switchPlatform('google')">Google Ads</button>
+            <button class="platform-tab" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
         </div>
 
         <!-- Year Tabs -->
@@ -48,7 +55,7 @@
                 <div class="stat-value" id="stat-campaigns">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Ad Groups</div>
+                <div class="stat-label" id="label-adgroups">Ad Groups</div>
                 <div class="stat-value" id="stat-adgroups">0</div>
             </div>
             <div class="stat-card">
@@ -56,15 +63,15 @@
                 <div class="stat-value" id="stat-ads">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Headlines</div>
+                <div class="stat-label" id="label-headlines">Headlines</div>
                 <div class="stat-value" id="stat-headlines">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Descriptions</div>
+                <div class="stat-label" id="label-descriptions">Descriptions</div>
                 <div class="stat-value" id="stat-descriptions">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Extensions</div>
+                <div class="stat-label" id="label-extensions">Extensions</div>
                 <div class="stat-value" id="stat-extensions">0</div>
             </div>
         </div>
@@ -72,7 +79,7 @@
         <!-- Loading -->
         <div class="loading" id="loading-state">
             <div class="spinner"></div>
-            <div>Loading ad copy from Google Ads...</div>
+            <div id="loading-text">Loading ad copy from Google Ads...</div>
         </div>
 
         <!-- Error -->
@@ -91,17 +98,44 @@
     </div>
 
     <script>
-        const API_URL = '/api/google-ads/dunham-ads';
+        const GOOGLE_API = '/api/google-ads/dunham-ads';
+        const META_API = '/api/meta-ads/dunham-ads';
         const CURRENT_YEAR = new Date().getFullYear();
-        const START_YEAR = 2018; // Go back to 2018
+        const GOOGLE_START_YEAR = 2018;
+        const META_START_YEAR = CURRENT_YEAR - 2; // Meta retains ~37 months
+        let activePlatform = 'google';
         let activeYear = 'active';
-        let dataCache = {};
+        let dataCache = {}; // keyed by "platform:year"
+
+        function cacheKey(year) { return `${activePlatform}:${year}`; }
+
+        // Platform toggle
+        function switchPlatform(platform) {
+            activePlatform = platform;
+            document.querySelectorAll('.platform-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.platform === platform);
+            });
+
+            // Update account label
+            document.getElementById('report-account').textContent =
+                platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
+
+            // Update Connect Meta button visibility
+            document.getElementById('connect-meta-btn').style.display =
+                platform === 'meta' ? 'inline-flex' : 'none';
+
+            // Rebuild year tabs for this platform
+            activeYear = 'active';
+            buildYearTabs();
+            dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
+        }
 
         // Build year tabs
         function buildYearTabs() {
             const container = document.getElementById('year-tabs');
+            const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
             let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
-            for (let y = CURRENT_YEAR; y >= START_YEAR; y--) {
+            for (let y = CURRENT_YEAR; y >= startYear; y--) {
                 html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
             }
             container.innerHTML = html;
@@ -109,17 +143,15 @@
 
         function switchYear(year) {
             activeYear = year;
-            // Update tab styling
             document.querySelectorAll('.year-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
-            // Update subtitle
+            const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
             document.querySelector('.subtitle').textContent = year === 'active'
-                ? 'Complete inventory of active ad headlines, descriptions, and extensions'
-                : `Ad copy that ran during ${year}`;
-            // Load from cache or fetch
-            if (dataCache[year]) {
-                renderReport(dataCache[year]);
+                ? `Complete inventory of active ${platformLabel} ad copy`
+                : `${platformLabel} ad copy that ran during ${year}`;
+            if (dataCache[cacheKey(year)]) {
+                renderReport(dataCache[cacheKey(year)]);
             } else {
                 loadData(year);
             }
@@ -138,20 +170,27 @@
             contentEl.style.display = 'none';
             statsEl.style.display = 'none';
 
-            const url = year === 'active' ? API_URL : `${API_URL}?year=${year}`;
+            const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
+            const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+            document.getElementById('loading-text').textContent =
+                `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
             try {
                 const resp = await fetch(url);
                 const data = await resp.json();
 
                 if (!resp.ok || data.error) {
+                    // If Meta needs auth, show helpful message
+                    if (data.needsAuth) {
+                        throw new Error(data.error + ' Click "Connect Meta" in the nav bar.');
+                    }
                     const msg = data.details
                         ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
                         : (data.error || `HTTP ${resp.status}`);
                     throw new Error(msg);
                 }
 
-                dataCache[year] = data;
+                dataCache[cacheKey(year)] = data;
                 loadingEl.style.display = 'none';
                 renderReport(data);
 
@@ -163,16 +202,23 @@
         }
 
         function renderReport(data) {
+            const isMeta = data.platform === 'meta';
+            if (isMeta) return renderMetaReport(data);
+            return renderGoogleReport(data);
+        }
+
+        // ============================================================
+        // Google Ads rendering (unchanged logic)
+        // ============================================================
+        function renderGoogleReport(data) {
             const contentEl = document.getElementById('report-content');
             const statsEl = document.getElementById('stats-row');
             const isHistorical = data.historical === true;
 
-            // Update date
             const fetchDate = new Date(data.fetchedAt);
             document.getElementById('report-date').textContent =
                 'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            // Count totals
             let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0;
             let totalExtensions = (data.accountAssets || []).length;
             let totalImpressions = 0, totalClicks = 0, totalCostMicros = 0;
@@ -194,16 +240,18 @@
                 }
             }
 
+            document.getElementById('label-adgroups').textContent = 'Ad Groups';
+            document.getElementById('label-headlines').textContent = 'Headlines';
+            document.getElementById('label-descriptions').textContent = 'Descriptions';
+            document.getElementById('label-extensions').textContent = isHistorical ? 'Total Spend' : 'Extensions';
+
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdGroups;
             document.getElementById('stat-ads').textContent = totalAds;
             document.getElementById('stat-headlines').textContent = totalHeadlines;
             document.getElementById('stat-descriptions').textContent = totalDescriptions;
             document.getElementById('stat-extensions').textContent = isHistorical
-                ? formatCost(totalCostMicros)
-                : totalExtensions;
-            document.querySelector('#stats-row .stat-card:last-child .stat-label').textContent =
-                isHistorical ? 'Total Spend' : 'Extensions';
+                ? formatCost(totalCostMicros) : totalExtensions;
             statsEl.style.display = 'flex';
 
             if (data.campaigns.length === 0) {
@@ -215,9 +263,7 @@
                 return;
             }
 
-            // Render campaigns
             let html = '';
-
             for (const camp of data.campaigns) {
                 const isPMax = camp.type === 'PERFORMANCE_MAX';
                 const typeBadge = isPMax ? '<span class="badge badge-pmax">PMAX</span>' : '';
@@ -230,29 +276,23 @@
                 </div>`;
                 html += `<div class="campaign-body">`;
 
-                // Collect campaign sitelinks for ad previews
                 const campSitelinks = (camp.assets || []).filter(a => a.type === 'SITELINK');
 
-                // Regular ad groups (Search campaigns)
                 for (const ag of camp.adGroups) {
                     html += `<div class="ad-group">`;
                     html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
-
                     for (const ad of ag.ads) {
-                        html += renderAd(ad, campSitelinks, isHistorical);
+                        html += renderGoogleAd(ad, campSitelinks, isHistorical);
                     }
-
                     html += `</div>`;
                 }
 
-                // PMax asset groups
                 if (camp.assetGroups && camp.assetGroups.length > 0) {
                     for (const ag of camp.assetGroups) {
                         html += renderAssetGroup(ag);
                     }
                 }
 
-                // Campaign-level extensions (only for active view)
                 if (!isHistorical && camp.assets && camp.assets.length > 0) {
                     html += renderExtensions('Campaign Extensions', camp.assets);
                 }
@@ -260,7 +300,6 @@
                 html += `</div></div>`;
             }
 
-            // Account-level assets (only for active view)
             if (!isHistorical && data.accountAssets && data.accountAssets.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Account-Level Extensions</h2>`;
@@ -273,7 +312,7 @@
             contentEl.style.display = 'block';
         }
 
-        function renderAd(ad, campaignSitelinks, isHistorical) {
+        function renderGoogleAd(ad, campaignSitelinks, isHistorical) {
             const typeName = (ad.type || 'UNKNOWN').replace(/_/g, ' ');
             const statusClass = ad.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
 
@@ -284,7 +323,6 @@
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
 
-            // Metrics row for historical ads
             if (isHistorical && (ad.impressions || ad.clicks || ad.costMicros)) {
                 html += `<div class="ad-metrics-row">
                     <span class="ad-metric"><strong>${formatNum(ad.impressions)}</strong> impressions</span>
@@ -294,7 +332,6 @@
                 </div>`;
             }
 
-            // Ad Preview (Google SERP mockup)
             if (ad.type === 'RESPONSIVE_SEARCH_AD' && ad.headlines && ad.headlines.length > 0) {
                 html += renderAdPreview(ad, campaignSitelinks);
             }
@@ -303,7 +340,6 @@
                 html += `<div class="ad-final-url">${esc(ad.finalUrls[0])}</div>`;
             }
 
-            // Headlines
             if (ad.headlines && ad.headlines.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Headlines (${ad.headlines.length})</div>`;
@@ -319,7 +355,6 @@
                 html += `</ul></div>`;
             }
 
-            // Descriptions
             if (ad.descriptions && ad.descriptions.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Descriptions (${ad.descriptions.length})</div>`;
@@ -340,7 +375,6 @@
         }
 
         function renderAdPreview(ad, campaignSitelinks) {
-            // Build display URL from final URL
             let displayUrl = '';
             if (ad.finalUrls && ad.finalUrls.length > 0) {
                 try {
@@ -351,7 +385,6 @@
                 }
             }
 
-            // Pick headlines: use pinned ones in their slots, fill rest in order
             const pinnedH = {};
             const unpinnedH = [];
             for (const h of ad.headlines) {
@@ -368,7 +401,6 @@
                 else if (uIdx < unpinnedH.length) { previewHeadlines.push(unpinnedH[uIdx++]); }
             }
 
-            // Pick descriptions similarly
             const pinnedD = {};
             const unpinnedD = [];
             for (const d of ad.descriptions) {
@@ -393,7 +425,6 @@
             html += `<div class="ad-preview-headline">${previewHeadlines.map(h => esc(h)).join(' | ')}</div>`;
             html += `<div class="ad-preview-description">${previewDescs.map(d => esc(d)).join(' ')}</div>`;
 
-            // Sitelinks
             const sitelinks = (campaignSitelinks || []).slice(0, 4);
             if (sitelinks.length > 0) {
                 html += `<div class="ad-preview-sitelinks">`;
@@ -414,12 +445,10 @@
             let html = `<div class="ad-group">`;
             html += `<div class="ad-group-name">${esc(ag.name)} <span class="badge badge-pmax">Asset Group</span></div>`;
 
-            // PMax ad preview
             if (ag.headlines.length > 0) {
                 html += renderPMaxPreview(ag);
             }
 
-            // Headlines
             if (ag.headlines.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Headlines (${ag.headlines.length})</div>`;
@@ -433,7 +462,6 @@
                 html += `</ul></div>`;
             }
 
-            // Long Headlines
             if (ag.longHeadlines.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Long Headlines (${ag.longHeadlines.length})</div>`;
@@ -447,7 +475,6 @@
                 html += `</ul></div>`;
             }
 
-            // Descriptions
             if (ag.descriptions.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Descriptions (${ag.descriptions.length})</div>`;
@@ -461,7 +488,6 @@
                 html += `</ul></div>`;
             }
 
-            // Business Name
             if (ag.businessName) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Business Name</div>`;
@@ -469,7 +495,6 @@
                 html += `</div>`;
             }
 
-            // Images
             if (ag.images.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Images (${ag.images.length})</div>`;
@@ -485,7 +510,6 @@
                 html += `</div></div>`;
             }
 
-            // Logos
             if (ag.logos.length > 0) {
                 html += `<div class="ad-copy-section">`;
                 html += `<div class="ad-copy-label">Logos (${ag.logos.length})</div>`;
@@ -531,7 +555,6 @@
         }
 
         function renderExtensionsGrid(assets) {
-            // Group by type
             const sitelinks = assets.filter(a => a.type === 'SITELINK');
             const callouts = assets.filter(a => a.type === 'CALLOUT');
             const snippets = assets.filter(a => a.type === 'STRUCTURED_SNIPPET');
@@ -585,9 +608,228 @@
             return html;
         }
 
+        // ============================================================
+        // Meta Ads rendering
+        // ============================================================
+        function renderMetaReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+            const isHistorical = data.historical === true;
+
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            let totalAdSets = 0, totalAds = 0, totalPrimaryTexts = 0, totalImages = 0;
+            let totalSpend = 0;
+
+            for (const camp of data.campaigns) {
+                totalAdSets += (camp.adSets || []).length;
+                for (const adSet of (camp.adSets || [])) {
+                    totalAds += adSet.ads.length;
+                    for (const ad of adSet.ads) {
+                        totalPrimaryTexts += (ad.primaryTexts || []).length;
+                        if (ad.imageUrl || ad.thumbnailUrl) totalImages++;
+                        if (isHistorical) totalSpend += ad.spend || 0;
+                    }
+                }
+            }
+
+            document.getElementById('label-adgroups').textContent = 'Ad Sets';
+            document.getElementById('label-headlines').textContent = 'Primary Texts';
+            document.getElementById('label-descriptions').textContent = 'Images';
+            document.getElementById('label-extensions').textContent = isHistorical ? 'Total Spend' : 'Headlines';
+
+            document.getElementById('stat-campaigns').textContent = data.campaigns.length;
+            document.getElementById('stat-adgroups').textContent = totalAdSets;
+            document.getElementById('stat-ads').textContent = totalAds;
+            document.getElementById('stat-headlines').textContent = totalPrimaryTexts;
+            document.getElementById('stat-descriptions').textContent = totalImages;
+
+            if (isHistorical) {
+                document.getElementById('stat-extensions').textContent =
+                    '$' + totalSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                // Count total headlines across all ads
+                let totalHL = 0;
+                for (const camp of data.campaigns) {
+                    for (const adSet of (camp.adSets || [])) {
+                        for (const ad of adSet.ads) {
+                            totalHL += (ad.headlines || []).length;
+                        }
+                    }
+                }
+                document.getElementById('stat-extensions').textContent = totalHL;
+            }
+            statsEl.style.display = 'flex';
+
+            if (data.campaigns.length === 0) {
+                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
+                    <h2>No Meta ad data for ${data.year || 'this period'}</h2>
+                    <p style="color:var(--text-secondary);">No ads found. Check that Meta is connected and the ad account is active.</p>
+                </div>`;
+                contentEl.style.display = 'block';
+                return;
+            }
+
+            let html = '';
+            for (const camp of data.campaigns) {
+                const statusClass = camp.status === 'ACTIVE' ? 'badge-enabled' : 'badge-paused';
+                const objBadge = camp.objective
+                    ? `<span class="badge badge-type">${camp.objective.replace(/_/g, ' ')}</span>` : '';
+
+                html += `<div class="campaign-section">`;
+                html += `<div class="campaign-header">
+                    <div class="campaign-name">${esc(camp.name)} ${objBadge}</div>
+                    <span class="badge ${statusClass}">${camp.status}</span>
+                </div>`;
+                html += `<div class="campaign-body">`;
+
+                for (const adSet of (camp.adSets || [])) {
+                    html += `<div class="ad-group">`;
+                    html += `<div class="ad-group-name">${esc(adSet.name)}</div>`;
+
+                    for (const ad of adSet.ads) {
+                        html += renderMetaAd(ad, isHistorical);
+                    }
+
+                    html += `</div>`;
+                }
+
+                html += `</div></div>`;
+            }
+
+            contentEl.innerHTML = html;
+            contentEl.style.display = 'block';
+        }
+
+        function renderMetaAd(ad, isHistorical) {
+            const statusClass = ad.status === 'ACTIVE' ? 'badge-enabled' : 'badge-paused';
+
+            let html = `<div class="ad-card">`;
+            html += `<div class="ad-card-header">
+                <span class="badge badge-type" style="background:rgba(24,119,242,0.15);color:#1877f2;">META AD</span>
+                ${isHistorical ? `<span class="badge ${statusClass}" style="font-size:0.7rem;">${ad.status}</span>` : ''}
+                ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
+            </div>`;
+
+            // Metrics for historical
+            if (isHistorical && (ad.impressions || ad.clicks || ad.spend)) {
+                html += `<div class="ad-metrics-row">
+                    <span class="ad-metric"><strong>${formatNum(ad.impressions)}</strong> impressions</span>
+                    <span class="ad-metric"><strong>${formatNum(ad.clicks)}</strong> clicks</span>
+                    <span class="ad-metric"><strong>$${parseFloat(ad.spend || 0).toFixed(2)}</strong> spend</span>
+                    <span class="ad-metric"><strong>${parseFloat(ad.ctr || 0).toFixed(2)}%</strong> CTR</span>
+                </div>`;
+            }
+
+            // Meta feed-style ad preview
+            html += renderMetaAdPreview(ad);
+
+            // Link URL
+            if (ad.linkUrl) {
+                html += `<div class="ad-final-url">${esc(ad.linkUrl)}</div>`;
+            }
+
+            // Primary Texts
+            if (ad.primaryTexts && ad.primaryTexts.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Primary Text (${ad.primaryTexts.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ad.primaryTexts.forEach((t, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(t.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Headlines
+            if (ad.headlines && ad.headlines.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Headlines (${ad.headlines.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ad.headlines.forEach((h, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(h.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Descriptions
+            if (ad.descriptions && ad.descriptions.length > 0) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Descriptions (${ad.descriptions.length})</div>`;
+                html += `<ul class="ad-copy-list">`;
+                ad.descriptions.forEach((d, i) => {
+                    html += `<li class="ad-copy-item">
+                        <span class="ad-copy-num">${i + 1}.</span>
+                        <span class="ad-copy-text">${esc(d.text)}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderMetaAdPreview(ad) {
+            const primaryText = ad.primaryTexts && ad.primaryTexts[0] ? ad.primaryTexts[0].text : '';
+            const headline = ad.headlines && ad.headlines[0] ? ad.headlines[0].text : '';
+            const description = ad.descriptions && ad.descriptions[0] ? ad.descriptions[0].text : '';
+            const imageUrl = ad.imageUrl || ad.thumbnailUrl;
+
+            if (!primaryText && !headline && !imageUrl) return '';
+
+            let html = `<div class="ad-preview">`;
+            html += `<div class="ad-preview-label">Meta Ad Preview</div>`;
+            html += `<div class="meta-ad-preview">`;
+
+            // Page header
+            html += `<div class="meta-ad-page-header">
+                <div class="meta-ad-page-avatar">DJ</div>
+                <div>
+                    <div class="meta-ad-page-name">Dunham & Jones</div>
+                    <div class="meta-ad-sponsored">Sponsored</div>
+                </div>
+            </div>`;
+
+            // Primary text
+            if (primaryText) {
+                html += `<div class="meta-ad-primary-text">${esc(primaryText)}</div>`;
+            }
+
+            // Image
+            if (imageUrl) {
+                html += `<div class="meta-ad-image"><img src="${esc(imageUrl)}" alt="Ad creative" loading="lazy"></div>`;
+            }
+
+            // Headline + description + CTA bar
+            if (headline || description) {
+                html += `<div class="meta-ad-footer">`;
+                if (ad.linkUrl) {
+                    try {
+                        html += `<div class="meta-ad-domain">${new URL(ad.linkUrl).hostname.toUpperCase()}</div>`;
+                    } catch(e) {}
+                }
+                if (headline) html += `<div class="meta-ad-headline">${esc(headline)}</div>`;
+                if (description) html += `<div class="meta-ad-description">${esc(description)}</div>`;
+                html += `</div>`;
+            }
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        // ============================================================
+        // Shared utilities
+        // ============================================================
         function formatPin(pinnedField) {
             if (!pinnedField) return '';
-            // e.g. HEADLINE_1 → Pin H1, DESCRIPTION_2 → Pin D2
             const match = pinnedField.match(/(HEADLINE|DESCRIPTION)_(\d+)/);
             if (match) {
                 const prefix = match[1] === 'HEADLINE' ? 'H' : 'D';
@@ -614,8 +856,15 @@
         }
 
         // Init
-        buildYearTabs();
-        loadData('active');
+        // Hide Connect Meta button initially (Google is default)
+        document.getElementById('connect-meta-btn').style.display = 'none';
+        // Check for ?meta_connected=true from OAuth callback
+        if (new URLSearchParams(window.location.search).get('meta_connected') === 'true') {
+            switchPlatform('meta');
+        } else {
+            buildYearTabs();
+            loadData('active');
+        }
     </script>
 </body>
 </html>
