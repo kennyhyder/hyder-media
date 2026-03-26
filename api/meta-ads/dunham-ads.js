@@ -114,7 +114,6 @@ async function fetchHistorical(accessToken, year) {
     const timeRange = JSON.stringify({ since: `${year}-01-01`, until: untilDate });
 
     // Paginate through all insights for the year
-    // Include filtering for ALL ad statuses (default only returns active)
     let allInsights = [];
     const baseParams = {
         level: 'ad',
@@ -122,11 +121,6 @@ async function fetchHistorical(accessToken, year) {
         fields: 'campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions',
         limit: 500,
         time_increment: 'all_days',
-        filtering: JSON.stringify([{
-            field: 'ad.effective_status',
-            operator: 'IN',
-            value: ['ACTIVE','PAUSED','DELETED','ARCHIVED','CAMPAIGN_PAUSED','ADSET_PAUSED','PENDING_REVIEW','DISAPPROVED','PREAPPROVED','PENDING_BILLING_INFO','IN_PROCESS','WITH_ISSUES'],
-        }]),
     };
 
     const firstResp = await graphGet(`${AD_ACCOUNT_ID}/insights`, baseParams, accessToken);
