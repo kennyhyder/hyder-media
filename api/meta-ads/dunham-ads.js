@@ -108,9 +108,18 @@ async function fetchActive(accessToken) {
 async function fetchHistorical(accessToken, year) {
     const now = new Date();
     const isCurrentYear = year >= now.getFullYear();
-    const untilDate = isCurrentYear
-        ? now.toISOString().slice(0, 10)
-        : `${year}-12-31`;
+
+    // For the current year, just use the active ads fetch (2 API calls)
+    // instead of insights + creative fetches (many calls, causes rate limiting)
+    if (isCurrentYear) {
+        const data = await fetchActive(accessToken);
+        data.historical = true;
+        data.year = year;
+        return data;
+    }
+
+    // For past years, use the Insights API
+    const untilDate = `${year}-12-31`;
 
     // Meta retains ~37 months of insights data — clamp start date
     const minDate = new Date(now);
@@ -146,12 +155,11 @@ async function fetchHistorical(accessToken, year) {
     const insights = allInsights.filter(r => parseInt(r.impressions || 0) > 0);
 
     // Fetch creative details for each unique ad from insights
-    const insightAdIds = new Set(insights.map(r => r.ad_id));
+    const adIds = [...new Set(insights.map(r => r.ad_id))];
     const creativeMap = new Map();
 
-    const adIdsToFetch = [...insightAdIds];
-    for (let i = 0; i < adIdsToFetch.length; i += 10) {
-        const batch = adIdsToFetch.slice(i, i + 10);
+    for (let i = 0; i < adIds.length; i += 10) {
+        const batch = adIds.slice(i, i + 10);
         await Promise.allSettled(
             batch.map(adId =>
                 graphGet(adId, {
@@ -163,99 +171,15 @@ async function fetchHistorical(accessToken, year) {
         );
     }
 
-    // For current year, also fetch active/paused ads directly
-    // (insights can lag 24-48h for newly launched ads)
-    let directAds = [];
-    let directAdsError = null;
-    if (isCurrentYear) {
-        try {
-            const adsResp = await graphGet(
-                `${AD_ACCOUNT_ID}/ads`,
-                {
-                    fields: [
-                        'id', 'name', 'status', 'effective_status',
-                        'campaign_id', 'adset_id',
-                        'campaign{name}', 'adset{name}',
-                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
-                    ].join(','),
-                    effective_status: '["ACTIVE"]',
-                    limit: 200,
-                },
-                accessToken
-            );
-            directAds = adsResp.data || [];
-        } catch (e) {
-            directAdsError = e.message;
-        }
-    }
-
     const response = buildHistoricalResponse(insights, creativeMap, year);
-
-    // Merge in direct ads not already covered by insights
-    if (directAds.length > 0) {
-        mergeDirectAds(response, directAds, insightAdIds);
-    }
-
     response._debug = {
         totalInsightsRows: allInsights.length,
         afterImpressionFilter: insights.length,
-        uniqueAdsFromInsights: insightAdIds.size,
+        uniqueAds: adIds.length,
         creativesFound: creativeMap.size,
-        directAdsFetched: directAds.length,
-        directAdsMerged: directAds.filter(a => !insightAdIds.has(a.id)).length,
-        directAdsError: directAdsError,
         timeRange: { since: sinceDate, until: untilDate },
     };
     return response;
-}
-
-/**
- * Merge directly-fetched ads into historical response (fills gaps from insights lag)
- */
-function mergeDirectAds(response, directAds, insightAdIds) {
-    for (const ad of directAds) {
-        if (insightAdIds.has(ad.id)) continue;
-
-        const campId = ad.campaign_id;
-        const adsetId = ad.adset_id;
-        const campaign = ad.campaign || {};
-        const adset = ad.adset || {};
-
-        let camp = response.campaigns.find(c => c.id === campId);
-        if (!camp) {
-            camp = {
-                id: campId,
-                name: campaign.name || `Campaign ${campId}`,
-                status: 'ACTIVE',
-                objective: null,
-                adSets: [],
-            };
-            response.campaigns.push(camp);
-        }
-
-        let adSetObj = camp.adSets.find(s => s.id === adsetId);
-        if (!adSetObj) {
-            adSetObj = {
-                id: adsetId,
-                name: adset.name || `Ad Set ${adsetId}`,
-                status: 'ACTIVE',
-                ads: [],
-            };
-            camp.adSets.push(adSetObj);
-        }
-
-        const creative = ad.creative || {};
-        const parsed = parseCreative(creative);
-        adSetObj.ads.push({
-            id: ad.id,
-            name: ad.name,
-            status: ad.effective_status || ad.status || 'ACTIVE',
-            ...parsed,
-            impressions: 0,
-        });
-    }
-
-    response.campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 }
 
 /**
