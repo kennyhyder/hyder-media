@@ -82,30 +82,67 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const adsData = await fetchQuery(CUSTOMER_ID, headers, `
-                SELECT
-                    campaign.id, campaign.name, campaign.status,
-                    ad_group.id, ad_group.name, ad_group.status,
-                    ad_group_ad.ad.id, ad_group_ad.ad.type,
-                    ad_group_ad.ad.name, ad_group_ad.status,
-                    ad_group_ad.ad.responsive_search_ad.headlines,
-                    ad_group_ad.ad.responsive_search_ad.descriptions,
-                    ad_group_ad.ad.expanded_text_ad.headline_part1,
-                    ad_group_ad.ad.expanded_text_ad.headline_part2,
-                    ad_group_ad.ad.expanded_text_ad.headline_part3,
-                    ad_group_ad.ad.expanded_text_ad.description,
-                    ad_group_ad.ad.expanded_text_ad.description2,
-                    ad_group_ad.ad.expanded_text_ad.path1,
-                    ad_group_ad.ad.expanded_text_ad.path2,
-                    ad_group_ad.ad.final_urls,
-                    metrics.impressions, metrics.clicks, metrics.cost_micros
-                FROM ad_group_ad
-                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
-                    AND metrics.impressions > 0
-            `);
+            const [adsData, keywordsData] = await Promise.all([
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id, campaign.name, campaign.status,
+                        ad_group.id, ad_group.name, ad_group.status,
+                        ad_group_ad.ad.id, ad_group_ad.ad.type,
+                        ad_group_ad.ad.name, ad_group_ad.status,
+                        ad_group_ad.ad.responsive_search_ad.headlines,
+                        ad_group_ad.ad.responsive_search_ad.descriptions,
+                        ad_group_ad.ad.expanded_text_ad.headline_part1,
+                        ad_group_ad.ad.expanded_text_ad.headline_part2,
+                        ad_group_ad.ad.expanded_text_ad.headline_part3,
+                        ad_group_ad.ad.expanded_text_ad.description,
+                        ad_group_ad.ad.expanded_text_ad.description2,
+                        ad_group_ad.ad.expanded_text_ad.path1,
+                        ad_group_ad.ad.expanded_text_ad.path2,
+                        ad_group_ad.ad.final_urls,
+                        metrics.impressions, metrics.clicks, metrics.cost_micros
+                    FROM ad_group_ad
+                    WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                        AND metrics.impressions > 0
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        ad_group_criterion.keyword.text,
+                        metrics.impressions,
+                        metrics.clicks
+                    FROM keyword_view
+                    WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                        AND metrics.impressions > 0
+                `),
+            ]);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
             const response = buildHistoricalResponse(adsData.results || [], year);
+
+            // Aggregate keywords (may have duplicates across date segments)
+            if (!keywordsData.error) {
+                const kwMap = new Map();
+                for (const row of (keywordsData.results || [])) {
+                    const text = (row.adGroupCriterion?.keyword?.text || '').toLowerCase();
+                    if (!text) continue;
+                    const metrics = row.metrics || {};
+                    if (kwMap.has(text)) {
+                        const existing = kwMap.get(text);
+                        existing.impressions += parseInt(metrics.impressions || 0);
+                        existing.clicks += parseInt(metrics.clicks || 0);
+                    } else {
+                        kwMap.set(text, {
+                            keyword: row.adGroupCriterion.keyword.text,
+                            impressions: parseInt(metrics.impressions || 0),
+                            clicks: parseInt(metrics.clicks || 0),
+                        });
+                    }
+                }
+                response.keywords = Array.from(kwMap.values())
+                    .sort((a, b) => b.impressions - a.impressions);
+            } else {
+                response.keywords = [];
+            }
+
             return res.status(200).json(response);
         }
 

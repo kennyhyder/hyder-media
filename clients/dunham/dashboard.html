@@ -230,14 +230,16 @@
             }
 
             document.getElementById('label-adgroups').textContent = 'Ad Groups';
-            document.getElementById('label-headlines').textContent = 'Headlines';
+            document.getElementById('label-headlines').textContent = isHistorical ? 'Keywords' : 'Headlines';
             document.getElementById('label-descriptions').textContent = 'Descriptions';
             document.getElementById('label-extensions').textContent = 'Extensions';
+
+            const totalKeywords = (data.keywords || []).length;
 
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdGroups;
             document.getElementById('stat-ads').textContent = totalAds;
-            document.getElementById('stat-headlines').textContent = totalHeadlines;
+            document.getElementById('stat-headlines').textContent = isHistorical ? totalKeywords : totalHeadlines;
             document.getElementById('stat-descriptions').textContent = totalDescriptions;
             document.getElementById('stat-extensions').textContent = totalExtensions;
             statsEl.style.display = 'flex';
@@ -286,6 +288,20 @@
                 }
 
                 html += `</div></div>`;
+            }
+
+            // Keywords section (historical only)
+            if (isHistorical && data.keywords && data.keywords.length > 0) {
+                html += `<div class="keywords-section">`;
+                html += `<h2>Keywords (${data.keywords.length})</h2>`;
+                html += `<p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">All keywords the account bid on during ${data.year}, sorted by impressions.</p>`;
+                html += `<table class="keywords-table">`;
+                html += `<thead><tr><th>Keyword</th><th>Impressions</th><th>Clicks</th></tr></thead>`;
+                html += `<tbody>`;
+                for (const kw of data.keywords) {
+                    html += `<tr><td>${esc(kw.keyword)}</td><td>${formatNum(kw.impressions)}</td><td>${formatNum(kw.clicks)}</td></tr>`;
+                }
+                html += `</tbody></table></div>`;
             }
 
             if (!isHistorical && data.accountAssets && data.accountAssets.length > 0) {
