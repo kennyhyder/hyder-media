@@ -90,6 +90,13 @@ export default async function handler(req, res) {
                     ad_group_ad.ad.name, ad_group_ad.status,
                     ad_group_ad.ad.responsive_search_ad.headlines,
                     ad_group_ad.ad.responsive_search_ad.descriptions,
+                    ad_group_ad.ad.expanded_text_ad.headline_part1,
+                    ad_group_ad.ad.expanded_text_ad.headline_part2,
+                    ad_group_ad.ad.expanded_text_ad.headline_part3,
+                    ad_group_ad.ad.expanded_text_ad.description,
+                    ad_group_ad.ad.expanded_text_ad.description2,
+                    ad_group_ad.ad.expanded_text_ad.path1,
+                    ad_group_ad.ad.expanded_text_ad.path2,
                     ad_group_ad.ad.final_urls,
                     metrics.impressions, metrics.clicks, metrics.cost_micros
                 FROM ad_group_ad
@@ -484,17 +491,28 @@ function buildHistoricalResponse(adsRows, year) {
             continue;
         }
 
-        const rsa = ad.responsiveSearchAd || {};
-        const headlines = (rsa.headlines || []).map((h, i) => ({
-            position: i + 1,
-            text: h.text,
-            pinnedField: h.pinnedField || null,
-        }));
-        const descriptions = (rsa.descriptions || []).map((d, i) => ({
-            position: i + 1,
-            text: d.text,
-            pinnedField: d.pinnedField || null,
-        }));
+        let headlines = [];
+        let descriptions = [];
+
+        if (ad.type === 'EXPANDED_TEXT_AD') {
+            const eta = ad.expandedTextAd || {};
+            const parts = [eta.headlinePart1, eta.headlinePart2, eta.headlinePart3].filter(Boolean);
+            headlines = parts.map((text, i) => ({ position: i + 1, text, pinnedField: null }));
+            const descs = [eta.description, eta.description2].filter(Boolean);
+            descriptions = descs.map((text, i) => ({ position: i + 1, text, pinnedField: null }));
+        } else {
+            const rsa = ad.responsiveSearchAd || {};
+            headlines = (rsa.headlines || []).map((h, i) => ({
+                position: i + 1,
+                text: h.text,
+                pinnedField: h.pinnedField || null,
+            }));
+            descriptions = (rsa.descriptions || []).map((d, i) => ({
+                position: i + 1,
+                text: d.text,
+                pinnedField: d.pinnedField || null,
+            }));
+        }
 
         agObj.ads.push({
             id: ad.id,

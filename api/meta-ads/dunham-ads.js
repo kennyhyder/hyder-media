@@ -115,17 +115,18 @@ async function fetchHistorical(accessToken, year) {
 
     // Paginate through all insights for the year
     let allInsights = [];
-    let nextUrl = null;
     const baseParams = {
         level: 'ad',
         time_range: timeRange,
         fields: 'campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions',
         limit: 500,
+        // Ensure we get one row per ad (not per day)
+        time_increment: 'all_days',
     };
 
     const firstResp = await graphGet(`${AD_ACCOUNT_ID}/insights`, baseParams, accessToken);
     allInsights = firstResp.data || [];
-    nextUrl = firstResp.paging?.next || null;
+    let nextUrl = firstResp.paging?.next || null;
 
     while (nextUrl) {
         const pageResp = await fetch(nextUrl);
@@ -145,7 +146,7 @@ async function fetchHistorical(accessToken, year) {
     // Fetch all creatives in parallel batches of 10
     for (let i = 0; i < adIds.length; i += 10) {
         const batch = adIds.slice(i, i + 10);
-        const results = await Promise.allSettled(
+        await Promise.allSettled(
             batch.map(adId =>
                 graphGet(adId, {
                     fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
@@ -156,7 +157,16 @@ async function fetchHistorical(accessToken, year) {
         );
     }
 
-    return buildHistoricalResponse(insights, creativeMap, year);
+    const response = buildHistoricalResponse(insights, creativeMap, year);
+    // Include debug info for troubleshooting
+    response._debug = {
+        totalInsightsRows: allInsights.length,
+        afterImpressionFilter: insights.length,
+        uniqueAds: adIds.length,
+        creativesFound: creativeMap.size,
+        timeRange: { since: `${year}-01-01`, until: untilDate },
+    };
+    return response;
 }
 
 /**
