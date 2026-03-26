@@ -41,7 +41,6 @@
         <!-- Platform Toggle -->
         <div class="platform-tabs">
             <button class="platform-tab active" data-platform="google" onclick="switchPlatform('google')">Google Ads</button>
-            <button class="platform-tab" data-platform="keywords" onclick="switchPlatform('keywords')">Google Keywords</button>
             <button class="platform-tab" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
         </div>
 
@@ -107,11 +106,7 @@
         let activeYear = 'active';
         let dataCache = {}; // keyed by "platform:year"
 
-        // Keywords shares cache with google (same API response)
-        function cacheKey(year) {
-            const p = activePlatform === 'keywords' ? 'google' : activePlatform;
-            return `${p}:${year}`;
-        }
+        function cacheKey(year) { return `${activePlatform}:${year}`; }
 
         // Platform toggle
         function switchPlatform(platform) {
@@ -122,24 +117,21 @@
 
             // Update account label
             document.getElementById('report-account').textContent =
-                platform === 'meta' ? 'Meta Ads' : 'Account: 840-838-5870';
+                platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
 
-            // Keywords has no "active" mode — default to current year
-            activeYear = platform === 'keywords' ? CURRENT_YEAR : 'active';
+            // Rebuild year tabs for this platform
+            activeYear = 'active';
             buildYearTabs();
-            dataCache[cacheKey(activeYear)] ? renderReport(dataCache[cacheKey(activeYear)]) : loadData(activeYear);
+            dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
         }
 
         // Build year tabs
         function buildYearTabs() {
             const container = document.getElementById('year-tabs');
             const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
-            let html = '';
-            if (activePlatform !== 'keywords') {
-                html += `<button class="year-tab${activeYear === 'active' ? ' active' : ''}" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
-            }
+            let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
             for (let y = CURRENT_YEAR; y >= startYear; y--) {
-                html += `<button class="year-tab${activeYear === y ? ' active' : ''}" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
+                html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
             }
             container.innerHTML = html;
         }
@@ -149,14 +141,10 @@
             document.querySelectorAll('.year-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
-            if (activePlatform === 'keywords') {
-                document.querySelector('.subtitle').textContent = `All keywords bid on during ${year}`;
-            } else {
-                const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
-                document.querySelector('.subtitle').textContent = year === 'active'
-                    ? `Complete inventory of active ${platformLabel} ad copy`
-                    : `${platformLabel} ad copy that ran during ${year}`;
-            }
+            const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
+            document.querySelector('.subtitle').textContent = year === 'active'
+                ? `Complete inventory of active ${platformLabel} ad copy`
+                : `${platformLabel} ad copy that ran during ${year}`;
             if (dataCache[cacheKey(year)]) {
                 renderReport(dataCache[cacheKey(year)]);
             } else {
@@ -180,8 +168,7 @@
             const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
             const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
             document.getElementById('loading-text').textContent =
-                activePlatform === 'keywords' ? 'Loading keywords from Google Ads...'
-                : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
+                `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
             try {
                 const resp = await fetch(url);
@@ -210,7 +197,6 @@
         }
 
         function renderReport(data) {
-            if (activePlatform === 'keywords') return renderKeywordsReport(data);
             const isMeta = data.platform === 'meta';
             if (isMeta) return renderMetaReport(data);
             return renderGoogleReport(data);
@@ -228,7 +214,7 @@
             document.getElementById('report-date').textContent =
                 'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0;
+            let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0, totalKeywords = 0;
             let totalExtensions = (data.accountAssets || []).length;
 
             for (const camp of data.campaigns) {
@@ -236,6 +222,7 @@
                 totalExtensions += (camp.assets || []).length;
                 for (const ag of camp.adGroups) {
                     totalAds += ag.ads.length;
+                    totalKeywords += (ag.keywords || []).length;
                     for (const ad of ag.ads) {
                         totalHeadlines += (ad.headlines || []).length;
                         totalDescriptions += (ad.descriptions || []).length;
@@ -246,16 +233,16 @@
             document.getElementById('label-campaigns').textContent = 'Campaigns';
             document.getElementById('label-adgroups').textContent = 'Ad Groups';
             document.getElementById('label-ads').textContent = 'Ads';
-            document.getElementById('label-headlines').textContent = 'Headlines';
-            document.getElementById('label-descriptions').textContent = 'Descriptions';
+            document.getElementById('label-headlines').textContent = 'Keywords';
+            document.getElementById('label-descriptions').textContent = 'Headlines';
             document.getElementById('label-extensions').textContent = 'Extensions';
             document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
 
             document.getElementById('stat-campaigns').textContent = data.campaigns.length;
             document.getElementById('stat-adgroups').textContent = totalAdGroups;
             document.getElementById('stat-ads').textContent = totalAds;
-            document.getElementById('stat-headlines').textContent = totalHeadlines;
-            document.getElementById('stat-descriptions').textContent = totalDescriptions;
+            document.getElementById('stat-headlines').textContent = totalKeywords;
+            document.getElementById('stat-descriptions').textContent = totalHeadlines;
             document.getElementById('stat-extensions').textContent = totalExtensions;
             statsEl.style.display = 'flex';
 
@@ -289,6 +276,9 @@
                     for (const ad of ag.ads) {
                         html += renderGoogleAd(ad, campSitelinks, isHistorical);
                     }
+                    if (ag.keywords && ag.keywords.length > 0) {
+                        html += renderAdGroupKeywords(ag.keywords);
+                    }
                     html += `</div>`;
                 }
 
@@ -317,60 +307,17 @@
             contentEl.style.display = 'block';
         }
 
-        // ============================================================
-        // Google Keywords rendering (own tab)
-        // ============================================================
-        function renderKeywordsReport(data) {
-            const contentEl = document.getElementById('report-content');
-            const statsEl = document.getElementById('stats-row');
-            const keywords = data.keywords || [];
-
-            const fetchDate = new Date(data.fetchedAt);
-            document.getElementById('report-date').textContent =
-                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-            let totalImpressions = 0, totalClicks = 0;
-            for (const kw of keywords) {
-                totalImpressions += kw.impressions;
-                totalClicks += kw.clicks;
-            }
-            const ctr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) + '%' : '0%';
-
-            // Show 4 stat cards, hide 2
-            document.getElementById('label-campaigns').textContent = 'Keywords';
-            document.getElementById('label-adgroups').textContent = 'Impressions';
-            document.getElementById('label-ads').textContent = 'Clicks';
-            document.getElementById('label-headlines').textContent = 'Avg CTR';
-            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
-            document.getElementById('card-descriptions').style.display = 'none';
-            document.getElementById('card-extensions').style.display = 'none';
-
-            document.getElementById('stat-campaigns').textContent = formatNum(keywords.length);
-            document.getElementById('stat-adgroups').textContent = formatNum(totalImpressions);
-            document.getElementById('stat-ads').textContent = formatNum(totalClicks);
-            document.getElementById('stat-headlines').textContent = ctr;
-            statsEl.style.display = 'flex';
-
-            if (keywords.length === 0) {
-                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
-                    <h2>No keyword data for ${data.year || 'this period'}</h2>
-                    <p style="color:var(--text-secondary);">No keywords received impressions during this year, or the account wasn't active yet.</p>
-                </div>`;
-                contentEl.style.display = 'block';
-                return;
-            }
-
-            let html = `<div class="keywords-section">`;
-            html += `<table class="keywords-table">`;
+        function renderAdGroupKeywords(keywords) {
+            let html = `<div class="ad-group-keywords">`;
+            html += `<div class="ad-copy-label">Keywords (${keywords.length})</div>`;
+            html += `<table class="keywords-table keywords-table-compact">`;
             html += `<thead><tr><th>Keyword</th><th>Impressions</th><th>Clicks</th></tr></thead>`;
             html += `<tbody>`;
             for (const kw of keywords) {
                 html += `<tr><td>${esc(kw.keyword)}</td><td>${formatNum(kw.impressions)}</td><td>${formatNum(kw.clicks)}</td></tr>`;
             }
             html += `</tbody></table></div>`;
-
-            contentEl.innerHTML = html;
-            contentEl.style.display = 'block';
+            return html;
         }
 
         function renderGoogleAd(ad, campaignSitelinks, isHistorical) {

@@ -106,6 +106,8 @@ export default async function handler(req, res) {
                 `),
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
+                        campaign.id,
+                        ad_group.id,
                         ad_group_criterion.keyword.text,
                         metrics.impressions,
                         metrics.clicks
@@ -117,31 +119,7 @@ export default async function handler(req, res) {
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
             const response = buildHistoricalResponse(adsData.results || [], year);
-
-            // Aggregate keywords (may have duplicates across date segments)
-            if (!keywordsData.error) {
-                const kwMap = new Map();
-                for (const row of (keywordsData.results || [])) {
-                    const text = (row.adGroupCriterion?.keyword?.text || '').toLowerCase();
-                    if (!text) continue;
-                    const metrics = row.metrics || {};
-                    if (kwMap.has(text)) {
-                        const existing = kwMap.get(text);
-                        existing.impressions += parseInt(metrics.impressions || 0);
-                        existing.clicks += parseInt(metrics.clicks || 0);
-                    } else {
-                        kwMap.set(text, {
-                            keyword: row.adGroupCriterion.keyword.text,
-                            impressions: parseInt(metrics.impressions || 0),
-                            clicks: parseInt(metrics.clicks || 0),
-                        });
-                    }
-                }
-                response.keywords = Array.from(kwMap.values())
-                    .sort((a, b) => b.impressions - a.impressions);
-            } else {
-                response.keywords = [];
-            }
+            attachKeywords(response, keywordsData.error ? [] : (keywordsData.results || []));
 
             return res.status(200).json(response);
         }
@@ -212,9 +190,9 @@ export default async function handler(req, res) {
                 AND asset_group_asset.status = 'ENABLED'
         `);
 
-        // Query 6: Fetch full asset details per type
+        // Query 6: Fetch full asset details per type + keywords (last 30 days)
         let assetDetails = new Map();
-        const [sitelinks, callouts, snippets, images, textAssets] = await Promise.all([
+        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords] = await Promise.all([
             fetchQuery(CUSTOMER_ID, headers, `
                 SELECT
                     asset.id,
@@ -255,6 +233,19 @@ export default async function handler(req, res) {
                 FROM asset
                 WHERE asset.type = 'TEXT'
             `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    campaign.id,
+                    ad_group.id,
+                    ad_group_criterion.keyword.text,
+                    metrics.impressions,
+                    metrics.clicks
+                FROM keyword_view
+                WHERE campaign.status = 'ENABLED'
+                    AND ad_group.status = 'ENABLED'
+                    AND segments.date DURING LAST_30_DAYS
+                    AND metrics.impressions > 0
+            `),
         ]);
 
         // Build lookup map from asset details
@@ -275,6 +266,8 @@ export default async function handler(req, res) {
             assetGroupsData.results || [],
             assetGroupAssetsData.results || []
         );
+
+        attachKeywords(response, activeKeywords.error ? [] : (activeKeywords.results || []));
 
         return res.status(200).json(response);
 
@@ -579,6 +572,44 @@ function buildHistoricalResponse(adsRows, year) {
         historical: true,
         fetchedAt: new Date().toISOString(),
     };
+}
+
+function attachKeywords(response, keywordRows) {
+    // Group keywords by campaign+adGroup, aggregate duplicates across date segments
+    const kwMap = new Map(); // "campId:agId" → Map<lowercaseText, {keyword, impressions, clicks}>
+    for (const row of keywordRows) {
+        const campId = row.campaign?.id;
+        const agId = row.adGroup?.id;
+        const text = (row.adGroupCriterion?.keyword?.text || '').toLowerCase();
+        if (!campId || !agId || !text) continue;
+
+        const key = `${campId}:${agId}`;
+        if (!kwMap.has(key)) kwMap.set(key, new Map());
+        const agKws = kwMap.get(key);
+        const metrics = row.metrics || {};
+
+        if (agKws.has(text)) {
+            const existing = agKws.get(text);
+            existing.impressions += parseInt(metrics.impressions || 0);
+            existing.clicks += parseInt(metrics.clicks || 0);
+        } else {
+            agKws.set(text, {
+                keyword: row.adGroupCriterion.keyword.text,
+                impressions: parseInt(metrics.impressions || 0),
+                clicks: parseInt(metrics.clicks || 0),
+            });
+        }
+    }
+
+    for (const camp of response.campaigns) {
+        for (const ag of camp.adGroups) {
+            const key = `${camp.id}:${ag.id}`;
+            const agKws = kwMap.get(key);
+            ag.keywords = agKws
+                ? Array.from(agKws.values()).sort((a, b) => b.impressions - a.impressions)
+                : [];
+        }
+    }
 }
 
 function formatAsset(asset, parentAsset) {

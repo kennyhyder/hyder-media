@@ -138,12 +138,6 @@ body {
     border-color: var(--accent);
 }
 
-.platform-tab.active[data-platform="keywords"] {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-}
-
 .platform-tab.active[data-platform="meta"] {
     background: #1877f2;
     color: #fff;
@@ -649,15 +643,9 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Keywords Section (historical) */
-.keywords-section {
-    margin-top: 40px;
-}
-
-.keywords-section > h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 8px;
+/* Keywords under ad groups */
+.ad-group-keywords {
+    margin-top: 12px;
 }
 
 .keywords-table {
@@ -698,6 +686,18 @@ body {
 
 .keywords-table tbody tr:hover {
     background: rgba(59, 130, 246, 0.06);
+}
+
+.keywords-table-compact {
+    font-size: 0.85rem;
+}
+
+.keywords-table-compact thead th {
+    padding: 6px 12px;
+}
+
+.keywords-table-compact tbody td {
+    padding: 5px 12px;
 }
 
 /* Account-level Assets */
