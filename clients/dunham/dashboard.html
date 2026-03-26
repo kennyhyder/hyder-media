@@ -23,7 +23,6 @@
         </a>
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
-            <a href="/api/meta-ads/auth?returnUrl=/clients/dunham/dashboard.html" class="btn btn-secondary" id="connect-meta-btn">Connect Meta</a>
             <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
             <button class="btn btn-primary" onclick="window.print()">Print Report</button>
         </div>
@@ -120,10 +119,6 @@
             document.getElementById('report-account').textContent =
                 platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
 
-            // Update Connect Meta button visibility
-            document.getElementById('connect-meta-btn').style.display =
-                platform === 'meta' ? 'inline-flex' : 'none';
-
             // Rebuild year tabs for this platform
             activeYear = 'active';
             buildYearTabs();
@@ -182,7 +177,7 @@
                 if (!resp.ok || data.error) {
                     // If Meta needs auth, show helpful message
                     if (data.needsAuth) {
-                        throw new Error(data.error + ' Click "Connect Meta" in the nav bar.');
+                        throw new Error(data.error + ' Please contact your account manager.');
                     }
                     const msg = data.details
                         ? `${data.error}: ${typeof data.details === 'string' ? data.details : JSON.stringify(data.details)}`
@@ -814,8 +809,6 @@
         }
 
         // Init
-        // Hide Connect Meta button initially (Google is default)
-        document.getElementById('connect-meta-btn').style.display = 'none';
         // Check for ?meta_connected=true from OAuth callback
         if (new URLSearchParams(window.location.search).get('meta_connected') === 'true') {
             switchPlatform('meta');

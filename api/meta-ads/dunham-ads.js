@@ -59,7 +59,15 @@ export default async function handler(req, res) {
             return res.status(200).json(data);
         }
 
+        // Cache active ads for 5 minutes to avoid rate limiting
+        const activeCacheKey = 'dunham:meta:active';
+        const forceRefresh = req.query.refresh === 'true';
+        if (!forceRefresh) {
+            const cached = await getCached(supabase, activeCacheKey, 5);
+            if (cached) { cached._cached = true; return res.status(200).json(cached); }
+        }
         const data = await fetchActive(accessToken);
+        await setCache(supabase, activeCacheKey, data);
         return res.status(200).json(data);
 
     } catch (error) {
