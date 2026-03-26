@@ -31,12 +31,15 @@
     <div class="container">
         <div class="report-header">
             <h1>Dunham & Jones — Ad Copy Audit</h1>
-            <p class="subtitle">Complete inventory of active ad headlines, descriptions, and extensions</p>
+            <p class="subtitle">Complete inventory of ad headlines, descriptions, and extensions</p>
             <div class="report-meta">
                 <span>Account: 840-838-5870</span>
                 <span id="report-date">Generated: —</span>
             </div>
         </div>
+
+        <!-- Year Tabs -->
+        <div class="year-tabs" id="year-tabs"></div>
 
         <!-- Stats -->
         <div class="stats-row" id="stats-row" style="display: none;">
@@ -89,8 +92,42 @@
 
     <script>
         const API_URL = '/api/google-ads/dunham-ads';
+        const CURRENT_YEAR = new Date().getFullYear();
+        const START_YEAR = 2018; // Go back to 2018
+        let activeYear = 'active';
+        let dataCache = {};
 
-        async function loadData() {
+        // Build year tabs
+        function buildYearTabs() {
+            const container = document.getElementById('year-tabs');
+            let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
+            for (let y = CURRENT_YEAR; y >= START_YEAR; y--) {
+                html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function switchYear(year) {
+            activeYear = year;
+            // Update tab styling
+            document.querySelectorAll('.year-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.year === String(year));
+            });
+            // Update subtitle
+            document.querySelector('.subtitle').textContent = year === 'active'
+                ? 'Complete inventory of active ad headlines, descriptions, and extensions'
+                : `Ad copy that ran during ${year}`;
+            // Load from cache or fetch
+            if (dataCache[year]) {
+                renderReport(dataCache[year]);
+            } else {
+                loadData(year);
+            }
+        }
+
+        async function loadData(year) {
+            if (year === undefined) year = activeYear;
+
             const loadingEl = document.getElementById('loading-state');
             const errorEl = document.getElementById('error-state');
             const contentEl = document.getElementById('report-content');
@@ -101,8 +138,10 @@
             contentEl.style.display = 'none';
             statsEl.style.display = 'none';
 
+            const url = year === 'active' ? API_URL : `${API_URL}?year=${year}`;
+
             try {
-                const resp = await fetch(API_URL);
+                const resp = await fetch(url);
                 const data = await resp.json();
 
                 if (!resp.ok || data.error) {
@@ -112,6 +151,7 @@
                     throw new Error(msg);
                 }
 
+                dataCache[year] = data;
                 loadingEl.style.display = 'none';
                 renderReport(data);
 
@@ -125,6 +165,7 @@
         function renderReport(data) {
             const contentEl = document.getElementById('report-content');
             const statsEl = document.getElementById('stats-row');
+            const isHistorical = data.historical === true;
 
             // Update date
             const fetchDate = new Date(data.fetchedAt);
@@ -134,6 +175,7 @@
             // Count totals
             let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0;
             let totalExtensions = (data.accountAssets || []).length;
+            let totalImpressions = 0, totalClicks = 0, totalCostMicros = 0;
 
             for (const camp of data.campaigns) {
                 totalAdGroups += camp.adGroups.length;
@@ -143,6 +185,11 @@
                     for (const ad of ag.ads) {
                         totalHeadlines += (ad.headlines || []).length;
                         totalDescriptions += (ad.descriptions || []).length;
+                        if (isHistorical) {
+                            totalImpressions += ad.impressions || 0;
+                            totalClicks += ad.clicks || 0;
+                            totalCostMicros += ad.costMicros || 0;
+                        }
                     }
                 }
             }
@@ -152,8 +199,21 @@
             document.getElementById('stat-ads').textContent = totalAds;
             document.getElementById('stat-headlines').textContent = totalHeadlines;
             document.getElementById('stat-descriptions').textContent = totalDescriptions;
-            document.getElementById('stat-extensions').textContent = totalExtensions;
+            document.getElementById('stat-extensions').textContent = isHistorical
+                ? formatCost(totalCostMicros)
+                : totalExtensions;
+            document.querySelector('#stats-row .stat-card:last-child .stat-label').textContent =
+                isHistorical ? 'Total Spend' : 'Extensions';
             statsEl.style.display = 'flex';
+
+            if (data.campaigns.length === 0) {
+                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
+                    <h2>No ad data for ${data.year || 'this period'}</h2>
+                    <p style="color:var(--text-secondary);">No ads received impressions during this year, or the account wasn't active yet.</p>
+                </div>`;
+                contentEl.style.display = 'block';
+                return;
+            }
 
             // Render campaigns
             let html = '';
@@ -161,11 +221,12 @@
             for (const camp of data.campaigns) {
                 const isPMax = camp.type === 'PERFORMANCE_MAX';
                 const typeBadge = isPMax ? '<span class="badge badge-pmax">PMAX</span>' : '';
+                const statusClass = camp.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
 
                 html += `<div class="campaign-section">`;
                 html += `<div class="campaign-header">
                     <div class="campaign-name">${esc(camp.name)} ${typeBadge}</div>
-                    <span class="badge badge-enabled">${camp.status}</span>
+                    <span class="badge ${statusClass}">${camp.status}</span>
                 </div>`;
                 html += `<div class="campaign-body">`;
 
@@ -178,7 +239,7 @@
                     html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
 
                     for (const ad of ag.ads) {
-                        html += renderAd(ad, campSitelinks);
+                        html += renderAd(ad, campSitelinks, isHistorical);
                     }
 
                     html += `</div>`;
@@ -191,16 +252,16 @@
                     }
                 }
 
-                // Campaign-level extensions
-                if (camp.assets && camp.assets.length > 0) {
+                // Campaign-level extensions (only for active view)
+                if (!isHistorical && camp.assets && camp.assets.length > 0) {
                     html += renderExtensions('Campaign Extensions', camp.assets);
                 }
 
                 html += `</div></div>`;
             }
 
-            // Account-level assets
-            if (data.accountAssets && data.accountAssets.length > 0) {
+            // Account-level assets (only for active view)
+            if (!isHistorical && data.accountAssets && data.accountAssets.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Account-Level Extensions</h2>`;
                 html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These extensions can appear on any ad in the account.</p>`;
@@ -212,14 +273,26 @@
             contentEl.style.display = 'block';
         }
 
-        function renderAd(ad, campaignSitelinks) {
+        function renderAd(ad, campaignSitelinks, isHistorical) {
             const typeName = (ad.type || 'UNKNOWN').replace(/_/g, ' ');
+            const statusClass = ad.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
 
             let html = `<div class="ad-card">`;
             html += `<div class="ad-card-header">
                 <span class="badge badge-type">${typeName}</span>
+                ${isHistorical ? `<span class="badge ${statusClass}" style="font-size:0.7rem;">${ad.status}</span>` : ''}
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
+
+            // Metrics row for historical ads
+            if (isHistorical && (ad.impressions || ad.clicks || ad.costMicros)) {
+                html += `<div class="ad-metrics-row">
+                    <span class="ad-metric"><strong>${formatNum(ad.impressions)}</strong> impressions</span>
+                    <span class="ad-metric"><strong>${formatNum(ad.clicks)}</strong> clicks</span>
+                    <span class="ad-metric"><strong>${formatCost(ad.costMicros)}</strong> spend</span>
+                    <span class="ad-metric"><strong>${ad.impressions > 0 ? ((ad.clicks / ad.impressions) * 100).toFixed(1) + '%' : '0%'}</strong> CTR</span>
+                </div>`;
+            }
 
             // Ad Preview (Google SERP mockup)
             if (ad.type === 'RESPONSIVE_SEARCH_AD' && ad.headlines && ad.headlines.length > 0) {
@@ -523,6 +596,16 @@
             return pinnedField;
         }
 
+        function formatNum(n) {
+            if (n == null) return '0';
+            return Number(n).toLocaleString();
+        }
+
+        function formatCost(micros) {
+            if (!micros) return '$0';
+            return '$' + (micros / 1000000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         function esc(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -530,8 +613,9 @@
             return div.innerHTML;
         }
 
-        // Load on page ready
-        loadData();
+        // Init
+        buildYearTabs();
+        loadData('active');
     </script>
 </body>
 </html>

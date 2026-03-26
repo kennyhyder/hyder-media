@@ -73,7 +73,35 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json',
         };
 
-        // Query 1: Active ads
+        // Check for year parameter (historical mode)
+        const year = parseInt(req.query.year);
+        const currentYear = new Date().getFullYear();
+        const isHistorical = year && year >= 2010 && year <= currentYear;
+
+        if (isHistorical) {
+            const startDate = `${year}-01-01`;
+            const endDate = `${year}-12-31`;
+
+            const adsData = await fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    campaign.id, campaign.name, campaign.status,
+                    ad_group.id, ad_group.name, ad_group.status,
+                    ad_group_ad.ad.id, ad_group_ad.ad.type,
+                    ad_group_ad.ad.name, ad_group_ad.status,
+                    ad_group_ad.ad.responsive_search_ad.headlines,
+                    ad_group_ad.ad.responsive_search_ad.descriptions,
+                    ad_group_ad.ad.final_urls,
+                    metrics.impressions, metrics.clicks, metrics.cost_micros
+                FROM ad_group_ad
+                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+            `);
+            if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
+
+            const response = buildHistoricalResponse(adsData.results || [], year);
+            return res.status(200).json(response);
+        }
+
+        // Query 1: Active ads (current mode - no year parameter)
         const adsData = await fetchQuery(CUSTOMER_ID, headers, `
             SELECT
                 campaign.id, campaign.name, campaign.status,
@@ -407,6 +435,92 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetai
         account: { id: '840-838-5870', name: 'Dunham & Jones' },
         campaigns,
         accountAssets,
+        fetchedAt: new Date().toISOString(),
+    };
+}
+
+function buildHistoricalResponse(adsRows, year) {
+    const campaignMap = new Map();
+
+    for (const row of adsRows) {
+        const campaign = row.campaign || {};
+        const adGroup = row.adGroup || {};
+        const adGroupAd = row.adGroupAd || {};
+        const ad = adGroupAd.ad || {};
+        const metrics = row.metrics || {};
+
+        const campId = campaign.id;
+        if (!campaignMap.has(campId)) {
+            campaignMap.set(campId, {
+                id: campId,
+                name: campaign.name,
+                status: campaign.status,
+                type: 'SEARCH',
+                adGroups: new Map(),
+                assets: [],
+            });
+        }
+
+        const campObj = campaignMap.get(campId);
+        const agId = adGroup.id;
+        if (!campObj.adGroups.has(agId)) {
+            campObj.adGroups.set(agId, {
+                id: agId,
+                name: adGroup.name,
+                status: adGroup.status,
+                ads: [],
+            });
+        }
+
+        const agObj = campObj.adGroups.get(agId);
+
+        // Check if ad already exists (can happen with date aggregation)
+        const existingAd = agObj.ads.find(a => a.id === ad.id);
+        if (existingAd) {
+            existingAd.impressions += parseInt(metrics.impressions || 0);
+            existingAd.clicks += parseInt(metrics.clicks || 0);
+            existingAd.costMicros += parseInt(metrics.costMicros || 0);
+            continue;
+        }
+
+        const rsa = ad.responsiveSearchAd || {};
+        const headlines = (rsa.headlines || []).map((h, i) => ({
+            position: i + 1,
+            text: h.text,
+            pinnedField: h.pinnedField || null,
+        }));
+        const descriptions = (rsa.descriptions || []).map((d, i) => ({
+            position: i + 1,
+            text: d.text,
+            pinnedField: d.pinnedField || null,
+        }));
+
+        agObj.ads.push({
+            id: ad.id,
+            type: ad.type,
+            name: ad.name || null,
+            status: adGroupAd.status,
+            headlines,
+            descriptions,
+            finalUrls: ad.finalUrls || [],
+            impressions: parseInt(metrics.impressions || 0),
+            clicks: parseInt(metrics.clicks || 0),
+            costMicros: parseInt(metrics.costMicros || 0),
+        });
+    }
+
+    const campaigns = Array.from(campaignMap.values()).map(c => ({
+        ...c,
+        adGroups: Array.from(c.adGroups.values()),
+    }));
+    campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    return {
+        account: { id: '840-838-5870', name: 'Dunham & Jones' },
+        campaigns,
+        accountAssets: [],
+        year,
+        historical: true,
         fetchedAt: new Date().toISOString(),
     };
 }
