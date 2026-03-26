@@ -103,25 +103,30 @@ async function fetchActive(accessToken) {
 
 /**
  * Fetch historical ads for a given year using insights.
- * Only ads with impressions > 0 are included.
+ * Also merges in active ads for current year (insights can lag behind).
  */
 async function fetchHistorical(accessToken, year) {
-    // For current year, use today's date as end (Meta API doesn't handle future dates)
     const now = new Date();
-    const untilDate = year >= now.getFullYear()
+    const isCurrentYear = year >= now.getFullYear();
+    const untilDate = isCurrentYear
         ? now.toISOString().slice(0, 10)
         : `${year}-12-31`;
     const timeRange = JSON.stringify({ since: `${year}-01-01`, until: untilDate });
 
     // Paginate through all insights for the year
+    // Include filtering for ALL ad statuses (default only returns active)
     let allInsights = [];
     const baseParams = {
         level: 'ad',
         time_range: timeRange,
         fields: 'campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions',
         limit: 500,
-        // Ensure we get one row per ad (not per day)
         time_increment: 'all_days',
+        filtering: JSON.stringify([{
+            field: 'ad.effective_status',
+            operator: 'IN',
+            value: ['ACTIVE','PAUSED','DELETED','ARCHIVED','CAMPAIGN_PAUSED','ADSET_PAUSED','PENDING_REVIEW','DISAPPROVED','PREAPPROVED','PENDING_BILLING_INFO','IN_PROCESS','WITH_ISSUES'],
+        }]),
     };
 
     const firstResp = await graphGet(`${AD_ACCOUNT_ID}/insights`, baseParams, accessToken);
@@ -139,13 +144,13 @@ async function fetchHistorical(accessToken, year) {
     // Only keep ads with actual impressions
     const insights = allInsights.filter(r => parseInt(r.impressions || 0) > 0);
 
-    // Fetch creative details for each unique ad
-    const adIds = [...new Set(insights.map(r => r.ad_id))];
+    // Fetch creative details for each unique ad from insights
+    const insightAdIds = new Set(insights.map(r => r.ad_id));
     const creativeMap = new Map();
 
-    // Fetch all creatives in parallel batches of 10
-    for (let i = 0; i < adIds.length; i += 10) {
-        const batch = adIds.slice(i, i + 10);
+    const adIdsToFetch = [...insightAdIds];
+    for (let i = 0; i < adIdsToFetch.length; i += 10) {
+        const batch = adIdsToFetch.slice(i, i + 10);
         await Promise.allSettled(
             batch.map(adId =>
                 graphGet(adId, {
@@ -157,16 +162,97 @@ async function fetchHistorical(accessToken, year) {
         );
     }
 
+    // For current year, also fetch active/paused ads directly
+    // (insights can lag 24-48h for newly launched ads)
+    let directAds = [];
+    if (isCurrentYear) {
+        try {
+            const adsResp = await graphGet(
+                `${AD_ACCOUNT_ID}/ads`,
+                {
+                    fields: [
+                        'id', 'name', 'status', 'effective_status',
+                        'campaign_id', 'adset_id',
+                        'campaign{name}', 'adset{name}',
+                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+                    ].join(','),
+                    effective_status: '["ACTIVE","PAUSED","CAMPAIGN_PAUSED","ADSET_PAUSED"]',
+                    limit: 200,
+                },
+                accessToken
+            );
+            directAds = adsResp.data || [];
+        } catch (e) {
+            // Non-fatal: insights data still works
+        }
+    }
+
     const response = buildHistoricalResponse(insights, creativeMap, year);
-    // Include debug info for troubleshooting
+
+    // Merge in direct ads not already covered by insights
+    if (directAds.length > 0) {
+        mergeDirectAds(response, directAds, insightAdIds);
+    }
+
     response._debug = {
         totalInsightsRows: allInsights.length,
         afterImpressionFilter: insights.length,
-        uniqueAds: adIds.length,
+        uniqueAdsFromInsights: insightAdIds.size,
         creativesFound: creativeMap.size,
+        directAdsFetched: directAds.length,
+        directAdsMerged: directAds.filter(a => !insightAdIds.has(a.id)).length,
         timeRange: { since: `${year}-01-01`, until: untilDate },
     };
     return response;
+}
+
+/**
+ * Merge directly-fetched ads into historical response (fills gaps from insights lag)
+ */
+function mergeDirectAds(response, directAds, insightAdIds) {
+    for (const ad of directAds) {
+        if (insightAdIds.has(ad.id)) continue;
+
+        const campId = ad.campaign_id;
+        const adsetId = ad.adset_id;
+        const campaign = ad.campaign || {};
+        const adset = ad.adset || {};
+
+        let camp = response.campaigns.find(c => c.id === campId);
+        if (!camp) {
+            camp = {
+                id: campId,
+                name: campaign.name || `Campaign ${campId}`,
+                status: 'ACTIVE',
+                objective: null,
+                adSets: [],
+            };
+            response.campaigns.push(camp);
+        }
+
+        let adSetObj = camp.adSets.find(s => s.id === adsetId);
+        if (!adSetObj) {
+            adSetObj = {
+                id: adsetId,
+                name: adset.name || `Ad Set ${adsetId}`,
+                status: 'ACTIVE',
+                ads: [],
+            };
+            camp.adSets.push(adSetObj);
+        }
+
+        const creative = ad.creative || {};
+        const parsed = parseCreative(creative);
+        adSetObj.ads.push({
+            id: ad.id,
+            name: ad.name,
+            status: ad.effective_status || ad.status || 'ACTIVE',
+            ...parsed,
+            impressions: 0,
+        });
+    }
+
+    response.campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 }
 
 /**
