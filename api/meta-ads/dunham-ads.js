@@ -59,11 +59,11 @@ export default async function handler(req, res) {
             return res.status(200).json(data);
         }
 
-        // Cache active ads for 5 minutes to avoid rate limiting
+        // Cache active ads for 3 hours
         const activeCacheKey = 'dunham:meta:active';
         const forceRefresh = req.query.refresh === 'true';
         if (!forceRefresh) {
-            const cached = await getCached(supabase, activeCacheKey, 5);
+            const cached = await getCached(supabase, activeCacheKey, 180);
             if (cached) { cached._cached = true; return res.status(200).json(cached); }
         }
         const data = await fetchActive(accessToken);
