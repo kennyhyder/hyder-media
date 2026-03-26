@@ -4,6 +4,9 @@
  *
  * Active mode (no year param): fetches currently active campaigns/ads
  * Historical mode (?year=YYYY): fetches ads that received impressions that year
+ *
+ * Historical results are cached in Supabase to avoid Meta API rate limits.
+ * Past years: 24h cache. Current year: 1h cache. Active: no cache.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -52,7 +55,7 @@ export default async function handler(req, res) {
         const isHistorical = year && year >= 2020 && year <= currentYear;
 
         if (isHistorical) {
-            const data = await fetchHistorical(accessToken, year);
+            const data = await fetchHistorical(accessToken, year, supabase);
             return res.status(200).json(data);
         }
 
@@ -65,11 +68,39 @@ export default async function handler(req, res) {
     }
 }
 
+// --------------- Cache helpers ---------------
+
+async function getCached(supabase, key, maxAgeMinutes) {
+    try {
+        const { data } = await supabase
+            .from('meta_ads_cache')
+            .select('data, cached_at')
+            .eq('cache_key', key)
+            .single();
+        if (!data) return null;
+        const ageMin = (Date.now() - new Date(data.cached_at).getTime()) / 60000;
+        if (ageMin > maxAgeMinutes) return null;
+        return data.data;
+    } catch {
+        return null;
+    }
+}
+
+async function setCache(supabase, key, value) {
+    try {
+        await supabase
+            .from('meta_ads_cache')
+            .upsert({ cache_key: key, data: value, cached_at: new Date().toISOString() },
+                     { onConflict: 'cache_key' });
+    } catch { /* non-fatal */ }
+}
+
+// --------------- Data fetching ---------------
+
 /**
- * Fetch currently active campaigns and ads
+ * Fetch currently active campaigns and ads (no cache)
  */
 async function fetchActive(accessToken) {
-    // Use effective_status param (not filtering) to get active campaigns
     const campaignsResp = await graphGet(
         `${AD_ACCOUNT_ID}/campaigns`,
         {
@@ -81,7 +112,6 @@ async function fetchActive(accessToken) {
     );
     const campaigns = campaignsResp.data || [];
 
-    // Use effective_status param for ads too
     const adsResp = await graphGet(
         `${AD_ACCOUNT_ID}/ads`,
         {
@@ -102,26 +132,29 @@ async function fetchActive(accessToken) {
 }
 
 /**
- * Fetch historical ads for a given year using insights.
- * Also merges in active ads for current year (insights can lag behind).
+ * Fetch historical ads for a given year.
+ * Uses Supabase cache to avoid rate limiting.
  */
-async function fetchHistorical(accessToken, year) {
+async function fetchHistorical(accessToken, year, supabase) {
     const now = new Date();
-    const isCurrentYear = year >= now.getFullYear();
+    const currentYear = now.getFullYear();
+    const isCurrentYear = year >= currentYear;
 
-    // For the current year, just use the active ads fetch (2 API calls)
-    // instead of insights + creative fetches (many calls, causes rate limiting)
-    if (isCurrentYear) {
-        const data = await fetchActive(accessToken);
-        data.historical = true;
-        data.year = year;
-        return data;
+    // Check cache: 1h for current year, 24h for past years
+    const cacheKey = `dunham:meta:${year}`;
+    const maxAgeMin = isCurrentYear ? 60 : 1440;
+    const cached = await getCached(supabase, cacheKey, maxAgeMin);
+    if (cached) {
+        cached._cached = true;
+        return cached;
     }
 
-    // For past years, use the Insights API
-    const untilDate = `${year}-12-31`;
+    // Determine date range
+    const untilDate = isCurrentYear
+        ? now.toISOString().slice(0, 10)
+        : `${year}-12-31`;
 
-    // Meta retains ~37 months of insights data — clamp start date
+    // Meta retains ~37 months of insights — clamp start date
     const minDate = new Date(now);
     minDate.setMonth(minDate.getMonth() - 37);
     const minDateStr = minDate.toISOString().slice(0, 10);
@@ -129,7 +162,7 @@ async function fetchHistorical(accessToken, year) {
 
     const timeRange = JSON.stringify({ since: sinceDate, until: untilDate });
 
-    // Paginate through all insights for the year
+    // 1. Fetch insights (all ads with impressions in the date range)
     let allInsights = [];
     const baseParams = {
         level: 'ad',
@@ -151,15 +184,15 @@ async function fetchHistorical(accessToken, year) {
         nextUrl = pageData.paging?.next || null;
     }
 
-    // Only keep ads with actual impressions
     const insights = allInsights.filter(r => parseInt(r.impressions || 0) > 0);
 
-    // Fetch creative details for each unique ad from insights
-    const adIds = [...new Set(insights.map(r => r.ad_id))];
+    // 2. Fetch creative details for insight ads
+    const insightAdIds = new Set(insights.map(r => r.ad_id));
     const creativeMap = new Map();
 
-    for (let i = 0; i < adIds.length; i += 10) {
-        const batch = adIds.slice(i, i + 10);
+    const adIdsToFetch = [...insightAdIds];
+    for (let i = 0; i < adIdsToFetch.length; i += 10) {
+        const batch = adIdsToFetch.slice(i, i + 10);
         await Promise.allSettled(
             batch.map(adId =>
                 graphGet(adId, {
@@ -171,30 +204,88 @@ async function fetchHistorical(accessToken, year) {
         );
     }
 
+    // 3. For current year, also fetch active ads directly
+    //    (insights can lag for recently launched ads)
+    let directAds = [];
+    if (isCurrentYear) {
+        try {
+            const adsResp = await graphGet(
+                `${AD_ACCOUNT_ID}/ads`,
+                {
+                    fields: [
+                        'id', 'name', 'status', 'effective_status',
+                        'campaign_id', 'adset_id',
+                        'campaign{name}', 'adset{name}',
+                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+                    ].join(','),
+                    effective_status: '["ACTIVE"]',
+                    limit: 200,
+                },
+                accessToken
+            );
+            directAds = adsResp.data || [];
+        } catch { /* non-fatal */ }
+    }
+
+    // 4. Build response
     const response = buildHistoricalResponse(insights, creativeMap, year);
+
+    // Merge in active ads not already in insights
+    if (directAds.length > 0) {
+        for (const ad of directAds) {
+            if (insightAdIds.has(ad.id)) continue;
+
+            const campId = ad.campaign_id;
+            const adsetId = ad.adset_id;
+            const campaign = ad.campaign || {};
+            const adset = ad.adset || {};
+
+            let camp = response.campaigns.find(c => c.id === campId);
+            if (!camp) {
+                camp = { id: campId, name: campaign.name || `Campaign ${campId}`, status: 'ACTIVE', objective: null, adSets: [] };
+                response.campaigns.push(camp);
+            }
+
+            let adSetObj = camp.adSets.find(s => s.id === adsetId);
+            if (!adSetObj) {
+                adSetObj = { id: adsetId, name: adset.name || `Ad Set ${adsetId}`, status: 'ACTIVE', ads: [] };
+                camp.adSets.push(adSetObj);
+            }
+
+            const parsed = parseCreative(ad.creative || {});
+            adSetObj.ads.push({
+                id: ad.id, name: ad.name,
+                status: ad.effective_status || ad.status || 'ACTIVE',
+                ...parsed, impressions: 0,
+            });
+        }
+        response.campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+
     response._debug = {
         totalInsightsRows: allInsights.length,
         afterImpressionFilter: insights.length,
-        uniqueAds: adIds.length,
+        uniqueAdsFromInsights: insightAdIds.size,
         creativesFound: creativeMap.size,
+        directAdsMerged: directAds.filter(a => !insightAdIds.has(a.id)).length,
         timeRange: { since: sinceDate, until: untilDate },
     };
+
+    // 5. Cache the result
+    await setCache(supabase, cacheKey, response);
+
     return response;
 }
 
-/**
- * Build response for active ads
- */
+// --------------- Response builders ---------------
+
 function buildActiveResponse(campaigns, ads) {
     const campaignMap = new Map();
 
     for (const c of campaigns) {
         campaignMap.set(c.id, {
-            id: c.id,
-            name: c.name,
-            status: c.status,
-            objective: c.objective || null,
-            adSets: new Map(),
+            id: c.id, name: c.name, status: c.status,
+            objective: c.objective || null, adSets: new Map(),
         });
     }
 
@@ -202,11 +293,8 @@ function buildActiveResponse(campaigns, ads) {
         const campId = ad.campaign_id;
         if (!campaignMap.has(campId)) {
             campaignMap.set(campId, {
-                id: campId,
-                name: `Campaign ${campId}`,
-                status: 'ACTIVE',
-                objective: null,
-                adSets: new Map(),
+                id: campId, name: `Campaign ${campId}`, status: 'ACTIVE',
+                objective: null, adSets: new Map(),
             });
         }
 
@@ -216,39 +304,30 @@ function buildActiveResponse(campaigns, ads) {
 
         if (!camp.adSets.has(adsetId)) {
             camp.adSets.set(adsetId, {
-                id: adsetId,
-                name: adset.name || `Ad Set ${adsetId}`,
-                status: adset.status || 'ACTIVE',
-                ads: [],
+                id: adsetId, name: adset.name || `Ad Set ${adsetId}`,
+                status: adset.status || 'ACTIVE', ads: [],
             });
         }
 
         camp.adSets.get(adsetId).ads.push(parseAd(ad));
     }
 
-    // Remove campaigns with no ads
     for (const [id, camp] of campaignMap) {
         if (camp.adSets.size === 0) campaignMap.delete(id);
     }
 
     const result = Array.from(campaignMap.values()).map(c => ({
-        ...c,
-        adSets: Array.from(c.adSets.values()),
+        ...c, adSets: Array.from(c.adSets.values()),
     }));
     result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     return {
         account: { id: AD_ACCOUNT_ID, name: 'Dunham & Jones' },
-        platform: 'meta',
-        campaigns: result,
-        historical: false,
-        fetchedAt: new Date().toISOString(),
+        platform: 'meta', campaigns: result,
+        historical: false, fetchedAt: new Date().toISOString(),
     };
 }
 
-/**
- * Build response for historical ads from insights data
- */
 function buildHistoricalResponse(insights, creativeMap, year) {
     const campaignMap = new Map();
 
@@ -256,11 +335,8 @@ function buildHistoricalResponse(insights, creativeMap, year) {
         const campId = row.campaign_id;
         if (!campaignMap.has(campId)) {
             campaignMap.set(campId, {
-                id: campId,
-                name: row.campaign_name,
-                status: 'HISTORICAL',
-                objective: null,
-                adSets: new Map(),
+                id: campId, name: row.campaign_name, status: 'HISTORICAL',
+                objective: null, adSets: new Map(),
             });
         }
 
@@ -269,16 +345,11 @@ function buildHistoricalResponse(insights, creativeMap, year) {
 
         if (!camp.adSets.has(adsetId)) {
             camp.adSets.set(adsetId, {
-                id: adsetId,
-                name: row.adset_name,
-                status: 'HISTORICAL',
-                ads: [],
+                id: adsetId, name: row.adset_name, status: 'HISTORICAL', ads: [],
             });
         }
 
         const adSetObj = camp.adSets.get(adsetId);
-
-        // Aggregate if same ad appears multiple times
         const existing = adSetObj.ads.find(a => a.id === row.ad_id);
         if (existing) {
             existing.impressions += parseInt(row.impressions || 0);
@@ -291,111 +362,79 @@ function buildHistoricalResponse(insights, creativeMap, year) {
             : { primaryTexts: [], headlines: [], descriptions: [], imageUrl: null, thumbnailUrl: null, linkUrl: null };
 
         adSetObj.ads.push({
-            id: row.ad_id,
-            name: row.ad_name,
-            status: 'HISTORICAL',
-            ...parsed,
-            impressions: parseInt(row.impressions || 0),
+            id: row.ad_id, name: row.ad_name, status: 'HISTORICAL',
+            ...parsed, impressions: parseInt(row.impressions || 0),
         });
     }
 
     const result = Array.from(campaignMap.values()).map(c => ({
-        ...c,
-        adSets: Array.from(c.adSets.values()),
+        ...c, adSets: Array.from(c.adSets.values()),
     }));
     result.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     return {
         account: { id: AD_ACCOUNT_ID, name: 'Dunham & Jones' },
-        platform: 'meta',
-        campaigns: result,
-        historical: true,
-        year,
-        fetchedAt: new Date().toISOString(),
+        platform: 'meta', campaigns: result,
+        historical: true, year, fetchedAt: new Date().toISOString(),
     };
 }
 
-/**
- * Parse a single active ad into our response shape
- */
+// --------------- Creative parsing ---------------
+
 function parseAd(ad) {
-    const creative = ad.creative || {};
-    const parsed = parseCreative(creative);
-    return {
-        id: ad.id,
-        name: ad.name,
-        status: ad.status,
-        ...parsed,
-    };
+    const parsed = parseCreative(ad.creative || {});
+    return { id: ad.id, name: ad.name, status: ad.status, ...parsed };
 }
 
-/**
- * Parse creative into primaryTexts/headlines/descriptions/imageUrl.
- * Handles asset_feed_spec (dynamic creative), object_story_spec (standard),
- * and legacy body/title fields.
- */
 function parseCreative(creative) {
     const result = {
-        primaryTexts: [],
-        headlines: [],
-        descriptions: [],
+        primaryTexts: [], headlines: [], descriptions: [],
         imageUrl: creative.image_url || creative.thumbnail_url || null,
         thumbnailUrl: creative.thumbnail_url || null,
         linkUrl: null,
     };
 
-    // 1. Dynamic creative (asset_feed_spec) — highest priority
+    // 1. Dynamic creative (asset_feed_spec)
     const afs = creative.asset_feed_spec;
     if (afs) {
         if (afs.bodies) result.primaryTexts = afs.bodies.map(b => ({ text: b.text || '' }));
         if (afs.titles) result.headlines = afs.titles.map(t => ({ text: t.text || '' }));
         if (afs.descriptions) result.descriptions = afs.descriptions.map(d => ({ text: d.text || '' }));
         if (afs.link_urls) result.linkUrl = afs.link_urls[0]?.website_url || null;
-        if (afs.images && afs.images.length > 0) {
-            result.imageUrl = result.imageUrl || afs.images[0].url || null;
-        }
+        if (afs.images?.length > 0) result.imageUrl = result.imageUrl || afs.images[0].url || null;
     }
 
-    // 2. object_story_spec — standard ads (link ads, video ads)
+    // 2. object_story_spec (standard link/video ads)
     const oss = creative.object_story_spec;
     if (oss) {
         const linkData = oss.link_data || {};
         const videoData = oss.video_data || {};
 
-        if (result.primaryTexts.length === 0) {
+        if (!result.primaryTexts.length) {
             const msg = linkData.message || videoData.message || '';
             if (msg) result.primaryTexts = [{ text: msg }];
         }
-        if (result.headlines.length === 0) {
+        if (!result.headlines.length) {
             const name = linkData.name || videoData.title || '';
             if (name) result.headlines = [{ text: name }];
         }
-        if (result.descriptions.length === 0) {
+        if (!result.descriptions.length) {
             const desc = linkData.description || videoData.description || '';
             if (desc) result.descriptions = [{ text: desc }];
         }
-        if (!result.linkUrl) {
-            result.linkUrl = linkData.link || null;
-        }
-        if (!result.imageUrl) {
-            result.imageUrl = linkData.picture || videoData.image_url || null;
-        }
+        if (!result.linkUrl) result.linkUrl = linkData.link || null;
+        if (!result.imageUrl) result.imageUrl = linkData.picture || videoData.image_url || null;
     }
 
     // 3. Legacy fallbacks
-    if (result.primaryTexts.length === 0 && creative.body) {
-        result.primaryTexts = [{ text: creative.body }];
-    }
-    if (result.headlines.length === 0 && creative.title) {
-        result.headlines = [{ text: creative.title }];
-    }
+    if (!result.primaryTexts.length && creative.body) result.primaryTexts = [{ text: creative.body }];
+    if (!result.headlines.length && creative.title) result.headlines = [{ text: creative.title }];
 
     return result;
 }
 
-/**
- * Helper: GET request to Graph API with pagination support
- */
+// --------------- Graph API helper ---------------
+
 async function graphGet(endpoint, params, accessToken) {
     const url = new URL(endpoint.startsWith('http') ? endpoint : `${GRAPH_BASE}/${endpoint}`);
     url.searchParams.set('access_token', accessToken);
