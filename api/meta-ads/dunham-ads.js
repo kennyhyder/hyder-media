@@ -153,7 +153,7 @@ async function fetchHistorical(accessToken, year, supabase, req) {
     const cacheKey = `dunham:meta:${year}`;
     const forceRefresh = req && req.query && req.query.refresh === 'true';
     if (!forceRefresh) {
-        const maxAgeMin = isCurrentYear ? 60 : Infinity;
+        const maxAgeMin = isCurrentYear ? 60 : 43200; // 30 days for past years
         const cached = await getCached(supabase, cacheKey, maxAgeMin);
         if (cached) {
             cached._cached = true;

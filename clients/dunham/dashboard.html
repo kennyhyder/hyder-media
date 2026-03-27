@@ -23,7 +23,7 @@
         </a>
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
-            <button class="btn btn-secondary" onclick="loadData()">Refresh</button>
+            <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
             <button class="btn btn-primary" onclick="window.print()">Print Report</button>
         </div>
     </nav>
@@ -152,8 +152,11 @@
             }
         }
 
-        async function loadData(year) {
+        async function loadData(year, forceRefresh) {
             if (year === undefined) year = activeYear;
+
+            // Clear local cache on manual refresh
+            if (forceRefresh) delete dataCache[cacheKey(year)];
 
             const loadingEl = document.getElementById('loading-state');
             const errorEl = document.getElementById('error-state');
@@ -166,7 +169,8 @@
             statsEl.style.display = 'none';
 
             const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
-            const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+            let url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+            if (forceRefresh) url += (url.includes('?') ? '&' : '?') + 'refresh=true';
             document.getElementById('loading-text').textContent =
                 `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
