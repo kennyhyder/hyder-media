@@ -125,10 +125,13 @@
 
             if (platform === 'changes') {
                 document.getElementById('report-account').textContent = 'Account: 840-838-5870';
-                document.querySelector('.subtitle').textContent = 'Account change history (last 30 days)';
-                document.getElementById('year-tabs').style.display = 'none';
-                activeYear = 'active';
-                dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
+                document.querySelector('.subtitle').textContent = 'Account change history';
+                // Show year tabs — rebuilt after data loads with available years
+                const yearContainer = document.getElementById('year-tabs');
+                yearContainer.innerHTML = '<button class="year-tab active" data-year="all" onclick="switchYear(\'all\')">All Changes</button>';
+                yearContainer.style.display = '';
+                activeYear = 'all';
+                dataCache[cacheKey('all')] ? renderReport(dataCache[cacheKey('all')]) : loadData('all');
                 return;
             }
 
@@ -159,8 +162,12 @@
             document.querySelectorAll('.year-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
-            const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
-            if (activePlatform !== 'changes') {
+            if (activePlatform === 'changes') {
+                document.querySelector('.subtitle').textContent = year === 'all'
+                    ? 'Account change history'
+                    : `Account change history — ${year}`;
+            } else {
+                const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
                 document.querySelector('.subtitle').textContent = year === 'active'
                     ? `Complete inventory of active ${platformLabel} ad copy`
                     : `${platformLabel} ad copy that ran during ${year}`;
@@ -188,12 +195,25 @@
             contentEl.style.display = 'none';
             statsEl.style.display = 'none';
 
-            const apiBase = activePlatform === 'changes' ? CHANGES_API : (activePlatform === 'meta' ? META_API : GOOGLE_API);
-            let url = (activePlatform === 'changes' || year === 'active') ? apiBase : `${apiBase}?year=${year}`;
-            if (forceRefresh) url += (url.includes('?') ? '&' : '?') + 'refresh=true';
+            // For changes platform: sync first on refresh, then read from DB
+            if (activePlatform === 'changes' && forceRefresh) {
+                document.getElementById('loading-text').textContent = 'Syncing change history from Google Ads...';
+                try { await fetch(CHANGES_API + '?sync=true'); } catch (e) { /* still try to load stored */ }
+                // Clear all changes cache keys
+                Object.keys(dataCache).forEach(k => { if (k.startsWith('changes:')) delete dataCache[k]; });
+            }
+
+            let url;
+            if (activePlatform === 'changes') {
+                url = (year === 'all') ? CHANGES_API : `${CHANGES_API}?year=${year}`;
+            } else {
+                const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
+                url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+            }
+            if (forceRefresh && activePlatform !== 'changes') url += (url.includes('?') ? '&' : '?') + 'refresh=true';
             document.getElementById('loading-text').textContent =
                 activePlatform === 'changes'
-                    ? 'Loading change history from Google Ads...'
+                    ? 'Loading change history...'
                     : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
             try {
@@ -1079,6 +1099,16 @@
             document.getElementById('report-date').textContent =
                 'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
+            // Rebuild year tabs from available years
+            if (data.availableYears && data.availableYears.length > 0) {
+                const container = document.getElementById('year-tabs');
+                let tabsHtml = `<button class="year-tab${activeYear === 'all' ? ' active' : ''}" data-year="all" onclick="switchYear('all')">All Changes</button>`;
+                for (const y of data.availableYears) {
+                    tabsHtml += `<button class="year-tab${activeYear === y ? ' active' : ''}" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
+                }
+                container.innerHTML = tabsHtml;
+            }
+
             const tc = data.typeCounts || {};
             const totalChanges = data.changes ? data.changes.length : 0;
 
@@ -1087,7 +1117,7 @@
             document.getElementById('label-ads').textContent = 'Ad Groups';
             document.getElementById('label-headlines').textContent = 'Ads';
             document.getElementById('label-descriptions').textContent = 'Keywords';
-            document.getElementById('label-extensions').textContent = 'Extensions';
+            document.getElementById('label-extensions').textContent = 'Budgets';
             document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
 
             document.getElementById('stat-campaigns').textContent = totalChanges;
@@ -1095,13 +1125,16 @@
             document.getElementById('stat-ads').textContent = tc['AD_GROUP'] || 0;
             document.getElementById('stat-headlines').textContent = tc['AD'] || 0;
             document.getElementById('stat-descriptions').textContent = (tc['AD_GROUP_CRITERION'] || 0) + (tc['CAMPAIGN_CRITERION'] || 0);
-            document.getElementById('stat-extensions').textContent = (tc['ASSET'] || 0) + (tc['CAMPAIGN_ASSET'] || 0) + (tc['CUSTOMER_ASSET'] || 0) + (tc['ASSET_GROUP_ASSET'] || 0);
+            document.getElementById('stat-extensions').textContent = tc['CAMPAIGN_BUDGET'] || 0;
             statsEl.style.display = 'flex';
 
             if (totalChanges === 0) {
+                const msg = data.totalStored === 0
+                    ? 'No change history stored yet. Click <strong>Refresh</strong> to sync the last 30 days from Google Ads.'
+                    : 'No changes found for this period.';
                 contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
-                    <h2>No changes in the last 30 days</h2>
-                    <p style="color:var(--text-secondary);">The Google Ads API only provides change history for the last 30 days.</p>
+                    <h2>No Changes</h2>
+                    <p style="color:var(--text-secondary);">${msg}</p>
                 </div>`;
                 contentEl.style.display = 'block';
                 return;
@@ -1159,7 +1192,8 @@
             const pairs = [];
             for (const year of googleYears) pairs.push({ platform: 'google', year });
             for (const year of metaYears) pairs.push({ platform: 'meta', year });
-            pairs.push({ platform: 'changes', year: 'active' });
+            // Changes: fetch "all" first so we know available years, then per-year
+            pairs.push({ platform: 'changes', year: 'all' });
 
             // Only fetch uncached
             const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
@@ -1172,14 +1206,39 @@
                 await Promise.all(batch.map(async ({ platform, year }) => {
                     try {
                         const apiBase = platform === 'changes' ? CHANGES_API : (platform === 'meta' ? META_API : GOOGLE_API);
-                        const url = (platform === 'changes' || year === 'active') ? apiBase : `${apiBase}?year=${year}`;
-                        const resp = await fetch(url);
+                        let fetchUrl;
+                        if (platform === 'changes') {
+                            fetchUrl = year === 'all' ? CHANGES_API : `${CHANGES_API}?year=${year}`;
+                        } else {
+                            fetchUrl = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+                        }
+                        const resp = await fetch(fetchUrl);
                         if (resp.ok) {
                             const data = await resp.json();
                             if (!data.error) dataCache[`${platform}:${year}`] = data;
                         }
                     } catch (e) { /* skip failed years */ }
                 }));
+            }
+
+            // After fetching changes:all, also fetch per-year if multiple years
+            const changesAllData = dataCache['changes:all'];
+            if (changesAllData && changesAllData.availableYears && changesAllData.availableYears.length > 1) {
+                const changeYearPairs = changesAllData.availableYears
+                    .filter(y => !dataCache[`changes:${y}`])
+                    .map(y => ({ platform: 'changes', year: y }));
+                for (let i = 0; i < changeYearPairs.length; i += BATCH) {
+                    const batch = changeYearPairs.slice(i, i + BATCH);
+                    await Promise.all(batch.map(async ({ year }) => {
+                        try {
+                            const resp = await fetch(`${CHANGES_API}?year=${year}`);
+                            if (resp.ok) {
+                                const data = await resp.json();
+                                if (!data.error) dataCache[`changes:${year}`] = data;
+                            }
+                        } catch (e) { /* skip */ }
+                    }));
+                }
             }
 
             progressText.textContent = 'Preparing report...';
@@ -1213,10 +1272,21 @@
             }
 
             // Change History section
-            const changesData = dataCache['changes:active'];
-            if (changesData && changesData.changes && changesData.changes.length > 0) {
+            const changesAll = dataCache['changes:all'];
+            if (changesAll && changesAll.changes && changesAll.changes.length > 0) {
                 combined += `<div class="print-section-header">Google Ads Change History</div>`;
-                combined += buildChangesHTML(changesData);
+                if (changesAll.availableYears && changesAll.availableYears.length > 1) {
+                    // Group by year in print
+                    for (const y of changesAll.availableYears) {
+                        const yearData = dataCache[`changes:${y}`];
+                        if (yearData && yearData.changes && yearData.changes.length > 0) {
+                            combined += `<div class="print-year-header">${y}</div>`;
+                            combined += buildChangesHTML(yearData);
+                        }
+                    }
+                } else {
+                    combined += buildChangesHTML(changesAll);
+                }
             }
 
             // Save current view state

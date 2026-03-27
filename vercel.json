@@ -125,6 +125,9 @@
     "api/google-ads/dunham-ads.js": {
       "maxDuration": 30
     },
+    "api/google-ads/dunham-changes.js": {
+      "maxDuration": 60
+    },
     "api/meta-ads/auth.js": {
       "maxDuration": 10
     },
