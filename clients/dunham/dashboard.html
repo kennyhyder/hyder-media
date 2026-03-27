@@ -43,6 +43,7 @@
         <div class="platform-tabs">
             <button class="platform-tab active" data-platform="google" onclick="switchPlatform('google')">Google Ads</button>
             <button class="platform-tab" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
+            <button class="platform-tab" data-platform="changes" onclick="switchPlatform('changes')">Change History</button>
         </div>
 
         <!-- Year Tabs -->
@@ -105,6 +106,7 @@
     <script>
         const GOOGLE_API = '/api/google-ads/dunham-ads';
         const META_API = '/api/meta-ads/dunham-ads';
+        const CHANGES_API = '/api/google-ads/dunham-changes';
         const CURRENT_YEAR = new Date().getFullYear();
         const GOOGLE_START_YEAR = 2018;
         const META_START_YEAR = 2023; // Account has data back to Feb 2023
@@ -121,11 +123,21 @@
                 t.classList.toggle('active', t.dataset.platform === platform);
             });
 
+            if (platform === 'changes') {
+                document.getElementById('report-account').textContent = 'Account: 840-838-5870';
+                document.querySelector('.subtitle').textContent = 'Account change history (last 30 days)';
+                document.getElementById('year-tabs').style.display = 'none';
+                activeYear = 'active';
+                dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
+                return;
+            }
+
             // Update account label
             document.getElementById('report-account').textContent =
                 platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
 
             // Rebuild year tabs for this platform
+            document.getElementById('year-tabs').style.display = '';
             activeYear = 'active';
             buildYearTabs();
             dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
@@ -148,9 +160,11 @@
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
             const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
-            document.querySelector('.subtitle').textContent = year === 'active'
-                ? `Complete inventory of active ${platformLabel} ad copy`
-                : `${platformLabel} ad copy that ran during ${year}`;
+            if (activePlatform !== 'changes') {
+                document.querySelector('.subtitle').textContent = year === 'active'
+                    ? `Complete inventory of active ${platformLabel} ad copy`
+                    : `${platformLabel} ad copy that ran during ${year}`;
+            }
             if (dataCache[cacheKey(year)]) {
                 renderReport(dataCache[cacheKey(year)]);
             } else {
@@ -174,11 +188,13 @@
             contentEl.style.display = 'none';
             statsEl.style.display = 'none';
 
-            const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
-            let url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+            const apiBase = activePlatform === 'changes' ? CHANGES_API : (activePlatform === 'meta' ? META_API : GOOGLE_API);
+            let url = (activePlatform === 'changes' || year === 'active') ? apiBase : `${apiBase}?year=${year}`;
             if (forceRefresh) url += (url.includes('?') ? '&' : '?') + 'refresh=true';
             document.getElementById('loading-text').textContent =
-                `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
+                activePlatform === 'changes'
+                    ? 'Loading change history from Google Ads...'
+                    : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
 
             try {
                 const resp = await fetch(url);
@@ -207,6 +223,7 @@
         }
 
         function renderReport(data) {
+            if (data.changes) return renderChangesReport(data);
             const isMeta = data.platform === 'meta';
             if (isMeta) return renderMetaReport(data);
             return renderGoogleReport(data);
@@ -896,6 +913,205 @@
         }
 
         // ============================================================
+        // Change History HTML builder (no DOM side effects)
+        // ============================================================
+        function buildChangesHTML(data) {
+            if (!data.changes || data.changes.length === 0) return '';
+
+            // Group by date
+            const groups = {};
+            for (const c of data.changes) {
+                const date = c.dateTime ? c.dateTime.split('T')[0] : 'Unknown';
+                if (!groups[date]) groups[date] = [];
+                groups[date].push(c);
+            }
+
+            let html = '';
+            if (data.note) {
+                html += `<div class="change-note">${esc(data.note)}</div>`;
+            }
+
+            for (const [date, changes] of Object.entries(groups)) {
+                const dateStr = date !== 'Unknown'
+                    ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+                    : 'Unknown Date';
+                html += `<div class="change-date-group">`;
+                html += `<div class="change-date-header">${esc(dateStr)} <span class="change-date-count">${changes.length} change${changes.length !== 1 ? 's' : ''}</span></div>`;
+
+                for (const c of changes) {
+                    const time = c.dateTime ? new Date(c.dateTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
+                    const opClass = c.operation === 'CREATE' ? 'op-create' : c.operation === 'REMOVE' ? 'op-remove' : 'op-update';
+                    const resLabel = (c.resourceType || '').replace(/_/g, ' ');
+
+                    html += `<div class="change-card">`;
+                    html += `<div class="change-card-time">${esc(time)}</div>`;
+                    html += `<div class="change-card-body">`;
+                    html += `<div class="change-card-badges">`;
+                    html += `<span class="badge change-operation ${opClass}">${esc(c.operation)}</span>`;
+                    html += `<span class="badge change-resource-type">${esc(resLabel)}</span>`;
+                    html += `</div>`;
+
+                    // Breadcrumb: campaign > ad group
+                    if (c.campaignName || c.adGroupName) {
+                        html += `<div class="change-breadcrumb">`;
+                        if (c.campaignName) html += `<span>${esc(c.campaignName)}</span>`;
+                        if (c.campaignName && c.adGroupName) html += `<span class="change-breadcrumb-sep">&rsaquo;</span>`;
+                        if (c.adGroupName) html += `<span>${esc(c.adGroupName)}</span>`;
+                        html += `</div>`;
+                    }
+
+                    // User
+                    if (c.userEmail) {
+                        const clientLabel = formatClientType(c.clientType);
+                        html += `<div class="change-user">${esc(c.userEmail)}${clientLabel ? ` <span class="change-client-type">(${esc(clientLabel)})</span>` : ''}</div>`;
+                    }
+
+                    // Changed fields summary
+                    if (c.changedFields && c.changedFields.length > 0) {
+                        html += `<div class="change-fields">Changed: ${c.changedFields.map(f => `<code>${esc(f)}</code>`).join(', ')}</div>`;
+                    }
+
+                    // Details (old → new)
+                    if (c.details) {
+                        html += `<div class="change-detail">`;
+                        html += renderChangeDetails(c.details, c.resourceType);
+                        html += `</div>`;
+                    }
+
+                    html += `</div></div>`; // close body + card
+                }
+
+                html += `</div>`; // close date group
+            }
+
+            return html;
+        }
+
+        function renderChangeDetails(details, resourceType) {
+            let html = '';
+
+            if (details.name) {
+                html += renderDiff('Name', details.name.old, details.name.new);
+            }
+            if (details.status) {
+                html += renderDiff('Status', details.status.old, details.status.new);
+            }
+            if (details.dailyBudget) {
+                html += renderDiff('Daily Budget', details.dailyBudget.old ? `$${details.dailyBudget.old}` : null, details.dailyBudget.new ? `$${details.dailyBudget.new}` : null);
+            }
+            if (details.cpcBid) {
+                html += renderDiff('CPC Bid', details.cpcBid.old ? `$${details.cpcBid.old}` : null, details.cpcBid.new ? `$${details.cpcBid.new}` : null);
+            }
+            if (details.keyword) {
+                const matchBadge = details.keyword.matchType ? ` [${details.keyword.matchType}]` : '';
+                const negLabel = details.negative ? ' (negative)' : '';
+                html += `<div class="change-detail-row"><span class="change-detail-label">Keyword:</span> ${esc(details.keyword.text)}${matchBadge}${negLabel}</div>`;
+            }
+            if (details.headlines) {
+                html += renderListDiff('Headlines', details.headlines.old, details.headlines.new);
+            }
+            if (details.descriptions) {
+                html += renderListDiff('Descriptions', details.descriptions.old, details.descriptions.new);
+            }
+
+            return html;
+        }
+
+        function renderDiff(label, oldVal, newVal) {
+            if (!oldVal && !newVal) return '';
+            let html = `<div class="change-detail-row"><span class="change-detail-label">${esc(label)}:</span> `;
+            if (oldVal && newVal) {
+                html += `<span class="change-old">${esc(String(oldVal))}</span> <span class="change-arrow">&rarr;</span> <span class="change-new">${esc(String(newVal))}</span>`;
+            } else if (newVal) {
+                html += `<span class="change-new">${esc(String(newVal))}</span>`;
+            } else {
+                html += `<span class="change-old">${esc(String(oldVal))}</span> <span class="change-arrow">&rarr;</span> <span class="change-removed">(removed)</span>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function renderListDiff(label, oldList, newList) {
+            oldList = oldList || [];
+            newList = newList || [];
+            if (oldList.length === 0 && newList.length === 0) return '';
+
+            let html = `<div class="change-detail-row"><span class="change-detail-label">${esc(label)}:</span></div>`;
+            const added = newList.filter(t => !oldList.includes(t));
+            const removed = oldList.filter(t => !newList.includes(t));
+            const kept = newList.filter(t => oldList.includes(t));
+
+            for (const t of added) {
+                html += `<div class="change-detail-list-item change-new">+ ${esc(t)}</div>`;
+            }
+            for (const t of removed) {
+                html += `<div class="change-detail-list-item change-old">- ${esc(t)}</div>`;
+            }
+            if (kept.length > 0 && (added.length > 0 || removed.length > 0)) {
+                html += `<div class="change-detail-list-item" style="color:var(--text-secondary);font-size:0.8rem;">(${kept.length} unchanged)</div>`;
+            }
+            return html;
+        }
+
+        function formatClientType(clientType) {
+            if (!clientType) return '';
+            const map = {
+                'GOOGLE_ADS_WEB_CLIENT': 'Web UI',
+                'GOOGLE_ADS_EDITOR': 'Editor',
+                'GOOGLE_ADS_MOBILE_APP': 'Mobile',
+                'GOOGLE_ADS_SCRIPTS': 'Scripts',
+                'GOOGLE_ADS_API': 'API',
+                'GOOGLE_ADS_AUTOMATED_RULE': 'Auto Rule',
+                'GOOGLE_ADS_BULK_UPLOAD': 'Bulk Upload',
+                'OTHER': 'Other',
+            };
+            return map[clientType] || clientType.replace(/_/g, ' ').toLowerCase();
+        }
+
+        // ============================================================
+        // Change History rendering
+        // ============================================================
+        function renderChangesReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            const tc = data.typeCounts || {};
+            const totalChanges = data.changes ? data.changes.length : 0;
+
+            document.getElementById('label-campaigns').textContent = 'Total Changes';
+            document.getElementById('label-adgroups').textContent = 'Campaigns';
+            document.getElementById('label-ads').textContent = 'Ad Groups';
+            document.getElementById('label-headlines').textContent = 'Ads';
+            document.getElementById('label-descriptions').textContent = 'Keywords';
+            document.getElementById('label-extensions').textContent = 'Extensions';
+            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
+
+            document.getElementById('stat-campaigns').textContent = totalChanges;
+            document.getElementById('stat-adgroups').textContent = tc['CAMPAIGN'] || 0;
+            document.getElementById('stat-ads').textContent = tc['AD_GROUP'] || 0;
+            document.getElementById('stat-headlines').textContent = tc['AD'] || 0;
+            document.getElementById('stat-descriptions').textContent = (tc['AD_GROUP_CRITERION'] || 0) + (tc['CAMPAIGN_CRITERION'] || 0);
+            document.getElementById('stat-extensions').textContent = (tc['ASSET'] || 0) + (tc['CAMPAIGN_ASSET'] || 0) + (tc['CUSTOMER_ASSET'] || 0) + (tc['ASSET_GROUP_ASSET'] || 0);
+            statsEl.style.display = 'flex';
+
+            if (totalChanges === 0) {
+                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
+                    <h2>No changes in the last 30 days</h2>
+                    <p style="color:var(--text-secondary);">The Google Ads API only provides change history for the last 30 days.</p>
+                </div>`;
+                contentEl.style.display = 'block';
+                return;
+            }
+
+            contentEl.innerHTML = buildChangesHTML(data);
+            contentEl.style.display = 'block';
+        }
+
+        // ============================================================
         // Shared utilities
         // ============================================================
         function formatPin(pinnedField) {
@@ -943,6 +1159,7 @@
             const pairs = [];
             for (const year of googleYears) pairs.push({ platform: 'google', year });
             for (const year of metaYears) pairs.push({ platform: 'meta', year });
+            pairs.push({ platform: 'changes', year: 'active' });
 
             // Only fetch uncached
             const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
@@ -954,8 +1171,8 @@
                 progressText.textContent = `Loading data... (${Math.min(i + BATCH, toFetch.length)} of ${toFetch.length})`;
                 await Promise.all(batch.map(async ({ platform, year }) => {
                     try {
-                        const apiBase = platform === 'meta' ? META_API : GOOGLE_API;
-                        const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+                        const apiBase = platform === 'changes' ? CHANGES_API : (platform === 'meta' ? META_API : GOOGLE_API);
+                        const url = (platform === 'changes' || year === 'active') ? apiBase : `${apiBase}?year=${year}`;
                         const resp = await fetch(url);
                         if (resp.ok) {
                             const data = await resp.json();
@@ -993,6 +1210,13 @@
                 const label = year === 'active' ? 'Active Ads' : String(year);
                 combined += `<div class="print-year-header">${label}</div>`;
                 combined += buildMetaHTML(data);
+            }
+
+            // Change History section
+            const changesData = dataCache['changes:active'];
+            if (changesData && changesData.changes && changesData.changes.length > 0) {
+                combined += `<div class="print-section-header">Google Ads Change History</div>`;
+                combined += buildChangesHTML(changesData);
             }
 
             // Save current view state

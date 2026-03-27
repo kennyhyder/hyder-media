@@ -144,6 +144,12 @@ body {
     border-color: #1877f2;
 }
 
+.platform-tab.active[data-platform="changes"] {
+    background: var(--purple);
+    color: #fff;
+    border-color: var(--purple);
+}
+
 /* Year Tabs */
 .year-tabs {
     display: flex;
@@ -1595,6 +1601,188 @@ body {
     font-size: 1rem;
 }
 
+/* ========================= */
+/* Change History Styles     */
+/* ========================= */
+
+.change-note {
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.change-date-group {
+    margin-bottom: 32px;
+}
+
+.change-date-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.change-date-count {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 8px;
+}
+
+.change-card {
+    display: flex;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+.change-card-time {
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    min-width: 70px;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.change-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.change-card-badges {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.change-operation {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+}
+
+.change-operation.op-create {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--success);
+}
+
+.change-operation.op-update {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent);
+}
+
+.change-operation.op-remove {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+}
+
+.change-resource-type {
+    background: rgba(148, 163, 184, 0.15);
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+}
+
+.change-breadcrumb {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.change-breadcrumb-sep {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.change-user {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.change-client-type {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.change-fields {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.change-fields code {
+    font-size: 0.75rem;
+    background: var(--bg-tertiary);
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
+.change-detail {
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 6px;
+    font-size: 0.85rem;
+}
+
+.change-detail-row {
+    margin-bottom: 3px;
+}
+
+.change-detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.change-old {
+    color: var(--danger);
+    text-decoration: line-through;
+    text-decoration-color: rgba(239, 68, 68, 0.4);
+}
+
+.change-new {
+    color: var(--success);
+}
+
+.change-removed {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.change-arrow {
+    color: var(--text-secondary);
+    margin: 0 4px;
+}
+
+.change-detail-list-item {
+    padding-left: 12px;
+    font-size: 0.82rem;
+}
+
+.change-detail-list-item.change-new {
+    text-decoration: none;
+}
+
+.change-detail-list-item.change-old {
+    text-decoration: line-through;
+    text-decoration-color: rgba(239, 68, 68, 0.4);
+}
+
 /* Print All — Cover & Section Headers */
 .print-cover-header {
     text-align: center;
@@ -1869,5 +2057,30 @@ body {
 
     .year-tabs {
         display: none !important;
+    }
+
+    /* Change History print */
+    .change-note {
+        background: #f5f3ff;
+        border-color: #ddd;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .change-card {
+        background: #fafafa;
+        border: 1px solid #ddd;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .change-detail {
+        background: #f0f0f0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .change-date-group {
+        page-break-inside: avoid;
     }
 }
