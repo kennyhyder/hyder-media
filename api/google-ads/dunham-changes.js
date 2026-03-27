@@ -74,6 +74,13 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json',
         };
 
+        // Use explicit date range — LAST_30_DAYS can trigger START_DATE_TOO_OLD
+        const now = new Date();
+        const startDate = new Date(now);
+        startDate.setDate(startDate.getDate() - 29);
+        const startStr = startDate.toISOString().split('T')[0];
+        const endStr = now.toISOString().split('T')[0];
+
         const changesData = await fetchQuery(CUSTOMER_ID, headers, `
             SELECT
                 change_event.change_date_time,
@@ -87,7 +94,7 @@ export default async function handler(req, res) {
                 campaign.name,
                 ad_group.name
             FROM change_event
-            WHERE change_event.change_date_time DURING LAST_30_DAYS
+            WHERE change_event.change_date_time >= '${startStr}' AND change_event.change_date_time <= '${endStr}'
             ORDER BY change_event.change_date_time DESC
             LIMIT 10000
         `);
