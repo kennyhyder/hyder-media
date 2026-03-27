@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridScout - Data Center Site Intelligence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --roboto-mono: 'Roboto Mono', monospace;
+            --pt-sans: 'PT Sans', sans-serif;
+            --body-color: #efe2b9;
+            --text-color: #354231;
+            --purple: #7c3aed;
+            --dark-purple: #0f0a1a;
+            --deep-purple: #1e1035;
+            --light-purple: #a78bfa;
+            --accent: #7c3aed;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --white: #fff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow: hidden; height: 100%; }
+        body { font-family: var(--roboto-mono); background: var(--dark-purple); color: var(--white); }
+
+        h1, h2, h3 { font-family: var(--pt-sans); font-weight: 700; }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: var(--purple); z-index: 100; transition: width 0.4s ease;
+        }
+
+        .deck-container { position: relative; width: 100%; height: 100vh; }
+
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 60px 80px;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .slide.active { opacity: 1; visibility: visible; }
+
+        .slide-title {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+            text-align: center;
+        }
+        .slide-dark { background: var(--dark-purple); }
+        .slide-accent { background: linear-gradient(135deg, var(--deep-purple) 0%, var(--dark-purple) 100%); }
+
+        .logo {
+            position: absolute; top: 28px; left: 36px; height: 36px; opacity: 0.85;
+            filter: brightness(0) invert(1);
+        }
+        .slide-number {
+            position: absolute; bottom: 24px; right: 36px;
+            font-size: 13px; opacity: 0.4; font-family: var(--roboto-mono);
+        }
+
+        .content { max-width: 1200px; width: 100%; }
+
+        /* Title slide */
+        .title-icon { font-size: 64px; margin-bottom: 20px; }
+        .slide-title h1 { font-size: 58px; line-height: 1.15; margin-bottom: 16px; }
+        .slide-title .subtitle { font-size: 22px; opacity: 0.8; font-family: var(--roboto-mono); font-weight: 400; }
+        .slide-title .tagline {
+            margin-top: 32px; font-size: 15px; opacity: 0.5;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        /* Feature slides */
+        .feature-layout {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+            align-items: center; width: 100%; max-width: 1200px;
+        }
+        .feature-layout.video-left { grid-template-columns: 1.1fr 0.9fr; }
+        .feature-layout.video-right { grid-template-columns: 0.9fr 1.1fr; }
+
+        .feature-text h2 {
+            font-size: 40px; margin-bottom: 8px; color: var(--white);
+        }
+        .feature-text .page-label {
+            font-size: 13px; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--light-purple); margin-bottom: 20px; font-family: var(--roboto-mono);
+        }
+        .feature-text p {
+            font-size: 15px; line-height: 1.7; opacity: 0.8; margin-bottom: 20px;
+        }
+        .feature-text .highlights {
+            list-style: none; padding: 0;
+        }
+        .feature-text .highlights li {
+            font-size: 14px; line-height: 1.6; padding: 6px 0; padding-left: 24px;
+            position: relative; opacity: 0.85;
+        }
+        .feature-text .highlights li::before {
+            content: "+"; position: absolute; left: 0; color: var(--purple);
+            font-weight: 700; font-size: 16px;
+        }
+
+        .video-frame {
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(124, 58, 237, 0.15), 0 0 0 1px rgba(255,255,255,0.08);
+            background: #000;
+        }
+        .video-frame video {
+            width: 100%; height: auto; display: block;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex; gap: 32px; margin-top: 24px;
+        }
+        .stat-box { text-align: center; }
+        .stat-number {
+            font-size: 32px; font-weight: 700; color: var(--light-purple);
+            font-family: var(--pt-sans);
+        }
+        .stat-label {
+            font-size: 11px; opacity: 0.5; text-transform: uppercase;
+            letter-spacing: 1px; margin-top: 2px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 16px;
+        }
+        .badge-purple { background: rgba(124,58,237,0.2); color: var(--light-purple); }
+        .badge-green { background: rgba(34,197,94,0.2); color: #86efac; }
+        .badge-amber { background: rgba(245,158,11,0.2); color: #fcd34d; }
+
+        /* Closing slide */
+        .close-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+            margin-top: 36px; max-width: 900px;
+        }
+        .close-card {
+            background: rgba(255,255,255,0.06); border-radius: 12px;
+            padding: 24px; border: 1px solid rgba(255,255,255,0.08);
+        }
+        .close-card h3 {
+            font-size: 18px; color: var(--light-purple); margin-bottom: 8px;
+        }
+        .close-card p { font-size: 13px; opacity: 0.7; line-height: 1.5; }
+
+        /* Nav controls */
+        .nav-controls {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; z-index: 50;
+        }
+        .nav-btn {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.1); color: var(--white);
+            font-size: 18px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-btn:hover { background: var(--purple); }
+
+        @media (max-width: 1024px) {
+            .slide { padding: 40px 32px; }
+            .feature-layout, .feature-layout.video-left, .feature-layout.video-right {
+                grid-template-columns: 1fr; gap: 24px;
+            }
+            .feature-text h2 { font-size: 28px; }
+            .slide-title h1 { font-size: 36px; }
+            .close-grid { grid-template-columns: 1fr; }
+            .stats-row { flex-wrap: wrap; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress" style="width: 0%"></div>
+
+    <div class="deck-container">
+
+        <!-- SLIDE 1: Title -->
+        <div class="slide slide-title active" data-slide="1">
+            <div class="title-icon">&#9889;</div>
+            <h1>GridScout</h1>
+            <p class="subtitle">Data Center Site Intelligence Platform</p>
+            <p class="tagline">154,000+ scored sites &bull; 50 states &bull; 14 scoring dimensions</p>
+            <span class="slide-number">1 / 10</span>
+        </div>
+
+        <!-- SLIDE 2: Dashboard -->
+        <div class="slide slide-dark" data-slide="2">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-left">
+                <div class="video-frame">
+                    <video src="Screen Recording-Dashboard.mov" autoplay loop muted playsinline></video>
+                </div>
+                <div class="feature-text">
+                    <span class="badge badge-purple">Dashboard</span>
+                    <h2>Executive Overview</h2>
+                    <p>A single-screen summary of the entire opportunity landscape. Score distributions, geographic concentration, and the top-ranked sites across all 50 states.</p>
+                    <ul class="highlights">
+                        <li>154K+ sites scored across substations, industrial, and greenfield categories</li>
+                        <li>Score distribution histogram with average, median, min, and max statistics</li>
+                        <li>Top 15 states ranked by average DC readiness score</li>
+                        <li>Top 25 highest-scoring sites with power, fiber, and capacity metrics</li>
+                        <li>8 authoritative federal data sources cited</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">2 / 10</span>
+        </div>
+
+        <!-- SLIDE 3: Interactive Map -->
+        <div class="slide slide-accent" data-slide="3">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-right">
+                <div class="feature-text">
+                    <span class="badge badge-purple">Interactive Map</span>
+                    <h2>Visual Infrastructure Analysis</h2>
+                    <p>A full-screen geospatial explorer with 7 independent data layers. Instantly correlate site opportunities with power, fiber, and existing data center infrastructure.</p>
+                    <ul class="highlights">
+                        <li>7 toggleable layers: prospect sites, existing DCs, IXPs, transmission lines, substations, fiber routes, ISO queue regions</li>
+                        <li>Heat map mode reveals macro patterns of infrastructure suitability</li>
+                        <li>Location search with radius-based proximity filtering</li>
+                        <li>Real-time score distribution and site type breakdown in sidebar</li>
+                        <li>3 base maps: dark, satellite, and street view</li>
+                        <li>Viewport-based dynamic loading for 150K+ markers</li>
+                    </ul>
+                </div>
+                <div class="video-frame">
+                    <video src="Screen Recording-Map.mov" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+            <span class="slide-number">3 / 10</span>
+        </div>
+
+        <!-- SLIDE 4: Greenfield Sites -->
+        <div class="slide slide-dark" data-slide="4">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-left">
+                <div class="video-frame">
+                    <video src="Screen Recording-Greenfields.mov" autoplay loop muted playsinline></video>
+                </div>
+                <div class="feature-text">
+                    <span class="badge badge-green">Greenfield Sites</span>
+                    <h2>Site Search &amp; Screening</h2>
+                    <p>The primary screening tool for narrowing thousands of candidate sites to a qualified shortlist. Filter by power, location, risk, and ISO region, then customize the scoring model to match your investment thesis.</p>
+                    <ul class="highlights">
+                        <li>12 sortable columns: score, voltage, capacity, IXP distance, energy price, flood zone, and more</li>
+                        <li>Adjustable weight editor to re-score sites against your own criteria in real time</li>
+                        <li>Compare mode for side-by-side evaluation of up to 10 sites</li>
+                        <li>Saved shortlists for investment committee workflows</li>
+                        <li>ISO region filter (PJM, MISO, ERCOT, CAISO, SPP, ISO-NE, NYISO)</li>
+                        <li>CSV export for offline analysis</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">4 / 10</span>
+        </div>
+
+        <!-- SLIDE 5: Industrial / Brownfield Sites -->
+        <div class="slide slide-accent" data-slide="5">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-right">
+                <div class="feature-text">
+                    <span class="badge badge-amber">Industrial Sites</span>
+                    <h2>Brownfield Opportunities</h2>
+                    <p>Decommissioned power plants with existing grid connections, cleared land, and road access. These sites can shave 2&ndash;4 years off the timeline to energization compared to greenfield development.</p>
+                    <ul class="highlights">
+                        <li>Retired coal, gas, and nuclear plants with known MW capacity</li>
+                        <li>Cleanup status tracking: completed, in-progress, or pending</li>
+                        <li>Nearest substation distance for interconnection feasibility</li>
+                        <li>Acreage, retirement date, and former-use classification</li>
+                        <li>Map overlay showing all industrial sites with popup details</li>
+                        <li>Sortable by capacity, acreage, substation proximity</li>
+                    </ul>
+                </div>
+                <div class="video-frame">
+                    <video src="Screen Recording-Industrial.mov" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+            <span class="slide-number">5 / 10</span>
+        </div>
+
+        <!-- SLIDE 6: Transmission Lines -->
+        <div class="slide slide-dark" data-slide="6">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-left">
+                <div class="video-frame">
+                    <video src="Screen Recording-Transmission.mov" autoplay loop muted playsinline></video>
+                </div>
+                <div class="feature-text">
+                    <span class="badge badge-purple">Transmission Lines</span>
+                    <h2>Power Delivery Infrastructure</h2>
+                    <p>Comprehensive view of the US transmission network. Identify high-voltage routes, upgrade candidates, and utility ownership to assess interconnection feasibility and cost.</p>
+                    <ul class="highlights">
+                        <li>Voltage class filtering: 100kV through 500kV+</li>
+                        <li>Upgrade candidate identification (50&ndash;100 MW lines eligible for reconductoring)</li>
+                        <li>Utility ownership lookup for interconnection planning</li>
+                        <li>Interactive map rendering up to 2,500 transmission lines with voltage-weighted thickness</li>
+                        <li>Route geometry from substation to substation</li>
+                        <li>Status tracking: in-service, proposed, under construction</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">6 / 10</span>
+        </div>
+
+        <!-- SLIDE 7: Energy Corridors -->
+        <div class="slide slide-accent" data-slide="7">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-right">
+                <div class="feature-text">
+                    <span class="badge badge-green">Energy Corridors</span>
+                    <h2>Pre-Permitted Federal Land</h2>
+                    <p>Federal energy corridors with completed environmental review. Section 368 corridors, NIETC designations, and BLM Designated Leasing Areas dramatically reduce permitting timelines and regulatory risk.</p>
+                    <ul class="highlights">
+                        <li>Section 368 pre-approved corridors across 12 western states</li>
+                        <li>NIETC areas with FERC backstop siting authority</li>
+                        <li>BLM Solar DLAs pre-screened for energy development on federal land</li>
+                        <li>Acreage, capacity, and transmission line counts per corridor</li>
+                        <li>Environmental review status for each corridor</li>
+                    </ul>
+                </div>
+                <div class="video-frame">
+                    <video src="Screen Recording-Corridors.mov" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+            <span class="slide-number">7 / 10</span>
+        </div>
+
+        <!-- SLIDE 8: Hyperscale Tracker -->
+        <div class="slide slide-dark" data-slide="8">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-left">
+                <div class="video-frame">
+                    <video src="Screen Recording-Hyperscale.mov" autoplay loop muted playsinline></video>
+                </div>
+                <div class="feature-text">
+                    <span class="badge badge-amber">Hyperscale Tracker</span>
+                    <h2>Competitive Landscape</h2>
+                    <p>Tracks frontier AI and cloud data center construction by every major hyperscaler. Understand where demand is concentrating and where grid congestion risks are emerging.</p>
+                    <ul class="highlights">
+                        <li>13 operators tracked: Microsoft, Google, Meta, Amazon, xAI, CoreWeave, Oracle, and more</li>
+                        <li>Pipeline status: operational, under construction, and announced projects</li>
+                        <li>Planned capacity in GW per operator and per state</li>
+                        <li>Clickable operator and status breakdowns filter the project table</li>
+                        <li>Linked to GridScout site search for each state with active deployments</li>
+                        <li>Source: Epoch AI Data Center Tracker</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">8 / 10</span>
+        </div>
+
+        <!-- SLIDE 9: Site Detail -->
+        <div class="slide slide-accent" data-slide="9">
+            <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+            <div class="feature-layout video-right">
+                <div class="feature-text">
+                    <span class="badge badge-green">Site Detail</span>
+                    <h2>Investment-Grade Dossier</h2>
+                    <p>A complete site evaluation for any of the 154K+ scored locations. Every data point sourced from federal agencies with deep links for independent verification. Designed to replace weeks of manual analyst research.</p>
+                    <ul class="highlights">
+                        <li>14-factor score breakdown with expandable data sources and scoring criteria</li>
+                        <li>Auto-generated investment thesis: strengths and risk flags</li>
+                        <li>Due diligence checklist: verified, flagged, and manual verification items</li>
+                        <li>Interactive map with transmission lines and fiber routes rendered</li>
+                        <li>Nearby IXPs and datacenters with contacts and distances</li>
+                        <li>Speed-to-energization analysis with ISO queue depth and wait times</li>
+                        <li>Land acquisition guidance with owner contacts and listing links</li>
+                        <li>50+ deep links to FEMA, EPA, EIA, WRI, FCC, PeeringDB, and more</li>
+                    </ul>
+                </div>
+                <div class="video-frame">
+                    <video src="Screen Recording-site-detail.mov" autoplay loop muted playsinline></video>
+                </div>
+            </div>
+            <span class="slide-number">9 / 10</span>
+        </div>
+
+        <!-- SLIDE 10: Closing -->
+        <div class="slide slide-title" data-slide="10">
+            <h2 style="font-size: 44px; margin-bottom: 12px;">Built for the Opportunity</h2>
+            <p class="subtitle" style="max-width: 700px; text-align: center; margin-bottom: 8px;">GridScout turns 154,000 potential sites into a ranked, filterable, investment-ready pipeline.</p>
+            <div class="close-grid">
+                <div class="close-card">
+                    <h3>14 Scoring Dimensions</h3>
+                    <p>Power, fiber, water, hazard, labor, climate, tax incentives, and more. Every score is auditable back to its federal data source.</p>
+                </div>
+                <div class="close-card">
+                    <h3>8 Federal Data Sources</h3>
+                    <p>HIFLD, FEMA NRI, WRI Aqueduct, BLS, FCC, EIA, NOAA, and PeeringDB. Updated and cross-referenced continuously.</p>
+                </div>
+                <div class="close-card">
+                    <h3>Weeks to Minutes</h3>
+                    <p>Auto-generated investment thesis, due diligence checklist, and land acquisition guidance for every site in the database.</p>
+                </div>
+            </div>
+            <p class="tagline" style="margin-top: 40px;">Kenny Hyder &bull; kenny@hyder.me &bull; hyder.me/grid</p>
+            <span class="slide-number">10 / 10</span>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+        <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            const target = document.querySelector(`[data-slide="${n}"]`);
+            if (target) target.classList.add('active');
+            currentSlide = n;
+            document.getElementById('progress').style.width = ((currentSlide / totalSlides) * 100) + '%';
+            history.replaceState(null, null, '#' + n);
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; });
+        document.addEventListener('touchend', function(e) {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+        });
+
+        window.addEventListener('load', function() {
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (hash >= 1 && hash <= totalSlides) showSlide(hash);
+        });
+    </script>
+</body>
+</html>

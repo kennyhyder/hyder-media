@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const [adsData, keywordsData] = await Promise.all([
+            const [adsData, keywordsData, agNegData, campNegData] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
                         campaign.id, campaign.name, campaign.status,
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
                         ad_group_ad.ad.expanded_text_ad.path1,
                         ad_group_ad.ad.expanded_text_ad.path2,
                         ad_group_ad.ad.final_urls,
-                        metrics.impressions, metrics.clicks, metrics.cost_micros
+                        metrics.impressions
                     FROM ad_group_ad
                     WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
                         AND metrics.impressions > 0
@@ -109,17 +109,37 @@ export default async function handler(req, res) {
                         campaign.id,
                         ad_group.id,
                         ad_group_criterion.keyword.text,
-                        metrics.impressions,
-                        metrics.clicks
+                        ad_group_criterion.keyword.match_type,
+                        metrics.impressions
                     FROM keyword_view
                     WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
                         AND metrics.impressions > 0
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id,
+                        ad_group.id,
+                        ad_group_criterion.keyword.text,
+                        ad_group_criterion.keyword.match_type
+                    FROM ad_group_criterion
+                    WHERE ad_group_criterion.type = 'KEYWORD'
+                        AND ad_group_criterion.negative = true
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id,
+                        campaign_criterion.keyword.text,
+                        campaign_criterion.keyword.match_type
+                    FROM campaign_criterion
+                    WHERE campaign_criterion.type = 'KEYWORD'
+                        AND campaign_criterion.negative = true
                 `),
             ]);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
             const response = buildHistoricalResponse(adsData.results || [], year);
             attachKeywords(response, keywordsData.error ? [] : (keywordsData.results || []));
+            attachNegatives(response, agNegData.error ? [] : (agNegData.results || []), campNegData.error ? [] : (campNegData.results || []));
 
             return res.status(200).json(response);
         }
@@ -190,9 +210,9 @@ export default async function handler(req, res) {
                 AND asset_group_asset.status = 'ENABLED'
         `);
 
-        // Query 6: Fetch full asset details per type + keywords (last 30 days)
+        // Query 6: Fetch full asset details per type + keywords + negatives
         let assetDetails = new Map();
-        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords] = await Promise.all([
+        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords, activeAgNegs, activeCampNegs] = await Promise.all([
             fetchQuery(CUSTOMER_ID, headers, `
                 SELECT
                     asset.id,
@@ -238,13 +258,32 @@ export default async function handler(req, res) {
                     campaign.id,
                     ad_group.id,
                     ad_group_criterion.keyword.text,
-                    metrics.impressions,
-                    metrics.clicks
-                FROM keyword_view
+                    ad_group_criterion.keyword.match_type
+                FROM ad_group_criterion
                 WHERE campaign.status = 'ENABLED'
                     AND ad_group.status = 'ENABLED'
-                    AND segments.date DURING LAST_30_DAYS
-                    AND metrics.impressions > 0
+                    AND ad_group_criterion.type = 'KEYWORD'
+                    AND ad_group_criterion.negative = false
+                    AND ad_group_criterion.status != 'REMOVED'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    campaign.id,
+                    ad_group.id,
+                    ad_group_criterion.keyword.text,
+                    ad_group_criterion.keyword.match_type
+                FROM ad_group_criterion
+                WHERE ad_group_criterion.type = 'KEYWORD'
+                    AND ad_group_criterion.negative = true
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT
+                    campaign.id,
+                    campaign_criterion.keyword.text,
+                    campaign_criterion.keyword.match_type
+                FROM campaign_criterion
+                WHERE campaign_criterion.type = 'KEYWORD'
+                    AND campaign_criterion.negative = true
             `),
         ]);
 
@@ -268,6 +307,7 @@ export default async function handler(req, res) {
         );
 
         attachKeywords(response, activeKeywords.error ? [] : (activeKeywords.results || []));
+        attachNegatives(response, activeAgNegs.error ? [] : (activeAgNegs.results || []), activeCampNegs.error ? [] : (activeCampNegs.results || []));
 
         return res.status(200).json(response);
 
@@ -485,7 +525,6 @@ function buildHistoricalResponse(adsRows, year) {
         const adGroup = row.adGroup || {};
         const adGroupAd = row.adGroupAd || {};
         const ad = adGroupAd.ad || {};
-        const metrics = row.metrics || {};
 
         const campId = campaign.id;
         if (!campaignMap.has(campId)) {
@@ -512,14 +551,8 @@ function buildHistoricalResponse(adsRows, year) {
 
         const agObj = campObj.adGroups.get(agId);
 
-        // Check if ad already exists (can happen with date aggregation)
-        const existingAd = agObj.ads.find(a => a.id === ad.id);
-        if (existingAd) {
-            existingAd.impressions += parseInt(metrics.impressions || 0);
-            existingAd.clicks += parseInt(metrics.clicks || 0);
-            existingAd.costMicros += parseInt(metrics.costMicros || 0);
-            continue;
-        }
+        // Skip duplicate ads (can happen with date aggregation)
+        if (agObj.ads.find(a => a.id === ad.id)) continue;
 
         let headlines = [];
         let descriptions = [];
@@ -552,9 +585,6 @@ function buildHistoricalResponse(adsRows, year) {
             headlines,
             descriptions,
             finalUrls: ad.finalUrls || [],
-            impressions: parseInt(metrics.impressions || 0),
-            clicks: parseInt(metrics.clicks || 0),
-            costMicros: parseInt(metrics.costMicros || 0),
         });
     }
 
@@ -575,28 +605,20 @@ function buildHistoricalResponse(adsRows, year) {
 }
 
 function attachKeywords(response, keywordRows) {
-    // Group keywords by campaign+adGroup, aggregate duplicates across date segments
-    const kwMap = new Map(); // "campId:agId" → Map<lowercaseText, {keyword, impressions, clicks}>
+    const kwMap = new Map(); // "campId:agId" → Map<lowercaseText, {keyword, matchType}>
     for (const row of keywordRows) {
         const campId = row.campaign?.id;
         const agId = row.adGroup?.id;
         const text = (row.adGroupCriterion?.keyword?.text || '').toLowerCase();
+        const matchType = row.adGroupCriterion?.keyword?.matchType || 'BROAD';
         if (!campId || !agId || !text) continue;
 
         const key = `${campId}:${agId}`;
         if (!kwMap.has(key)) kwMap.set(key, new Map());
-        const agKws = kwMap.get(key);
-        const metrics = row.metrics || {};
-
-        if (agKws.has(text)) {
-            const existing = agKws.get(text);
-            existing.impressions += parseInt(metrics.impressions || 0);
-            existing.clicks += parseInt(metrics.clicks || 0);
-        } else {
-            agKws.set(text, {
+        if (!kwMap.get(key).has(text)) {
+            kwMap.get(key).set(text, {
                 keyword: row.adGroupCriterion.keyword.text,
-                impressions: parseInt(metrics.impressions || 0),
-                clicks: parseInt(metrics.clicks || 0),
+                matchType,
             });
         }
     }
@@ -606,8 +628,41 @@ function attachKeywords(response, keywordRows) {
             const key = `${camp.id}:${ag.id}`;
             const agKws = kwMap.get(key);
             ag.keywords = agKws
-                ? Array.from(agKws.values()).sort((a, b) => b.impressions - a.impressions)
+                ? Array.from(agKws.values()).sort((a, b) => a.keyword.localeCompare(b.keyword))
                 : [];
+        }
+    }
+}
+
+function attachNegatives(response, agNegRows, campNegRows) {
+    const campNegMap = new Map();
+    for (const row of campNegRows) {
+        const campId = row.campaign?.id;
+        const text = row.campaignCriterion?.keyword?.text;
+        const matchType = row.campaignCriterion?.keyword?.matchType || 'BROAD';
+        if (!campId || !text) continue;
+        if (!campNegMap.has(campId)) campNegMap.set(campId, []);
+        campNegMap.get(campId).push({ keyword: text, matchType, level: 'campaign' });
+    }
+
+    const agNegMap = new Map();
+    for (const row of agNegRows) {
+        const campId = row.campaign?.id;
+        const agId = row.adGroup?.id;
+        const text = row.adGroupCriterion?.keyword?.text;
+        const matchType = row.adGroupCriterion?.keyword?.matchType || 'BROAD';
+        if (!campId || !agId || !text) continue;
+        const key = `${campId}:${agId}`;
+        if (!agNegMap.has(key)) agNegMap.set(key, []);
+        agNegMap.get(key).push({ keyword: text, matchType, level: 'ad_group' });
+    }
+
+    for (const camp of response.campaigns) {
+        const campNegs = campNegMap.get(camp.id) || [];
+        for (const ag of camp.adGroups) {
+            const key = `${camp.id}:${ag.id}`;
+            const agNegs = agNegMap.get(key) || [];
+            ag.negativeKeywords = [...agNegs, ...campNegs].sort((a, b) => a.keyword.localeCompare(b.keyword));
         }
     }
 }

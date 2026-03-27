@@ -644,60 +644,52 @@ body {
 }
 
 /* Keywords under ad groups */
-.ad-group-keywords {
+.ad-group-keywords,
+.ad-group-negatives {
     margin-top: 12px;
 }
 
-.keywords-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
+.keyword-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-.keywords-table thead th {
-    text-align: left;
-    padding: 10px 16px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
+.keyword-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+}
+
+.keyword-item-negative {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
     color: var(--text-secondary);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
+    text-decoration: line-through;
+    text-decoration-color: rgba(239, 68, 68, 0.4);
 }
 
-.keywords-table thead th:nth-child(2),
-.keywords-table thead th:nth-child(3) {
-    text-align: right;
-    width: 120px;
+.badge-match {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--purple);
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    text-decoration: none;
 }
 
-.keywords-table tbody td {
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-}
-
-.keywords-table tbody td:nth-child(2),
-.keywords-table tbody td:nth-child(3) {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--text-secondary);
-}
-
-.keywords-table tbody tr:hover {
-    background: rgba(59, 130, 246, 0.06);
-}
-
-.keywords-table-compact {
-    font-size: 0.85rem;
-}
-
-.keywords-table-compact thead th {
-    padding: 6px 12px;
-}
-
-.keywords-table-compact tbody td {
-    padding: 5px 12px;
+.badge-level {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    text-decoration: none;
 }
 
 /* Account-level Assets */

@@ -279,6 +279,9 @@
                     if (ag.keywords && ag.keywords.length > 0) {
                         html += renderAdGroupKeywords(ag.keywords);
                     }
+                    if (ag.negativeKeywords && ag.negativeKeywords.length > 0) {
+                        html += renderAdGroupNegatives(ag.negativeKeywords);
+                    }
                     html += `</div>`;
                 }
 
@@ -309,14 +312,26 @@
 
         function renderAdGroupKeywords(keywords) {
             let html = `<div class="ad-group-keywords">`;
-            html += `<div class="ad-copy-label">Keywords (${keywords.length})</div>`;
-            html += `<table class="keywords-table keywords-table-compact">`;
-            html += `<thead><tr><th>Keyword</th><th>Impressions</th><th>Clicks</th></tr></thead>`;
-            html += `<tbody>`;
+            html += `<div class="ad-copy-label">Targeted Keywords (${keywords.length})</div>`;
+            html += `<ul class="keyword-list">`;
             for (const kw of keywords) {
-                html += `<tr><td>${esc(kw.keyword)}</td><td>${formatNum(kw.impressions)}</td><td>${formatNum(kw.clicks)}</td></tr>`;
+                const matchBadge = kw.matchType ? `<span class="badge badge-match">${kw.matchType}</span>` : '';
+                html += `<li class="keyword-item">${esc(kw.keyword)} ${matchBadge}</li>`;
             }
-            html += `</tbody></table></div>`;
+            html += `</ul></div>`;
+            return html;
+        }
+
+        function renderAdGroupNegatives(negativeKeywords) {
+            let html = `<div class="ad-group-negatives">`;
+            html += `<div class="ad-copy-label">Negative Keywords (${negativeKeywords.length})</div>`;
+            html += `<ul class="keyword-list keyword-list-negative">`;
+            for (const kw of negativeKeywords) {
+                const matchBadge = kw.matchType ? `<span class="badge badge-match">${kw.matchType}</span>` : '';
+                const levelBadge = kw.level === 'campaign' ? `<span class="badge badge-level">Campaign</span>` : '';
+                html += `<li class="keyword-item keyword-item-negative">${esc(kw.keyword)} ${matchBadge} ${levelBadge}</li>`;
+            }
+            html += `</ul></div>`;
             return html;
         }
 
