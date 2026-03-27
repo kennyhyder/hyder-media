@@ -227,7 +227,7 @@
 
                 html += `<div class="campaign-section">`;
                 html += `<div class="campaign-header">
-                    <div class="campaign-name">${esc(camp.name)} ${typeBadge}</div>
+                    <div class="campaign-name"><span class="badge badge-label">Campaign</span> ${esc(camp.name)} ${typeBadge}</div>
                     <span class="badge ${statusClass}">${camp.status}</span>
                 </div>`;
                 html += `<div class="campaign-body">`;
@@ -236,7 +236,7 @@
 
                 for (const ag of camp.adGroups) {
                     html += `<div class="ad-group">`;
-                    html += `<div class="ad-group-name">${esc(ag.name)}</div>`;
+                    html += `<div class="ad-group-name"><span class="badge badge-label">Ad Group</span> ${esc(ag.name)}</div>`;
                     for (const ad of ag.ads) {
                         html += renderGoogleAd(ad, campSitelinks, isHistorical);
                     }
@@ -291,7 +291,7 @@
                 for (const list of data.negativeKeywordLists) {
                     html += `<div class="campaign-section">`;
                     html += `<div class="campaign-header">
-                        <div class="campaign-name">${esc(list.name)}</div>
+                        <div class="campaign-name"><span class="badge badge-label">Shared List</span> ${esc(list.name)}</div>
                         <span class="badge badge-type">${list.keywords.length} keywords</span>
                     </div>`;
                     html += `<div class="campaign-body">`;
@@ -709,14 +709,14 @@
 
                 html += `<div class="campaign-section">`;
                 html += `<div class="campaign-header">
-                    <div class="campaign-name">${esc(camp.name)} ${objBadge}</div>
+                    <div class="campaign-name"><span class="badge badge-label">Campaign</span> ${esc(camp.name)} ${objBadge}</div>
                     <span class="badge ${statusClass}">${camp.status}</span>
                 </div>`;
                 html += `<div class="campaign-body">`;
 
                 for (const adSet of (camp.adSets || [])) {
                     html += `<div class="ad-group">`;
-                    html += `<div class="ad-group-name">${esc(adSet.name)}</div>`;
+                    html += `<div class="ad-group-name"><span class="badge badge-label">Ad Set</span> ${esc(adSet.name)}</div>`;
 
                     for (const ad of adSet.ads) {
                         html += renderMetaAd(ad, isHistorical);
