@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const [adsData, keywordsData, agNegData, campNegData] = await Promise.all([
+            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
                         campaign.id, campaign.name, campaign.status,
@@ -134,10 +134,75 @@ export default async function handler(req, res) {
                     WHERE campaign_criterion.type = 'KEYWORD'
                         AND campaign_criterion.negative = true
                 `),
+                // PMax: find campaigns that ran during this period
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id, campaign.name, campaign.status,
+                        metrics.impressions
+                    FROM campaign
+                    WHERE campaign.advertising_channel_type = 'PERFORMANCE_MAX'
+                        AND segments.date BETWEEN '${startDate}' AND '${endDate}'
+                        AND metrics.impressions > 0
+                `),
+                // PMax: asset groups (current state — no historical snapshots available)
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id, campaign.name, campaign.status,
+                        asset_group.id, asset_group.name, asset_group.status
+                    FROM asset_group
+                `),
+                // PMax: asset group → asset links
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        campaign.id,
+                        asset_group.id,
+                        asset.id, asset.name, asset.type,
+                        asset_group_asset.field_type,
+                        asset_group_asset.status
+                    FROM asset_group_asset
+                    WHERE asset_group_asset.status = 'ENABLED'
+                `),
+                // Asset details: text
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT asset.id, asset.text_asset.text
+                    FROM asset WHERE asset.type = 'TEXT'
+                `),
+                // Asset details: images
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id, asset.name,
+                        asset.image_asset.full_size.url,
+                        asset.image_asset.full_size.width_pixels,
+                        asset.image_asset.full_size.height_pixels
+                    FROM asset WHERE asset.type = 'IMAGE'
+                `),
             ]);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
             const response = buildHistoricalResponse(adsData.results || [], year);
+
+            // Attach PMax campaigns that ran during this period
+            if (!pmaxCampaigns.error) {
+                const pmaxCampIds = new Set();
+                for (const row of (pmaxCampaigns.results || [])) {
+                    if (row.campaign?.id) pmaxCampIds.add(row.campaign.id);
+                }
+                if (pmaxCampIds.size > 0) {
+                    const histAssetDetails = new Map();
+                    for (const result of [histTextAssets, histImageAssets]) {
+                        if (result.results) {
+                            for (const row of result.results) {
+                                if (row.asset) histAssetDetails.set(row.asset.id, row.asset);
+                            }
+                        }
+                    }
+                    attachPMax(response, pmaxCampIds,
+                        assetGroupsData.error ? [] : (assetGroupsData.results || []),
+                        assetGroupAssetsData.error ? [] : (assetGroupAssetsData.results || []),
+                        histAssetDetails);
+                }
+            }
+
             attachKeywords(response, keywordsData.error ? [] : (keywordsData.results || []));
             attachNegatives(response, agNegData.error ? [] : (agNegData.results || []), campNegData.error ? [] : (campNegData.results || []));
 
@@ -665,6 +730,85 @@ function attachNegatives(response, agNegRows, campNegRows) {
             ag.negativeKeywords = [...agNegs, ...campNegs].sort((a, b) => a.keyword.localeCompare(b.keyword));
         }
     }
+}
+
+function attachPMax(response, pmaxCampIds, assetGroupRows, assetGroupAssetRows, assetDetails) {
+    // Build asset groups, filtered to campaigns that ran in the period
+    const assetGroupMap = new Map();
+    const campMap = new Map();
+    const campAssetGroups = new Map();
+
+    for (const row of assetGroupRows) {
+        const campaign = row.campaign || {};
+        const ag = row.assetGroup || {};
+        const campId = campaign.id;
+        if (!pmaxCampIds.has(campId)) continue;
+
+        if (!campMap.has(campId)) {
+            campMap.set(campId, { id: campId, name: campaign.name, status: campaign.status });
+        }
+
+        const agObj = {
+            id: ag.id, name: ag.name, status: ag.status,
+            headlines: [], longHeadlines: [], descriptions: [],
+            businessName: null, images: [], logos: [], finalUrl: null,
+        };
+        assetGroupMap.set(ag.id, agObj);
+        if (!campAssetGroups.has(campId)) campAssetGroups.set(campId, []);
+        campAssetGroups.get(campId).push(agObj);
+    }
+
+    // Attach assets to their asset groups
+    for (const row of assetGroupAssetRows) {
+        const agId = (row.assetGroup || {}).id;
+        const agObj = assetGroupMap.get(agId);
+        if (!agObj) continue;
+
+        const asset = row.asset || {};
+        const fieldType = (row.assetGroupAsset || {}).fieldType;
+        const details = assetDetails.get(asset.id) || {};
+        const merged = { ...asset, ...details };
+        const textVal = (merged.textAsset || {}).text || merged.name || '';
+
+        switch (fieldType) {
+            case 'HEADLINE': agObj.headlines.push({ text: textVal }); break;
+            case 'LONG_HEADLINE': agObj.longHeadlines.push({ text: textVal }); break;
+            case 'DESCRIPTION': agObj.descriptions.push({ text: textVal }); break;
+            case 'BUSINESS_NAME': agObj.businessName = textVal; break;
+            case 'MARKETING_IMAGE':
+            case 'SQUARE_MARKETING_IMAGE': {
+                const img = merged.imageAsset || {};
+                const fs = img.fullSize || {};
+                agObj.images.push({ id: asset.id, type: 'IMAGE', name: asset.name || null, imageUrl: fs.url || null, width: fs.widthPixels, height: fs.heightPixels });
+                break;
+            }
+            case 'LOGO':
+            case 'LANDSCAPE_LOGO': {
+                const img = merged.imageAsset || {};
+                const fs = img.fullSize || {};
+                agObj.logos.push({ id: asset.id, type: 'IMAGE', name: asset.name || null, imageUrl: fs.url || null, width: fs.widthPixels, height: fs.heightPixels });
+                break;
+            }
+            case 'FINAL_URL': agObj.finalUrl = textVal; break;
+        }
+    }
+
+    // Add PMax campaigns to response
+    const existingCampIds = new Set(response.campaigns.map(c => c.id));
+    for (const [campId, assetGroups] of campAssetGroups) {
+        if (existingCampIds.has(campId)) {
+            const camp = response.campaigns.find(c => c.id === campId);
+            camp.assetGroups = assetGroups;
+            camp.type = 'PERFORMANCE_MAX';
+        } else {
+            const info = campMap.get(campId);
+            response.campaigns.push({
+                id: campId, name: info.name, status: info.status,
+                type: 'PERFORMANCE_MAX', adGroups: [], assetGroups, assets: [],
+            });
+        }
+    }
+    response.campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 }
 
 function formatAsset(asset, parentAsset) {
