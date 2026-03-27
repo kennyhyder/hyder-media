@@ -1572,6 +1572,59 @@ body {
     }
 }
 
+/* PDF Overlay */
+#pdf-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* Print All — Cover & Section Headers */
+.print-cover-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+}
+
+.print-cover-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.print-cover-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.print-section-header {
+    font-size: 1.6rem;
+    font-weight: 700;
+    padding: 16px 0 8px;
+    margin-top: 32px;
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: 24px;
+}
+
+.print-year-header {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 12px 0 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
 /* ==================== */
 /* Print Styles         */
 /* ==================== */
@@ -1773,5 +1826,34 @@ body {
     a {
         color: #000;
         text-decoration: none;
+    }
+
+    #pdf-overlay {
+        display: none !important;
+    }
+
+    .print-cover-header h1 {
+        background: none;
+        -webkit-text-fill-color: #000;
+        color: #000;
+    }
+
+    .print-section-header {
+        page-break-before: always;
+        border-bottom-color: #000;
+        margin-top: 0;
+    }
+
+    .print-year-header {
+        page-break-before: always;
+        border-bottom-color: #ccc;
+    }
+
+    .print-section-header + .print-year-header {
+        page-break-before: avoid;
+    }
+
+    .year-tabs {
+        display: none !important;
     }
 }

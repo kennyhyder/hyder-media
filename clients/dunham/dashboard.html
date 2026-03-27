@@ -24,6 +24,7 @@
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
             <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
+            <button class="btn btn-secondary" onclick="downloadAll()">Print All Years</button>
             <button class="btn btn-primary" onclick="window.print()">Print Report</button>
         </div>
     </nav>
@@ -90,6 +91,11 @@
 
         <!-- Report Content -->
         <div id="report-content" style="display: none;"></div>
+    </div>
+
+    <div id="pdf-overlay" style="display:none;">
+        <div class="spinner"></div>
+        <div id="pdf-progress-text">Loading data...</div>
     </div>
 
     <div class="footer">
@@ -207,57 +213,11 @@
         }
 
         // ============================================================
-        // Google Ads rendering (unchanged logic)
+        // Google Ads HTML builder (no DOM side effects)
         // ============================================================
-        function renderGoogleReport(data) {
-            const contentEl = document.getElementById('report-content');
-            const statsEl = document.getElementById('stats-row');
+        function buildGoogleHTML(data) {
             const isHistorical = data.historical === true;
-
-            const fetchDate = new Date(data.fetchedAt);
-            document.getElementById('report-date').textContent =
-                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-            let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0, totalKeywords = 0;
-            let totalExtensions = (data.accountAssets || []).length;
-
-            for (const camp of data.campaigns) {
-                totalAdGroups += camp.adGroups.length;
-                totalExtensions += (camp.assets || []).length;
-                for (const ag of camp.adGroups) {
-                    totalAds += ag.ads.length;
-                    totalKeywords += (ag.keywords || []).length;
-                    for (const ad of ag.ads) {
-                        totalHeadlines += (ad.headlines || []).length;
-                        totalDescriptions += (ad.descriptions || []).length;
-                    }
-                }
-            }
-
-            document.getElementById('label-campaigns').textContent = 'Campaigns';
-            document.getElementById('label-adgroups').textContent = 'Ad Groups';
-            document.getElementById('label-ads').textContent = 'Ads';
-            document.getElementById('label-headlines').textContent = 'Keywords';
-            document.getElementById('label-descriptions').textContent = 'Headlines';
-            document.getElementById('label-extensions').textContent = 'Extensions';
-            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
-
-            document.getElementById('stat-campaigns').textContent = data.campaigns.length;
-            document.getElementById('stat-adgroups').textContent = totalAdGroups;
-            document.getElementById('stat-ads').textContent = totalAds;
-            document.getElementById('stat-headlines').textContent = totalKeywords;
-            document.getElementById('stat-descriptions').textContent = totalHeadlines;
-            document.getElementById('stat-extensions').textContent = totalExtensions;
-            statsEl.style.display = 'flex';
-
-            if (data.campaigns.length === 0) {
-                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
-                    <h2>No ad data for ${data.year || 'this period'}</h2>
-                    <p style="color:var(--text-secondary);">No ads received impressions during this year, or the account wasn't active yet.</p>
-                </div>`;
-                contentEl.style.display = 'block';
-                return;
-            }
+            if (data.campaigns.length === 0) return '';
 
             let html = '';
             for (const camp of data.campaigns) {
@@ -310,7 +270,115 @@
                 html += `</div>`;
             }
 
-            contentEl.innerHTML = html;
+            // Account-level negative keywords
+            if (data.accountNegativeKeywords && data.accountNegativeKeywords.length > 0) {
+                html += `<div class="account-assets-section">`;
+                html += `<h2>Account-Level Negative Keywords</h2>`;
+                html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These negative keywords apply to all campaigns in the account.</p>`;
+                html += `<ul class="keyword-list keyword-list-negative">`;
+                for (const kw of data.accountNegativeKeywords) {
+                    const matchBadge = kw.matchType ? `<span class="badge badge-match">${kw.matchType}</span>` : '';
+                    html += `<li class="keyword-item keyword-item-negative">${esc(kw.keyword)} ${matchBadge}</li>`;
+                }
+                html += `</ul></div>`;
+            }
+
+            // Shared negative keyword lists
+            if (data.negativeKeywordLists && data.negativeKeywordLists.length > 0) {
+                html += `<div class="account-assets-section">`;
+                html += `<h2>Shared Negative Keyword Lists</h2>`;
+                html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">Negative keyword lists shared across campaigns.</p>`;
+                for (const list of data.negativeKeywordLists) {
+                    html += `<div class="campaign-section">`;
+                    html += `<div class="campaign-header">
+                        <div class="campaign-name">${esc(list.name)}</div>
+                        <span class="badge badge-type">${list.keywords.length} keywords</span>
+                    </div>`;
+                    html += `<div class="campaign-body">`;
+
+                    if (list.campaigns.length > 0) {
+                        html += `<div class="ad-group">`;
+                        html += `<div class="ad-copy-label">Applied to Campaigns (${list.campaigns.length})</div>`;
+                        html += `<ul class="keyword-list">`;
+                        for (const name of list.campaigns) {
+                            html += `<li class="keyword-item">${esc(name)}</li>`;
+                        }
+                        html += `</ul></div>`;
+                    }
+
+                    if (list.keywords.length > 0) {
+                        html += `<div class="ad-group" style="border-bottom:none;">`;
+                        html += `<div class="ad-copy-label">Negative Keywords (${list.keywords.length})</div>`;
+                        html += `<ul class="keyword-list keyword-list-negative">`;
+                        for (const kw of list.keywords) {
+                            const matchBadge = kw.matchType ? `<span class="badge badge-match">${kw.matchType}</span>` : '';
+                            html += `<li class="keyword-item keyword-item-negative">${esc(kw.keyword)} ${matchBadge}</li>`;
+                        }
+                        html += `</ul></div>`;
+                    }
+
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+            }
+
+            return html;
+        }
+
+        // ============================================================
+        // Google Ads rendering
+        // ============================================================
+        function renderGoogleReport(data) {
+            const contentEl = document.getElementById('report-content');
+            const statsEl = document.getElementById('stats-row');
+            const isHistorical = data.historical === true;
+
+            const fetchDate = new Date(data.fetchedAt);
+            document.getElementById('report-date').textContent =
+                'Generated: ' + fetchDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            let totalAdGroups = 0, totalAds = 0, totalHeadlines = 0, totalDescriptions = 0, totalKeywords = 0;
+            let totalExtensions = (data.accountAssets || []).length;
+
+            for (const camp of data.campaigns) {
+                totalAdGroups += camp.adGroups.length;
+                totalExtensions += (camp.assets || []).length;
+                for (const ag of camp.adGroups) {
+                    totalAds += ag.ads.length;
+                    totalKeywords += (ag.keywords || []).length;
+                    for (const ad of ag.ads) {
+                        totalHeadlines += (ad.headlines || []).length;
+                        totalDescriptions += (ad.descriptions || []).length;
+                    }
+                }
+            }
+
+            document.getElementById('label-campaigns').textContent = 'Campaigns';
+            document.getElementById('label-adgroups').textContent = 'Ad Groups';
+            document.getElementById('label-ads').textContent = 'Ads';
+            document.getElementById('label-headlines').textContent = 'Keywords';
+            document.getElementById('label-descriptions').textContent = 'Headlines';
+            document.getElementById('label-extensions').textContent = 'Extensions';
+            document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
+
+            document.getElementById('stat-campaigns').textContent = data.campaigns.length;
+            document.getElementById('stat-adgroups').textContent = totalAdGroups;
+            document.getElementById('stat-ads').textContent = totalAds;
+            document.getElementById('stat-headlines').textContent = totalKeywords;
+            document.getElementById('stat-descriptions').textContent = totalHeadlines;
+            document.getElementById('stat-extensions').textContent = totalExtensions;
+            statsEl.style.display = 'flex';
+
+            if (data.campaigns.length === 0) {
+                contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
+                    <h2>No ad data for ${data.year || 'this period'}</h2>
+                    <p style="color:var(--text-secondary);">No ads received impressions during this year, or the account wasn't active yet.</p>
+                </div>`;
+                contentEl.style.display = 'block';
+                return;
+            }
+
+            contentEl.innerHTML = buildGoogleHTML(data);
             contentEl.style.display = 'block';
         }
 
@@ -627,6 +695,43 @@
         }
 
         // ============================================================
+        // Meta Ads HTML builder (no DOM side effects)
+        // ============================================================
+        function buildMetaHTML(data) {
+            const isHistorical = data.historical === true;
+            if (data.campaigns.length === 0) return '';
+
+            let html = '';
+            for (const camp of data.campaigns) {
+                const statusClass = camp.status === 'ACTIVE' ? 'badge-enabled' : 'badge-paused';
+                const objBadge = camp.objective
+                    ? `<span class="badge badge-type">${camp.objective.replace(/_/g, ' ')}</span>` : '';
+
+                html += `<div class="campaign-section">`;
+                html += `<div class="campaign-header">
+                    <div class="campaign-name">${esc(camp.name)} ${objBadge}</div>
+                    <span class="badge ${statusClass}">${camp.status}</span>
+                </div>`;
+                html += `<div class="campaign-body">`;
+
+                for (const adSet of (camp.adSets || [])) {
+                    html += `<div class="ad-group">`;
+                    html += `<div class="ad-group-name">${esc(adSet.name)}</div>`;
+
+                    for (const ad of adSet.ads) {
+                        html += renderMetaAd(ad, isHistorical);
+                    }
+
+                    html += `</div>`;
+                }
+
+                html += `</div></div>`;
+            }
+
+            return html;
+        }
+
+        // ============================================================
         // Meta Ads rendering
         // ============================================================
         function renderMetaReport(data) {
@@ -674,34 +779,7 @@
                 return;
             }
 
-            let html = '';
-            for (const camp of data.campaigns) {
-                const statusClass = camp.status === 'ACTIVE' ? 'badge-enabled' : 'badge-paused';
-                const objBadge = camp.objective
-                    ? `<span class="badge badge-type">${camp.objective.replace(/_/g, ' ')}</span>` : '';
-
-                html += `<div class="campaign-section">`;
-                html += `<div class="campaign-header">
-                    <div class="campaign-name">${esc(camp.name)} ${objBadge}</div>
-                    <span class="badge ${statusClass}">${camp.status}</span>
-                </div>`;
-                html += `<div class="campaign-body">`;
-
-                for (const adSet of (camp.adSets || [])) {
-                    html += `<div class="ad-group">`;
-                    html += `<div class="ad-group-name">${esc(adSet.name)}</div>`;
-
-                    for (const ad of adSet.ads) {
-                        html += renderMetaAd(ad, isHistorical);
-                    }
-
-                    html += `</div>`;
-                }
-
-                html += `</div></div>`;
-            }
-
-            contentEl.innerHTML = html;
+            contentEl.innerHTML = buildMetaHTML(data);
             contentEl.style.display = 'block';
         }
 
@@ -845,6 +923,111 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // ============================================================
+        // Print All Years
+        // ============================================================
+        async function downloadAll() {
+            const overlay = document.getElementById('pdf-overlay');
+            const progressText = document.getElementById('pdf-progress-text');
+            overlay.style.display = 'flex';
+
+            // Build year lists for each platform
+            const googleYears = ['active'];
+            for (let y = CURRENT_YEAR; y >= GOOGLE_START_YEAR; y--) googleYears.push(y);
+            const metaYears = ['active'];
+            for (let y = CURRENT_YEAR; y >= META_START_YEAR; y--) metaYears.push(y);
+
+            // All (platform, year) pairs to potentially fetch
+            const pairs = [];
+            for (const year of googleYears) pairs.push({ platform: 'google', year });
+            for (const year of metaYears) pairs.push({ platform: 'meta', year });
+
+            // Only fetch uncached
+            const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
+
+            // Batch fetch 4 at a time
+            const BATCH = 4;
+            for (let i = 0; i < toFetch.length; i += BATCH) {
+                const batch = toFetch.slice(i, i + BATCH);
+                progressText.textContent = `Loading data... (${Math.min(i + BATCH, toFetch.length)} of ${toFetch.length})`;
+                await Promise.all(batch.map(async ({ platform, year }) => {
+                    try {
+                        const apiBase = platform === 'meta' ? META_API : GOOGLE_API;
+                        const url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
+                        const resp = await fetch(url);
+                        if (resp.ok) {
+                            const data = await resp.json();
+                            if (!data.error) dataCache[`${platform}:${year}`] = data;
+                        }
+                    } catch (e) { /* skip failed years */ }
+                }));
+            }
+
+            progressText.textContent = 'Preparing report...';
+
+            // Build combined HTML
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            let combined = '';
+            combined += `<div class="print-cover-header">
+                <h1>Dunham & Jones — Complete Ad Audit</h1>
+                <p>${today}</p>
+            </div>`;
+
+            // Google Ads section
+            combined += `<div class="print-section-header">Google Ads</div>`;
+            for (const year of googleYears) {
+                const data = dataCache[`google:${year}`];
+                if (!data || !data.campaigns || data.campaigns.length === 0) continue;
+                const label = year === 'active' ? 'Active Ads' : String(year);
+                combined += `<div class="print-year-header">${label}</div>`;
+                combined += buildGoogleHTML(data);
+            }
+
+            // Meta Ads section
+            combined += `<div class="print-section-header">Meta Ads</div>`;
+            for (const year of metaYears) {
+                const data = dataCache[`meta:${year}`];
+                if (!data || !data.campaigns || data.campaigns.length === 0) continue;
+                const label = year === 'active' ? 'Active Ads' : String(year);
+                combined += `<div class="print-year-header">${label}</div>`;
+                combined += buildMetaHTML(data);
+            }
+
+            // Save current view state
+            const contentEl = document.getElementById('report-content');
+            const savedHTML = contentEl.innerHTML;
+            const savedDisplay = contentEl.style.display;
+            const headerEl = document.querySelector('.report-header');
+            const platformEl = document.querySelector('.platform-tabs');
+            const yearEl = document.getElementById('year-tabs');
+            const statsEl = document.getElementById('stats-row');
+
+            // Hide UI chrome, show combined report
+            headerEl.style.display = 'none';
+            platformEl.style.display = 'none';
+            yearEl.style.display = 'none';
+            statsEl.style.display = 'none';
+            contentEl.innerHTML = combined;
+            contentEl.style.display = 'block';
+            overlay.style.display = 'none';
+
+            window.print();
+
+            // Restore after print dialog closes
+            const restore = () => {
+                contentEl.innerHTML = savedHTML;
+                contentEl.style.display = savedDisplay;
+                headerEl.style.display = '';
+                platformEl.style.display = '';
+                yearEl.style.display = '';
+                // Re-render current view to restore stat cards
+                const cached = dataCache[cacheKey(activeYear)];
+                if (cached) renderReport(cached);
+                window.removeEventListener('afterprint', restore);
+            };
+            window.addEventListener('afterprint', restore);
         }
 
         // Init

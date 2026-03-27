@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets] = await Promise.all([
+            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, accountNegsH] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
                         campaign.id, campaign.name, campaign.status,
@@ -176,6 +176,31 @@ export default async function handler(req, res) {
                         asset.image_asset.full_size.height_pixels
                     FROM asset WHERE asset.type = 'IMAGE'
                 `),
+                // Shared negative keyword lists
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT shared_set.id, shared_set.name, shared_set.member_count
+                    FROM shared_set
+                    WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+                        AND shared_set.status = 'ENABLED'
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                    FROM shared_criterion
+                    WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT campaign.id, campaign.name, shared_set.id
+                    FROM campaign_shared_set
+                    WHERE campaign_shared_set.status = 'ENABLED'
+                `),
+                // Account-level negative keywords
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT customer_negative_criterion.id,
+                           customer_negative_criterion.keyword.text,
+                           customer_negative_criterion.keyword.match_type
+                    FROM customer_negative_criterion
+                    WHERE customer_negative_criterion.type = 'KEYWORD'
+                `),
             ]);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
@@ -205,6 +230,12 @@ export default async function handler(req, res) {
 
             attachKeywords(response, keywordsData.error ? [] : (keywordsData.results || []));
             attachNegatives(response, agNegData.error ? [] : (agNegData.results || []), campNegData.error ? [] : (campNegData.results || []));
+            attachSharedNegatives(response,
+                sharedSetsH.error ? [] : (sharedSetsH.results || []),
+                sharedCriteriaH.error ? [] : (sharedCriteriaH.results || []),
+                campaignSharedSetsH.error ? [] : (campaignSharedSetsH.results || []),
+                accountNegsH.error ? [] : (accountNegsH.results || [])
+            );
 
             return res.status(200).json(response);
         }
@@ -277,7 +308,7 @@ export default async function handler(req, res) {
 
         // Query 6: Fetch full asset details per type + keywords + negatives
         let assetDetails = new Map();
-        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords, activeAgNegs, activeCampNegs] = await Promise.all([
+        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords, activeAgNegs, activeCampNegs, sharedSets, sharedCriteria, campaignSharedSets, accountNegs] = await Promise.all([
             fetchQuery(CUSTOMER_ID, headers, `
                 SELECT
                     asset.id,
@@ -350,6 +381,31 @@ export default async function handler(req, res) {
                 WHERE campaign_criterion.type = 'KEYWORD'
                     AND campaign_criterion.negative = true
             `),
+            // Shared negative keyword lists
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT shared_set.id, shared_set.name, shared_set.member_count
+                FROM shared_set
+                WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+                    AND shared_set.status = 'ENABLED'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                FROM shared_criterion
+                WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT campaign.id, campaign.name, shared_set.id
+                FROM campaign_shared_set
+                WHERE campaign_shared_set.status = 'ENABLED'
+            `),
+            // Account-level negative keywords
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT customer_negative_criterion.id,
+                       customer_negative_criterion.keyword.text,
+                       customer_negative_criterion.keyword.match_type
+                FROM customer_negative_criterion
+                WHERE customer_negative_criterion.type = 'KEYWORD'
+            `),
         ]);
 
         // Build lookup map from asset details
@@ -373,6 +429,12 @@ export default async function handler(req, res) {
 
         attachKeywords(response, activeKeywords.error ? [] : (activeKeywords.results || []));
         attachNegatives(response, activeAgNegs.error ? [] : (activeAgNegs.results || []), activeCampNegs.error ? [] : (activeCampNegs.results || []));
+        attachSharedNegatives(response,
+            sharedSets.error ? [] : (sharedSets.results || []),
+            sharedCriteria.error ? [] : (sharedCriteria.results || []),
+            campaignSharedSets.error ? [] : (campaignSharedSets.results || []),
+            accountNegs.error ? [] : (accountNegs.results || [])
+        );
 
         return res.status(200).json(response);
 
@@ -730,6 +792,59 @@ function attachNegatives(response, agNegRows, campNegRows) {
             ag.negativeKeywords = [...agNegs, ...campNegs].sort((a, b) => a.keyword.localeCompare(b.keyword));
         }
     }
+}
+
+function attachSharedNegatives(response, sharedSetRows, sharedCriteriaRows, campaignSharedSetRows, accountNegRows) {
+    // Account-level negatives
+    response.accountNegativeKeywords = accountNegRows
+        .filter(row => row.customerNegativeCriterion?.keyword?.text)
+        .map(row => ({
+            keyword: row.customerNegativeCriterion.keyword.text,
+            matchType: row.customerNegativeCriterion.keyword.matchType || 'BROAD',
+        }))
+        .sort((a, b) => a.keyword.localeCompare(b.keyword));
+
+    // Build shared set info
+    const listMap = new Map();
+    for (const row of sharedSetRows) {
+        const ss = row.sharedSet || {};
+        if (ss.id) {
+            listMap.set(ss.id, {
+                id: ss.id,
+                name: ss.name,
+                memberCount: ss.memberCount || 0,
+                keywords: [],
+                campaigns: [],
+            });
+        }
+    }
+
+    // Attach keywords to their lists
+    for (const row of sharedCriteriaRows) {
+        const ssId = row.sharedSet?.id;
+        const text = row.sharedCriterion?.keyword?.text;
+        const matchType = row.sharedCriterion?.keyword?.matchType || 'BROAD';
+        if (ssId && text && listMap.has(ssId)) {
+            listMap.get(ssId).keywords.push({ keyword: text, matchType });
+        }
+    }
+
+    // Attach campaign associations
+    for (const row of campaignSharedSetRows) {
+        const ssId = row.sharedSet?.id;
+        const campName = row.campaign?.name;
+        if (ssId && campName && listMap.has(ssId)) {
+            listMap.get(ssId).campaigns.push(campName);
+        }
+    }
+
+    // Sort keywords and campaigns within each list
+    for (const list of listMap.values()) {
+        list.keywords.sort((a, b) => a.keyword.localeCompare(b.keyword));
+        list.campaigns.sort();
+    }
+
+    response.negativeKeywordLists = Array.from(listMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function attachPMax(response, pmaxCampIds, assetGroupRows, assetGroupAssetRows, assetDetails) {
