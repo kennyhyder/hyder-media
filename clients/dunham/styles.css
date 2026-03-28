@@ -1783,6 +1783,43 @@ body {
     text-decoration-color: rgba(239, 68, 68, 0.4);
 }
 
+/* Changes Pagination */
+.changes-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-current {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    padding: 0 8px;
+}
+
+.btn-sm {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+}
+
+.btn-sm:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 /* Print All — Cover & Section Headers */
 .print-cover-header {
     text-align: center;

@@ -113,6 +113,8 @@
         let activePlatform = 'google';
         let activeYear = 'active';
         let dataCache = {}; // keyed by "platform:year"
+        let changesPage = 1;
+        let changesPageCount = 1;
 
         function cacheKey(year) { return `${activePlatform}:${year}`; }
 
@@ -131,7 +133,8 @@
                 yearContainer.innerHTML = '<button class="year-tab active" data-year="all" onclick="switchYear(\'all\')">All Changes</button>';
                 yearContainer.style.display = '';
                 activeYear = 'all';
-                dataCache[cacheKey('all')] ? renderReport(dataCache[cacheKey('all')]) : loadData('all');
+                changesPage = 1;
+                loadData('all');
                 return;
             }
 
@@ -159,6 +162,7 @@
 
         function switchYear(year) {
             activeYear = year;
+            if (activePlatform === 'changes') changesPage = 1;
             document.querySelectorAll('.year-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.year === String(year));
             });
@@ -172,7 +176,10 @@
                     ? `Complete inventory of active ${platformLabel} ad copy`
                     : `${platformLabel} ad copy that ran during ${year}`;
             }
-            if (dataCache[cacheKey(year)]) {
+            if (activePlatform === 'changes') {
+                // Always fetch fresh for changes (paginated)
+                loadData(year);
+            } else if (dataCache[cacheKey(year)]) {
                 renderReport(dataCache[cacheKey(year)]);
             } else {
                 loadData(year);
@@ -205,7 +212,11 @@
 
             let url;
             if (activePlatform === 'changes') {
-                url = (year === 'all') ? CHANGES_API : `${CHANGES_API}?year=${year}`;
+                const params = new URLSearchParams();
+                if (year !== 'all') params.set('year', year);
+                params.set('page', changesPage);
+                params.set('per_page', '100');
+                url = `${CHANGES_API}?${params.toString()}`;
             } else {
                 const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
                 url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
@@ -231,7 +242,8 @@
                     throw new Error(msg);
                 }
 
-                dataCache[cacheKey(year)] = data;
+                // Don't cache changes (paginated) — only cache google/meta
+                if (activePlatform !== 'changes') dataCache[cacheKey(year)] = data;
                 loadingEl.style.display = 'none';
                 renderReport(data);
 
@@ -1083,6 +1095,7 @@
                 'GOOGLE_ADS_API': 'API',
                 'GOOGLE_ADS_AUTOMATED_RULE': 'Auto Rule',
                 'GOOGLE_ADS_BULK_UPLOAD': 'Bulk Upload',
+                'CSV_IMPORT': '',
                 'OTHER': 'Other',
             };
             return map[clientType] || clientType.replace(/_/g, ' ').toLowerCase();
@@ -1110,7 +1123,11 @@
             }
 
             const tc = data.typeCounts || {};
-            const totalChanges = data.changes ? data.changes.length : 0;
+            const totalChanges = data.totalStored || 0;
+
+            // Update pagination state
+            changesPage = data.page || 1;
+            changesPageCount = data.totalPages || 1;
 
             document.getElementById('label-campaigns').textContent = 'Total Changes';
             document.getElementById('label-adgroups').textContent = 'Campaigns';
@@ -1120,16 +1137,16 @@
             document.getElementById('label-extensions').textContent = 'Budgets';
             document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
 
-            document.getElementById('stat-campaigns').textContent = totalChanges;
-            document.getElementById('stat-adgroups').textContent = tc['CAMPAIGN'] || 0;
-            document.getElementById('stat-ads').textContent = tc['AD_GROUP'] || 0;
-            document.getElementById('stat-headlines').textContent = tc['AD'] || 0;
-            document.getElementById('stat-descriptions').textContent = (tc['AD_GROUP_CRITERION'] || 0) + (tc['CAMPAIGN_CRITERION'] || 0);
-            document.getElementById('stat-extensions').textContent = tc['CAMPAIGN_BUDGET'] || 0;
+            document.getElementById('stat-campaigns').textContent = totalChanges.toLocaleString();
+            document.getElementById('stat-adgroups').textContent = (tc['CAMPAIGN'] || 0).toLocaleString();
+            document.getElementById('stat-ads').textContent = (tc['AD_GROUP'] || 0).toLocaleString();
+            document.getElementById('stat-headlines').textContent = (tc['AD'] || 0).toLocaleString();
+            document.getElementById('stat-descriptions').textContent = ((tc['AD_GROUP_CRITERION'] || 0) + (tc['CAMPAIGN_CRITERION'] || 0)).toLocaleString();
+            document.getElementById('stat-extensions').textContent = (tc['CAMPAIGN_BUDGET'] || 0).toLocaleString();
             statsEl.style.display = 'flex';
 
-            if (totalChanges === 0) {
-                const msg = data.totalStored === 0
+            if (!data.changes || data.changes.length === 0) {
+                const msg = totalChanges === 0
                     ? 'No change history stored yet. Click <strong>Refresh</strong> to sync the last 30 days from Google Ads.'
                     : 'No changes found for this period.';
                 contentEl.innerHTML = `<div class="empty-prompt" style="padding:60px 20px;text-align:center;">
@@ -1140,8 +1157,37 @@
                 return;
             }
 
-            contentEl.innerHTML = buildChangesHTML(data);
+            let html = buildChangesHTML(data);
+
+            // Pagination controls
+            if (changesPageCount > 1) {
+                html += buildChangesPagination(changesPage, changesPageCount, totalChanges, data.perPage || 100);
+            }
+
+            contentEl.innerHTML = html;
             contentEl.style.display = 'block';
+        }
+
+        function buildChangesPagination(page, totalPages, totalItems, perPage) {
+            const from = (page - 1) * perPage + 1;
+            const to = Math.min(page * perPage, totalItems);
+            let html = `<div class="changes-pagination">`;
+            html += `<span class="pagination-info">Showing ${from.toLocaleString()}–${to.toLocaleString()} of ${totalItems.toLocaleString()} changes</span>`;
+            html += `<div class="pagination-buttons">`;
+            html += `<button class="btn btn-secondary btn-sm" onclick="goChangesPage(1)" ${page <= 1 ? 'disabled' : ''}>&laquo;</button>`;
+            html += `<button class="btn btn-secondary btn-sm" onclick="goChangesPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>&lsaquo; Prev</button>`;
+            html += `<span class="pagination-current">Page ${page} of ${totalPages.toLocaleString()}</span>`;
+            html += `<button class="btn btn-secondary btn-sm" onclick="goChangesPage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>Next &rsaquo;</button>`;
+            html += `<button class="btn btn-secondary btn-sm" onclick="goChangesPage(${totalPages})" ${page >= totalPages ? 'disabled' : ''}>&raquo;</button>`;
+            html += `</div></div>`;
+            return html;
+        }
+
+        function goChangesPage(page) {
+            if (page < 1 || page > changesPageCount) return;
+            changesPage = page;
+            loadData(activeYear);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ============================================================

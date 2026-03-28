@@ -37,15 +37,31 @@ export default async function handler(req, res) {
 // ─── Read from Supabase ──────────────────────────────────────────────
 async function readChanges(supabase, req, res) {
     const year = parseInt(req.query.year);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const perPage = Math.min(200, Math.max(1, parseInt(req.query.per_page) || 100));
 
-    // Get date range of stored data
-    const [oldest, newest, countResult] = await Promise.all([
+    // Build date filter helper
+    const applyYearFilter = (q) => year
+        ? q.gte('change_date_time', `${year}-01-01T00:00:00Z`).lt('change_date_time', `${year + 1}-01-01T00:00:00Z`)
+        : q;
+
+    // Known resource types
+    const RESOURCE_TYPES = ['CAMPAIGN', 'AD_GROUP', 'AD', 'AD_GROUP_CRITERION', 'CAMPAIGN_CRITERION', 'CAMPAIGN_BUDGET', 'ASSET', 'ASSET_GROUP', 'LABEL', 'CUSTOMER', 'TARGETING', 'EXPERIMENT', 'UNKNOWN'];
+
+    // Get metadata + type counts in parallel (individual count queries are fast)
+    const [oldest, newest, countResult, ...typeResults] = await Promise.all([
         supabase.from('dunham_change_history').select('change_date_time').order('change_date_time', { ascending: true }).limit(1),
         supabase.from('dunham_change_history').select('change_date_time').order('change_date_time', { ascending: false }).limit(1),
-        supabase.from('dunham_change_history').select('*', { count: 'exact', head: true }),
+        applyYearFilter(supabase.from('dunham_change_history').select('*', { count: 'exact', head: true })),
+        ...RESOURCE_TYPES.map(t =>
+            applyYearFilter(supabase.from('dunham_change_history').select('*', { count: 'exact', head: true }).eq('resource_type', t))
+                .then(r => [t, r.count || 0])
+        ),
     ]);
 
-    const totalStored = countResult.count || 0;
+    const totalForFilter = countResult.count || 0;
+    const typeCounts = Object.fromEntries(typeResults.filter(([, c]) => c > 0));
+
     const availableYears = [];
     const startYear = oldest.data?.[0] ? new Date(oldest.data[0].change_date_time).getFullYear() : null;
     const endYear = newest.data?.[0] ? new Date(newest.data[0].change_date_time).getFullYear() : null;
@@ -53,11 +69,15 @@ async function readChanges(supabase, req, res) {
         for (let y = endYear; y >= startYear; y--) availableYears.push(y);
     }
 
-    // Fetch changes
+    // Fetch paginated changes
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+
     let query = supabase
         .from('dunham_change_history')
         .select('*')
-        .order('change_date_time', { ascending: false });
+        .order('change_date_time', { ascending: false })
+        .range(from, to);
 
     if (year) {
         query = query
@@ -65,7 +85,7 @@ async function readChanges(supabase, req, res) {
             .lt('change_date_time', `${year + 1}-01-01T00:00:00Z`);
     }
 
-    const { data: rows, error } = await query.limit(10000);
+    const { data: rows, error } = await query;
 
     if (error) {
         return res.status(500).json({ error: 'Failed to read change history', details: error.message });
@@ -83,18 +103,18 @@ async function readChanges(supabase, req, res) {
         details: row.details,
     }));
 
-    const typeCounts = {};
-    for (const c of changes) {
-        typeCounts[c.resourceType] = (typeCounts[c.resourceType] || 0) + 1;
-    }
+    const totalPages = Math.ceil(totalForFilter / perPage);
 
     return res.status(200).json({
         account: { id: '840-838-5870', name: 'Dunham & Jones' },
         changes,
         typeCounts,
         availableYears,
-        totalStored,
+        totalStored: totalForFilter,
         year: year || null,
+        page,
+        perPage,
+        totalPages,
         fetchedAt: new Date().toISOString(),
     });
 }
