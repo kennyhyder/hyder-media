@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
         // ── Fetch all rows in batches of 5000 ──
         const allRows = [];
-        const BATCH = 5000;
+        const BATCH = 1000;
         let offset = 0;
         while (true) {
             let query = supabase
