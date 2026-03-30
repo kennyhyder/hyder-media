@@ -1295,6 +1295,16 @@
             return allChanges;
         }
 
+        function fmtDate(d) {
+            return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+        }
+        function fmtTime(d) {
+            let h = d.getHours(), m = d.getMinutes(), ap = 'AM';
+            if (h >= 12) { ap = 'PM'; if (h > 12) h -= 12; }
+            if (h === 0) h = 12;
+            return `${h}:${String(m).padStart(2,'0')} ${ap}`;
+        }
+
         async function exportChangesPDF() {
             const overlay = document.getElementById('pdf-overlay');
             const progressText = document.getElementById('pdf-progress-text');
@@ -1302,65 +1312,86 @@
 
             const allChanges = await fetchAllChanges(progressText);
 
-            progressText.textContent = `Building PDF (${allChanges.length.toLocaleString()} records)...`;
-            await new Promise(r => setTimeout(r, 50));
+            progressText.textContent = `Preparing ${allChanges.length.toLocaleString()} records...`;
+            await new Promise(r => setTimeout(r, 30));
 
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
-            const yearLabel = activeYear === 'all' ? 'All Years' : String(activeYear);
-
-            // Title page header
-            doc.setFontSize(18);
-            doc.text('Dunham & Jones — Change History', 40, 40);
-            doc.setFontSize(11);
-            doc.text(`${yearLabel}  |  ${allChanges.length.toLocaleString()} changes  |  Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 40, 58);
-
-            const tableRows = allChanges.map(c => {
+            // Pre-build all rows with fast date formatting
+            const tableRows = new Array(allChanges.length);
+            for (let i = 0; i < allChanges.length; i++) {
+                const c = allChanges[i];
                 const dt = c.dateTime ? new Date(c.dateTime) : null;
-                const date = dt ? dt.toLocaleDateString('en-US') : '';
-                const time = dt ? dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
                 const summary = c.details?.summary || '';
                 const lines = (c.details?.lines || []).join('; ');
-                const detail = summary ? (lines ? `${summary} — ${lines}` : summary) : lines;
-                return [
-                    date, time,
+                const detail = summary ? (lines ? summary + ' — ' + lines : summary) : lines;
+                tableRows[i] = [
+                    dt ? fmtDate(dt) : '', dt ? fmtTime(dt) : '',
                     (c.resourceType || '').replace(/_/g, ' '),
                     c.operation || '',
                     c.campaignName || '',
                     c.adGroupName || '',
                     c.userEmail || '',
-                    detail,
+                    detail.length > 200 ? detail.slice(0, 200) + '...' : detail,
                 ];
-            });
+            }
 
-            doc.autoTable({
-                startY: 70,
-                head: [['Date', 'Time', 'Type', 'Operation', 'Campaign', 'Ad Group', 'User', 'Details']],
-                body: tableRows,
-                styles: { fontSize: 7, cellPadding: 3, overflow: 'linebreak' },
-                headStyles: { fillColor: [30, 41, 59], fontSize: 7.5 },
-                columnStyles: {
-                    0: { cellWidth: 62 },  // Date
-                    1: { cellWidth: 48 },  // Time
-                    2: { cellWidth: 58 },  // Type
-                    3: { cellWidth: 50 },  // Operation
-                    4: { cellWidth: 120 }, // Campaign
-                    5: { cellWidth: 90 },  // Ad Group
-                    6: { cellWidth: 110 }, // User
-                    7: { cellWidth: 'auto' }, // Details
-                },
-                margin: { top: 30, left: 20, right: 20 },
-                didDrawPage: (data) => {
-                    // Footer with page numbers
-                    doc.setFontSize(8);
-                    doc.setTextColor(120);
-                    doc.text(
-                        `Dunham & Jones Change History — Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
-                        doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 15,
-                        { align: 'center' }
-                    );
-                },
-            });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
+            const yearLabel = activeYear === 'all' ? 'All Years' : String(activeYear);
+            const now = new Date();
+            const genDate = `${now.toLocaleString('en-US', { month: 'long' })} ${now.getDate()}, ${now.getFullYear()}`;
+
+            // Title header
+            doc.setFontSize(18);
+            doc.text('Dunham & Jones — Change History', 40, 40);
+            doc.setFontSize(11);
+            doc.text(`${yearLabel}  |  ${allChanges.length.toLocaleString()} changes  |  Generated ${genDate}`, 40, 58);
+
+            const header = [['Date', 'Time', 'Type', 'Operation', 'Campaign', 'Ad Group', 'User', 'Details']];
+            const colStyles = {
+                0: { cellWidth: 62 },
+                1: { cellWidth: 48 },
+                2: { cellWidth: 58 },
+                3: { cellWidth: 50 },
+                4: { cellWidth: 120 },
+                5: { cellWidth: 90 },
+                6: { cellWidth: 110 },
+                7: { cellWidth: 'auto' },
+            };
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const footerCb = () => {
+                doc.setFontSize(8);
+                doc.setTextColor(120);
+                doc.text(
+                    `Dunham & Jones Change History — Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+                    pageW / 2, pageH - 15, { align: 'center' }
+                );
+                doc.setTextColor(0);
+            };
+
+            // Chunk into batches of 2000 rows to avoid UI freeze
+            const CHUNK = 2000;
+            for (let i = 0; i < tableRows.length; i += CHUNK) {
+                const chunk = tableRows.slice(i, i + CHUNK);
+                progressText.textContent = `Building PDF... ${Math.min(i + CHUNK, tableRows.length).toLocaleString()} of ${tableRows.length.toLocaleString()} rows`;
+                await new Promise(r => setTimeout(r, 0));
+
+                const startY = i === 0 ? 70 : (doc.lastAutoTable ? doc.lastAutoTable.finalY : 30);
+                doc.autoTable({
+                    startY,
+                    head: header,
+                    showHead: i === 0 ? 'everyPage' : 'everyPage',
+                    body: chunk,
+                    styles: { fontSize: 7, cellPadding: 2, overflow: 'ellipsize' },
+                    headStyles: { fillColor: [30, 41, 59], fontSize: 7.5 },
+                    columnStyles: colStyles,
+                    margin: { top: 30, left: 20, right: 20 },
+                    didDrawPage: footerCb,
+                });
+            }
+
+            progressText.textContent = 'Saving PDF...';
+            await new Promise(r => setTimeout(r, 30));
 
             const filename = `dunham-change-history-${activeYear === 'all' ? 'all-years' : activeYear}.pdf`;
             doc.save(filename);
