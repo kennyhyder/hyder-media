@@ -127,7 +127,7 @@ async function fetchActive(accessToken) {
                 'id', 'name', 'status', 'effective_status',
                 'campaign_id', 'adset_id',
                 'adset{name,status}',
-                'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+                'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
             ].join(','),
             effective_status: '["ACTIVE"]',
             limit: 200,
@@ -209,7 +209,7 @@ async function fetchHistorical(accessToken, year, supabase, req) {
         try {
             const resp = await graphGet('', {
                 ids: batch.join(','),
-                fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+                fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
             }, accessToken);
             // Response is keyed by ad ID
             for (const [adId, adData] of Object.entries(resp)) {
@@ -220,7 +220,8 @@ async function fetchHistorical(accessToken, year, supabase, req) {
 
     // 3. For current year, also fetch active ads directly
     //    (insights can lag for recently launched ads)
-    let directAds = [];
+    //    Only merge into EXISTING ad sets that already had impressions.
+    let directAdsMerged = 0;
     if (isCurrentYear) {
         try {
             const adsResp = await graphGet(
@@ -230,58 +231,62 @@ async function fetchHistorical(accessToken, year, supabase, req) {
                         'id', 'name', 'status', 'effective_status',
                         'campaign_id', 'adset_id',
                         'campaign{name}', 'adset{name}',
-                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
+                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
                     ].join(','),
                     effective_status: '["ACTIVE"]',
                     limit: 200,
                 },
                 accessToken
             );
-            directAds = adsResp.data || [];
-        } catch { /* non-fatal */ }
+            const directAds = adsResp.data || [];
+
+            // 4. Build response first, then merge active ads into existing ad sets only
+            const response = buildHistoricalResponse(insights, creativeMap, year);
+
+            for (const ad of directAds) {
+                if (insightAdIds.has(ad.id)) continue;
+
+                const campId = ad.campaign_id;
+                const adsetId = ad.adset_id;
+
+                // Only add to ad sets that already exist (had impressions)
+                const camp = response.campaigns.find(c => c.id === campId);
+                if (!camp) continue;
+                const adSetObj = camp.adSets.find(s => s.id === adsetId);
+                if (!adSetObj) continue;
+
+                const parsed = parseCreative(ad.creative || {});
+                adSetObj.ads.push({
+                    id: ad.id, name: ad.name,
+                    status: ad.effective_status || ad.status || 'ACTIVE',
+                    ...parsed, impressions: 0,
+                });
+                directAdsMerged++;
+            }
+
+            response._debug = {
+                totalInsightsRows: allInsights.length,
+                afterImpressionFilter: insights.length,
+                uniqueAdsFromInsights: insightAdIds.size,
+                creativesFound: creativeMap.size,
+                directAdsMerged,
+                timeRange: { since: sinceDate, until: untilDate },
+            };
+
+            await setCache(supabase, cacheKey, response);
+            return response;
+        } catch { /* non-fatal, fall through */ }
     }
 
-    // 4. Build response
+    // 4. Build response (non-current-year path, or if current-year fetch failed)
     const response = buildHistoricalResponse(insights, creativeMap, year);
-
-    // Merge in active ads not already in insights
-    if (directAds.length > 0) {
-        for (const ad of directAds) {
-            if (insightAdIds.has(ad.id)) continue;
-
-            const campId = ad.campaign_id;
-            const adsetId = ad.adset_id;
-            const campaign = ad.campaign || {};
-            const adset = ad.adset || {};
-
-            let camp = response.campaigns.find(c => c.id === campId);
-            if (!camp) {
-                camp = { id: campId, name: campaign.name || `Campaign ${campId}`, status: 'ACTIVE', objective: null, adSets: [] };
-                response.campaigns.push(camp);
-            }
-
-            let adSetObj = camp.adSets.find(s => s.id === adsetId);
-            if (!adSetObj) {
-                adSetObj = { id: adsetId, name: adset.name || `Ad Set ${adsetId}`, status: 'ACTIVE', ads: [] };
-                camp.adSets.push(adSetObj);
-            }
-
-            const parsed = parseCreative(ad.creative || {});
-            adSetObj.ads.push({
-                id: ad.id, name: ad.name,
-                status: ad.effective_status || ad.status || 'ACTIVE',
-                ...parsed, impressions: 0,
-            });
-        }
-        response.campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-    }
 
     response._debug = {
         totalInsightsRows: allInsights.length,
         afterImpressionFilter: insights.length,
         uniqueAdsFromInsights: insightAdIds.size,
         creativesFound: creativeMap.size,
-        directAdsMerged: directAds.filter(a => !insightAdIds.has(a.id)).length,
+        directAdsMerged,
         timeRange: { since: sinceDate, until: untilDate },
     };
 
@@ -401,9 +406,11 @@ function parseAd(ad) {
 }
 
 function parseCreative(creative) {
+    // Prefer effective_image_url (full-size rendered image) over image_url/thumbnail_url
+    const bestImage = creative.effective_image_url || creative.image_url || null;
     const result = {
         primaryTexts: [], headlines: [], descriptions: [],
-        imageUrl: creative.image_url || creative.thumbnail_url || null,
+        imageUrl: bestImage,
         thumbnailUrl: creative.thumbnail_url || null,
         linkUrl: null,
     };
@@ -437,12 +444,15 @@ function parseCreative(creative) {
             if (desc) result.descriptions = [{ text: desc }];
         }
         if (!result.linkUrl) result.linkUrl = linkData.link || null;
-        if (!result.imageUrl) result.imageUrl = linkData.picture || videoData.image_url || null;
+        // Skip linkData.picture (always low-res ~120px) — prefer videoData.image_url or fallback to thumbnail
+        if (!result.imageUrl) result.imageUrl = videoData.image_url || null;
     }
 
     // 3. Legacy fallbacks
     if (!result.primaryTexts.length && creative.body) result.primaryTexts = [{ text: creative.body }];
     if (!result.headlines.length && creative.title) result.headlines = [{ text: creative.title }];
+    // Last resort: use thumbnail_url (low-res but better than nothing)
+    if (!result.imageUrl) result.imageUrl = creative.thumbnail_url || null;
 
     return result;
 }
