@@ -116,13 +116,29 @@ export default async function handler(req, res) {
             doc.fillColor('#000000').font('Helvetica').fontSize(FONT_SIZE);
         }
 
-        // Measure height a string needs within a column width
-        function cellHeight(str, colW) {
-            if (!str) return MIN_ROW_H;
-            return Math.max(MIN_ROW_H, doc.heightOfString(str, { width: colW - COL_PAD }));
+        // Word-wrap text into lines that fit a given width (all rendering
+        // uses lineBreak:false so PDFKit never auto-adds pages)
+        function wrapLines(str, maxW) {
+            if (!str) return [''];
+            if (doc.widthOfString(str) <= maxW) return [str];
+            const words = str.split(/\s+/);
+            const lines = [];
+            let cur = '';
+            for (const word of words) {
+                const test = cur ? cur + ' ' + word : word;
+                if (doc.widthOfString(test) > maxW && cur) {
+                    lines.push(cur);
+                    cur = word;
+                } else {
+                    cur = test;
+                }
+            }
+            if (cur) lines.push(cur);
+            return lines.length ? lines : [''];
         }
 
         startPage(true);
+        const lineH = doc.currentLineHeight();
 
         for (let i = 0; i < allRows.length; i++) {
             const row = allRows[i];
@@ -138,13 +154,15 @@ export default async function handler(req, res) {
                 buildDetail(row.details),
             ];
 
-            // Calculate row height from tallest cell
+            // Pre-wrap all cells and calculate row height
             doc.font('Helvetica').fontSize(FONT_SIZE);
+            const cellLines = [];
             let rowH = MIN_ROW_H;
             for (let c = 0; c < cols.length; c++) {
-                rowH = Math.max(rowH, cellHeight(values[c], cols[c].w));
+                const lines = wrapLines(values[c], cols[c].w - COL_PAD);
+                cellLines.push(lines);
+                rowH = Math.max(rowH, lines.length * lineH);
             }
-            // Cap row height to avoid single rows spanning entire pages
             rowH = Math.min(rowH, PAGE_H / 3);
 
             // Page break if needed
@@ -153,14 +171,13 @@ export default async function handler(req, res) {
                 startPage(false);
             }
 
-            // Render each cell with wrapping
+            // Render each cell line by line (lineBreak:false prevents auto pages)
             for (let c = 0; c < cols.length; c++) {
-                if (values[c]) {
-                    doc.text(values[c], cols[c].x, y, {
-                        width: cols[c].w - COL_PAD,
-                        height: rowH,
-                        ellipsis: true,
-                    });
+                const lines = cellLines[c];
+                for (let l = 0; l < lines.length; l++) {
+                    const ly = y + l * lineH;
+                    if (ly + lineH > y + rowH) break;
+                    doc.text(lines[l], cols[c].x, ly, { lineBreak: false });
                 }
             }
             y += rowH + 1;
