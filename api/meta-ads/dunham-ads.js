@@ -127,7 +127,7 @@ async function fetchActive(accessToken) {
                 'id', 'name', 'status', 'effective_status',
                 'campaign_id', 'adset_id',
                 'adset{name,status}',
-                'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
+                'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
             ].join(','),
             effective_status: '["ACTIVE"]',
             limit: 200,
@@ -209,7 +209,7 @@ async function fetchHistorical(accessToken, year, supabase, req) {
         try {
             const resp = await graphGet('', {
                 ids: batch.join(','),
-                fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
+                fields: 'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
             }, accessToken);
             // Response is keyed by ad ID
             for (const [adId, adData] of Object.entries(resp)) {
@@ -231,7 +231,7 @@ async function fetchHistorical(accessToken, year, supabase, req) {
                         'id', 'name', 'status', 'effective_status',
                         'campaign_id', 'adset_id',
                         'campaign{name}', 'adset{name}',
-                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec,effective_image_url}',
+                        'creative{id,name,title,body,asset_feed_spec,image_url,thumbnail_url,object_story_spec}',
                     ].join(','),
                     effective_status: '["ACTIVE"]',
                     limit: 200,
@@ -406,11 +406,9 @@ function parseAd(ad) {
 }
 
 function parseCreative(creative) {
-    // Prefer effective_image_url (full-size rendered image) over image_url/thumbnail_url
-    const bestImage = creative.effective_image_url || creative.image_url || null;
     const result = {
         primaryTexts: [], headlines: [], descriptions: [],
-        imageUrl: bestImage,
+        imageUrl: creative.image_url || null,
         thumbnailUrl: creative.thumbnail_url || null,
         linkUrl: null,
     };
@@ -422,6 +420,7 @@ function parseCreative(creative) {
         if (afs.titles) result.headlines = afs.titles.map(t => ({ text: t.text || '' }));
         if (afs.descriptions) result.descriptions = afs.descriptions.map(d => ({ text: d.text || '' }));
         if (afs.link_urls) result.linkUrl = afs.link_urls[0]?.website_url || null;
+        // asset_feed_spec images are typically full-resolution
         if (afs.images?.length > 0) result.imageUrl = result.imageUrl || afs.images[0].url || null;
     }
 
@@ -444,14 +443,12 @@ function parseCreative(creative) {
             if (desc) result.descriptions = [{ text: desc }];
         }
         if (!result.linkUrl) result.linkUrl = linkData.link || null;
-        // Skip linkData.picture (always low-res ~120px) — prefer videoData.image_url or fallback to thumbnail
-        if (!result.imageUrl) result.imageUrl = videoData.image_url || null;
+        if (!result.imageUrl) result.imageUrl = linkData.picture || videoData.image_url || null;
     }
 
     // 3. Legacy fallbacks
     if (!result.primaryTexts.length && creative.body) result.primaryTexts = [{ text: creative.body }];
     if (!result.headlines.length && creative.title) result.headlines = [{ text: creative.title }];
-    // Last resort: use thumbnail_url (low-res but better than nothing)
     if (!result.imageUrl) result.imageUrl = creative.thumbnail_url || null;
 
     return result;
