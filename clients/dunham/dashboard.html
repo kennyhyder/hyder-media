@@ -25,7 +25,7 @@
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
             <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
             <button class="btn btn-secondary" onclick="downloadAll()">Print All Years</button>
-            <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+            <button class="btn btn-primary" onclick="printCurrentView()">Print Report</button>
         </div>
     </nav>
 
@@ -118,6 +118,26 @@
 
         function cacheKey(year) { return `${activePlatform}:${year}`; }
 
+        // URL hash state management
+        function updateHash() {
+            const params = new URLSearchParams();
+            params.set('platform', activePlatform);
+            params.set('year', String(activeYear));
+            if (activePlatform === 'changes' && changesPage > 1) params.set('page', String(changesPage));
+            history.replaceState(null, '', '#' + params.toString());
+        }
+
+        function readHash() {
+            const hash = window.location.hash.slice(1);
+            if (!hash) return null;
+            const params = new URLSearchParams(hash);
+            return {
+                platform: params.get('platform') || 'google',
+                year: params.get('year') || 'active',
+                page: parseInt(params.get('page')) || 1,
+            };
+        }
+
         // Platform toggle
         function switchPlatform(platform) {
             activePlatform = platform;
@@ -134,6 +154,7 @@
                 yearContainer.style.display = '';
                 activeYear = 'all';
                 changesPage = 1;
+                updateHash();
                 loadData('all');
                 return;
             }
@@ -146,6 +167,7 @@
             document.getElementById('year-tabs').style.display = '';
             activeYear = 'active';
             buildYearTabs();
+            updateHash();
             dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
         }
 
@@ -176,6 +198,7 @@
                     ? `Complete inventory of active ${platformLabel} ad copy`
                     : `${platformLabel} ad copy that ran during ${year}`;
             }
+            updateHash();
             if (activePlatform === 'changes') {
                 // Always fetch fresh for changes (paginated)
                 loadData(year);
@@ -1200,6 +1223,7 @@
         function goChangesPage(page) {
             if (page < 1 || page > changesPageCount) return;
             changesPage = page;
+            updateHash();
             loadData(activeYear);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1232,6 +1256,86 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // ============================================================
+        // Print Current View (fetches all pages for changes)
+        // ============================================================
+        async function printCurrentView() {
+            if (activePlatform !== 'changes' || changesPageCount <= 1) {
+                window.print();
+                return;
+            }
+
+            // Fetch all pages for the current changes year
+            const overlay = document.getElementById('pdf-overlay');
+            const progressText = document.getElementById('pdf-progress-text');
+            overlay.style.display = 'flex';
+
+            const allChanges = [];
+            let firstData = null;
+            for (let p = 1; p <= changesPageCount; p++) {
+                progressText.textContent = `Loading change history... (page ${p} of ${changesPageCount})`;
+                try {
+                    const params = new URLSearchParams();
+                    if (activeYear !== 'all') params.set('year', activeYear);
+                    params.set('page', p);
+                    params.set('per_page', '100');
+                    const resp = await fetch(`${CHANGES_API}?${params.toString()}`);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (!data.error) {
+                            if (!firstData) firstData = data;
+                            allChanges.push(...(data.changes || []));
+                        }
+                    }
+                } catch (e) { /* continue */ }
+            }
+
+            if (!firstData) { overlay.style.display = 'none'; window.print(); return; }
+
+            progressText.textContent = 'Preparing report...';
+
+            // Build full HTML with all changes
+            const fullData = { ...firstData, changes: allChanges };
+            const label = activeYear === 'all' ? 'All Changes' : String(activeYear);
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            let combined = `<div class="print-cover-header">
+                <h1>Dunham & Jones — Change History: ${label}</h1>
+                <p>${today} &middot; ${allChanges.length.toLocaleString()} changes</p>
+            </div>`;
+            combined += buildChangesHTML(fullData);
+
+            // Save current view and replace with full report
+            const contentEl = document.getElementById('report-content');
+            const savedHTML = contentEl.innerHTML;
+            const savedDisplay = contentEl.style.display;
+            const headerEl = document.querySelector('.report-header');
+            const platformEl = document.querySelector('.platform-tabs');
+            const yearEl = document.getElementById('year-tabs');
+            const statsEl = document.getElementById('stats-row');
+
+            headerEl.style.display = 'none';
+            platformEl.style.display = 'none';
+            yearEl.style.display = 'none';
+            statsEl.style.display = 'none';
+            contentEl.innerHTML = combined;
+            contentEl.style.display = 'block';
+            overlay.style.display = 'none';
+
+            window.print();
+
+            const restore = () => {
+                contentEl.innerHTML = savedHTML;
+                contentEl.style.display = savedDisplay;
+                headerEl.style.display = '';
+                platformEl.style.display = '';
+                yearEl.style.display = '';
+                const cached = dataCache[cacheKey(activeYear)];
+                if (cached) renderReport(cached);
+                window.removeEventListener('afterprint', restore);
+            };
+            window.addEventListener('afterprint', restore);
         }
 
         // ============================================================
@@ -1281,23 +1385,31 @@
                 }));
             }
 
-            // After fetching changes:all, also fetch per-year if multiple years
+            // After fetching changes:all, fetch ALL pages per year
             const changesAllData = dataCache['changes:all'];
-            if (changesAllData && changesAllData.availableYears && changesAllData.availableYears.length > 1) {
-                const changeYearPairs = changesAllData.availableYears
-                    .filter(y => !dataCache[`changes:${y}`])
-                    .map(y => ({ platform: 'changes', year: y }));
-                for (let i = 0; i < changeYearPairs.length; i += BATCH) {
-                    const batch = changeYearPairs.slice(i, i + BATCH);
-                    await Promise.all(batch.map(async ({ year }) => {
+            if (changesAllData && changesAllData.availableYears) {
+                for (const y of changesAllData.availableYears) {
+                    if (dataCache[`changes:${y}`] && dataCache[`changes:${y}`]._allPages) continue;
+                    progressText.textContent = `Loading change history for ${y}...`;
+                    const allChanges = [];
+                    let firstData = null;
+                    let totalPages = 1;
+                    for (let p = 1; p <= totalPages; p++) {
                         try {
-                            const resp = await fetch(`${CHANGES_API}?year=${year}`);
+                            const resp = await fetch(`${CHANGES_API}?year=${y}&page=${p}&per_page=100`);
                             if (resp.ok) {
                                 const data = await resp.json();
-                                if (!data.error) dataCache[`changes:${year}`] = data;
+                                if (!data.error) {
+                                    if (!firstData) { firstData = data; totalPages = data.totalPages || 1; }
+                                    allChanges.push(...(data.changes || []));
+                                }
                             }
-                        } catch (e) { /* skip */ }
-                    }));
+                        } catch (e) { break; }
+                        if (p % 10 === 0) progressText.textContent = `Loading change history for ${y}... (page ${p} of ${totalPages})`;
+                    }
+                    if (firstData) {
+                        dataCache[`changes:${y}`] = { ...firstData, changes: allChanges, _allPages: true };
+                    }
                 }
             }
 
@@ -1389,8 +1501,42 @@
         if (new URLSearchParams(window.location.search).get('meta_connected') === 'true') {
             switchPlatform('meta');
         } else {
-            buildYearTabs();
-            loadData('active');
+            const hashState = readHash();
+            if (hashState) {
+                activePlatform = hashState.platform;
+                const yearVal = hashState.year === 'active' || hashState.year === 'all' ? hashState.year : parseInt(hashState.year) || 'active';
+                activeYear = yearVal;
+                if (hashState.platform === 'changes') changesPage = hashState.page;
+                // Set platform tab active
+                document.querySelectorAll('.platform-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.platform === hashState.platform);
+                });
+                if (hashState.platform === 'changes') {
+                    document.getElementById('report-account').textContent = 'Account: 840-838-5870';
+                    document.querySelector('.subtitle').textContent = yearVal === 'all'
+                        ? 'Account change history' : `Account change history — ${yearVal}`;
+                    const yearContainer = document.getElementById('year-tabs');
+                    yearContainer.innerHTML = `<button class="year-tab${yearVal === 'all' ? ' active' : ''}" data-year="all" onclick="switchYear('all')">All Changes</button>`;
+                    yearContainer.style.display = '';
+                    loadData(yearVal);
+                } else {
+                    document.getElementById('report-account').textContent =
+                        hashState.platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
+                    if (hashState.platform === 'meta') {
+                        document.querySelector('.subtitle').textContent = yearVal === 'active'
+                            ? 'Complete inventory of active Meta ad copy' : `Meta ad copy that ran during ${yearVal}`;
+                    }
+                    buildYearTabs();
+                    // Highlight the correct year tab
+                    document.querySelectorAll('.year-tab').forEach(t => {
+                        t.classList.toggle('active', t.dataset.year === String(yearVal));
+                    });
+                    loadData(yearVal);
+                }
+            } else {
+                buildYearTabs();
+                loadData('active');
+            }
         }
     </script>
 </body>
