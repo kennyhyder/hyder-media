@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunham & Jones — Ad Audit</title>
+    <title>Dunham & Jones — Ad Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
     <link rel="icon" href="../../favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -19,7 +21,7 @@
     <nav class="main-nav">
         <a href="dashboard.html" class="nav-brand">
             <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
-            Dunham & Jones Ad Copy Audit
+            Dunham & Jones Ad Report
         </a>
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
@@ -31,7 +33,7 @@
 
     <div class="container">
         <div class="report-header">
-            <h1>Dunham & Jones — Ad Audit</h1>
+            <h1>Dunham & Jones — Ad Report</h1>
             <p class="subtitle">Complete inventory of ad headlines, descriptions, and extensions</p>
             <div class="report-meta">
                 <span id="report-account">Account: 840-838-5870</span>
@@ -144,7 +146,7 @@
             document.querySelectorAll('.platform-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.platform === platform);
             });
-            document.getElementById('print-btn').textContent = platform === 'changes' ? 'Export CSV' : 'Print Report';
+            document.getElementById('print-btn').textContent = platform === 'changes' ? 'Export PDF' : 'Print Report';
 
             if (platform === 'changes') {
                 document.getElementById('report-account').textContent = 'Account: 840-838-5870';
@@ -1267,28 +1269,14 @@
                 window.print();
                 return;
             }
-            // Change history: export as CSV (too large for browser print)
-            await exportChangesCSV();
+            await exportChangesPDF();
         }
 
-        function csvCell(val) {
-            if (val == null) return '';
-            const s = String(val);
-            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-                return '"' + s.replace(/"/g, '""') + '"';
-            }
-            return s;
-        }
-
-        async function exportChangesCSV() {
-            const overlay = document.getElementById('pdf-overlay');
-            const progressText = document.getElementById('pdf-progress-text');
-            overlay.style.display = 'flex';
-
+        async function fetchAllChanges(progressText) {
             const allChanges = [];
             let totalPages = changesPageCount || 1;
             for (let p = 1; p <= totalPages; p++) {
-                progressText.textContent = `Exporting change history... (page ${p} of ${totalPages})`;
+                if (progressText) progressText.textContent = `Fetching change history... (page ${p} of ${totalPages})`;
                 try {
                     const params = new URLSearchParams();
                     if (activeYear !== 'all') params.set('year', activeYear);
@@ -1304,39 +1292,78 @@
                     }
                 } catch (e) { /* continue */ }
             }
+            return allChanges;
+        }
 
-            progressText.textContent = 'Building CSV...';
-            await new Promise(r => setTimeout(r, 50)); // let UI update
+        async function exportChangesPDF() {
+            const overlay = document.getElementById('pdf-overlay');
+            const progressText = document.getElementById('pdf-progress-text');
+            overlay.style.display = 'flex';
 
-            const header = ['Date', 'Time', 'Resource Type', 'Operation', 'Campaign', 'Ad Group', 'User', 'Summary', 'Details'];
-            const rows = [header.join(',')];
-            for (const c of allChanges) {
+            const allChanges = await fetchAllChanges(progressText);
+
+            progressText.textContent = `Building PDF (${allChanges.length.toLocaleString()} records)...`;
+            await new Promise(r => setTimeout(r, 50));
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
+            const yearLabel = activeYear === 'all' ? 'All Years' : String(activeYear);
+
+            // Title page header
+            doc.setFontSize(18);
+            doc.text('Dunham & Jones — Change History', 40, 40);
+            doc.setFontSize(11);
+            doc.text(`${yearLabel}  |  ${allChanges.length.toLocaleString()} changes  |  Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 40, 58);
+
+            const tableRows = allChanges.map(c => {
                 const dt = c.dateTime ? new Date(c.dateTime) : null;
                 const date = dt ? dt.toLocaleDateString('en-US') : '';
                 const time = dt ? dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
                 const summary = c.details?.summary || '';
-                const details = (c.details?.lines || []).join(' | ');
-                rows.push([
-                    csvCell(date), csvCell(time),
-                    csvCell((c.resourceType || '').replace(/_/g, ' ')),
-                    csvCell(c.operation),
-                    csvCell(c.campaignName), csvCell(c.adGroupName),
-                    csvCell(c.userEmail),
-                    csvCell(summary), csvCell(details),
-                ].join(','));
-            }
+                const lines = (c.details?.lines || []).join('; ');
+                const detail = summary ? (lines ? `${summary} — ${lines}` : summary) : lines;
+                return [
+                    date, time,
+                    (c.resourceType || '').replace(/_/g, ' '),
+                    c.operation || '',
+                    c.campaignName || '',
+                    c.adGroupName || '',
+                    c.userEmail || '',
+                    detail,
+                ];
+            });
 
-            const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const label = activeYear === 'all' ? 'all-years' : String(activeYear);
-            a.download = `dunham-change-history-${label}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            doc.autoTable({
+                startY: 70,
+                head: [['Date', 'Time', 'Type', 'Operation', 'Campaign', 'Ad Group', 'User', 'Details']],
+                body: tableRows,
+                styles: { fontSize: 7, cellPadding: 3, overflow: 'linebreak' },
+                headStyles: { fillColor: [30, 41, 59], fontSize: 7.5 },
+                columnStyles: {
+                    0: { cellWidth: 62 },  // Date
+                    1: { cellWidth: 48 },  // Time
+                    2: { cellWidth: 58 },  // Type
+                    3: { cellWidth: 50 },  // Operation
+                    4: { cellWidth: 120 }, // Campaign
+                    5: { cellWidth: 90 },  // Ad Group
+                    6: { cellWidth: 110 }, // User
+                    7: { cellWidth: 'auto' }, // Details
+                },
+                margin: { top: 30, left: 20, right: 20 },
+                didDrawPage: (data) => {
+                    // Footer with page numbers
+                    doc.setFontSize(8);
+                    doc.setTextColor(120);
+                    doc.text(
+                        `Dunham & Jones Change History — Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+                        doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 15,
+                        { align: 'center' }
+                    );
+                },
+            });
 
+            const filename = `dunham-change-history-${activeYear === 'all' ? 'all-years' : activeYear}.pdf`;
+            doc.save(filename);
             overlay.style.display = 'none';
         }
 
@@ -1358,7 +1385,7 @@
             const pairs = [];
             for (const year of googleYears) pairs.push({ platform: 'google', year });
             for (const year of metaYears) pairs.push({ platform: 'meta', year });
-            // Change history excluded from print (too large) — use Export CSV instead
+            // Change history excluded from browser print — use Export PDF from Change History tab
 
             // Only fetch uncached
             const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
@@ -1392,7 +1419,7 @@
             const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             let combined = '';
             combined += `<div class="print-cover-header">
-                <h1>Dunham & Jones — Complete Ad Audit</h1>
+                <h1>Dunham & Jones — Complete Ad Report</h1>
                 <p>${today}</p>
             </div>`;
 
@@ -1416,7 +1443,7 @@
                 combined += buildMetaHTML(data);
             }
 
-            // Change history excluded — too large for print; use Export CSV from Change History tab
+            // Change history excluded — too large for browser print; use Export PDF from Change History tab
 
             // Save current view state
             const contentEl = document.getElementById('report-content');
@@ -1468,7 +1495,7 @@
                 document.querySelectorAll('.platform-tab').forEach(t => {
                     t.classList.toggle('active', t.dataset.platform === hashState.platform);
                 });
-                document.getElementById('print-btn').textContent = hashState.platform === 'changes' ? 'Export CSV' : 'Print Report';
+                document.getElementById('print-btn').textContent = hashState.platform === 'changes' ? 'Export PDF' : 'Print Report';
                 if (hashState.platform === 'changes') {
                     document.getElementById('report-account').textContent = 'Account: 840-838-5870';
                     document.querySelector('.subtitle').textContent = yearVal === 'all'
