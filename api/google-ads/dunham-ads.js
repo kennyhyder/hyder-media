@@ -529,6 +529,13 @@ export default async function handler(req, res) {
             accountNegs.error ? [] : (accountNegs.results || [])
         );
 
+        // Debug: expose account negatives query result
+        response._debug_accountNegs = {
+            error: accountNegs.error || null,
+            resultCount: (accountNegs.results || []).length,
+            sampleRows: (accountNegs.results || []).slice(0, 3),
+        };
+
         return res.status(200).json(response);
 
     } catch (error) {
