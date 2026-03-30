@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, accountNegsH, histCampAssets, histCustAssets, histSitelinks, histCallouts, histSnippets] = await Promise.all([
+            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, acctNegSetH, acctNegCriteriaH, histCampAssets, histCustAssets, histSitelinks, histCallouts, histSnippets] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
                         campaign.id, campaign.name, campaign.status,
@@ -193,13 +193,17 @@ export default async function handler(req, res) {
                     FROM campaign_shared_set
                     WHERE campaign_shared_set.status = 'ENABLED'
                 `),
-                // Account-level negative keywords
+                // Account-level negative keywords (stored as ACCOUNT_LEVEL_NEGATIVE_KEYWORDS shared set)
                 fetchQuery(CUSTOMER_ID, headers, `
-                    SELECT customer_negative_criterion.id,
-                           customer_negative_criterion.keyword.text,
-                           customer_negative_criterion.keyword.match_type
-                    FROM customer_negative_criterion
-                    WHERE customer_negative_criterion.type = 'KEYWORD'
+                    SELECT shared_set.id, shared_set.name
+                    FROM shared_set
+                    WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
+                        AND shared_set.status = 'ENABLED'
+                `),
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                    FROM shared_criterion
+                    WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
                 `),
                 // Campaign-level extensions that actually served in this period
                 fetchQuery(CUSTOMER_ID, headers, `
@@ -327,7 +331,7 @@ export default async function handler(req, res) {
                 sharedSetsH.error ? [] : (sharedSetsH.results || []),
                 sharedCriteriaH.error ? [] : (sharedCriteriaH.results || []),
                 campaignSharedSetsH.error ? [] : (campaignSharedSetsH.results || []),
-                accountNegsH.error ? [] : (accountNegsH.results || [])
+                acctNegCriteriaH.error ? [] : (acctNegCriteriaH.results || [])
             );
 
             return res.status(200).json(response);
@@ -401,7 +405,7 @@ export default async function handler(req, res) {
 
         // Query 6: Fetch full asset details per type + keywords + negatives
         let assetDetails = new Map();
-        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords, activeAgNegs, activeCampNegs, sharedSets, sharedCriteria, campaignSharedSets, accountNegs] = await Promise.all([
+        const [sitelinks, callouts, snippets, images, textAssets, activeKeywords, activeAgNegs, activeCampNegs, sharedSets, sharedCriteria, campaignSharedSets, acctNegSet, acctNegCriteria] = await Promise.all([
             fetchQuery(CUSTOMER_ID, headers, `
                 SELECT
                     asset.id,
@@ -491,13 +495,17 @@ export default async function handler(req, res) {
                 FROM campaign_shared_set
                 WHERE campaign_shared_set.status = 'ENABLED'
             `),
-            // Account-level negative keywords
+            // Account-level negative keywords (stored as ACCOUNT_LEVEL_NEGATIVE_KEYWORDS shared set)
             fetchQuery(CUSTOMER_ID, headers, `
-                SELECT customer_negative_criterion.id,
-                       customer_negative_criterion.keyword.text,
-                       customer_negative_criterion.keyword.match_type
-                FROM customer_negative_criterion
-                WHERE customer_negative_criterion.type = 'KEYWORD'
+                SELECT shared_set.id, shared_set.name
+                FROM shared_set
+                WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
+                    AND shared_set.status = 'ENABLED'
+            `),
+            fetchQuery(CUSTOMER_ID, headers, `
+                SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                FROM shared_criterion
+                WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
             `),
         ]);
 
@@ -526,15 +534,8 @@ export default async function handler(req, res) {
             sharedSets.error ? [] : (sharedSets.results || []),
             sharedCriteria.error ? [] : (sharedCriteria.results || []),
             campaignSharedSets.error ? [] : (campaignSharedSets.results || []),
-            accountNegs.error ? [] : (accountNegs.results || [])
+            acctNegCriteria.error ? [] : (acctNegCriteria.results || [])
         );
-
-        // Debug: expose account negatives query result
-        response._debug_accountNegs = {
-            error: accountNegs.error || null,
-            resultCount: (accountNegs.results || []).length,
-            sampleRows: (accountNegs.results || []).slice(0, 3),
-        };
 
         return res.status(200).json(response);
 
@@ -894,13 +895,13 @@ function attachNegatives(response, agNegRows, campNegRows) {
     }
 }
 
-function attachSharedNegatives(response, sharedSetRows, sharedCriteriaRows, campaignSharedSetRows, accountNegRows) {
-    // Account-level negatives
-    response.accountNegativeKeywords = accountNegRows
-        .filter(row => row.customerNegativeCriterion?.keyword?.text)
+function attachSharedNegatives(response, sharedSetRows, sharedCriteriaRows, campaignSharedSetRows, accountNegCriteriaRows) {
+    // Account-level negatives (from ACCOUNT_LEVEL_NEGATIVE_KEYWORDS shared set)
+    response.accountNegativeKeywords = accountNegCriteriaRows
+        .filter(row => row.sharedCriterion?.keyword?.text)
         .map(row => ({
-            keyword: row.customerNegativeCriterion.keyword.text,
-            matchType: row.customerNegativeCriterion.keyword.matchType || 'BROAD',
+            keyword: row.sharedCriterion.keyword.text,
+            matchType: row.sharedCriterion.keyword.matchType || 'BROAD',
         }))
         .sort((a, b) => a.keyword.localeCompare(b.keyword));
 
