@@ -62,20 +62,22 @@ export default async function handler(req, res) {
         const PAGE_W = 792;
         const PAGE_H = 612;
         const MARGIN = 30;
-        const ROW_H = 10;
+        const MIN_ROW_H = 10;
         const FONT_SIZE = 6.5;
         const HEADER_FONT = 7;
+        const FOOTER_ZONE = 30;
+        const COL_PAD = 4; // gap between columns
 
         // Column layout
         const cols = [
-            { label: 'Date',      x: 30,  w: 58 },
-            { label: 'Time',      x: 88,  w: 42 },
-            { label: 'Type',      x: 130, w: 62 },
-            { label: 'Operation', x: 192, w: 48 },
-            { label: 'Campaign',  x: 240, w: 145 },
-            { label: 'Ad Group',  x: 385, w: 95 },
-            { label: 'User',      x: 480, w: 115 },
-            { label: 'Details',   x: 595, w: 167 },
+            { label: 'Date',      x: 30,  w: 55 },
+            { label: 'Time',      x: 85,  w: 42 },
+            { label: 'Type',      x: 127, w: 62 },
+            { label: 'Operation', x: 189, w: 48 },
+            { label: 'Campaign',  x: 237, w: 150 },
+            { label: 'Ad Group',  x: 387, w: 100 },
+            { label: 'User',      x: 487, w: 115 },
+            { label: 'Details',   x: 602, w: 160 },
         ];
 
         let y = 0;
@@ -87,23 +89,22 @@ export default async function handler(req, res) {
             y = MARGIN;
 
             if (isFirst) {
-                // Title on first page
                 doc.font('Helvetica-Bold').fontSize(16)
-                    .text('Dunham & Jones \u2014 Change History', MARGIN, y);
+                    .text('Dunham & Jones \u2014 Change History', MARGIN, y, { lineBreak: false });
                 y += 20;
                 const now = new Date();
                 const genDate = `${now.toLocaleString('en-US', { month: 'long' })} ${now.getDate()}, ${now.getFullYear()}`;
                 doc.font('Helvetica').fontSize(9)
-                    .text(`${year || 'All Years'}  |  ${allRows.length.toLocaleString()} changes  |  Generated ${genDate}`, MARGIN, y);
+                    .text(`${year || 'All Years'}  |  ${allRows.length.toLocaleString()} changes  |  Generated ${genDate}`, MARGIN, y, { lineBreak: false });
                 y += 18;
             }
 
             // Column headers
             doc.font('Helvetica-Bold').fontSize(HEADER_FONT);
             for (const col of cols) {
-                doc.text(col.label, col.x, y, { width: col.w, lineBreak: false });
+                doc.text(col.label, col.x, y, { width: col.w - COL_PAD, lineBreak: false });
             }
-            y += ROW_H + 2;
+            y += MIN_ROW_H + 2;
             doc.moveTo(MARGIN, y - 1).lineTo(PAGE_W - MARGIN, y - 1).lineWidth(0.5).stroke();
             y += 3;
             doc.font('Helvetica').fontSize(FONT_SIZE);
@@ -112,34 +113,57 @@ export default async function handler(req, res) {
         function drawFooter() {
             doc.font('Helvetica').fontSize(7).fillColor('#888888')
                 .text(`Dunham & Jones Change History \u2014 Page ${pageNum}`, 0, PAGE_H - 20, { width: PAGE_W, align: 'center', lineBreak: false });
-            doc.fillColor('#000000');
+            doc.fillColor('#000000').font('Helvetica').fontSize(FONT_SIZE);
+        }
+
+        // Measure height a string needs within a column width
+        function cellHeight(str, colW) {
+            if (!str) return MIN_ROW_H;
+            return Math.max(MIN_ROW_H, doc.heightOfString(str, { width: colW - COL_PAD }));
         }
 
         startPage(true);
 
         for (let i = 0; i < allRows.length; i++) {
-            if (y + ROW_H > PAGE_H - 30) {
-                drawFooter();
-                startPage(false);
-            }
-
             const row = allRows[i];
             const dt = row.change_date_time ? new Date(row.change_date_time) : null;
             const values = [
                 dt ? fmtDate(dt) : '',
                 dt ? fmtTime(dt) : '',
-                trunc(shortType(row.resource_type), 14),
-                trunc(row.operation || '', 10),
-                trunc(row.campaign_name || '', 30),
-                trunc(row.ad_group_name || '', 20),
-                trunc(row.user_email || '', 25),
-                trunc(buildDetail(row.details), 40),
+                shortType(row.resource_type),
+                row.operation || '',
+                row.campaign_name || '',
+                row.ad_group_name || '',
+                row.user_email || '',
+                buildDetail(row.details),
             ];
 
+            // Calculate row height from tallest cell
+            doc.font('Helvetica').fontSize(FONT_SIZE);
+            let rowH = MIN_ROW_H;
             for (let c = 0; c < cols.length; c++) {
-                doc.text(values[c], cols[c].x, y, { width: cols[c].w - 4, lineBreak: false });
+                rowH = Math.max(rowH, cellHeight(values[c], cols[c].w));
             }
-            y += ROW_H;
+            // Cap row height to avoid single rows spanning entire pages
+            rowH = Math.min(rowH, PAGE_H / 3);
+
+            // Page break if needed
+            if (y + rowH > PAGE_H - FOOTER_ZONE) {
+                drawFooter();
+                startPage(false);
+            }
+
+            // Render each cell with wrapping
+            for (let c = 0; c < cols.length; c++) {
+                if (values[c]) {
+                    doc.text(values[c], cols[c].x, y, {
+                        width: cols[c].w - COL_PAD,
+                        height: rowH,
+                        ellipsis: true,
+                    });
+                }
+            }
+            y += rowH + 1;
         }
 
         drawFooter();
@@ -186,10 +210,6 @@ function shortType(t) {
     return TYPE_LABELS[t] || t.replace(/_/g, ' ').toLowerCase();
 }
 
-function trunc(s, maxChars) {
-    if (!s) return '';
-    return s.length > maxChars ? s.slice(0, maxChars) + '\u2026' : s;
-}
 
 function buildDetail(details) {
     if (!details) return '';
