@@ -416,6 +416,7 @@
             document.getElementById('stat-headlines').textContent = totalKeywords;
             document.getElementById('stat-descriptions').textContent = totalHeadlines;
             document.getElementById('stat-extensions').textContent = totalExtensions;
+            document.getElementById('card-extensions').style.display = totalExtensions > 0 ? '' : 'none';
             statsEl.style.display = 'flex';
 
             if (data.campaigns.length === 0) {
