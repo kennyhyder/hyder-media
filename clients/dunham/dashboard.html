@@ -25,7 +25,7 @@
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
             <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
             <button class="btn btn-secondary" onclick="downloadAll()">Print All Years</button>
-            <button class="btn btn-primary" onclick="printCurrentView()">Print Report</button>
+            <button class="btn btn-primary" id="print-btn" onclick="printCurrentView()">Print Report</button>
         </div>
     </nav>
 
@@ -144,6 +144,7 @@
             document.querySelectorAll('.platform-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.platform === platform);
             });
+            document.getElementById('print-btn').textContent = platform === 'changes' ? 'Export CSV' : 'Print Report';
 
             if (platform === 'changes') {
                 document.getElementById('report-account').textContent = 'Account: 840-838-5870';
@@ -1259,23 +1260,35 @@
         }
 
         // ============================================================
-        // Print Current View (fetches all pages for changes)
+        // Print / Export Current View
         // ============================================================
         async function printCurrentView() {
-            if (activePlatform !== 'changes' || changesPageCount <= 1) {
+            if (activePlatform !== 'changes') {
                 window.print();
                 return;
             }
+            // Change history: export as CSV (too large for browser print)
+            await exportChangesCSV();
+        }
 
-            // Fetch all pages for the current changes year
+        function csvCell(val) {
+            if (val == null) return '';
+            const s = String(val);
+            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                return '"' + s.replace(/"/g, '""') + '"';
+            }
+            return s;
+        }
+
+        async function exportChangesCSV() {
             const overlay = document.getElementById('pdf-overlay');
             const progressText = document.getElementById('pdf-progress-text');
             overlay.style.display = 'flex';
 
             const allChanges = [];
-            let firstData = null;
-            for (let p = 1; p <= changesPageCount; p++) {
-                progressText.textContent = `Loading change history... (page ${p} of ${changesPageCount})`;
+            let totalPages = changesPageCount || 1;
+            for (let p = 1; p <= totalPages; p++) {
+                progressText.textContent = `Exporting change history... (page ${p} of ${totalPages})`;
                 try {
                     const params = new URLSearchParams();
                     if (activeYear !== 'all') params.set('year', activeYear);
@@ -1285,57 +1298,46 @@
                     if (resp.ok) {
                         const data = await resp.json();
                         if (!data.error) {
-                            if (!firstData) firstData = data;
+                            if (p === 1) totalPages = data.totalPages || 1;
                             allChanges.push(...(data.changes || []));
                         }
                     }
                 } catch (e) { /* continue */ }
             }
 
-            if (!firstData) { overlay.style.display = 'none'; window.print(); return; }
+            progressText.textContent = 'Building CSV...';
+            await new Promise(r => setTimeout(r, 50)); // let UI update
 
-            progressText.textContent = 'Preparing report...';
+            const header = ['Date', 'Time', 'Resource Type', 'Operation', 'Campaign', 'Ad Group', 'User', 'Summary', 'Details'];
+            const rows = [header.join(',')];
+            for (const c of allChanges) {
+                const dt = c.dateTime ? new Date(c.dateTime) : null;
+                const date = dt ? dt.toLocaleDateString('en-US') : '';
+                const time = dt ? dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '';
+                const summary = c.details?.summary || '';
+                const details = (c.details?.lines || []).join(' | ');
+                rows.push([
+                    csvCell(date), csvCell(time),
+                    csvCell((c.resourceType || '').replace(/_/g, ' ')),
+                    csvCell(c.operation),
+                    csvCell(c.campaignName), csvCell(c.adGroupName),
+                    csvCell(c.userEmail),
+                    csvCell(summary), csvCell(details),
+                ].join(','));
+            }
 
-            // Build full HTML with all changes
-            const fullData = { ...firstData, changes: allChanges };
-            const label = activeYear === 'all' ? 'All Changes' : String(activeYear);
-            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            let combined = `<div class="print-cover-header">
-                <h1>Dunham & Jones — Change History: ${label}</h1>
-                <p>${today} &middot; ${allChanges.length.toLocaleString()} changes</p>
-            </div>`;
-            combined += buildChangesHTML(fullData);
+            const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const label = activeYear === 'all' ? 'all-years' : String(activeYear);
+            a.download = `dunham-change-history-${label}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
-            // Save current view and replace with full report
-            const contentEl = document.getElementById('report-content');
-            const savedHTML = contentEl.innerHTML;
-            const savedDisplay = contentEl.style.display;
-            const headerEl = document.querySelector('.report-header');
-            const platformEl = document.querySelector('.platform-tabs');
-            const yearEl = document.getElementById('year-tabs');
-            const statsEl = document.getElementById('stats-row');
-
-            headerEl.style.display = 'none';
-            platformEl.style.display = 'none';
-            yearEl.style.display = 'none';
-            statsEl.style.display = 'none';
-            contentEl.innerHTML = combined;
-            contentEl.style.display = 'block';
             overlay.style.display = 'none';
-
-            window.print();
-
-            const restore = () => {
-                contentEl.innerHTML = savedHTML;
-                contentEl.style.display = savedDisplay;
-                headerEl.style.display = '';
-                platformEl.style.display = '';
-                yearEl.style.display = '';
-                const cached = dataCache[cacheKey(activeYear)];
-                if (cached) renderReport(cached);
-                window.removeEventListener('afterprint', restore);
-            };
-            window.addEventListener('afterprint', restore);
         }
 
         // ============================================================
@@ -1356,8 +1358,7 @@
             const pairs = [];
             for (const year of googleYears) pairs.push({ platform: 'google', year });
             for (const year of metaYears) pairs.push({ platform: 'meta', year });
-            // Changes: fetch "all" first so we know available years, then per-year
-            pairs.push({ platform: 'changes', year: 'all' });
+            // Change history excluded from print (too large) — use Export CSV instead
 
             // Only fetch uncached
             const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
@@ -1383,34 +1384,6 @@
                         }
                     } catch (e) { /* skip failed years */ }
                 }));
-            }
-
-            // After fetching changes:all, fetch ALL pages per year
-            const changesAllData = dataCache['changes:all'];
-            if (changesAllData && changesAllData.availableYears) {
-                for (const y of changesAllData.availableYears) {
-                    if (dataCache[`changes:${y}`] && dataCache[`changes:${y}`]._allPages) continue;
-                    progressText.textContent = `Loading change history for ${y}...`;
-                    const allChanges = [];
-                    let firstData = null;
-                    let totalPages = 1;
-                    for (let p = 1; p <= totalPages; p++) {
-                        try {
-                            const resp = await fetch(`${CHANGES_API}?year=${y}&page=${p}&per_page=100`);
-                            if (resp.ok) {
-                                const data = await resp.json();
-                                if (!data.error) {
-                                    if (!firstData) { firstData = data; totalPages = data.totalPages || 1; }
-                                    allChanges.push(...(data.changes || []));
-                                }
-                            }
-                        } catch (e) { break; }
-                        if (p % 10 === 0) progressText.textContent = `Loading change history for ${y}... (page ${p} of ${totalPages})`;
-                    }
-                    if (firstData) {
-                        dataCache[`changes:${y}`] = { ...firstData, changes: allChanges, _allPages: true };
-                    }
-                }
             }
 
             progressText.textContent = 'Preparing report...';
@@ -1443,23 +1416,7 @@
                 combined += buildMetaHTML(data);
             }
 
-            // Change History section
-            const changesAll = dataCache['changes:all'];
-            if (changesAll && changesAll.changes && changesAll.changes.length > 0) {
-                combined += `<div class="print-section-header">Google Ads Change History</div>`;
-                if (changesAll.availableYears && changesAll.availableYears.length > 1) {
-                    // Group by year in print
-                    for (const y of changesAll.availableYears) {
-                        const yearData = dataCache[`changes:${y}`];
-                        if (yearData && yearData.changes && yearData.changes.length > 0) {
-                            combined += `<div class="print-year-header">${y}</div>`;
-                            combined += buildChangesHTML(yearData);
-                        }
-                    }
-                } else {
-                    combined += buildChangesHTML(changesAll);
-                }
-            }
+            // Change history excluded — too large for print; use Export CSV from Change History tab
 
             // Save current view state
             const contentEl = document.getElementById('report-content');
@@ -1511,6 +1468,7 @@
                 document.querySelectorAll('.platform-tab').forEach(t => {
                     t.classList.toggle('active', t.dataset.platform === hashState.platform);
                 });
+                document.getElementById('print-btn').textContent = hashState.platform === 'changes' ? 'Export CSV' : 'Print Report';
                 if (hashState.platform === 'changes') {
                     document.getElementById('report-account').textContent = 'Account: 840-838-5870';
                     document.querySelector('.subtitle').textContent = yearVal === 'all'
