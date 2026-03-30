@@ -82,7 +82,7 @@ export default async function handler(req, res) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
 
-            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, accountNegsH] = await Promise.all([
+            const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, accountNegsH, histCampAssets, histCustAssets, histSitelinks, histCallouts, histSnippets] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
                     SELECT
                         campaign.id, campaign.name, campaign.status,
@@ -201,6 +201,56 @@ export default async function handler(req, res) {
                     FROM customer_negative_criterion
                     WHERE customer_negative_criterion.type = 'KEYWORD'
                 `),
+                // Campaign-level extensions that actually served in this period
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id, asset.name, asset.type,
+                        campaign.id,
+                        campaign_asset.field_type,
+                        campaign_asset.status,
+                        metrics.impressions
+                    FROM campaign_asset
+                    WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                        AND metrics.impressions > 0
+                `),
+                // Customer-level extensions that actually served in this period
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id, asset.name, asset.type,
+                        customer_asset.field_type,
+                        customer_asset.status,
+                        metrics.impressions
+                    FROM customer_asset
+                    WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                        AND metrics.impressions > 0
+                `),
+                // Sitelink asset details
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.sitelink_asset.description1,
+                        asset.sitelink_asset.description2,
+                        asset.sitelink_asset.link_text
+                    FROM asset
+                    WHERE asset.type = 'SITELINK'
+                `),
+                // Callout asset details
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.callout_asset.callout_text
+                    FROM asset
+                    WHERE asset.type = 'CALLOUT'
+                `),
+                // Structured snippet asset details
+                fetchQuery(CUSTOMER_ID, headers, `
+                    SELECT
+                        asset.id,
+                        asset.structured_snippet_asset.header,
+                        asset.structured_snippet_asset.values
+                    FROM asset
+                    WHERE asset.type = 'STRUCTURED_SNIPPET'
+                `),
             ]);
             if (adsData.error) return res.status(500).json({ error: 'Historical ads query failed', details: adsData.error, query: adsData.query });
 
@@ -225,6 +275,49 @@ export default async function handler(req, res) {
                         assetGroupsData.error ? [] : (assetGroupsData.results || []),
                         assetGroupAssetsData.error ? [] : (assetGroupAssetsData.results || []),
                         histAssetDetails);
+                }
+            }
+
+            // Build asset details map for extensions (sitelinks, callouts, snippets + reuse text/images)
+            const histAssetDetailsFull = new Map();
+            for (const result of [histTextAssets, histImageAssets, histSitelinks, histCallouts, histSnippets]) {
+                if (result && result.results) {
+                    for (const row of result.results) {
+                        if (row.asset) histAssetDetailsFull.set(row.asset.id, row.asset);
+                    }
+                }
+            }
+
+            // Attach campaign-level extensions (deduplicate — date segments return one row per day)
+            if (!histCampAssets.error) {
+                const seenCampAssets = new Set();
+                for (const row of (histCampAssets.results || [])) {
+                    const asset = row.asset || {};
+                    const campaignAsset = row.campaignAsset || {};
+                    const campId = row.campaign?.id;
+                    const dedup = `${campId}:${asset.id}`;
+                    if (seenCampAssets.has(dedup)) continue;
+                    seenCampAssets.add(dedup);
+                    const camp = response.campaigns.find(c => c.id === campId);
+                    if (!camp) continue;
+                    const details = histAssetDetailsFull.get(asset.id) || {};
+                    const mergedAsset = { ...asset, ...details };
+                    camp.assets.push(formatAsset(mergedAsset, campaignAsset));
+                }
+            }
+
+            // Build account-level extensions (deduplicate)
+            if (!histCustAssets.error) {
+                const seenCustAssets = new Set();
+                response.accountAssets = [];
+                for (const row of (histCustAssets.results || [])) {
+                    const asset = row.asset || {};
+                    if (seenCustAssets.has(asset.id)) continue;
+                    seenCustAssets.add(asset.id);
+                    const customerAsset = row.customerAsset || {};
+                    const details = histAssetDetailsFull.get(asset.id) || {};
+                    const mergedAsset = { ...asset, ...details };
+                    response.accountAssets.push(formatAsset(mergedAsset, customerAsset));
                 }
             }
 

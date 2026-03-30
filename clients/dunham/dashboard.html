@@ -304,14 +304,14 @@
                     }
                 }
 
-                if (!isHistorical && camp.assets && camp.assets.length > 0) {
+                if (camp.assets && camp.assets.length > 0) {
                     html += renderExtensions('Campaign Extensions', camp.assets);
                 }
 
                 html += `</div></div>`;
             }
 
-            if (!isHistorical && data.accountAssets && data.accountAssets.length > 0) {
+            if (data.accountAssets && data.accountAssets.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Account-Level Extensions</h2>`;
                 html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These extensions can appear on any ad in the account.</p>`;
