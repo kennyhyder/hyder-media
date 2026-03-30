@@ -111,7 +111,7 @@ export default async function handler(req, res) {
 
         function drawFooter() {
             doc.font('Helvetica').fontSize(7).fillColor('#888888')
-                .text(`Dunham & Jones Change History \u2014 Page ${pageNum}`, 0, PAGE_H - 20, { width: PAGE_W, align: 'center' });
+                .text(`Dunham & Jones Change History \u2014 Page ${pageNum}`, 0, PAGE_H - 20, { width: PAGE_W, align: 'center', lineBreak: false });
             doc.fillColor('#000000');
         }
 
