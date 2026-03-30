@@ -128,8 +128,8 @@ export default async function handler(req, res) {
             const values = [
                 dt ? fmtDate(dt) : '',
                 dt ? fmtTime(dt) : '',
-                (row.resource_type || '').replace(/_/g, ' '),
-                row.operation || '',
+                trunc(shortType(row.resource_type), 14),
+                trunc(row.operation || '', 10),
                 trunc(row.campaign_name || '', 30),
                 trunc(row.ad_group_name || '', 20),
                 trunc(row.user_email || '', 25),
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
             ];
 
             for (let c = 0; c < cols.length; c++) {
-                doc.text(values[c], cols[c].x, y, { width: cols[c].w, lineBreak: false });
+                doc.text(values[c], cols[c].x, y, { width: cols[c].w - 4, lineBreak: false });
             }
             y += ROW_H;
         }
@@ -164,6 +164,26 @@ function fmtTime(d) {
     if (h >= 12) { ap = 'PM'; if (h > 12) h -= 12; }
     if (h === 0) h = 12;
     return `${h}:${String(m).padStart(2, '0')} ${ap}`;
+}
+
+const TYPE_LABELS = {
+    AD: 'Ad',
+    AD_GROUP: 'Ad Group',
+    AD_GROUP_CRITERION: 'Keyword',
+    CAMPAIGN: 'Campaign',
+    CAMPAIGN_BUDGET: 'Budget',
+    CAMPAIGN_CRITERION: 'Campaign Neg',
+    ASSET: 'Asset',
+    ASSET_GROUP: 'Asset Group',
+    LABEL: 'Label',
+    CUSTOMER: 'Account',
+    TARGETING: 'Targeting',
+    EXPERIMENT: 'Experiment',
+};
+
+function shortType(t) {
+    if (!t) return '';
+    return TYPE_LABELS[t] || t.replace(/_/g, ' ').toLowerCase();
 }
 
 function trunc(s, maxChars) {
