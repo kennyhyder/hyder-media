@@ -83,12 +83,6 @@ export default async function handler(req, res) {
         let y = 0;
         let pageNum = 0;
 
-        // Reset PDFKit's internal cursor to prevent auto page breaks
-        function resetCursor() {
-            doc.x = MARGIN;
-            doc.y = MARGIN;
-        }
-
         function startPage(isFirst) {
             if (!isFirst) doc.addPage();
             pageNum++;
@@ -105,23 +99,24 @@ export default async function handler(req, res) {
                 y += 18;
             }
 
-            // Column headers
+            // Column headers — NO width option (triggers LineWrapper / auto pages)
             doc.font('Helvetica-Bold').fontSize(HEADER_FONT);
             for (const col of cols) {
-                doc.text(col.label, col.x, y, { width: col.w - COL_PAD, lineBreak: false });
+                doc.text(col.label, col.x, y, { lineBreak: false });
             }
             y += MIN_ROW_H + 2;
             doc.moveTo(MARGIN, y - 1).lineTo(PAGE_W - MARGIN, y - 1).lineWidth(0.5).stroke();
             y += 3;
             doc.font('Helvetica').fontSize(FONT_SIZE);
-            resetCursor();
         }
 
         function drawFooter() {
-            doc.font('Helvetica').fontSize(7).fillColor('#888888')
-                .text(`Dunham & Jones Change History \u2014 Page ${pageNum}`, 0, PAGE_H - 20, { width: PAGE_W, align: 'center', lineBreak: false });
+            // Manually center — NO width/align options (triggers LineWrapper / auto pages)
+            const footerStr = `Dunham & Jones Change History \u2014 Page ${pageNum}`;
+            doc.font('Helvetica').fontSize(7).fillColor('#888888');
+            const fw = doc.widthOfString(footerStr);
+            doc.text(footerStr, (PAGE_W - fw) / 2, PAGE_H - 20, { lineBreak: false });
             doc.fillColor('#000000').font('Helvetica').fontSize(FONT_SIZE);
-            resetCursor();
         }
 
         // Word-wrap text into lines that fit a given width (all rendering
@@ -189,7 +184,6 @@ export default async function handler(req, res) {
                 }
             }
             y += rowH + 1;
-            resetCursor();
         }
 
         drawFooter();
