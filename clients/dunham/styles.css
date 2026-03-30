@@ -1771,6 +1771,19 @@ body {
     margin: 0 4px;
 }
 
+.change-detail-summary {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.change-detail-line {
+    color: var(--text-secondary);
+    font-size: 0.83rem;
+    padding-left: 0;
+    line-height: 1.5;
+}
+
 .change-detail-list-item {
     padding-left: 12px;
     font-size: 0.82rem;

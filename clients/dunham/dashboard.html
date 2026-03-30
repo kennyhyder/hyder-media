@@ -1006,9 +1006,10 @@
 
                     // Details (old → new)
                     if (c.details) {
-                        html += `<div class="change-detail">`;
-                        html += renderChangeDetails(c.details, c.resourceType);
-                        html += `</div>`;
+                        const detailHtml = renderChangeDetails(c.details, c.resourceType);
+                        if (detailHtml) {
+                            html += `<div class="change-detail">${detailHtml}</div>`;
+                        }
                     }
 
                     html += `</div></div>`; // close body + card
@@ -1023,6 +1024,18 @@
         function renderChangeDetails(details, resourceType) {
             let html = '';
 
+            // Handle lines/summary format (CSV-imported data)
+            if (details.lines && details.lines.length > 0) {
+                if (details.summary) {
+                    html += `<div class="change-detail-summary">${esc(details.summary)}</div>`;
+                }
+                for (const line of details.lines) {
+                    html += `<div class="change-detail-line">${esc(line)}</div>`;
+                }
+                return html;
+            }
+
+            // Handle structured format (API-synced data)
             if (details.name) {
                 html += renderDiff('Name', details.name.old, details.name.new);
             }
