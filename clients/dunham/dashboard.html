@@ -1135,7 +1135,7 @@
                 'CSV_IMPORT': '',
                 'OTHER': 'Other',
             };
-            return map[clientType] || clientType.replace(/_/g, ' ').toLowerCase();
+            return clientType in map ? map[clientType] : clientType.replace(/_/g, ' ').toLowerCase();
         }
 
         // ============================================================
