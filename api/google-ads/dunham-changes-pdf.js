@@ -160,12 +160,14 @@ export default async function handler(req, res) {
             // Pre-wrap all cells and calculate row height
             doc.font('Helvetica').fontSize(FONT_SIZE);
             const cellLines = [];
-            let rowH = MIN_ROW_H;
+            let maxLines = 1;
             for (let c = 0; c < cols.length; c++) {
-                const lines = wrapLines(values[c], cols[c].w - COL_PAD);
+                // Subtract extra buffer (8pt) to account for widthOfString measurement variance
+                const lines = wrapLines(values[c], cols[c].w - COL_PAD - 4);
                 cellLines.push(lines);
-                rowH = Math.max(rowH, lines.length * lineH);
+                maxLines = Math.max(maxLines, lines.length);
             }
+            let rowH = Math.max(MIN_ROW_H, maxLines * lineH + 2);
             rowH = Math.min(rowH, PAGE_H / 3);
 
             // Page break if needed
@@ -178,9 +180,7 @@ export default async function handler(req, res) {
             for (let c = 0; c < cols.length; c++) {
                 const lines = cellLines[c];
                 for (let l = 0; l < lines.length; l++) {
-                    const ly = y + l * lineH;
-                    if (ly + lineH > y + rowH) break;
-                    doc.text(lines[l], cols[c].x, ly, { lineBreak: false });
+                    doc.text(lines[l], cols[c].x, y + l * lineH, { lineBreak: false });
                 }
             }
             y += rowH + 1;
