@@ -108,7 +108,7 @@
         const META_API = '/api/meta-ads/dunham-ads';
         const CHANGES_API = '/api/google-ads/dunham-changes';
         const CURRENT_YEAR = new Date().getFullYear();
-        const GOOGLE_START_YEAR = 2018;
+        const GOOGLE_START_YEAR = 2016;
         const META_START_YEAR = 2023; // Account has data back to Feb 2023
         let activePlatform = 'google';
         let activeYear = 'active';
@@ -552,6 +552,8 @@
 
             if ((ad.type === 'RESPONSIVE_SEARCH_AD' || ad.type === 'EXPANDED_TEXT_AD') && ad.headlines && ad.headlines.length > 0) {
                 html += renderAdPreview(ad, campaignSitelinks);
+            } else if (ad.type === 'RESPONSIVE_DISPLAY_AD' && (ad.headlines?.length > 0 || ad.longHeadline)) {
+                html += renderDisplayAdPreview(ad);
             }
 
             if (ad.finalUrls && ad.finalUrls.length > 0) {
@@ -586,6 +588,20 @@
                     </li>`;
                 }
                 html += `</ul></div>`;
+            }
+
+            if (ad.longHeadline) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Long Headline</div>`;
+                html += `<div style="font-size: 0.9rem; padding: 4px 0;">${esc(ad.longHeadline)}</div>`;
+                html += `</div>`;
+            }
+
+            if (ad.businessName) {
+                html += `<div class="ad-copy-section">`;
+                html += `<div class="ad-copy-label">Business Name</div>`;
+                html += `<div style="font-size: 0.9rem; padding: 4px 0;">${esc(ad.businessName)}</div>`;
+                html += `</div>`;
             }
 
             html += `</div>`;
@@ -655,6 +671,26 @@
                 html += `</div>`;
             }
 
+            html += `</div></div>`;
+            return html;
+        }
+
+        function renderDisplayAdPreview(ad) {
+            const headline = ad.longHeadline || (ad.headlines && ad.headlines[0] ? ad.headlines[0].text : '');
+            const desc = ad.descriptions && ad.descriptions[0] ? ad.descriptions[0].text : '';
+            const bizName = ad.businessName || '';
+            let displayUrl = '';
+            if (ad.finalUrls && ad.finalUrls.length > 0) {
+                try { displayUrl = new URL(ad.finalUrls[0]).hostname; } catch(e) { displayUrl = ad.finalUrls[0]; }
+            }
+
+            let html = `<div class="ad-preview">`;
+            html += `<div class="ad-preview-label">Display Ad Preview</div>`;
+            html += `<div class="ad-preview-card" style="max-width: 400px;">`;
+            if (bizName) html += `<div class="ad-preview-sponsored">${esc(bizName)}</div>`;
+            html += `<div class="ad-preview-headline">${esc(headline)}</div>`;
+            if (desc) html += `<div class="ad-preview-description">${esc(desc)}</div>`;
+            if (displayUrl) html += `<div class="ad-preview-url">${esc(displayUrl)}</div>`;
             html += `</div></div>`;
             return html;
         }

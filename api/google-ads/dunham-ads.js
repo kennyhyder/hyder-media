@@ -109,6 +109,10 @@ export default async function handler(req, res) {
                         ad_group_ad.ad.expanded_text_ad.description2,
                         ad_group_ad.ad.expanded_text_ad.path1,
                         ad_group_ad.ad.expanded_text_ad.path2,
+                        ad_group_ad.ad.responsive_display_ad.headlines,
+                        ad_group_ad.ad.responsive_display_ad.long_headline,
+                        ad_group_ad.ad.responsive_display_ad.descriptions,
+                        ad_group_ad.ad.responsive_display_ad.business_name,
                         ad_group_ad.ad.final_urls,
                         metrics.impressions
                     FROM ad_group_ad
@@ -823,6 +827,18 @@ function buildHistoricalResponse(adsRows, year, accountId, accountName) {
             headlines = parts.map((text, i) => ({ position: i + 1, text, pinnedField: null }));
             const descs = [eta.description, eta.description2].filter(Boolean);
             descriptions = descs.map((text, i) => ({ position: i + 1, text, pinnedField: null }));
+        } else if (ad.type === 'RESPONSIVE_DISPLAY_AD') {
+            const rda = ad.responsiveDisplayAd || {};
+            headlines = (rda.headlines || []).map((h, i) => ({
+                position: i + 1,
+                text: h.text,
+                pinnedField: null,
+            }));
+            descriptions = (rda.descriptions || []).map((d, i) => ({
+                position: i + 1,
+                text: d.text,
+                pinnedField: null,
+            }));
         } else {
             const rsa = ad.responsiveSearchAd || {};
             headlines = (rsa.headlines || []).map((h, i) => ({
@@ -837,7 +853,7 @@ function buildHistoricalResponse(adsRows, year, accountId, accountName) {
             }));
         }
 
-        agObj.ads.push({
+        const adObj = {
             id: ad.id,
             type: ad.type,
             name: ad.name || null,
@@ -845,7 +861,16 @@ function buildHistoricalResponse(adsRows, year, accountId, accountName) {
             headlines,
             descriptions,
             finalUrls: ad.finalUrls || [],
-        });
+        };
+
+        // Include RDA-specific fields
+        if (ad.type === 'RESPONSIVE_DISPLAY_AD') {
+            const rda = ad.responsiveDisplayAd || {};
+            adObj.longHeadline = rda.longHeadline?.text || null;
+            adObj.businessName = rda.businessName || null;
+        }
+
+        agObj.ads.push(adObj);
     }
 
     const campaigns = Array.from(campaignMap.values()).map(c => ({
@@ -1129,6 +1154,10 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
                     ad_group_ad.ad.expanded_text_ad.description2,
                     ad_group_ad.ad.expanded_text_ad.path1,
                     ad_group_ad.ad.expanded_text_ad.path2,
+                    ad_group_ad.ad.responsive_display_ad.headlines,
+                    ad_group_ad.ad.responsive_display_ad.long_headline,
+                    ad_group_ad.ad.responsive_display_ad.descriptions,
+                    ad_group_ad.ad.responsive_display_ad.business_name,
                     ad_group_ad.ad.final_urls,
                     metrics.impressions
                 FROM ad_group_ad
@@ -1163,12 +1192,11 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
                 WHERE campaign_criterion.type = 'KEYWORD'
                     AND campaign_criterion.negative = true
             `),
-            // Shared negative keyword lists
+            // Shared negative keyword lists (no status filter — retired accounts may have non-ENABLED sets)
             fetchQuery(accountId, legacyHeaders, `
                 SELECT shared_set.id, shared_set.name, shared_set.member_count
                 FROM shared_set
                 WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
-                    AND shared_set.status = 'ENABLED'
             `),
             fetchQuery(accountId, legacyHeaders, `
                 SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
@@ -1178,42 +1206,36 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
             fetchQuery(accountId, legacyHeaders, `
                 SELECT campaign.id, campaign.name, shared_set.id
                 FROM campaign_shared_set
-                WHERE campaign_shared_set.status = 'ENABLED'
             `),
-            // Account-level negative keywords
+            // Account-level negative keywords (no status filter for retired accounts)
             fetchQuery(accountId, legacyHeaders, `
                 SELECT shared_set.id, shared_set.name
                 FROM shared_set
                 WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
-                    AND shared_set.status = 'ENABLED'
             `),
             fetchQuery(accountId, legacyHeaders, `
                 SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
                 FROM shared_criterion
                 WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
             `),
-            // Campaign-level extensions that served in this period
+            // Campaign-level extensions (all — no date filter for retired accounts)
             fetchQuery(accountId, legacyHeaders, `
                 SELECT
                     asset.id, asset.name, asset.type,
                     campaign.id,
                     campaign_asset.field_type,
-                    campaign_asset.status,
-                    metrics.impressions
+                    campaign_asset.status
                 FROM campaign_asset
-                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
-                    AND metrics.impressions > 0
+                WHERE campaign_asset.status != 'REMOVED'
             `),
-            // Customer-level extensions that served in this period
+            // Customer-level extensions (all — no date filter for retired accounts)
             fetchQuery(accountId, legacyHeaders, `
                 SELECT
                     asset.id, asset.name, asset.type,
                     customer_asset.field_type,
-                    customer_asset.status,
-                    metrics.impressions
+                    customer_asset.status
                 FROM customer_asset
-                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
-                    AND metrics.impressions > 0
+                WHERE customer_asset.status != 'REMOVED'
             `),
             // Asset details
             fetchQuery(accountId, legacyHeaders, `
