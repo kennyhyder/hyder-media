@@ -131,6 +131,9 @@
     "api/google-ads/dunham-changes-pdf.js": {
       "maxDuration": 120
     },
+    "api/google-ads/dunham-ads-pdf.js": {
+      "maxDuration": 300
+    },
     "api/meta-ads/auth.js": {
       "maxDuration": 10
     },

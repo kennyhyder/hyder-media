@@ -24,8 +24,8 @@
         <div class="nav-actions">
             <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
             <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
-            <button class="btn btn-secondary" onclick="downloadAll()">Print All Years</button>
-            <button class="btn btn-primary" id="print-btn" onclick="printCurrentView()">Print Report</button>
+            <button class="btn btn-secondary" onclick="downloadAll()">Export All Years</button>
+            <button class="btn btn-primary" id="print-btn" onclick="printCurrentView()">Export PDF</button>
         </div>
     </nav>
 
@@ -117,6 +117,19 @@
         let changesPageCount = 1;
 
         function cacheKey(year) { return `${activePlatform}:${year}`; }
+        const ADS_PDF_API = '/api/google-ads/dunham-ads-pdf';
+
+        function updateHeadline() {
+            let label;
+            if (activePlatform === 'changes') {
+                label = activeYear === 'all' ? 'Change History' : `Change History \u2014 ${activeYear}`;
+            } else {
+                label = activeYear === 'active' ? 'Ad Report' : `Ad Report \u2014 ${activeYear}`;
+            }
+            const full = `Dunham & Jones \u2014 ${label}`;
+            document.querySelector('h1').textContent = full;
+            document.title = full;
+        }
 
         // URL hash state management
         function updateHash() {
@@ -144,29 +157,26 @@
             document.querySelectorAll('.platform-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.platform === platform);
             });
-            document.getElementById('print-btn').textContent = platform === 'changes' ? 'Export PDF' : 'Print Report';
-
             if (platform === 'changes') {
                 document.getElementById('report-account').textContent = 'Account: 840-838-5870';
                 document.querySelector('.subtitle').textContent = 'Account change history';
-                // Show year tabs — rebuilt after data loads with available years
                 const yearContainer = document.getElementById('year-tabs');
                 yearContainer.innerHTML = '<button class="year-tab active" data-year="all" onclick="switchYear(\'all\')">All Changes</button>';
                 yearContainer.style.display = '';
                 activeYear = 'all';
                 changesPage = 1;
+                updateHeadline();
                 updateHash();
                 loadData('all');
                 return;
             }
 
-            // Update account label
             document.getElementById('report-account').textContent =
                 platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
 
-            // Rebuild year tabs for this platform
             document.getElementById('year-tabs').style.display = '';
             activeYear = 'active';
+            updateHeadline();
             buildYearTabs();
             updateHash();
             dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
@@ -199,6 +209,7 @@
                     ? `Complete inventory of active ${platformLabel} ad copy`
                     : `${platformLabel} ad copy that ran during ${year}`;
             }
+            updateHeadline();
             updateHash();
             if (activePlatform === 'changes') {
                 // Always fetch fresh for changes (paginated)
@@ -1364,13 +1375,16 @@
         const CHANGES_PDF_API = '/api/google-ads/dunham-changes-pdf';
 
         function printCurrentView() {
-            if (activePlatform !== 'changes') {
-                window.print();
+            if (activePlatform === 'changes') {
+                const url = activeYear === 'all' ? CHANGES_PDF_API : `${CHANGES_PDF_API}?year=${activeYear}`;
+                window.open(url, '_blank');
                 return;
             }
-            // Server-side PDF generation — just open the endpoint URL
-            const url = activeYear === 'all' ? CHANGES_PDF_API : `${CHANGES_PDF_API}?year=${activeYear}`;
-            window.open(url, '_blank');
+            // Server-side PDF for Google/Meta ads
+            const params = new URLSearchParams();
+            params.set('platform', activePlatform);
+            params.set('year', String(activeYear));
+            window.open(`${ADS_PDF_API}?${params.toString()}`, '_blank');
         }
 
         // ============================================================
@@ -1380,110 +1394,28 @@
             const overlay = document.getElementById('pdf-overlay');
             const progressText = document.getElementById('pdf-progress-text');
             overlay.style.display = 'flex';
+            progressText.textContent = 'Generating PDF... this may take a few minutes.';
 
-            // Build year lists for each platform
-            const googleYears = ['active'];
-            for (let y = CURRENT_YEAR; y >= GOOGLE_START_YEAR; y--) googleYears.push(y);
-            const metaYears = ['active'];
-            for (let y = CURRENT_YEAR; y >= META_START_YEAR; y--) metaYears.push(y);
-
-            // All (platform, year) pairs to potentially fetch
-            const pairs = [];
-            for (const year of googleYears) pairs.push({ platform: 'google', year });
-            for (const year of metaYears) pairs.push({ platform: 'meta', year });
-            // Change history excluded from browser print — use Export PDF from Change History tab
-
-            // Only fetch uncached
-            const toFetch = pairs.filter(p => !dataCache[`${p.platform}:${p.year}`]);
-
-            // Batch fetch 4 at a time
-            const BATCH = 4;
-            for (let i = 0; i < toFetch.length; i += BATCH) {
-                const batch = toFetch.slice(i, i + BATCH);
-                progressText.textContent = `Loading data... (${Math.min(i + BATCH, toFetch.length)} of ${toFetch.length})`;
-                await Promise.all(batch.map(async ({ platform, year }) => {
-                    try {
-                        const apiBase = platform === 'changes' ? CHANGES_API : (platform === 'meta' ? META_API : GOOGLE_API);
-                        let fetchUrl;
-                        if (platform === 'changes') {
-                            fetchUrl = year === 'all' ? CHANGES_API : `${CHANGES_API}?year=${year}`;
-                        } else {
-                            fetchUrl = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
-                        }
-                        const resp = await fetch(fetchUrl);
-                        if (resp.ok) {
-                            const data = await resp.json();
-                            if (!data.error) dataCache[`${platform}:${year}`] = data;
-                        }
-                    } catch (e) { /* skip failed years */ }
-                }));
+            try {
+                const resp = await fetch(ADS_PDF_API + '?all=true');
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({}));
+                    throw new Error(err.error || `HTTP ${resp.status}`);
+                }
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'dunham-ads-all-years.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('PDF generation failed: ' + err.message);
             }
 
-            progressText.textContent = 'Preparing report...';
-
-            // Build combined HTML
-            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            let combined = '';
-            combined += `<div class="print-cover-header">
-                <h1>Dunham & Jones — Complete Ad Report</h1>
-                <p>${today}</p>
-            </div>`;
-
-            // Google Ads section
-            combined += `<div class="print-section-header">Google Ads</div>`;
-            for (const year of googleYears) {
-                const data = dataCache[`google:${year}`];
-                if (!data || !data.campaigns || data.campaigns.length === 0) continue;
-                const label = year === 'active' ? 'Active Ads' : String(year);
-                combined += `<div class="print-year-header">${label}</div>`;
-                combined += buildGoogleHTML(data);
-            }
-
-            // Meta Ads section
-            combined += `<div class="print-section-header">Meta Ads</div>`;
-            for (const year of metaYears) {
-                const data = dataCache[`meta:${year}`];
-                if (!data || !data.campaigns || data.campaigns.length === 0) continue;
-                const label = year === 'active' ? 'Active Ads' : String(year);
-                combined += `<div class="print-year-header">${label}</div>`;
-                combined += buildMetaHTML(data);
-            }
-
-            // Change history excluded — too large for browser print; use Export PDF from Change History tab
-
-            // Save current view state
-            const contentEl = document.getElementById('report-content');
-            const savedHTML = contentEl.innerHTML;
-            const savedDisplay = contentEl.style.display;
-            const headerEl = document.querySelector('.report-header');
-            const platformEl = document.querySelector('.platform-tabs');
-            const yearEl = document.getElementById('year-tabs');
-            const statsEl = document.getElementById('stats-row');
-
-            // Hide UI chrome, show combined report
-            headerEl.style.display = 'none';
-            platformEl.style.display = 'none';
-            yearEl.style.display = 'none';
-            statsEl.style.display = 'none';
-            contentEl.innerHTML = combined;
-            contentEl.style.display = 'block';
             overlay.style.display = 'none';
-
-            window.print();
-
-            // Restore after print dialog closes
-            const restore = () => {
-                contentEl.innerHTML = savedHTML;
-                contentEl.style.display = savedDisplay;
-                headerEl.style.display = '';
-                platformEl.style.display = '';
-                yearEl.style.display = '';
-                // Re-render current view to restore stat cards
-                const cached = dataCache[cacheKey(activeYear)];
-                if (cached) renderReport(cached);
-                window.removeEventListener('afterprint', restore);
-            };
-            window.addEventListener('afterprint', restore);
         }
 
         // Init
@@ -1501,7 +1433,7 @@
                 document.querySelectorAll('.platform-tab').forEach(t => {
                     t.classList.toggle('active', t.dataset.platform === hashState.platform);
                 });
-                document.getElementById('print-btn').textContent = hashState.platform === 'changes' ? 'Export PDF' : 'Print Report';
+                updateHeadline();
                 if (hashState.platform === 'changes') {
                     document.getElementById('report-account').textContent = 'Account: 840-838-5870';
                     document.querySelector('.subtitle').textContent = yearVal === 'all'
