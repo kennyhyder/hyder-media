@@ -384,6 +384,11 @@
                 negKwLists = extras.negativeKeywordLists || [];
             }
 
+            // Account-level negative keywords didn't exist before Jan 2023
+            if (data.historical && data.year && data.year < 2023) {
+                acctNegKws = [];
+            }
+
             let html = '';
 
             if (acctAssets.length > 0) {

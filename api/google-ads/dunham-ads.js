@@ -361,7 +361,6 @@ export default async function handler(req, res) {
                     accountAssets: result.accountAssets,
                     accountNegativeKeywords: result.accountNegativeKeywords,
                     negativeKeywordLists: result.negativeKeywordLists,
-                    _debug: result._debug,
                 };
             }
             if (accountsList.length > 1) {
@@ -1328,14 +1327,6 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
             accountAssets: result.accountAssets || [],
             accountNegativeKeywords: result.accountNegativeKeywords || [],
             negativeKeywordLists: result.negativeKeywordLists || [],
-            _debug: {
-                acctNegSet: acctNegSetL.error || `${(acctNegSetL.results || []).length} sets`,
-                acctNegCriteria: acctNegCriteriaL.error || `${(acctNegCriteriaL.results || []).length} keywords`,
-                sharedSets: sharedSetsL.error || `${(sharedSetsL.results || []).length} sets`,
-                sharedCriteria: sharedCriteriaL.error || `${(sharedCriteriaL.results || []).length} criteria`,
-                campAssets: campAssetsL.error || `${(campAssetsL.results || []).length} assets`,
-                custAssets: custAssetsL.error || `${(custAssetsL.results || []).length} assets`,
-            },
         };
     } catch (e) {
         return null; // Skip failed accounts gracefully
