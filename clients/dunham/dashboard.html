@@ -308,7 +308,7 @@
                     html += `<div class="account-group">`;
                     html += `<div class="account-group-header">
                         <h2 class="account-group-name">${esc(acct.name || currentAccountId)}</h2>
-                        <span class="account-group-id">${esc(acct.id || currentAccountId)}</span>
+                        <span class="account-group-id">Account ID: ${esc(acct.id || currentAccountId)}</span>
                     </div>`;
                 }
                 const isPMax = camp.type === 'PERFORMANCE_MAX';
@@ -521,7 +521,7 @@
                 ${ad.name ? `<span style="color: var(--text-secondary); font-size: 0.8rem;">${esc(ad.name)}</span>` : ''}
             </div>`;
 
-            if (ad.type === 'RESPONSIVE_SEARCH_AD' && ad.headlines && ad.headlines.length > 0) {
+            if ((ad.type === 'RESPONSIVE_SEARCH_AD' || ad.type === 'EXPANDED_TEXT_AD') && ad.headlines && ad.headlines.length > 0) {
                 html += renderAdPreview(ad, campaignSitelinks);
             }
 
