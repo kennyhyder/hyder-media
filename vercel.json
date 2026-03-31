@@ -123,7 +123,7 @@
       "maxDuration": 30
     },
     "api/google-ads/dunham-ads.js": {
-      "maxDuration": 30
+      "maxDuration": 120
     },
     "api/google-ads/dunham-changes.js": {
       "maxDuration": 60

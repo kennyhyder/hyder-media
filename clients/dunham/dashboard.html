@@ -292,8 +292,25 @@
             const isHistorical = data.historical === true;
             if (data.campaigns.length === 0) return '';
 
+            const hasAccounts = data.accounts && data.accounts.length > 1;
+            const accountLookup = {};
+            if (data.accounts) data.accounts.forEach(a => accountLookup[a.id] = a);
+
             let html = '';
+            let currentAccountId = null;
+
             for (const camp of data.campaigns) {
+                // Insert account group header when account changes (multi-account historical)
+                if (hasAccounts && camp.accountId && camp.accountId !== currentAccountId) {
+                    if (currentAccountId !== null) html += `</div>`; // close previous group
+                    currentAccountId = camp.accountId;
+                    const acct = accountLookup[currentAccountId] || {};
+                    html += `<div class="account-group">`;
+                    html += `<div class="account-group-header">
+                        <h2 class="account-group-name">${esc(acct.name || currentAccountId)}</h2>
+                        <span class="account-group-id">${esc(acct.id || currentAccountId)}</span>
+                    </div>`;
+                }
                 const isPMax = camp.type === 'PERFORMANCE_MAX';
                 const typeBadge = isPMax ? '<span class="badge badge-pmax">PMAX</span>' : '';
                 const statusClass = camp.status === 'ENABLED' ? 'badge-enabled' : 'badge-paused';
@@ -334,6 +351,9 @@
 
                 html += `</div></div>`;
             }
+
+            // Close last account group div (multi-account)
+            if (hasAccounts && currentAccountId !== null) html += `</div>`;
 
             if (data.accountAssets && data.accountAssets.length > 0) {
                 html += `<div class="account-assets-section">`;
@@ -426,17 +446,26 @@
                 }
             }
 
-            document.getElementById('label-campaigns').textContent = 'Campaigns';
-            document.getElementById('label-adgroups').textContent = 'Ad Groups';
-            document.getElementById('label-ads').textContent = 'Ads';
+            const hasMultiAcct = data.accounts && data.accounts.length > 1;
+
+            // Update account label for multi-account
+            if (hasMultiAcct) {
+                document.getElementById('report-account').textContent = `${data.accounts.length} Accounts`;
+            } else {
+                document.getElementById('report-account').textContent = 'Account: 840-838-5870';
+            }
+
+            document.getElementById('label-campaigns').textContent = hasMultiAcct ? 'Accounts' : 'Campaigns';
+            document.getElementById('label-adgroups').textContent = hasMultiAcct ? 'Campaigns' : 'Ad Groups';
+            document.getElementById('label-ads').textContent = hasMultiAcct ? 'Ad Groups' : 'Ads';
             document.getElementById('label-headlines').textContent = 'Keywords';
             document.getElementById('label-descriptions').textContent = 'Headlines';
             document.getElementById('label-extensions').textContent = 'Extensions';
             document.querySelectorAll('.stat-card').forEach(c => c.style.display = '');
 
-            document.getElementById('stat-campaigns').textContent = data.campaigns.length;
-            document.getElementById('stat-adgroups').textContent = totalAdGroups;
-            document.getElementById('stat-ads').textContent = totalAds;
+            document.getElementById('stat-campaigns').textContent = hasMultiAcct ? data.accounts.length : data.campaigns.length;
+            document.getElementById('stat-adgroups').textContent = hasMultiAcct ? data.campaigns.length : totalAdGroups;
+            document.getElementById('stat-ads').textContent = hasMultiAcct ? totalAdGroups : totalAds;
             document.getElementById('stat-headlines').textContent = totalKeywords;
             document.getElementById('stat-descriptions').textContent = totalHeadlines;
             document.getElementById('stat-extensions').textContent = totalExtensions;

@@ -9,6 +9,12 @@ import { createClient } from '@supabase/supabase-js';
 
 const CUSTOMER_ID = '8408385870';
 
+// Legacy accounts (retired, consolidated into current account)
+const LEGACY_ACCOUNTS = [
+    '3965220693', '6706065021', '7879946960', '2929707921', '9353262272',
+    '9594942613', '8088381186', '8282166029', '8384363359', '3530440148',
+];
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -81,6 +87,11 @@ export default async function handler(req, res) {
         if (isHistorical) {
             const startDate = `${year}-01-01`;
             const endDate = `${year}-12-31`;
+
+            // Start legacy account fetches in parallel with main queries
+            const legacyPromise = Promise.all(
+                LEGACY_ACCOUNTS.map(id => fetchLegacyAccount(id, headers, startDate, endDate))
+            );
 
             const [adsData, keywordsData, agNegData, campNegData, pmaxCampaigns, assetGroupsData, assetGroupAssetsData, histTextAssets, histImageAssets, sharedSetsH, sharedCriteriaH, campaignSharedSetsH, acctNegSetH, acctNegCriteriaH, histCampAssets, histCustAssets, histSitelinks, histCallouts, histSnippets] = await Promise.all([
                 fetchQuery(CUSTOMER_ID, headers, `
@@ -333,6 +344,16 @@ export default async function handler(req, res) {
                 campaignSharedSetsH.error ? [] : (campaignSharedSetsH.results || []),
                 acctNegCriteriaH.error ? [] : (acctNegCriteriaH.results || [])
             );
+
+            // Merge legacy account data (fetches started in parallel above)
+            const legacyResults = await legacyPromise;
+            const accountsList = [{ id: '840-838-5870', name: 'Dunham & Jones' }];
+            for (const result of legacyResults) {
+                if (!result || !result.campaigns.length) continue;
+                accountsList.push({ id: result.accountId, name: result.accountName });
+                response.campaigns.push(...result.campaigns);
+            }
+            if (accountsList.length > 1) response.accounts = accountsList;
 
             return res.status(200).json(response);
         }
@@ -745,7 +766,9 @@ function buildResponse(adsRows, campaignAssetRows, customerAssetRows, assetDetai
     };
 }
 
-function buildHistoricalResponse(adsRows, year) {
+function buildHistoricalResponse(adsRows, year, accountId, accountName) {
+    accountId = accountId || '840-838-5870';
+    accountName = accountName || 'Dunham & Jones';
     const campaignMap = new Map();
 
     for (const row of adsRows) {
@@ -818,12 +841,14 @@ function buildHistoricalResponse(adsRows, year) {
 
     const campaigns = Array.from(campaignMap.values()).map(c => ({
         ...c,
+        accountId,
+        accountLabel: accountName,
         adGroups: Array.from(c.adGroups.values()),
     }));
     campaigns.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
     return {
-        account: { id: '840-838-5870', name: 'Dunham & Jones' },
+        account: { id: accountId, name: accountName },
         campaigns,
         accountAssets: [],
         year,
@@ -1055,4 +1080,91 @@ function formatAsset(asset, parentAsset) {
         return { ...base, imageUrl: fullSize.url || null, width: fullSize.widthPixels, height: fullSize.heightPixels };
     }
     return base;
+}
+
+// ── Legacy Account Support ──
+
+function fmtAcctId(id) {
+    return `${id.slice(0,3)}-${id.slice(3,6)}-${id.slice(6)}`;
+}
+
+async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
+    const mccId = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/-/g, '');
+    const legacyHeaders = {
+        ...baseHeaders,
+        'login-customer-id': mccId || accountId,
+    };
+
+    try {
+        const [nameData, adsData, kwData, agNegData, campNegData] = await Promise.all([
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT customer.descriptive_name FROM customer LIMIT 1
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    campaign.id, campaign.name, campaign.status,
+                    ad_group.id, ad_group.name, ad_group.status,
+                    ad_group_ad.ad.id, ad_group_ad.ad.type,
+                    ad_group_ad.ad.name, ad_group_ad.status,
+                    ad_group_ad.ad.responsive_search_ad.headlines,
+                    ad_group_ad.ad.responsive_search_ad.descriptions,
+                    ad_group_ad.ad.expanded_text_ad.headline_part1,
+                    ad_group_ad.ad.expanded_text_ad.headline_part2,
+                    ad_group_ad.ad.expanded_text_ad.headline_part3,
+                    ad_group_ad.ad.expanded_text_ad.description,
+                    ad_group_ad.ad.expanded_text_ad.description2,
+                    ad_group_ad.ad.expanded_text_ad.path1,
+                    ad_group_ad.ad.expanded_text_ad.path2,
+                    ad_group_ad.ad.final_urls,
+                    metrics.impressions
+                FROM ad_group_ad
+                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND metrics.impressions > 0
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    campaign.id, ad_group.id,
+                    ad_group_criterion.keyword.text,
+                    ad_group_criterion.keyword.match_type,
+                    metrics.impressions
+                FROM keyword_view
+                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND metrics.impressions > 0
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    campaign.id, ad_group.id,
+                    ad_group_criterion.keyword.text,
+                    ad_group_criterion.keyword.match_type
+                FROM ad_group_criterion
+                WHERE ad_group_criterion.type = 'KEYWORD'
+                    AND ad_group_criterion.negative = true
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    campaign.id,
+                    campaign_criterion.keyword.text,
+                    campaign_criterion.keyword.match_type
+                FROM campaign_criterion
+                WHERE campaign_criterion.type = 'KEYWORD'
+                    AND campaign_criterion.negative = true
+            `),
+        ]);
+
+        if (adsData.error || !adsData.results?.length) return null;
+
+        const acctIdFmt = fmtAcctId(accountId);
+        const accountName = nameData.results?.[0]?.customer?.descriptiveName || acctIdFmt;
+
+        // Build campaigns using shared builder
+        const result = buildHistoricalResponse(adsData.results, null, acctIdFmt, accountName);
+
+        // Attach keywords and negatives
+        attachKeywords(result, kwData.error ? [] : (kwData.results || []));
+        attachNegatives(result, agNegData.error ? [] : (agNegData.results || []), campNegData.error ? [] : (campNegData.results || []));
+
+        return { accountId: acctIdFmt, accountName, campaigns: result.campaigns };
+    } catch (e) {
+        return null; // Skip failed accounts gracefully
+    }
 }
