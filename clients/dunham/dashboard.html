@@ -302,7 +302,10 @@
             for (const camp of data.campaigns) {
                 // Insert account group header when account changes (multi-account historical)
                 if (hasAccounts && camp.accountId && camp.accountId !== currentAccountId) {
-                    if (currentAccountId !== null) html += `</div>`; // close previous group
+                    if (currentAccountId !== null) {
+                        html += buildAccountExtrasHTML(data, currentAccountId);
+                        html += `</div>`; // close previous group
+                    }
                     currentAccountId = camp.accountId;
                     const acct = accountLookup[currentAccountId] || {};
                     html += `<div class="account-group">`;
@@ -352,36 +355,62 @@
                 html += `</div></div>`;
             }
 
-            // Close last account group div (multi-account)
-            if (hasAccounts && currentAccountId !== null) html += `</div>`;
-
-            if (data.accountAssets && data.accountAssets.length > 0) {
-                html += `<div class="account-assets-section">`;
-                html += `<h2>Account-Level Extensions</h2>`;
-                html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These extensions can appear on any ad in the account.</p>`;
-                html += renderExtensionsGrid(data.accountAssets);
+            // Close last account group (render its extras first)
+            if (hasAccounts && currentAccountId !== null) {
+                html += buildAccountExtrasHTML(data, currentAccountId);
                 html += `</div>`;
             }
 
-            // Account-level negative keywords
-            if (data.accountNegativeKeywords && data.accountNegativeKeywords.length > 0) {
+            // Single-account mode: render account-level data at top level
+            if (!hasAccounts) {
+                html += buildAccountExtrasHTML(data, data.account?.id || '840-838-5870');
+            }
+
+            return html;
+        }
+
+        // Renders account-level extensions, negatives, and shared lists for a given account
+        function buildAccountExtrasHTML(data, accountId) {
+            let acctAssets, acctNegKws, negKwLists;
+            const primaryId = data.account?.id || '840-838-5870';
+            if (accountId === primaryId) {
+                acctAssets = data.accountAssets || [];
+                acctNegKws = data.accountNegativeKeywords || [];
+                negKwLists = data.negativeKeywordLists || [];
+            } else {
+                const extras = (data.accountExtras || {})[accountId] || {};
+                acctAssets = extras.accountAssets || [];
+                acctNegKws = extras.accountNegativeKeywords || [];
+                negKwLists = extras.negativeKeywordLists || [];
+            }
+
+            let html = '';
+
+            if (acctAssets.length > 0) {
+                html += `<div class="account-assets-section">`;
+                html += `<h2>Account-Level Extensions</h2>`;
+                html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These extensions can appear on any ad in the account.</p>`;
+                html += renderExtensionsGrid(acctAssets);
+                html += `</div>`;
+            }
+
+            if (acctNegKws.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Account-Level Negative Keywords</h2>`;
                 html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">These negative keywords apply to all campaigns in the account.</p>`;
                 html += `<ul class="keyword-list keyword-list-negative">`;
-                for (const kw of data.accountNegativeKeywords) {
+                for (const kw of acctNegKws) {
                     const matchBadge = kw.matchType ? `<span class="badge badge-match">${kw.matchType}</span>` : '';
                     html += `<li class="keyword-item keyword-item-negative">${esc(kw.keyword)} ${matchBadge}</li>`;
                 }
                 html += `</ul></div>`;
             }
 
-            // Shared negative keyword lists
-            if (data.negativeKeywordLists && data.negativeKeywordLists.length > 0) {
+            if (negKwLists.length > 0) {
                 html += `<div class="account-assets-section">`;
                 html += `<h2>Shared Negative Keyword Lists</h2>`;
                 html += `<p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">Negative keyword lists shared across campaigns.</p>`;
-                for (const list of data.negativeKeywordLists) {
+                for (const list of negKwLists) {
                     html += `<div class="campaign-section">`;
                     html += `<div class="campaign-header">
                         <div class="campaign-name"><span class="badge badge-label">Shared List</span> ${esc(list.name)}</div>

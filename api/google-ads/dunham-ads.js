@@ -348,12 +348,21 @@ export default async function handler(req, res) {
             // Merge legacy account data (fetches started in parallel above)
             const legacyResults = await legacyPromise;
             const accountsList = [{ id: '840-838-5870', name: 'Dunham & Jones' }];
+            const accountExtras = {};
             for (const result of legacyResults) {
                 if (!result || !result.campaigns.length) continue;
                 accountsList.push({ id: result.accountId, name: result.accountName });
                 response.campaigns.push(...result.campaigns);
+                accountExtras[result.accountId] = {
+                    accountAssets: result.accountAssets,
+                    accountNegativeKeywords: result.accountNegativeKeywords,
+                    negativeKeywordLists: result.negativeKeywordLists,
+                };
             }
-            if (accountsList.length > 1) response.accounts = accountsList;
+            if (accountsList.length > 1) {
+                response.accounts = accountsList;
+                response.accountExtras = accountExtras;
+            }
 
             return res.status(200).json(response);
         }
@@ -1096,7 +1105,12 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
     };
 
     try {
-        const [nameData, adsData, kwData, agNegData, campNegData] = await Promise.all([
+        const [nameData, adsData, kwData, agNegData, campNegData,
+               sharedSetsL, sharedCriteriaL, campaignSharedSetsL,
+               acctNegSetL, acctNegCriteriaL,
+               campAssetsL, custAssetsL,
+               sitelinksL, calloutsL, snippetsL, textAssetsL, imageAssetsL
+        ] = await Promise.all([
             fetchQuery(accountId, legacyHeaders, `
                 SELECT customer.descriptive_name FROM customer LIMIT 1
             `),
@@ -1149,6 +1163,79 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
                 WHERE campaign_criterion.type = 'KEYWORD'
                     AND campaign_criterion.negative = true
             `),
+            // Shared negative keyword lists
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT shared_set.id, shared_set.name, shared_set.member_count
+                FROM shared_set
+                WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+                    AND shared_set.status = 'ENABLED'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                FROM shared_criterion
+                WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT campaign.id, campaign.name, shared_set.id
+                FROM campaign_shared_set
+                WHERE campaign_shared_set.status = 'ENABLED'
+            `),
+            // Account-level negative keywords
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT shared_set.id, shared_set.name
+                FROM shared_set
+                WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
+                    AND shared_set.status = 'ENABLED'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT shared_set.id, shared_criterion.keyword.text, shared_criterion.keyword.match_type
+                FROM shared_criterion
+                WHERE shared_set.type = 'ACCOUNT_LEVEL_NEGATIVE_KEYWORDS'
+            `),
+            // Campaign-level extensions that served in this period
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    asset.id, asset.name, asset.type,
+                    campaign.id,
+                    campaign_asset.field_type,
+                    campaign_asset.status,
+                    metrics.impressions
+                FROM campaign_asset
+                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND metrics.impressions > 0
+            `),
+            // Customer-level extensions that served in this period
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT
+                    asset.id, asset.name, asset.type,
+                    customer_asset.field_type,
+                    customer_asset.status,
+                    metrics.impressions
+                FROM customer_asset
+                WHERE segments.date BETWEEN '${startDate}' AND '${endDate}'
+                    AND metrics.impressions > 0
+            `),
+            // Asset details
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT asset.id, asset.sitelink_asset.description1, asset.sitelink_asset.description2, asset.sitelink_asset.link_text
+                FROM asset WHERE asset.type = 'SITELINK'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT asset.id, asset.callout_asset.callout_text
+                FROM asset WHERE asset.type = 'CALLOUT'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT asset.id, asset.structured_snippet_asset.header, asset.structured_snippet_asset.values
+                FROM asset WHERE asset.type = 'STRUCTURED_SNIPPET'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT asset.id, asset.text_asset.text
+                FROM asset WHERE asset.type = 'TEXT'
+            `),
+            fetchQuery(accountId, legacyHeaders, `
+                SELECT asset.id, asset.name, asset.image_asset.full_size.url, asset.image_asset.full_size.width_pixels, asset.image_asset.full_size.height_pixels
+                FROM asset WHERE asset.type = 'IMAGE'
+            `),
         ]);
 
         if (adsData.error || !adsData.results?.length) return null;
@@ -1162,8 +1249,63 @@ async function fetchLegacyAccount(accountId, baseHeaders, startDate, endDate) {
         // Attach keywords and negatives
         attachKeywords(result, kwData.error ? [] : (kwData.results || []));
         attachNegatives(result, agNegData.error ? [] : (agNegData.results || []), campNegData.error ? [] : (campNegData.results || []));
+        attachSharedNegatives(result,
+            sharedSetsL.error ? [] : (sharedSetsL.results || []),
+            sharedCriteriaL.error ? [] : (sharedCriteriaL.results || []),
+            campaignSharedSetsL.error ? [] : (campaignSharedSetsL.results || []),
+            acctNegCriteriaL.error ? [] : (acctNegCriteriaL.results || [])
+        );
 
-        return { accountId: acctIdFmt, accountName, campaigns: result.campaigns };
+        // Build asset details map
+        const assetDetailMap = new Map();
+        for (const r of [sitelinksL, calloutsL, snippetsL, textAssetsL, imageAssetsL]) {
+            if (r && r.results) {
+                for (const row of r.results) {
+                    if (row.asset) assetDetailMap.set(row.asset.id, row.asset);
+                }
+            }
+        }
+
+        // Attach campaign-level extensions (dedup — date segments return one row per day)
+        if (!campAssetsL.error) {
+            const seen = new Set();
+            for (const row of (campAssetsL.results || [])) {
+                const asset = row.asset || {};
+                const campaignAsset = row.campaignAsset || {};
+                const campId = row.campaign?.id;
+                const dedup = `${campId}:${asset.id}`;
+                if (seen.has(dedup)) continue;
+                seen.add(dedup);
+                const camp = result.campaigns.find(c => c.id === campId);
+                if (!camp) continue;
+                if (!camp.assets) camp.assets = [];
+                const details = assetDetailMap.get(asset.id) || {};
+                camp.assets.push(formatAsset({ ...asset, ...details }, campaignAsset));
+            }
+        }
+
+        // Build account-level extensions (dedup)
+        if (!custAssetsL.error) {
+            const seen = new Set();
+            result.accountAssets = [];
+            for (const row of (custAssetsL.results || [])) {
+                const asset = row.asset || {};
+                if (seen.has(asset.id)) continue;
+                seen.add(asset.id);
+                const customerAsset = row.customerAsset || {};
+                const details = assetDetailMap.get(asset.id) || {};
+                result.accountAssets.push(formatAsset({ ...asset, ...details }, customerAsset));
+            }
+        }
+
+        return {
+            accountId: acctIdFmt,
+            accountName,
+            campaigns: result.campaigns,
+            accountAssets: result.accountAssets || [],
+            accountNegativeKeywords: result.accountNegativeKeywords || [],
+            negativeKeywordLists: result.negativeKeywordLists || [],
+        };
     } catch (e) {
         return null; // Skip failed accounts gracefully
     }
