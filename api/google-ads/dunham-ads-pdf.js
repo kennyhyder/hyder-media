@@ -11,6 +11,64 @@
 
 import PDFDocument from 'pdfkit';
 
+// ── Image Prefetching ──
+
+async function prefetchImages(data, platform) {
+    const urls = new Set();
+    for (const camp of (data?.campaigns || [])) {
+        if (platform !== 'meta') {
+            for (const ag of (camp.assetGroups || [])) {
+                for (const img of (ag.images || [])) { if (img.imageUrl) urls.add(img.imageUrl); }
+                for (const logo of (ag.logos || [])) { if (logo.imageUrl) urls.add(logo.imageUrl); }
+            }
+        }
+        if (platform === 'meta') {
+            for (const adSet of (camp.adSets || [])) {
+                for (const ad of (adSet.ads || [])) {
+                    const url = ad.imageUrl || ad.thumbnailUrl;
+                    if (url) urls.add(url);
+                }
+            }
+        }
+    }
+    const cache = new Map();
+    if (urls.size === 0) return cache;
+    const arr = [...urls];
+    const BATCH = 8;
+    for (let i = 0; i < arr.length; i += BATCH) {
+        await Promise.all(arr.slice(i, i + BATCH).map(async (url) => {
+            try {
+                const ctrl = new AbortController();
+                const t = setTimeout(() => ctrl.abort(), 5000);
+                const r = await fetch(url, { signal: ctrl.signal });
+                clearTimeout(t);
+                if (r.ok) cache.set(url, Buffer.from(await r.arrayBuffer()));
+            } catch {}
+        }));
+    }
+    return cache;
+}
+
+function getImageDimensions(buffer) {
+    try {
+        if (buffer[0] === 0x89 && buffer[1] === 0x50) {
+            return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+        }
+        if (buffer[0] === 0xFF && buffer[1] === 0xD8) {
+            let i = 2;
+            while (i < buffer.length - 1) {
+                if (buffer[i] !== 0xFF) break;
+                const m = buffer[i + 1];
+                if (m === 0xC0 || m === 0xC2) {
+                    return { height: buffer.readUInt16BE(i + 5), width: buffer.readUInt16BE(i + 7) };
+                }
+                i += 2 + buffer.readUInt16BE(i + 2);
+            }
+        }
+    } catch {}
+    return null;
+}
+
 const CURRENT_YEAR = new Date().getFullYear();
 const GOOGLE_START_YEAR = 2016;
 const META_START_YEAR = 2023;
@@ -64,6 +122,8 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: data?.error || 'Failed to fetch data' });
         }
 
+        const imageCache = await prefetchImages(data, platform);
+
         const yearLabel = yearParam === 'active' ? 'Active Ads' : yearParam;
         const platformLabel = platform === 'meta' ? 'Meta Ads' : 'Google Ads';
         const filename = `dunham-ads-${platform}-${yearParam}.pdf`;
@@ -73,7 +133,7 @@ export default async function handler(req, res) {
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         doc.pipe(res);
 
-        const ctx = createCtx(doc);
+        const ctx = createCtx(doc, imageCache);
         renderTitleBlock(ctx, `Dunham & Jones \u2014 Ad Report \u2014 ${yearLabel}`, platformLabel, data);
 
         if (platform === 'meta') {
@@ -157,6 +217,7 @@ async function generateAllYearsPdf(baseUrl, res) {
         needsNewPage = true;
         const label = yr === 'active' ? 'Active Ads' : String(yr);
         renderSectionDivider(ctx, `Google Ads \u2014 ${label}`);
+        ctx.imageCache = await prefetchImages(data, 'google');
         renderGoogleData(ctx, data);
     }
 
@@ -167,6 +228,7 @@ async function generateAllYearsPdf(baseUrl, res) {
         needsNewPage = true;
         const label = yr === 'active' ? 'Active Ads' : String(yr);
         renderSectionDivider(ctx, `Meta Ads \u2014 ${label}`);
+        ctx.imageCache = await prefetchImages(data, 'meta');
         renderMetaData(ctx, data);
     }
 
@@ -176,8 +238,8 @@ async function generateAllYearsPdf(baseUrl, res) {
 
 // ── PDF Helpers ──
 
-function createCtx(doc) {
-    return { doc, y: MARGIN, pageNum: 1 };
+function createCtx(doc, imageCache) {
+    return { doc, y: MARGIN, pageNum: 1, imageCache: imageCache || new Map() };
 }
 
 function checkPageBreak(ctx, needed) {
@@ -248,6 +310,414 @@ function formatPin(pinnedField) {
         return `Pin ${prefix}${match[2]}`;
     }
     return pinnedField;
+}
+
+// ── Ad Preview Cards ──
+
+function renderSearchPreview(ctx, ad, sitelinks) {
+    const doc = ctx.doc;
+
+    let displayUrl = '';
+    if (ad.finalUrls && ad.finalUrls.length > 0) {
+        try { const u = new URL(ad.finalUrls[0]); displayUrl = u.hostname + (u.pathname !== '/' ? u.pathname : ''); }
+        catch { displayUrl = ad.finalUrls[0] || ''; }
+    }
+
+    // Build preview headlines with pinning logic
+    const pinnedH = {}, unpinnedH = [];
+    for (const h of (ad.headlines || [])) {
+        if (h.pinnedField) {
+            const m = h.pinnedField.match(/HEADLINE_(\d+)/);
+            if (m) { pinnedH[parseInt(m[1])] = h.text; continue; }
+        }
+        unpinnedH.push(h.text);
+    }
+    const previewHL = [];
+    let ui = 0;
+    for (let i = 1; i <= 3; i++) {
+        if (pinnedH[i]) previewHL.push(pinnedH[i]);
+        else if (ui < unpinnedH.length) previewHL.push(unpinnedH[ui++]);
+    }
+
+    // Build preview descriptions with pinning logic
+    const pinnedD = {}, unpinnedD = [];
+    for (const d of (ad.descriptions || [])) {
+        if (d.pinnedField) {
+            const m = d.pinnedField.match(/DESCRIPTION_(\d+)/);
+            if (m) { pinnedD[parseInt(m[1])] = d.text; continue; }
+        }
+        unpinnedD.push(d.text);
+    }
+    const previewDesc = [];
+    let di = 0;
+    for (let i = 1; i <= 2; i++) {
+        if (pinnedD[i]) previewDesc.push(pinnedD[i]);
+        else if (di < unpinnedD.length) previewDesc.push(unpinnedD[di++]);
+    }
+
+    if (previewHL.length === 0) return;
+
+    const cardX = I2;
+    const cardW = CONTENT_W - (I2 - MARGIN);
+    const padX = 12, padY = 10;
+    const innerW = cardW - 2 * padX;
+
+    // Pre-calculate text lines
+    doc.font('Helvetica-Bold').fontSize(11);
+    const hlText = previewHL.join(' | ');
+    const hlLines = wrapLines(doc, hlText, innerW);
+
+    doc.font('Helvetica').fontSize(8);
+    const descText = previewDesc.join(' ');
+    const descLines = descText ? wrapLines(doc, descText, innerW) : [];
+
+    const slItems = (sitelinks || []).slice(0, 4);
+    const slRows = slItems.length > 0 ? Math.ceil(slItems.length / 2) : 0;
+
+    // Calculate total card height
+    let cardH = padY;
+    cardH += 10; // "Sponsored"
+    if (displayUrl) cardH += 11;
+    cardH += hlLines.length * 13 + 2;
+    if (descLines.length) cardH += descLines.length * 10;
+    if (slRows) cardH += 5 + slRows * 20 + 3;
+    cardH += padY;
+
+    checkPageBreak(ctx, cardH + 12);
+
+    // Label
+    doc.font('Helvetica').fontSize(6).fillColor('#6b7280')
+        .text('AD PREVIEW', cardX, ctx.y, { lineBreak: false });
+    ctx.y += 9;
+
+    // Card background + border
+    const cardTop = ctx.y;
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4).fill('#ffffff');
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4)
+        .lineWidth(0.5).strokeColor('#dadce0').stroke();
+
+    let cy = cardTop + padY;
+
+    // "Sponsored"
+    doc.font('Helvetica-Bold').fontSize(7).fillColor('#202124')
+        .text('Sponsored', cardX + padX, cy, { lineBreak: false });
+    cy += 10;
+
+    // Display URL
+    if (displayUrl) {
+        doc.font('Helvetica').fontSize(8).fillColor('#202124')
+            .text(truncText(doc, displayUrl, innerW), cardX + padX, cy, { lineBreak: false });
+        cy += 11;
+    }
+
+    // Headlines (blue)
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#1a0dab');
+    for (const line of hlLines) {
+        doc.text(line, cardX + padX, cy, { lineBreak: false });
+        cy += 13;
+    }
+    cy += 2;
+
+    // Descriptions (gray)
+    if (descLines.length) {
+        doc.font('Helvetica').fontSize(8).fillColor('#4d5156');
+        for (const line of descLines) {
+            doc.text(line, cardX + padX, cy, { lineBreak: false });
+            cy += 10;
+        }
+    }
+
+    // Sitelinks (2-column grid)
+    if (slRows > 0) {
+        cy += 2;
+        doc.moveTo(cardX + padX, cy).lineTo(cardX + cardW - padX, cy)
+            .lineWidth(0.3).strokeColor('#dadce0').stroke();
+        cy += 3;
+        const colW = (innerW - 12) / 2;
+        for (let i = 0; i < slItems.length; i++) {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const sx = cardX + padX + col * (colW + 12);
+            const sy = cy + row * 20;
+            doc.font('Helvetica').fontSize(8).fillColor('#1a0dab')
+                .text(truncText(doc, slItems[i].linkText || slItems[i].name || '', colW), sx, sy, { lineBreak: false });
+            if (slItems[i].desc1) {
+                doc.font('Helvetica').fontSize(6.5).fillColor('#4d5156')
+                    .text(truncText(doc, slItems[i].desc1, colW), sx, sy + 9, { lineBreak: false });
+            }
+        }
+    }
+
+    doc.fillColor('#000000');
+    ctx.y = cardTop + cardH + 6;
+}
+
+function renderDisplayPreview(ctx, ad) {
+    const doc = ctx.doc;
+    const headline = ad.longHeadline || (ad.headlines && ad.headlines[0] ? ad.headlines[0].text : '');
+    const desc = ad.descriptions && ad.descriptions[0] ? ad.descriptions[0].text : '';
+    const bizName = ad.businessName || '';
+    let displayUrl = '';
+    if (ad.finalUrls && ad.finalUrls.length > 0) {
+        try { displayUrl = new URL(ad.finalUrls[0]).hostname; } catch { displayUrl = ad.finalUrls[0] || ''; }
+    }
+
+    if (!headline) return;
+
+    const cardX = I2;
+    const cardW = Math.min(CONTENT_W - (I2 - MARGIN), 300);
+    const padX = 12, padY = 10;
+    const innerW = cardW - 2 * padX;
+
+    doc.font('Helvetica-Bold').fontSize(11);
+    const hlLines = wrapLines(doc, headline, innerW);
+
+    let cardH = padY;
+    if (bizName) cardH += 10;
+    cardH += hlLines.length * 13 + 2;
+    if (desc) { doc.font('Helvetica').fontSize(8); cardH += wrapLines(doc, desc, innerW).length * 10; }
+    if (displayUrl) cardH += 10;
+    cardH += padY;
+
+    checkPageBreak(ctx, cardH + 12);
+
+    doc.font('Helvetica').fontSize(6).fillColor('#6b7280')
+        .text('DISPLAY AD PREVIEW', cardX, ctx.y, { lineBreak: false });
+    ctx.y += 9;
+
+    const cardTop = ctx.y;
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4).fill('#ffffff');
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4)
+        .lineWidth(0.5).strokeColor('#dadce0').stroke();
+
+    let cy = cardTop + padY;
+
+    if (bizName) {
+        doc.font('Helvetica-Bold').fontSize(7).fillColor('#202124')
+            .text(bizName, cardX + padX, cy, { lineBreak: false });
+        cy += 10;
+    }
+
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#1a0dab');
+    for (const line of hlLines) {
+        doc.text(line, cardX + padX, cy, { lineBreak: false });
+        cy += 13;
+    }
+    cy += 2;
+
+    if (desc) {
+        doc.font('Helvetica').fontSize(8).fillColor('#4d5156');
+        for (const line of wrapLines(doc, desc, innerW)) {
+            doc.text(line, cardX + padX, cy, { lineBreak: false });
+            cy += 10;
+        }
+    }
+
+    if (displayUrl) {
+        doc.font('Helvetica').fontSize(7).fillColor('#202124')
+            .text(displayUrl, cardX + padX, cy, { lineBreak: false });
+    }
+
+    doc.fillColor('#000000');
+    ctx.y = cardTop + cardH + 6;
+}
+
+function renderPMaxPreviewCard(ctx, ag) {
+    const doc = ctx.doc;
+    const headline = ag.headlines && ag.headlines[0] ? ag.headlines[0].text : '';
+    const longHL = ag.longHeadlines && ag.longHeadlines[0] ? ag.longHeadlines[0].text : '';
+    const desc = ag.descriptions && ag.descriptions[0] ? ag.descriptions[0].text : '';
+    const displayUrl = ag.finalUrl || ag.businessName || '';
+
+    if (!headline && !longHL) return;
+
+    const cardX = I2;
+    const cardW = CONTENT_W - (I2 - MARGIN);
+    const padX = 12, padY = 10;
+    const innerW = cardW - 2 * padX;
+
+    doc.font('Helvetica-Bold').fontSize(11);
+    const hlText = longHL || headline;
+    const hlLines = wrapLines(doc, hlText, innerW);
+
+    let cardH = padY + 10 + (displayUrl ? 11 : 0) + hlLines.length * 13 + 2;
+    if (desc) { doc.font('Helvetica').fontSize(8); cardH += wrapLines(doc, desc, innerW).length * 10; }
+    cardH += padY;
+
+    checkPageBreak(ctx, cardH + 12);
+
+    doc.font('Helvetica').fontSize(6).fillColor('#6b7280')
+        .text('PMAX AD PREVIEW (EXAMPLE COMBINATION)', cardX, ctx.y, { lineBreak: false });
+    ctx.y += 9;
+
+    const cardTop = ctx.y;
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4).fill('#ffffff');
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4)
+        .lineWidth(0.5).strokeColor('#dadce0').stroke();
+
+    let cy = cardTop + padY;
+
+    doc.font('Helvetica-Bold').fontSize(7).fillColor('#202124')
+        .text('Sponsored', cardX + padX, cy, { lineBreak: false });
+    cy += 10;
+
+    if (displayUrl) {
+        doc.font('Helvetica').fontSize(8).fillColor('#202124')
+            .text(truncText(doc, displayUrl, innerW), cardX + padX, cy, { lineBreak: false });
+        cy += 11;
+    }
+
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#1a0dab');
+    for (const line of hlLines) {
+        doc.text(line, cardX + padX, cy, { lineBreak: false });
+        cy += 13;
+    }
+    cy += 2;
+
+    if (desc) {
+        doc.font('Helvetica').fontSize(8).fillColor('#4d5156');
+        for (const line of wrapLines(doc, desc, innerW)) {
+            doc.text(line, cardX + padX, cy, { lineBreak: false });
+            cy += 10;
+        }
+    }
+
+    doc.fillColor('#000000');
+    ctx.y = cardTop + cardH + 6;
+}
+
+function renderMetaPreviewCard(ctx, ad) {
+    const doc = ctx.doc;
+    const primaryText = ad.primaryTexts && ad.primaryTexts[0] ? ad.primaryTexts[0].text : '';
+    const headline = ad.headlines && ad.headlines[0] ? ad.headlines[0].text : '';
+    const description = ad.descriptions && ad.descriptions[0] ? ad.descriptions[0].text : '';
+    const imageUrl = ad.imageUrl || ad.thumbnailUrl;
+
+    if (!primaryText && !headline && !imageUrl) return;
+
+    const cardX = I2;
+    const cardW = CONTENT_W - (I2 - MARGIN);
+    const textPad = 12;
+    const textW = cardW - 2 * textPad;
+
+    // Pre-measure text
+    doc.font('Helvetica').fontSize(8.5);
+    const ptLines = primaryText ? wrapLines(doc, primaryText, textW) : [];
+    doc.font('Helvetica-Bold').fontSize(10);
+    const hlLines = headline ? wrapLines(doc, headline, textW) : [];
+    doc.font('Helvetica').fontSize(8);
+    const descLines = description ? wrapLines(doc, description, textW) : [];
+
+    let domain = '';
+    if (ad.linkUrl) { try { domain = new URL(ad.linkUrl).hostname.toUpperCase(); } catch {} }
+
+    // Image dimensions
+    let imgRW = 0, imgRH = 0;
+    const imgBuf = imageUrl ? ctx.imageCache?.get(imageUrl) : null;
+    if (imgBuf) {
+        const dims = getImageDimensions(imgBuf);
+        if (dims) {
+            const scale = Math.min(cardW / dims.width, 180 / dims.height, 1);
+            imgRW = Math.round(dims.width * scale);
+            imgRH = Math.round(dims.height * scale);
+        }
+    }
+
+    // Calculate card height
+    let cardH = 12; // top pad
+    cardH += 32; // page header
+    if (ptLines.length) cardH += ptLines.length * 11 + 6;
+    if (imgRH) cardH += imgRH + 2;
+    if (headline || description || domain) {
+        cardH += 8;
+        if (domain) cardH += 10;
+        if (hlLines.length) cardH += hlLines.length * 12;
+        if (descLines.length) cardH += descLines.length * 10;
+        cardH += 8;
+    }
+    cardH += 4;
+
+    checkPageBreak(ctx, cardH + 12);
+
+    // Label
+    doc.font('Helvetica').fontSize(6).fillColor('#6b7280')
+        .text('META AD PREVIEW', cardX, ctx.y, { lineBreak: false });
+    ctx.y += 9;
+
+    const cardTop = ctx.y;
+
+    // Card with clip for rounded corners on footer
+    doc.save();
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4).clip();
+    doc.rect(cardX, cardTop, cardW, cardH).fill('#ffffff');
+
+    let cy = cardTop + 12;
+
+    // Avatar
+    const avX = cardX + textPad;
+    const avR = 14;
+    doc.circle(avX + avR, cy + avR, avR).fill('#1877f2');
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#ffffff')
+        .text('DJ', avX + avR - 7, cy + avR - 5, { lineBreak: false });
+
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#050505')
+        .text('Dunham & Jones', avX + avR * 2 + 8, cy + 3, { lineBreak: false });
+    doc.font('Helvetica').fontSize(7).fillColor('#65676b')
+        .text('Sponsored', avX + avR * 2 + 8, cy + 15, { lineBreak: false });
+    cy += 32;
+
+    // Primary text
+    if (ptLines.length) {
+        doc.font('Helvetica').fontSize(8.5).fillColor('#050505');
+        for (const line of ptLines) {
+            doc.text(line, cardX + textPad, cy, { lineBreak: false });
+            cy += 11;
+        }
+        cy += 6;
+    }
+
+    // Image
+    if (imgRH && imgBuf) {
+        try {
+            const imgX = cardX + (cardW - imgRW) / 2;
+            doc.image(imgBuf, imgX, cy, { width: imgRW, height: imgRH });
+            cy += imgRH + 2;
+        } catch {}
+    }
+
+    // Footer (gray background)
+    if (headline || description || domain) {
+        doc.rect(cardX, cy, cardW, cardH - (cy - cardTop)).fill('#f0f2f5');
+        cy += 8;
+        if (domain) {
+            doc.font('Helvetica').fontSize(7).fillColor('#65676b')
+                .text(domain, cardX + textPad, cy, { lineBreak: false });
+            cy += 10;
+        }
+        if (hlLines.length) {
+            doc.font('Helvetica-Bold').fontSize(10).fillColor('#050505');
+            for (const line of hlLines) {
+                doc.text(line, cardX + textPad, cy, { lineBreak: false });
+                cy += 12;
+            }
+        }
+        if (descLines.length) {
+            doc.font('Helvetica').fontSize(8).fillColor('#65676b');
+            for (const line of descLines) {
+                doc.text(line, cardX + textPad, cy, { lineBreak: false });
+                cy += 10;
+            }
+        }
+    }
+
+    doc.restore();
+
+    // Card border (after restore to release clip)
+    doc.roundedRect(cardX, cardTop, cardW, cardH, 4)
+        .lineWidth(0.5).strokeColor('#dadce0').stroke();
+
+    doc.fillColor('#000000');
+    ctx.y = cardTop + cardH + 6;
 }
 
 // ── Title / Section Headers ──
@@ -376,8 +846,9 @@ function renderGoogleCampaign(ctx, camp, isHistorical) {
     doc.fillColor('#000000');
     ctx.y += 20;
 
+    const campaignSitelinks = (camp.assets || []).filter(a => a.type === 'SITELINK');
     for (const ag of (camp.adGroups || [])) {
-        renderGoogleAdGroup(ctx, ag, isHistorical);
+        renderGoogleAdGroup(ctx, ag, isHistorical, campaignSitelinks);
     }
 
     if (camp.assetGroups && camp.assetGroups.length > 0) {
@@ -393,7 +864,7 @@ function renderGoogleCampaign(ctx, camp, isHistorical) {
     ctx.y += 4;
 }
 
-function renderGoogleAdGroup(ctx, ag, isHistorical) {
+function renderGoogleAdGroup(ctx, ag, isHistorical, sitelinks) {
     const doc = ctx.doc;
     checkPageBreak(ctx, 16);
     doc.font('Helvetica-Bold').fontSize(F_ADGROUP).fillColor('#374151')
@@ -405,7 +876,7 @@ function renderGoogleAdGroup(ctx, ag, isHistorical) {
     ctx.y += 13;
 
     for (const ad of ag.ads) {
-        renderGoogleAd(ctx, ad, isHistorical);
+        renderGoogleAd(ctx, ad, isHistorical, sitelinks);
     }
 
     if (ag.keywords && ag.keywords.length > 0) {
@@ -419,7 +890,7 @@ function renderGoogleAdGroup(ctx, ag, isHistorical) {
     ctx.y += 4;
 }
 
-function renderGoogleAd(ctx, ad, isHistorical) {
+function renderGoogleAd(ctx, ad, isHistorical, sitelinks) {
     const doc = ctx.doc;
     const typeName = (ad.type || 'UNKNOWN').replace(/_/g, ' ');
     checkPageBreak(ctx, 14);
@@ -434,6 +905,16 @@ function renderGoogleAd(ctx, ad, isHistorical) {
     }
     doc.fillColor('#000000');
     ctx.y += 11;
+
+    // Ad preview card
+    const isRSA = ad.type === 'RESPONSIVE_SEARCH_AD';
+    const isETA = ad.type === 'EXPANDED_TEXT_AD';
+    const isRDA = ad.type === 'RESPONSIVE_DISPLAY_AD';
+    if ((isRSA || isETA) && ad.headlines && ad.headlines.length > 0) {
+        renderSearchPreview(ctx, ad, sitelinks);
+    } else if (isRDA) {
+        renderDisplayPreview(ctx, ad);
+    }
 
     // URL
     if (ad.finalUrls && ad.finalUrls.length > 0) {
@@ -511,6 +992,11 @@ function renderAssetGroup(ctx, ag) {
     doc.fillColor('#000000');
     ctx.y += 13;
 
+    // PMax preview card
+    if (ag.headlines && ag.headlines.length > 0) {
+        renderPMaxPreviewCard(ctx, ag);
+    }
+
     // Final URL
     if (ag.finalUrl) {
         doc.font('Helvetica').fontSize(F_LABEL).fillColor('#2563eb')
@@ -569,14 +1055,67 @@ function renderAssetGroup(ctx, ag) {
         ctx.y += 10;
     }
 
-    // Images note (skip embedding remote images)
-    const imgCount = (ag.images?.length || 0) + (ag.logos?.length || 0);
-    if (imgCount > 0) {
-        checkPageBreak(ctx, 10);
-        doc.font('Helvetica').fontSize(F_LABEL).fillColor('#6b7280')
-            .text(`(${imgCount} images \u2014 see online report)`, I2, ctx.y, { lineBreak: false });
-        doc.fillColor('#000000');
-        ctx.y += 10;
+    // Images
+    if (ag.images && ag.images.length > 0) {
+        checkPageBreak(ctx, 14);
+        doc.font('Helvetica-Bold').fontSize(F_LABEL)
+            .text(`Images (${ag.images.length}):`, I2, ctx.y, { lineBreak: false });
+        ctx.y += 9;
+        const imgMaxW = 120, imgMaxH = 90;
+        const imgCols = 3, imgGap = 8;
+        let imgCol = 0, rowMaxH = 0;
+        for (const img of ag.images) {
+            if (!img.imageUrl) continue;
+            const buf = ctx.imageCache?.get(img.imageUrl);
+            if (!buf) continue;
+            const dims = getImageDimensions(buf);
+            if (!dims) continue;
+            const scale = Math.min(imgMaxW / dims.width, imgMaxH / dims.height, 1);
+            const rW = Math.round(dims.width * scale);
+            const rH = Math.round(dims.height * scale);
+            if (imgCol >= imgCols) {
+                ctx.y += rowMaxH + imgGap;
+                imgCol = 0;
+                rowMaxH = 0;
+                checkPageBreak(ctx, rH + 4);
+            }
+            const ix = I3 + imgCol * (imgMaxW + imgGap);
+            try { ctx.doc.image(buf, ix, ctx.y, { width: rW, height: rH }); } catch {}
+            rowMaxH = Math.max(rowMaxH, rH);
+            imgCol++;
+        }
+        if (rowMaxH > 0) ctx.y += rowMaxH + imgGap;
+    }
+
+    // Logos
+    if (ag.logos && ag.logos.length > 0) {
+        checkPageBreak(ctx, 14);
+        doc.font('Helvetica-Bold').fontSize(F_LABEL)
+            .text(`Logos (${ag.logos.length}):`, I2, ctx.y, { lineBreak: false });
+        ctx.y += 9;
+        const logoMaxW = 60, logoMaxH = 60, logoGap = 8;
+        let logoCol = 0, logoRowH = 0;
+        for (const logo of ag.logos) {
+            if (!logo.imageUrl) continue;
+            const buf = ctx.imageCache?.get(logo.imageUrl);
+            if (!buf) continue;
+            const dims = getImageDimensions(buf);
+            if (!dims) continue;
+            const scale = Math.min(logoMaxW / dims.width, logoMaxH / dims.height, 1);
+            const rW = Math.round(dims.width * scale);
+            const rH = Math.round(dims.height * scale);
+            if (logoCol >= 5) {
+                ctx.y += logoRowH + logoGap;
+                logoCol = 0;
+                logoRowH = 0;
+                checkPageBreak(ctx, rH + 4);
+            }
+            const lx = I3 + logoCol * (logoMaxW + logoGap);
+            try { ctx.doc.image(buf, lx, ctx.y, { width: rW, height: rH }); } catch {}
+            logoRowH = Math.max(logoRowH, rH);
+            logoCol++;
+        }
+        if (logoRowH > 0) ctx.y += logoRowH + logoGap;
     }
 
     ctx.y += 3;
@@ -806,6 +1345,9 @@ function renderMetaAd(ctx, ad, isHistorical) {
     doc.fillColor('#000000');
     ctx.y += 11;
 
+    // Meta ad preview card
+    renderMetaPreviewCard(ctx, ad);
+
     // Link URL
     if (ad.linkUrl) {
         doc.font('Helvetica').fontSize(F_LABEL).fillColor('#2563eb')
@@ -851,15 +1393,6 @@ function renderMetaAd(ctx, ad, isHistorical) {
             checkPageBreak(ctx, 10);
             textBlock(ctx, `${i + 1}. ${d.text}`, I4, CONTENT_W - (I4 - MARGIN));
         });
-    }
-
-    // Image note (skip embedding remote images)
-    if (ad.imageUrl || ad.thumbnailUrl) {
-        checkPageBreak(ctx, 10);
-        doc.font('Helvetica').fontSize(F_LABEL).fillColor('#6b7280')
-            .text('(1 image \u2014 see online report)', I3, ctx.y, { lineBreak: false });
-        doc.fillColor('#000000');
-        ctx.y += 10;
     }
 
     ctx.y += 3;
