@@ -320,7 +320,7 @@ async function getCampaigns(h, accountId) {
     const xml = await soapCall(CM_SOAP, 'GetCampaignsByAccountId', CM_NS, h,
         `<GetCampaignsByAccountIdRequest xmlns="${CM_NS}">
             <AccountId>${accountId}</AccountId>
-            <CampaignType>Search Shopping Audience DynamicSearchAds PerformanceMax</CampaignType>
+            <CampaignType>Search</CampaignType>
         </GetCampaignsByAccountIdRequest>`);
     return parseCampaigns(xml);
 }
@@ -567,28 +567,6 @@ export default async function handler(req, res) {
 
         const year = parseInt(req.query.year);
         const isHistorical = year && year >= 2010 && year <= new Date().getFullYear();
-
-        // Debug mode: actually execute a SOAP call and return raw result
-        if (req.query.debug === 'soap') {
-            const h = { token: accessToken, devToken, customerId, accountId };
-            try {
-                const xml = await soapCall(CM_SOAP, 'GetCampaignsByAccountId', CM_NS, h,
-                    `<GetCampaignsByAccountIdRequest xmlns="${CM_NS}"><AccountId>${accountId}</AccountId><CampaignType>Search</CampaignType></GetCampaignsByAccountIdRequest>`);
-                // Test different regex patterns
-                const re1 = /<(?:a:)?Campaign(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Campaign>/g;
-                const re2 = /<Campaign>/g;
-                const re3 = /<\/Campaign>/g;
-                const count1 = (xml.match(re1) || []).length;
-                const count2 = (xml.match(re2) || []).length;
-                const count3 = (xml.match(re3) || []).length;
-                // Find first <Campaign> and show surrounding context
-                const idx = xml.indexOf('<Campaign>');
-                const ctx = idx >= 0 ? xml.substring(Math.max(0, idx - 50), idx + 200) : 'NOT FOUND';
-                return res.status(200).json({ success: true, xmlLen: xml.length, regexMatches: count1, openTags: count2, closeTags: count3, firstCampaignContext: ctx });
-            } catch (e) {
-                return res.status(200).json({ success: false, error: e.message });
-            }
-        }
 
         const data = isHistorical
             ? await fetchHistoricalData(accessToken, devToken, customerId, accountId, year)
