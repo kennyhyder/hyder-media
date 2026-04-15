@@ -1,8 +1,7 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 },
-    { "source": "/clients/dunham", "destination": "/clients/dunham/", "statusCode": 301 }
+    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
   "functions": {
     "api/contact.js": {
@@ -122,32 +121,14 @@
     "api/grid/hyperscale.js": {
       "maxDuration": 30
     },
-    "api/google-ads/dunham-ads.js": {
-      "maxDuration": 120
-    },
-    "api/google-ads/dunham-changes.js": {
-      "maxDuration": 60
-    },
-    "api/google-ads/dunham-changes-pdf.js": {
-      "maxDuration": 120
-    },
-    "api/google-ads/dunham-ads-pdf.js": {
-      "maxDuration": 300
-    },
-    "api/meta-ads/auth.js": {
+    "api/bing-ads/auth.js": {
       "maxDuration": 10
     },
-    "api/meta-ads/callback.js": {
+    "api/bing-ads/callback.js": {
       "maxDuration": 30
     },
-    "api/meta-ads/dunham-ads.js": {
-      "maxDuration": 30
-    },
-    "api/gbp/export.js": {
+    "api/bing-ads/dunham-ads.js": {
       "maxDuration": 60
-    },
-    "api/gbp/locations.js": {
-      "maxDuration": 30
     }
   }
 }

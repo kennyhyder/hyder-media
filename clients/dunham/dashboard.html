@@ -42,6 +42,7 @@
         <!-- Platform Toggle -->
         <div class="platform-tabs">
             <button class="platform-tab active" data-platform="google" onclick="switchPlatform('google')">Google Ads</button>
+            <button class="platform-tab" data-platform="bing" onclick="switchPlatform('bing')">Bing Ads</button>
             <button class="platform-tab" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
             <button class="platform-tab" data-platform="changes" onclick="switchPlatform('changes')">Change History</button>
         </div>
@@ -105,10 +106,12 @@
 
     <script>
         const GOOGLE_API = '/api/google-ads/dunham-ads';
+        const BING_API = '/api/bing-ads/dunham-ads';
         const META_API = '/api/meta-ads/dunham-ads';
         const CHANGES_API = '/api/google-ads/dunham-changes';
         const CURRENT_YEAR = new Date().getFullYear();
         const GOOGLE_START_YEAR = 2016;
+        const BING_START_YEAR = 2016;
         const META_START_YEAR = 2023; // Account has data back to Feb 2023
         let activePlatform = 'google';
         let activeYear = 'active';
@@ -172,7 +175,9 @@
             }
 
             document.getElementById('report-account').textContent =
-                platform === 'google' ? 'Account: 840-838-5870' : 'Meta Ads';
+                platform === 'google' ? 'Account: 840-838-5870'
+                : platform === 'bing' ? 'Account: C449285895'
+                : 'Meta Ads';
 
             document.getElementById('year-tabs').style.display = '';
             activeYear = 'active';
@@ -185,7 +190,8 @@
         // Build year tabs
         function buildYearTabs() {
             const container = document.getElementById('year-tabs');
-            const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
+            const startYear = activePlatform === 'meta' ? META_START_YEAR
+                : activePlatform === 'bing' ? BING_START_YEAR : GOOGLE_START_YEAR;
             let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
             for (let y = CURRENT_YEAR; y >= startYear; y--) {
                 html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
@@ -204,7 +210,7 @@
                     ? 'Account change history'
                     : `Account change history — ${year}`;
             } else {
-                const platformLabel = activePlatform === 'meta' ? 'Meta' : 'Google';
+                const platformLabel = activePlatform === 'meta' ? 'Meta' : activePlatform === 'bing' ? 'Bing' : 'Google';
                 document.querySelector('.subtitle').textContent = year === 'active'
                     ? `Complete inventory of active ${platformLabel} ad copy`
                     : `${platformLabel} ad copy that ran during ${year}`;
@@ -253,14 +259,15 @@
                 params.set('per_page', '100');
                 url = `${CHANGES_API}?${params.toString()}`;
             } else {
-                const apiBase = activePlatform === 'meta' ? META_API : GOOGLE_API;
+                const apiBase = activePlatform === 'bing' ? BING_API
+                    : activePlatform === 'meta' ? META_API : GOOGLE_API;
                 url = year === 'active' ? apiBase : `${apiBase}?year=${year}`;
             }
             if (forceRefresh && activePlatform !== 'changes') url += (url.includes('?') ? '&' : '?') + 'refresh=true';
             document.getElementById('loading-text').textContent =
                 activePlatform === 'changes'
                     ? 'Loading change history...'
-                    : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : 'Google'} Ads...`;
+                    : `Loading ad copy from ${activePlatform === 'meta' ? 'Meta' : activePlatform === 'bing' ? 'Bing' : 'Google'} Ads...`;
 
             try {
                 const resp = await fetch(url);
@@ -497,7 +504,8 @@
             if (hasMultiAcct) {
                 document.getElementById('report-account').textContent = `${data.accounts.length} Accounts`;
             } else {
-                document.getElementById('report-account').textContent = 'Account: 840-838-5870';
+                const acctId = data.account?.id || (activePlatform === 'bing' ? 'C449285895' : '840-838-5870');
+                document.getElementById('report-account').textContent = `Account: ${acctId}`;
             }
 
             document.getElementById('label-campaigns').textContent = hasMultiAcct ? 'Accounts' : 'Campaigns';
@@ -1420,7 +1428,9 @@
 
         // Init
         // Check for ?meta_connected=true from OAuth callback
-        if (new URLSearchParams(window.location.search).get('meta_connected') === 'true') {
+        if (new URLSearchParams(window.location.search).get('bing_connected') === 'true') {
+            switchPlatform('bing');
+        } else if (new URLSearchParams(window.location.search).get('meta_connected') === 'true') {
             switchPlatform('meta');
         } else {
             const hashState = readHash();
