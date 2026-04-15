@@ -181,10 +181,11 @@
 
             document.getElementById('year-tabs').style.display = '';
             activeYear = 'active';
-            updateHeadline();
             buildYearTabs();
+            // buildYearTabs may override activeYear (e.g. Bing sets it to '2024')
+            updateHeadline();
             updateHash();
-            dataCache[cacheKey('active')] ? renderReport(dataCache[cacheKey('active')]) : loadData('active');
+            dataCache[cacheKey(activeYear)] ? renderReport(dataCache[cacheKey(activeYear)]) : loadData(activeYear);
         }
 
         // Build year tabs
@@ -192,7 +193,8 @@
             const container = document.getElementById('year-tabs');
             // Bing: only ran ads in 2024
             if (activePlatform === 'bing') {
-                container.innerHTML = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">2024</button>`;
+                container.innerHTML = `<button class="year-tab active" data-year="2024" onclick="switchYear('2024')">2024</button>`;
+                activeYear = '2024';
                 return;
             }
             const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
