@@ -139,12 +139,12 @@ function mapPinnedField(field) {
 
 function parseCampaigns(xml) {
     const campaigns = [];
-    // Match <Campaign> or <a:Campaign> blocks — use negative lookahead to avoid
-    // matching CampaignType, CampaignManagement, etc.
-    const re = /<(?:a:)?Campaign(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Campaign>/g;
-    let m;
-    while ((m = re.exec(xml)) !== null) {
-        const block = m[0];
+    // Use split instead of regex to avoid Node.js regex issues on large XML
+    const parts = xml.split('<Campaign>');
+    for (let i = 1; i < parts.length; i++) {
+        const endIdx = parts[i].indexOf('</Campaign>');
+        if (endIdx === -1) continue;
+        const block = parts[i].substring(0, endIdx);
         const id = xmlVal(block, 'Id');
         const name = xmlVal(block, 'Name');
         const status = xmlVal(block, 'Status');
@@ -153,15 +153,34 @@ function parseCampaigns(xml) {
             campaigns.push({ Id: id, Name: name, Status: status, CampaignType: type });
         }
     }
+    // Also handle <a:Campaign> prefix variant
+    if (campaigns.length === 0) {
+        const parts2 = xml.split('<a:Campaign>');
+        for (let i = 1; i < parts2.length; i++) {
+            const endIdx = parts2[i].indexOf('</a:Campaign>');
+            if (endIdx === -1) continue;
+            const block = parts2[i].substring(0, endIdx);
+            const id = xmlVal(block, 'Id');
+            const name = xmlVal(block, 'Name');
+            const status = xmlVal(block, 'Status');
+            const type = xmlVal(block, 'CampaignType');
+            if (id && name) {
+                campaigns.push({ Id: id, Name: name, Status: status, CampaignType: type });
+            }
+        }
+    }
     return campaigns;
 }
 
 function parseAdGroups(xml) {
     const adGroups = [];
-    const re = /<(?:a:)?AdGroup(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?AdGroup>/g;
-    let m;
-    while ((m = re.exec(xml)) !== null) {
-        const block = m[0];
+    const tag = xml.includes('<a:AdGroup>') ? '<a:AdGroup>' : '<AdGroup>';
+    const endTag = xml.includes('<a:AdGroup>') ? '</a:AdGroup>' : '</AdGroup>';
+    const parts = xml.split(tag);
+    for (let i = 1; i < parts.length; i++) {
+        const endIdx = parts[i].indexOf(endTag);
+        if (endIdx === -1) continue;
+        const block = parts[i].substring(0, endIdx);
         const id = xmlVal(block, 'Id');
         const name = xmlVal(block, 'Name');
         const status = xmlVal(block, 'Status');
@@ -174,10 +193,15 @@ function parseAdGroups(xml) {
 
 function parseAds(xml) {
     const ads = [];
-    const re = /<(?:a:)?Ad(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Ad>/g;
-    let m;
-    while ((m = re.exec(xml)) !== null) {
-        const block = m[0];
+    const tag = xml.includes('<a:Ad>') ? '<a:Ad>' : '<Ad>';
+    const endTag = xml.includes('<a:Ad>') ? '</a:Ad>' : '</Ad>';
+    // Handle Ad blocks which may have i:type attribute
+    const tagPattern = xml.includes('<a:Ad') ? '<a:Ad' : '<Ad';
+    const parts = xml.split(new RegExp(`${tagPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[> ]`));
+    for (let i = 1; i < parts.length; i++) {
+        const endIdx = parts[i].indexOf(endTag.replace('>', '>').replace('</', '</'));
+        if (endIdx === -1) continue;
+        const block = parts[i].substring(0, endIdx);
         const type = block.match(/i:type="([^"]+)"/)?.[1] || xmlVal(block, 'Type') || 'Unknown';
         const id = xmlVal(block, 'Id');
         const status = xmlVal(block, 'Status');
@@ -240,10 +264,13 @@ function parseAds(xml) {
 
 function parseKeywords(xml) {
     const keywords = [];
-    const re = /<(?:a:)?Keyword(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Keyword>/g;
-    let m;
-    while ((m = re.exec(xml)) !== null) {
-        const block = m[0];
+    const tag = xml.includes('<a:Keyword>') ? '<a:Keyword>' : '<Keyword>';
+    const endTag = xml.includes('<a:Keyword>') ? '</a:Keyword>' : '</Keyword>';
+    const parts = xml.split(tag);
+    for (let i = 1; i < parts.length; i++) {
+        const endIdx = parts[i].indexOf(endTag);
+        if (endIdx === -1) continue;
+        const block = parts[i].substring(0, endIdx);
         const text = xmlVal(block, 'Text');
         const matchType = xmlVal(block, 'MatchType');
         const status = xmlVal(block, 'Status');
