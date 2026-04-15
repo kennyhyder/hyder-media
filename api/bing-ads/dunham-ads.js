@@ -62,7 +62,9 @@ async function soapCall(url, action, ns, headers, bodyXml) {
 // ─── XML Parsing Helpers ───
 
 function xmlVal(xml, tag) {
-    const m = xml.match(new RegExp(`<[^>]*:?${tag}[^>]*>([^<]*)<`));
+    // Match <Tag>, <a:Tag>, <ns:Tag> but NOT <SomeOtherTag>
+    // Anchored: must be immediately after < with only an optional short ns prefix
+    const m = xml.match(new RegExp(`<(?:[a-zA-Z]{1,3}:)?${tag}(?:\\s[^>]*)?>([^<]*)<`));
     return m ? decodeXmlEntities(m[1]) : null;
 }
 
