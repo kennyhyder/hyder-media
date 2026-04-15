@@ -310,8 +310,15 @@ async function getCampaigns(h, accountId) {
             <AccountId>${accountId}</AccountId>
             <CampaignType>Search Shopping Audience DynamicSearchAds PerformanceMax</CampaignType>
         </GetCampaignsByAccountIdRequest>`);
-    return parseCampaigns(xml);
+    const result = parseCampaigns(xml);
+    // Temporary debug: if 0 results, store raw response length
+    if (result.length === 0) {
+        getCampaigns._debugXml = xml.substring(0, 1000);
+    }
+    return result;
 }
+// Expose debug info
+getCampaigns._debugXml = null;
 
 async function getAdGroups(h, campaignId) {
     const xml = await soapCall(CM_SOAP, 'GetAdGroupsByCampaignId', CM_NS, h,
@@ -373,7 +380,7 @@ async function fetchActiveData(token, devToken, customerId, accountId) {
 
     if (campaigns.length === 0) {
         // Return debug info when no campaigns found
-        return { campaigns: [], accountAssets: [], _debug: { totalBeforeFilter: allCampaigns.length, accountId, customerId } };
+        return { campaigns: [], accountAssets: [], _debug: { totalBeforeFilter: allCampaigns.length, accountId, customerId, soapResponse: getCampaigns._debugXml } };
     }
 
     // 2. Get ad groups in parallel
