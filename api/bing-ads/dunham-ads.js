@@ -355,7 +355,10 @@ async function getCampaigns(h, accountId) {
         const hasCampaignTag = xml.includes('<Campaign>');
         const xmlLen = xml.length;
         const first200 = xml.substring(0, 200);
-        throw new Error(`parseCampaigns returned 0. xmlLen=${xmlLen}, hasCampaignTag=${hasCampaignTag}, first200=${first200}`);
+        const splitCount = xml.split('<Campaign>').length - 1;
+        const idxFirst = xml.indexOf('<Campaign>');
+        const around = idxFirst >= 0 ? xml.substring(idxFirst, idxFirst + 100) : 'N/A';
+        throw new Error(`parse=0 xmlLen=${xmlLen} splits=${splitCount} idx=${idxFirst} around=${around}`);
     }
     return result;
 }
