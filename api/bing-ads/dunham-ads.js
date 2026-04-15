@@ -547,7 +547,7 @@ export default async function handler(req, res) {
         if (!connection) return res.status(401).json({ error: 'Microsoft Advertising not connected', needsAuth: true });
 
         const accessToken = await refreshTokenIfNeeded(connection, supabase);
-        const devToken = process.env.BING_ADS_DEVELOPER_TOKEN;
+        const devToken = (process.env.BING_ADS_DEVELOPER_TOKEN || '').trim();
         if (!devToken) return res.status(500).json({ error: 'BING_ADS_DEVELOPER_TOKEN not configured' });
 
         const { customer_id: customerId, account_id: accountId } = connection;
