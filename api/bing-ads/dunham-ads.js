@@ -363,31 +363,30 @@ async function getAdGroups(h, campaignId) {
 }
 
 async function getAds(h, adGroupId) {
-    // Try with common ad types first; if that fails, try without filter
     try {
         const xml = await soapCall(CM_SOAP, 'GetAdsByAdGroupId', CM_NS, h,
             `<GetAdsByAdGroupIdRequest xmlns="${CM_NS}">
                 <AdGroupId>${adGroupId}</AdGroupId>
-                <AdTypes xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-                    <a:string>ResponsiveSearch</a:string>
-                    <a:string>ExpandedText</a:string>
-                    <a:string>DynamicSearch</a:string>
+                <AdTypes>
+                    <AdType>ResponsiveSearch</AdType>
+                    <AdType>ExpandedText</AdType>
+                    <AdType>DynamicSearch</AdType>
                 </AdTypes>
             </GetAdsByAdGroupIdRequest>`);
         return parseAds(xml);
     } catch (e) {
-        // Retry with just ResponsiveAd (for PMax/Audience campaigns)
+        // Retry with ResponsiveAd for audience/PMax campaigns
         try {
             const xml2 = await soapCall(CM_SOAP, 'GetAdsByAdGroupId', CM_NS, h,
                 `<GetAdsByAdGroupIdRequest xmlns="${CM_NS}">
                     <AdGroupId>${adGroupId}</AdGroupId>
-                    <AdTypes xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-                        <a:string>ResponsiveAd</a:string>
+                    <AdTypes>
+                        <AdType>ResponsiveAd</AdType>
                     </AdTypes>
                 </GetAdsByAdGroupIdRequest>`);
             return parseAds(xml2);
         } catch (e2) {
-            return []; // Ad group doesn't support any ad type query
+            return [];
         }
     }
 }
