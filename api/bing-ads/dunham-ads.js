@@ -195,16 +195,16 @@ function parseAdGroups(xml) {
 
 function parseAds(xml) {
     const ads = [];
-    const tag = xml.includes('<a:Ad>') ? '<a:Ad>' : '<Ad>';
-    const endTag = xml.includes('<a:Ad>') ? '</a:Ad>' : '</Ad>';
-    // Handle Ad blocks which may have i:type attribute
-    const tagPattern = xml.includes('<a:Ad') ? '<a:Ad' : '<Ad';
-    const parts = xml.split(new RegExp(`${tagPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[> ]`));
+    // Ads have i:type attribute: <Ad i:type="ResponsiveSearchAd">
+    // Split on this specific pattern to avoid matching AdGroup, AdDescription, etc.
+    const endTag = xml.includes('</a:Ad>') ? '</a:Ad>' : '</Ad>';
+    const parts = xml.split(/<(?:a:)?Ad\s+i:type="/);
     for (let i = 1; i < parts.length; i++) {
-        const endIdx = parts[i].indexOf(endTag.replace('>', '>').replace('</', '</'));
+        const endIdx = parts[i].indexOf(endTag);
         if (endIdx === -1) continue;
         const block = parts[i].substring(0, endIdx);
-        const type = block.match(/i:type="([^"]+)"/)?.[1] || xmlVal(block, 'Type') || 'Unknown';
+        // Block starts with type value since we split at i:type="
+        const type = block.match(/^([^"]+)/)?.[1] || 'Unknown';
         const id = xmlVal(block, 'Id');
         const status = xmlVal(block, 'Status');
         const name = xmlVal(block, 'Name');
@@ -473,63 +473,10 @@ async function fetchActiveData(token, devToken, customerId, accountId) {
 // ─── Fetch Historical Ads ───
 
 async function fetchHistoricalData(token, devToken, customerId, accountId, year) {
-    const h = { token, devToken, customerId, accountId };
-
-    // Get ALL campaigns (including paused)
-    const campaigns = await getCampaigns(h, accountId);
-    if (campaigns.length === 0) return { campaigns: [], accountAssets: [] };
-
-    // Get ad groups
-    const agResults = await Promise.all(
-        campaigns.map(c => getAdGroups(h, c.Id)
-            .then(ags => ({ cId: c.Id, ags }))
-            .catch(() => ({ cId: c.Id, ags: [] }))
-        )
-    );
-
-    const agMap = {};
-    for (const r of agResults) agMap[r.cId] = r.ags;
-
-    const allAgs = [];
-    for (const camp of campaigns) {
-        for (const ag of (agMap[camp.Id] || [])) {
-            allAgs.push({ ...ag, _cId: camp.Id });
-        }
-    }
-
-    // Fetch ads + keywords (all statuses for historical)
-    const details = await Promise.all(
-        allAgs.map(ag =>
-            Promise.all([
-                getAds(h, ag.Id).catch(() => []),
-                getKeywords(h, ag.Id).catch(() => []),
-            ]).then(([ads, kws]) => ({
-                campaignId: ag._cId, name: ag.Name,
-                ads: ads.map(transformAd),
-                keywords: kws.map(transformKeyword),
-            }))
-        )
-    );
-
-    const byCampaign = {};
-    for (const d of details) {
-        if (d.ads.length === 0 && d.keywords.length === 0) continue;
-        if (!byCampaign[d.campaignId]) byCampaign[d.campaignId] = [];
-        byCampaign[d.campaignId].push({ name: d.name, ads: d.ads, keywords: d.keywords, negativeKeywords: [] });
-    }
-
-    const accountAssets = await getExtensions(h, accountId);
-
-    return {
-        campaigns: campaigns
-            .filter(c => byCampaign[c.Id])
-            .map(c => ({
-                name: c.Name, status: mapStatus(c.Status), type: mapCampaignType(c.CampaignType),
-                adGroups: byCampaign[c.Id] || [], assets: [],
-            })),
-        accountAssets,
-        negativeKeywordLists: [],
-    };
+    // Microsoft Advertising Campaign Management API only returns current state.
+    // Historical year-by-year filtering would require the Reporting API.
+    // For now, return the same active data for all years.
+    return fetchActiveData(token, devToken, customerId, accountId);
 }
 
 // ─── Token Management ───
