@@ -125,7 +125,7 @@ export default async function handler(req, res) {
         const imageCache = await prefetchImages(data, platform);
 
         const yearLabel = yearParam === 'active' ? 'Active Ads' : yearParam;
-        const platformLabel = platform === 'meta' ? 'Meta Ads' : 'Google Ads';
+        const platformLabel = platform === 'meta' ? 'Meta Ads' : platform === 'bing' ? 'Bing Ads' : 'Google Ads';
         const filename = `dunham-ads-${platform}-${yearParam}.pdf`;
 
         const doc = new PDFDocument({ size: 'letter', margin: MARGIN, bufferPages: false });
@@ -155,7 +155,9 @@ export default async function handler(req, res) {
 // ── Data Fetching ──
 
 async function fetchData(baseUrl, platform, yearParam) {
-    const apiPath = platform === 'meta' ? '/api/meta-ads/dunham-ads' : '/api/google-ads/dunham-ads';
+    const apiPath = platform === 'meta' ? '/api/meta-ads/dunham-ads'
+        : platform === 'bing' ? '/api/bing-ads/dunham-ads'
+        : '/api/google-ads/dunham-ads';
     const url = yearParam === 'active'
         ? `${baseUrl}${apiPath}`
         : `${baseUrl}${apiPath}?year=${yearParam}`;
