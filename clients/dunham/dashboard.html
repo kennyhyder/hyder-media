@@ -176,7 +176,7 @@
 
             document.getElementById('report-account').textContent =
                 platform === 'google' ? 'Account: 840-838-5870'
-                : platform === 'bing' ? 'Account: C449285895'
+                : platform === 'bing' ? 'Account: X1592490'
                 : 'Meta Ads';
 
             document.getElementById('year-tabs').style.display = '';
@@ -504,7 +504,7 @@
             if (hasMultiAcct) {
                 document.getElementById('report-account').textContent = `${data.accounts.length} Accounts`;
             } else {
-                const acctId = data.account?.id || (activePlatform === 'bing' ? 'C449285895' : '840-838-5870');
+                const acctId = data.account?.id || (activePlatform === 'bing' ? 'X1592490' : '840-838-5870');
                 document.getElementById('report-account').textContent = `Account: ${acctId}`;
             }
 

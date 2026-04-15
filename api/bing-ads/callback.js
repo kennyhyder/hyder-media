@@ -12,7 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 const REDIRECT_URI = 'https://hyder.me/api/bing-ads/callback';
 const TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 const CUST_BASE = 'https://clientcenter.api.bingads.microsoft.com/Api/CustomerManagement/v13/CustomerManagementService.svc/v13';
-const TARGET_ACCOUNT_NUMBER = 'C449285895';
+const TARGET_ACCOUNT_NUMBER = 'X1592490';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {

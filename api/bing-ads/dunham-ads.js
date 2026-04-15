@@ -2,7 +2,7 @@
  * Microsoft Advertising — Dunham & Jones Ad Copy Audit
  * GET /api/bing-ads/dunham-ads
  *
- * Fetches ad copy from Microsoft Advertising account C449285895.
+ * Fetches ad copy from Microsoft Advertising account X1592490.
  * Returns data in the same format as the Google Ads endpoint so the
  * dashboard can reuse the same rendering logic.
  *
@@ -14,7 +14,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { inflateRawSync } from 'zlib';
 
-const ACCOUNT_NUMBER = 'C449285895';
+const ACCOUNT_NUMBER = 'X1592490';
 
 const CM_BASE = 'https://campaign.api.bingads.microsoft.com/Api/Advertiser/CampaignManagement/v13/CampaignManagementService.svc/v13';
 const CUST_BASE = 'https://clientcenter.api.bingads.microsoft.com/Api/CustomerManagement/v13/CustomerManagementService.svc/v13';
