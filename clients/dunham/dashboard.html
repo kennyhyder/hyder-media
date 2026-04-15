@@ -190,8 +190,12 @@
         // Build year tabs
         function buildYearTabs() {
             const container = document.getElementById('year-tabs');
-            const startYear = activePlatform === 'meta' ? META_START_YEAR
-                : activePlatform === 'bing' ? BING_START_YEAR : GOOGLE_START_YEAR;
+            // Bing: only ran ads in 2024
+            if (activePlatform === 'bing') {
+                container.innerHTML = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">2024</button>`;
+                return;
+            }
+            const startYear = activePlatform === 'meta' ? META_START_YEAR : GOOGLE_START_YEAR;
             let html = `<button class="year-tab active" data-year="active" onclick="switchYear('active')">Active Ads</button>`;
             for (let y = CURRENT_YEAR; y >= startYear; y--) {
                 html += `<button class="year-tab" data-year="${y}" onclick="switchYear(${y})">${y}</button>`;
