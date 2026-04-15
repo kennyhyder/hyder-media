@@ -50,9 +50,11 @@ async function soapCall(url, action, ns, headers, bodyXml) {
         body: envelope,
     });
     const text = await resp.text();
-    if (!resp.ok || text.includes('<faultstring>')) {
+    if (!resp.ok || text.includes('Fault>') || text.includes('faultstring') || text.includes('ErrorCode>')) {
         const fault = text.match(/<faultstring[^>]*>([^<]+)<\/faultstring>/);
-        throw new Error(`SOAP ${action}: ${fault ? fault[1] : resp.status}`);
+        const errCode = text.match(/<ErrorCode>([^<]+)<\/ErrorCode>/);
+        const errMsg = text.match(/<Message>([^<]+)<\/Message>/);
+        throw new Error(`SOAP ${action}: ${errCode ? errCode[1] : ''} ${errMsg ? errMsg[1] : fault ? fault[1] : `HTTP ${resp.status}`}`);
     }
     return text;
 }
@@ -310,15 +312,8 @@ async function getCampaigns(h, accountId) {
             <AccountId>${accountId}</AccountId>
             <CampaignType>Search Shopping Audience DynamicSearchAds PerformanceMax</CampaignType>
         </GetCampaignsByAccountIdRequest>`);
-    const result = parseCampaigns(xml);
-    // Temporary debug: if 0 results, store raw response length
-    if (result.length === 0) {
-        getCampaigns._debugXml = xml.substring(0, 1000);
-    }
-    return result;
+    return parseCampaigns(xml);
 }
-// Expose debug info
-getCampaigns._debugXml = null;
 
 async function getAdGroups(h, campaignId) {
     const xml = await soapCall(CM_SOAP, 'GetAdGroupsByCampaignId', CM_NS, h,
@@ -380,7 +375,7 @@ async function fetchActiveData(token, devToken, customerId, accountId) {
 
     if (campaigns.length === 0) {
         // Return debug info when no campaigns found
-        return { campaigns: [], accountAssets: [], _debug: { totalBeforeFilter: allCampaigns.length, accountId, customerId, soapResponse: getCampaigns._debugXml } };
+        return { campaigns: [], accountAssets: [] };
     }
 
     // 2. Get ad groups in parallel
@@ -508,7 +503,9 @@ async function getConnection(supabase) {
 }
 
 async function refreshTokenIfNeeded(connection, supabase) {
-    if (new Date(connection.token_expires_at) > new Date()) return connection.access_token;
+    // Always refresh if within 5 minutes of expiry
+    const fiveMinutes = 5 * 60 * 1000;
+    if (new Date(connection.token_expires_at).getTime() - fiveMinutes > Date.now()) return connection.access_token;
     if (!connection.refresh_token) throw new Error('Token expired. Please re-authorize.');
 
     const resp = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
