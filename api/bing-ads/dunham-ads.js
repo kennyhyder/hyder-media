@@ -139,8 +139,12 @@ function mapPinnedField(field) {
 
 function parseCampaigns(xml) {
     const campaigns = [];
-    const campBlocks = xmlBlocks(xml, 'Campaign');
-    for (const block of campBlocks) {
+    // Match <Campaign> or <a:Campaign> blocks — use negative lookahead to avoid
+    // matching CampaignType, CampaignManagement, etc.
+    const re = /<(?:a:)?Campaign(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Campaign>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+        const block = m[0];
         const id = xmlVal(block, 'Id');
         const name = xmlVal(block, 'Name');
         const status = xmlVal(block, 'Status');
@@ -154,8 +158,10 @@ function parseCampaigns(xml) {
 
 function parseAdGroups(xml) {
     const adGroups = [];
-    const blocks = xmlBlocks(xml, 'AdGroup');
-    for (const block of blocks) {
+    const re = /<(?:a:)?AdGroup(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?AdGroup>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+        const block = m[0];
         const id = xmlVal(block, 'Id');
         const name = xmlVal(block, 'Name');
         const status = xmlVal(block, 'Status');
@@ -168,8 +174,10 @@ function parseAdGroups(xml) {
 
 function parseAds(xml) {
     const ads = [];
-    const adBlocks = xmlBlocks(xml, 'Ad');
-    for (const block of adBlocks) {
+    const re = /<(?:a:)?Ad(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Ad>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+        const block = m[0];
         const type = block.match(/i:type="([^"]+)"/)?.[1] || xmlVal(block, 'Type') || 'Unknown';
         const id = xmlVal(block, 'Id');
         const status = xmlVal(block, 'Status');
@@ -232,8 +240,10 @@ function parseAds(xml) {
 
 function parseKeywords(xml) {
     const keywords = [];
-    const blocks = xmlBlocks(xml, 'Keyword');
-    for (const block of blocks) {
+    const re = /<(?:a:)?Keyword(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Keyword>/g;
+    let m;
+    while ((m = re.exec(xml)) !== null) {
+        const block = m[0];
         const text = xmlVal(block, 'Text');
         const matchType = xmlVal(block, 'MatchType');
         const status = xmlVal(block, 'Status');
