@@ -381,10 +381,12 @@ async function fetchActiveData(token, devToken, customerId, accountId) {
     } catch (e) {
         throw new Error(`getCampaigns failed: ${e.message}`);
     }
-    const campaigns = allCampaigns.filter(c => c.Status === 'Active' || c.Status === 'Paused');
+    // Include all non-deleted campaigns (Paused campaigns are important for audit)
+    const campaigns = allCampaigns.filter(c => c.Status !== 'Deleted');
 
     if (campaigns.length === 0) {
-        // Return debug info when no campaigns found
+        const statuses = [...new Set(allCampaigns.map(c => c.Status))];
+        throw new Error(`0 campaigns after filter. Raw count: ${allCampaigns.length}. Statuses: [${statuses.join(', ')}]`);
         return { campaigns: [], accountAssets: [] };
     }
 
