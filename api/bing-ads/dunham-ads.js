@@ -349,7 +349,15 @@ async function getCampaigns(h, accountId) {
             <AccountId>${accountId}</AccountId>
             <CampaignType>Search</CampaignType>
         </GetCampaignsByAccountIdRequest>`);
-    return parseCampaigns(xml);
+    const result = parseCampaigns(xml);
+    if (result.length === 0) {
+        // Add XML diagnostics to help debug
+        const hasCampaignTag = xml.includes('<Campaign>');
+        const xmlLen = xml.length;
+        const first200 = xml.substring(0, 200);
+        throw new Error(`parseCampaigns returned 0. xmlLen=${xmlLen}, hasCampaignTag=${hasCampaignTag}, first200=${first200}`);
+    }
+    return result;
 }
 
 async function getAdGroups(h, campaignId) {
