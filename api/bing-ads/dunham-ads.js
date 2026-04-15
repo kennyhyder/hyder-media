@@ -363,11 +363,17 @@ async function fetchActiveData(token, devToken, customerId, accountId) {
     const h = { token, devToken, customerId, accountId };
 
     // 1. Get campaigns
-    const campaigns = (await getCampaigns(h, accountId))
-        .filter(c => c.Status === 'Active' || c.Status === 'Paused');
+    let allCampaigns;
+    try {
+        allCampaigns = await getCampaigns(h, accountId);
+    } catch (e) {
+        throw new Error(`getCampaigns failed: ${e.message}`);
+    }
+    const campaigns = allCampaigns.filter(c => c.Status === 'Active' || c.Status === 'Paused');
 
     if (campaigns.length === 0) {
-        return { campaigns: [], accountAssets: [] };
+        // Return debug info when no campaigns found
+        return { campaigns: [], accountAssets: [], _debug: { totalBeforeFilter: allCampaigns.length, accountId, customerId } };
     }
 
     // 2. Get ad groups in parallel
