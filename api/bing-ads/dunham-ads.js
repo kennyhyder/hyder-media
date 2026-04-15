@@ -574,10 +574,19 @@ export default async function handler(req, res) {
             try {
                 const xml = await soapCall(CM_SOAP, 'GetCampaignsByAccountId', CM_NS, h,
                     `<GetCampaignsByAccountIdRequest xmlns="${CM_NS}"><AccountId>${accountId}</AccountId><CampaignType>Search</CampaignType></GetCampaignsByAccountIdRequest>`);
-                const camps = parseCampaigns(xml);
-                return res.status(200).json({ success: true, campaigns: camps.length, xmlLen: xml.length, first500: xml.substring(0, 500) });
+                // Test different regex patterns
+                const re1 = /<(?:a:)?Campaign(?=>|[ ])[^>]*>([\s\S]*?)<\/(?:a:)?Campaign>/g;
+                const re2 = /<Campaign>/g;
+                const re3 = /<\/Campaign>/g;
+                const count1 = (xml.match(re1) || []).length;
+                const count2 = (xml.match(re2) || []).length;
+                const count3 = (xml.match(re3) || []).length;
+                // Find first <Campaign> and show surrounding context
+                const idx = xml.indexOf('<Campaign>');
+                const ctx = idx >= 0 ? xml.substring(Math.max(0, idx - 50), idx + 200) : 'NOT FOUND';
+                return res.status(200).json({ success: true, xmlLen: xml.length, regexMatches: count1, openTags: count2, closeTags: count3, firstCampaignContext: ctx });
             } catch (e) {
-                return res.status(200).json({ success: false, error: e.message, devToken, customerId, accountId, tokenLen: accessToken.length });
+                return res.status(200).json({ success: false, error: e.message });
             }
         }
 
