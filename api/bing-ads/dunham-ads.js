@@ -21,22 +21,26 @@ const REPORT_SOAP = 'https://reporting.api.bingads.microsoft.com/Api/Advertiser/
 const REPORT_NS = 'https://bingads.microsoft.com/Reporting/v13';
 
 // ─── SOAP Helper ───
+// CRITICAL: Must use default namespace on s:Header and include Action element.
+// Microsoft's API rejects requests without this exact format.
 
-function soapEnvelope(ns, headers, bodyXml) {
-    let headerXml = `<h:AuthenticationToken xmlns:h="${ns}">${headers.token}</h:AuthenticationToken>
-    <h:DeveloperToken xmlns:h="${ns}">${headers.devToken}</h:DeveloperToken>`;
-    if (headers.customerId) headerXml += `\n    <h:CustomerId xmlns:h="${ns}">${headers.customerId}</h:CustomerId>`;
-    if (headers.accountId) headerXml += `\n    <h:AccountId xmlns:h="${ns}">${headers.accountId}</h:AccountId>`;
-
+function soapEnvelope(ns, action, headers, bodyXml) {
     return `<?xml version="1.0" encoding="utf-8"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-  <s:Header>${headerXml}</s:Header>
+<s:Envelope xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header xmlns="${ns}">
+    <Action mustUnderstand="1">${action}</Action>
+    <ApplicationToken i:nil="true"/>
+    <AuthenticationToken i:nil="false">${headers.token}</AuthenticationToken>
+    <CustomerAccountId i:nil="false">${headers.accountId || ''}</CustomerAccountId>
+    <CustomerId i:nil="false">${headers.customerId || ''}</CustomerId>
+    <DeveloperToken i:nil="false">${headers.devToken}</DeveloperToken>
+  </s:Header>
   <s:Body>${bodyXml}</s:Body>
 </s:Envelope>`;
 }
 
 async function soapCall(url, action, ns, headers, bodyXml) {
-    const envelope = soapEnvelope(ns, headers, bodyXml);
+    const envelope = soapEnvelope(ns, action, headers, bodyXml);
     const resp = await fetch(url, {
         method: 'POST',
         headers: {
