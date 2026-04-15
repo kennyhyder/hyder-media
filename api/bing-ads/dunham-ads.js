@@ -558,20 +558,17 @@ export default async function handler(req, res) {
         const year = parseInt(req.query.year);
         const isHistorical = year && year >= 2010 && year <= new Date().getFullYear();
 
-        // Debug mode
+        // Debug mode: actually execute a SOAP call and return raw result
         if (req.query.debug === 'soap') {
             const h = { token: accessToken, devToken, customerId, accountId };
-            const testEnvelope = soapEnvelope(CM_NS, 'GetCampaignsByAccountId', h,
-                `<GetCampaignsByAccountIdRequest xmlns="${CM_NS}"><AccountId>${accountId}</AccountId><CampaignType>Search</CampaignType></GetCampaignsByAccountIdRequest>`);
-            return res.status(200).json({
-                tokenLen: accessToken.length,
-                tokenStart: accessToken.substring(0, 30),
-                devToken,
-                customerId,
-                accountId,
-                envelopeLen: testEnvelope.length,
-                headerSection: testEnvelope.substring(0, testEnvelope.indexOf('</s:Header>') + 11),
-            });
+            try {
+                const xml = await soapCall(CM_SOAP, 'GetCampaignsByAccountId', CM_NS, h,
+                    `<GetCampaignsByAccountIdRequest xmlns="${CM_NS}"><AccountId>${accountId}</AccountId><CampaignType>Search</CampaignType></GetCampaignsByAccountIdRequest>`);
+                const camps = parseCampaigns(xml);
+                return res.status(200).json({ success: true, campaigns: camps.length, xmlLen: xml.length, first500: xml.substring(0, 500) });
+            } catch (e) {
+                return res.status(200).json({ success: false, error: e.message, devToken, customerId, accountId, tokenLen: accessToken.length });
+            }
         }
 
         const data = isHistorical
