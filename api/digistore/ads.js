@@ -80,17 +80,18 @@ export default async function handler(req, res) {
         const start = startDate.toISOString().split('T')[0];
         const end = endDate.toISOString().split('T')[0];
 
-        // Fetch RSA ads with metrics and asset performance in parallel
-        const [adsData, assetData] = await Promise.all([
-            fetchRSAAds(headers, start, end),
+        // Fetch live ads (no date filter), metrics for date range, and asset performance in parallel
+        const [liveAds, adMetrics, assetData] = await Promise.all([
+            fetchLiveRSAAds(headers),
+            fetchRSAMetrics(headers, start, end),
             fetchAssetPerformance(headers).catch(() => null),
         ]);
 
         // Build asset leaderboard from asset performance data
         const assetLeaderboard = assetData ? buildAssetLeaderboard(assetData) : null;
 
-        // Attach asset labels to ads if available
-        const ads = processAds(adsData, assetData);
+        // Merge live ad structure with metrics + asset labels
+        const ads = mergeAdsAndMetrics(liveAds, adMetrics, assetData);
 
         return res.status(200).json({
             status: 'success',
@@ -119,17 +120,38 @@ async function fetchQuery(headers, query) {
     return data.results || [];
 }
 
-async function fetchRSAAds(headers, start, end) {
+async function fetchLiveRSAAds(headers) {
+    // All enabled RSA ads in enabled campaigns/ad groups — no date filter, structural only
     const query = `
         SELECT
+            campaign.id,
             campaign.name,
+            campaign.status,
+            ad_group.id,
             ad_group.name,
+            ad_group.status,
             ad_group_ad.ad.id,
             ad_group_ad.ad.type,
             ad_group_ad.status,
             ad_group_ad.ad.responsive_search_ad.headlines,
             ad_group_ad.ad.responsive_search_ad.descriptions,
-            ad_group_ad.ad.final_urls,
+            ad_group_ad.ad.responsive_search_ad.path1,
+            ad_group_ad.ad.responsive_search_ad.path2,
+            ad_group_ad.ad.final_urls
+        FROM ad_group_ad
+        WHERE ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD'
+            AND ad_group_ad.status = 'ENABLED'
+            AND ad_group.status = 'ENABLED'
+            AND campaign.status = 'ENABLED'
+    `;
+    return fetchQuery(headers, query);
+}
+
+async function fetchRSAMetrics(headers, start, end) {
+    // Metrics per ad for the date range (aggregated, no segments in SELECT)
+    const query = `
+        SELECT
+            ad_group_ad.ad.id,
             metrics.impressions,
             metrics.clicks,
             metrics.cost_micros,
@@ -138,8 +160,6 @@ async function fetchRSAAds(headers, start, end) {
         FROM ad_group_ad
         WHERE segments.date BETWEEN '${start}' AND '${end}'
             AND ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD'
-            AND metrics.impressions > 0
-        ORDER BY metrics.conversions DESC
     `;
     return fetchQuery(headers, query);
 }
@@ -158,14 +178,13 @@ async function fetchAssetPerformance(headers) {
     return fetchQuery(headers, query);
 }
 
-function processAds(adsData, assetData) {
+function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
     // Build asset label lookup: adId -> { headlines: {text: label}, descriptions: {text: label} }
     const assetLabels = {};
     if (assetData) {
         for (const row of assetData) {
             const view = row.adGroupAdAssetView || {};
             const adResourceName = view.adGroupAd || '';
-            // Extract ad ID from resource name: customers/xxx/adGroupAds/yyy~zzz
             const adIdMatch = adResourceName.match(/~(\d+)$/);
             if (!adIdMatch) continue;
             const adId = adIdMatch[1];
@@ -182,16 +201,28 @@ function processAds(adsData, assetData) {
         }
     }
 
-    return adsData.map(row => {
+    // Build metrics lookup by ad ID (aggregate if duplicate rows)
+    const metricsByAdId = {};
+    for (const row of (adMetrics || [])) {
+        const adId = row.adGroupAd?.ad?.id;
+        if (!adId) continue;
+        const m = row.metrics || {};
+        if (!metricsByAdId[adId]) {
+            metricsByAdId[adId] = { impressions: 0, clicks: 0, spend: 0, conversions: 0, conversionValue: 0 };
+        }
+        metricsByAdId[adId].impressions += parseInt(m.impressions || 0, 10);
+        metricsByAdId[adId].clicks += parseInt(m.clicks || 0, 10);
+        metricsByAdId[adId].spend += parseFloat(m.costMicros || 0) / 1000000;
+        metricsByAdId[adId].conversions += parseFloat(m.conversions || 0);
+        metricsByAdId[adId].conversionValue += parseFloat(m.conversionsValue || 0);
+    }
+
+    return liveAds.map(row => {
         const campaign = row.campaign?.name || '';
         const adGroup = row.adGroup?.name || '';
         const ad = row.adGroupAd?.ad || {};
-        const m = row.metrics || {};
         const adId = ad.id;
-        const spend = parseFloat(m.costMicros || 0) / 1000000;
-        const clicks = parseInt(m.clicks || 0, 10);
-        const impressions = parseInt(m.impressions || 0, 10);
-        const conversions = parseFloat(m.conversions || 0);
+        const metrics = metricsByAdId[adId] || { impressions: 0, clicks: 0, spend: 0, conversions: 0, conversionValue: 0 };
 
         const headlines = (ad.responsiveSearchAd?.headlines || []).map(h => ({
             text: h.text,
@@ -205,21 +236,34 @@ function processAds(adsData, assetData) {
             performanceLabel: assetLabels[adId]?.descriptions[d.text] || null,
         }));
 
+        // Count performance labels for quick summary
+        const labelCounts = { BEST: 0, GOOD: 0, LEARNING: 0, LOW: 0, UNRATED: 0 };
+        [...headlines, ...descriptions].forEach(a => {
+            const l = a.performanceLabel || 'UNRATED';
+            if (labelCounts[l] != null) labelCounts[l]++;
+        });
+
+        const rsa = ad.responsiveSearchAd || {};
         return {
             adId,
             campaign,
             adGroup,
+            campaignId: row.campaign?.id,
+            adGroupId: row.adGroup?.id,
             status: row.adGroupAd?.status || '',
             finalUrl: (ad.finalUrls || [])[0] || '',
+            path1: rsa.path1 || '',
+            path2: rsa.path2 || '',
             headlines,
             descriptions,
-            impressions,
-            clicks,
-            spend,
-            conversions,
-            conversionValue: parseFloat(m.conversionsValue || 0),
-            ctr: impressions > 0 ? clicks / impressions : 0,
-            cpa: conversions > 0 ? spend / conversions : 0,
+            labelCounts,
+            impressions: metrics.impressions,
+            clicks: metrics.clicks,
+            spend: metrics.spend,
+            conversions: metrics.conversions,
+            conversionValue: metrics.conversionValue,
+            ctr: metrics.impressions > 0 ? metrics.clicks / metrics.impressions : 0,
+            cpa: metrics.conversions > 0 ? metrics.spend / metrics.conversions : 0,
         };
     });
 }

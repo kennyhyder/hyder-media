@@ -3,7 +3,7 @@
  * GET /api/digistore/performance
  *
  * Fetches metrics for Digistore24 (246-624-6400)
- * Supports ?days=30 (default) and ?breakdown=summary|campaign|monthly
+ * Supports ?days=30 (default) and ?breakdown=summary|campaign|monthly|daily
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
     const days = parseInt(req.query.days) || 30;
-    const breakdown = req.query.breakdown || 'summary'; // 'summary' | 'campaign' | 'monthly'
+    const breakdown = req.query.breakdown || 'summary'; // 'summary' | 'campaign' | 'monthly' | 'daily'
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -97,6 +97,8 @@ export default async function handler(req, res) {
             result.campaigns = await fetchCampaignBreakdown(headers, dateRange);
         } else if (breakdown === 'monthly') {
             result.monthly = await fetchMonthlyMetrics(headers, dateRange);
+        } else if (breakdown === 'daily') {
+            result.daily = await fetchDailyMetrics(headers, dateRange);
         } else {
             result.summary = await fetchSummaryMetrics(headers, dateRange);
         }
@@ -260,4 +262,49 @@ async function fetchMonthlyMetrics(headers, dateRange) {
         cpa: m.conversions > 0 ? m.spend / m.conversions : 0,
         roas: m.spend > 0 ? m.conversionValue / m.spend : 0,
     }));
+}
+
+async function fetchDailyMetrics(headers, dateRange) {
+    const query = `
+        SELECT
+            segments.date,
+            metrics.cost_micros,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.conversions,
+            metrics.conversions_value
+        FROM customer
+        WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
+        ORDER BY segments.date ASC
+    `;
+
+    const response = await fetch(
+        `https://googleads.googleapis.com/v23/customers/${CUSTOMER_ID}/googleAds:search`,
+        { method: 'POST', headers, body: JSON.stringify({ query }) }
+    );
+
+    const data = await response.json();
+    if (data.error) return { error: data.error.message };
+
+    return (data.results || []).map(row => {
+        const m = row.metrics || {};
+        const spend = parseFloat(m.costMicros || 0) / 1000000;
+        const clicks = parseInt(m.clicks || 0, 10);
+        const impressions = parseInt(m.impressions || 0, 10);
+        const conversions = parseFloat(m.conversions || 0);
+        const conversionValue = parseFloat(m.conversionsValue || 0);
+
+        return {
+            date: row.segments?.date,
+            spend,
+            clicks,
+            impressions,
+            conversions,
+            conversionValue,
+            ctr: impressions > 0 ? clicks / impressions : 0,
+            cpc: clicks > 0 ? spend / clicks : 0,
+            cpa: conversions > 0 ? spend / conversions : 0,
+            roas: spend > 0 ? conversionValue / spend : 0,
+        };
+    });
 }

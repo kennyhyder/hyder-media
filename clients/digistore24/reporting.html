@@ -422,6 +422,93 @@
             color: var(--text-secondary);
         }
         .empty-state h3 { margin-bottom: 8px; color: var(--text-primary); }
+
+        /* Creative header + filters */
+        .creative-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .creative-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .creative-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            max-width: 280px;
+        }
+        .count-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: rgba(59,130,246,0.15);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* Label summary strip on ad cards */
+        .label-summary {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 8px 0 12px 0;
+        }
+        .label-pill {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .label-pill.best { background: rgba(34,197,94,0.15); color: var(--success); }
+        .label-pill.good { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .label-pill.low { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .label-pill.learning { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .label-pill.unrated { background: rgba(148,163,184,0.08); color: var(--text-secondary); }
+
+        /* Ad URL path display */
+        .ad-path {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: 6px;
+        }
+
+        /* Paused ad indicator (if somehow shown) */
+        .ad-card.paused {
+            opacity: 0.7;
+            border-left: 3px solid var(--warning);
+        }
+
+        /* Asset list - 2 columns on wide screens */
+        .asset-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(71,85,105,0.3);
+        }
+        @media (max-width: 768px) {
+            .asset-columns { grid-template-columns: 1fr; }
+        }
+        .asset-columns .asset-list {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
     </style>
 </head>
 <body>
@@ -448,6 +535,7 @@
             <div class="header-controls">
                 <span id="dataBadge" class="data-badge loading">Loading...</span>
                 <div class="date-selector">
+                    <button class="date-btn" data-days="7">7d</button>
                     <button class="date-btn" data-days="30">30d</button>
                     <button class="date-btn active" data-days="90">90d</button>
                     <button class="date-btn" data-days="180">6mo</button>
@@ -476,11 +564,11 @@
 
             <div class="chart-row">
                 <div class="chart-card">
-                    <h3>Monthly Spend & Conversions</h3>
+                    <h3 id="spendChartTitle">Spend & Conversions</h3>
                     <div class="chart-container"><canvas id="spendChart"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h3>Monthly CPA Trend</h3>
+                    <h3 id="cpaChartTitle">CPA Trend</h3>
                     <div class="chart-container"><canvas id="cpaChart"></canvas></div>
                 </div>
             </div>
@@ -513,7 +601,26 @@
 
         <!-- Ad Creative Tab -->
         <div id="tab-creative" class="tab-content">
-            <h2 style="font-size:1.2rem; margin-bottom:20px;">Top Performing Ads</h2>
+            <div class="creative-header">
+                <div>
+                    <h2 style="font-size:1.2rem;">Live Ads <span id="adCountBadge" class="count-badge">0</span></h2>
+                    <p class="creative-subtitle">All enabled responsive search ads with asset performance details</p>
+                </div>
+                <div class="creative-controls">
+                    <select id="adCampaignFilter" class="filter-select">
+                        <option value="">All campaigns</option>
+                    </select>
+                    <select id="adSortSelect" class="filter-select">
+                        <option value="spend">Sort: Spend (high → low)</option>
+                        <option value="conversions">Sort: Conversions</option>
+                        <option value="impressions">Sort: Impressions</option>
+                        <option value="ctr">Sort: CTR</option>
+                        <option value="cpa">Sort: CPA (low → high)</option>
+                        <option value="best">Sort: Most BEST assets</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="ad-cards" id="adCards"></div>
 
             <div class="leaderboard-grid" id="leaderboardGrid" style="display:none;">
@@ -535,14 +642,20 @@ let currentDays = 90;
 let isDemo = false;
 let performanceData = null;
 let campaignData = null;
-let monthlyData = null;
+let trendData = null;          // Either daily or monthly data depending on range
+let trendGranularity = 'monthly'; // 'daily' | 'monthly'
 let adsData = null;
 let spendChartInstance = null;
 let cpaChartInstance = null;
 let campaignSortKey = 'spend';
 let campaignSortDir = -1;
+let adSortKey = 'spend';
+let adCampaignFilter = '';
 
 const API_BASE = '/api/digistore';
+
+// Ranges <= this value use daily granularity; longer ranges use monthly
+const DAILY_GRANULARITY_MAX_DAYS = 45;
 
 // ===== Tab routing =====
 function initTabs() {
@@ -582,25 +695,29 @@ async function loadAllData() {
     setBadge('loading', 'Loading...');
     document.getElementById('refreshBtn').disabled = true;
 
+    // Pick granularity based on current range
+    trendGranularity = currentDays <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
+    const trendParam = trendGranularity; // 'daily' or 'monthly'
+
     try {
-        const [summaryRes, campaignRes, monthlyRes, adsRes] = await Promise.all([
+        const [summaryRes, campaignRes, trendRes, adsRes] = await Promise.all([
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=monthly`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
         const summaryOk = summaryRes?.status === 'success' && summaryRes.summary && !summaryRes.summary.error;
         const campaignOk = campaignRes?.status === 'success' && Array.isArray(campaignRes.campaigns);
-        const monthlyOk = monthlyRes?.status === 'success' && Array.isArray(monthlyRes.monthly);
+        const trendOk = trendRes?.status === 'success' && Array.isArray(trendRes[trendParam]);
         const adsOk = adsRes?.status === 'success' && Array.isArray(adsRes.ads) && adsRes.ads.length > 0;
 
         if (summaryOk) {
             isDemo = false;
             performanceData = summaryRes.summary;
             campaignData = campaignOk ? campaignRes.campaigns : [];
-            monthlyData = monthlyOk ? monthlyRes.monthly : [];
+            trendData = trendOk ? trendRes[trendParam] : [];
             adsData = adsOk ? adsRes : null;
             setBadge('live', 'Live Data');
         } else {
@@ -662,23 +779,47 @@ function generateDemoData() {
         };
     });
 
-    const months = [];
-    for (let i = Math.min(currentDays / 30, 12); i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - Math.floor(i));
-        const month = d.toISOString().slice(0, 7) + '-01';
-        const ms = (spend / 3) * (0.7 + Math.random() * 0.6);
-        const mc = Math.round((clicks / 3) * (0.7 + Math.random() * 0.6));
-        const mi = mc * (12 + Math.random() * 6);
-        const mconv = Math.round((conversions / 3) * (0.6 + Math.random() * 0.8) * 10) / 10;
-        months.push({
-            month, spend: ms, clicks: mc, impressions: Math.round(mi),
-            conversions: mconv, conversionValue: mconv * (80 + Math.random() * 30),
-            ctr: mc / mi, cpc: mc > 0 ? ms / mc : 0,
-            cpa: mconv > 0 ? ms / mconv : 0, roas: ms > 0 ? (mconv * 90) / ms : 0,
-        });
+    // Build trend data (daily for short ranges, monthly for long)
+    trendData = [];
+    if (trendGranularity === 'daily') {
+        const dailySpendAvg = spend / currentDays;
+        const dailyClicksAvg = clicks / currentDays;
+        const dailyConvAvg = conversions / currentDays;
+        for (let i = currentDays - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dow = d.getDay();
+            const weekendMult = (dow === 0 || dow === 6) ? 0.6 : 1.0;
+            const ds = dailySpendAvg * weekendMult * (0.7 + Math.random() * 0.6);
+            const dc = Math.round(dailyClicksAvg * weekendMult * (0.7 + Math.random() * 0.6));
+            const di = dc * (12 + Math.random() * 6);
+            const dconv = Math.round(dailyConvAvg * weekendMult * (0.6 + Math.random() * 0.8) * 10) / 10;
+            trendData.push({
+                date: d.toISOString().split('T')[0],
+                spend: ds, clicks: dc, impressions: Math.round(di),
+                conversions: dconv, conversionValue: dconv * (80 + Math.random() * 30),
+                ctr: dc / di, cpc: dc > 0 ? ds / dc : 0,
+                cpa: dconv > 0 ? ds / dconv : 0, roas: ds > 0 ? (dconv * 90) / ds : 0,
+            });
+        }
+    } else {
+        const monthCount = Math.max(1, Math.min(Math.floor(currentDays / 30), 12));
+        for (let i = monthCount - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const month = d.toISOString().slice(0, 7) + '-01';
+            const ms = (spend / monthCount) * (0.7 + Math.random() * 0.6);
+            const mc = Math.round((clicks / monthCount) * (0.7 + Math.random() * 0.6));
+            const mi = mc * (12 + Math.random() * 6);
+            const mconv = Math.round((conversions / monthCount) * (0.6 + Math.random() * 0.8) * 10) / 10;
+            trendData.push({
+                month, spend: ms, clicks: mc, impressions: Math.round(mi),
+                conversions: mconv, conversionValue: mconv * (80 + Math.random() * 30),
+                ctr: mc / mi, cpc: mc > 0 ? ms / mc : 0,
+                cpa: mconv > 0 ? ms / mconv : 0, roas: ms > 0 ? (mconv * 90) / ms : 0,
+            });
+        }
     }
-    monthlyData = months;
 
     // Demo ad data
     const demoHeadlines = [
@@ -696,29 +837,46 @@ function generateDemoData() {
     ];
     const labels = ['BEST', 'GOOD', 'LEARNING', 'LOW', null];
 
-    adsData = {
-        ads: campaignNames.slice(0, 4).map((camp, ci) => {
-            const imp = 2000 + Math.round(Math.random() * 8000);
-            const cl = Math.round(imp * (0.04 + Math.random() * 0.06));
+    // Demo: 12 live ads across campaigns with full asset performance
+    const adGroupNames = ['Core', 'Long Tail', 'Exact', 'Phrase', 'Branded'];
+    const demoAdList = [];
+    for (let ci = 0; ci < Math.min(campaignNames.length, 6); ci++) {
+        const adsInCampaign = 1 + Math.floor(Math.random() * 3);
+        for (let ai = 0; ai < adsInCampaign; ai++) {
+            const imp = Math.round(Math.random() * 9000);
+            const cl = Math.round(imp * (0.03 + Math.random() * 0.06));
             const conv = Math.round((cl * 0.03 + Math.random() * 3) * 10) / 10;
             const s = cl * (1.5 + Math.random() * 3);
-            return {
-                adId: String(5000 + ci), campaign: camp, adGroup: 'Ad Group ' + (ci + 1),
+            const headlineOffset = (ci * 2 + ai) % 10;
+            const descOffset = (ci + ai) % 3;
+            demoAdList.push({
+                adId: String(5000 + ci * 10 + ai),
+                campaign: campaignNames[ci],
+                adGroup: adGroupNames[ai % adGroupNames.length] + ' Ad Group',
                 status: 'ENABLED',
-                finalUrl: 'https://www.digistore24.com/' + ['marketplace', 'affiliate', 'vendors', 'start'][ci],
-                headlines: demoHeadlines.slice(ci * 3, ci * 3 + 5).map((text, hi) => ({
-                    text, pinned: hi === 0 ? 'HEADLINE_1' : null,
+                finalUrl: 'https://www.digistore24.com/' + ['marketplace', 'affiliate', 'vendors', 'start', 'pricing', 'features'][ci % 6],
+                path1: ['affiliate', 'marketplace', 'vendors'][ci % 3],
+                path2: ['signup', 'platform', 'grow'][ai % 3],
+                headlines: demoHeadlines.slice(headlineOffset, headlineOffset + 7).map((text, hi) => ({
+                    text: text || demoHeadlines[hi],
+                    pinned: hi === 0 ? 'HEADLINE_1' : null,
                     performanceLabel: labels[hi % labels.length],
                 })),
-                descriptions: demoDescs.slice(ci, ci + 2).map((text, di) => ({
-                    text, pinned: di === 0 ? 'DESCRIPTION_1' : null,
+                descriptions: demoDescs.slice(descOffset, descOffset + 3).map((text, di) => ({
+                    text: text || demoDescs[di],
+                    pinned: di === 0 ? 'DESCRIPTION_1' : null,
                     performanceLabel: labels[di % labels.length],
                 })),
+                labelCounts: { BEST: 1 + Math.floor(Math.random() * 3), GOOD: 1 + Math.floor(Math.random() * 3), LEARNING: Math.floor(Math.random() * 3), LOW: Math.floor(Math.random() * 2), UNRATED: 0 },
                 impressions: imp, clicks: cl, spend: s, conversions: conv,
                 conversionValue: conv * (70 + Math.random() * 50),
-                ctr: cl / imp, cpa: conv > 0 ? s / conv : 0,
-            };
-        }),
+                ctr: imp > 0 ? cl / imp : 0, cpa: conv > 0 ? s / conv : 0,
+            });
+        }
+    }
+
+    adsData = {
+        ads: demoAdList,
         assetLeaderboard: {
             headlines: demoHeadlines.slice(0, 10).map((text, i) => ({
                 text, performanceLabel: ['BEST','BEST','GOOD','GOOD','GOOD','LEARNING','LEARNING','LEARNING','LOW','LOW'][i],
@@ -761,9 +919,18 @@ function renderOverview() {
 }
 
 function renderCharts() {
-    if (!monthlyData || monthlyData.length === 0) return;
+    if (!trendData || trendData.length === 0) return;
 
-    const labels = monthlyData.map(m => {
+    // Update chart titles based on granularity
+    const titlePrefix = trendGranularity === 'daily' ? 'Daily' : 'Monthly';
+    document.getElementById('spendChartTitle').textContent = `${titlePrefix} Spend & Conversions`;
+    document.getElementById('cpaChartTitle').textContent = `${titlePrefix} CPA Trend`;
+
+    const labels = trendData.map(m => {
+        if (trendGranularity === 'daily') {
+            const d = new Date(m.date);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
         const d = new Date(m.month);
         return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
     });
@@ -775,6 +942,7 @@ function renderCharts() {
 
     // Spend & Conversions chart
     if (spendChartInstance) spendChartInstance.destroy();
+    const pointRadius = trendGranularity === 'daily' && trendData.length > 30 ? 2 : 4;
     spendChartInstance = new Chart(document.getElementById('spendChart'), {
         type: 'bar',
         data: {
@@ -782,7 +950,7 @@ function renderCharts() {
             datasets: [
                 {
                     label: 'Spend',
-                    data: monthlyData.map(m => m.spend),
+                    data: trendData.map(m => m.spend),
                     backgroundColor: 'rgba(59,130,246,0.6)',
                     borderRadius: 4,
                     yAxisID: 'y',
@@ -790,12 +958,12 @@ function renderCharts() {
                 },
                 {
                     label: 'Conversions',
-                    data: monthlyData.map(m => m.conversions),
+                    data: trendData.map(m => m.conversions),
                     type: 'line',
                     borderColor: '#22c55e',
                     backgroundColor: 'rgba(34,197,94,0.1)',
                     borderWidth: 2,
-                    pointRadius: 4,
+                    pointRadius,
                     pointBackgroundColor: '#22c55e',
                     tension: 0.3,
                     fill: true,
@@ -819,10 +987,17 @@ function renderCharts() {
                 }
             },
             scales: {
-                x: { ticks: { color: chartDefaults.color }, grid: { color: chartDefaults.borderColor } },
+                x: {
+                    ticks: {
+                        color: chartDefaults.color,
+                        maxTicksLimit: trendGranularity === 'daily' ? 12 : undefined,
+                        autoSkip: true,
+                    },
+                    grid: { color: chartDefaults.borderColor },
+                },
                 y: {
                     position: 'left',
-                    ticks: { color: chartDefaults.color, callback: v => '$' + (v/1000).toFixed(0) + 'k' },
+                    ticks: { color: chartDefaults.color, callback: v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'k' : '$' + v.toFixed(0) },
                     grid: { color: chartDefaults.borderColor },
                 },
                 y1: {
@@ -842,8 +1017,8 @@ function renderCharts() {
             labels,
             datasets: [{
                 label: 'CPA',
-                data: monthlyData.map(m => m.cpa),
-                backgroundColor: monthlyData.map(m => m.cpa > (performanceData?.cpa || 999) ? 'rgba(239,68,68,0.6)' : 'rgba(34,197,94,0.6)'),
+                data: trendData.map(m => m.cpa),
+                backgroundColor: trendData.map(m => m.cpa > (performanceData?.cpa || 999) ? 'rgba(239,68,68,0.6)' : 'rgba(34,197,94,0.6)'),
                 borderRadius: 4,
             }],
         },
@@ -855,7 +1030,14 @@ function renderCharts() {
                 tooltip: { callbacks: { label: ctx => 'CPA: ' + fmt(ctx.raw, '$') } },
             },
             scales: {
-                x: { ticks: { color: chartDefaults.color }, grid: { color: chartDefaults.borderColor } },
+                x: {
+                    ticks: {
+                        color: chartDefaults.color,
+                        maxTicksLimit: trendGranularity === 'daily' ? 12 : undefined,
+                        autoSkip: true,
+                    },
+                    grid: { color: chartDefaults.borderColor },
+                },
                 y: {
                     ticks: { color: chartDefaults.color, callback: v => '$' + v.toFixed(0) },
                     grid: { color: chartDefaults.borderColor },
@@ -930,52 +1112,125 @@ function exportCampaignsCSV() {
 function renderCreative() {
     const container = document.getElementById('adCards');
     const lbGrid = document.getElementById('leaderboardGrid');
+    const countBadge = document.getElementById('adCountBadge');
+    const campaignFilter = document.getElementById('adCampaignFilter');
 
     if (!adsData || !adsData.ads || adsData.ads.length === 0) {
-        container.innerHTML = '<div class="empty-state"><h3>No ad data available</h3><p>Ad creative data will appear here once the account has active RSA ads.</p></div>';
+        countBadge.textContent = '0';
+        container.innerHTML = '<div class="empty-state"><h3>No live ads</h3><p>No enabled responsive search ads found. Ad creative data will appear once live ads are running.</p></div>';
         lbGrid.style.display = 'none';
         return;
     }
 
-    // Top 10 ads by conversions
-    const topAds = [...adsData.ads]
-        .sort((a, b) => b.conversions - a.conversions)
-        .slice(0, 10);
+    // Populate campaign filter options (unique campaign names)
+    const campaignNames = [...new Set(adsData.ads.map(a => a.campaign))].sort();
+    const currentFilter = adCampaignFilter;
+    campaignFilter.innerHTML = '<option value="">All campaigns</option>' +
+        campaignNames.map(c => `<option value="${esc(c)}" ${c === currentFilter ? 'selected' : ''}>${esc(c)}</option>`).join('');
 
-    container.innerHTML = topAds.map((ad, i) => {
-        const topHeadlines = ad.headlines.slice(0, 3).map(h => h.text).join(' | ');
-        const topDesc = ad.descriptions[0]?.text || '';
+    // Filter
+    let ads = adsData.ads.slice();
+    if (adCampaignFilter) ads = ads.filter(a => a.campaign === adCampaignFilter);
 
-        return `<div class="ad-card">
-            <div class="ad-card-header">
-                <div class="ad-card-campaign">${esc(ad.campaign)} &rsaquo; ${esc(ad.adGroup)}</div>
-                <div class="ad-card-rank">#${i+1}</div>
-            </div>
-            <div class="ad-preview">
-                <div class="ad-preview-url">${esc(ad.finalUrl)}</div>
-                <div class="ad-preview-headline">${esc(topHeadlines)}</div>
-                <div class="ad-preview-desc">${esc(topDesc)}</div>
-            </div>
-            <div class="ad-metrics">
-                <span>Impr: <span class="ad-metric-val">${fmt(ad.impressions,'n')}</span></span>
-                <span>Clicks: <span class="ad-metric-val">${fmt(ad.clicks,'n')}</span></span>
-                <span>CTR: <span class="ad-metric-val">${fmt(ad.ctr,'%')}</span></span>
-                <span>Conv: <span class="ad-metric-val">${fmt(ad.conversions,'f1')}</span></span>
-                <span>CPA: <span class="ad-metric-val">${fmt(ad.cpa,'$')}</span></span>
-            </div>
-            ${renderAssetList('Headlines', ad.headlines)}
-            ${renderAssetList('Descriptions', ad.descriptions)}
-        </div>`;
-    }).join('');
+    // Sort
+    ads.sort((a, b) => {
+        if (adSortKey === 'best') {
+            const ab = (a.labelCounts?.BEST || 0);
+            const bb = (b.labelCounts?.BEST || 0);
+            if (bb !== ab) return bb - ab;
+            return (b.spend || 0) - (a.spend || 0);
+        }
+        if (adSortKey === 'cpa') {
+            // CPA: low-to-high, but push 0 (no conversions) to bottom
+            const av = a.cpa > 0 ? a.cpa : Infinity;
+            const bv = b.cpa > 0 ? b.cpa : Infinity;
+            return av - bv;
+        }
+        return (b[adSortKey] || 0) - (a[adSortKey] || 0);
+    });
 
-    // Asset leaderboard
-    if (adsData.assetLeaderboard) {
+    countBadge.textContent = ads.length;
+
+    if (ads.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>No ads match filter</h3><p>Try selecting "All campaigns".</p></div>';
+    } else {
+        container.innerHTML = ads.map(ad => renderAdCard(ad)).join('');
+    }
+
+    // Asset leaderboard (only shown when not filtered to a single campaign, since leaderboard is account-wide)
+    if (adsData.assetLeaderboard && !adCampaignFilter) {
         lbGrid.style.display = 'grid';
         document.getElementById('headlineLeaderboard').innerHTML = renderLeaderboard(adsData.assetLeaderboard.headlines);
         document.getElementById('descriptionLeaderboard').innerHTML = renderLeaderboard(adsData.assetLeaderboard.descriptions);
     } else {
         lbGrid.style.display = 'none';
     }
+}
+
+function renderAdCard(ad) {
+    // Google ad preview: use first unpinned (or pinned position 1) headlines and description
+    const sortedHeadlines = [...ad.headlines].sort((a, b) => {
+        const pa = a.pinned === 'HEADLINE_1' ? 0 : a.pinned === 'HEADLINE_2' ? 1 : a.pinned === 'HEADLINE_3' ? 2 : 99;
+        const pb = b.pinned === 'HEADLINE_1' ? 0 : b.pinned === 'HEADLINE_2' ? 1 : b.pinned === 'HEADLINE_3' ? 2 : 99;
+        return pa - pb;
+    });
+    const previewHeadlines = sortedHeadlines.slice(0, 3).map(h => h.text).filter(Boolean).join(' | ');
+    const previewDesc = ad.descriptions[0]?.text || '';
+    const displayUrl = buildDisplayUrl(ad);
+
+    const labelSummary = renderLabelSummary(ad.labelCounts);
+
+    return `<div class="ad-card">
+        <div class="ad-card-header">
+            <div>
+                <div class="ad-card-campaign">${esc(ad.campaign)} &rsaquo; ${esc(ad.adGroup)}</div>
+                <div style="font-size:0.7rem; color: var(--text-secondary); margin-top:2px;">Ad ID: ${esc(ad.adId)}</div>
+            </div>
+            <div class="ad-card-rank"><span class="status-dot enabled"></span>Live</div>
+        </div>
+        ${labelSummary}
+        <div class="ad-preview">
+            <div class="ad-preview-url">${esc(displayUrl)}</div>
+            <div class="ad-preview-headline">${esc(previewHeadlines || '(no headlines)')}</div>
+            <div class="ad-preview-desc">${esc(previewDesc || '(no descriptions)')}</div>
+        </div>
+        <div class="ad-metrics">
+            <span>Impr: <span class="ad-metric-val">${fmt(ad.impressions,'n')}</span></span>
+            <span>Clicks: <span class="ad-metric-val">${fmt(ad.clicks,'n')}</span></span>
+            <span>CTR: <span class="ad-metric-val">${fmt(ad.ctr,'%')}</span></span>
+            <span>Spend: <span class="ad-metric-val">${fmt(ad.spend,'$0')}</span></span>
+            <span>Conv: <span class="ad-metric-val">${fmt(ad.conversions,'f1')}</span></span>
+            <span>CPA: <span class="ad-metric-val">${ad.cpa > 0 ? fmt(ad.cpa,'$') : '—'}</span></span>
+        </div>
+        <div class="asset-columns">
+            ${renderAssetList('Headlines (' + ad.headlines.length + ')', ad.headlines)}
+            ${renderAssetList('Descriptions (' + ad.descriptions.length + ')', ad.descriptions)}
+        </div>
+    </div>`;
+}
+
+function buildDisplayUrl(ad) {
+    try {
+        const u = new URL(ad.finalUrl);
+        let path = u.hostname;
+        if (ad.path1) path += '/' + ad.path1;
+        if (ad.path2) path += '/' + ad.path2;
+        return path;
+    } catch {
+        return ad.finalUrl || '';
+    }
+}
+
+function renderLabelSummary(counts) {
+    if (!counts) return '';
+    const parts = [];
+    if (counts.BEST) parts.push(`<span class="label-pill best">${counts.BEST} Best</span>`);
+    if (counts.GOOD) parts.push(`<span class="label-pill good">${counts.GOOD} Good</span>`);
+    if (counts.LEARNING) parts.push(`<span class="label-pill learning">${counts.LEARNING} Learning</span>`);
+    if (counts.LOW) parts.push(`<span class="label-pill low">${counts.LOW} Low</span>`);
+    if (counts.UNRATED) parts.push(`<span class="label-pill unrated">${counts.UNRATED} Unrated</span>`);
+    if (parts.length === 0) return '';
+    return `<div class="label-summary">${parts.join('')}</div>`;
 }
 
 function renderAssetList(title, assets) {
@@ -985,7 +1240,7 @@ function renderAssetList(title, assets) {
         ${assets.map(a => `<div class="asset-item">
             <span class="asset-text">${esc(a.text)}</span>
             ${a.pinned ? `<span class="pinned-badge">Pin ${a.pinned.replace('HEADLINE_','H').replace('DESCRIPTION_','D')}</span>` : ''}
-            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : ''}
+            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : badgeHTML('UNRATED')}
         </div>`).join('')}
     </div>`;
 }
@@ -1013,6 +1268,16 @@ function esc(str) {
     d.textContent = str;
     return d.innerHTML;
 }
+
+// Ad creative filter/sort controls
+document.getElementById('adSortSelect').addEventListener('change', (e) => {
+    adSortKey = e.target.value;
+    renderCreative();
+});
+document.getElementById('adCampaignFilter').addEventListener('change', (e) => {
+    adCampaignFilter = e.target.value;
+    renderCreative();
+});
 
 // ===== Init =====
 initTabs();
