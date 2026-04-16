@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunham & Jones — Expert Exhibits</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .dl-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .dl-header { text-align: center; margin-bottom: 40px; }
+        .dl-header h1 { font-size: 1.5rem; margin-bottom: 8px; }
+        .dl-header .meta { color: var(--text-secondary); font-size: 0.9rem; }
+        .dl-section { margin-bottom: 32px; }
+        .dl-section h2 { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .dl-section h2 span { color: var(--text-secondary); font-weight: normal; font-size: 0.85rem; }
+        .dl-grid { display: grid; gap: 8px; }
+        .dl-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; transition: border-color 0.2s; }
+        .dl-item:hover { border-color: #3b82f6; }
+        .dl-item-info { flex: 1; }
+        .dl-item-name { font-weight: 600; font-size: 0.95rem; }
+        .dl-item-detail { color: var(--text-secondary); font-size: 0.8rem; margin-top: 2px; }
+        .dl-item-actions { display: flex; gap: 8px; align-items: center; }
+        .dl-item-size { color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap; }
+        .dl-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+        .dl-btn:hover { background: #2563eb; }
+        .dl-btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .dl-btn-secondary:hover { background: var(--border); }
+        .dl-report { padding: 20px; background: var(--bg-card); border: 2px solid #3b82f6; border-radius: 12px; margin-bottom: 32px; }
+        .dl-report h3 { margin: 0 0 4px; font-size: 1rem; }
+        .dl-report p { margin: 0; color: var(--text-secondary); font-size: 0.85rem; }
+        .dl-report .dl-item-actions { margin-top: 12px; }
+        .dl-stats { display: flex; gap: 24px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .dl-stat { text-align: center; }
+        .dl-stat-value { font-size: 1.4rem; font-weight: 700; color: #3b82f6; }
+        .dl-stat-label { font-size: 0.75rem; color: var(--text-secondary); }
+        .dl-note { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; padding: 12px 16px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham & Jones Expert Exhibits
+        </a>
+        <div class="nav-actions">
+            <a href="dashboard.html" class="btn btn-secondary">Ad Report Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="dl-container">
+        <div class="dl-header">
+            <h1>Supplemental Expert Rebuttal — Exhibit Downloads</h1>
+            <p class="meta">Dunnam & Dunnam LLP v. Dunham & Jones, Attorneys at Law, P.C., et al.<br>
+            Civil Action No. 6:21-cv-1041-ADA-DGT &bull; W.D. Texas, Waco Division<br>
+            Prepared by Kenny Hyder, April 16, 2026</p>
+        </div>
+
+        <div class="dl-stats">
+            <div class="dl-stat"><div class="dl-stat-value">18</div><div class="dl-stat-label">Exhibits</div></div>
+            <div class="dl-stat"><div class="dl-stat-value">7,383</div><div class="dl-stat-label">Pages</div></div>
+            <div class="dl-stat"><div class="dl-stat-value">3</div><div class="dl-stat-label">Platforms</div></div>
+            <div class="dl-stat"><div class="dl-stat-value">10</div><div class="dl-stat-label">Years</div></div>
+        </div>
+
+        <div class="dl-note">
+            These exhibits document every advertisement ever run by Dunham & Jones across Google Ads (2016–2026), Microsoft Bing Ads (2024), and Meta Ads (2023–2026). Each report was generated directly from the advertising platform's authenticated API and contains complete, unedited records of all campaigns, ad copy, keywords, and extensions.
+        </div>
+
+        <div class="dl-report">
+            <h3>Expert Rebuttal Report v3</h3>
+            <p>Supplemental Expert Rebuttal Report of Kenny Hyder — Response to Brown Rebuttal dated April 9, 2026</p>
+            <div class="dl-item-actions">
+                <a href="rebuttal2/expert-rebuttal-report-v3.pdf" class="dl-btn" download>Download PDF</a>
+                <a href="rebuttal2/expert-rebuttal-report-v3.html" class="dl-btn dl-btn-secondary" target="_blank">View HTML</a>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <h2>Google Ads — 2016–2022 <span>(HYDER-S002 through HYDER-S008 &bull; 4,684 pages)</span></h2>
+            <div class="dl-grid">
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S002: Google Ads — 2016</div><div class="dl-item-detail">542 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.2 MB</span><a href="rebuttal2/exhibits/google-ads-2016.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S003: Google Ads — 2017</div><div class="dl-item-detail">670 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.5 MB</span><a href="rebuttal2/exhibits/google-ads-2017.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S004: Google Ads — 2018</div><div class="dl-item-detail">641 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.5 MB</span><a href="rebuttal2/exhibits/google-ads-2018.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S005: Google Ads — 2019</div><div class="dl-item-detail">662 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.5 MB</span><a href="rebuttal2/exhibits/google-ads-2019.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S006: Google Ads — 2020</div><div class="dl-item-detail">870 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">2.0 MB</span><a href="rebuttal2/exhibits/google-ads-2020.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S007: Google Ads — 2021</div><div class="dl-item-detail">679 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.6 MB</span><a href="rebuttal2/exhibits/google-ads-2021.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S008: Google Ads — 2022</div><div class="dl-item-detail">620 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">1.5 MB</span><a href="rebuttal2/exhibits/google-ads-2022.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+            </div>
+            <div style="margin-top:8px;">
+                <a href="rebuttal2/google-ads-2016-2022.zip" class="dl-btn dl-btn-secondary" download>Download All 2016–2022 (9.3 MB zip)</a>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <h2>Google Ads — 2023–2026 <span>(HYDER-S009 through HYDER-S012 &bull; 1,909 pages)</span></h2>
+            <div class="dl-grid">
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S009: Google Ads — 2023</div><div class="dl-item-detail">454 pages &bull; Includes Performance Max ad images</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">24 MB</span><a href="rebuttal2/exhibits/google-ads-2023.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S010: Google Ads — 2024</div><div class="dl-item-detail">538 pages &bull; Includes Performance Max ad images</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">53 MB</span><a href="rebuttal2/exhibits/google-ads-2024.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S011: Google Ads — 2025</div><div class="dl-item-detail">516 pages &bull; Includes Performance Max ad images</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">224 MB</span><a href="rebuttal2/exhibits/google-ads-2025.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S012: Google Ads — 2026 (Jan–Apr)</div><div class="dl-item-detail">401 pages &bull; Includes Performance Max ad images</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">192 MB</span><a href="rebuttal2/exhibits/google-ads-2026.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <h2>Google Ads — Current Snapshot <span>(HYDER-S001 &bull; 364 pages)</span></h2>
+            <div class="dl-grid">
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S001: Google Ads — Active Ads</div><div class="dl-item-detail">364 pages &bull; Current active ad inventory as of April 2026</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">112 MB</span><a href="rebuttal2/exhibits/google-ads-active.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <h2>Microsoft Bing Ads <span>(HYDER-S013 &bull; 279 pages)</span></h2>
+            <div class="dl-grid">
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S013: Bing Ads — 2024</div><div class="dl-item-detail">279 pages &bull; 59 campaigns, 378 ads, 12,079 keywords &bull; ~$297K spend</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">704 KB</span><a href="rebuttal2/exhibits/bing-ads-2024.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <h2>Meta Ads (Facebook/Instagram) <span>(HYDER-S014 through HYDER-S018 &bull; 143 pages)</span></h2>
+            <div class="dl-grid">
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S014: Meta Ads — Active Ads</div><div class="dl-item-detail">27 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">2.2 MB</span><a href="rebuttal2/exhibits/meta-ads-active.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S015: Meta Ads — 2023</div><div class="dl-item-detail">40 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">100 KB</span><a href="rebuttal2/exhibits/meta-ads-2023.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S016: Meta Ads — 2024</div><div class="dl-item-detail">38 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">96 KB</span><a href="rebuttal2/exhibits/meta-ads-2024.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S017: Meta Ads — 2025</div><div class="dl-item-detail">35 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">88 KB</span><a href="rebuttal2/exhibits/meta-ads-2025.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+                <div class="dl-item">
+                    <div class="dl-item-info"><div class="dl-item-name">HYDER-S018: Meta Ads — 2026 (Jan–Apr)</div><div class="dl-item-detail">3 pages</div></div>
+                    <div class="dl-item-actions"><span class="dl-item-size">20 KB</span><a href="rebuttal2/exhibits/meta-ads-2026.pdf" class="dl-btn" download>Download</a></div>
+                </div>
+            </div>
+            <div style="margin-top:8px;">
+                <a href="rebuttal2/bing-meta-ads.zip" class="dl-btn dl-btn-secondary" download>Download All Bing + Meta (2.6 MB zip)</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a>
+    </div>
+</body>
+</html>
