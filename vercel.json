@@ -129,6 +129,12 @@
     },
     "api/bing-ads/dunham-ads.js": {
       "maxDuration": 60
+    },
+    "api/digistore/performance.js": {
+      "maxDuration": 30
+    },
+    "api/digistore/ads.js": {
+      "maxDuration": 30
     }
   }
 }

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Ads Reporting | Digistore24</title>
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+            --purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand:hover { color: var(--accent-hover); }
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+        .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+        .nav-link:hover { background: var(--border); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent); color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .header-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+        /* Data badge */
+        .data-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .data-badge.live { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+        .data-badge.demo { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
+        .data-badge.loading { background: rgba(59,130,246,0.15); color: var(--accent); border: 1px solid rgba(59,130,246,0.3); }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: var(--border); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); }
+
+        /* Date range selector */
+        .date-selector { display: flex; gap: 4px; }
+        .date-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .date-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .date-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Stat cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Charts */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        @media (max-width: 768px) { .chart-row { grid-template-columns: 1fr; } }
+        .chart-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .chart-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+        .chart-container { position: relative; height: 280px; }
+
+        /* Campaign table */
+        .table-wrapper {
+            overflow-x: auto;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+        th:hover { color: var(--text-primary); }
+        th.sorted { color: var(--accent); }
+        td {
+            padding: 10px 16px;
+            border-top: 1px solid rgba(71,85,105,0.3);
+            white-space: nowrap;
+        }
+        tr:hover td { background: rgba(59,130,246,0.05); }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.enabled { background: var(--success); }
+        .status-dot.paused { background: var(--warning); }
+
+        /* Ad creative cards */
+        .ad-cards { display: grid; gap: 20px; }
+        .ad-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .ad-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        .ad-card-campaign {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .ad-card-rank {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        /* Google ad preview */
+        .ad-preview {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .ad-preview-url {
+            font-size: 0.8rem;
+            color: var(--success);
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+        .ad-preview-headline {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .ad-preview-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Asset badges */
+        .asset-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .asset-badge.best { background: rgba(34,197,94,0.15); color: var(--success); }
+        .asset-badge.good { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .asset-badge.low { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .asset-badge.learning { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .asset-badge.unrated { background: rgba(148,163,184,0.1); color: var(--text-secondary); }
+
+        .ad-metrics {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .ad-metric-val { color: var(--text-primary); font-weight: 600; }
+
+        /* Asset lists in ad cards */
+        .asset-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(71,85,105,0.3);
+        }
+        .asset-list h4 {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .asset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.8rem;
+            gap: 8px;
+        }
+        .asset-text { color: var(--text-primary); flex: 1; min-width: 0; }
+        .pinned-badge {
+            font-size: 0.65rem;
+            color: var(--purple);
+            background: rgba(139,92,246,0.15);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+
+        /* Leaderboard */
+        .leaderboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+        @media (max-width: 768px) { .leaderboard-grid { grid-template-columns: 1fr; } }
+        .leaderboard-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .leaderboard-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(71,85,105,0.2);
+            gap: 8px;
+        }
+        .leaderboard-text {
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .leaderboard-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .leaderboard-count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Export bar */
+        .export-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state h3 { margin-bottom: 8px; color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="keyword-tool.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Digistore24 Competitive Intel
+        </a>
+        <div class="nav-links">
+            <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link">Projections</a>
+            <a href="reporting.html" class="nav-link active">Reporting</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Google Ads Reporting</h1>
+            </div>
+            <div class="header-controls">
+                <span id="dataBadge" class="data-badge loading">Loading...</span>
+                <div class="date-selector">
+                    <button class="date-btn" data-days="30">30d</button>
+                    <button class="date-btn active" data-days="90">90d</button>
+                    <button class="date-btn" data-days="180">6mo</button>
+                    <button class="date-btn" data-days="365">12mo</button>
+                </div>
+                <button id="refreshBtn" class="btn btn-primary" onclick="loadAllData()">Refresh</button>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="campaigns">Campaigns</button>
+            <button class="tab-btn" data-tab="creative">Ad Creative</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card"><div class="stat-label">Spend</div><div class="stat-value" id="statSpend">--</div></div>
+                <div class="stat-card"><div class="stat-label">Clicks</div><div class="stat-value" id="statClicks">--</div></div>
+                <div class="stat-card"><div class="stat-label">Impressions</div><div class="stat-value" id="statImpressions">--</div></div>
+                <div class="stat-card"><div class="stat-label">CTR</div><div class="stat-value" id="statCTR">--</div></div>
+                <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">--</div></div>
+                <div class="stat-card"><div class="stat-label">CPA</div><div class="stat-value" id="statCPA">--</div></div>
+            </div>
+
+            <div class="chart-row">
+                <div class="chart-card">
+                    <h3>Monthly Spend & Conversions</h3>
+                    <div class="chart-container"><canvas id="spendChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Monthly CPA Trend</h3>
+                    <div class="chart-container"><canvas id="cpaChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaigns Tab -->
+        <div id="tab-campaigns" class="tab-content">
+            <div class="export-bar">
+                <button class="btn" onclick="exportCampaignsCSV()">Export CSV</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="campaignTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Campaign</th>
+                            <th data-sort="status">Status</th>
+                            <th data-sort="spend" class="sorted">Spend</th>
+                            <th data-sort="clicks">Clicks</th>
+                            <th data-sort="impressions">Impr</th>
+                            <th data-sort="ctr">CTR</th>
+                            <th data-sort="conversions">Conv</th>
+                            <th data-sort="cpa">CPA</th>
+                            <th data-sort="roas">ROAS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaignBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ad Creative Tab -->
+        <div id="tab-creative" class="tab-content">
+            <h2 style="font-size:1.2rem; margin-bottom:20px;">Top Performing Ads</h2>
+            <div class="ad-cards" id="adCards"></div>
+
+            <div class="leaderboard-grid" id="leaderboardGrid" style="display:none;">
+                <div class="leaderboard-card">
+                    <h3>Headline Leaderboard</h3>
+                    <div id="headlineLeaderboard"></div>
+                </div>
+                <div class="leaderboard-card">
+                    <h3>Description Leaderboard</h3>
+                    <div id="descriptionLeaderboard"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// State
+let currentDays = 90;
+let isDemo = false;
+let performanceData = null;
+let campaignData = null;
+let monthlyData = null;
+let adsData = null;
+let spendChartInstance = null;
+let cpaChartInstance = null;
+let campaignSortKey = 'spend';
+let campaignSortDir = -1;
+
+const API_BASE = '/api/digistore';
+
+// ===== Tab routing =====
+function initTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            window.location.hash = tab;
+            activateTab(tab);
+        });
+    });
+    const hash = window.location.hash.replace('#', '') || 'overview';
+    activateTab(hash);
+}
+
+function activateTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+}
+
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '') || 'overview';
+    activateTab(hash);
+});
+
+// ===== Date selector =====
+document.querySelectorAll('.date-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDays = parseInt(btn.dataset.days);
+        loadAllData();
+    });
+});
+
+// ===== Data loading =====
+async function loadAllData() {
+    setBadge('loading', 'Loading...');
+    document.getElementById('refreshBtn').disabled = true;
+
+    try {
+        const [summaryRes, campaignRes, monthlyRes, adsRes] = await Promise.all([
+            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=monthly`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
+        ]);
+
+        // Check if API returned valid data
+        const summaryOk = summaryRes?.status === 'success' && summaryRes.summary && !summaryRes.summary.error;
+        const campaignOk = campaignRes?.status === 'success' && Array.isArray(campaignRes.campaigns);
+        const monthlyOk = monthlyRes?.status === 'success' && Array.isArray(monthlyRes.monthly);
+        const adsOk = adsRes?.status === 'success' && Array.isArray(adsRes.ads) && adsRes.ads.length > 0;
+
+        if (summaryOk) {
+            isDemo = false;
+            performanceData = summaryRes.summary;
+            campaignData = campaignOk ? campaignRes.campaigns : [];
+            monthlyData = monthlyOk ? monthlyRes.monthly : [];
+            adsData = adsOk ? adsRes : null;
+            setBadge('live', 'Live Data');
+        } else {
+            isDemo = true;
+            generateDemoData();
+            setBadge('demo', 'Demo Data');
+        }
+    } catch (e) {
+        isDemo = true;
+        generateDemoData();
+        setBadge('demo', 'Demo Data');
+    }
+
+    renderOverview();
+    renderCampaigns();
+    renderCreative();
+    document.getElementById('refreshBtn').disabled = false;
+}
+
+function setBadge(type, text) {
+    const badge = document.getElementById('dataBadge');
+    badge.className = 'data-badge ' + type;
+    badge.textContent = text;
+}
+
+// ===== Demo data generation =====
+function generateDemoData() {
+    const spend = 8500 + Math.random() * 4000;
+    const clicks = 3200 + Math.random() * 2000;
+    const impressions = clicks * (12 + Math.random() * 8);
+    const conversions = 45 + Math.random() * 30;
+    const conversionValue = conversions * (85 + Math.random() * 40);
+
+    performanceData = {
+        spend, clicks: Math.round(clicks), impressions: Math.round(impressions),
+        conversions: Math.round(conversions * 10) / 10, conversionValue,
+        ctr: clicks / impressions, cpc: spend / clicks,
+        cpa: spend / conversions, roas: conversionValue / spend,
+        convRate: conversions / clicks,
+    };
+
+    const campaignNames = [
+        'DS24 - Brand - US', 'DS24 - Non-Brand - Affiliate Marketing',
+        'DS24 - Non-Brand - Digital Products', 'DS24 - Competitor - ClickBank',
+        'DS24 - Non-Brand - Online Business', 'DS24 - Brand - DE'
+    ];
+    campaignData = campaignNames.map((name, i) => {
+        const s = spend * (0.35 - i * 0.05) * (0.8 + Math.random() * 0.4);
+        const cl = Math.round(clicks * (0.3 - i * 0.04) * (0.8 + Math.random() * 0.4));
+        const imp = cl * (10 + Math.random() * 10);
+        const conv = Math.max(0, Math.round((conversions * (0.35 - i * 0.05) * (0.7 + Math.random() * 0.6)) * 10) / 10);
+        const cv = conv * (70 + Math.random() * 50);
+        return {
+            id: String(1000 + i), name, status: i < 5 ? 'ENABLED' : 'PAUSED',
+            spend: Math.round(s * 100) / 100, clicks: cl, impressions: Math.round(imp),
+            conversions: conv, conversionValue: cv,
+            ctr: cl / imp, cpc: cl > 0 ? s / cl : 0,
+            cpa: conv > 0 ? s / conv : 0, roas: s > 0 ? cv / s : 0,
+        };
+    });
+
+    const months = [];
+    for (let i = Math.min(currentDays / 30, 12); i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - Math.floor(i));
+        const month = d.toISOString().slice(0, 7) + '-01';
+        const ms = (spend / 3) * (0.7 + Math.random() * 0.6);
+        const mc = Math.round((clicks / 3) * (0.7 + Math.random() * 0.6));
+        const mi = mc * (12 + Math.random() * 6);
+        const mconv = Math.round((conversions / 3) * (0.6 + Math.random() * 0.8) * 10) / 10;
+        months.push({
+            month, spend: ms, clicks: mc, impressions: Math.round(mi),
+            conversions: mconv, conversionValue: mconv * (80 + Math.random() * 30),
+            ctr: mc / mi, cpc: mc > 0 ? ms / mc : 0,
+            cpa: mconv > 0 ? ms / mconv : 0, roas: ms > 0 ? (mconv * 90) / ms : 0,
+        });
+    }
+    monthlyData = months;
+
+    // Demo ad data
+    const demoHeadlines = [
+        'Sell Digital Products Online', 'Start Your Online Business', 'Digistore24 Marketplace',
+        'Earn Money as an Affiliate', 'Best Affiliate Network', '#1 Digital Sales Platform',
+        'Free to Join - Start Today', 'High Commission Rates', 'Trusted by 100K+ Vendors',
+        'Join Digistore24 Now', 'Grow Your Revenue Fast', 'Top Affiliate Programs',
+        'Automate Your Sales', 'Global Payment Processing', 'Scale Your Business',
+    ];
+    const demoDescs = [
+        'Join 100,000+ vendors selling digital products on Digistore24. Start free today.',
+        'Earn high commissions promoting top digital products. Sign up in minutes.',
+        'All-in-one platform for digital product sales, affiliate management & payments.',
+        'Automated affiliate payouts, analytics & tracking. Trusted worldwide.',
+    ];
+    const labels = ['BEST', 'GOOD', 'LEARNING', 'LOW', null];
+
+    adsData = {
+        ads: campaignNames.slice(0, 4).map((camp, ci) => {
+            const imp = 2000 + Math.round(Math.random() * 8000);
+            const cl = Math.round(imp * (0.04 + Math.random() * 0.06));
+            const conv = Math.round((cl * 0.03 + Math.random() * 3) * 10) / 10;
+            const s = cl * (1.5 + Math.random() * 3);
+            return {
+                adId: String(5000 + ci), campaign: camp, adGroup: 'Ad Group ' + (ci + 1),
+                status: 'ENABLED',
+                finalUrl: 'https://www.digistore24.com/' + ['marketplace', 'affiliate', 'vendors', 'start'][ci],
+                headlines: demoHeadlines.slice(ci * 3, ci * 3 + 5).map((text, hi) => ({
+                    text, pinned: hi === 0 ? 'HEADLINE_1' : null,
+                    performanceLabel: labels[hi % labels.length],
+                })),
+                descriptions: demoDescs.slice(ci, ci + 2).map((text, di) => ({
+                    text, pinned: di === 0 ? 'DESCRIPTION_1' : null,
+                    performanceLabel: labels[di % labels.length],
+                })),
+                impressions: imp, clicks: cl, spend: s, conversions: conv,
+                conversionValue: conv * (70 + Math.random() * 50),
+                ctr: cl / imp, cpa: conv > 0 ? s / conv : 0,
+            };
+        }),
+        assetLeaderboard: {
+            headlines: demoHeadlines.slice(0, 10).map((text, i) => ({
+                text, performanceLabel: ['BEST','BEST','GOOD','GOOD','GOOD','LEARNING','LEARNING','LEARNING','LOW','LOW'][i],
+                adCount: 3 - Math.floor(i / 4),
+            })),
+            descriptions: demoDescs.map((text, i) => ({
+                text, performanceLabel: ['BEST','GOOD','LEARNING','LOW'][i],
+                adCount: 4 - i,
+            })),
+        },
+    };
+}
+
+// ===== Formatting =====
+function fmt(n, type) {
+    if (n == null || isNaN(n)) return '--';
+    switch(type) {
+        case '$': return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        case '$0': return '$' + Math.round(n).toLocaleString('en-US');
+        case '%': return (n * 100).toFixed(2) + '%';
+        case 'n': return Math.round(n).toLocaleString('en-US');
+        case 'f1': return n.toFixed(1);
+        case 'x': return n.toFixed(2) + 'x';
+        default: return String(n);
+    }
+}
+
+// ===== Render Overview =====
+function renderOverview() {
+    const d = performanceData;
+    if (!d) return;
+    document.getElementById('statSpend').textContent = fmt(d.spend, '$');
+    document.getElementById('statClicks').textContent = fmt(d.clicks, 'n');
+    document.getElementById('statImpressions').textContent = fmt(d.impressions, 'n');
+    document.getElementById('statCTR').textContent = fmt(d.ctr, '%');
+    document.getElementById('statConversions').textContent = fmt(d.conversions, 'f1');
+    document.getElementById('statCPA').textContent = fmt(d.cpa, '$');
+
+    renderCharts();
+}
+
+function renderCharts() {
+    if (!monthlyData || monthlyData.length === 0) return;
+
+    const labels = monthlyData.map(m => {
+        const d = new Date(m.month);
+        return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    });
+
+    const chartDefaults = {
+        color: '#94a3b8',
+        borderColor: 'rgba(71,85,105,0.3)',
+    };
+
+    // Spend & Conversions chart
+    if (spendChartInstance) spendChartInstance.destroy();
+    spendChartInstance = new Chart(document.getElementById('spendChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Spend',
+                    data: monthlyData.map(m => m.spend),
+                    backgroundColor: 'rgba(59,130,246,0.6)',
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                    order: 2,
+                },
+                {
+                    label: 'Conversions',
+                    data: monthlyData.map(m => m.conversions),
+                    type: 'line',
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34,197,94,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#22c55e',
+                    tension: 0.3,
+                    fill: true,
+                    yAxisID: 'y1',
+                    order: 1,
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: chartDefaults.color, usePointStyle: true, padding: 16 } },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ctx.dataset.label === 'Spend'
+                            ? 'Spend: ' + fmt(ctx.raw, '$')
+                            : 'Conv: ' + ctx.raw.toFixed(1),
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { color: chartDefaults.color }, grid: { color: chartDefaults.borderColor } },
+                y: {
+                    position: 'left',
+                    ticks: { color: chartDefaults.color, callback: v => '$' + (v/1000).toFixed(0) + 'k' },
+                    grid: { color: chartDefaults.borderColor },
+                },
+                y1: {
+                    position: 'right',
+                    ticks: { color: '#22c55e' },
+                    grid: { display: false },
+                },
+            },
+        },
+    });
+
+    // CPA chart
+    if (cpaChartInstance) cpaChartInstance.destroy();
+    cpaChartInstance = new Chart(document.getElementById('cpaChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'CPA',
+                data: monthlyData.map(m => m.cpa),
+                backgroundColor: monthlyData.map(m => m.cpa > (performanceData?.cpa || 999) ? 'rgba(239,68,68,0.6)' : 'rgba(34,197,94,0.6)'),
+                borderRadius: 4,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => 'CPA: ' + fmt(ctx.raw, '$') } },
+            },
+            scales: {
+                x: { ticks: { color: chartDefaults.color }, grid: { color: chartDefaults.borderColor } },
+                y: {
+                    ticks: { color: chartDefaults.color, callback: v => '$' + v.toFixed(0) },
+                    grid: { color: chartDefaults.borderColor },
+                },
+            },
+        },
+    });
+}
+
+// ===== Render Campaigns =====
+function renderCampaigns() {
+    const tbody = document.getElementById('campaignBody');
+    if (!campaignData || campaignData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
+        return;
+    }
+
+    const sorted = [...campaignData].sort((a, b) => {
+        const av = a[campaignSortKey], bv = b[campaignSortKey];
+        if (typeof av === 'string') return campaignSortDir * av.localeCompare(bv);
+        return campaignSortDir * (av - bv);
+    });
+
+    tbody.innerHTML = sorted.map(c => {
+        const statusClass = c.status === 'ENABLED' ? 'enabled' : 'paused';
+        return `<tr>
+            <td>${esc(c.name)}</td>
+            <td><span class="status-dot ${statusClass}"></span>${c.status === 'ENABLED' ? 'Active' : 'Paused'}</td>
+            <td>${fmt(c.spend, '$')}</td>
+            <td>${fmt(c.clicks, 'n')}</td>
+            <td>${fmt(c.impressions, 'n')}</td>
+            <td>${fmt(c.ctr, '%')}</td>
+            <td>${fmt(c.conversions, 'f1')}</td>
+            <td>${fmt(c.cpa, '$')}</td>
+            <td>${fmt(c.roas, 'x')}</td>
+        </tr>`;
+    }).join('');
+}
+
+// Table sorting
+document.querySelectorAll('#campaignTable th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if (campaignSortKey === key) {
+            campaignSortDir *= -1;
+        } else {
+            campaignSortKey = key;
+            campaignSortDir = key === 'name' ? 1 : -1;
+        }
+        document.querySelectorAll('#campaignTable th').forEach(h => h.classList.remove('sorted'));
+        th.classList.add('sorted');
+        renderCampaigns();
+    });
+});
+
+function exportCampaignsCSV() {
+    if (!campaignData || campaignData.length === 0) return;
+    const headers = ['Campaign','Status','Spend','Clicks','Impressions','CTR','Conversions','CPA','ROAS'];
+    const rows = campaignData.map(c => [
+        c.name, c.status, c.spend.toFixed(2), c.clicks, c.impressions,
+        (c.ctr*100).toFixed(2)+'%', c.conversions.toFixed(1), c.cpa.toFixed(2), c.roas.toFixed(2)
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `digistore24-campaigns-${currentDays}d.csv`; a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ===== Render Ad Creative =====
+function renderCreative() {
+    const container = document.getElementById('adCards');
+    const lbGrid = document.getElementById('leaderboardGrid');
+
+    if (!adsData || !adsData.ads || adsData.ads.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h3>No ad data available</h3><p>Ad creative data will appear here once the account has active RSA ads.</p></div>';
+        lbGrid.style.display = 'none';
+        return;
+    }
+
+    // Top 10 ads by conversions
+    const topAds = [...adsData.ads]
+        .sort((a, b) => b.conversions - a.conversions)
+        .slice(0, 10);
+
+    container.innerHTML = topAds.map((ad, i) => {
+        const topHeadlines = ad.headlines.slice(0, 3).map(h => h.text).join(' | ');
+        const topDesc = ad.descriptions[0]?.text || '';
+
+        return `<div class="ad-card">
+            <div class="ad-card-header">
+                <div class="ad-card-campaign">${esc(ad.campaign)} &rsaquo; ${esc(ad.adGroup)}</div>
+                <div class="ad-card-rank">#${i+1}</div>
+            </div>
+            <div class="ad-preview">
+                <div class="ad-preview-url">${esc(ad.finalUrl)}</div>
+                <div class="ad-preview-headline">${esc(topHeadlines)}</div>
+                <div class="ad-preview-desc">${esc(topDesc)}</div>
+            </div>
+            <div class="ad-metrics">
+                <span>Impr: <span class="ad-metric-val">${fmt(ad.impressions,'n')}</span></span>
+                <span>Clicks: <span class="ad-metric-val">${fmt(ad.clicks,'n')}</span></span>
+                <span>CTR: <span class="ad-metric-val">${fmt(ad.ctr,'%')}</span></span>
+                <span>Conv: <span class="ad-metric-val">${fmt(ad.conversions,'f1')}</span></span>
+                <span>CPA: <span class="ad-metric-val">${fmt(ad.cpa,'$')}</span></span>
+            </div>
+            ${renderAssetList('Headlines', ad.headlines)}
+            ${renderAssetList('Descriptions', ad.descriptions)}
+        </div>`;
+    }).join('');
+
+    // Asset leaderboard
+    if (adsData.assetLeaderboard) {
+        lbGrid.style.display = 'grid';
+        document.getElementById('headlineLeaderboard').innerHTML = renderLeaderboard(adsData.assetLeaderboard.headlines);
+        document.getElementById('descriptionLeaderboard').innerHTML = renderLeaderboard(adsData.assetLeaderboard.descriptions);
+    } else {
+        lbGrid.style.display = 'none';
+    }
+}
+
+function renderAssetList(title, assets) {
+    if (!assets || assets.length === 0) return '';
+    return `<div class="asset-list">
+        <h4>${title}</h4>
+        ${assets.map(a => `<div class="asset-item">
+            <span class="asset-text">${esc(a.text)}</span>
+            ${a.pinned ? `<span class="pinned-badge">Pin ${a.pinned.replace('HEADLINE_','H').replace('DESCRIPTION_','D')}</span>` : ''}
+            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : ''}
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderLeaderboard(items) {
+    if (!items || items.length === 0) return '<p style="color:var(--text-secondary);font-size:0.85rem;">No data</p>';
+    return items.map(item => `<div class="leaderboard-item">
+        <span class="leaderboard-text" title="${esc(item.text)}">${esc(item.text)}</span>
+        <div class="leaderboard-meta">
+            <span class="leaderboard-count">${item.adCount} ad${item.adCount !== 1 ? 's' : ''}</span>
+            ${badgeHTML(item.performanceLabel)}
+        </div>
+    </div>`).join('');
+}
+
+function badgeHTML(label) {
+    if (!label) return '';
+    const cls = label.toLowerCase();
+    return `<span class="asset-badge ${cls}">${label}</span>`;
+}
+
+function esc(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+// ===== Init =====
+initTabs();
+loadAllData();
+</script>
+</body>
+</html>
