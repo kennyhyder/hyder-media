@@ -248,6 +248,11 @@
             white-space: nowrap;
         }
         tr:hover td { background: rgba(59,130,246,0.05); }
+        /* Right-align numeric columns in search terms and keywords tables */
+        #searchTermsTable th:not(:first-child),
+        #searchTermsTable td:not(:first-child),
+        #keywordsTable th:nth-child(n+3),
+        #keywordsTable td:nth-child(n+3) { text-align: right; }
         .status-dot {
             display: inline-block;
             width: 8px;
@@ -322,7 +327,7 @@
         .asset-badge.good { background: rgba(59,130,246,0.15); color: var(--accent); }
         .asset-badge.low { background: rgba(245,158,11,0.15); color: var(--warning); }
         .asset-badge.learning { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
-        .asset-badge.unrated { background: rgba(148,163,184,0.1); color: var(--text-secondary); }
+        .asset-badge.pending { background: rgba(139,92,246,0.15); color: var(--purple); }
 
         .ad-metrics {
             display: flex;
@@ -477,7 +482,7 @@
         .label-pill.good { background: rgba(59,130,246,0.15); color: var(--accent); }
         .label-pill.low { background: rgba(245,158,11,0.15); color: var(--warning); }
         .label-pill.learning { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
-        .label-pill.unrated { background: rgba(148,163,184,0.08); color: var(--text-secondary); }
+        .label-pill.pending { background: rgba(139,92,246,0.15); color: var(--purple); }
 
         /* Ad URL path display */
         .ad-path {
@@ -535,9 +540,9 @@
             <div class="header-controls">
                 <span id="dataBadge" class="data-badge loading">Loading...</span>
                 <div class="date-selector">
-                    <button class="date-btn" data-days="7">7d</button>
+                    <button class="date-btn active" data-days="7">7d</button>
                     <button class="date-btn" data-days="30">30d</button>
-                    <button class="date-btn active" data-days="90">90d</button>
+                    <button class="date-btn" data-days="90">90d</button>
                     <button class="date-btn" data-days="180">6mo</button>
                     <button class="date-btn" data-days="365">12mo</button>
                 </div>
@@ -549,6 +554,8 @@
             <button class="tab-btn active" data-tab="overview">Overview</button>
             <button class="tab-btn" data-tab="campaigns">Campaigns</button>
             <button class="tab-btn" data-tab="creative">Ad Creative</button>
+            <button class="tab-btn" data-tab="search-terms">Search Terms</button>
+            <button class="tab-btn" data-tab="keywords">Keywords</button>
         </div>
 
         <!-- Overview Tab -->
@@ -558,8 +565,10 @@
                 <div class="stat-card"><div class="stat-label">Clicks</div><div class="stat-value" id="statClicks">--</div></div>
                 <div class="stat-card"><div class="stat-label">Impressions</div><div class="stat-value" id="statImpressions">--</div></div>
                 <div class="stat-card"><div class="stat-label">CTR</div><div class="stat-value" id="statCTR">--</div></div>
+                <div class="stat-card"><div class="stat-label">Avg CPC</div><div class="stat-value" id="statCPC">--</div></div>
                 <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">--</div></div>
-                <div class="stat-card"><div class="stat-label">CPA</div><div class="stat-value" id="statCPA">--</div></div>
+                <div class="stat-card"><div class="stat-label">Conv Rate</div><div class="stat-value" id="statConvRate">--</div></div>
+                <div class="stat-card"><div class="stat-label">Cost / Conv</div><div class="stat-value" id="statCPA">--</div></div>
             </div>
 
             <div class="chart-row">
@@ -586,12 +595,13 @@
                             <th data-sort="name">Campaign</th>
                             <th data-sort="status">Status</th>
                             <th data-sort="spend" class="sorted">Spend</th>
-                            <th data-sort="clicks">Clicks</th>
                             <th data-sort="impressions">Impr</th>
+                            <th data-sort="clicks">Clicks</th>
                             <th data-sort="ctr">CTR</th>
+                            <th data-sort="cpc">Avg CPC</th>
                             <th data-sort="conversions">Conv</th>
-                            <th data-sort="cpa">CPA</th>
-                            <th data-sort="roas">ROAS</th>
+                            <th data-sort="convRate">Conv Rate</th>
+                            <th data-sort="cpa">Cost / Conv</th>
                         </tr>
                     </thead>
                     <tbody id="campaignBody"></tbody>
@@ -634,23 +644,108 @@
                 </div>
             </div>
         </div>
+
+        <!-- Search Terms Tab -->
+        <div id="tab-search-terms" class="tab-content">
+            <div class="creative-header">
+                <div>
+                    <h2 style="font-size:1.2rem;">Search Terms <span id="stCountBadge" class="count-badge">0</span></h2>
+                    <p class="creative-subtitle">Actual user queries that triggered your ads, aggregated across campaigns</p>
+                </div>
+                <div class="creative-controls">
+                    <select id="stLimitSelect" class="filter-select">
+                        <option value="20">Top 20</option>
+                        <option value="50" selected>Top 50</option>
+                        <option value="100">Top 100</option>
+                    </select>
+                    <button class="btn" onclick="exportSearchTermsCSV()">Export CSV</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="searchTermsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort-st="searchTerm">Search Term</th>
+                            <th data-sort-st="spend" class="sorted">Spend</th>
+                            <th data-sort-st="impressions">Impr</th>
+                            <th data-sort-st="clicks">Clicks</th>
+                            <th data-sort-st="ctr">CTR</th>
+                            <th data-sort-st="cpc">Avg CPC</th>
+                            <th data-sort-st="conversions">Conv</th>
+                            <th data-sort-st="convRate">Conv Rate</th>
+                            <th data-sort-st="cpa">Cost / Conv</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchTermsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Keywords Tab -->
+        <div id="tab-keywords" class="tab-content">
+            <div class="creative-header">
+                <div>
+                    <h2 style="font-size:1.2rem;">Keywords <span id="kwCountBadge" class="count-badge">0</span></h2>
+                    <p class="creative-subtitle">All active keywords targeted across the account</p>
+                </div>
+                <div class="creative-controls">
+                    <input type="text" id="kwSearchInput" class="filter-select" placeholder="Search keywords..." style="max-width:220px;">
+                    <select id="kwMatchFilter" class="filter-select">
+                        <option value="">All match types</option>
+                        <option value="EXACT">Exact</option>
+                        <option value="PHRASE">Phrase</option>
+                        <option value="BROAD">Broad</option>
+                    </select>
+                    <button class="btn" onclick="exportKeywordsCSV()">Export CSV</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="keywordsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort-kw="keyword">Keyword</th>
+                            <th data-sort-kw="matchType">Match</th>
+                            <th data-sort-kw="qualityScore">QS</th>
+                            <th data-sort-kw="spend" class="sorted">Spend</th>
+                            <th data-sort-kw="impressions">Impr</th>
+                            <th data-sort-kw="clicks">Clicks</th>
+                            <th data-sort-kw="ctr">CTR</th>
+                            <th data-sort-kw="cpc">Avg CPC</th>
+                            <th data-sort-kw="conversions">Conv</th>
+                            <th data-sort-kw="convRate">Conv Rate</th>
+                            <th data-sort-kw="cpa">Cost / Conv</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keywordsBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 <script>
 // State
-let currentDays = 90;
+let currentDays = 7;
 let isDemo = false;
 let performanceData = null;
 let campaignData = null;
 let trendData = null;          // Either daily or monthly data depending on range
 let trendGranularity = 'monthly'; // 'daily' | 'monthly'
 let adsData = null;
+let searchTermsData = null;
+let keywordsData = null;
 let spendChartInstance = null;
 let cpaChartInstance = null;
 let campaignSortKey = 'spend';
 let campaignSortDir = -1;
 let adSortKey = 'spend';
 let adCampaignFilter = '';
+let stLimit = 50;
+let stSortKey = 'spend';
+let stSortDir = -1;
+let kwSortKey = 'spend';
+let kwSortDir = -1;
+let kwMatchFilter = '';
+let kwSearchFilter = '';
 
 const API_BASE = '/api/digistore';
 
@@ -700,11 +795,13 @@ async function loadAllData() {
     const trendParam = trendGranularity; // 'daily' or 'monthly'
 
     try {
-        const [summaryRes, campaignRes, trendRes, adsRes] = await Promise.all([
+        const [summaryRes, campaignRes, trendRes, adsRes, stRes, kwRes] = await Promise.all([
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/search-terms?days=${currentDays}&limit=100`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/account-keywords?days=${currentDays}`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
@@ -712,6 +809,8 @@ async function loadAllData() {
         const campaignOk = campaignRes?.status === 'success' && Array.isArray(campaignRes.campaigns);
         const trendOk = trendRes?.status === 'success' && Array.isArray(trendRes[trendParam]);
         const adsOk = adsRes?.status === 'success' && Array.isArray(adsRes.ads) && adsRes.ads.length > 0;
+        const stOk = stRes?.status === 'success' && Array.isArray(stRes.terms);
+        const kwOk = kwRes?.status === 'success' && Array.isArray(kwRes.keywords);
 
         if (summaryOk) {
             isDemo = false;
@@ -719,6 +818,8 @@ async function loadAllData() {
             campaignData = campaignOk ? campaignRes.campaigns : [];
             trendData = trendOk ? trendRes[trendParam] : [];
             adsData = adsOk ? adsRes : null;
+            searchTermsData = stOk ? stRes.terms : [];
+            keywordsData = kwOk ? kwRes.keywords : [];
             setBadge('live', 'Live Data');
         } else {
             isDemo = true;
@@ -734,6 +835,8 @@ async function loadAllData() {
     renderOverview();
     renderCampaigns();
     renderCreative();
+    renderSearchTerms();
+    renderKeywords();
     document.getElementById('refreshBtn').disabled = false;
 }
 
@@ -867,7 +970,7 @@ function generateDemoData() {
                     pinned: di === 0 ? 'DESCRIPTION_1' : null,
                     performanceLabel: labels[di % labels.length],
                 })),
-                labelCounts: { BEST: 1 + Math.floor(Math.random() * 3), GOOD: 1 + Math.floor(Math.random() * 3), LEARNING: Math.floor(Math.random() * 3), LOW: Math.floor(Math.random() * 2), UNRATED: 0 },
+                labelCounts: { BEST: 1 + Math.floor(Math.random() * 3), GOOD: 1 + Math.floor(Math.random() * 3), LEARNING: Math.floor(Math.random() * 3), LOW: Math.floor(Math.random() * 2), PENDING: Math.floor(Math.random() * 2) },
                 impressions: imp, clicks: cl, spend: s, conversions: conv,
                 conversionValue: conv * (70 + Math.random() * 50),
                 ctr: imp > 0 ? cl / imp : 0, cpa: conv > 0 ? s / conv : 0,
@@ -888,6 +991,77 @@ function generateDemoData() {
             })),
         },
     };
+
+    // Demo search terms
+    const demoTerms = [
+        'digistore24', 'digistore 24', 'digistore24 review', 'affiliate marketing platform',
+        'best affiliate network', 'clickbank alternative', 'digital product marketplace',
+        'sell digital products online', 'how to become affiliate', 'online course platform',
+        'digital downloads store', 'affiliate tracking software', 'high commission affiliate',
+        'digistore24 login', 'digistore24 vs clickbank', 'best online business platform',
+        'affiliate marketing for beginners', 'passive income online', 'start affiliate marketing',
+        'digital sales platform', 'ebook selling platform', 'course affiliate program',
+        'digistore24 payout', 'digistore24 germany', 'affiliate marketing tools',
+    ];
+    searchTermsData = demoTerms.map((term, i) => {
+        const imp = Math.round((500 + Math.random() * 3000) * (1 - i * 0.03));
+        const cl = Math.round(imp * (0.03 + Math.random() * 0.08));
+        const s = cl * (1.2 + Math.random() * 2.5);
+        const conv = Math.max(0, Math.round((cl * (0.02 + Math.random() * 0.04)) * 10) / 10);
+        const cv = conv * (60 + Math.random() * 50);
+        return {
+            searchTerm: term,
+            status: ['ADDED', 'EXCLUDED', 'NONE'][Math.floor(Math.random() * 3)],
+            sources: [campaignNames[i % campaignNames.length] + ' › ' + adGroupNames[i % adGroupNames.length]],
+            impressions: imp, clicks: cl, spend: s, conversions: conv,
+            conversionValue: cv,
+            ctr: imp > 0 ? cl / imp : 0,
+            cpc: cl > 0 ? s / cl : 0,
+            cpa: conv > 0 ? s / conv : 0,
+            convRate: cl > 0 ? conv / cl : 0,
+        };
+    });
+
+    // Demo keywords
+    const demoKwList = [
+        { kw: 'digistore24', mt: 'EXACT' },
+        { kw: 'digistore 24', mt: 'PHRASE' },
+        { kw: 'affiliate marketing', mt: 'PHRASE' },
+        { kw: 'affiliate network', mt: 'BROAD' },
+        { kw: 'clickbank alternative', mt: 'PHRASE' },
+        { kw: 'digital product marketplace', mt: 'PHRASE' },
+        { kw: 'sell digital products', mt: 'BROAD' },
+        { kw: 'online course platform', mt: 'BROAD' },
+        { kw: 'affiliate tracking', mt: 'PHRASE' },
+        { kw: 'high commission affiliate', mt: 'BROAD' },
+        { kw: 'digistore24 review', mt: 'PHRASE' },
+        { kw: 'passive income', mt: 'BROAD' },
+        { kw: 'digital downloads platform', mt: 'PHRASE' },
+        { kw: 'best affiliate marketing', mt: 'BROAD' },
+        { kw: 'ebook selling platform', mt: 'PHRASE' },
+        { kw: 'digistore', mt: 'EXACT' },
+    ];
+    keywordsData = demoKwList.map((k, i) => {
+        const imp = Math.round((300 + Math.random() * 2500) * (1 - i * 0.03));
+        const cl = Math.round(imp * (0.03 + Math.random() * 0.08));
+        const s = cl * (1.2 + Math.random() * 2.5);
+        const conv = Math.max(0, Math.round((cl * (0.02 + Math.random() * 0.04)) * 10) / 10);
+        return {
+            criterionId: String(9000 + i),
+            keyword: k.kw,
+            matchType: k.mt,
+            status: 'ENABLED',
+            qualityScore: 4 + Math.floor(Math.random() * 7),
+            campaign: campaignNames[i % campaignNames.length],
+            adGroup: adGroupNames[i % adGroupNames.length] + ' Ad Group',
+            impressions: imp, clicks: cl, spend: s, conversions: conv,
+            conversionValue: conv * (60 + Math.random() * 50),
+            ctr: imp > 0 ? cl / imp : 0,
+            cpc: cl > 0 ? s / cl : 0,
+            cpa: conv > 0 ? s / conv : 0,
+            convRate: cl > 0 ? conv / cl : 0,
+        };
+    });
 }
 
 // ===== Formatting =====
@@ -912,8 +1086,10 @@ function renderOverview() {
     document.getElementById('statClicks').textContent = fmt(d.clicks, 'n');
     document.getElementById('statImpressions').textContent = fmt(d.impressions, 'n');
     document.getElementById('statCTR').textContent = fmt(d.ctr, '%');
+    document.getElementById('statCPC').textContent = fmt(d.cpc, '$');
     document.getElementById('statConversions').textContent = fmt(d.conversions, 'f1');
-    document.getElementById('statCPA').textContent = fmt(d.cpa, '$');
+    document.getElementById('statConvRate').textContent = fmt(d.convRate, '%');
+    document.getElementById('statCPA').textContent = d.cpa > 0 ? fmt(d.cpa, '$') : '--';
 
     renderCharts();
 }
@@ -1051,7 +1227,7 @@ function renderCharts() {
 function renderCampaigns() {
     const tbody = document.getElementById('campaignBody');
     if (!campaignData || campaignData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
         return;
     }
 
@@ -1063,16 +1239,18 @@ function renderCampaigns() {
 
     tbody.innerHTML = sorted.map(c => {
         const statusClass = c.status === 'ENABLED' ? 'enabled' : 'paused';
+        const convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
         return `<tr>
             <td>${esc(c.name)}</td>
             <td><span class="status-dot ${statusClass}"></span>${c.status === 'ENABLED' ? 'Active' : 'Paused'}</td>
             <td>${fmt(c.spend, '$')}</td>
-            <td>${fmt(c.clicks, 'n')}</td>
             <td>${fmt(c.impressions, 'n')}</td>
+            <td>${fmt(c.clicks, 'n')}</td>
             <td>${fmt(c.ctr, '%')}</td>
+            <td>${fmt(c.cpc, '$')}</td>
             <td>${fmt(c.conversions, 'f1')}</td>
-            <td>${fmt(c.cpa, '$')}</td>
-            <td>${fmt(c.roas, 'x')}</td>
+            <td>${fmt(convRate, '%')}</td>
+            <td>${c.cpa > 0 ? fmt(c.cpa, '$') : '—'}</td>
         </tr>`;
     }).join('');
 }
@@ -1095,11 +1273,16 @@ document.querySelectorAll('#campaignTable th[data-sort]').forEach(th => {
 
 function exportCampaignsCSV() {
     if (!campaignData || campaignData.length === 0) return;
-    const headers = ['Campaign','Status','Spend','Clicks','Impressions','CTR','Conversions','CPA','ROAS'];
-    const rows = campaignData.map(c => [
-        c.name, c.status, c.spend.toFixed(2), c.clicks, c.impressions,
-        (c.ctr*100).toFixed(2)+'%', c.conversions.toFixed(1), c.cpa.toFixed(2), c.roas.toFixed(2)
-    ]);
+    const headers = ['Campaign','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv'];
+    const rows = campaignData.map(c => {
+        const convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
+        return [
+            c.name, c.status, c.spend.toFixed(2), c.impressions, c.clicks,
+            (c.ctr*100).toFixed(2)+'%', c.cpc.toFixed(2),
+            c.conversions.toFixed(1), (convRate*100).toFixed(2)+'%',
+            c.cpa > 0 ? c.cpa.toFixed(2) : '',
+        ];
+    });
     const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
@@ -1228,7 +1411,7 @@ function renderLabelSummary(counts) {
     if (counts.GOOD) parts.push(`<span class="label-pill good">${counts.GOOD} Good</span>`);
     if (counts.LEARNING) parts.push(`<span class="label-pill learning">${counts.LEARNING} Learning</span>`);
     if (counts.LOW) parts.push(`<span class="label-pill low">${counts.LOW} Low</span>`);
-    if (counts.UNRATED) parts.push(`<span class="label-pill unrated">${counts.UNRATED} Unrated</span>`);
+    if (counts.PENDING) parts.push(`<span class="label-pill pending">${counts.PENDING} Pending</span>`);
     if (parts.length === 0) return '';
     return `<div class="label-summary">${parts.join('')}</div>`;
 }
@@ -1240,7 +1423,7 @@ function renderAssetList(title, assets) {
         ${assets.map(a => `<div class="asset-item">
             <span class="asset-text">${esc(a.text)}</span>
             ${a.pinned ? `<span class="pinned-badge">Pin ${a.pinned.replace('HEADLINE_','H').replace('DESCRIPTION_','D')}</span>` : ''}
-            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : badgeHTML('UNRATED')}
+            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : ''}
         </div>`).join('')}
     </div>`;
 }
@@ -1258,8 +1441,9 @@ function renderLeaderboard(items) {
 
 function badgeHTML(label) {
     if (!label) return '';
-    const cls = label.toLowerCase();
-    return `<span class="asset-badge ${cls}">${label}</span>`;
+    const cls = String(label).toLowerCase();
+    const display = String(label).charAt(0) + String(label).slice(1).toLowerCase();
+    return `<span class="asset-badge ${cls}">${display}</span>`;
 }
 
 function esc(str) {
@@ -1278,6 +1462,174 @@ document.getElementById('adCampaignFilter').addEventListener('change', (e) => {
     adCampaignFilter = e.target.value;
     renderCreative();
 });
+
+// ===== Render Search Terms =====
+function renderSearchTerms() {
+    const tbody = document.getElementById('searchTermsBody');
+    const badge = document.getElementById('stCountBadge');
+
+    if (!searchTermsData || searchTermsData.length === 0) {
+        badge.textContent = '0';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary)">No search term data</td></tr>';
+        return;
+    }
+
+    // Sort
+    const sorted = [...searchTermsData].sort((a, b) => {
+        const av = a[stSortKey], bv = b[stSortKey];
+        if (typeof av === 'string') return stSortDir * av.localeCompare(bv);
+        return stSortDir * ((av || 0) - (bv || 0));
+    });
+
+    // Limit
+    const limited = sorted.slice(0, stLimit);
+    badge.textContent = `${limited.length} of ${searchTermsData.length}`;
+
+    tbody.innerHTML = limited.map(t => {
+        const statusLabel = t.status === 'ADDED' ? 'Added'
+                          : t.status === 'EXCLUDED' ? 'Excluded'
+                          : '';
+        return `<tr>
+            <td>${esc(t.searchTerm)}${statusLabel ? `<span class="ad-path">${statusLabel}</span>` : ''}</td>
+            <td>${fmt(t.spend, '$')}</td>
+            <td>${fmt(t.impressions, 'n')}</td>
+            <td>${fmt(t.clicks, 'n')}</td>
+            <td>${fmt(t.ctr, '%')}</td>
+            <td>${fmt(t.cpc, '$')}</td>
+            <td>${fmt(t.conversions, 'f1')}</td>
+            <td>${fmt(t.convRate, '%')}</td>
+            <td>${t.cpa > 0 ? fmt(t.cpa, '$') : '—'}</td>
+        </tr>`;
+    }).join('');
+}
+
+// Search terms sort + limit
+document.querySelectorAll('#searchTermsTable th[data-sort-st]').forEach(th => {
+    th.addEventListener('click', () => {
+        const key = th.dataset.sortSt;
+        if (stSortKey === key) stSortDir *= -1;
+        else { stSortKey = key; stSortDir = key === 'searchTerm' ? 1 : -1; }
+        document.querySelectorAll('#searchTermsTable th').forEach(h => h.classList.remove('sorted'));
+        th.classList.add('sorted');
+        renderSearchTerms();
+    });
+});
+
+document.getElementById('stLimitSelect').addEventListener('change', (e) => {
+    stLimit = parseInt(e.target.value);
+    renderSearchTerms();
+});
+
+function exportSearchTermsCSV() {
+    if (!searchTermsData || searchTermsData.length === 0) return;
+    const sorted = [...searchTermsData].sort((a, b) => (b.spend || 0) - (a.spend || 0)).slice(0, stLimit);
+    const headers = ['Search Term','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv'];
+    const rows = sorted.map(t => [
+        t.searchTerm, t.status || '', t.spend.toFixed(2), t.impressions, t.clicks,
+        (t.ctr*100).toFixed(2)+'%', t.cpc.toFixed(2),
+        t.conversions.toFixed(1), (t.convRate*100).toFixed(2)+'%',
+        t.cpa > 0 ? t.cpa.toFixed(2) : '',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `digistore24-search-terms-${currentDays}d.csv`; a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ===== Render Keywords =====
+function renderKeywords() {
+    const tbody = document.getElementById('keywordsBody');
+    const badge = document.getElementById('kwCountBadge');
+
+    if (!keywordsData || keywordsData.length === 0) {
+        badge.textContent = '0';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-secondary)">No keyword data</td></tr>';
+        return;
+    }
+
+    // Filter
+    let rows = keywordsData.slice();
+    if (kwMatchFilter) rows = rows.filter(k => k.matchType === kwMatchFilter);
+    if (kwSearchFilter) {
+        const q = kwSearchFilter.toLowerCase();
+        rows = rows.filter(k => (k.keyword || '').toLowerCase().includes(q));
+    }
+
+    // Sort
+    rows.sort((a, b) => {
+        const av = a[kwSortKey], bv = b[kwSortKey];
+        if (typeof av === 'string') return kwSortDir * av.localeCompare(bv);
+        return kwSortDir * ((av || 0) - (bv || 0));
+    });
+
+    badge.textContent = `${rows.length} of ${keywordsData.length}`;
+
+    tbody.innerHTML = rows.map(k => {
+        const matchLabel = k.matchType ? String(k.matchType).charAt(0) + String(k.matchType).slice(1).toLowerCase() : '';
+        const qs = k.qualityScore != null ? String(k.qualityScore) : '—';
+        const qsColor = k.qualityScore >= 7 ? 'var(--success)' : k.qualityScore >= 4 ? 'var(--text-primary)' : k.qualityScore != null ? 'var(--warning)' : 'var(--text-secondary)';
+        return `<tr>
+            <td>${esc(k.keyword)}<div class="ad-path">${esc(k.campaign)} › ${esc(k.adGroup)}</div></td>
+            <td>${matchLabel}</td>
+            <td><span style="color:${qsColor}">${qs}</span></td>
+            <td>${fmt(k.spend, '$')}</td>
+            <td>${fmt(k.impressions, 'n')}</td>
+            <td>${fmt(k.clicks, 'n')}</td>
+            <td>${fmt(k.ctr, '%')}</td>
+            <td>${fmt(k.cpc, '$')}</td>
+            <td>${fmt(k.conversions, 'f1')}</td>
+            <td>${fmt(k.convRate, '%')}</td>
+            <td>${k.cpa > 0 ? fmt(k.cpa, '$') : '—'}</td>
+        </tr>`;
+    }).join('');
+}
+
+// Keyword sort + filters
+document.querySelectorAll('#keywordsTable th[data-sort-kw]').forEach(th => {
+    th.addEventListener('click', () => {
+        const key = th.dataset.sortKw;
+        if (kwSortKey === key) kwSortDir *= -1;
+        else { kwSortKey = key; kwSortDir = (key === 'keyword' || key === 'matchType') ? 1 : -1; }
+        document.querySelectorAll('#keywordsTable th').forEach(h => h.classList.remove('sorted'));
+        th.classList.add('sorted');
+        renderKeywords();
+    });
+});
+
+document.getElementById('kwMatchFilter').addEventListener('change', (e) => {
+    kwMatchFilter = e.target.value;
+    renderKeywords();
+});
+
+let kwSearchTimer = null;
+document.getElementById('kwSearchInput').addEventListener('input', (e) => {
+    clearTimeout(kwSearchTimer);
+    kwSearchTimer = setTimeout(() => {
+        kwSearchFilter = e.target.value;
+        renderKeywords();
+    }, 200);
+});
+
+function exportKeywordsCSV() {
+    if (!keywordsData || keywordsData.length === 0) return;
+    const headers = ['Keyword','Match Type','QS','Campaign','Ad Group','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv'];
+    const rows = keywordsData.map(k => [
+        k.keyword, k.matchType || '', k.qualityScore ?? '',
+        k.campaign || '', k.adGroup || '',
+        k.spend.toFixed(2), k.impressions, k.clicks,
+        (k.ctr*100).toFixed(2)+'%', k.cpc.toFixed(2),
+        k.conversions.toFixed(1), (k.convRate*100).toFixed(2)+'%',
+        k.cpa > 0 ? k.cpa.toFixed(2) : '',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `digistore24-keywords-${currentDays}d.csv`; a.click();
+    URL.revokeObjectURL(url);
+}
 
 // ===== Init =====
 initTabs();

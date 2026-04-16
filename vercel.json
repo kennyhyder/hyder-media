@@ -135,6 +135,12 @@
     },
     "api/digistore/ads.js": {
       "maxDuration": 30
+    },
+    "api/digistore/search-terms.js": {
+      "maxDuration": 30
+    },
+    "api/digistore/account-keywords.js": {
+      "maxDuration": 30
     }
   }
 }

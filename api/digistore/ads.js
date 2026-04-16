@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         const [liveAds, adMetrics, assetData] = await Promise.all([
             fetchLiveRSAAds(headers),
             fetchRSAMetrics(headers, start, end),
-            fetchAssetPerformance(headers).catch(() => null),
+            fetchAssetPerformance(headers, start, end).catch(() => null),
         ]);
 
         // Build asset leaderboard from asset performance data
@@ -164,22 +164,27 @@ async function fetchRSAMetrics(headers, start, end) {
     return fetchQuery(headers, query);
 }
 
-async function fetchAssetPerformance(headers) {
+async function fetchAssetPerformance(headers, start, end) {
+    // Date-segmented to match the UI's evaluation window. Without a date filter,
+    // Google can return stale/aggregated labels that don't match the Ads UI.
     const query = `
         SELECT
             ad_group_ad_asset_view.ad_group_ad,
             ad_group_ad_asset_view.field_type,
             ad_group_ad_asset_view.performance_label,
-            asset.text_asset.text
+            asset.text_asset.text,
+            asset.resource_name
         FROM ad_group_ad_asset_view
-        WHERE ad_group_ad_asset_view.field_type IN ('HEADLINE', 'DESCRIPTION')
-            AND ad_group_ad_asset_view.enabled = true
+        WHERE segments.date BETWEEN '${start}' AND '${end}'
+            AND ad_group_ad_asset_view.field_type IN ('HEADLINE', 'DESCRIPTION')
     `;
     return fetchQuery(headers, query);
 }
 
 function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
-    // Build asset label lookup: adId -> { headlines: {text: label}, descriptions: {text: label} }
+    // Build asset label lookup from ad_group_ad_asset_view (used as fallback if the
+    // RSA itself didn't expose asset_performance_label).
+    // Structure: adId -> { headlines: {text: bestLabel}, descriptions: {text: bestLabel} }
     const assetLabels = {};
     if (assetData) {
         for (const row of assetData) {
@@ -189,15 +194,17 @@ function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
             if (!adIdMatch) continue;
             const adId = adIdMatch[1];
             const fieldType = view.fieldType;
-            const label = view.performanceLabel || 'UNRATED';
-            const text = row.asset?.textAsset?.text || '';
+            const rawLabel = view.performanceLabel;
+            const text = (row.asset?.textAsset?.text || '').trim();
+            if (!text) continue;
 
             if (!assetLabels[adId]) assetLabels[adId] = { headlines: {}, descriptions: {} };
-            if (fieldType === 'HEADLINE') {
-                assetLabels[adId].headlines[text] = label;
-            } else if (fieldType === 'DESCRIPTION') {
-                assetLabels[adId].descriptions[text] = label;
-            }
+            const bucket = fieldType === 'HEADLINE' ? assetLabels[adId].headlines
+                         : fieldType === 'DESCRIPTION' ? assetLabels[adId].descriptions : null;
+            if (!bucket) continue;
+            // Keep the strongest label seen for this asset (same asset can appear
+            // across multiple date segments / ad groups)
+            bucket[text] = bestLabel(bucket[text], rawLabel);
         }
     }
 
@@ -224,23 +231,31 @@ function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
         const adId = ad.id;
         const metrics = metricsByAdId[adId] || { impressions: 0, clicks: 0, spend: 0, conversions: 0, conversionValue: 0 };
 
-        const headlines = (ad.responsiveSearchAd?.headlines || []).map(h => ({
-            text: h.text,
-            pinned: h.pinnedField || null,
-            performanceLabel: assetLabels[adId]?.headlines[h.text] || null,
-        }));
+        const headlines = (ad.responsiveSearchAd?.headlines || []).map(h => {
+            const direct = normalizeLabel(h.assetPerformanceLabel);
+            const fromView = assetLabels[adId]?.headlines[(h.text || '').trim()];
+            return {
+                text: h.text,
+                pinned: h.pinnedField || null,
+                performanceLabel: direct || normalizeLabel(fromView) || null,
+            };
+        });
 
-        const descriptions = (ad.responsiveSearchAd?.descriptions || []).map(d => ({
-            text: d.text,
-            pinned: d.pinnedField || null,
-            performanceLabel: assetLabels[adId]?.descriptions[d.text] || null,
-        }));
+        const descriptions = (ad.responsiveSearchAd?.descriptions || []).map(d => {
+            const direct = normalizeLabel(d.assetPerformanceLabel);
+            const fromView = assetLabels[adId]?.descriptions[(d.text || '').trim()];
+            return {
+                text: d.text,
+                pinned: d.pinnedField || null,
+                performanceLabel: direct || normalizeLabel(fromView) || null,
+            };
+        });
 
-        // Count performance labels for quick summary
-        const labelCounts = { BEST: 0, GOOD: 0, LEARNING: 0, LOW: 0, UNRATED: 0 };
+        // Count performance labels (only rated ones)
+        const labelCounts = { BEST: 0, GOOD: 0, LEARNING: 0, LOW: 0, PENDING: 0 };
         [...headlines, ...descriptions].forEach(a => {
-            const l = a.performanceLabel || 'UNRATED';
-            if (labelCounts[l] != null) labelCounts[l]++;
+            const l = a.performanceLabel;
+            if (l && labelCounts[l] != null) labelCounts[l]++;
         });
 
         const rsa = ad.responsiveSearchAd || {};
@@ -275,29 +290,53 @@ function buildAssetLeaderboard(assetData) {
     for (const row of assetData) {
         const view = row.adGroupAdAssetView || {};
         const fieldType = view.fieldType;
-        const label = view.performanceLabel || 'UNRATED';
-        const text = row.asset?.textAsset?.text || '';
+        const label = normalizeLabel(view.performanceLabel);
+        const text = (row.asset?.textAsset?.text || '').trim();
         if (!text) continue;
 
-        const target = fieldType === 'HEADLINE' ? headlines : descriptions;
+        const target = fieldType === 'HEADLINE' ? headlines
+                     : fieldType === 'DESCRIPTION' ? descriptions : null;
+        if (!target) continue;
+
         if (!target[text]) {
             target[text] = { text, performanceLabel: label, adCount: 0 };
         }
         target[text].adCount++;
-        // Keep the best label (BEST > GOOD > LEARNING > LOW > UNRATED)
-        const rank = { BEST: 4, GOOD: 3, LEARNING: 2, LOW: 1, UNRATED: 0 };
-        if ((rank[label] || 0) > (rank[target[text].performanceLabel] || 0)) {
-            target[text].performanceLabel = label;
-        }
+        target[text].performanceLabel = bestLabel(target[text].performanceLabel, label);
     }
 
-    const sortByLabel = (a, b) => {
-        const rank = { BEST: 4, GOOD: 3, LEARNING: 2, LOW: 1, UNRATED: 0 };
-        return (rank[b.performanceLabel] || 0) - (rank[a.performanceLabel] || 0);
+    // Only include entries that have a real (rated) label, with rated first then unrated at bottom
+    const items = (obj) => {
+        const arr = Object.values(obj);
+        arr.sort((a, b) => labelRank(b.performanceLabel) - labelRank(a.performanceLabel));
+        return arr;
     };
 
     return {
-        headlines: Object.values(headlines).sort(sortByLabel),
-        descriptions: Object.values(descriptions).sort(sortByLabel),
+        headlines: items(headlines),
+        descriptions: items(descriptions),
     };
+}
+
+// Normalize any "no-rating" variant to null so the UI can render cleanly.
+// Google returns: UNSPECIFIED, UNKNOWN, PENDING, LEARNING, LOW, GOOD, BEST.
+// Some ads also surface NOT_APPLICABLE for pinned or otherwise uncomparable assets.
+function normalizeLabel(label) {
+    if (!label) return null;
+    const up = String(label).toUpperCase();
+    if (up === 'BEST' || up === 'GOOD' || up === 'LEARNING' || up === 'LOW' || up === 'PENDING') {
+        return up;
+    }
+    // UNSPECIFIED, UNKNOWN, NOT_APPLICABLE, anything else → treat as no rating
+    return null;
+}
+
+function labelRank(label) {
+    return { BEST: 5, GOOD: 4, LEARNING: 3, LOW: 2, PENDING: 1 }[label] || 0;
+}
+
+function bestLabel(a, b) {
+    const na = normalizeLabel(a);
+    const nb = normalizeLabel(b);
+    return labelRank(nb) > labelRank(na) ? nb : na;
 }
