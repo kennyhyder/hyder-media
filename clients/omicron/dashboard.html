@@ -664,8 +664,10 @@
         }
 
         // Format period label for display.
-        //   "2025-01"     -> "Jan 25"    (month bucket)
-        //   "2025-01-07"  -> "Jan 7"     (day bucket)
+        //   monthly  granularity: "Jan 26"   (month abbr + 2-digit year)
+        //   daily    granularity: "Jan 7"    (month abbr + day number)
+        // Google Ads' `segments.month` returns "YYYY-MM-01" (first of month),
+        // so we can't distinguish by string shape — use apiData.granularity.
         function formatMonth(periodStr) {
             if (!periodStr) return '';
             const parts = periodStr.split('-');
@@ -673,7 +675,8 @@
             const year = parts[0];
             const month = parts[1];
             const day = parts[2];
-            if (day) {
+            const granularity = apiData?.granularity || 'month';
+            if (granularity === 'day' && day) {
                 return monthAbbr[parseInt(month, 10) - 1] + ' ' + parseInt(day, 10);
             }
             return monthAbbr[parseInt(month, 10) - 1] + ' ' + year.slice(2);
