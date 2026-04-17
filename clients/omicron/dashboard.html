@@ -87,6 +87,38 @@
             height: 350px;
         }
 
+        .account-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .account-chart-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .account-chart-block .chart-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .account-chart-block .chart-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .account-chart-block .chart-wrap {
+            position: relative;
+            height: 220px;
+        }
+
         .legend-inline {
             display: flex;
             gap: 20px;
@@ -703,6 +735,13 @@
                 isLoading = false;
                 updateDashboard();
 
+                // Fetch conversion actions in parallel so SKU/brand breakdown
+                // charts on the Account Details tab have data to render.
+                refreshConversionData().then(() => {
+                    // Re-render account cards so the SKU chart populates
+                    updateAccountDetails();
+                }).catch(err => console.error('Conversion data fetch failed:', err));
+
             } catch (error) {
                 console.error('Failed to fetch API data:', error);
                 document.getElementById('data-badge').textContent = 'API ERROR';
@@ -1059,6 +1098,22 @@
             charts[group + 'Cost'].update();
         }
 
+        // Track per-account Chart.js instances so we can destroy them before re-render
+        const accountCharts = {};
+
+        function destroyAccountCharts() {
+            for (const key in accountCharts) {
+                try { accountCharts[key].destroy(); } catch (e) { /* ignore */ }
+                delete accountCharts[key];
+            }
+        }
+
+        // Shared Chart.js options for the account detail sub-charts
+        const accountSubChartScales = {
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 10 } }, beginAtZero: true }
+        };
+
         // Update account details section
         function updateAccountDetails() {
             if (!apiData || !apiData.accounts) return;
@@ -1066,9 +1121,10 @@
             const container = document.getElementById('account-details-container');
             const successAccounts = apiData.accounts.filter(a => a.status === 'success');
 
+            destroyAccountCharts();
+
             container.innerHTML = successAccounts.map(account => {
                 const totals = account.totals || {};
-                const monthly = account.monthly || [];
                 const chartId = account.name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
                 return `
@@ -1112,8 +1168,27 @@
                             <div class="legend-item"><div class="legend-dot" style="background: #3b82f6;"></div> Non-Brand</div>
                             <div class="legend-item"><div class="legend-dot" style="background: #ef4444;"></div> Brand</div>
                         </div>
-                        <div style="height: 250px; padding: 0 16px 16px;">
-                            <canvas id="chart-${chartId}"></canvas>
+                        <div class="account-charts-grid">
+                            <div class="account-chart-block">
+                                <div class="chart-title">Conversions — Brand vs Non-Brand</div>
+                                <div class="chart-subtitle">Monthly conversions, stacked</div>
+                                <div class="chart-wrap"><canvas id="chart-conv-${chartId}"></canvas></div>
+                            </div>
+                            <div class="account-chart-block">
+                                <div class="chart-title">CPA — Brand vs Non-Brand</div>
+                                <div class="chart-subtitle">Cost per conversion, monthly</div>
+                                <div class="chart-wrap"><canvas id="chart-cpa-${chartId}"></canvas></div>
+                            </div>
+                            <div class="account-chart-block">
+                                <div class="chart-title">Spend (Cost) — Brand vs Non-Brand</div>
+                                <div class="chart-subtitle">Monthly ad spend, stacked</div>
+                                <div class="chart-wrap"><canvas id="chart-spend-${chartId}"></canvas></div>
+                            </div>
+                            <div class="account-chart-block">
+                                <div class="chart-title">Conversions by ${account.group === 'review' ? 'Brand' : 'SKU'} Breakdown</div>
+                                <div class="chart-subtitle" id="chart-sku-sub-${chartId}">${conversionData ? 'Conversion actions, monthly' : 'Loading conversion data…'}</div>
+                                <div class="chart-wrap"><canvas id="chart-sku-${chartId}"></canvas></div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1121,42 +1196,146 @@
 
             // Create charts for each account
             successAccounts.forEach(account => {
-                const chartId = account.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                const canvas = document.getElementById(`chart-${chartId}`);
-                if (!canvas) return;
+                renderAccountCharts(account);
+            });
+        }
 
-                const monthly = account.monthly || [];
-                const labels = monthly.map(m => formatMonth(m.month));
+        function renderAccountCharts(account) {
+            const chartId = account.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const monthly = account.monthly || [];
+            const labels = monthly.map(m => formatMonth(m.month));
 
-                new Chart(canvas, {
+            // 1) Conversions — brand vs non-brand (stacked bar)
+            const convCanvas = document.getElementById(`chart-conv-${chartId}`);
+            if (convCanvas) {
+                accountCharts[`conv-${chartId}`] = new Chart(convCanvas, {
                     type: 'bar',
                     data: {
                         labels,
                         datasets: [
-                            {
-                                label: 'Non-Brand',
-                                data: monthly.map(m => m.nonBrand?.conversions || 0),
-                                backgroundColor: '#3b82f6',
-                                borderRadius: 4
-                            },
-                            {
-                                label: 'Brand',
-                                data: monthly.map(m => m.brand?.conversions || 0),
-                                backgroundColor: '#ef4444',
-                                borderRadius: 4
-                            }
+                            { label: 'Non-Brand', data: monthly.map(m => m.nonBrand?.conversions || 0), backgroundColor: '#3b82f6', borderRadius: 4 },
+                            { label: 'Brand', data: monthly.map(m => m.brand?.conversions || 0), backgroundColor: '#ef4444', borderRadius: 4 }
                         ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatNumber(c.raw)}` } }
+                        },
                         scales: {
-                            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, stacked: true },
-                            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' }, stacked: true }
+                            x: { ...accountSubChartScales.x, stacked: true },
+                            y: { ...accountSubChartScales.y, stacked: true }
                         }
                     }
                 });
+            }
+
+            // 2) CPA — brand vs non-brand (grouped bar, not stacked: averages don't add)
+            const cpaCanvas = document.getElementById(`chart-cpa-${chartId}`);
+            if (cpaCanvas) {
+                accountCharts[`cpa-${chartId}`] = new Chart(cpaCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Non-Brand CPA', data: monthly.map(m => m.nonBrand?.cpa || 0), backgroundColor: '#3b82f6', borderRadius: 4 },
+                            { label: 'Brand CPA', data: monthly.map(m => m.brand?.cpa || 0), backgroundColor: '#ef4444', borderRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.raw)}` } }
+                        },
+                        scales: {
+                            x: accountSubChartScales.x,
+                            y: { ...accountSubChartScales.y, ticks: { ...accountSubChartScales.y.ticks, callback: (v) => '$' + v } }
+                        }
+                    }
+                });
+            }
+
+            // 3) Spend (Cost) — brand vs non-brand (stacked bar)
+            const spendCanvas = document.getElementById(`chart-spend-${chartId}`);
+            if (spendCanvas) {
+                accountCharts[`spend-${chartId}`] = new Chart(spendCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Non-Brand Spend', data: monthly.map(m => m.nonBrand?.spend || 0), backgroundColor: '#3b82f6', borderRadius: 4 },
+                            { label: 'Brand Spend', data: monthly.map(m => m.brand?.spend || 0), backgroundColor: '#ef4444', borderRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.raw)}` } }
+                        },
+                        scales: {
+                            x: { ...accountSubChartScales.x, stacked: true },
+                            y: { ...accountSubChartScales.y, stacked: true, ticks: { ...accountSubChartScales.y.ticks, callback: (v) => '$' + v } }
+                        }
+                    }
+                });
+            }
+
+            // 4) SKU / Brand conversion breakdown (stacked bar from conversionData)
+            const skuCanvas = document.getElementById(`chart-sku-${chartId}`);
+            const skuSub = document.getElementById(`chart-sku-sub-${chartId}`);
+            if (!skuCanvas) return;
+
+            const convAccount = conversionData?.accounts?.find(a => a.name === account.name);
+            const isReviewSite = account.group === 'review';
+
+            if (!convAccount || convAccount.status !== 'success') {
+                if (skuSub) skuSub.textContent = conversionData ? 'No conversion data for this account' : 'Loading conversion data…';
+                return;
+            }
+
+            const convMonthly = convAccount.monthly || [];
+            const convLabels = convMonthly.map(m => formatMonth(m.month));
+            const topActions = (convAccount.conversionActions || []).slice(0, 8).map(a => a.name);
+
+            if (topActions.length === 0) {
+                if (skuSub) skuSub.textContent = 'No conversion actions tracked';
+                return;
+            }
+
+            if (skuSub) skuSub.textContent = `Top ${topActions.length} ${isReviewSite ? 'brand' : 'SKU'} actions, monthly`;
+
+            const datasets = topActions.map((actionName, i) => ({
+                label: actionName,
+                data: convMonthly.map(m => m.actions?.[actionName]?.conversions || 0),
+                backgroundColor: getConversionColor(actionName, i, isReviewSite),
+                borderRadius: 2
+            }));
+
+            accountCharts[`sku-${chartId}`] = new Chart(skuCanvas, {
+                type: 'bar',
+                data: { labels: convLabels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 10, padding: 6 }
+                        },
+                        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatNumber(c.raw)}` } }
+                    },
+                    scales: {
+                        x: { ...accountSubChartScales.x, stacked: true },
+                        y: { ...accountSubChartScales.y, stacked: true }
+                    }
+                }
             });
         }
 
