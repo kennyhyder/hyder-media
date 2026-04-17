@@ -445,6 +445,16 @@ function parseLookback(req) {
         startDate.setDate(endDate.getDate() - 29);
         granularity = 'day';
         lookback = '1mo';
+    } else if (lookbackRaw === 'this_month') {
+        // 1st of this month through today, daily buckets
+        startDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), 1);
+        granularity = 'day';
+    } else if (lookbackRaw === 'last_month') {
+        // 1st through last day of previous calendar month, daily buckets
+        startDate.setFullYear(endDate.getFullYear(), endDate.getMonth() - 1, 1);
+        // endDate = last day of previous month = day 0 of current month
+        endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), 0);
+        granularity = 'day';
     } else if (lookbackRaw === '3mo') {
         startDate.setMonth(endDate.getMonth() - 3);
         startDate.setDate(1);

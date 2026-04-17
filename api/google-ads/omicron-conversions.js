@@ -339,6 +339,13 @@ function parseLookback(req) {
         startDate.setDate(endDate.getDate() - 29);
         granularity = 'day';
         lookback = '1mo';
+    } else if (lookbackRaw === 'this_month') {
+        startDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), 1);
+        granularity = 'day';
+    } else if (lookbackRaw === 'last_month') {
+        startDate.setFullYear(endDate.getFullYear(), endDate.getMonth() - 1, 1);
+        endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), 0);
+        granularity = 'day';
     } else if (lookbackRaw === '3mo') {
         startDate.setMonth(endDate.getMonth() - 3);
         startDate.setDate(1);
