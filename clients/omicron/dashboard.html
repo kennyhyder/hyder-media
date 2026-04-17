@@ -331,13 +331,15 @@
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">PPC Performance Dashboard <span class="demo-badge" id="data-badge">LOADING...</span></h1>
-                <p class="text-muted">Monthly trends with Brand vs Non-Brand breakdown</p>
+                <p class="text-muted" id="dashboard-subtitle">Monthly trends with Brand vs Non-Brand breakdown</p>
             </div>
             <div class="dashboard-actions">
-                <select id="months-selector" onchange="changeMonths()" style="padding: 8px 12px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
-                    <option value="3">Last 3 Months</option>
-                    <option value="6">Last 6 Months</option>
-                    <option value="13" selected>Last 13 Months</option>
+                <select id="lookback-selector" onchange="changeLookback()" style="padding: 8px 12px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                    <option value="7d">Last 7 Days</option>
+                    <option value="1mo">Last 30 Days</option>
+                    <option value="3mo">Last 3 Months</option>
+                    <option value="6mo">Last 6 Months</option>
+                    <option value="13mo" selected>Last 13 Months</option>
                 </select>
                 <button class="btn btn-secondary btn-sm" onclick="refreshData()">
                     <span id="refresh-icon">↻</span> Refresh
@@ -659,12 +661,20 @@
             return new Intl.NumberFormat('en-US').format(Math.round(value || 0));
         }
 
-        // Format month for display (2025-01 -> Jan 2025)
-        function formatMonth(monthStr) {
-            if (!monthStr) return '';
-            const [year, month] = monthStr.split('-');
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[parseInt(month, 10) - 1] + ' ' + year.slice(2);
+        // Format period label for display.
+        //   "2025-01"     -> "Jan 25"    (month bucket)
+        //   "2025-01-07"  -> "Jan 7"     (day bucket)
+        function formatMonth(periodStr) {
+            if (!periodStr) return '';
+            const parts = periodStr.split('-');
+            const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const year = parts[0];
+            const month = parts[1];
+            const day = parts[2];
+            if (day) {
+                return monthAbbr[parseInt(month, 10) - 1] + ' ' + parseInt(day, 10);
+            }
+            return monthAbbr[parseInt(month, 10) - 1] + ' ' + year.slice(2);
         }
 
         // Switch view tabs (with URL hash support for direct linking)
@@ -694,18 +704,27 @@
         window.addEventListener('hashchange', handleHashNavigation);
 
         // Change months selector
+        function changeLookback() {
+            refreshData();
+        }
+        // Legacy alias in case anything still calls it
         function changeMonths() {
             refreshData();
         }
 
+        function getSelectedLookback() {
+            const el = document.getElementById('lookback-selector');
+            return el ? el.value : '13mo';
+        }
+
         // Fetch data from API
         async function fetchApiData() {
-            const months = document.getElementById('months-selector').value;
+            const lookback = getSelectedLookback();
             isLoading = true;
             updateLoadingState();
 
             try {
-                const response = await fetch(`/api/google-ads/omicron-monthly?months=${months}`);
+                const response = await fetch(`/api/google-ads/omicron-monthly?lookback=${encodeURIComponent(lookback)}`);
                 apiData = await response.json();
 
                 if (apiData.errors && apiData.errors.length > 0) {
@@ -804,6 +823,13 @@
                 document.getElementById('owned-spend').textContent = formatCurrency(ownedTotals.spend);
                 document.getElementById('owned-conv').textContent = formatNumber(ownedTotals.conversions);
                 document.getElementById('owned-cpa').textContent = formatCurrency(ownedTotals.conversions > 0 ? ownedTotals.spend / ownedTotals.conversions : 0);
+            }
+
+            // Update header subtitle with current granularity
+            const subtitleEl = document.getElementById('dashboard-subtitle');
+            if (subtitleEl) {
+                const word = apiData.granularity === 'day' ? 'Daily' : 'Monthly';
+                subtitleEl.textContent = `${word} trends with Brand vs Non-Brand breakdown`;
             }
 
             // Update charts
@@ -1120,6 +1146,7 @@
 
             const container = document.getElementById('account-details-container');
             const successAccounts = apiData.accounts.filter(a => a.status === 'success');
+            const periodWord = apiData.granularity === 'day' ? 'Daily' : 'Monthly';
 
             destroyAccountCharts();
 
@@ -1171,22 +1198,22 @@
                         <div class="account-charts-grid">
                             <div class="account-chart-block">
                                 <div class="chart-title">Conversions — Brand vs Non-Brand</div>
-                                <div class="chart-subtitle">Monthly conversions, stacked</div>
+                                <div class="chart-subtitle">${periodWord} conversions, stacked</div>
                                 <div class="chart-wrap"><canvas id="chart-conv-${chartId}"></canvas></div>
                             </div>
                             <div class="account-chart-block">
                                 <div class="chart-title">CPA — Brand vs Non-Brand</div>
-                                <div class="chart-subtitle">Cost per conversion, monthly</div>
+                                <div class="chart-subtitle">Cost per conversion, ${periodWord.toLowerCase()}</div>
                                 <div class="chart-wrap"><canvas id="chart-cpa-${chartId}"></canvas></div>
                             </div>
                             <div class="account-chart-block">
                                 <div class="chart-title">Spend (Cost) — Brand vs Non-Brand</div>
-                                <div class="chart-subtitle">Monthly ad spend, stacked</div>
+                                <div class="chart-subtitle">${periodWord} ad spend, stacked</div>
                                 <div class="chart-wrap"><canvas id="chart-spend-${chartId}"></canvas></div>
                             </div>
                             <div class="account-chart-block">
                                 <div class="chart-title">Conversions by ${account.group === 'review' ? 'Brand' : 'SKU'} Breakdown</div>
-                                <div class="chart-subtitle" id="chart-sku-sub-${chartId}">${conversionData ? 'Conversion actions, monthly' : 'Loading conversion data…'}</div>
+                                <div class="chart-subtitle" id="chart-sku-sub-${chartId}">${conversionData ? `Conversion actions, ${periodWord.toLowerCase()}` : 'Loading conversion data…'}</div>
                                 <div class="chart-wrap"><canvas id="chart-sku-${chartId}"></canvas></div>
                             </div>
                         </div>
@@ -1351,7 +1378,8 @@
         function exportCSV() {
             if (!apiData || !apiData.monthlyTotals) return;
 
-            let csv = 'Month,Total Spend,Total Conv,Total CPA,Brand Spend,Brand Conv,Brand CPA,Non-Brand Spend,Non-Brand Conv,Non-Brand CPA\n';
+            const periodHeader = apiData.granularity === 'day' ? 'Date' : 'Month';
+            let csv = `${periodHeader},Total Spend,Total Conv,Total CPA,Brand Spend,Brand Conv,Brand CPA,Non-Brand Spend,Non-Brand Conv,Non-Brand CPA\n`;
 
             for (const m of apiData.monthlyTotals) {
                 csv += `${m.month},${(m.total?.spend || 0).toFixed(2)},${m.total?.conversions || 0},${(m.total?.cpa || 0).toFixed(2)},`;
@@ -1407,12 +1435,12 @@
 
         async function refreshConversionData() {
             const icon = document.getElementById('conv-refresh-icon');
-            icon.style.animation = 'spin 1s linear infinite';
+            if (icon) icon.style.animation = 'spin 1s linear infinite';
 
-            const months = document.getElementById('months-selector').value;
+            const lookback = getSelectedLookback();
 
             try {
-                const response = await fetch(`/api/google-ads/omicron-conversions?months=${months}`);
+                const response = await fetch(`/api/google-ads/omicron-conversions?lookback=${encodeURIComponent(lookback)}`);
                 conversionData = await response.json();
 
                 if (conversionData.errors && conversionData.errors.length > 0) {
@@ -1424,7 +1452,7 @@
                 console.error('Failed to fetch conversion data:', error);
             }
 
-            icon.style.animation = '';
+            if (icon) icon.style.animation = '';
         }
 
         function selectConversionAccount(accountName) {

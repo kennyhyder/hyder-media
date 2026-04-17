@@ -39,23 +39,14 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Parse parameters
-    const months = parseInt(req.query.months) || 13;
+    // Parse parameters — prefer `lookback`, fall back to legacy `months`
+    const { dateRange, granularity, lookback } = parseLookback(req);
     const accountFilter = req.query.account; // Optional: filter to single account
-
-    // Calculate date range
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - months);
-    startDate.setDate(1);
-
-    const dateRange = {
-        start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0]
-    };
 
     const results = {
         dateRange,
+        granularity,
+        lookback,
         accounts: [],
         errors: []
     };
@@ -125,7 +116,8 @@ export default async function handler(req, res) {
                     account.mcc,
                     accessToken,
                     developerToken,
-                    dateRange
+                    dateRange,
+                    granularity
                 );
 
                 if (conversionData.error) {
@@ -172,13 +164,12 @@ export default async function handler(req, res) {
 /**
  * Fetch conversion action data for a single account
  */
-async function fetchConversionActionData(customerId, loginCustomerId, accessToken, developerToken, dateRange) {
-    // Query for conversion metrics segmented by conversion action and month
-    // Must use campaign resource (not customer) to segment by conversion action
+async function fetchConversionActionData(customerId, loginCustomerId, accessToken, developerToken, dateRange, granularity = 'month') {
+    const segmentField = granularity === 'day' ? 'segments.date' : 'segments.month';
     const query = `
         SELECT
             segments.conversion_action_name,
-            segments.month,
+            ${segmentField},
             metrics.conversions,
             metrics.conversions_value
         FROM campaign
@@ -215,7 +206,11 @@ async function fetchConversionActionData(customerId, loginCustomerId, accessToke
         if (data.results) {
             for (const row of data.results) {
                 const actionName = row.segments?.conversionActionName || 'Unknown';
-                const month = row.segments?.month || '';
+                // `month` field is kept as the bucket key name for response compat,
+                // but holds a YYYY-MM-DD day string when granularity is 'day'.
+                const month = granularity === 'day'
+                    ? (row.segments?.date || '')
+                    : (row.segments?.month || '');
                 const m = row.metrics || {};
 
                 if (!month) continue;
@@ -321,4 +316,54 @@ function shouldSkipConversionAction(actionName) {
     }
 
     return false;
+}
+
+/**
+ * Parse the lookback window from the request.
+ * Supported `lookback` values: '7d', '1mo', '3mo', '6mo', '13mo'.
+ * Falls back to legacy `months` query param, then to 13mo.
+ */
+function parseLookback(req) {
+    const lookbackRaw = (req.query.lookback || '').toString().toLowerCase();
+    const monthsParam = parseInt(req.query.months);
+
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    let granularity = 'month';
+    let lookback = lookbackRaw;
+
+    if (lookbackRaw === '7d') {
+        startDate.setDate(endDate.getDate() - 6);
+        granularity = 'day';
+    } else if (lookbackRaw === '1mo' || lookbackRaw === '30d') {
+        startDate.setDate(endDate.getDate() - 29);
+        granularity = 'day';
+        lookback = '1mo';
+    } else if (lookbackRaw === '3mo') {
+        startDate.setMonth(endDate.getMonth() - 3);
+        startDate.setDate(1);
+    } else if (lookbackRaw === '6mo') {
+        startDate.setMonth(endDate.getMonth() - 6);
+        startDate.setDate(1);
+    } else if (lookbackRaw === '13mo') {
+        startDate.setMonth(endDate.getMonth() - 13);
+        startDate.setDate(1);
+    } else if (!isNaN(monthsParam)) {
+        startDate.setMonth(endDate.getMonth() - monthsParam);
+        startDate.setDate(1);
+        lookback = `${monthsParam}mo`;
+    } else {
+        startDate.setMonth(endDate.getMonth() - 13);
+        startDate.setDate(1);
+        lookback = '13mo';
+    }
+
+    return {
+        dateRange: {
+            start: startDate.toISOString().split('T')[0],
+            end: endDate.toISOString().split('T')[0]
+        },
+        granularity,
+        lookback
+    };
 }
