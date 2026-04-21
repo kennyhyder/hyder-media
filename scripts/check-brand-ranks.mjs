@@ -114,11 +114,6 @@ async function main() {
     const toFetch = uniqueKeywords.filter(k => !cached.has(k));
     console.log(`Cached (fresh, non-error): ${cached.size}. To fetch: ${toFetch.length}.`);
 
-    if (toFetch.length === 0) {
-        console.log('Nothing to do.');
-        return;
-    }
-
     // Concurrency-limited queue
     const queue = [...toFetch];
     let done = 0;
@@ -156,36 +151,62 @@ async function main() {
 
     console.log(`\n\nDone. ${done} keywords processed in ${((Date.now() - started) / 1000).toFixed(0)}s.`);
 
-    // Print summary: how many owned-domain matches?
+    // Summary: classify each keyword row by match type and compute projected savings
     const { data: rankedRows } = await supabase
         .from('serp_rankings')
         .select('keyword, top_domain, error')
-        .in('keyword', uniqueKeywords)
-        .eq('source', SOURCE);
-    const rankedMap = new Map((rankedRows || []).map(r => [r.keyword, r]));
+        .in('keyword', uniqueKeywords);
+    const rankedMap = new Map();
+    for (const r of (rankedRows || [])) {
+        const existing = rankedMap.get(r.keyword);
+        if (!existing || (existing.error && !r.error)) rankedMap.set(r.keyword, r);
+    }
 
-    let matches = 0;
-    let errors = 0;
-    let unmatched = 0;
-    const matchedByAccount = {};
+    let exact = 0, portfolio = 0, external = 0, errors = 0;
+    const exactByAccount = {}, portfolioByAccount = {};
     for (const row of data.keywords) {
         const r = rankedMap.get(row.keyword.toLowerCase());
-        if (!r || r.error) { errors++; continue; }
-        if (ownedMatches(row.ownedDomain, r.top_domain)) {
-            matches++;
-            matchedByAccount[row.account] = (matchedByAccount[row.account] || 0) + row.cost;
+        if (!r || r.error || !r.top_domain) { errors++; continue; }
+        const cls = classifyMatchCli(row.ownedDomain, r.top_domain);
+        if (cls === 'exact') {
+            exact++;
+            exactByAccount[row.account] = (exactByAccount[row.account] || 0) + row.cost;
+            portfolioByAccount[row.account] = (portfolioByAccount[row.account] || 0) + row.cost;
+        } else if (cls === 'portfolio') {
+            portfolio++;
+            portfolioByAccount[row.account] = (portfolioByAccount[row.account] || 0) + row.cost;
         } else {
-            unmatched++;
+            external++;
         }
     }
-    console.log(`\nOwned-domain rank-#1 matches: ${matches}  (unmatched: ${unmatched}, errors: ${errors})`);
-    console.log(`\nProjected savings (branded spend where owned domain already ranks #1):`);
-    let total = 0;
-    for (const [acct, cost] of Object.entries(matchedByAccount).sort((a, b) => b[1] - a[1])) {
-        console.log(`  ${acct.padEnd(16)} $${cost.toFixed(2)}`);
-        total += cost;
+    console.log(`\nMatches: ${exact} exact · ${portfolio} portfolio · ${external} external · ${errors} unranked`);
+
+    function printSavings(title, byAccount) {
+        console.log(`\n${title}:`);
+        let total = 0;
+        for (const [acct, cost] of Object.entries(byAccount).sort((a, b) => b[1] - a[1])) {
+            console.log(`  ${acct.padEnd(16)} $${cost.toFixed(2)}`);
+            total += cost;
+        }
+        console.log(`  ${'TOTAL'.padEnd(16)} $${total.toFixed(2)}`);
     }
-    console.log(`  ${'TOTAL'.padEnd(16)} $${total.toFixed(2)}`);
+    printSavings('Savings — Exact (account domain = #1)', exactByAccount);
+    printSavings('Savings — Portfolio (any Omicron domain = #1)', portfolioByAccount);
+}
+
+const OMICRON_PORTFOLIO_DOMAINS = [
+    'eweka.nl', 'easynews.com', 'newshosting.com', 'usenetserver.com',
+    'tweaknews.eu', 'pureusenet.nl', 'sunnyusenet.com',
+    'bestusenetreviews.com', 'top10usenet.com', 'privadovpn.com'
+];
+
+function classifyMatchCli(accountOwnedDomain, rankDomain) {
+    if (!rankDomain) return null;
+    if (accountOwnedDomain && ownedMatches(accountOwnedDomain, rankDomain)) return 'exact';
+    for (const d of OMICRON_PORTFOLIO_DOMAINS) {
+        if (ownedMatches(d, rankDomain)) return 'portfolio';
+    }
+    return 'external';
 }
 
 async function fetchBraveSerp(keyword) {

@@ -692,12 +692,20 @@
                         <div class="group-stat-label">Rank-Checked</div>
                     </div>
                     <div class="group-stat" style="text-align: center;">
-                        <div class="group-stat-value" id="bd-owned-match-pct" style="color: #22c55e;">—</div>
-                        <div class="group-stat-label">Owned-Domain Match #1</div>
+                        <div class="group-stat-value" id="bd-exact-match-pct" style="color: #22c55e;">—</div>
+                        <div class="group-stat-label">Exact Match #1</div>
                     </div>
                     <div class="group-stat" style="text-align: center;">
-                        <div class="group-stat-value" id="bd-savings" style="color: #22c55e;">$0</div>
-                        <div class="group-stat-label">Projected Savings</div>
+                        <div class="group-stat-value" id="bd-portfolio-match-pct" style="color: #eab308;">—</div>
+                        <div class="group-stat-label">Portfolio Match #1</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-savings-exact" style="color: #22c55e;">$0</div>
+                        <div class="group-stat-label">Savings — Exact</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-savings-portfolio" style="color: #eab308;">$0</div>
+                        <div class="group-stat-label">Savings — Portfolio</div>
                     </div>
                 </div>
 
@@ -726,7 +734,7 @@
                                 <th style="padding: 8px; text-align: right;">CPA</th>
                                 <th style="padding: 8px; text-align: right;">Conv Rate</th>
                                 <th style="padding: 8px;">Organic #1</th>
-                                <th style="padding: 8px;">Owned Match?</th>
+                                <th style="padding: 8px;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
                             </tr>
                         </thead>
                         <tbody id="bd-tbody">
@@ -1734,19 +1742,48 @@
         let brandDefenseRanks = new Map();  // keyword (lowercase) -> rank result
         let brandDefenseLoading = false;
 
-        // Normalise an owned domain for comparison (strip www + trailing slash)
+        // Full portfolio of Omicron-owned domains — any click landing on one of
+        // these stays within the Omicron portfolio regardless of which ad
+        // account bid on the keyword. Sourced from ACCOUNT_CONFIG in
+        // api/google-ads/omicron-branded-keywords.js.
+        const OMICRON_PORTFOLIO_DOMAINS = [
+            'eweka.nl', 'easynews.com', 'newshosting.com', 'usenetserver.com',
+            'tweaknews.eu', 'pureusenet.nl', 'sunnyusenet.com',
+            'bestusenetreviews.com', 'top10usenet.com', 'privadovpn.com'
+        ];
+
+        // Normalise a domain for comparison (strip www + trailing slash)
         function normalizeDomain(d) {
             if (!d) return '';
             return String(d).toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
         }
 
+        function domainsMatch(a, b) {
+            a = normalizeDomain(a);
+            b = normalizeDomain(b);
+            if (!a || !b) return false;
+            // Match if either is a suffix of the other (handles subdomains like members.easynews.com)
+            return a === b || a.endsWith('.' + b) || b.endsWith('.' + a);
+        }
+
+        // Classify the rank-1 organic domain for a keyword row.
+        // Returns: 'exact'     — the account's own domain ranks #1
+        //          'portfolio' — another Omicron-owned domain ranks #1
+        //          'external'  — a third party ranks #1
+        //          null        — no rank data yet
+        function classifyMatch(accountOwnedDomain, rankDomain) {
+            if (!rankDomain) return null;
+            if (accountOwnedDomain && domainsMatch(accountOwnedDomain, rankDomain)) return 'exact';
+            for (const d of OMICRON_PORTFOLIO_DOMAINS) {
+                if (domainsMatch(d, rankDomain)) return 'portfolio';
+            }
+            return 'external';
+        }
+
+        // Legacy helper — retained for any callers not yet migrated.
         function ownedDomainMatchesRank(ownedDomain, rankDomain) {
             if (!ownedDomain || !rankDomain) return null;
-            const a = normalizeDomain(ownedDomain);
-            const b = normalizeDomain(rankDomain);
-            if (!a || !b) return null;
-            // Match if either is a suffix of the other (handles .com vs .nl vs subdomains)
-            return a === b || a.endsWith('.' + b) || b.endsWith('.' + a);
+            return domainsMatch(ownedDomain, rankDomain);
         }
 
         // Hook into switchView: lazy-load when the Brand Defense tab opens for the first time
@@ -1882,21 +1919,24 @@
             }
 
             const rows = [...brandDefenseData.keywords];
-            // Enrich with rank + computed savings
+            // Enrich with rank + match classification + savings
             for (const r of rows) {
                 const key = r.keyword.toLowerCase();
                 const rank = brandDefenseRanks.get(key);
                 r._rank = rank || null;
-                r._ownedMatch = rank ? ownedDomainMatchesRank(r.ownedDomain, rank.top_domain) : null;
-                // Projected savings = cost of keywords where owned domain ranks #1
-                r._savings = r._ownedMatch === true ? r.cost : 0;
+                r._matchType = rank?.top_domain
+                    ? classifyMatch(r.ownedDomain, rank.top_domain)
+                    : null;
+                // Portfolio savings ≥ exact savings. Store both for sorting/summary.
+                r._savingsExact = r._matchType === 'exact' ? r.cost : 0;
+                r._savingsPortfolio = (r._matchType === 'exact' || r._matchType === 'portfolio') ? r.cost : 0;
             }
 
             // Sort
             const sortBy = document.getElementById('bd-sort').value;
             const sorters = {
                 cost: (a, b) => b.cost - a.cost,
-                savings: (a, b) => b._savings - a._savings || b.cost - a.cost,
+                savings: (a, b) => b._savingsPortfolio - a._savingsPortfolio || b.cost - a.cost,
                 clicks: (a, b) => b.clicks - a.clicks,
                 conversions: (a, b) => b.conversions - a.conversions,
                 cpa: (a, b) => (a.cpa || 1e12) - (b.cpa || 1e12)
@@ -1914,10 +1954,12 @@
                     : '<span class="text-muted">—</span>';
 
                 let matchCell;
-                if (r._ownedMatch === true) {
-                    matchCell = `<span style="color: #22c55e; font-weight: 600;">✓ match</span>`;
-                } else if (r._ownedMatch === false) {
-                    matchCell = `<span style="color: #ef4444;">✗ no</span>`;
+                if (r._matchType === 'exact') {
+                    matchCell = `<span style="color: #22c55e; font-weight: 600;" title="Account's own domain ranks #1">✓ Exact</span>`;
+                } else if (r._matchType === 'portfolio') {
+                    matchCell = `<span style="color: #eab308; font-weight: 600;" title="Another Omicron-owned domain ranks #1">◆ Portfolio</span>`;
+                } else if (r._matchType === 'external') {
+                    matchCell = `<span style="color: #ef4444;" title="Third-party ranks #1">✗ External</span>`;
                 } else {
                     matchCell = `<span class="text-muted">—</span>`;
                 }
@@ -1952,18 +1994,30 @@
             const uniqueKws = new Set(rows.map(r => r.keyword.toLowerCase()));
             const checked = [...uniqueKws].filter(k => brandDefenseRanks.has(k)).length;
 
-            // Owned-match count: unique keywords where owned domain matches rank #1
-            const ownedMatchKws = new Set();
-            let projectedSavings = 0;
+            // Per-row match classification and savings totals.
+            // Exact = account's own domain ranks #1 (click cannibalizes the account's own organic).
+            // Portfolio = a different Omicron-owned domain ranks #1 (click still lands in the portfolio).
+            const exactMatchKws = new Set();
+            const portfolioMatchKws = new Set();
+            let savingsExact = 0;
+            let savingsPortfolio = 0;
             for (const r of rows) {
                 const key = r.keyword.toLowerCase();
                 const rank = brandDefenseRanks.get(key);
-                if (rank && ownedDomainMatchesRank(r.ownedDomain, rank.top_domain)) {
-                    ownedMatchKws.add(key);
-                    projectedSavings += r.cost;
+                if (!rank || !rank.top_domain) continue;
+                const match = classifyMatch(r.ownedDomain, rank.top_domain);
+                if (match === 'exact') {
+                    exactMatchKws.add(key);
+                    portfolioMatchKws.add(key);
+                    savingsExact += r.cost;
+                    savingsPortfolio += r.cost;
+                } else if (match === 'portfolio') {
+                    portfolioMatchKws.add(key);
+                    savingsPortfolio += r.cost;
                 }
             }
-            const matchPct = checked > 0 ? ((ownedMatchKws.size / checked) * 100).toFixed(0) + '%' : '—';
+            const exactPct = checked > 0 ? ((exactMatchKws.size / checked) * 100).toFixed(0) + '%' : '—';
+            const portfolioPct = checked > 0 ? ((portfolioMatchKws.size / checked) * 100).toFixed(0) + '%' : '—';
 
             document.getElementById('bd-total-cost').textContent = formatCurrency(totalCost);
             document.getElementById('bd-total-clicks').textContent = formatNumber(totalClicks);
@@ -1971,8 +2025,10 @@
             document.getElementById('bd-avg-cpa').textContent = formatCurrency(avgCpa);
             document.getElementById('bd-kw-count').textContent = formatNumber(uniqueKws.size);
             document.getElementById('bd-ranked-count').textContent = `${formatNumber(checked)} / ${formatNumber(uniqueKws.size)}`;
-            document.getElementById('bd-owned-match-pct').textContent = matchPct;
-            document.getElementById('bd-savings').textContent = formatCurrency(projectedSavings);
+            document.getElementById('bd-exact-match-pct').textContent = exactPct;
+            document.getElementById('bd-portfolio-match-pct').textContent = portfolioPct;
+            document.getElementById('bd-savings-exact').textContent = formatCurrency(savingsExact);
+            document.getElementById('bd-savings-portfolio').textContent = formatCurrency(savingsPortfolio);
         }
 
         function exportBrandDefenseCSV() {
@@ -1980,13 +2036,13 @@
                 alert('No keywords loaded.');
                 return;
             }
-            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','OwnedMatches'];
+            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification'];
             const lines = [header.join(',')];
             for (const r of brandDefenseData.keywords) {
                 const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
                 const rankDomain = rank?.top_domain || '';
                 const rankUrl = rank?.top_url || '';
-                const matches = rank ? (ownedDomainMatchesRank(r.ownedDomain, rank.top_domain) ? 'yes' : 'no') : '';
+                const match = rank?.top_domain ? (classifyMatch(r.ownedDomain, rank.top_domain) || '') : '';
                 lines.push([
                     csvEscape(r.keyword),
                     csvEscape(r.account),
@@ -2004,7 +2060,7 @@
                     csvEscape(r.ownedDomain || ''),
                     csvEscape(rankDomain),
                     csvEscape(rankUrl),
-                    matches
+                    match
                 ].join(','));
             }
             const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
