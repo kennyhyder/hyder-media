@@ -657,8 +657,8 @@
                         </select>
                     </label>
                     <div style="flex: 1;"></div>
-                    <button class="btn btn-primary btn-sm" id="bd-run-rank-btn" onclick="runBrandDefenseRankCheck()" style="align-self: flex-end;">
-                        Run Organic Rank Check
+                    <button class="btn btn-primary btn-sm" id="bd-run-rank-btn" onclick="runBrandDefenseRankCheck()" style="align-self: flex-end;" title="Load the latest rank data from the Supabase cache. To refresh the cache itself, run: node scripts/check-brand-ranks.mjs from your local machine (DDG blocks Vercel IPs).">
+                        Reload Rank Data
                     </button>
                     <button class="btn btn-secondary btn-sm" onclick="exportBrandDefenseCSV()" style="align-self: flex-end;">
                         Export CSV
@@ -1809,33 +1809,33 @@
             }
         }
 
-        // Pre-fetch ranks that are already cached (no new scrapes). Done in a single batch.
-        async function preloadCachedRanks() {
-            const keywords = (brandDefenseData?.keywords || []).map(k => k.keyword.toLowerCase());
-            if (keywords.length === 0) return;
+        // Load cached ranks for all branded keywords in one call.
+        // Fresh rank data is populated by running scripts/check-brand-ranks.mjs locally
+        // — DDG blocks Vercel datacenter IPs, so server-side scraping isn't viable.
+        async function loadBrandDefenseRanks() {
+            const keywords = [...new Set((brandDefenseData?.keywords || []).map(k => k.keyword.toLowerCase()))];
+            if (keywords.length === 0) return { fromCache: 0, missing: 0 };
 
-            // Ask for the first 50 — server returns cached only (no new fetches) when the
-            // keyword is already in the cache table. This is fast.
-            const batch = keywords.slice(0, 50);
             try {
                 const response = await fetch('/api/serp/rank', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ keywords: batch, forceRefresh: false })
+                    body: JSON.stringify({ keywords })
                 });
                 const data = await response.json();
-                // Only adopt cached entries (fetched_now will be > 0 if the endpoint scraped,
-                // but we want this preload to be cheap — either way, store what we got back)
-                for (const kw of batch) {
+                for (const kw of keywords) {
                     const r = data.results?.[kw];
-                    if (r && !r.error && r.top_domain && r.cached) {
-                        brandDefenseRanks.set(kw, r);
-                    }
+                    if (r) brandDefenseRanks.set(kw, r);
                 }
+                return { fromCache: data.from_cache || 0, missing: data.missing || 0 };
             } catch (e) {
-                console.warn('Cached rank preload failed:', e);
+                console.warn('Rank data load failed:', e);
+                return { fromCache: 0, missing: keywords.length };
             }
         }
+
+        // Alias for the initial tab-open load
+        const preloadCachedRanks = loadBrandDefenseRanks;
 
         async function runBrandDefenseRankCheck() {
             if (!brandDefenseData?.keywords?.length) {
@@ -1848,49 +1848,30 @@
             const progressLabel = document.getElementById('bd-progress-label');
 
             btn.disabled = true;
-            btn.textContent = 'Checking…';
+            btn.textContent = 'Loading…';
             progressWrap.style.display = 'block';
+            progressBar.style.width = '50%';
+            progressLabel.textContent = 'Loading rank data from cache…';
 
-            const allKws = brandDefenseData.keywords.map(k => k.keyword.toLowerCase());
-            // Dedupe — multiple accounts may have the same keyword
-            const uniqueKws = [...new Set(allKws)];
-            const BATCH_SIZE = 20;
-            let done = 0;
-
-            try {
-                for (let i = 0; i < uniqueKws.length; i += BATCH_SIZE) {
-                    const batch = uniqueKws.slice(i, i + BATCH_SIZE);
-                    const response = await fetch('/api/serp/rank', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ keywords: batch, forceRefresh: false })
-                    });
-                    const data = await response.json();
-                    for (const kw of batch) {
-                        const r = data.results?.[kw];
-                        if (r) brandDefenseRanks.set(kw, r);
-                    }
-                    done += batch.length;
-                    const pct = Math.min(100, (done / uniqueKws.length) * 100);
-                    progressBar.style.width = pct + '%';
-                    progressLabel.textContent = `Checking organic ranks… ${done} / ${uniqueKws.length}`;
-                    renderBrandDefenseTable();
-                    updateBrandDefenseSummary();
-                }
-                progressLabel.textContent = `Done — ${done} keywords checked.`;
-            } catch (e) {
-                console.error('Rank check failed:', e);
-                progressLabel.textContent = `Error: ${e.message}`;
-                progressLabel.style.color = '#ef4444';
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Run Organic Rank Check';
-                setTimeout(() => {
-                    progressWrap.style.display = 'none';
-                    progressLabel.style.color = '';
-                    progressBar.style.width = '0%';
-                }, 3000);
+            const { fromCache, missing } = await loadBrandDefenseRanks();
+            progressBar.style.width = '100%';
+            if (missing > 0) {
+                progressLabel.textContent =
+                    `Loaded ${fromCache} cached results. ${missing} keywords not yet ranked — ` +
+                    `run "node scripts/check-brand-ranks.mjs" locally to populate the cache.`;
+            } else {
+                progressLabel.textContent = `Loaded ${fromCache} cached rank results.`;
             }
+
+            renderBrandDefenseTable();
+            updateBrandDefenseSummary();
+
+            btn.disabled = false;
+            btn.textContent = 'Reload Rank Data';
+            setTimeout(() => {
+                progressWrap.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 6000);
         }
 
         function renderBrandDefenseTable() {
