@@ -141,6 +141,12 @@
     },
     "api/digistore/account-keywords.js": {
       "maxDuration": 30
+    },
+    "api/google-ads/omicron-branded-keywords.js": {
+      "maxDuration": 60
+    },
+    "api/serp/rank.js": {
+      "maxDuration": 60
     }
   }
 }

@@ -359,6 +359,7 @@
             <button class="view-tab" onclick="switchView('owned')">Owned Sites</button>
             <button class="view-tab" onclick="switchView('conversions')">SKU / Brand</button>
             <button class="view-tab" onclick="switchView('accounts')">Account Details</button>
+            <button class="view-tab" onclick="switchView('brand-defense')">Brand Defense</button>
         </div>
 
         <!-- Overview Section -->
@@ -615,6 +616,129 @@
             </div>
         </div>
 
+        <!-- Brand Defense Section -->
+        <div id="view-brand-defense" class="view-section">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Brand Defense Analysis</h2>
+                        <p class="text-muted" style="font-size: 0.85rem; margin: 4px 0 0;">
+                            What would happen if branded paid search were paused?
+                            Shows the top organic result for each branded keyword —
+                            if the owned domain already ranks #1, that spend is likely cannibalizing free clicks.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Filters row -->
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; padding: 16px; border-bottom: 1px solid var(--border);">
+                    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                        <span class="text-muted">Account</span>
+                        <select id="bd-account-filter" onchange="loadBrandDefense()" style="padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                            <option value="">All accounts</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                        <span class="text-muted">Keyword limit</span>
+                        <select id="bd-limit" onchange="loadBrandDefense()" style="padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                            <option value="100">Top 100</option>
+                            <option value="250">Top 250</option>
+                            <option value="500" selected>Top 500</option>
+                        </select>
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
+                        <span class="text-muted">Sort by</span>
+                        <select id="bd-sort" onchange="renderBrandDefenseTable()" style="padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                            <option value="cost">Cost (desc)</option>
+                            <option value="savings">Savings opportunity</option>
+                            <option value="clicks">Clicks (desc)</option>
+                            <option value="conversions">Conversions (desc)</option>
+                            <option value="cpa">CPA (asc)</option>
+                        </select>
+                    </label>
+                    <div style="flex: 1;"></div>
+                    <button class="btn btn-primary btn-sm" id="bd-run-rank-btn" onclick="runBrandDefenseRankCheck()" style="align-self: flex-end;">
+                        Run Organic Rank Check
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="exportBrandDefenseCSV()" style="align-self: flex-end;">
+                        Export CSV
+                    </button>
+                </div>
+
+                <!-- Summary stats -->
+                <div class="group-stats" id="bd-summary" style="padding: 20px 16px; justify-content: space-around; gap: 20px; flex-wrap: wrap;">
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-total-cost">$0</div>
+                        <div class="group-stat-label">Branded Spend</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-total-clicks">0</div>
+                        <div class="group-stat-label">Branded Clicks</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-total-conv">0</div>
+                        <div class="group-stat-label">Branded Conv</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-avg-cpa">$0</div>
+                        <div class="group-stat-label">Branded CPA</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-kw-count">0</div>
+                        <div class="group-stat-label">Keywords</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-ranked-count">0 / 0</div>
+                        <div class="group-stat-label">Rank-Checked</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-owned-match-pct" style="color: #22c55e;">—</div>
+                        <div class="group-stat-label">Owned-Domain Match #1</div>
+                    </div>
+                    <div class="group-stat" style="text-align: center;">
+                        <div class="group-stat-value" id="bd-savings" style="color: #22c55e;">$0</div>
+                        <div class="group-stat-label">Projected Savings</div>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div id="bd-progress-wrap" style="display: none; padding: 0 16px 16px;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="bd-progress-label">
+                        Checking organic ranks…
+                    </div>
+                    <div style="height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;">
+                        <div id="bd-progress-bar" style="height: 100%; width: 0%; background: #22c55e; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+
+                <!-- Keyword table -->
+                <div style="padding: 0 8px 16px; overflow-x: auto;">
+                    <table class="data-table" id="bd-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th style="padding: 8px;">Keyword</th>
+                                <th style="padding: 8px;">Account</th>
+                                <th style="padding: 8px;">Match</th>
+                                <th style="padding: 8px; text-align: right;">Impr</th>
+                                <th style="padding: 8px; text-align: right;">Clicks</th>
+                                <th style="padding: 8px; text-align: right;">Cost</th>
+                                <th style="padding: 8px; text-align: right;">Conv</th>
+                                <th style="padding: 8px; text-align: right;">CPA</th>
+                                <th style="padding: 8px; text-align: right;">Conv Rate</th>
+                                <th style="padding: 8px;">Organic #1</th>
+                                <th style="padding: 8px;">Owned Match?</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bd-tbody">
+                            <tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">
+                                Select a date range above, then the keyword table will load.
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Data Source Note -->
         <p class="data-source-note" id="data-source-note">
             Loading data from Google Ads API...
@@ -699,7 +823,7 @@
         // Handle URL hash on page load and hash changes
         function handleHashNavigation() {
             const hash = window.location.hash.replace('#', '');
-            const validViews = ['overview', 'review', 'owned', 'conversions', 'accounts'];
+            const validViews = ['overview', 'review', 'owned', 'conversions', 'accounts', 'brand-defense'];
             if (hash && validViews.includes(hash)) {
                 switchView(hash, false);
             }
@@ -1601,6 +1725,339 @@
             // Default to SKU color palette
             return skuColors[index % skuColors.length];
         }
+
+        // ========================================
+        // Brand Defense (branded-keyword + organic rank) Functions
+        // ========================================
+
+        let brandDefenseData = null;        // Raw response from omicron-branded-keywords
+        let brandDefenseRanks = new Map();  // keyword (lowercase) -> rank result
+        let brandDefenseLoading = false;
+
+        // Normalise an owned domain for comparison (strip www + trailing slash)
+        function normalizeDomain(d) {
+            if (!d) return '';
+            return String(d).toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+        }
+
+        function ownedDomainMatchesRank(ownedDomain, rankDomain) {
+            if (!ownedDomain || !rankDomain) return null;
+            const a = normalizeDomain(ownedDomain);
+            const b = normalizeDomain(rankDomain);
+            if (!a || !b) return null;
+            // Match if either is a suffix of the other (handles .com vs .nl vs subdomains)
+            return a === b || a.endsWith('.' + b) || b.endsWith('.' + a);
+        }
+
+        // Hook into switchView: lazy-load when the Brand Defense tab opens for the first time
+        const _origSwitchView = switchView;
+        switchView = function(view, updateHash = true) {
+            _origSwitchView(view, updateHash);
+            if (view === 'brand-defense' && !brandDefenseData && !brandDefenseLoading) {
+                populateBrandDefenseAccountFilter();
+                loadBrandDefense();
+            }
+        };
+
+        function populateBrandDefenseAccountFilter() {
+            const select = document.getElementById('bd-account-filter');
+            if (!select || select.options.length > 1) return;
+            // Pull the same account list as apiData for consistency
+            const accounts = (apiData?.accounts || []).map(a => a.name).sort();
+            for (const name of accounts) {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                select.appendChild(opt);
+            }
+        }
+
+        async function loadBrandDefense() {
+            const lookback = getSelectedLookback();
+            const limit = document.getElementById('bd-limit').value;
+            const account = document.getElementById('bd-account-filter').value;
+
+            const tbody = document.getElementById('bd-tbody');
+            tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">Loading branded keywords…</td></tr>`;
+
+            brandDefenseLoading = true;
+            brandDefenseData = null;
+            brandDefenseRanks = new Map();
+
+            const params = new URLSearchParams({ lookback, limit });
+            if (account) params.set('account', account);
+
+            try {
+                const response = await fetch(`/api/google-ads/omicron-branded-keywords?${params}`);
+                brandDefenseData = await response.json();
+
+                if (brandDefenseData.errors?.length) {
+                    console.warn('Branded keywords API errors:', brandDefenseData.errors);
+                }
+
+                // Pre-populate ranks from cache — fire a forceRefresh=false batch for the first 50
+                // so users see cached results immediately without clicking "Run Rank Check"
+                await preloadCachedRanks();
+
+                renderBrandDefenseTable();
+                updateBrandDefenseSummary();
+            } catch (err) {
+                console.error('Brand defense load failed:', err);
+                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed to load: ${err.message}</td></tr>`;
+            } finally {
+                brandDefenseLoading = false;
+            }
+        }
+
+        // Pre-fetch ranks that are already cached (no new scrapes). Done in a single batch.
+        async function preloadCachedRanks() {
+            const keywords = (brandDefenseData?.keywords || []).map(k => k.keyword.toLowerCase());
+            if (keywords.length === 0) return;
+
+            // Ask for the first 50 — server returns cached only (no new fetches) when the
+            // keyword is already in the cache table. This is fast.
+            const batch = keywords.slice(0, 50);
+            try {
+                const response = await fetch('/api/serp/rank', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keywords: batch, forceRefresh: false })
+                });
+                const data = await response.json();
+                // Only adopt cached entries (fetched_now will be > 0 if the endpoint scraped,
+                // but we want this preload to be cheap — either way, store what we got back)
+                for (const kw of batch) {
+                    const r = data.results?.[kw];
+                    if (r && !r.error && r.top_domain && r.cached) {
+                        brandDefenseRanks.set(kw, r);
+                    }
+                }
+            } catch (e) {
+                console.warn('Cached rank preload failed:', e);
+            }
+        }
+
+        async function runBrandDefenseRankCheck() {
+            if (!brandDefenseData?.keywords?.length) {
+                alert('Load keywords first.');
+                return;
+            }
+            const btn = document.getElementById('bd-run-rank-btn');
+            const progressWrap = document.getElementById('bd-progress-wrap');
+            const progressBar = document.getElementById('bd-progress-bar');
+            const progressLabel = document.getElementById('bd-progress-label');
+
+            btn.disabled = true;
+            btn.textContent = 'Checking…';
+            progressWrap.style.display = 'block';
+
+            const allKws = brandDefenseData.keywords.map(k => k.keyword.toLowerCase());
+            // Dedupe — multiple accounts may have the same keyword
+            const uniqueKws = [...new Set(allKws)];
+            const BATCH_SIZE = 20;
+            let done = 0;
+
+            try {
+                for (let i = 0; i < uniqueKws.length; i += BATCH_SIZE) {
+                    const batch = uniqueKws.slice(i, i + BATCH_SIZE);
+                    const response = await fetch('/api/serp/rank', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ keywords: batch, forceRefresh: false })
+                    });
+                    const data = await response.json();
+                    for (const kw of batch) {
+                        const r = data.results?.[kw];
+                        if (r) brandDefenseRanks.set(kw, r);
+                    }
+                    done += batch.length;
+                    const pct = Math.min(100, (done / uniqueKws.length) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressLabel.textContent = `Checking organic ranks… ${done} / ${uniqueKws.length}`;
+                    renderBrandDefenseTable();
+                    updateBrandDefenseSummary();
+                }
+                progressLabel.textContent = `Done — ${done} keywords checked.`;
+            } catch (e) {
+                console.error('Rank check failed:', e);
+                progressLabel.textContent = `Error: ${e.message}`;
+                progressLabel.style.color = '#ef4444';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Organic Rank Check';
+                setTimeout(() => {
+                    progressWrap.style.display = 'none';
+                    progressLabel.style.color = '';
+                    progressBar.style.width = '0%';
+                }, 3000);
+            }
+        }
+
+        function renderBrandDefenseTable() {
+            const tbody = document.getElementById('bd-tbody');
+            if (!brandDefenseData?.keywords?.length) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">No branded keywords in this date range.</td></tr>`;
+                return;
+            }
+
+            const rows = [...brandDefenseData.keywords];
+            // Enrich with rank + computed savings
+            for (const r of rows) {
+                const key = r.keyword.toLowerCase();
+                const rank = brandDefenseRanks.get(key);
+                r._rank = rank || null;
+                r._ownedMatch = rank ? ownedDomainMatchesRank(r.ownedDomain, rank.top_domain) : null;
+                // Projected savings = cost of keywords where owned domain ranks #1
+                r._savings = r._ownedMatch === true ? r.cost : 0;
+            }
+
+            // Sort
+            const sortBy = document.getElementById('bd-sort').value;
+            const sorters = {
+                cost: (a, b) => b.cost - a.cost,
+                savings: (a, b) => b._savings - a._savings || b.cost - a.cost,
+                clicks: (a, b) => b.clicks - a.clicks,
+                conversions: (a, b) => b.conversions - a.conversions,
+                cpa: (a, b) => (a.cpa || 1e12) - (b.cpa || 1e12)
+            };
+            rows.sort(sorters[sortBy] || sorters.cost);
+
+            tbody.innerHTML = rows.map(r => {
+                const rank = r._rank;
+                const rankDomain = rank?.top_domain || '';
+                const rankUrl = rank?.top_url || '';
+                const rankCell = rank
+                    ? (rank.error
+                        ? `<span class="text-muted" title="${escapeHtml(rank.error)}">error</span>`
+                        : `<a href="${escapeHtml(rankUrl)}" target="_blank" rel="noopener" style="color: #3b82f6;">${escapeHtml(rankDomain)}</a>`)
+                    : '<span class="text-muted">—</span>';
+
+                let matchCell;
+                if (r._ownedMatch === true) {
+                    matchCell = `<span style="color: #22c55e; font-weight: 600;">✓ match</span>`;
+                } else if (r._ownedMatch === false) {
+                    matchCell = `<span style="color: #ef4444;">✗ no</span>`;
+                } else {
+                    matchCell = `<span class="text-muted">—</span>`;
+                }
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.keyword)}">${escapeHtml(r.keyword)}</td>
+                        <td style="padding: 8px;"><span style="color: ${r.accountColor};">${escapeHtml(r.account)}</span></td>
+                        <td style="padding: 8px; font-size: 0.75rem;" class="text-muted">${escapeHtml(r.matchType || '')}</td>
+                        <td style="padding: 8px; text-align: right;">${formatNumber(r.impressions)}</td>
+                        <td style="padding: 8px; text-align: right;">${formatNumber(r.clicks)}</td>
+                        <td style="padding: 8px; text-align: right;">${formatCurrency(r.cost)}</td>
+                        <td style="padding: 8px; text-align: right;">${r.conversions.toFixed(1)}</td>
+                        <td style="padding: 8px; text-align: right;">${formatCurrency(r.cpa)}</td>
+                        <td style="padding: 8px; text-align: right;">${(r.convRate * 100).toFixed(1)}%</td>
+                        <td style="padding: 8px;">${rankCell}</td>
+                        <td style="padding: 8px;">${matchCell}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateBrandDefenseSummary() {
+            if (!brandDefenseData?.keywords?.length) return;
+            const rows = brandDefenseData.keywords;
+            const totalCost = rows.reduce((s, r) => s + r.cost, 0);
+            const totalClicks = rows.reduce((s, r) => s + r.clicks, 0);
+            const totalConv = rows.reduce((s, r) => s + r.conversions, 0);
+            const avgCpa = totalConv > 0 ? totalCost / totalConv : 0;
+
+            // Rank-checked = number of unique keywords with a rank result
+            const uniqueKws = new Set(rows.map(r => r.keyword.toLowerCase()));
+            const checked = [...uniqueKws].filter(k => brandDefenseRanks.has(k)).length;
+
+            // Owned-match count: unique keywords where owned domain matches rank #1
+            const ownedMatchKws = new Set();
+            let projectedSavings = 0;
+            for (const r of rows) {
+                const key = r.keyword.toLowerCase();
+                const rank = brandDefenseRanks.get(key);
+                if (rank && ownedDomainMatchesRank(r.ownedDomain, rank.top_domain)) {
+                    ownedMatchKws.add(key);
+                    projectedSavings += r.cost;
+                }
+            }
+            const matchPct = checked > 0 ? ((ownedMatchKws.size / checked) * 100).toFixed(0) + '%' : '—';
+
+            document.getElementById('bd-total-cost').textContent = formatCurrency(totalCost);
+            document.getElementById('bd-total-clicks').textContent = formatNumber(totalClicks);
+            document.getElementById('bd-total-conv').textContent = formatNumber(totalConv);
+            document.getElementById('bd-avg-cpa').textContent = formatCurrency(avgCpa);
+            document.getElementById('bd-kw-count').textContent = formatNumber(uniqueKws.size);
+            document.getElementById('bd-ranked-count').textContent = `${formatNumber(checked)} / ${formatNumber(uniqueKws.size)}`;
+            document.getElementById('bd-owned-match-pct').textContent = matchPct;
+            document.getElementById('bd-savings').textContent = formatCurrency(projectedSavings);
+        }
+
+        function exportBrandDefenseCSV() {
+            if (!brandDefenseData?.keywords?.length) {
+                alert('No keywords loaded.');
+                return;
+            }
+            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','OwnedMatches'];
+            const lines = [header.join(',')];
+            for (const r of brandDefenseData.keywords) {
+                const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
+                const rankDomain = rank?.top_domain || '';
+                const rankUrl = rank?.top_url || '';
+                const matches = rank ? (ownedDomainMatchesRank(r.ownedDomain, rank.top_domain) ? 'yes' : 'no') : '';
+                lines.push([
+                    csvEscape(r.keyword),
+                    csvEscape(r.account),
+                    csvEscape(r.matchType || ''),
+                    csvEscape(r.campaign || ''),
+                    csvEscape(r.adGroup || ''),
+                    r.impressions,
+                    r.clicks,
+                    r.cost.toFixed(2),
+                    r.conversions.toFixed(2),
+                    r.cpa.toFixed(2),
+                    (r.ctr * 100).toFixed(2) + '%',
+                    (r.convRate * 100).toFixed(2) + '%',
+                    r.roas.toFixed(2),
+                    csvEscape(r.ownedDomain || ''),
+                    csvEscape(rankDomain),
+                    csvEscape(rankUrl),
+                    matches
+                ].join(','));
+            }
+            const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `omicron-brand-defense-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function csvEscape(s) {
+            const str = String(s ?? '');
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return '"' + str.replace(/"/g, '""') + '"';
+            }
+            return str;
+        }
+
+        function escapeHtml(s) {
+            return String(s ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // When the main lookback changes, reload brand defense too (if already loaded)
+        const _origChangeLookback = changeLookback;
+        changeLookback = function() {
+            _origChangeLookback();
+            if (brandDefenseData) loadBrandDefense();
+        };
 
         // ========================================
         // Initialize
