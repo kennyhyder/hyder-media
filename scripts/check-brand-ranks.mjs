@@ -2,18 +2,20 @@
 /**
  * Check organic rank #1 for branded keywords — runs from your local machine.
  *
- * Why local: DuckDuckGo / Bing / Google all block Vercel datacenter IPs.
- * Your residential IP works fine. This script fetches the branded keyword
- * list from the production API, scrapes DuckDuckGo's HTML SERP, and
- * upserts results directly into Supabase (the same table the dashboard reads).
+ * Source: Brave Search API (preferred) or DuckDuckGo HTML scrape (fallback).
+ * DDG tends to IP-ban after a handful of requests even from residential IPs,
+ * so Brave is the reliable path. Free tier = 2000 queries/month, 1 query/sec.
+ * Key from https://api.search.brave.com/app/dashboard → add BRAVE_SEARCH_API_KEY
+ * to .env.local.
  *
  * Usage:
- *   node scripts/check-brand-ranks.js            # top 500 keywords, 3mo lookback
- *   node scripts/check-brand-ranks.js --limit 100 --lookback 1mo
- *   node scripts/check-brand-ranks.js --account BUR
- *   node scripts/check-brand-ranks.js --force    # re-check cached keywords too
+ *   node scripts/check-brand-ranks.mjs                 # top 500 kws, 3mo lookback
+ *   node scripts/check-brand-ranks.mjs --limit 100 --lookback 1mo
+ *   node scripts/check-brand-ranks.mjs --account BUR
+ *   node scripts/check-brand-ranks.mjs --force         # re-check cached kws too
+ *   node scripts/check-brand-ranks.mjs --source ddg    # force DDG fallback
  *
- * Env: reads .env.local for SUPABASE_URL and SUPABASE_SERVICE_KEY.
+ * Env: reads .env.local for SUPABASE_URL, SUPABASE_SERVICE_KEY, BRAVE_SEARCH_API_KEY.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -24,10 +26,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
-const SOURCE = 'duckduckgo';
 const CACHE_TTL_DAYS = 7;
-const CONCURRENCY = 3;
-const DDG_DELAY_MS = 700;   // polite delay between requests per worker
 const API_BASE = process.env.API_BASE || 'https://hyder.me';
 
 const args = parseArgs(process.argv.slice(2));
@@ -35,6 +34,20 @@ const limit = parseInt(args.limit) || 500;
 const lookback = args.lookback || '3mo';
 const accountFilter = args.account || '';
 const forceRefresh = !!args.force;
+
+// Pick a source: 'brave' (preferred) or 'ddg' (fallback)
+const sourceArg = (args.source || '').toLowerCase();
+const BRAVE_KEY = process.env.BRAVE_SEARCH_API_KEY || '';
+let SOURCE, CONCURRENCY, DELAY_MS;
+if (sourceArg === 'ddg' || (!BRAVE_KEY && sourceArg !== 'brave')) {
+    SOURCE = 'duckduckgo';
+    CONCURRENCY = 1;
+    DELAY_MS = 3000;
+} else {
+    SOURCE = 'brave';
+    CONCURRENCY = 1;       // Brave free tier: 1 req/sec
+    DELAY_MS = 1100;       // small buffer above 1s
+}
 
 const USER_AGENTS = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -47,6 +60,12 @@ async function main() {
         console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY in .env.local');
         process.exit(1);
     }
+    if (SOURCE === 'brave' && !BRAVE_KEY) {
+        console.error('Missing BRAVE_SEARCH_API_KEY in .env.local');
+        console.error('Get a key (free 2000/mo) at https://api.search.brave.com/app/dashboard');
+        process.exit(1);
+    }
+    console.log(`Source: ${SOURCE} · concurrency: ${CONCURRENCY} · delay: ${DELAY_MS}ms`);
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
     // Fetch branded keywords from the production API
@@ -111,7 +130,9 @@ async function main() {
             const kw = queue.shift();
             if (!kw) break;
             try {
-                const result = await fetchDuckDuckGoSerp(kw);
+                const result = SOURCE === 'brave'
+                    ? await fetchBraveSerp(kw)
+                    : await fetchDuckDuckGoSerp(kw);
                 await upsertResult(supabase, result);
                 done++;
                 const elapsed = ((Date.now() - started) / 1000).toFixed(0);
@@ -126,7 +147,7 @@ async function main() {
                 done++;
                 process.stdout.write(`\r[${done}/${toFetch.length}] err: ${kw} → ${e.message}\n`);
             }
-            await sleep(DDG_DELAY_MS + Math.random() * 300);
+            await sleep(DELAY_MS + Math.random() * 200);
         }
     }
 
@@ -165,6 +186,42 @@ async function main() {
         total += cost;
     }
     console.log(`  ${'TOTAL'.padEnd(16)} $${total.toFixed(2)}`);
+}
+
+async function fetchBraveSerp(keyword) {
+    const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(keyword)}&count=10&country=us&safesearch=off`;
+    const resp = await fetch(url, {
+        headers: {
+            'Accept': 'application/json',
+            'Accept-Encoding': 'gzip',
+            'X-Subscription-Token': BRAVE_KEY
+        }
+    });
+    if (resp.status === 429) throw new Error('rate limited (429)');
+    if (!resp.ok) {
+        const body = await resp.text().catch(() => '');
+        throw new Error(`HTTP ${resp.status}${body ? ' · ' + body.slice(0, 100) : ''}`);
+    }
+    const data = await resp.json();
+    const webResults = data.web?.results || [];
+    if (webResults.length === 0) {
+        throw new Error('no web results');
+    }
+    const results = webResults.slice(0, 10).map((r, i) => ({
+        rank: i + 1,
+        url: r.url,
+        domain: extractDomain(r.url),
+        title: r.title || ''
+    })).filter(r => r.domain);
+    if (results.length === 0) throw new Error('no parseable results');
+    const top = results[0];
+    return {
+        keyword,
+        top_domain: top.domain,
+        top_url: top.url,
+        top_title: top.title,
+        top_results: results.slice(0, 5)
+    };
 }
 
 async function fetchDuckDuckGoSerp(keyword) {
@@ -224,7 +281,7 @@ function parseDdgHtml(html) {
 async function upsertResult(supabase, result) {
     const { error } = await supabase.from('serp_rankings').upsert({
         keyword: result.keyword,
-        source: SOURCE,
+        source: SOURCE,  // column now holds 'brave' or 'duckduckgo'
         top_domain: result.top_domain || null,
         top_url: result.top_url || null,
         top_title: result.top_title || null,

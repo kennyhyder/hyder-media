@@ -18,8 +18,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SOURCE = 'duckduckgo';
-
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -43,7 +41,9 @@ export default async function handler(req, res) {
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-    // Look up cached rows (chunked — Supabase .in() limit is around 1000)
+    // Look up cached rows (chunked — Supabase .in() limit is around 1000).
+    // We don't filter by source — if multiple sources exist for a keyword,
+    // keep the most recent non-errored row.
     const cached = new Map();
     const CHUNK = 200;
     for (let i = 0; i < cleanKeywords.length; i += CHUNK) {
@@ -52,11 +52,19 @@ export default async function handler(req, res) {
             .from('serp_rankings')
             .select('*')
             .in('keyword', batch)
-            .eq('source', SOURCE);
+            .order('checked_at', { ascending: false });
         if (error) {
             return res.status(500).json({ error: error.message });
         }
-        if (rows) for (const r of rows) cached.set(r.keyword, r);
+        if (rows) {
+            for (const r of rows) {
+                const existing = cached.get(r.keyword);
+                // Prefer non-errored rows, then most recent (already sorted desc)
+                if (!existing || (existing.error && !r.error)) {
+                    cached.set(r.keyword, r);
+                }
+            }
+        }
     }
 
     const resultsByKeyword = {};
@@ -74,6 +82,7 @@ export default async function handler(req, res) {
         }
         resultsByKeyword[kw] = {
             keyword: kw,
+            source: row.source,
             top_domain: row.top_domain,
             top_url: row.top_url,
             top_title: row.top_title,
@@ -85,7 +94,6 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-        source: SOURCE,
         requested: cleanKeywords.length,
         from_cache: cached.size,
         missing,
