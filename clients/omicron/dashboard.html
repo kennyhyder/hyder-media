@@ -647,13 +647,14 @@
                         </select>
                     </label>
                     <label style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem;">
-                        <span class="text-muted">Sort by</span>
-                        <select id="bd-sort" onchange="renderBrandDefenseTable()" style="padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
-                            <option value="cost">Cost (desc)</option>
-                            <option value="savings">Savings opportunity</option>
-                            <option value="clicks">Clicks (desc)</option>
-                            <option value="conversions">Conversions (desc)</option>
-                            <option value="cpa">CPA (asc)</option>
+                        <span class="text-muted">Match type</span>
+                        <select id="bd-match-filter" onchange="renderBrandDefenseTable()" style="padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary);">
+                            <option value="all">All rows</option>
+                            <option value="exact">Exact only</option>
+                            <option value="portfolio">Portfolio only</option>
+                            <option value="exact-or-portfolio">Exact + Portfolio</option>
+                            <option value="external">External only</option>
+                            <option value="unranked">Unranked only</option>
                         </select>
                     </label>
                     <div style="flex: 1;"></div>
@@ -723,18 +724,18 @@
                 <div style="padding: 0 8px 16px; overflow-x: auto;">
                     <table class="data-table" id="bd-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                                <th style="padding: 8px;">Keyword</th>
-                                <th style="padding: 8px;">Account</th>
-                                <th style="padding: 8px;">Match</th>
-                                <th style="padding: 8px; text-align: right;">Impr</th>
-                                <th style="padding: 8px; text-align: right;">Clicks</th>
-                                <th style="padding: 8px; text-align: right;">Cost</th>
-                                <th style="padding: 8px; text-align: right;">Conv</th>
-                                <th style="padding: 8px; text-align: right;">CPA</th>
-                                <th style="padding: 8px; text-align: right;">Conv Rate</th>
-                                <th style="padding: 8px;">Organic #1</th>
-                                <th style="padding: 8px;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
+                            <tr id="bd-thead-row" style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th class="bd-sort-th" data-field="keyword" style="padding: 8px; cursor: pointer; user-select: none;">Keyword</th>
+                                <th class="bd-sort-th" data-field="account" style="padding: 8px; cursor: pointer; user-select: none;">Account</th>
+                                <th class="bd-sort-th" data-field="matchType" style="padding: 8px; cursor: pointer; user-select: none;" title="Keyword match type (BROAD / PHRASE / EXACT)">KW Match</th>
+                                <th class="bd-sort-th" data-field="impressions" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Impr</th>
+                                <th class="bd-sort-th" data-field="clicks" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Clicks</th>
+                                <th class="bd-sort-th" data-field="cost" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Cost</th>
+                                <th class="bd-sort-th" data-field="conversions" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Conv</th>
+                                <th class="bd-sort-th" data-field="cpa" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">CPA</th>
+                                <th class="bd-sort-th" data-field="convRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Conv Rate</th>
+                                <th class="bd-sort-th" data-field="rankDomain" style="padding: 8px; cursor: pointer; user-select: none;">Organic #1</th>
+                                <th class="bd-sort-th" data-field="match" style="padding: 8px; cursor: pointer; user-select: none;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
                             </tr>
                         </thead>
                         <tbody id="bd-tbody">
@@ -1742,6 +1743,75 @@
         let brandDefenseRanks = new Map();  // keyword (lowercase) -> rank result
         let brandDefenseLoading = false;
 
+        // Table sort state — default: savings (portfolio) descending
+        let bdSortField = 'savingsPortfolio';
+        let bdSortDir = 'desc';
+
+        const BD_TEXT_FIELDS = new Set(['keyword', 'account', 'matchType', 'rankDomain', 'match']);
+
+        function setBdSort(field) {
+            if (bdSortField === field) {
+                bdSortDir = bdSortDir === 'desc' ? 'asc' : 'desc';
+            } else {
+                bdSortField = field;
+                bdSortDir = BD_TEXT_FIELDS.has(field) ? 'asc' : 'desc';
+            }
+            renderBrandDefenseTable();
+        }
+
+        function bdSortValue(row, field) {
+            switch (field) {
+                case 'keyword': return (row.keyword || '').toLowerCase();
+                case 'account': return (row.account || '').toLowerCase();
+                case 'matchType': return (row.matchType || '').toLowerCase();
+                case 'impressions': return row.impressions || 0;
+                case 'clicks': return row.clicks || 0;
+                case 'cost': return row.cost || 0;
+                case 'conversions': return row.conversions || 0;
+                case 'cpa': return row.cpa || 0;
+                case 'convRate': return row.convRate || 0;
+                case 'rankDomain': return (row._rank?.top_domain || '').toLowerCase();
+                case 'match': {
+                    // Order: exact, portfolio, external, unranked
+                    const order = { exact: 0, portfolio: 1, external: 2 };
+                    return row._matchType != null ? order[row._matchType] : 3;
+                }
+                case 'savingsPortfolio': return row._savingsPortfolio || 0;
+                default: return row.cost || 0;
+            }
+        }
+
+        function bdCompare(a, b) {
+            const va = bdSortValue(a, bdSortField);
+            const vb = bdSortValue(b, bdSortField);
+            let cmp;
+            if (typeof va === 'number' && typeof vb === 'number') {
+                cmp = va - vb;
+            } else {
+                cmp = String(va).localeCompare(String(vb));
+            }
+            if (cmp === 0) {
+                // Stable secondary sort by cost descending
+                cmp = (b.cost || 0) - (a.cost || 0);
+                return cmp;
+            }
+            return bdSortDir === 'desc' ? -cmp : cmp;
+        }
+
+        function updateBdSortIndicators() {
+            document.querySelectorAll('.bd-sort-th').forEach(th => {
+                const field = th.dataset.field;
+                const base = th.textContent.replace(/\s*[▲▼]\s*$/, '');
+                if (field === bdSortField) {
+                    th.textContent = base + (bdSortDir === 'desc' ? ' ▼' : ' ▲');
+                    th.style.color = '#3b82f6';
+                } else {
+                    th.textContent = base;
+                    th.style.color = '';
+                }
+            });
+        }
+
         // Full portfolio of Omicron-owned domains — any click landing on one of
         // these stays within the Omicron portfolio regardless of which ad
         // account bid on the keyword. Sourced from ACCOUNT_CONFIG in
@@ -1790,18 +1860,33 @@
         const _origSwitchView = switchView;
         switchView = function(view, updateHash = true) {
             _origSwitchView(view, updateHash);
-            if (view === 'brand-defense' && !brandDefenseData && !brandDefenseLoading) {
+            if (view === 'brand-defense') {
                 populateBrandDefenseAccountFilter();
-                loadBrandDefense();
+                if (!brandDefenseData && !brandDefenseLoading) loadBrandDefense();
             }
         };
+
+        // Click-to-sort delegation on the table header (runs once at load)
+        document.addEventListener('click', (ev) => {
+            const th = ev.target.closest('.bd-sort-th');
+            if (!th) return;
+            const field = th.dataset.field;
+            if (field) setBdSort(field);
+        });
+
+        // Fixed list of Omicron accounts — matches ACCOUNT_CONFIG in
+        // api/google-ads/omicron-branded-keywords.js. Hard-coded so the
+        // filter always populates, even if apiData hasn't loaded yet or
+        // some accounts errored in the main dashboard fetch.
+        const BD_ACCOUNT_NAMES = [
+            'BUR', 'Top10usenet', 'Eweka', 'Easynews', 'Newshosting',
+            'UsenetServer', 'Tweak', 'Pure', 'Sunny', 'Privado'
+        ];
 
         function populateBrandDefenseAccountFilter() {
             const select = document.getElementById('bd-account-filter');
             if (!select || select.options.length > 1) return;
-            // Pull the same account list as apiData for consistency
-            const accounts = (apiData?.accounts || []).map(a => a.name).sort();
-            for (const name of accounts) {
+            for (const name of BD_ACCOUNT_NAMES) {
                 const opt = document.createElement('option');
                 opt.value = name;
                 opt.textContent = name;
@@ -1918,9 +2003,9 @@
                 return;
             }
 
-            const rows = [...brandDefenseData.keywords];
+            const allRows = [...brandDefenseData.keywords];
             // Enrich with rank + match classification + savings
-            for (const r of rows) {
+            for (const r of allRows) {
                 const key = r.keyword.toLowerCase();
                 const rank = brandDefenseRanks.get(key);
                 r._rank = rank || null;
@@ -1932,16 +2017,27 @@
                 r._savingsPortfolio = (r._matchType === 'exact' || r._matchType === 'portfolio') ? r.cost : 0;
             }
 
-            // Sort
-            const sortBy = document.getElementById('bd-sort').value;
-            const sorters = {
-                cost: (a, b) => b.cost - a.cost,
-                savings: (a, b) => b._savingsPortfolio - a._savingsPortfolio || b.cost - a.cost,
-                clicks: (a, b) => b.clicks - a.clicks,
-                conversions: (a, b) => b.conversions - a.conversions,
-                cpa: (a, b) => (a.cpa || 1e12) - (b.cpa || 1e12)
-            };
-            rows.sort(sorters[sortBy] || sorters.cost);
+            // Apply match-type filter
+            const matchFilter = document.getElementById('bd-match-filter')?.value || 'all';
+            const rows = allRows.filter(r => {
+                switch (matchFilter) {
+                    case 'exact':              return r._matchType === 'exact';
+                    case 'portfolio':          return r._matchType === 'portfolio';
+                    case 'exact-or-portfolio': return r._matchType === 'exact' || r._matchType === 'portfolio';
+                    case 'external':           return r._matchType === 'external';
+                    case 'unranked':           return r._matchType == null;
+                    default:                   return true;
+                }
+            });
+
+            // Sort by the active column
+            rows.sort(bdCompare);
+            updateBdSortIndicators();
+
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">No rows match the current filter.</td></tr>`;
+                return;
+            }
 
             tbody.innerHTML = rows.map(r => {
                 const rank = r._rank;
