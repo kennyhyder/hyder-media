@@ -4,158 +4,25 @@
     { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
   "functions": {
-    "api/contact.js": {
-      "maxDuration": 10
-    },
-    "api/google-ads/auth.js": {
-      "maxDuration": 10
-    },
-    "api/google-ads/callback.js": {
-      "maxDuration": 30
-    },
-    "api/google-ads/sync.js": {
-      "maxDuration": 60
-    },
-    "api/google-ads/accounts.js": {
-      "maxDuration": 30
-    },
-    "api/google-ads/campaigns.js": {
-      "maxDuration": 30
-    },
-    "api/google-ads/debug.js": {
-      "maxDuration": 30
-    },
-    "api/google-ads/keywords.js": {
-      "maxDuration": 60
-    },
-    "api/google-ads/ag2020-spend.js": {
-      "maxDuration": 60
-    },
-    "api/google-ads/ag2020-performance.js": {
-      "maxDuration": 60
-    },
-    "api/ag2020/leads.js": {
-      "maxDuration": 30
-    },
-    "api/ag2020/calls.js": {
-      "maxDuration": 30
-    },
-    "api/solar/installations.js": {
-      "maxDuration": 30
-    },
-    "api/solar/installation.js": {
-      "maxDuration": 30
-    },
-    "api/solar/equipment.js": {
-      "maxDuration": 30
-    },
-    "api/solar/stats.js": {
-      "maxDuration": 60
-    },
-    "api/solar/installers.js": {
-      "maxDuration": 30
-    },
-    "api/solar/export.js": {
-      "maxDuration": 60
-    },
-    "api/solar/directory.js": {
-      "maxDuration": 30
-    },
-    "api/solar/company.js": {
-      "maxDuration": 30
-    },
-    "api/affiliati/sync-offers.js": {
-      "maxDuration": 60
-    },
-    "api/affiliati/enrich-offer.js": {
-      "maxDuration": 30
-    },
-    "api/affiliati/match-trials.js": {
-      "maxDuration": 60
-    },
-    "api/affiliati/manual-match.js": {
-      "maxDuration": 30
-    },
-    "api/affiliati/generate-ad-unit.js": {
-      "maxDuration": 60
-    },
-    "api/google-ads/autoaddiction-data.js": {
-      "maxDuration": 30
-    },
-    "api/grid/lines.js": {
-      "maxDuration": 30
-    },
-    "api/grid/line.js": {
-      "maxDuration": 30
-    },
-    "api/grid/stats.js": {
-      "maxDuration": 60
-    },
-    "api/grid/corridors.js": {
-      "maxDuration": 30
-    },
-    "api/grid/substations.js": {
-      "maxDuration": 30
-    },
-    "api/grid/dc-sites.js": {
-      "maxDuration": 30
-    },
-    "api/grid/dc-site.js": {
-      "maxDuration": 30
-    },
-    "api/grid/dc-stats.js": {
-      "maxDuration": 60
-    },
-    "api/grid/brownfields.js": {
-      "maxDuration": 30
-    },
-    "api/grid/ixps.js": {
-      "maxDuration": 30
-    },
-    "api/grid/county-data.js": {
-      "maxDuration": 30
-    },
-    "api/grid/dc-export.js": {
-      "maxDuration": 60
-    },
-    "api/grid/brownfield.js": {
-      "maxDuration": 30
-    },
-    "api/grid/corridor.js": {
-      "maxDuration": 30
-    },
-    "api/grid/map-data.js": {
-      "maxDuration": 120
-    },
-    "api/grid/hyperscale.js": {
-      "maxDuration": 30
-    },
-    "api/bing-ads/auth.js": {
-      "maxDuration": 10
-    },
-    "api/bing-ads/callback.js": {
-      "maxDuration": 30
-    },
-    "api/bing-ads/dunham-ads.js": {
-      "maxDuration": 60
-    },
-    "api/digistore/performance.js": {
-      "maxDuration": 30
-    },
-    "api/digistore/ads.js": {
-      "maxDuration": 30
-    },
-    "api/digistore/search-terms.js": {
-      "maxDuration": 30
-    },
-    "api/digistore/account-keywords.js": {
-      "maxDuration": 30
-    },
-    "api/google-ads/omicron-branded-keywords.js": {
-      "maxDuration": 60
-    },
-    "api/serp/rank.js": {
-      "maxDuration": 60
-    }
+    "api/**/*.js": { "maxDuration": 30 },
+    "api/contact.js": { "maxDuration": 10 },
+    "api/google-ads/auth.js": { "maxDuration": 10 },
+    "api/bing-ads/auth.js": { "maxDuration": 10 },
+    "api/google-ads/sync.js": { "maxDuration": 60 },
+    "api/google-ads/keywords.js": { "maxDuration": 60 },
+    "api/google-ads/ag2020-spend.js": { "maxDuration": 60 },
+    "api/google-ads/ag2020-performance.js": { "maxDuration": 60 },
+    "api/google-ads/omicron-branded-keywords.js": { "maxDuration": 60 },
+    "api/solar/stats.js": { "maxDuration": 60 },
+    "api/solar/export.js": { "maxDuration": 60 },
+    "api/affiliati/sync-offers.js": { "maxDuration": 60 },
+    "api/affiliati/match-trials.js": { "maxDuration": 60 },
+    "api/affiliati/generate-ad-unit.js": { "maxDuration": 60 },
+    "api/grid/stats.js": { "maxDuration": 60 },
+    "api/grid/dc-stats.js": { "maxDuration": 60 },
+    "api/grid/dc-export.js": { "maxDuration": 60 },
+    "api/bing-ads/dunham-ads.js": { "maxDuration": 60 },
+    "api/serp/rank.js": { "maxDuration": 60 },
+    "api/grid/map-data.js": { "maxDuration": 120 }
   }
 }
