@@ -4,25 +4,16 @@
     { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
   "functions": {
-    "api/**/*.js": { "maxDuration": 30 },
-    "api/contact.js": { "maxDuration": 10 },
-    "api/google-ads/auth.js": { "maxDuration": 10 },
-    "api/bing-ads/auth.js": { "maxDuration": 10 },
-    "api/google-ads/sync.js": { "maxDuration": 60 },
-    "api/google-ads/keywords.js": { "maxDuration": 60 },
-    "api/google-ads/ag2020-spend.js": { "maxDuration": 60 },
-    "api/google-ads/ag2020-performance.js": { "maxDuration": 60 },
-    "api/google-ads/omicron-branded-keywords.js": { "maxDuration": 60 },
-    "api/solar/stats.js": { "maxDuration": 60 },
-    "api/solar/export.js": { "maxDuration": 60 },
-    "api/affiliati/sync-offers.js": { "maxDuration": 60 },
-    "api/affiliati/match-trials.js": { "maxDuration": 60 },
-    "api/affiliati/generate-ad-unit.js": { "maxDuration": 60 },
-    "api/grid/stats.js": { "maxDuration": 60 },
-    "api/grid/dc-stats.js": { "maxDuration": 60 },
-    "api/grid/dc-export.js": { "maxDuration": 60 },
-    "api/bing-ads/dunham-ads.js": { "maxDuration": 60 },
-    "api/serp/rank.js": { "maxDuration": 60 },
-    "api/grid/map-data.js": { "maxDuration": 120 }
+    "api/*.js": { "maxDuration": 10 },
+    "api/google-ads/**/*.js": { "maxDuration": 60 },
+    "api/solar/**/*.js": { "maxDuration": 60 },
+    "api/grid/**/*.js": { "maxDuration": 120 },
+    "api/bing-ads/**/*.js": { "maxDuration": 60 },
+    "api/affiliati/**/*.js": { "maxDuration": 60 },
+    "api/ag2020/**/*.js": { "maxDuration": 30 },
+    "api/digistore/**/*.js": { "maxDuration": 30 },
+    "api/meta-ads/**/*.js": { "maxDuration": 30 },
+    "api/serp/**/*.js": { "maxDuration": 60 },
+    "api/gbp/**/*.js": { "maxDuration": 30 }
   }
 }
