@@ -13,7 +13,7 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const MAX_ROWS = 10000;
+const MAX_ROWS = 20000;
 
 // ============================================================================
 // Column detection
@@ -21,8 +21,14 @@ const MAX_ROWS = 10000;
 
 // Map normalized field -> regex patterns matching VBC CSV headers (case-insensitive)
 const COLUMN_PATTERNS = {
+    call_id: [
+        /^call\s*id$/i,
+        /^id$/i,
+        /^uuid$/i,
+    ],
     call_time: [
         /^call\s*date(\s*\/?\s*time)?$/i,
+        /^date\s*\/?\s*time(\s*\([^)]*\))?$/i,   // "Date/Time", "Date/Time (earliest)"
         /^date(\s*\/?\s*time)?$/i,
         /^start\s*time$/i,
         /^timestamp$/i,
@@ -30,7 +36,7 @@ const COLUMN_PATTERNS = {
         /^call\s*start$/i,
     ],
     direction: [
-        /^(call\s*)?direction$/i,
+        /^(initial\s*|call\s*)?direction$/i,      // "Direction", "Initial Direction", "Call Direction"
         /^(call\s*)?type$/i,
         /^in\s*\/?\s*out$/i,
     ],
@@ -157,7 +163,10 @@ function normalizePhone(v) {
     return String(v).replace(/[^\d+*#]/g, '').slice(0, 50) || null;
 }
 
-function hashRow({ callTime, fromNumber, toNumber, duration }) {
+function hashRow({ callId, callTime, fromNumber, toNumber, duration }) {
+    // Prefer Vonage's native Call ID (UUID) as the dedupe key when present — it's
+    // globally unique per call. Fall back to hashing the key fields otherwise.
+    if (callId) return String(callId).slice(0, 64);
     const payload = [callTime || '', fromNumber || '', toNumber || '', duration || 0].join('|');
     return crypto.createHash('sha256').update(payload).digest('hex').slice(0, 64);
 }
@@ -210,16 +219,21 @@ export default async function handler(req, res) {
                 errors.push({ row: i + 1, error: 'Missing or unparseable call_time' });
                 continue;
             }
-            const fromNumber = normalizePhone(row[mapping.from_number]);
-            const toNumber = normalizePhone(row[mapping.to_number]);
+            const fromNumber = mapping.from_number ? normalizePhone(row[mapping.from_number]) : null;
+            const toNumber = mapping.to_number ? normalizePhone(row[mapping.to_number]) : null;
             const duration = parseDuration(row[mapping.duration_seconds]);
             const direction = parseDirection(row[mapping.direction]);
             const status = mapping.status ? String(row[mapping.status] || '').slice(0, 50) : null;
-            const answered = parseAnswered(status, mapping.answered ? row[mapping.answered] : null);
+            const callId = mapping.call_id ? String(row[mapping.call_id] || '').trim() : null;
+
+            // Answered detection: explicit column → status keywords → duration > 0 fallback
+            let answered = parseAnswered(status, mapping.answered ? row[mapping.answered] : null);
+            if (!answered && !status && !mapping.answered) answered = duration > 0;
+
             const extension = mapping.extension ? String(row[mapping.extension] || '').slice(0, 50) : null;
             const userName = mapping.user_name ? String(row[mapping.user_name] || '').slice(0, 200) : null;
 
-            const callHash = hashRow({ callTime: callTimeIso, fromNumber, toNumber, duration });
+            const callHash = hashRow({ callId, callTime: callTimeIso, fromNumber, toNumber, duration });
 
             toInsert.push({
                 call_hash: callHash,
