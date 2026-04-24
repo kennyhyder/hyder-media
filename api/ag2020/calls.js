@@ -38,13 +38,21 @@ export default async function handler(req, res) {
         return res.status(200).json({
             status: 'not_configured',
             setupRequired: true,
-            message: 'Vonage VBC OAuth not yet configured',
-            steps: [
-                'Log in to https://developer.vonage.com',
-                'Create a new API Application with VBC scopes enabled',
-                'Add redirect URI: https://hyder.me/api/vonage/callback',
-                'Add these env vars to Vercel: AG2020_VONAGE_CLIENT_ID, AG2020_VONAGE_CLIENT_SECRET, AG2020_VONAGE_ACCOUNT_ID, AG2020_VONAGE_REDIRECT_URI',
-                'Visit /api/vonage/auth to complete OAuth and store tokens in Supabase',
+            message: 'Vonage VBC call data not available — VBC accounts do not expose API access by default',
+            context: 'AG2020 account #400386 is a VBC-only account. Vonage Voice API credentials from a separate developer account cannot see VBC call history.',
+            options: [
+                {
+                    title: 'Request VBC API access from Vonage',
+                    detail: 'Contact Vonage support and request API access be enabled on account 400386. This typically requires a paid tier upgrade or a specific sales conversation. Once enabled, provide the Client ID + Client Secret for the API application.',
+                },
+                {
+                    title: 'Manual CSV import',
+                    detail: 'VBC admin portal at bc.vonage.com allows exporting call history as CSV. Export weekly/monthly and upload to this dashboard for aggregated reporting.',
+                },
+                {
+                    title: 'Call tracking numbers via Voice API',
+                    detail: 'Purchase Vonage Voice API phone numbers, port or forward existing lines through them to VBC extensions. Calls then appear in the Voice API call logs (viewable via basic auth). Adds monthly cost per number.',
+                },
             ],
         });
     }
