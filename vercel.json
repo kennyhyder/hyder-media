@@ -34,6 +34,12 @@
     "api/google-ads/ag2020-performance.js": {
       "maxDuration": 60
     },
+    "api/ag2020/leads.js": {
+      "maxDuration": 30
+    },
+    "api/ag2020/calls.js": {
+      "maxDuration": 30
+    },
     "api/solar/installations.js": {
       "maxDuration": 30
     },
