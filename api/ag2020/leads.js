@@ -16,8 +16,8 @@
  * ActiveCampaign API docs: https://developers.activecampaign.com/reference
  */
 
-const AC_PAGE_SIZE = 100; // AC max
-const AC_MAX_PAGES = 20;  // safety cap (2000 contacts per request)
+const AC_PAGE_SIZE = 100;  // AC max
+const AC_MAX_PAGES = 150;  // safety cap (15,000 contacts per request; 12mo of AG2020 runs ~10K)
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');

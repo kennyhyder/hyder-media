@@ -111,22 +111,35 @@ function resolveDateRange(query) {
     return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] };
 }
 
-async function fetchSummary(supabase, startIso, endIso) {
-    // Single aggregate query via RPC isn't available without a defined function,
-    // so fetch bucket counts using filtered selects.
-    const { data, error } = await supabase
-        .from('ag2020_call_logs')
-        .select('id,direction,answered,duration_seconds')
-        .gte('call_time', startIso)
-        .lte('call_time', endIso);
+// Supabase/PostgREST caps a single SELECT at 1000 rows by default. Paginate
+// through the result set using .range() so large date ranges return real totals.
+async function selectAll(queryFactory, pageSize = 1000, hardLimit = 200000) {
+    const rows = [];
+    for (let offset = 0; offset < hardLimit; offset += pageSize) {
+        const { data, error } = await queryFactory().range(offset, offset + pageSize - 1);
+        if (error) throw new Error(error.message);
+        const chunk = data || [];
+        rows.push(...chunk);
+        if (chunk.length < pageSize) break;
+    }
+    return rows;
+}
 
-    if (error) throw new Error(error.message);
+async function fetchSummary(supabase, startIso, endIso) {
+    const data = await selectAll(() =>
+        supabase
+            .from('ag2020_call_logs')
+            .select('id,direction,answered,duration_seconds')
+            .gte('call_time', startIso)
+            .lte('call_time', endIso)
+            .order('call_time', { ascending: true })
+    );
 
     let inbound = 0, outbound = 0, internal = 0, other = 0;
     let answered = 0, missed = 0;
     let totalDuration = 0;
 
-    for (const r of data || []) {
+    for (const r of data) {
         if (r.direction === 'inbound') inbound++;
         else if (r.direction === 'outbound') outbound++;
         else if (r.direction === 'internal') internal++;
@@ -136,7 +149,7 @@ async function fetchSummary(supabase, startIso, endIso) {
         totalDuration += r.duration_seconds || 0;
     }
 
-    const totalCalls = (data || []).length;
+    const totalCalls = data.length;
     return {
         totalCalls,
         inbound,
@@ -152,13 +165,14 @@ async function fetchSummary(supabase, startIso, endIso) {
 }
 
 async function fetchDaily(supabase, startIso, endIso, startDate, endDate) {
-    const { data, error } = await supabase
-        .from('ag2020_call_logs')
-        .select('call_time,answered,duration_seconds,direction')
-        .gte('call_time', startIso)
-        .lte('call_time', endIso);
-
-    if (error) throw new Error(error.message);
+    const data = await selectAll(() =>
+        supabase
+            .from('ag2020_call_logs')
+            .select('call_time,answered,duration_seconds,direction')
+            .gte('call_time', startIso)
+            .lte('call_time', endIso)
+            .order('call_time', { ascending: true })
+    );
 
     const byDay = {};
     const cur = new Date(startDate);
