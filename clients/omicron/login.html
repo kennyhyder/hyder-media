@@ -253,7 +253,9 @@
 
         const SUPABASE_URL = 'https://ilbovwnhrowvxjdkvrln.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYm92d25ocm93dnhqZGt2cmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjUzMTIsImV4cCI6MjA4NDEwMTMxMn0.FKtChreOxcemcTUZqbtnk-ZkjqLHYwQFKvx_Xy35FlM';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        // The UMD build declares `supabase` as a top-level global, so we use
+        // a different local name (`sb`) to avoid a redeclaration SyntaxError.
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             auth: { detectSessionInUrl: true, flowType: 'pkce' }
         });
 
@@ -300,7 +302,7 @@
                 try {
                     const codeFromUrl = _initialQS.get('code');
                     console.log('[omicron-login] Exchanging PKCE code for session…');
-                    const { error } = await supabase.auth.exchangeCodeForSession(codeFromUrl);
+                    const { error } = await sb.auth.exchangeCodeForSession(codeFromUrl);
                     if (error) {
                         // Code may already have been consumed by the SDK auto-handler — that's fine
                         if (!/code.+used|already.+used|code_verifier/i.test(error.message)) {
@@ -312,7 +314,7 @@
                 }
             }
 
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await sb.auth.getSession();
             console.log('[omicron-login] Session after URL processing:', !!session, session?.user?.email);
             if (!session) {
                 if (_isInviteOrRecovery) {
@@ -336,7 +338,7 @@
         // Decide what to show after a successful password login (or page reload with session)
         async function routeAfterPasswordLogin() {
             const { data: aalData, error: aalErr } =
-                await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+                await sb.auth.mfa.getAuthenticatorAssuranceLevel();
             if (aalErr) {
                 showError(aalErr.message);
                 showStep('step-login');
@@ -350,7 +352,7 @@
             }
 
             // currentLevel = aal1. Check if user already has a verified TOTP factor.
-            const { data: factors, error: factorsErr } = await supabase.auth.mfa.listFactors();
+            const { data: factors, error: factorsErr } = await sb.auth.mfa.listFactors();
             if (factorsErr) {
                 showError(factorsErr.message);
                 showStep('step-login');
@@ -364,7 +366,7 @@
                 // No verified factor — clean up any half-enrolled factors and start enrollment
                 for (const f of (factors.totp || [])) {
                     if (f.status !== 'verified') {
-                        try { await supabase.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
+                        try { await sb.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
                     }
                 }
                 await beginMfaEnrollment();
@@ -383,7 +385,7 @@
             try {
                 const email = $('email').value.trim();
                 const password = $('password').value;
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await sb.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 await routeAfterPasswordLogin();
             } catch (err) {
@@ -398,7 +400,7 @@
         // -------- Step 2: MFA challenge (existing factor) --------
         async function beginMfaChallenge(factorId) {
             try {
-                const { data, error } = await supabase.auth.mfa.challenge({ factorId });
+                const { data, error } = await sb.auth.mfa.challenge({ factorId });
                 if (error) throw error;
                 pendingFactorId = factorId;
                 pendingChallengeId = data.id;
@@ -419,7 +421,7 @@
             btn.innerHTML = '<span class="spinner"></span>Verifying…';
             try {
                 const code = $('mfa-code').value.trim();
-                const { error } = await supabase.auth.mfa.verify({
+                const { error } = await sb.auth.mfa.verify({
                     factorId: pendingFactorId,
                     challengeId: pendingChallengeId,
                     code
@@ -440,7 +442,7 @@
         // -------- Step 3: MFA enrollment (first time) --------
         async function beginMfaEnrollment() {
             try {
-                const { data, error } = await supabase.auth.mfa.enroll({
+                const { data, error } = await sb.auth.mfa.enroll({
                     factorType: 'totp',
                     friendlyName: 'Omicron Dashboard'
                 });
@@ -476,9 +478,9 @@
             try {
                 const code = $('enroll-code').value.trim();
                 // Create a challenge for the freshly enrolled factor, then verify
-                const challenge = await supabase.auth.mfa.challenge({ factorId: pendingFactorId });
+                const challenge = await sb.auth.mfa.challenge({ factorId: pendingFactorId });
                 if (challenge.error) throw challenge.error;
-                const { error: verifyErr } = await supabase.auth.mfa.verify({
+                const { error: verifyErr } = await sb.auth.mfa.verify({
                     factorId: pendingFactorId,
                     challengeId: challenge.data.id,
                     code
@@ -516,7 +518,7 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span>Saving…';
             try {
-                const { error } = await supabase.auth.updateUser({ password: pwd });
+                const { error } = await sb.auth.updateUser({ password: pwd });
                 if (error) throw error;
                 needsPasswordSet = false;
                 // Clear hash to avoid re-triggering invite flow on refresh
@@ -536,7 +538,7 @@
 
         // -------- Sign out from interim states --------
         async function signOutAndReset() {
-            await supabase.auth.signOut();
+            await sb.auth.signOut();
             // Drop hash + query so we don't re-enter an invite flow on reload
             window.location.replace(window.location.pathname);
         }
