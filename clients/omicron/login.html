@@ -225,16 +225,37 @@
     </div>
 
     <script>
-        // Capture the URL hash BEFORE the Supabase SDK consumes it. Invite and
-        // password-reset emails land here with #type=invite (or recovery), and
-        // we use that signal to show the "set your password" step.
+        // Capture URL state BEFORE the Supabase SDK consumes it.
+        // Invite emails can land here in either of two formats:
+        //   Implicit flow:  #access_token=...&type=invite
+        //   PKCE flow:      ?code=... (token exchanged via exchangeCodeForSession)
+        // The SDK auto-handles both with detectSessionInUrl=true; we mirror the
+        // detection here so we know to show the "set your password" step.
         const _initialHash = window.location.hash || '';
+        const _initialSearch = window.location.search || '';
+        const _initialQS = new URLSearchParams(_initialSearch);
+        const _initialHQ = new URLSearchParams(_initialHash.replace(/^#/, ''));
+        const _hashType = _initialHQ.get('type');
+        const _searchType = _initialQS.get('type');
+        const _hasPkceCode = _initialQS.has('code');
+        // True for any auth-link landing: invite, recovery, or magic-link with code.
+        // We treat all of these as "fresh interaction → likely needs password".
         const _isInviteOrRecovery =
-            _initialHash.includes('type=invite') || _initialHash.includes('type=recovery');
+            _hashType === 'invite' || _hashType === 'recovery' ||
+            _searchType === 'invite' || _searchType === 'recovery' ||
+            _hasPkceCode;
+        // Log for debugging — visible in browser devtools console
+        console.log('[omicron-login] URL inspection:', {
+            hash: _initialHash, search: _initialSearch,
+            hashType: _hashType, searchType: _searchType,
+            hasPkceCode: _hasPkceCode, isInviteOrRecovery: _isInviteOrRecovery
+        });
 
         const SUPABASE_URL = 'https://ilbovwnhrowvxjdkvrln.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYm92d25ocm93dnhqZGt2cmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjUzMTIsImV4cCI6MjA4NDEwMTMxMn0.FKtChreOxcemcTUZqbtnk-ZkjqLHYwQFKvx_Xy35FlM';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: { detectSessionInUrl: true, flowType: 'pkce' }
+        });
 
         const NEXT_URL = new URLSearchParams(window.location.search).get('next') || 'summary.html';
 
@@ -271,8 +292,32 @@
 
         // -------- Initial state determination --------
         async function bootstrap() {
+            // If we landed here from a PKCE invite/recovery email, the URL has
+            // ?code=... that needs to be exchanged for a session. The SDK does
+            // this automatically when detectSessionInUrl=true, but we also try
+            // explicitly here so any error surfaces in the UI.
+            if (_hasPkceCode) {
+                try {
+                    const codeFromUrl = _initialQS.get('code');
+                    console.log('[omicron-login] Exchanging PKCE code for session…');
+                    const { error } = await supabase.auth.exchangeCodeForSession(codeFromUrl);
+                    if (error) {
+                        // Code may already have been consumed by the SDK auto-handler — that's fine
+                        if (!/code.+used|already.+used|code_verifier/i.test(error.message)) {
+                            console.warn('[omicron-login] exchangeCodeForSession error:', error);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[omicron-login] PKCE exchange threw:', e);
+                }
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
+            console.log('[omicron-login] Session after URL processing:', !!session, session?.user?.email);
             if (!session) {
+                if (_isInviteOrRecovery) {
+                    showError('That invite or reset link has expired or already been used. Please request a new one.');
+                }
                 showStep('step-login');
                 return;
             }
