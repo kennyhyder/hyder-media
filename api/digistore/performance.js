@@ -320,6 +320,7 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
             ad_group.id,
             ad_group.name,
             ad_group.status,
+            ad_group.url_custom_parameters,
             metrics.cost_micros,
             metrics.clicks,
             metrics.impressions,
@@ -350,11 +351,17 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
         const conversions = parseFloat(m.conversions || 0);
         const conversionValue = parseFloat(m.conversionsValue || 0);
 
+        // Extract the {_adgroup} custom param value (the slug used in utm_content)
+        const customParams = ag.urlCustomParameters || [];
+        const adgroupParam = customParams.find(p => p.key === 'adgroup');
+        const slug = adgroupParam?.value || null;
+
         return {
             campaignId: c.id,
             campaign: c.name,
             adGroupId: ag.id,
             adGroup: ag.name,
+            slug,  // The utm_content slug from this ad group's custom parameters
             status: ag.status,
             spend,
             clicks,

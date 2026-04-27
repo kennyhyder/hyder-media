@@ -1315,39 +1315,32 @@ function renderCharts() {
 }
 
 // ===== Render Campaigns =====
+// Build all ad-group lookup tables dynamically from the live ad-group API
+// response. No hardcoded mappings — when Kenny adds new ad groups via the
+// editor CSV with their `adgroup=<slug>` custom parameter, they automatically
+// flow through here on the next dashboard load.
+function buildAdGroupLookups() {
+    const adgroupToCampaign = {};   // "Sell Ebooks" → "Nonbrand | Sell Online | US"
+    const slugToName = {};           // "sell-ebooks" → "Sell Ebooks"
+    if (adGroupData) {
+        for (const ag of adGroupData) {
+            adgroupToCampaign[ag.adGroup] = ag.campaign;
+            if (ag.slug) slugToName[ag.slug] = ag.adGroup;
+        }
+    }
+    return { adgroupToCampaign, slugToName };
+}
+
 // Build a campaign-name → {vendor, affiliate} lookup from GA4 data
 function buildGA4ByCampaign() {
-    const ADGROUP_TO_CAMPAIGN = {
-        'Competitor Brand - Clickbank': 'Competitors | US',
-        'Digistore24 vs Clickbank': 'Competitors | US',
-        'Clickbank vs Competitor': 'Competitors | US',
-        'Sell Digital Products': 'Nonbrand | Sell Online | US',
-        'Sell Ebooks': 'Nonbrand | Sell Online | US',
-        'Sell Online Courses': 'Nonbrand | Sell Online | US',
-        'Supplements': 'Nonbrand | Niche Specific | US',
-        'Coaching Courses': 'Nonbrand | Niche Specific | US',
-        'Digistore24 US Brand Main': 'Brand Digistore24 US',
-        'Digital Products Marketplace': 'Nonbrand | Digital Products | US',
-        'Digital Products Store': 'Nonbrand | Digital Products | US',
-    };
-    const SLUG_TO_ADGROUP = {
-        'clickbank-brand': 'Competitor Brand - Clickbank',
-        'ds24-vs-clickbank': 'Digistore24 vs Clickbank',
-        'clickbank-vs-competitor': 'Clickbank vs Competitor',
-        'sell-digital-products': 'Sell Digital Products',
-        'sell-ebooks': 'Sell Ebooks',
-        'sell-online-courses': 'Sell Online Courses',
-        'supplements': 'Supplements',
-        'brand-main': 'Digistore24 US Brand Main',
-        'digital-marketplace': 'Digital Products Marketplace',
-        'digital-store': 'Digital Products Store',
-        'coaching-courses': 'Coaching Courses',
-    };
+    const { adgroupToCampaign, slugToName } = buildAdGroupLookups();
     const out = {};
     if (!ga4Data || !ga4Data.byAdGroup) return out;
     for (const ag of ga4Data.byAdGroup) {
-        const adGroupName = SLUG_TO_ADGROUP[ag.ad_group] || ag.ad_group;
-        const camp = ADGROUP_TO_CAMPAIGN[adGroupName];
+        // ad_group from GA4 is either the display name (historical CSV) or
+        // the utm_content slug (live events). Normalize to display name.
+        const adGroupName = slugToName[ag.ad_group] || ag.ad_group;
+        const camp = adgroupToCampaign[adGroupName];
         if (!camp) continue;
         if (!out[camp]) out[camp] = { vendor: 0, affiliate: 0 };
         out[camp].vendor += ag.vendor || 0;
@@ -1356,7 +1349,7 @@ function buildGA4ByCampaign() {
     // Also expose per-ad-group vendor/affiliate for the accordion rows
     out._byAdGroupName = {};
     for (const ag of ga4Data.byAdGroup) {
-        const name = SLUG_TO_ADGROUP[ag.ad_group] || ag.ad_group;
+        const name = slugToName[ag.ad_group] || ag.ad_group;
         out._byAdGroupName[name] = { vendor: ag.vendor || 0, affiliate: ag.affiliate || 0 };
     }
     return out;
