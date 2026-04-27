@@ -14,9 +14,9 @@
 
 import { BigQuery } from '@google-cloud/bigquery';
 
-const PROJECT_ID = process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338';
-const HISTORY_TABLE = process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026';
-const PROPERTY_ID = process.env.GA4_BQ_PROPERTY_ID; // e.g. "314577708" — set once GA4 export lands
+const PROJECT_ID = (process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338').trim();
+const HISTORY_TABLE = (process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
+const PROPERTY_ID = (process.env.GA4_BQ_PROPERTY_ID || '').trim() || null; // e.g. "314577708" — set once GA4 export lands
 
 function getBigQueryClient() {
     const keyJson = process.env.GA4_BQ_SERVICE_ACCOUNT_KEY;
