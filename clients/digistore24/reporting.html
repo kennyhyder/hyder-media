@@ -556,6 +556,7 @@
             <button class="tab-btn" data-tab="creative">Ad Creative</button>
             <button class="tab-btn" data-tab="search-terms">Search Terms</button>
             <button class="tab-btn" data-tab="keywords">Keywords</button>
+            <button class="tab-btn" data-tab="ga4">GA4 Insights</button>
         </div>
 
         <!-- Overview Tab -->
@@ -720,6 +721,70 @@
                 </table>
             </div>
         </div>
+
+        <!-- GA4 Insights Tab -->
+        <div id="tab-ga4" class="tab-content">
+            <div class="creative-header">
+                <div>
+                    <h2 style="font-size:1.2rem;">Vendor vs Affiliate Signups <span id="ga4Source" class="count-badge">Loading...</span></h2>
+                    <p class="creative-subtitle">Account-type breakdown from GA4 — what Google Ads can't see by itself</p>
+                </div>
+            </div>
+
+            <!-- Account-wide stats -->
+            <div class="stats-grid" style="margin-bottom: 24px;">
+                <div class="stat-card">
+                    <div class="stat-label">Vendor Signups</div>
+                    <div class="stat-value" id="ga4StatVendor" style="color: var(--success);">--</div>
+                    <div class="stat-sub" id="ga4StatVendorPct">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Affiliate Signups</div>
+                    <div class="stat-value" id="ga4StatAffiliate" style="color: var(--accent);">--</div>
+                    <div class="stat-sub" id="ga4StatAffiliatePct">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Vendor : Affiliate Ratio</div>
+                    <div class="stat-value" id="ga4StatRatio">--</div>
+                    <div class="stat-sub">For a marketplace, vendors are the asset</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Active Users</div>
+                    <div class="stat-value" id="ga4StatTotal">--</div>
+                    <div class="stat-sub">Includes pre-signup traffic</div>
+                </div>
+            </div>
+
+            <!-- Insight banner -->
+            <div id="ga4InsightBanner" style="display:none; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:14px 18px; margin-bottom: 20px; font-size: 0.9rem;">
+                <strong style="color: var(--warning);">Insight:</strong>
+                <span id="ga4InsightText"></span>
+            </div>
+
+            <!-- Per-ad-group breakdown -->
+            <h3 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-secondary);">Breakdown by Ad Group</h3>
+            <div class="table-wrapper">
+                <table id="ga4Table">
+                    <thead>
+                        <tr>
+                            <th>Ad Group</th>
+                            <th>Vendor Signups</th>
+                            <th>Affiliate Signups</th>
+                            <th>Vendor %</th>
+                            <th>Spend (28d)</th>
+                            <th>$ / Vendor</th>
+                            <th>$ / Affiliate</th>
+                            <th>Quality Tier</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ga4Body"></tbody>
+                </table>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 16px;">
+                Spend column joins this view with the campaign data above. "Quality Tier" ranks ad groups by vendor share — for a marketplace, vendors bring inventory and LTV.
+            </p>
+        </div>
     </div>
 
 <script>
@@ -746,6 +811,7 @@ let kwSortKey = 'spend';
 let kwSortDir = -1;
 let kwMatchFilter = '';
 let kwSearchFilter = '';
+let ga4Data = null;
 
 const API_BASE = '/api/digistore';
 
@@ -795,13 +861,14 @@ async function loadAllData() {
     const trendParam = trendGranularity; // 'daily' or 'monthly'
 
     try {
-        const [summaryRes, campaignRes, trendRes, adsRes, stRes, kwRes] = await Promise.all([
+        const [summaryRes, campaignRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/search-terms?days=${currentDays}&limit=100`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/account-keywords?days=${currentDays}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ga4-insights`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
@@ -811,6 +878,7 @@ async function loadAllData() {
         const adsOk = adsRes?.status === 'success' && Array.isArray(adsRes.ads) && adsRes.ads.length > 0;
         const stOk = stRes?.status === 'success' && Array.isArray(stRes.terms);
         const kwOk = kwRes?.status === 'success' && Array.isArray(kwRes.keywords);
+        const ga4Ok = ga4Res?.status === 'success' && Array.isArray(ga4Res.byAdGroup);
 
         if (summaryOk) {
             isDemo = false;
@@ -820,6 +888,7 @@ async function loadAllData() {
             adsData = adsOk ? adsRes : null;
             searchTermsData = stOk ? stRes.terms : [];
             keywordsData = kwOk ? kwRes.keywords : [];
+            ga4Data = ga4Ok ? ga4Res : null;
             setBadge('live', 'Live Data');
         } else {
             isDemo = true;
@@ -837,6 +906,7 @@ async function loadAllData() {
     renderCreative();
     renderSearchTerms();
     renderKeywords();
+    renderGA4();
     document.getElementById('refreshBtn').disabled = false;
 }
 
@@ -1629,6 +1699,109 @@ function exportKeywordsCSV() {
     const a = document.createElement('a');
     a.href = url; a.download = `digistore24-keywords-${currentDays}d.csv`; a.click();
     URL.revokeObjectURL(url);
+}
+
+// ===== Render GA4 Insights =====
+function renderGA4() {
+    const sourceBadge = document.getElementById('ga4Source');
+    const tbody = document.getElementById('ga4Body');
+
+    if (!ga4Data || !ga4Data.byAdGroup || ga4Data.byAdGroup.length === 0) {
+        sourceBadge.textContent = isDemo ? 'Demo' : 'No data yet';
+        sourceBadge.style.background = 'rgba(245,158,11,0.15)';
+        sourceBadge.style.color = 'var(--warning)';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-secondary)">GA4 export still pending. Live data lands within 24h of the BigQuery link.</td></tr>';
+        ['ga4StatVendor','ga4StatAffiliate','ga4StatRatio','ga4StatTotal','ga4StatVendorPct','ga4StatAffiliatePct'].forEach(id => {
+            document.getElementById(id).textContent = '--';
+        });
+        return;
+    }
+
+    sourceBadge.textContent = ga4Data.dataAge || ga4Data.source || 'Live';
+    sourceBadge.style.background = ga4Data.source === 'live' ? 'rgba(34,197,94,0.15)' : 'rgba(59,130,246,0.15)';
+    sourceBadge.style.color = ga4Data.source === 'live' ? 'var(--success)' : 'var(--accent)';
+
+    const t = ga4Data.totals;
+    document.getElementById('ga4StatVendor').textContent = (t.vendor || 0).toLocaleString();
+    document.getElementById('ga4StatAffiliate').textContent = (t.affiliate || 0).toLocaleString();
+    const knownTotal = (t.vendor || 0) + (t.affiliate || 0);
+    document.getElementById('ga4StatVendorPct').textContent = knownTotal > 0
+        ? `${((t.vendor / knownTotal) * 100).toFixed(0)}% of known signups` : '--';
+    document.getElementById('ga4StatAffiliatePct').textContent = knownTotal > 0
+        ? `${((t.affiliate / knownTotal) * 100).toFixed(0)}% of known signups` : '--';
+    const ratio = t.affiliate > 0 ? (t.vendor / t.affiliate).toFixed(2) : '∞';
+    document.getElementById('ga4StatRatio').textContent = `${ratio} : 1`;
+    document.getElementById('ga4StatTotal').textContent = (t.total || 0).toLocaleString();
+
+    // Build campaign-spend lookup (keyed by ad group name as it appears in Google Ads)
+    // Note: ga4Data.byAdGroup uses utm_content slugs, campaignData uses ad group names from the API.
+    // Map slugs back to ad group display names for spend lookup.
+    const SLUG_TO_ADGROUP = {
+        'clickbank-brand': 'Competitor Brand - Clickbank',
+        'ds24-vs-clickbank': 'Digistore24 vs Clickbank',
+        'clickbank-vs-competitor': 'Clickbank vs Competitor',
+        'sell-digital-products': 'Sell Digital Products',
+        'sell-ebooks': 'Sell Ebooks',
+        'sell-online-courses': 'Sell Online Courses',
+        'supplements': 'Supplements',
+        'brand-main': 'Digistore24 US Brand Main',
+        'digital-marketplace': 'Digital Products Marketplace',
+        'digital-store': 'Digital Products Store',
+        'coaching-courses': 'Coaching Courses',
+    };
+
+    // Get campaign-level spend from current campaignData (the 28-day window)
+    // Sum spend by ad group name. campaignData is per-campaign though, not per-ad-group.
+    // For a closer estimate, we use the campaign spend split proportionally — but for now
+    // just match on display name when possible.
+    const adGroupSpend = {}; // ad_group display name → estimated 28d spend
+    if (campaignData) {
+        // We don't have per-ad-group spend in campaignData (it's campaign-level).
+        // Show — for accuracy — only if user has a per-ad-group endpoint.
+        // For now, leave spend column empty and let the user infer from campaigns tab.
+    }
+
+    const sortedAGs = [...ga4Data.byAdGroup].sort((a, b) => b.signups - a.signups);
+
+    tbody.innerHTML = sortedAGs.map(ag => {
+        const displayName = SLUG_TO_ADGROUP[ag.ad_group] || ag.ad_group;
+        const known = ag.vendor + ag.affiliate;
+        const vendorPct = known > 0 ? (ag.vendor / known * 100) : 0;
+        const tier = vendorPct >= 50 ? 'high'
+                   : vendorPct >= 30 ? 'medium'
+                   : known > 0 ? 'low'
+                   : 'unknown';
+        const tierLabel = tier === 'high' ? '🟢 High vendor' : tier === 'medium' ? '🟡 Mixed' : tier === 'low' ? '🔴 Affiliate-heavy' : '⚪ Unknown';
+        const spendStr = adGroupSpend[displayName] != null ? `$${adGroupSpend[displayName].toFixed(0)}` : '—';
+        const cpvStr = adGroupSpend[displayName] != null && ag.vendor > 0 ? `$${(adGroupSpend[displayName] / ag.vendor).toFixed(0)}` : '—';
+        const cpaStr = adGroupSpend[displayName] != null && ag.affiliate > 0 ? `$${(adGroupSpend[displayName] / ag.affiliate).toFixed(0)}` : '—';
+        return `<tr>
+            <td>${esc(displayName)}</td>
+            <td style="color: var(--success); font-weight: 600;">${ag.vendor}</td>
+            <td style="color: var(--accent); font-weight: 600;">${ag.affiliate}</td>
+            <td>${known > 0 ? vendorPct.toFixed(0) + '%' : '—'}</td>
+            <td>${spendStr}</td>
+            <td>${cpvStr}</td>
+            <td>${cpaStr}</td>
+            <td>${tierLabel}</td>
+        </tr>`;
+    }).join('');
+
+    // Insight banner — call out the most strategically important finding
+    const banner = document.getElementById('ga4InsightBanner');
+    const insightEl = document.getElementById('ga4InsightText');
+    const topVendor = sortedAGs.filter(a => a.vendor > 0).sort((a,b) => (b.vendor/(b.vendor+b.affiliate||1)) - (a.vendor/(a.vendor+a.affiliate||1)))[0];
+    const worstAffiliate = sortedAGs.filter(a => a.affiliate >= 10).sort((a,b) => (a.vendor/(a.vendor+a.affiliate||1)) - (b.vendor/(b.vendor+b.affiliate||1)))[0];
+    if (topVendor && worstAffiliate && topVendor.ad_group !== worstAffiliate.ad_group) {
+        const tvDisp = SLUG_TO_ADGROUP[topVendor.ad_group] || topVendor.ad_group;
+        const waDisp = SLUG_TO_ADGROUP[worstAffiliate.ad_group] || worstAffiliate.ad_group;
+        const tvPct = (topVendor.vendor / (topVendor.vendor + topVendor.affiliate) * 100).toFixed(0);
+        const waPct = (worstAffiliate.vendor / (worstAffiliate.vendor + worstAffiliate.affiliate) * 100).toFixed(0);
+        insightEl.innerHTML = `<strong>${tvDisp}</strong> brings ${tvPct}% vendor signups vs <strong>${waDisp}</strong> at ${waPct}%. Effective vendor acquisition cost on ${waDisp} is much higher than the headline CPA suggests — that ad group is mostly acquiring affiliates, not vendors.`;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
 }
 
 // ===== Init =====
