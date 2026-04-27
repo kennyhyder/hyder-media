@@ -33,9 +33,10 @@ export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
     const result = { source: null, rows: [], totals: {}, errors: [], dataAge: null };
+    let bq;
 
     try {
-        const bq = getBigQueryClient();
+        bq = getBigQueryClient();
 
         // Try the live GA4 export first (most current)
         let liveRows = [];
@@ -165,9 +166,21 @@ export default async function handler(req, res) {
         return res.status(200).json(result);
 
     } catch (error) {
+        // Try to attach schema info for debugging
+        let actualColumns = null;
+        try {
+            const [schemaRows] = await bq.query({
+                query: `SELECT column_name, data_type FROM \`${PROJECT_ID}.ds24_views.INFORMATION_SCHEMA.COLUMNS\` WHERE table_name = 'signup_history_apr2026'`,
+                location: 'US',
+            });
+            actualColumns = schemaRows.map(r => `${r.column_name} (${r.data_type})`);
+        } catch (schemaErr) {
+            actualColumns = `schema lookup also failed: ${schemaErr.message}`;
+        }
         return res.status(200).json({
             status: 'error',
             error: error.message,
+            actualColumns,
             rows: [], byAdGroup: [], totals: {},
         });
     }
