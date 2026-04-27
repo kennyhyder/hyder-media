@@ -175,6 +175,27 @@
                 </form>
             </div>
 
+            <!-- Step "Set Password": shown after accepting an invite or password-reset email -->
+            <div class="step" id="step-set-password">
+                <h1>Set Your Password</h1>
+                <p class="subtitle">Choose a password for your account. You'll set up two-factor authentication next.</p>
+
+                <form id="set-password-form">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" placeholder="At least 8 characters"
+                               minlength="8" autocomplete="new-password" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password-confirm">Confirm Password</label>
+                        <input type="password" id="new-password-confirm" placeholder="Re-enter password"
+                               minlength="8" autocomplete="new-password" required>
+                    </div>
+                    <button type="submit" class="btn" id="set-password-btn">Save &amp; Continue</button>
+                    <button type="button" class="btn btn-secondary" id="logout-btn-3">Cancel &amp; Sign Out</button>
+                </form>
+            </div>
+
             <!-- Step 3: MFA enrollment (first-time setup) -->
             <div class="step" id="step-mfa-enroll">
                 <h1>Set Up Two-Factor Auth</h1>
@@ -204,6 +225,13 @@
     </div>
 
     <script>
+        // Capture the URL hash BEFORE the Supabase SDK consumes it. Invite and
+        // password-reset emails land here with #type=invite (or recovery), and
+        // we use that signal to show the "set your password" step.
+        const _initialHash = window.location.hash || '';
+        const _isInviteOrRecovery =
+            _initialHash.includes('type=invite') || _initialHash.includes('type=recovery');
+
         const SUPABASE_URL = 'https://ilbovwnhrowvxjdkvrln.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYm92d25ocm93dnhqZGt2cmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjUzMTIsImV4cCI6MjA4NDEwMTMxMn0.FKtChreOxcemcTUZqbtnk-ZkjqLHYwQFKvx_Xy35FlM';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -212,6 +240,7 @@
 
         let pendingFactorId = null;       // factor we're challenging or about to verify after enrollment
         let pendingChallengeId = null;
+        let needsPasswordSet = false;     // true after invite/recovery, until user sets a password
 
         const $ = (id) => document.getElementById(id);
         function showStep(id) {
@@ -236,7 +265,7 @@
         }
 
         // Hide alerts when user types
-        ['email', 'password', 'mfa-code', 'enroll-code'].forEach(id => {
+        ['email', 'password', 'mfa-code', 'enroll-code', 'new-password', 'new-password-confirm'].forEach(id => {
             $(id).addEventListener('input', clearAlerts);
         });
 
@@ -245,6 +274,14 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 showStep('step-login');
+                return;
+            }
+            // Invited / password-reset users land here with no usable password.
+            // Force them through the set-password step before MFA enrollment.
+            if (_isInviteOrRecovery) {
+                needsPasswordSet = true;
+                showInfo('Welcome! Please set your password to continue.');
+                showStep('step-set-password');
                 return;
             }
             // We have a session — check assurance level
@@ -414,13 +451,53 @@
             }
         });
 
+        // -------- Set Password (after invite or recovery email) --------
+        $('set-password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlerts();
+
+            const pwd = $('new-password').value;
+            const confirm = $('new-password-confirm').value;
+            if (pwd !== confirm) {
+                showError('Passwords do not match.');
+                return;
+            }
+            if (pwd.length < 8) {
+                showError('Password must be at least 8 characters.');
+                return;
+            }
+
+            const btn = $('set-password-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Saving…';
+            try {
+                const { error } = await supabase.auth.updateUser({ password: pwd });
+                if (error) throw error;
+                needsPasswordSet = false;
+                // Clear hash to avoid re-triggering invite flow on refresh
+                if (window.history?.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+                // Move on to MFA enrollment (or challenge if a factor exists)
+                await routeAfterPasswordLogin();
+            } catch (err) {
+                console.error('Set password error:', err);
+                showError(err.message || 'Could not save password.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save & Continue';
+            }
+        });
+
         // -------- Sign out from interim states --------
         async function signOutAndReset() {
             await supabase.auth.signOut();
-            window.location.reload();
+            // Drop hash + query so we don't re-enter an invite flow on reload
+            window.location.replace(window.location.pathname);
         }
         $('logout-btn-1').addEventListener('click', signOutAndReset);
         $('logout-btn-2').addEventListener('click', signOutAndReset);
+        $('logout-btn-3').addEventListener('click', signOutAndReset);
 
         bootstrap();
     </script>
