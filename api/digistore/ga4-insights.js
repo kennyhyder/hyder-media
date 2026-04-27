@@ -79,12 +79,44 @@ export default async function handler(req, res) {
 
         // Fallback: historical backfill table (always available)
         if (liveRows.length === 0) {
+            // Column names from GA4 CSV autodetect: spaces → underscores, original case preserved
+            // First, discover what columns actually exist in the table — handles either schema
+            const schemaQuery = `
+                SELECT column_name
+                FROM \`${PROJECT_ID}.ds24_views.INFORMATION_SCHEMA.COLUMNS\`
+                WHERE table_name = 'signup_history_apr2026'
+            `;
+            const [schemaJob] = await bq.createQueryJob({ query: schemaQuery, location: 'US' });
+            const [schemaRows] = await schemaJob.getQueryResults();
+            const cols = schemaRows.map(r => r.column_name);
+
+            // Map our logical names → actual column names (case-insensitive substring match)
+            const findCol = (...patterns) => {
+                for (const p of patterns) {
+                    const found = cols.find(c => c.toLowerCase() === p.toLowerCase());
+                    if (found) return found;
+                }
+                for (const p of patterns) {
+                    const found = cols.find(c => c.toLowerCase().includes(p.toLowerCase()));
+                    if (found) return found;
+                }
+                return null;
+            };
+            const adGroupCol = findCol('ad_group', 'Session_Google_Ads_ad_group_name', 'ad group name');
+            const accountTypeCol = findCol('account_type', 'Account_Type');
+            const usersCol = findCol('active_users', 'Active_users');
+            const keyEventsCol = findCol('key_events', 'Key_events');
+
+            if (!adGroupCol || !accountTypeCol || !usersCol) {
+                throw new Error(`Schema mismatch in historical table. Found columns: ${cols.join(', ')}`);
+            }
+
             const histQuery = `
                 SELECT
-                    ad_group,
-                    account_type,
-                    SUM(active_users) AS active_users,
-                    SUM(key_events) AS key_events
+                    \`${adGroupCol}\` AS ad_group,
+                    \`${accountTypeCol}\` AS account_type,
+                    SUM(\`${usersCol}\`) AS active_users,
+                    SUM(\`${keyEventsCol || usersCol}\`) AS key_events
                 FROM \`${PROJECT_ID}.${HISTORY_TABLE}\`
                 GROUP BY 1, 2
             `;
@@ -93,6 +125,7 @@ export default async function handler(req, res) {
             liveRows = rows;
             result.source = result.source || 'historical';
             result.dataAge = 'Mar 30 – Apr 26, 2026 (28d backfill)';
+            result.schemaUsed = { adGroupCol, accountTypeCol, usersCol, keyEventsCol };
         }
 
         result.rows = liveRows.map(r => ({
