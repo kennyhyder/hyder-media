@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Omicron Google Ads Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #475569;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container { width: 100%; max-width: 460px; padding: 20px; }
+
+        .login-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 48px 40px;
+            text-align: center;
+        }
+
+        .logo { margin-bottom: 24px; }
+        .logo img {
+            height: 48px; width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+
+        h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; }
+        .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 28px; }
+
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label {
+            display: block; font-size: 0.85rem; color: var(--text-secondary);
+            margin-bottom: 8px; font-weight: 500;
+        }
+        .form-group input {
+            width: 100%; padding: 14px 16px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text-primary); font-size: 1rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: var(--accent); }
+        .form-group input::placeholder { color: var(--text-secondary); }
+
+        .otp-input {
+            text-align: center;
+            font-size: 1.5rem !important;
+            letter-spacing: 8px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .alert {
+            padding: 12px 16px; border-radius: 8px;
+            font-size: 0.9rem; margin-bottom: 18px; display: none;
+            text-align: left;
+        }
+        .alert.show { display: block; }
+        .alert.error { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .alert.info  { background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent); color: var(--text-primary); }
+        .alert.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--warning); color: var(--text-primary); }
+
+        .btn {
+            width: 100%; padding: 14px 24px;
+            background: var(--accent); color: white; border: none;
+            border-radius: 8px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn:hover { background: var(--accent-hover); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+        .btn-secondary:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+        .qr-wrap {
+            background: white; padding: 16px; border-radius: 8px;
+            margin: 12px auto 18px; display: inline-block;
+        }
+        .qr-wrap img, .qr-wrap svg { display: block; max-width: 200px; height: auto; }
+
+        .secret-display {
+            background: var(--bg-tertiary); padding: 10px 14px;
+            border-radius: 6px; font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem; color: var(--text-secondary);
+            word-break: break-all; margin-bottom: 18px;
+            user-select: all;
+        }
+
+        .footer-text { margin-top: 24px; font-size: 0.8rem; color: var(--text-secondary); }
+        .footer-text a { color: var(--accent); text-decoration: none; }
+        .footer-text a:hover { text-decoration: underline; }
+
+        .step { display: none; }
+        .step.active { display: block; }
+
+        .spinner {
+            display: inline-block; width: 14px; height: 14px;
+            border: 2px solid currentColor; border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            </div>
+
+            <div class="alert error" id="alert-error"></div>
+            <div class="alert info" id="alert-info"></div>
+
+            <!-- Step 1: Email + password login -->
+            <div class="step active" id="step-login">
+                <h1>Omicron Dashboard</h1>
+                <p class="subtitle">Sign in to continue</p>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Password" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn" id="login-btn">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Step 2: MFA challenge (existing user) -->
+            <div class="step" id="step-mfa-challenge">
+                <h1>Two-Factor Verification</h1>
+                <p class="subtitle">Open your authenticator app and enter the 6-digit code.</p>
+
+                <form id="mfa-challenge-form">
+                    <div class="form-group">
+                        <label for="mfa-code">6-Digit Code</label>
+                        <input type="text" id="mfa-code" inputmode="numeric" pattern="[0-9]{6}"
+                               maxlength="6" placeholder="000000" autocomplete="one-time-code"
+                               class="otp-input" required>
+                    </div>
+                    <button type="submit" class="btn" id="mfa-challenge-btn">Verify</button>
+                    <button type="button" class="btn btn-secondary" id="logout-btn-1">Cancel &amp; Sign Out</button>
+                </form>
+            </div>
+
+            <!-- Step 3: MFA enrollment (first-time setup) -->
+            <div class="step" id="step-mfa-enroll">
+                <h1>Set Up Two-Factor Auth</h1>
+                <p class="subtitle">Scan this QR code with an authenticator app (Google Authenticator, 1Password, Authy, etc.) and enter the 6-digit code it shows.</p>
+
+                <div class="qr-wrap" id="qr-wrap"></div>
+
+                <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 8px;">Can't scan? Enter this secret manually:</p>
+                <div class="secret-display" id="secret-display">—</div>
+
+                <form id="mfa-enroll-form">
+                    <div class="form-group">
+                        <label for="enroll-code">Code from your app</label>
+                        <input type="text" id="enroll-code" inputmode="numeric" pattern="[0-9]{6}"
+                               maxlength="6" placeholder="000000" autocomplete="one-time-code"
+                               class="otp-input" required>
+                    </div>
+                    <button type="submit" class="btn" id="enroll-btn">Activate &amp; Sign In</button>
+                    <button type="button" class="btn btn-secondary" id="logout-btn-2">Cancel &amp; Sign Out</button>
+                </form>
+            </div>
+
+            <p class="footer-text">
+                Prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ilbovwnhrowvxjdkvrln.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYm92d25ocm93dnhqZGt2cmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjUzMTIsImV4cCI6MjA4NDEwMTMxMn0.FKtChreOxcemcTUZqbtnk-ZkjqLHYwQFKvx_Xy35FlM';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const NEXT_URL = new URLSearchParams(window.location.search).get('next') || 'summary.html';
+
+        let pendingFactorId = null;       // factor we're challenging or about to verify after enrollment
+        let pendingChallengeId = null;
+
+        const $ = (id) => document.getElementById(id);
+        function showStep(id) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            $(id).classList.add('active');
+        }
+        function showError(msg) {
+            const el = $('alert-error');
+            el.textContent = msg;
+            el.classList.add('show');
+            $('alert-info').classList.remove('show');
+        }
+        function showInfo(msg) {
+            const el = $('alert-info');
+            el.textContent = msg;
+            el.classList.add('show');
+            $('alert-error').classList.remove('show');
+        }
+        function clearAlerts() {
+            $('alert-error').classList.remove('show');
+            $('alert-info').classList.remove('show');
+        }
+
+        // Hide alerts when user types
+        ['email', 'password', 'mfa-code', 'enroll-code'].forEach(id => {
+            $(id).addEventListener('input', clearAlerts);
+        });
+
+        // -------- Initial state determination --------
+        async function bootstrap() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                showStep('step-login');
+                return;
+            }
+            // We have a session — check assurance level
+            await routeAfterPasswordLogin();
+        }
+
+        // Decide what to show after a successful password login (or page reload with session)
+        async function routeAfterPasswordLogin() {
+            const { data: aalData, error: aalErr } =
+                await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+            if (aalErr) {
+                showError(aalErr.message);
+                showStep('step-login');
+                return;
+            }
+
+            // Already verified at AAL2 → into the dashboard
+            if (aalData.currentLevel === 'aal2') {
+                window.location.href = NEXT_URL;
+                return;
+            }
+
+            // currentLevel = aal1. Check if user already has a verified TOTP factor.
+            const { data: factors, error: factorsErr } = await supabase.auth.mfa.listFactors();
+            if (factorsErr) {
+                showError(factorsErr.message);
+                showStep('step-login');
+                return;
+            }
+            const verifiedTotp = (factors.totp || []).find(f => f.status === 'verified');
+            if (verifiedTotp) {
+                // Existing user, has TOTP enrolled — challenge them
+                await beginMfaChallenge(verifiedTotp.id);
+            } else {
+                // No verified factor — clean up any half-enrolled factors and start enrollment
+                for (const f of (factors.totp || [])) {
+                    if (f.status !== 'verified') {
+                        try { await supabase.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
+                    }
+                }
+                await beginMfaEnrollment();
+            }
+        }
+
+        // -------- Step 1: password login --------
+        $('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlerts();
+
+            const btn = $('login-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Signing in…';
+
+            try {
+                const email = $('email').value.trim();
+                const password = $('password').value;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                await routeAfterPasswordLogin();
+            } catch (err) {
+                console.error('Login error:', err);
+                showError(err.message || 'Sign in failed.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        });
+
+        // -------- Step 2: MFA challenge (existing factor) --------
+        async function beginMfaChallenge(factorId) {
+            try {
+                const { data, error } = await supabase.auth.mfa.challenge({ factorId });
+                if (error) throw error;
+                pendingFactorId = factorId;
+                pendingChallengeId = data.id;
+                showStep('step-mfa-challenge');
+                $('mfa-code').focus();
+            } catch (err) {
+                console.error('MFA challenge error:', err);
+                showError(err.message || 'Could not start MFA challenge.');
+                showStep('step-login');
+            }
+        }
+
+        $('mfa-challenge-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlerts();
+            const btn = $('mfa-challenge-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Verifying…';
+            try {
+                const code = $('mfa-code').value.trim();
+                const { error } = await supabase.auth.mfa.verify({
+                    factorId: pendingFactorId,
+                    challengeId: pendingChallengeId,
+                    code
+                });
+                if (error) throw error;
+                window.location.href = NEXT_URL;
+            } catch (err) {
+                console.error('MFA verify error:', err);
+                showError(err.message || 'Invalid code. Try again.');
+                $('mfa-code').value = '';
+                $('mfa-code').focus();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verify';
+            }
+        });
+
+        // -------- Step 3: MFA enrollment (first time) --------
+        async function beginMfaEnrollment() {
+            try {
+                const { data, error } = await supabase.auth.mfa.enroll({
+                    factorType: 'totp',
+                    friendlyName: 'Omicron Dashboard'
+                });
+                if (error) throw error;
+                pendingFactorId = data.id;
+                pendingChallengeId = null;
+
+                // Render QR code (Supabase returns SVG markup as a data URI string; embed directly)
+                const qrWrap = $('qr-wrap');
+                qrWrap.innerHTML = '';
+                if (data.totp?.qr_code) {
+                    // qr_code is an SVG markup string
+                    qrWrap.innerHTML = data.totp.qr_code;
+                } else if (data.totp?.uri) {
+                    qrWrap.innerHTML = `<a href="${data.totp.uri}" style="color:#0f172a;">${data.totp.uri}</a>`;
+                }
+                $('secret-display').textContent = data.totp?.secret || '—';
+                showStep('step-mfa-enroll');
+                $('enroll-code').focus();
+            } catch (err) {
+                console.error('MFA enrollment error:', err);
+                showError(err.message || 'Could not start MFA enrollment.');
+                showStep('step-login');
+            }
+        }
+
+        $('mfa-enroll-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlerts();
+            const btn = $('enroll-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Activating…';
+            try {
+                const code = $('enroll-code').value.trim();
+                // Create a challenge for the freshly enrolled factor, then verify
+                const challenge = await supabase.auth.mfa.challenge({ factorId: pendingFactorId });
+                if (challenge.error) throw challenge.error;
+                const { error: verifyErr } = await supabase.auth.mfa.verify({
+                    factorId: pendingFactorId,
+                    challengeId: challenge.data.id,
+                    code
+                });
+                if (verifyErr) throw verifyErr;
+                window.location.href = NEXT_URL;
+            } catch (err) {
+                console.error('MFA enrollment verify error:', err);
+                showError(err.message || 'That code didn\'t match. Try again.');
+                $('enroll-code').value = '';
+                $('enroll-code').focus();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Activate & Sign In';
+            }
+        });
+
+        // -------- Sign out from interim states --------
+        async function signOutAndReset() {
+            await supabase.auth.signOut();
+            window.location.reload();
+        }
+        $('logout-btn-1').addEventListener('click', signOutAndReset);
+        $('logout-btn-2').addEventListener('click', signOutAndReset);
+
+        bootstrap();
+    </script>
+</body>
+</html>

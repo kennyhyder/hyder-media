@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Ads Performance Dashboard</title>
-    <script>
-        (function() {
-            const AUTH_KEY = 'omicron_dashboard_auth';
-            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
-                window.location.href = 'password.html';
-            }
-        })();
-    </script>
+    <!-- Supabase Auth gate — requires AAL2 (MFA-verified) session -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-check.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>

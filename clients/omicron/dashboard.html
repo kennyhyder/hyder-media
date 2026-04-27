@@ -301,17 +301,11 @@
             --sku-8: #bbf7d0;
         }
     </style>
+    <!-- Supabase Auth gate — requires AAL2 (MFA-verified) session -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-check.js"></script>
 </head>
 <body>
-    <!-- Auth Check -->
-    <script>
-        (function() {
-            const AUTH_KEY = 'omicron_dashboard_auth';
-            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
-                window.location.href = 'password.html';
-            }
-        })();
-    </script>
 
     <!-- Navigation -->
     <nav class="main-nav">
@@ -323,6 +317,7 @@
             <a href="summary.html" class="nav-link">Summary</a>
             <a href="dashboard.html" class="nav-link active">Dashboard</a>
             <a href="legacy-dashboard.html" class="nav-link">Legacy View</a>
+            <a href="#" class="nav-link" onclick="event.preventDefault(); window.omicronSignOut();">Sign Out</a>
         </div>
     </nav>
 
