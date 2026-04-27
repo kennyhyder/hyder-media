@@ -248,6 +248,19 @@
             white-space: nowrap;
         }
         tr:hover td { background: rgba(59,130,246,0.05); }
+
+        /* Accordion in campaigns table */
+        tr.campaign-row { cursor: pointer; }
+        tr.campaign-row td:first-child { color: var(--text-secondary); transition: transform 0.15s; }
+        tr.campaign-row.expanded td:first-child { color: var(--accent); }
+        tr.adgroup-row { background: rgba(255,255,255,0.015); font-size: 0.8rem; }
+        tr.adgroup-row td { padding-left: 32px; color: var(--text-secondary); }
+        tr.adgroup-row td:first-child { padding-left: 16px; }
+        tr.adgroup-row.first-of-campaign td { border-top: 1px solid rgba(71,85,105,0.4); }
+        .ag-name { color: var(--text-primary); font-style: italic; }
+        td.vendor { color: var(--success); font-weight: 600; }
+        td.affiliate { color: var(--accent); font-weight: 600; }
+        td.vendor.zero, td.affiliate.zero { color: var(--text-secondary); font-weight: normal; }
         /* Right-align numeric columns in search terms and keywords tables */
         #searchTermsTable th:not(:first-child),
         #searchTermsTable td:not(:first-child),
@@ -589,20 +602,23 @@
             <div class="export-bar">
                 <button class="btn" onclick="exportCampaignsCSV()">Export CSV</button>
             </div>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">Click any campaign to expand its ad groups. Vendor / Affiliate columns from GA4.</p>
             <div class="table-wrapper">
                 <table id="campaignTable">
                     <thead>
                         <tr>
+                            <th style="width:24px;"></th>
                             <th data-sort="name">Campaign</th>
-                            <th data-sort="status">Status</th>
                             <th data-sort="spend" class="sorted">Spend</th>
                             <th data-sort="impressions">Impr</th>
                             <th data-sort="clicks">Clicks</th>
                             <th data-sort="ctr">CTR</th>
                             <th data-sort="cpc">Avg CPC</th>
                             <th data-sort="conversions">Conv</th>
-                            <th data-sort="convRate">Conv Rate</th>
+                            <th data-sort="convRate">CR</th>
                             <th data-sort="cpa">Cost / Conv</th>
+                            <th data-sort="vendor">Vendor</th>
+                            <th data-sort="affiliate">Affiliate</th>
                         </tr>
                     </thead>
                     <tbody id="campaignBody"></tbody>
@@ -812,6 +828,8 @@ let kwSortDir = -1;
 let kwMatchFilter = '';
 let kwSearchFilter = '';
 let ga4Data = null;
+let adGroupData = null;
+let expandedCampaigns = new Set();
 
 const API_BASE = '/api/digistore';
 
@@ -861,9 +879,10 @@ async function loadAllData() {
     const trendParam = trendGranularity; // 'daily' or 'monthly'
 
     try {
-        const [summaryRes, campaignRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
+        const [summaryRes, campaignRes, agRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=adgroup`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/search-terms?days=${currentDays}&limit=100`).then(r => r.json()).catch(() => null),
@@ -879,11 +898,13 @@ async function loadAllData() {
         const stOk = stRes?.status === 'success' && Array.isArray(stRes.terms);
         const kwOk = kwRes?.status === 'success' && Array.isArray(kwRes.keywords);
         const ga4Ok = ga4Res?.status === 'success' && Array.isArray(ga4Res.byAdGroup);
+        const agOk = agRes?.status === 'success' && Array.isArray(agRes.adGroups);
 
         if (summaryOk) {
             isDemo = false;
             performanceData = summaryRes.summary;
             campaignData = campaignOk ? campaignRes.campaigns : [];
+            adGroupData = agOk ? agRes.adGroups : [];
             trendData = trendOk ? trendRes[trendParam] : [];
             adsData = adsOk ? adsRes : null;
             searchTermsData = stOk ? stRes.terms : [];
@@ -1294,25 +1315,95 @@ function renderCharts() {
 }
 
 // ===== Render Campaigns =====
+// Build a campaign-name → {vendor, affiliate} lookup from GA4 data
+function buildGA4ByCampaign() {
+    const ADGROUP_TO_CAMPAIGN = {
+        'Competitor Brand - Clickbank': 'Competitors | US',
+        'Digistore24 vs Clickbank': 'Competitors | US',
+        'Clickbank vs Competitor': 'Competitors | US',
+        'Sell Digital Products': 'Nonbrand | Sell Online | US',
+        'Sell Ebooks': 'Nonbrand | Sell Online | US',
+        'Sell Online Courses': 'Nonbrand | Sell Online | US',
+        'Supplements': 'Nonbrand | Niche Specific | US',
+        'Coaching Courses': 'Nonbrand | Niche Specific | US',
+        'Digistore24 US Brand Main': 'Brand Digistore24 US',
+        'Digital Products Marketplace': 'Nonbrand | Digital Products | US',
+        'Digital Products Store': 'Nonbrand | Digital Products | US',
+    };
+    const SLUG_TO_ADGROUP = {
+        'clickbank-brand': 'Competitor Brand - Clickbank',
+        'ds24-vs-clickbank': 'Digistore24 vs Clickbank',
+        'clickbank-vs-competitor': 'Clickbank vs Competitor',
+        'sell-digital-products': 'Sell Digital Products',
+        'sell-ebooks': 'Sell Ebooks',
+        'sell-online-courses': 'Sell Online Courses',
+        'supplements': 'Supplements',
+        'brand-main': 'Digistore24 US Brand Main',
+        'digital-marketplace': 'Digital Products Marketplace',
+        'digital-store': 'Digital Products Store',
+        'coaching-courses': 'Coaching Courses',
+    };
+    const out = {};
+    if (!ga4Data || !ga4Data.byAdGroup) return out;
+    for (const ag of ga4Data.byAdGroup) {
+        const adGroupName = SLUG_TO_ADGROUP[ag.ad_group] || ag.ad_group;
+        const camp = ADGROUP_TO_CAMPAIGN[adGroupName];
+        if (!camp) continue;
+        if (!out[camp]) out[camp] = { vendor: 0, affiliate: 0 };
+        out[camp].vendor += ag.vendor || 0;
+        out[camp].affiliate += ag.affiliate || 0;
+    }
+    // Also expose per-ad-group vendor/affiliate for the accordion rows
+    out._byAdGroupName = {};
+    for (const ag of ga4Data.byAdGroup) {
+        const name = SLUG_TO_ADGROUP[ag.ad_group] || ag.ad_group;
+        out._byAdGroupName[name] = { vendor: ag.vendor || 0, affiliate: ag.affiliate || 0 };
+    }
+    return out;
+}
+
 function renderCampaigns() {
     const tbody = document.getElementById('campaignBody');
     if (!campaignData || campaignData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
         return;
     }
 
-    const sorted = [...campaignData].sort((a, b) => {
+    const ga4ByCampaign = buildGA4ByCampaign();
+
+    // Decorate campaigns with GA4 totals + sort
+    const decorated = campaignData.map(c => ({
+        ...c,
+        vendor: ga4ByCampaign[c.name]?.vendor || 0,
+        affiliate: ga4ByCampaign[c.name]?.affiliate || 0,
+    }));
+
+    const sorted = [...decorated].sort((a, b) => {
         const av = a[campaignSortKey], bv = b[campaignSortKey];
         if (typeof av === 'string') return campaignSortDir * av.localeCompare(bv);
-        return campaignSortDir * (av - bv);
+        return campaignSortDir * ((av || 0) - (bv || 0));
     });
 
-    tbody.innerHTML = sorted.map(c => {
-        const statusClass = c.status === 'ENABLED' ? 'enabled' : 'paused';
+    // Group ad groups by campaign for accordion rows
+    const agByCampaign = {};
+    if (adGroupData) {
+        for (const ag of adGroupData) {
+            if (!agByCampaign[ag.campaign]) agByCampaign[ag.campaign] = [];
+            agByCampaign[ag.campaign].push(ag);
+        }
+        for (const k of Object.keys(agByCampaign)) {
+            agByCampaign[k].sort((a, b) => b.spend - a.spend);
+        }
+    }
+
+    const html = [];
+    for (const c of sorted) {
         const convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
-        return `<tr>
+        const isExpanded = expandedCampaigns.has(c.name);
+        const caret = isExpanded ? '▾' : '▸';
+        html.push(`<tr class="campaign-row ${isExpanded ? 'expanded' : ''}" data-campaign="${esc(c.name)}">
+            <td>${caret}</td>
             <td>${esc(c.name)}</td>
-            <td><span class="status-dot ${statusClass}"></span>${c.status === 'ENABLED' ? 'Active' : 'Paused'}</td>
             <td>${fmt(c.spend, '$')}</td>
             <td>${fmt(c.impressions, 'n')}</td>
             <td>${fmt(c.clicks, 'n')}</td>
@@ -1321,8 +1412,47 @@ function renderCampaigns() {
             <td>${fmt(c.conversions, 'f1')}</td>
             <td>${fmt(convRate, '%')}</td>
             <td>${c.cpa > 0 ? fmt(c.cpa, '$') : '—'}</td>
-        </tr>`;
-    }).join('');
+            <td class="vendor ${c.vendor === 0 ? 'zero' : ''}">${c.vendor || '—'}</td>
+            <td class="affiliate ${c.affiliate === 0 ? 'zero' : ''}">${c.affiliate || '—'}</td>
+        </tr>`);
+
+        if (isExpanded) {
+            const ags = agByCampaign[c.name] || [];
+            if (ags.length === 0) {
+                html.push(`<tr class="adgroup-row first-of-campaign"><td></td><td colspan="11" style="text-align:left;padding:8px 16px;color:var(--text-secondary);font-style:italic;">No ad groups with activity in this date range</td></tr>`);
+            } else {
+                ags.forEach((ag, idx) => {
+                    const agCR = ag.clicks > 0 ? ag.conversions / ag.clicks : 0;
+                    const agGA4 = ga4ByCampaign._byAdGroupName?.[ag.adGroup] || { vendor: 0, affiliate: 0 };
+                    html.push(`<tr class="adgroup-row ${idx === 0 ? 'first-of-campaign' : ''}">
+                        <td></td>
+                        <td><span class="ag-name">↳ ${esc(ag.adGroup)}</span></td>
+                        <td>${fmt(ag.spend, '$')}</td>
+                        <td>${fmt(ag.impressions, 'n')}</td>
+                        <td>${fmt(ag.clicks, 'n')}</td>
+                        <td>${fmt(ag.ctr, '%')}</td>
+                        <td>${fmt(ag.cpc, '$')}</td>
+                        <td>${fmt(ag.conversions, 'f1')}</td>
+                        <td>${fmt(agCR, '%')}</td>
+                        <td>${ag.cpa > 0 ? fmt(ag.cpa, '$') : '—'}</td>
+                        <td class="vendor ${agGA4.vendor === 0 ? 'zero' : ''}">${agGA4.vendor || '—'}</td>
+                        <td class="affiliate ${agGA4.affiliate === 0 ? 'zero' : ''}">${agGA4.affiliate || '—'}</td>
+                    </tr>`);
+                });
+            }
+        }
+    }
+    tbody.innerHTML = html.join('');
+
+    // Wire up accordion toggle
+    tbody.querySelectorAll('tr.campaign-row').forEach(row => {
+        row.addEventListener('click', () => {
+            const camp = row.dataset.campaign;
+            if (expandedCampaigns.has(camp)) expandedCampaigns.delete(camp);
+            else expandedCampaigns.add(camp);
+            renderCampaigns();
+        });
+    });
 }
 
 // Table sorting
@@ -1343,14 +1473,17 @@ document.querySelectorAll('#campaignTable th[data-sort]').forEach(th => {
 
 function exportCampaignsCSV() {
     if (!campaignData || campaignData.length === 0) return;
-    const headers = ['Campaign','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv'];
+    const ga4ByCampaign = buildGA4ByCampaign();
+    const headers = ['Campaign','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv','Vendor Signups','Affiliate Signups'];
     const rows = campaignData.map(c => {
         const convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
+        const ga4 = ga4ByCampaign[c.name] || { vendor: 0, affiliate: 0 };
         return [
             c.name, c.status, c.spend.toFixed(2), c.impressions, c.clicks,
             (c.ctr*100).toFixed(2)+'%', c.cpc.toFixed(2),
             c.conversions.toFixed(1), (convRate*100).toFixed(2)+'%',
             c.cpa > 0 ? c.cpa.toFixed(2) : '',
+            ga4.vendor, ga4.affiliate,
         ];
     });
     const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');

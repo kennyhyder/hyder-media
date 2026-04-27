@@ -3,7 +3,8 @@
  * GET /api/digistore/performance
  *
  * Fetches metrics for Digistore24 (246-624-6400)
- * Supports ?days=30 (default) and ?breakdown=summary|campaign|monthly|daily
+ * Supports ?days=30 (default) and ?breakdown=summary|campaign|adgroup|monthly|daily
+ * All campaign-level filters use ENABLED only — paused campaigns excluded.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -95,6 +96,8 @@ export default async function handler(req, res) {
 
         if (breakdown === 'campaign') {
             result.campaigns = await fetchCampaignBreakdown(headers, dateRange);
+        } else if (breakdown === 'adgroup') {
+            result.adGroups = await fetchAdGroupBreakdown(headers, dateRange);
         } else if (breakdown === 'monthly') {
             result.monthly = await fetchMonthlyMetrics(headers, dateRange);
         } else if (breakdown === 'daily') {
@@ -174,7 +177,7 @@ async function fetchCampaignBreakdown(headers, dateRange) {
             metrics.cost_per_conversion
         FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
-            AND campaign.status != 'REMOVED'
+            AND campaign.status = 'ENABLED'
         ORDER BY metrics.cost_micros DESC
     `;
 
@@ -226,7 +229,7 @@ async function fetchMonthlyMetrics(headers, dateRange) {
             metrics.conversions_value
         FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
-            AND campaign.status != 'REMOVED'
+            AND campaign.status = 'ENABLED'
         ORDER BY segments.month ASC
     `;
 
@@ -305,6 +308,63 @@ async function fetchDailyMetrics(headers, dateRange) {
             cpc: clicks > 0 ? spend / clicks : 0,
             cpa: conversions > 0 ? spend / conversions : 0,
             roas: spend > 0 ? conversionValue / spend : 0,
+        };
+    });
+}
+
+async function fetchAdGroupBreakdown(headers, dateRange) {
+    const query = `
+        SELECT
+            campaign.id,
+            campaign.name,
+            ad_group.id,
+            ad_group.name,
+            ad_group.status,
+            metrics.cost_micros,
+            metrics.clicks,
+            metrics.impressions,
+            metrics.conversions,
+            metrics.conversions_value
+        FROM ad_group
+        WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
+            AND campaign.status = 'ENABLED'
+            AND ad_group.status != 'REMOVED'
+        ORDER BY metrics.cost_micros DESC
+    `;
+
+    const response = await fetch(
+        `https://googleads.googleapis.com/v23/customers/${CUSTOMER_ID}/googleAds:search`,
+        { method: 'POST', headers, body: JSON.stringify({ query }) }
+    );
+
+    const data = await response.json();
+    if (data.error) return { error: data.error.message };
+
+    return (data.results || []).map(row => {
+        const c = row.campaign || {};
+        const ag = row.adGroup || {};
+        const m = row.metrics || {};
+        const spend = parseFloat(m.costMicros || 0) / 1000000;
+        const clicks = parseInt(m.clicks || 0, 10);
+        const impressions = parseInt(m.impressions || 0, 10);
+        const conversions = parseFloat(m.conversions || 0);
+        const conversionValue = parseFloat(m.conversionsValue || 0);
+
+        return {
+            campaignId: c.id,
+            campaign: c.name,
+            adGroupId: ag.id,
+            adGroup: ag.name,
+            status: ag.status,
+            spend,
+            clicks,
+            impressions,
+            conversions,
+            conversionValue,
+            cpc: clicks > 0 ? spend / clicks : 0,
+            ctr: impressions > 0 ? clicks / impressions : 0,
+            cpa: conversions > 0 ? spend / conversions : 0,
+            convRate: clicks > 0 ? conversions / clicks : 0,
         };
     });
 }

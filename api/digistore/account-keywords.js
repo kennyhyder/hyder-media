@@ -96,6 +96,7 @@ export default async function handler(req, res) {
             FROM keyword_view
             WHERE segments.date BETWEEN '${start}' AND '${end}'
                 AND ad_group_criterion.status != 'REMOVED'
+                AND campaign.status = 'ENABLED'
             ORDER BY metrics.cost_micros DESC
         `;
 

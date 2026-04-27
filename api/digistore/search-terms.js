@@ -93,6 +93,7 @@ export default async function handler(req, res) {
                 metrics.conversions_value
             FROM search_term_view
             WHERE segments.date BETWEEN '${start}' AND '${end}'
+                AND campaign.status = 'ENABLED'
             ORDER BY metrics.cost_micros DESC
         `;
 
