@@ -752,7 +752,7 @@
                                 <th class="bd-sort-th" data-field="convRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Conv Rate</th>
                                 <th class="bd-sort-th" data-field="rankDomain" style="padding: 8px; cursor: pointer; user-select: none;">Organic #1</th>
                                 <th class="bd-sort-th" data-field="gaConvRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="GA4 organic-search conversion rate (purchase events / sessions, default 180-day window) on the Organic #1 landing page. Only available for the 7 owned domains with GA4 access.">Org CVR</th>
-                                <th class="bd-sort-th" data-field="cvrDelta" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="Organic CVR minus paid CVR, in percentage points. Green = organic converts better than paid (paid spend may be cannibalizing). Red = organic converts worse than paid (paid is doing real work).">Δ</th>
+                                <th class="bd-sort-th" data-field="cvrDelta" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="Relative change in conversion rate from paid LP to organic rank-1 page: (organic − paid) / paid × 100. Green = organic converts better than paid (paid spend may be cannibalizing). Red = organic converts worse than paid (paid is doing real work).">CVR Δ</th>
                                 <th class="bd-sort-th" data-field="match" style="padding: 8px; cursor: pointer; user-select: none;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
                             </tr>
                         </thead>
@@ -2011,7 +2011,9 @@
                 case 'cvrDelta': {
                     const g = row._gaConv;
                     if (!g || g.unmapped || g.error || g.sessions == null || g.sessions === 0) return -Infinity;
-                    return (g.convRate || 0) - (row.convRate || 0);
+                    const paid = row.convRate || 0;
+                    if (paid <= 0) return -Infinity;
+                    return ((g.convRate || 0) - paid) / paid;
                 }
                 case 'match': {
                     // Order: exact, portfolio, external, unranked
@@ -2058,10 +2060,11 @@
         // these stays within the Omicron portfolio regardless of which ad
         // account bid on the keyword. Sourced from ACCOUNT_CONFIG in
         // api/google-ads/omicron-branded-keywords.js.
+        // Usenet portfolio only — Privado (VPN) excluded from Brand Defense scope
         const OMICRON_PORTFOLIO_DOMAINS = [
             'eweka.nl', 'easynews.com', 'newshosting.com', 'usenetserver.com',
             'tweaknews.eu', 'pureusenet.nl', 'sunnyusenet.com',
-            'bestusenetreviews.com', 'top10usenet.com', 'privadovpn.com'
+            'bestusenetreviews.com', 'top10usenet.com'
         ];
 
         // Normalise a domain for comparison (strip www + trailing slash)
@@ -2122,7 +2125,7 @@
         // some accounts errored in the main dashboard fetch.
         const BD_ACCOUNT_NAMES = [
             'BUR', 'Top10usenet', 'Eweka', 'Easynews', 'Newshosting',
-            'UsenetServer', 'Tweak', 'Pure', 'Sunny', 'Privado'
+            'UsenetServer', 'Tweak', 'Pure', 'Sunny'
         ];
 
         function populateBrandDefenseAccountFilter() {
@@ -2372,10 +2375,21 @@
                 const rank = r._rank;
                 const rankDomain = rank?.top_domain || '';
                 const rankUrl = rank?.top_url || '';
+                // Display URL: domain + path (drop https:// and www. for compactness)
+                let rankDisplay = '';
+                if (rankUrl) {
+                    try {
+                        const u = new URL(rankUrl);
+                        const path = (u.pathname || '/') + (u.search || '');
+                        rankDisplay = u.hostname.replace(/^www\./, '') + (path === '/' ? '' : path);
+                    } catch (_) {
+                        rankDisplay = rankDomain;
+                    }
+                }
                 const rankCell = rank
                     ? (rank.error
                         ? `<span class="text-muted" title="${escapeHtml(rank.error)}">error</span>`
-                        : `<a href="${escapeHtml(rankUrl)}" target="_blank" rel="noopener" style="color: #3b82f6;">${escapeHtml(rankDomain)}</a>`)
+                        : `<a href="${escapeHtml(rankUrl)}" target="_blank" rel="noopener" style="color: #3b82f6; max-width: 360px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;" title="${escapeHtml(rankUrl)}">${escapeHtml(rankDisplay)}</a>`)
                     : '<span class="text-muted">—</span>';
 
                 let matchCell;
@@ -2407,12 +2421,15 @@
                         const color = pct >= 5 ? '#22c55e' : pct >= 1 ? '#eab308' : '#94a3b8';
                         gaCell = `<span style="color: ${color}; font-weight: 500;" title="${formatNumber(ga.purchases)} purchases / ${formatNumber(ga.sessions)} organic sessions over ${gaWindowDays}d">${pct.toFixed(2)}%</span>`;
 
-                        // Delta: organic minus paid, in percentage points
+                        // Delta: relative % change from paid CVR to organic CVR
+                        // (organic - paid) / paid × 100. Edge case: paid=0 → not computable.
                         const paidPct = (r.convRate || 0) * 100;
-                        const delta = pct - paidPct;
-                        const sign = delta > 0 ? '+' : delta < 0 ? '−' : '';
-                        const dColor = delta > 0 ? '#22c55e' : delta < 0 ? '#ef4444' : '#94a3b8';
-                        deltaCell = `<span style="color: ${dColor}; font-weight: 500;" title="Organic ${pct.toFixed(2)}% − Paid ${paidPct.toFixed(2)}%">${sign}${Math.abs(delta).toFixed(2)}pp</span>`;
+                        if (paidPct > 0) {
+                            const relDelta = ((pct - paidPct) / paidPct) * 100;
+                            const sign = relDelta > 0 ? '+' : relDelta < 0 ? '−' : '';
+                            const dColor = relDelta > 0 ? '#22c55e' : relDelta < 0 ? '#ef4444' : '#94a3b8';
+                            deltaCell = `<span style="color: ${dColor}; font-weight: 500;" title="Paid ${paidPct.toFixed(2)}% → Organic ${pct.toFixed(2)}% (${(pct - paidPct).toFixed(2)}pp absolute)">${sign}${Math.abs(relDelta).toFixed(2)}%</span>`;
+                        }
                     }
                 } else if (gaState === 'loading') {
                     gaCell = '<span class="text-muted">…</span>';
@@ -2496,7 +2513,7 @@
                 alert('No keywords loaded.');
                 return;
             }
-            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification','GA4_OrgSessions','GA4_OrgPurchases','GA4_OrgConvRate','CvrDelta_pp'];
+            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification','GA4_OrgSessions','GA4_OrgPurchases','GA4_OrgConvRate','CvrDelta_RelPct'];
             const lines = [header.join(',')];
             for (const r of brandDefenseData.keywords) {
                 const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
@@ -2508,8 +2525,8 @@
                 const gaPurchases = ga && !ga.unmapped && !ga.error ? (ga.purchases ?? '') : '';
                 const gaRate = ga && !ga.unmapped && !ga.error && ga.convRate != null
                     ? (ga.convRate * 100).toFixed(2) + '%' : '';
-                const cvrDelta = ga && !ga.unmapped && !ga.error && ga.sessions > 0 && ga.convRate != null
-                    ? (((ga.convRate - r.convRate) * 100).toFixed(2)) : '';
+                const cvrDelta = ga && !ga.unmapped && !ga.error && ga.sessions > 0 && ga.convRate != null && r.convRate > 0
+                    ? (((ga.convRate - r.convRate) / r.convRate * 100).toFixed(2) + '%') : '';
                 lines.push([
                     csvEscape(r.keyword),
                     csvEscape(r.account),

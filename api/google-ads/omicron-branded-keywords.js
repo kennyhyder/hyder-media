@@ -14,6 +14,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Brand Defense scope is the usenet portfolio only — Privado (VPN) is excluded
+// since the brand-bidding question is about usenet-property cannibalization.
 const ACCOUNT_CONFIG = [
     { id: '7079118680', name: 'Eweka', mcc: '8086957043', color: '#22c55e', group: 'owned', ownedDomain: 'eweka.nl' },
     { id: '5380661321', name: 'Easynews', mcc: '8086957043', color: '#f59e0b', group: 'owned', ownedDomain: 'easynews.com' },
@@ -24,7 +26,6 @@ const ACCOUNT_CONFIG = [
     { id: '8908689985', name: 'Sunny', mcc: '8086957043', color: '#eab308', group: 'owned', ownedDomain: 'sunnyusenet.com' },
     { id: '4413390727', name: 'BUR', mcc: '6736988718', color: '#3b82f6', group: 'review', ownedDomain: 'bestusenetreviews.com' },
     { id: '1478467425', name: 'Top10usenet', mcc: '1478467425', color: '#ec4899', group: 'review', ownedDomain: 'top10usenet.com' },
-    { id: '6759792960', name: 'Privado', mcc: '2031897556', color: '#10b981', group: 'owned', ownedDomain: 'privadovpn.com' },
 ];
 
 const BRAND_PATTERNS = [
