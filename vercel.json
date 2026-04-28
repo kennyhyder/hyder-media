@@ -14,6 +14,7 @@
     "api/digistore/**/*.js": { "maxDuration": 30 },
     "api/meta-ads/**/*.js": { "maxDuration": 30 },
     "api/serp/**/*.js": { "maxDuration": 60 },
-    "api/gbp/**/*.js": { "maxDuration": 30 }
+    "api/gbp/**/*.js": { "maxDuration": 30 },
+    "api/ga4/**/*.js": { "maxDuration": 60 }
   }
 }

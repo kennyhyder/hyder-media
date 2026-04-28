@@ -653,7 +653,9 @@
                             <option value="unranked">Unranked only</option>
                         </select>
                     </label>
-                    <div style="flex: 1;"></div>
+                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                        <div id="bd-ga4-status" style="display: none; font-size: 0.85rem; padding: 8px 12px;"></div>
+                    </div>
                     <button class="btn btn-primary btn-sm" id="bd-run-rank-btn" onclick="runBrandDefenseRankCheck()" style="align-self: flex-end;" title="Load the latest rank data from the Supabase cache. To refresh the cache itself, run: node scripts/check-brand-ranks.mjs from your local machine (DDG blocks Vercel IPs).">
                         Reload Rank Data
                     </button>
@@ -731,11 +733,12 @@
                                 <th class="bd-sort-th" data-field="cpa" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">CPA</th>
                                 <th class="bd-sort-th" data-field="convRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Conv Rate</th>
                                 <th class="bd-sort-th" data-field="rankDomain" style="padding: 8px; cursor: pointer; user-select: none;">Organic #1</th>
+                                <th class="bd-sort-th" data-field="gaConvRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="GA4 organic-search conversion rate (purchase events / sessions, default 180-day window) on the Organic #1 landing page. Only available for the 7 owned domains with GA4 access.">Org Conv Rate</th>
                                 <th class="bd-sort-th" data-field="match" style="padding: 8px; cursor: pointer; user-select: none;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
                             </tr>
                         </thead>
                         <tbody id="bd-tbody">
-                            <tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">
+                            <tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">
                                 Select a date range above, then the keyword table will load.
                             </td></tr>
                         </tbody>
@@ -1948,6 +1951,11 @@
         let brandDefenseRanks = new Map();  // keyword (lowercase) -> rank result
         let brandDefenseLoading = false;
 
+        // GA4 organic-conversion-rate state
+        let gaConvByUrl = new Map();        // top_url -> {sessions, purchases, convRate, unmapped?, error?}
+        let gaState = 'idle';               // 'idle' | 'loading' | 'loaded' | 'unauthenticated' | 'error'
+        let gaWindowDays = 180;             // matches API default; configurable via UI later if needed
+
         // Table sort state — default: savings (portfolio) descending
         let bdSortField = 'savingsPortfolio';
         let bdSortDir = 'desc';
@@ -1976,6 +1984,11 @@
                 case 'cpa': return row.cpa || 0;
                 case 'convRate': return row.convRate || 0;
                 case 'rankDomain': return (row._rank?.top_domain || '').toLowerCase();
+                case 'gaConvRate': {
+                    const g = row._gaConv;
+                    if (!g || g.unmapped || g.error || g.sessions == null || g.sessions === 0) return -1;
+                    return g.convRate || 0;
+                }
                 case 'match': {
                     // Order: exact, portfolio, external, unranked
                     const order = { exact: 0, portfolio: 1, external: 2 };
@@ -2105,7 +2118,7 @@
             const account = document.getElementById('bd-account-filter').value;
 
             const tbody = document.getElementById('bd-tbody');
-            tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">Loading branded keywords…</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">Loading branded keywords…</td></tr>`;
 
             brandDefenseLoading = true;
             brandDefenseData = null;
@@ -2126,11 +2139,15 @@
                 // so users see cached results immediately without clicking "Run Rank Check"
                 await preloadCachedRanks();
 
+                // Pull GA4 organic conversion rates for the rank-1 URLs (non-blocking).
+                // Re-renders incrementally when it lands.
+                fetchGaConvRates();
+
                 renderBrandDefenseTable();
                 updateBrandDefenseSummary();
             } catch (err) {
                 console.error('Brand defense load failed:', err);
-                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed to load: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed to load: ${err.message}</td></tr>`;
             } finally {
                 brandDefenseLoading = false;
             }
@@ -2164,6 +2181,84 @@
         // Alias for the initial tab-open load
         const preloadCachedRanks = loadBrandDefenseRanks;
 
+        // Fetch GA4 organic-search conversion rate for each unique rank-1 URL.
+        // Non-blocking — re-renders the table when results land. Caches in memory.
+        async function fetchGaConvRates() {
+            const rankedUrls = new Set();
+            for (const v of brandDefenseRanks.values()) {
+                if (v?.top_url && !v.error) rankedUrls.add(v.top_url);
+            }
+            const toFetch = [...rankedUrls].filter(u => !gaConvByUrl.has(u));
+            if (toFetch.length === 0) {
+                updateGaConnectStatus();
+                return;
+            }
+            gaState = 'loading';
+            updateGaConnectStatus();
+
+            try {
+                const response = await fetch('/api/ga4/landing-page-conversions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ urls: toFetch, days: gaWindowDays })
+                });
+                const data = await response.json();
+
+                if (data?.authenticated === false) {
+                    gaState = 'unauthenticated';
+                    for (const url of toFetch) gaConvByUrl.set(url, null);
+                    updateGaConnectStatus();
+                    renderBrandDefenseTable();
+                    return;
+                }
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                gaWindowDays = data.days || gaWindowDays;
+                for (const url of toFetch) {
+                    const r = data.results?.[url];
+                    if (!r) { gaConvByUrl.set(url, null); continue; }
+                    if (r.unmapped) { gaConvByUrl.set(url, { unmapped: true }); continue; }
+                    if (r.error) { gaConvByUrl.set(url, { error: r.error }); continue; }
+                    gaConvByUrl.set(url, {
+                        sessions: r.sessions || 0,
+                        purchases: r.purchases || 0,
+                        convRate: r.convRate
+                    });
+                }
+                gaState = 'loaded';
+                updateGaConnectStatus();
+                renderBrandDefenseTable();
+            } catch (err) {
+                console.error('GA4 conv-rate fetch failed:', err);
+                gaState = 'error';
+                updateGaConnectStatus(err.message);
+            }
+        }
+
+        // Show / hide the "Connect GA4" CTA in the filters row based on gaState
+        function updateGaConnectStatus() {
+            const el = document.getElementById('bd-ga4-status');
+            if (!el) return;
+            if (gaState === 'unauthenticated') {
+                el.innerHTML = `
+                    <a href="/api/ga4/auth?returnUrl=${encodeURIComponent('/clients/omicron/dashboard.html#brand-defense')}"
+                       class="btn btn-secondary btn-sm" style="text-decoration: none;">
+                        Connect GA4 to populate Org Conv Rate
+                    </a>`;
+                el.style.display = '';
+            } else if (gaState === 'loading') {
+                el.textContent = 'Loading GA4 organic conversion rates…';
+                el.style.color = 'var(--text-secondary)';
+                el.style.display = '';
+            } else if (gaState === 'error') {
+                el.textContent = 'GA4 fetch failed — see browser console';
+                el.style.color = '#ef4444';
+                el.style.display = '';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
         async function runBrandDefenseRankCheck() {
             if (!brandDefenseData?.keywords?.length) {
                 alert('Load keywords first.');
@@ -2181,6 +2276,8 @@
             progressLabel.textContent = 'Loading rank data from cache…';
 
             const { fromCache, missing } = await loadBrandDefenseRanks();
+            // Refresh GA4 rates for any newly-discovered URLs
+            fetchGaConvRates();
             progressBar.style.width = '100%';
             if (missing > 0) {
                 progressLabel.textContent =
@@ -2204,12 +2301,12 @@
         function renderBrandDefenseTable() {
             const tbody = document.getElementById('bd-tbody');
             if (!brandDefenseData?.keywords?.length) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">No branded keywords in this date range.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">No branded keywords in this date range.</td></tr>`;
                 return;
             }
 
             const allRows = [...brandDefenseData.keywords];
-            // Enrich with rank + match classification + savings
+            // Enrich with rank + match classification + savings + GA4 conv rate
             for (const r of allRows) {
                 const key = r.keyword.toLowerCase();
                 const rank = brandDefenseRanks.get(key);
@@ -2220,6 +2317,9 @@
                 // Portfolio savings ≥ exact savings. Store both for sorting/summary.
                 r._savingsExact = r._matchType === 'exact' ? r.cost : 0;
                 r._savingsPortfolio = (r._matchType === 'exact' || r._matchType === 'portfolio') ? r.cost : 0;
+                // GA4 organic-search conversion rate for the rank-1 page
+                const url = rank?.top_url;
+                r._gaConv = url ? (gaConvByUrl.get(url) || null) : null;
             }
 
             // Apply match-type filter
@@ -2240,7 +2340,7 @@
             updateBdSortIndicators();
 
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-muted" style="padding: 40px; text-align: center;">No rows match the current filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">No rows match the current filter.</td></tr>`;
                 return;
             }
 
@@ -2265,6 +2365,31 @@
                     matchCell = `<span class="text-muted">—</span>`;
                 }
 
+                // GA4 organic conversion rate cell
+                const ga = r._gaConv;
+                let gaCell;
+                if (!rankUrl) {
+                    gaCell = '<span class="text-muted">—</span>';
+                } else if (ga?.unmapped) {
+                    gaCell = '<span class="text-muted" title="No GA4 property for this domain (BUR / Top10 / Privado / external)">—</span>';
+                } else if (ga?.error) {
+                    gaCell = `<span class="text-muted" title="${escapeHtml(ga.error)}">err</span>`;
+                } else if (ga && ga.sessions != null) {
+                    if (ga.sessions === 0) {
+                        gaCell = `<span class="text-muted" title="No organic sessions on this landing page in the last ${gaWindowDays} days">0 sess</span>`;
+                    } else {
+                        const pct = (ga.convRate || 0) * 100;
+                        const color = pct >= 5 ? '#22c55e' : pct >= 1 ? '#eab308' : '#94a3b8';
+                        gaCell = `<span style="color: ${color}; font-weight: 500;" title="${formatNumber(ga.purchases)} purchases / ${formatNumber(ga.sessions)} organic sessions over ${gaWindowDays}d">${pct.toFixed(2)}%</span>`;
+                    }
+                } else if (gaState === 'loading') {
+                    gaCell = '<span class="text-muted">…</span>';
+                } else if (gaState === 'unauthenticated') {
+                    gaCell = '<span class="text-muted">—</span>';
+                } else {
+                    gaCell = '<span class="text-muted">—</span>';
+                }
+
                 return `
                     <tr style="border-bottom: 1px solid var(--border);">
                         <td style="padding: 8px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.keyword)}">${escapeHtml(r.keyword)}</td>
@@ -2277,6 +2402,7 @@
                         <td style="padding: 8px; text-align: right;">${formatCurrency(r.cpa)}</td>
                         <td style="padding: 8px; text-align: right;">${(r.convRate * 100).toFixed(1)}%</td>
                         <td style="padding: 8px;">${rankCell}</td>
+                        <td style="padding: 8px; text-align: right;">${gaCell}</td>
                         <td style="padding: 8px;">${matchCell}</td>
                     </tr>
                 `;
@@ -2337,13 +2463,18 @@
                 alert('No keywords loaded.');
                 return;
             }
-            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification'];
+            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification','GA4_OrgSessions','GA4_OrgPurchases','GA4_OrgConvRate'];
             const lines = [header.join(',')];
             for (const r of brandDefenseData.keywords) {
                 const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
                 const rankDomain = rank?.top_domain || '';
                 const rankUrl = rank?.top_url || '';
                 const match = rank?.top_domain ? (classifyMatch(r.ownedDomain, rank.top_domain) || '') : '';
+                const ga = rankUrl ? gaConvByUrl.get(rankUrl) : null;
+                const gaSessions = ga && !ga.unmapped && !ga.error ? (ga.sessions ?? '') : '';
+                const gaPurchases = ga && !ga.unmapped && !ga.error ? (ga.purchases ?? '') : '';
+                const gaRate = ga && !ga.unmapped && !ga.error && ga.convRate != null
+                    ? (ga.convRate * 100).toFixed(2) + '%' : '';
                 lines.push([
                     csvEscape(r.keyword),
                     csvEscape(r.account),
@@ -2361,7 +2492,10 @@
                     csvEscape(r.ownedDomain || ''),
                     csvEscape(rankDomain),
                     csvEscape(rankUrl),
-                    match
+                    match,
+                    gaSessions,
+                    gaPurchases,
+                    gaRate
                 ].join(','));
             }
             const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
