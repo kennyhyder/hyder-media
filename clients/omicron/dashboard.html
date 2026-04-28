@@ -6,6 +6,10 @@
     <title>Performance Dashboard | Omicron Google Ads</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ExcelJS — used by the Brand Defense XLSX export to write a styled workbook
+         (cell colors, hyperlinks, frozen header). Loaded lazily by the export
+         button if not yet ready. -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js" defer></script>
     <style>
         .dashboard-header {
             display: flex;
@@ -677,8 +681,11 @@
                     <button class="btn btn-primary btn-sm" id="bd-run-rank-btn" onclick="runBrandDefenseRankCheck()" style="align-self: flex-end;" title="Load the latest rank data from the Supabase cache. To refresh the cache itself, run: node scripts/check-brand-ranks.mjs from your local machine (DDG blocks Vercel IPs).">
                         Reload Rank Data
                     </button>
-                    <button class="btn btn-secondary btn-sm" onclick="exportBrandDefenseCSV()" style="align-self: flex-end;">
-                        Export CSV
+                    <button class="btn btn-secondary btn-sm" id="bd-export-xlsx-btn" onclick="exportBrandDefenseXLSX()" style="align-self: flex-end;" title="Export the table as an .xlsx workbook with the same color formatting as the dashboard.">
+                        Export XLSX
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="exportBrandDefenseCSV()" style="align-self: flex-end;" title="Plain CSV — for tools that don't need styling.">
+                        CSV
                     </button>
                 </div>
 
@@ -2506,6 +2513,213 @@
             document.getElementById('bd-portfolio-match-pct').textContent = portfolioPct;
             document.getElementById('bd-savings-exact').textContent = formatCurrency(savingsExact);
             document.getElementById('bd-savings-portfolio').textContent = formatCurrency(savingsPortfolio);
+        }
+
+        // ===== XLSX export (styled, mirrors dashboard formatting) =====
+        // Library: ExcelJS, loaded via CDN <script defer> above. We poll briefly
+        // on first click in case the user fires the button before the script
+        // finishes loading.
+        function hexToARGB(hex) {
+            if (!hex) return 'FF94A3B8';
+            const h = String(hex).replace('#', '');
+            return 'FF' + (h.length === 3
+                ? h.split('').map(c => c + c).join('')
+                : h).toUpperCase();
+        }
+
+        async function waitForExcelJS(timeoutMs = 5000) {
+            const start = Date.now();
+            while (typeof ExcelJS === 'undefined') {
+                if (Date.now() - start > timeoutMs) {
+                    throw new Error('ExcelJS failed to load. Check your network or ad blocker.');
+                }
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+
+        async function exportBrandDefenseXLSX() {
+            if (!brandDefenseData?.keywords?.length) {
+                alert('No keywords loaded.');
+                return;
+            }
+            const btn = document.getElementById('bd-export-xlsx-btn');
+            const origText = btn ? btn.textContent : null;
+            if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+
+            try {
+                await waitForExcelJS();
+
+                const wb = new ExcelJS.Workbook();
+                wb.creator = 'Hyder Media — Omicron Brand Defense';
+                wb.created = new Date();
+                const ws = wb.addWorksheet('Brand Defense', {
+                    views: [{ state: 'frozen', ySplit: 1 }]
+                });
+
+                ws.columns = [
+                    { header: 'Keyword',           key: 'keyword',     width: 30 },
+                    { header: 'Account',           key: 'account',     width: 13 },
+                    { header: 'KW Match',          key: 'matchType',   width: 10 },
+                    { header: 'Impr',              key: 'impressions', width: 10 },
+                    { header: 'Clicks',            key: 'clicks',      width: 10 },
+                    { header: 'Cost',              key: 'cost',        width: 12 },
+                    { header: 'Conv',              key: 'conversions', width: 9 },
+                    { header: 'CPA',               key: 'cpa',         width: 9 },
+                    { header: 'Conv Rate',         key: 'convRate',    width: 11 },
+                    { header: 'Organic #1',        key: 'organicUrl',  width: 50 },
+                    { header: 'Org CVR',           key: 'orgCvr',      width: 11 },
+                    { header: 'CVR Δ (relative)',  key: 'cvrDelta',    width: 14 },
+                    { header: 'Match',             key: 'match',       width: 12 }
+                ];
+
+                // Header row styling — dark blue fill, white bold text
+                const hdr = ws.getRow(1);
+                hdr.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+                hdr.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } };
+                hdr.alignment = { vertical: 'middle' };
+                hdr.height = 22;
+
+                // Build rows. Apply the same filter the table uses so the export
+                // matches what the user sees on screen.
+                const matchFilter = document.getElementById('bd-match-filter')?.value || 'all';
+                const allRows = [...brandDefenseData.keywords];
+                for (const r of allRows) {
+                    const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
+                    r._rank = rank || null;
+                    r._matchType = rank?.top_domain
+                        ? classifyMatch(r.ownedDomain, rank.top_domain)
+                        : null;
+                    r._gaConv = rank?.top_url ? (gaConvByUrl.get(rank.top_url) || null) : null;
+                }
+                const filtered = allRows.filter(r => {
+                    switch (matchFilter) {
+                        case 'exact':              return r._matchType === 'exact';
+                        case 'portfolio':          return r._matchType === 'portfolio';
+                        case 'exact-or-portfolio': return r._matchType === 'exact' || r._matchType === 'portfolio';
+                        case 'external':           return r._matchType === 'external';
+                        case 'unranked':           return r._matchType == null;
+                        default:                   return true;
+                    }
+                });
+                filtered.sort(bdCompare);
+
+                const altFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+
+                for (let i = 0; i < filtered.length; i++) {
+                    const r = filtered[i];
+                    const rank = r._rank;
+                    const rankUrl = rank?.top_url || '';
+                    const ga = r._gaConv;
+                    const paidPct = (r.convRate || 0) * 100;
+                    const orgPct = ga && !ga.unmapped && !ga.error && ga.sessions > 0 ? (ga.convRate || 0) * 100 : null;
+                    const relDelta = (orgPct != null && paidPct > 0) ? ((orgPct - paidPct) / paidPct) * 100 : null;
+
+                    // Build cell display values
+                    let organicDisplay = '';
+                    if (rankUrl) {
+                        try {
+                            const u = new URL(rankUrl);
+                            const path = (u.pathname || '/') + (u.search || '');
+                            organicDisplay = u.hostname.replace(/^www\./, '') + (path === '/' ? '' : path);
+                        } catch (_) { organicDisplay = rank?.top_domain || rankUrl; }
+                    }
+                    let matchLabel = '';
+                    if (r._matchType === 'exact') matchLabel = '✓ Exact';
+                    else if (r._matchType === 'portfolio') matchLabel = '◆ Portfolio';
+                    else if (r._matchType === 'external') matchLabel = '✗ External';
+
+                    const row = ws.addRow({
+                        keyword: r.keyword,
+                        account: r.account,
+                        matchType: r.matchType || '',
+                        impressions: r.impressions,
+                        clicks: r.clicks,
+                        cost: r.cost,
+                        conversions: r.conversions,
+                        cpa: r.cpa,
+                        convRate: r.convRate,                                    // 0-1, formatted as %
+                        organicUrl: rankUrl
+                            ? { text: organicDisplay, hyperlink: rankUrl }
+                            : '',
+                        orgCvr: orgPct != null ? orgPct / 100 : null,            // 0-1, formatted as %
+                        cvrDelta: relDelta != null ? relDelta / 100 : null,      // 0-1, formatted as %
+                        match: matchLabel
+                    });
+
+                    // Number formatting
+                    row.getCell('cost').numFmt = '$#,##0.00';
+                    row.getCell('cpa').numFmt = '$#,##0.00';
+                    row.getCell('impressions').numFmt = '#,##0';
+                    row.getCell('clicks').numFmt = '#,##0';
+                    row.getCell('conversions').numFmt = '#,##0.0';
+                    row.getCell('convRate').numFmt = '0.00%';
+                    row.getCell('orgCvr').numFmt = '0.00%';
+                    row.getCell('cvrDelta').numFmt = '+0.00%;-0.00%;0.00%';
+
+                    // Account name in the account's own color
+                    if (r.accountColor) {
+                        row.getCell('account').font = { color: { argb: hexToARGB(r.accountColor) }, bold: true };
+                    }
+
+                    // Organic URL — blue hyperlink underline
+                    if (rankUrl) {
+                        row.getCell('organicUrl').font = {
+                            color: { argb: 'FF3B82F6' },
+                            underline: true
+                        };
+                    }
+
+                    // Org CVR coloring (matches dashboard thresholds)
+                    if (orgPct != null) {
+                        const c = orgPct >= 5 ? 'FF22C55E' : orgPct >= 1 ? 'FFEAB308' : 'FF94A3B8';
+                        row.getCell('orgCvr').font = { color: { argb: c }, bold: true };
+                    }
+
+                    // CVR Δ coloring — green up, red down
+                    if (relDelta != null) {
+                        const c = relDelta > 0 ? 'FF22C55E' : relDelta < 0 ? 'FFEF4444' : 'FF94A3B8';
+                        row.getCell('cvrDelta').font = { color: { argb: c }, bold: true };
+                    }
+
+                    // Match coloring
+                    if (r._matchType === 'exact') {
+                        row.getCell('match').font = { color: { argb: 'FF22C55E' }, bold: true };
+                    } else if (r._matchType === 'portfolio') {
+                        row.getCell('match').font = { color: { argb: 'FFEAB308' }, bold: true };
+                    } else if (r._matchType === 'external') {
+                        row.getCell('match').font = { color: { argb: 'FFEF4444' }, bold: true };
+                    }
+
+                    // Subtle alternating row tint for readability
+                    if (i % 2 === 1) {
+                        for (let col = 1; col <= ws.columnCount; col++) {
+                            row.getCell(col).fill = altFill;
+                        }
+                    }
+                }
+
+                // Auto-filter on the header row
+                ws.autoFilter = {
+                    from: { row: 1, column: 1 },
+                    to: { row: 1, column: ws.columnCount }
+                };
+
+                const buf = await wb.xlsx.writeBuffer();
+                const blob = new Blob([buf], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `omicron-brand-defense-${new Date().toISOString().split('T')[0]}.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                console.error('XLSX export failed:', err);
+                alert(`XLSX export failed: ${err.message}`);
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = origText || 'Export XLSX'; }
+            }
         }
 
         function exportBrandDefenseCSV() {
