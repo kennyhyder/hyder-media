@@ -119,6 +119,24 @@
             height: 220px;
         }
 
+        /* Compact data table for Brand Defense / Audit views — overrides
+           the inline padding so rows aren't airy. */
+        table.bd-table {
+            font-size: 0.78rem !important;
+            line-height: 1.25;
+        }
+        table.bd-table th,
+        table.bd-table td {
+            padding: 4px 8px !important;
+            white-space: nowrap;
+        }
+        table.bd-table tbody tr {
+            transition: background 0.1s;
+        }
+        table.bd-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
         .legend-inline {
             display: flex;
             gap: 20px;
@@ -720,7 +738,7 @@
 
                 <!-- Keyword table -->
                 <div style="padding: 0 8px 16px; overflow-x: auto;">
-                    <table class="data-table" id="bd-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                    <table class="data-table bd-table" id="bd-table" style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr id="bd-thead-row" style="border-bottom: 2px solid var(--border); text-align: left;">
                                 <th class="bd-sort-th" data-field="keyword" style="padding: 8px; cursor: pointer; user-select: none;">Keyword</th>
@@ -733,12 +751,13 @@
                                 <th class="bd-sort-th" data-field="cpa" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">CPA</th>
                                 <th class="bd-sort-th" data-field="convRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;">Conv Rate</th>
                                 <th class="bd-sort-th" data-field="rankDomain" style="padding: 8px; cursor: pointer; user-select: none;">Organic #1</th>
-                                <th class="bd-sort-th" data-field="gaConvRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="GA4 organic-search conversion rate (purchase events / sessions, default 180-day window) on the Organic #1 landing page. Only available for the 7 owned domains with GA4 access.">Org Conv Rate</th>
+                                <th class="bd-sort-th" data-field="gaConvRate" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="GA4 organic-search conversion rate (purchase events / sessions, default 180-day window) on the Organic #1 landing page. Only available for the 7 owned domains with GA4 access.">Org CVR</th>
+                                <th class="bd-sort-th" data-field="cvrDelta" data-numeric="1" style="padding: 8px; cursor: pointer; user-select: none; text-align: right;" title="Organic CVR minus paid CVR, in percentage points. Green = organic converts better than paid (paid spend may be cannibalizing). Red = organic converts worse than paid (paid is doing real work).">Δ</th>
                                 <th class="bd-sort-th" data-field="match" style="padding: 8px; cursor: pointer; user-select: none;" title="Exact = organic #1 matches this ad account's own domain. Portfolio = organic #1 is a different Omicron-owned domain. External = third-party site ranks #1.">Match</th>
                             </tr>
                         </thead>
                         <tbody id="bd-tbody">
-                            <tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">
+                            <tr><td colspan="13" class="text-muted" style="padding: 40px; text-align: center;">
                                 Select a date range above, then the keyword table will load.
                             </td></tr>
                         </tbody>
@@ -1989,6 +2008,11 @@
                     if (!g || g.unmapped || g.error || g.sessions == null || g.sessions === 0) return -1;
                     return g.convRate || 0;
                 }
+                case 'cvrDelta': {
+                    const g = row._gaConv;
+                    if (!g || g.unmapped || g.error || g.sessions == null || g.sessions === 0) return -Infinity;
+                    return (g.convRate || 0) - (row.convRate || 0);
+                }
                 case 'match': {
                     // Order: exact, portfolio, external, unranked
                     const order = { exact: 0, portfolio: 1, external: 2 };
@@ -2118,7 +2142,7 @@
             const account = document.getElementById('bd-account-filter').value;
 
             const tbody = document.getElementById('bd-tbody');
-            tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">Loading branded keywords…</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="13" class="text-muted" style="padding: 40px; text-align: center;">Loading branded keywords…</td></tr>`;
 
             brandDefenseLoading = true;
             brandDefenseData = null;
@@ -2147,7 +2171,7 @@
                 updateBrandDefenseSummary();
             } catch (err) {
                 console.error('Brand defense load failed:', err);
-                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed to load: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed to load: ${err.message}</td></tr>`;
             } finally {
                 brandDefenseLoading = false;
             }
@@ -2301,7 +2325,7 @@
         function renderBrandDefenseTable() {
             const tbody = document.getElementById('bd-tbody');
             if (!brandDefenseData?.keywords?.length) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">No branded keywords in this date range.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="text-muted" style="padding: 40px; text-align: center;">No branded keywords in this date range.</td></tr>`;
                 return;
             }
 
@@ -2340,7 +2364,7 @@
             updateBdSortIndicators();
 
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-muted" style="padding: 40px; text-align: center;">No rows match the current filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="text-muted" style="padding: 40px; text-align: center;">No rows match the current filter.</td></tr>`;
                 return;
             }
 
@@ -2365,9 +2389,10 @@
                     matchCell = `<span class="text-muted">—</span>`;
                 }
 
-                // GA4 organic conversion rate cell
+                // GA4 organic conversion rate cell + delta vs paid
                 const ga = r._gaConv;
                 let gaCell;
+                let deltaCell = '<span class="text-muted">—</span>';
                 if (!rankUrl) {
                     gaCell = '<span class="text-muted">—</span>';
                 } else if (ga?.unmapped) {
@@ -2381,6 +2406,13 @@
                         const pct = (ga.convRate || 0) * 100;
                         const color = pct >= 5 ? '#22c55e' : pct >= 1 ? '#eab308' : '#94a3b8';
                         gaCell = `<span style="color: ${color}; font-weight: 500;" title="${formatNumber(ga.purchases)} purchases / ${formatNumber(ga.sessions)} organic sessions over ${gaWindowDays}d">${pct.toFixed(2)}%</span>`;
+
+                        // Delta: organic minus paid, in percentage points
+                        const paidPct = (r.convRate || 0) * 100;
+                        const delta = pct - paidPct;
+                        const sign = delta > 0 ? '+' : delta < 0 ? '−' : '';
+                        const dColor = delta > 0 ? '#22c55e' : delta < 0 ? '#ef4444' : '#94a3b8';
+                        deltaCell = `<span style="color: ${dColor}; font-weight: 500;" title="Organic ${pct.toFixed(2)}% − Paid ${paidPct.toFixed(2)}%">${sign}${Math.abs(delta).toFixed(2)}pp</span>`;
                     }
                 } else if (gaState === 'loading') {
                     gaCell = '<span class="text-muted">…</span>';
@@ -2392,18 +2424,19 @@
 
                 return `
                     <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 8px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.keyword)}">${escapeHtml(r.keyword)}</td>
-                        <td style="padding: 8px;"><span style="color: ${r.accountColor};">${escapeHtml(r.account)}</span></td>
-                        <td style="padding: 8px; font-size: 0.75rem;" class="text-muted">${escapeHtml(r.matchType || '')}</td>
-                        <td style="padding: 8px; text-align: right;">${formatNumber(r.impressions)}</td>
-                        <td style="padding: 8px; text-align: right;">${formatNumber(r.clicks)}</td>
-                        <td style="padding: 8px; text-align: right;">${formatCurrency(r.cost)}</td>
-                        <td style="padding: 8px; text-align: right;">${r.conversions.toFixed(1)}</td>
-                        <td style="padding: 8px; text-align: right;">${formatCurrency(r.cpa)}</td>
-                        <td style="padding: 8px; text-align: right;">${(r.convRate * 100).toFixed(1)}%</td>
-                        <td style="padding: 8px;">${rankCell}</td>
-                        <td style="padding: 8px; text-align: right;">${gaCell}</td>
-                        <td style="padding: 8px;">${matchCell}</td>
+                        <td style="max-width: 240px; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(r.keyword)}">${escapeHtml(r.keyword)}</td>
+                        <td><span style="color: ${r.accountColor};">${escapeHtml(r.account)}</span></td>
+                        <td class="text-muted" style="font-size: 0.7rem;">${escapeHtml(r.matchType || '')}</td>
+                        <td style="text-align: right;">${formatNumber(r.impressions)}</td>
+                        <td style="text-align: right;">${formatNumber(r.clicks)}</td>
+                        <td style="text-align: right;">${formatCurrency(r.cost)}</td>
+                        <td style="text-align: right;">${r.conversions.toFixed(1)}</td>
+                        <td style="text-align: right;">${formatCurrency(r.cpa)}</td>
+                        <td style="text-align: right;">${(r.convRate * 100).toFixed(1)}%</td>
+                        <td>${rankCell}</td>
+                        <td style="text-align: right;">${gaCell}</td>
+                        <td style="text-align: right;">${deltaCell}</td>
+                        <td>${matchCell}</td>
                     </tr>
                 `;
             }).join('');
@@ -2463,7 +2496,7 @@
                 alert('No keywords loaded.');
                 return;
             }
-            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification','GA4_OrgSessions','GA4_OrgPurchases','GA4_OrgConvRate'];
+            const header = ['Keyword','Account','MatchType','Campaign','AdGroup','Impressions','Clicks','Cost','Conversions','CPA','CTR','ConvRate','ROAS','OwnedDomain','OrganicRank1Domain','OrganicRank1URL','MatchClassification','GA4_OrgSessions','GA4_OrgPurchases','GA4_OrgConvRate','CvrDelta_pp'];
             const lines = [header.join(',')];
             for (const r of brandDefenseData.keywords) {
                 const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
@@ -2475,6 +2508,8 @@
                 const gaPurchases = ga && !ga.unmapped && !ga.error ? (ga.purchases ?? '') : '';
                 const gaRate = ga && !ga.unmapped && !ga.error && ga.convRate != null
                     ? (ga.convRate * 100).toFixed(2) + '%' : '';
+                const cvrDelta = ga && !ga.unmapped && !ga.error && ga.sessions > 0 && ga.convRate != null
+                    ? (((ga.convRate - r.convRate) * 100).toFixed(2)) : '';
                 lines.push([
                     csvEscape(r.keyword),
                     csvEscape(r.account),
@@ -2495,7 +2530,8 @@
                     match,
                     gaSessions,
                     gaPurchases,
-                    gaRate
+                    gaRate,
+                    cvrDelta
                 ].join(','));
             }
             const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
