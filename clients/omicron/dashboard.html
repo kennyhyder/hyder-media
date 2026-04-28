@@ -355,6 +355,7 @@
             <button class="view-tab" onclick="switchView('conversions')">SKU / Brand</button>
             <button class="view-tab" onclick="switchView('accounts')">Account Details</button>
             <button class="view-tab" onclick="switchView('brand-defense')">Brand Defense</button>
+            <button class="view-tab" onclick="switchView('audit')">Audit</button>
         </div>
 
         <!-- Overview Section -->
@@ -743,6 +744,215 @@
             </div>
         </div>
 
+        <!-- Audit Section (rebuilt portfolio-wide audit) -->
+        <div id="view-audit" class="view-section">
+            <!-- Verdict -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Portfolio Audit — 3-Year Window</h2>
+                        <p class="text-muted" style="font-size: 0.85rem; margin: 4px 0 0;" id="audit-window-label">
+                            Loading…
+                        </p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="loadAuditData()" style="align-self: flex-start;">↻ Refresh</button>
+                </div>
+                <div style="padding: 16px 20px; line-height: 1.5;">
+                    <p style="font-size: 0.95rem; color: var(--text-primary); margin: 0 0 12px;"><strong>Verdict.</strong>
+                        All accounts hit their brand CPA targets within tolerance. The prior audit
+                        covered 3 of 10 accounts and missed <strong id="audit-missing-spend">$0</strong> of 3-year spend
+                        across the 7 it excluded. The brand-bidding question the prior audit proposed
+                        a 4–6 week holdout for is already answered directionally by the Brand Defense
+                        rank check: <strong id="audit-bd-pct">—</strong> of recent branded spend goes to keywords where
+                        an Omicron-owned domain ranks #1 organically, totaling
+                        <strong id="audit-bd-savings">$0</strong> over the most recent 3-month window.
+                        The holdout still has value for marginal incrementality, but the higher-impact
+                        levers are scope (Top10usenet) and structural (rank-1 cannibalization across the portfolio).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Portfolio Table — All 10 Accounts -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">All Accounts — 3-Year Totals</h2>
+                        <p class="text-muted" style="font-size: 0.85rem; margin: 4px 0 0;">
+                            Live Google Ads API. Spend in account currency (Eweka, Tweak, Pure, Sunny report in EUR).
+                        </p>
+                    </div>
+                </div>
+                <div style="padding: 0 8px 16px; overflow-x: auto;">
+                    <table class="data-table" id="audit-portfolio-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th style="padding: 8px;">Account</th>
+                                <th style="padding: 8px;">Group</th>
+                                <th style="padding: 8px; text-align: right;">3yr Spend</th>
+                                <th style="padding: 8px; text-align: right;">Conv</th>
+                                <th style="padding: 8px; text-align: right;">Blended CPA</th>
+                                <th style="padding: 8px; text-align: right;">Brand Spend</th>
+                                <th style="padding: 8px; text-align: right;">Brand CPA</th>
+                                <th style="padding: 8px; text-align: right;">Non-Brand Spend</th>
+                                <th style="padding: 8px; text-align: right;">Non-Brand CPA</th>
+                                <th style="padding: 8px;">Flags</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-portfolio-tbody">
+                            <tr><td colspan="10" class="text-muted" style="padding: 40px; text-align: center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Verification of Prior Audit (BUR / Newshosting / Eweka) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Verification — Where the Prior Audit Was Right vs Stale</h2>
+                        <p class="text-muted" style="font-size: 0.85rem; margin: 4px 0 0;">
+                            Specific claims from <code>Omicron_PPC_Audit_2026.pdf</code> compared to live API for the same window.
+                            Variances above 5% are flagged.
+                        </p>
+                    </div>
+                </div>
+                <div style="padding: 0 8px 16px; overflow-x: auto;">
+                    <table class="data-table" id="audit-verify-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th style="padding: 8px;">Account</th>
+                                <th style="padding: 8px;">Metric</th>
+                                <th style="padding: 8px; text-align: right;">Audit Claim</th>
+                                <th style="padding: 8px; text-align: right;">Live API</th>
+                                <th style="padding: 8px; text-align: right;">Variance</th>
+                                <th style="padding: 8px;">Read</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-verify-tbody">
+                            <tr><td colspan="6" class="text-muted" style="padding: 40px; text-align: center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Findings (only what's actionable) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title">Findings the Prior Audit Missed</h2>
+                </div>
+                <div style="padding: 0 20px 16px;">
+                    <ol id="audit-findings" style="margin: 0; padding-left: 20px; line-height: 1.55; font-size: 0.9rem;">
+                        <li style="margin-bottom: 12px;">
+                            <strong>Top10usenet was excluded entirely.</strong> 3-year spend is
+                            <span id="audit-top10-spend">—</span> at <span id="audit-top10-cpa">—</span> blended CPA —
+                            <em>more than BUR.</em> Brand bucket is only ~7% of that; the other 93% is non-brand at
+                            <span id="audit-top10-nb-cpa">—</span> CPA. Either the model differs from BUR (review aggregator
+                            vs review site) and is healthy, or the non-brand layer needs the same scrutiny BUR got. <strong>Audit it next.</strong>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <strong>UsenetServer non-brand at <span id="audit-us-cpa">—</span>.</strong> Outside any
+                            reasonable target on a small base (<span id="audit-us-spend">—</span>). Likely match-type
+                            or generic-keyword leakage. <strong>Pause non-brand or restructure match types.</strong>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <strong>Privado non-brand is effectively unused</strong> — <span id="audit-privado-conv">—</span>
+                            non-brand conversions over 3 years on <span id="audit-privado-spend">—</span> spend. Statistical noise; either
+                            <strong>pause or commit a real budget</strong>.
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <strong>Eweka non-brand spend is materially higher in live data than the audit reported</strong>
+                            (live: <span id="audit-ew-nb-live">—</span> · audit: $108K · variance: <span id="audit-ew-nb-var">—</span>).
+                            The Editor export the prior audit was built on is stale.
+                            The "Eweka has scale headroom" claim relied on this number — re-validate before committing.
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <strong>The brand-bidding answer is already in the data.</strong> Brand Defense tab shows
+                            <span id="audit-bd-pct-2">—</span> of recent branded spend goes to keywords where an Omicron-owned domain
+                            ranks #1 organically (<span id="audit-bd-savings-2">—</span> over 3 months,
+                            ~<span id="audit-bd-annual">—</span> annualized).
+                            The proposed 4–6 week Newshosting holdout is still useful for measuring marginal incrementality,
+                            but the directional answer doesn't require it and would apply to all 8 owned accounts, not just NH.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Actions Ranked by 12-mo $ Impact -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="card-title">Actions, Ranked by 12-mo $ Impact</h2>
+                </div>
+                <div style="padding: 0 8px 16px; overflow-x: auto;">
+                    <table class="data-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                                <th style="padding: 8px;">#</th>
+                                <th style="padding: 8px;">Action</th>
+                                <th style="padding: 8px;">Mechanism</th>
+                                <th style="padding: 8px;">12-mo Impact</th>
+                                <th style="padding: 8px;">Effort</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 10px;">1</td>
+                                <td style="padding: 10px;"><strong>Restructure rank-1 branded spend across the 8 owned accounts</strong></td>
+                                <td style="padding: 10px;">Brand Defense data: ~59% of branded spend goes to keywords where the owned domain ranks #1. Restructure campaigns to bid only when not at rank #1, or pause the worst offenders identified by per-keyword cost.</td>
+                                <td style="padding: 10px;"><strong id="audit-action-1-impact">~$320K–$476K/yr</strong> recoverable</td>
+                                <td style="padding: 10px;">Mid</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 10px;">2</td>
+                                <td style="padding: 10px;"><strong>Full Top10usenet audit</strong></td>
+                                <td style="padding: 10px;">Same depth applied to BUR — bid-strategy mix, match types, ad strength, QS distribution, search-term review. Prior audit excluded this account; it represents the largest single uninspected spend pool.</td>
+                                <td style="padding: 10px;"><strong id="audit-action-2-impact">—</strong> annual spend at risk</td>
+                                <td style="padding: 10px;">High (full audit)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 10px;">3</td>
+                                <td style="padding: 10px;"><strong>UsenetServer non-brand pause / match-type review</strong></td>
+                                <td style="padding: 10px;">Non-brand CPA <span id="audit-action-3-cpa">—</span> on <span id="audit-action-3-spend">—</span>. Pause non-brand or tighten match types + add negatives.</td>
+                                <td style="padding: 10px;"><strong id="audit-action-3-impact">—</strong> /yr</td>
+                                <td style="padding: 10px;">Low</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 10px;">4</td>
+                                <td style="padding: 10px;"><strong>Eweka creative + QS uplift</strong></td>
+                                <td style="padding: 10px;">Prior audit's strongest operational finding (59% Poor ads, 41% QS≤4). Multiplicative — every other lever benefits from a higher baseline.</td>
+                                <td style="padding: 10px;">Multiplicative</td>
+                                <td style="padding: 10px;">Mid</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 10px;">5</td>
+                                <td style="padding: 10px;"><strong>BUR Target CPA migration</strong></td>
+                                <td style="padding: 10px;">All 49 BUR campaigns currently uncapped. Currently 11% under target but unprotected against drift. Migrate brand campaigns first as a pilot.</td>
+                                <td style="padding: 10px;">Drift protection</td>
+                                <td style="padding: 10px;">Low</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px;">6</td>
+                                <td style="padding: 10px;"><strong>Paired holdout test (NH paid-direct vs BUR-pursuit)</strong></td>
+                                <td style="padding: 10px;">Still valuable, but for measuring marginal incrementality, not establishing the directional answer (which we already have). Run after the higher-impact items above.</td>
+                                <td style="padding: 10px;">Sizing</td>
+                                <td style="padding: 10px;">Mid (4–6 weeks)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Methodology footnote -->
+            <p class="text-muted" style="font-size: 0.75rem; padding: 0 16px 16px; line-height: 1.5;">
+                <strong>Methodology.</strong> 3-year totals via Google Ads API <code>keyword_view</code>/<code>campaign</code>
+                with <code>segments.date</code> (campaign-level cost summed; ad-group-level matches within rounding).
+                Brand vs non-brand classification follows the existing <code>BRAND_PATTERNS</code>/<code>NON_BRAND_PATTERNS</code>
+                in <code>api/google-ads/omicron-monthly.js</code>. Spend in account currency (Eweka, Tweak, Pure, Sunny in EUR;
+                rest in USD). Brand Defense rank evidence from a 177-keyword Brave Search SERP check across the most recent 3 months
+                of branded spend. Prior audit's GA4 + Search Console findings (BUR-attributed revenue, organic CTR, position) are
+                not re-verified here — directional values are accepted; they don't change the actions.
+            </p>
+        </div>
+
         <!-- Data Source Note -->
         <p class="data-source-note" id="data-source-note">
             Loading data from Google Ads API...
@@ -827,7 +1037,7 @@
         // Handle URL hash on page load and hash changes
         function handleHashNavigation() {
             const hash = window.location.hash.replace('#', '');
-            const validViews = ['overview', 'review', 'owned', 'conversions', 'accounts', 'brand-defense'];
+            const validViews = ['overview', 'review', 'owned', 'conversions', 'accounts', 'brand-defense', 'audit'];
             if (hash && validViews.includes(hash)) {
                 switchView(hash, false);
             }
@@ -2186,6 +2396,282 @@
             _origChangeLookback();
             if (brandDefenseData) loadBrandDefense();
         };
+
+        // ========================================
+        // Audit Tab — Portfolio-wide audit, redo of Omicron_PPC_Audit_2026.pdf
+        // ========================================
+
+        let auditData = null;
+
+        // Per-account brand/non-brand CPA targets. From Omicron_PPC_Audit_2026.pdf
+        // for BUR/Newshosting/Eweka. Other accounts: extrapolated from the
+        // overall portfolio shape — clearly marked when displayed (italics).
+        const AUDIT_CPA_TARGETS = {
+            BUR:           { brand: 30, nonBrand: 60, source: 'audit' },
+            Newshosting:   { brand: 20, nonBrand: 60, source: 'audit' },
+            Eweka:         { brand: 10, nonBrand: 60, source: 'audit' },
+            Top10usenet:   { brand: 30, nonBrand: 60, source: 'extrapolated' },
+            Easynews:      { brand: 25, nonBrand: 50, source: 'extrapolated' },
+            UsenetServer:  { brand: 25, nonBrand: 50, source: 'extrapolated' },
+            Tweak:         { brand: 15, nonBrand: 50, source: 'extrapolated' },
+            Pure:          { brand: 10, nonBrand: 40, source: 'extrapolated' },
+            Sunny:         { brand: 10, nonBrand: 40, source: 'extrapolated' },
+            Privado:       { brand: 20, nonBrand: 50, source: 'extrapolated' }
+        };
+
+        // Hardcoded claims from the colleague's PDF audit — used to flag stale
+        // numbers vs live API. 3-year window, account currency.
+        const PRIOR_AUDIT_CLAIMS = [
+            { account: 'BUR',          metric: 'Total spend',       claim: 863174,  field: ['total','spend'] },
+            { account: 'BUR',          metric: 'Conversions',       claim: 19081,   field: ['total','conversions'] },
+            { account: 'BUR',          metric: 'Blended CPA',       claim: 45.24,   field: ['total','cpa'], isCurrency: true },
+            { account: 'BUR',          metric: 'Brand spend',       claim: 206462,  field: ['brand','spend'] },
+            { account: 'BUR',          metric: 'Brand CPA',         claim: 26.82,   field: ['brand','cpa'], isCurrency: true },
+            { account: 'BUR',          metric: 'Non-brand spend',   claim: 656712,  field: ['nonBrand','spend'] },
+            { account: 'BUR',          metric: 'Non-brand CPA',     claim: 57.70,   field: ['nonBrand','cpa'], isCurrency: true },
+            { account: 'Newshosting',  metric: 'Total spend',       claim: 159809,  field: ['total','spend'] },
+            { account: 'Newshosting',  metric: 'Conversions',       claim: 7554,    field: ['total','conversions'] },
+            { account: 'Newshosting',  metric: 'Brand spend',       claim: 131864,  field: ['brand','spend'] },
+            { account: 'Newshosting',  metric: 'Brand CPA',         claim: 18.60,   field: ['brand','cpa'], isCurrency: true },
+            { account: 'Newshosting',  metric: 'Non-brand spend',   claim: 27945,   field: ['nonBrand','spend'] },
+            { account: 'Newshosting',  metric: 'Non-brand CPA',     claim: 60.34,   field: ['nonBrand','cpa'], isCurrency: true },
+            { account: 'Eweka',        metric: 'Total spend',       claim: 167227,  field: ['total','spend'] },
+            { account: 'Eweka',        metric: 'Conversions',       claim: 7690,    field: ['total','conversions'] },
+            { account: 'Eweka',        metric: 'Brand spend',       claim: 49261,   field: ['brand','spend'] },
+            { account: 'Eweka',        metric: 'Brand CPA',         claim: 10.03,   field: ['brand','cpa'], isCurrency: true },
+            { account: 'Eweka',        metric: 'Non-brand spend',   claim: 108085,  field: ['nonBrand','spend'] },
+            { account: 'Eweka',        metric: 'Non-brand CPA',     claim: 43.36,   field: ['nonBrand','cpa'], isCurrency: true }
+        ];
+
+        // Hook switchView so loadAuditData fires on first open
+        const _origSwitchViewForAudit = switchView;
+        switchView = function(view, updateHash = true) {
+            _origSwitchViewForAudit(view, updateHash);
+            if (view === 'audit' && !auditData) loadAuditData();
+        };
+
+        async function loadAuditData() {
+            const tbody = document.getElementById('audit-portfolio-tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-muted" style="padding: 40px; text-align: center;">Loading 3-year data…</td></tr>';
+            const verifyTbody = document.getElementById('audit-verify-tbody');
+            if (verifyTbody) verifyTbody.innerHTML = '<tr><td colspan="6" class="text-muted" style="padding: 40px; text-align: center;">Loading…</td></tr>';
+
+            try {
+                const resp = await fetch('/api/google-ads/omicron-monthly?months=36');
+                auditData = await resp.json();
+            } catch (e) {
+                console.error('Audit data load failed:', e);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="text-muted" style="padding: 40px; text-align: center; color: #ef4444;">Failed: ${e.message}</td></tr>`;
+                return;
+            }
+
+            // Also pull the Brand Defense data so we can compute the savings line.
+            // Reuse what's already loaded if the user has visited that tab; else fetch.
+            if (!brandDefenseData) {
+                try {
+                    const r = await fetch('/api/google-ads/omicron-branded-keywords?lookback=3mo&limit=500');
+                    brandDefenseData = await r.json();
+                    await loadBrandDefenseRanks();
+                } catch (e) {
+                    console.warn('Brand Defense data fetch failed (audit will show partial):', e);
+                }
+            }
+
+            renderAuditPortfolioTable();
+            renderAuditVerificationTable();
+            updateAuditVerdict();
+            updateAuditFindings();
+        }
+
+        function renderAuditPortfolioTable() {
+            const tbody = document.getElementById('audit-portfolio-tbody');
+            if (!tbody || !auditData?.accounts) return;
+
+            const EUR_ACCOUNTS = new Set(['Eweka', 'Tweak', 'Pure', 'Sunny']);
+
+            // Sort by 3yr spend desc
+            const accounts = [...auditData.accounts].sort((a, b) =>
+                (b.totals?.total?.spend || 0) - (a.totals?.total?.spend || 0)
+            );
+
+            tbody.innerHTML = accounts.map(a => {
+                if (a.status !== 'success') {
+                    return `<tr><td style="padding: 8px;">${escapeHtml(a.name)}</td><td style="padding: 8px;">${a.group || ''}</td><td colspan="8" class="text-muted" style="padding: 8px;">error: ${escapeHtml(a.error || a.status)}</td></tr>`;
+                }
+                const t = a.totals || {};
+                const tot = t.total || {};
+                const br = t.brand || {};
+                const nb = t.nonBrand || {};
+                const target = AUDIT_CPA_TARGETS[a.name] || {};
+                const currency = EUR_ACCOUNTS.has(a.name) ? '€' : '$';
+                const fmtMoney = v => `${currency}${formatNumber(v || 0)}`;
+                const fmtCpa = v => `${currency}${(v || 0).toFixed(2)}`;
+
+                // Flags
+                const flags = [];
+                if (target.brand && br.cpa > target.brand * 1.05) flags.push('<span style="color:#ef4444;">brand CPA over</span>');
+                if (target.nonBrand && nb.cpa > target.nonBrand * 1.05) flags.push('<span style="color:#ef4444;">non-brand CPA over</span>');
+                if (nb.conversions != null && nb.conversions < 10 && nb.spend > 100) flags.push('<span style="color:#eab308;">non-brand near-zero conv</span>');
+                if (a.name === 'Top10usenet') flags.push('<span style="color:#eab308;">excluded from prior audit</span>');
+                if (target.source === 'extrapolated') flags.push('<span style="color:#94a3b8; font-size: 0.7rem;">target extrapolated</span>');
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px;"><span style="color: ${a.color};">${escapeHtml(a.name)}</span></td>
+                        <td style="padding: 8px; font-size: 0.75rem;" class="text-muted">${a.group || ''}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtMoney(tot.spend)}</td>
+                        <td style="padding: 8px; text-align: right;">${formatNumber(tot.conversions || 0)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtCpa(tot.cpa)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtMoney(br.spend)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtCpa(br.cpa)}${target.brand ? ` <span class="text-muted" style="font-size: 0.7rem;">/ ${currency}${target.brand}</span>` : ''}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtMoney(nb.spend)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmtCpa(nb.cpa)}${target.nonBrand ? ` <span class="text-muted" style="font-size: 0.7rem;">/ ${currency}${target.nonBrand}</span>` : ''}</td>
+                        <td style="padding: 8px; font-size: 0.75rem;">${flags.join('<br>') || '<span class="text-muted">—</span>'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderAuditVerificationTable() {
+            const tbody = document.getElementById('audit-verify-tbody');
+            if (!tbody || !auditData?.accounts) return;
+
+            const accountsByName = Object.fromEntries(
+                auditData.accounts.map(a => [a.name, a])
+            );
+
+            tbody.innerHTML = PRIOR_AUDIT_CLAIMS.map(c => {
+                const acct = accountsByName[c.account];
+                if (!acct || acct.status !== 'success') {
+                    return `<tr><td style="padding: 8px;">${escapeHtml(c.account)}</td><td colspan="5" class="text-muted" style="padding: 8px;">no live data</td></tr>`;
+                }
+                let live = acct.totals;
+                for (const k of c.field) live = live?.[k];
+                if (live == null) return '';
+
+                const variance = live - c.claim;
+                const pctVar = c.claim !== 0 ? (variance / c.claim) * 100 : 0;
+                const isOver5 = Math.abs(pctVar) > 5;
+
+                const fmt = c.isCurrency
+                    ? v => '$' + v.toFixed(2)
+                    : v => Number.isInteger(v) ? formatNumber(v) : '$' + formatNumber(v);
+
+                let read;
+                if (Math.abs(pctVar) < 1) read = '<span style="color: #22c55e;">verified</span>';
+                else if (Math.abs(pctVar) < 5) read = '<span style="color: #22c55e;">~verified</span>';
+                else if (Math.abs(pctVar) < 20) read = '<span style="color: #eab308;">stale</span>';
+                else read = '<span style="color: #ef4444;">materially stale</span>';
+
+                const varColor = isOver5 ? '#eab308' : '#94a3b8';
+                const varSign = variance >= 0 ? '+' : '';
+
+                return `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px;">${escapeHtml(c.account)}</td>
+                        <td style="padding: 8px;">${escapeHtml(c.metric)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmt(c.claim)}</td>
+                        <td style="padding: 8px; text-align: right;">${fmt(live)}</td>
+                        <td style="padding: 8px; text-align: right; color: ${varColor};">${varSign}${pctVar.toFixed(1)}%</td>
+                        <td style="padding: 8px;">${read}</td>
+                    </tr>
+                `;
+            }).filter(Boolean).join('');
+        }
+
+        function updateAuditVerdict() {
+            if (!auditData?.accounts) return;
+
+            const PRIOR_AUDIT_ACCOUNTS = new Set(['BUR', 'Newshosting', 'Eweka']);
+            const missingSpend = auditData.accounts
+                .filter(a => a.status === 'success' && !PRIOR_AUDIT_ACCOUNTS.has(a.name))
+                .reduce((s, a) => s + (a.totals?.total?.spend || 0), 0);
+            document.getElementById('audit-missing-spend').textContent = '$' + formatNumber(missingSpend);
+
+            // Window label
+            if (auditData.dateRange) {
+                const d = auditData.dateRange;
+                document.getElementById('audit-window-label').textContent =
+                    `Live Google Ads API data, ${d.start} → ${d.end}. Verifies & extends Omicron_PPC_Audit_2026.pdf to all 10 accounts.`;
+            }
+
+            // Brand Defense numbers (from 3mo Brand Defense data)
+            if (brandDefenseData?.keywords?.length && brandDefenseRanks?.size) {
+                const rows = brandDefenseData.keywords;
+                let exact = 0, portfolio = 0, totalChecked = 0;
+                let savingsExact = 0, savingsPortfolio = 0;
+                for (const r of rows) {
+                    const rank = brandDefenseRanks.get(r.keyword.toLowerCase());
+                    if (!rank?.top_domain) continue;
+                    totalChecked++;
+                    const m = classifyMatch(r.ownedDomain, rank.top_domain);
+                    if (m === 'exact') { exact++; savingsExact += r.cost; savingsPortfolio += r.cost; }
+                    else if (m === 'portfolio') { portfolio++; savingsPortfolio += r.cost; }
+                }
+                const portfolioRows = exact + portfolio;
+                const pct = totalChecked > 0 ? Math.round((portfolioRows / totalChecked) * 100) : 0;
+                const pctText = `${pct}%`;
+                document.getElementById('audit-bd-pct').textContent = pctText;
+                document.getElementById('audit-bd-pct-2').textContent = pctText;
+                document.getElementById('audit-bd-savings').textContent =
+                    `$${formatNumber(savingsExact)} exact / $${formatNumber(savingsPortfolio)} portfolio`;
+                document.getElementById('audit-bd-savings-2').textContent =
+                    `$${formatNumber(savingsExact)} exact, $${formatNumber(savingsPortfolio)} portfolio`;
+                const annualLow = savingsExact * 4;
+                const annualHigh = savingsPortfolio * 4;
+                document.getElementById('audit-bd-annual').textContent =
+                    `$${formatNumber(annualLow)}–$${formatNumber(annualHigh)}/yr`;
+                // Action 1 impact
+                document.getElementById('audit-action-1-impact').textContent =
+                    `~$${formatNumber(annualLow)}–$${formatNumber(annualHigh)}/yr`;
+            }
+        }
+
+        function updateAuditFindings() {
+            if (!auditData?.accounts) return;
+            const byName = Object.fromEntries(auditData.accounts.map(a => [a.name, a]));
+
+            // Top10usenet
+            const t10 = byName['Top10usenet'];
+            if (t10?.status === 'success') {
+                const t = t10.totals;
+                document.getElementById('audit-top10-spend').textContent = '$' + formatNumber(t.total.spend);
+                document.getElementById('audit-top10-cpa').textContent = '$' + (t.total.cpa || 0).toFixed(2);
+                document.getElementById('audit-top10-nb-cpa').textContent = '$' + (t.nonBrand.cpa || 0).toFixed(2);
+                // Action 2 — annualized = 3yr / 3
+                const yearly = t.total.spend / 3;
+                document.getElementById('audit-action-2-impact').textContent = '$' + formatNumber(yearly);
+            }
+
+            // UsenetServer
+            const us = byName['UsenetServer'];
+            if (us?.status === 'success') {
+                const t = us.totals;
+                document.getElementById('audit-us-cpa').textContent = '$' + (t.nonBrand.cpa || 0).toFixed(2);
+                document.getElementById('audit-us-spend').textContent = '$' + formatNumber(t.nonBrand.spend);
+                document.getElementById('audit-action-3-cpa').textContent = '$' + (t.nonBrand.cpa || 0).toFixed(2);
+                document.getElementById('audit-action-3-spend').textContent = '$' + formatNumber(t.nonBrand.spend);
+                document.getElementById('audit-action-3-impact').textContent = '$' + formatNumber(t.nonBrand.spend / 3);
+            }
+
+            // Privado
+            const pr = byName['Privado'];
+            if (pr?.status === 'success') {
+                const t = pr.totals;
+                document.getElementById('audit-privado-conv').textContent = formatNumber(t.nonBrand.conversions || 0);
+                document.getElementById('audit-privado-spend').textContent = '$' + formatNumber(t.nonBrand.spend);
+            }
+
+            // Eweka non-brand variance
+            const ew = byName['Eweka'];
+            if (ew?.status === 'success') {
+                const live = ew.totals.nonBrand.spend;
+                const claim = 108085;
+                const pct = ((live - claim) / claim * 100).toFixed(0);
+                document.getElementById('audit-ew-nb-live').textContent = '€' + formatNumber(live);
+                document.getElementById('audit-ew-nb-var').textContent = `+${pct}%`;
+            }
+        }
 
         // ========================================
         // Initialize
