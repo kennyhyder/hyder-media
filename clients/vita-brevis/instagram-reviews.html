@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vita Brevis — Instagram Reviews Preview</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f1ec;
+            color: #2a201a;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .preview-banner {
+            max-width: 1200px;
+            margin: 0 auto 32px auto;
+            background: #2a201a;
+            color: #f5ede0;
+            padding: 18px 24px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .preview-banner code {
+            background: rgba(201,163,106,0.2);
+            color: #d4b27d;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .preview-banner a { color: #d4b27d; }
+    </style>
+</head>
+<body>
+    <div class="preview-banner">
+        <strong>Local preview</strong> — this file is not deployed. The snippet below is what gets pasted into a Squarespace
+        <strong>Code Block</strong> on the <a href="https://www.vitabrevisfineart.com/rave-reviews" target="_blank">/rave-reviews</a> page.
+        Edit the post data inside the <code>const POSTS = [...]</code> array, then copy everything from
+        <code>&lt;!-- VITA BREVIS IG REVIEWS START --&gt;</code> to <code>&lt;!-- VITA BREVIS IG REVIEWS END --&gt;</code>.
+    </div>
+
+<!-- =========================================================================
+     VITA BREVIS IG REVIEWS START
+     Paste everything from this comment to the matching END comment into a
+     Squarespace Code Block on the rave-reviews page.
+
+     To update posts: edit the POSTS array below.
+     - url:        link to the live Instagram post (https://www.instagram.com/p/...)
+     - image:      direct image URL (right-click → Copy Image Address from the IG post,
+                   OR upload a screenshot to Squarespace and paste its URL,
+                   OR paste a public CDN URL)
+     - handle:     the Instagram username of the person who tagged Vita Brevis (without @)
+     - quote:      the highlighted excerpt from their post caption
+     ========================================================================= -->
+<style>
+    .vb-ig-section {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+        color: #2a201a;
+    }
+    .vb-ig-heading {
+        text-align: center;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 2rem;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        margin: 0 0 8px 0;
+        color: #2a201a;
+    }
+    .vb-ig-subheading {
+        text-align: center;
+        color: #6b5b4d;
+        font-style: italic;
+        font-size: 1rem;
+        margin: 0 0 40px 0;
+    }
+    .vb-ig-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+    .vb-ig-card {
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border: 1px solid #e5ddd0;
+        border-radius: 4px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .vb-ig-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(42, 32, 26, 0.12);
+        text-decoration: none;
+    }
+    .vb-ig-image {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        background: #ede5d5;
+        display: block;
+    }
+    .vb-ig-image-placeholder {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: linear-gradient(135deg, #ede5d5, #d4c5a8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8a7561;
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+    .vb-ig-body { padding: 18px 18px 16px 18px; flex: 1; display: flex; flex-direction: column; }
+    .vb-ig-handle {
+        font-size: 0.85rem;
+        color: #c9a36a;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: 0.02em;
+    }
+    .vb-ig-quote {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #4a3c32;
+        margin: 0 0 12px 0;
+    }
+    .vb-ig-link {
+        margin-top: auto;
+        padding-top: 8px;
+        font-size: 0.78rem;
+        color: #8a7561;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .vb-ig-link svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+    }
+    @media (max-width: 600px) {
+        .vb-ig-heading { font-size: 1.6rem; }
+        .vb-ig-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+    }
+</style>
+
+<section class="vb-ig-section" id="vb-ig-reviews">
+    <h2 class="vb-ig-heading">From Our Collectors on Instagram</h2>
+    <p class="vb-ig-subheading">Real moments from collectors who've welcomed Vita Brevis pieces into their homes.</p>
+    <div class="vb-ig-grid" id="vb-ig-grid"></div>
+</section>
+
+<script>
+(function() {
+    // ====== EDIT YOUR POSTS HERE ======
+    // Images are served from hyder.me/clients/vita-brevis/IGPosts/<handle>.png
+    const IMG_BASE = 'https://hyder.me/clients/vita-brevis/IGPosts/';
+    const POSTS = [
+        {
+            url: 'https://www.instagram.com/p/C4d8V0WO5MO/?img_index=1',
+            handle: 'cambrascottl',
+            image: IMG_BASE + 'cambrascottl.png',
+            quote: 'Love these kids. So glad we won the photo package we did.',
+        },
+        {
+            url: 'https://www.instagram.com/p/C6CemuOAtMb/',
+            handle: 'annie.oakley.vizsla',
+            image: IMG_BASE + 'annie.oakley.vizsla.png',
+            quote: 'Can’t remember who tagged us in a @vitabrevisfineart giveaway BUT — we won and the results are EPIC.',
+        },
+        {
+            url: 'https://www.instagram.com/p/C5YWOI6Lh4G/',
+            handle: 'coloradomountaintowns',
+            image: IMG_BASE + 'coloradomountaintowns.png',
+            quote: 'What an amazing experience this was and cannot wait to share more when I receive my masterpiece portrait 😍 🖼️',
+        },
+        {
+            url: 'https://www.instagram.com/p/C4wKcOnR2qC/?img_index=1',
+            handle: 'lips_by_lauren',
+            image: IMG_BASE + 'lips_by_lauren.png',
+            quote: 'Thank you so much @vitabrevisfineart for capturing these photos of our little family! 💙',
+        },
+        {
+            url: 'https://www.instagram.com/p/C5cLQ1dMXCW/',
+            handle: 'poshrhombus',
+            image: IMG_BASE + 'poshrhombus.png',
+            quote: 'Your patience and skill in working with our four cats and dog were nothing short of amazing.',
+        },
+        {
+            url: 'https://www.instagram.com/p/C2lW3hMuvKt/',
+            handle: 'heathermariee33',
+            image: IMG_BASE + 'heathermariee33.png',
+            quote: 'Thank you @vitabrevisfineart for an incredible experience!',
+        },
+        {
+            url: 'https://www.instagram.com/p/C2lWUHbRLC0/',
+            handle: 'flyinwithbrian',
+            image: IMG_BASE + 'flyinwithbrian.png',
+            quote: 'My little man all dressed up for our formal wear fine art photoshoot with @vitabrevisfineart.',
+        },
+        {
+            url: 'https://www.instagram.com/p/C7jihyIsuwJ/',
+            handle: 'b_haala',
+            image: IMG_BASE + 'b_haala.png',
+            quote: 'Life is short … why not get portraits done with your cat?! What a great experience from start to finish with @vitabrevisfineart!',
+        },
+        {
+            url: 'https://www.instagram.com/p/C7p8YtoIgXh/?img_index=10',
+            handle: 'lindsaywithstyle',
+            image: IMG_BASE + 'lindsaywithstyle.png',
+            quote: 'Featured @vitabrevisfineart as a highlight of my May recap.',
+        },
+    ];
+    // ====== END OF POST DATA ======
+
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    const ig = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.85 5.85 0 0 0-2.13 1.38A5.85 5.85 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91a5.85 5.85 0 0 0 1.38 2.13 5.85 5.85 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.85 5.85 0 0 0 2.13-1.38 5.85 5.85 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.85 5.85 0 0 0-1.38-2.13A5.85 5.85 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0Zm0 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84ZM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4Zm6.41-11.85a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44Z"/></svg>';
+
+    const grid = document.getElementById('vb-ig-grid');
+    grid.innerHTML = POSTS.map(p => `
+        <a class="vb-ig-card" href="${esc(p.url)}" target="_blank" rel="noopener">
+            ${p.image
+                ? `<img class="vb-ig-image" src="${esc(p.image)}" alt="Instagram post by @${esc(p.handle)}" loading="lazy">`
+                : `<div class="vb-ig-image-placeholder">image coming soon</div>`}
+            <div class="vb-ig-body">
+                <div class="vb-ig-handle">@${esc(p.handle)}</div>
+                <blockquote class="vb-ig-quote">&ldquo;${esc(p.quote)}&rdquo;</blockquote>
+                <div class="vb-ig-link">${ig} View on Instagram</div>
+            </div>
+        </a>
+    `).join('');
+})();
+</script>
+<!-- VITA BREVIS IG REVIEWS END -->
+
+</body>
+</html>

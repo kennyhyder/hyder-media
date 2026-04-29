@@ -111,6 +111,13 @@ Authenticated dashboards for individual clients.
 - Built with Next.js static export
 - See detailed breakdown below
 
+**Vita Brevis Fine Art Dashboard:** `/clients/vita-brevis/`
+- Password-protected ad reporting dashboard (password: VITABREVIS)
+- Cross-platform Google Ads (327-808-5194) + Meta Ads (3 accounts) reporting
+- Hyder does NOT manage their spend — read-only reporting only
+- Also includes `instagram-reviews.html` Squarespace Code Block snippet for /rave-reviews page
+- See `/clients/vita-brevis/CLAUDE.md`
+
 ### `/assets` - Static Assets
 ```
 /assets/
