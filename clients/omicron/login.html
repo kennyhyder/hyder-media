@@ -238,6 +238,11 @@
         const _hashType = _initialHQ.get('type');
         const _searchType = _initialQS.get('type');
         const _hasPkceCode = _initialQS.has('code');
+        // Capture any auth error Supabase passed back in the hash/search.
+        // Common: type=invite + error_code=otp_expired when the email link's
+        // one-time token was consumed by an email-client preview / link-tracker.
+        const _authErrorCode = _initialHQ.get('error_code') || _initialQS.get('error_code');
+        const _authErrorDesc = _initialHQ.get('error_description') || _initialQS.get('error_description');
         // True for any auth-link landing: invite, recovery, or magic-link with code.
         // We treat all of these as "fresh interaction → likely needs password".
         const _isInviteOrRecovery =
@@ -294,6 +299,22 @@
 
         // -------- Initial state determination --------
         async function bootstrap() {
+            // If Supabase redirected with an explicit error (expired token,
+            // already-used OTP, etc.) tell the user up front instead of
+            // silently dropping them on the login form.
+            if (_authErrorCode) {
+                const friendly = _authErrorCode === 'otp_expired'
+                    ? 'That invite link has expired or was already used. This usually means an email link-scanner (Outlook Safe Links, Gmail preview, or Resend\'s click tracking) consumed the one-time token before you clicked. Ask Kenny to send a fresh invite — and if your email client previews links, copy the link from the email and paste it directly into the address bar.'
+                    : (_authErrorDesc || _authErrorCode);
+                showError(friendly);
+                showStep('step-login');
+                // Clear the hash so a refresh doesn't re-show the error
+                if (window.history?.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname);
+                }
+                return;
+            }
+
             // If we landed here from a PKCE invite/recovery email, the URL has
             // ?code=... that needs to be exchanged for a session. The SDK does
             // this automatically when detectSessionInUrl=true, but we also try
