@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In | Omicron Google Ads Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- qrcode-generator: client-side QR rendering with adjustable error
+         correction. Used to redraw the MFA setup QR at higher resolution
+         and contrast than Supabase's default SVG. -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -100,18 +104,50 @@
         .btn-secondary:hover { background: var(--bg-tertiary); color: var(--text-primary); }
 
         .qr-wrap {
-            background: white; padding: 16px; border-radius: 8px;
+            background: white; padding: 20px; border-radius: 12px;
             margin: 12px auto 18px; display: inline-block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
-        .qr-wrap img, .qr-wrap svg { display: block; max-width: 200px; height: auto; }
+        .qr-wrap img, .qr-wrap svg {
+            display: block;
+            width: 280px; height: 280px;   /* Fixed size — bigger + crisp on hi-dpi */
+            max-width: 100%;
+        }
 
+        .otpauth-link {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-decoration: none;
+            margin: 0 0 14px;
+        }
+        .otpauth-link:hover { text-decoration: underline; }
+
+        .secret-row {
+            display: flex; gap: 8px; align-items: stretch;
+            margin-bottom: 18px;
+        }
         .secret-display {
+            flex: 1;
             background: var(--bg-tertiary); padding: 10px 14px;
             border-radius: 6px; font-family: 'Roboto Mono', monospace;
-            font-size: 0.8rem; color: var(--text-secondary);
-            word-break: break-all; margin-bottom: 18px;
+            font-size: 0.85rem; color: var(--text-primary);
+            word-break: break-all;
             user-select: all;
+            text-align: left;
+            letter-spacing: 1px;
         }
+        .secret-copy-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            padding: 0 14px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.15s;
+        }
+        .secret-copy-btn:hover { background: var(--border); color: var(--text-primary); }
 
         .footer-text { margin-top: 24px; font-size: 0.8rem; color: var(--text-secondary); }
         .footer-text a { color: var(--accent); text-decoration: none; }
@@ -228,8 +264,13 @@
 
                 <div class="qr-wrap" id="qr-wrap"></div>
 
-                <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 8px;">Can't scan? Enter this secret manually:</p>
-                <div class="secret-display" id="secret-display">—</div>
+                <a href="#" class="otpauth-link" id="otpauth-link" style="display: none;">📱 On your phone? Tap to open in your authenticator app</a>
+
+                <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 8px;">Can't scan? Enter this secret manually in your app:</p>
+                <div class="secret-row">
+                    <div class="secret-display" id="secret-display">—</div>
+                    <button type="button" class="secret-copy-btn" id="secret-copy-btn" title="Copy secret to clipboard">Copy</button>
+                </div>
 
                 <form id="mfa-enroll-form">
                     <div class="form-group">
@@ -550,6 +591,34 @@
         });
 
         // -------- Step 3: MFA enrollment (first time) --------
+        // Render an otpauth:// URI as a high-contrast QR using qrcode-generator
+        // (level 'H' error correction → ~30% redundancy, scans cleanly even
+        // when partly obscured or photographed at an angle). Falls back to
+        // Supabase's SVG if the library failed to load for any reason.
+        function renderQR(uri, fallbackSvg) {
+            const qrWrap = $('qr-wrap');
+            qrWrap.innerHTML = '';
+            if (uri && typeof qrcode === 'function') {
+                try {
+                    // typeNumber 0 = auto-size; level 'H' = high error correction
+                    const qr = qrcode(0, 'H');
+                    qr.addData(uri);
+                    qr.make();
+                    // Cell size 8 + margin 4 → ~280-330px for a typical otpauth URI.
+                    // Output as data-URL <img> so CSS sizing works uniformly.
+                    qrWrap.innerHTML = qr.createImgTag(8, 16);
+                    return;
+                } catch (e) {
+                    console.warn('qrcode-generator failed, falling back to Supabase SVG:', e);
+                }
+            }
+            if (fallbackSvg) {
+                qrWrap.innerHTML = fallbackSvg;
+            } else if (uri) {
+                qrWrap.innerHTML = `<a href="${uri}" style="color:#0f172a; word-break: break-all;">${uri}</a>`;
+            }
+        }
+
         async function beginMfaEnrollment() {
             try {
                 const { data, error } = await sb.auth.mfa.enroll({
@@ -560,15 +629,19 @@
                 pendingFactorId = data.id;
                 pendingChallengeId = null;
 
-                // Render QR code (Supabase returns SVG markup as a data URI string; embed directly)
-                const qrWrap = $('qr-wrap');
-                qrWrap.innerHTML = '';
-                if (data.totp?.qr_code) {
-                    // qr_code is an SVG markup string
-                    qrWrap.innerHTML = data.totp.qr_code;
-                } else if (data.totp?.uri) {
-                    qrWrap.innerHTML = `<a href="${data.totp.uri}" style="color:#0f172a;">${data.totp.uri}</a>`;
+                // Render the QR ourselves at high resolution + error correction
+                renderQR(data.totp?.uri, data.totp?.qr_code);
+
+                // Mobile shortcut — tapping the link triggers the OS to open
+                // the user's authenticator app with the secret pre-loaded
+                const otpauthLink = $('otpauth-link');
+                if (data.totp?.uri && otpauthLink) {
+                    otpauthLink.href = data.totp.uri;
+                    otpauthLink.style.display = '';
+                } else if (otpauthLink) {
+                    otpauthLink.style.display = 'none';
                 }
+
                 $('secret-display').textContent = data.totp?.secret || '—';
                 showStep('step-mfa-enroll');
                 $('enroll-code').focus();
@@ -578,6 +651,26 @@
                 showStep('step-login');
             }
         }
+
+        // Copy the manual secret to clipboard
+        $('secret-copy-btn').addEventListener('click', async () => {
+            const secret = $('secret-display').textContent;
+            const btn = $('secret-copy-btn');
+            try {
+                await navigator.clipboard.writeText(secret);
+                const orig = btn.textContent;
+                btn.textContent = '✓ Copied';
+                setTimeout(() => { btn.textContent = orig; }, 1500);
+            } catch (_) {
+                // Fallback for older browsers
+                const range = document.createRange();
+                range.selectNodeContents($('secret-display'));
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                try { document.execCommand('copy'); btn.textContent = '✓ Copied'; setTimeout(() => { btn.textContent = 'Copy'; }, 1500); } catch (_) {}
+            }
+        });
 
         $('mfa-enroll-form').addEventListener('submit', async (e) => {
             e.preventDefault();
