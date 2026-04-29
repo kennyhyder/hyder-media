@@ -156,6 +156,31 @@
                     </div>
                     <button type="submit" class="btn" id="login-btn">Sign In</button>
                 </form>
+                <p class="footer-text" style="margin-top: 16px;">
+                    First time signing in?
+                    <a href="#" id="show-otp-link" style="color: var(--accent); cursor: pointer;">Use the 6-digit code from your invite email</a>
+                </p>
+            </div>
+
+            <!-- Step "OTP Verify": invite/recovery code from email -->
+            <div class="step" id="step-otp-verify">
+                <h1>Enter Invite Code</h1>
+                <p class="subtitle">Type the 6-digit code from your invite or password-reset email.</p>
+
+                <form id="otp-verify-form">
+                    <div class="form-group">
+                        <label for="otp-email">Email</label>
+                        <input type="email" id="otp-email" placeholder="you@example.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="otp-token">6-Digit Code</label>
+                        <input type="text" id="otp-token" inputmode="numeric" pattern="[0-9]{6}"
+                               maxlength="6" placeholder="000000" autocomplete="one-time-code"
+                               class="otp-input" required>
+                    </div>
+                    <button type="submit" class="btn" id="otp-verify-btn">Verify Code</button>
+                    <button type="button" class="btn btn-secondary" id="back-to-password-btn">Back to Password Sign-In</button>
+                </form>
             </div>
 
             <!-- Step 2: MFA challenge (existing user) -->
@@ -293,8 +318,23 @@
         }
 
         // Hide alerts when user types
-        ['email', 'password', 'mfa-code', 'enroll-code', 'new-password', 'new-password-confirm'].forEach(id => {
+        ['email', 'password', 'mfa-code', 'enroll-code', 'new-password', 'new-password-confirm', 'otp-email', 'otp-token'].forEach(id => {
             $(id).addEventListener('input', clearAlerts);
+        });
+
+        // Show / hide the OTP code step
+        $('show-otp-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            clearAlerts();
+            // Pre-fill email if user already typed one
+            const email = $('email').value.trim();
+            if (email) $('otp-email').value = email;
+            showStep('step-otp-verify');
+            $('otp-token').focus();
+        });
+        $('back-to-password-btn').addEventListener('click', () => {
+            clearAlerts();
+            showStep('step-login');
         });
 
         // -------- Initial state determination --------
@@ -393,6 +433,53 @@
                 await beginMfaEnrollment();
             }
         }
+
+        // -------- OTP code verification (invite or recovery email) --------
+        // The user enters their email + 6-digit code from the invite email.
+        // We try type='invite' first (since that's the primary use case), then
+        // fall back to type='recovery' if invite fails. On success the SDK
+        // establishes a session at AAL1; the rest of the flow (set password →
+        // MFA enrollment) is identical to the link-based path.
+        $('otp-verify-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlerts();
+            const btn = $('otp-verify-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Verifying…';
+
+            const email = $('otp-email').value.trim().toLowerCase();
+            const token = $('otp-token').value.trim();
+
+            const tryVerify = async (type) => {
+                return await sb.auth.verifyOtp({ email, token, type });
+            };
+
+            try {
+                let res = await tryVerify('invite');
+                if (res.error) {
+                    // Common: "Token has expired or is invalid" when this is
+                    // actually a recovery (password-reset) code, not an invite.
+                    res = await tryVerify('recovery');
+                }
+                if (res.error) {
+                    throw res.error;
+                }
+                // Session established. Treat this exactly like the link flow:
+                // force the user through "Set Your Password" before MFA setup.
+                needsPasswordSet = true;
+                showInfo('Welcome! Please set your password to continue.');
+                showStep('step-set-password');
+                $('new-password').focus();
+            } catch (err) {
+                console.error('OTP verify error:', err);
+                showError(err.message || 'Could not verify that code. Double-check the email and code, or request a fresh invite.');
+                $('otp-token').value = '';
+                $('otp-token').focus();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verify Code';
+            }
+        });
 
         // -------- Step 1: password login --------
         $('login-form').addEventListener('submit', async (e) => {
