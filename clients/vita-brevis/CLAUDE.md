@@ -31,6 +31,7 @@ Meta access is via the shared `meta_ads_connections` OAuth token under kenny@hyd
 | `password.html` | Password gate (warm/gold styled, serif) |
 | `reporting.html` | 6-tab live ads dashboard (Overview, Google Ads, Search Terms, Keywords, Meta Ads, Meta Creative) |
 | `instagram-reviews.html` | Squarespace Code Block snippet — preview locally, copy snippet between START/END comments into a Code Block on /rave-reviews |
+| `seo-audit.md` | Standalone SEO/local-visibility audit (2026-04-30). Diagnoses why they don't appear in Map Pack and rank low for "colorado springs photography studio". Prioritized punch-list + drop-in `LocalBusiness` JSON-LD. Re-run when major changes ship. |
 
 ## Reporting Dashboard
 
@@ -41,6 +42,7 @@ Meta access is via the shared `meta_ads_connections` OAuth token under kenny@hyd
 - `#keywords` — All active targeted keywords with QS, match type filter, search filter
 - `#meta` — Meta combined KPIs, per-account breakdown cards, campaigns table (all 3 accounts merged)
 - `#meta-creative` — Meta ad cards with image preview, copy, per-ad metrics. Account filter.
+- `#gsc` — Google Search Console: clicks/impr/CTR/avg-position summary, queries table (filterable + sortable), pages table, daily trend chart, device breakdown, sitemap status. Re-auth banner appears if `webmasters.readonly` scope is missing.
 
 ### Date Range
 30d default (vs digistore24 which uses 7d) — gallery sales cycles tend to be longer. Options: 7d/30d/90d/6mo/12mo. Trend granularity auto-switches: daily ≤45d, monthly otherwise.
@@ -60,12 +62,15 @@ All under `/api/vita-brevis/`. Vercel timeout: 30s (set in `vercel.json`).
 | `google-keywords.js` | All active targeted keywords with QS |
 | `meta-performance.js` | Aggregates 3 Meta accounts. `?breakdown=summary` returns both `summary` (totals) and `byAccount` (per-account array). Also supports `campaign`, `daily`, `monthly`. |
 | `meta-ads.js` | Active Meta ads across all 3 accounts with creative + per-ad metrics |
+| `gsc-performance.js` | GSC Search Analytics — `?breakdown=summary\|query\|page\|date\|device\|country`. Property: `sc-domain:vitabrevisfineart.com`. Returns `status: 'needs_reauth'` if scope missing. |
+| `gsc-coverage.js` | Sitemap list + per-sitemap submitted/indexed counts + property permission level. |
 
 ### Conventions
 - Google endpoints inline OAuth refresh + GAQL search (matches digistore24 pattern — no shared helpers since Vercel functions deploy independently).
 - Meta endpoints use shared `meta_ads_connections` OAuth row (one row, all 3 accounts under same token).
-- All endpoints return `{ status, ... }` where status ∈ `success | partial | error | not_configured`.
-- All accept `?days=N` (default 30 for Google, varies for Meta), `?breakdown=` where applicable.
+- GSC endpoints use the same `google_ads_connections` row — requires `webmasters.readonly` scope which was added to `/api/google-ads/auth.js` on 2026-04-30. Existing auth grants need a one-time re-auth at `/api/google-ads/auth` to pick up the scope.
+- All endpoints return `{ status, ... }` where status ∈ `success | partial | error | not_configured | needs_reauth`.
+- All accept `?days=N` (default 30 for Google, 28 for GSC since GSC has 2-day data lag), `?breakdown=` where applicable.
 
 ## Instagram Reviews Snippet
 

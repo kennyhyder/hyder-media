@@ -602,6 +602,7 @@
             <button class="tab-btn" data-tab="keywords">Keywords</button>
             <button class="tab-btn" data-tab="meta">Meta Ads</button>
             <button class="tab-btn" data-tab="meta-creative">Meta Creative</button>
+            <button class="tab-btn" data-tab="gsc">Search Console</button>
         </div>
 
         <!-- ===== Overview Tab ===== -->
@@ -853,6 +854,77 @@
             </div>
         </div>
 
+        <!-- ===== Search Console Tab ===== -->
+        <div id="tab-gsc" class="tab-content">
+            <div id="gscReauthBanner" style="display:none; background:rgba(217,164,65,0.12); border:1px solid rgba(217,164,65,0.3); border-radius:4px; padding:14px 18px; margin-bottom:20px; font-size:0.9rem;">
+                <strong style="color:var(--warning);">Re-authorization needed.</strong>
+                <span style="color:var(--text-secondary);">The Google connection is missing the Search Console scope. Visit <a href="/api/google-ads/auth" style="color:var(--accent);">/api/google-ads/auth</a> while logged in as kenny@hyder.me to grant it (one click). Until then, GSC tab shows demo data.</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card accent"><div class="stat-label">Clicks</div><div class="stat-value" id="gscStatClicks">--</div><div class="stat-sub">Organic Google clicks to your site</div></div>
+                <div class="stat-card accent"><div class="stat-label">Impressions</div><div class="stat-value" id="gscStatImpressions">--</div><div class="stat-sub">Times you appeared in results</div></div>
+                <div class="stat-card accent"><div class="stat-label">Avg CTR</div><div class="stat-value" id="gscStatCTR">--</div></div>
+                <div class="stat-card accent"><div class="stat-label">Avg Position</div><div class="stat-value" id="gscStatPosition">--</div><div class="stat-sub">Lower is better (1 = top of page)</div></div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 32px;">
+                <h3>Clicks &amp; Impressions Over Time</h3>
+                <div class="chart-container"><canvas id="gscTrendChart"></canvas></div>
+            </div>
+
+            <div class="subsection-divider"><h2>Top Queries <span id="gscQueryCount" class="count-badge">0</span></h2></div>
+            <div class="section-header">
+                <p class="subtitle" style="margin:0;">Search queries that triggered impressions of your site. Position = avg rank in results.</p>
+                <div class="section-controls">
+                    <input type="text" id="gscQueryFilter" class="filter-input" placeholder="Filter queries…">
+                    <button class="btn" onclick="exportGSCQueriesCSV()">Export CSV</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="gscQueryTable">
+                    <thead>
+                        <tr>
+                            <th data-gsq-sort="query">Query</th>
+                            <th class="numeric" data-gsq-sort="clicks">Clicks</th>
+                            <th class="numeric" data-gsq-sort="impressions">Impr</th>
+                            <th class="numeric" data-gsq-sort="ctr">CTR</th>
+                            <th class="numeric" data-gsq-sort="position">Avg Pos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gscQueryBody"></tbody>
+                </table>
+            </div>
+
+            <div class="subsection-divider"><h2>Top Pages <span id="gscPageCount" class="count-badge">0</span></h2></div>
+            <div class="section-header">
+                <p class="subtitle" style="margin:0;">Pages on your site that received Google traffic.</p>
+                <div class="section-controls">
+                    <button class="btn" onclick="exportGSCPagesCSV()">Export CSV</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="gscPageTable">
+                    <thead>
+                        <tr>
+                            <th data-gsp-sort="page">Page</th>
+                            <th class="numeric" data-gsp-sort="clicks">Clicks</th>
+                            <th class="numeric" data-gsp-sort="impressions">Impr</th>
+                            <th class="numeric" data-gsp-sort="ctr">CTR</th>
+                            <th class="numeric" data-gsp-sort="position">Avg Pos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gscPageBody"></tbody>
+                </table>
+            </div>
+
+            <div class="subsection-divider"><h2>By Device</h2></div>
+            <div class="stats-grid" id="gscDeviceGrid"></div>
+
+            <div class="subsection-divider"><h2>Sitemaps</h2></div>
+            <div id="gscSitemapList" style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 18px;"></div>
+        </div>
+
         <!-- ===== Meta Creative Tab ===== -->
         <div id="tab-meta-creative" class="tab-content">
             <div class="section-header">
@@ -899,14 +971,26 @@ let metaCampaigns = [];
 let metaAds = [];
 let metaTrend = [];
 
+let gscSummary = null;
+let gscQueries = [];
+let gscPages = [];
+let gscDaily = [];
+let gscDevices = [];
+let gscSitemaps = [];
+let gscNeedsReauth = false;
+
 let spendChartInstance = null;
 let splitChartInstance = null;
+let gscTrendChartInstance = null;
 
 // Sort state
 let gcSort = { key: 'spend', dir: -1 };
 let stSort = { key: 'spend', dir: -1 };
 let kwSort = { key: 'spend', dir: -1 };
 let mcSort = { key: 'spend', dir: -1 };
+let gscQuerySort = { key: 'clicks', dir: -1 };
+let gscPageSort = { key: 'clicks', dir: -1 };
+let gscQueryFilter = '';
 let kwSearchFilter = '';
 let kwMatchFilter = '';
 let stLimit = 50;
@@ -967,6 +1051,7 @@ async function loadAllData() {
         const [
             gSummaryRes, gCampaignRes, gTrendRes, gAdsRes, gSTRes, gKWRes,
             mSummaryRes, mCampaignRes, mTrendRes, mAdsRes,
+            gscSummaryRes, gscQueryRes, gscPageRes, gscDateRes, gscDeviceRes, gscCoverageRes,
         ] = await Promise.all([
             fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
@@ -978,6 +1063,12 @@ async function loadAllData() {
             fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
             fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${META_API}/meta-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=query&limit=200`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=page&limit=200`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=date`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=device`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-coverage`).then(r => r.json()).catch(() => null),
         ]);
 
         const gSumOk = gSummaryRes?.status === 'success' && gSummaryRes.summary && !gSummaryRes.summary.error;
@@ -990,6 +1081,15 @@ async function loadAllData() {
         const mCampOk = mCampaignRes?.status === 'success' && Array.isArray(mCampaignRes.campaigns);
         const mTrendOk = mTrendRes?.status === 'success' && Array.isArray(mTrendRes[trendParam]);
         const mAdsOk = mAdsRes?.status === 'success' && Array.isArray(mAdsRes.ads);
+
+        const gscSumOk = gscSummaryRes?.status === 'success' && gscSummaryRes.summary;
+        const gscQueryOk = gscQueryRes?.status === 'success' && Array.isArray(gscQueryRes.queries);
+        const gscPageOk = gscPageRes?.status === 'success' && Array.isArray(gscPageRes.pages);
+        const gscDateOk = gscDateRes?.status === 'success' && Array.isArray(gscDateRes.daily);
+        const gscDeviceOk = gscDeviceRes?.status === 'success' && Array.isArray(gscDeviceRes.devices);
+        const gscCoverageOk = gscCoverageRes?.status === 'success' && Array.isArray(gscCoverageRes.sitemaps);
+        gscNeedsReauth = [gscSummaryRes, gscQueryRes, gscPageRes, gscDateRes, gscDeviceRes, gscCoverageRes]
+            .some(r => r?.status === 'needs_reauth');
 
         const anyLive = gSumOk || mSumOk;
 
@@ -1019,10 +1119,24 @@ async function loadAllData() {
             generateMetaDemo();
             setBadge('demo', 'Demo Data');
         }
+
+        // GSC has independent live/demo state — it can be live even when ads APIs aren't,
+        // and re-auth might be needed even after ads work
+        if (gscSumOk) {
+            gscSummary = gscSummaryRes.summary;
+            gscQueries = gscQueryOk ? gscQueryRes.queries : [];
+            gscPages = gscPageOk ? gscPageRes.pages : [];
+            gscDaily = gscDateOk ? gscDateRes.daily : [];
+            gscDevices = gscDeviceOk ? gscDeviceRes.devices : [];
+            gscSitemaps = gscCoverageOk ? gscCoverageRes.sitemaps : [];
+        } else {
+            generateGSCDemo();
+        }
     } catch (e) {
         isDemo = true;
         generateGoogleDemo();
         generateMetaDemo();
+        generateGSCDemo();
         setBadge('demo', 'Demo Data');
     }
 
@@ -1032,6 +1146,7 @@ async function loadAllData() {
     renderKeywords();
     renderMetaTab();
     renderMetaCreative();
+    renderGSC();
     document.getElementById('refreshBtn').disabled = false;
 }
 
@@ -1331,6 +1446,79 @@ function buildDemoTrend(totalSpend, totalClicks, totalConv) {
         }
     }
     return trend;
+}
+
+function generateGSCDemo() {
+    const totalClicks = 280 + Math.floor(Math.random() * 200);
+    const totalImpr = totalClicks * (35 + Math.random() * 25);
+    gscSummary = {
+        clicks: totalClicks,
+        impressions: Math.round(totalImpr),
+        ctr: totalClicks / totalImpr,
+        position: 14 + Math.random() * 18,
+    };
+
+    const queries = [
+        'vita brevis fine art', 'vita brevis', 'vita brevis fine art colorado springs',
+        'vitabrevisfineart', 'fine art portrait colorado springs',
+        'colorado springs photography studio', 'family portrait photographer colorado springs',
+        'pet portrait studio colorado springs', 'fine art photographer colorado springs',
+        'children portrait studio', 'colorado springs photographer',
+        'family photographer near me', 'studio photographer colorado',
+        'unicorn photoshoot colorado', 'fairy photoshoot colorado springs',
+        'tiaras and tuxedos colorado springs', 'professional family portraits',
+    ];
+    gscQueries = queries.map((q, i) => {
+        const impr = Math.round((50 + Math.random() * 800) * (1 - i * 0.02));
+        const isBranded = q.includes('vita brevis') || q.includes('vitabrevis');
+        const ctr = isBranded ? 0.18 + Math.random() * 0.20 : 0.005 + Math.random() * 0.015;
+        const clicks = Math.max(0, Math.round(impr * ctr));
+        const position = isBranded ? 1 + Math.random() * 2 : 18 + Math.random() * 30;
+        return { query: q, clicks, impressions: impr, ctr, position };
+    });
+
+    const pages = [
+        '/', '/rave-reviews', '/the-experience', '/about-vita-brevis-fine-art',
+        '/contact', '/black-label-family-fine-art', '/premier-pets',
+        '/garden-fairies-studio-photography', '/our-team', '/pricing',
+        '/location', '/the-unicorn-experience-by-vita-brevis',
+        '/tiaras-and-tuxedos-colorado-springs', '/financing-1',
+    ];
+    gscPages = pages.map((p, i) => {
+        const impr = Math.round((100 + Math.random() * 1500) * (1 - i * 0.03));
+        const ctr = p === '/' ? 0.12 + Math.random() * 0.10 : 0.02 + Math.random() * 0.05;
+        const clicks = Math.max(0, Math.round(impr * ctr));
+        const position = 5 + Math.random() * 25;
+        return { page: 'https://www.vitabrevisfineart.com' + p, clicks, impressions: impr, ctr, position };
+    });
+
+    gscDaily = [];
+    const days = trendGranularity === 'daily' ? Math.min(currentDays, 90) : Math.min(currentDays, 365);
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i - 2);
+        const impr = Math.round(8 + Math.random() * 60);
+        const clicks = Math.max(0, Math.round(impr * (0.04 + Math.random() * 0.10)));
+        gscDaily.push({
+            date: d.toISOString().split('T')[0],
+            clicks, impressions: impr,
+            ctr: impr > 0 ? clicks / impr : 0,
+            position: 14 + Math.random() * 12,
+        });
+    }
+
+    gscDevices = [
+        { device: 'MOBILE', clicks: Math.round(totalClicks * 0.62), impressions: Math.round(totalImpr * 0.66), ctr: 0.05, position: 16 },
+        { device: 'DESKTOP', clicks: Math.round(totalClicks * 0.34), impressions: Math.round(totalImpr * 0.30), ctr: 0.07, position: 13 },
+        { device: 'TABLET', clicks: Math.round(totalClicks * 0.04), impressions: Math.round(totalImpr * 0.04), ctr: 0.04, position: 18 },
+    ];
+
+    gscSitemaps = [{
+        path: 'https://www.vitabrevisfineart.com/sitemap.xml',
+        lastSubmitted: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(),
+        lastDownloaded: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+        isPending: false, errors: 0, warnings: 0,
+        contents: [{ type: 'web', submitted: '48', indexed: '42' }],
+    }];
 }
 
 // ============================================================================
@@ -1797,6 +1985,176 @@ function renderMetaCreative() {
 }
 
 // ============================================================================
+// Render: Search Console
+// ============================================================================
+function renderGSC() {
+    document.getElementById('gscReauthBanner').style.display = gscNeedsReauth ? 'block' : 'none';
+
+    const s = gscSummary || {};
+    document.getElementById('gscStatClicks').textContent = fmt(s.clicks, 'n');
+    document.getElementById('gscStatImpressions').textContent = fmt(s.impressions, 'n');
+    document.getElementById('gscStatCTR').textContent = fmt(s.ctr, '%');
+    document.getElementById('gscStatPosition').textContent = s.position ? s.position.toFixed(1) : '--';
+
+    renderGSCTrendChart();
+    renderGSCQueries();
+    renderGSCPages();
+    renderGSCDevices();
+    renderGSCSitemaps();
+}
+
+function renderGSCTrendChart() {
+    if (gscTrendChartInstance) gscTrendChartInstance.destroy();
+    if (!gscDaily.length) return;
+
+    const labels = gscDaily.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const chartDefaults = { color: '#a89888', borderColor: 'rgba(74,60,50,0.4)' };
+
+    gscTrendChartInstance = new Chart(document.getElementById('gscTrendChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Impressions',
+                    data: gscDaily.map(d => d.impressions),
+                    backgroundColor: 'rgba(168,152,136,0.4)',
+                    borderRadius: 3, yAxisID: 'y',
+                    order: 2,
+                },
+                {
+                    label: 'Clicks',
+                    data: gscDaily.map(d => d.clicks),
+                    type: 'line',
+                    borderColor: '#c9a36a',
+                    backgroundColor: 'rgba(201,163,106,0.1)',
+                    borderWidth: 2,
+                    pointRadius: gscDaily.length > 30 ? 1 : 3,
+                    pointBackgroundColor: '#c9a36a',
+                    tension: 0.3, fill: true, yAxisID: 'y1', order: 1,
+                },
+            ],
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: chartDefaults.color, usePointStyle: true, padding: 16 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw.toLocaleString() } },
+            },
+            scales: {
+                x: { ticks: { color: chartDefaults.color, autoSkip: true, maxTicksLimit: 12 }, grid: { color: chartDefaults.borderColor } },
+                y: { position: 'left', ticks: { color: chartDefaults.color }, grid: { color: chartDefaults.borderColor }, title: { display: true, text: 'Impressions', color: chartDefaults.color } },
+                y1: { position: 'right', ticks: { color: '#c9a36a' }, grid: { display: false }, title: { display: true, text: 'Clicks', color: '#c9a36a' } },
+            },
+        },
+    });
+}
+
+function renderGSCQueries() {
+    let qs = gscQueries;
+    if (gscQueryFilter) {
+        const f = gscQueryFilter.toLowerCase();
+        qs = qs.filter(q => (q.query || '').toLowerCase().includes(f));
+    }
+    document.getElementById('gscQueryCount').textContent = qs.length;
+    const tbody = document.getElementById('gscQueryBody');
+    if (!qs.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No queries</td></tr>';
+        return;
+    }
+    const sorted = [...qs].sort((a, b) => {
+        const av = a[gscQuerySort.key], bv = b[gscQuerySort.key];
+        if (typeof av === 'string') return gscQuerySort.dir * av.localeCompare(bv || '');
+        return gscQuerySort.dir * ((av || 0) - (bv || 0));
+    });
+    tbody.innerHTML = sorted.map(q => `
+        <tr>
+            <td>${esc(q.query)}</td>
+            <td class="numeric">${fmt(q.clicks, 'n')}</td>
+            <td class="numeric">${fmt(q.impressions, 'n')}</td>
+            <td class="numeric">${fmt(q.ctr, '%')}</td>
+            <td class="numeric">${q.position ? q.position.toFixed(1) : '--'}</td>
+        </tr>
+    `).join('');
+    document.querySelectorAll('#gscQueryTable th').forEach(th => {
+        th.classList.toggle('sorted', th.dataset.gsqSort === gscQuerySort.key);
+    });
+}
+
+function renderGSCPages() {
+    document.getElementById('gscPageCount').textContent = gscPages.length;
+    const tbody = document.getElementById('gscPageBody');
+    if (!gscPages.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No pages</td></tr>';
+        return;
+    }
+    const sorted = [...gscPages].sort((a, b) => {
+        const av = a[gscPageSort.key], bv = b[gscPageSort.key];
+        if (typeof av === 'string') return gscPageSort.dir * av.localeCompare(bv || '');
+        return gscPageSort.dir * ((av || 0) - (bv || 0));
+    });
+    tbody.innerHTML = sorted.map(p => {
+        const path = (p.page || '').replace(/^https?:\/\/[^/]+/, '') || '/';
+        return `<tr>
+            <td><a href="${esc(p.page)}" target="_blank" rel="noopener" style="color:var(--text-primary); text-decoration:none;">${esc(path)}</a></td>
+            <td class="numeric">${fmt(p.clicks, 'n')}</td>
+            <td class="numeric">${fmt(p.impressions, 'n')}</td>
+            <td class="numeric">${fmt(p.ctr, '%')}</td>
+            <td class="numeric">${p.position ? p.position.toFixed(1) : '--'}</td>
+        </tr>`;
+    }).join('');
+    document.querySelectorAll('#gscPageTable th').forEach(th => {
+        th.classList.toggle('sorted', th.dataset.gspSort === gscPageSort.key);
+    });
+}
+
+function renderGSCDevices() {
+    const wrap = document.getElementById('gscDeviceGrid');
+    if (!gscDevices.length) {
+        wrap.innerHTML = '<div class="empty-state">No device data</div>';
+        return;
+    }
+    wrap.innerHTML = gscDevices.map(d => `
+        <div class="stat-card accent">
+            <div class="stat-label">${esc(d.device || 'Unknown')}</div>
+            <div class="stat-value">${fmt(d.clicks, 'n')}</div>
+            <div class="stat-sub">${fmt(d.impressions, 'n')} impr · CTR ${fmt(d.ctr, '%')} · Pos ${d.position ? d.position.toFixed(1) : '--'}</div>
+        </div>
+    `).join('');
+}
+
+function renderGSCSitemaps() {
+    const wrap = document.getElementById('gscSitemapList');
+    if (!gscSitemaps.length) {
+        wrap.innerHTML = '<div class="empty-state">No sitemaps registered. Submit one at <a href="https://search.google.com/search-console" target="_blank" style="color:var(--accent);">search.google.com/search-console</a> for faster indexing.</div>';
+        return;
+    }
+    wrap.innerHTML = gscSitemaps.map(s => {
+        const fmtDate = ts => ts ? new Date(ts).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : '--';
+        const totalSubmitted = (s.contents || []).reduce((sum, c) => sum + (parseInt(c.submitted) || 0), 0);
+        const totalIndexed = (s.contents || []).reduce((sum, c) => sum + (parseInt(c.indexed) || 0), 0);
+        const indexRate = totalSubmitted > 0 ? totalIndexed / totalSubmitted : 0;
+        const errCount = (s.errors || 0) + (s.warnings || 0);
+        const errBadge = errCount > 0
+            ? `<span style="color:var(--danger); font-weight:600;">${s.errors || 0} errors, ${s.warnings || 0} warnings</span>`
+            : '<span style="color:var(--success); font-weight:600;">✓ no errors</span>';
+        return `
+            <div style="margin-bottom: 16px;">
+                <div style="font-family:monospace; color:var(--accent); font-size:0.85rem; margin-bottom:8px;">${esc(s.path)}</div>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; font-size:0.85rem;">
+                    <div><span style="color:var(--text-secondary)">Submitted:</span> <strong>${totalSubmitted.toLocaleString()}</strong></div>
+                    <div><span style="color:var(--text-secondary)">Indexed:</span> <strong>${totalIndexed.toLocaleString()}</strong> (${(indexRate * 100).toFixed(0)}%)</div>
+                    <div><span style="color:var(--text-secondary)">Last submitted:</span> <strong>${fmtDate(s.lastSubmitted)}</strong></div>
+                    <div><span style="color:var(--text-secondary)">Last downloaded:</span> <strong>${fmtDate(s.lastDownloaded)}</strong></div>
+                    <div>${errBadge}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ============================================================================
 // Sort handlers
 // ============================================================================
 document.querySelectorAll('#gCampaignTable th[data-gc-sort]').forEach(th => {
@@ -1831,6 +2189,22 @@ document.querySelectorAll('#mCampaignTable th[data-mc-sort]').forEach(th => {
         renderMetaCampaigns();
     });
 });
+document.querySelectorAll('#gscQueryTable th[data-gsq-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const k = th.dataset.gsqSort;
+        if (gscQuerySort.key === k) gscQuerySort.dir *= -1;
+        else { gscQuerySort.key = k; gscQuerySort.dir = ['query'].includes(k) ? 1 : (k === 'position' ? 1 : -1); }
+        renderGSCQueries();
+    });
+});
+document.querySelectorAll('#gscPageTable th[data-gsp-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const k = th.dataset.gspSort;
+        if (gscPageSort.key === k) gscPageSort.dir *= -1;
+        else { gscPageSort.key = k; gscPageSort.dir = ['page'].includes(k) ? 1 : (k === 'position' ? 1 : -1); }
+        renderGSCPages();
+    });
+});
 
 // ============================================================================
 // Filter listeners
@@ -1862,6 +2236,10 @@ document.getElementById('mAdAccountFilter').addEventListener('change', e => {
 document.getElementById('mAdSortSelect').addEventListener('change', e => {
     mAdSort = e.target.value;
     renderMetaCreative();
+});
+document.getElementById('gscQueryFilter').addEventListener('input', e => {
+    gscQueryFilter = e.target.value;
+    renderGSCQueries();
 });
 
 // ============================================================================
@@ -1910,6 +2288,22 @@ function exportMetaCampaignsCSV() {
         rows.push([c.accountName, c.name, c.spend.toFixed(2), c.impressions, c.reach, c.clicks, (c.ctr * 100).toFixed(2) + '%', c.cpm.toFixed(2), c.conversions]);
     }
     downloadCSV(`vita-brevis-meta-campaigns-${currentDays}d.csv`, rows);
+}
+
+function exportGSCQueriesCSV() {
+    const rows = [['Query', 'Clicks', 'Impressions', 'CTR', 'Avg Position']];
+    for (const q of gscQueries) {
+        rows.push([q.query, q.clicks, q.impressions, (q.ctr * 100).toFixed(2) + '%', q.position.toFixed(2)]);
+    }
+    downloadCSV(`vita-brevis-gsc-queries-${currentDays}d.csv`, rows);
+}
+
+function exportGSCPagesCSV() {
+    const rows = [['Page', 'Clicks', 'Impressions', 'CTR', 'Avg Position']];
+    for (const p of gscPages) {
+        rows.push([p.page, p.clicks, p.impressions, (p.ctr * 100).toFixed(2) + '%', p.position.toFixed(2)]);
+    }
+    downloadCSV(`vita-brevis-gsc-pages-${currentDays}d.csv`, rows);
 }
 
 // ============================================================================
