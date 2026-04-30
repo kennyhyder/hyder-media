@@ -564,7 +564,7 @@
             </div>
         </div>
 
-        <div id="customDatePopover" style="display:none; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div id="customDatePopover" style="display: none; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; align-items: center; gap: 10px; flex-wrap: wrap;">
             <label style="font-size: 0.85rem; color: var(--text-secondary);">Start:</label>
             <input type="date" id="customStartInput" class="filter-select" style="padding: 6px 10px;">
             <label style="font-size: 0.85rem; color: var(--text-secondary);">End:</label>
@@ -945,25 +945,33 @@ function activeDayCount() {
 
 // ===== Data loading =====
 async function loadAllData() {
-    setBadge('loading', 'Loading...');
-    document.getElementById('refreshBtn').disabled = true;
-
     // Pick granularity based on active range (preset or custom)
     const dayCount = activeDayCount();
     trendGranularity = dayCount <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
     const trendParam = trendGranularity;
     const dp = dateParams();
 
+    // Show what's actually being loaded — caught one bug where state wasn't propagating
+    const rangeLabel = dateMode === 'custom'
+        ? `${customStart} → ${customEnd}`
+        : `Last ${currentDays} days`;
+    setBadge('loading', `Loading… ${rangeLabel}`);
+    console.log('[reporting] loadAllData', { dateMode, dp, dayCount, trendGranularity });
+    document.getElementById('refreshBtn').disabled = true;
+
+    // Cache-bust so Vercel/CDN/browser doesn't return a stale response
+    const bust = `_t=${Date.now()}`;
+
     try {
         const [summaryRes, campaignRes, agRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
-            fetch(`${API_BASE}/performance?${dp}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?${dp}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?${dp}&breakdown=adgroup`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?${dp}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/ads?${dp}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/search-terms?${dp}&limit=100`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/account-keywords?${dp}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/ga4-insights`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=campaign&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=adgroup&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=${trendParam}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ads?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/search-terms?${dp}&limit=100&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/account-keywords?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ga4-insights?${bust}`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
