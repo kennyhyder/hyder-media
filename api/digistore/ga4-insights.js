@@ -58,13 +58,16 @@ export default async function handler(req, res) {
         let liveRows = [];
         if (PROPERTY_ID) {
             try {
-                // GA4 puts UTMs on collected_traffic_source (every event in the
-                // attributed session), NOT in event_params (which only carries
-                // them on the landing page_view). And the website fires
-                // `acct_type` (not `account_type`) per dev team's implementation.
+                // Use GA4's session-level Google Ads attribution
+                // (session_traffic_source_last_click.google_ads_campaign), which
+                // survives cross-domain hops between the LP and signup form.
+                // collected_traffic_source.manual_* would be empty here because
+                // the URL params don't reach the signup domain — but GA4's own
+                // session attribution preserves the original ad group.
+                // acct_type (not account_type) per dev team's implementation.
                 const liveQuery = `
                     SELECT
-                        collected_traffic_source.manual_content AS ad_group,
+                        session_traffic_source_last_click.google_ads_campaign.ad_group_name AS ad_group,
                         IFNULL(
                           (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'acct_type'),
                           (SELECT value.string_value FROM UNNEST(user_properties) WHERE key = 'acct_type'),
@@ -78,9 +81,9 @@ export default async function handler(req, res) {
                             OR _TABLE_SUFFIX BETWEEN 'intraday_${startSuffix}' AND 'intraday_${endSuffix}'
                           )
                       AND event_name = 'signup_success'
-                      AND collected_traffic_source.manual_source = 'google'
-                      AND collected_traffic_source.manual_medium = 'cpc'
-                      AND collected_traffic_source.manual_content IS NOT NULL
+                      AND session_traffic_source_last_click.google_ads_campaign.ad_group_name IS NOT NULL
+                      -- US Digistore24 account only (excludes DACH-DE traffic on same property)
+                      AND session_traffic_source_last_click.google_ads_campaign.customer_id = '2466246400'
                     GROUP BY 1, 2
                 `;
                 const [job] = await bq.createQueryJob({ query: liveQuery, location: 'US' });
