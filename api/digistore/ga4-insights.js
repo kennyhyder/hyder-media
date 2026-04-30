@@ -82,10 +82,11 @@ export default async function handler(req, res) {
                           )
                       AND event_name = 'signup_success'
                       AND session_traffic_source_last_click.google_ads_campaign.ad_group_name IS NOT NULL
-                      -- US Digistore24 account only (excludes DACH-DE traffic on same property)
-                      AND session_traffic_source_last_click.google_ads_campaign.customer_id = '2466246400'
                     GROUP BY 1, 2
                 `;
+                // (DACH-DE traffic on same property is filtered out downstream
+                //  — the dashboard's ad-group→campaign mapping only knows about
+                //  US ad groups, so DE rows have no campaign and get dropped.)
                 const [job] = await bq.createQueryJob({ query: liveQuery, location: 'US' });
                 const [rows] = await job.getQueryResults();
                 liveRows = rows;
