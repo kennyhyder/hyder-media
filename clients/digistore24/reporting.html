@@ -558,9 +558,20 @@
                     <button class="date-btn" data-days="90">90d</button>
                     <button class="date-btn" data-days="180">6mo</button>
                     <button class="date-btn" data-days="365">12mo</button>
+                    <button class="date-btn" id="customDateBtn">Custom</button>
                 </div>
                 <button id="refreshBtn" class="btn btn-primary" onclick="loadAllData()">Refresh</button>
             </div>
+        </div>
+
+        <div id="customDatePopover" style="display:none; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label style="font-size: 0.85rem; color: var(--text-secondary);">Start:</label>
+            <input type="date" id="customStartInput" class="filter-select" style="padding: 6px 10px;">
+            <label style="font-size: 0.85rem; color: var(--text-secondary);">End:</label>
+            <input type="date" id="customEndInput" class="filter-select" style="padding: 6px 10px;">
+            <button class="btn btn-primary" onclick="applyCustomRange()">Apply</button>
+            <button class="btn" onclick="closeCustomPopover()" style="background: transparent;">Cancel</button>
+            <span id="customDateMsg" style="font-size: 0.8rem; color: var(--warning);"></span>
         </div>
 
         <div class="tab-bar">
@@ -806,6 +817,9 @@
 <script>
 // State
 let currentDays = 7;
+let dateMode = 'preset';     // 'preset' | 'custom'
+let customStart = null;      // ISO date string YYYY-MM-DD
+let customEnd = null;
 let isDemo = false;
 let performanceData = null;
 let campaignData = null;
@@ -862,31 +876,93 @@ window.addEventListener('hashchange', () => {
 // ===== Date selector =====
 document.querySelectorAll('.date-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+        // Custom button toggles the popover, doesn't trigger a load
+        if (btn.id === 'customDateBtn') {
+            const pop = document.getElementById('customDatePopover');
+            const isOpen = pop.style.display === 'flex';
+            if (isOpen) {
+                closeCustomPopover();
+            } else {
+                // Pre-fill with current date range or sensible defaults
+                const today = new Date();
+                const start = customStart || (() => { const d = new Date(); d.setDate(d.getDate() - currentDays); return d.toISOString().split('T')[0]; })();
+                const end = customEnd || today.toISOString().split('T')[0];
+                document.getElementById('customStartInput').value = start;
+                document.getElementById('customEndInput').value = end;
+                document.getElementById('customStartInput').max = today.toISOString().split('T')[0];
+                document.getElementById('customEndInput').max = today.toISOString().split('T')[0];
+                pop.style.display = 'flex';
+            }
+            return;
+        }
         document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentDays = parseInt(btn.dataset.days);
+        dateMode = 'preset';
+        customStart = null;
+        customEnd = null;
+        closeCustomPopover();
         loadAllData();
     });
 });
+
+function closeCustomPopover() {
+    document.getElementById('customDatePopover').style.display = 'none';
+    document.getElementById('customDateMsg').textContent = '';
+}
+
+function applyCustomRange() {
+    const s = document.getElementById('customStartInput').value;
+    const e = document.getElementById('customEndInput').value;
+    const msg = document.getElementById('customDateMsg');
+    if (!s || !e) { msg.textContent = 'Pick both dates.'; return; }
+    if (s > e) { msg.textContent = 'Start must be before end.'; return; }
+    customStart = s;
+    customEnd = e;
+    dateMode = 'custom';
+    // Mark Custom button active, others inactive
+    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('customDateBtn').classList.add('active');
+    closeCustomPopover();
+    loadAllData();
+}
+
+// Build the date query-string fragment used by all API fetches
+function dateParams() {
+    if (dateMode === 'custom' && customStart && customEnd) {
+        return `start=${customStart}&end=${customEnd}`;
+    }
+    return `days=${currentDays}`;
+}
+
+// Day count for the active date range — used to pick chart granularity
+function activeDayCount() {
+    if (dateMode === 'custom' && customStart && customEnd) {
+        return Math.max(1, Math.round((new Date(customEnd) - new Date(customStart)) / 86400000));
+    }
+    return currentDays;
+}
 
 // ===== Data loading =====
 async function loadAllData() {
     setBadge('loading', 'Loading...');
     document.getElementById('refreshBtn').disabled = true;
 
-    // Pick granularity based on current range
-    trendGranularity = currentDays <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
-    const trendParam = trendGranularity; // 'daily' or 'monthly'
+    // Pick granularity based on active range (preset or custom)
+    const dayCount = activeDayCount();
+    trendGranularity = dayCount <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
+    const trendParam = trendGranularity;
+    const dp = dateParams();
 
     try {
         const [summaryRes, campaignRes, agRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
-            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=adgroup`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/search-terms?days=${currentDays}&limit=100`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/account-keywords?days=${currentDays}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=summary`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=campaign`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=adgroup`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ads?${dp}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/search-terms?${dp}&limit=100`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/account-keywords?${dp}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ga4-insights`).then(r => r.json()).catch(() => null),
         ]);
 
@@ -910,7 +986,7 @@ async function loadAllData() {
             searchTermsData = stOk ? stRes.terms : [];
             keywordsData = kwOk ? kwRes.keywords : [];
             ga4Data = ga4Ok ? ga4Res : null;
-            setBadge('live', 'Live Data');
+            setBadge('live', dateMode === 'custom' ? `${customStart} → ${customEnd}` : 'Live Data');
         } else {
             isDemo = true;
             generateDemoData();
@@ -1483,7 +1559,7 @@ function exportCampaignsCSV() {
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `digistore24-campaigns-${currentDays}d.csv`; a.click();
+    a.href = url; a.download = `digistore24-campaigns-${dateMode === 'custom' ? customStart + '_to_' + customEnd : currentDays + 'd'}.csv`; a.click();
     URL.revokeObjectURL(url);
 }
 
@@ -1730,7 +1806,7 @@ function exportSearchTermsCSV() {
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `digistore24-search-terms-${currentDays}d.csv`; a.click();
+    a.href = url; a.download = `digistore24-search-terms-${dateMode === 'custom' ? customStart + '_to_' + customEnd : currentDays + 'd'}.csv`; a.click();
     URL.revokeObjectURL(url);
 }
 
@@ -1823,7 +1899,7 @@ function exportKeywordsCSV() {
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `digistore24-keywords-${currentDays}d.csv`; a.click();
+    a.href = url; a.download = `digistore24-keywords-${dateMode === 'custom' ? customStart + '_to_' + customEnd : currentDays + 'd'}.csv`; a.click();
     URL.revokeObjectURL(url);
 }
 

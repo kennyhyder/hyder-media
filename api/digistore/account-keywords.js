@@ -72,12 +72,7 @@ export default async function handler(req, res) {
             'Content-Type': 'application/json',
         };
 
-        const days = parseInt(req.query.days) || 30;
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - days);
-        const start = startDate.toISOString().split('T')[0];
-        const end = endDate.toISOString().split('T')[0];
+        const { start, end } = resolveDateRange(req.query);
 
         const query = `
             SELECT
@@ -148,4 +143,16 @@ export default async function handler(req, res) {
     } catch (error) {
         return res.status(200).json({ status: 'error', error: error.message, keywords: [] });
     }
+}
+
+function resolveDateRange(query) {
+    const isISODate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    if (isISODate(query.start) && isISODate(query.end)) {
+        return { start: query.start, end: query.end };
+    }
+    const days = parseInt(query.days) || 30;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] };
 }

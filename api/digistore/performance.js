@@ -21,16 +21,8 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    const days = parseInt(req.query.days) || 30;
-    const breakdown = req.query.breakdown || 'summary'; // 'summary' | 'campaign' | 'monthly' | 'daily'
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    const dateRange = {
-        start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0]
-    };
+    const breakdown = req.query.breakdown || 'summary'; // 'summary' | 'campaign' | 'adgroup' | 'monthly' | 'daily'
+    const dateRange = resolveDateRange(req.query);
 
     const result = { dateRange, status: 'loading', errors: [] };
 
@@ -374,4 +366,19 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
             convRate: clicks > 0 ? conversions / clicks : 0,
         };
     });
+}
+
+// Resolve the date range from query params.
+// Accepts ?start=YYYY-MM-DD&end=YYYY-MM-DD (preferred) or ?days=N (fallback).
+// Returns { start, end } in ISO date format.
+function resolveDateRange(query) {
+    const isISODate = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    if (isISODate(query.start) && isISODate(query.end)) {
+        return { start: query.start, end: query.end };
+    }
+    const days = parseInt(query.days) || 30;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    return { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] };
 }
