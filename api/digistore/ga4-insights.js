@@ -58,31 +58,29 @@ export default async function handler(req, res) {
         let liveRows = [];
         if (PROPERTY_ID) {
             try {
+                // GA4 puts UTMs on collected_traffic_source (every event in the
+                // attributed session), NOT in event_params (which only carries
+                // them on the landing page_view). And the website fires
+                // `acct_type` (not `account_type`) per dev team's implementation.
                 const liveQuery = `
-                    WITH events AS (
-                        SELECT
-                            event_date,
-                            event_name,
-                            user_pseudo_id,
-                            (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'campaign')   AS utm_campaign,
-                            (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'content')    AS utm_content,
-                            (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'account_type') AS account_type,
-                            (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'source')     AS utm_source,
-                            (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'medium')     AS utm_medium
-                        FROM \`${PROJECT_ID}.analytics_${PROPERTY_ID}.events_*\`
-                        WHERE (
-                                _TABLE_SUFFIX BETWEEN '${startSuffix}' AND '${endSuffix}'
-                                OR _TABLE_SUFFIX BETWEEN 'intraday_${startSuffix}' AND 'intraday_${endSuffix}'
-                              )
-                    )
                     SELECT
-                        utm_content AS ad_group,
-                        IFNULL(account_type, '(not set)') AS account_type,
+                        collected_traffic_source.manual_content AS ad_group,
+                        IFNULL(
+                          (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'acct_type'),
+                          (SELECT value.string_value FROM UNNEST(user_properties) WHERE key = 'acct_type'),
+                          '(not set)'
+                        ) AS account_type,
                         COUNT(DISTINCT user_pseudo_id) AS active_users,
-                        COUNTIF(event_name = 'signup_success') AS key_events
-                    FROM events
-                    WHERE utm_source = 'google' AND utm_medium = 'cpc'
-                      AND utm_content IS NOT NULL
+                        COUNT(*) AS key_events
+                    FROM \`${PROJECT_ID}.analytics_${PROPERTY_ID}.events_*\`
+                    WHERE (
+                            _TABLE_SUFFIX BETWEEN '${startSuffix}' AND '${endSuffix}'
+                            OR _TABLE_SUFFIX BETWEEN 'intraday_${startSuffix}' AND 'intraday_${endSuffix}'
+                          )
+                      AND event_name = 'signup_success'
+                      AND collected_traffic_source.manual_source = 'google'
+                      AND collected_traffic_source.manual_medium = 'cpc'
+                      AND collected_traffic_source.manual_content IS NOT NULL
                     GROUP BY 1, 2
                 `;
                 const [job] = await bq.createQueryJob({ query: liveQuery, location: 'US' });
