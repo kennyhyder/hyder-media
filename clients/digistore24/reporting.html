@@ -614,6 +614,7 @@
                 <button class="btn" onclick="exportCampaignsCSV()">Export CSV</button>
             </div>
             <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;">Click any campaign to expand its ad groups. Vendor / Affiliate columns from GA4.</p>
+            <div id="ga4SourceBanner" style="display:none; font-size:0.82rem; padding:8px 14px; border-radius:6px; margin-bottom:12px;"></div>
             <div class="table-wrapper">
                 <table id="campaignTable">
                     <thead>
@@ -971,7 +972,7 @@ async function loadAllData() {
             fetch(`${API_BASE}/ads?${dp}&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/search-terms?${dp}&limit=100&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/account-keywords?${dp}&${bust}`).then(r => r.json()).catch(() => null),
-            fetch(`${API_BASE}/ga4-insights?${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/ga4-insights?${dp}&${bust}`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
@@ -1441,6 +1442,27 @@ function buildGA4ByCampaign() {
 
 function renderCampaigns() {
     const tbody = document.getElementById('campaignBody');
+    const banner = document.getElementById('ga4SourceBanner');
+
+    // Banner messaging based on GA4 data source vs active date range
+    if (banner) {
+        if (!ga4Data || !ga4Data.byAdGroup || ga4Data.byAdGroup.length === 0) {
+            banner.style.display = 'none';
+        } else if (ga4Data.source === 'historical') {
+            banner.style.display = 'block';
+            banner.style.background = 'rgba(245,158,11,0.10)';
+            banner.style.border = '1px solid rgba(245,158,11,0.35)';
+            banner.style.color = 'var(--warning)';
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> ${ga4Data.dataAge || 'Historical 28d backfill'}. These numbers do not change with the date range until live GA4 export accumulates more data.`;
+        } else if (ga4Data.source === 'live') {
+            banner.style.display = 'block';
+            banner.style.background = 'rgba(34,197,94,0.10)';
+            banner.style.border = '1px solid rgba(34,197,94,0.35)';
+            banner.style.color = 'var(--success)';
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> Live GA4 data, filtered to ${ga4Data.dateRange?.start} → ${ga4Data.dateRange?.end}.`;
+        }
+    }
+
     if (!campaignData || campaignData.length === 0) {
         tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
         return;

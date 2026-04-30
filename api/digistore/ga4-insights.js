@@ -35,6 +35,22 @@ export default async function handler(req, res) {
     const result = { source: null, rows: [], totals: {}, errors: [], dataAge: null };
     let bq;
 
+    // Resolve date range (start/end ISO dates) — same pattern as the other endpoints
+    const isISO = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    let start, end;
+    if (isISO(req.query.start) && isISO(req.query.end)) {
+        start = req.query.start; end = req.query.end;
+    } else {
+        const days = parseInt(req.query.days) || 28;
+        const e = new Date(); const s = new Date();
+        s.setDate(s.getDate() - days);
+        start = s.toISOString().split('T')[0];
+        end = e.toISOString().split('T')[0];
+    }
+    const startSuffix = start.replace(/-/g, '');
+    const endSuffix = end.replace(/-/g, '');
+    result.dateRange = { start, end };
+
     try {
         bq = getBigQueryClient();
 
@@ -54,8 +70,10 @@ export default async function handler(req, res) {
                             (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'source')     AS utm_source,
                             (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'medium')     AS utm_medium
                         FROM \`${PROJECT_ID}.analytics_${PROPERTY_ID}.events_*\`
-                        WHERE _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 28 DAY))
-                                                AND CONCAT('intraday_', FORMAT_DATE('%Y%m%d', CURRENT_DATE()))
+                        WHERE (
+                                _TABLE_SUFFIX BETWEEN '${startSuffix}' AND '${endSuffix}'
+                                OR _TABLE_SUFFIX BETWEEN 'intraday_${startSuffix}' AND 'intraday_${endSuffix}'
+                              )
                     )
                     SELECT
                         utm_content AS ad_group,
@@ -70,8 +88,10 @@ export default async function handler(req, res) {
                 const [job] = await bq.createQueryJob({ query: liveQuery, location: 'US' });
                 const [rows] = await job.getQueryResults();
                 liveRows = rows;
-                result.source = 'live';
-                result.dataAge = 'Last 28d (live GA4 export)';
+                if (liveRows.length > 0) {
+                    result.source = 'live';
+                    result.dataAge = `${start} → ${end} (live GA4 export)`;
+                }
             } catch (err) {
                 // Fall back to historical if live isn't ready yet
                 result.errors.push({ step: 'live_query', error: err.message });
@@ -124,8 +144,9 @@ export default async function handler(req, res) {
             const [job] = await bq.createQueryJob({ query: histQuery, location: 'US' });
             const [rows] = await job.getQueryResults();
             liveRows = rows;
-            result.source = result.source || 'historical';
-            result.dataAge = 'Mar 30 – Apr 26, 2026 (28d backfill)';
+            result.source = 'historical';
+            result.historicalRange = 'Mar 30 – Apr 26, 2026';
+            result.dataAge = `Historical 28d backfill (${result.historicalRange}) — does NOT reflect selected ${start} → ${end} window`;
             result.schemaUsed = { adGroupCol, accountTypeCol, usersCol, keyEventsCol };
         }
 
