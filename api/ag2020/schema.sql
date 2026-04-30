@@ -63,3 +63,35 @@ CREATE TABLE IF NOT EXISTS ag2020_call_log_uploads (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ag2020_call_log_uploads_created ON ag2020_call_log_uploads(created_at DESC);
+
+-- ============================================================================
+-- Missed-call follow-ups (email-triggered: VBC sends an email when a call
+-- is missed, an external parser POSTs to /api/ag2020/missed-call-webhook,
+-- this row records the result).
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ag2020_missed_call_followups (
+    id BIGSERIAL PRIMARY KEY,
+    caller_number VARCHAR(50),
+    caller_name VARCHAR(200),
+    called_at TIMESTAMP WITH TIME ZONE,
+    received_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    -- ActiveCampaign outcome
+    ac_contact_id VARCHAR(50),
+    ac_deal_id VARCHAR(50),
+    ac_status VARCHAR(50),
+    ac_error TEXT,
+    -- Twilio SMS outcome
+    sms_sent BOOLEAN DEFAULT FALSE,
+    sms_sid VARCHAR(50),
+    sms_status VARCHAR(50),
+    sms_error TEXT,
+    sms_body TEXT,
+    -- Source/raw
+    source VARCHAR(50),                  -- 'zapier', 'make', 'manual', 'mailgun', etc.
+    raw_payload JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_called ON ag2020_missed_call_followups(called_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_caller ON ag2020_missed_call_followups(caller_number);
+CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_received ON ag2020_missed_call_followups(received_at DESC);

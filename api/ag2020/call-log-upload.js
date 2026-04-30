@@ -183,7 +183,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { filename, rows, mapping: userMapping } = req.body || {};
+    const { filename, rows, mapping: userMapping, pushMissedToAC } = req.body || {};
 
     if (!Array.isArray(rows) || rows.length === 0) {
         return res.status(400).json({ error: 'Body must include a non-empty rows array' });
@@ -282,6 +282,19 @@ export default async function handler(req, res) {
         }
     }
 
+    // Optional: push missed inbound calls to ActiveCampaign (Phase 3 fallback for
+    // when the real-time email pipeline isn't set up). Only fires for calls that
+    // (a) just got inserted, (b) are inbound, (c) are missed, (d) have a phone.
+    let acPush = null;
+    if (pushMissedToAC) {
+        const eligible = toInsert.filter(r =>
+            r.from_number &&
+            r.direction === 'inbound' &&
+            r.answered === false
+        );
+        acPush = await pushMissedCallsToAC(supabase, eligible, batchId);
+    }
+
     // Record the upload audit row
     await supabase.from('ag2020_call_log_uploads').insert({
         id: batchId,
@@ -306,5 +319,154 @@ export default async function handler(req, res) {
         errors: errors.slice(0, 20),
         mapping,
         dateRange: { start: minDate, end: maxDate },
+        acPush,
     });
+}
+
+// ============================================================================
+// Phase 3: push missed inbound calls into ActiveCampaign as contacts/deals
+// ============================================================================
+
+async function pushMissedCallsToAC(supabase, missedCalls, batchId) {
+    const acUrl = process.env.AG2020_ACTIVECAMPAIGN_URL;
+    const acKey = process.env.AG2020_ACTIVECAMPAIGN_KEY;
+    if (!acUrl || !acKey) {
+        return { status: 'not_configured', error: 'AC env vars missing', pushed: 0, skipped: missedCalls.length };
+    }
+    if (missedCalls.length === 0) {
+        return { status: 'success', pushed: 0, skipped: 0, note: 'no eligible missed inbound calls in this batch' };
+    }
+
+    const base = acUrl.replace(/\/$/, '') + '/api/3';
+    const headers = {
+        'Api-Token': acKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    };
+
+    const tagId = process.env.AG2020_AC_MISSED_CALL_TAG_ID;
+    const pipelineId = process.env.AG2020_AC_MISSED_CALL_PIPELINE_ID;
+    const stageId = process.env.AG2020_AC_MISSED_CALL_STAGE_ID;
+    const ownerId = process.env.AG2020_AC_MISSED_CALL_OWNER_ID || '1';
+
+    let pushed = 0, errors = 0, alreadyTracked = 0;
+    const errorDetails = [];
+    const followupRows = [];
+
+    // Limit per-batch AC writes to keep the function under the 30s timeout.
+    const MAX_AC_PUSH = 200;
+    const targets = missedCalls.slice(0, MAX_AC_PUSH);
+    const skipped = missedCalls.length - targets.length;
+
+    // Pre-skip rows we've already pushed for the same caller in the last 24h to
+    // avoid spamming AC with duplicates when the same CSV is reuploaded.
+    const phones = [...new Set(targets.map(r => r.from_number).filter(Boolean))];
+    const since = new Date();
+    since.setHours(since.getHours() - 24);
+    const { data: recent } = await supabase
+        .from('ag2020_missed_call_followups')
+        .select('caller_number')
+        .gte('received_at', since.toISOString())
+        .in('caller_number', phones);
+    const recentlyTracked = new Set((recent || []).map(r => r.caller_number));
+
+    for (const call of targets) {
+        if (recentlyTracked.has(call.from_number)) {
+            alreadyTracked += 1;
+            continue;
+        }
+        try {
+            // Find or create AC contact
+            const search = await fetch(`${base}/contacts?filters[phone]=${encodeURIComponent(call.from_number)}&limit=1`, { headers });
+            const searchData = await search.json();
+            let contactId = null;
+            if (search.ok && searchData.contacts?.length > 0) {
+                contactId = searchData.contacts[0].id;
+            } else {
+                const syntheticEmail = `${call.from_number.replace(/\D/g, '')}@phone.autoglass2020.com`;
+                const create = await fetch(`${base}/contact/sync`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ contact: { email: syntheticEmail, phone: call.from_number } }),
+                });
+                const createData = await create.json();
+                if (!create.ok || !createData.contact) {
+                    throw new Error(`contact/sync failed: ${JSON.stringify(createData).slice(0, 200)}`);
+                }
+                contactId = createData.contact.id;
+            }
+
+            if (tagId) {
+                await fetch(`${base}/contactTags`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ contactTag: { contact: contactId, tag: tagId } }),
+                }).catch(() => {});
+            }
+
+            let dealId = null;
+            if (pipelineId && stageId) {
+                const dealRes = await fetch(`${base}/deals`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        deal: {
+                            title: `Missed call (CSV) — ${call.from_number}`,
+                            contact: contactId,
+                            value: 0,
+                            currency: 'usd',
+                            group: pipelineId,
+                            stage: stageId,
+                            owner: ownerId,
+                        },
+                    }),
+                });
+                const dealData = await dealRes.json();
+                if (dealRes.ok && dealData.deal) dealId = dealData.deal.id;
+            }
+
+            followupRows.push({
+                caller_number: call.from_number,
+                caller_name: call.user_name || null,
+                called_at: call.call_time,
+                ac_contact_id: contactId,
+                ac_deal_id: dealId,
+                ac_status: 'success',
+                sms_sent: false,
+                sms_status: 'skipped',
+                source: `csv-batch:${batchId}`,
+                raw_payload: { batchId, call_hash: call.call_hash, csv_row: call.raw_row || null },
+            });
+            pushed += 1;
+        } catch (err) {
+            errors += 1;
+            if (errorDetails.length < 20) errorDetails.push({ phone: call.from_number, error: err.message });
+            followupRows.push({
+                caller_number: call.from_number,
+                caller_name: call.user_name || null,
+                called_at: call.call_time,
+                ac_status: 'error',
+                ac_error: err.message,
+                sms_sent: false,
+                sms_status: 'skipped',
+                source: `csv-batch:${batchId}`,
+                raw_payload: { batchId, call_hash: call.call_hash },
+            });
+        }
+    }
+
+    // Audit all attempts in one batch insert
+    if (followupRows.length > 0) {
+        await supabase.from('ag2020_missed_call_followups').insert(followupRows).select('id');
+    }
+
+    return {
+        status: errors === 0 ? 'success' : 'partial',
+        eligible: missedCalls.length,
+        pushed,
+        alreadyTracked,
+        errors,
+        errorDetails,
+        skippedDueToCap: skipped,
+    };
 }
