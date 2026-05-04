@@ -141,24 +141,31 @@ async function fetchAllRecords(apiKey, baseId, tableName) {
 // Field normalization
 // ============================================================================
 
-// Lacy's table likely has Title-Cased column names. We accept many spellings
-// for each canonical field so we don't have to ask Kenny what every column is.
+// Field aliases for the AG2020 Rebates Airtable. Confirmed real fields are
+// listed first; legacy/alternate spellings come after for tolerance.
 const FIELD_ALIASES = {
-    customer: ['Customer', 'Customer Name', 'Name', 'Client', 'Client Name'],
-    phone: ['Phone', 'Phone Number', 'Mobile', 'Cell', 'Caller', 'Customer Phone'],
-    vehicle: ['Vehicle', 'Car', 'YMM', 'Year/Make/Model', 'Make/Model', 'Vehicle Description'],
+    customer: ['Name', 'Customer', 'Customer Name', 'Client', 'Client Name'],
+    phone: ['Phone', 'Enter Phone', '10-Digit Phone', 'Phone Number', 'Mobile', 'Cell', 'Caller', 'Customer Phone'],
+    email: ['E-Mail', 'Email'],
+    vehicle: ['Year Make Model', 'Vehicle', 'Car', 'YMM', 'Year/Make/Model', 'Make/Model', 'Vehicle Description'],
     year: ['Year'],
     make: ['Make'],
     model: ['Model'],
-    jobDate: ['Job Date', 'Service Date', 'Date', 'Install Date', 'Install', 'Date Installed'],
-    invoice: ['Invoice', 'Invoice #', 'Invoice Number', 'Job #', 'Job Number'],
+    jobDate: ['Install Date', 'Job Date', 'Service Date', 'Date', 'Install', 'Date Installed'],
+    invoice: ['GB Job#', 'Invoice', 'Invoice #', 'Invoice Number', 'Job #', 'Job Number'],
     amount: ['Amount', 'Rebate Amount', 'Rebate', 'Amount Owed', '$', 'Total', 'Payout'],
-    status: ['Status', 'Pay Status', 'Payment Status', 'State'],
-    payDate: ['Pay Date', 'Date Paid', 'Paid Date', 'Promised Date', 'Commit Date', 'Date Committed'],
+    status: ['Rebate Action', 'Main Status', 'Status', 'Pay Status', 'Payment Status', 'State'],
+    payDate: ['Paid on', 'Pay Date', 'Date Paid', 'Paid Date', 'Promised Date', 'Commit Date', 'Date Committed'],
+    paymentTarget: ['Payment Target'],
+    paidVia: ['Paid via', 'Paid Via', 'Payment Method'],
     checkNumber: ['Check #', 'Check Number', 'Check'],
     notes: ['Notes', 'Comment', 'Comments', 'Note'],
     paid: ['Paid', 'Is Paid'],
-    committed: ['Committed', 'Is Committed', 'Promise', 'Promised'],
+    committed: ['Committed', 'Is Committed', 'Promise', 'Promised', 'NITP'],
+    tags: ['Tags', 'Data Source'],
+    priority: ['Priority'],
+    daysWaiting: ['Days'],
+    address: ['Mailing Address', 'Address'],
 };
 
 function getField(fields, aliases) {
@@ -176,6 +183,7 @@ function normalizeRecord(r) {
 
     const customer = strOrNull(getField(f, FIELD_ALIASES.customer));
     const phone = strOrNull(getField(f, FIELD_ALIASES.phone));
+    const email = strOrNull(getField(f, FIELD_ALIASES.email));
     let vehicle = strOrNull(getField(f, FIELD_ALIASES.vehicle));
     if (!vehicle) {
         const y = getField(f, FIELD_ALIASES.year);
@@ -187,24 +195,34 @@ function normalizeRecord(r) {
     const jobDate = parseDate(getField(f, FIELD_ALIASES.jobDate));
     const invoice = strOrNull(getField(f, FIELD_ALIASES.invoice));
     const amount = parseAmount(getField(f, FIELD_ALIASES.amount));
-    let status = strOrNull(getField(f, FIELD_ALIASES.status));
+    const rawStatus = strOrNull(getField(f, FIELD_ALIASES.status));
     const payDate = parseDate(getField(f, FIELD_ALIASES.payDate));
+    const paymentTarget = parseDate(getField(f, FIELD_ALIASES.paymentTarget));
+    const paidVia = strOrNull(getField(f, FIELD_ALIASES.paidVia));
     const checkNumber = strOrNull(getField(f, FIELD_ALIASES.checkNumber));
     const notes = strOrNull(getField(f, FIELD_ALIASES.notes));
+    const priority = getField(f, FIELD_ALIASES.priority);
+    const daysWaiting = getField(f, FIELD_ALIASES.daysWaiting);
+    const address = strOrNull(getField(f, FIELD_ALIASES.address));
+    const tagsRaw = getField(f, FIELD_ALIASES.tags);
+    const tags = Array.isArray(tagsRaw) ? tagsRaw.map(String) : (tagsRaw ? [String(tagsRaw)] : []);
 
-    // If no Status column, infer from booleans
-    if (!status) {
-        const paid = !!getField(f, FIELD_ALIASES.paid);
-        const committed = !!getField(f, FIELD_ALIASES.committed);
-        if (paid) status = 'Paid';
-        else if (committed) status = 'Committed';
-        else status = 'Owed';
+    // Status: combine Paid checkbox + Rebate Action + NITP into our canonical buckets.
+    // Paid checkbox always wins. NITP (Notice of Intent To Pay) maps to Committed.
+    const paidFlag = !!getField(f, FIELD_ALIASES.paid);
+    const nitpFlag = !!f['NITP'];
+    let status;
+    if (paidFlag || (rawStatus && /paid/i.test(rawStatus))) {
+        status = 'Paid';
+    } else if (nitpFlag || (rawStatus && /(commit|promis|nitp|intent.*pay)/i.test(rawStatus))) {
+        status = 'Committed';
+    } else if (rawStatus && /(owed|outstand|open|new|pending)/i.test(rawStatus)) {
+        status = 'Owed';
+    } else if (rawStatus) {
+        // Pass through any unrecognized rebate-action value so Lacy can still see/filter it
+        status = rawStatus;
     } else {
-        // Normalize variant spellings
-        const lower = status.toLowerCase();
-        if (lower.includes('paid')) status = 'Paid';
-        else if (lower.includes('commit') || lower.includes('promis')) status = 'Committed';
-        else if (lower.includes('owed') || lower.includes('outstand') || lower.includes('open')) status = 'Owed';
+        status = 'Owed';
     }
 
     // Skip rows with no customer + no amount + no invoice — likely deleted/empty
@@ -214,14 +232,22 @@ function normalizeRecord(r) {
         id: r.id,
         customer,
         phone,
+        email,
         vehicle,
         jobDate,
         invoice,
         amount,
         status,
+        rawStatus,
         payDate,
+        paymentTarget,
+        paidVia,
         checkNumber,
         notes,
+        priority,
+        daysWaiting,
+        address,
+        tags,
         // Pass through anything we didn't recognize so the UI can hint at unmapped data
         unmappedFields: Object.fromEntries(
             Object.entries(f).filter(([k]) => !isMapped(k))
