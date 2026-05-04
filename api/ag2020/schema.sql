@@ -95,3 +95,48 @@ CREATE TABLE IF NOT EXISTS ag2020_missed_call_followups (
 CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_called ON ag2020_missed_call_followups(called_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_caller ON ag2020_missed_call_followups(caller_number);
 CREATE INDEX IF NOT EXISTS idx_ag2020_missed_call_followups_received ON ag2020_missed_call_followups(received_at DESC);
+
+-- ============================================================================
+-- Call Triage Queue: every inbound call (missed + answered) lands here.
+-- Agents triage from the dashboard, deciding which AC pipeline + tags +
+-- notes to apply. Submitting creates an AC deal and marks the row processed.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ag2020_call_queue (
+    id BIGSERIAL PRIMARY KEY,
+    call_hash VARCHAR(64) UNIQUE NOT NULL,           -- dedupe (caller+timestamp+duration)
+    caller_number VARCHAR(50),
+    caller_name VARCHAR(200),
+    called_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    received_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    -- Call attributes
+    answered BOOLEAN NOT NULL DEFAULT FALSE,
+    answered_by_extension VARCHAR(50),
+    answered_by_user VARCHAR(200),
+    ring_duration_seconds INTEGER,
+    direction VARCHAR(20) DEFAULT 'inbound',
+    -- Source/raw
+    source VARCHAR(50),
+    raw_payload JSONB,
+    -- Auto SMS for missed calls (sent at intake time)
+    auto_sms_sent BOOLEAN DEFAULT FALSE,
+    auto_sms_sid VARCHAR(50),
+    auto_sms_status VARCHAR(50),
+    auto_sms_error TEXT,
+    -- Triage outcome (set when an agent acts on the row)
+    triaged_at TIMESTAMP WITH TIME ZONE,
+    triaged_by VARCHAR(200),                          -- which agent did the triage (cookie name)
+    triage_action VARCHAR(20),                        -- 'deal_created' | 'spam' | 'skip'
+    triage_tags TEXT[],                               -- AC tag IDs applied
+    triage_pipeline_id VARCHAR(50),                   -- which AC pipeline (group ID)
+    triage_stage_id VARCHAR(50),                      -- which AC stage
+    triage_owner_id VARCHAR(50),                      -- which AC user owns the deal
+    triage_notes TEXT,
+    triage_ac_contact_id VARCHAR(50),                 -- created/found AC contact
+    triage_ac_deal_id VARCHAR(50),                    -- created AC deal
+    triage_error TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_called ON ag2020_call_queue(called_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_pending ON ag2020_call_queue(triaged_at, called_at DESC) WHERE triaged_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_caller ON ag2020_call_queue(caller_number);
