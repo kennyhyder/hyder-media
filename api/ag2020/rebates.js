@@ -19,7 +19,7 @@
  */
 
 const PAGE_SIZE = 100;
-const MAX_PAGES = 50;
+const MAX_PAGES = 100;
 let _cache = null;
 let _cacheAt = 0;
 
@@ -207,20 +207,19 @@ function normalizeRecord(r) {
     const tagsRaw = getField(f, FIELD_ALIASES.tags);
     const tags = Array.isArray(tagsRaw) ? tagsRaw.map(String) : (tagsRaw ? [String(tagsRaw)] : []);
 
-    // Status: combine Paid checkbox + Rebate Action + NITP into our canonical buckets.
-    // Paid checkbox always wins. NITP (Notice of Intent To Pay) maps to Committed.
+    // 3-bucket status: Paid / Committed / Owed.
+    // Lacy's workflow vocabulary lives in the Rebate Action singleSelect with
+    // values like "Called in - ready to send check", "needs manager call", etc.
+    // Any non-empty Rebate Action means somebody has engaged with this rebate,
+    // so we bucket it as "Committed" (customer has been worked) regardless of
+    // exact workflow stage. The raw value comes back in `rawStatus` for the UI.
     const paidFlag = !!getField(f, FIELD_ALIASES.paid);
     const nitpFlag = !!f['NITP'];
     let status;
-    if (paidFlag || (rawStatus && /paid/i.test(rawStatus))) {
+    if (paidFlag || (rawStatus && /^paid/i.test(rawStatus))) {
         status = 'Paid';
-    } else if (nitpFlag || (rawStatus && /(commit|promis|nitp|intent.*pay)/i.test(rawStatus))) {
+    } else if (rawStatus || nitpFlag) {
         status = 'Committed';
-    } else if (rawStatus && /(owed|outstand|open|new|pending)/i.test(rawStatus)) {
-        status = 'Owed';
-    } else if (rawStatus) {
-        // Pass through any unrecognized rebate-action value so Lacy can still see/filter it
-        status = rawStatus;
     } else {
         status = 'Owed';
     }
