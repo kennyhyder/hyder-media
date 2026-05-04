@@ -27,6 +27,8 @@
             --google-soft: rgba(66, 133, 244, 0.15);
             --meta: #1877f2;
             --meta-soft: rgba(24, 119, 242, 0.15);
+            --tiktok: #ff0050;
+            --tiktok-soft: rgba(255, 0, 80, 0.15);
             --success: #7fb069;
             --warning: #d9a441;
             --danger: #c46a5e;
@@ -196,6 +198,7 @@
         .stat-card.accent { border-left: 3px solid var(--accent); }
         .stat-card.google { border-left: 3px solid var(--google); }
         .stat-card.meta { border-left: 3px solid var(--meta); }
+        .stat-card.tiktok { border-left: 3px solid var(--tiktok); }
         .stat-label {
             font-size: 0.72rem;
             color: var(--text-secondary);
@@ -313,6 +316,18 @@
             font-weight: 600;
             margin-right: 6px;
         }
+        .platform-chip {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-right: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .platform-chip.tiktok { background: var(--tiktok-soft); color: var(--tiktok); }
+        .platform-chip.meta { background: var(--meta-soft); color: var(--meta); }
 
         /* Filter inputs */
         .filter-input, .filter-select {
@@ -602,6 +617,8 @@
             <button class="tab-btn" data-tab="keywords">Keywords</button>
             <button class="tab-btn" data-tab="meta">Meta Ads</button>
             <button class="tab-btn" data-tab="meta-creative">Meta Creative</button>
+            <button class="tab-btn" data-tab="tiktok">TikTok Ads</button>
+            <button class="tab-btn" data-tab="tiktok-creative">TikTok Creative</button>
             <button class="tab-btn" data-tab="gsc">Search Console</button>
         </div>
 
@@ -611,7 +628,7 @@
                 <div class="stat-card accent">
                     <div class="stat-label">Total Spend</div>
                     <div class="stat-value" id="ovTotalSpend">--</div>
-                    <div class="stat-sub" id="ovTotalSpendSub">Google + Meta combined</div>
+                    <div class="stat-sub" id="ovTotalSpendSub">Google + Meta + TikTok combined</div>
                 </div>
                 <div class="stat-card accent">
                     <div class="stat-label">Total Impressions</div>
@@ -681,6 +698,23 @@
                 <div class="stat-card meta">
                     <div class="stat-label">Meta — CPM</div>
                     <div class="stat-value" id="ovMetaCPM">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Spend</div>
+                    <div class="stat-value" id="ovTiktokSpend">--</div>
+                    <div class="stat-sub" id="ovTiktokSub">BC 7094682853576916994</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Impressions</div>
+                    <div class="stat-value" id="ovTiktokImpressions">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Video Plays</div>
+                    <div class="stat-value" id="ovTiktokVideoPlays">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — CTR</div>
+                    <div class="stat-value" id="ovTiktokCTR">--</div>
                 </div>
             </div>
         </div>
@@ -854,6 +888,93 @@
             </div>
         </div>
 
+        <!-- ===== TikTok Ads Tab ===== -->
+        <div id="tab-tiktok" class="tab-content">
+            <div id="tiktokAuthBanner" style="display:none; background:rgba(255,0,80,0.10); border:1px solid rgba(255,0,80,0.3); border-radius:4px; padding:14px 18px; margin-bottom:20px; font-size:0.9rem;">
+                <strong style="color:var(--tiktok);">TikTok not connected.</strong>
+                <span style="color:var(--text-secondary);">Authorize at <a href="/api/tiktok-ads/auth" style="color:var(--tiktok);">/api/tiktok-ads/auth</a> while logged in as kenny@hyder.me. Until then, this tab shows demo data.</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card tiktok"><div class="stat-label">Spend</div><div class="stat-value" id="tStatSpend">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Impressions</div><div class="stat-value" id="tStatImpressions">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Reach</div><div class="stat-value" id="tStatReach">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Frequency</div><div class="stat-value" id="tStatFreq">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Clicks</div><div class="stat-value" id="tStatClicks">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">CTR</div><div class="stat-value" id="tStatCTR">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">CPM</div><div class="stat-value" id="tStatCPM">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Conversions</div><div class="stat-value" id="tStatConv">--</div></div>
+            </div>
+
+            <div class="subsection-divider"><h2>Video Performance</h2></div>
+            <div class="stats-grid">
+                <div class="stat-card tiktok"><div class="stat-label">Video Plays</div><div class="stat-value" id="tStatVideoPlays">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">2-Second Views</div><div class="stat-value" id="tStatVideo2s">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">25% Watched</div><div class="stat-value" id="tStatVideo25">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">50% Watched</div><div class="stat-value" id="tStatVideo50">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">75% Watched</div><div class="stat-value" id="tStatVideo75">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">100% Watched</div><div class="stat-value" id="tStatVideo100">--</div></div>
+            </div>
+
+            <div class="subsection-divider"><h2>Engagement</h2></div>
+            <div class="stats-grid">
+                <div class="stat-card tiktok"><div class="stat-label">Profile Visits</div><div class="stat-value" id="tStatProfileVisits">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Follows</div><div class="stat-value" id="tStatFollows">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Likes</div><div class="stat-value" id="tStatLikes">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Comments</div><div class="stat-value" id="tStatComments">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Shares</div><div class="stat-value" id="tStatShares">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Engaged Views</div><div class="stat-value" id="tStatEngagedView">--</div></div>
+            </div>
+
+            <div class="subsection-divider"><h2>Campaigns</h2></div>
+            <div class="export-bar">
+                <button class="btn" onclick="exportTiktokCampaignsCSV()">Export CSV</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="tCampaignTable">
+                    <thead>
+                        <tr>
+                            <th data-tc-sort="name">Campaign</th>
+                            <th data-tc-sort="objective">Objective</th>
+                            <th class="numeric" data-tc-sort="spend">Spend</th>
+                            <th class="numeric" data-tc-sort="impressions">Impr</th>
+                            <th class="numeric" data-tc-sort="clicks">Clicks</th>
+                            <th class="numeric" data-tc-sort="ctr">CTR</th>
+                            <th class="numeric" data-tc-sort="cpm">CPM</th>
+                            <th class="numeric" data-tc-sort="conversions">Conv</th>
+                            <th class="numeric" data-tc-sort="costPerConv">Cost / Conv</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tCampaignBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== TikTok Creative Tab ===== -->
+        <div id="tab-tiktok-creative" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>TikTok Ads Creative <span id="tAdCountBadge" class="count-badge">0</span></h2>
+                    <p class="subtitle">Active TikTok ads with thumbnail/cover, copy, and per-ad performance.</p>
+                </div>
+                <div class="section-controls">
+                    <select id="tAdCampaignFilter" class="filter-select">
+                        <option value="">All campaigns</option>
+                    </select>
+                    <select id="tAdSortSelect" class="filter-select">
+                        <option value="spend">Sort: Spend (high → low)</option>
+                        <option value="impressions">Sort: Impressions</option>
+                        <option value="clicks">Sort: Clicks</option>
+                        <option value="ctr">Sort: CTR</option>
+                        <option value="conversions">Sort: Conversions</option>
+                        <option value="videoPlays">Sort: Video Plays</option>
+                        <option value="video100p">Sort: 100% Watched</option>
+                    </select>
+                </div>
+            </div>
+            <div class="meta-card-grid" id="tAdGrid"></div>
+        </div>
+
         <!-- ===== Search Console Tab ===== -->
         <div id="tab-gsc" class="tab-content">
             <div id="gscReauthBanner" style="display:none; background:rgba(217,164,65,0.12); border:1px solid rgba(217,164,65,0.3); border-radius:4px; padding:14px 18px; margin-bottom:20px; font-size:0.9rem;">
@@ -971,6 +1092,12 @@ let metaCampaigns = [];
 let metaAds = [];
 let metaTrend = [];
 
+let tiktokSummary = null;
+let tiktokCampaigns = [];
+let tiktokAds = [];
+let tiktokTrend = [];
+let tiktokNeedsAuth = false;
+
 let gscSummary = null;
 let gscQueries = [];
 let gscPages = [];
@@ -998,6 +1125,9 @@ let gAdCampaignFilter = '';
 let gAdSort = 'spend';
 let mAdAccountFilter = '';
 let mAdSort = 'spend';
+let tcSort = { key: 'spend', dir: -1 };
+let tAdCampaignFilter = '';
+let tAdSort = 'spend';
 
 const GOOGLE_API = '/api/vita-brevis';
 const META_API = '/api/vita-brevis';
@@ -1051,6 +1181,7 @@ async function loadAllData() {
         const [
             gSummaryRes, gCampaignRes, gTrendRes, gAdsRes, gSTRes, gKWRes,
             mSummaryRes, mCampaignRes, mTrendRes, mAdsRes,
+            tSummaryRes, tCampaignRes, tTrendRes, tAdsRes,
             gscSummaryRes, gscQueryRes, gscPageRes, gscDateRes, gscDeviceRes, gscCoverageRes,
         ] = await Promise.all([
             fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
@@ -1063,6 +1194,10 @@ async function loadAllData() {
             fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
             fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
             fetch(`${META_API}/meta-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
             fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
             fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=query&limit=200`).then(r => r.json()).catch(() => null),
             fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=page&limit=200`).then(r => r.json()).catch(() => null),
@@ -1081,6 +1216,13 @@ async function loadAllData() {
         const mCampOk = mCampaignRes?.status === 'success' && Array.isArray(mCampaignRes.campaigns);
         const mTrendOk = mTrendRes?.status === 'success' && Array.isArray(mTrendRes[trendParam]);
         const mAdsOk = mAdsRes?.status === 'success' && Array.isArray(mAdsRes.ads);
+
+        const tSumOk = tSummaryRes?.status === 'success' && tSummaryRes.summary;
+        const tCampOk = tCampaignRes?.status === 'success' && Array.isArray(tCampaignRes.campaigns);
+        const tTrendOk = tTrendRes?.status === 'success' && Array.isArray(tTrendRes[trendParam]);
+        const tAdsOk = tAdsRes?.status === 'success' && Array.isArray(tAdsRes.ads);
+        tiktokNeedsAuth = [tSummaryRes, tCampaignRes, tTrendRes, tAdsRes]
+            .some(r => r?.status === 'not_configured' || r?.status === 'needs_reauth' || r?.needsAuth);
 
         const gscSumOk = gscSummaryRes?.status === 'success' && gscSummaryRes.summary;
         const gscQueryOk = gscQueryRes?.status === 'success' && Array.isArray(gscQueryRes.queries);
@@ -1120,6 +1262,16 @@ async function loadAllData() {
             setBadge('demo', 'Demo Data');
         }
 
+        // TikTok independent live/demo state
+        if (tSumOk) {
+            tiktokSummary = tSummaryRes.summary;
+            tiktokCampaigns = tCampOk ? tCampaignRes.campaigns : [];
+            tiktokTrend = tTrendOk ? tTrendRes[trendParam] : [];
+            tiktokAds = tAdsOk ? tAdsRes.ads : [];
+        } else {
+            generateTiktokDemo();
+        }
+
         // GSC has independent live/demo state — it can be live even when ads APIs aren't,
         // and re-auth might be needed even after ads work
         if (gscSumOk) {
@@ -1136,6 +1288,7 @@ async function loadAllData() {
         isDemo = true;
         generateGoogleDemo();
         generateMetaDemo();
+        generateTiktokDemo();
         generateGSCDemo();
         setBadge('demo', 'Demo Data');
     }
@@ -1146,6 +1299,8 @@ async function loadAllData() {
     renderKeywords();
     renderMetaTab();
     renderMetaCreative();
+    renderTiktokTab();
+    renderTiktokCreative();
     renderGSC();
     document.getElementById('refreshBtn').disabled = false;
 }
@@ -1448,6 +1603,127 @@ function buildDemoTrend(totalSpend, totalClicks, totalConv) {
     return trend;
 }
 
+function generateTiktokDemo() {
+    const spend = 600 + Math.random() * 900;
+    const impressions = Math.round(45000 + Math.random() * 60000);
+    const clicks = Math.round(impressions * (0.008 + Math.random() * 0.012));
+    const reach = Math.round(impressions / (1.4 + Math.random() * 1.0));
+    const conv = Math.round((4 + Math.random() * 12) * 10) / 10;
+    const videoPlays = Math.round(impressions * (0.55 + Math.random() * 0.20));
+    const video2s = Math.round(videoPlays * (0.55 + Math.random() * 0.15));
+    const video25 = Math.round(videoPlays * (0.30 + Math.random() * 0.15));
+    const video50 = Math.round(videoPlays * (0.18 + Math.random() * 0.10));
+    const video75 = Math.round(videoPlays * (0.10 + Math.random() * 0.07));
+    const video100 = Math.round(videoPlays * (0.06 + Math.random() * 0.05));
+
+    tiktokSummary = {
+        spend, impressions, clicks, reach,
+        frequency: reach > 0 ? impressions / reach : 0,
+        ctr: clicks / impressions,
+        cpc: clicks > 0 ? spend / clicks : 0,
+        cpm: (spend / impressions) * 1000,
+        conversions: conv,
+        costPerConv: conv > 0 ? spend / conv : 0,
+        convRate: clicks > 0 ? conv / clicks : 0,
+        videoPlays, video2s, video25p: video25, video50p: video50, video75p: video75, video100p: video100,
+        engagedView: Math.round(video2s * 0.6),
+        profileVisits: Math.round(clicks * 0.18),
+        follows: Math.round(8 + Math.random() * 25),
+        likes: Math.round(clicks * (0.3 + Math.random() * 0.5)),
+        comments: Math.round(2 + Math.random() * 12),
+        shares: Math.round(3 + Math.random() * 18),
+    };
+
+    const campaignNames = [
+        'Originals — Awareness', 'Prints — Conversion', 'Studio Tour — Reach',
+        'Behind the Scenes — Engagement', 'Spring Specials — Conversion',
+    ];
+    tiktokCampaigns = campaignNames.slice(0, 3 + Math.floor(Math.random() * 2)).map((name, i) => {
+        const s = 100 + Math.random() * 500;
+        const imp = Math.round(8000 + Math.random() * 25000);
+        const cl = Math.round(imp * (0.008 + Math.random() * 0.014));
+        const c = Math.round((1 + Math.random() * 6) * 10) / 10;
+        return {
+            id: String(80000 + i),
+            name,
+            objective: ['REACH', 'TRAFFIC', 'VIDEO_VIEWS', 'CONVERSIONS'][i % 4],
+            spend: s, impressions: imp, clicks: cl,
+            reach: Math.round(imp / 1.5),
+            ctr: cl / imp,
+            cpc: cl > 0 ? s / cl : 0,
+            cpm: (s / imp) * 1000,
+            conversions: c,
+            costPerConv: c > 0 ? s / c : 0,
+            convRate: cl > 0 ? c / cl : 0,
+            videoPlays: Math.round(imp * 0.6),
+            video100p: Math.round(imp * 0.05),
+            likes: Math.round(cl * 0.3),
+        };
+    });
+
+    tiktokTrend = [];
+    if (trendGranularity === 'daily') {
+        for (let i = currentDays - 1; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const ds = (spend / currentDays) * (0.7 + Math.random() * 0.6);
+            const di = Math.round((impressions / currentDays) * (0.7 + Math.random() * 0.6));
+            const dc = Math.round(di * 0.01);
+            tiktokTrend.push({ date: d.toISOString().split('T')[0], spend: ds, impressions: di, clicks: dc });
+        }
+    } else {
+        const monthCount = Math.max(1, Math.min(Math.floor(currentDays / 30), 12));
+        for (let i = monthCount - 1; i >= 0; i--) {
+            const d = new Date(); d.setMonth(d.getMonth() - i);
+            const ms = (spend / monthCount) * (0.7 + Math.random() * 0.6);
+            const mi = Math.round((impressions / monthCount) * (0.7 + Math.random() * 0.6));
+            const mc = Math.round(mi * 0.01);
+            tiktokTrend.push({ month: d.toISOString().slice(0, 7), spend: ms, impressions: mi, clicks: mc });
+        }
+    }
+
+    const demoTexts = [
+        '15 years of capturing legacy. Book your fine art portrait session in Colorado Springs.',
+        'From cherished family moments to one-of-a-kind heirlooms — Vita Brevis Fine Art.',
+        'Why a portrait? Because life is short and beauty deserves to be remembered.',
+        'Behind the scenes: how we transform a session into a museum-quality keepsake.',
+        'Now booking spring sessions. Limited availability.',
+    ];
+    const demoTitles = [
+        'Heirloom Portraits', 'Studio Tour', 'Behind the Scenes',
+        'Spring Sessions Open', 'Why a Portrait?',
+    ];
+    tiktokAds = [];
+    for (let i = 0; i < 6; i++) {
+        const imp = Math.round(2000 + Math.random() * 9000);
+        const cl = Math.round(imp * (0.009 + Math.random() * 0.014));
+        const s = imp * (0.012 + Math.random() * 0.022);
+        const c = Math.round(Math.random() * 4 * 10) / 10;
+        tiktokAds.push({
+            id: String(90000 + i),
+            name: demoTitles[i % demoTitles.length] + ' v' + (i + 1),
+            campaign: campaignNames[i % campaignNames.length],
+            adGroup: 'Ad Group ' + ((i % 3) + 1),
+            status: 'STATUS_DELIVERY_OK',
+            adFormat: 'SINGLE_VIDEO',
+            adText: demoTexts[i % demoTexts.length],
+            callToAction: ['BOOK_NOW', 'LEARN_MORE', 'SHOP_NOW', 'CONTACT_US'][i % 4],
+            landingUrl: 'https://www.vitabrevisfineart.com/the-experience',
+            imageUrl: null, videoCoverUrl: null, videoPreviewUrl: null,
+            spend: s, impressions: imp, clicks: cl, reach: Math.round(imp / 1.5),
+            ctr: cl / imp, cpc: s / cl, cpm: (s / imp) * 1000,
+            conversions: c, costPerConv: c > 0 ? s / c : 0,
+            videoPlays: Math.round(imp * 0.6),
+            video2s: Math.round(imp * 0.35),
+            video100p: Math.round(imp * 0.04),
+            engagedView: Math.round(imp * 0.20),
+            likes: Math.round(cl * 0.3),
+            comments: Math.round(Math.random() * 5),
+            shares: Math.round(Math.random() * 8),
+        });
+    }
+    tiktokAds.sort((a, b) => b.spend - a.spend);
+}
+
 function generateGSCDemo() {
     const totalClicks = 280 + Math.floor(Math.random() * 200);
     const totalImpr = totalClicks * (35 + Math.random() * 25);
@@ -1550,10 +1826,11 @@ function esc(s) {
 function renderOverview() {
     const g = googleSummary || {};
     const m = metaSummary || {};
-    const totalSpend = (g.spend || 0) + (m.spend || 0);
-    const totalImpr = (g.impressions || 0) + (m.impressions || 0);
-    const totalClicks = (g.clicks || 0) + (m.clicks || 0);
-    const totalConv = (g.conversions || 0) + (m.conversions || 0);
+    const t = tiktokSummary || {};
+    const totalSpend = (g.spend || 0) + (m.spend || 0) + (t.spend || 0);
+    const totalImpr = (g.impressions || 0) + (m.impressions || 0) + (t.impressions || 0);
+    const totalClicks = (g.clicks || 0) + (m.clicks || 0) + (t.clicks || 0);
+    const totalConv = (g.conversions || 0) + (m.conversions || 0) + (t.conversions || 0);
     const avgCPC = totalClicks > 0 ? totalSpend / totalClicks : 0;
     const avgCTR = totalImpr > 0 ? totalClicks / totalImpr : 0;
 
@@ -1574,11 +1851,19 @@ function renderOverview() {
     document.getElementById('ovMetaReach').textContent = fmt(m.reach, 'n');
     document.getElementById('ovMetaCPM').textContent = fmt(m.cpm, '$');
 
+    document.getElementById('ovTiktokSpend').textContent = fmt(t.spend, '$');
+    document.getElementById('ovTiktokImpressions').textContent = fmt(t.impressions, 'n');
+    document.getElementById('ovTiktokVideoPlays').textContent = fmt(t.videoPlays, 'n');
+    document.getElementById('ovTiktokCTR').textContent = fmt(t.ctr, '%');
+
     renderOverviewCharts();
 }
 
 function renderOverviewCharts() {
-    const labels = (googleTrend.length >= metaTrend.length ? googleTrend : metaTrend).map(p =>
+    // Pick the longest trend series so we get the widest x-axis
+    const trends = [googleTrend, metaTrend, tiktokTrend];
+    const longest = trends.reduce((a, b) => (a.length >= b.length ? a : b), []);
+    const labels = longest.map(p =>
         trendGranularity === 'daily'
             ? new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
             : new Date(p.month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
@@ -1587,10 +1872,12 @@ function renderOverviewCharts() {
     const keyField = trendGranularity === 'daily' ? 'date' : 'month';
     const gByKey = Object.fromEntries(googleTrend.map(p => [p[keyField], p.spend || 0]));
     const mByKey = Object.fromEntries(metaTrend.map(p => [p[keyField], p.spend || 0]));
-    const allKeys = (googleTrend.length >= metaTrend.length ? googleTrend : metaTrend).map(p => p[keyField]);
+    const tByKey = Object.fromEntries(tiktokTrend.map(p => [p[keyField], p.spend || 0]));
+    const allKeys = longest.map(p => p[keyField]);
 
     const googleSpend = allKeys.map(k => gByKey[k] || 0);
     const metaSpend = allKeys.map(k => mByKey[k] || 0);
+    const tiktokSpendArr = allKeys.map(k => tByKey[k] || 0);
 
     const chartDefaults = { color: '#a89888', borderColor: 'rgba(74,60,50,0.4)' };
 
@@ -1604,6 +1891,7 @@ function renderOverviewCharts() {
             datasets: [
                 { label: 'Google Ads', data: googleSpend, backgroundColor: 'rgba(66,133,244,0.7)', borderRadius: 3, stack: 'a' },
                 { label: 'Meta Ads', data: metaSpend, backgroundColor: 'rgba(24,119,242,0.7)', borderRadius: 3, stack: 'a' },
+                { label: 'TikTok Ads', data: tiktokSpendArr, backgroundColor: 'rgba(255,0,80,0.7)', borderRadius: 3, stack: 'a' },
             ],
         },
         options: {
@@ -1623,13 +1911,15 @@ function renderOverviewCharts() {
     if (splitChartInstance) splitChartInstance.destroy();
     const gTotal = googleSummary?.spend || 0;
     const mTotal = metaSummary?.spend || 0;
+    const tTotal = tiktokSummary?.spend || 0;
+    const grandTotal = gTotal + mTotal + tTotal;
     splitChartInstance = new Chart(document.getElementById('splitChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Google Ads', 'Meta Ads'],
+            labels: ['Google Ads', 'Meta Ads', 'TikTok Ads'],
             datasets: [{
-                data: [gTotal, mTotal],
-                backgroundColor: ['rgba(66,133,244,0.8)', 'rgba(24,119,242,0.8)'],
+                data: [gTotal, mTotal, tTotal],
+                backgroundColor: ['rgba(66,133,244,0.8)', 'rgba(24,119,242,0.8)', 'rgba(255,0,80,0.8)'],
                 borderColor: ['#1a1410'],
                 borderWidth: 2,
             }],
@@ -1639,7 +1929,7 @@ function renderOverviewCharts() {
             cutout: '60%',
             plugins: {
                 legend: { position: 'bottom', labels: { color: chartDefaults.color, padding: 14 } },
-                tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmt(ctx.raw, '$') + ' (' + ((ctx.raw / (gTotal + mTotal)) * 100).toFixed(1) + '%)' } },
+                tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmt(ctx.raw, '$') + (grandTotal > 0 ? ' (' + ((ctx.raw / grandTotal) * 100).toFixed(1) + '%)' : '') } },
             },
         },
     });
@@ -1985,6 +2275,138 @@ function renderMetaCreative() {
 }
 
 // ============================================================================
+// Render: TikTok
+// ============================================================================
+function renderTiktokTab() {
+    document.getElementById('tiktokAuthBanner').style.display = tiktokNeedsAuth ? 'block' : 'none';
+
+    const t = tiktokSummary || {};
+    document.getElementById('tStatSpend').textContent = fmt(t.spend, '$');
+    document.getElementById('tStatImpressions').textContent = fmt(t.impressions, 'n');
+    document.getElementById('tStatReach').textContent = fmt(t.reach, 'n');
+    document.getElementById('tStatFreq').textContent = fmt(t.frequency, 'f2');
+    document.getElementById('tStatClicks').textContent = fmt(t.clicks, 'n');
+    document.getElementById('tStatCTR').textContent = fmt(t.ctr, '%');
+    document.getElementById('tStatCPM').textContent = fmt(t.cpm, '$');
+    document.getElementById('tStatConv').textContent = fmt(t.conversions, 'f1');
+
+    document.getElementById('tStatVideoPlays').textContent = fmt(t.videoPlays, 'n');
+    document.getElementById('tStatVideo2s').textContent = fmt(t.video2s, 'n');
+    document.getElementById('tStatVideo25').textContent = fmt(t.video25p, 'n');
+    document.getElementById('tStatVideo50').textContent = fmt(t.video50p, 'n');
+    document.getElementById('tStatVideo75').textContent = fmt(t.video75p, 'n');
+    document.getElementById('tStatVideo100').textContent = fmt(t.video100p, 'n');
+
+    document.getElementById('tStatProfileVisits').textContent = fmt(t.profileVisits, 'n');
+    document.getElementById('tStatFollows').textContent = fmt(t.follows, 'n');
+    document.getElementById('tStatLikes').textContent = fmt(t.likes, 'n');
+    document.getElementById('tStatComments').textContent = fmt(t.comments, 'n');
+    document.getElementById('tStatShares').textContent = fmt(t.shares, 'n');
+    document.getElementById('tStatEngagedView').textContent = fmt(t.engagedView, 'n');
+
+    renderTiktokCampaigns();
+}
+
+function renderTiktokCampaigns() {
+    const tbody = document.getElementById('tCampaignBody');
+    if (!tiktokCampaigns.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No campaign data</td></tr>';
+        return;
+    }
+    const sorted = [...tiktokCampaigns].sort((a, b) => {
+        const av = a[tcSort.key], bv = b[tcSort.key];
+        if (typeof av === 'string') return tcSort.dir * av.localeCompare(bv || '');
+        return tcSort.dir * ((av || 0) - (bv || 0));
+    });
+    tbody.innerHTML = sorted.map(c => `
+        <tr>
+            <td>${esc(c.name)}</td>
+            <td><span style="font-size:0.75rem; color:var(--text-secondary);">${esc(c.objective || '--')}</span></td>
+            <td class="numeric">${fmt(c.spend, '$')}</td>
+            <td class="numeric">${fmt(c.impressions, 'n')}</td>
+            <td class="numeric">${fmt(c.clicks, 'n')}</td>
+            <td class="numeric">${fmt(c.ctr, '%')}</td>
+            <td class="numeric">${fmt(c.cpm, '$')}</td>
+            <td class="numeric">${fmt(c.conversions, 'f1')}</td>
+            <td class="numeric">${c.costPerConv > 0 ? fmt(c.costPerConv, '$') : '--'}</td>
+        </tr>
+    `).join('');
+    document.querySelectorAll('#tCampaignTable th').forEach(th => {
+        th.classList.toggle('sorted', th.dataset.tcSort === tcSort.key);
+    });
+}
+
+function renderTiktokCreative() {
+    const ads = tiktokAds || [];
+    document.getElementById('tAdCountBadge').textContent = ads.length;
+
+    const campaigns = [...new Set(ads.map(a => a.campaign).filter(Boolean))].sort();
+    const filterEl = document.getElementById('tAdCampaignFilter');
+    if (filterEl.options.length <= 1) {
+        for (const c of campaigns) {
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            filterEl.appendChild(opt);
+        }
+    }
+
+    const filtered = tAdCampaignFilter ? ads.filter(a => a.campaign === tAdCampaignFilter) : ads;
+    const sorted = [...filtered].sort((a, b) => (b[tAdSort] || 0) - (a[tAdSort] || 0));
+
+    const wrap = document.getElementById('tAdGrid');
+    if (!sorted.length) {
+        wrap.innerHTML = '<div class="empty-state"><h3>No active ads</h3><p>No active TikTok ads in this period.</p></div>';
+        return;
+    }
+
+    wrap.innerHTML = sorted.map(ad => {
+        const cover = ad.videoCoverUrl || ad.imageUrl;
+        const isVideo = !!ad.videoCoverUrl;
+        return `
+            <div class="meta-card">
+                ${cover
+                    ? `<img class="meta-card-image" src="${esc(cover)}" alt="" loading="lazy" style="aspect-ratio: 9 / 16; object-fit: cover;" onerror="this.outerHTML='<div class=\\'meta-card-image-placeholder\\' style=\\'aspect-ratio: 9/16;\\'>No preview</div>'">`
+                    : `<div class="meta-card-image-placeholder" style="aspect-ratio: 9/16;">${isVideo ? 'Video preview unavailable' : 'No preview'}</div>`}
+                <div class="meta-card-body">
+                    <div class="meta-card-meta">
+                        <span class="platform-chip tiktok">TikTok</span>
+                        <span>${esc(ad.campaign)}</span>
+                    </div>
+                    <div class="meta-card-headline">${esc(ad.name || '—')}</div>
+                    <div class="meta-card-body-text">${esc(ad.adText || '')}</div>
+                    ${ad.callToAction ? `<div style="font-size:0.72rem; color:var(--tiktok); font-weight:600; margin-bottom:10px; letter-spacing:0.05em;">${esc(ad.callToAction.replace(/_/g, ' '))}</div>` : ''}
+                    <div class="meta-card-metrics">
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.spend, '$0')}</div>
+                            <div class="meta-card-metric-label">Spend</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.impressions, 'n')}</div>
+                            <div class="meta-card-metric-label">Impr</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.ctr, '%')}</div>
+                            <div class="meta-card-metric-label">CTR</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.videoPlays, 'n')}</div>
+                            <div class="meta-card-metric-label">Plays</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.video100p, 'n')}</div>
+                            <div class="meta-card-metric-label">100% Watched</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.likes, 'n')}</div>
+                            <div class="meta-card-metric-label">Likes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
+}
+
+// ============================================================================
 // Render: Search Console
 // ============================================================================
 function renderGSC() {
@@ -2189,6 +2611,14 @@ document.querySelectorAll('#mCampaignTable th[data-mc-sort]').forEach(th => {
         renderMetaCampaigns();
     });
 });
+document.querySelectorAll('#tCampaignTable th[data-tc-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const k = th.dataset.tcSort;
+        if (tcSort.key === k) tcSort.dir *= -1;
+        else { tcSort.key = k; tcSort.dir = ['name', 'objective'].includes(k) ? 1 : -1; }
+        renderTiktokCampaigns();
+    });
+});
 document.querySelectorAll('#gscQueryTable th[data-gsq-sort]').forEach(th => {
     th.addEventListener('click', () => {
         const k = th.dataset.gsqSort;
@@ -2241,6 +2671,14 @@ document.getElementById('gscQueryFilter').addEventListener('input', e => {
     gscQueryFilter = e.target.value;
     renderGSCQueries();
 });
+document.getElementById('tAdCampaignFilter').addEventListener('change', e => {
+    tAdCampaignFilter = e.target.value;
+    renderTiktokCreative();
+});
+document.getElementById('tAdSortSelect').addEventListener('change', e => {
+    tAdSort = e.target.value;
+    renderTiktokCreative();
+});
 
 // ============================================================================
 // CSV export
@@ -2288,6 +2726,14 @@ function exportMetaCampaignsCSV() {
         rows.push([c.accountName, c.name, c.spend.toFixed(2), c.impressions, c.reach, c.clicks, (c.ctr * 100).toFixed(2) + '%', c.cpm.toFixed(2), c.conversions]);
     }
     downloadCSV(`vita-brevis-meta-campaigns-${currentDays}d.csv`, rows);
+}
+
+function exportTiktokCampaignsCSV() {
+    const rows = [['Campaign', 'Objective', 'Spend', 'Impressions', 'Clicks', 'CTR', 'CPM', 'Conversions', 'Cost/Conv', 'Video Plays', '100% Watched']];
+    for (const c of tiktokCampaigns) {
+        rows.push([c.name, c.objective, c.spend.toFixed(2), c.impressions, c.clicks, (c.ctr * 100).toFixed(2) + '%', c.cpm.toFixed(2), c.conversions, c.costPerConv > 0 ? c.costPerConv.toFixed(2) : '', c.videoPlays, c.video100p]);
+    }
+    downloadCSV(`vita-brevis-tiktok-campaigns-${currentDays}d.csv`, rows);
 }
 
 function exportGSCQueriesCSV() {

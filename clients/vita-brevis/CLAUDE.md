@@ -20,6 +20,7 @@ Vita Brevis Fine Art is an online fine art gallery. Hyder Media does NOT manage 
 | Meta Ads | act_910982119354033 | One of three accounts |
 | Meta Ads | act_1187662444921041 | Two of three |
 | Meta Ads | act_1088960198165753 | Three of three |
+| TikTok Ads | BC `7094682853576916994` | Single advertiser within the BC. Auth via shared `tiktok_ads_connections` row keyed by core_user_id. |
 
 Meta access is via the shared `meta_ads_connections` OAuth token under kenny@hyder.me's Business Portfolio. Kenny has direct access to all 3 accounts.
 
@@ -42,6 +43,8 @@ Meta access is via the shared `meta_ads_connections` OAuth token under kenny@hyd
 - `#keywords` — All active targeted keywords with QS, match type filter, search filter
 - `#meta` — Meta combined KPIs, per-account breakdown cards, campaigns table (all 3 accounts merged)
 - `#meta-creative` — Meta ad cards with image preview, copy, per-ad metrics. Account filter.
+- `#tiktok` — TikTok summary (spend/impr/reach/freq/clicks/CTR/CPM/conv) + Video Performance section (plays, 2s, 25/50/75/100% watched) + Engagement section (profile visits, follows, likes, comments, shares) + campaigns table. Auth banner if not connected.
+- `#tiktok-creative` — TikTok ad cards (9:16 portrait aspect-ratio thumbnails for video covers/posters), ad text, CTA, per-ad metrics including video plays + 100% watched. Campaign filter.
 - `#gsc` — Google Search Console: clicks/impr/CTR/avg-position summary, queries table (filterable + sortable), pages table, daily trend chart, device breakdown, sitemap status. Re-auth banner appears if `webmasters.readonly` scope is missing.
 
 ### Date Range
@@ -64,11 +67,22 @@ All under `/api/vita-brevis/`. Vercel timeout: 30s (set in `vercel.json`).
 | `meta-ads.js` | Active Meta ads across all 3 accounts with creative + per-ad metrics |
 | `gsc-performance.js` | GSC Search Analytics — `?breakdown=summary\|query\|page\|date\|device\|country`. Property: `sc-domain:vitabrevisfineart.com`. Returns `status: 'needs_reauth'` if scope missing. |
 | `gsc-coverage.js` | Sitemap list + per-sitemap submitted/indexed counts + property permission level. |
+| `tiktok-performance.js` | TikTok Marketing API report — `?breakdown=summary\|daily\|monthly\|campaign`. Reads first advertiser_id from `tiktok_ads_connections.advertiser_ids`. Returns rich metrics (spend/impr/clicks + reach/frequency + conversions + 6 video-watch percentiles + engagement: likes/comments/shares/follows/profile_visits). Monthly is client-aggregated from daily. |
+| `tiktok-ads.js` | Active TikTok ads with creative — image_url for static, video_cover_url + preview_url for videos. 4 sequential calls: `/ad/get/` → `/file/image/ad/info/` (batched 100) → `/file/video/ad/info/` (batched 100) → ad-level metrics report. |
+
+### TikTok OAuth (separate folder `/api/tiktok-ads/`)
+- `auth.js` — redirects to `business-api.tiktok.com/portal/auth?app_id=&redirect_uri=&state=`
+- `callback.js` — exchanges `auth_code` for token via `/oauth2/access_token/` (note: `auth_code` param, not `code` like Google/Meta). Stores access_token + refresh_token + advertiser_ids[] + scope[] in `tiktok_ads_connections`. Redirects back to `#tiktok` tab.
+- `schema.sql` — `tiktok_ads_connections` (token bundle keyed by `tiktok_user_id`) + `tiktok_ads_cache`
+- Required env vars: `TIKTOK_APP_ID`, `TIKTOK_APP_SECRET`
+- TikTok API authentication header: `Access-Token: <token>` (NOT `Authorization: Bearer`)
+- Response envelope: `{ code, message, data, request_id }` — `code === 0` means success
 
 ### Conventions
 - Google endpoints inline OAuth refresh + GAQL search (matches digistore24 pattern — no shared helpers since Vercel functions deploy independently).
 - Meta endpoints use shared `meta_ads_connections` OAuth row (one row, all 3 accounts under same token).
 - GSC endpoints use the same `google_ads_connections` row — requires `webmasters.readonly` scope which was added to `/api/google-ads/auth.js` on 2026-04-30. Existing auth grants need a one-time re-auth at `/api/google-ads/auth` to pick up the scope.
+- TikTok endpoints use the `tiktok_ads_connections` row. CTR returned as percentage 0-100 — divided by 100 in the endpoint to match other platforms (0-1 fraction).
 - All endpoints return `{ status, ... }` where status ∈ `success | partial | error | not_configured | needs_reauth`.
 - All accept `?days=N` (default 30 for Google, 28 for GSC since GSC has 2-day data lag), `?breakdown=` where applicable.
 
