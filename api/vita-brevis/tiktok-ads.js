@@ -99,9 +99,21 @@ export default async function handler(req, res) {
         const allVideoIds = [...new Set(ads.map(a => a.video_id).filter(Boolean))];
 
         const [imageMap, videoMap] = await Promise.all([
-            allImageIds.length ? fetchImageInfo(accessToken, advertiserId, allImageIds) : Promise.resolve(new Map()),
-            allVideoIds.length ? fetchVideoInfo(accessToken, advertiserId, allVideoIds) : Promise.resolve(new Map()),
+            allImageIds.length ? fetchImageInfo(accessToken, advertiserId, allImageIds, result.errors) : Promise.resolve(new Map()),
+            allVideoIds.length ? fetchVideoInfo(accessToken, advertiserId, allVideoIds, result.errors) : Promise.resolve(new Map()),
         ]);
+
+        if (req.query.diag === 'true') {
+            result.diagnostics = {
+                ads_total: ads.length,
+                unique_image_ids: allImageIds.length,
+                unique_video_ids: allVideoIds.length,
+                image_urls_resolved: imageMap.size,
+                video_urls_resolved: videoMap.size,
+                first_image_id: allImageIds[0],
+                first_video_id: allVideoIds[0],
+            };
+        }
 
         result.ads = ads.map(ad => {
             const m = metricsByAdId.get(ad.ad_id) || emptyMetrics();
@@ -246,11 +258,10 @@ async function fetchCurrentlyDeliveringAds(accessToken, advertiserId) {
     }
 }
 
-async function fetchImageInfo(accessToken, advertiserId, imageIds) {
+async function fetchImageInfo(accessToken, advertiserId, imageIds, errorBag) {
     const map = new Map();
-    // Batch by 100
-    for (let i = 0; i < imageIds.length; i += 100) {
-        const batch = imageIds.slice(i, i + 100);
+    for (let i = 0; i < imageIds.length; i += 50) {
+        const batch = imageIds.slice(i, i + 50);
         try {
             const data = await tiktokGet(IMAGE_INFO_URL, accessToken, {
                 advertiser_id: advertiserId,
@@ -259,15 +270,17 @@ async function fetchImageInfo(accessToken, advertiserId, imageIds) {
             for (const item of (data.list || [])) {
                 if (item.image_id && item.image_url) map.set(item.image_id, item.image_url);
             }
-        } catch (e) { /* non-fatal */ }
+        } catch (e) {
+            if (errorBag) errorBag.push({ step: 'fetchImageInfo', batch_index: i, error: e.message });
+        }
     }
     return map;
 }
 
-async function fetchVideoInfo(accessToken, advertiserId, videoIds) {
+async function fetchVideoInfo(accessToken, advertiserId, videoIds, errorBag) {
     const map = new Map();
-    for (let i = 0; i < videoIds.length; i += 100) {
-        const batch = videoIds.slice(i, i + 100);
+    for (let i = 0; i < videoIds.length; i += 50) {
+        const batch = videoIds.slice(i, i + 50);
         try {
             const data = await tiktokGet(VIDEO_INFO_URL, accessToken, {
                 advertiser_id: advertiserId,
@@ -276,12 +289,14 @@ async function fetchVideoInfo(accessToken, advertiserId, videoIds) {
             for (const item of (data.list || [])) {
                 if (item.video_id) {
                     map.set(item.video_id, {
-                        video_cover_url: item.video_cover_url || item.poster_url || null,
+                        video_cover_url: item.video_cover_url || null,
                         preview_url: item.preview_url || null,
                     });
                 }
             }
-        } catch (e) { /* non-fatal */ }
+        } catch (e) {
+            if (errorBag) errorBag.push({ step: 'fetchVideoInfo', batch_index: i, error: e.message });
+        }
     }
     return map;
 }
