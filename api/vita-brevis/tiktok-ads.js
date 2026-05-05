@@ -72,10 +72,29 @@ export default async function handler(req, res) {
         }
         result.advertiserId = advertiserId;
 
-        // 1. List active ads
-        const ads = await fetchActiveAds(accessToken, advertiserId);
+        // 1. Per-ad metrics first — this gives us the ads that actually ran in
+        //    the date range. STATUS_DELIVERY_OK alone misses ads that ran
+        //    earlier in the period but aren't delivering at this exact moment.
+        const metricsByAdId = await fetchAdMetrics(accessToken, advertiserId, startDate, endDate);
+        const adIdsWithMetrics = [...metricsByAdId.keys()];
 
-        // 2 & 3. Resolve image + video URLs
+        // 2. Fetch the full ad structures for those IDs (plus any currently-live
+        //    ads that haven't accrued impressions yet). Two parallel queries
+        //    deduped by ad_id.
+        const [adsByMetrics, adsCurrentlyLive] = await Promise.all([
+            adIdsWithMetrics.length
+                ? fetchAdsByIds(accessToken, advertiserId, adIdsWithMetrics)
+                : Promise.resolve([]),
+            fetchCurrentlyDeliveringAds(accessToken, advertiserId),
+        ]);
+
+        const adsById = new Map();
+        for (const ad of [...adsByMetrics, ...adsCurrentlyLive]) {
+            if (ad?.ad_id) adsById.set(ad.ad_id, ad);
+        }
+        const ads = [...adsById.values()];
+
+        // 3. Resolve image + video URLs
         const allImageIds = [...new Set(ads.flatMap(a => a.image_ids || []).filter(Boolean))];
         const allVideoIds = [...new Set(ads.map(a => a.video_id).filter(Boolean))];
 
@@ -83,9 +102,6 @@ export default async function handler(req, res) {
             allImageIds.length ? fetchImageInfo(accessToken, advertiserId, allImageIds) : Promise.resolve(new Map()),
             allVideoIds.length ? fetchVideoInfo(accessToken, advertiserId, allVideoIds) : Promise.resolve(new Map()),
         ]);
-
-        // 4. Per-ad metrics
-        const metricsByAdId = await fetchAdMetrics(accessToken, advertiserId, startDate, endDate);
 
         result.ads = ads.map(ad => {
             const m = metricsByAdId.get(ad.ad_id) || emptyMetrics();
@@ -193,25 +209,41 @@ async function tiktokGet(url, accessToken, params) {
     return data.data || {};
 }
 
-async function fetchActiveAds(accessToken, advertiserId) {
+async function fetchAdsByIds(accessToken, advertiserId, adIds) {
+    // /ad/get/ accepts ad_ids[] in the filtering object — batch by 100.
     const out = [];
-    let page = 1;
-    const pageSize = 200;
-    while (true) {
+    for (let i = 0; i < adIds.length; i += 100) {
+        const batch = adIds.slice(i, i + 100);
+        try {
+            const data = await tiktokGet(AD_GET_URL, accessToken, {
+                advertiser_id: advertiserId,
+                filtering: { ad_ids: batch },
+                fields: AD_FIELDS,
+                page: 1,
+                page_size: 100,
+            });
+            out.push(...(data.list || []));
+        } catch (e) { /* non-fatal, skip the batch */ }
+    }
+    return out;
+}
+
+async function fetchCurrentlyDeliveringAds(accessToken, advertiserId) {
+    // Catch ads that are delivering right now but might not have impressions
+    // yet (just-launched). Limited to a single page (200) — a small advertiser
+    // shouldn't have more than that delivering.
+    try {
         const data = await tiktokGet(AD_GET_URL, accessToken, {
             advertiser_id: advertiserId,
             filtering: { primary_status: 'STATUS_DELIVERY_OK' },
             fields: AD_FIELDS,
-            page,
-            page_size: pageSize,
+            page: 1,
+            page_size: 200,
         });
-        const list = data.list || [];
-        out.push(...list);
-        const total = data.page_info?.total_number || 0;
-        if (page * pageSize >= total || !list.length) break;
-        page += 1;
+        return data.list || [];
+    } catch (e) {
+        return [];
     }
-    return out;
 }
 
 async function fetchImageInfo(accessToken, advertiserId, imageIds) {

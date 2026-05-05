@@ -1221,7 +1221,11 @@ async function loadAllData() {
         const tCampOk = tCampaignRes?.status === 'success' && Array.isArray(tCampaignRes.campaigns);
         const tTrendOk = tTrendRes?.status === 'success' && Array.isArray(tTrendRes[trendParam]);
         const tAdsOk = tAdsRes?.status === 'success' && Array.isArray(tAdsRes.ads);
-        tiktokNeedsAuth = [tSummaryRes, tCampaignRes, tTrendRes, tAdsRes]
+        // Banner only fires for actual auth issues. A successful summary call
+        // means the connection + token are working; downstream errors (bad
+        // metric names, etc.) are different problems and should surface in
+        // the per-section empty states rather than as a misleading auth banner.
+        tiktokNeedsAuth = !tSumOk && [tSummaryRes, tCampaignRes, tTrendRes, tAdsRes]
             .some(r => r?.status === 'not_configured' || r?.status === 'needs_reauth' || r?.needsAuth);
 
         const gscSumOk = gscSummaryRes?.status === 'success' && gscSummaryRes.summary;
