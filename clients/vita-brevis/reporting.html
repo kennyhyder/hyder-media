@@ -726,6 +726,14 @@
                     <div class="stat-label">Avg CTR</div>
                     <div class="stat-value" id="ovAvgCTR">--</div>
                 </div>
+                <div class="stat-card accent">
+                    <div class="stat-label">Avg Conv Rate</div>
+                    <div class="stat-value" id="ovAvgConvRate">--</div>
+                </div>
+                <div class="stat-card accent">
+                    <div class="stat-label">Avg Cost / Conv</div>
+                    <div class="stat-value" id="ovAvgCPA">--</div>
+                </div>
             </div>
 
             <div class="chart-row">
@@ -758,6 +766,18 @@
                     <div class="stat-label">Google — Avg CPC</div>
                     <div class="stat-value" id="ovGoogleCPC">--</div>
                 </div>
+                <div class="stat-card google">
+                    <div class="stat-label">Google — Conversions</div>
+                    <div class="stat-value" id="ovGoogleConv">--</div>
+                </div>
+                <div class="stat-card google">
+                    <div class="stat-label">Google — Conv Rate</div>
+                    <div class="stat-value" id="ovGoogleConvRate">--</div>
+                </div>
+                <div class="stat-card google">
+                    <div class="stat-label">Google — Cost / Conv</div>
+                    <div class="stat-value" id="ovGoogleCPA">--</div>
+                </div>
                 <div class="stat-card meta">
                     <div class="stat-label">Meta — Spend</div>
                     <div class="stat-value" id="ovMetaSpend">--</div>
@@ -775,6 +795,18 @@
                     <div class="stat-label">Meta — CPM</div>
                     <div class="stat-value" id="ovMetaCPM">--</div>
                 </div>
+                <div class="stat-card meta">
+                    <div class="stat-label">Meta — Conversions</div>
+                    <div class="stat-value" id="ovMetaConv">--</div>
+                </div>
+                <div class="stat-card meta">
+                    <div class="stat-label">Meta — Conv Rate</div>
+                    <div class="stat-value" id="ovMetaConvRate">--</div>
+                </div>
+                <div class="stat-card meta">
+                    <div class="stat-label">Meta — Cost / Conv</div>
+                    <div class="stat-value" id="ovMetaCPA">--</div>
+                </div>
                 <div class="stat-card tiktok">
                     <div class="stat-label">TikTok — Spend</div>
                     <div class="stat-value" id="ovTiktokSpend">--</div>
@@ -791,6 +823,18 @@
                 <div class="stat-card tiktok">
                     <div class="stat-label">TikTok — CTR</div>
                     <div class="stat-value" id="ovTiktokCTR">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Conversions</div>
+                    <div class="stat-value" id="ovTiktokConv">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Conv Rate</div>
+                    <div class="stat-value" id="ovTiktokConvRate">--</div>
+                </div>
+                <div class="stat-card tiktok">
+                    <div class="stat-label">TikTok — Cost / Conv</div>
+                    <div class="stat-value" id="ovTiktokCPA">--</div>
                 </div>
             </div>
         </div>
@@ -935,6 +979,8 @@
                 <div class="stat-card meta"><div class="stat-label">CTR</div><div class="stat-value" id="mStatCTR">--</div></div>
                 <div class="stat-card meta"><div class="stat-label">CPM</div><div class="stat-value" id="mStatCPM">--</div></div>
                 <div class="stat-card meta"><div class="stat-label">Conversions</div><div class="stat-value" id="mStatConv">--</div></div>
+                <div class="stat-card meta"><div class="stat-label">Conv Rate</div><div class="stat-value" id="mStatConvRate">--</div></div>
+                <div class="stat-card meta"><div class="stat-label">Cost / Conv</div><div class="stat-value" id="mStatCPA">--</div></div>
             </div>
 
             <div class="subsection-divider"><h2>By Account</h2></div>
@@ -957,6 +1003,8 @@
                             <th class="numeric" data-mc-sort="ctr">CTR</th>
                             <th class="numeric" data-mc-sort="cpm">CPM</th>
                             <th class="numeric" data-mc-sort="conversions">Conv</th>
+                            <th class="numeric" data-mc-sort="convRate">CR</th>
+                            <th class="numeric" data-mc-sort="cpa">Cost / Conv</th>
                         </tr>
                     </thead>
                     <tbody id="mCampaignBody"></tbody>
@@ -980,6 +1028,8 @@
                 <div class="stat-card tiktok"><div class="stat-label">CTR</div><div class="stat-value" id="tStatCTR">--</div></div>
                 <div class="stat-card tiktok"><div class="stat-label">CPM</div><div class="stat-value" id="tStatCPM">--</div></div>
                 <div class="stat-card tiktok"><div class="stat-label">Conversions</div><div class="stat-value" id="tStatConv">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Conv Rate</div><div class="stat-value" id="tStatConvRate">--</div></div>
+                <div class="stat-card tiktok"><div class="stat-label">Cost / Conv</div><div class="stat-value" id="tStatCPA">--</div></div>
             </div>
 
             <div class="subsection-divider"><h2>Video Performance</h2></div>
@@ -1018,6 +1068,7 @@
                             <th class="numeric" data-tc-sort="ctr">CTR</th>
                             <th class="numeric" data-tc-sort="cpm">CPM</th>
                             <th class="numeric" data-tc-sort="conversions">Conv</th>
+                            <th class="numeric" data-tc-sort="convRate">CR</th>
                             <th class="numeric" data-tc-sort="costPerConv">Cost / Conv</th>
                         </tr>
                     </thead>
@@ -1998,27 +2049,41 @@ function renderOverview() {
     const avgCPC = totalClicks > 0 ? totalSpend / totalClicks : 0;
     const avgCTR = totalImpr > 0 ? totalClicks / totalImpr : 0;
 
+    const avgConvRate = totalClicks > 0 ? totalConv / totalClicks : 0;
+    const avgCPA = totalConv > 0 ? totalSpend / totalConv : 0;
+
     document.getElementById('ovTotalSpend').textContent = fmt(totalSpend, '$');
     document.getElementById('ovTotalImpressions').textContent = fmt(totalImpr, 'n');
     document.getElementById('ovTotalClicks').textContent = fmt(totalClicks, 'n');
     document.getElementById('ovTotalConv').textContent = fmt(totalConv, 'f1');
     document.getElementById('ovAvgCPC').textContent = fmt(avgCPC, '$');
     document.getElementById('ovAvgCTR').textContent = fmt(avgCTR, '%');
+    document.getElementById('ovAvgConvRate').textContent = fmt(avgConvRate, '%');
+    document.getElementById('ovAvgCPA').textContent = avgCPA > 0 ? fmt(avgCPA, '$') : '--';
 
     document.getElementById('ovGoogleSpend').textContent = fmt(g.spend, '$');
     document.getElementById('ovGoogleClicks').textContent = fmt(g.clicks, 'n');
     document.getElementById('ovGoogleCTR').textContent = fmt(g.ctr, '%');
     document.getElementById('ovGoogleCPC').textContent = fmt(g.cpc, '$');
+    document.getElementById('ovGoogleConv').textContent = fmt(g.conversions, 'f1');
+    document.getElementById('ovGoogleConvRate').textContent = fmt(g.convRate, '%');
+    document.getElementById('ovGoogleCPA').textContent = g.cpa > 0 ? fmt(g.cpa, '$') : '--';
 
     document.getElementById('ovMetaSpend').textContent = fmt(m.spend, '$');
     document.getElementById('ovMetaImpressions').textContent = fmt(m.impressions, 'n');
     document.getElementById('ovMetaReach').textContent = fmt(m.reach, 'n');
     document.getElementById('ovMetaCPM').textContent = fmt(m.cpm, '$');
+    document.getElementById('ovMetaConv').textContent = fmt(m.conversions, 'f1');
+    document.getElementById('ovMetaConvRate').textContent = fmt(m.convRate, '%');
+    document.getElementById('ovMetaCPA').textContent = m.cpa > 0 ? fmt(m.cpa, '$') : '--';
 
     document.getElementById('ovTiktokSpend').textContent = fmt(t.spend, '$');
     document.getElementById('ovTiktokImpressions').textContent = fmt(t.impressions, 'n');
     document.getElementById('ovTiktokVideoPlays').textContent = fmt(t.videoPlays, 'n');
     document.getElementById('ovTiktokCTR').textContent = fmt(t.ctr, '%');
+    document.getElementById('ovTiktokConv').textContent = fmt(t.conversions, 'f1');
+    document.getElementById('ovTiktokConvRate').textContent = fmt(t.convRate, '%');
+    document.getElementById('ovTiktokCPA').textContent = t.costPerConv > 0 ? fmt(t.costPerConv, '$') : '--';
 
     renderOverviewCharts();
 }
@@ -2226,6 +2291,7 @@ function renderGoogleAdCards() {
                     <span>Spend: <span class="ad-metric-val">${fmt(ad.spend, '$')}</span></span>
                     <span>CTR: <span class="ad-metric-val">${fmt(ad.ctr, '%')}</span></span>
                     <span>Conv: <span class="ad-metric-val">${fmt(ad.conversions, 'f1')}</span></span>
+                    <span>CR: <span class="ad-metric-val">${ad.clicks > 0 ? fmt(ad.conversions / ad.clicks, '%') : '--'}</span></span>
                     <span>CPA: <span class="ad-metric-val">${ad.cpa > 0 ? fmt(ad.cpa, '$') : '--'}</span></span>
                 </div>
                 <div class="asset-columns">
@@ -2331,6 +2397,8 @@ function renderMetaTab() {
     document.getElementById('mStatCTR').textContent = fmt(m.ctr, '%');
     document.getElementById('mStatCPM').textContent = fmt(m.cpm, '$');
     document.getElementById('mStatConv').textContent = fmt(m.conversions, 'f1');
+    document.getElementById('mStatConvRate').textContent = fmt(m.convRate, '%');
+    document.getElementById('mStatCPA').textContent = m.cpa > 0 ? fmt(m.cpa, '$') : '--';
 
     // Per-account cards
     const wrap = document.getElementById('mAccountGrid');
@@ -2380,6 +2448,8 @@ function renderMetaCampaigns() {
             <td class="numeric">${fmt(c.ctr, '%')}</td>
             <td class="numeric">${fmt(c.cpm, '$')}</td>
             <td class="numeric">${fmt(c.conversions, 'f1')}</td>
+            <td class="numeric">${fmt(c.convRate, '%')}</td>
+            <td class="numeric">${c.cpa > 0 ? fmt(c.cpa, '$') : '--'}</td>
         </tr>
     `).join('');
     document.querySelectorAll('#mCampaignTable th').forEach(th => {
@@ -2442,6 +2512,18 @@ function renderMetaCreative() {
                             <div class="meta-card-metric-value">${fmt(ad.ctr, '%')}</div>
                             <div class="meta-card-metric-label">CTR</div>
                         </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.conversions, 'f1')}</div>
+                            <div class="meta-card-metric-label">Conv</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${ad.clicks > 0 ? fmt(ad.conversions / ad.clicks, '%') : '--'}</div>
+                            <div class="meta-card-metric-label">Conv Rate</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${ad.cpa > 0 ? fmt(ad.cpa, '$0') : '--'}</div>
+                            <div class="meta-card-metric-label">Cost / Conv</div>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -2463,6 +2545,8 @@ function renderTiktokTab() {
     document.getElementById('tStatCTR').textContent = fmt(t.ctr, '%');
     document.getElementById('tStatCPM').textContent = fmt(t.cpm, '$');
     document.getElementById('tStatConv').textContent = fmt(t.conversions, 'f1');
+    document.getElementById('tStatConvRate').textContent = fmt(t.convRate, '%');
+    document.getElementById('tStatCPA').textContent = t.costPerConv > 0 ? fmt(t.costPerConv, '$') : '--';
 
     document.getElementById('tStatVideoPlays').textContent = fmt(t.videoPlays, 'n');
     document.getElementById('tStatVideo2s').textContent = fmt(t.video2s, 'n');
@@ -2502,6 +2586,7 @@ function renderTiktokCampaigns() {
             <td class="numeric">${fmt(c.ctr, '%')}</td>
             <td class="numeric">${fmt(c.cpm, '$')}</td>
             <td class="numeric">${fmt(c.conversions, 'f1')}</td>
+            <td class="numeric">${fmt(c.convRate, '%')}</td>
             <td class="numeric">${c.costPerConv > 0 ? fmt(c.costPerConv, '$') : '--'}</td>
         </tr>
     `).join('');
@@ -2561,6 +2646,18 @@ function renderTiktokCreative() {
                         <div class="meta-card-metric">
                             <div class="meta-card-metric-value">${fmt(ad.ctr, '%')}</div>
                             <div class="meta-card-metric-label">CTR</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${fmt(ad.conversions, 'f1')}</div>
+                            <div class="meta-card-metric-label">Conv</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${ad.clicks > 0 ? fmt(ad.conversions / ad.clicks, '%') : '--'}</div>
+                            <div class="meta-card-metric-label">Conv Rate</div>
+                        </div>
+                        <div class="meta-card-metric">
+                            <div class="meta-card-metric-value">${ad.costPerConv > 0 ? fmt(ad.costPerConv, '$0') : '--'}</div>
+                            <div class="meta-card-metric-label">Cost / Conv</div>
                         </div>
                         <div class="meta-card-metric">
                             <div class="meta-card-metric-value">${fmt(ad.videoPlays, 'n')}</div>
