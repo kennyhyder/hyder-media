@@ -22,11 +22,14 @@ const REPORT_URL = `${TT_BASE}/report/integrated/get/`;
 const REFRESH_URL = `${TT_BASE}/oauth2/refresh_token/`;
 const BC_ID = '7094682853576916994';
 
+// Fields requested from /ad/get/. Names are validated by TikTok — invalid names
+// throw 40002. `creative_material_mode` was removed because it isn't an accepted
+// field name in v1.3 (ad_format covers the same idea).
 const AD_FIELDS = [
     'ad_id', 'ad_name', 'campaign_id', 'campaign_name', 'adgroup_id', 'adgroup_name',
     'ad_format', 'image_ids', 'video_id',
     'ad_text', 'ad_texts', 'call_to_action', 'landing_page_url', 'display_name',
-    'operation_status', 'secondary_status', 'creative_material_mode',
+    'operation_status', 'secondary_status',
 ];
 
 const AD_METRICS = [
@@ -113,12 +116,19 @@ export default async function handler(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         result.errors.push({ step: 'general', error: err.message });
-        const m = (err.message || '').toLowerCase();
-        result.status = m.includes('not found') || m.includes('no tiktok') ? 'not_configured'
-                      : m.includes('auth') || m.includes('token') ? 'needs_reauth'
-                      : 'error';
+        result.status = classifyError(err.message);
         return res.status(200).json(result);
     }
+}
+
+function classifyError(message) {
+    const m = (message || '').toLowerCase();
+    if (m.includes('no tiktok connection') || m.includes('not found')) return 'not_configured';
+    if (/\bunauth\w*\b/.test(m)) return 'needs_reauth';
+    if (/\binvalid\s+token\b/.test(m) || /\bexpired\s+token\b/.test(m)) return 'needs_reauth';
+    if (/\baccess[\s_-]?token\b/.test(m) && /(invalid|expired|missing)/.test(m)) return 'needs_reauth';
+    if (/\bcode\s+(40100|40104|40105)\b/.test(m)) return 'needs_reauth';
+    return 'error';
 }
 
 // ============================================================================

@@ -31,7 +31,9 @@ const BASE_METRICS = [
     'engaged_view', 'profile_visits', 'follows', 'likes', 'comments', 'shares',
 ];
 
-const CAMPAIGN_FIELDS = ['campaign_name', 'objective_type', 'campaign_id'];
+// Extra fields on the campaign-level report. campaign_id is already the dimension,
+// so we only ask for descriptive fields (name + objective).
+const CAMPAIGN_FIELDS = ['campaign_name', 'objective_type'];
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -86,15 +88,26 @@ export default async function handler(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         result.errors.push({ step: 'general', error: err.message });
-        const m = (err.message || '').toLowerCase();
-        result.status = m.includes('not found') || m.includes('no tiktok') ? 'not_configured'
-                      : m.includes('auth') || m.includes('token') ? 'needs_reauth'
-                      : 'error';
+        result.status = classifyError(err.message);
         if (result.status === 'needs_reauth') {
             result.message = 'TikTok token invalid — re-authorize at /api/tiktok-ads/auth';
         }
         return res.status(200).json(result);
     }
+}
+
+// Map error message → status. Use word-boundary matching so we don't flag
+// a generic field-validation error that happens to contain "auth" inside
+// the substring "authorized" or "authenticator" etc.
+function classifyError(message) {
+    const m = (message || '').toLowerCase();
+    if (m.includes('no tiktok connection') || m.includes('not found')) return 'not_configured';
+    // TikTok auth-failure codes/phrases
+    if (/\bunauth\w*\b/.test(m)) return 'needs_reauth';
+    if (/\binvalid\s+token\b/.test(m) || /\bexpired\s+token\b/.test(m)) return 'needs_reauth';
+    if (/\baccess[\s_-]?token\b/.test(m) && /(invalid|expired|missing)/.test(m)) return 'needs_reauth';
+    if (/\bcode\s+(40100|40104|40105)\b/.test(m)) return 'needs_reauth';
+    return 'error';
 }
 
 // ============================================================================
