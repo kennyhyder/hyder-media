@@ -19,13 +19,15 @@ const REPORT_URL = `${TT_BASE}/report/integrated/get/`;
 const REFRESH_URL = `${TT_BASE}/oauth2/refresh_token/`;
 const BC_ID = '7094682853576916994';
 
-// Metrics requested for every breakdown
+// Metrics requested for every breakdown.
+// Names follow TikTok Marketing API v1.3 — video percentiles use `video_views_pN`,
+// NOT `video_watched_Np` (the latter is rejected as 40002 invalid metric).
 const BASE_METRICS = [
     'spend', 'impressions', 'clicks', 'ctr', 'cpc', 'cpm',
     'reach', 'frequency',
     'conversion', 'cost_per_conversion', 'conversion_rate',
-    'video_play_actions', 'video_watched_2s',
-    'video_watched_25p', 'video_watched_50p', 'video_watched_75p', 'video_watched_100p',
+    'video_play_actions', 'video_watched_2s', 'video_watched_6s',
+    'video_views_p25', 'video_views_p50', 'video_views_p75', 'video_views_p100',
     'engaged_view', 'profile_visits', 'follows', 'likes', 'comments', 'shares',
 ];
 
@@ -180,10 +182,11 @@ function metricsFromRow(row) {
         convRate: num(m.conversion_rate) / 100,
         videoPlays: num(m.video_play_actions),
         video2s: num(m.video_watched_2s),
-        video25p: num(m.video_watched_25p),
-        video50p: num(m.video_watched_50p),
-        video75p: num(m.video_watched_75p),
-        video100p: num(m.video_watched_100p),
+        video6s: num(m.video_watched_6s),
+        video25p: num(m.video_views_p25),
+        video50p: num(m.video_views_p50),
+        video75p: num(m.video_views_p75),
+        video100p: num(m.video_views_p100),
         engagedView: num(m.engaged_view),
         profileVisits: num(m.profile_visits),
         follows: num(m.follows),

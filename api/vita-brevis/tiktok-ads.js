@@ -32,7 +32,7 @@ const AD_FIELDS = [
 const AD_METRICS = [
     'spend', 'impressions', 'clicks', 'ctr', 'cpc', 'cpm',
     'reach', 'conversion', 'cost_per_conversion',
-    'video_play_actions', 'video_watched_2s', 'video_watched_100p',
+    'video_play_actions', 'video_watched_2s', 'video_views_p100',
     'engaged_view', 'likes', 'comments', 'shares',
 ];
 
@@ -279,7 +279,7 @@ async function fetchAdMetrics(accessToken, advertiserId, startDate, endDate) {
                 costPerConv: num(m.cost_per_conversion),
                 videoPlays: num(m.video_play_actions),
                 video2s: num(m.video_watched_2s),
-                video100p: num(m.video_watched_100p),
+                video100p: num(m.video_views_p100),
                 engagedView: num(m.engaged_view),
                 likes: num(m.likes),
                 comments: num(m.comments),
