@@ -168,10 +168,11 @@ function resolveDateRange(query) {
 function classifyError(message) {
     const m = (message || '').toLowerCase();
     if (m.includes('no tiktok connection') || m.includes('not found')) return 'not_configured';
+    if (m.includes('qps limit') || m.includes('rate limit')) return 'error';
     if (/\bunauth\w*\b/.test(m)) return 'needs_reauth';
     if (/\binvalid\s+token\b/.test(m) || /\bexpired\s+token\b/.test(m)) return 'needs_reauth';
     if (/\baccess[\s_-]?token\b/.test(m) && /(invalid|expired|missing)/.test(m)) return 'needs_reauth';
-    if (/\bcode\s+(40100|40104|40105)\b/.test(m)) return 'needs_reauth';
+    if (/\bcode\s+(40104|40105)\b/.test(m)) return 'needs_reauth';
     return 'error';
 }
 

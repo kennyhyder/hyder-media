@@ -111,11 +111,16 @@ function resolveDateRange(query) {
 function classifyError(message) {
     const m = (message || '').toLowerCase();
     if (m.includes('no tiktok connection') || m.includes('not found')) return 'not_configured';
-    // TikTok auth-failure codes/phrases
+    // QPS / rate limit — not an auth issue, just transient
+    if (m.includes('qps limit') || m.includes('rate limit')) return 'error';
+    // TikTok auth-failure phrases
     if (/\bunauth\w*\b/.test(m)) return 'needs_reauth';
     if (/\binvalid\s+token\b/.test(m) || /\bexpired\s+token\b/.test(m)) return 'needs_reauth';
     if (/\baccess[\s_-]?token\b/.test(m) && /(invalid|expired|missing)/.test(m)) return 'needs_reauth';
-    if (/\bcode\s+(40100|40104|40105)\b/.test(m)) return 'needs_reauth';
+    // 40104 = invalid token, 40105 = token expired. 40100 is too generic
+    // (used for both auth failures AND rate limits) so we only flag it as
+    // re-auth when paired with auth keywords above.
+    if (/\bcode\s+(40104|40105)\b/.test(m)) return 'needs_reauth';
     return 'error';
 }
 
@@ -237,15 +242,52 @@ async function fetchSummary(accessToken, advertiserId, startDate, endDate) {
 }
 
 async function fetchTimeSeries(accessToken, advertiserId, startDate, endDate, granularity) {
-    // TikTok caps stat_time_day queries at 30 days. Chunk the requested
-    // range into <=28-day windows, fetch in parallel, concat results.
+    // TikTok caps stat_time_day queries at 30 days AND rate-limits the app
+    // at 10 QPS. Chunk into <=28-day windows and use a concurrency-limited
+    // pool (max 4 in flight) so 13 chunks for a 12-month range don't trip
+    // the QPS limit.
     const chunks = chunkDateRange(startDate, endDate, 28);
-    const chunkResults = await Promise.all(
-        chunks.map(({ start, end }) => fetchDailyChunk(accessToken, advertiserId, start, end))
+    const chunkResults = await pMap(
+        chunks,
+        ({ start, end }) => fetchDailyChunkWithRetry(accessToken, advertiserId, start, end),
+        4
     );
     const out = chunkResults.flat();
     out.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     return out;
+}
+
+async function pMap(items, mapper, concurrency) {
+    const results = new Array(items.length);
+    let i = 0;
+    const workers = [];
+    for (let w = 0; w < Math.min(concurrency, items.length); w++) {
+        workers.push((async () => {
+            while (true) {
+                const idx = i++;
+                if (idx >= items.length) break;
+                results[idx] = await mapper(items[idx], idx);
+            }
+        })());
+    }
+    await Promise.all(workers);
+    return results;
+}
+
+async function fetchDailyChunkWithRetry(accessToken, advertiserId, startDate, endDate) {
+    // Retry once on rate-limit. TikTok returns code 40100 + "QPS limit" message
+    // when we hit the cap.
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            return await fetchDailyChunk(accessToken, advertiserId, startDate, endDate);
+        } catch (err) {
+            const msg = (err.message || '').toLowerCase();
+            const isRateLimit = msg.includes('qps limit') || msg.includes('rate limit') ||
+                                /\bcode\s+50002\b/.test(msg);
+            if (!isRateLimit || attempt === 2) throw err;
+            await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+        }
+    }
 }
 
 function chunkDateRange(startDate, endDate, maxDays) {
