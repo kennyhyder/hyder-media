@@ -319,6 +319,47 @@ async function fetchVideoInfo(accessToken, advertiserId, videoIds, errorBag) {
 }
 
 async function fetchAdMetrics(accessToken, advertiserId, startDate, endDate) {
+    // BASIC report tops out at 365 days. Chunk and aggregate per-ad.
+    const chunks = chunkDateRange(startDate, endDate, 364);
+    const chunkResults = await pMap(chunks, ({ start, end }) =>
+        fetchAdMetricsChunk(accessToken, advertiserId, start, end), 4);
+
+    const map = new Map();
+    for (const chunkMap of chunkResults) {
+        for (const [adId, m] of chunkMap.entries()) {
+            const agg = map.get(adId) || {
+                spend: 0, impressions: 0, clicks: 0, reach: 0,
+                ctr: 0, cpc: 0, cpm: 0,
+                conversions: 0, costPerConv: 0,
+                videoPlays: 0, video2s: 0, video100p: 0,
+                engagedView: 0, likes: 0, comments: 0, shares: 0,
+            };
+            agg.spend += m.spend;
+            agg.impressions += m.impressions;
+            agg.clicks += m.clicks;
+            agg.reach += m.reach;
+            agg.conversions += m.conversions;
+            agg.videoPlays += m.videoPlays;
+            agg.video2s += m.video2s;
+            agg.video100p += m.video100p;
+            agg.engagedView += m.engagedView;
+            agg.likes += m.likes;
+            agg.comments += m.comments;
+            agg.shares += m.shares;
+            map.set(adId, agg);
+        }
+    }
+    // Re-derive rates from totals
+    for (const m of map.values()) {
+        m.ctr = m.impressions > 0 ? m.clicks / m.impressions : 0;
+        m.cpc = m.clicks > 0 ? m.spend / m.clicks : 0;
+        m.cpm = m.impressions > 0 ? (m.spend / m.impressions) * 1000 : 0;
+        m.costPerConv = m.conversions > 0 ? m.spend / m.conversions : 0;
+    }
+    return map;
+}
+
+async function fetchAdMetricsChunk(accessToken, advertiserId, startDate, endDate) {
     const map = new Map();
     let page = 1;
     const pageSize = 1000;
@@ -365,6 +406,42 @@ async function fetchAdMetrics(accessToken, advertiserId, startDate, endDate) {
         page += 1;
     }
     return map;
+}
+
+function chunkDateRange(startDate, endDate, maxDays) {
+    const chunks = [];
+    const start = new Date(startDate + 'T00:00:00Z');
+    const end = new Date(endDate + 'T00:00:00Z');
+    let cur = new Date(start);
+    while (cur <= end) {
+        const chunkEnd = new Date(cur);
+        chunkEnd.setUTCDate(chunkEnd.getUTCDate() + maxDays - 1);
+        if (chunkEnd > end) chunkEnd.setTime(end.getTime());
+        chunks.push({
+            start: cur.toISOString().slice(0, 10),
+            end: chunkEnd.toISOString().slice(0, 10),
+        });
+        cur = new Date(chunkEnd);
+        cur.setUTCDate(cur.getUTCDate() + 1);
+    }
+    return chunks;
+}
+
+async function pMap(items, mapper, concurrency) {
+    const results = new Array(items.length);
+    let i = 0;
+    const workers = [];
+    for (let w = 0; w < Math.min(concurrency, items.length); w++) {
+        workers.push((async () => {
+            while (true) {
+                const idx = i++;
+                if (idx >= items.length) break;
+                results[idx] = await mapper(items[idx], idx);
+            }
+        })());
+    }
+    await Promise.all(workers);
+    return results;
 }
 
 function emptyMetrics() {

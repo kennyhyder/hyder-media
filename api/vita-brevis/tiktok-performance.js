@@ -224,21 +224,57 @@ function metricsFromRow(row) {
 }
 
 async function fetchSummary(accessToken, advertiserId, startDate, endDate) {
-    const data = await tiktokGet(REPORT_URL, accessToken, {
-        advertiser_id: advertiserId,
-        service_type: 'AUCTION',
-        report_type: 'BASIC',
-        data_level: 'AUCTION_ADVERTISER',
-        dimensions: ['advertiser_id'],
-        metrics: BASE_METRICS,
-        start_date: startDate,
-        end_date: endDate,
-        page: 1,
-        page_size: 1,
-    });
-    const list = data.list || [];
-    if (!list.length) return emptyMetrics();
-    return metricsFromRow(list[0]);
+    // BASIC report tops out at 365 days. For longer custom ranges, chunk
+    // and roll up the sum-able metrics. Rates (CTR/CPC/CPM/etc.) get
+    // re-derived from the totals.
+    const chunks = chunkDateRange(startDate, endDate, 364);
+    const chunkSums = await pMap(chunks, async ({ start, end }) => {
+        const data = await tiktokGet(REPORT_URL, accessToken, {
+            advertiser_id: advertiserId,
+            service_type: 'AUCTION',
+            report_type: 'BASIC',
+            data_level: 'AUCTION_ADVERTISER',
+            dimensions: ['advertiser_id'],
+            metrics: BASE_METRICS,
+            start_date: start,
+            end_date: end,
+            page: 1,
+            page_size: 1,
+        });
+        const list = data.list || [];
+        return list.length ? metricsFromRow(list[0]) : null;
+    }, 4);
+
+    const totals = emptyMetrics();
+    for (const m of chunkSums) {
+        if (!m) continue;
+        totals.spend += m.spend || 0;
+        totals.impressions += m.impressions || 0;
+        totals.clicks += m.clicks || 0;
+        totals.reach += m.reach || 0;
+        totals.conversions += m.conversions || 0;
+        totals.videoPlays += m.videoPlays || 0;
+        totals.video2s += m.video2s || 0;
+        totals.video6s += m.video6s || 0;
+        totals.video25p += m.video25p || 0;
+        totals.video50p += m.video50p || 0;
+        totals.video75p += m.video75p || 0;
+        totals.video100p += m.video100p || 0;
+        totals.engagedView += m.engagedView || 0;
+        totals.profileVisits += m.profileVisits || 0;
+        totals.follows += m.follows || 0;
+        totals.likes += m.likes || 0;
+        totals.comments += m.comments || 0;
+        totals.shares += m.shares || 0;
+    }
+    // Re-derive rates from totals; reach is approximate (not strictly additive)
+    totals.ctr = totals.impressions > 0 ? totals.clicks / totals.impressions : 0;
+    totals.cpc = totals.clicks > 0 ? totals.spend / totals.clicks : 0;
+    totals.cpm = totals.impressions > 0 ? (totals.spend / totals.impressions) * 1000 : 0;
+    totals.convRate = totals.clicks > 0 ? totals.conversions / totals.clicks : 0;
+    totals.costPerConv = totals.conversions > 0 ? totals.spend / totals.conversions : 0;
+    totals.frequency = totals.reach > 0 ? totals.impressions / totals.reach : 0;
+    return totals;
 }
 
 async function fetchTimeSeries(accessToken, advertiserId, startDate, endDate, granularity) {
@@ -363,6 +399,42 @@ function aggregateByMonth(daily) {
 }
 
 async function fetchCampaignBreakdown(accessToken, advertiserId, startDate, endDate) {
+    // Same 365-day cap as summary — chunk and merge by campaign_id.
+    const chunks = chunkDateRange(startDate, endDate, 364);
+    const chunkResults = await pMap(chunks, ({ start, end }) =>
+        fetchCampaignChunk(accessToken, advertiserId, start, end), 4);
+
+    const byId = new Map();
+    for (const list of chunkResults) {
+        for (const row of list) {
+            const id = row.id;
+            if (!byId.has(id)) {
+                byId.set(id, { id, name: row.name, objective: row.objective, ...emptyMetrics() });
+            }
+            const agg = byId.get(id);
+            // Sum additive fields
+            for (const k of Object.keys(row)) {
+                if (k === 'id' || k === 'name' || k === 'objective') continue;
+                if (typeof row[k] === 'number') agg[k] = (agg[k] || 0) + row[k];
+            }
+        }
+    }
+    // Re-derive rates per campaign
+    const out = [];
+    for (const c of byId.values()) {
+        c.ctr = c.impressions > 0 ? c.clicks / c.impressions : 0;
+        c.cpc = c.clicks > 0 ? c.spend / c.clicks : 0;
+        c.cpm = c.impressions > 0 ? (c.spend / c.impressions) * 1000 : 0;
+        c.convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
+        c.costPerConv = c.conversions > 0 ? c.spend / c.conversions : 0;
+        c.frequency = c.reach > 0 ? c.impressions / c.reach : 0;
+        out.push(c);
+    }
+    out.sort((a, b) => b.spend - a.spend);
+    return out;
+}
+
+async function fetchCampaignChunk(accessToken, advertiserId, startDate, endDate) {
     const out = [];
     let page = 1;
     const pageSize = 200;
@@ -393,7 +465,6 @@ async function fetchCampaignBreakdown(accessToken, advertiserId, startDate, endD
         if (page * pageSize >= total || !list.length) break;
         page += 1;
     }
-    out.sort((a, b) => b.spend - a.spend);
     return out;
 }
 
