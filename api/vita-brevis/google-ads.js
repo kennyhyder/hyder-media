@@ -22,12 +22,7 @@ export default async function handler(req, res) {
     try {
         const headers = await getHeaders();
 
-        const days = parseInt(req.query.days) || 30;
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - days);
-        const start = startDate.toISOString().split('T')[0];
-        const end = endDate.toISOString().split('T')[0];
+        const { start, end } = resolveDateRange(req.query);
 
         const [liveAds, adMetrics, assetData] = await Promise.all([
             fetchLiveRSAAds(headers),
@@ -49,6 +44,20 @@ export default async function handler(req, res) {
             status: 'error', error: error.message, ads: [], assetLeaderboard: null,
         });
     }
+}
+
+function resolveDateRange(query) {
+    if (query.startDate && query.endDate) {
+        return { start: query.startDate, end: query.endDate };
+    }
+    const days = parseInt(query.days) || 30;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    return {
+        start: start.toISOString().split('T')[0],
+        end: end.toISOString().split('T')[0],
+    };
 }
 
 async function getHeaders() {

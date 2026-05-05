@@ -121,7 +121,62 @@
         .data-badge.live { background: rgba(127,176,105,0.15); color: var(--success); border: 1px solid rgba(127,176,105,0.3); }
         .data-badge.demo { background: rgba(217,164,65,0.15); color: var(--warning); border: 1px solid rgba(217,164,65,0.3); }
         .data-badge.partial { background: rgba(217,164,65,0.15); color: var(--warning); border: 1px solid rgba(217,164,65,0.3); }
-        .data-badge.loading { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(201,163,106,0.3); }
+        .data-badge.loading {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid rgba(201,163,106,0.3);
+            animation: badgePulse 1.4s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { background: var(--accent-soft); }
+            50%      { background: rgba(201,163,106,0.35); }
+        }
+
+        /* Loading overlay — covers the main content area while a refresh is in flight */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 20, 16, 0.55);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: all;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-overlay-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 28px 36px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(201,163,106,0.25);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay-text {
+            font-family: 'Georgia', serif;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+        .loading-overlay-sub {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 4px;
+        }
 
         /* Buttons */
         .btn {
@@ -595,7 +650,7 @@
         <div class="page-header">
             <div>
                 <h1>Advertising Report</h1>
-                <p class="lede">Live performance across Google &amp; Meta — refreshed on demand.</p>
+                <p class="lede">Live performance across Google, Meta &amp; TikTok — refreshed on demand.</p>
             </div>
             <div class="header-controls">
                 <span id="dataBadge" class="data-badge loading">Loading…</span>
@@ -605,8 +660,29 @@
                     <button class="date-btn" data-days="90">90d</button>
                     <button class="date-btn" data-days="180">6mo</button>
                     <button class="date-btn" data-days="365">12mo</button>
+                    <button class="date-btn" id="customDateBtn">Custom</button>
                 </div>
                 <button id="refreshBtn" class="btn btn-primary" onclick="loadAllData()">Refresh</button>
+            </div>
+        </div>
+
+        <div id="customDatePopover" style="display: none; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label style="font-size: 0.85rem; color: var(--text-secondary);">Start:</label>
+            <input type="date" id="customStartInput" class="filter-input" style="padding: 6px 10px;">
+            <label style="font-size: 0.85rem; color: var(--text-secondary);">End:</label>
+            <input type="date" id="customEndInput" class="filter-input" style="padding: 6px 10px;">
+            <button class="btn btn-primary" onclick="applyCustomRange()">Apply</button>
+            <button class="btn" onclick="closeCustomPopover()" style="background: transparent;">Cancel</button>
+            <span id="customDateMsg" style="font-size: 0.8rem; color: var(--warning);"></span>
+        </div>
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-overlay-card">
+                <div class="loading-spinner"></div>
+                <div>
+                    <div class="loading-overlay-text" id="loadingOverlayText">Loading data…</div>
+                    <div class="loading-overlay-sub" id="loadingOverlaySub">Fetching the latest from each platform</div>
+                </div>
             </div>
         </div>
 
@@ -1075,6 +1151,9 @@
 // State
 // ============================================================================
 let currentDays = 30;
+let dateMode = 'preset';   // 'preset' | 'custom'
+let customStart = null;    // ISO date YYYY-MM-DD
+let customEnd = null;
 let isDemo = false;
 let badgeState = 'loading';
 
@@ -1161,21 +1240,100 @@ window.addEventListener('hashchange', () => {
 // ============================================================================
 document.querySelectorAll('.date-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+        if (btn.id === 'customDateBtn') {
+            const pop = document.getElementById('customDatePopover');
+            const isOpen = pop.style.display === 'flex';
+            if (isOpen) { closeCustomPopover(); return; }
+            const today = new Date().toISOString().split('T')[0];
+            const defaultStart = customStart || (() => {
+                const d = new Date();
+                d.setDate(d.getDate() - currentDays);
+                return d.toISOString().split('T')[0];
+            })();
+            const defaultEnd = customEnd || today;
+            document.getElementById('customStartInput').value = defaultStart;
+            document.getElementById('customEndInput').value = defaultEnd;
+            document.getElementById('customStartInput').max = today;
+            document.getElementById('customEndInput').max = today;
+            pop.style.display = 'flex';
+            return;
+        }
         document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentDays = parseInt(btn.dataset.days);
+        dateMode = 'preset';
+        customStart = null;
+        customEnd = null;
+        closeCustomPopover();
         loadAllData();
     });
 });
+
+function closeCustomPopover() {
+    document.getElementById('customDatePopover').style.display = 'none';
+    document.getElementById('customDateMsg').textContent = '';
+}
+
+function applyCustomRange() {
+    const s = document.getElementById('customStartInput').value;
+    const e = document.getElementById('customEndInput').value;
+    const msg = document.getElementById('customDateMsg');
+    if (!s || !e) { msg.textContent = 'Pick both dates.'; return; }
+    if (s > e) { msg.textContent = 'Start must be before end.'; return; }
+    customStart = s;
+    customEnd = e;
+    dateMode = 'custom';
+    document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('customDateBtn').classList.add('active');
+    closeCustomPopover();
+    loadAllData();
+}
+
+function dateParams() {
+    if (dateMode === 'custom' && customStart && customEnd) {
+        return `startDate=${customStart}&endDate=${customEnd}`;
+    }
+    return `days=${currentDays}`;
+}
+
+function activeDayCount() {
+    if (dateMode === 'custom' && customStart && customEnd) {
+        return Math.max(1, Math.round((new Date(customEnd) - new Date(customStart)) / 86400000));
+    }
+    return currentDays;
+}
+
+function rangeLabel() {
+    if (dateMode === 'custom' && customStart && customEnd) {
+        return `${customStart} → ${customEnd}`;
+    }
+    const labels = { 7: 'Last 7 days', 30: 'Last 30 days', 90: 'Last 90 days', 180: 'Last 6 months', 365: 'Last 12 months' };
+    return labels[currentDays] || `Last ${currentDays} days`;
+}
+
+function showLoadingOverlay(label) {
+    document.getElementById('loadingOverlayText').textContent = 'Loading data…';
+    document.getElementById('loadingOverlaySub').textContent = label;
+    document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoadingOverlay() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+}
 
 // ============================================================================
 // Data loading
 // ============================================================================
 async function loadAllData() {
+    const label = rangeLabel();
     setBadge('loading', 'Loading…');
+    showLoadingOverlay(label);
     document.getElementById('refreshBtn').disabled = true;
-    trendGranularity = currentDays <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
+    const dayCount = activeDayCount();
+    trendGranularity = dayCount <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
     const trendParam = trendGranularity;
+    const dp = dateParams();
+    const bust = `_t=${Date.now()}`;
 
     try {
         const [
@@ -1184,26 +1342,26 @@ async function loadAllData() {
             tSummaryRes, tCampaignRes, tTrendRes, tAdsRes,
             gscSummaryRes, gscQueryRes, gscPageRes, gscDateRes, gscDeviceRes, gscCoverageRes,
         ] = await Promise.all([
-            fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/google-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/google-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/google-search-terms?days=${currentDays}&limit=100`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/google-keywords?days=${currentDays}`).then(r => r.json()).catch(() => null),
-            fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${META_API}/meta-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
-            fetch(`${META_API}/meta-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=campaign`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/tiktok-performance?days=${currentDays}&breakdown=${trendParam}`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/tiktok-ads?days=${currentDays}`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=summary`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=query&limit=200`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=page&limit=200`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=date`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-performance?days=${currentDays}&breakdown=device`).then(r => r.json()).catch(() => null),
-            fetch(`${GOOGLE_API}/gsc-coverage`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-performance?${dp}&breakdown=campaign&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-performance?${dp}&breakdown=${trendParam}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-ads?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-search-terms?${dp}&limit=100&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/google-keywords?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${META_API}/meta-performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${META_API}/meta-performance?${dp}&breakdown=campaign&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${META_API}/meta-performance?${dp}&breakdown=${trendParam}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${META_API}/meta-ads?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?${dp}&breakdown=campaign&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-performance?${dp}&breakdown=${trendParam}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/tiktok-ads?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?${dp}&breakdown=query&limit=200&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?${dp}&breakdown=page&limit=200&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?${dp}&breakdown=date&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-performance?${dp}&breakdown=device&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${GOOGLE_API}/gsc-coverage?${bust}`).then(r => r.json()).catch(() => null),
         ]);
 
         const gSumOk = gSummaryRes?.status === 'success' && gSummaryRes.summary && !gSummaryRes.summary.error;
@@ -1258,7 +1416,8 @@ async function loadAllData() {
             if (!metaSummary) generateMetaDemo();
 
             const allLive = gSumOk && mSumOk;
-            setBadge(allLive ? 'live' : 'partial', allLive ? 'Live Data' : 'Partial Data');
+            const customSuffix = dateMode === 'custom' ? ` · ${customStart} → ${customEnd}` : '';
+            setBadge(allLive ? 'live' : 'partial', (allLive ? 'Live Data' : 'Partial Data') + customSuffix);
         } else {
             isDemo = true;
             generateGoogleDemo();
@@ -1307,6 +1466,7 @@ async function loadAllData() {
     renderTiktokCreative();
     renderGSC();
     document.getElementById('refreshBtn').disabled = false;
+    hideLoadingOverlay();
 }
 
 function setBadge(type, text) {

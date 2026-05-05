@@ -27,17 +27,25 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    const days = parseInt(req.query.days) || 28;
     const breakdown = (req.query.breakdown || 'summary').toLowerCase();
     const limit = Math.min(parseInt(req.query.limit) || 100, 5000);
 
-    // GSC has a ~2-day delay; cap end date at 2 days ago to avoid sparse rows
-    const end = new Date();
-    end.setDate(end.getDate() - 2);
-    const start = new Date(end);
-    start.setDate(start.getDate() - days);
-    const startDate = start.toISOString().split('T')[0];
-    const endDate = end.toISOString().split('T')[0];
+    let startDate, endDate;
+    if (req.query.startDate && req.query.endDate) {
+        // Custom range. Still clamp end to <= 2 days ago since GSC data lags.
+        const requestedEnd = new Date(req.query.endDate + 'T00:00:00Z');
+        const maxEnd = new Date(); maxEnd.setDate(maxEnd.getDate() - 2);
+        endDate = (requestedEnd < maxEnd ? requestedEnd : maxEnd).toISOString().split('T')[0];
+        startDate = req.query.startDate;
+    } else {
+        const days = parseInt(req.query.days) || 28;
+        const end = new Date();
+        end.setDate(end.getDate() - 2);
+        const start = new Date(end);
+        start.setDate(start.getDate() - days);
+        startDate = start.toISOString().split('T')[0];
+        endDate = end.toISOString().split('T')[0];
+    }
 
     const result = {
         property: SITE_URL,

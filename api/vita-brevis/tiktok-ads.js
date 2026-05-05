@@ -47,12 +47,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    const days = parseInt(req.query.days) || 30;
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - days);
-    const startDate = start.toISOString().split('T')[0];
-    const endDate = end.toISOString().split('T')[0];
+    const { start: startDate, end: endDate } = resolveDateRange(req.query);
 
     const result = {
         bcId: BC_ID,
@@ -154,6 +149,20 @@ export default async function handler(req, res) {
         result.status = classifyError(err.message);
         return res.status(200).json(result);
     }
+}
+
+function resolveDateRange(query) {
+    if (query.startDate && query.endDate) {
+        return { start: query.startDate, end: query.endDate };
+    }
+    const days = parseInt(query.days) || 30;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    return {
+        start: start.toISOString().split('T')[0],
+        end: end.toISOString().split('T')[0],
+    };
 }
 
 function classifyError(message) {

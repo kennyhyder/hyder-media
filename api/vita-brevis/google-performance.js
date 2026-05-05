@@ -19,16 +19,8 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    const days = parseInt(req.query.days) || 30;
     const breakdown = req.query.breakdown || 'summary';
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    const dateRange = {
-        start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0],
-    };
+    const dateRange = resolveDateRange(req.query);
 
     const result = { dateRange, breakdown, status: 'loading', errors: [] };
 
@@ -106,6 +98,20 @@ export default async function handler(req, res) {
         result.status = 'error';
         return res.status(200).json(result);
     }
+}
+
+function resolveDateRange(query) {
+    if (query.startDate && query.endDate) {
+        return { start: query.startDate, end: query.endDate };
+    }
+    const days = parseInt(query.days) || 30;
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    return {
+        start: start.toISOString().split('T')[0],
+        end: end.toISOString().split('T')[0],
+    };
 }
 
 async function gaqlSearch(headers, query) {
