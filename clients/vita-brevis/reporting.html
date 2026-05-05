@@ -1864,24 +1864,34 @@ function renderOverview() {
 }
 
 function renderOverviewCharts() {
-    // Pick the longest trend series so we get the widest x-axis
-    const trends = [googleTrend, metaTrend, tiktokTrend];
-    const longest = trends.reduce((a, b) => (a.length >= b.length ? a : b), []);
-    const labels = longest.map(p =>
-        trendGranularity === 'daily'
-            ? new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-            : new Date(p.month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-    );
-
     const keyField = trendGranularity === 'daily' ? 'date' : 'month';
-    const gByKey = Object.fromEntries(googleTrend.map(p => [p[keyField], p.spend || 0]));
-    const mByKey = Object.fromEntries(metaTrend.map(p => [p[keyField], p.spend || 0]));
-    const tByKey = Object.fromEntries(tiktokTrend.map(p => [p[keyField], p.spend || 0]));
-    const allKeys = longest.map(p => p[keyField]);
+    // Normalize: Google returns 'YYYY-MM-DD' for monthly, Meta + TikTok return
+    // 'YYYY-MM'. Slice to 'YYYY-MM' for monthly so all three line up.
+    const normKey = trendGranularity === 'monthly'
+        ? k => String(k || '').slice(0, 7)
+        : k => String(k || '');
+
+    // Build the union of all keys from all three platforms, so a month with
+    // data on only one channel isn't dropped.
+    const keySet = new Set();
+    for (const trend of [googleTrend, metaTrend, tiktokTrend]) {
+        for (const p of trend) keySet.add(normKey(p[keyField]));
+    }
+    const allKeys = [...keySet].sort();
+
+    const gByKey = Object.fromEntries(googleTrend.map(p => [normKey(p[keyField]), p.spend || 0]));
+    const mByKey = Object.fromEntries(metaTrend.map(p => [normKey(p[keyField]), p.spend || 0]));
+    const tByKey = Object.fromEntries(tiktokTrend.map(p => [normKey(p[keyField]), p.spend || 0]));
 
     const googleSpend = allKeys.map(k => gByKey[k] || 0);
     const metaSpend = allKeys.map(k => mByKey[k] || 0);
     const tiktokSpendArr = allKeys.map(k => tByKey[k] || 0);
+
+    const labels = allKeys.map(k =>
+        trendGranularity === 'daily'
+            ? new Date(k).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            : new Date(k + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+    );
 
     const chartDefaults = { color: '#a89888', borderColor: 'rgba(74,60,50,0.4)' };
 
