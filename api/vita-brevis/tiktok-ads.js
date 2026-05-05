@@ -98,10 +98,17 @@ export default async function handler(req, res) {
         const allImageIds = [...new Set(ads.flatMap(a => a.image_ids || []).filter(Boolean))];
         const allVideoIds = [...new Set(ads.map(a => a.video_id).filter(Boolean))];
 
+        // Image/video enrichment errors are non-critical — videos provide
+        // their own cover via /file/video/ad/info/, and many image IDs are
+        // shared system assets that TikTok blocks from /file/image/ad/info/.
+        // Collect them as warnings instead of result.errors so the response
+        // still reports status: 'success' and the dashboard renders cards.
+        const warnings = [];
         const [imageMap, videoMap] = await Promise.all([
-            allImageIds.length ? fetchImageInfo(accessToken, advertiserId, allImageIds, result.errors) : Promise.resolve(new Map()),
-            allVideoIds.length ? fetchVideoInfo(accessToken, advertiserId, allVideoIds, result.errors) : Promise.resolve(new Map()),
+            allImageIds.length ? fetchImageInfo(accessToken, advertiserId, allImageIds, warnings) : Promise.resolve(new Map()),
+            allVideoIds.length ? fetchVideoInfo(accessToken, advertiserId, allVideoIds, warnings) : Promise.resolve(new Map()),
         ]);
+        if (warnings.length) result.warnings = warnings;
 
         if (req.query.diag === 'true') {
             result.diagnostics = {
