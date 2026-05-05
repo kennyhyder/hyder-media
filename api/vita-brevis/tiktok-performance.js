@@ -228,7 +228,37 @@ async function fetchSummary(accessToken, advertiserId, startDate, endDate) {
 }
 
 async function fetchTimeSeries(accessToken, advertiserId, startDate, endDate, granularity) {
-    // TikTok supports stat_time_day. We aggregate to monthly client-side.
+    // TikTok caps stat_time_day queries at 30 days. Chunk the requested
+    // range into <=28-day windows, fetch in parallel, concat results.
+    const chunks = chunkDateRange(startDate, endDate, 28);
+    const chunkResults = await Promise.all(
+        chunks.map(({ start, end }) => fetchDailyChunk(accessToken, advertiserId, start, end))
+    );
+    const out = chunkResults.flat();
+    out.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    return out;
+}
+
+function chunkDateRange(startDate, endDate, maxDays) {
+    const chunks = [];
+    const start = new Date(startDate + 'T00:00:00Z');
+    const end = new Date(endDate + 'T00:00:00Z');
+    let cur = new Date(start);
+    while (cur <= end) {
+        const chunkEnd = new Date(cur);
+        chunkEnd.setUTCDate(chunkEnd.getUTCDate() + maxDays - 1);
+        if (chunkEnd > end) chunkEnd.setTime(end.getTime());
+        chunks.push({
+            start: cur.toISOString().slice(0, 10),
+            end: chunkEnd.toISOString().slice(0, 10),
+        });
+        cur = new Date(chunkEnd);
+        cur.setUTCDate(cur.getUTCDate() + 1);
+    }
+    return chunks;
+}
+
+async function fetchDailyChunk(accessToken, advertiserId, startDate, endDate) {
     const out = [];
     let page = 1;
     const pageSize = 1000;
@@ -255,7 +285,6 @@ async function fetchTimeSeries(accessToken, advertiserId, startDate, endDate, gr
         if (page * pageSize >= total || !list.length) break;
         page += 1;
     }
-    out.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     return out;
 }
 
