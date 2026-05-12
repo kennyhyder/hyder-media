@@ -2210,9 +2210,11 @@ function renderGA4() {
 
 // ===== PDF Export =====
 // Captures every reporting view into one PDF for client delivery.
-// Strategy: clone the main reporting container, force every tab visible,
-// strip interactive controls, copy chart bitmaps over (cloned canvases come
-// blank), insert a header, then hand to html2pdf for rasterized output.
+// Charts live inside the Overview tab; when the user clicks Export PDF from
+// any other tab, the Overview parent is display:none, so Chart.js canvases
+// have width=height=0 and drawImage throws. We force Overview visible
+// (off-screen), let Chart.js resize, capture each chart via toBase64Image,
+// restore the tab state, then build the clone and swap canvases for <img>.
 async function exportPDF() {
     const btn = document.getElementById('exportPdfBtn');
     if (typeof html2pdf === 'undefined') {
@@ -2224,6 +2226,9 @@ async function exportPDF() {
         btn.dataset.origText = btn.textContent;
         btn.textContent = 'Generating…';
     }
+
+    const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const chartImages = await captureChartImages(nextFrame);
 
     let clone = null;
     try {
@@ -2238,7 +2243,7 @@ async function exportPDF() {
         clone.style.color = '#f1f5f9';
         clone.style.padding = '24px';
 
-        // Remove non-PDF UI: tab bar, refresh / export buttons, date selectors, custom-range popover
+        // Remove non-PDF UI
         ['.tab-bar', '.header-controls', '#customDatePopover', '.export-bar'].forEach(sel => {
             clone.querySelectorAll(sel).forEach(el => el.remove());
         });
@@ -2246,21 +2251,20 @@ async function exportPDF() {
 
         // Show all tabs and force a page break between major sections
         const tabs = clone.querySelectorAll('.tab-content');
+        const sectionTitles = {
+            'tab-overview': 'Overview',
+            'tab-campaigns': 'Campaigns',
+            'tab-creative': 'Ad Creative',
+            'tab-search-terms': 'Search Terms',
+            'tab-keywords': 'Keywords',
+            'tab-ga4': 'Vendor / Affiliate',
+        };
         tabs.forEach((t, i) => {
             t.classList.add('active');
             t.style.display = 'block';
             t.style.pageBreakBefore = i === 0 ? 'auto' : 'always';
             t.style.breakBefore = i === 0 ? 'auto' : 'page';
 
-            // Re-add the section name (the tab bar is gone, so users need a label)
-            const sectionTitles = {
-                'tab-overview': 'Overview',
-                'tab-campaigns': 'Campaigns',
-                'tab-creative': 'Ad Creative',
-                'tab-search-terms': 'Search Terms',
-                'tab-keywords': 'Keywords',
-                'tab-ga4': 'Vendor / Affiliate',
-            };
             const title = sectionTitles[t.id];
             if (title) {
                 const h = document.createElement('h2');
@@ -2273,21 +2277,17 @@ async function exportPDF() {
             }
         });
 
-        // Copy live canvas bitmaps over to the cloned ones (cloneNode resets canvases)
-        const origCanvases = container.querySelectorAll('canvas');
-        const cloneCanvases = clone.querySelectorAll('canvas');
-        origCanvases.forEach((orig, i) => {
-            const dst = cloneCanvases[i];
-            if (!dst) return;
-            try {
-                dst.width = orig.width;
-                dst.height = orig.height;
-                dst.style.width = orig.style.width || (orig.clientWidth + 'px');
-                dst.style.height = orig.style.height || (orig.clientHeight + 'px');
-                dst.getContext('2d').drawImage(orig, 0, 0);
-            } catch (e) {
-                console.warn('Canvas copy failed', e);
-            }
+        // Swap chart canvases for <img> tags from the captured base64 — avoids
+        // drawImage on the cloned canvases entirely.
+        clone.querySelectorAll('canvas').forEach((dst) => {
+            const dataUrl = chartImages[dst.id];
+            if (!dataUrl) return;
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            dst.replaceWith(img);
         });
 
         // Cover header
@@ -2307,7 +2307,7 @@ async function exportPDF() {
         else clone.insertBefore(header, clone.firstChild);
 
         document.body.appendChild(clone);
-        await new Promise(r => setTimeout(r, 150)); // let layout settle
+        await new Promise(r => setTimeout(r, 150));
 
         const filename = `digistore24-report-${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}.pdf`;
 
@@ -2335,6 +2335,63 @@ async function exportPDF() {
             btn.textContent = btn.dataset.origText || 'Export PDF';
         }
     }
+}
+
+// Force the Overview tab visible (off-screen) so Chart.js can resize its
+// canvases, then capture base64 PNGs from each live chart. Restores tab
+// state before returning. Returns {} on any failure — PDF export proceeds
+// without chart images rather than failing outright.
+async function captureChartImages(nextFrame) {
+    const images = {};
+    const overview = document.getElementById('tab-overview');
+    if (!overview) return images;
+
+    const wasActive = overview.classList.contains('active');
+    const saved = {
+        position: overview.style.position,
+        opacity: overview.style.opacity,
+        pointerEvents: overview.style.pointerEvents,
+        left: overview.style.left,
+        top: overview.style.top,
+        width: overview.style.width,
+        display: overview.style.display,
+    };
+
+    if (!wasActive) {
+        overview.style.position = 'absolute';
+        overview.style.opacity = '0';
+        overview.style.pointerEvents = 'none';
+        overview.style.left = '0';
+        overview.style.top = '0';
+        overview.style.width = '1280px';
+        overview.style.display = 'block';
+        overview.classList.add('active');
+    }
+
+    try {
+        await nextFrame();
+        if (spendChartInstance) spendChartInstance.resize();
+        if (cpaChartInstance) cpaChartInstance.resize();
+        await nextFrame();
+
+        if (spendChartInstance && spendChartInstance.canvas.width > 0) {
+            images.spendChart = spendChartInstance.toBase64Image('image/png', 1.0);
+        }
+        if (cpaChartInstance && cpaChartInstance.canvas.width > 0) {
+            images.cpaChart = cpaChartInstance.toBase64Image('image/png', 1.0);
+        }
+    } catch (e) {
+        console.warn('Chart capture failed', e);
+    } finally {
+        if (!wasActive) {
+            overview.classList.remove('active');
+            Object.assign(overview.style, saved);
+            // Trigger one more resize so the live chart fits the (still-hidden) parent
+            if (spendChartInstance) spendChartInstance.resize();
+            if (cpaChartInstance) cpaChartInstance.resize();
+        }
+    }
+    return images;
 }
 
 // ===== Init =====
