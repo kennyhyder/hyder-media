@@ -600,6 +600,16 @@
                 border-bottom: 1px solid var(--border);
                 color: var(--text-primary);
             }
+            /* Current-tab-only mode: only the active tab prints, and the
+               cover header already names the section, so suppress the
+               per-section title to avoid duplication. */
+            body.pdf-current-only .tab-content { display: none !important; }
+            body.pdf-current-only .tab-content.active {
+                display: block !important;
+                page-break-before: avoid !important;
+                break-before: avoid !important;
+            }
+            body.pdf-current-only .pdf-section-title { display: none !important; }
         }
     </style>
 </head>
@@ -634,7 +644,8 @@
                     <button class="date-btn" data-days="365">12mo</button>
                     <button class="date-btn" id="customDateBtn">Custom</button>
                 </div>
-                <button id="exportPdfBtn" class="btn" onclick="exportPDF()">Export PDF</button>
+                <button id="exportPdfBtn" class="btn" onclick="exportPDF('current')">Export PDF</button>
+                <button id="exportAllBtn" class="btn" onclick="exportPDF('all')" title="Export every tab into one PDF">Export All</button>
                 <button id="refreshBtn" class="btn btn-primary" onclick="loadAllData()">Refresh</button>
             </div>
         </div>
@@ -2308,19 +2319,47 @@ function renderGA4() {
 // @media print, so the browser handles rendering with full fidelity.
 // Earlier html2pdf/html2canvas approach produced blank or empty pages due
 // to dark-theme CSS variable resolution quirks.
-async function exportPDF() {
-    const btn = document.getElementById('exportPdfBtn');
+// mode: 'current' (active tab only) | 'all' (every tab in one PDF).
+// Auto-expands every campaign when the Campaigns tab is included so ad
+// group detail prints.
+async function exportPDF(mode = 'current') {
+    const isAll = mode === 'all';
+    const btn = document.getElementById(isAll ? 'exportAllBtn' : 'exportPdfBtn');
     if (btn) {
         btn.disabled = true;
         btn.dataset.origText = btn.textContent;
         btn.textContent = 'Preparing…';
     }
 
+    // Stack of undo callbacks run after the print dialog closes.
+    const restoreActions = [];
+
     try {
+        const sectionLabel = getCurrentTabLabel();
+        const includesCampaigns = isAll || (mode === 'current' && document.getElementById('tab-campaigns')?.classList.contains('active'));
+
+        // Auto-expand every campaign so ad group rows are visible in the PDF
+        if (includesCampaigns && Array.isArray(campaignData) && campaignData.length > 0) {
+            const prevExpanded = new Set(expandedCampaigns);
+            campaignData.forEach(c => expandedCampaigns.add(c.name));
+            renderCampaigns();
+            restoreActions.push(() => {
+                expandedCampaigns.clear();
+                prevExpanded.forEach(c => expandedCampaigns.add(c));
+                renderCampaigns();
+            });
+        }
+
+        // In current-tab mode, ask the print stylesheet to hide everything else
+        if (!isAll) {
+            document.body.classList.add('pdf-current-only');
+            restoreActions.push(() => document.body.classList.remove('pdf-current-only'));
+        }
+
+        // Pre-render charts to <img> (Overview canvases are 0×0 when on
+        // another tab, so we can't rely on the live canvas painting in print)
         const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         const chartImages = await captureChartImages(nextFrame);
-
-        // Populate the print-only chart imgs
         document.querySelectorAll('.chart-pdf-img').forEach(img => {
             const id = img.dataset.chart;
             if (chartImages[id]) img.src = chartImages[id];
@@ -2335,26 +2374,58 @@ async function exportPDF() {
         if (rangeEl) rangeEl.textContent = rangeText;
         if (timeEl) timeEl.textContent = new Date().toLocaleString();
 
-        // Document title becomes the PDF default filename in most browsers
+        const coverH1 = document.querySelector('#pdfCoverHeader h1');
+        if (coverH1) {
+            const prevH1 = coverH1.textContent;
+            coverH1.textContent = isAll
+                ? 'Digistore24 — Performance Report'
+                : `Digistore24 — ${sectionLabel}`;
+            restoreActions.push(() => { coverH1.textContent = prevH1; });
+        }
+
+        // Document title → default Save As PDF filename
         const origTitle = document.title;
-        document.title = `Digistore24 Report ${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}`;
+        const titleSection = isAll ? 'Full-Report' : sectionLabel.replace(/[^0-9a-zA-Z]+/g, '-');
+        document.title = `Digistore24 ${titleSection} ${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}`;
+        restoreActions.push(() => { document.title = origTitle; });
 
-        // Give chart images a moment to decode, then fire the print dialog
-        await new Promise(r => setTimeout(r, 200));
+        // Let chart imgs decode and any re-render settle
+        await new Promise(r => setTimeout(r, 250));
+
+        // Run restore after the print dialog closes
+        const onAfterPrint = () => {
+            window.removeEventListener('afterprint', onAfterPrint);
+            restoreActions.reverse().forEach(fn => { try { fn(); } catch (e) { console.warn('cleanup', e); } });
+        };
+        window.addEventListener('afterprint', onAfterPrint);
+
         window.print();
-
-        // Restore title after the dialog closes
-        const restoreTitle = () => { document.title = origTitle; window.removeEventListener('afterprint', restoreTitle); };
-        window.addEventListener('afterprint', restoreTitle);
     } catch (err) {
         console.error('PDF export failed', err);
         alert('PDF export failed: ' + (err?.message || err));
+        // If we threw before printing, restore immediately
+        restoreActions.reverse().forEach(fn => { try { fn(); } catch (e) { console.warn('cleanup', e); } });
     } finally {
         if (btn) {
             btn.disabled = false;
-            btn.textContent = btn.dataset.origText || 'Export PDF';
+            btn.textContent = btn.dataset.origText || (isAll ? 'Export All' : 'Export PDF');
         }
     }
+}
+
+function getCurrentTabLabel() {
+    const map = {
+        'tab-overview': 'Overview',
+        'tab-campaigns': 'Campaigns',
+        'tab-creative': 'Ad Creative',
+        'tab-search-terms': 'Search Terms',
+        'tab-keywords': 'Keywords',
+        'tab-ga4': 'Vendor / Affiliate',
+    };
+    for (const [id, label] of Object.entries(map)) {
+        if (document.getElementById(id)?.classList.contains('active')) return label;
+    }
+    return 'Report';
 }
 
 // Force the Overview tab visible (off-screen) so Chart.js can resize its
