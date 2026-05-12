@@ -2209,12 +2209,14 @@ function renderGA4() {
 }
 
 // ===== PDF Export =====
-// Captures every reporting view into one PDF for client delivery.
-// Charts live inside the Overview tab; when the user clicks Export PDF from
-// any other tab, the Overview parent is display:none, so Chart.js canvases
-// have width=height=0 and drawImage throws. We force Overview visible
-// (off-screen), let Chart.js resize, capture each chart via toBase64Image,
-// restore the tab state, then build the clone and swap canvases for <img>.
+// Captures every reporting view into one PDF for client delivery. Works by
+// briefly modifying the live DOM (force every tab visible, swap chart
+// canvases for <img>, hide controls, inject section headers + cover), then
+// running html2pdf on the live .container, then restoring everything. An
+// opaque overlay covers the page during capture so the user doesn't see
+// the in-place modifications. Earlier cloning approach produced blank PDFs
+// because html2canvas resolves layout via getBoundingClientRect — clones
+// positioned at left:-10000px rendered as empty.
 async function exportPDF() {
     const btn = document.getElementById('exportPdfBtn');
     if (typeof html2pdf === 'undefined') {
@@ -2230,27 +2232,31 @@ async function exportPDF() {
     const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     const chartImages = await captureChartImages(nextFrame);
 
-    let clone = null;
+    // Overlay so the user only sees "Generating PDF…" while the live DOM
+    // is in its modified state. html2canvas reads from the DOM directly
+    // (not a screen capture), so the overlay doesn't affect the output.
+    const overlay = document.createElement('div');
+    overlay.id = '__pdfExportOverlay';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.96); z-index:999999; display:flex; align-items:center; justify-content:center; color:#f1f5f9; font-size:18px; flex-direction:column; gap:12px;';
+    overlay.innerHTML = '<div style="font-size:24px;">Generating PDF…</div><div style="font-size:13px; color:#94a3b8;">Rendering all sections, this can take 10–20 seconds.</div>';
+    document.body.appendChild(overlay);
+
+    const cleanup = []; // restore stack (run in reverse)
+
     try {
-        const container = document.querySelector('.container');
-        clone = container.cloneNode(true);
-        clone.id = 'pdfExportContent';
-        clone.style.position = 'fixed';
-        clone.style.left = '-10000px';
-        clone.style.top = '0';
-        clone.style.width = '1280px';
-        clone.style.background = '#0f172a';
-        clone.style.color = '#f1f5f9';
-        clone.style.padding = '24px';
+        await nextFrame();
 
-        // Remove non-PDF UI
-        ['.tab-bar', '.header-controls', '#customDatePopover', '.export-bar'].forEach(sel => {
-            clone.querySelectorAll(sel).forEach(el => el.remove());
+        // Hide non-PDF UI
+        const hideSelectors = ['.tab-bar', '.header-controls', '#customDatePopover', '.export-bar'];
+        hideSelectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => {
+                const prev = el.style.display;
+                el.style.display = 'none';
+                cleanup.push(() => { el.style.display = prev; });
+            });
         });
-        clone.querySelectorAll('select').forEach(el => el.remove());
 
-        // Show all tabs and force a page break between major sections
-        const tabs = clone.querySelectorAll('.tab-content');
+        // Force every tab visible with page-break hints between sections
         const sectionTitles = {
             'tab-overview': 'Overview',
             'tab-campaigns': 'Campaigns',
@@ -2259,56 +2265,75 @@ async function exportPDF() {
             'tab-keywords': 'Keywords',
             'tab-ga4': 'Vendor / Affiliate',
         };
-        tabs.forEach((t, i) => {
+        document.querySelectorAll('.tab-content').forEach((t, i) => {
+            const prevClassName = t.className;
+            const prevStyle = t.getAttribute('style');
             t.classList.add('active');
             t.style.display = 'block';
             t.style.pageBreakBefore = i === 0 ? 'auto' : 'always';
             t.style.breakBefore = i === 0 ? 'auto' : 'page';
+            cleanup.push(() => {
+                t.className = prevClassName;
+                if (prevStyle == null) t.removeAttribute('style');
+                else t.setAttribute('style', prevStyle);
+            });
 
             const title = sectionTitles[t.id];
             if (title) {
                 const h = document.createElement('h2');
                 h.textContent = title;
-                h.style.fontSize = '20px';
-                h.style.margin = '0 0 16px 0';
-                h.style.paddingBottom = '8px';
-                h.style.borderBottom = '1px solid #475569';
+                h.dataset.pdfInserted = '1';
+                h.style.cssText = 'font-size:20px; margin:0 0 16px 0; padding-bottom:8px; border-bottom:1px solid #475569; color:#f1f5f9;';
                 t.insertBefore(h, t.firstChild);
+                cleanup.push(() => h.remove());
             }
         });
 
-        // Swap chart canvases for <img> tags from the captured base64 — avoids
-        // drawImage on the cloned canvases entirely.
-        clone.querySelectorAll('canvas').forEach((dst) => {
-            const dataUrl = chartImages[dst.id];
-            if (!dataUrl) return;
+        // Swap each chart canvas for an <img> using the captured base64
+        Object.entries(chartImages).forEach(([id, dataUrl]) => {
+            const canvas = document.getElementById(id);
+            if (!canvas || !canvas.parentNode) return;
             const img = document.createElement('img');
             img.src = dataUrl;
-            img.style.width = '100%';
-            img.style.height = 'auto';
-            img.style.display = 'block';
-            dst.replaceWith(img);
+            img.style.cssText = 'width:100%; height:auto; display:block;';
+            img.dataset.pdfInserted = '1';
+            const prevDisplay = canvas.style.display;
+            canvas.style.display = 'none';
+            canvas.parentNode.insertBefore(img, canvas);
+            cleanup.push(() => {
+                canvas.style.display = prevDisplay;
+                img.remove();
+            });
         });
 
-        // Cover header
-        const header = document.createElement('div');
+        // PDF cover (replaces the .page-header)
         const rangeText = dateMode === 'custom' && customStart && customEnd
             ? `${customStart} → ${customEnd}`
             : `Last ${currentDays} days`;
-        header.innerHTML = `
-            <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #3b82f6;">
-                <div style="font-size: 12px; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">Hyder Media · Google Ads Reporting</div>
-                <h1 style="font-size: 26px; margin: 0 0 6px 0;">Digistore24 — Performance Report</h1>
-                <div style="font-size: 13px; color: #94a3b8;">Date range: <strong style="color:#f1f5f9;">${rangeText}</strong> · Generated ${new Date().toLocaleString()}</div>
-            </div>
-        `;
-        const pageHeader = clone.querySelector('.page-header');
-        if (pageHeader) pageHeader.replaceWith(header);
-        else clone.insertBefore(header, clone.firstChild);
+        const pageHeader = document.querySelector('.page-header');
+        if (pageHeader) {
+            const cover = document.createElement('div');
+            cover.dataset.pdfInserted = '1';
+            cover.innerHTML = `
+                <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #3b82f6;">
+                    <div style="font-size: 12px; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">Hyder Media · Google Ads Reporting</div>
+                    <h1 style="font-size: 26px; margin: 0 0 6px 0; color:#f1f5f9;">Digistore24 — Performance Report</h1>
+                    <div style="font-size: 13px; color: #94a3b8;">Date range: <strong style="color:#f1f5f9;">${rangeText}</strong> · Generated ${new Date().toLocaleString()}</div>
+                </div>
+            `;
+            const prevHeaderDisplay = pageHeader.style.display;
+            pageHeader.style.display = 'none';
+            pageHeader.parentNode.insertBefore(cover, pageHeader);
+            cleanup.push(() => {
+                cover.remove();
+                pageHeader.style.display = prevHeaderDisplay;
+            });
+        }
 
-        document.body.appendChild(clone);
-        await new Promise(r => setTimeout(r, 150));
+        // Let layout settle (chart images need a moment to decode)
+        await new Promise(r => setTimeout(r, 250));
 
+        const container = document.querySelector('.container');
         const filename = `digistore24-report-${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}.pdf`;
 
         await html2pdf().set({
@@ -2321,15 +2346,19 @@ async function exportPDF() {
                 useCORS: true,
                 logging: false,
                 windowWidth: 1280,
+                scrollX: 0,
+                scrollY: 0,
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
             pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.stat-card', '.ad-card'] },
-        }).from(clone).save();
+        }).from(container).save();
     } catch (err) {
         console.error('PDF export failed', err);
         alert('PDF export failed: ' + (err?.message || err));
     } finally {
-        if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+        // Restore in reverse so each layer undoes correctly
+        cleanup.reverse().forEach(fn => { try { fn(); } catch (e) { console.warn('cleanup error', e); } });
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         if (btn) {
             btn.disabled = false;
             btn.textContent = btn.dataset.origText || 'Export PDF';
