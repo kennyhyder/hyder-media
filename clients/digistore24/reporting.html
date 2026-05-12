@@ -13,6 +13,7 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -560,6 +561,7 @@
                     <button class="date-btn" data-days="365">12mo</button>
                     <button class="date-btn" id="customDateBtn">Custom</button>
                 </div>
+                <button id="exportPdfBtn" class="btn" onclick="exportPDF()">Export PDF</button>
                 <button id="refreshBtn" class="btn btn-primary" onclick="loadAllData()">Refresh</button>
             </div>
         </div>
@@ -594,6 +596,16 @@
                 <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">--</div></div>
                 <div class="stat-card"><div class="stat-label">Conv Rate</div><div class="stat-value" id="statConvRate">--</div></div>
                 <div class="stat-card"><div class="stat-label">Cost / Conv</div><div class="stat-value" id="statCPA">--</div></div>
+                <div class="stat-card">
+                    <div class="stat-label">Cost / Vendor Signup</div>
+                    <div class="stat-value" id="statCostPerVendor" style="color: var(--success);">--</div>
+                    <div class="stat-sub" id="statCostPerVendorSub">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Cost / Affiliate Signup</div>
+                    <div class="stat-value" id="statCostPerAffiliate" style="color: var(--accent);">--</div>
+                    <div class="stat-sub" id="statCostPerAffiliateSub">--</div>
+                </div>
             </div>
 
             <div class="chart-row">
@@ -630,7 +642,9 @@
                             <th data-sort="convRate">CR</th>
                             <th data-sort="cpa">Cost / Conv</th>
                             <th data-sort="vendor">Vendor</th>
+                            <th data-sort="costPerVendor">$ / Vendor</th>
                             <th data-sort="affiliate">Affiliate</th>
+                            <th data-sort="costPerAffiliate">$ / Affiliate</th>
                         </tr>
                     </thead>
                     <tbody id="campaignBody"></tbody>
@@ -1271,7 +1285,47 @@ function renderOverview() {
     document.getElementById('statConvRate').textContent = fmt(d.convRate, '%');
     document.getElementById('statCPA').textContent = d.cpa > 0 ? fmt(d.cpa, '$') : '--';
 
+    // Cost per Vendor / Affiliate — proportional spend split by signup ratio.
+    // (vendorShare × spend) / vendorCount; same shape for affiliate. With
+    // unrounded shares both reduce to spend / (vendor + affiliate), so the
+    // two cards will track each other closely — the breakout is for client
+    // readability per the requested method.
+    const split = computeVendorAffiliateCPA(d.spend, ga4Data?.totals);
+    const vEl = document.getElementById('statCostPerVendor');
+    const aEl = document.getElementById('statCostPerAffiliate');
+    const vSub = document.getElementById('statCostPerVendorSub');
+    const aSub = document.getElementById('statCostPerAffiliateSub');
+    vEl.textContent = split.vendorCPA != null ? fmt(split.vendorCPA, '$') : '--';
+    aEl.textContent = split.affiliateCPA != null ? fmt(split.affiliateCPA, '$') : '--';
+    vSub.textContent = split.vendor > 0
+        ? `${fmt(split.vendor, 'f1')} signups · ${(split.vendorShare * 100).toFixed(0)}% of spend`
+        : '--';
+    aSub.textContent = split.affiliate > 0
+        ? `${fmt(split.affiliate, 'f1')} signups · ${(split.affiliateShare * 100).toFixed(0)}% of spend`
+        : '--';
+
     renderCharts();
+}
+
+// Returns { vendor, affiliate, vendorShare, affiliateShare, vendorCPA, affiliateCPA }
+// CPAs are null when there are zero signups in that bucket.
+function computeVendorAffiliateCPA(spend, totals) {
+    const vendor = totals?.vendor || 0;
+    const affiliate = totals?.affiliate || 0;
+    const total = vendor + affiliate;
+    if (!spend || total === 0) {
+        return { vendor, affiliate, vendorShare: 0, affiliateShare: 0, vendorCPA: null, affiliateCPA: null };
+    }
+    const vendorShare = vendor / total;
+    const affiliateShare = affiliate / total;
+    return {
+        vendor,
+        affiliate,
+        vendorShare,
+        affiliateShare,
+        vendorCPA: vendor > 0 ? (spend * vendorShare) / vendor : null,
+        affiliateCPA: affiliate > 0 ? (spend * affiliateShare) / affiliate : null,
+    };
 }
 
 function renderCharts() {
@@ -1558,18 +1612,25 @@ function renderCampaigns() {
     }
 
     if (!campaignData || campaignData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;padding:40px;color:var(--text-secondary)">No campaign data</td></tr>';
         return;
     }
 
     const ga4ByCampaign = buildGA4ByCampaign();
 
-    // Decorate campaigns with GA4 totals + sort
-    const decorated = campaignData.map(c => ({
-        ...c,
-        vendor: ga4ByCampaign[c.name]?.vendor || 0,
-        affiliate: ga4ByCampaign[c.name]?.affiliate || 0,
-    }));
+    // Decorate campaigns with GA4 totals + proportional CPA + sort
+    const decorated = campaignData.map(c => {
+        const vendor = ga4ByCampaign[c.name]?.vendor || 0;
+        const affiliate = ga4ByCampaign[c.name]?.affiliate || 0;
+        const split = computeVendorAffiliateCPA(c.spend, { vendor, affiliate });
+        return {
+            ...c,
+            vendor,
+            affiliate,
+            costPerVendor: split.vendorCPA,
+            costPerAffiliate: split.affiliateCPA,
+        };
+    });
 
     const sorted = [...decorated].sort((a, b) => {
         const av = a[campaignSortKey], bv = b[campaignSortKey];
@@ -1606,17 +1667,20 @@ function renderCampaigns() {
             <td>${fmt(convRate, '%')}</td>
             <td>${c.cpa > 0 ? fmt(c.cpa, '$') : '—'}</td>
             <td class="vendor ${c.vendor === 0 ? 'zero' : ''}">${c.vendor || '—'}</td>
+            <td class="vendor ${c.costPerVendor == null ? 'zero' : ''}">${c.costPerVendor != null ? fmt(c.costPerVendor, '$') : '—'}</td>
             <td class="affiliate ${c.affiliate === 0 ? 'zero' : ''}">${c.affiliate || '—'}</td>
+            <td class="affiliate ${c.costPerAffiliate == null ? 'zero' : ''}">${c.costPerAffiliate != null ? fmt(c.costPerAffiliate, '$') : '—'}</td>
         </tr>`);
 
         if (isExpanded) {
             const ags = agByCampaign[c.name] || [];
             if (ags.length === 0) {
-                html.push(`<tr class="adgroup-row first-of-campaign"><td></td><td colspan="11" style="text-align:left;padding:8px 16px;color:var(--text-secondary);font-style:italic;">No ad groups with activity in this date range</td></tr>`);
+                html.push(`<tr class="adgroup-row first-of-campaign"><td></td><td colspan="13" style="text-align:left;padding:8px 16px;color:var(--text-secondary);font-style:italic;">No ad groups with activity in this date range</td></tr>`);
             } else {
                 ags.forEach((ag, idx) => {
                     const agCR = ag.clicks > 0 ? ag.conversions / ag.clicks : 0;
                     const agGA4 = ga4ByCampaign._byAdGroupName?.[ag.adGroup] || { vendor: 0, affiliate: 0 };
+                    const agSplit = computeVendorAffiliateCPA(ag.spend, agGA4);
                     html.push(`<tr class="adgroup-row ${idx === 0 ? 'first-of-campaign' : ''}">
                         <td></td>
                         <td><span class="ag-name">↳ ${esc(ag.adGroup)}</span></td>
@@ -1629,7 +1693,9 @@ function renderCampaigns() {
                         <td>${fmt(agCR, '%')}</td>
                         <td>${ag.cpa > 0 ? fmt(ag.cpa, '$') : '—'}</td>
                         <td class="vendor ${agGA4.vendor === 0 ? 'zero' : ''}">${agGA4.vendor || '—'}</td>
+                        <td class="vendor ${agSplit.vendorCPA == null ? 'zero' : ''}">${agSplit.vendorCPA != null ? fmt(agSplit.vendorCPA, '$') : '—'}</td>
                         <td class="affiliate ${agGA4.affiliate === 0 ? 'zero' : ''}">${agGA4.affiliate || '—'}</td>
+                        <td class="affiliate ${agSplit.affiliateCPA == null ? 'zero' : ''}">${agSplit.affiliateCPA != null ? fmt(agSplit.affiliateCPA, '$') : '—'}</td>
                     </tr>`);
                 });
             }
@@ -1667,16 +1733,20 @@ document.querySelectorAll('#campaignTable th[data-sort]').forEach(th => {
 function exportCampaignsCSV() {
     if (!campaignData || campaignData.length === 0) return;
     const ga4ByCampaign = buildGA4ByCampaign();
-    const headers = ['Campaign','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv','Vendor Signups','Affiliate Signups'];
+    const headers = ['Campaign','Status','Spend','Impressions','Clicks','CTR','Avg CPC','Conversions','Conv Rate','Cost / Conv','Vendor Signups','Cost / Vendor','Affiliate Signups','Cost / Affiliate'];
     const rows = campaignData.map(c => {
         const convRate = c.clicks > 0 ? c.conversions / c.clicks : 0;
         const ga4 = ga4ByCampaign[c.name] || { vendor: 0, affiliate: 0 };
+        const split = computeVendorAffiliateCPA(c.spend, ga4);
         return [
             c.name, c.status, c.spend.toFixed(2), c.impressions, c.clicks,
             (c.ctr*100).toFixed(2)+'%', c.cpc.toFixed(2),
             c.conversions.toFixed(1), (convRate*100).toFixed(2)+'%',
             c.cpa > 0 ? c.cpa.toFixed(2) : '',
-            ga4.vendor, ga4.affiliate,
+            ga4.vendor,
+            split.vendorCPA != null ? split.vendorCPA.toFixed(2) : '',
+            ga4.affiliate,
+            split.affiliateCPA != null ? split.affiliateCPA.toFixed(2) : '',
         ];
     });
     const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
@@ -2134,6 +2204,135 @@ function renderGA4() {
         banner.style.display = 'block';
     } else {
         banner.style.display = 'none';
+    }
+}
+
+// ===== PDF Export =====
+// Captures every reporting view into one PDF for client delivery.
+// Strategy: clone the main reporting container, force every tab visible,
+// strip interactive controls, copy chart bitmaps over (cloned canvases come
+// blank), insert a header, then hand to html2pdf for rasterized output.
+async function exportPDF() {
+    const btn = document.getElementById('exportPdfBtn');
+    if (typeof html2pdf === 'undefined') {
+        alert('PDF library is still loading — try again in a moment.');
+        return;
+    }
+    if (btn) {
+        btn.disabled = true;
+        btn.dataset.origText = btn.textContent;
+        btn.textContent = 'Generating…';
+    }
+
+    let clone = null;
+    try {
+        const container = document.querySelector('.container');
+        clone = container.cloneNode(true);
+        clone.id = 'pdfExportContent';
+        clone.style.position = 'fixed';
+        clone.style.left = '-10000px';
+        clone.style.top = '0';
+        clone.style.width = '1280px';
+        clone.style.background = '#0f172a';
+        clone.style.color = '#f1f5f9';
+        clone.style.padding = '24px';
+
+        // Remove non-PDF UI: tab bar, refresh / export buttons, date selectors, custom-range popover
+        ['.tab-bar', '.header-controls', '#customDatePopover', '.export-bar'].forEach(sel => {
+            clone.querySelectorAll(sel).forEach(el => el.remove());
+        });
+        clone.querySelectorAll('select').forEach(el => el.remove());
+
+        // Show all tabs and force a page break between major sections
+        const tabs = clone.querySelectorAll('.tab-content');
+        tabs.forEach((t, i) => {
+            t.classList.add('active');
+            t.style.display = 'block';
+            t.style.pageBreakBefore = i === 0 ? 'auto' : 'always';
+            t.style.breakBefore = i === 0 ? 'auto' : 'page';
+
+            // Re-add the section name (the tab bar is gone, so users need a label)
+            const sectionTitles = {
+                'tab-overview': 'Overview',
+                'tab-campaigns': 'Campaigns',
+                'tab-creative': 'Ad Creative',
+                'tab-search-terms': 'Search Terms',
+                'tab-keywords': 'Keywords',
+                'tab-ga4': 'Vendor / Affiliate',
+            };
+            const title = sectionTitles[t.id];
+            if (title) {
+                const h = document.createElement('h2');
+                h.textContent = title;
+                h.style.fontSize = '20px';
+                h.style.margin = '0 0 16px 0';
+                h.style.paddingBottom = '8px';
+                h.style.borderBottom = '1px solid #475569';
+                t.insertBefore(h, t.firstChild);
+            }
+        });
+
+        // Copy live canvas bitmaps over to the cloned ones (cloneNode resets canvases)
+        const origCanvases = container.querySelectorAll('canvas');
+        const cloneCanvases = clone.querySelectorAll('canvas');
+        origCanvases.forEach((orig, i) => {
+            const dst = cloneCanvases[i];
+            if (!dst) return;
+            try {
+                dst.width = orig.width;
+                dst.height = orig.height;
+                dst.style.width = orig.style.width || (orig.clientWidth + 'px');
+                dst.style.height = orig.style.height || (orig.clientHeight + 'px');
+                dst.getContext('2d').drawImage(orig, 0, 0);
+            } catch (e) {
+                console.warn('Canvas copy failed', e);
+            }
+        });
+
+        // Cover header
+        const header = document.createElement('div');
+        const rangeText = dateMode === 'custom' && customStart && customEnd
+            ? `${customStart} → ${customEnd}`
+            : `Last ${currentDays} days`;
+        header.innerHTML = `
+            <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #3b82f6;">
+                <div style="font-size: 12px; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">Hyder Media · Google Ads Reporting</div>
+                <h1 style="font-size: 26px; margin: 0 0 6px 0;">Digistore24 — Performance Report</h1>
+                <div style="font-size: 13px; color: #94a3b8;">Date range: <strong style="color:#f1f5f9;">${rangeText}</strong> · Generated ${new Date().toLocaleString()}</div>
+            </div>
+        `;
+        const pageHeader = clone.querySelector('.page-header');
+        if (pageHeader) pageHeader.replaceWith(header);
+        else clone.insertBefore(header, clone.firstChild);
+
+        document.body.appendChild(clone);
+        await new Promise(r => setTimeout(r, 150)); // let layout settle
+
+        const filename = `digistore24-report-${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}.pdf`;
+
+        await html2pdf().set({
+            margin: [10, 8, 12, 8],
+            filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: {
+                scale: 2,
+                backgroundColor: '#0f172a',
+                useCORS: true,
+                logging: false,
+                windowWidth: 1280,
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+            pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.stat-card', '.ad-card'] },
+        }).from(clone).save();
+    } catch (err) {
+        console.error('PDF export failed', err);
+        alert('PDF export failed: ' + (err?.message || err));
+    } finally {
+        if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = btn.dataset.origText || 'Export PDF';
+        }
     }
 }
 
