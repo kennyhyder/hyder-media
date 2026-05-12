@@ -13,7 +13,6 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -528,6 +527,80 @@
             padding-top: 0;
             border-top: none;
         }
+
+        /* PDF / print export. .pdf-only nodes live in the DOM but are hidden
+           on screen; @media print reveals them and reformats the page for
+           a multi-section landscape report. window.print() handles render. */
+        .pdf-only { display: none; }
+
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 10mm 8mm 12mm 8mm;
+            }
+            html, body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                background: var(--bg-primary) !important;
+                color: var(--text-primary) !important;
+                min-height: 0 !important;
+            }
+            .main-nav,
+            .tab-bar,
+            .header-controls,
+            .page-header,
+            #customDatePopover,
+            .export-bar,
+            .data-badge {
+                display: none !important;
+            }
+            .container {
+                max-width: none !important;
+                padding: 0 !important;
+            }
+            .pdf-only { display: block !important; }
+            .tab-content {
+                display: block !important;
+                page-break-before: always;
+                break-before: page;
+            }
+            /* First section starts on page 1 (right after the cover) */
+            #tab-overview {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+            .stat-card,
+            .ad-card,
+            .leaderboard-card,
+            .chart-card { page-break-inside: avoid; break-inside: avoid; }
+            table { page-break-inside: auto; }
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; break-inside: avoid; }
+            /* Charts: swap canvas for pre-rendered PNG */
+            canvas { display: none !important; }
+            .chart-pdf-img {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            .chart-container { height: auto !important; }
+            .stats-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            }
+            .chart-row {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            /* Tighter table padding to fit more per page */
+            table th, table td { padding: 6px 8px !important; font-size: 11px !important; }
+            .pdf-section-title {
+                font-size: 18px;
+                margin: 0 0 14px 0;
+                padding-bottom: 6px;
+                border-bottom: 1px solid var(--border);
+                color: var(--text-primary);
+            }
+        }
     </style>
 </head>
 <body>
@@ -586,7 +659,15 @@
         </div>
 
         <!-- Overview Tab -->
+        <!-- PDF cover header (visible only in print/PDF, populated by exportPDF) -->
+        <div id="pdfCoverHeader" class="pdf-only" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--accent);">
+            <div style="font-size: 11px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">Hyder Media · Google Ads Reporting</div>
+            <h1 style="font-size: 24px; margin: 0 0 6px 0;">Digistore24 — Performance Report</h1>
+            <div style="font-size: 12px; color: var(--text-secondary);">Date range: <strong style="color: var(--text-primary);" id="pdfCoverRange">--</strong> · Generated <span id="pdfCoverTime">--</span></div>
+        </div>
+
         <div id="tab-overview" class="tab-content active">
+            <h2 class="pdf-only pdf-section-title">Overview</h2>
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card"><div class="stat-label">Spend</div><div class="stat-value" id="statSpend">--</div></div>
                 <div class="stat-card"><div class="stat-label">Clicks</div><div class="stat-value" id="statClicks">--</div></div>
@@ -611,17 +692,24 @@
             <div class="chart-row">
                 <div class="chart-card">
                     <h3 id="spendChartTitle">Spend & Conversions</h3>
-                    <div class="chart-container"><canvas id="spendChart"></canvas></div>
+                    <div class="chart-container">
+                        <canvas id="spendChart"></canvas>
+                        <img class="chart-pdf-img" data-chart="spendChart" alt="Spend &amp; Conversions chart">
+                    </div>
                 </div>
                 <div class="chart-card">
                     <h3 id="cpaChartTitle">CPA Trend</h3>
-                    <div class="chart-container"><canvas id="cpaChart"></canvas></div>
+                    <div class="chart-container">
+                        <canvas id="cpaChart"></canvas>
+                        <img class="chart-pdf-img" data-chart="cpaChart" alt="CPA Trend chart">
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Campaigns Tab -->
         <div id="tab-campaigns" class="tab-content">
+            <h2 class="pdf-only pdf-section-title">Campaigns</h2>
             <div class="export-bar">
                 <button class="btn" onclick="exportCampaignsCSV()">Export CSV</button>
             </div>
@@ -654,6 +742,7 @@
 
         <!-- Ad Creative Tab -->
         <div id="tab-creative" class="tab-content">
+            <h2 class="pdf-only pdf-section-title">Ad Creative</h2>
             <div class="creative-header">
                 <div>
                     <h2 style="font-size:1.2rem;">Live Ads <span id="adCountBadge" class="count-badge">0</span></h2>
@@ -690,6 +779,7 @@
 
         <!-- Search Terms Tab -->
         <div id="tab-search-terms" class="tab-content">
+            <h2 class="pdf-only pdf-section-title">Search Terms</h2>
             <div class="creative-header">
                 <div>
                     <h2 style="font-size:1.2rem;">Search Terms <span id="stCountBadge" class="count-badge">0</span></h2>
@@ -726,6 +816,7 @@
 
         <!-- Keywords Tab -->
         <div id="tab-keywords" class="tab-content">
+            <h2 class="pdf-only pdf-section-title">Keywords</h2>
             <div class="creative-header">
                 <div>
                     <h2 style="font-size:1.2rem;">Keywords <span id="kwCountBadge" class="count-badge">0</span></h2>
@@ -766,6 +857,7 @@
 
         <!-- GA4 Insights Tab -->
         <div id="tab-ga4" class="tab-content">
+            <h2 class="pdf-only pdf-section-title">Vendor / Affiliate Breakdown</h2>
             <div class="creative-header">
                 <div>
                     <h2 style="font-size:1.2rem;">Vendor vs Affiliate Signups <span id="ga4Source" class="count-badge">Loading...</span></h2>
@@ -2209,156 +2301,55 @@ function renderGA4() {
 }
 
 // ===== PDF Export =====
-// Captures every reporting view into one PDF for client delivery. Works by
-// briefly modifying the live DOM (force every tab visible, swap chart
-// canvases for <img>, hide controls, inject section headers + cover), then
-// running html2pdf on the live .container, then restoring everything. An
-// opaque overlay covers the page during capture so the user doesn't see
-// the in-place modifications. Earlier cloning approach produced blank PDFs
-// because html2canvas resolves layout via getBoundingClientRect — clones
-// positioned at left:-10000px rendered as empty.
+// Uses the browser's native print pipeline. Chart canvases are pre-rendered
+// to <img> tags (Chart.js toBase64Image), the cover header date is filled
+// in, then window.print() is called. All the layout work — forcing every
+// tab visible, hiding controls, page breaks — is done in CSS under
+// @media print, so the browser handles rendering with full fidelity.
+// Earlier html2pdf/html2canvas approach produced blank or empty pages due
+// to dark-theme CSS variable resolution quirks.
 async function exportPDF() {
     const btn = document.getElementById('exportPdfBtn');
-    if (typeof html2pdf === 'undefined') {
-        alert('PDF library is still loading — try again in a moment.');
-        return;
-    }
     if (btn) {
         btn.disabled = true;
         btn.dataset.origText = btn.textContent;
-        btn.textContent = 'Generating…';
+        btn.textContent = 'Preparing…';
     }
 
-    const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    const chartImages = await captureChartImages(nextFrame);
-
-    // Overlay so the user only sees "Generating PDF…" while the live DOM
-    // is in its modified state. html2canvas reads from the DOM directly
-    // (not a screen capture), so the overlay doesn't affect the output.
-    const overlay = document.createElement('div');
-    overlay.id = '__pdfExportOverlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(15,23,42,0.96); z-index:999999; display:flex; align-items:center; justify-content:center; color:#f1f5f9; font-size:18px; flex-direction:column; gap:12px;';
-    overlay.innerHTML = '<div style="font-size:24px;">Generating PDF…</div><div style="font-size:13px; color:#94a3b8;">Rendering all sections, this can take 10–20 seconds.</div>';
-    document.body.appendChild(overlay);
-
-    const cleanup = []; // restore stack (run in reverse)
-
     try {
-        await nextFrame();
+        const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const chartImages = await captureChartImages(nextFrame);
 
-        // Hide non-PDF UI
-        const hideSelectors = ['.tab-bar', '.header-controls', '#customDatePopover', '.export-bar'];
-        hideSelectors.forEach(sel => {
-            document.querySelectorAll(sel).forEach(el => {
-                const prev = el.style.display;
-                el.style.display = 'none';
-                cleanup.push(() => { el.style.display = prev; });
-            });
+        // Populate the print-only chart imgs
+        document.querySelectorAll('.chart-pdf-img').forEach(img => {
+            const id = img.dataset.chart;
+            if (chartImages[id]) img.src = chartImages[id];
         });
 
-        // Force every tab visible with page-break hints between sections
-        const sectionTitles = {
-            'tab-overview': 'Overview',
-            'tab-campaigns': 'Campaigns',
-            'tab-creative': 'Ad Creative',
-            'tab-search-terms': 'Search Terms',
-            'tab-keywords': 'Keywords',
-            'tab-ga4': 'Vendor / Affiliate',
-        };
-        document.querySelectorAll('.tab-content').forEach((t, i) => {
-            const prevClassName = t.className;
-            const prevStyle = t.getAttribute('style');
-            t.classList.add('active');
-            t.style.display = 'block';
-            t.style.pageBreakBefore = i === 0 ? 'auto' : 'always';
-            t.style.breakBefore = i === 0 ? 'auto' : 'page';
-            cleanup.push(() => {
-                t.className = prevClassName;
-                if (prevStyle == null) t.removeAttribute('style');
-                else t.setAttribute('style', prevStyle);
-            });
-
-            const title = sectionTitles[t.id];
-            if (title) {
-                const h = document.createElement('h2');
-                h.textContent = title;
-                h.dataset.pdfInserted = '1';
-                h.style.cssText = 'font-size:20px; margin:0 0 16px 0; padding-bottom:8px; border-bottom:1px solid #475569; color:#f1f5f9;';
-                t.insertBefore(h, t.firstChild);
-                cleanup.push(() => h.remove());
-            }
-        });
-
-        // Swap each chart canvas for an <img> using the captured base64
-        Object.entries(chartImages).forEach(([id, dataUrl]) => {
-            const canvas = document.getElementById(id);
-            if (!canvas || !canvas.parentNode) return;
-            const img = document.createElement('img');
-            img.src = dataUrl;
-            img.style.cssText = 'width:100%; height:auto; display:block;';
-            img.dataset.pdfInserted = '1';
-            const prevDisplay = canvas.style.display;
-            canvas.style.display = 'none';
-            canvas.parentNode.insertBefore(img, canvas);
-            cleanup.push(() => {
-                canvas.style.display = prevDisplay;
-                img.remove();
-            });
-        });
-
-        // PDF cover (replaces the .page-header)
+        // Fill in cover header
         const rangeText = dateMode === 'custom' && customStart && customEnd
             ? `${customStart} → ${customEnd}`
             : `Last ${currentDays} days`;
-        const pageHeader = document.querySelector('.page-header');
-        if (pageHeader) {
-            const cover = document.createElement('div');
-            cover.dataset.pdfInserted = '1';
-            cover.innerHTML = `
-                <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #3b82f6;">
-                    <div style="font-size: 12px; color: #94a3b8; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px;">Hyder Media · Google Ads Reporting</div>
-                    <h1 style="font-size: 26px; margin: 0 0 6px 0; color:#f1f5f9;">Digistore24 — Performance Report</h1>
-                    <div style="font-size: 13px; color: #94a3b8;">Date range: <strong style="color:#f1f5f9;">${rangeText}</strong> · Generated ${new Date().toLocaleString()}</div>
-                </div>
-            `;
-            const prevHeaderDisplay = pageHeader.style.display;
-            pageHeader.style.display = 'none';
-            pageHeader.parentNode.insertBefore(cover, pageHeader);
-            cleanup.push(() => {
-                cover.remove();
-                pageHeader.style.display = prevHeaderDisplay;
-            });
-        }
+        const rangeEl = document.getElementById('pdfCoverRange');
+        const timeEl = document.getElementById('pdfCoverTime');
+        if (rangeEl) rangeEl.textContent = rangeText;
+        if (timeEl) timeEl.textContent = new Date().toLocaleString();
 
-        // Let layout settle (chart images need a moment to decode)
-        await new Promise(r => setTimeout(r, 250));
+        // Document title becomes the PDF default filename in most browsers
+        const origTitle = document.title;
+        document.title = `Digistore24 Report ${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}`;
 
-        const container = document.querySelector('.container');
-        const filename = `digistore24-report-${rangeText.replace(/[^0-9a-zA-Z]+/g, '-')}.pdf`;
+        // Give chart images a moment to decode, then fire the print dialog
+        await new Promise(r => setTimeout(r, 200));
+        window.print();
 
-        await html2pdf().set({
-            margin: [10, 8, 12, 8],
-            filename,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: {
-                scale: 2,
-                backgroundColor: '#0f172a',
-                useCORS: true,
-                logging: false,
-                windowWidth: 1280,
-                scrollX: 0,
-                scrollY: 0,
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-            pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.stat-card', '.ad-card'] },
-        }).from(container).save();
+        // Restore title after the dialog closes
+        const restoreTitle = () => { document.title = origTitle; window.removeEventListener('afterprint', restoreTitle); };
+        window.addEventListener('afterprint', restoreTitle);
     } catch (err) {
         console.error('PDF export failed', err);
         alert('PDF export failed: ' + (err?.message || err));
     } finally {
-        // Restore in reverse so each layer undoes correctly
-        cleanup.reverse().forEach(fn => { try { fn(); } catch (e) { console.warn('cleanup error', e); } });
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         if (btn) {
             btn.disabled = false;
             btn.textContent = btn.dataset.origText || 'Export PDF';
