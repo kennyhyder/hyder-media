@@ -580,7 +580,7 @@
             <button class="tab-btn" data-tab="creative">Ad Creative</button>
             <button class="tab-btn" data-tab="search-terms">Search Terms</button>
             <button class="tab-btn" data-tab="keywords">Keywords</button>
-            <button class="tab-btn" data-tab="ga4">GA4 Insights</button>
+            <button class="tab-btn" data-tab="ga4">Vendor / Affiliate</button>
         </div>
 
         <!-- Overview Tab -->
@@ -755,7 +755,7 @@
             <div class="creative-header">
                 <div>
                     <h2 style="font-size:1.2rem;">Vendor vs Affiliate Signups <span id="ga4Source" class="count-badge">Loading...</span></h2>
-                    <p class="creative-subtitle">Account-type breakdown from GA4 — what Google Ads can't see by itself</p>
+                    <p class="creative-subtitle">Up to Apr 30: GA4 signup events (acct_type). From May 1: Google Ads Vendor Sign-up &amp; Affiliate Sign-up conversion actions.</p>
                 </div>
             </div>
 
@@ -964,7 +964,7 @@ async function loadAllData() {
     const bust = `_t=${Date.now()}`;
 
     try {
-        const [summaryRes, campaignRes, agRes, trendRes, adsRes, stRes, kwRes, ga4Res] = await Promise.all([
+        const [summaryRes, campaignRes, agRes, trendRes, adsRes, stRes, kwRes, ga4Res, vaRes] = await Promise.all([
             fetch(`${API_BASE}/performance?${dp}&breakdown=summary&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?${dp}&breakdown=campaign&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/performance?${dp}&breakdown=adgroup&${bust}`).then(r => r.json()).catch(() => null),
@@ -973,6 +973,7 @@ async function loadAllData() {
             fetch(`${API_BASE}/search-terms?${dp}&limit=100&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/account-keywords?${dp}&${bust}`).then(r => r.json()).catch(() => null),
             fetch(`${API_BASE}/ga4-insights?${dp}&${bust}`).then(r => r.json()).catch(() => null),
+            fetch(`${API_BASE}/performance?${dp}&breakdown=vendor-affiliate&${bust}`).then(r => r.json()).catch(() => null),
         ]);
 
         // Check if API returned valid data
@@ -983,6 +984,7 @@ async function loadAllData() {
         const stOk = stRes?.status === 'success' && Array.isArray(stRes.terms);
         const kwOk = kwRes?.status === 'success' && Array.isArray(kwRes.keywords);
         const ga4Ok = ga4Res?.status === 'success' && Array.isArray(ga4Res.byAdGroup);
+        const vaOk = vaRes?.status === 'success' && vaRes.vendorAffiliate && Array.isArray(vaRes.vendorAffiliate.byAdGroup);
         const agOk = agRes?.status === 'success' && Array.isArray(agRes.adGroups);
 
         if (summaryOk) {
@@ -994,7 +996,9 @@ async function loadAllData() {
             adsData = adsOk ? adsRes : null;
             searchTermsData = stOk ? stRes.terms : [];
             keywordsData = kwOk ? kwRes.keywords : [];
-            ga4Data = ga4Ok ? ga4Res : null;
+            // Pre-May 1: GA4. From May 1 on: Google Ads conversion actions.
+            // Both endpoints already clamp their own date windows; we just sum them.
+            ga4Data = mergeVendorAffiliate(ga4Ok ? ga4Res : null, vaOk ? vaRes.vendorAffiliate : null, adGroupData);
             setBadge('live', dateMode === 'custom' ? `${customStart} → ${customEnd}` : 'Live Data');
         } else {
             isDemo = true;
@@ -1416,14 +1420,91 @@ function buildAdGroupLookups() {
     return { adgroupToCampaign, slugToName };
 }
 
-// Build a campaign-name → {vendor, affiliate} lookup from GA4 data
+// Merge GA4 (≤ Apr 30) + Google Ads conversion actions (≥ May 1) into a single
+// vendor/affiliate-per-ad-group structure. Both sources normalize to ad-group
+// display names — GA4 may report slugs (utm_content) which we map via the
+// live ad-group list before summing.
+function mergeVendorAffiliate(ga4, va, adGroups) {
+    if (!ga4 && !va) return null;
+
+    const slugToName = {};
+    if (Array.isArray(adGroups)) {
+        for (const ag of adGroups) {
+            if (ag.slug) slugToName[ag.slug] = ag.adGroup;
+        }
+    }
+
+    const map = {};
+    const add = (key, row, withTotals) => {
+        if (!map[key]) map[key] = { ad_group: key, vendor: 0, affiliate: 0, notSet: 0, total: 0, signups: 0 };
+        map[key].vendor += row.vendor || 0;
+        map[key].affiliate += row.affiliate || 0;
+        if (withTotals) {
+            map[key].notSet += row.notSet || 0;
+            map[key].total += row.total || 0;
+        }
+        map[key].signups += row.signups || ((row.vendor || 0) + (row.affiliate || 0));
+    };
+
+    if (ga4 && Array.isArray(ga4.byAdGroup)) {
+        for (const r of ga4.byAdGroup) {
+            const key = slugToName[r.ad_group] || r.ad_group;
+            add(key, r, true);
+        }
+    }
+    if (va && Array.isArray(va.byAdGroup)) {
+        for (const r of va.byAdGroup) {
+            add(r.ad_group, r, false);
+        }
+    }
+
+    const byAdGroup = Object.values(map).sort((a, b) => b.signups - a.signups);
+    const totals = byAdGroup.reduce((acc, r) => {
+        acc.vendor += r.vendor;
+        acc.affiliate += r.affiliate;
+        acc.notSet += r.notSet;
+        acc.total += r.total;
+        acc.signups += r.signups;
+        return acc;
+    }, { vendor: 0, affiliate: 0, notSet: 0, total: 0, signups: 0 });
+
+    const ga4HasRows = (ga4?.byAdGroup?.length || 0) > 0;
+    const vaHasRows = (va?.byAdGroup?.length || 0) > 0;
+    const parts = [];
+    if (ga4HasRows) {
+        const range = ga4.effectiveRange ? `${ga4.effectiveRange.start} → ${ga4.effectiveRange.end}` : 'historical';
+        parts.push(`GA4 (${range})`);
+    }
+    if (vaHasRows) {
+        const range = va.effectiveRange ? `${va.effectiveRange.start} → ${va.effectiveRange.end}` : 'May 1 →';
+        parts.push(`Google Ads conv actions (${range})`);
+    }
+
+    let source = 'none';
+    if (ga4HasRows && vaHasRows) source = 'mixed';
+    else if (vaHasRows) source = 'google_ads';
+    else if (ga4HasRows) source = ga4.source || 'historical';
+
+    return {
+        status: 'success',
+        source,
+        byAdGroup,
+        totals,
+        dataAge: parts.join(' + ') || 'no data in range',
+        ga4Part: ga4 || null,
+        vaPart: va || null,
+        dateRange: ga4?.dateRange || va?.dateRange || null,
+    };
+}
+
+// Build a campaign-name → {vendor, affiliate} lookup from merged data
 function buildGA4ByCampaign() {
     const { adgroupToCampaign, slugToName } = buildAdGroupLookups();
     const out = {};
     if (!ga4Data || !ga4Data.byAdGroup) return out;
+    // ad_group keys are already normalized to display names by mergeVendorAffiliate.
+    // slugToName fallback stays as a safety net for any stragglers.
     for (const ag of ga4Data.byAdGroup) {
-        // ad_group from GA4 is either the display name (historical CSV) or
-        // the utm_content slug (live events). Normalize to display name.
         const adGroupName = slugToName[ag.ad_group] || ag.ad_group;
         const camp = adgroupToCampaign[adGroupName];
         if (!camp) continue;
@@ -1431,7 +1512,6 @@ function buildGA4ByCampaign() {
         out[camp].vendor += ag.vendor || 0;
         out[camp].affiliate += ag.affiliate || 0;
     }
-    // Also expose per-ad-group vendor/affiliate for the accordion rows
     out._byAdGroupName = {};
     for (const ag of ga4Data.byAdGroup) {
         const name = slugToName[ag.ad_group] || ag.ad_group;
@@ -1444,22 +1524,36 @@ function renderCampaigns() {
     const tbody = document.getElementById('campaignBody');
     const banner = document.getElementById('ga4SourceBanner');
 
-    // Banner messaging based on GA4 data source vs active date range
+    // Banner messaging based on which source(s) supplied the vendor/affiliate split.
+    // Pre-2026-05-01: GA4 (signup event acct_type). Post-2026-05-01: Google Ads
+    // Vendor Sign-up / Affiliate Sign-up conversion actions.
     if (banner) {
         if (!ga4Data || !ga4Data.byAdGroup || ga4Data.byAdGroup.length === 0) {
             banner.style.display = 'none';
+        } else if (ga4Data.source === 'google_ads') {
+            banner.style.display = 'block';
+            banner.style.background = 'rgba(34,197,94,0.10)';
+            banner.style.border = '1px solid rgba(34,197,94,0.35)';
+            banner.style.color = 'var(--success)';
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> Google Ads Vendor Sign-up &amp; Affiliate Sign-up conversion actions (${ga4Data.vaPart?.effectiveRange?.start} → ${ga4Data.vaPart?.effectiveRange?.end}).`;
+        } else if (ga4Data.source === 'mixed') {
+            banner.style.display = 'block';
+            banner.style.background = 'rgba(59,130,246,0.10)';
+            banner.style.border = '1px solid rgba(59,130,246,0.35)';
+            banner.style.color = 'var(--accent)';
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> ${ga4Data.dataAge}. Range spans the 2026-05-01 cutover — pre-May 1 from GA4 signup events, May 1 onward from Google Ads conversion actions.`;
         } else if (ga4Data.source === 'historical') {
             banner.style.display = 'block';
             banner.style.background = 'rgba(245,158,11,0.10)';
             banner.style.border = '1px solid rgba(245,158,11,0.35)';
             banner.style.color = 'var(--warning)';
-            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> ${ga4Data.dataAge || 'Historical 28d backfill'}. These numbers do not change with the date range until live GA4 export accumulates more data.`;
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> ${ga4Data.dataAge || 'Historical 28d backfill'}. GA4-only fallback for the pre-May 1 window.`;
         } else if (ga4Data.source === 'live') {
             banner.style.display = 'block';
             banner.style.background = 'rgba(34,197,94,0.10)';
             banner.style.border = '1px solid rgba(34,197,94,0.35)';
             banner.style.color = 'var(--success)';
-            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> Live GA4 data, filtered to ${ga4Data.dateRange?.start} → ${ga4Data.dateRange?.end}.`;
+            banner.innerHTML = `<strong>Vendor / Affiliate columns:</strong> Live GA4 data (${ga4Data.ga4Part?.effectiveRange?.start} → ${ga4Data.ga4Part?.effectiveRange?.end}). Switches to Google Ads conversion actions from 2026-05-01 on.`;
         }
     }
 
@@ -1939,10 +2033,10 @@ function renderGA4() {
     const tbody = document.getElementById('ga4Body');
 
     if (!ga4Data || !ga4Data.byAdGroup || ga4Data.byAdGroup.length === 0) {
-        sourceBadge.textContent = isDemo ? 'Demo' : 'No data yet';
+        sourceBadge.textContent = isDemo ? 'Demo' : 'No data in range';
         sourceBadge.style.background = 'rgba(245,158,11,0.15)';
         sourceBadge.style.color = 'var(--warning)';
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-secondary)">GA4 export still pending. Live data lands within 24h of the BigQuery link.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-secondary)">No vendor/affiliate signups in the selected range. Try a wider date window.</td></tr>';
         ['ga4StatVendor','ga4StatAffiliate','ga4StatRatio','ga4StatTotal','ga4StatVendorPct','ga4StatAffiliatePct'].forEach(id => {
             document.getElementById(id).textContent = '--';
         });
@@ -1950,8 +2044,15 @@ function renderGA4() {
     }
 
     sourceBadge.textContent = ga4Data.dataAge || ga4Data.source || 'Live';
-    sourceBadge.style.background = ga4Data.source === 'live' ? 'rgba(34,197,94,0.15)' : 'rgba(59,130,246,0.15)';
-    sourceBadge.style.color = ga4Data.source === 'live' ? 'var(--success)' : 'var(--accent)';
+    const badgeColor =
+        ga4Data.source === 'google_ads' ? 'success' :
+        ga4Data.source === 'mixed' ? 'accent' :
+        ga4Data.source === 'live' ? 'success' :
+        'warning';
+    sourceBadge.style.background = badgeColor === 'success' ? 'rgba(34,197,94,0.15)'
+        : badgeColor === 'accent' ? 'rgba(59,130,246,0.15)'
+        : 'rgba(245,158,11,0.15)';
+    sourceBadge.style.color = `var(--${badgeColor})`;
 
     const t = ga4Data.totals;
     document.getElementById('ga4StatVendor').textContent = (t.vendor || 0).toLocaleString();

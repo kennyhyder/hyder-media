@@ -18,6 +18,11 @@ const PROJECT_ID = (process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338').trim
 const HISTORY_TABLE = (process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
 const PROPERTY_ID = (process.env.GA4_BQ_PROPERTY_ID || '').trim() || null; // e.g. "314577708" — set once GA4 export lands
 
+// On 2026-05-01 the account got dedicated Vendor/Affiliate Sign-up conversion
+// actions in Google Ads, so we stop using GA4 for that split from May 1 on.
+// This endpoint always clamps its range to ≤ 2026-04-30.
+const GA4_CUTOFF_END = '2026-04-30';
+
 function getBigQueryClient() {
     const keyJson = process.env.GA4_BQ_SERVICE_ACCOUNT_KEY;
     if (!keyJson) throw new Error('GA4_BQ_SERVICE_ACCOUNT_KEY not set in env');
@@ -47,9 +52,31 @@ export default async function handler(req, res) {
         start = s.toISOString().split('T')[0];
         end = e.toISOString().split('T')[0];
     }
+
+    // Clamp to the GA4 cutoff. From May 1 on, the dashboard reads vendor/affiliate
+    // from Google Ads conversion actions instead, so this endpoint hands back
+    // nothing for ranges entirely after Apr 30.
+    const requested = { start, end };
+    if (end > GA4_CUTOFF_END) end = GA4_CUTOFF_END;
+    if (start > GA4_CUTOFF_END) {
+        return res.status(200).json({
+            status: 'success',
+            source: 'out_of_range',
+            rows: [],
+            byAdGroup: [],
+            totals: { vendor: 0, affiliate: 0, notSet: 0, total: 0, signups: 0 },
+            dateRange: requested,
+            effectiveRange: null,
+            dataAge: `GA4 only covers through ${GA4_CUTOFF_END}; selected range is entirely after the cutoff`,
+            errors: [],
+        });
+    }
+
     const startSuffix = start.replace(/-/g, '');
     const endSuffix = end.replace(/-/g, '');
-    result.dateRange = { start, end };
+    result.dateRange = requested;
+    result.effectiveRange = { start, end };
+    result.cutoff = GA4_CUTOFF_END;
 
     try {
         bq = getBigQueryClient();
@@ -90,7 +117,7 @@ export default async function handler(req, res) {
                 liveRows = rows;
                 if (liveRows.length > 0) {
                     result.source = 'live';
-                    result.dataAge = `${start} → ${end} (live GA4 export)`;
+                    result.dataAge = `${start} → ${end} (live GA4 export, clamped to ≤ ${GA4_CUTOFF_END})`;
                 }
             } catch (err) {
                 // Fall back to historical if live isn't ready yet

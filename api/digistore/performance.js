@@ -13,6 +13,13 @@ const CUSTOMER_ID = '2466246400';
 // Direct access (not via MCC)
 const LOGIN_CUSTOMER_ID = '2466246400';
 
+// 2026-05-01: dedicated Vendor Sign-up + Affiliate Sign-up conversion actions
+// were implemented in the Google Ads account. Before this date the breakout
+// only existed in GA4 (see /api/digistore/ga4-insights.js).
+const VA_CUTOFF_START = '2026-05-01';
+const VENDOR_NAME = 'Vendor Sign-up';
+const AFFILIATE_NAME = 'Affiliate Sign-up';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -94,6 +101,8 @@ export default async function handler(req, res) {
             result.monthly = await fetchMonthlyMetrics(headers, dateRange);
         } else if (breakdown === 'daily') {
             result.daily = await fetchDailyMetrics(headers, dateRange);
+        } else if (breakdown === 'vendor-affiliate') {
+            result.vendorAffiliate = await fetchVendorAffiliateBreakdown(headers, dateRange);
         } else {
             result.summary = await fetchSummaryMetrics(headers, dateRange);
         }
@@ -366,6 +375,89 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
             convRate: clicks > 0 ? conversions / clicks : 0,
         };
     });
+}
+
+// Vendor / Affiliate signups per ad group from the dedicated Google Ads
+// conversion actions added 2026-05-01. Auto-clamps the start date to the
+// cutoff — anything earlier comes from GA4 via /api/digistore/ga4-insights.
+async function fetchVendorAffiliateBreakdown(headers, dateRange) {
+    const requested = { start: dateRange.start, end: dateRange.end };
+    const start = dateRange.start < VA_CUTOFF_START ? VA_CUTOFF_START : dateRange.start;
+    const end = dateRange.end;
+
+    if (start > end) {
+        return {
+            source: 'out_of_range',
+            byAdGroup: [],
+            totals: { vendor: 0, affiliate: 0, signups: 0 },
+            dateRange: requested,
+            effectiveRange: null,
+            cutoff: VA_CUTOFF_START,
+            dataAge: `Vendor / Affiliate Sign-up actions only available from ${VA_CUTOFF_START} onwards`,
+        };
+    }
+
+    const query = `
+        SELECT
+            ad_group.id,
+            ad_group.name,
+            campaign.id,
+            campaign.name,
+            segments.conversion_action_name,
+            metrics.conversions
+        FROM ad_group
+        WHERE segments.date BETWEEN '${start}' AND '${end}'
+            AND ad_group.status != 'REMOVED'
+            AND campaign.status = 'ENABLED'
+            AND segments.conversion_action_name IN ('${VENDOR_NAME}', '${AFFILIATE_NAME}')
+    `;
+
+    const response = await fetch(
+        `https://googleads.googleapis.com/v23/customers/${CUSTOMER_ID}/googleAds:search`,
+        { method: 'POST', headers, body: JSON.stringify({ query }) }
+    );
+
+    const data = await response.json();
+    if (data.error) return { error: data.error.message };
+
+    const byAdGroupMap = {};
+    for (const row of (data.results || [])) {
+        const adGroupName = row.adGroup?.name || '(unknown)';
+        const actionName = row.segments?.conversionActionName;
+        const conv = parseFloat(row.metrics?.conversions || 0);
+        if (!actionName || conv === 0) continue;
+
+        if (!byAdGroupMap[adGroupName]) {
+            byAdGroupMap[adGroupName] = {
+                ad_group: adGroupName,
+                campaign: row.campaign?.name || null,
+                vendor: 0,
+                affiliate: 0,
+                signups: 0,
+            };
+        }
+        if (actionName === VENDOR_NAME) byAdGroupMap[adGroupName].vendor += conv;
+        else if (actionName === AFFILIATE_NAME) byAdGroupMap[adGroupName].affiliate += conv;
+        byAdGroupMap[adGroupName].signups += conv;
+    }
+
+    const byAdGroup = Object.values(byAdGroupMap).sort((a, b) => b.signups - a.signups);
+    const totals = byAdGroup.reduce((acc, r) => {
+        acc.vendor += r.vendor;
+        acc.affiliate += r.affiliate;
+        acc.signups += r.signups;
+        return acc;
+    }, { vendor: 0, affiliate: 0, signups: 0 });
+
+    return {
+        source: 'google_ads',
+        byAdGroup,
+        totals,
+        dateRange: requested,
+        effectiveRange: { start, end },
+        cutoff: VA_CUTOFF_START,
+        dataAge: `Google Ads conversion actions (Vendor Sign-up + Affiliate Sign-up) for ${start} → ${end}`,
+    };
 }
 
 // Resolve the date range from query params.
