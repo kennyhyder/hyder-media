@@ -1285,11 +1285,8 @@ function renderOverview() {
     document.getElementById('statConvRate').textContent = fmt(d.convRate, '%');
     document.getElementById('statCPA').textContent = d.cpa > 0 ? fmt(d.cpa, '$') : '--';
 
-    // Cost per Vendor / Affiliate — proportional spend split by signup ratio.
-    // (vendorShare × spend) / vendorCount; same shape for affiliate. With
-    // unrounded shares both reduce to spend / (vendor + affiliate), so the
-    // two cards will track each other closely — the breakout is for client
-    // readability per the requested method.
+    // Cost per Vendor / Affiliate — spend split by signup ratio rounded to
+    // whole percent, then divided by each bucket's count. See computeVendorAffiliateCPA.
     const split = computeVendorAffiliateCPA(d.spend, ga4Data?.totals);
     const vEl = document.getElementById('statCostPerVendor');
     const aEl = document.getElementById('statCostPerAffiliate');
@@ -1309,6 +1306,9 @@ function renderOverview() {
 
 // Returns { vendor, affiliate, vendorShare, affiliateShare, vendorCPA, affiliateCPA }
 // CPAs are null when there are zero signups in that bucket.
+// Shares are rounded to whole percent before multiplying (matches Kenny's spec:
+// "55% of $9,806.89 ... cost per vendor $45.33, affiliate $45.26"). Without the
+// rounding, both CPAs algebraically reduce to spend / (vendor + affiliate).
 function computeVendorAffiliateCPA(spend, totals) {
     const vendor = totals?.vendor || 0;
     const affiliate = totals?.affiliate || 0;
@@ -1316,8 +1316,9 @@ function computeVendorAffiliateCPA(spend, totals) {
     if (!spend || total === 0) {
         return { vendor, affiliate, vendorShare: 0, affiliateShare: 0, vendorCPA: null, affiliateCPA: null };
     }
-    const vendorShare = vendor / total;
-    const affiliateShare = affiliate / total;
+    const vendorPct = Math.round((vendor / total) * 100);
+    const vendorShare = vendorPct / 100;
+    const affiliateShare = 1 - vendorShare; // forces shares to sum to 100%
     return {
         vendor,
         affiliate,
