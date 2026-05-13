@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { fetchEventDetail, fetchLeagues } from "@/lib/sports-data";
 import { fetchEventHistory, fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
-import { fmtPctSigned } from "@/lib/format";
+import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass, edgeBgClass } from "@/lib/format";
 import PriceSpark from "@/components/PriceSpark";
 
 export const dynamic = "force-dynamic";
@@ -27,10 +27,8 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
   // movements for this specific event
   const eventMoves = allMovements.filter((m) => m.event_id === id);
   const historyByMarket = new Map(history.map((h) => [h.market_id, h]));
-
-  // Lookup contestant_id from sports_contestants? We don't have it on markets directly...
-  // We pull from contestant_label. For click-through, we need contestant_id which isn't here.
-  // For V1, the click-through can be a separate query — we'll embed a /contestant?label= fallback.
+  const isPaidTier = tier !== "free";
+  const anyBooks = detail.markets.some((m) => (m.books_count ?? 0) > 0);
 
   return (
     <div className="min-h-screen">
@@ -57,8 +55,10 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
         <Card className="mb-4">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Kalshi prices</span>
-              <span className="text-xs font-normal text-muted-foreground">24h history</span>
+              <span>Lines</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                <span className="text-amber-500">Kalshi</span> vs {anyBooks ? `book consensus${isPaidTier ? "" : " (free shows 5 of N books)"}` : "books (ingesting…)"}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 divide-y divide-border/40">
@@ -66,13 +66,17 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
               const p = m.implied_prob;
               const width = Math.max(0, Math.min(100, (p ?? 0) * 100));
               const hist = historyByMarket.get(m.id);
+              const edgeMed = m.edge_vs_books_median;
+              const edgeBest = m.edge_vs_best_book;
+              const books = m.book_prices || [];
+              const visibleBooks = isPaidTier ? books : books.slice(0, 5);
               return (
                 <div key={m.id} className="px-5 py-4">
                   <div className="flex items-center justify-between mb-2 gap-3">
                     <div className="font-semibold flex-1 min-w-0 truncate">{m.contestant_label}</div>
                     <div className="flex items-center gap-3 shrink-0">
                       {hist && hist.points.length >= 2 && <PriceSpark points={hist.points} width={100} height={28} />}
-                      <div className="text-2xl font-bold tabular-nums text-amber-300">{p != null ? `${(p * 100).toFixed(1)}%` : "—"}</div>
+                      <div className="text-2xl font-bold tabular-nums text-amber-500">{p != null ? `${(p * 100).toFixed(1)}%` : "—"}</div>
                     </div>
                   </div>
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -83,6 +87,50 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
                       Bid {m.yes_bid != null ? `${(m.yes_bid * 100).toFixed(1)}¢` : "—"} ·
                       Ask {m.yes_ask != null ? `${(m.yes_ask * 100).toFixed(1)}¢` : "—"} ·
                       Last {m.last_price != null ? `${(m.last_price * 100).toFixed(1)}¢` : "—"}
+                    </div>
+                  )}
+
+                  {/* Book overlay */}
+                  {(m.books_count ?? 0) > 0 && (
+                    <div className="mt-3 rounded-md border border-border/60 bg-card/50 p-3 text-xs">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+                        <span className="text-muted-foreground">
+                          Books median <span className="text-foreground tabular-nums">{fmtPct(m.books_median)}</span>{" "}
+                          <span className="text-muted-foreground/70">({m.books_count} books, {fmtPct(m.books_min)}–{fmtPct(m.books_max)})</span>
+                        </span>
+                        {m.best_book && (
+                          <span className="text-muted-foreground">
+                            Best book <span className="text-foreground">{bookLabel(m.best_book.book)}</span>{" "}
+                            <span className="tabular-nums">{fmtAmerican(m.best_book.american)}</span>{" "}
+                            <span className="text-muted-foreground/70">({fmtPct(m.best_book.implied_prob_novig)})</span>
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-3">
+                        <span>
+                          Buy edge vs median{" "}
+                          <span className={`tabular-nums font-semibold px-1 rounded ${edgeTextClass(edgeMed)} ${edgeBgClass(edgeMed)}`}>{fmtPctSigned(edgeMed)}</span>
+                        </span>
+                        <span>
+                          vs best book{" "}
+                          <span className={`tabular-nums font-semibold ${edgeTextClass(edgeBest)}`}>{fmtPctSigned(edgeBest)}</span>
+                        </span>
+                      </div>
+                      {visibleBooks.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 text-[11px]">
+                          {visibleBooks.map((b) => (
+                            <div key={b.book} className="flex items-center justify-between bg-muted/40 rounded px-2 py-1">
+                              <span className="text-muted-foreground truncate" title={bookLabel(b.book)}>{bookLabel(b.book)}</span>
+                              <span className="tabular-nums">{fmtAmerican(b.american)}</span>
+                            </div>
+                          ))}
+                          {!isPaidTier && books.length > 5 && (
+                            <Link href="/pricing" className="flex items-center justify-center bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded px-2 py-1 col-span-full sm:col-span-1">
+                              +{books.length - 5} more (Pro)
+                            </Link>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

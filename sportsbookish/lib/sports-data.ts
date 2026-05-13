@@ -39,6 +39,13 @@ export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]
   return data.events || [];
 }
 
+export interface BookPrice {
+  book: string;
+  implied_prob_novig: number | null;
+  american: number | null;
+  fetched_at: string | null;
+}
+
 export interface MarketRow {
   id: string;
   contestant_label: string;
@@ -49,6 +56,15 @@ export interface MarketRow {
   yes_ask: number | null;
   last_price: number | null;
   fetched_at: string | null;
+  // Book overlay (only populated for h2h-equivalent markets where Odds API data exists)
+  books_count?: number;
+  books_median?: number | null;
+  books_min?: number | null;
+  books_max?: number | null;
+  book_prices?: BookPrice[];
+  best_book?: { book: string; implied_prob_novig: number | null; american: number | null } | null;
+  edge_vs_books_median?: number | null;
+  edge_vs_best_book?: number | null;
 }
 
 export interface EventDetail {
