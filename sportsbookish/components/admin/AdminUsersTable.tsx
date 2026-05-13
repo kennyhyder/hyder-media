@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Trash2 } from "lucide-react";
+import { Trash2, ExternalLink } from "lucide-react";
 
 export interface AdminUserRow {
   id: string;
@@ -112,7 +113,10 @@ export default function AdminUsersTable({ initial, adminEmail }: { initial: Admi
               {filtered.map((u) => (
                 <tr key={u.id} className="hover:bg-muted/30">
                   <td className="px-3 py-2">
-                    <div className="font-medium">{u.email || "(no email)"}</div>
+                    <Link href={`/admin/users/${u.id}`} className="font-medium hover:text-emerald-500 hover:underline inline-flex items-center gap-1">
+                      {u.email || "(no email)"}
+                      <ExternalLink className="h-3 w-3 opacity-50" />
+                    </Link>
                     <div className="text-[10px] text-muted-foreground/70 font-mono">{u.id.slice(0, 8)}…</div>
                   </td>
                   <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
