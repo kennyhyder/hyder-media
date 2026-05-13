@@ -3,11 +3,13 @@ import { redirect, notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
-import { fetchLeagues, fetchEventsByLeagueWithMarkets } from "@/lib/sports-data";
+import { fetchLeagues, fetchLeagueData } from "@/lib/sports-data";
 import { fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPctSigned } from "@/lib/format";
 import GameCard from "@/components/sports/GameCard";
+import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookTable";
+import SportsBestBets from "@/components/sports/SportsBestBets";
 
 export const dynamic = "force-dynamic";
 
@@ -29,20 +31,44 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
   const { tier, userId } = await getCurrentTier();
   if (!userId) redirect(`/login?next=/sports/${league}`);
 
-  const [leagues, events, leagueMoves] = await Promise.all([
+  const [leagues, leagueData, leagueMoves] = await Promise.all([
     fetchLeagues(),
-    fetchEventsByLeagueWithMarkets(league),
+    fetchLeagueData(league),
     fetchMovements({ sinceHours: 24, league, minDelta: 0.02, limit: 6 }),
   ]);
+  const events = leagueData.events;
+  const allBooks = leagueData.books;
   const meta = leagues.find((l) => l.key === league);
   if (!meta) notFound();
   const allowedTypes = visibleEventTypesForTier(tier);
+  const isPaidTier = tier !== "free";
 
   // Group by event_type
   const groups: Record<string, typeof events> = {};
   for (const e of events) {
     if (!groups[e.event_type]) groups[e.event_type] = [];
     groups[e.event_type].push(e);
+  }
+
+  // Flatten "game" events into team-rows for the unified book table
+  const gameRows: SportsRow[] = [];
+  for (const e of groups.game || []) {
+    for (const m of e.markets || []) {
+      gameRows.push({
+        event_id: e.id,
+        event_title: e.title,
+        start_time: e.start_time,
+        market_id: m.id,
+        contestant_label: m.contestant_label,
+        implied_prob: m.implied_prob,
+        books_count: m.books_count,
+        books_median: m.books_median,
+        edge_vs_books_median: m.edge_vs_books_median,
+        edge_vs_best_book: m.edge_vs_best_book,
+        best_book: m.best_book,
+        book_prices: m.book_prices,
+      });
+    }
   }
 
   const order = ["championship", "series", "game", "mvp"];
@@ -60,7 +86,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         </div>
       </header>
 
-      <main className="container mx-auto max-w-6xl px-4 py-8">
+      <main className="container mx-auto max-w-[1600px] px-4 py-8">
         {leagueMoves.length > 0 && (
           <section className="mb-6">
             <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">📈 Recent moves (24h)</div>
@@ -82,7 +108,19 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
           </div>
         )}
 
-        {order.map((type) => {
+        {/* Unified book table for game-type events */}
+        {(groups.game?.length ?? 0) > 0 && (
+          <section className="mb-8">
+            <div className="flex items-baseline gap-2 mb-3">
+              <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Game slate ({groups.game!.length})</h2>
+            </div>
+            <SportsBestBets league={league} rows={gameRows} />
+            <SportsBookTable league={league} rows={gameRows} books={allBooks} isPaidTier={isPaidTier} />
+          </section>
+        )}
+
+        {/* Other event types (championship, series, mvp) — kept as cards */}
+        {(["championship", "series", "mvp"] as const).map((type) => {
           const list = groups[type];
           if (!list?.length) return null;
           const locked = !allowedTypes.includes(type);

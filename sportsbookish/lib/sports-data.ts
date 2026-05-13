@@ -40,11 +40,20 @@ export interface InlineMarket {
   yes_ask: number | null;
   books_count: number;
   books_median: number | null;
+  books_min: number | null;
   edge_vs_books_median: number | null;
+  edge_vs_best_book: number | null;
+  best_book: { book: string; implied_prob_novig: number | null; american: number | null } | null;
+  book_prices: Record<string, { american: number | null; novig: number | null }>;
 }
 
 export interface SportsEventWithMarkets extends SportsEvent {
   markets: InlineMarket[];
+}
+
+export interface SportsLeagueData {
+  events: SportsEventWithMarkets[];
+  books: string[];
 }
 
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {
@@ -54,11 +63,11 @@ export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]
   return data.events || [];
 }
 
-export async function fetchEventsByLeagueWithMarkets(league: string): Promise<SportsEventWithMarkets[]> {
+export async function fetchLeagueData(league: string): Promise<SportsLeagueData> {
   const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open&with=markets`, { next: { revalidate: 30 } });
-  if (!r.ok) return [];
+  if (!r.ok) return { events: [], books: [] };
   const data = await r.json();
-  return data.events || [];
+  return { events: data.events || [], books: data.books || [] };
 }
 
 export interface BookPrice {
