@@ -57,7 +57,11 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
             <CardTitle className="flex items-center justify-between">
               <span>Lines</span>
               <span className="text-xs font-normal text-muted-foreground">
-                <span className="text-amber-500">Kalshi</span> vs {anyBooks ? `book consensus${isPaidTier ? "" : " (free shows 5 of N books)"}` : "books (ingesting…)"}
+                {anyBooks ? (
+                  <><span className="text-amber-500">Kalshi</span> vs book consensus{isPaidTier ? "" : " (free shows 5 of N books)"}</>
+                ) : (
+                  <span className="text-muted-foreground/70">Books haven&apos;t posted lines for this game yet — typically 1-2 days before tipoff</span>
+                )}
               </span>
             </CardTitle>
           </CardHeader>
