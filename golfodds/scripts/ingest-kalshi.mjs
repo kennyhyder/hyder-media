@@ -61,6 +61,15 @@ const KALSHI_MATCHUP_SERIES = [
   { ticker: "KXPGA5BALL", matchupType: "5ball", scope: "round" },
 ];
 
+// Multi-outcome prop series — each event has N markets covering mutually
+// exclusive outcomes (or cumulative thresholds for hole-in-one).
+const KALSHI_PROP_SERIES = [
+  { ticker: "KXPGAWINNINGSCORE", propType: "winning_score",  outcomeKind: "mutually_exclusive", question: "What will the winning score be?" },
+  { ticker: "KXPGASTROKEMARGIN", propType: "stroke_margin",  outcomeKind: "mutually_exclusive", question: "What will the winner's stroke margin be?" },
+  { ticker: "KXPGAWINNERREGION", propType: "winner_region",  outcomeKind: "mutually_exclusive", question: "What region will the winner come from?" },
+  { ticker: "KXPGAHOLEINONE",    propType: "hole_in_one",    outcomeKind: "cumulative_threshold", question: "How many holes-in-one this week?" },
+];
+
 // Node 20 lacks native WebSocket; supply `ws` so Supabase client constructs.
 // We don't use realtime here, but the SDK initializes it eagerly.
 const supabase = createClient(
@@ -420,6 +429,122 @@ async function ingestMatchupSeries(series, tournamentMap) {
   return { totalQuotes, totalErrors };
 }
 
+// ---- Prop ingestion ------------------------------------------------------
+
+async function upsertProp(row) {
+  const { data, error } = await supabase
+    .from("golfodds_props")
+    .upsert(row, { onConflict: "tournament_id,prop_type" })
+    .select("id")
+    .single();
+  if (error) throw new Error(`upsert prop ${row.kalshi_event_ticker}: ${error.message}`);
+  return data.id;
+}
+
+async function upsertPropOutcome(propId, label, key, displayOrder, ticker) {
+  const { data, error } = await supabase
+    .from("golfodds_prop_outcomes")
+    .upsert({ prop_id: propId, outcome_label: label, outcome_key: key, display_order: displayOrder, kalshi_ticker: ticker }, { onConflict: "prop_id,outcome_key" })
+    .select("id")
+    .single();
+  if (error) throw new Error(`upsert prop outcome ${key}: ${error.message}`);
+  return data.id;
+}
+
+async function insertPropQuote(outcomeId, market) {
+  const toUnit = (v) => {
+    if (v == null) return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    return n > 1 ? n / 100 : n;
+  };
+  const toBigInt = (v) => {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const yesBid = toUnit(market.yes_bid_dollars ?? market.yes_bid);
+  const yesAsk = toUnit(market.yes_ask_dollars ?? market.yes_ask);
+  const last = toUnit(market.last_price_dollars ?? market.last_price);
+  let implied = null;
+  if (yesBid != null && yesAsk != null && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
+    implied = Number(((yesBid + yesAsk) / 2).toFixed(4));
+  } else if (last != null && last > 0 && last < 1) {
+    implied = last;
+  }
+  const { error } = await supabase.from("golfodds_prop_quotes").insert({
+    outcome_id: outcomeId,
+    yes_bid: yesBid, yes_ask: yesAsk, last_price: last, implied_prob: implied,
+    volume: toBigInt(market.volume ?? market.volume_24h),
+    open_interest: toBigInt(market.open_interest_fp ?? market.open_interest),
+    status: market.status || null,
+  });
+  if (error) throw new Error(`insert prop quote: ${error.message}`);
+}
+
+// Derive a numeric display order from the outcome key. Best-effort: parses
+// the first number to sort. Falls back to alpha.
+function displayOrderFromKey(key) {
+  const m = key.match(/^-?(\d+)/);
+  return m ? parseInt(m[1], 10) : 999;
+}
+
+async function ingestPropSeries(series, tournamentMap) {
+  console.log(`\nFetching Kalshi ${series.ticker} prop events (type=${series.propType})…`);
+  const events = await listEventsForSeries(series.ticker);
+  console.log(`  Found ${events.length} open events`);
+
+  let totalQuotes = 0;
+  let totalErrors = 0;
+  let skipped = 0;
+
+  for (const evt of events) {
+    try {
+      const suffix = tournamentSuffix(evt.event_ticker);
+      const match = tournamentForMatchupSuffix(suffix, tournamentMap);
+      if (!match) {
+        skipped++;
+        continue;
+      }
+      const markets = await fetchMarketsForEvent(evt.event_ticker);
+
+      const propId = await upsertProp({
+        tournament_id: match.id,
+        prop_type: series.propType,
+        question: series.question,
+        outcome_kind: series.outcomeKind,
+        kalshi_event_ticker: evt.event_ticker,
+      });
+
+      let inserted = 0;
+      for (const m of markets) {
+        const label = (m.yes_sub_title || m.title || "").trim();
+        if (!label) continue;
+        // outcome_key = ticker portion after the event_ticker prefix
+        const key = m.ticker.startsWith(evt.event_ticker + "-")
+          ? m.ticker.slice(evt.event_ticker.length + 1)
+          : m.ticker;
+        try {
+          const outcomeId = await upsertPropOutcome(propId, label, key, displayOrderFromKey(key), m.ticker);
+          await insertPropQuote(outcomeId, m);
+          inserted++;
+        } catch (e) {
+          totalErrors++;
+          console.error(`    ${m.ticker}: ${e.message}`);
+        }
+      }
+      totalQuotes += inserted;
+      console.log(`  ${evt.event_ticker}: ${inserted} outcomes inserted`);
+    } catch (e) {
+      totalErrors++;
+      console.error(`  event ${evt.event_ticker}: ${e.message}`);
+    }
+  }
+
+  console.log(`  ${series.ticker}: ${totalQuotes} prop quotes inserted, ${totalErrors} errors, ${skipped} events without matching tournament`);
+  return { totalQuotes, totalErrors };
+}
+
 async function main() {
   let totalQuotes = 0;
   let totalErrors = 0;
@@ -467,12 +592,24 @@ async function main() {
     }
   }
 
+  // Props (multi-outcome events)
+  for (const series of KALSHI_PROP_SERIES) {
+    try {
+      const r = await ingestPropSeries(series, tournamentMap);
+      totalQuotes += r.totalQuotes;
+      totalErrors += r.totalErrors;
+    } catch (e) {
+      totalErrors++;
+      console.error(`! ${series.ticker}: ${e.message}`);
+    }
+  }
+
   await supabase
     .from("golfodds_data_sources")
     .update({ last_import: new Date().toISOString(), record_count: totalQuotes })
     .eq("name", "kalshi");
 
-  console.log(`\nDone. ${totalQuotes} total quotes inserted, ${totalErrors} errors across ${KALSHI_SERIES.length} binary series + ${KALSHI_MATCHUP_SERIES.length} matchup series.`);
+  console.log(`\nDone. ${totalQuotes} total quotes inserted, ${totalErrors} errors across ${KALSHI_SERIES.length} binary + ${KALSHI_MATCHUP_SERIES.length} matchup + ${KALSHI_PROP_SERIES.length} prop series.`);
 }
 
 main().catch((e) => {

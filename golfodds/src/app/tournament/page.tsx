@@ -172,7 +172,7 @@ function TournamentInner() {
         />
 
         {!loading && !error && comparison?.players && comparison.players.length > 0 && (
-          <BestBetsCards players={comparison.players} marketType={marketType} />
+          <BestBetsCards players={comparison.players} marketType={marketType} tournamentId={id} />
         )}
 
         <div className="flex items-center gap-4 mb-3 text-sm">
@@ -229,8 +229,13 @@ function TournamentInner() {
               <tbody>
                 {sorted.map((r) => (
                   <tr key={r.player_id} className="border-t border-neutral-800/60 hover:bg-neutral-900/40">
-                    <td className="px-2 py-1.5 text-neutral-100 whitespace-nowrap">
-                      {r.player?.name}
+                    <td className="px-2 py-1.5 whitespace-nowrap">
+                      <Link
+                        href={`/player/?id=${r.player_id}&tournament_id=${id}`}
+                        className="text-neutral-100 hover:text-green-400 hover:underline"
+                      >
+                        {r.player?.name}
+                      </Link>
                       {r.kalshi?.implied_prob != null && <span className="ml-2 text-[10px] text-amber-400/70">●K</span>}
                     </td>
                     <td className="px-2 py-1.5 text-right tabular-nums text-amber-300">

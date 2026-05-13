@@ -12,10 +12,11 @@ interface TournamentInfo {
     matchups_by_type: Record<string, number>;
     kalshi_quote_count: number;
     book_quote_count: number;
+    total_props?: number;
   };
 }
 
-type View = "outrights" | "matchups" | "ladder";
+type View = "outrights" | "matchups" | "props" | "ladder";
 
 interface Props {
   tournamentId: string;
@@ -35,6 +36,7 @@ export default function TournamentNav({ tournamentId, activeView }: Props) {
 
   const matchupCount = info?.stats?.total_matchups ?? 0;
   const marketCount = info?.stats?.total_markets ?? 0;
+  const propCount = info?.stats?.total_props ?? 0;
 
   return (
     <div className="bg-neutral-950/80 border-b border-neutral-800 backdrop-blur sticky top-0 z-20">
@@ -71,6 +73,14 @@ export default function TournamentNav({ tournamentId, activeView }: Props) {
             label="Matchups"
             badge={matchupCount > 0 ? String(matchupCount) : null}
             sublabel="Head-to-head · 3-ball"
+          />
+          <NavTab
+            href={`/props/?id=${tournamentId}`}
+            active={activeView === "props"}
+            icon="🎯"
+            label="Props"
+            badge={propCount > 0 ? String(propCount) : null}
+            sublabel="Winning score · Margin · Region · Holes-in-one"
           />
           <NavTab
             href={`/ladder/?id=${tournamentId}`}

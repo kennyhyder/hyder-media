@@ -1,0 +1,2 @@
+:HL["/golfodds/_next/static/chunks/3226bf83b0015744.css","style"]
+0:{"buildId":"1Gd5pBcUnbhhzmUrmigdl","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"player","paramType":null,"paramKey":"player","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

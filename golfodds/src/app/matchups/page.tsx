@@ -145,7 +145,7 @@ function MatchupsInner() {
 
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            {filtered.map((m) => <MatchupCard key={m.id} matchup={m} />)}
+            {filtered.map((m) => <MatchupCard key={m.id} matchup={m} tournamentId={id} />)}
             {filtered.length === 0 && (
               <div className="col-span-full text-center text-neutral-500 py-8">No matchups match the current filters.</div>
             )}
@@ -164,7 +164,7 @@ function MatchupsInner() {
   );
 }
 
-function MatchupCard({ matchup }: { matchup: Matchup }) {
+function MatchupCard({ matchup, tournamentId }: { matchup: Matchup; tournamentId: string }) {
   const sortedPlayers = [...matchup.players].sort((a, b) => (b.kalshi?.implied_prob ?? 0) - (a.kalshi?.implied_prob ?? 0));
   const hasAnyBookData = matchup.players.some((p) => p.book_count > 0);
   const headerLabel: string = matchup.matchup_type === "h2h" ? "H2H"
@@ -199,7 +199,12 @@ function MatchupCard({ matchup }: { matchup: Matchup }) {
           return (
             <div key={p.matchup_player_id} className={`px-4 py-2.5 ${edgeBg(edge)}`}>
               <div className="flex items-center justify-between gap-2 mb-1">
-                <span className="text-sm font-semibold text-neutral-100 truncate">{p.player?.name}</span>
+                <Link
+                  href={`/player/?id=${p.player_id}&tournament_id=${tournamentId}`}
+                  className="text-sm font-semibold text-neutral-100 hover:text-green-400 hover:underline truncate"
+                >
+                  {p.player?.name}
+                </Link>
                 {edge != null && (
                   <span className={`text-sm font-semibold tabular-nums whitespace-nowrap ${edgeColor(edge)}`}>{fmtPctSigned(edge)}</span>
                 )}

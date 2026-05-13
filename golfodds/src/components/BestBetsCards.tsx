@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, MARKET_LABELS } from "@/lib/format";
 
 interface PlayerRow {
@@ -18,6 +19,7 @@ interface PlayerRow {
 interface Props {
   players: PlayerRow[];
   marketType: string;
+  tournamentId?: string;
   minBooks?: number;
   minEdge?: number;
 }
@@ -45,7 +47,7 @@ function topByEdge(players: PlayerRow[], n: number, direction: "buy" | "sell", m
   return rows.filter((r) => (r.edge_vs_books_median ?? 0) < 0).slice(0, n);
 }
 
-function Card({ row, direction }: { row: PlayerRow; direction: "buy" | "sell" }) {
+function Card({ row, direction, tournamentId }: { row: PlayerRow; direction: "buy" | "sell"; tournamentId?: string }) {
   const edge = row.edge_vs_books_median!;
   const edgePct = edge * 100;
   const isBuy = direction === "buy";
@@ -57,9 +59,19 @@ function Card({ row, direction }: { row: PlayerRow; direction: "buy" | "sell" })
   return (
     <div className={`bg-neutral-900 border border-neutral-800 rounded-lg p-3 ring-1 ${ringCls}`}>
       <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="text-sm font-semibold text-neutral-100 truncate" title={row.player?.name}>
-          {row.player?.name}
-        </div>
+        {tournamentId ? (
+          <Link
+            href={`/player/?id=${row.player_id}&tournament_id=${tournamentId}`}
+            className="text-sm font-semibold text-neutral-100 hover:text-green-400 hover:underline truncate"
+            title={row.player?.name}
+          >
+            {row.player?.name}
+          </Link>
+        ) : (
+          <div className="text-sm font-semibold text-neutral-100 truncate" title={row.player?.name}>
+            {row.player?.name}
+          </div>
+        )}
         <div className={`px-2 py-0.5 text-[10px] uppercase tracking-wide rounded border ${badgeBg}`}>
           {isBuy ? "BUY" : "SELL"}
         </div>
@@ -92,7 +104,7 @@ function Card({ row, direction }: { row: PlayerRow; direction: "buy" | "sell" })
   );
 }
 
-export default function BestBetsCards({ players, marketType, minBooks = 3, minEdge = 0.002 }: Props) {
+export default function BestBetsCards({ players, marketType, tournamentId, minBooks = 3, minEdge = 0.002 }: Props) {
   const buys = topByEdge(players, 5, "buy", minBooks, minEdge);
   const sells = topByEdge(players, 3, "sell", minBooks, minEdge);
   const label = MARKET_LABELS[marketType] || marketType;
@@ -115,7 +127,7 @@ export default function BestBetsCards({ players, marketType, minBooks = 3, minEd
             <span className="text-xs text-neutral-500">Kalshi cheaper than fair — buy YES</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {buys.map((r) => <Card key={r.player_id} row={r} direction="buy" />)}
+            {buys.map((r) => <Card key={r.player_id} row={r} direction="buy" tournamentId={tournamentId} />)}
           </div>
         </div>
       )}
@@ -126,7 +138,7 @@ export default function BestBetsCards({ players, marketType, minBooks = 3, minEd
             <span className="text-xs text-neutral-500">Sell YES on Kalshi, or bet at the books instead</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {sells.map((r) => <Card key={r.player_id} row={r} direction="sell" />)}
+            {sells.map((r) => <Card key={r.player_id} row={r} direction="sell" tournamentId={tournamentId} />)}
           </div>
         </div>
       )}

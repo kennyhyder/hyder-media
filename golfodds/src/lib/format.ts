@@ -77,6 +77,14 @@ export function edgeBg(edge: number | null | undefined): string {
   return "";
 }
 
+export const PROP_LABELS: Record<string, string> = {
+  winning_score: "Winning Score",
+  stroke_margin: "Margin of Victory",
+  winner_region: "Winner Region",
+  hole_in_one: "Holes-in-One",
+  cut_line: "Cut Line",
+};
+
 export const BOOK_LABELS: Record<string, string> = {
   draftkings: "DraftKings",
   fanduel: "FanDuel",
