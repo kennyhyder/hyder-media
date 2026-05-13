@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import TournamentNav from "@/components/TournamentNav";
 import MarketTabs from "@/components/MarketTabs";
 import BestBetsCards from "@/components/BestBetsCards";
 import { fmtPct, fmtPctSigned, fmtAmerican, edgeColor, edgeBg, bookLabel, MARKET_LABELS } from "@/lib/format";
@@ -149,29 +150,8 @@ function TournamentInner() {
   return (
     <div className="min-h-screen">
       <NavBar />
+      <TournamentNav tournamentId={id} activeView="outrights" />
       <main className="max-w-[1800px] mx-auto px-6 py-6">
-        <div className="mb-4 flex items-baseline gap-3 flex-wrap">
-          <Link href="/" className="text-neutral-500 hover:text-neutral-300 text-sm">← Tournaments</Link>
-          <h1 className="text-2xl font-bold text-neutral-100">{info?.tournament?.name || "…"}</h1>
-          {info?.tournament?.is_major && (
-            <span className="text-[10px] uppercase tracking-wide bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">Major</span>
-          )}
-          {info?.tournament?.kalshi_event_ticker && (
-            <span className="text-xs text-neutral-500">{info.tournament.kalshi_event_ticker}</span>
-          )}
-          {id && (
-            <div className="ml-auto flex items-center gap-2">
-              <Link
-                href={`/matchups/?id=${id}`}
-                className="text-sm px-3 py-1 bg-purple-900/40 hover:bg-purple-900/60 text-purple-200 rounded border border-purple-700/40"
-              >Matchups →</Link>
-              <Link
-                href={`/ladder/?id=${id}`}
-                className="text-sm px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded border border-neutral-700"
-              >Ladder view →</Link>
-            </div>
-          )}
-        </div>
 
         {info && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-5">

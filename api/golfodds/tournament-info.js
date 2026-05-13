@@ -39,9 +39,10 @@ export default async function handler(req, res) {
 
   try {
     const supabase = getSupabase();
-    const [tRes, mRes] = await Promise.all([
+    const [tRes, mRes, muRes] = await Promise.all([
       supabase.from("golfodds_tournaments").select("*").eq("id", id).single(),
       supabase.from("golfodds_markets").select("id, market_type, player_id").eq("tournament_id", id).range(0, 9999),
+      supabase.from("golfodds_matchups").select("id, matchup_type").eq("tournament_id", id).range(0, 9999),
     ]);
     if (tRes.error) return res.status(404).json({ error: tRes.error.message });
 
@@ -74,6 +75,12 @@ export default async function handler(req, res) {
       }
     }
 
+    const matchups = muRes.data || [];
+    const matchupsByType = matchups.reduce((acc, m) => {
+      acc[m.matchup_type] = (acc[m.matchup_type] || 0) + 1;
+      return acc;
+    }, {});
+
     return res.status(200).json({
       tournament: tRes.data,
       stats: {
@@ -84,6 +91,8 @@ export default async function handler(req, res) {
         kalshi_quote_count: kalshiCount,
         dg_quote_count: dgCount,
         book_quote_count: bookCount,
+        total_matchups: matchups.length,
+        matchups_by_type: matchupsByType,
       },
       books: booksSeen,
     });

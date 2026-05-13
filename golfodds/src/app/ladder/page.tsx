@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import TournamentNav from "@/components/TournamentNav";
 import { fmtPct, fmtPctSigned, edgeColor, MARKET_LABELS } from "@/lib/format";
 
 interface MarketEntry {
@@ -74,13 +75,8 @@ function LadderInner() {
   return (
     <div className="min-h-screen">
       <NavBar />
+      <TournamentNav tournamentId={id} activeView="ladder" />
       <main className="max-w-[1800px] mx-auto px-6 py-6">
-        <div className="mb-4 flex items-baseline gap-3 flex-wrap">
-          <Link href="/" className="text-neutral-500 hover:text-neutral-300 text-sm">← Tournaments</Link>
-          <Link href={`/tournament/?id=${id}`} className="text-neutral-500 hover:text-neutral-300 text-sm">← Cross-source view</Link>
-          <h1 className="text-2xl font-bold text-neutral-100">{tournament?.name || "Ladder"}</h1>
-          <span className="text-xs text-neutral-500">Internal-consistency view</span>
-        </div>
 
         <div className="flex flex-wrap items-center gap-4 mb-4 text-sm">
           <input

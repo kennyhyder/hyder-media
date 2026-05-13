@@ -4,7 +4,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import { fmtPct, fmtPctSigned, fmtAmerican, edgeColor, edgeBg, bookLabel } from "@/lib/format";
+import TournamentNav from "@/components/TournamentNav";
+import { fmtPct, fmtPctSigned, edgeColor, edgeBg } from "@/lib/format";
 
 interface PlayerLeg {
   matchup_player_id: string;
@@ -39,18 +40,14 @@ function MatchupsInner() {
   const [typeFilter, setTypeFilter] = useState<"all" | "h2h" | "3ball" | "5ball">("all");
   const [roundFilter, setRoundFilter] = useState<number | "all">("all");
   const [minEdge, setMinEdge] = useState(0);
-  const [tournamentName, setTournamentName] = useState<string | null>(null);
-
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    Promise.all([
-      fetch(`/api/golfodds/tournament-info?id=${id}`).then((r) => r.json()).then((d) => setTournamentName(d.tournament?.name || null)).catch(() => {}),
-      fetch(`/api/golfodds/matchups?tournament_id=${id}`)
-        .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
-        .then((d) => setMatchups(d.matchups || []))
-        .catch((e) => setError(String(e))),
-    ]).finally(() => setLoading(false));
+    fetch(`/api/golfodds/matchups?tournament_id=${id}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
+      .then((d) => setMatchups(d.matchups || []))
+      .catch((e) => setError(String(e)))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const rounds = useMemo(() => Array.from(new Set(matchups.map((m) => m.round_number).filter((r): r is number => r != null))).sort(), [matchups]);
@@ -89,13 +86,8 @@ function MatchupsInner() {
   return (
     <div className="min-h-screen">
       <NavBar />
+      <TournamentNav tournamentId={id} activeView="matchups" />
       <main className="max-w-[1800px] mx-auto px-6 py-6">
-        <div className="mb-4 flex items-baseline gap-3 flex-wrap">
-          <Link href="/" className="text-neutral-500 hover:text-neutral-300 text-sm">← Tournaments</Link>
-          <Link href={`/tournament/?id=${id}`} className="text-neutral-500 hover:text-neutral-300 text-sm">← Outright table</Link>
-          <h1 className="text-2xl font-bold text-neutral-100">{tournamentName || "Matchups"}</h1>
-          <span className="text-xs text-neutral-500">Head-to-head & 3-ball markets</span>
-        </div>
 
         <div className="flex flex-wrap items-center gap-4 mb-4 text-sm">
           <div className="flex items-center gap-1">
@@ -174,48 +166,75 @@ function MatchupsInner() {
 
 function MatchupCard({ matchup }: { matchup: Matchup }) {
   const sortedPlayers = [...matchup.players].sort((a, b) => (b.kalshi?.implied_prob ?? 0) - (a.kalshi?.implied_prob ?? 0));
+  const hasAnyBookData = matchup.players.some((p) => p.book_count > 0);
+  const headerLabel: string = matchup.matchup_type === "h2h" ? "H2H"
+    : matchup.matchup_type === "3ball" ? "3-Ball"
+    : "5-Ball";
+  const typeBg = matchup.matchup_type === "h2h" ? "bg-sky-500/15 text-sky-300 border-sky-500/30"
+    : matchup.matchup_type === "3ball" ? "bg-purple-500/15 text-purple-300 border-purple-500/30"
+    : "bg-pink-500/15 text-pink-300 border-pink-500/30";
+
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4">
-      <div className="flex items-start justify-between mb-3 gap-2">
-        <div className="text-sm text-neutral-200 font-medium leading-tight">{matchup.title}</div>
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded border ${
-            matchup.matchup_type === "h2h" ? "bg-sky-500/15 text-sky-300 border-sky-500/30"
-            : matchup.matchup_type === "3ball" ? "bg-purple-500/15 text-purple-300 border-purple-500/30"
-            : "bg-pink-500/15 text-pink-300 border-pink-500/30"
-          }`}>{matchup.matchup_type.toUpperCase()}</span>
-          {matchup.round_number != null && <span className="text-[10px] text-amber-400">R{matchup.round_number}</span>}
+    <div className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
+      {/* Card header */}
+      <div className="px-4 py-2 bg-neutral-900/80 border-b border-neutral-800 flex items-start justify-between gap-2">
+        <div className="text-xs text-neutral-400 leading-tight flex-1 min-w-0">{matchup.title}</div>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className={`text-[10px] uppercase tracking-wide px-2 py-0.5 rounded border ${typeBg}`}>{headerLabel}</span>
+          {matchup.round_number != null && (
+            <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">R{matchup.round_number}</span>
+          )}
+          {!hasAnyBookData && (
+            <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded bg-amber-500/10 text-amber-400/80 border border-amber-500/20" title="DataGolf doesn't publish odds for this matchup">Kalshi only</span>
+          )}
         </div>
       </div>
-      <div className="space-y-1.5">
+
+      {/* Player legs */}
+      <div className="divide-y divide-neutral-800/60">
         {sortedPlayers.map((p) => {
           const edge = p.edge_vs_books_median;
+          const kalshiP = p.kalshi?.implied_prob;
+          const hasBooks = p.book_count > 0;
           return (
-            <div key={p.matchup_player_id} className={`rounded p-2 ${edgeBg(edge)}`}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-neutral-100">{p.player?.name}</span>
+            <div key={p.matchup_player_id} className={`px-4 py-2.5 ${edgeBg(edge)}`}>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-sm font-semibold text-neutral-100 truncate">{p.player?.name}</span>
                 {edge != null && (
-                  <span className={`text-xs tabular-nums ${edgeColor(edge)}`}>{fmtPctSigned(edge)}</span>
+                  <span className={`text-sm font-semibold tabular-nums whitespace-nowrap ${edgeColor(edge)}`}>{fmtPctSigned(edge)}</span>
                 )}
               </div>
-              <div className="grid grid-cols-3 gap-1 text-[11px]">
-                <div>
-                  <div className="text-[9px] uppercase tracking-wide text-neutral-500">Kalshi</div>
-                  <div className="tabular-nums text-amber-300">{fmtPct(p.kalshi?.implied_prob)}</div>
+              {hasBooks ? (
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <ProbBlock label="Kalshi" value={fmtPct(kalshiP)} tone="kalshi" />
+                  <ProbBlock label={`Books med (${p.book_count})`} value={fmtPct(p.books_median)} tone="book" />
+                  <ProbBlock label="Best book" value={fmtPct(p.books_min)} tone="book" />
                 </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-wide text-neutral-500">Books med ({p.book_count})</div>
-                  <div className="tabular-nums text-neutral-300">{fmtPct(p.books_median)}</div>
+              ) : (
+                // Kalshi-only: clean single-line layout with prob + barProgress
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-1.5 bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-500/60 rounded-full"
+                      style={{ width: `${Math.max(0, Math.min(100, (kalshiP ?? 0) * 100))}%` }}
+                    />
+                  </div>
+                  <span className="text-sm tabular-nums text-amber-300 font-medium">{fmtPct(kalshiP)}</span>
                 </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-wide text-neutral-500">Best book</div>
-                  <div className="tabular-nums text-neutral-300">{fmtPct(p.books_min)}</div>
-                </div>
-              </div>
+              )}
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function ProbBlock({ label, value, tone }: { label: string; value: string; tone: "kalshi" | "book" }) {
+  return (
+    <div>
+      <div className="text-[9px] uppercase tracking-wide text-neutral-500">{label}</div>
+      <div className={`tabular-nums font-medium ${tone === "kalshi" ? "text-amber-300" : "text-neutral-200"}`}>{value}</div>
     </div>
   );
 }

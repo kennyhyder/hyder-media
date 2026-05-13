@@ -1,2 +1,2 @@
-:HL["/golfodds/_next/static/chunks/95d3dbf5311d9b68.css","style"]
-0:{"buildId":"37F4YSn5Dn1O74TNQnY4X","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"ladder","paramType":null,"paramKey":"ladder","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/golfodds/_next/static/chunks/767bc0eb092fc371.css","style"]
+0:{"buildId":"MLDgy3p37fbdqDvcn_wPL","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"ladder","paramType":null,"paramKey":"ladder","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
