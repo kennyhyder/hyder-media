@@ -2,13 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { Lock } from "lucide-react";
 import { getCurrentTier, getUserPreferences } from "@/lib/tier-guard";
 import { fetchTournamentInfo } from "@/lib/golf-data";
 import { fetchMatchups, type Matchup } from "@/lib/matchup-data";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import TournamentTabs from "@/components/TournamentTabs";
+import PaywallCard from "@/components/PaywallCard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,27 +16,19 @@ export default async function MatchupsPage({ searchParams }: { searchParams: Pro
   if (!id) redirect("/golf");
 
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/golf/tournament/matchups?id=${id}`);
+  const isAnonymous = !userId;
 
-  // Free tier blocked
+  // Free / anonymous blocked from matchups
   if (tier === "free") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="max-w-md w-full text-center">
-          <CardHeader>
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
-              <Lock className="h-6 w-6 text-amber-400" />
-            </div>
-            <CardTitle>Matchups are a Pro feature</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm text-muted-foreground">
-            <p>Head-to-head and 3-ball matchups are part of the Pro plan ($19/mo). Upgrade to see every Kalshi matchup with book consensus + buy edges per leg.</p>
-            <div className="flex gap-2 justify-center">
-              <Link href={`/golf/tournament?id=${id}`} className={buttonVariants({ variant: "outline" })}>Back</Link>
-              <Link href="/pricing" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>Upgrade</Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <PaywallCard
+          feature="Matchups are a Pro feature"
+          description="Head-to-head and 3-ball matchups are part of the Pro plan. See every Kalshi matchup with book consensus + buy edges per leg."
+          isAnonymous={isAnonymous}
+          requiredTier="pro"
+          next={`/golf/tournament/matchups?id=${id}`}
+        />
       </div>
     );
   }

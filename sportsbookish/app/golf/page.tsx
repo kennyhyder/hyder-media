@@ -1,31 +1,37 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Trophy } from "lucide-react";
 import { fetchTournaments } from "@/lib/golf-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
 export default async function GolfHome() {
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect("/login?next=/golf");
-
+  const isAnonymous = !userId;
   const tournaments = await fetchTournaments();
   const tierInfo = TIER_BY_KEY[tier];
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next="/golf" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">← Dashboard</Link>
+          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground">
+            ← {isAnonymous ? "Home" : "Dashboard"}
+          </Link>
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-emerald-500" />
             <span className="font-semibold">Golf — PGA Tour</span>
           </div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          {isAnonymous ? (
+            <Link href="/signup?next=/golf" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          )}
         </div>
       </header>
 
@@ -33,9 +39,12 @@ export default async function GolfHome() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold">Active tournaments</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Live data ingested from Kalshi every 5 min + DataGolf every 10 min.{" "}
-            {tier === "free" && (
-              <>You&apos;re on the <strong>First Line</strong> plan — winner markets only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro</Link> for top-5/10/20, props, matchups, and your home-book preference.</>
+            Live data ingested from Kalshi every 5 min + DataGolf every 10 min.
+            {!isAnonymous && tier === "free" && (
+              <> You&apos;re on the <strong>First Line</strong> plan — winner markets only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro</Link> for top-5/10/20, props, matchups, and your home-book preference.</>
+            )}
+            {isAnonymous && (
+              <> Free signup: save favorites + daily edge digest. <Link href="/pricing" className="text-emerald-400 hover:underline">Pro $19</Link> unlocks every market, every book.</>
             )}
           </p>
         </div>

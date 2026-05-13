@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchContestant } from "@/lib/movements-data";
 import { fetchLeagues } from "@/lib/sports-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPct } from "@/lib/format";
+import PaywallCard from "@/components/PaywallCard";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,22 @@ const EVENT_TYPE_LABEL: Record<string, string> = {
 export default async function ContestantPage({ params }: { params: Promise<{ league: string; id: string }> }) {
   const { league, id } = await params;
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/sports/${league}/contestant/${id}`);
+  const isAnonymous = !userId;
+
+  // Cross-event team detail is Pro+
+  if (tier === "free") {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <PaywallCard
+          feature="Team detail is a Pro feature"
+          description="See every active market for one team across every game with edges vs book consensus."
+          isAnonymous={isAnonymous}
+          requiredTier="pro"
+          next={`/sports/${league}/contestant/${id}`}
+        />
+      </div>
+    );
+  }
 
   const [leagues, data] = await Promise.all([fetchLeagues(), fetchContestant(id)]);
   const meta = leagues.find((l) => l.key === league);

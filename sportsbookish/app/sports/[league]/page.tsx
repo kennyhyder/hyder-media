@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
@@ -10,6 +10,7 @@ import { fmtPctSigned } from "@/lib/format";
 import GameCard from "@/components/sports/GameCard";
 import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookTable";
 import SportsBestBets from "@/components/sports/SportsBestBets";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ function visibleEventTypesForTier(tier: string): string[] {
 export default async function LeaguePage({ params }: { params: Promise<{ league: string }> }) {
   const { league } = await params;
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/sports/${league}`);
+  const isAnonymous = !userId;
 
   const [leagues, leagueData, leagueMoves] = await Promise.all([
     fetchLeagues(),
@@ -83,6 +84,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next={`/sports/${league}`} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between px-4">
           <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground">← Sports</Link>
@@ -90,7 +92,11 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
             <span className="text-base">{meta.icon}</span>
             <span>{meta.display_name}</span>
           </div>
-          <div className="w-12" />
+          {isAnonymous ? (
+            <Link href={`/signup?next=/sports/${league}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <div className="w-12" />
+          )}
         </div>
       </header>
 

@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { Lock, TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fetchMovements } from "@/lib/movements-data";
 import { fetchLeagues } from "@/lib/sports-data";
 import { fmtPctSigned } from "@/lib/format";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +27,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
   const hours = Math.min(Number(params.hours) || 24, 24 * 7);
 
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect("/login?next=/sports/movers");
+  const isAnonymous = !userId;
 
   const [leagues, movements] = await Promise.all([
     fetchLeagues(),
@@ -41,6 +39,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next="/sports/movers" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground/80">← Sports</Link>
@@ -48,7 +47,11 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
             <TrendingUp className="h-4 w-4 text-emerald-500" />
             <span>Top Movers</span>
           </div>
-          <div className="w-12" />
+          {isAnonymous ? (
+            <Link href="/signup?next=/sports/movers" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <div className="w-12" />
+          )}
         </div>
       </header>
 
@@ -75,7 +78,11 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
 
         {tier === "free" && (
           <div className="mb-5 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
-            Free tier shows moves ≥5%. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade</Link> to see moves ≥2% and add Elite to receive these as live email + SMS alerts.
+            {isAnonymous ? (
+              <><strong>Anonymous view:</strong> moves ≥5%. <Link href="/signup?next=/sports/movers" className="text-emerald-400 hover:underline">Sign up free</Link>, then <Link href="/pricing" className="text-emerald-400 hover:underline">upgrade to Pro</Link> to see ≥2% moves and Elite for live email + SMS alerts.</>
+            ) : (
+              <>Free tier shows moves ≥5%. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade</Link> to see moves ≥2% and add Elite to receive these as live email + SMS alerts.</>
+            )}
           </div>
         )}
 

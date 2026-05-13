@@ -12,6 +12,7 @@ import MarketTabs from "@/components/MarketTabs";
 import BestBetsCards from "@/components/BestBetsCards";
 import TournamentTabs from "@/components/TournamentTabs";
 import OutrightTable from "@/components/OutrightTable";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -20,12 +21,11 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
   if (!id) redirect("/golf");
 
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/golf/tournament?id=${id}`);
-
+  const isAnonymous = !userId;
   const isPaidTier = tier !== "free";
 
   if (!canSeeMarket(tier, mt)) {
-    return <Locked tier={tier} marketType={mt} tournamentId={id} />;
+    return <Locked tier={tier} marketType={mt} tournamentId={id} isAnonymous={isAnonymous} />;
   }
 
   const [info, comparison, prefs] = await Promise.all([
@@ -65,6 +65,7 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next={`/golf/tournament?id=${id}`} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4">
           <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground">← Tournaments</Link>
@@ -73,7 +74,11 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
             <span>{info?.tournament?.name || "Tournament"}</span>
             {info?.tournament?.is_major && <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20">Major</Badge>}
           </div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-500">{tierInfo.name}</Badge>
+          {isAnonymous ? (
+            <Link href={`/signup?next=/golf/tournament?id=${id}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-500">{tierInfo.name}</Badge>
+          )}
         </div>
       </header>
 
@@ -172,30 +177,46 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "ka
   );
 }
 
-function Locked({ tier, marketType, tournamentId }: { tier: string; marketType: string; tournamentId: string }) {
+function Locked({ tier, marketType, tournamentId, isAnonymous }: { tier: string; marketType: string; tournamentId: string; isAnonymous: boolean }) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <Card className="max-w-md w-full text-center">
-        <CardHeader>
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
-            <Lock className="h-6 w-6 text-amber-500" />
-          </div>
-          <CardTitle>{MARKET_LABELS[marketType] || marketType} is a Pro-only market</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            You&apos;re on the <strong>{tier}</strong> plan, which includes only the Win market. Upgrade to Pro ($19/mo) for all 17+ market types, per-book pricing, player detail, matchups, and props.
-          </p>
-          <div className="flex gap-2 justify-center">
-            <Link href={`/golf/tournament?id=${tournamentId}&mt=win`} className={buttonVariants({ variant: "outline" })}>
-              Back to Win
-            </Link>
-            <Link href="/pricing" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>
-              Upgrade
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next={`/golf/tournament?id=${tournamentId}&mt=${marketType}`} />}
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <Card className="max-w-md w-full text-center">
+          <CardHeader>
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
+              <Lock className="h-6 w-6 text-amber-500" />
+            </div>
+            <CardTitle>{MARKET_LABELS[marketType] || marketType} is a Pro market</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isAnonymous ? (
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Free signup</strong> includes daily edge digest emails and saved preferences.{" "}
+                <strong className="text-foreground">Pro ($19/mo)</strong> unlocks all 17+ market types, per-book pricing, player detail, matchups, and props.
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                You&apos;re on the <strong className="text-foreground">{tier}</strong> plan, which includes only the Win market. Upgrade to Pro ($19/mo) for all 17+ market types, per-book pricing, player detail, matchups, and props.
+              </p>
+            )}
+            <div className="flex gap-2 justify-center">
+              <Link href={`/golf/tournament?id=${tournamentId}&mt=win`} className={buttonVariants({ variant: "outline" })}>
+                Back to Win
+              </Link>
+              {isAnonymous ? (
+                <Link href={`/signup?next=/golf/tournament?id=${tournamentId}`} className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>
+                  Sign up free
+                </Link>
+              ) : (
+                <Link href="/pricing" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>
+                  Upgrade
+                </Link>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

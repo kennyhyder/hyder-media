@@ -2,13 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import { Lock } from "lucide-react";
 import { fetchTournamentInfo } from "@/lib/golf-data";
 import { fetchProps, type PropEvent } from "@/lib/props-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import { fmtPct, PROP_LABELS } from "@/lib/format";
+import PaywallCard from "@/components/PaywallCard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,26 +16,18 @@ export default async function PropsPage({ searchParams }: { searchParams: Promis
   if (!id) redirect("/golf");
 
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/golf/tournament/props?id=${id}`);
+  const isAnonymous = !userId;
 
   if (tier === "free") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="max-w-md w-full text-center">
-          <CardHeader>
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
-              <Lock className="h-6 w-6 text-amber-400" />
-            </div>
-            <CardTitle>Props are a Pro feature</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm text-muted-foreground">
-            <p>Winning score, margin of victory, winner region, holes-in-one — multi-outcome markets are part of the Pro plan ($19/mo).</p>
-            <div className="flex gap-2 justify-center">
-              <Link href={`/golf/tournament?id=${id}`} className={buttonVariants({ variant: "outline" })}>Back</Link>
-              <Link href="/pricing" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>Upgrade</Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <PaywallCard
+          feature="Props are a Pro feature"
+          description="Winning score, margin of victory, winner region, holes-in-one — multi-outcome markets are part of the Pro plan."
+          isAnonymous={isAnonymous}
+          requiredTier="pro"
+          next={`/golf/tournament/props?id=${id}`}
+        />
       </div>
     );
   }

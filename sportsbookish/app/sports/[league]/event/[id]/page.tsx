@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchEventDetail, fetchLeagues } from "@/lib/sports-data";
@@ -7,13 +7,14 @@ import { fetchEventHistory, fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass, edgeBgClass } from "@/lib/format";
 import PriceSpark from "@/components/PriceSpark";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
 export default async function EventPage({ params }: { params: Promise<{ league: string; id: string }> }) {
   const { league, id } = await params;
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/sports/${league}/event/${id}`);
+  const isAnonymous = !userId;
 
   const [leagues, detail, history, allMovements] = await Promise.all([
     fetchLeagues(),
@@ -32,11 +33,16 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next={`/sports/${league}/event/${id}`} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
           <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {meta.display_name}</Link>
           <div className="text-sm font-semibold capitalize">{detail.event.event_type}</div>
-          <div className="w-12" />
+          {isAnonymous ? (
+            <Link href={`/signup?next=/sports/${league}/event/${id}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <div className="w-12" />
+          )}
         </div>
       </header>
 
@@ -160,10 +166,19 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
           </Card>
         )}
 
-        {tier !== "elite" && (
+        {(isAnonymous || tier !== "elite") && (
           <div className="mt-6 rounded-md border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
-            <strong>Elite</strong> ($39/mo) gets live email + SMS the moment Kalshi moves ≥3% in 15 min on any market.{" "}
-            <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade →</Link>
+            {isAnonymous ? (
+              <>
+                <strong>Don&apos;t miss the next edge.</strong> <Link href={`/signup?next=/sports/${league}/event/${id}`} className="text-emerald-400 hover:underline">Sign up free</Link> to save preferences and get the daily top edges by email.{" "}
+                <Link href="/pricing" className="text-emerald-400 hover:underline">Elite ($39)</Link> sends email + SMS the moment Kalshi moves ≥3% in 15 min on any market.
+              </>
+            ) : (
+              <>
+                <strong>Elite</strong> ($39/mo) gets live email + SMS the moment Kalshi moves ≥3% in 15 min on any market.{" "}
+                <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade →</Link>
+              </>
+            )}
           </div>
         )}
       </main>

@@ -2,12 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Lock } from "lucide-react";
 import { fetchPlayer } from "@/lib/matchup-data";
 import { getCurrentTier, getUserPreferences, canSeeMarket } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
+import PaywallCard from "@/components/PaywallCard";
 
 export const dynamic = "force-dynamic";
 
@@ -32,27 +31,19 @@ export default async function PlayerPage({ searchParams }: { searchParams: Promi
   if (!id || !player_id) redirect("/golf");
 
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect(`/login?next=/golf/tournament/player?id=${id}&player_id=${player_id}`);
+  const isAnonymous = !userId;
 
   // Player detail is Pro+ (free only sees aggregated outright table)
   if (tier === "free") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="max-w-md w-full text-center">
-          <CardHeader>
-            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
-              <Lock className="h-6 w-6 text-amber-400" />
-            </div>
-            <CardTitle>Player detail is a Pro feature</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm text-muted-foreground">
-            <p>See every market and matchup a single player is in, with edges vs your home book. Pro plan ($19/mo).</p>
-            <div className="flex gap-2 justify-center">
-              <Link href={`/golf/tournament?id=${id}`} className={buttonVariants({ variant: "outline" })}>Back</Link>
-              <Link href="/pricing" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>Upgrade</Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <PaywallCard
+          feature="Player detail is a Pro feature"
+          description="See every market and matchup a single player is in, with edges vs your home book."
+          isAnonymous={isAnonymous}
+          requiredTier="pro"
+          next={`/golf/tournament/player?id=${id}&player_id=${player_id}`}
+        />
       </div>
     );
   }

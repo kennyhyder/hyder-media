@@ -1,27 +1,34 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Trophy } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { fetchLeagues } from "@/lib/sports-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
+import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
 
 export default async function SportsHub() {
   const { tier, userId } = await getCurrentTier();
-  if (!userId) redirect("/login?next=/sports");
+  const isAnonymous = !userId;
   const leagues = await fetchLeagues();
   const tierInfo = TIER_BY_KEY[tier];
 
   return (
     <div className="min-h-screen">
+      {isAnonymous && <UpsellBanner variant="anonymous" next="/sports" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">← Dashboard</Link>
+          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground">
+            ← {isAnonymous ? "Home" : "Dashboard"}
+          </Link>
           <div className="font-semibold text-sm">All Sports</div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          {isAnonymous ? (
+            <Link href="/signup?next=/sports" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+          ) : (
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          )}
         </div>
       </header>
 
@@ -52,7 +59,7 @@ export default async function SportsHub() {
                   <span className="text-4xl">{l.icon}</span>
                   <div className="flex-1">
                     <div className="font-semibold">{l.display_name}</div>
-                    <div className="text-xs text-muted-foreground">{l.sport_category[0].toUpperCase()}{l.sport_category.slice(1)} · Kalshi only</div>
+                    <div className="text-xs text-muted-foreground">{l.sport_category[0].toUpperCase()}{l.sport_category.slice(1)} · Kalshi + books</div>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </CardContent>
@@ -61,9 +68,14 @@ export default async function SportsHub() {
           ))}
         </div>
 
-        {tier === "free" && (
+        {isAnonymous && (
+          <div className="mt-8 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm text-center">
+            Bookmark sportsbookish.com or <Link href="/signup?next=/sports" className="text-emerald-400 hover:underline font-semibold">sign up free</Link> to set live edge alerts.
+          </div>
+        )}
+        {!isAnonymous && tier === "free" && (
           <div className="mt-8 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
-            <strong>Free tier</strong>: see headline winner odds only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro</Link> for all bet types across every sport.
+            <strong>Free tier</strong>: winner odds + book median. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro</Link> for per-book pricing, top-N markets, and props across every sport.
           </div>
         )}
       </main>
