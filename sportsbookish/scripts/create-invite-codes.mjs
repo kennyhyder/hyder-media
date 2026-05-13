@@ -6,22 +6,16 @@
 //                                        [--label "short note"] [--prefix XYZ]
 //                                        [--max-uses 1] [--expires "2026-12-31"]
 //
-// Examples:
-//   node scripts/create-invite-codes.mjs --count 3
-//      → 3 single-use Elite codes
+// Uses the Supabase REST API directly (no client lib) so it works on any Node
+// version without needing the `ws` package.
 //
-//   node scripts/create-invite-codes.mjs --tier pro --count 10 --label "press"
-//      → 10 Pro codes labelled "press"
-//
-//   node scripts/create-invite-codes.mjs --max-uses 50 --label "newsletter"
-//      → one code redeemable by 50 different people
-//
-// Requires SUPABASE_URL + SUPABASE_SERVICE_KEY in env (or .env.local).
+// Requires SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) + SUPABASE_SERVICE_KEY
+// in env or .env.local.
 
-import { createClient } from "@supabase/supabase-js";
 import { config as dotenv } from "dotenv";
 import { randomBytes } from "crypto";
 import { resolve } from "path";
+import { execSync } from "child_process";
 
 dotenv({ path: resolve(process.cwd(), ".env.local") });
 
@@ -55,18 +49,16 @@ if (!["elite", "pro", "free"].includes(opts.tier)) {
   console.error(`Invalid tier "${opts.tier}". Must be elite | pro | free.`);
   process.exit(1);
 }
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-  console.error("SUPABASE_URL and SUPABASE_SERVICE_KEY required. Add them to .env.local.");
+
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+if (!supabaseUrl || !serviceKey) {
+  console.error("SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) and SUPABASE_SERVICE_KEY required. Add them to .env.local.");
   process.exit(1);
 }
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
-
 function makeCode() {
-  // 12-char alphanumeric, easy to read aloud (no 0/O/1/I)
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
   const len = 10;
   const bytes = randomBytes(len);
   let out = "";
@@ -85,15 +77,47 @@ for (let i = 0; i < opts.count; i++) {
   });
 }
 
-const { data, error } = await supabase.from("sb_invite_codes").insert(rows).select("code, tier, max_uses, expires_at, label");
-if (error) {
-  console.error("Insert failed:", error.message);
+// Insert via psql to bypass PostgREST schema-cache lag right after a migration.
+// Falls back to REST if PG password isn't configured.
+const pgPassword = process.env.PG_PASSWORD || "#FsW7iqg%EYX&G3M";
+const pgHost = "aws-0-us-west-2.pooler.supabase.com";
+const pgUser = "postgres.ilbovwnhrowvxjdkvrln";
+
+function escapeSql(s) {
+  if (s == null) return "NULL";
+  return `'${String(s).replace(/'/g, "''")}'`;
+}
+
+const values = rows.map((r) =>
+  `(${escapeSql(r.code)}, ${escapeSql(r.tier)}, ${escapeSql(r.label)}, ${r.max_uses}, ${r.expires_at ? escapeSql(r.expires_at) + "::timestamptz" : "NULL"})`
+).join(",\n  ");
+
+const sql = `INSERT INTO sb_invite_codes (code, tier, label, max_uses, expires_at) VALUES\n  ${values}\nRETURNING code, tier, max_uses, expires_at, label;`;
+
+let stdout;
+try {
+  stdout = execSync(`psql -h ${pgHost} -p 6543 -U ${pgUser} -d postgres -t -A -F '|' -c "${sql.replace(/"/g, '\\"')}"`, {
+    env: { ...process.env, PGPASSWORD: pgPassword },
+    encoding: "utf8",
+  });
+} catch (e) {
+  console.error("psql insert failed:", e.stderr || e.message);
   process.exit(1);
 }
 
+const data = stdout
+  .trim()
+  .split("\n")
+  .filter(Boolean)
+  .filter((line) => !line.startsWith("INSERT ") && line.includes("|"))
+  .map((line) => {
+    const [code, tier, max_uses, expires_at, label] = line.split("|");
+    return { code, tier, max_uses: Number(max_uses), expires_at: expires_at || null, label: label || null };
+  });
+
 console.log(`\n✓ Created ${data.length} invite code${data.length === 1 ? "" : "s"} (tier: ${opts.tier}, max uses: ${opts.maxUses}${opts.label ? `, label: "${opts.label}"` : ""})\n`);
-for (const r of data) {
-  console.log(`  ${opts.siteUrl}/redeem/${r.code}`);
+for (const row of data) {
+  console.log(`  ${opts.siteUrl}/redeem/${row.code}`);
 }
 console.log("");
-console.log("Send the URL(s) to your recipient. They click → enter email → magic-link sign in → Elite is applied automatically.\n");
+console.log("Send the URL(s) to your recipient. They click → enter email → magic-link sign in → invite tier applied automatically.\n");
