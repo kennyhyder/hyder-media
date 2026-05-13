@@ -1,0 +1,2 @@
+:HL["/golfodds/_next/static/chunks/9579f64494d626c1.css","style"]
+0:{"buildId":"eqomY046fPB-Hv7nLlfFz","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"tournament","paramType":null,"paramKey":"tournament","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

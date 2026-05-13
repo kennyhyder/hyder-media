@@ -1,0 +1,9 @@
+1:"$Sreact.fragment"
+2:I[4001,["/golfodds/_next/static/chunks/1dac2db3cd87ee26.js","/golfodds/_next/static/chunks/9d77ffe8d40b7b8f.js"],"ClientPageRoot"]
+3:I[82800,["/golfodds/_next/static/chunks/dc01b90bf5167575.js"],"default"]
+6:I[72959,["/golfodds/_next/static/chunks/1dac2db3cd87ee26.js","/golfodds/_next/static/chunks/9d77ffe8d40b7b8f.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+0:{"buildId":"eqomY046fPB-Hv7nLlfFz","rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/golfodds/_next/static/chunks/dc01b90bf5167575.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"loading":null,"isPartial":false}
+4:{}
+5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null
