@@ -3,16 +3,19 @@ import { Lock } from "lucide-react";
 
 interface Props {
   tournamentId: string;
-  active: "outrights" | "matchups" | "player";
+  active: "outrights" | "matchups" | "props" | "ladder" | "player";
   matchupCount?: number;
   marketCount?: number;
+  propCount?: number;
   proRequired: boolean;
 }
 
-export default function TournamentTabs({ tournamentId, active, matchupCount, marketCount, proRequired }: Props) {
+export default function TournamentTabs({ tournamentId, active, matchupCount, marketCount, propCount, proRequired }: Props) {
   const tabs = [
     { key: "outrights" as const, label: "Outrights & Lines", href: `/golf/tournament?id=${tournamentId}`, count: marketCount, locked: false },
     { key: "matchups" as const,  label: "Matchups",          href: `/golf/tournament/matchups?id=${tournamentId}`, count: matchupCount, locked: proRequired },
+    { key: "props" as const,     label: "Props",             href: `/golf/tournament/props?id=${tournamentId}`,    count: propCount,    locked: proRequired },
+    { key: "ladder" as const,    label: "Ladder",            href: `/golf/tournament/ladder?id=${tournamentId}`,   count: undefined,    locked: proRequired },
   ];
   return (
     <div className="flex gap-1 border-b border-border/40 mb-5">
