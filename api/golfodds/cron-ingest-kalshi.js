@@ -67,10 +67,29 @@ function computeImpliedFromQuote(yesBid, yesAsk, last) {
   return null;
 }
 
-async function fetchJSON(url) {
+async function fetchJSON(url, attempt = 0) {
   const r = await fetch(url, { headers: { Accept: "application/json" } });
+  if (r.status === 429 && attempt < 4) {
+    const wait = 500 * Math.pow(2, attempt); // 500ms, 1s, 2s, 4s
+    await new Promise((res) => setTimeout(res, wait));
+    return fetchJSON(url, attempt + 1);
+  }
   if (!r.ok) throw new Error(`Kalshi ${r.status} ${url}: ${await r.text().catch(() => "")}`);
   return r.json();
+}
+
+// Throttled Promise.all — limit concurrency so we stay under Kalshi's 20 req/sec.
+async function mapLimit(items, limit, fn) {
+  const out = new Array(items.length);
+  let i = 0;
+  async function worker() {
+    while (i < items.length) {
+      const idx = i++;
+      out[idx] = await fn(items[idx], idx);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return out;
 }
 
 async function listEventsForSeries(seriesTicker) {
@@ -109,9 +128,11 @@ async function ingestBinarySeries(supabase, series) {
   // 1) Fetch events + markets in parallel
   const events = await listEventsForSeries(series.ticker);
   if (!events.length) return { quotes: 0, errors: 0 };
-  const eventsWithMarkets = await Promise.all(
-    events.map(async (e) => ({ event: e, markets: await fetchMarketsForEvent(e.event_ticker) }))
-  );
+  // Throttle to ~10 concurrent fetches to stay under Kalshi's 20 req/sec limit
+  const eventsWithMarkets = await mapLimit(events, 10, async (e) => ({
+    event: e,
+    markets: await fetchMarketsForEvent(e.event_ticker),
+  }));
 
   // 2) Upsert tournaments (winner series only) OR look up existing
   let tournamentByTicker = new Map();
@@ -240,9 +261,11 @@ async function ingestBinarySeries(supabase, series) {
 async function ingestMatchupSeries(supabase, series) {
   const events = await listEventsForSeries(series.ticker);
   if (!events.length) return { quotes: 0 };
-  const eventsWithMarkets = await Promise.all(
-    events.map(async (e) => ({ event: e, markets: await fetchMarketsForEvent(e.event_ticker) }))
-  );
+  // Throttle to ~10 concurrent fetches to stay under Kalshi's 20 req/sec limit
+  const eventsWithMarkets = await mapLimit(events, 10, async (e) => ({
+    event: e,
+    markets: await fetchMarketsForEvent(e.event_ticker),
+  }));
 
   // Load tournament map
   const { data: tdata } = await supabase
