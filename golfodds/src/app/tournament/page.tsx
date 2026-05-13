@@ -225,9 +225,9 @@ function TournamentInner() {
                   <SortHeader k="kalshi">Kalshi</SortHeader>
                   <SortHeader k="dg">DG model</SortHeader>
                   <SortHeader k="books_med">Books median</SortHeader>
-                  <SortHeader k="edge_books">Edge vs med</SortHeader>
-                  <SortHeader k="edge_dg">Edge vs DG</SortHeader>
-                  <SortHeader k="edge_best">Edge vs best</SortHeader>
+                  <SortHeader k="edge_books">Buy edge vs med</SortHeader>
+                  <SortHeader k="edge_dg">Buy edge vs DG</SortHeader>
+                  <SortHeader k="edge_best">Buy edge vs best</SortHeader>
                   {books.map((b) => (
                     <th key={b} className="px-2 py-2 text-right text-xs uppercase tracking-wide text-neutral-500" title={bookLabel(b)}>
                       {bookLabel(b)}
@@ -296,10 +296,15 @@ function TournamentInner() {
         <div className="mt-3 text-xs text-neutral-500 space-y-1">
           <p>
             <span className="text-amber-300">Kalshi</span> = implied probability from bid/ask mid (or last trade if spread is wide).{" "}
-            <span className="text-sky-300">DG model</span> = DataGolf baseline. <span className="text-neutral-300">Books</span> = de-vigged implied probability per book.
+            <span className="text-sky-300">DG model</span> = DataGolf baseline. <span className="text-neutral-300">Books</span> = de-vigged implied probability per book (raw for Make Cut, which is binary).
           </p>
           <p>
-            Edge = Kalshi prob − reference. Positive edge means Kalshi is pricing the player higher than the reference; consider buying YES on the cheaper side or selling on Kalshi depending on direction.
+            <strong className="text-neutral-300">Edge = reference − Kalshi.</strong>{" "}
+            <span className="text-emerald-300">Positive edge (green)</span> = Kalshi&apos;s YES contract is{" "}
+            <em>cheaper</em> than the reference → good <strong>buy</strong> on Kalshi.{" "}
+            <span className="text-rose-300">Negative edge (red)</span> = Kalshi is overpriced → good <strong>sell</strong> on Kalshi
+            (or just bet at the books instead). &quot;Edge vs best&quot; compares Kalshi to the book offering the longest American
+            odds (= cheapest implied YES).
           </p>
         </div>
       </main>

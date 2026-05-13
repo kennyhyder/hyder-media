@@ -89,10 +89,13 @@ export default async function handler(req, res) {
       const booksMin = novigVals.length ? Math.min(...novigVals) : null;
       const booksMax = novigVals.length ? Math.max(...novigVals) : null;
       const kalshiProb = k?.implied_prob ?? null;
-      // "Best book to bet on Kalshi": the book whose price is HIGHEST (lowest implied prob).
-      // If Kalshi's prob > that book's, the bet looks even better than the most generous book.
+      // "Best alternative book": where can the bettor get the longest payout
+      // (= lowest implied prob = longest American odds) outside Kalshi? This
+      // is the book to compare Kalshi against — if Kalshi's price is lower
+      // still, Kalshi is the place; if it's higher, the bettor should use
+      // that book instead.
       let bestBookForBet = null;
-      if (kalshiProb != null && books.length) {
+      if (books.length) {
         const sorted = [...books].filter((b) => b.novig_prob != null).sort((a, b) => a.novig_prob - b.novig_prob);
         if (sorted.length) bestBookForBet = { book: sorted[0].book, novig_prob: sorted[0].novig_prob, price_american: sorted[0].price_american };
       }
@@ -105,6 +108,9 @@ export default async function handler(req, res) {
           novig: b.novig_prob,
         };
       }
+      // Edge convention: positive = Kalshi's YES price is CHEAPER than the
+      // reference → good buy on Kalshi. Negative = Kalshi is overpriced.
+      //   edge = reference_prob - kalshi_prob
       return {
         player_id: m.player_id,
         player: m.golfodds_players,
@@ -117,9 +123,10 @@ export default async function handler(req, res) {
         books_min: booksMin,
         books_max: booksMax,
         best_book_for_bet: bestBookForBet,
-        edge_vs_books_median: kalshiProb != null && booksMedian != null ? Number((kalshiProb - booksMedian).toFixed(4)) : null,
-        edge_vs_best_book: kalshiProb != null && booksMin != null ? Number((kalshiProb - booksMin).toFixed(4)) : null,
-        edge_vs_dg: kalshiProb != null && dg?.dg_prob != null ? Number((kalshiProb - dg.dg_prob).toFixed(4)) : null,
+        edge_vs_books_median: kalshiProb != null && booksMedian != null ? Number((booksMedian - kalshiProb).toFixed(4)) : null,
+        // edge vs best book: how much cheaper is Kalshi than the cheapest book?
+        edge_vs_best_book: kalshiProb != null && booksMin != null ? Number((booksMin - kalshiProb).toFixed(4)) : null,
+        edge_vs_dg: kalshiProb != null && dg?.dg_prob != null ? Number((dg.dg_prob - kalshiProb).toFixed(4)) : null,
       };
     });
 

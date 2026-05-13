@@ -19,7 +19,18 @@ import { createClient } from "@supabase/supabase-js";
 import WebSocket from "ws";
 
 const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
-const SERIES_TICKER = "KXPGATOUR";
+
+// Kalshi splits golf markets across distinct series per market type.
+// `KXPGATOUR` is just the outright winner; T5/T10/T20/MC each live in their
+// own series. Each event under these has per-golfer Yes/No binaries, but the
+// event_ticker for the same tournament shares a suffix (e.g. `-PGC26`).
+const KALSHI_SERIES = [
+  { ticker: "KXPGATOUR",    marketType: "win", isWinner: true  },
+  { ticker: "KXPGATOP5",    marketType: "t5",  isWinner: false },
+  { ticker: "KXPGATOP10",   marketType: "t10", isWinner: false },
+  { ticker: "KXPGATOP20",   marketType: "t20", isWinner: false },
+  { ticker: "KXPGAMAKECUT", marketType: "mc",  isWinner: false },
+];
 
 // Node 20 lacks native WebSocket; supply `ws` so Supabase client constructs.
 // We don't use realtime here, but the SDK initializes it eagerly.
@@ -33,21 +44,13 @@ const supabase = createClient(
 
 const normalizeName = (s) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
-/**
- * Classify a Kalshi market into our taxonomy.
- * Kalshi's golf markets are predominantly per-golfer outright winner contracts.
- * Top 5/10/20 and make-cut markets appear inconsistently — usually only on majors.
- * We look at the event's title / market subtitle to infer the type.
- */
-function classifyMarketType(eventTitle, marketSubtitle, marketTicker) {
-  const haystack = `${eventTitle || ""} ${marketSubtitle || ""} ${marketTicker || ""}`.toLowerCase();
-  if (/\btop\s*5\b/.test(haystack)) return "t5";
-  if (/\btop\s*10\b/.test(haystack)) return "t10";
-  if (/\btop\s*20\b/.test(haystack)) return "t20";
-  if (/\bmake.*cut\b|\bmiss.*cut\b|\bmade.*cut\b/.test(haystack)) return "mc";
-  if (/\bfirst\s*round\s*lead\b|\bfrl\b/.test(haystack)) return "frl";
-  // Default: per-golfer winner binary
-  return "win";
+// Extract the tournament suffix from an event ticker. e.g.:
+//   KXPGATOUR-PGC26      -> PGC26
+//   KXPGATOP5-PGC26      -> PGC26
+//   KXPGAMAKECUT-PGC26   -> PGC26
+function tournamentSuffix(eventTicker) {
+  const i = eventTicker.indexOf("-");
+  return i > -1 ? eventTicker.slice(i + 1) : eventTicker;
 }
 
 /**
@@ -69,13 +72,12 @@ async function fetchJSON(url) {
   return r.json();
 }
 
-async function listGolfEvents() {
-  // status=open returns active events; we paginate via cursor
+async function listEventsForSeries(seriesTicker) {
   const events = [];
   let cursor = null;
   do {
     const url = new URL(`${KALSHI_BASE}/events`);
-    url.searchParams.set("series_ticker", SERIES_TICKER);
+    url.searchParams.set("series_ticker", seriesTicker);
     url.searchParams.set("status", "open");
     url.searchParams.set("limit", "200");
     if (cursor) url.searchParams.set("cursor", cursor);
@@ -132,6 +134,19 @@ async function upsertTournament(event) {
     .single();
   if (error) throw new Error(`upsert tournament ${event.event_ticker}: ${error.message}`);
   return data.id;
+}
+
+// For non-winner series (Top-N, Make Cut, etc.), the tournament was created by
+// the winner series with kalshi_event_ticker = `KXPGATOUR-<suffix>`. Look it up
+// by suffix. Returns null if not found (e.g. winner series hasn't run yet).
+async function findTournamentBySuffix(suffix) {
+  const { data, error } = await supabase
+    .from("golfodds_tournaments")
+    .select("id")
+    .eq("kalshi_event_ticker", `KXPGATOUR-${suffix}`)
+    .maybeSingle();
+  if (error) throw new Error(`lookup tournament -${suffix}: ${error.message}`);
+  return data?.id || null;
 }
 
 async function upsertPlayer(rawName) {
@@ -203,54 +218,70 @@ async function insertQuote(marketId, market) {
 
 // --- Main ------------------------------------------------------------------
 
-async function main() {
-  console.log(`Fetching Kalshi ${SERIES_TICKER} events...`);
-  const events = await listGolfEvents();
-  console.log(`  Found ${events.length} open events`);
-
-  let totalMarkets = 0;
-  let totalQuotes = 0;
+async function processEvent({ event, marketType, tournamentId }) {
+  const markets = await fetchMarketsForEvent(event.event_ticker);
+  let inserted = 0;
   let errors = 0;
-
-  for (const evt of events) {
+  for (const m of markets) {
+    const playerName = extractPlayerName(m);
+    if (!playerName) continue;
+    // Skip non-per-golfer markets that occasionally appear (cut line, win margin, etc.)
+    if (playerName.length > 40 || /\b(rain|weather|cut\s*line|delay|playoff|margin|stroke|hole|score)\b/i.test(playerName)) {
+      continue;
+    }
     try {
-      const full = await fetchEvent(evt.event_ticker);
-      const tournamentId = await upsertTournament(full.event || evt);
-      const markets = await fetchMarketsForEvent(evt.event_ticker);
-      console.log(`  ${evt.event_ticker}: ${markets.length} markets`);
-
-      for (const m of markets) {
-        const playerName = extractPlayerName(m);
-        if (!playerName) continue;
-        // Skip markets that aren't per-golfer (e.g. "Will rain delay play?")
-        if (playerName.length > 40 || /\b(rain|weather|cut|delay|playoff)\b/i.test(playerName)) {
-          continue;
-        }
-        try {
-          const playerId = await upsertPlayer(playerName);
-          const marketType = classifyMarketType(evt.title, m.subtitle, m.ticker);
-          const marketId = await upsertMarket(tournamentId, playerId, marketType);
-          await insertQuote(marketId, m);
-          totalMarkets++;
-          totalQuotes++;
-        } catch (e) {
-          errors++;
-          console.error(`    ${m.ticker}: ${e.message}`);
-        }
-      }
+      const playerId = await upsertPlayer(playerName);
+      const marketId = await upsertMarket(tournamentId, playerId, marketType);
+      await insertQuote(marketId, m);
+      inserted++;
     } catch (e) {
       errors++;
-      console.error(`  event ${evt.event_ticker}: ${e.message}`);
+      console.error(`    ${m.ticker}: ${e.message}`);
+    }
+  }
+  return { inserted, errors, totalMarkets: markets.length };
+}
+
+async function main() {
+  let totalQuotes = 0;
+  let totalErrors = 0;
+
+  for (const series of KALSHI_SERIES) {
+    console.log(`\nFetching Kalshi ${series.ticker} events (market_type=${series.marketType})…`);
+    const events = await listEventsForSeries(series.ticker);
+    console.log(`  Found ${events.length} open events`);
+
+    for (const evt of events) {
+      try {
+        let tournamentId;
+        if (series.isWinner) {
+          const full = await fetchEvent(evt.event_ticker);
+          tournamentId = await upsertTournament(full.event || evt);
+        } else {
+          const suffix = tournamentSuffix(evt.event_ticker);
+          tournamentId = await findTournamentBySuffix(suffix);
+          if (!tournamentId) {
+            console.warn(`  skip ${evt.event_ticker}: no winner tournament for suffix ${suffix} — run winner series first`);
+            continue;
+          }
+        }
+        const r = await processEvent({ event: evt, marketType: series.marketType, tournamentId });
+        console.log(`  ${evt.event_ticker}: ${r.totalMarkets} markets, ${r.inserted} inserted, ${r.errors} errors`);
+        totalQuotes += r.inserted;
+        totalErrors += r.errors;
+      } catch (e) {
+        totalErrors++;
+        console.error(`  event ${evt.event_ticker}: ${e.message}`);
+      }
     }
   }
 
-  // Update data source stats
   await supabase
     .from("golfodds_data_sources")
     .update({ last_import: new Date().toISOString(), record_count: totalQuotes })
     .eq("name", "kalshi");
 
-  console.log(`\nDone. ${totalMarkets} markets, ${totalQuotes} quotes inserted, ${errors} errors.`);
+  console.log(`\nDone. ${totalQuotes} total quotes inserted, ${totalErrors} errors across ${KALSHI_SERIES.length} series.`);
 }
 
 main().catch((e) => {

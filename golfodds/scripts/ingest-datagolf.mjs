@@ -89,10 +89,10 @@ function americanToDecimal(a) {
 // Decimal → implied probability (raw, with vig)
 const decimalToImplied = (d) => (d ? 1 / d : null);
 
-// De-vig: take an array of raw implied probabilities for a single market and
-// scale them so they sum to the "true" outcome count. For Top-N markets the
-// sum should be N (since N golfers can finish in top N), for Win it should be 1.
-function devig(rawProbs, expectedSum) {
+// De-vig for mutually-exclusive multi-outcome markets (Win/T5/T10/T20): the
+// field's implied probabilities should sum to the outcome count (1, 5, 10, 20).
+// Scale each prob so that constraint holds.
+function devigField(rawProbs, expectedSum) {
   const total = rawProbs.reduce((s, p) => s + (p || 0), 0);
   if (!total) return rawProbs.map(() => null);
   const scale = expectedSum / total;
@@ -206,13 +206,14 @@ async function ingestMarket(dgMarket, marketType) {
   if (Array.isArray(payload.books_offering)) {
     for (const b of payload.books_offering) bookCols.add(b);
   }
-  const expectedSum = marketType === "win" ? 1
-    : marketType === "t5" ? 5
-    : marketType === "t10" ? 10
-    : marketType === "t20" ? 20
-    : 1; // mc, frl
+  // Pick the right de-vig strategy. Field-sum scaling works for mutually
+  // exclusive Top-N markets (sum should equal the bucket size). Make Cut is a
+  // per-player binary (each market is independent), so we can't sum-scale.
+  // For MC, leave the raw implied prob alone — the book's vig stays in.
+  const FIELD_SUM = { win: 1, t5: 5, t10: 10, t20: 20 };
+  const expectedSum = FIELD_SUM[marketType];
 
-  // Build per-book de-vigged probability arrays aligned to `players` order
+  // Build per-book novig probability arrays aligned to `players` order
   const novigByBook = {};
   for (const book of bookCols) {
     const rawProbs = players.map((p) => {
@@ -220,7 +221,7 @@ async function ingestMarket(dgMarket, marketType) {
       const dec = americanToDecimal(am);
       return decimalToImplied(dec);
     });
-    novigByBook[book] = devig(rawProbs, expectedSum);
+    novigByBook[book] = expectedSum != null ? devigField(rawProbs, expectedSum) : rawProbs;
   }
 
   let quotes = 0;
