@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "ingest:kalshi": "node --env-file=../.env.local scripts/ingest-kalshi.mjs",
-    "ingest:datagolf": "node --env-file=../.env.local scripts/ingest-datagolf.mjs"
+    "ingest:datagolf": "node --env-file=../.env.local scripts/ingest-datagolf.mjs",
+    "ingest:datagolf-matchups": "node --env-file=../.env.local scripts/ingest-datagolf-matchups.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.2",

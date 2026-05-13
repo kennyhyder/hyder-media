@@ -18,6 +18,6 @@
     "api/ga4/**/*.js": { "maxDuration": 60 },
     "api/vita-brevis/**/*.js": { "maxDuration": 30 },
     "api/tiktok-ads/**/*.js": { "maxDuration": 30 },
-    "api/golfodds/**/*.js": { "maxDuration": 30 }
+    "api/golfodds/**/*.js": { "maxDuration": 60 }
   }
 }

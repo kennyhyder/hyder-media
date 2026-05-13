@@ -160,10 +160,16 @@ function TournamentInner() {
             <span className="text-xs text-neutral-500">{info.tournament.kalshi_event_ticker}</span>
           )}
           {id && (
-            <Link
-              href={`/ladder/?id=${id}`}
-              className="ml-auto text-sm px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded border border-neutral-700"
-            >Ladder view →</Link>
+            <div className="ml-auto flex items-center gap-2">
+              <Link
+                href={`/matchups/?id=${id}`}
+                className="text-sm px-3 py-1 bg-purple-900/40 hover:bg-purple-900/60 text-purple-200 rounded border border-purple-700/40"
+              >Matchups →</Link>
+              <Link
+                href={`/ladder/?id=${id}`}
+                className="text-sm px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded border border-neutral-700"
+              >Ladder view →</Link>
+            </div>
           )}
         </div>
 

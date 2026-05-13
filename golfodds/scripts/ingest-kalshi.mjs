@@ -53,6 +53,14 @@ const KALSHI_SERIES = [
   { ticker: "KXPGALOWSCORE",  marketType: "low_score", isWinner: false },
 ];
 
+// Matchup series — different data shape (2 or 3 players per "event").
+// Each event has 2 markets (H2H) or 3 markets (3-ball), one per player.
+const KALSHI_MATCHUP_SERIES = [
+  { ticker: "KXPGAH2H",   matchupType: "h2h",   scope: "tournament" },
+  { ticker: "KXPGA3BALL", matchupType: "3ball", scope: "round" },
+  { ticker: "KXPGA5BALL", matchupType: "5ball", scope: "round" },
+];
+
 // Node 20 lacks native WebSocket; supply `ws` so Supabase client constructs.
 // We don't use realtime here, but the SDK initializes it eagerly.
 const supabase = createClient(
@@ -263,6 +271,155 @@ async function processEvent({ event, marketType, tournamentId }) {
   return { inserted, errors, totalMarkets: markets.length };
 }
 
+// ---- Matchup ingestion ---------------------------------------------------
+
+// Build map of tournament_code -> tournament_id from existing winner tournaments
+async function loadTournamentMap() {
+  const { data, error } = await supabase
+    .from("golfodds_tournaments")
+    .select("id, kalshi_event_ticker")
+    .like("kalshi_event_ticker", "KXPGATOUR-%");
+  if (error) throw new Error(`load tournaments: ${error.message}`);
+  const map = new Map();
+  for (const t of data || []) {
+    const code = t.kalshi_event_ticker.replace(/^KXPGATOUR-/, "");
+    map.set(code, t.id);
+  }
+  return map;
+}
+
+// Find tournament for matchup ticker by longest prefix match on the suffix
+// e.g. suffix "PGC26SSCHRMCI" → match tournament code "PGC26"
+function tournamentForMatchupSuffix(suffix, tournamentMap) {
+  const codes = Array.from(tournamentMap.keys()).sort((a, b) => b.length - a.length);
+  for (const code of codes) {
+    if (suffix.startsWith(code)) return { id: tournamentMap.get(code), code };
+  }
+  return null;
+}
+
+// Extract round number from matchup ticker. Examples:
+//   PGC26SSCHRMCI -> null (tournament scope)
+//   PGC26R1JROSSSCHMFIT -> 1
+function extractRound(suffixAfterCode) {
+  const m = suffixAfterCode.match(/^R(\d)/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// Player from yes_sub_title — "Scottie Scheffler beats Rory McIlroy" -> "Scottie Scheffler"
+function extractMatchupPlayer(market) {
+  const sub = market.yes_sub_title || "";
+  const i = sub.toLowerCase().indexOf(" beats ");
+  if (i < 0) return null;
+  return sub.slice(0, i).trim();
+}
+
+async function upsertMatchup(row) {
+  const { data, error } = await supabase
+    .from("golfodds_matchups")
+    .upsert(row, { onConflict: "kalshi_event_ticker" })
+    .select("id")
+    .single();
+  if (error) throw new Error(`upsert matchup ${row.kalshi_event_ticker}: ${error.message}`);
+  return data.id;
+}
+
+async function upsertMatchupPlayer(matchupId, playerId, ticker) {
+  const { data, error } = await supabase
+    .from("golfodds_matchup_players")
+    .upsert({ matchup_id: matchupId, player_id: playerId, kalshi_ticker: ticker }, { onConflict: "matchup_id,player_id" })
+    .select("id")
+    .single();
+  if (error) throw new Error(`upsert matchup_player: ${error.message}`);
+  return data.id;
+}
+
+async function insertMatchupQuote(matchupPlayerId, market) {
+  const toUnit = (v) => {
+    if (v == null) return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return null;
+    return n > 1 ? n / 100 : n;
+  };
+  const toBigInt = (v) => {
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const yesBid = toUnit(market.yes_bid_dollars ?? market.yes_bid);
+  const yesAsk = toUnit(market.yes_ask_dollars ?? market.yes_ask);
+  const last = toUnit(market.last_price_dollars ?? market.last_price);
+  let implied = null;
+  if (yesBid != null && yesAsk != null && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
+    implied = Number(((yesBid + yesAsk) / 2).toFixed(4));
+  } else if (last != null && last > 0 && last < 1) {
+    implied = last;
+  }
+  const { error } = await supabase.from("golfodds_matchup_kalshi_quotes").insert({
+    matchup_player_id: matchupPlayerId,
+    yes_bid: yesBid, yes_ask: yesAsk, last_price: last, implied_prob: implied,
+    volume: toBigInt(market.volume ?? market.volume_24h),
+    open_interest: toBigInt(market.open_interest_fp ?? market.open_interest),
+    status: market.status || null,
+  });
+  if (error) throw new Error(`insert matchup quote: ${error.message}`);
+}
+
+async function ingestMatchupSeries(series, tournamentMap) {
+  console.log(`\nFetching Kalshi ${series.ticker} matchup events (type=${series.matchupType})…`);
+  const events = await listEventsForSeries(series.ticker);
+  console.log(`  Found ${events.length} open events`);
+
+  let totalQuotes = 0;
+  let totalErrors = 0;
+  let skipped = 0;
+
+  for (const evt of events) {
+    try {
+      const suffix = tournamentSuffix(evt.event_ticker);
+      const match = tournamentForMatchupSuffix(suffix, tournamentMap);
+      if (!match) {
+        skipped++;
+        continue;
+      }
+      const matchupTail = suffix.slice(match.code.length);
+      const round = series.scope === "round" ? extractRound(matchupTail) : null;
+      const markets = await fetchMarketsForEvent(evt.event_ticker);
+
+      const matchupId = await upsertMatchup({
+        tournament_id: match.id,
+        matchup_type: series.matchupType,
+        scope: series.scope,
+        round_number: round,
+        kalshi_event_ticker: evt.event_ticker,
+        title: evt.title || null,
+      });
+
+      let inserted = 0;
+      for (const m of markets) {
+        const playerName = extractMatchupPlayer(m);
+        if (!playerName) continue;
+        try {
+          const playerId = await upsertPlayer(playerName);
+          const matchupPlayerId = await upsertMatchupPlayer(matchupId, playerId, m.ticker);
+          await insertMatchupQuote(matchupPlayerId, m);
+          inserted++;
+        } catch (e) {
+          totalErrors++;
+          console.error(`    ${m.ticker}: ${e.message}`);
+        }
+      }
+      totalQuotes += inserted;
+    } catch (e) {
+      totalErrors++;
+      console.error(`  event ${evt.event_ticker}: ${e.message}`);
+    }
+  }
+
+  console.log(`  ${series.ticker}: ${totalQuotes} matchup quotes inserted, ${totalErrors} errors, ${skipped} events without matching tournament`);
+  return { totalQuotes, totalErrors };
+}
+
 async function main() {
   let totalQuotes = 0;
   let totalErrors = 0;
@@ -297,12 +454,25 @@ async function main() {
     }
   }
 
+  // Matchups (different data model) — run after binaries so tournaments exist
+  const tournamentMap = await loadTournamentMap();
+  for (const series of KALSHI_MATCHUP_SERIES) {
+    try {
+      const r = await ingestMatchupSeries(series, tournamentMap);
+      totalQuotes += r.totalQuotes;
+      totalErrors += r.totalErrors;
+    } catch (e) {
+      totalErrors++;
+      console.error(`! ${series.ticker}: ${e.message}`);
+    }
+  }
+
   await supabase
     .from("golfodds_data_sources")
     .update({ last_import: new Date().toISOString(), record_count: totalQuotes })
     .eq("name", "kalshi");
 
-  console.log(`\nDone. ${totalQuotes} total quotes inserted, ${totalErrors} errors across ${KALSHI_SERIES.length} series.`);
+  console.log(`\nDone. ${totalQuotes} total quotes inserted, ${totalErrors} errors across ${KALSHI_SERIES.length} binary series + ${KALSHI_MATCHUP_SERIES.length} matchup series.`);
 }
 
 main().catch((e) => {
