@@ -3,10 +3,11 @@ import { redirect, notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
-import { fetchLeagues, fetchEventsByLeague } from "@/lib/sports-data";
+import { fetchLeagues, fetchEventsByLeagueWithMarkets } from "@/lib/sports-data";
 import { fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPctSigned } from "@/lib/format";
+import GameCard from "@/components/sports/GameCard";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
 
   const [leagues, events, leagueMoves] = await Promise.all([
     fetchLeagues(),
-    fetchEventsByLeague(league),
+    fetchEventsByLeagueWithMarkets(league),
     fetchMovements({ sinceHours: 24, league, minDelta: 0.02, limit: 6 }),
   ]);
   const meta = leagues.find((l) => l.key === league);
@@ -107,21 +108,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
                       </Link>
                     );
                   }
-                  return (
-                    <Link key={e.id} href={`/sports/${league}/event/${e.id}`} className="block">
-                      <Card className="hover:border-emerald-500/40 transition-colors">
-                        <CardContent className="p-4">
-                          <div className="text-sm font-semibold leading-tight">{e.title}</div>
-                          {e.start_time && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {new Date(e.start_time).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
-                            </div>
-                          )}
-                          <div className="text-[10px] text-muted-foreground mt-2 font-mono">{e.kalshi_event_ticker}</div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  );
+                  return <GameCard key={e.id} event={e} league={league} />;
                 })}
               </div>
             </section>

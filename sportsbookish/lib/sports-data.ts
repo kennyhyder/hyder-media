@@ -32,8 +32,30 @@ export interface SportsEvent {
   kalshi_event_ticker: string | null;
 }
 
+export interface InlineMarket {
+  id: string;
+  contestant_label: string;
+  implied_prob: number | null;
+  yes_bid: number | null;
+  yes_ask: number | null;
+  books_count: number;
+  books_median: number | null;
+  edge_vs_books_median: number | null;
+}
+
+export interface SportsEventWithMarkets extends SportsEvent {
+  markets: InlineMarket[];
+}
+
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {
   const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open`, { next: { revalidate: 30 } });
+  if (!r.ok) return [];
+  const data = await r.json();
+  return data.events || [];
+}
+
+export async function fetchEventsByLeagueWithMarkets(league: string): Promise<SportsEventWithMarkets[]> {
+  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open&with=markets`, { next: { revalidate: 30 } });
   if (!r.ok) return [];
   const data = await r.json();
   return data.events || [];
