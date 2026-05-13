@@ -4,18 +4,18 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
-async function fetchAllIn(query, marketIds, pageSize = 1000) {
+async function fetchAllIn(query, marketIds, idChunkSize = 100, rowPageSize = 1000) {
   const out = [];
-  for (let i = 0; i < marketIds.length; i += pageSize) {
-    const chunk = marketIds.slice(i, i + pageSize);
+  for (let i = 0; i < marketIds.length; i += idChunkSize) {
+    const chunk = marketIds.slice(i, i + idChunkSize);
     let page = 0;
     while (true) {
-      const start = page * pageSize;
-      const { data, error } = await query().in("market_id", chunk).range(start, start + pageSize - 1);
+      const start = page * rowPageSize;
+      const { data, error } = await query().in("market_id", chunk).range(start, start + rowPageSize - 1);
       if (error) throw new Error(error.message);
       if (!data || !data.length) break;
       out.push(...data);
-      if (data.length < pageSize) break;
+      if (data.length < rowPageSize) break;
       page++;
     }
   }
