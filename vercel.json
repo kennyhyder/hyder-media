@@ -3,6 +3,11 @@
   "redirects": [
     { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
+  "crons": [
+    { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
+    { "path": "/api/golfodds/cron-ingest-datagolf", "schedule": "*/10 * * * *" },
+    { "path": "/api/golfodds/cron-detect-alerts",   "schedule": "*/5 * * * *" }
+  ],
   "functions": {
     "api/*.js": { "maxDuration": 10 },
     "api/google-ads/**/*.js": { "maxDuration": 60 },
@@ -18,6 +23,9 @@
     "api/ga4/**/*.js": { "maxDuration": 60 },
     "api/vita-brevis/**/*.js": { "maxDuration": 30 },
     "api/tiktok-ads/**/*.js": { "maxDuration": 30 },
-    "api/golfodds/**/*.js": { "maxDuration": 60 }
+    "api/golfodds/**/*.js": { "maxDuration": 60 },
+    "api/golfodds/cron-ingest-kalshi.js": { "maxDuration": 300 },
+    "api/golfodds/cron-ingest-datagolf.js": { "maxDuration": 120 },
+    "api/golfodds/cron-detect-alerts.js": { "maxDuration": 60 }
   }
 }

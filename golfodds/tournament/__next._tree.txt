@@ -1,2 +1,2 @@
-:HL["/golfodds/_next/static/chunks/3226bf83b0015744.css","style"]
-0:{"buildId":"1Gd5pBcUnbhhzmUrmigdl","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"tournament","paramType":null,"paramKey":"tournament","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/golfodds/_next/static/chunks/d94b16f31abc1b71.css","style"]
+0:{"buildId":"x6sn6Tg6hiXvZ3Xu_fWzI","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"tournament","paramType":null,"paramKey":"tournament","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

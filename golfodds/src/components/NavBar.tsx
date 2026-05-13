@@ -13,6 +13,9 @@ export default function NavBar() {
         <div className="text-xs text-neutral-500">Kalshi vs Sportsbook Outright Analyzer</div>
         <div className="ml-auto flex items-center gap-4 text-sm">
           <Link href="/" className="text-neutral-300 hover:text-green-400">Tournaments</Link>
+          <Link href="/alerts/" className="text-neutral-300 hover:text-green-400 flex items-center gap-1">
+            <span>⚡</span> Alerts
+          </Link>
           <a
             href="https://docs.kalshi.com/api-reference"
             target="_blank"
