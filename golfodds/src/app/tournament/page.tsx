@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import MarketTabs from "@/components/MarketTabs";
+import BestBetsCards from "@/components/BestBetsCards";
 import { fmtPct, fmtPctSigned, fmtAmerican, edgeColor, edgeBg, bookLabel, MARKET_LABELS } from "@/lib/format";
 
 interface PlayerRow {
@@ -183,6 +184,10 @@ function TournamentInner() {
           kalshiCounts={info?.stats.kalshi_markets_by_type}
           onSelect={setMarketType}
         />
+
+        {!loading && !error && comparison?.players && comparison.players.length > 0 && (
+          <BestBetsCards players={comparison.players} marketType={marketType} />
+        )}
 
         <div className="flex items-center gap-4 mb-3 text-sm">
           <label className="flex items-center gap-2 text-neutral-400">
