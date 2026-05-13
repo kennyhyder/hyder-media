@@ -28,12 +28,14 @@ export const NAME_OVERRIDES = {
   mlb: {
     "chicago cubs": "chicago c",
     "chicago white sox": "chicago ws",
-    "los angeles dodgers": "la dodgers",
-    "los angeles angels": "la angels",
-    "new york yankees": "ny yankees",
-    "new york mets": "ny mets",
+    "los angeles dodgers": "los angeles d",
+    "los angeles angels": "los angeles a",
+    "new york yankees": "new york y",
+    "new york mets": "new york m",
     "athletics": "as",
     "oakland athletics": "as",
+    "st louis cardinals": "st louis",
+    "saint louis cardinals": "st louis",
   },
   mls: {
     "dc united": "dc united",
