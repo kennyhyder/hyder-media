@@ -4,6 +4,25 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
+// Supabase REST caps at 1000 rows per query by default. Paginate to fetch all.
+async function fetchAllIn(query, marketIds, pageSize = 1000) {
+  const out = [];
+  for (let i = 0; i < marketIds.length; i += pageSize) {
+    const chunk = marketIds.slice(i, i + pageSize);
+    let page = 0;
+    while (true) {
+      const start = page * pageSize;
+      const { data, error } = await query().in("market_id", chunk).range(start, start + pageSize - 1);
+      if (error) throw new Error(error.message);
+      if (!data || !data.length) break;
+      out.push(...data);
+      if (data.length < pageSize) break;
+      page++;
+    }
+  }
+  return out;
+}
+
 function median(values) {
   const xs = values.filter((v) => typeof v === "number").sort((a, b) => a - b);
   if (!xs.length) return null;
@@ -41,18 +60,18 @@ export default async function handler(req, res) {
 
     const marketIds = markets.map((m) => m.id);
 
-    // Supabase REST caps at 1000 rows per query by default; override with range.
-    const [kalshiRes, dgRes, bookRes] = await Promise.all([
-      supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at").in("market_id", marketIds).range(0, 49999),
-      supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob, dg_fit_prob, fetched_at").in("market_id", marketIds).range(0, 49999),
-      supabase.from("golfodds_v_latest_books").select("market_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at").in("market_id", marketIds).range(0, 49999),
+    // Use pagination helper to bypass the 1000-row cap on view queries.
+    const [kalshiRows, dgRows, bookRows] = await Promise.all([
+      fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), marketIds),
     ]);
 
-    const kalshiByMarket = new Map((kalshiRes.data || []).map((r) => [r.market_id, r]));
-    const dgByMarket = new Map((dgRes.data || []).map((r) => [r.market_id, r]));
+    const kalshiByMarket = new Map(kalshiRows.map((r) => [r.market_id, r]));
+    const dgByMarket = new Map(dgRows.map((r) => [r.market_id, r]));
     const booksByMarket = new Map();
     const bookSet = new Set();
-    for (const r of bookRes.data || []) {
+    for (const r of bookRows) {
       if (!booksByMarket.has(r.market_id)) booksByMarket.set(r.market_id, []);
       booksByMarket.get(r.market_id).push(r);
       bookSet.add(r.book);

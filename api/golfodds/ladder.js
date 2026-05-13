@@ -4,6 +4,24 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
+async function fetchAllIn(query, marketIds, pageSize = 1000) {
+  const out = [];
+  for (let i = 0; i < marketIds.length; i += pageSize) {
+    const chunk = marketIds.slice(i, i + pageSize);
+    let page = 0;
+    while (true) {
+      const start = page * pageSize;
+      const { data, error } = await query().in("market_id", chunk).range(start, start + pageSize - 1);
+      if (error) throw new Error(error.message);
+      if (!data || !data.length) break;
+      out.push(...data);
+      if (data.length < pageSize) break;
+      page++;
+    }
+  }
+  return out;
+}
+
 function median(values) {
   const xs = values.filter((v) => typeof v === "number").sort((a, b) => a - b);
   if (!xs.length) return null;
@@ -42,16 +60,15 @@ export default async function handler(req, res) {
     if (!markets?.length) return res.status(200).json({ players: [] });
 
     const marketIds = markets.map((m) => m.id);
-    // Supabase REST caps at 1000 rows per query by default; override with range.
-    const [kalshiRes, dgRes, bookRes] = await Promise.all([
-      supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob").in("market_id", marketIds).range(0, 49999),
-      supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob").in("market_id", marketIds).range(0, 49999),
-      supabase.from("golfodds_v_latest_books").select("market_id, novig_prob").in("market_id", marketIds).range(0, 49999),
+    const [kalshiRows, dgRows, bookRows] = await Promise.all([
+      fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, novig_prob"), marketIds),
     ]);
-    const k = new Map((kalshiRes.data || []).map((r) => [r.market_id, r.implied_prob]));
-    const d = new Map((dgRes.data || []).map((r) => [r.market_id, r.dg_prob]));
+    const k = new Map(kalshiRows.map((r) => [r.market_id, r.implied_prob]));
+    const d = new Map(dgRows.map((r) => [r.market_id, r.dg_prob]));
     const b = new Map();
-    for (const r of bookRes.data || []) {
+    for (const r of bookRows) {
       if (!b.has(r.market_id)) b.set(r.market_id, []);
       b.get(r.market_id).push(r.novig_prob);
     }

@@ -4,6 +4,24 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
+async function fetchAllIn(query, marketIds, pageSize = 1000) {
+  const out = [];
+  for (let i = 0; i < marketIds.length; i += pageSize) {
+    const chunk = marketIds.slice(i, i + pageSize);
+    let page = 0;
+    while (true) {
+      const start = page * pageSize;
+      const { data, error } = await query().in("market_id", chunk).range(start, start + pageSize - 1);
+      if (error) throw new Error(error.message);
+      if (!data || !data.length) break;
+      out.push(...data);
+      if (data.length < pageSize) break;
+      page++;
+    }
+  }
+  return out;
+}
+
 /**
  * GET /api/golfodds/tournament-info?id=<uuid>
  *
@@ -41,17 +59,16 @@ export default async function handler(req, res) {
     const kalshiCountByType = {};
 
     if (marketIds.length) {
-      // Supabase REST caps at 1000 rows per query by default; override with range.
-      const [kalshiRes, dgRes, bookRes] = await Promise.all([
-        supabase.from("golfodds_v_latest_kalshi").select("market_id").in("market_id", marketIds).range(0, 49999),
-        supabase.from("golfodds_v_latest_dg").select("market_id").in("market_id", marketIds).range(0, 49999),
-        supabase.from("golfodds_v_latest_books").select("market_id, book").in("market_id", marketIds).range(0, 49999),
+      const [kalshiRows, dgRows, bookRows] = await Promise.all([
+        fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, book"), marketIds),
       ]);
-      kalshiCount = (kalshiRes.data || []).length;
-      dgCount = (dgRes.data || []).length;
-      bookCount = (bookRes.data || []).length;
-      booksSeen = Array.from(new Set((bookRes.data || []).map((r) => r.book))).sort();
-      const kalshiMarketIds = new Set((kalshiRes.data || []).map((r) => r.market_id));
+      kalshiCount = kalshiRows.length;
+      dgCount = dgRows.length;
+      bookCount = bookRows.length;
+      booksSeen = Array.from(new Set(bookRows.map((r) => r.book))).sort();
+      const kalshiMarketIds = new Set(kalshiRows.map((r) => r.market_id));
       for (const m of markets) {
         if (kalshiMarketIds.has(m.id)) kalshiCountByType[m.market_type] = (kalshiCountByType[m.market_type] || 0) + 1;
       }
