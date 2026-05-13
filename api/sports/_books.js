@@ -20,10 +20,10 @@ export const LEAGUE_TO_FUTURES_SPORT = {
   mlb: "baseball_mlb_world_series_winner",
   nhl: "icehockey_nhl_championship_winner",
   epl: "soccer_epl_winner",
-  // MLS has no published futures market on Odds API as of 2026-05
 };
 
-// Hand overrides for ambiguous Kalshi names. Format: league → odds_team_norm → kalshi_norm
+// Hand overrides per league for cases the heuristics can't resolve.
+// Maps a normalized Odds API team name → the normalized Kalshi market label.
 export const NAME_OVERRIDES = {
   mlb: {
     "chicago cubs": "chicago c",
@@ -32,61 +32,99 @@ export const NAME_OVERRIDES = {
     "los angeles angels": "la angels",
     "new york yankees": "ny yankees",
     "new york mets": "ny mets",
-    "athletics": "a's",
-    "oakland athletics": "a's",
+    "athletics": "as",
+    "oakland athletics": "as",
   },
-  nhl: {
-    "new york rangers": "ny rangers",
-    "new york islanders": "ny islanders",
-    "los angeles kings": "la kings",
+  mls: {
+    "dc united": "dc united",
+    "d c united": "dc united",
+    "new york red bulls": "new york rb",
+    "new york city fc": "new york city",
+    "los angeles fc": "los angeles f",
+    "los angeles galaxy": "los angeles g",
+    "la galaxy": "los angeles g",
+    "lafc": "los angeles f",
+    "sporting kansas city": "kansas city",
+    "st louis city sc": "saint louis",
+    "st louis city": "saint louis",
+    "saint louis city sc": "saint louis",
+    "minnesota united": "minnesota",
+    "minnesota united fc": "minnesota",
+    "seattle sounders fc": "seattle",
+    "columbus crew sc": "columbus",
+    "fc cincinnati": "cincinnati",
+    "atlanta united fc": "atlanta",
+    "atlanta united": "atlanta",
+    "inter miami cf": "miami",
+    "real salt lake": "salt lake",
+    "new england revolution": "new england",
+    "fc dallas": "dallas",
+    "houston dynamo": "houston",
+    "houston dynamo fc": "houston",
+    "san jose earthquakes": "san jose",
+    "vancouver whitecaps fc": "vancouver",
+    "vancouver whitecaps": "vancouver",
+    "cf montreal": "montreal",
+    "portland timbers": "portland",
+    "philadelphia union": "philadelphia",
+    "orlando city sc": "orlando",
+    "nashville sc": "nashville",
+    "fc cincinnati": "cincinnati",
+    "colorado rapids": "colorado",
+    "charlotte fc": "charlotte",
+    "chicago fire fc": "chicago fire",
+    "austin fc": "austin",
+    "toronto fc": "toronto",
   },
-  nba: {
-    "los angeles lakers": "la lakers",
-    "los angeles clippers": "la clippers",
-    "new york knicks": "ny knicks",
+  epl: {
+    "nottingham forest": "nottingham",
+    "newcastle united": "newcastle",
+    "wolverhampton wanderers": "wolverhampton",
+    "tottenham hotspur": "tottenham",
+    "west ham united": "west ham",
+    "brighton and hove albion": "brighton",
   },
 };
 
-// Match an Odds API team name against the set of Kalshi contestants for a league.
-// Strategy:
-//   1. Direct equality on normalized name
-//   2. Hand override
-//   3. Kalshi name is a prefix-token of Odds API name (e.g. "san antonio" → "san antonio spurs")
-//   4. Last word of Kalshi name matches last word of Odds name (e.g. "manchester city" matches itself)
-// Returns the Kalshi contestant id or null.
-export function matchContestant(oddsTeamName, league, kalshiNormToId) {
-  const oddsNorm = normalizeName(oddsTeamName);
+// Strip punctuation + collapse spaces — used on top of normalizeName for
+// punctuation-heavy team names like "D.C. United".
+export function normalizeForMatch(s) {
+  return normalizeName(s || "")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  // 1. Direct
-  if (kalshiNormToId.has(oddsNorm)) return kalshiNormToId.get(oddsNorm);
+// True if a Kalshi market label could refer to the same team as an Odds API name.
+// Handles: direct match, override, last-word match (ANA Ducks vs Anaheim Ducks),
+// prefix match (Boston vs Boston Celtics), substring (in either direction).
+export function softLabelMatch(oddsName, kalshiLabel, league) {
+  if (!oddsName || !kalshiLabel) return false;
+  const o = normalizeForMatch(oddsName);
+  const k = normalizeForMatch(kalshiLabel);
+  if (!o || !k || k === "tie") return false;
 
-  // 2. Override
-  const override = NAME_OVERRIDES[league]?.[oddsNorm];
-  if (override && kalshiNormToId.has(override)) return kalshiNormToId.get(override);
+  if (o === k) return true;
 
-  // 3. Prefix-token: longest matching Kalshi-norm that is a prefix of Odds name
-  let bestMatch = null;
-  let bestLen = 0;
-  for (const [knorm, id] of kalshiNormToId.entries()) {
-    if (knorm === "tie") continue;
-    if (oddsNorm === knorm || oddsNorm.startsWith(knorm + " ")) {
-      if (knorm.length > bestLen) {
-        bestLen = knorm.length;
-        bestMatch = id;
-      }
-    }
+  const override = NAME_OVERRIDES[league]?.[o];
+  if (override && override === k) return true;
+
+  // Prefix match (Kalshi is shorter, Odds adds suffix)
+  if (o.startsWith(k + " ")) return true;
+  if (k.startsWith(o + " ")) return true;
+
+  // Last-word match — e.g. "ana ducks" vs "anaheim ducks"
+  const oWords = o.split(" ");
+  const kWords = k.split(" ");
+  if (oWords.length >= 2 && kWords.length >= 2) {
+    if (oWords[oWords.length - 1] === kWords[kWords.length - 1]) return true;
   }
-  if (bestMatch) return bestMatch;
 
-  // 4. Substring fallback — only allow when single match to avoid Brooklyn/etc collisions
-  const subs = [];
-  for (const [knorm, id] of kalshiNormToId.entries()) {
-    if (knorm === "tie" || knorm.length < 4) continue;
-    if (oddsNorm.includes(knorm)) subs.push({ knorm, id });
-  }
-  if (subs.length === 1) return subs[0].id;
+  // Substring (one fully contains the other surrounded by spaces or boundaries)
+  if (o.includes(" " + k + " ") || k.includes(" " + o + " ")) return true;
+  if (o.endsWith(" " + k) || k.endsWith(" " + o)) return true;
 
-  return null;
+  return false;
 }
 
 // Convert American odds → raw implied prob (no de-vig)
@@ -100,7 +138,6 @@ export function americanToProb(american) {
 
 // De-vig a set of mutually-exclusive prices for one event/market/book.
 // outcomes: [{ name, prob_raw }, ...]
-// Returns the same array with prob_novig field added.
 export function devigOutcomes(outcomes) {
   const sum = outcomes.reduce((s, o) => s + (o.prob_raw ?? 0), 0);
   if (sum <= 0) return outcomes.map((o) => ({ ...o, prob_novig: null }));
@@ -110,7 +147,7 @@ export function devigOutcomes(outcomes) {
   }));
 }
 
-// Throttled fetch w/ exponential backoff + credit header capture.
+// Throttled fetch w/ backoff + credit header capture
 export async function fetchOddsApi(path, params, attempt = 0) {
   const apiKey = process.env.ODDS_API_KEY;
   if (!apiKey) throw new Error("ODDS_API_KEY missing");
@@ -135,8 +172,7 @@ export async function fetchOddsApi(path, params, attempt = 0) {
   return { body, credits: { remaining, used, lastCost } };
 }
 
-// Bookmaker labels — used to normalize Odds API book keys to our display labels
-// (which match the golf-side BOOK_LABELS in sportsbookish/lib/format.ts).
+// Bookmaker key → display label normalization (matches golf-side BOOK_LABELS)
 export const BOOK_KEYS = {
   draftkings: "draftkings",
   fanduel: "fanduel",
