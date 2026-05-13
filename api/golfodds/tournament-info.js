@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const supabase = getSupabase();
     const [tRes, mRes] = await Promise.all([
       supabase.from("golfodds_tournaments").select("*").eq("id", id).single(),
-      supabase.from("golfodds_markets").select("id, market_type, player_id").eq("tournament_id", id),
+      supabase.from("golfodds_markets").select("id, market_type, player_id").eq("tournament_id", id).range(0, 9999),
     ]);
     if (tRes.error) return res.status(404).json({ error: tRes.error.message });
 
@@ -41,10 +41,11 @@ export default async function handler(req, res) {
     const kalshiCountByType = {};
 
     if (marketIds.length) {
+      // Supabase REST caps at 1000 rows per query by default; override with range.
       const [kalshiRes, dgRes, bookRes] = await Promise.all([
-        supabase.from("golfodds_v_latest_kalshi").select("market_id").in("market_id", marketIds),
-        supabase.from("golfodds_v_latest_dg").select("market_id").in("market_id", marketIds),
-        supabase.from("golfodds_v_latest_books").select("market_id, book").in("market_id", marketIds),
+        supabase.from("golfodds_v_latest_kalshi").select("market_id").in("market_id", marketIds).range(0, 49999),
+        supabase.from("golfodds_v_latest_dg").select("market_id").in("market_id", marketIds).range(0, 49999),
+        supabase.from("golfodds_v_latest_books").select("market_id, book").in("market_id", marketIds).range(0, 49999),
       ]);
       kalshiCount = (kalshiRes.data || []).length;
       dgCount = (dgRes.data || []).length;

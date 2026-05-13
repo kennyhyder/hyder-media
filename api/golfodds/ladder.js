@@ -36,15 +36,17 @@ export default async function handler(req, res) {
     const { data: markets, error: mErr } = await supabase
       .from("golfodds_markets")
       .select("id, player_id, market_type, golfodds_players(id, name, dg_id, owgr_rank)")
-      .eq("tournament_id", tournamentId);
+      .eq("tournament_id", tournamentId)
+      .range(0, 9999);
     if (mErr) return res.status(500).json({ error: mErr.message });
     if (!markets?.length) return res.status(200).json({ players: [] });
 
     const marketIds = markets.map((m) => m.id);
+    // Supabase REST caps at 1000 rows per query by default; override with range.
     const [kalshiRes, dgRes, bookRes] = await Promise.all([
-      supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob").in("market_id", marketIds),
-      supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob").in("market_id", marketIds),
-      supabase.from("golfodds_v_latest_books").select("market_id, novig_prob").in("market_id", marketIds),
+      supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob").in("market_id", marketIds).range(0, 49999),
+      supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob").in("market_id", marketIds).range(0, 49999),
+      supabase.from("golfodds_v_latest_books").select("market_id, novig_prob").in("market_id", marketIds).range(0, 49999),
     ]);
     const k = new Map((kalshiRes.data || []).map((r) => [r.market_id, r.implied_prob]));
     const d = new Map((dgRes.data || []).map((r) => [r.market_id, r.dg_prob]));
