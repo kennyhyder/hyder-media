@@ -83,7 +83,7 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted-foreground mb-3">
                 Live ingestion every 5 min. {tier === "free" ? "Free tier shows winner lines only." : "All markets available."}
               </p>
-              <Link href="/golf" className={buttonVariants({ variant: "outline" })}>Open golf dashboard</Link>
+              <Link href="/golf" className={`${buttonVariants()} bg-emerald-600 hover:bg-emerald-500 text-white`}>Open golf dashboard</Link>
             </CardContent>
           </Card>
         </div>
