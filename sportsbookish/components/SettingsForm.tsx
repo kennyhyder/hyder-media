@@ -8,6 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
+function ThresholdRow({ label, type }: { label: string; type: string }) {
+  return (
+    <div className="contents">
+      <div className="text-sm pt-1.5">{label}</div>
+      <div className="flex items-center gap-1 text-xs">
+        <Input type="number" step="0.5" defaultValue={type === "movement" ? "3" : "3"} className="w-16 h-8" />
+        <span className="text-muted-foreground">%</span>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   tier: "pro" | "elite" | string;
   initial: {
@@ -159,44 +171,69 @@ export default function SettingsForm({ tier, initial, allBooks }: Props) {
       </Card>
 
       {tier === "elite" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Alert delivery</CardTitle>
-            <CardDescription>Where edge alerts get sent.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              {(["email", "sms"] as const).map((ch) => (
-                <label key={ch} className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer ${
-                  channels.has(ch) ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-200" : "border-border"
-                }`}>
-                  <input
-                    type="checkbox"
-                    checked={channels.has(ch)}
-                    onChange={() => toggleChannel(ch)}
-                    className="accent-emerald-500"
-                  />
-                  <span className="text-sm capitalize">{ch}</span>
-                </label>
-              ))}
-            </div>
-            {channels.has("sms") && (
-              <div>
-                <Label htmlFor="sms">Mobile (E.164)</Label>
-                <Input
-                  id="sms"
-                  type="tel"
-                  placeholder="+18085551234"
-                  value={smsPhone}
-                  onChange={(e) => setSmsPhone(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  SMS sent via Twilio. Standard message rates apply (you&apos;ll pay $0 — this is on us).
-                </p>
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Alert delivery</CardTitle>
+              <CardDescription>Where edge + movement alerts get sent.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap gap-3">
+                {(["email", "sms"] as const).map((ch) => (
+                  <label key={ch} className={`flex items-center gap-2 px-3 py-2 rounded border cursor-pointer ${
+                    channels.has(ch) ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-200" : "border-border"
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={channels.has(ch)}
+                      onChange={() => toggleChannel(ch)}
+                      className="accent-emerald-500"
+                    />
+                    <span className="text-sm capitalize">{ch}</span>
+                  </label>
+                ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+              {channels.has("sms") && (
+                <div>
+                  <Label htmlFor="sms">Mobile (E.164)</Label>
+                  <Input
+                    id="sms"
+                    type="tel"
+                    placeholder="+18085551234"
+                    value={smsPhone}
+                    onChange={(e) => setSmsPhone(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    SMS sent via Twilio. Standard message rates apply (you&apos;ll pay $0 — this is on us).
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Custom alert thresholds</CardTitle>
+              <CardDescription>
+                Override default thresholds per market type. Higher buy edge → fewer but stronger alerts. Movement uses absolute deltas.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground col-span-2">Edge thresholds (golf only — requires book overlay)</div>
+                <ThresholdRow label="Win / outright" type="win" />
+                <ThresholdRow label="Top 5/10/20" type="topN" />
+                <ThresholdRow label="Make cut" type="mc" />
+                <ThresholdRow label="Matchups" type="matchup" />
+                <div className="text-xs uppercase tracking-wide text-muted-foreground col-span-2 mt-2">Movement threshold (any sport)</div>
+                <ThresholdRow label="Sport movement in 15 min" type="movement" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                These are coming-soon — UI saves to your profile but the detector still uses defaults for now (3% buy / 5% sell on golf, 3% movement on sports).
+              </p>
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {tier !== "elite" && (
