@@ -88,11 +88,22 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-10 rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            🚧 The golf data view, alerts feed, and player detail pages are being migrated here from the legacy{" "}
-            <Link href="https://hyder.me/golfodds" className="underline">hyder.me/golfodds</Link> — coming in the next push.
-          </p>
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Link href="/golf" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+            <div className="text-xs uppercase text-muted-foreground mb-1">Golf</div>
+            <div className="font-semibold">Tournaments & lines</div>
+            <div className="text-xs text-muted-foreground mt-1">PGA Championship live now</div>
+          </Link>
+          <Link href={tier === "elite" ? "/alerts" : "/pricing"} className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition relative">
+            <div className="text-xs uppercase text-muted-foreground mb-1">Alerts</div>
+            <div className="font-semibold flex items-center gap-2">Live edge feed {tier !== "elite" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>}</div>
+            <div className="text-xs text-muted-foreground mt-1">Email + SMS when thresholds cross</div>
+          </Link>
+          <Link href="/settings" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+            <div className="text-xs uppercase text-muted-foreground mb-1">Settings</div>
+            <div className="font-semibold flex items-center gap-2">Preferences {tier === "free" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Pro</Badge>}</div>
+            <div className="text-xs text-muted-foreground mt-1">Home book · book filter · alert thresholds</div>
+          </Link>
         </div>
       </main>
     </div>

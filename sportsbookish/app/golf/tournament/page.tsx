@@ -8,6 +8,7 @@ import { Lock } from "lucide-react";
 import { fetchTournamentInfo, fetchComparison, computeEdgeForRow, type PlayerComparisonRow } from "@/lib/golf-data";
 import { getCurrentTier, getUserPreferences, canSeeMarket } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
+import TournamentTabs from "@/components/TournamentTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,8 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
       </header>
 
       <main className="container mx-auto max-w-6xl px-4 py-6">
+        <TournamentTabs tournamentId={id} active="outrights" matchupCount={info?.stats.total_matchups} marketCount={info?.stats.total_markets} proRequired={tier === "free"} />
+
         {/* Market type tabs */}
         <div className="flex flex-wrap gap-1 border-b border-border/40 mb-5 pb-1">
           {availableTabs.map((t) => {
@@ -128,7 +131,15 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
                     : "text-muted-foreground";
                   return (
                     <TableRow key={r.player_id}>
-                      <TableCell className="font-medium">{r.player?.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {tier === "free" ? (
+                          <span>{r.player?.name}</span>
+                        ) : (
+                          <Link href={`/golf/tournament/player?id=${id}&player_id=${r.player_id}`} className="hover:text-emerald-400 hover:underline">
+                            {r.player?.name}
+                          </Link>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right tabular-nums text-amber-300">{fmtPct(r.kalshi?.implied_prob)}</TableCell>
                       <TableCell className="text-right tabular-nums text-sky-300">{fmtPct(r.datagolf?.dg_prob)}</TableCell>
                       <TableCell className="text-right tabular-nums">{fmtPct(r.books_median)}</TableCell>
