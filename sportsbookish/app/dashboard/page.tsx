@@ -8,6 +8,7 @@ import { TIER_BY_KEY, type TierKey } from "@/lib/tiers";
 import { LineChart, Settings, LogOut } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { fetchLeagues } from "@/lib/sports-data";
+import { isAdminEmail } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export default async function DashboardPage() {
 
   const tier = (sub?.tier || "free") as TierKey;
   const tierInfo = TIER_BY_KEY[tier];
+  const isAdmin = isAdminEmail(user.email);
 
   return (
     <div className="min-h-screen">
@@ -136,6 +138,24 @@ export default async function DashboardPage() {
               <div className="text-xs text-muted-foreground mt-1">Home book · alerts · billing</div>
             </Link>
           </div>
+
+          {isAdmin && (
+            <>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mt-6 mb-2">Admin</div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <Link href="/admin" className="rounded-lg border border-rose-500/40 bg-rose-500/5 hover:bg-rose-500/10 p-4 transition">
+                  <div className="text-2xl mb-2">👥</div>
+                  <div className="font-semibold">Users</div>
+                  <div className="text-xs text-muted-foreground mt-1">View · change tier · delete</div>
+                </Link>
+                <Link href="/admin/invites" className="rounded-lg border border-rose-500/40 bg-rose-500/5 hover:bg-rose-500/10 p-4 transition">
+                  <div className="text-2xl mb-2">🎁</div>
+                  <div className="font-semibold">Invite codes</div>
+                  <div className="text-xs text-muted-foreground mt-1">Create · disable · track redemptions</div>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>
