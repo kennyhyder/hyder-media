@@ -7,17 +7,23 @@ import { Badge } from "@/components/ui/badge";
 import { TIER_BY_KEY, type TierKey } from "@/lib/tiers";
 import { LineChart, Settings, LogOut } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { fetchLeagues } from "@/lib/sports-data";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: sub } = await supabase
-    .from("sb_subscriptions")
-    .select("tier, status, current_period_end, cancel_at_period_end")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [{ data: sub }, leagues] = await Promise.all([
+    supabase
+      .from("sb_subscriptions")
+      .select("tier, status, current_period_end, cancel_at_period_end")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    fetchLeagues(),
+  ]);
 
   const tier = (sub?.tier || "free") as TierKey;
   const tierInfo = TIER_BY_KEY[tier];
@@ -90,27 +96,46 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Link href="/golf" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
-            <div className="text-2xl mb-2">⛳</div>
-            <div className="font-semibold">Golf</div>
-            <div className="text-xs text-muted-foreground mt-1">PGA Tour · book overlay</div>
-          </Link>
-          <Link href="/sports" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
-            <div className="text-2xl mb-2">🏀⚾🏒⚽</div>
-            <div className="font-semibold">All Sports</div>
-            <div className="text-xs text-muted-foreground mt-1">NBA · MLB · NHL · EPL · MLS</div>
-          </Link>
-          <Link href={tier === "elite" ? "/alerts" : "/pricing"} className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
-            <div className="text-2xl mb-2">⚡</div>
-            <div className="font-semibold flex items-center gap-2">Alerts {tier !== "elite" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>}</div>
-            <div className="text-xs text-muted-foreground mt-1">Live edges via email + SMS</div>
-          </Link>
-          <Link href="/settings" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
-            <div className="text-2xl mb-2">⚙️</div>
-            <div className="font-semibold flex items-center gap-2">Settings {tier === "free" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Pro</Badge>}</div>
-            <div className="text-xs text-muted-foreground mt-1">Home book · alerts · billing</div>
-          </Link>
+        <div className="mt-6">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Sports</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <Link href="/golf" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 hover:border-emerald-500/40 p-4 transition">
+              <div className="text-2xl mb-2">⛳</div>
+              <div className="font-semibold">Golf</div>
+              <div className="text-xs text-muted-foreground mt-1">PGA Tour · DataGolf model</div>
+            </Link>
+            {leagues.map((l) => (
+              <Link key={l.key} href={`/sports/${l.key}`} className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 hover:border-emerald-500/40 p-4 transition">
+                <div className="text-2xl mb-2">{l.icon}</div>
+                <div className="font-semibold">{l.display_name}</div>
+                <div className="text-xs text-muted-foreground mt-1 capitalize">{l.sport_category} · Kalshi + books</div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mt-6 mb-2">Tools</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <Link href="/sports/movers" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+              <div className="text-2xl mb-2">📈</div>
+              <div className="font-semibold">Top movers</div>
+              <div className="text-xs text-muted-foreground mt-1">Recent moves across all sports</div>
+            </Link>
+            <Link href={tier === "elite" ? "/alerts" : "/pricing"} className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+              <div className="text-2xl mb-2">⚡</div>
+              <div className="font-semibold flex items-center gap-2">Alerts {tier !== "elite" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>}</div>
+              <div className="text-xs text-muted-foreground mt-1">Live edges via email + SMS</div>
+            </Link>
+            <Link href="/sports" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+              <div className="text-2xl mb-2">🌐</div>
+              <div className="font-semibold">All sports hub</div>
+              <div className="text-xs text-muted-foreground mt-1">League index</div>
+            </Link>
+            <Link href="/settings" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+              <div className="text-2xl mb-2">⚙️</div>
+              <div className="font-semibold flex items-center gap-2">Settings {tier === "free" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Pro</Badge>}</div>
+              <div className="text-xs text-muted-foreground mt-1">Home book · alerts · billing</div>
+            </Link>
+          </div>
         </div>
       </main>
     </div>
