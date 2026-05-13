@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { LineChart } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function MarketingNav() {
   return (
@@ -14,6 +15,7 @@ export default function MarketingNav() {
           <Link href="/pricing" className={buttonVariants({ variant: "ghost", size: "sm" })}>Pricing</Link>
           <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>Log in</Link>
           <Link href="/signup" className={`${buttonVariants({ size: "sm" })} bg-emerald-600 hover:bg-emerald-500 text-white`}>Start free</Link>
+          <ThemeToggle compact />
         </nav>
       </div>
     </header>

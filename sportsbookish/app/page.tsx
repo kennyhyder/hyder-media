@@ -24,7 +24,7 @@ export default function Home() {
             </span>{" "}
             and the books — live.
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-400">
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
             Compare every event-contract price on Kalshi against sportsbook consensus every 5 minutes.
             Get alerted the moment a mispricing crosses your threshold across golf, NBA, MLB, NHL, and soccer.
           </p>
@@ -70,7 +70,7 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl px-4 py-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Simple, honest pricing</h2>
-            <p className="mt-2 text-neutral-400">Cancel anytime. No long-term commitment.</p>
+            <p className="mt-2 text-muted-foreground">Cancel anytime. No long-term commitment.</p>
           </div>
           <PricingCards />
         </div>
@@ -78,7 +78,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-border/40">
-        <div className="container mx-auto max-w-6xl px-4 py-8 text-sm text-neutral-500 flex flex-col md:flex-row items-center justify-between gap-2">
+        <div className="container mx-auto max-w-6xl px-4 py-8 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-2">
           <div>© 2026 SportsBookish — built by Hyder Media</div>
           <div className="flex items-center gap-4">
             <Link href="/pricing" className="hover:text-foreground">Pricing</Link>
@@ -103,7 +103,7 @@ function Feature({
     <div>
       <div className="mb-3">{icon}</div>
       <h3 className="mb-1 text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-neutral-400">{body}</p>
+      <p className="text-sm text-muted-foreground">{body}</p>
     </div>
   );
 }

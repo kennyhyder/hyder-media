@@ -13,7 +13,7 @@ interface Props {
 
 export default function PriceSpark({ points, width = 120, height = 32, className = "", stroke = "currentColor" }: Props) {
   if (!points || points.length < 2) {
-    return <div className={`text-[10px] text-neutral-600 italic ${className}`}>insufficient history</div>;
+    return <div className={`text-[10px] text-muted-foreground/60 italic ${className}`}>insufficient history</div>;
   }
   const xs = points.map((_, i) => i);
   const ys = points.map((p) => p.p);

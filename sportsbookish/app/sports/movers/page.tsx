@@ -43,7 +43,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href="/sports" className="text-sm text-neutral-500 hover:text-neutral-300">← Sports</Link>
+          <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground/80">← Sports</Link>
           <div className="flex items-center gap-2 font-semibold text-sm">
             <TrendingUp className="h-4 w-4 text-emerald-500" />
             <span>Top Movers</span>
@@ -55,22 +55,22 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
       <main className="container mx-auto max-w-6xl px-4 py-6">
         <div className="flex flex-wrap items-center gap-3 mb-5 text-sm">
           <div className="flex items-center gap-1">
-            <Link href="/sports/movers" className={`px-3 py-1 text-xs rounded ${!league ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40" : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/70"}`}>All sports</Link>
+            <Link href="/sports/movers" className={`px-3 py-1 text-xs rounded ${!league ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>All sports</Link>
             {leagues.map((l) => (
-              <Link key={l.key} href={`/sports/movers?league=${l.key}`} className={`px-3 py-1 text-xs rounded ${league === l.key ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40" : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/70"}`}>
+              <Link key={l.key} href={`/sports/movers?league=${l.key}`} className={`px-3 py-1 text-xs rounded ${league === l.key ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>
                 {l.icon} {l.display_name}
               </Link>
             ))}
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs text-neutral-500 mr-1">Last:</span>
+            <span className="text-xs text-muted-foreground mr-1">Last:</span>
             {[1, 6, 24, 72, 168].map((h) => (
-              <Link key={h} href={`/sports/movers?${league ? `league=${league}&` : ""}hours=${h}`} className={`px-2 py-1 text-xs rounded ${hours === h ? "bg-amber-500/15 text-amber-300" : "text-neutral-400 hover:text-neutral-200"}`}>
+              <Link key={h} href={`/sports/movers?${league ? `league=${league}&` : ""}hours=${h}`} className={`px-2 py-1 text-xs rounded ${hours === h ? "bg-amber-500/15 text-amber-300" : "text-muted-foreground hover:text-foreground"}`}>
                 {h < 24 ? `${h}h` : `${h / 24}d`}
               </Link>
             ))}
           </div>
-          <div className="ml-auto text-xs text-neutral-500">{movements.length} moves (≥{tier === "free" ? "5" : "2"}%)</div>
+          <div className="ml-auto text-xs text-muted-foreground">{movements.length} moves (≥{tier === "free" ? "5" : "2"}%)</div>
         </div>
 
         {tier === "free" && (
@@ -85,7 +85,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
               <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="h-4 w-4 text-emerald-400" /> Up moves ({ups.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-0 divide-y divide-border/40 max-h-[600px] overflow-y-auto">
-              {ups.length === 0 && <div className="text-center text-neutral-500 py-6">No qualifying moves in window.</div>}
+              {ups.length === 0 && <div className="text-center text-muted-foreground py-6">No qualifying moves in window.</div>}
               {ups.map((m) => <MoveRow key={m.id} m={m} />)}
             </CardContent>
           </Card>
@@ -94,7 +94,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
               <CardTitle className="text-sm flex items-center gap-2"><TrendingDown className="h-4 w-4 text-rose-400" /> Down moves ({downs.length})</CardTitle>
             </CardHeader>
             <CardContent className="p-0 divide-y divide-border/40 max-h-[600px] overflow-y-auto">
-              {downs.length === 0 && <div className="text-center text-neutral-500 py-6">No qualifying moves in window.</div>}
+              {downs.length === 0 && <div className="text-center text-muted-foreground py-6">No qualifying moves in window.</div>}
               {downs.map((m) => <MoveRow key={m.id} m={m} />)}
             </CardContent>
           </Card>
@@ -107,21 +107,21 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
 function MoveRow({ m }: { m: import("@/lib/movements-data").Movement }) {
   const isUp = m.direction === "up";
   return (
-    <Link href={`/sports/${m.league}/event/${m.event_id}`} className="block px-4 py-3 hover:bg-neutral-900/40">
+    <Link href={`/sports/${m.league}/event/${m.event_id}`} className="block px-4 py-3 hover:bg-muted/40">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-sm">{SPORT_ICON[m.league] || "🎯"}</span>
-            <span className="text-xs uppercase text-neutral-500">{m.league}</span>
-            <span className="text-[10px] text-neutral-600">·</span>
-            <span className="text-[10px] text-neutral-600">{timeAgo(m.fired_at)}</span>
+            <span className="text-xs uppercase text-muted-foreground">{m.league}</span>
+            <span className="text-[10px] text-muted-foreground/60">·</span>
+            <span className="text-[10px] text-muted-foreground/60">{timeAgo(m.fired_at)}</span>
           </div>
           <div className="font-semibold text-sm truncate">{m.contestant_label}</div>
-          <div className="text-xs text-neutral-500 truncate">{m.event_title}</div>
+          <div className="text-xs text-muted-foreground truncate">{m.event_title}</div>
         </div>
         <div className="text-right shrink-0">
           <div className={`text-lg font-bold tabular-nums ${isUp ? "text-emerald-400" : "text-rose-400"}`}>{fmtPctSigned(m.delta)}</div>
-          <div className="text-[10px] text-neutral-500 tabular-nums">{(m.prob_baseline * 100).toFixed(1)}% → {(m.prob_now * 100).toFixed(1)}%</div>
+          <div className="text-[10px] text-muted-foreground tabular-nums">{(m.prob_baseline * 100).toFixed(1)}% → {(m.prob_now * 100).toFixed(1)}%</div>
         </div>
       </div>
     </Link>

@@ -2,16 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { buttonVariants } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { fetchTournamentInfo, fetchComparison, computeEdgeForRow, type PlayerComparisonRow } from "@/lib/golf-data";
 import { getCurrentTier, getUserPreferences, canSeeMarket } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
-import { MARKET_LABELS, fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass, edgeBgClass } from "@/lib/format";
+import { MARKET_LABELS, bookLabel } from "@/lib/format";
 import MarketTabs from "@/components/MarketTabs";
 import BestBetsCards from "@/components/BestBetsCards";
 import TournamentTabs from "@/components/TournamentTabs";
+import OutrightTable from "@/components/OutrightTable";
 
 export const dynamic = "force-dynamic";
 
@@ -67,13 +67,13 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4">
-          <Link href="/golf" className="text-sm text-neutral-500 hover:text-neutral-300">← Tournaments</Link>
+          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground">← Tournaments</Link>
           <div className="flex items-center gap-2 font-semibold text-sm">
             <span>⛳</span>
             <span>{info?.tournament?.name || "Tournament"}</span>
-            {info?.tournament?.is_major && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Major</Badge>}
+            {info?.tournament?.is_major && <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20">Major</Badge>}
           </div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          <Badge variant="outline" className="border-emerald-500/40 text-emerald-500">{tierInfo.name}</Badge>
         </div>
       </header>
 
@@ -111,98 +111,49 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-neutral-400">
-              {MARKET_LABELS[mt] || mt} · {rows.length} players · Edge vs <span className="text-emerald-400">{referenceLabel}</span>
-              {!isPaidTier && <span className="ml-3 text-amber-400 text-xs">Free tier — showing 5 of {books.length} books. <Link href="/pricing" className="underline hover:text-amber-300">Upgrade for all</Link></span>}
+            <CardTitle className="text-sm font-normal text-muted-foreground">
+              {MARKET_LABELS[mt] || mt} · {rows.length} players · Edge vs <span className="text-emerald-500">{referenceLabel}</span>
+              {!isPaidTier && <span className="ml-3 text-amber-500 text-xs">Free tier — showing 5 of {books.length} books. <Link href="/pricing" className="underline hover:text-amber-400">Upgrade for all</Link></span>}
+              <span className="ml-3 text-muted-foreground/70 text-xs">Click any column header to sort.</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="text-right text-amber-400">Kalshi</TableHead>
-                  <TableHead className="text-right text-sky-400">DG</TableHead>
-                  <TableHead className="text-right">Books med</TableHead>
-                  <TableHead className="text-right">Buy edge</TableHead>
-                  <TableHead className="text-right">vs DG</TableHead>
-                  <TableHead className="text-right">vs best book</TableHead>
-                  {visibleBooks.map((b) => (
-                    <TableHead key={b} className="text-right text-xs" title={bookLabel(b)}>{bookLabel(b)}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((r) => {
-                  const userEdge = r._user_edge.edge;
-                  const dgEdge = r.edge_vs_dg;
-                  const bestEdge = r.edge_vs_best_book;
-                  return (
-                    <TableRow key={r.player_id}>
-                      <TableCell className="font-medium whitespace-nowrap">
-                        {isPaidTier ? (
-                          <Link href={`/golf/tournament/player?id=${id}&player_id=${r.player_id}`} className="hover:text-emerald-400 hover:underline">
-                            {r.player?.name}
-                          </Link>
-                        ) : (
-                          <span>{r.player?.name}</span>
-                        )}
-                        {r.kalshi?.implied_prob != null && <span className="ml-2 text-[10px] text-amber-400/70">●K</span>}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums text-amber-300">{fmtPct(r.kalshi?.implied_prob)}</TableCell>
-                      <TableCell className="text-right tabular-nums text-sky-300">{fmtPct(r.datagolf?.dg_prob)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{fmtPct(r.books_median)}</TableCell>
-                      <TableCell className={`text-right tabular-nums ${edgeTextClass(userEdge)} ${edgeBgClass(userEdge)}`}>
-                        {fmtPctSigned(userEdge)}
-                      </TableCell>
-                      <TableCell className={`text-right tabular-nums ${edgeTextClass(dgEdge)}`}>{fmtPctSigned(dgEdge)}</TableCell>
-                      <TableCell className={`text-right tabular-nums ${edgeTextClass(bestEdge)}`}>
-                        {fmtPctSigned(bestEdge)}
-                        {r.best_book_for_bet && (
-                          <div className="text-[10px] text-neutral-500">
-                            {bookLabel(r.best_book_for_bet.book)} {fmtAmerican(r.best_book_for_bet.price_american)}
-                          </div>
-                        )}
-                      </TableCell>
-                      {visibleBooks.map((b) => {
-                        const px = r.book_prices[b];
-                        return (
-                          <TableCell key={b} className="text-right tabular-nums text-neutral-400">
-                            {px ? (
-                              <span title={`american ${fmtAmerican(px.american)}, no-vig ${fmtPct(px.novig)}`}>
-                                {fmtPct(px.novig)}
-                              </span>
-                            ) : (
-                              <span className="text-neutral-700">—</span>
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-                {rows.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={visibleBooks.length + 7} className="text-center py-8 text-neutral-500">
-                      No data for this market type. Kalshi T5/T10/T20 coverage is inconsistent outside majors.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <OutrightTable
+              tournamentId={id}
+              books={visibleBooks}
+              isPaidTier={isPaidTier}
+              rows={rows.map((r) => ({
+                player_id: r.player_id,
+                player: r.player,
+                kalshi: r.kalshi ? { implied_prob: r.kalshi.implied_prob } : null,
+                datagolf: r.datagolf ? { dg_prob: r.datagolf.dg_prob } : null,
+                books_median: r.books_median,
+                books_min: r.books_min,
+                book_count: r.book_count,
+                edge_vs_books_median: r.edge_vs_books_median,
+                edge_vs_dg: r.edge_vs_dg,
+                edge_vs_best_book: r.edge_vs_best_book,
+                best_book_for_bet: r.best_book_for_bet,
+                book_prices: Object.fromEntries(
+                  Object.entries(r.book_prices).map(([k, v]) => [k, { american: v.american, novig: v.novig }])
+                ),
+                user_edge: r._user_edge.edge,
+                user_reference: r._user_edge.reference,
+              }))}
+            />
           </CardContent>
         </Card>
 
-        <div className="mt-4 text-xs text-neutral-500 space-y-1">
+        <div className="mt-4 text-xs text-muted-foreground space-y-1">
           <p>
-            <span className="text-amber-300">Kalshi</span> = implied prob from bid/ask mid (or last trade if spread wide).{" "}
-            <span className="text-sky-300">DG</span> = DataGolf model baseline.{" "}
-            <span className="text-neutral-300">Books</span> = de-vigged implied prob per book.
+            <span className="text-amber-500">Kalshi</span> = implied prob from bid/ask mid (or last trade if spread wide).{" "}
+            <span className="text-sky-500">DG</span> = DataGolf model baseline.{" "}
+            <span className="text-foreground/80">Books</span> = de-vigged implied prob per book.
           </p>
           <p>
-            <strong className="text-neutral-300">Buy edge = reference − Kalshi.</strong>{" "}
-            <span className="text-emerald-300">Positive (green)</span> = Kalshi cheaper than reference → good <strong>buy</strong>.{" "}
-            <span className="text-rose-300">Negative (red)</span> = Kalshi overpriced → <strong>sell</strong> or bet at the books.{" "}
+            <strong className="text-foreground">Buy edge = reference − Kalshi.</strong>{" "}
+            <span className="text-emerald-500">Positive (green)</span> = Kalshi cheaper than reference → good <strong>buy</strong>.{" "}
+            <span className="text-rose-500">Negative (red)</span> = Kalshi overpriced → <strong>sell</strong> or bet at the books.{" "}
             &ldquo;Edge vs best&rdquo; compares Kalshi to the book offering the longest American odds.
           </p>
         </div>
@@ -212,10 +163,10 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
 }
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: "kalshi" | "dg" }) {
-  const cls = tone === "kalshi" ? "text-amber-300" : tone === "dg" ? "text-sky-300" : "text-neutral-100";
+  const cls = tone === "kalshi" ? "text-amber-500" : tone === "dg" ? "text-sky-500" : "text-foreground";
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded px-3 py-2">
-      <div className="text-[10px] uppercase tracking-wide text-neutral-500">{label}</div>
+    <div className="bg-card border border-border rounded px-3 py-2">
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className={`text-lg font-semibold tabular-nums ${cls}`}>{value}</div>
     </div>
   );
@@ -227,12 +178,12 @@ function Locked({ tier, marketType, tournamentId }: { tier: string; marketType: 
       <Card className="max-w-md w-full text-center">
         <CardHeader>
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
-            <Lock className="h-6 w-6 text-amber-400" />
+            <Lock className="h-6 w-6 text-amber-500" />
           </div>
           <CardTitle>{MARKET_LABELS[marketType] || marketType} is a Pro-only market</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-muted-foreground">
             You&apos;re on the <strong>{tier}</strong> plan, which includes only the Win market. Upgrade to Pro ($19/mo) for all 17+ market types, per-book pricing, player detail, matchups, and props.
           </p>
           <div className="flex gap-2 justify-center">

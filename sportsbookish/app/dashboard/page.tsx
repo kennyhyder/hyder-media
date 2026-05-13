@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TIER_BY_KEY, type TierKey } from "@/lib/tiers";
 import { LineChart, Settings, LogOut } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -36,6 +37,7 @@ export default async function DashboardPage() {
             <Link href="/settings" className={buttonVariants({ variant: "ghost", size: "sm" })}>
               <Settings className="h-4 w-4" />
             </Link>
+            <ThemeToggle compact />
             <form action="/api/auth/signout" method="post">
               <Button type="submit" variant="ghost" size="sm">
                 <LogOut className="h-4 w-4" />

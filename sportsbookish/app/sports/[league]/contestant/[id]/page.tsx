@@ -38,7 +38,7 @@ export default async function ContestantPage({ params }: { params: Promise<{ lea
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <Link href={`/sports/${league}`} className="text-sm text-neutral-500 hover:text-neutral-300">← {meta.display_name}</Link>
+          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {meta.display_name}</Link>
           <div className="flex items-center gap-1 font-semibold text-sm">
             <span>{meta.icon}</span>
             <span>{data.contestant.name}</span>
@@ -53,7 +53,7 @@ export default async function ContestantPage({ params }: { params: Promise<{ lea
             <span className="text-4xl">{meta.icon}</span>
             <span>{data.contestant.name}</span>
           </h1>
-          <div className="text-sm text-neutral-500 mt-1">{meta.display_name} · {data.markets.length} active markets</div>
+          <div className="text-sm text-muted-foreground mt-1">{meta.display_name} · {data.markets.length} active markets</div>
         </div>
 
         {order.map((type) => {
@@ -61,7 +61,7 @@ export default async function ContestantPage({ params }: { params: Promise<{ lea
           if (!list?.length) return null;
           return (
             <section key={type} className="mb-6">
-              <h2 className="text-xs uppercase tracking-wide text-neutral-500 mb-2">{EVENT_TYPE_LABEL[type] || type}</h2>
+              <h2 className="text-xs uppercase tracking-wide text-muted-foreground mb-2">{EVENT_TYPE_LABEL[type] || type}</h2>
               <div className="space-y-2">
                 {list.map((m) => (
                   <Link key={m.market_id} href={`/sports/${league}/event/${m.event.id}`} className="block">
@@ -69,12 +69,12 @@ export default async function ContestantPage({ params }: { params: Promise<{ lea
                       <CardContent className="p-4 flex items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-sm truncate">{m.event.title}</div>
-                          {m.event.start_time && <div className="text-xs text-neutral-500 mt-0.5">{new Date(m.event.start_time).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</div>}
+                          {m.event.start_time && <div className="text-xs text-muted-foreground mt-0.5">{new Date(m.event.start_time).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</div>}
                         </div>
                         <div className="text-right shrink-0">
                           <div className="text-2xl font-bold tabular-nums text-amber-300">{fmtPct(m.implied_prob)}</div>
                           {m.yes_bid != null && m.yes_ask != null && (
-                            <div className="text-[10px] text-neutral-500 tabular-nums">{(m.yes_bid * 100).toFixed(0)}¢/{(m.yes_ask * 100).toFixed(0)}¢</div>
+                            <div className="text-[10px] text-muted-foreground tabular-nums">{(m.yes_bid * 100).toFixed(0)}¢/{(m.yes_ask * 100).toFixed(0)}¢</div>
                           )}
                         </div>
                       </CardContent>

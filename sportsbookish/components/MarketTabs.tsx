@@ -18,7 +18,7 @@ export default function MarketTabs({ tournamentId, active, available = {}, kalsh
         if (visible.length === 0) return null;
         return (
           <div key={group.label} className="flex flex-wrap items-center gap-1">
-            <span className="text-[10px] uppercase tracking-wide text-neutral-600 w-24 shrink-0">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground/60 w-24 shrink-0">
               {group.label}
             </span>
             {visible.map((mt) => {
@@ -36,8 +36,8 @@ export default function MarketTabs({ tournamentId, active, available = {}, kalsh
                     isActive
                       ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
                       : locked
-                        ? "text-neutral-600 hover:text-neutral-400"
-                        : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/70",
+                        ? "text-muted-foreground/60 hover:text-muted-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted",
                   ].join(" ")}
                   title={locked ? "Pro+ feature" : `${total} markets${kalshi ? `, ${kalshi} with Kalshi` : ""}`}
                 >
