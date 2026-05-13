@@ -9,7 +9,7 @@ export default function MarketingNav() {
       <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <LineChart className="h-5 w-5 text-emerald-500" />
-          <span className="text-lg tracking-tight">SportsBookish</span>
+          <span className="text-lg tracking-tight">SportsBook<span className="text-emerald-500">ISH</span></span>
         </Link>
         <nav className="flex items-center gap-1">
           <Link href="/pricing" className={buttonVariants({ variant: "ghost", size: "sm" })}>Pricing</Link>

@@ -34,7 +34,7 @@ export default async function DashboardPage() {
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <LineChart className="h-5 w-5 text-emerald-500" />
-            <span className="text-lg tracking-tight">SportsBookish</span>
+            <span className="text-lg tracking-tight">SportsBook<span className="text-emerald-500">ISH</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">

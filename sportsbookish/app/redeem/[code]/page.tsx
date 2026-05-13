@@ -87,7 +87,7 @@ export default async function RedeemPage({ params }: { params: Promise<{ code: s
         </Card>
         <div className="text-center mt-4">
           <Link href="/" className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-            <LineChart className="h-3 w-3" /> SportsBookish
+            <LineChart className="h-3 w-3" /> SportsBook<span className="text-emerald-500">ISH</span>
           </Link>
         </div>
       </main>
