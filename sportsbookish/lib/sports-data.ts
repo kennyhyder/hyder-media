@@ -1,7 +1,8 @@
-// Server-side data access for team sports — reads from the sports_* tables
-// directly via Supabase (no intermediate API on hyder.me yet for sports).
+// Server-side data access for team sports. Fetches via hyder.me/api/sports/*
+// instead of querying Supabase directly — this keeps SportsBookish auth/users
+// isolated from the data-plane Supabase project.
 
-import { createServiceClient } from "@/lib/supabase/server";
+const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
 
 export interface League {
   key: string;
@@ -14,13 +15,10 @@ export interface League {
 }
 
 export async function fetchLeagues(): Promise<League[]> {
-  const supabase = createServiceClient();
-  const { data } = await supabase
-    .from("sports_leagues")
-    .select("key, display_name, sport_category, icon, accent_color, active, display_order")
-    .eq("active", true)
-    .order("display_order", { ascending: true });
-  return data || [];
+  const r = await fetch(`${DATA_HOST}/api/sports/leagues`, { next: { revalidate: 60 } });
+  if (!r.ok) return [];
+  const data = await r.json();
+  return data.leagues || [];
 }
 
 export interface SportsEvent {
@@ -35,15 +33,10 @@ export interface SportsEvent {
 }
 
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {
-  const supabase = createServiceClient();
-  const { data } = await supabase
-    .from("sports_events")
-    .select("id, league, event_type, title, short_title, start_time, status, kalshi_event_ticker")
-    .eq("league", league)
-    .eq("status", "open")
-    .order("start_time", { ascending: true, nullsFirst: false })
-    .range(0, 199);
-  return data || [];
+  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open`, { next: { revalidate: 30 } });
+  if (!r.ok) return [];
+  const data = await r.json();
+  return data.events || [];
 }
 
 export interface MarketRow {
@@ -64,41 +57,7 @@ export interface EventDetail {
 }
 
 export async function fetchEventDetail(eventId: string): Promise<EventDetail | null> {
-  const supabase = createServiceClient();
-  const { data: event } = await supabase
-    .from("sports_events")
-    .select("id, league, event_type, title, short_title, start_time, status, kalshi_event_ticker")
-    .eq("id", eventId)
-    .maybeSingle();
-  if (!event) return null;
-
-  const { data: markets } = await supabase
-    .from("sports_markets")
-    .select("id, contestant_label, market_type, kalshi_ticker")
-    .eq("event_id", eventId);
-  if (!markets?.length) return { event, markets: [] };
-
-  const ids = markets.map((m) => m.id);
-  const { data: quotes } = await supabase
-    .from("sports_v_latest_quotes")
-    .select("market_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at")
-    .in("market_id", ids);
-  const qByMarket = new Map((quotes || []).map((q) => [q.market_id, q]));
-
-  const enriched: MarketRow[] = markets.map((m) => {
-    const q = qByMarket.get(m.id);
-    return {
-      id: m.id,
-      contestant_label: m.contestant_label,
-      market_type: m.market_type,
-      kalshi_ticker: m.kalshi_ticker,
-      implied_prob: q?.implied_prob ?? null,
-      yes_bid: q?.yes_bid ?? null,
-      yes_ask: q?.yes_ask ?? null,
-      last_price: q?.last_price ?? null,
-      fetched_at: q?.fetched_at ?? null,
-    };
-  });
-  enriched.sort((a, b) => (b.implied_prob ?? 0) - (a.implied_prob ?? 0));
-  return { event, markets: enriched };
+  const r = await fetch(`${DATA_HOST}/api/sports/event?id=${eventId}`, { next: { revalidate: 15 } });
+  if (!r.ok) return null;
+  return r.json();
 }
