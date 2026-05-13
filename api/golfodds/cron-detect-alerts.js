@@ -114,6 +114,44 @@ async function detectForTournament(supabase, tournament) {
   return { newAlerts };
 }
 
+async function sendSMSAlerts(supabase, alerts) {
+  // Find Elite users with sms_phone set + sms channel enabled, send each a digest
+  const { data: eliteUsers } = await supabase
+    .from("sb_subscriptions")
+    .select("user_id, tier, sb_user_preferences(sms_phone, notification_channels)")
+    .eq("tier", "elite")
+    .eq("status", "active");
+  if (!eliteUsers?.length) return { sent: 0 };
+
+  const SID = process.env.AG2020_TWILIO_ACCOUNT_SID;
+  const TOKEN = process.env.AG2020_TWILIO_AUTH_TOKEN;
+  const FROM = process.env.AG2020_TWILIO_FROM_NUMBER;
+  if (!SID || !TOKEN || !FROM) return { sent: 0, reason: "twilio not configured" };
+
+  let sent = 0;
+  for (const user of eliteUsers) {
+    const prefs = user.sb_user_preferences;
+    if (!prefs?.sms_phone) continue;
+    if (!prefs?.notification_channels?.includes("sms")) continue;
+    const top = alerts.slice(0, 3);
+    const body = `SportsBookish: ${alerts.length} new edge${alerts.length === 1 ? "" : "s"}.\n` +
+      top.map((a) => `${a._player_name} ${a.market_type} ${a.direction === "buy" ? "+" : ""}${(a.edge_value * 100).toFixed(1)}%`).join("\n") +
+      (alerts.length > 3 ? `\n+${alerts.length - 3} more at hyder.me/golfodds/alerts` : "");
+    try {
+      const url = `https://api.twilio.com/2010-04-01/Accounts/${SID}/Messages.json`;
+      const auth = Buffer.from(`${SID}:${TOKEN}`).toString("base64");
+      const params = new URLSearchParams({ To: prefs.sms_phone, From: FROM, Body: body.slice(0, 320) });
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
+      if (r.ok) sent++;
+    } catch {}
+  }
+  return { sent };
+}
+
 async function sendEmail(alerts) {
   if (!process.env.RESEND_API_KEY) return { sent: false, reason: "no RESEND_API_KEY" };
   if (!process.env.ALERT_EMAIL_TO) return { sent: false, reason: "no ALERT_EMAIL_TO" };
@@ -206,16 +244,16 @@ export default async function handler(req, res) {
     else inserted = rows.length;
   }
 
-  // Email batch
+  // Email batch (admin/owner)
   let emailResult = { sent: false, reason: "no new alerts" };
+  let smsResult = { sent: 0 };
   if (allNewAlerts.length > 0) {
     emailResult = await sendEmail(allNewAlerts);
+    smsResult = await sendSMSAlerts(supabase, allNewAlerts);
     if (emailResult.sent) {
-      const ids = allNewAlerts.map((a) => `${a.player_id}|${a.market_type}|${a.direction}`);
-      // Mark as notified — using the firing-time window since we just inserted them
       await supabase
         .from("golfodds_alerts")
-        .update({ notified_at: new Date().toISOString(), notification_channel: "email" })
+        .update({ notified_at: new Date().toISOString(), notification_channel: smsResult.sent > 0 ? "email+sms" : "email" })
         .gte("fired_at", startedAt);
     }
   }
@@ -237,5 +275,6 @@ export default async function handler(req, res) {
     finished_at: new Date().toISOString(),
     new_alerts: inserted,
     email: emailResult,
+    sms: smsResult,
   });
 }

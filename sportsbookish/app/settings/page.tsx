@@ -37,6 +37,15 @@ export default async function SettingsPage() {
             <CardTitle>Account</CardTitle>
             <CardDescription>{email}</CardDescription>
           </CardHeader>
+          {tier !== "free" && (
+            <CardContent>
+              <form action="/api/stripe/portal" method="post">
+                <button type="submit" className={`${buttonVariants({ variant: "outline" })}`}>
+                  Manage subscription / billing
+                </button>
+              </form>
+            </CardContent>
+          )}
         </Card>
 
         {tier === "free" ? (

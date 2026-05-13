@@ -6,7 +6,10 @@
   "crons": [
     { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
     { "path": "/api/golfodds/cron-ingest-datagolf", "schedule": "*/10 * * * *" },
-    { "path": "/api/golfodds/cron-detect-alerts",   "schedule": "*/5 * * * *" }
+    { "path": "/api/golfodds/cron-detect-alerts",   "schedule": "*/5 * * * *" },
+    { "path": "/api/sports/cron-ingest",            "schedule": "*/5 * * * *" },
+    { "path": "/api/sports/cron-detect-movements",  "schedule": "*/5 * * * *" },
+    { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" }
   ],
   "functions": {
     "api/*.js": { "maxDuration": 10 },
@@ -23,6 +26,7 @@
     "api/ga4/**/*.js": { "maxDuration": 60 },
     "api/vita-brevis/**/*.js": { "maxDuration": 30 },
     "api/tiktok-ads/**/*.js": { "maxDuration": 30 },
-    "api/golfodds/**/*.js": { "maxDuration": 300 }
+    "api/golfodds/**/*.js": { "maxDuration": 300 },
+    "api/sports/**/*.js": { "maxDuration": 300 }
   }
 }
