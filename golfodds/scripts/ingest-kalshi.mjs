@@ -21,15 +21,36 @@ import WebSocket from "ws";
 const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
 
 // Kalshi splits golf markets across distinct series per market type.
-// `KXPGATOUR` is just the outright winner; T5/T10/T20/MC each live in their
-// own series. Each event under these has per-golfer Yes/No binaries, but the
-// event_ticker for the same tournament shares a suffix (e.g. `-PGC26`).
+// `KXPGATOUR` is just the outright winner; every other line lives in its own
+// series. Each event has per-golfer Yes/No binaries, and the event_ticker
+// for the same tournament shares a suffix (e.g. `-PGC26`).
+//
+// All series here are per-golfer binary in shape (Yes = the named golfer
+// achieves the outcome). Multi-outcome markets (cut line, winning score,
+// matchups) need a separate data model and are handled elsewhere.
 const KALSHI_SERIES = [
-  { ticker: "KXPGATOUR",    marketType: "win", isWinner: true  },
-  { ticker: "KXPGATOP5",    marketType: "t5",  isWinner: false },
-  { ticker: "KXPGATOP10",   marketType: "t10", isWinner: false },
-  { ticker: "KXPGATOP20",   marketType: "t20", isWinner: false },
-  { ticker: "KXPGAMAKECUT", marketType: "mc",  isWinner: false },
+  // Pre-tournament outrights
+  { ticker: "KXPGATOUR",      marketType: "win",     isWinner: true  },
+  { ticker: "KXPGATOP5",      marketType: "t5",      isWinner: false },
+  { ticker: "KXPGATOP10",     marketType: "t10",     isWinner: false },
+  { ticker: "KXPGATOP20",     marketType: "t20",     isWinner: false },
+  { ticker: "KXPGATOP40",     marketType: "t40",     isWinner: false },
+  { ticker: "KXPGAMAKECUT",   marketType: "mc",      isWinner: false },
+  // Per-round leaders (sum-to-1 like Win, just for that round)
+  { ticker: "KXPGAR1LEAD",    marketType: "r1lead",  isWinner: false },
+  { ticker: "KXPGAR2LEAD",    marketType: "r2lead",  isWinner: false },
+  { ticker: "KXPGAR3LEAD",    marketType: "r3lead",  isWinner: false },
+  // Per-round Top N (sum-to-N)
+  { ticker: "KXPGAR1TOP5",    marketType: "r1t5",    isWinner: false },
+  { ticker: "KXPGAR1TOP10",   marketType: "r1t10",   isWinner: false },
+  { ticker: "KXPGAR1TOP20",   marketType: "r1t20",   isWinner: false },
+  { ticker: "KXPGAR2TOP5",    marketType: "r2t5",    isWinner: false },
+  { ticker: "KXPGAR2TOP10",   marketType: "r2t10",   isWinner: false },
+  { ticker: "KXPGAR3TOP5",    marketType: "r3t5",    isWinner: false },
+  { ticker: "KXPGAR3TOP10",   marketType: "r3t10",   isWinner: false },
+  // Per-golfer props (binary, no field-sum constraint)
+  { ticker: "KXPGAEAGLE",     marketType: "eagle",   isWinner: false },
+  { ticker: "KXPGALOWSCORE",  marketType: "low_score", isWinner: false },
 ];
 
 // Node 20 lacks native WebSocket; supply `ws` so Supabase client constructs.

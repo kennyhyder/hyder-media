@@ -36,14 +36,15 @@ const supabase = createClient(
   { realtime: { transport: WebSocket } }
 );
 
-// DataGolf market name -> our market_type code
+// DataGolf market name -> our market_type code. DG only publishes these
+// pre-tournament markets; round-by-round leader/top-N are Kalshi-only.
 const DG_MARKETS = {
   win: "win",
   top_5: "t5",
   top_10: "t10",
   top_20: "t20",
   make_cut: "mc",
-  // first_round_leader: "frl",  // available but lower priority for V1
+  frl: "r1lead",
 };
 
 // Books DataGolf returns (key as it appears in the JSON payload).

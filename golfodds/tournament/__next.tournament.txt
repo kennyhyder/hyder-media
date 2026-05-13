@@ -1,4 +1,4 @@
 1:"$Sreact.fragment"
 2:I[91563,["/golfodds/_next/static/chunks/1dac2db3cd87ee26.js","/golfodds/_next/static/chunks/9d77ffe8d40b7b8f.js"],"default"]
 3:I[68335,["/golfodds/_next/static/chunks/1dac2db3cd87ee26.js","/golfodds/_next/static/chunks/9d77ffe8d40b7b8f.js"],"default"]
-0:{"buildId":"gvXDfHpNfUtxyRW2GOB4N","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}
+0:{"buildId":"eJpyYa4nFER1JAEYxydNK","rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"loading":null,"isPartial":false}

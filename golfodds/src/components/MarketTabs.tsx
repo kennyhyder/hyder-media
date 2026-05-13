@@ -1,6 +1,6 @@
 "use client";
 
-import { MARKET_LABELS, MARKET_ORDER } from "@/lib/format";
+import { MARKET_LABELS, MARKET_GROUPS } from "@/lib/format";
 
 interface Props {
   active: string;
@@ -11,34 +11,37 @@ interface Props {
 
 export default function MarketTabs({ active, available = {}, kalshiCounts = {}, onSelect }: Props) {
   return (
-    <div className="flex flex-wrap gap-1 border-b border-neutral-800 mb-4">
-      {MARKET_ORDER.filter((mt) => MARKET_LABELS[mt]).map((mt) => {
-        const total = available[mt] || 0;
-        const kalshi = kalshiCounts[mt] || 0;
-        const isActive = active === mt;
-        const isEmpty = total === 0;
+    <div className="border-b border-neutral-800 mb-4 space-y-1 pb-1">
+      {MARKET_GROUPS.map((group) => {
+        // Only render the group if at least one market type in it has data
+        const visible = group.types.filter((mt) => MARKET_LABELS[mt] && (available[mt] || 0) > 0);
+        if (visible.length === 0) return null;
         return (
-          <button
-            key={mt}
-            onClick={() => !isEmpty && onSelect(mt)}
-            disabled={isEmpty}
-            className={[
-              "px-4 py-2 text-sm rounded-t border-b-2 -mb-px transition",
-              isActive
-                ? "border-green-500 bg-neutral-900 text-green-400"
-                : isEmpty
-                  ? "border-transparent text-neutral-700 cursor-not-allowed"
-                  : "border-transparent text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/50",
-            ].join(" ")}
-          >
-            <span className="font-medium">{MARKET_LABELS[mt]}</span>
-            {total > 0 && (
-              <span className="ml-2 text-xs opacity-70">
-                {total}
-                {kalshi > 0 && <span className="ml-1 text-amber-400">+K{kalshi}</span>}
-              </span>
-            )}
-          </button>
+          <div key={group.label} className="flex flex-wrap items-center gap-1">
+            <span className="text-[10px] uppercase tracking-wide text-neutral-600 w-24 shrink-0">{group.label}</span>
+            {visible.map((mt) => {
+              const total = available[mt] || 0;
+              const kalshi = kalshiCounts[mt] || 0;
+              const isActive = active === mt;
+              return (
+                <button
+                  key={mt}
+                  onClick={() => onSelect(mt)}
+                  className={[
+                    "px-3 py-1 text-xs rounded transition",
+                    isActive
+                      ? "bg-green-500/20 text-green-300 ring-1 ring-green-500/40"
+                      : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/70",
+                  ].join(" ")}
+                  title={`${total} markets${kalshi ? `, ${kalshi} with Kalshi` : ""}`}
+                >
+                  <span className="font-medium">{MARKET_LABELS[mt]}</span>
+                  <span className="ml-1.5 text-[10px] opacity-70">{total}</span>
+                  {kalshi > 0 && <span className="ml-1 text-[10px] text-amber-400">K{kalshi}</span>}
+                </button>
+              );
+            })}
+          </div>
         );
       })}
     </div>
