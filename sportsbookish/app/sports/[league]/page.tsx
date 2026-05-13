@@ -73,10 +73,18 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
 
   const order = ["championship", "series", "game", "mvp"];
 
+  // Stats for the strip at top — same shape as golf tournament page.
+  const totalGames = (groups.game || []).length;
+  const totalMarkets = (groups.game || []).reduce((s, e) => s + (e.markets?.length || 0), 0);
+  const kalshiQuotes = gameRows.filter((r) => r.implied_prob != null).length;
+  const bookQuotes = gameRows.reduce((s, r) => s + (r.books_count || 0), 0);
+  const gamesWithBooks = (groups.game || []).filter((e) => (e.markets || []).some((m) => (m.books_count ?? 0) > 0)).length;
+  const booksTracked = allBooks.length;
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between px-4">
           <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground">← Sports</Link>
           <div className="flex items-center gap-2 font-semibold text-sm">
             <span className="text-base">{meta.icon}</span>
@@ -86,7 +94,18 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         </div>
       </header>
 
-      <main className="container mx-auto max-w-[1600px] px-4 py-8">
+      <main className="container mx-auto max-w-[1800px] px-4 py-8">
+        {totalGames > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+            <Stat label="Games" value={String(totalGames)} />
+            <Stat label="With books" value={`${gamesWithBooks}/${totalGames}`} tone={gamesWithBooks > 0 ? "ok" : undefined} />
+            <Stat label="Markets" value={String(totalMarkets)} />
+            <Stat label="Kalshi quotes" value={String(kalshiQuotes)} tone="kalshi" />
+            <Stat label="Book quotes" value={String(bookQuotes)} />
+            <Stat label="Books tracked" value={String(booksTracked)} />
+          </div>
+        )}
+
         {leagueMoves.length > 0 && (
           <section className="mb-6">
             <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">📈 Recent moves (24h)</div>
@@ -94,7 +113,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
               {leagueMoves.map((m) => (
                 <Link key={m.id} href={`/sports/${league}/event/${m.event_id}`} className={`block rounded border p-2 text-xs hover:bg-muted/30 ${m.direction === "up" ? "border-emerald-500/30" : "border-rose-500/30"}`}>
                   <div className="font-medium truncate">{m.contestant_label}</div>
-                  <div className={`text-sm tabular-nums font-bold ${m.direction === "up" ? "text-emerald-400" : "text-rose-400"}`}>{fmtPctSigned(m.delta)}</div>
+                  <div className={`text-sm tabular-nums font-bold ${m.direction === "up" ? "text-emerald-500" : "text-rose-500"}`}>{fmtPctSigned(m.delta)}</div>
                   <div className="text-[10px] text-muted-foreground truncate">{m.event_title}</div>
                 </Link>
               ))}
@@ -120,6 +139,8 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         )}
 
         {/* Other event types (championship, series, mvp) — kept as cards */}
+        {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
+        {order.length === 0 && null}
         {(["championship", "series", "mvp"] as const).map((type) => {
           const list = groups[type];
           if (!list?.length) return null;
@@ -159,6 +180,16 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "kalshi" | "ok" }) {
+  const cls = tone === "kalshi" ? "text-amber-500" : tone === "ok" ? "text-emerald-500" : "text-foreground";
+  return (
+    <div className="bg-card border border-border rounded px-3 py-2">
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`text-lg font-semibold tabular-nums ${cls}`}>{value}</div>
     </div>
   );
 }

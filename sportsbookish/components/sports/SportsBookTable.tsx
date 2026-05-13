@@ -85,18 +85,19 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
   }, [filtered, sort]);
 
   const visibleBooks = isPaidTier ? books : books.filter((b) => ["draftkings", "fanduel", "betmgm", "caesars", "betrivers"].includes(b));
+  const hasStartTimes = rows.some((r) => r.start_time);
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs flex-wrap">
         <span className="text-muted-foreground">Filter:</span>
         <button onClick={() => setFilter("books_only")} className={`px-2 py-1 rounded ${filter === "books_only" ? "bg-emerald-500/15 text-emerald-500 ring-1 ring-emerald-500/40" : "text-muted-foreground hover:bg-muted/50"}`}>With books only ({rows.filter((r) => r.books_count > 0).length})</button>
         <button onClick={() => setFilter("all")} className={`px-2 py-1 rounded ${filter === "all" ? "bg-emerald-500/15 text-emerald-500 ring-1 ring-emerald-500/40" : "text-muted-foreground hover:bg-muted/50"}`}>All games ({rows.length})</button>
-        <span className="ml-auto text-muted-foreground/70">Click any column to sort. {sorted.length} rows.</span>
+        <span className="ml-auto text-muted-foreground/70">Edge vs <span className="text-emerald-500">Books median</span>. Click any column header to sort. {sorted.length} rows.</span>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-x-auto -mx-4 px-4">
+        <Table className="min-w-max">
           <TableHeader>
             <TableRow>
               <SortHead k="matchup" current={sort} onClick={toggle} align="left">Team / Game</SortHead>
@@ -105,7 +106,7 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
               <SortHead k="edge_vs_books_median" current={sort} onClick={toggle}>Buy edge</SortHead>
               <SortHead k="edge_vs_best_book" current={sort} onClick={toggle}>vs best</SortHead>
               <SortHead k="book_count" current={sort} onClick={toggle}>#</SortHead>
-              <SortHead k="start_time" current={sort} onClick={toggle}>Start</SortHead>
+              {hasStartTimes && <SortHead k="start_time" current={sort} onClick={toggle}>Start</SortHead>}
               {visibleBooks.map((b) => (
                 <SortHead key={b} k={`book:${b}` as SortKey} current={sort} onClick={toggle}>
                   <span className="text-xs">{bookLabel(b)}</span>
@@ -137,9 +138,11 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-muted-foreground text-xs">{r.books_count}</TableCell>
-                  <TableCell className="text-right text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">
-                    {r.start_time ? new Date(r.start_time).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" }) : "—"}
-                  </TableCell>
+                  {hasStartTimes && (
+                    <TableCell className="text-right text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">
+                      {r.start_time ? new Date(r.start_time).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" }) : "—"}
+                    </TableCell>
+                  )}
                   {visibleBooks.map((b) => {
                     const px = r.book_prices[b];
                     return (
@@ -159,7 +162,7 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
             })}
             {sorted.length === 0 && (
               <TableRow>
-                <TableCell colSpan={visibleBooks.length + 7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={visibleBooks.length + (hasStartTimes ? 7 : 6)} className="text-center py-8 text-muted-foreground">
                   No rows in current filter. Try switching to &quot;All games&quot; or check back when books post lines (1-2 days before tipoff).
                 </TableCell>
               </TableRow>
