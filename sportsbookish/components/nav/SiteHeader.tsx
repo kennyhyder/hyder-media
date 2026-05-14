@@ -2,20 +2,26 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LineChart } from "lucide-react";
+import {
+  LineChart, Trophy, Activity, TrendingUp, BookOpen, GitCompare,
+  Bell, Star, BarChart3, LayoutDashboard, Sparkles,
+} from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import UserMenu from "@/components/nav/UserMenu";
+import NavDropdown, { type NavDropdownSection } from "@/components/nav/NavDropdown";
+import { fetchLeagues } from "@/lib/sports-data";
 import { TIER_BY_KEY, type TierKey } from "@/lib/tiers";
 import { isAdminEmail } from "@/lib/admin";
 
-// One header for every page on the site. Auth-aware:
-// - Anonymous: Sports / Compare / Learn / Pricing · Log in · Sign up free
-// - Free: Sports / Golf / Movers / Pricing · tier · user menu
-// - Pro+: + Alerts · Watchlist
-// - Elite: + Bet Tracker
-// - Admin: + Admin link inside user menu
-//
-// Mobile: trims to Sports + Pricing visible; rest collapse into the user menu.
+// Faceted-dropdown nav. Server component fetches user + league list.
+//   Sports ▾   →   live league cards (NBA, MLB, NHL, EPL, MLS, Golf) + All Sports + Top Movers
+//   Tools ▾    →   tier-aware: Compare/Learn (anon) or Watchlist/Alerts/Bets (signed-in)
+//   Pricing
+//   right side: tier badge + UserMenu + theme toggle (anonymous: Log in + Start free + theme)
+
+const LEAGUE_ICONS: Record<string, string> = {
+  nba: "🏀", mlb: "⚾", nhl: "🏒", epl: "⚽", mls: "⚽",
+};
 
 export default async function SiteHeader() {
   const supabase = await createClient();
@@ -37,31 +43,71 @@ export default async function SiteHeader() {
   const isAdmin = isAdminEmail(user?.email);
   const tierInfo = TIER_BY_KEY[tier];
 
+  const leagues = await fetchLeagues();
+
+  // SPORTS dropdown — show all leagues as facets including golf
+  const sportsSections: NavDropdownSection[] = [
+    {
+      heading: "Leagues",
+      items: [
+        { label: "Golf", href: "/golf", description: "PGA Tour · DataGolf model" },
+        ...leagues.map((l) => ({
+          label: l.display_name,
+          href: `/sports/${l.key}`,
+          description: `${LEAGUE_ICONS[l.key] || ""} ${l.sport_category}`,
+        })),
+      ],
+    },
+    {
+      heading: "More",
+      items: [
+        { label: "All sports", href: "/sports", description: "League index", icon: Trophy },
+        { label: "Top movers", href: "/sports/movers", description: "Live Kalshi line moves ≥2%", icon: TrendingUp },
+      ],
+    },
+  ];
+
+  // TOOLS dropdown — tier-aware
+  const toolsItems: NavDropdownSection[] = [];
+  if (isAnonymous) {
+    toolsItems.push({
+      heading: "Resources",
+      items: [
+        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs DraftKings, FanDuel & more", icon: GitCompare },
+        { label: "Learn", href: "/learn", description: "Kalshi odds explained · no-vig math", icon: BookOpen },
+      ],
+    });
+  } else {
+    toolsItems.push({
+      heading: "Your stuff",
+      items: [
+        { label: "Dashboard", href: "/dashboard", description: "Account hub", icon: LayoutDashboard },
+        ...(isPaid ? [{ label: "Alerts", href: "/alerts", description: "Custom rules + smart presets", icon: Bell }] : []),
+        ...(isElite ? [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · CLV · ROI", icon: BarChart3 }] : [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · Elite", icon: BarChart3, badge: "Elite" }]),
+        { label: "Settings", href: "/settings", description: "Preferences + billing", icon: Sparkles },
+      ],
+    });
+    toolsItems.push({
+      heading: "Discover",
+      items: [
+        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs each book", icon: GitCompare },
+        { label: "Learn", href: "/learn", description: "Kalshi odds explainers", icon: BookOpen },
+      ],
+    });
+  }
+
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/65">
       <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between gap-3 px-4">
         <div className="flex items-center gap-1 min-w-0">
           <Link href={isAnonymous ? "/" : "/dashboard"} className="flex items-center gap-2 font-semibold mr-3 shrink-0">
             <LineChart className="h-5 w-5 text-emerald-500" aria-hidden="true" />
             <span className="text-lg tracking-tight">SportsBook<span className="text-emerald-500">ISH</span></span>
           </Link>
-          <nav className="flex items-center gap-0.5 overflow-x-auto" aria-label="Primary">
-            <Link href="/sports" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0`}>Sports</Link>
-            <Link href="/golf" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden sm:inline-flex`}>Golf</Link>
-            <Link href="/sports/movers" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden md:inline-flex`}>Movers</Link>
-            {isPaid && (
-              <Link href="/alerts" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden md:inline-flex`}>Alerts</Link>
-            )}
-            {isElite && (
-              <Link href="/bets" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden lg:inline-flex`}>Bets</Link>
-            )}
-            {isAnonymous && (
-              <>
-                <Link href="/compare" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden lg:inline-flex`}>Compare</Link>
-                <Link href="/learn" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0 hidden lg:inline-flex`}>Learn</Link>
-              </>
-            )}
-            <Link href="/pricing" className={`${buttonVariants({ variant: "ghost", size: "sm" })} shrink-0`}>Pricing</Link>
+          <nav className="flex items-center gap-0.5" aria-label="Primary">
+            <NavDropdown label="Sports" sections={sportsSections} width="wide" />
+            <NavDropdown label="Tools" sections={toolsItems} width="narrow" />
+            <Link href="/pricing" className={buttonVariants({ variant: "ghost", size: "sm" })}>Pricing</Link>
           </nav>
         </div>
 
