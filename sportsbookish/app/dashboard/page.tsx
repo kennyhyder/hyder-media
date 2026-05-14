@@ -122,6 +122,11 @@ export default async function DashboardPage() {
               <div className="font-semibold">Top movers</div>
               <div className="text-xs text-muted-foreground mt-1">Recent moves across all sports</div>
             </Link>
+            <Link href="/bets" className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
+              <div className="text-2xl mb-2">📊</div>
+              <div className="font-semibold flex items-center gap-2">Bet Tracker {tier !== "elite" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>}</div>
+              <div className="text-xs text-muted-foreground mt-1">Log bets · Skill Score · CLV tracking</div>
+            </Link>
             <Link href={tier === "elite" ? "/alerts" : "/pricing"} className="rounded-lg border border-border bg-muted/10 hover:bg-muted/30 p-4 transition">
               <div className="text-2xl mb-2">⚡</div>
               <div className="font-semibold flex items-center gap-2">Alerts {tier !== "elite" && <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>}</div>
