@@ -31,14 +31,26 @@ export default async function handler(req, res) {
       .eq("event_id", id);
 
     // Pull all book quotes for this event in one query, then split by market_type
-    const { data: allBookQuotes } = await supabase
-      .from("sports_book_v_latest")
-      .select("contestant_label, contestant_norm, market_type, book, implied_prob_novig, american, point, fetched_at")
-      .eq("sports_event_id", id);
+    const [{ data: allBookQuotes }, { data: polymarketQuotes }] = await Promise.all([
+      supabase
+        .from("sports_book_v_latest")
+        .select("contestant_label, contestant_norm, market_type, book, implied_prob_novig, american, point, fetched_at")
+        .eq("sports_event_id", id),
+      supabase
+        .from("sports_polymarket_v_latest")
+        .select("contestant_label, contestant_norm, yes_price, no_price, implied_prob, volume_usd, fetched_at")
+        .eq("sports_event_id", id),
+    ]);
 
     const h2hQuotes = (allBookQuotes || []).filter((b) => b.market_type === "h2h");
     const spreadsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "spreads");
     const totalsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "totals");
+
+    // Index polymarket quotes by contestant for easy join
+    const polyByContestant = new Map();
+    for (const p of polymarketQuotes || []) {
+      polyByContestant.set(p.contestant_norm, p);
+    }
 
     // Kalshi quotes for each market
     let marketsWithQuotes = markets || [];
@@ -75,6 +87,12 @@ export default async function handler(req, res) {
         const edge_vs_median = (kalshi != null && median != null) ? Number((median - kalshi).toFixed(5)) : null;
         const edge_vs_best = (kalshi != null && bestBook?.implied_prob_novig != null) ? Number((bestBook.implied_prob_novig - kalshi).toFixed(5)) : null;
 
+        // Polymarket quote (if any) for this contestant
+        const poly = polyByContestant.get(labelNorm);
+        const polyProb = poly?.implied_prob != null ? Number(poly.implied_prob) : null;
+        const edge_kalshi_vs_polymarket = (kalshi != null && polyProb != null) ? Number((polyProb - kalshi).toFixed(5)) : null;
+        const edge_polymarket_vs_books = (polyProb != null && median != null) ? Number((median - polyProb).toFixed(5)) : null;
+
         return {
           id: m.id,
           contestant_label: m.contestant_label,
@@ -93,6 +111,11 @@ export default async function handler(req, res) {
           best_book: bestBook,
           edge_vs_books_median: edge_vs_median,
           edge_vs_best_book: edge_vs_best,
+          // Polymarket — second peer-to-peer exchange comparison
+          polymarket_prob: polyProb,
+          polymarket_volume_usd: poly?.volume_usd ? Number(poly.volume_usd) : null,
+          edge_kalshi_vs_polymarket,   // positive = Polymarket sees it as more likely than Kalshi
+          edge_polymarket_vs_books,    // positive = books see it as more likely than Polymarket
         };
       });
       marketsWithQuotes.sort((a, b) => (b.implied_prob ?? 0) - (a.implied_prob ?? 0));
