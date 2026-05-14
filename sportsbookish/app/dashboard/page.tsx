@@ -75,7 +75,7 @@ export default async function DashboardPage() {
                 </Link>
               ) : (
                 <div className="text-sm text-muted-foreground">
-                  ${tierInfo.priceMonthly}/month
+                  {tierInfo.interval === "year" ? `$${tierInfo.priceCents / 100}/year` : `$${tierInfo.priceCents / 100}/month`}
                   {sub?.current_period_end && (
                     <> · renews {new Date(sub.current_period_end).toLocaleDateString()}</>
                   )}

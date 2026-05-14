@@ -11,6 +11,8 @@ import PriceSpark from "@/components/PriceSpark";
 import UpsellBanner from "@/components/UpsellBanner";
 import SpreadsTable from "@/components/sports/SpreadsTable";
 import TotalsTable from "@/components/sports/TotalsTable";
+import WatchlistButton from "@/components/WatchlistButton";
+import { createClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -44,7 +46,6 @@ export const dynamic = "force-dynamic";
 export default async function EventPage({ params }: { params: Promise<{ league: string; id: string }> }) {
   const { league, id } = await params;
   const { tier, userId } = await getCurrentTier();
-  const isAnonymous = !userId;
 
   const [leagues, detail, history, allMovements] = await Promise.all([
     fetchLeagues(),
@@ -58,8 +59,16 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
   // movements for this specific event
   const eventMoves = allMovements.filter((m) => m.event_id === id);
   const historyByMarket = new Map(history.map((h) => [h.market_id, h]));
-  const isPaidTier = tier !== "free";
+  const isAnonymous = !userId;
+  const isPaidTier = !isAnonymous && tier !== "free";
   const anyBooks = detail.markets.some((m) => (m.books_count ?? 0) > 0);
+
+  // Watchlist state — load all bookmarks for this user keyed by contestant label
+  const supabaseAuth = await createClient();
+  const { data: watchlistRows } = userId
+    ? await supabaseAuth.from("sb_watchlist").select("id, ref_id").eq("user_id", userId).eq("league", league)
+    : { data: [] as { id: number; ref_id: string }[] };
+  const bookmarkByRef = new Map((watchlistRows || []).map((w) => [w.ref_id, w.id]));
 
   return (
     <div className="min-h-screen">
@@ -110,10 +119,23 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
               const edgeBest = m.edge_vs_best_book;
               const books = m.book_prices || [];
               const visibleBooks = isPaidTier ? books : books.slice(0, 5);
+              const bookmarkId = bookmarkByRef.get(m.contestant_label);
               return (
                 <div key={m.id} className="px-5 py-4">
                   <div className="flex items-center justify-between mb-2 gap-3">
-                    <div className="font-semibold flex-1 min-w-0 truncate">{m.contestant_label}</div>
+                    <div className="font-semibold flex-1 min-w-0 truncate flex items-center gap-2">
+                      <WatchlistButton
+                        signedIn={!isAnonymous}
+                        initialActive={!!bookmarkId}
+                        initialId={bookmarkId}
+                        kind="team"
+                        refId={m.contestant_label}
+                        label={m.contestant_label}
+                        league={league}
+                        size="sm"
+                      />
+                      <span className="truncate">{m.contestant_label}</span>
+                    </div>
                     <div className="flex items-center gap-3 shrink-0">
                       {hist && hist.points.length >= 2 && <PriceSpark points={hist.points} width={100} height={28} />}
                       <div className="text-2xl font-bold tabular-nums text-amber-500">{p != null ? `${(p * 100).toFixed(1)}%` : "—"}</div>
@@ -156,17 +178,29 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
                           <span className={`tabular-nums font-semibold ${edgeTextClass(edgeBest)}`}>{fmtPctSigned(edgeBest)}</span>
                         </span>
                       </div>
-                      {visibleBooks.length > 0 && (
+                      {books.length > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 text-[11px]">
-                          {visibleBooks.map((b) => (
-                            <div key={b.book} className="flex items-center justify-between bg-muted/40 rounded px-2 py-1">
-                              <span className="text-muted-foreground truncate" title={bookLabel(b.book)}>{bookLabel(b.book)}</span>
-                              <span className="tabular-nums">{fmtAmerican(b.american)}</span>
-                            </div>
-                          ))}
+                          {books.map((b, idx) => {
+                            const locked = !isPaidTier && idx >= 5;
+                            const href = isAnonymous ? `/signup?next=/sports/${league}/event/${id}` : "/pricing";
+                            if (locked) {
+                              return (
+                                <Link key={b.book} href={href} className="flex items-center justify-between bg-muted/40 rounded px-2 py-1 relative overflow-hidden hover:bg-muted">
+                                  <span className="text-muted-foreground/60 truncate text-[10px]">{bookLabel(b.book)} 🔒</span>
+                                  <span className="tabular-nums blur-sm pointer-events-none">{fmtAmerican(b.american)}</span>
+                                </Link>
+                              );
+                            }
+                            return (
+                              <div key={b.book} className="flex items-center justify-between bg-muted/40 rounded px-2 py-1">
+                                <span className="text-muted-foreground truncate" title={bookLabel(b.book)}>{bookLabel(b.book)}</span>
+                                <span className="tabular-nums">{fmtAmerican(b.american)}</span>
+                              </div>
+                            );
+                          })}
                           {!isPaidTier && books.length > 5 && (
-                            <Link href="/pricing" className="flex items-center justify-center bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded px-2 py-1 col-span-full sm:col-span-1">
-                              +{books.length - 5} more (Pro)
+                            <Link href={isAnonymous ? `/signup?next=/sports/${league}/event/${id}` : "/pricing"} className="flex items-center justify-center bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 rounded px-2 py-1 col-span-full sm:col-span-1 text-[10px] font-semibold">
+                              {isAnonymous ? "Sign up free →" : `Pro: +${books.length - 5}`}
                             </Link>
                           )}
                         </div>

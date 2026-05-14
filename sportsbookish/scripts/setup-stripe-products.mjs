@@ -4,8 +4,7 @@
  * Idempotent — finds existing products by name and reuses; otherwise creates.
  * Prints env-ready output you can paste into Vercel.
  *
- * Usage: node --env-file=/tmp/sbk-env scripts/setup-stripe-products.mjs
- *   (or: STRIPE_SECRET_KEY=sk_xxx node scripts/setup-stripe-products.mjs)
+ * Usage: STRIPE_SECRET_KEY=sk_xxx node scripts/setup-stripe-products.mjs
  */
 
 import Stripe from "stripe";
@@ -18,12 +17,13 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const PLANS = [
-  { tier: "pro",   name: "SportsBookish Pro",   priceCents: 1900, envName: "STRIPE_PRICE_PRO" },
-  { tier: "elite", name: "SportsBookish Elite", priceCents: 3900, envName: "STRIPE_PRICE_ELITE" },
+  // Pro is monthly only ($10/mo)
+  { tier: "pro",   name: "SportsBookish Pro",   priceCents: 1000, interval: "month", envName: "STRIPE_PRICE_PRO" },
+  // Elite is annual only ($100/yr) — cheaper than Pro on annual basis to push commitment
+  { tier: "elite", name: "SportsBookish Elite", priceCents: 10000, interval: "year",  envName: "STRIPE_PRICE_ELITE" },
 ];
 
 async function findProductByName(name) {
-  // Stripe doesn't support exact-name search; list and match
   const products = await stripe.products.list({ limit: 100, active: true });
   return products.data.find((p) => p.name === name) || null;
 }
@@ -43,24 +43,23 @@ async function ensureProduct(name) {
   return created;
 }
 
-async function ensurePrice(productId, priceCents) {
-  // Look for existing recurring monthly price at this amount
+async function ensurePrice(productId, priceCents, interval) {
   const prices = await stripe.prices.list({ product: productId, limit: 50, active: true });
   const existing = prices.data.find(
-    (p) => p.recurring?.interval === "month" && p.unit_amount === priceCents && p.currency === "usd"
+    (p) => p.recurring?.interval === interval && p.unit_amount === priceCents && p.currency === "usd"
   );
   if (existing) {
-    console.log(`    Found existing price: $${priceCents / 100}/mo (${existing.id})`);
+    console.log(`    Found existing price: $${priceCents / 100}/${interval} (${existing.id})`);
     return existing;
   }
   const created = await stripe.prices.create({
     product: productId,
     unit_amount: priceCents,
     currency: "usd",
-    recurring: { interval: "month" },
+    recurring: { interval },
     metadata: { app: "sportsbookish" },
   });
-  console.log(`    Created price: $${priceCents / 100}/mo (${created.id})`);
+  console.log(`    Created price: $${priceCents / 100}/${interval} (${created.id})`);
   return created;
 }
 
@@ -75,7 +74,7 @@ async function main() {
   for (const plan of PLANS) {
     console.log(`Plan: ${plan.tier}`);
     const product = await ensureProduct(plan.name);
-    const price = await ensurePrice(product.id, plan.priceCents);
+    const price = await ensurePrice(product.id, plan.priceCents, plan.interval);
     envVars[plan.envName] = price.id;
     envVars[`${plan.envName}_PRODUCT`] = product.id;
     console.log("");

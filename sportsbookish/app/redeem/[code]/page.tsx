@@ -3,7 +3,7 @@ import Link from "next/link";
 import { validateInvite } from "@/lib/invites";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TIER_BY_KEY } from "@/lib/tiers";
+import { TIER_BY_KEY, getPricePerMonth } from "@/lib/tiers";
 import MarketingNav from "@/components/nav/MarketingNav";
 import { LineChart, Gift, AlertCircle, CheckCircle2 } from "lucide-react";
 import RedeemForm from "./RedeemForm";
@@ -59,7 +59,7 @@ export default async function RedeemPage({ params }: { params: Promise<{ code: s
             </div>
             <CardTitle className="text-2xl">You&apos;ve been gifted {tierInfo.name}</CardTitle>
             <CardDescription>
-              Full <strong className="text-foreground">{tierInfo.name}</strong> access (normally ${tierInfo.priceMonthly}/mo) — free, no card required.
+              Full <strong className="text-foreground">{tierInfo.name}</strong> access (normally {tierInfo.interval === "year" ? `$${tierInfo.priceCents / 100}/year` : `$${getPricePerMonth(tierInfo)}/mo`}) — free, no card required.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

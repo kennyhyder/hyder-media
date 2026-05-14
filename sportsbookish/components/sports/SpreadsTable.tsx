@@ -9,12 +9,13 @@ interface Props {
   signupHref?: string;
 }
 
+const MAJOR_FREE = ["draftkings", "fanduel", "betmgm", "caesars", "betrivers"];
+
 export default function SpreadsTable({ rows, isPaidTier, signupHref }: Props) {
   if (!rows.length) return null;
 
-  // Build union of book keys across both rows, sorted by major US books first
+  // Sort all books with major US books first
   const allBooks = Array.from(new Set(rows.flatMap((r) => Object.keys(r.books))));
-  const MAJOR_FREE = ["draftkings", "fanduel", "betmgm", "caesars", "betrivers"];
   const sortedBooks = allBooks.sort((a, b) => {
     const aMajor = MAJOR_FREE.indexOf(a);
     const bMajor = MAJOR_FREE.indexOf(b);
@@ -23,11 +24,18 @@ export default function SpreadsTable({ rows, isPaidTier, signupHref }: Props) {
     if (bMajor !== -1) return 1;
     return a.localeCompare(b);
   });
-  const visibleBooks = isPaidTier ? sortedBooks : sortedBooks.filter((b) => MAJOR_FREE.includes(b));
+  // Non-paid users see ALL book columns, but only major books' data is unblurred.
+  // The other books' values are blurred to drive signup/upgrade conversion.
+  const visibleBooks = sortedBooks;
+  const isBlurred = (b: string) => !isPaidTier && !MAJOR_FREE.includes(b);
 
   // Find consensus spread = median of all books' favourite team points
   const fav = rows.find((r) => Object.values(r.books).some((v) => v.point != null && v.point < 0));
   const consensus = fav ? medianPoint(Object.values(fav.books).map((v) => v.point).filter((v): v is number => v != null)) : null;
+
+  const blurredCount = visibleBooks.filter(isBlurred).length;
+  const upgradeHref = signupHref || "/pricing";
+  const upgradeLabel = signupHref ? "Sign up free" : "Upgrade to Pro";
 
   return (
     <Card>
@@ -35,9 +43,9 @@ export default function SpreadsTable({ rows, isPaidTier, signupHref }: Props) {
         <CardTitle className="text-sm font-normal text-muted-foreground">
           <span className="text-foreground font-semibold">Spread</span> · {visibleBooks.length} books
           {consensus != null && <span className="ml-3">Consensus line: <span className="text-foreground font-semibold tabular-nums">{consensus > 0 ? `+${consensus}` : consensus}</span></span>}
-          {!isPaidTier && visibleBooks.length < sortedBooks.length && (
+          {blurredCount > 0 && (
             <span className="ml-3 text-amber-500 text-xs">
-              Free shows {visibleBooks.length} of {sortedBooks.length} books — {signupHref ? <Link href={signupHref} className="underline hover:text-amber-400">sign up free</Link> : <Link href="/pricing" className="underline hover:text-amber-400">upgrade</Link>} for all
+              🔒 {blurredCount} {blurredCount === 1 ? "book" : "books"} locked — <Link href={upgradeHref} className="underline hover:text-amber-400">{upgradeLabel}</Link> to unlock
             </span>
           )}
         </CardTitle>
@@ -48,7 +56,10 @@ export default function SpreadsTable({ rows, isPaidTier, signupHref }: Props) {
             <tr>
               <th className="px-3 py-2 text-left">Team</th>
               {visibleBooks.map((b) => (
-                <th key={b} className="px-2 py-2 text-right whitespace-nowrap">{bookLabel(b)}</th>
+                <th key={b} className={`px-2 py-2 text-right whitespace-nowrap ${isBlurred(b) ? "text-muted-foreground/60" : ""}`}>
+                  {bookLabel(b)}
+                  {isBlurred(b) && <span className="ml-1 text-amber-500">🔒</span>}
+                </th>
               ))}
             </tr>
           </thead>
@@ -59,6 +70,16 @@ export default function SpreadsTable({ rows, isPaidTier, signupHref }: Props) {
                 {visibleBooks.map((b) => {
                   const cell = r.books[b];
                   if (!cell) return <td key={b} className="px-2 py-2 text-right text-muted-foreground/40">—</td>;
+                  if (isBlurred(b)) {
+                    return (
+                      <td key={b} className="px-2 py-2 text-right tabular-nums relative">
+                        <Link href={upgradeHref} className="block select-none" aria-label={`Unlock ${bookLabel(b)}`}>
+                          <div className="font-semibold blur-sm pointer-events-none">{cell.point != null ? (cell.point > 0 ? `+${cell.point}` : cell.point) : "—"}</div>
+                          <div className="text-[10px] text-muted-foreground blur-sm pointer-events-none">{fmtAmerican(cell.american)}</div>
+                        </Link>
+                      </td>
+                    );
+                  }
                   return (
                     <td key={b} className="px-2 py-2 text-right tabular-nums">
                       <div className="font-semibold">{cell.point != null ? (cell.point > 0 ? `+${cell.point}` : cell.point) : "—"}</div>

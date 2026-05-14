@@ -35,6 +35,9 @@ function normalizeAlertForMatch(a: FeedAlert): AlertMatchInput {
     a.source === "golf" && a.direction === "buy" ? "edge_buy" :
     a.source === "golf" && a.direction === "sell" ? "edge_sell" :
     "movement";
+  // Build a stable contestant key for watchlist matching: "<league>:<normalized title>"
+  // This matches the convention used by WatchlistButton when bookmarking.
+  const norm = (a.title || "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
   return {
     source: a.source,
     sport: a.sport,
@@ -43,6 +46,7 @@ function normalizeAlertForMatch(a: FeedAlert): AlertMatchInput {
     direction: a.direction,
     delta: a.delta,
     probability: a.probability,
+    contestant_key: `${a.league}:${norm}`,
   };
 }
 
@@ -140,12 +144,31 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: true, alerts_scanned: alerts.length, rules_active: 0, dispatches: 0 });
   }
 
-  // 3. Build (rule, alert) match list
+  // 3. Pre-load per-user watchlist sets for any rule with watchlist_only=true.
+  // Convention: watchlist match key = "<league>:<normalized label>".
+  const userIdsNeedingWatchlist = Array.from(new Set(rules.filter((r) => r.watchlist_only).map((r) => r.user_id)));
+  const watchlistByUser = new Map<string, Set<string>>();
+  if (userIdsNeedingWatchlist.length > 0) {
+    const { data: wl } = await supabase
+      .from("sb_watchlist")
+      .select("user_id, label, league")
+      .in("user_id", userIdsNeedingWatchlist);
+    for (const w of wl || []) {
+      const norm = (w.label || "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+      const key = `${w.league || ""}:${norm}`;
+      const set = watchlistByUser.get(w.user_id) || new Set<string>();
+      set.add(key);
+      watchlistByUser.set(w.user_id, set);
+    }
+  }
+
+  // 4. Build (rule, alert) match list
   const matches: { rule: AlertRule; alert: FeedAlert }[] = [];
   for (const alert of alerts) {
     const input = normalizeAlertForMatch(alert);
     for (const rule of rules) {
-      if (alertMatchesRule(input, rule)) matches.push({ rule, alert });
+      const watchlist = rule.watchlist_only ? watchlistByUser.get(rule.user_id) : undefined;
+      if (alertMatchesRule(input, rule, watchlist)) matches.push({ rule, alert });
     }
   }
 

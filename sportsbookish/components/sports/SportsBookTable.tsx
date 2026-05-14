@@ -84,7 +84,10 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
     });
   }, [filtered, sort]);
 
-  const visibleBooks = isPaidTier ? books : books.filter((b) => ["draftkings", "fanduel", "betmgm", "caesars", "betrivers"].includes(b));
+  const MAJOR_FREE = ["draftkings", "fanduel", "betmgm", "caesars", "betrivers"];
+  // Show every book column, but blur the non-major ones for non-paid users.
+  const visibleBooks = books;
+  const isBlurred = (b: string) => !isPaidTier && !MAJOR_FREE.includes(b);
   const hasStartTimes = rows.some((r) => r.start_time);
 
   return (
@@ -109,7 +112,9 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
               {hasStartTimes && <SortHead k="start_time" current={sort} onClick={toggle}>Start</SortHead>}
               {visibleBooks.map((b) => (
                 <SortHead key={b} k={`book:${b}` as SortKey} current={sort} onClick={toggle}>
-                  <span className="text-xs">{bookLabel(b)}</span>
+                  <span className={`text-xs ${isBlurred(b) ? "text-muted-foreground/60" : ""}`}>
+                    {bookLabel(b)}{isBlurred(b) && <span className="ml-1 text-amber-500">🔒</span>}
+                  </span>
                 </SortHead>
               ))}
             </TableRow>
@@ -145,15 +150,19 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
                   )}
                   {visibleBooks.map((b) => {
                     const px = r.book_prices[b];
+                    if (!px) return <TableCell key={b} className="text-right text-muted-foreground/40">—</TableCell>;
+                    if (isBlurred(b)) {
+                      return (
+                        <TableCell key={b} className="text-right tabular-nums text-muted-foreground">
+                          <span className="blur-sm pointer-events-none select-none">{fmtPct(px.novig)}</span>
+                        </TableCell>
+                      );
+                    }
                     return (
                       <TableCell key={b} className="text-right tabular-nums text-muted-foreground">
-                        {px ? (
-                          <span title={`american ${fmtAmerican(px.american)}, no-vig ${fmtPct(px.novig)}`}>
-                            {fmtPct(px.novig)}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground/40">—</span>
-                        )}
+                        <span title={`american ${fmtAmerican(px.american)}, no-vig ${fmtPct(px.novig)}`}>
+                          {fmtPct(px.novig)}
+                        </span>
                       </TableCell>
                     );
                   })}

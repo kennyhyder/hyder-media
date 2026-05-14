@@ -43,16 +43,22 @@ export default function TotalsTable({ rows, isPaidTier, signupHref }: Props) {
     if (bMajor !== -1) return 1;
     return a.localeCompare(b);
   });
-  const visibleBooks = isPaidTier ? sortedBooks : sortedBooks.filter((b) => MAJOR_FREE.includes(b));
+  // Same blur strategy as SpreadsTable — show every book column, blur the
+  // values for non-paid users.
+  const visibleBooks = sortedBooks;
+  const isBlurred = (b: string) => !isPaidTier && !MAJOR_FREE.includes(b);
+  const blurredCount = visibleBooks.filter(isBlurred).length;
+  const upgradeHref = signupHref || "/pricing";
+  const upgradeLabel = signupHref ? "Sign up free" : "Upgrade to Pro";
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-normal text-muted-foreground">
           <span className="text-foreground font-semibold">Total</span> · {visibleBooks.length} books · {sortedPoints.length} line{sortedPoints.length === 1 ? "" : "s"}
-          {!isPaidTier && visibleBooks.length < sortedBooks.length && (
+          {blurredCount > 0 && (
             <span className="ml-3 text-amber-500 text-xs">
-              Free shows {visibleBooks.length} of {sortedBooks.length} books — {signupHref ? <Link href={signupHref} className="underline hover:text-amber-400">sign up free</Link> : <Link href="/pricing" className="underline hover:text-amber-400">upgrade</Link>} for all
+              🔒 {blurredCount} {blurredCount === 1 ? "book" : "books"} locked — <Link href={upgradeHref} className="underline hover:text-amber-400">{upgradeLabel}</Link> to unlock
             </span>
           )}
         </CardTitle>
@@ -64,7 +70,10 @@ export default function TotalsTable({ rows, isPaidTier, signupHref }: Props) {
               <th className="px-3 py-2 text-left">Line</th>
               <th className="px-3 py-2 text-left">Side</th>
               {visibleBooks.map((b) => (
-                <th key={b} className="px-2 py-2 text-right whitespace-nowrap">{bookLabel(b)}</th>
+                <th key={b} className={`px-2 py-2 text-right whitespace-nowrap ${isBlurred(b) ? "text-muted-foreground/60" : ""}`}>
+                  {bookLabel(b)}
+                  {isBlurred(b) && <span className="ml-1 text-amber-500">🔒</span>}
+                </th>
               ))}
             </tr>
           </thead>
@@ -78,6 +87,13 @@ export default function TotalsTable({ rows, isPaidTier, signupHref }: Props) {
                   {visibleBooks.map((b) => {
                     const cell = r.books[b];
                     if (!cell) return <td key={b} className="px-2 py-2 text-right text-muted-foreground/40">—</td>;
+                    if (isBlurred(b)) {
+                      return (
+                        <td key={b} className="px-2 py-2 text-right tabular-nums">
+                          <Link href={upgradeHref} className="blur-sm pointer-events-none">{fmtAmerican(cell.american)}</Link>
+                        </td>
+                      );
+                    }
                     return (
                       <td key={b} className="px-2 py-2 text-right tabular-nums">{fmtAmerican(cell.american)}</td>
                     );

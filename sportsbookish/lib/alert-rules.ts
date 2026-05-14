@@ -13,11 +13,86 @@ export interface AlertRule {
   min_kalshi_prob: number | null;
   max_kalshi_prob: number | null;
   channels: string[];               // 'email' | 'sms'
+  preset_key: string | null;        // 'big_movers' | 'top_buys_daily' | 'sharp_action' | null = manual
+  watchlist_only: boolean;          // Elite: only fire on watchlisted teams/players
   created_at: string;
   updated_at: string;
   last_fired_at: string | null;
   fire_count: number;
 }
+
+// Smart presets — one-click toggles available to Elite. Each one expands into
+// a stored sb_alert_rules row with these defaults; the dispatcher reads them
+// like any other rule.
+export interface SmartPreset {
+  key: string;
+  name: string;
+  description: string;
+  defaults: Omit<Partial<AlertRule>, "id" | "user_id" | "created_at" | "updated_at" | "last_fired_at" | "fire_count">;
+}
+
+export const SMART_PRESETS: SmartPreset[] = [
+  {
+    key: "big_movers",
+    name: "🚀 Big movers (≥5%)",
+    description: "Any market on any sport that moves ≥5% in 15 min on Kalshi.",
+    defaults: {
+      name: "🚀 Big movers (≥5%)",
+      enabled: true,
+      alert_types: ["movement"],
+      min_delta: 0.05,
+      direction: null,
+      channels: ["email", "sms"],
+      preset_key: "big_movers",
+      watchlist_only: false,
+    },
+  },
+  {
+    key: "top_buys_daily",
+    name: "💰 Top buy edges (≥3%)",
+    description: "Best buy opportunities — Kalshi cheaper than book consensus by ≥3%.",
+    defaults: {
+      name: "💰 Top buy edges (≥3%)",
+      enabled: true,
+      alert_types: ["edge_buy"],
+      min_delta: 0.03,
+      direction: "up",
+      channels: ["email"],
+      preset_key: "top_buys_daily",
+      watchlist_only: false,
+    },
+  },
+  {
+    key: "my_watchlist",
+    name: "⭐ My watchlist only",
+    description: "Any move ≥2% on any team or player you've bookmarked.",
+    defaults: {
+      name: "⭐ My watchlist only",
+      enabled: true,
+      alert_types: null,
+      min_delta: 0.02,
+      direction: null,
+      channels: ["email", "sms"],
+      preset_key: "my_watchlist",
+      watchlist_only: true,
+    },
+  },
+  {
+    key: "sharp_action",
+    name: "📊 Sharp action (≥7%)",
+    description: "Very large moves that usually indicate sharp money — ≥7% in 15 min.",
+    defaults: {
+      name: "📊 Sharp action (≥7%)",
+      enabled: true,
+      alert_types: ["movement"],
+      min_delta: 0.07,
+      direction: null,
+      channels: ["email", "sms"],
+      preset_key: "sharp_action",
+      watchlist_only: false,
+    },
+  },
+];
 
 export interface AlertRuleInput {
   name: string;
@@ -79,10 +154,19 @@ export interface AlertMatchInput {
   direction: string;          // 'up' | 'down' | 'buy' | 'sell'
   delta: number;              // absolute value compared against min_delta
   probability: number | null;
+  contestant_key?: string;    // normalized "league:contestant_norm" for watchlist matching
 }
 
-export function alertMatchesRule(alert: AlertMatchInput, rule: AlertRule): boolean {
+export function alertMatchesRule(alert: AlertMatchInput, rule: AlertRule, watchlistRefs?: Set<string>): boolean {
   if (!rule.enabled) return false;
+
+  // Watchlist filter (smart preset / Elite)
+  if (rule.watchlist_only) {
+    if (!watchlistRefs || watchlistRefs.size === 0) return false;
+    // alert needs a contestant_norm or similar identifier — convention: we pass
+    // a flat set of strings the dispatcher built from the alert payload
+    if (!alert.contestant_key || !watchlistRefs.has(alert.contestant_key)) return false;
+  }
 
   // Sport filter
   if (rule.sports && rule.sports.length > 0 && alert.sport && !rule.sports.includes(alert.sport)) {

@@ -14,6 +14,7 @@ import { ALL_LEAGUES, ALERT_TYPES, type AlertRule, type AlertRuleInput } from "@
 interface Props {
   initialRules: AlertRule[];
   hasPhone: boolean;
+  isElite: boolean;
 }
 
 const blankRule: AlertRuleInput = {
@@ -27,7 +28,7 @@ const blankRule: AlertRuleInput = {
   channels: ["email"],
 };
 
-export default function AlertRulesPanel({ initialRules, hasPhone }: Props) {
+export default function AlertRulesPanel({ initialRules, hasPhone, isElite }: Props) {
   const [rules, setRules] = useState<AlertRule[]>(initialRules);
   const [editing, setEditing] = useState<AlertRuleInput | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -104,6 +105,7 @@ export default function AlertRulesPanel({ initialRules, hasPhone }: Props) {
           input={editing}
           editingId={editingId}
           hasPhone={hasPhone}
+          isElite={isElite}
           onSave={saveRule}
           onCancel={() => { setEditing(null); setEditingId(null); }}
         />
@@ -175,10 +177,11 @@ export default function AlertRulesPanel({ initialRules, hasPhone }: Props) {
   );
 }
 
-function RuleForm({ input, editingId, hasPhone, onSave, onCancel }: {
+function RuleForm({ input, editingId, hasPhone, isElite, onSave, onCancel }: {
   input: AlertRuleInput;
   editingId: string | null;
   hasPhone: boolean;
+  isElite: boolean;
   onSave: (i: AlertRuleInput) => Promise<void>;
   onCancel: () => void;
 }) {
@@ -292,7 +295,7 @@ function RuleForm({ input, editingId, hasPhone, onSave, onCancel }: {
 
           <div>
             <Label className="text-xs">Delivery</Label>
-            <div className="flex gap-2 mt-1">
+            <div className="flex gap-2 mt-1 flex-wrap">
               <label className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded cursor-pointer border ${(form.channels || []).includes("email") ? "bg-emerald-500/10 border-emerald-500/40 text-foreground" : "border-border hover:bg-muted/30"}`}>
                 <input
                   type="checkbox"
@@ -302,18 +305,20 @@ function RuleForm({ input, editingId, hasPhone, onSave, onCancel }: {
                 />
                 <Mail className="h-4 w-4" />Email
               </label>
-              <label className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded cursor-pointer border ${(form.channels || []).includes("sms") ? "bg-emerald-500/10 border-emerald-500/40 text-foreground" : "border-border hover:bg-muted/30"} ${!hasPhone ? "opacity-50" : ""}`}>
+              <label className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded cursor-pointer border ${(form.channels || []).includes("sms") && isElite ? "bg-emerald-500/10 border-emerald-500/40 text-foreground" : "border-border hover:bg-muted/30"} ${!isElite || !hasPhone ? "opacity-50" : ""}`}>
                 <input
                   type="checkbox"
                   checked={(form.channels || []).includes("sms")}
                   onChange={() => toggleArray("channels", "sms")}
-                  disabled={!hasPhone}
+                  disabled={!isElite || !hasPhone}
                   className="sr-only"
                 />
                 <Smartphone className="h-4 w-4" />SMS
-                {!hasPhone && <Link href="/settings" className="text-[10px] text-amber-500 hover:underline">add phone</Link>}
+                {!isElite && <Link href="/pricing" className="text-[10px] text-amber-500 hover:underline">Elite</Link>}
+                {isElite && !hasPhone && <Link href="/settings" className="text-[10px] text-amber-500 hover:underline">add phone</Link>}
               </label>
             </div>
+            {!isElite && <p className="text-[10px] text-muted-foreground mt-1">Pro is email only. <Link href="/pricing" className="text-emerald-500 hover:underline">Upgrade to Elite</Link> for SMS + smart presets + watchlist filtering.</p>}
           </div>
 
           <div className="flex gap-2 pt-2 border-t border-border/40">
