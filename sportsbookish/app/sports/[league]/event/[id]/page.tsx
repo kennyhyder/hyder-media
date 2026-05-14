@@ -13,6 +13,7 @@ import SpreadsTable from "@/components/sports/SpreadsTable";
 import TotalsTable from "@/components/sports/TotalsTable";
 import WatchlistButton from "@/components/WatchlistButton";
 import QuickLogBet from "@/components/bets/QuickLogBet";
+import BookLink from "@/components/BookLink";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
@@ -226,7 +227,7 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
                         </span>
                         {m.best_book && (
                           <span className="text-muted-foreground">
-                            Best book <span className="text-foreground">{bookLabel(m.best_book.book)}</span>{" "}
+                            Best book <BookLink book={m.best_book.book} campaign="event-detail-best-book" className="text-foreground hover:text-emerald-500 underline-offset-2 hover:underline" />{" "}
                             <span className="tabular-nums">{fmtAmerican(m.best_book.american)}</span>{" "}
                             <span className="text-muted-foreground/70">({fmtPct(m.best_book.implied_prob_novig)})</span>
                           </span>
