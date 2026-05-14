@@ -5,8 +5,9 @@ function getSupabase() {
 }
 
 // GET /api/sports/event?id=<uuid>
-// Returns event + each Kalshi market overlaid with sportsbook consensus from
-// sports_book_v_latest: per-book no-vig probs, median, best book, edge vs Kalshi.
+// Returns event + each Kalshi market overlaid with sportsbook consensus
+// (h2h) AND separate spreads/totals tables aggregated from
+// sports_book_v_latest for that event.
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -29,26 +30,28 @@ export default async function handler(req, res) {
       .select("id, contestant_label, market_type, kalshi_ticker")
       .eq("event_id", id);
 
+    // Pull all book quotes for this event in one query, then split by market_type
+    const { data: allBookQuotes } = await supabase
+      .from("sports_book_v_latest")
+      .select("contestant_label, contestant_norm, market_type, book, implied_prob_novig, american, point, fetched_at")
+      .eq("sports_event_id", id);
+
+    const h2hQuotes = (allBookQuotes || []).filter((b) => b.market_type === "h2h");
+    const spreadsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "spreads");
+    const totalsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "totals");
+
+    // Kalshi quotes for each market
     let marketsWithQuotes = markets || [];
     if (marketsWithQuotes.length > 0) {
       const ids = marketsWithQuotes.map((m) => m.id);
-      const [{ data: kalshiQuotes }, { data: bookQuotes }] = await Promise.all([
-        supabase
-          .from("sports_v_latest_quotes")
-          .select("market_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at")
-          .in("market_id", ids),
-        // Map sports_book_quotes via the event_id + contestant_norm join
-        supabase
-          .from("sports_book_v_latest")
-          .select("contestant_norm, book, implied_prob_novig, american, fetched_at")
-          .eq("sports_event_id", id)
-          .eq("market_type", "h2h"),
-      ]);
+      const { data: kalshiQuotes } = await supabase
+        .from("sports_v_latest_quotes")
+        .select("market_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at")
+        .in("market_id", ids);
 
       const qByMarket = new Map((kalshiQuotes || []).map((q) => [q.market_id, q]));
-      // Group book quotes by contestant_norm
       const booksByContestant = new Map();
-      for (const b of bookQuotes || []) {
+      for (const b of h2hQuotes) {
         const arr = booksByContestant.get(b.contestant_norm) || [];
         arr.push(b);
         booksByContestant.set(b.contestant_norm, arr);
@@ -56,11 +59,7 @@ export default async function handler(req, res) {
 
       marketsWithQuotes = marketsWithQuotes.map((m) => {
         const q = qByMarket.get(m.id);
-        const labelNorm = (m.contestant_label || "")
-          .toLowerCase()
-          .replace(/[^a-z0-9 ]+/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
+        const labelNorm = (m.contestant_label || "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
         const books = (booksByContestant.get(labelNorm) || []).map((b) => ({
           book: b.book,
           implied_prob_novig: b.implied_prob_novig != null ? Number(b.implied_prob_novig) : null,
@@ -69,12 +68,9 @@ export default async function handler(req, res) {
         }));
         const novigs = books.map((b) => b.implied_prob_novig).filter((v) => v != null).sort((a, b) => a - b);
         const median = novigs.length ? novigs[Math.floor(novigs.length / 2)] : null;
-        // best book = lowest no-vig prob (cheapest YES → longest American on YES)
         let bestBook = null;
-        if (books.length) {
-          const sortedBest = [...books].filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
-          if (sortedBest.length) bestBook = { book: sortedBest[0].book, implied_prob_novig: sortedBest[0].implied_prob_novig, american: sortedBest[0].american };
-        }
+        const sortedBest = [...books].filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
+        if (sortedBest.length) bestBook = { book: sortedBest[0].book, implied_prob_novig: sortedBest[0].implied_prob_novig, american: sortedBest[0].american };
         const kalshi = q?.implied_prob ?? null;
         const edge_vs_median = (kalshi != null && median != null) ? Number((median - kalshi).toFixed(5)) : null;
         const edge_vs_best = (kalshi != null && bestBook?.implied_prob_novig != null) ? Number((bestBook.implied_prob_novig - kalshi).toFixed(5)) : null;
@@ -89,7 +85,6 @@ export default async function handler(req, res) {
           yes_ask: q?.yes_ask ?? null,
           last_price: q?.last_price ?? null,
           fetched_at: q?.fetched_at ?? null,
-          // Book overlay
           books_count: books.length,
           books_median: median,
           books_min: novigs.length ? novigs[0] : null,
@@ -103,7 +98,46 @@ export default async function handler(req, res) {
       marketsWithQuotes.sort((a, b) => (b.implied_prob ?? 0) - (a.implied_prob ?? 0));
     }
 
-    return res.status(200).json({ event, markets: marketsWithQuotes });
+    // Build spreads table: group by team label, then for each team list each
+    // book's spread + price. UI renders two rows (home / away) with per-book columns.
+    const spreadsByTeam = {};
+    for (const b of spreadsQuotes) {
+      if (!spreadsByTeam[b.contestant_norm]) {
+        spreadsByTeam[b.contestant_norm] = { label: b.contestant_label, books: {} };
+      }
+      spreadsByTeam[b.contestant_norm].books[b.book] = {
+        point: b.point != null ? Number(b.point) : null,
+        american: b.american,
+        implied_prob_novig: b.implied_prob_novig != null ? Number(b.implied_prob_novig) : null,
+      };
+    }
+    const spreads = Object.values(spreadsByTeam);
+
+    // Totals: group by (point, side). Each book has its own primary line
+    // — pick the median point as the "consensus line" and show all books at
+    // that line + ±0.5 from it.
+    const totalsByPointSide = {};
+    for (const b of totalsQuotes) {
+      const k = `${b.point}|${b.contestant_norm}`;
+      if (!totalsByPointSide[k]) {
+        totalsByPointSide[k] = { point: b.point != null ? Number(b.point) : null, side: b.contestant_label, books: {} };
+      }
+      totalsByPointSide[k].books[b.book] = {
+        american: b.american,
+        implied_prob_novig: b.implied_prob_novig != null ? Number(b.implied_prob_novig) : null,
+      };
+    }
+    const totals = Object.values(totalsByPointSide).sort((a, b) => {
+      if (a.point !== b.point) return (a.point ?? 0) - (b.point ?? 0);
+      return a.side.localeCompare(b.side);
+    });
+
+    return res.status(200).json({
+      event,
+      markets: marketsWithQuotes,
+      spreads,
+      totals,
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
