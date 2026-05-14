@@ -24,26 +24,32 @@ const LEAGUE_ICONS: Record<string, string> = {
 };
 
 export default async function SiteHeader() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  // Resilient resolution — any error in user / tier / leagues must NOT
+  // crash the layout. We fall back to anonymous + empty leagues.
+  let userEmail: string | null = null;
   let tier: TierKey = "free";
-  if (user) {
-    const { data: sub } = await supabase
-      .from("sb_subscriptions")
-      .select("tier")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    tier = (sub?.tier || "free") as TierKey;
-  }
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      userEmail = user.email || null;
+      const { data: sub } = await supabase
+        .from("sb_subscriptions")
+        .select("tier")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      tier = (sub?.tier || "free") as TierKey;
+    }
+  } catch {}
 
-  const isAnonymous = !user;
+  const isAnonymous = !userEmail;
   const isElite = tier === "elite";
   const isPaid = tier !== "free";
-  const isAdmin = isAdminEmail(user?.email);
+  const isAdmin = isAdminEmail(userEmail);
   const tierInfo = TIER_BY_KEY[tier];
 
-  const leagues = await fetchLeagues();
+  let leagues: Awaited<ReturnType<typeof fetchLeagues>> = [];
+  try { leagues = await fetchLeagues(); } catch {}
 
   // SPORTS dropdown — show all leagues as facets including golf
   const sportsSections: NavDropdownSection[] = [
@@ -61,8 +67,8 @@ export default async function SiteHeader() {
     {
       heading: "More",
       items: [
-        { label: "All sports", href: "/sports", description: "League index", icon: Trophy },
-        { label: "Top movers", href: "/sports/movers", description: "Live Kalshi line moves ≥2%", icon: TrendingUp },
+        { label: "All sports", href: "/sports", description: "League index", icon: <Trophy className="h-4 w-4" /> },
+        { label: "Top movers", href: "/sports/movers", description: "Live Kalshi line moves ≥2%", icon: <TrendingUp className="h-4 w-4" /> },
       ],
     },
   ];
@@ -73,25 +79,25 @@ export default async function SiteHeader() {
     toolsItems.push({
       heading: "Resources",
       items: [
-        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs DraftKings, FanDuel & more", icon: GitCompare },
-        { label: "Learn", href: "/learn", description: "Kalshi odds explained · no-vig math", icon: BookOpen },
+        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs DraftKings, FanDuel & more", icon: <GitCompare className="h-4 w-4" /> },
+        { label: "Learn", href: "/learn", description: "Kalshi odds explained · no-vig math", icon: <BookOpen className="h-4 w-4" /> },
       ],
     });
   } else {
     toolsItems.push({
       heading: "Your stuff",
       items: [
-        { label: "Dashboard", href: "/dashboard", description: "Account hub", icon: LayoutDashboard },
-        ...(isPaid ? [{ label: "Alerts", href: "/alerts", description: "Custom rules + smart presets", icon: Bell }] : []),
-        ...(isElite ? [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · CLV · ROI", icon: BarChart3 }] : [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · Elite", icon: BarChart3, badge: "Elite" }]),
-        { label: "Settings", href: "/settings", description: "Preferences + billing", icon: Sparkles },
+        { label: "Dashboard", href: "/dashboard", description: "Account hub", icon: <LayoutDashboard className="h-4 w-4" /> },
+        ...(isPaid ? [{ label: "Alerts", href: "/alerts", description: "Custom rules + smart presets", icon: <Bell className="h-4 w-4" /> }] : []),
+        ...(isElite ? [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · CLV · ROI", icon: <BarChart3 className="h-4 w-4" /> }] : [{ label: "Bet Tracker", href: "/bets", description: "Skill Score · Elite", icon: <BarChart3 className="h-4 w-4" />, badge: "Elite" }]),
+        { label: "Settings", href: "/settings", description: "Preferences + billing", icon: <Sparkles className="h-4 w-4" /> },
       ],
     });
     toolsItems.push({
       heading: "Discover",
       items: [
-        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs each book", icon: GitCompare },
-        { label: "Learn", href: "/learn", description: "Kalshi odds explainers", icon: BookOpen },
+        { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs each book", icon: <GitCompare className="h-4 w-4" /> },
+        { label: "Learn", href: "/learn", description: "Kalshi odds explainers", icon: <BookOpen className="h-4 w-4" /> },
       ],
     });
   }
@@ -131,7 +137,7 @@ export default async function SiteHeader() {
               >
                 {tierInfo.name}
               </Badge>
-              <UserMenu email={user!.email || ""} tier={tier} isAdmin={isAdmin} />
+              <UserMenu email={userEmail || ""} tier={tier} isAdmin={isAdmin} />
             </>
           )}
           <ThemeToggle compact />

@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, type LucideIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export interface NavDropdownItem {
   label: string;
   href: string;
   description?: string;
-  icon?: LucideIcon;
+  icon?: React.ReactNode;        // pass JSX element from server; function refs can't cross the boundary
   badge?: string;
 }
 
@@ -73,31 +73,28 @@ export default function NavDropdown({ label, sections, width = "narrow" }: Props
                   </div>
                 )}
                 <div className={width === "wide" ? "grid grid-cols-2 gap-1" : "space-y-0.5"}>
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        role="menuitem"
-                        className="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500 group"
-                        onClick={() => setOpen(false)}
-                      >
-                        {Icon && <Icon className="h-4 w-4 text-muted-foreground group-hover:text-foreground mt-0.5 shrink-0" aria-hidden="true" />}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            {item.label}
-                            {item.badge && (
-                              <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500">{item.badge}</span>
-                            )}
-                          </div>
-                          {item.description && (
-                            <div className="text-xs text-muted-foreground truncate">{item.description}</div>
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      role="menuitem"
+                      className="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500 group"
+                      onClick={() => setOpen(false)}
+                    >
+                      {item.icon && <span className="text-muted-foreground group-hover:text-foreground mt-0.5 shrink-0" aria-hidden="true">{item.icon}</span>}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          {item.label}
+                          {item.badge && (
+                            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500">{item.badge}</span>
                           )}
                         </div>
-                      </Link>
-                    );
-                  })}
+                        {item.description && (
+                          <div className="text-xs text-muted-foreground truncate">{item.description}</div>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
             ))}
