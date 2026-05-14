@@ -96,6 +96,11 @@ export interface MarketRow {
   best_book?: { book: string; implied_prob_novig: number | null; american: number | null } | null;
   edge_vs_books_median?: number | null;
   edge_vs_best_book?: number | null;
+  // Polymarket (peer-to-peer; same fee-free structure as Kalshi)
+  polymarket_prob?: number | null;
+  polymarket_volume_usd?: number | null;
+  edge_kalshi_vs_polymarket?: number | null;
+  edge_polymarket_vs_books?: number | null;
 }
 
 export interface SpreadRow {

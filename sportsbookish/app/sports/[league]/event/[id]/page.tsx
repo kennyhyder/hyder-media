@@ -179,6 +179,27 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
                     </div>
                   )}
 
+                  {/* Polymarket peer-to-peer comparison */}
+                  {m.polymarket_prob != null && (
+                    <div className="mt-2 text-xs flex items-center gap-3 flex-wrap">
+                      <span className="text-muted-foreground">
+                        <span className="font-semibold" style={{ color: "#a855f7" }}>Polymarket</span>{" "}
+                        <span className="tabular-nums">{fmtPct(m.polymarket_prob)}</span>
+                        {m.polymarket_volume_usd != null && m.polymarket_volume_usd > 1000 && (
+                          <span className="text-muted-foreground/70 ml-1">(${Math.round(m.polymarket_volume_usd / 1000)}k vol)</span>
+                        )}
+                      </span>
+                      {m.edge_kalshi_vs_polymarket != null && Math.abs(m.edge_kalshi_vs_polymarket) >= 0.01 && (
+                        <span className="text-muted-foreground">
+                          K vs P:{" "}
+                          <span className={`tabular-nums font-semibold ${edgeTextClass(m.edge_kalshi_vs_polymarket)}`}>
+                            {fmtPctSigned(m.edge_kalshi_vs_polymarket)}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Book overlay */}
                   {(m.books_count ?? 0) > 0 && (
                     <div className="mt-3 rounded-md border border-border/60 bg-card/50 p-3 text-xs">
