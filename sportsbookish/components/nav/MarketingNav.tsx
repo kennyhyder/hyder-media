@@ -11,7 +11,10 @@ export default function MarketingNav() {
           <LineChart className="h-5 w-5 text-emerald-500" />
           <span className="text-lg tracking-tight">SportsBook<span className="text-emerald-500">ISH</span></span>
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1" aria-label="Primary">
+          <Link href="/sports" className={`${buttonVariants({ variant: "ghost", size: "sm" })} hidden sm:inline-flex`}>Sports</Link>
+          <Link href="/compare" className={`${buttonVariants({ variant: "ghost", size: "sm" })} hidden md:inline-flex`}>Compare</Link>
+          <Link href="/learn" className={`${buttonVariants({ variant: "ghost", size: "sm" })} hidden md:inline-flex`}>Learn</Link>
           <Link href="/pricing" className={buttonVariants({ variant: "ghost", size: "sm" })}>Pricing</Link>
           <Link href="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>Log in</Link>
           <Link href="/signup" className={`${buttonVariants({ size: "sm" })} bg-emerald-600 hover:bg-emerald-500 text-white`}>Start free</Link>
