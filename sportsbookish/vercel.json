@@ -1,8 +1,10 @@
 {
   "crons": [
-    { "path": "/api/alerts/dispatch", "schedule": "*/5 * * * *" }
+    { "path": "/api/alerts/dispatch", "schedule": "*/5 * * * *" },
+    { "path": "/api/alerts/digest",   "schedule": "0 14 * * *" }
   ],
   "functions": {
-    "app/api/alerts/dispatch/route.ts": { "maxDuration": 60 }
+    "app/api/alerts/dispatch/route.ts": { "maxDuration": 60 },
+    "app/api/alerts/digest/route.ts":   { "maxDuration": 120 }
   }
 }
