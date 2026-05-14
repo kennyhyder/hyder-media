@@ -39,7 +39,7 @@ const HOMEPAGE_FAQ = [
   {
     question: "Is this free?",
     answer:
-      "Browsing live odds and the daily edge digest are free, no signup required. Setting custom alert rules requires Pro ($10/month). Smart preset alerts (one-click 'Big Movers', 'My Watchlist'), SMS delivery, and watchlist-filtered alerts are Elite ($100/year — cheaper than Pro on an annual basis).",
+      "Browsing live odds, the daily edge digest, and basic edge math are free without signup. A free account adds the Kalshi-fee-adjusted edge (net-of-fee — see exactly what you pocket after Kalshi's 1–2¢ per-share trading fee) and the watchlist for bookmarking teams/players. Setting custom alert rules requires Pro ($10/month). Smart preset alerts (one-click 'Big Movers', 'My Watchlist'), SMS delivery, and watchlist-filtered alerts are Elite ($100/year — cheaper than Pro on an annual basis).",
   },
   {
     question: "How often do the odds update?",

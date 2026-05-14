@@ -173,7 +173,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
             <div className="flex items-baseline gap-2 mb-3">
               <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Game slate ({groups.game!.length})</h2>
             </div>
-            <SportsBestBets league={league} rows={gameRows} />
+            <SportsBestBets league={league} rows={gameRows} isAnonymous={isAnonymous} />
             <SportsBookTable league={league} rows={gameRows} books={allBooks} isPaidTier={isPaidTier} />
           </section>
         )}

@@ -14,6 +14,7 @@ import TotalsTable from "@/components/sports/TotalsTable";
 import WatchlistButton from "@/components/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
+import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -198,6 +199,16 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
                         <span>
                           Buy edge vs median{" "}
                           <span className={`tabular-nums font-semibold px-1 rounded ${edgeTextClass(edgeMed)} ${edgeBgClass(edgeMed)}`}>{fmtPctSigned(edgeMed)}</span>
+                          {!isAnonymous && edgeMed != null && m.implied_prob != null && (
+                            <span className="ml-1 text-[10px] text-muted-foreground" title={`Kalshi fee ≈ ${(kalshiFeeFraction(m.implied_prob) * 100).toFixed(1)}¢/share`}>
+                              (after fee: <span className={edgeTextClass(netBuyEdge(edgeMed, m.implied_prob))}>{fmtPctSigned(netBuyEdge(edgeMed, m.implied_prob))}</span>)
+                            </span>
+                          )}
+                          {isAnonymous && edgeMed != null && (
+                            <Link href={`/signup?next=/sports/${league}/event/${id}`} className="ml-1 text-[10px] text-amber-500 hover:text-amber-400 italic" title="See edge after Kalshi trading fees">
+                              · 🔒 net-of-fee
+                            </Link>
+                          )}
                         </span>
                         <span>
                           vs best book{" "}
