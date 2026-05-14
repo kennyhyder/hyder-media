@@ -50,6 +50,33 @@ function normalizeAlertForMatch(a: FeedAlert): AlertMatchInput {
   };
 }
 
+async function sendSms(to: string, body: string): Promise<{ ok: boolean; error?: string }> {
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_FROM_NUMBER;
+  if (!sid || !token || !from) return { ok: false, error: "Twilio env missing" };
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+  const auth = Buffer.from(`${sid}:${token}`).toString("base64");
+  const params = new URLSearchParams({ To: to, From: from, Body: body.slice(0, 320) });
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
+  });
+  if (!r.ok) {
+    const body = await r.text().catch(() => "");
+    return { ok: false, error: `Twilio ${r.status}: ${body.slice(0, 200)}` };
+  }
+  return { ok: true };
+}
+
+function alertSmsBody(a: FeedAlert, ruleName: string): string {
+  const direction = (a.direction === "up" || a.direction === "buy") ? "🟢" : "🔴";
+  const deltaStr = `${a.delta >= 0 ? "+" : ""}${(a.delta * 100).toFixed(1)}%`;
+  const probStr = `${(a.probability * 100).toFixed(0)}%`;
+  return `${direction} ${ruleName}\n${a.title}: ${deltaStr} edge (Kalshi ${probStr})\n${a.subtitle}\nsportsbookish.com${a.link}`;
+}
+
 async function sendEmail(to: string, subject: string, html: string): Promise<{ ok: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, error: "RESEND_API_KEY missing" };
@@ -188,13 +215,24 @@ export async function GET(req: Request) {
   const existingSet = new Set((existing || []).map((e) => `${e.rule_id}|${e.alert_source}|${e.alert_id}`));
   const pending = matches.filter((m) => !existingSet.has(`${m.rule.id}|${m.alert.source}|${m.alert.id}`));
 
-  // 5. Look up email addresses for each user that has pending matches
+  // 5. Look up email + SMS phone for each user that has pending matches
   const userIds = Array.from(new Set(pending.map((m) => m.rule.user_id)));
   const emailByUser = new Map<string, string>();
   // auth.admin.listUsers is paginated; for our scale, single page is fine
   const { data: usersRes } = await supabase.auth.admin.listUsers({ perPage: 1000 });
   for (const u of usersRes?.users || []) {
     if (u.email) emailByUser.set(u.id, u.email);
+  }
+  // SMS phone numbers come from sb_user_preferences (Elite users opt in by saving their phone in /settings)
+  const phoneByUser = new Map<string, string>();
+  if (userIds.length) {
+    const { data: prefs } = await supabase
+      .from("sb_user_preferences")
+      .select("user_id, sms_phone")
+      .in("user_id", userIds);
+    for (const p of prefs || []) {
+      if (p.sms_phone) phoneByUser.set(p.user_id, p.sms_phone);
+    }
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
@@ -221,8 +259,14 @@ export async function GET(req: Request) {
     }
 
     if (wantsSms) {
-      // SMS dispatch not wired yet (pending Twilio A2P)
-      smsStatus = "pending";
+      const phone = phoneByUser.get(rule.user_id);
+      if (!phone) {
+        smsStatus = "skipped"; // no number on file — user needs to set sms_phone in /settings
+      } else {
+        const smsResult = await sendSms(phone, alertSmsBody(alert, rule.name));
+        smsStatus = smsResult.ok ? "sent" : "failed";
+        if (!smsResult.ok && !err) err = smsResult.error || null;
+      }
     }
 
     dispatched.push({

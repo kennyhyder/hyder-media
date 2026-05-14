@@ -319,6 +319,7 @@ function RuleForm({ input, editingId, hasPhone, isElite, onSave, onCancel }: {
               </label>
             </div>
             {!isElite && <p className="text-[10px] text-muted-foreground mt-1">Pro is email only. <Link href="/pricing" className="text-emerald-500 hover:underline">Upgrade to Elite</Link> for SMS + smart presets + watchlist filtering.</p>}
+            {isElite && !hasPhone && <p className="text-[10px] text-amber-500 mt-1">SMS requires a phone number on file. <Link href="/settings" className="hover:underline">Add it in Settings →</Link></p>}
           </div>
 
           <div className="flex gap-2 pt-2 border-t border-border/40">
