@@ -3,8 +3,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Bell, LineChart, Target, Zap } from "lucide-react";
 import MarketingNav from "@/components/nav/MarketingNav";
 import PricingCards from "@/components/marketing/PricingCards";
+import { fetchLeagues } from "@/lib/sports-data";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const leagues = await fetchLeagues();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <MarketingNav />
@@ -39,6 +44,55 @@ export default function Home() {
               See plans
             </Link>
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            No card required to browse live odds — click into any sport below.
+          </p>
+        </div>
+      </section>
+
+      {/* Sports grid — public free-tier content */}
+      <section className="border-b border-border/40 bg-muted/20">
+        <div className="container mx-auto max-w-6xl px-4 py-16">
+          <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Live edges right now</h2>
+              <p className="text-sm text-muted-foreground mt-1">Free to browse — Kalshi vs book consensus across every sport we cover.</p>
+            </div>
+            <Link href="/sports" className="text-sm text-emerald-500 hover:text-emerald-400 inline-flex items-center gap-1">
+              All sports <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <Link
+              href="/golf"
+              className="group rounded-lg border border-border bg-card hover:bg-card/80 hover:border-emerald-500/40 p-4 transition flex flex-col items-center text-center"
+            >
+              <div className="text-4xl mb-2">⛳</div>
+              <div className="font-semibold text-sm">Golf</div>
+              <div className="text-[10px] text-muted-foreground mt-1">PGA · DataGolf model</div>
+            </Link>
+            {leagues.map((l) => (
+              <Link
+                key={l.key}
+                href={`/sports/${l.key}`}
+                className="group rounded-lg border border-border bg-card hover:bg-card/80 hover:border-emerald-500/40 p-4 transition flex flex-col items-center text-center"
+              >
+                <div className="text-4xl mb-2">{l.icon}</div>
+                <div className="font-semibold text-sm">{l.display_name}</div>
+                <div className="text-[10px] text-muted-foreground mt-1 capitalize">{l.sport_category} · Kalshi + books</div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/sports/movers"
+              className={`${buttonVariants({ variant: "outline" })} text-sm`}
+            >
+              📈 Top movers across all sports
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -49,7 +103,7 @@ export default function Home() {
             <Feature
               icon={<LineChart className="h-6 w-6 text-emerald-500" />}
               title="Every market, every book"
-              body="Outrights, top-5/10/20, make cut, matchups, round leaders, props on golf. Game moneylines, series, and championships across NBA, MLB, NHL, EPL, MLS — with 14 sportsbooks side-by-side on golf."
+              body="Outrights, top-5/10/20, make cut, matchups, round leaders, props on golf. Game moneylines, series, and championships across NBA, MLB, NHL, EPL, MLS — with up to 14 sportsbooks side-by-side."
             />
             <Feature
               icon={<Target className="h-6 w-6 text-emerald-500" />}

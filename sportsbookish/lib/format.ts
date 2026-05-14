@@ -84,19 +84,22 @@ export function fmtAmerican(a: number | null | undefined): string {
   return a > 0 ? `+${a}` : `${a}`;
 }
 
+// Edge color helpers — must read well on BOTH light and dark backgrounds.
+// Mid-range shades (600/500) for text in light mode, brighter (400/300) in dark.
+// Backgrounds get higher opacity in light mode since /8 is invisible on white.
 export function edgeTextClass(edge: number | null | undefined): string {
-  if (edge == null) return "text-neutral-500";
+  if (edge == null) return "text-muted-foreground";
   const abs = Math.abs(edge);
-  if (abs >= 0.05) return edge > 0 ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold";
-  if (abs >= 0.02) return edge > 0 ? "text-emerald-300" : "text-rose-300";
-  if (abs >= 0.005) return edge > 0 ? "text-emerald-200/70" : "text-rose-200/70";
-  return "text-neutral-400";
+  if (abs >= 0.05) return edge > 0 ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-rose-600 dark:text-rose-400 font-semibold";
+  if (abs >= 0.02) return edge > 0 ? "text-emerald-700/90 dark:text-emerald-300" : "text-rose-700/90 dark:text-rose-300";
+  if (abs >= 0.005) return edge > 0 ? "text-emerald-700/70 dark:text-emerald-200/70" : "text-rose-700/70 dark:text-rose-200/70";
+  return "text-muted-foreground";
 }
 
 export function edgeBgClass(edge: number | null | undefined): string {
   if (edge == null) return "";
   const abs = Math.abs(edge);
-  if (abs >= 0.05) return edge > 0 ? "bg-emerald-500/15" : "bg-rose-500/15";
-  if (abs >= 0.02) return edge > 0 ? "bg-emerald-500/8" : "bg-rose-500/8";
+  if (abs >= 0.05) return edge > 0 ? "bg-emerald-500/20 dark:bg-emerald-500/15" : "bg-rose-500/20 dark:bg-rose-500/15";
+  if (abs >= 0.02) return edge > 0 ? "bg-emerald-500/10 dark:bg-emerald-500/8" : "bg-rose-500/10 dark:bg-rose-500/8";
   return "";
 }

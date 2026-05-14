@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
+import type { Metadata } from "next";
 import { fetchLeagues, fetchLeagueData } from "@/lib/sports-data";
 import { fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
@@ -11,6 +12,24 @@ import GameCard from "@/components/sports/GameCard";
 import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookTable";
 import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
+
+export async function generateMetadata({ params }: { params: Promise<{ league: string }> }): Promise<Metadata> {
+  const { league } = await params;
+  const leagues = await fetchLeagues();
+  const meta = leagues.find((l) => l.key === league);
+  if (!meta) return { title: "Sports — SportsBookISH" };
+  const title = `${meta.display_name} — Kalshi vs Books | SportsBookISH`;
+  const description = `Live ${meta.display_name} odds: every game compared between Kalshi and US sportsbooks. Find the best edge in seconds — free, no signup.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `${SITE_URL}/sports/${league}` },
+    openGraph: { title, description, url: `${SITE_URL}/sports/${league}`, type: "website", siteName: "SportsBookISH" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export const dynamic = "force-dynamic";
 

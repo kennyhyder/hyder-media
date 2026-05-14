@@ -2,12 +2,40 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import type { Metadata } from "next";
 import { fetchEventDetail, fetchLeagues } from "@/lib/sports-data";
 import { fetchEventHistory, fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass, edgeBgClass } from "@/lib/format";
 import PriceSpark from "@/components/PriceSpark";
 import UpsellBanner from "@/components/UpsellBanner";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
+
+export async function generateMetadata({ params }: { params: Promise<{ league: string; id: string }> }): Promise<Metadata> {
+  const { league, id } = await params;
+  const detail = await fetchEventDetail(id);
+  if (!detail) return { title: "Event — SportsBookISH" };
+  const title = `${detail.event.title} — Kalshi vs Books | SportsBookISH`;
+  const ogImage = `${SITE_URL}/api/og/sports-event?id=${id}`;
+  const url = `${SITE_URL}/sports/${league}/event/${id}`;
+
+  // Build a snappy description: top edge + Kalshi vs books per side
+  const m0 = detail.markets[0];
+  const m1 = detail.markets[1];
+  const lines = [m0, m1].filter(Boolean).map((m) =>
+    `${m.contestant_label}: Kalshi ${m.implied_prob != null ? `${(m.implied_prob * 100).toFixed(1)}%` : "—"} vs books ${m.books_median != null ? `${(m.books_median * 100).toFixed(1)}%` : "—"}`
+  ).join(" · ");
+  const description = lines || "Live Kalshi vs sportsbook odds comparison.";
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, type: "website", images: [ogImage], siteName: "SportsBookISH" },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
