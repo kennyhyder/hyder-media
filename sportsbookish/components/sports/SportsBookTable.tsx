@@ -19,6 +19,7 @@ export interface SportsRow {
   edge_vs_best_book: number | null;
   best_book: { book: string; implied_prob_novig: number | null; american: number | null } | null;
   book_prices: Record<string, { american: number | null; novig: number | null }>;
+  polymarket_prob?: number | null;
 }
 
 interface Props {
@@ -29,7 +30,7 @@ interface Props {
 }
 
 type SortKey =
-  | "matchup" | "kalshi" | "books_median" | "edge_vs_books_median"
+  | "matchup" | "kalshi" | "polymarket" | "books_median" | "edge_vs_books_median"
   | "edge_vs_best_book" | "book_count" | "start_time"
   | `book:${string}`;
 
@@ -63,6 +64,7 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
       if (key === "matchup") return r.event_title || "";
       if (key === "start_time") return r.start_time ? new Date(r.start_time).getTime() : null;
       if (key === "kalshi") return r.implied_prob;
+      if (key === "polymarket") return r.polymarket_prob ?? null;
       if (key === "books_median") return r.books_median;
       if (key === "edge_vs_books_median") return r.edge_vs_books_median;
       if (key === "edge_vs_best_book") return r.edge_vs_best_book;
@@ -105,6 +107,7 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
             <TableRow>
               <SortHead k="matchup" current={sort} onClick={toggle} align="left">Team / Game</SortHead>
               <SortHead k="kalshi" current={sort} onClick={toggle}><span className="text-amber-500">Kalshi</span></SortHead>
+              <SortHead k="polymarket" current={sort} onClick={toggle}><span style={{ color: "#a855f7" }}>Polymarket</span></SortHead>
               <SortHead k="books_median" current={sort} onClick={toggle}>Books med</SortHead>
               <SortHead k="edge_vs_books_median" current={sort} onClick={toggle}>Buy edge</SortHead>
               <SortHead k="edge_vs_best_book" current={sort} onClick={toggle}>vs best</SortHead>
@@ -132,6 +135,9 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
                     </Link>
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-amber-500">{fmtPct(r.implied_prob)}</TableCell>
+                  <TableCell className="text-right tabular-nums" style={{ color: r.polymarket_prob != null ? "#a855f7" : undefined }}>
+                    {r.polymarket_prob != null ? fmtPct(r.polymarket_prob) : <span className="text-muted-foreground/40">—</span>}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">{fmtPct(r.books_median)}</TableCell>
                   <TableCell className={`text-right tabular-nums font-semibold ${edgeTextClass(edgeMed)} ${edgeBgClass(edgeMed)}`}>{fmtPctSigned(edgeMed)}</TableCell>
                   <TableCell className={`text-right tabular-nums ${edgeTextClass(edgeBest)}`}>
@@ -171,7 +177,7 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
             })}
             {sorted.length === 0 && (
               <TableRow>
-                <TableCell colSpan={visibleBooks.length + (hasStartTimes ? 7 : 6)} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={visibleBooks.length + (hasStartTimes ? 8 : 7)} className="text-center py-8 text-muted-foreground">
                   No rows in current filter. Try switching to &quot;All games&quot; or check back when books post lines (1-2 days before tipoff).
                 </TableCell>
               </TableRow>

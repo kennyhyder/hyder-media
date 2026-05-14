@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
     const eventIds = events.map((e) => e.id);
 
-    const [{ data: markets }, { data: bookQuotes }] = await Promise.all([
+    const [{ data: markets }, { data: bookQuotes }, { data: polymarketQuotes }] = await Promise.all([
       supabase
         .from("sports_markets")
         .select("id, event_id, contestant_label, market_type")
@@ -46,7 +46,17 @@ export default async function handler(req, res) {
         .select("sports_event_id, contestant_norm, book, implied_prob_novig, american")
         .in("sports_event_id", eventIds)
         .eq("market_type", "h2h"),
+      supabase
+        .from("sports_polymarket_v_latest")
+        .select("sports_event_id, contestant_norm, implied_prob, volume_usd")
+        .in("sports_event_id", eventIds),
     ]);
+
+    // Index polymarket by (event_id, contestant_norm)
+    const polyByEventContestant = new Map();
+    for (const p of polymarketQuotes || []) {
+      polyByEventContestant.set(`${p.sports_event_id}|${p.contestant_norm}`, p);
+    }
 
     const marketIds = (markets || []).map((m) => m.id);
     const { data: kalshiQuotes } = marketIds.length
@@ -99,6 +109,11 @@ export default async function handler(req, res) {
       const bookPrices = {};
       for (const b of bookList) bookPrices[b.book] = { american: b.american, novig: b.implied_prob_novig };
 
+      // Polymarket overlay for this contestant on this event
+      const poly = polyByEventContestant.get(`${m.event_id}|${norm}`);
+      const polyProb = poly?.implied_prob != null ? Number(poly.implied_prob) : null;
+      const edgeKalshiVsPoly = (kalshi != null && polyProb != null) ? Number((polyProb - kalshi).toFixed(5)) : null;
+
       arr.push({
         id: m.id,
         contestant_label: m.contestant_label,
@@ -112,6 +127,9 @@ export default async function handler(req, res) {
         edge_vs_best_book: edgeBest,
         best_book: bestBook,
         book_prices: bookPrices,
+        polymarket_prob: polyProb,
+        polymarket_volume_usd: poly?.volume_usd != null ? Number(poly.volume_usd) : null,
+        edge_kalshi_vs_polymarket: edgeKalshiVsPoly,
       });
       marketsByEvent.set(m.event_id, arr);
     }

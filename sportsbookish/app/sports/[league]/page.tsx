@@ -88,6 +88,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         edge_vs_best_book: m.edge_vs_best_book,
         best_book: m.best_book,
         book_prices: m.book_prices,
+        polymarket_prob: m.polymarket_prob ?? null,
       });
     }
   }

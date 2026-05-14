@@ -45,6 +45,9 @@ export interface InlineMarket {
   edge_vs_best_book: number | null;
   best_book: { book: string; implied_prob_novig: number | null; american: number | null } | null;
   book_prices: Record<string, { american: number | null; novig: number | null }>;
+  polymarket_prob?: number | null;
+  polymarket_volume_usd?: number | null;
+  edge_kalshi_vs_polymarket?: number | null;
 }
 
 export interface SportsEventWithMarkets extends SportsEvent {
