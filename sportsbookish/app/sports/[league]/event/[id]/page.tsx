@@ -9,6 +9,8 @@ import { getCurrentTier } from "@/lib/tier-guard";
 import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass, edgeBgClass } from "@/lib/format";
 import PriceSpark from "@/components/PriceSpark";
 import UpsellBanner from "@/components/UpsellBanner";
+import SpreadsTable from "@/components/sports/SpreadsTable";
+import TotalsTable from "@/components/sports/TotalsTable";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -179,6 +181,18 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
             )}
           </CardContent>
         </Card>
+
+        {detail.spreads && detail.spreads.length > 0 && (
+          <div className="mb-4">
+            <SpreadsTable rows={detail.spreads} isPaidTier={isPaidTier && !isAnonymous} signupHref={isAnonymous ? `/signup?next=/sports/${league}/event/${id}` : undefined} />
+          </div>
+        )}
+
+        {detail.totals && detail.totals.length > 0 && (
+          <div className="mb-4">
+            <TotalsTable rows={detail.totals} isPaidTier={isPaidTier && !isAnonymous} signupHref={isAnonymous ? `/signup?next=/sports/${league}/event/${id}` : undefined} />
+          </div>
+        )}
 
         {eventMoves.length > 0 && (
           <Card>

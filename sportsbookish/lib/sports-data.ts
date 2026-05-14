@@ -98,9 +98,22 @@ export interface MarketRow {
   edge_vs_best_book?: number | null;
 }
 
+export interface SpreadRow {
+  label: string;
+  books: Record<string, { point: number | null; american: number | null; implied_prob_novig: number | null }>;
+}
+
+export interface TotalRow {
+  point: number | null;
+  side: string;                // "Over" | "Under"
+  books: Record<string, { american: number | null; implied_prob_novig: number | null }>;
+}
+
 export interface EventDetail {
   event: SportsEvent;
   markets: MarketRow[];
+  spreads?: SpreadRow[];
+  totals?: TotalRow[];
 }
 
 export async function fetchEventDetail(eventId: string): Promise<EventDetail | null> {
