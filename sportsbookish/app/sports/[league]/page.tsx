@@ -12,6 +12,7 @@ import GameCard from "@/components/sports/GameCard";
 import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookTable";
 import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
+import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -101,8 +102,22 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
   const gamesWithBooks = (groups.game || []).filter((e) => (e.markets || []).some((m) => (m.books_count ?? 0) > 0)).length;
   const booksTracked = allBooks.length;
 
+  const eventList = (groups.game || []).map((e) => ({
+    name: `${e.title} — Kalshi odds`,
+    url: `/sports/${league}/event/${e.id}`,
+  }));
+  const ldData = [
+    breadcrumbLd([
+      { name: "Home", url: "/" },
+      { name: "Sports", url: "/sports" },
+      { name: meta.display_name, url: `/sports/${league}` },
+    ]),
+    itemListLd(`${meta.display_name} games with Kalshi odds`, eventList),
+  ];
+
   return (
     <div className="min-h-screen">
+      <JsonLd data={ldData} />
       {isAnonymous && <UpsellBanner variant="anonymous" next={`/sports/${league}`} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between px-4">
@@ -119,7 +134,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         </div>
       </header>
 
-      <main className="container mx-auto max-w-[1800px] px-4 py-8">
+      <main id="main" className="container mx-auto max-w-[1800px] px-4 py-8">
         {totalGames > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
             <Stat label="Games" value={String(totalGames)} />

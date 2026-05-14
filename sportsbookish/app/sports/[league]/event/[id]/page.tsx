@@ -13,6 +13,7 @@ import SpreadsTable from "@/components/sports/SpreadsTable";
 import TotalsTable from "@/components/sports/TotalsTable";
 import WatchlistButton from "@/components/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
+import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -70,22 +71,47 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
     : { data: [] as { id: number; ref_id: string }[] };
   const bookmarkByRef = new Map((watchlistRows || []).map((w) => [w.ref_id, w.id]));
 
+  // Build SportsEvent + BreadcrumbList schema for the page. Parse title
+  // "Game N: A at B" into away/home if possible; fall back to title order.
+  const titleMatch = detail.event.title.match(/(?:Game \d+:\s+)?(.+?)\s+(?:at|vs|@)\s+(.+)/i);
+  const awayTeam = titleMatch?.[1]?.trim() || detail.event.title;
+  const homeTeam = titleMatch?.[2]?.trim() || "";
+  const pageUrl = `/sports/${league}/event/${id}`;
+  const ldData = [
+    breadcrumbLd([
+      { name: "Home", url: "/" },
+      { name: "Sports", url: "/sports" },
+      { name: meta.display_name, url: `/sports/${league}` },
+      { name: detail.event.title, url: pageUrl },
+    ]),
+    sportsEventLd({
+      name: `${detail.event.title} — Kalshi odds vs sportsbooks`,
+      homeTeam: homeTeam || awayTeam,
+      awayTeam,
+      startDate: detail.event.start_time,
+      league,
+      url: pageUrl,
+      description: `Live Kalshi event-contract odds compared to DraftKings, FanDuel, BetMGM and 8+ books for ${detail.event.title}. Moneyline, spread, and total markets refreshed every 5 minutes.`,
+    }),
+  ];
+
   return (
     <div className="min-h-screen">
-      {isAnonymous && <UpsellBanner variant="anonymous" next={`/sports/${league}/event/${id}`} />}
+      <JsonLd data={ldData} />
+      {isAnonymous && <UpsellBanner variant="anonymous" next={pageUrl} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
           <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {meta.display_name}</Link>
           <div className="text-sm font-semibold capitalize">{detail.event.event_type}</div>
           {isAnonymous ? (
-            <Link href={`/signup?next=/sports/${league}/event/${id}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            <Link href={`/signup?next=${pageUrl}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
           ) : (
-            <div className="w-12" />
+            <div className="w-12" aria-hidden="true" />
           )}
         </div>
       </header>
 
-      <main className="container mx-auto max-w-3xl px-4 py-8">
+      <main id="main" className="container mx-auto max-w-3xl px-4 py-8">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-3xl">{meta.icon}</span>

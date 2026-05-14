@@ -55,7 +55,7 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
         </div>
       </header>
 
-      <main className="container mx-auto max-w-6xl px-4 py-6">
+      <main id="main" className="container mx-auto max-w-6xl px-4 py-6">
         <div className="flex flex-wrap items-center gap-3 mb-5 text-sm">
           <div className="flex items-center gap-1">
             <Link href="/sports/movers" className={`px-3 py-1 text-xs rounded ${!league ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/40" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}>All sports</Link>

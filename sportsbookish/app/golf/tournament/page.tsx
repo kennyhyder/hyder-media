@@ -82,7 +82,7 @@ export default async function TournamentPage({ searchParams }: { searchParams: P
         </div>
       </header>
 
-      <main className="container mx-auto max-w-[1600px] px-4 py-6">
+      <main id="main" className="container mx-auto max-w-[1600px] px-4 py-6">
         <TournamentTabs tournamentId={id} active="outrights" matchupCount={info?.stats.total_matchups} marketCount={info?.stats.total_markets} proRequired={tier === "free"} />
 
         {/* Stats strip */}
