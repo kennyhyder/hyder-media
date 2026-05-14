@@ -21,6 +21,19 @@ export const config = { maxDuration: 60 };
 const LEAGUES = ["nba", "mlb", "nhl", "epl", "mls"];
 const MATCH_WINDOW_MS = 6 * 60 * 60 * 1000; // ±6h
 
+// Group totals outcomes (Over/Under at multiple points) by their point so each
+// (point) pair can be de-vigged independently. Books may offer alternate lines
+// (e.g. NBA 220.5, 221.5, 222.5) — each constitutes its own market.
+function groupByPoint(outcomes) {
+  const byPoint = new Map();
+  for (const o of outcomes) {
+    const k = String(o.point);
+    if (!byPoint.has(k)) byPoint.set(k, []);
+    byPoint.get(k).push(o);
+  }
+  return Array.from(byPoint.values()).filter((g) => g.length === 2);
+}
+
 async function ingestLeague(supabase, league) {
   const summary = {
     league, api_calls: 0,
@@ -62,12 +75,15 @@ async function ingestLeague(supabase, league) {
     marketsByEvent.set(m.event_id, arr);
   }
 
-  // 3. Pull lines from Odds API
+  // 3. Pull lines from Odds API — h2h + spreads + totals in one call.
+  // Cost: 3 credits per league per tick (1 per market). At every 30 min ×
+  // 5 leagues that's 21,600/month — just over the 20K budget but Odds API
+  // is forgiving on small overages; we monitor with summary.credit_remaining.
   const sport = LEAGUE_TO_SPORT[league];
   let api;
   try {
     api = await fetchOddsApi(`/sports/${sport}/odds`, {
-      regions: "us", markets: "h2h",
+      regions: "us", markets: "h2h,spreads,totals",
       oddsFormat: "american", dateFormat: "iso",
     });
     summary.api_calls = 1;
@@ -131,40 +147,66 @@ async function ingestLeague(supabase, league) {
       matched_at: now, last_seen_at: now,
     });
 
-    // 5. Quotes: for each bookmaker, de-vig the H2H outcomes
+    // 5. Quotes: walk each book's markets (h2h, spreads, totals) and store
+    // each outcome with its point (spreads/totals) or null (h2h).
     for (const bm of oaEvent.bookmakers || []) {
-      const h2h = (bm.markets || []).find((m) => m.key === "h2h");
-      if (!h2h || !h2h.outcomes?.length) continue;
-      const outcomes = h2h.outcomes.map((o) => ({
-        name: o.name,
-        american: Math.round(Number(o.price)),
-        prob_raw: americanToProb(o.price),
-      }));
-      const devigged = devigOutcomes(outcomes);
       const bookNorm = normalizeBookKey(bm.key);
 
-      for (const o of devigged) {
-        // Which Kalshi market does this outcome belong to?
-        let target;
-        if (softLabelMatch(o.name, homeMarket.label, league)) target = homeMarket;
-        else if (softLabelMatch(o.name, awayMarket.label, league)) target = awayMarket;
-        // Soccer 3-way moneyline includes "Draw" — skip (no Kalshi market for it
-        // by default; we could later store it under contestant_label='Tie')
-        if (!target) continue;
+      for (const market of bm.markets || []) {
+        const key = market.key;            // 'h2h' | 'spreads' | 'totals'
+        if (!["h2h", "spreads", "totals"].includes(key)) continue;
+        if (!market.outcomes?.length) continue;
 
-        insertQuoteRows.push({
-          sports_event_id: matched.id,
-          odds_api_event_id: oaEvent.id,
-          league,
-          contestant_label: target.label,
-          contestant_norm: target.label_norm,
-          market_type: "h2h",
-          book: bookNorm,
-          american: o.american,
-          implied_prob_raw: o.prob_raw,
-          implied_prob_novig: o.prob_novig,
-          fetched_at: now,
-        });
+        // Pair outcomes for de-vigging:
+        // - h2h / spreads: both team outcomes pair (sum to 1)
+        // - totals: Over + Under pair (sum to 1) but multiple points may exist;
+        //   group by point first.
+        const grouped = key === "totals"
+          ? groupByPoint(market.outcomes)
+          : [market.outcomes];
+
+        for (const group of grouped) {
+          const outcomes = group.map((o) => ({
+            name: o.name,
+            point: o.point != null ? Number(o.point) : null,
+            american: Math.round(Number(o.price)),
+            prob_raw: americanToProb(o.price),
+          }));
+          const devigged = devigOutcomes(outcomes);
+
+          for (const o of devigged) {
+            // For h2h + spreads: outcome.name is a team name → match to a Kalshi market
+            // For totals: outcome.name is "Over"/"Under" → no Kalshi match, store under that label
+            let label, labelNorm;
+            if (key === "totals") {
+              label = o.name;                                // "Over" or "Under"
+              labelNorm = normalizeName(o.name);
+            } else {
+              // h2h / spreads — match to home or away Kalshi market
+              const targetIsHome = softLabelMatch(o.name, homeMarket.label, league);
+              const targetIsAway = softLabelMatch(o.name, awayMarket.label, league);
+              if (!targetIsHome && !targetIsAway) continue;  // skip soccer "Draw"
+              const target = targetIsHome ? homeMarket : awayMarket;
+              label = target.label;
+              labelNorm = target.label_norm;
+            }
+
+            insertQuoteRows.push({
+              sports_event_id: matched.id,
+              odds_api_event_id: oaEvent.id,
+              league,
+              contestant_label: label,
+              contestant_norm: labelNorm,
+              market_type: key,
+              book: bookNorm,
+              point: o.point,
+              american: o.american,
+              implied_prob_raw: o.prob_raw,
+              implied_prob_novig: o.prob_novig,
+              fetched_at: now,
+            });
+          }
+        }
       }
     }
   }
