@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import MarketingNav from "@/components/nav/MarketingNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Check, X } from "lucide-react";
 import { JsonLd, breadcrumbLd, faqLd, SITE_URL } from "@/lib/seo";
@@ -247,7 +246,6 @@ export default async function ComparePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <JsonLd data={ld} />
-      <MarketingNav />
       <main id="main" className="container mx-auto max-w-3xl px-4 py-16">
         <nav className="text-sm text-muted-foreground mb-6 flex items-center gap-2" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-foreground">Home</Link>

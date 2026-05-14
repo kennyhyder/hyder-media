@@ -1,10 +1,8 @@
-import MarketingNav from "@/components/nav/MarketingNav";
 import PricingCards from "@/components/marketing/PricingCards";
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen">
-      <MarketingNav />
       <main className="container mx-auto max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Pricing</h1>

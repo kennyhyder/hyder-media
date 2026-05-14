@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import MarketingNav from "@/components/nav/MarketingNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { JsonLd, breadcrumbLd, itemListLd, SITE_URL } from "@/lib/seo";
@@ -52,7 +51,6 @@ export default function LearnPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <JsonLd data={ld} />
-      <MarketingNav />
       <main id="main" className="container mx-auto max-w-5xl px-4 py-16">
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
           <BookOpen className="h-4 w-4" aria-hidden="true" />

@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ThemeProviderClient from "@/components/ThemeProviderClient";
 import ThemeToggle from "@/components/ThemeToggle";
+import SiteHeader from "@/components/nav/SiteHeader";
 import { JsonLd, organizationLd, websiteLd, SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 
@@ -94,12 +95,9 @@ export default function RootLayout({
           Skip to content
         </a>
         <ThemeProviderClient>
+          <SiteHeader />
           {children}
           <Toaster position="top-right" richColors />
-          {/* Site-wide floating theme toggle — visible on every page */}
-          <div className="fixed bottom-3 right-3 z-50 rounded-full border border-border bg-background/80 backdrop-blur shadow-md">
-            <ThemeToggle compact />
-          </div>
         </ThemeProviderClient>
         <GoogleAnalytics gaId={GA_ID} />
       </body>

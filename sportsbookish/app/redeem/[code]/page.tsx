@@ -4,7 +4,6 @@ import { validateInvite } from "@/lib/invites";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TIER_BY_KEY, getPricePerMonth } from "@/lib/tiers";
-import MarketingNav from "@/components/nav/MarketingNav";
 import { LineChart, Gift, AlertCircle, CheckCircle2 } from "lucide-react";
 import RedeemForm from "./RedeemForm";
 import RedeemForLoggedIn from "./RedeemForLoggedIn";
@@ -22,7 +21,6 @@ export default async function RedeemPage({ params }: { params: Promise<{ code: s
   if (!result.ok) {
     return (
       <div className="min-h-screen">
-        <MarketingNav />
         <main className="container mx-auto max-w-md px-4 py-16">
           <Card>
             <CardHeader className="text-center">
@@ -50,7 +48,6 @@ export default async function RedeemPage({ params }: { params: Promise<{ code: s
 
   return (
     <div className="min-h-screen">
-      <MarketingNav />
       <main className="container mx-auto max-w-md px-4 py-16">
         <Card>
           <CardHeader className="text-center">

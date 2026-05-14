@@ -12,6 +12,7 @@ import UpsellBanner from "@/components/UpsellBanner";
 import SpreadsTable from "@/components/sports/SpreadsTable";
 import TotalsTable from "@/components/sports/TotalsTable";
 import WatchlistButton from "@/components/WatchlistButton";
+import QuickLogBet from "@/components/bets/QuickLogBet";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
@@ -123,6 +124,21 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
           </div>
           <div className="text-[10px] text-muted-foreground mt-2 font-mono">{detail.event.kalshi_event_ticker}</div>
         </div>
+
+        {/* Quick log bet — Elite gets the interactive form, others see an upsell */}
+        <QuickLogBet
+          eventId={id}
+          eventLabel={detail.event.title}
+          league={league}
+          contestants={detail.markets.map((m) => ({
+            label: m.contestant_label,
+            kalshi_implied: m.implied_prob,
+            polymarket_implied: m.polymarket_prob ?? null,
+            book_prices: m.book_prices || {},
+          }))}
+          tier={tier}
+          isAnonymous={isAnonymous}
+        />
 
         <Card className="mb-4">
           <CardHeader>

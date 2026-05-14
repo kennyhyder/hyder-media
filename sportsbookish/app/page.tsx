@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Bell, LineChart, Target, Zap } from "lucide-react";
-import MarketingNav from "@/components/nav/MarketingNav";
 import PricingCards from "@/components/marketing/PricingCards";
 import { fetchLeagues } from "@/lib/sports-data";
 import { JsonLd, itemListLd, faqLd, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
@@ -64,7 +63,6 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <JsonLd data={[itemListLd("Sports covered by SportsBookISH", sportsItemList), faqLd(HOMEPAGE_FAQ)]} />
-      <MarketingNav />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border/40">

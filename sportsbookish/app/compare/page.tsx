@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import MarketingNav from "@/components/nav/MarketingNav";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { JsonLd, breadcrumbLd, itemListLd, SITE_URL } from "@/lib/seo";
@@ -34,7 +33,6 @@ export default function ComparePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <JsonLd data={ld} />
-      <MarketingNav />
       <main id="main" className="container mx-auto max-w-5xl px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">Kalshi vs the sportsbooks</h1>
         <p className="text-lg text-muted-foreground mb-10 max-w-3xl">

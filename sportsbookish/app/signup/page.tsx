@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import MarketingNav from "@/components/nav/MarketingNav";
 import { LineChart, Mail } from "lucide-react";
 
 function SignupInner() {
@@ -42,7 +41,6 @@ function SignupInner() {
 
   return (
     <div className="min-h-screen">
-      <MarketingNav />
       <main className="container mx-auto max-w-md px-4 py-16">
         <Card>
           <CardHeader className="text-center">
