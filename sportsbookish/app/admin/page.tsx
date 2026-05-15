@@ -70,6 +70,7 @@ export default async function AdminPage() {
         <div className="flex items-center gap-1 mb-5 border-b border-border/40">
           <Link href="/admin" className="px-4 py-2 text-sm border-b-2 border-emerald-500 text-foreground">Users ({users.length})</Link>
           <Link href="/admin/invites" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Invite codes</Link>
+          <Link href="/admin/distribute" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Distribute</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
