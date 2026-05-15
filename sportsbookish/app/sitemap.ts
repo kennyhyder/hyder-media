@@ -6,83 +6,92 @@ import { GLOSSARY } from "@/lib/glossary";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
-// Sharded sitemap. Next.js auto-generates an index at /sitemap.xml linking to
-// /sitemap/{id}.xml for each shard returned by generateSitemaps. This gives
-// Search Console per-type indexation reporting AND keeps individual sitemap
-// files small enough to crawl efficiently (each shard < 5MB / 50K URLs).
+// Single-file sitemap at /sitemap.xml. ~1,200 URLs — well under the 50k/50MB
+// limits. changeFrequency + priority tuned per URL type:
 //
-// Shards by content type so we can tune changeFrequency + priority per type:
-//   0 → static / marketing / authority
-//   1 → sports events (game lines, futures, awards)
-//   2 → golf tournaments
-//   3 → team + player contestant hubs (across all sports)
-//   4 → golfer hubs (PGA Tour roster)
-//   5 → learn articles + glossary terms
-//   6 → tools + compare + data + contact
+//   hourly  → live game events, league hubs, golf tournaments
+//   daily   → contestant hubs, team/player indexes
+//   weekly  → compare-book pages, data export
+//   monthly → glossary, learn articles, tool calculators, authority pages
 //
-// Routes adjusted via app config — Next.js handles the sitemap index XML.
+// New URLs from cron-ingest auto-appear here within 30s (no revalidate cap).
+// Search Console submission: paste https://sportsbookish.com/sitemap.xml once,
+// Google polls it hourly automatically.
 
 type Sm = MetadataRoute.Sitemap;
-const ITEMS_PER_SHARD = 10000;  // safety cap; we're nowhere near it
 
-export async function generateSitemaps() {
-  // Return one descriptor per shard. id values match the switch in sitemap()
-  return [
-    { id: 0 }, // static
-    { id: 1 }, // sports events
-    { id: 2 }, // golf tournaments
-    { id: 3 }, // contestants (teams + players)
-    { id: 4 }, // golfers
-    { id: 5 }, // learn + glossary
-    { id: 6 }, // tools + meta
-  ];
-}
-
-export default async function sitemap({ id }: { id: number }): Promise<Sm> {
+export default async function sitemap(): Promise<Sm> {
   const now = new Date();
-  switch (id) {
-    case 0: return staticUrls(now);
-    case 1: return await sportsEvents(now);
-    case 2: return await golfTournaments(now);
-    case 3: return await contestants(now);
-    case 4: return await golfers(now);
-    case 5: return learnAndGlossary(now);
-    case 6: return toolsAndMeta(now);
-    default: return [];
+  const urls: Sm = [];
+
+  // ---- Static / marketing / authority ----
+  urls.push(
+    { url: `${SITE_URL}/`,                lastModified: now, changeFrequency: "hourly",  priority: 1.0 },
+    { url: `${SITE_URL}/pricing`,         lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
+    { url: `${SITE_URL}/sports`,          lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
+    { url: `${SITE_URL}/sports/movers`,   lastModified: now, changeFrequency: "hourly",  priority: 0.7 },
+    { url: `${SITE_URL}/golf`,            lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
+    { url: `${SITE_URL}/golf/players`,    lastModified: now, changeFrequency: "daily",   priority: 0.7 },
+    { url: `${SITE_URL}/compare`,         lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
+    { url: `${SITE_URL}/signup`,          lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/login`,           lastModified: now, changeFrequency: "monthly", priority: 0.3 },
+  );
+
+  // ---- Learn + glossary ----
+  urls.push(
+    { url: `${SITE_URL}/learn`,                              lastModified: now, changeFrequency: "weekly",  priority: 0.75 },
+    { url: `${SITE_URL}/learn/what-are-kalshi-odds`,         lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${SITE_URL}/learn/no-vig-explained`,             lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/learn/kalshi-edge-betting`,          lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/learn/kalshi-vs-prediction-markets`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/learn/glossary`,                     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+  );
+  for (const e of GLOSSARY) {
+    urls.push({ url: `${SITE_URL}/learn/glossary/${e.slug}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 });
   }
-}
 
-function staticUrls(now: Date): Sm {
-  return [
-    // Top-level marketing
-    { url: `${SITE_URL}/`,          lastModified: now, changeFrequency: "hourly",  priority: 1.0 },
-    { url: `${SITE_URL}/pricing`,   lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
-    { url: `${SITE_URL}/sports`,    lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
-    { url: `${SITE_URL}/sports/movers`, lastModified: now, changeFrequency: "hourly", priority: 0.7 },
-    { url: `${SITE_URL}/golf`,      lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
-    { url: `${SITE_URL}/golf/players`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
-    { url: `${SITE_URL}/compare`,   lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
-    // Auth surface (low priority but useful for SC coverage)
-    { url: `${SITE_URL}/signup`,    lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/login`,     lastModified: now, changeFrequency: "monthly", priority: 0.3 },
-  ];
-}
+  // ---- Tools ----
+  urls.push(
+    { url: `${SITE_URL}/tools`,                       lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${SITE_URL}/tools/no-vig-calculator`,     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${SITE_URL}/tools/kelly-calculator`,      lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${SITE_URL}/tools/odds-converter`,        lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${SITE_URL}/tools/parlay-calculator`,     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+  );
 
-async function sportsEvents(now: Date): Promise<Sm> {
+  // ---- Compare books ----
+  for (const book of ["draftkings", "fanduel", "betmgm", "caesars", "betrivers", "fanatics"]) {
+    urls.push({ url: `${SITE_URL}/compare/kalshi-vs-${book}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 });
+  }
+
+  // ---- Authority / data ----
+  urls.push(
+    { url: `${SITE_URL}/data`,              lastModified: now, changeFrequency: "weekly",  priority: 0.75 },
+    { url: `${SITE_URL}/press`,             lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/about/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/about/kenny-hyder`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`,           lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+  );
+
+  // ---- Dynamic data: leagues, events, contestants, golfers, tournaments ----
   try {
-    const leagues = await fetchLeagues();
-    const out: Sm = [];
+    const [leagues, contestants, golfers, tournaments] = await Promise.all([
+      fetchLeagues(),
+      fetchTeams(),
+      fetchGolfers(),
+      fetchTournaments(),
+    ]);
 
     // Per-league hub + team/player index pages
     for (const l of leagues) {
-      out.push(
+      urls.push(
         { url: `${SITE_URL}/sports/${l.key}`,         lastModified: now, changeFrequency: "hourly", priority: 0.85 },
         { url: `${SITE_URL}/sports/${l.key}/teams`,   lastModified: now, changeFrequency: "daily",  priority: 0.65 },
         { url: `${SITE_URL}/sports/${l.key}/players`, lastModified: now, changeFrequency: "daily",  priority: 0.65 },
       );
     }
 
-    // Individual events
+    // Individual sports events
     for (const l of leagues) {
       let events;
       try { events = await fetchEventsByLeague(l.key); } catch { continue; }
@@ -91,9 +100,8 @@ async function sportsEvents(now: Date): Promise<Sm> {
         const slug = e.slug || slugify(e.title);
         if (!slug) continue;
         const startTime = e.start_time ? new Date(e.start_time) : null;
-        // Tighter frequency for events that haven't started; weekly for past
         const upcoming = !startTime || startTime > now;
-        out.push({
+        urls.push({
           url: `${SITE_URL}${eventUrl(l.key, year, slug)}`,
           lastModified: now,
           changeFrequency: upcoming ? "hourly" : "weekly",
@@ -101,88 +109,45 @@ async function sportsEvents(now: Date): Promise<Sm> {
         });
       }
     }
-    return out.slice(0, ITEMS_PER_SHARD);
-  } catch { return []; }
-}
 
-async function golfTournaments(now: Date): Promise<Sm> {
-  try {
-    const tournaments = await fetchTournaments();
-    return tournaments.map((t) => {
+    // Golf tournaments
+    for (const t of tournaments) {
       const year = t.season_year || (t.start_date ? new Date(t.start_date).getUTCFullYear() : now.getUTCFullYear());
       const slug = t.slug || slugify(t.name);
       const url = slug ? `${SITE_URL}${tournamentUrl(year, slug)}` : `${SITE_URL}/golf/tournament?id=${t.id}`;
       const start = t.start_date ? new Date(t.start_date) : null;
       const upcoming = !start || start > now;
-      return {
+      urls.push({
         url,
         lastModified: now,
-        changeFrequency: upcoming ? ("hourly" as const) : ("monthly" as const),
+        changeFrequency: upcoming ? "hourly" : "monthly",
         priority: upcoming ? 0.8 : 0.5,
-      };
-    }).slice(0, ITEMS_PER_SHARD);
-  } catch { return []; }
-}
+      });
+    }
 
-async function contestants(now: Date): Promise<Sm> {
-  try {
-    const list = await fetchTeams();
-    return list.map((c) => ({
-      url: `${SITE_URL}${c.kind === "player" ? playerUrl(c.league, c.slug) : teamUrl(c.league, c.slug)}`,
-      lastModified: now,
-      changeFrequency: "daily" as const,
-      priority: 0.6,
-    })).slice(0, ITEMS_PER_SHARD);
-  } catch { return []; }
-}
+    // Contestants (teams + players)
+    for (const c of contestants) {
+      urls.push({
+        url: `${SITE_URL}${c.kind === "player" ? playerUrl(c.league, c.slug) : teamUrl(c.league, c.slug)}`,
+        lastModified: now,
+        changeFrequency: "daily",
+        priority: 0.6,
+      });
+    }
 
-async function golfers(now: Date): Promise<Sm> {
-  try {
-    const list = await fetchGolfers();
-    return list.map((g) => ({
-      url: `${SITE_URL}${golfPlayerUrl(g.slug)}`,
-      lastModified: now,
-      changeFrequency: "daily" as const,
-      priority: g.owgr_rank && g.owgr_rank <= 100 ? 0.7 : 0.55,
-    })).slice(0, ITEMS_PER_SHARD);
-  } catch { return []; }
-}
+    // Golfers (PGA Tour roster)
+    for (const g of golfers) {
+      urls.push({
+        url: `${SITE_URL}${golfPlayerUrl(g.slug)}`,
+        lastModified: now,
+        changeFrequency: "daily",
+        priority: g.owgr_rank && g.owgr_rank <= 100 ? 0.7 : 0.55,
+      });
+    }
+  } catch {
+    // If the data plane stutters mid-sitemap, return what we have so the
+    // sitemap still renders (better partial than 500).
+  }
 
-function learnAndGlossary(now: Date): Sm {
-  return [
-    { url: `${SITE_URL}/learn`, lastModified: now, changeFrequency: "weekly", priority: 0.75 },
-    { url: `${SITE_URL}/learn/what-are-kalshi-odds`,        lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${SITE_URL}/learn/no-vig-explained`,            lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/learn/kalshi-edge-betting`,         lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/learn/kalshi-vs-prediction-markets`,lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/learn/glossary`,                    lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    ...GLOSSARY.map((e) => ({
-      url: `${SITE_URL}/learn/glossary/${e.slug}`,
-      lastModified: now,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    })),
-  ];
-}
-
-function toolsAndMeta(now: Date): Sm {
-  return [
-    { url: `${SITE_URL}/tools`,                       lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${SITE_URL}/tools/no-vig-calculator`,     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${SITE_URL}/tools/kelly-calculator`,      lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${SITE_URL}/tools/odds-converter`,        lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    { url: `${SITE_URL}/tools/parlay-calculator`,     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-    // Compare book pages
-    { url: `${SITE_URL}/compare/kalshi-vs-draftkings`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/compare/kalshi-vs-fanduel`,    lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/compare/kalshi-vs-betmgm`,     lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/compare/kalshi-vs-caesars`,    lastModified: now, changeFrequency: "weekly", priority: 0.65 },
-    { url: `${SITE_URL}/compare/kalshi-vs-betrivers`,  lastModified: now, changeFrequency: "weekly", priority: 0.65 },
-    { url: `${SITE_URL}/compare/kalshi-vs-fanatics`,   lastModified: now, changeFrequency: "weekly", priority: 0.65 },
-    // Authority / data
-    { url: `${SITE_URL}/data`,                  lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
-    { url: `${SITE_URL}/about/methodology`,     lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/about/kenny-hyder`,     lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/contact`,               lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-  ];
+  return urls;
 }
