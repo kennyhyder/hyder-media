@@ -20,6 +20,56 @@ export interface TournamentSlugRow {
   is_major: boolean;
 }
 
+// Golfer hub data + sitemap support
+export interface GolferListItem {
+  id: string;
+  name: string;
+  slug: string;
+  dg_id: number | null;
+  owgr_rank: number | null;
+}
+
+export interface GolferDetail {
+  player: { id: string; name: string; slug: string; dg_id: number | null; owgr_rank: number | null; country: string | null };
+  tournaments: Array<{
+    tournament: { id: string; name: string; short_name: string | null; slug: string | null; season_year: number | null; start_date: string | null; is_major: boolean; status: string };
+    markets: Array<{
+      market_id: string;
+      market_type: string;
+      kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string } | null;
+      dg: { dg_prob: number | null; dg_fit_prob: number | null; fetched_at: string } | null;
+      books: { count: number; median: number | null; best: { book: string; american: number | null } | null } | null;
+    }>;
+  }>;
+}
+
+export async function fetchGolfers(): Promise<GolferListItem[]> {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/players`, { next: { revalidate: 300 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.players || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchGolferBySlug(slug: string): Promise<GolferDetail | null> {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/player-by-slug?slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchTournamentBySlug(year: number, slug: string): Promise<TournamentSlugRow | null> {
   try {
     const ctrl = new AbortController();

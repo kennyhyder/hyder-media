@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { fetchLeagues, fetchEventsByLeague, fetchTeams } from "@/lib/sports-data";
-import { fetchTournaments } from "@/lib/golf-data";
-import { eventUrl, tournamentUrl, teamUrl, slugify } from "@/lib/slug";
+import { fetchTournaments, fetchGolfers } from "@/lib/golf-data";
+import { eventUrl, tournamentUrl, teamUrl, golfPlayerUrl, slugify } from "@/lib/slug";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -93,7 +93,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    return [...staticUrls, ...leagueUrls, ...tournamentUrls, ...eventUrls, ...teamUrls];
+    // Golfer hub pages — one per player. Top of OWGR + active-tournament-field
+    // golfers are highest-value pSEO surface in golf.
+    const golfers = await fetchGolfers();
+    const golferUrls: MetadataRoute.Sitemap = golfers.map((g) => ({
+      url: `${SITE_URL}${golfPlayerUrl(g.slug)}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      // Prioritize top-100 OWGR pages slightly higher
+      priority: g.owgr_rank && g.owgr_rank <= 100 ? 0.7 : 0.5,
+    }));
+
+    return [...staticUrls, ...leagueUrls, ...tournamentUrls, ...eventUrls, ...teamUrls, ...golferUrls];
   } catch {
     return staticUrls;
   }
