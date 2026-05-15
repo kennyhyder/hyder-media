@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
-import { ArrowRight, Bell, LineChart, Target, Zap } from "lucide-react";
+import { ArrowRight, Bell, LineChart, Target, Zap, Calculator, BookOpen, Database } from "lucide-react";
 import PricingCards from "@/components/marketing/PricingCards";
 import { fetchLeagues } from "@/lib/sports-data";
 import { JsonLd, itemListLd, faqLd, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
@@ -171,6 +171,49 @@ export default async function Home() {
               title="Alerts when it matters"
               body="Email + SMS the moment Kalshi crosses ±3% from consensus, or moves ≥3% in 15 min on any sport. Smart preset alerts on Elite — one-click toggles, no config."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Resources — Tools, learn, dataset. Surfaces deep-linked pages so
+          they get discovered from the highest-traffic page (home). */}
+      <section className="border-b border-border/40 bg-muted/10" aria-labelledby="resources-heading">
+        <div className="container mx-auto max-w-6xl px-4 py-16">
+          <h2 id="resources-heading" className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-3">Free for everyone</h2>
+          <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
+            Calculators, definitions, and the public dataset — useful even if you never sign up.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link href="/tools" className="block group">
+              <div className="rounded-xl border border-border bg-card p-6 h-full hover:border-emerald-500/40 transition-colors">
+                <Calculator className="h-7 w-7 text-emerald-500 mb-3" aria-hidden="true" />
+                <h3 className="font-semibold text-lg mb-1">Free calculators</h3>
+                <p className="text-sm text-muted-foreground mb-3">No-vig, Kelly, parlay payout, odds converter. Pure-math utilities, no signup.</p>
+                <span className="text-emerald-500 text-sm inline-flex items-center gap-1">
+                  Open tools <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                </span>
+              </div>
+            </Link>
+            <Link href="/learn/glossary" className="block group">
+              <div className="rounded-xl border border-border bg-card p-6 h-full hover:border-emerald-500/40 transition-colors">
+                <BookOpen className="h-7 w-7 text-emerald-500 mb-3" aria-hidden="true" />
+                <h3 className="font-semibold text-lg mb-1">Glossary + guides</h3>
+                <p className="text-sm text-muted-foreground mb-3">20+ definitions (vig, no-vig, edge, CLV, Kelly) + long-form explainers on Kalshi math.</p>
+                <span className="text-emerald-500 text-sm inline-flex items-center gap-1">
+                  Browse glossary <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                </span>
+              </div>
+            </Link>
+            <Link href="/data" className="block group">
+              <div className="rounded-xl border border-border bg-card p-6 h-full hover:border-emerald-500/40 transition-colors">
+                <Database className="h-7 w-7 text-emerald-500 mb-3" aria-hidden="true" />
+                <h3 className="font-semibold text-lg mb-1">Public dataset</h3>
+                <p className="text-sm text-muted-foreground mb-3">CC-BY-4.0 JSON snapshot of Kalshi vs book odds across 9 sports. Free for research.</p>
+                <span className="text-emerald-500 text-sm inline-flex items-center gap-1">
+                  See dataset <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
