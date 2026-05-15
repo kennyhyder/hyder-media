@@ -15,6 +15,7 @@ import OutrightTable from "@/components/OutrightTable";
 import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 export default async function TournamentPage({ searchParams }: { searchParams: Promise<{ id?: string; mt?: string }> }) {
   const { id, mt = "win" } = await searchParams;

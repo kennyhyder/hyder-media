@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ league: s
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const EVENT_TYPE_LABEL: Record<string, string> = {
   game: "Game",

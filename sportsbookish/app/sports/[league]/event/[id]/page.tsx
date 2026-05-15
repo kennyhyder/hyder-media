@@ -47,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ league: s
 }
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 export default async function EventPage({ params }: { params: Promise<{ league: string; id: string }> }) {
   const { league, id } = await params;

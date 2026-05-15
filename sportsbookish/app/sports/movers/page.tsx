@@ -8,6 +8,7 @@ import { fmtPctSigned } from "@/lib/format";
 import UpsellBanner from "@/components/UpsellBanner";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const SPORT_ICON: Record<string, string> = { nba: "🏀", mlb: "⚾", nhl: "🏒", epl: "⚽", mls: "⚽" };
 
