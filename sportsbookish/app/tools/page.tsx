@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Calculator, Percent, Repeat, TrendingUp } from "lucide-react";
+import { ArrowRight, Calculator, Percent, Repeat, TrendingUp, Layers } from "lucide-react";
 import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
@@ -30,6 +30,12 @@ const TOOLS = [
     title: "Odds converter",
     excerpt: "Convert between American (-150), decimal (1.67), fractional (2/3), and implied probability (60%) instantly. The Rosetta Stone for betting math.",
     icon: Repeat,
+  },
+  {
+    slug: "parlay-calculator",
+    title: "Parlay calculator",
+    excerpt: "Compute parlay payout and see the compounded vig cost. 2-12 legs, real-time fair-value comparison so you know exactly what the book is charging you.",
+    icon: Layers,
   },
 ];
 
@@ -61,7 +67,7 @@ export default function ToolsIndex() {
           Pure-math utilities that work without an account. Stripped-vig probabilities, Kelly bet sizing, and odds conversion — the same math powering our live edge tables across NBA, NFL, MLB, NHL, EPL, MLS, UCL, and PGA Tour.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {TOOLS.map((t) => {
             const Icon = t.icon;
             return (

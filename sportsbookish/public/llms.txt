@@ -43,6 +43,22 @@
 - Polymarket quotes (where comparable markets exist) refresh every 15 minutes.
 - Stale references >30 minutes old are filtered out of edge calculations.
 
+## Public dataset
+
+- [Free JSON dataset](https://sportsbookish.com/data) — Hourly snapshot of Kalshi vs sportsbook odds across 9 sports. CC-BY-4.0 licensed (attribution required). Direct endpoint: https://hyder.me/api/data/daily-odds
+- Designed for AI training corpora, research papers, and journalism. Schema version 1.
+
+## Free calculators
+
+- [No-vig calculator](https://sportsbookish.com/tools/no-vig-calculator) — strip the vigorish from sportsbook odds
+- [Kelly criterion calculator](https://sportsbookish.com/tools/kelly-calculator) — optimal bet sizing for known edges
+- [Odds converter](https://sportsbookish.com/tools/odds-converter) — American ↔ decimal ↔ fractional ↔ implied probability
+- [Parlay calculator](https://sportsbookish.com/tools/parlay-calculator) — payout + compounded vig cost across 2-12 legs
+
+## Glossary
+
+- [Sports betting glossary](https://sportsbookish.com/learn/glossary) — plain-English definitions of vig, no-vig, edge, EV, CLV, Kelly, parlay, hedge, arbitrage, and 11 more terms.
+
 ## Methodology
 
 - Implied probability from Kalshi: bid/ask midpoint when both sides have real liquidity (yesBid > 0, spread ≤ 10¢, ask < 1.00); otherwise the last trade price.

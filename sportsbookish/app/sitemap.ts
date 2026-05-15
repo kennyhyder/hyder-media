@@ -44,9 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/tools/no-vig-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/tools/kelly-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/tools/odds-converter`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/tools/parlay-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     // E-E-A-T / authority pages
     { url: `${SITE_URL}/about/kenny-hyder`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/about/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    // Public dataset
+    { url: `${SITE_URL}/data`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...GLOSSARY.map((e) => ({
       url: `${SITE_URL}/learn/glossary/${e.slug}`,
       lastModified: now,

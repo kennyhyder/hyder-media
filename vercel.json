@@ -30,6 +30,7 @@
     "api/vita-brevis/**/*.js": { "maxDuration": 30 },
     "api/tiktok-ads/**/*.js": { "maxDuration": 30 },
     "api/golfodds/**/*.js": { "maxDuration": 300 },
-    "api/sports/**/*.js": { "maxDuration": 300 }
+    "api/sports/**/*.js": { "maxDuration": 300 },
+    "api/data/**/*.js": { "maxDuration": 30 }
   }
 }
