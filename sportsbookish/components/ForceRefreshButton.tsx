@@ -108,7 +108,7 @@ export default function ForceRefreshButton({ entityId, source, league, tier, isA
   let label = busy ? "Refreshing…" : "Force refresh";
   let title = source === "golf"
     ? "Re-pull Kalshi + DataGolf for this tournament right now"
-    : "Re-poll the Odds API for this event right now (3 credits)";
+    : "Re-pull Kalshi (always) + sportsbook lines (for game events) right now";
   if (out) { label = "Daily limit hit"; title = "Resets at midnight UTC"; }
   else if (cooling) {
     const secs = Math.ceil((new Date(quota!.cooldown_until!).getTime() - Date.now()) / 1000);

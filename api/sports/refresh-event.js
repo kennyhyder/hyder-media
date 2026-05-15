@@ -1,18 +1,28 @@
-import { getSupabase, normalizeName } from "./_lib.js";
+import { getSupabase, normalizeName, computeImplied, toUnit, toBigInt, KALSHI_BASE } from "./_lib.js";
 import {
   LEAGUE_TO_SPORT, fetchOddsApi, americanToProb, devigOutcomes,
   softLabelMatch, normalizeBookKey, normalizeForMatch,
 } from "./_books.js";
 
-// Per-event Odds API refresh. Bypasses the 30-min cron schedule by calling
-// the Odds API endpoint scoped to a single event_id. Auth via CRON_SECRET
-// (so only the sportsbookish refresh proxy + our own crons can hit it).
+// Per-event force-refresh. Works for EVERY event type (game, championship,
+// conference, division, playoffs, MVP, awards, win totals, etc.).
+//
+//   - Always re-pulls Kalshi markets for the event_ticker (free, fast)
+//   - For "game" event_type ONLY, additionally hits The Odds API for book
+//     lines (3 credits). Futures-style events have no equivalent at the
+//     sportsbooks, so we skip that step rather than waste credits.
+//
+// Auth via CRON_SECRET (so only the sportsbookish refresh proxy + our own
+// crons can hit it).
 //
 // GET /api/sports/refresh-event?event_id=<sports_events.id>&secret=<CRON_SECRET>
 //
 // Returns:
-//   { ok: true, credits_used: N, events_matched: 1, quotes_inserted: M }
-//   { ok: false, reason: "..." }
+//   {
+//     ok: true, event_type, credits_used: N,
+//     kalshi: { markets_seen, quotes_inserted },
+//     books:  { events_matched, quotes_inserted } | null,
+//   }
 
 export const config = { maxDuration: 30 };
 
@@ -32,53 +42,92 @@ function groupByPoint(outcomes) {
   return Array.from(byPoint.values()).filter((g) => g.length === 2);
 }
 
-export default async function handler(req, res) {
-  if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
+// Re-fetch Kalshi markets for a single event_ticker and insert fresh quotes.
+// Idempotent — multiple calls within seconds just append duplicate-timestamp
+// rows. Returns { markets_seen, quotes_inserted }.
+async function refreshKalshiForEvent(supabase, event) {
+  if (!event.kalshi_event_ticker) return { markets_seen: 0, quotes_inserted: 0 };
 
-  const sportsEventId = req.query.event_id;
-  if (!sportsEventId) return res.status(400).json({ error: "event_id required" });
+  // Pull all markets for this event from Kalshi
+  let cursor = null;
+  const allMarkets = [];
+  do {
+    const url = new URL(`${KALSHI_BASE}/markets`);
+    url.searchParams.set("event_ticker", event.kalshi_event_ticker);
+    url.searchParams.set("limit", "200");
+    if (cursor) url.searchParams.set("cursor", cursor);
+    const r = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error(`Kalshi ${r.status}`);
+    const data = await r.json();
+    allMarkets.push(...(data.markets || []));
+    cursor = data.cursor || null;
+  } while (cursor);
 
-  const supabase = getSupabase();
+  if (!allMarkets.length) return { markets_seen: 0, quotes_inserted: 0 };
 
-  // 1. Load the event + its markets
-  const { data: event } = await supabase
-    .from("sports_events")
-    .select("id, league, title, start_time, status, kalshi_event_ticker")
-    .eq("id", sportsEventId)
-    .maybeSingle();
-  if (!event) return res.status(404).json({ error: "event not found" });
+  // Load the sports_markets rows for this event so we can map kalshi_ticker -> market_id.
+  const { data: ourMarkets } = await supabase
+    .from("sports_markets")
+    .select("id, kalshi_ticker")
+    .eq("event_id", event.id)
+    .not("kalshi_ticker", "is", null);
+  const idByTicker = new Map((ourMarkets || []).map((m) => [m.kalshi_ticker, m.id]));
 
+  const rows = [];
+  for (const km of allMarkets) {
+    const mid = idByTicker.get(km.ticker);
+    if (!mid) continue;
+    const yesBid = toUnit(km.yes_bid_dollars ?? km.yes_bid);
+    const yesAsk = toUnit(km.yes_ask_dollars ?? km.yes_ask);
+    const last = toUnit(km.last_price_dollars ?? km.last_price);
+    rows.push({
+      market_id: mid,
+      yes_bid: yesBid,
+      yes_ask: yesAsk,
+      last_price: last,
+      implied_prob: computeImplied(yesBid, yesAsk, last),
+      volume: toBigInt(km.volume ?? km.volume_24h),
+      open_interest: toBigInt(km.open_interest_fp ?? km.open_interest),
+      status: km.status || null,
+    });
+  }
+  let inserted = 0;
+  for (let i = 0; i < rows.length; i += 500) {
+    const slice = rows.slice(i, i + 500);
+    const { error } = await supabase.from("sports_quotes").insert(slice);
+    if (!error) inserted += slice.length;
+  }
+  return { markets_seen: rows.length, quotes_inserted: inserted };
+}
+
+// Re-pull Odds API book lines for a game event. Only valid for event_type="game".
+// Returns { events_matched, quotes_inserted, credits_used } or { error }.
+async function refreshBooksForGame(supabase, event) {
   const sport = LEAGUE_TO_SPORT[event.league];
-  if (!sport) return res.status(400).json({ error: `league ${event.league} not Odds-API-supported` });
+  if (!sport) return { error: `league ${event.league} not Odds-API-supported`, credits_used: 0 };
 
-  // 2. Find the matching Odds API event id from our map table (saved at last
-  // cron tick); fall back to a fresh league-wide /sports/{sport}/events lookup
-  // if we don't have one yet.
+  // Find the matching Odds API event id (cached) or discover it.
   const { data: mapRow } = await supabase
     .from("sports_book_events_map")
     .select("odds_api_event_id")
-    .eq("sports_event_id", sportsEventId)
+    .eq("sports_event_id", event.id)
     .maybeSingle();
 
   let oddsApiEventId = mapRow?.odds_api_event_id;
   let creditsUsed = 0;
 
   if (!oddsApiEventId) {
-    // Discover from Odds API events index — 1 credit
     let listing;
     try {
-      listing = await fetchOddsApi(`/sports/${sport}/events`, {
-        dateFormat: "iso",
-      });
+      listing = await fetchOddsApi(`/sports/${sport}/events`, { dateFormat: "iso" });
       creditsUsed += 1;
     } catch (e) {
-      return res.status(502).json({ error: `odds api events lookup: ${e.message}` });
+      return { error: `odds api events lookup: ${e.message}`, credits_used: creditsUsed };
     }
-    // Match by team names + commence_time
     const { data: markets } = await supabase
       .from("sports_markets")
       .select("contestant_label")
-      .eq("event_id", sportsEventId)
+      .eq("event_id", event.id)
       .eq("market_type", "winner");
     const labels = (markets || []).map((m) => m.contestant_label);
     const cand = (listing.body || []).find((e) => {
@@ -88,12 +137,8 @@ export default async function handler(req, res) {
     });
     if (cand) oddsApiEventId = cand.id;
   }
+  if (!oddsApiEventId) return { error: "no Odds API event match for this game", credits_used: creditsUsed };
 
-  if (!oddsApiEventId) {
-    return res.status(404).json({ error: "no Odds API event match for this game" });
-  }
-
-  // 3. Fetch the single-event odds with h2h + spreads + totals (3 credits)
   let api;
   try {
     api = await fetchOddsApi(`/sports/${sport}/events/${oddsApiEventId}/odds`, {
@@ -102,21 +147,18 @@ export default async function handler(req, res) {
     });
     creditsUsed += 3;
   } catch (e) {
-    return res.status(502).json({ ok: false, credits_used: creditsUsed, error: e.message });
+    return { error: e.message, credits_used: creditsUsed };
   }
-
   const oaEvent = api.body;
 
-  // 4. Load Kalshi markets for the event so we can match team names → market labels
   const { data: kMarkets } = await supabase
     .from("sports_markets")
     .select("id, contestant_label")
-    .eq("event_id", sportsEventId)
+    .eq("event_id", event.id)
     .eq("market_type", "winner");
   const homeMarket = (kMarkets || []).find((m) => softLabelMatch(oaEvent.home_team, m.contestant_label, event.league));
   const awayMarket = (kMarkets || []).find((m) => softLabelMatch(oaEvent.away_team, m.contestant_label, event.league));
 
-  // 5. Walk each book's markets + insert quotes
   const insertQuoteRows = [];
   const now = new Date().toISOString();
   for (const bm of oaEvent.bookmakers || []) {
@@ -125,7 +167,6 @@ export default async function handler(req, res) {
       const key = market.key;
       if (!["h2h", "spreads", "totals"].includes(key)) continue;
       if (!market.outcomes?.length) continue;
-
       const grouped = key === "totals" ? groupByPoint(market.outcomes) : [market.outcomes];
       for (const group of grouped) {
         const outcomes = group.map((o) => ({
@@ -149,7 +190,7 @@ export default async function handler(req, res) {
             labelNorm = normalizeForMatch(label);
           }
           insertQuoteRows.push({
-            sports_event_id: sportsEventId,
+            sports_event_id: event.id,
             odds_api_event_id: oddsApiEventId,
             league: event.league,
             contestant_label: label,
@@ -166,22 +207,17 @@ export default async function handler(req, res) {
       }
     }
   }
-
-  // 6. Persist
   let inserted = 0;
   for (let i = 0; i < insertQuoteRows.length; i += 500) {
     const slice = insertQuoteRows.slice(i, i + 500);
     const { error } = await supabase.from("sports_book_quotes").insert(slice);
-    if (error) return res.status(500).json({ ok: false, credits_used: creditsUsed, error: error.message });
-    inserted += slice.length;
+    if (!error) inserted += slice.length;
   }
-
-  // 7. Update map table's last_seen_at
   await supabase
     .from("sports_book_events_map")
     .upsert({
       odds_api_event_id: oddsApiEventId,
-      sports_event_id: sportsEventId,
+      sports_event_id: event.id,
       league: event.league,
       sport_key: sport,
       home_team: oaEvent.home_team,
@@ -192,10 +228,56 @@ export default async function handler(req, res) {
       last_seen_at: now,
     }, { onConflict: "odds_api_event_id" });
 
-  return res.status(200).json({
-    ok: true,
+  return {
+    events_matched: 1,
+    quotes_inserted: inserted,
     credits_used: creditsUsed,
     credits_remaining: api.credits.remaining,
-    quotes_inserted: inserted,
+  };
+}
+
+export default async function handler(req, res) {
+  if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
+  const sportsEventId = req.query.event_id;
+  if (!sportsEventId) return res.status(400).json({ error: "event_id required" });
+
+  const supabase = getSupabase();
+  const { data: event } = await supabase
+    .from("sports_events")
+    .select("id, league, title, event_type, start_time, status, kalshi_event_ticker")
+    .eq("id", sportsEventId)
+    .maybeSingle();
+  if (!event) return res.status(404).json({ error: "event not found" });
+
+  const t0 = Date.now();
+  let kalshi, books = null;
+
+  try {
+    kalshi = await refreshKalshiForEvent(supabase, event);
+  } catch (e) {
+    kalshi = { error: e.message, markets_seen: 0, quotes_inserted: 0 };
+  }
+
+  // Books are only relevant for "game" event types. Skip for futures, awards,
+  // championships, division winners, etc. (saves credits, avoids 404 noise).
+  if (event.event_type === "game") {
+    books = await refreshBooksForGame(supabase, event);
+  }
+
+  const creditsUsed = books?.credits_used ?? 0;
+  // Preserve legacy shape for the existing sportsbookish proxy:
+  //   { ok, credits_used, quotes_inserted } — quotes_inserted now reflects
+  //   the COMBINED total (kalshi + books) so the toast message stays correct.
+  const totalQuotes = (kalshi.quotes_inserted || 0) + (books?.quotes_inserted || 0);
+
+  return res.status(200).json({
+    ok: true,
+    event_type: event.event_type,
+    credits_used: creditsUsed,
+    credits_remaining: books?.credits_remaining ?? null,
+    quotes_inserted: totalQuotes,
+    kalshi,
+    books,
+    elapsed_ms: Date.now() - t0,
   });
 }
