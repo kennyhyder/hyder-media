@@ -71,10 +71,18 @@ export function toBigInt(v) {
 }
 
 export function computeImplied(yesBid, yesAsk, last) {
-  if (yesBid != null && yesAsk != null && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
+  // Same logic as golfodds — only trust bid/ask midpoint when BOTH sides have
+  // real liquidity. Otherwise fall back to last trade. Prevents 0/1¢ dust
+  // asks (no real buyer) from being read as 0.5% probability.
+  if (yesBid != null && yesAsk != null
+      && yesBid > 0 && yesAsk > yesBid
+      && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
     return Number(((yesBid + yesAsk) / 2).toFixed(4));
   }
   if (last != null && last > 0 && last < 1) return last;
+  if (yesBid != null && yesAsk != null && yesAsk < 1) {
+    return Number(((yesBid + yesAsk) / 2).toFixed(4));
+  }
   return null;
 }
 

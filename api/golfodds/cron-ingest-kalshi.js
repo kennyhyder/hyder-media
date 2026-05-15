@@ -60,10 +60,23 @@ function toBigInt(v) {
 }
 
 function computeImpliedFromQuote(yesBid, yesAsk, last) {
-  if (yesBid != null && yesAsk != null && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
+  // Trust bid/ask midpoint ONLY when both sides have real liquidity:
+  //   - both > 0 (someone actually wants to buy AND sell)
+  //   - spread <= 10¢ (tight market — bid and ask agree)
+  //   - ask < $1 (not a fully empty offer)
+  // Without the yesBid>0 check, a stale dust ask (e.g. 0/1¢) tricks the
+  // midpoint into reading 0.5% on a market that last traded at 58%.
+  if (yesBid != null && yesAsk != null
+      && yesBid > 0 && yesAsk > yesBid
+      && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
     return Number(((yesBid + yesAsk) / 2).toFixed(4));
   }
+  // Otherwise prefer last trade — it's what users actually paid most recently
   if (last != null && last > 0 && last < 1) return last;
+  // Last resort: midpoint of whatever (one-sided) book is left
+  if (yesBid != null && yesAsk != null && yesAsk < 1) {
+    return Number(((yesBid + yesAsk) / 2).toFixed(4));
+  }
   return null;
 }
 
