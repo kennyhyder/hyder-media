@@ -76,18 +76,32 @@ export interface EventSlugRow {
 }
 
 export async function fetchEventBySlug(league: string, year: number, slug: string): Promise<EventSlugRow | null> {
-  const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 } });
-  if (!r.ok) return null;
-  const data = await r.json();
-  return data.event || null;
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.event || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchEventSlugById(id: string): Promise<{ league: string; season_year: number; slug: string } | null> {
-  const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 } });
-  if (!r.ok) return null;
-  const data = await r.json();
-  if (!data.event?.slug || !data.event?.season_year) return null;
-  return { league: data.event.league, season_year: data.event.season_year, slug: data.event.slug };
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data.event?.slug || !data.event?.season_year) return null;
+    return { league: data.event.league, season_year: data.event.season_year, slug: data.event.slug };
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {

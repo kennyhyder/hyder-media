@@ -21,18 +21,32 @@ export interface TournamentSlugRow {
 }
 
 export async function fetchTournamentBySlug(year: number, slug: string): Promise<TournamentSlugRow | null> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 } });
-  if (!r.ok) return null;
-  const data = await r.json();
-  return data.tournament || null;
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    const data = await r.json();
+    return data.tournament || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchTournamentSlugById(id: string): Promise<{ season_year: number; slug: string } | null> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 } });
-  if (!r.ok) return null;
-  const data = await r.json();
-  if (!data.tournament?.slug || !data.tournament?.season_year) return null;
-  return { season_year: data.tournament.season_year, slug: data.tournament.slug };
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data.tournament?.slug || !data.tournament?.season_year) return null;
+    return { season_year: data.tournament.season_year, slug: data.tournament.slug };
+  } catch {
+    return null;
+  }
 }
 
 export interface Tournament {
@@ -51,10 +65,17 @@ export interface Tournament {
 }
 
 export async function fetchTournaments(): Promise<Tournament[]> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/tournaments`, { next: { revalidate: 60 } });
-  if (!r.ok) throw new Error(`tournaments fetch: ${r.status}`);
-  const data = await r.json();
-  return data.tournaments || [];
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournaments`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.tournaments || [];
+  } catch {
+    return [];
+  }
 }
 
 export interface TournamentInfo {
@@ -75,9 +96,20 @@ export interface TournamentInfo {
 }
 
 export async function fetchTournamentInfo(id: string): Promise<TournamentInfo | null> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-info?id=${id}`, { next: { revalidate: 30 } });
-  if (!r.ok) return null;
-  return r.json();
+  // Hard-cap upstream latency. Without this, a slow data-plane response on
+  // a cold start blocks the page render until the function's maxDuration,
+  // resulting in a Vercel FUNCTION_INVOCATION_FAILED error rather than a
+  // graceful empty state.
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-info?id=${id}`, { next: { revalidate: 30 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
 }
 
 export interface PlayerComparisonRow {
@@ -107,9 +139,19 @@ export interface ComparisonResponse {
 
 export async function fetchComparison(tournamentId: string, marketType: string): Promise<ComparisonResponse> {
   const url = `${DATA_HOST}/api/golfodds/comparison?tournament_id=${tournamentId}&market_type=${marketType}`;
-  const r = await fetch(url, { next: { revalidate: 30 } });
-  if (!r.ok) throw new Error(`comparison fetch: ${r.status}`);
-  return r.json();
+  // 12s hard cap. The comparison response can be 500KB+ for a major; if the
+  // upstream is cold and slow we'd rather return an empty result than blow
+  // the function's maxDuration budget.
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 12000);
+    const r = await fetch(url, { next: { revalidate: 30 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) throw new Error(`comparison fetch: ${r.status}`);
+    return await r.json();
+  } catch {
+    return { tournament_id: tournamentId, market_type: marketType, books: [], player_count: 0, players: [] };
+  }
 }
 
 /**
