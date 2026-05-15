@@ -14,6 +14,7 @@ import TotalsTable from "@/components/sports/TotalsTable";
 import WatchlistButton from "@/components/WatchlistButton";
 import QuickLogBet from "@/components/bets/QuickLogBet";
 import BookLink from "@/components/BookLink";
+import ForceRefreshButton from "@/components/ForceRefreshButton";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
@@ -124,6 +125,10 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
             {detail.event.start_time && new Date(detail.event.start_time).toLocaleString(undefined, { dateStyle: "long", timeStyle: "short" })}
           </div>
           <div className="text-[10px] text-muted-foreground mt-2 font-mono">{detail.event.kalshi_event_ticker}</div>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          <ForceRefreshButton eventId={id} league={league} tier={tier} isAnonymous={isAnonymous} />
         </div>
 
         {/* Quick log bet — Elite gets the interactive form, others see an upsell */}
