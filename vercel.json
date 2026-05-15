@@ -11,7 +11,8 @@
     { "path": "/api/sports/cron-ingest-books",      "schedule": "*/30 * * * *" },
     { "path": "/api/sports/cron-ingest-polymarket", "schedule": "*/15 * * * *" },
     { "path": "/api/sports/cron-detect-movements",  "schedule": "*/5 * * * *" },
-    { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" }
+    { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" },
+    { "path": "/api/sports/cron-archive-events",    "schedule": "0 * * * *" }
   ],
   "functions": {
     "api/*.js": { "maxDuration": 10 },
