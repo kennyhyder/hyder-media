@@ -99,7 +99,7 @@ export interface TeamMarket {
 }
 
 export interface TeamDetail {
-  team: { id: string; league: string; name: string; slug: string; abbreviation: string | null; normalized_name: string };
+  team: { id: string; league: string; name: string; slug: string; kind: "team" | "player" | null; abbreviation: string | null; normalized_name: string };
   markets: TeamMarket[];
   counts: { games: number; futures: number; total: number };
 }
@@ -109,16 +109,18 @@ export interface TeamListItem {
   league: string;
   name: string;
   slug: string;
+  kind: "team" | "player" | null;
   abbreviation: string | null;
 }
 
-export async function fetchTeams(league?: string): Promise<TeamListItem[]> {
+export async function fetchTeams(league?: string, kind?: "team" | "player"): Promise<TeamListItem[]> {
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const url = league
-      ? `${DATA_HOST}/api/sports/teams?league=${encodeURIComponent(league)}`
-      : `${DATA_HOST}/api/sports/teams`;
+    const params = new URLSearchParams();
+    if (league) params.set("league", league);
+    if (kind) params.set("kind", kind);
+    const url = `${DATA_HOST}/api/sports/teams${params.toString() ? "?" + params.toString() : ""}`;
     const r = await fetch(url, { next: { revalidate: 300 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return [];

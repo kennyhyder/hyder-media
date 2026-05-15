@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   // 1. Resolve the contestant row
   const { data: team } = await supabase
     .from("sports_contestants")
-    .select("id, league, name, slug, abbreviation, normalized_name")
+    .select("id, league, name, slug, kind, abbreviation, normalized_name")
     .eq("league", league)
     .eq("slug", slug)
     .maybeSingle();

@@ -66,7 +66,14 @@ async function ingestLeague(supabase, league) {
         if (!name || name.length > 60) continue;
         const norm = normalizeName(name);
         if (!contestantMap.has(norm)) {
-          contestantMap.set(norm, { league: league.key, name, normalized_name: norm, slug: slugify(name) });
+          // kind: 'team' if this series ingests game-type events, else 'player'.
+          // Backfill SQL set this for existing rows; new inserts get the right
+          // kind from the start. Note: contestants that appear in BOTH game
+          // and non-game series will keep their first-seen kind because we
+          // never overwrite on conflict — that's the desired behavior since
+          // appearing in even one game event indicates this IS a team.
+          const kind = series.event_type === "game" ? "team" : "player";
+          contestantMap.set(norm, { league: league.key, name, normalized_name: norm, slug: slugify(name), kind });
         }
       }
     }

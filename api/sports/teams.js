@@ -13,15 +13,16 @@ function getSupabase() {
 }
 
 export default async function handler(req, res) {
-  const { league } = req.query;
+  const { league, kind } = req.query;
   const supabase = getSupabase();
 
   let q = supabase
     .from("sports_contestants")
-    .select("id, league, name, slug, abbreviation")
+    .select("id, league, name, slug, kind, abbreviation")
     .not("slug", "is", null)
     .order("name", { ascending: true });
   if (league) q = q.eq("league", league);
+  if (kind) q = q.eq("kind", kind);
 
   const { data, error } = await q;
   if (error) return res.status(500).json({ error: error.message });
