@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const supabase = getSupabase();
     const { data: event } = await supabase
       .from("sports_events")
-      .select("id, league, event_type, title, short_title, start_time, status, kalshi_event_ticker")
+      .select("id, league, event_type, title, short_title, season_year, slug, start_time, status, kalshi_event_ticker")
       .eq("id", id)
       .maybeSingle();
     if (!event) return res.status(404).json({ error: "not found" });

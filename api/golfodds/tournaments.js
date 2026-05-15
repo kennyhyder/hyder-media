@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from("golfodds_tournaments")
-      .select("id, tour, name, short_name, start_date, end_date, is_major, status, kalshi_event_ticker, dg_event_id")
+      .select("id, tour, name, short_name, season_year, slug, start_date, end_date, is_major, status, kalshi_event_ticker, dg_event_id")
       .order("start_date", { ascending: false, nullsFirst: false })
       .limit(50);
     if (error) return res.status(500).json({ error: error.message });

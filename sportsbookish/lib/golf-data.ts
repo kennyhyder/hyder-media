@@ -49,6 +49,8 @@ export interface Tournament {
   tour: string;
   name: string;
   short_name: string | null;
+  season_year: number | null;
+  slug: string | null;
   start_date: string | null;
   end_date: string | null;
   is_major: boolean;

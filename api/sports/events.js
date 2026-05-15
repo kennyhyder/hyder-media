@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const supabase = getSupabase();
     const { data: events } = await supabase
       .from("sports_events")
-      .select("id, league, event_type, title, short_title, start_time, status, kalshi_event_ticker")
+      .select("id, league, event_type, title, short_title, season_year, slug, start_time, status, kalshi_event_ticker")
       .eq("league", league)
       .eq("status", status)
       .order("start_time", { ascending: true, nullsFirst: false })

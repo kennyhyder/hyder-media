@@ -48,12 +48,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    // Tournament pages — prefer the slug URL when available, fall back to the
-    // legacy ?id= URL for any tournament that hasn't been slugged yet (newly
-    // ingested before the cron's slug-write has run).
+    // Tournament pages — use the DB-stored slug + season_year (canonical).
+    // Fall back to slug-computed-from-name only if backfill hasn't run.
     const tournamentUrls: MetadataRoute.Sitemap = tournaments.map((t) => {
-      const year = t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear();
-      const slug = slugify(t.short_name || t.name);
+      const year = t.season_year || (t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear());
+      const slug = t.slug || slugify(t.name);
       const url = slug ? `${SITE_URL}${tournamentUrl(year, slug)}` : `${SITE_URL}/golf/tournament?id=${t.id}`;
       return {
         url,
@@ -63,15 +62,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
-    // Per-event sports URLs — fetch each league's open events. Slug URL takes
-    // precedence; UUID URL is only emitted when slug isn't yet backfilled.
+    // Per-event sports URLs — DB-stored slug + season_year are canonical.
     const eventUrls: MetadataRoute.Sitemap = [];
     for (const l of leagues) {
       try {
         const events = await fetchEventsByLeague(l.key);
         for (const e of events) {
-          const year = e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear();
-          const slug = slugify(e.title);
+          const year = e.season_year || (e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear());
+          const slug = e.slug || slugify(e.title);
           const url = slug ? `${SITE_URL}${eventUrl(l.key, year, slug)}` : `${SITE_URL}/sports/${l.key}/event/${e.id}`;
           eventUrls.push({
             url,

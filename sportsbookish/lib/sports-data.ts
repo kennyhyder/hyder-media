@@ -27,6 +27,8 @@ export interface SportsEvent {
   event_type: string;
   title: string;
   short_title: string | null;
+  season_year: number | null;
+  slug: string | null;
   start_time: string | null;
   status: string;
   kalshi_event_ticker: string | null;

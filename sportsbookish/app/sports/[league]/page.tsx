@@ -16,11 +16,15 @@ import { JsonLd, breadcrumbLd, itemListLd, faqLd, faqForLeaguePage } from "@/lib
 import FaqSection from "@/components/FaqSection";
 import { slugify, eventUrl } from "@/lib/slug";
 
-// Returns canonical slug URL when title slugifies cleanly, else legacy UUID URL.
-function eventLinkFor(league: string, e: { id: string; title: string; start_time: string | null }): string {
-  const slug = slugify(e.title);
+// Returns canonical slug URL using DB-stored slug + season_year when present,
+// else falls back to a computed slug, else legacy UUID URL.
+function eventLinkFor(
+  league: string,
+  e: { id: string; title: string; start_time: string | null; slug?: string | null; season_year?: number | null }
+): string {
+  const slug = e.slug || slugify(e.title);
   if (!slug) return `/sports/${league}/event/${e.id}`;
-  const year = e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear();
+  const year = e.season_year || (e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear());
   return eventUrl(league, year, slug);
 }
 

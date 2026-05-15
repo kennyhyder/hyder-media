@@ -56,10 +56,11 @@ export default async function GolfHome() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {tournaments.map((t) => {
-            // Prefer canonical slug URL; fall back to legacy ?id= for any
-            // tournaments without a slug yet (newly ingested pre-backfill).
-            const year = t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear();
-            const slug = slugify(t.short_name || t.name);
+            // Use the DB-stored slug + season_year (canonical). Fall back to a
+            // computed slug from t.name only if backfill hasn't run yet, and
+            // the legacy ?id= URL if both are missing.
+            const year = t.season_year || (t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear());
+            const slug = t.slug || slugify(t.name);
             const href = slug ? tournamentUrl(year, slug) : `/golf/tournament?id=${t.id}`;
             return (
             <Link key={t.id} href={href} className="block">
