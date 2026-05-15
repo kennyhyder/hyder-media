@@ -27,7 +27,8 @@ export async function generateMetadata({ params }: {
   if (!evt) return { title: "Event not found — SportsBookISH" };
 
   const canonical = `${SITE_URL}${eventUrl(league, year, slug)}`;
-  const title = `${evt.title} ${year} odds — Kalshi vs sportsbooks | SportsBookISH`;
+  // Layout template appends " | SportsBookISH" automatically — don't duplicate
+  const title = `${evt.title} ${year} odds — Kalshi vs sportsbooks`;
   const description = `Live ${evt.title} odds comparison — Kalshi event-contract pricing vs DraftKings, FanDuel, BetMGM and 8+ more sportsbooks. Updated every 5 minutes.`;
   return {
     title,

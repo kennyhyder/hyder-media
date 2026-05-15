@@ -23,7 +23,8 @@ export async function generateMetadata({ params, searchParams }: {
 
   const url = tournamentUrl(year, slug);
   const marketLabel = mt === "win" ? "outright winner" : mt;
-  const title = `${t.name} ${year} odds — Kalshi vs sportsbooks | SportsBookISH`;
+  // Layout template appends " | SportsBookISH" automatically — don't duplicate
+  const title = `${t.name} ${year} odds — Kalshi vs sportsbooks`;
   const description = `Live ${marketLabel} odds for the ${t.name} ${year}. Compare every player's Kalshi price against DraftKings, FanDuel, BetMGM and 11+ more sportsbooks plus the DataGolf model. Updated every 5 minutes.`;
 
   return {
