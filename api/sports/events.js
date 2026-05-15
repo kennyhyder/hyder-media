@@ -52,10 +52,17 @@ export default async function handler(req, res) {
         .in("sports_event_id", eventIds),
     ]);
 
-    // Index polymarket by (event_id, contestant_norm)
+    // 30-min staleness filter — drop quotes that haven't refreshed in one
+    // cron cycle. Prevents stale book/polymarket data from creating fake edges
+    // when the actual market has moved (books update live during games).
+    const STALE_THRESHOLD_MS = 30 * 60 * 1000;
+    const nowMs = Date.now();
+    const freshBook = (row) => !row?.fetched_at || (nowMs - new Date(row.fetched_at).getTime()) <= STALE_THRESHOLD_MS;
+
+    // Index polymarket by (event_id, contestant_norm) — age-filtered
     const polyByEventContestant = new Map();
     for (const p of polymarketQuotes || []) {
-      polyByEventContestant.set(`${p.sports_event_id}|${p.contestant_norm}`, p);
+      if (freshBook(p)) polyByEventContestant.set(`${p.sports_event_id}|${p.contestant_norm}`, p);
     }
 
     const marketIds = (markets || []).map((m) => m.id);
@@ -67,9 +74,10 @@ export default async function handler(req, res) {
       : { data: [] };
 
     const qByMarket = new Map((kalshiQuotes || []).map((q) => [q.market_id, q]));
-    // Group book quotes by (event_id, contestant_norm)
+    // Group book quotes by (event_id, contestant_norm) — age-filtered
     const booksByEventContestant = new Map();
     for (const b of bookQuotes || []) {
+      if (!freshBook(b)) continue;
       const key = `${b.sports_event_id}|${b.contestant_norm}`;
       const arr = booksByEventContestant.get(key) || [];
       arr.push({

@@ -42,14 +42,22 @@ export default async function handler(req, res) {
         .eq("sports_event_id", id),
     ]);
 
-    const h2hQuotes = (allBookQuotes || []).filter((b) => b.market_type === "h2h");
-    const spreadsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "spreads");
-    const totalsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "totals");
+    // Drop any book or polymarket quote older than 30 min — books update
+    // live during games and our cron is 30 min, so anything beyond one
+    // cycle is likely stale (e.g. game ended, book closed market) and
+    // shouldn't drive an edge calculation against the moving Kalshi tick.
+    const STALE_THRESHOLD_MS = 30 * 60 * 1000;
+    const nowMs = Date.now();
+    const fresh = (row) => !row?.fetched_at || (nowMs - new Date(row.fetched_at).getTime()) <= STALE_THRESHOLD_MS;
 
-    // Index polymarket quotes by contestant for easy join
+    const h2hQuotes = (allBookQuotes || []).filter((b) => b.market_type === "h2h" && fresh(b));
+    const spreadsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "spreads" && fresh(b));
+    const totalsQuotes = (allBookQuotes || []).filter((b) => b.market_type === "totals" && fresh(b));
+
+    // Index polymarket quotes by contestant (also age-filtered)
     const polyByContestant = new Map();
     for (const p of polymarketQuotes || []) {
-      polyByContestant.set(p.contestant_norm, p);
+      if (fresh(p)) polyByContestant.set(p.contestant_norm, p);
     }
 
     // Kalshi quotes for each market

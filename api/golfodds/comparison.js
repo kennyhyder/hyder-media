@@ -80,29 +80,29 @@ export default async function handler(req, res) {
     }
     const allBooks = Array.from(bookSet).sort();
 
-    // Staleness threshold: when a reference (DG model OR book consensus) is
-    // significantly older than the Kalshi quote, the reference is no longer
-    // tracking reality. DataGolf closes some markets mid-tournament (make_cut
-    // after R2, r1lead after R1) and our cached snapshot then sits unchanged
-    // for 12+ hours while Kalshi keeps moving. Treat anything more than
-    // STALE_THRESHOLD_MS older than the current Kalshi tick as "no data".
-    const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
-    const isStale = (refFetched, kalshiFetched) => {
+    // Staleness threshold: absolute wall-clock age. Books DO update live
+    // during games (recreational books move on every score change), and our
+    // golf books cron runs every 10 min, sports books every 30 min. Anything
+    // older than 30 min is one missed cron cycle of grace — drop it.
+    //
+    // DataGolf closes some markets mid-event (make_cut after R2, r1lead after
+    // R1) and our cached snapshot sits unchanged for 12+ hours while Kalshi
+    // keeps moving — this filter catches that case AND any genuine cron lag.
+    const STALE_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+    const now = Date.now();
+    const isStale = (refFetched) => {
       if (!refFetched) return false;
-      if (!kalshiFetched) return false;
-      const ageDelta = new Date(kalshiFetched).getTime() - new Date(refFetched).getTime();
-      return ageDelta > STALE_THRESHOLD_MS;
+      return now - new Date(refFetched).getTime() > STALE_THRESHOLD_MS;
     };
 
     const players = markets.map((m) => {
       const k = kalshiByMarket.get(m.id);
       const dg = dgByMarket.get(m.id);
       let books = booksByMarket.get(m.id) || [];
-      const kalshiFetchedAt = k?.fetched_at || null;
-      // Drop DG/books quotes that are stale relative to Kalshi
-      const dgStale = dg && isStale(dg.fetched_at, kalshiFetchedAt);
+      // Drop DG/books quotes that haven't refreshed in the last 30 min
+      const dgStale = dg && isStale(dg.fetched_at);
       const dgEffective = dgStale ? null : dg;
-      books = books.filter((b) => !isStale(b.fetched_at, kalshiFetchedAt));
+      books = books.filter((b) => !isStale(b.fetched_at));
       const novigVals = books.map((b) => b.novig_prob).filter((p) => p != null);
       const booksMedian = median(novigVals);
       const booksMin = novigVals.length ? Math.min(...novigVals) : null;
