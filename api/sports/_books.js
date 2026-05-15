@@ -11,15 +11,21 @@ export const LEAGUE_TO_SPORT = {
   nba: "basketball_nba",
   mlb: "baseball_mlb",
   nhl: "icehockey_nhl",
+  nfl: "americanfootball_nfl",
   epl: "soccer_epl",
   mls: "soccer_usa_mls",
+  ucl: "soccer_uefa_champs_league",
+  wc:  "soccer_fifa_world_cup",
 };
 
 export const LEAGUE_TO_FUTURES_SPORT = {
   nba: "basketball_nba_championship_winner",
   mlb: "baseball_mlb_world_series_winner",
   nhl: "icehockey_nhl_championship_winner",
+  nfl: "americanfootball_nfl_super_bowl_winner",
   epl: "soccer_epl_winner",
+  ucl: "soccer_uefa_champs_league_winner",
+  wc:  "soccer_fifa_world_cup_winner",
 };
 
 // Hand overrides per league for cases the heuristics can't resolve.

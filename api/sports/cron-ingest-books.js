@@ -18,7 +18,7 @@ import {
 
 export const config = { maxDuration: 60 };
 
-const LEAGUES = ["nba", "mlb", "nhl", "epl", "mls"];
+const LEAGUES = ["nba", "mlb", "nhl", "nfl", "epl", "mls", "ucl", "wc"];
 const MATCH_WINDOW_MS = 6 * 60 * 60 * 1000; // ±6h
 
 // Group totals outcomes (Over/Under at multiple points) by their point so each

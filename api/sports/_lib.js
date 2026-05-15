@@ -8,6 +8,20 @@ export const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
 
 // League config: which Kalshi series to pull per league, and what event_type
 // each one represents in our sports_events.event_type column.
+//
+// event_type values used across UI + tier-gating:
+//   game            single game money line
+//   series          playoff series winner (best-of-N)
+//   championship    overall season title (World Series, Stanley Cup, NBA Finals, etc.)
+//   conference      conference / league title (AFC, NFC, EC, WC, AL, NL)
+//   division        division winner (AL East, NFC West, etc.)
+//   playoffs        make / miss playoffs (binary per-team)
+//   record_best     best regular-season record
+//   record_worst    worst regular-season record
+//   win_total       team win total over/under
+//   award           generic award (Cy Young, Hart, Norris, Vezina, CoY, RoY, DPoY)
+//   mvp             MVP (kept as its own type so it ranks above generic awards)
+//   trade           trade-related futures (one-off events; rarely book-comparable)
 export const LEAGUES = [
   {
     key: "nba",
@@ -15,14 +29,29 @@ export const LEAGUES = [
       { ticker: "KXNBA",        event_type: "championship" },
       { ticker: "KXNBAGAME",    event_type: "game" },
       { ticker: "KXNBASERIES",  event_type: "series" },
+      { ticker: "KXNBAEAST",    event_type: "conference" },
+      { ticker: "KXNBAWEST",    event_type: "conference" },
       { ticker: "KXNBAMVP",     event_type: "mvp" },
+      { ticker: "KXNBACOY",     event_type: "award" },
     ],
   },
   {
     key: "mlb",
     series: [
-      { ticker: "KXMLB",        event_type: "championship" },
-      { ticker: "KXMLBGAME",    event_type: "game" },
+      { ticker: "KXMLB",              event_type: "championship" },
+      { ticker: "KXMLBGAME",          event_type: "game" },
+      { ticker: "KXMLBPLAYOFFS",      event_type: "playoffs" },
+      { ticker: "KXMLBBESTRECORD",    event_type: "record_best" },
+      { ticker: "KXMLBWORSTRECORD",   event_type: "record_worst" },
+      { ticker: "KXMLBALMVP",         event_type: "mvp" },
+      { ticker: "KXMLBNLMVP",         event_type: "mvp" },
+      { ticker: "KXMLBALCY",          event_type: "award" },
+      { ticker: "KXMLBNLCY",          event_type: "award" },
+      { ticker: "KXMLBALEAST",        event_type: "division" },
+      { ticker: "KXMLBALWEST",        event_type: "division" },
+      { ticker: "KXMLBNLEAST",        event_type: "division" },
+      { ticker: "KXMLBNLWEST",        event_type: "division" },
+      { ticker: "KXMLBTRADE",         event_type: "trade" },
     ],
   },
   {
@@ -30,6 +59,30 @@ export const LEAGUES = [
     series: [
       { ticker: "KXNHL",        event_type: "championship" },
       { ticker: "KXNHLGAME",    event_type: "game" },
+      { ticker: "KXNHLSERIES",  event_type: "series" },
+      { ticker: "KXNHLEAST",    event_type: "conference" },
+      { ticker: "KXNHLWEST",    event_type: "conference" },
+      { ticker: "KXNHLHART",    event_type: "mvp" },
+      { ticker: "KXNHLNORRIS",  event_type: "award" },
+      { ticker: "KXNHLVEZINA",  event_type: "award" },
+    ],
+  },
+  {
+    key: "nfl",
+    series: [
+      { ticker: "KXNFLGAME",      event_type: "game" },
+      { ticker: "KXNFLMVP",       event_type: "mvp" },
+      { ticker: "KXNFLWINS",      event_type: "win_total" },
+      { ticker: "KXNFLAFCCHAMP",  event_type: "conference" },
+      { ticker: "KXNFLNFCCHAMP",  event_type: "conference" },
+      { ticker: "KXNFLAFCEAST",   event_type: "division" },
+      { ticker: "KXNFLAFCWEST",   event_type: "division" },
+      { ticker: "KXNFLAFCNORTH",  event_type: "division" },
+      { ticker: "KXNFLAFCSOUTH",  event_type: "division" },
+      { ticker: "KXNFLNFCEAST",   event_type: "division" },
+      { ticker: "KXNFLNFCWEST",   event_type: "division" },
+      { ticker: "KXNFLNFCNORTH",  event_type: "division" },
+      { ticker: "KXNFLNFCSOUTH",  event_type: "division" },
     ],
   },
   {
@@ -42,6 +95,20 @@ export const LEAGUES = [
     key: "mls",
     series: [
       { ticker: "KXMLSGAME",    event_type: "game" },
+      { ticker: "KXMLSCUP",     event_type: "championship" },
+    ],
+  },
+  {
+    key: "ucl",
+    series: [
+      { ticker: "KXUCL",        event_type: "championship" },
+      { ticker: "KXUCLGAME",    event_type: "game" },
+    ],
+  },
+  {
+    key: "wc",
+    series: [
+      { ticker: "KXWCGAME",     event_type: "game" },
     ],
   },
 ];

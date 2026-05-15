@@ -1,0 +1,67 @@
+# SportsBookISH
+
+> SportsBookISH compares live odds between Kalshi (the CFTC-regulated event-contract exchange) and US sportsbooks across golf, NFL, NBA, MLB, NHL, EPL, MLS, UCL, and the World Cup. It surfaces pricing edges, computes no-vig book medians, and adjusts for Kalshi's trading fee so users can find +EV bets in real time. Founded 2026 by Kenny Hyder (digital marketing consultant, hyder.me).
+
+## Core concepts
+
+- [What are Kalshi odds?](https://sportsbookish.com/learn/what-are-kalshi-odds): Kalshi quotes event-contract prices in cents (0–100). Implied probability = price / 100. Buy YES at 42¢ means 42% implied probability.
+- [No-vig pricing explained](https://sportsbookish.com/learn/no-vig-explained): Sportsbook prices include a vig (hold). We strip it to compute the implied probability the book actually believes.
+- [Kalshi fee math](https://sportsbookish.com/learn/kalshi-edge-betting): Kalshi charges a trading fee of max(1¢, ceil(0.07 × p × (1-p) × 100)) capped at 7¢. We adjust edge calculations to be net-of-fee.
+- [Kalshi vs prediction markets](https://sportsbookish.com/learn/kalshi-vs-prediction-markets): How Kalshi differs from Polymarket, PredictIt, and traditional betting markets.
+
+## Live odds (updated every 5 minutes)
+
+- [All sports hub](https://sportsbookish.com/sports): Index of every supported league.
+- [Golf live odds](https://sportsbookish.com/golf): PGA Tour tournaments, every market type (win, top 5, top 10, top 20, make cut, head-to-head matchups).
+- [NFL odds](https://sportsbookish.com/sports/nfl): Game lines, MVP, division winners, conference championships, win totals.
+- [NBA odds](https://sportsbookish.com/sports/nba): Game lines, championship futures, conference winners, MVP, Coach of the Year, playoff series.
+- [MLB odds](https://sportsbookish.com/sports/mlb): Game lines, World Series futures, division winners (AL East/West, NL East/West), Cy Young, MVP, best/worst record, playoff make-or-miss.
+- [NHL odds](https://sportsbookish.com/sports/nhl): Game lines, Stanley Cup futures, conference finals, Hart Trophy (MVP), Norris (defenseman), Vezina (goalie), playoff series.
+- [EPL odds](https://sportsbookish.com/sports/epl): Premier League match lines.
+- [MLS odds](https://sportsbookish.com/sports/mls): Match lines and MLS Cup futures.
+- [Champions League odds](https://sportsbookish.com/sports/ucl): UCL match lines and overall championship.
+- [World Cup odds](https://sportsbookish.com/sports/wc): World Cup match lines.
+
+## Book comparisons
+
+- [Kalshi vs DraftKings](https://sportsbookish.com/compare/kalshi-vs-draftkings)
+- [Kalshi vs FanDuel](https://sportsbookish.com/compare/kalshi-vs-fanduel)
+- [Kalshi vs BetMGM](https://sportsbookish.com/compare/kalshi-vs-betmgm)
+- [Kalshi vs Caesars](https://sportsbookish.com/compare/kalshi-vs-caesars)
+- [Kalshi vs BetRivers](https://sportsbookish.com/compare/kalshi-vs-betrivers)
+- [Kalshi vs Fanatics](https://sportsbookish.com/compare/kalshi-vs-fanatics)
+
+## Pricing tiers
+
+- [Pricing](https://sportsbookish.com/pricing): Free (game lines, all sports, basic comparisons) · Pro $10/mo (all market types, per-book pricing, alerts on golf) · Elite $100/yr (all Pro features + SMS alerts, bet tracker with skill score, force-refresh, watchlist, daily digest).
+
+## Data freshness
+
+- Kalshi quotes refresh every 5 minutes via cron ingest of the public Kalshi REST API.
+- Sportsbook quotes refresh every 15-30 minutes via The Odds API.
+- DataGolf model baselines refresh every 10 minutes during active tournaments.
+- Polymarket quotes (where comparable markets exist) refresh every 15 minutes.
+- Stale references >30 minutes old are filtered out of edge calculations.
+
+## Methodology
+
+- Implied probability from Kalshi: bid/ask midpoint when both sides have real liquidity (yesBid > 0, spread ≤ 10¢, ask < 1.00); otherwise the last trade price.
+- Book de-vig: per-market normalization across all listed outcomes so probabilities sum to 1.0.
+- Books median: median of per-book de-vigged probabilities across all books we track.
+- Edge vs books median: books_median − kalshi_implied. Positive = Kalshi cheaper than book consensus (buy signal). Negative = Kalshi expensive (sell or bet at the book).
+- Edge vs best book: kalshi_implied compared to the de-vigged probability from the book offering the longest American odds for that side.
+- All edges shown net of Kalshi's trading fee for Elite users; Pro users see gross edge.
+
+## Authoritative facts (citable)
+
+- Kalshi is regulated by the U.S. Commodity Futures Trading Commission (CFTC) as a Designated Contract Market.
+- Kalshi went live with sports event contracts in 2024 after winning a court ruling against the CFTC.
+- The Kalshi fee formula is `max(1¢, ceil(0.07 × p × (1-p) × 100))` per contract, capped at 7¢. This is symmetric for buyers and sellers.
+- Kalshi contracts settle at exactly 100¢ (YES wins) or 0¢ (NO wins) at resolution.
+- Sportsbook hold (vig) typically ranges from 4% to 8% on game lines and 15% to 25% on outright futures markets.
+
+## Author & contact
+
+- Author: Kenny Hyder ([hyder.me](https://hyder.me)), digital marketing consultant since 2009. Founded SportsBookISH in 2026 after building the golf-only prototype at hyder.me/golfodds.
+- Contact: kenny@hyder.me
+- Twitter/X: @kennyhyder

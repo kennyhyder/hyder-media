@@ -12,7 +12,8 @@ import GameCard from "@/components/sports/GameCard";
 import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookTable";
 import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
-import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
+import { JsonLd, breadcrumbLd, itemListLd, faqLd, faqForLeaguePage } from "@/lib/seo";
+import FaqSection from "@/components/FaqSection";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -37,15 +38,37 @@ export const maxDuration = 30;
 
 const EVENT_TYPE_LABEL: Record<string, string> = {
   game: "Game",
-  series: "Series",
+  series: "Playoff series",
   championship: "Championship",
+  conference: "Conference winner",
+  division: "Division winner",
+  playoffs: "Make / miss playoffs",
+  record_best: "Best regular-season record",
+  record_worst: "Worst regular-season record",
+  win_total: "Team win totals",
   mvp: "MVP",
+  award: "Awards",
+  trade: "Trades & roster moves",
 };
 
-// Free tier sees only "game" type events. Pro+ sees series, championship, mvp.
+// Free tier sees only "game" type events. Pro+ sees every other event type.
+const PAID_EVENT_TYPES = [
+  "championship",
+  "conference",
+  "division",
+  "series",
+  "playoffs",
+  "record_best",
+  "record_worst",
+  "win_total",
+  "mvp",
+  "award",
+  "trade",
+];
+
 function visibleEventTypesForTier(tier: string): string[] {
   if (tier === "free") return ["game"];
-  return ["championship", "series", "game", "mvp"];
+  return ["game", ...PAID_EVENT_TYPES];
 }
 
 export default async function LeaguePage({ params }: { params: Promise<{ league: string }> }) {
@@ -94,7 +117,20 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
     }
   }
 
-  const order = ["championship", "series", "game", "mvp"];
+  // Display order for the non-game cards section below
+  const order = [
+    "championship",
+    "conference",
+    "division",
+    "series",
+    "playoffs",
+    "mvp",
+    "award",
+    "record_best",
+    "record_worst",
+    "win_total",
+    "trade",
+  ];
 
   // Stats for the strip at top — same shape as golf tournament page.
   const totalGames = (groups.game || []).length;
@@ -108,6 +144,24 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
     name: `${e.title} — Kalshi odds`,
     url: `/sports/${league}/event/${e.id}`,
   }));
+  // Pick the row with the largest absolute edge for the FAQ "biggest edge" answer.
+  const bestEdgeRow = gameRows.reduce<SportsRow | null>((acc, r) => {
+    const e = r.edge_vs_books_median;
+    if (e == null) return acc;
+    if (!acc || Math.abs(e) > Math.abs(acc.edge_vs_books_median ?? 0)) return r;
+    return acc;
+  }, null);
+
+  const faqItems = faqForLeaguePage({
+    leagueDisplayName: meta.display_name,
+    totalGames,
+    totalMarkets,
+    booksTracked,
+    bestEdgeContestant: bestEdgeRow?.contestant_label ?? null,
+    bestEdgePct: bestEdgeRow?.edge_vs_books_median ?? null,
+    hasFutures: order.some((t) => (groups[t] || []).length > 0),
+  });
+
   const ldData = [
     breadcrumbLd([
       { name: "Home", url: "/" },
@@ -115,6 +169,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
       { name: meta.display_name, url: `/sports/${league}` },
     ]),
     itemListLd(`${meta.display_name} games with Kalshi odds`, eventList),
+    faqLd(faqItems),
   ];
 
   return (
@@ -180,10 +235,8 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
           </section>
         )}
 
-        {/* Other event types (championship, series, mvp) — kept as cards */}
-        {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
-        {order.length === 0 && null}
-        {(["championship", "series", "mvp"] as const).map((type) => {
+        {/* Non-game event types rendered as cards, grouped + tier-gated */}
+        {order.map((type) => {
           const list = groups[type];
           if (!list?.length) return null;
           const locked = !allowedTypes.includes(type);
@@ -218,9 +271,11 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
 
         {tier === "free" && (
           <div className="mt-8 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm">
-            Free tier sees individual games only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro ($19/mo)</Link> to unlock series winners, championship futures, MVP odds, and team detail pages.
+            Free tier sees individual games only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro ($10/mo)</Link> to unlock championship & conference futures, MVP & award odds, division winners, win totals, playoff series, team detail pages, and historical archives.
           </div>
         )}
+
+        <FaqSection items={faqItems} heading={`${meta.display_name} odds — frequently asked questions`} />
       </main>
     </div>
   );
