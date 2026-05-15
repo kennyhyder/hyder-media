@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/sports`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/sports/movers`, lastModified: now, changeFrequency: "hourly", priority: 0.7 },
     { url: `${SITE_URL}/golf`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
+    { url: `${SITE_URL}/golf/players`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${SITE_URL}/compare`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/learn`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     // High-intent comparison pages
@@ -40,13 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const [leagues, tournaments] = await Promise.all([fetchLeagues(), fetchTournaments()]);
 
-    // League pages
-    const leagueUrls: MetadataRoute.Sitemap = leagues.map((l) => ({
-      url: `${SITE_URL}/sports/${l.key}`,
-      lastModified: now,
-      changeFrequency: "hourly" as const,
-      priority: 0.8,
-    }));
+    // League pages + per-league team/player index pages
+    const leagueUrls: MetadataRoute.Sitemap = leagues.flatMap((l) => [
+      { url: `${SITE_URL}/sports/${l.key}`, lastModified: now, changeFrequency: "hourly" as const, priority: 0.8 },
+      { url: `${SITE_URL}/sports/${l.key}/teams`, lastModified: now, changeFrequency: "daily" as const, priority: 0.6 },
+      { url: `${SITE_URL}/sports/${l.key}/players`, lastModified: now, changeFrequency: "daily" as const, priority: 0.6 },
+    ]);
 
     // Tournament pages — use the DB-stored slug + season_year (canonical).
     // Fall back to slug-computed-from-name only if backfill hasn't run.

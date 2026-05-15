@@ -205,6 +205,15 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
       </header>
 
       <main id="main" className="container mx-auto max-w-[1800px] px-4 py-8">
+        <div className="flex items-center gap-2 mb-4 text-xs">
+          <Link href={`/sports/${league}/teams`} className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
+            All {meta.display_name} teams →
+          </Link>
+          <Link href={`/sports/${league}/players`} className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
+            All {meta.display_name} players →
+          </Link>
+        </div>
+
         {totalGames > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
             <Stat label="Games" value={String(totalGames)} />

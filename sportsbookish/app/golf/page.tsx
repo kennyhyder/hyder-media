@@ -37,6 +37,11 @@ export default async function GolfHome() {
       </header>
 
       <main id="main" className="container mx-auto max-w-6xl px-4 py-10">
+        <div className="flex items-center gap-2 mb-4 text-xs">
+          <Link href="/golf/players" className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
+            All PGA Tour golfers →
+          </Link>
+        </div>
         <div className="mb-6">
           <h1 className="text-3xl font-bold">Active tournaments</h1>
           <p className="text-muted-foreground text-sm mt-1">
