@@ -47,3 +47,6 @@ export default function robots(): MetadataRoute.Robots {
     host: SITE_URL,
   };
 }
+
+// IndexNow key file:  https://sportsbookish.com/620c7d50b41090ac7f0493e654f3219c.txt
+// (Bing + Yandex + Naver + Seznam verify ownership by fetching the key file)
