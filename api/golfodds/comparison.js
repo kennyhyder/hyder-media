@@ -80,10 +80,29 @@ export default async function handler(req, res) {
     }
     const allBooks = Array.from(bookSet).sort();
 
+    // Staleness threshold: when a reference (DG model OR book consensus) is
+    // significantly older than the Kalshi quote, the reference is no longer
+    // tracking reality. DataGolf closes some markets mid-tournament (make_cut
+    // after R2, r1lead after R1) and our cached snapshot then sits unchanged
+    // for 12+ hours while Kalshi keeps moving. Treat anything more than
+    // STALE_THRESHOLD_MS older than the current Kalshi tick as "no data".
+    const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
+    const isStale = (refFetched, kalshiFetched) => {
+      if (!refFetched) return false;
+      if (!kalshiFetched) return false;
+      const ageDelta = new Date(kalshiFetched).getTime() - new Date(refFetched).getTime();
+      return ageDelta > STALE_THRESHOLD_MS;
+    };
+
     const players = markets.map((m) => {
       const k = kalshiByMarket.get(m.id);
       const dg = dgByMarket.get(m.id);
-      const books = booksByMarket.get(m.id) || [];
+      let books = booksByMarket.get(m.id) || [];
+      const kalshiFetchedAt = k?.fetched_at || null;
+      // Drop DG/books quotes that are stale relative to Kalshi
+      const dgStale = dg && isStale(dg.fetched_at, kalshiFetchedAt);
+      const dgEffective = dgStale ? null : dg;
+      books = books.filter((b) => !isStale(b.fetched_at, kalshiFetchedAt));
       const novigVals = books.map((b) => b.novig_prob).filter((p) => p != null);
       const booksMedian = median(novigVals);
       const booksMin = novigVals.length ? Math.min(...novigVals) : null;
@@ -116,7 +135,8 @@ export default async function handler(req, res) {
         player: m.golfodds_players,
         market_type: m.market_type,
         kalshi: k ? { implied_prob: kalshiProb, yes_bid: k.yes_bid, yes_ask: k.yes_ask, last_price: k.last_price, fetched_at: k.fetched_at } : null,
-        datagolf: dg ? { dg_prob: dg.dg_prob, dg_fit_prob: dg.dg_fit_prob, fetched_at: dg.fetched_at } : null,
+        datagolf: dgEffective ? { dg_prob: dgEffective.dg_prob, dg_fit_prob: dgEffective.dg_fit_prob, fetched_at: dgEffective.fetched_at } : null,
+        dg_stale: dgStale,
         book_prices: bookMap,
         book_count: books.length,
         books_median: booksMedian,
@@ -126,7 +146,7 @@ export default async function handler(req, res) {
         edge_vs_books_median: kalshiProb != null && booksMedian != null ? Number((booksMedian - kalshiProb).toFixed(4)) : null,
         // edge vs best book: how much cheaper is Kalshi than the cheapest book?
         edge_vs_best_book: kalshiProb != null && booksMin != null ? Number((booksMin - kalshiProb).toFixed(4)) : null,
-        edge_vs_dg: kalshiProb != null && dg?.dg_prob != null ? Number((dg.dg_prob - kalshiProb).toFixed(4)) : null,
+        edge_vs_dg: kalshiProb != null && dgEffective?.dg_prob != null ? Number((dgEffective.dg_prob - kalshiProb).toFixed(4)) : null,
       };
     });
 

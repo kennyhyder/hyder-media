@@ -15,10 +15,10 @@ function checkAuth(req) {
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 
-const normalizeName = (s) => s.trim().toLowerCase().replace(/\s+/g, " ");
+const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
 
 function canonicalPlayerName(raw) {
-  if (!raw) return raw;
+  if (!raw || typeof raw !== "string") return "";
   const s = raw.trim();
   const i = s.indexOf(",");
   if (i < 0) return s;
@@ -58,8 +58,11 @@ async function fetchDG(path, params = {}) {
 async function ingestMarket(supabase, dgMarket, marketType) {
   const payload = await fetchDG("/betting-tools/outrights", { tour: "pga", market: dgMarket, odds_format: "american" });
   const eventName = payload.event_name || "Unknown Event";
-  const players = payload.odds || [];
-  if (!players.length) return { book: 0, model: 0 };
+  // DataGolf closes some markets mid-tournament (e.g. make_cut after R2). When that
+  // happens, payload.odds is a STRING ("No <market> available for this event") rather
+  // than an array. Guard against it so the cron doesn't crash + skip the rest.
+  const players = Array.isArray(payload.odds) ? payload.odds.filter((p) => p && typeof p === "object" && p.player_name) : [];
+  if (!players.length) return { book: 0, model: 0, skipped: typeof payload.odds === "string" ? `DG: ${payload.odds.slice(0, 80)}` : "no players" };
 
   // Find tournament by name (DG name matches our canonical "PGA Championship" etc.)
   const { data: tdata } = await supabase
