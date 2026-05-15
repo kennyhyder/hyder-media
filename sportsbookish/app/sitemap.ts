@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { fetchLeagues, fetchEventsByLeague, fetchTeams } from "@/lib/sports-data";
 import { fetchTournaments, fetchGolfers } from "@/lib/golf-data";
 import { eventUrl, tournamentUrl, teamUrl, playerUrl, golfPlayerUrl, slugify } from "@/lib/slug";
+import { GLOSSARY } from "@/lib/glossary";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -36,6 +37,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/learn/no-vig-explained`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/learn/kalshi-edge-betting`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/learn/kalshi-vs-prediction-markets`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    // Glossary
+    { url: `${SITE_URL}/learn/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    ...GLOSSARY.map((e) => ({
+      url: `${SITE_URL}/learn/glossary/${e.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 
   try {

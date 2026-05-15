@@ -61,6 +61,14 @@ export default function LearnPage() {
           Short, practical guides on event-contract odds, no-vig calculations, and finding consistent edges. Written for sports bettors who want to understand <em>why</em> Kalshi prices differ from DraftKings and FanDuel, not just <em>that</em> they do.
         </p>
 
+        <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold">Sports betting glossary</div>
+            <p className="text-xs text-muted-foreground mt-0.5">20+ plain-English definitions: vig, no-vig, edge, EV, CLV, Kelly, parlay, prop, hedge, arbitrage and more.</p>
+          </div>
+          <Link href="/learn/glossary" className="rounded bg-amber-500 hover:bg-amber-400 text-amber-950 px-3 py-1.5 text-sm font-semibold whitespace-nowrap">Browse glossary →</Link>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {TOPICS.map((t) => (
             <Link
