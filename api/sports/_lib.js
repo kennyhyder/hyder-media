@@ -124,6 +124,19 @@ export function checkAuth(req) {
 
 export const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
 
+// URL-safe slug for SEO permalinks. Mirrors the sb_slugify() Postgres function
+// so cron writes and DB backfill produce identical slugs.
+export function slugify(s) {
+  if (!s) return null;
+  return s
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")  // strip diacritics
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-") || null;
+}
+
 export function toUnit(v) {
   if (v == null) return null;
   const n = Number(v);

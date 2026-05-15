@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { fetchLeagues, fetchEventsByLeague } from "@/lib/sports-data";
 import { fetchTournaments } from "@/lib/golf-data";
+import { eventUrl, tournamentUrl, slugify } from "@/lib/slug";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -47,22 +48,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    // Tournament pages
-    const tournamentUrls: MetadataRoute.Sitemap = tournaments.map((t) => ({
-      url: `${SITE_URL}/golf/tournament?id=${t.id}`,
-      lastModified: now,
-      changeFrequency: "hourly" as const,
-      priority: 0.7,
-    }));
+    // Tournament pages — prefer the slug URL when available, fall back to the
+    // legacy ?id= URL for any tournament that hasn't been slugged yet (newly
+    // ingested before the cron's slug-write has run).
+    const tournamentUrls: MetadataRoute.Sitemap = tournaments.map((t) => {
+      const year = t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear();
+      const slug = slugify(t.short_name || t.name);
+      const url = slug ? `${SITE_URL}${tournamentUrl(year, slug)}` : `${SITE_URL}/golf/tournament?id=${t.id}`;
+      return {
+        url,
+        lastModified: now,
+        changeFrequency: "hourly" as const,
+        priority: 0.7,
+      };
+    });
 
-    // Per-event sports URLs — fetch each league's open events
+    // Per-event sports URLs — fetch each league's open events. Slug URL takes
+    // precedence; UUID URL is only emitted when slug isn't yet backfilled.
     const eventUrls: MetadataRoute.Sitemap = [];
     for (const l of leagues) {
       try {
         const events = await fetchEventsByLeague(l.key);
         for (const e of events) {
+          const year = e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear();
+          const slug = slugify(e.title);
+          const url = slug ? `${SITE_URL}${eventUrl(l.key, year, slug)}` : `${SITE_URL}/sports/${l.key}/event/${e.id}`;
           eventUrls.push({
-            url: `${SITE_URL}/sports/${l.key}/event/${e.id}`,
+            url,
             lastModified: now,
             changeFrequency: "hourly",
             priority: 0.6,

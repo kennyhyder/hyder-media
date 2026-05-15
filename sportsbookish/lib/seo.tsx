@@ -235,6 +235,59 @@ export function faqForEventPage(opts: {
   return items;
 }
 
+// FAQ generator for a golf tournament page. Pulls in tournament-specific
+// facts so the schema-extracted answers are not generic.
+export function faqForGolfTournament(opts: {
+  tournamentName: string;
+  isMajor: boolean;
+  playerCount: number;
+  marketCount: number;
+  kalshiQuoteCount: number;
+  bookQuoteCount: number;
+  booksTracked: number;
+  bestBuy?: { player: string; edge: number } | null;
+}): { question: string; answer: string }[] {
+  const t = opts.tournamentName;
+  const items: { question: string; answer: string }[] = [];
+
+  items.push({
+    question: `What Kalshi markets are available for the ${t}?`,
+    answer: `Kalshi is currently pricing ${opts.kalshiQuoteCount} markets across ${opts.playerCount} players for the ${t}, including outright winner, top 5, top 10, top 20, make cut, first-round leader, and head-to-head matchups. SportsBookISH compares each Kalshi price against ${opts.booksTracked} sportsbooks plus the DataGolf model baseline.`,
+  });
+
+  if (opts.bestBuy) {
+    const pct = (opts.bestBuy.edge * 100).toFixed(1);
+    items.push({
+      question: `Where's the best buy opportunity at the ${t} right now?`,
+      answer: `${opts.bestBuy.player} currently shows the largest positive edge — Kalshi is priced ${pct} percentage points cheaper than the sportsbook consensus. Edges shift continuously during live tournaments; this snapshot reflects the last cron tick within the past 30 minutes.`,
+    });
+  }
+
+  items.push({
+    question: `How often do ${t} odds update on SportsBookISH?`,
+    answer: `Kalshi quotes refresh every 5 minutes. DataGolf model + sportsbook lines refresh every 10 minutes. References older than 30 minutes are filtered out automatically. Elite subscribers can force-refresh any tournament on demand.`,
+  });
+
+  items.push({
+    question: `What does "edge vs books median" mean for ${t}?`,
+    answer: `It's the difference between the sportsbook consensus implied probability (median of de-vigged book prices) and Kalshi's implied probability. Positive edge = Kalshi is priced cheaper than the books expect, suggesting a good BUY on Kalshi. Negative edge = Kalshi is more expensive, suggesting a SELL on Kalshi or a BET at the books.`,
+  });
+
+  if (opts.isMajor) {
+    items.push({
+      question: `Is the ${t} a major championship?`,
+      answer: `Yes — the ${t} is one of golf's four major championships. Major championships typically see the deepest Kalshi markets, the most sportsbook coverage, and the widest field of players priced.`,
+    });
+  }
+
+  items.push({
+    question: `How does Kalshi compare to sportsbooks for golf?`,
+    answer: `Kalshi is a CFTC-regulated event-contract exchange — you buy YES/NO contracts that settle at $1 or $0. Sportsbooks build a vig into outrights typically 15-25% on golf futures, vs Kalshi's max 7¢ trading fee. When Kalshi is priced cheaper than the no-vig book consensus, that's a +EV opportunity (after fee adjustment).`,
+  });
+
+  return items;
+}
+
 // Helper to render a <script type="application/ld+json"> in a server component
 export function JsonLd({ data }: { data: object | object[] }) {
   return (

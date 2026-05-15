@@ -7,9 +7,18 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { RefreshCw, Zap, Lock } from "lucide-react";
 
+// Source determines which endpoint we hit + which entity id we pass.
+//   "sports" — POSTs to /api/sports/refresh with event_id    (3 credits / call)
+//   "golf"   — POSTs to /api/golf/refresh   with tournament_id (free, rate-limited)
+type RefreshSource = "sports" | "golf";
+
 interface Props {
-  eventId: string;
-  league: string;
+  // ID of the thing to refresh — sports event UUID or golf tournament UUID
+  entityId: string;
+  // Display label suffix ("event" vs "tournament") + endpoint routing
+  source: RefreshSource;
+  // For sports: which league this belongs to (passed through to the API for logging)
+  league?: string;
   tier: "free" | "pro" | "elite";
   isAnonymous: boolean;
 }
@@ -21,9 +30,16 @@ interface Quota {
   cooldown_until: string | null;
 }
 
-// Elite-only "force refresh" button. Daily quota + per-event cooldown
-// enforced server-side. Anonymous + Free + Pro see an upsell badge.
-export default function ForceRefreshButton({ eventId, league, tier, isAnonymous }: Props) {
+const ENDPOINT: Record<RefreshSource, string> = {
+  sports: "/api/sports/refresh",
+  golf: "/api/golf/refresh",
+};
+const QUERY_PARAM: Record<RefreshSource, string> = {
+  sports: "event_id",
+  golf: "tournament_id",
+};
+
+export default function ForceRefreshButton({ entityId, source, league, tier, isAnonymous }: Props) {
   const [busy, setBusy] = useState(false);
   const [quota, setQuota] = useState<Quota | null>(null);
   const router = useRouter();
@@ -31,18 +47,19 @@ export default function ForceRefreshButton({ eventId, league, tier, isAnonymous 
   useEffect(() => {
     if (tier !== "elite") return;
     let alive = true;
-    fetch(`/api/sports/refresh?event_id=${eventId}`).then((r) => r.json()).then((data) => {
-      if (alive && data.daily_quota) setQuota(data);
-    }).catch(() => {});
+    fetch(`${ENDPOINT[source]}?${QUERY_PARAM[source]}=${entityId}`)
+      .then((r) => r.json())
+      .then((data) => { if (alive && data.daily_quota) setQuota(data); })
+      .catch(() => {});
     return () => { alive = false; };
-  }, [tier, eventId]);
+  }, [tier, entityId, source]);
 
   if (tier !== "elite") {
     return (
       <Link
         href={isAnonymous ? "/signup?next=/pricing" : "/pricing"}
         className="inline-flex items-center gap-1.5 text-xs rounded border border-amber-500/40 bg-amber-500/5 text-amber-500 hover:bg-amber-500/10 px-3 py-1.5"
-        title="Force-refresh book lines — Elite only"
+        title={`Force-refresh ${source === "golf" ? "tournament" : "event"} odds — Elite only`}
       >
         <Lock className="h-3 w-3" aria-hidden="true" />
         Force refresh (Elite)
@@ -57,10 +74,13 @@ export default function ForceRefreshButton({ eventId, league, tier, isAnonymous 
   async function refresh() {
     setBusy(true);
     try {
-      const r = await fetch(`/api/sports/refresh`, {
+      const payload = source === "golf"
+        ? { tournament_id: entityId }
+        : { event_id: entityId, league };
+      const r = await fetch(ENDPOINT[source], {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event_id: eventId, league }),
+        body: JSON.stringify(payload),
       });
       const data = await r.json();
       if (!r.ok || !data.ok) {
@@ -68,12 +88,16 @@ export default function ForceRefreshButton({ eventId, league, tier, isAnonymous 
         if (data.daily_quota) setQuota(data);
         return;
       }
-      toast.success(`✓ ${data.quotes_inserted} fresh quotes · ${data.remaining} refreshes left today`);
+      const msg = source === "golf"
+        ? `✓ Fresh Kalshi + DataGolf data · ${data.remaining} refreshes left today`
+        : `✓ ${data.quotes_inserted} fresh quotes · ${data.remaining} refreshes left today`;
+      toast.success(msg);
+      const cooldownSec = source === "golf" ? 90 : 5 * 60;
       setQuota({
         remaining: data.remaining,
         used_today: data.used_today,
         daily_quota: data.daily_quota,
-        cooldown_until: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        cooldown_until: new Date(Date.now() + cooldownSec * 1000).toISOString(),
       });
       router.refresh();
     } finally {
@@ -82,12 +106,14 @@ export default function ForceRefreshButton({ eventId, league, tier, isAnonymous 
   }
 
   let label = busy ? "Refreshing…" : "Force refresh";
-  let title = "Re-poll the Odds API for this event right now (3 credits)";
+  let title = source === "golf"
+    ? "Re-pull Kalshi + DataGolf for this tournament right now"
+    : "Re-poll the Odds API for this event right now (3 credits)";
   if (out) { label = "Daily limit hit"; title = "Resets at midnight UTC"; }
   else if (cooling) {
     const secs = Math.ceil((new Date(quota!.cooldown_until!).getTime() - Date.now()) / 1000);
     label = `Wait ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
-    title = "On cooldown for this event — wait a few minutes";
+    title = "On cooldown — wait a moment";
   }
 
   return (

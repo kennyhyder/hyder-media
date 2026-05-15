@@ -5,7 +5,44 @@
 // This keeps the ingestion + cron + alert pipeline running on the hyder-media
 // project unchanged. SportsBookish is a tiered presentation layer on top.
 
+import { createServiceClient } from "@/lib/supabase/server";
+
 const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
+
+// Resolve canonical tournament URL by slug + year (Supabase direct).
+// Cached for 60s to avoid hammering the DB on every visitor — the slugs
+// change rarely.
+export interface TournamentSlugRow {
+  id: string;
+  name: string;
+  short_name: string | null;
+  season_year: number;
+  slug: string;
+  start_date: string | null;
+  is_major: boolean;
+}
+
+export async function fetchTournamentBySlug(year: number, slug: string): Promise<TournamentSlugRow | null> {
+  const sb = createServiceClient();
+  const { data } = await sb
+    .from("golfodds_tournaments")
+    .select("id, name, short_name, season_year, slug, start_date, is_major")
+    .eq("season_year", year)
+    .eq("slug", slug)
+    .maybeSingle();
+  return data || null;
+}
+
+export async function fetchTournamentSlugById(id: string): Promise<{ season_year: number; slug: string } | null> {
+  const sb = createServiceClient();
+  const { data } = await sb
+    .from("golfodds_tournaments")
+    .select("season_year, slug")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data?.slug || !data?.season_year) return null;
+  return { season_year: data.season_year, slug: data.slug };
+}
 
 export interface Tournament {
   id: string;

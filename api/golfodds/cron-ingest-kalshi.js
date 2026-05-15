@@ -31,6 +31,17 @@ function checkAuth(req) {
 
 const normalizeName = (s) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
+function slugifyKalshi(s) {
+  if (!s) return null;
+  return s
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-") || null;
+}
+
 function canonicalTournamentName(title) {
   if (!title) return title;
   return title.replace(/\s+winner$/i, "").trim();
@@ -150,13 +161,19 @@ async function ingestBinarySeries(supabase, series) {
   // 2) Upsert tournaments (winner series only) OR look up existing
   let tournamentByTicker = new Map();
   if (series.isWinner) {
-    const rows = events.map((e) => ({
-      tour: "pga",
-      name: canonicalTournamentName(e.title || e.sub_title || e.event_ticker),
-      short_name: e.sub_title || null,
-      kalshi_event_ticker: e.event_ticker,
-      status: "upcoming",
-    }));
+    const rows = events.map((e) => {
+      const name = canonicalTournamentName(e.title || e.sub_title || e.event_ticker);
+      const year = new Date().getUTCFullYear();
+      return {
+        tour: "pga",
+        name,
+        short_name: e.sub_title || null,
+        kalshi_event_ticker: e.event_ticker,
+        season_year: year,
+        slug: slugifyKalshi(name),
+        status: "upcoming",
+      };
+    });
     const { data, error } = await supabase
       .from("golfodds_tournaments")
       .upsert(rows, { onConflict: "kalshi_event_ticker" })
@@ -188,7 +205,7 @@ async function ingestBinarySeries(supabase, series) {
       if (!name || name.length > 40) continue;
       if (/\b(rain|weather|cut\s*line|delay|playoff|margin|stroke|hole|score)\b/i.test(name)) continue;
       const norm = normalizeName(name);
-      if (!playerMap.has(norm)) playerMap.set(norm, { name, normalized_name: norm });
+      if (!playerMap.has(norm)) playerMap.set(norm, { name, normalized_name: norm, slug: slugifyKalshi(name) });
     }
   }
   let playerIdByNorm = new Map();
@@ -298,7 +315,7 @@ async function ingestMatchupSeries(supabase, series) {
       const name = sub.slice(0, i).trim();
       if (!name) continue;
       const norm = normalizeName(name);
-      if (!playerMap.has(norm)) playerMap.set(norm, { name, normalized_name: norm });
+      if (!playerMap.has(norm)) playerMap.set(norm, { name, normalized_name: norm, slug: slugifyKalshi(name) });
     }
   }
   const playerIdByNorm = new Map();

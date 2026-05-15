@@ -1,5 +1,5 @@
 import {
-  getSupabase, checkAuth, normalizeName, toUnit, toBigInt, computeImplied,
+  getSupabase, checkAuth, normalizeName, slugify, toUnit, toBigInt, computeImplied,
   listEventsForSeries, fetchMarketsForEvent, mapLimit, LEAGUES,
 } from "./_lib.js";
 
@@ -32,16 +32,24 @@ async function ingestLeague(supabase, league) {
       markets: await fetchMarketsForEvent(e.event_ticker).catch(() => []),
     }));
 
-    // 1) Bulk upsert sports_events
-    const eventRows = events.map((e) => ({
-      league: league.key,
-      event_type: series.event_type,
-      title: e.title || e.sub_title || e.event_ticker,
-      short_title: e.sub_title || null,
-      kalshi_event_ticker: e.event_ticker,
-      start_time: e.expected_expiration_time ? new Date(e.expected_expiration_time).toISOString() : null,
-      status: "open",
-    }));
+    // 1) Bulk upsert sports_events. Includes slug + season_year so the new
+    // /sports/{league}/{year}/{slug} routes can resolve.
+    const eventRows = events.map((e) => {
+      const title = e.title || e.sub_title || e.event_ticker;
+      const startTime = e.expected_expiration_time ? new Date(e.expected_expiration_time) : null;
+      const year = startTime ? startTime.getUTCFullYear() : new Date().getUTCFullYear();
+      return {
+        league: league.key,
+        event_type: series.event_type,
+        title,
+        short_title: e.sub_title || null,
+        kalshi_event_ticker: e.event_ticker,
+        start_time: startTime ? startTime.toISOString() : null,
+        season_year: year,
+        slug: slugify(title),
+        status: "open",
+      };
+    });
     const { data: eventsResult, error: evErr } = await supabase
       .from("sports_events")
       .upsert(eventRows, { onConflict: "kalshi_event_ticker" })
@@ -58,7 +66,7 @@ async function ingestLeague(supabase, league) {
         if (!name || name.length > 60) continue;
         const norm = normalizeName(name);
         if (!contestantMap.has(norm)) {
-          contestantMap.set(norm, { league: league.key, name, normalized_name: norm });
+          contestantMap.set(norm, { league: league.key, name, normalized_name: norm, slug: slugify(name) });
         }
       }
     }

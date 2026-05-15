@@ -59,6 +59,43 @@ export interface SportsLeagueData {
   books: string[];
 }
 
+// Resolve canonical event URL by league + year + slug. Service-role read.
+export interface EventSlugRow {
+  id: string;
+  league: string;
+  title: string;
+  short_title: string | null;
+  season_year: number;
+  slug: string;
+  start_time: string | null;
+  event_type: string;
+}
+
+export async function fetchEventBySlug(league: string, year: number, slug: string): Promise<EventSlugRow | null> {
+  const { createServiceClient } = await import("@/lib/supabase/server");
+  const sb = createServiceClient();
+  const { data } = await sb
+    .from("sports_events")
+    .select("id, league, title, short_title, season_year, slug, start_time, event_type")
+    .eq("league", league)
+    .eq("season_year", year)
+    .eq("slug", slug)
+    .maybeSingle();
+  return data || null;
+}
+
+export async function fetchEventSlugById(id: string): Promise<{ league: string; season_year: number; slug: string } | null> {
+  const { createServiceClient } = await import("@/lib/supabase/server");
+  const sb = createServiceClient();
+  const { data } = await sb
+    .from("sports_events")
+    .select("league, season_year, slug")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data?.slug || !data?.season_year) return null;
+  return { league: data.league, season_year: data.season_year, slug: data.slug };
+}
+
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {
   const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open`, { next: { revalidate: 30 } });
   if (!r.ok) return [];

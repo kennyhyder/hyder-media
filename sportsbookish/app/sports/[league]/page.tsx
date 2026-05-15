@@ -14,6 +14,15 @@ import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
 import { JsonLd, breadcrumbLd, itemListLd, faqLd, faqForLeaguePage } from "@/lib/seo";
 import FaqSection from "@/components/FaqSection";
+import { slugify, eventUrl } from "@/lib/slug";
+
+// Returns canonical slug URL when title slugifies cleanly, else legacy UUID URL.
+function eventLinkFor(league: string, e: { id: string; title: string; start_time: string | null }): string {
+  const slug = slugify(e.title);
+  if (!slug) return `/sports/${league}/event/${e.id}`;
+  const year = e.start_time ? new Date(e.start_time).getUTCFullYear() : new Date().getUTCFullYear();
+  return eventUrl(league, year, slug);
+}
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -142,7 +151,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
 
   const eventList = (groups.game || []).map((e) => ({
     name: `${e.title} — Kalshi odds`,
-    url: `/sports/${league}/event/${e.id}`,
+    url: eventLinkFor(league, e),
   }));
   // Pick the row with the largest absolute edge for the FAQ "biggest edge" answer.
   const bestEdgeRow = gameRows.reduce<SportsRow | null>((acc, r) => {
@@ -208,7 +217,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
             <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">📈 Recent moves (24h)</div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
               {leagueMoves.map((m) => (
-                <Link key={m.id} href={`/sports/${league}/event/${m.event_id}`} className={`block rounded border p-2 text-xs hover:bg-muted/30 ${m.direction === "up" ? "border-emerald-500/30" : "border-rose-500/30"}`}>
+                <Link key={m.id} href={eventLinkFor(league, { id: m.event_id, title: m.event_title || "", start_time: null })} className={`block rounded border p-2 text-xs hover:bg-muted/30 ${m.direction === "up" ? "border-emerald-500/30" : "border-rose-500/30"}`}>
                   <div className="font-medium truncate">{m.contestant_label}</div>
                   <div className={`text-sm tabular-nums font-bold ${m.direction === "up" ? "text-emerald-500" : "text-rose-500"}`}>{fmtPctSigned(m.delta)}</div>
                   <div className="text-[10px] text-muted-foreground truncate">{m.event_title}</div>

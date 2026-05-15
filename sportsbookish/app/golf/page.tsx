@@ -6,6 +6,7 @@ import { fetchTournaments } from "@/lib/golf-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import UpsellBanner from "@/components/UpsellBanner";
+import { slugify, tournamentUrl } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
 
@@ -54,8 +55,14 @@ export default async function GolfHome() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tournaments.map((t) => (
-            <Link key={t.id} href={`/golf/tournament?id=${t.id}`} className="block">
+          {tournaments.map((t) => {
+            // Prefer canonical slug URL; fall back to legacy ?id= for any
+            // tournaments without a slug yet (newly ingested pre-backfill).
+            const year = t.start_date ? new Date(t.start_date).getUTCFullYear() : new Date().getUTCFullYear();
+            const slug = slugify(t.short_name || t.name);
+            const href = slug ? tournamentUrl(year, slug) : `/golf/tournament?id=${t.id}`;
+            return (
+            <Link key={t.id} href={href} className="block">
               <Card className="hover:border-emerald-500/40 transition-colors">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
@@ -75,7 +82,8 @@ export default async function GolfHome() {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>

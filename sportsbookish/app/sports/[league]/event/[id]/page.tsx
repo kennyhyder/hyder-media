@@ -18,6 +18,15 @@ import ForceRefreshButton from "@/components/ForceRefreshButton";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd } from "@/lib/seo";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
+import { slugify, eventUrl as canonicalEventUrl } from "@/lib/slug";
+
+// Compute canonical slug URL for an event if we can derive a slug from its title.
+function canonicalSlugUrl(league: string, title: string, startTime: string | null): string | null {
+  const slug = slugify(title);
+  if (!slug) return null;
+  const year = startTime ? new Date(startTime).getUTCFullYear() : new Date().getUTCFullYear();
+  return canonicalEventUrl(league, year, slug);
+}
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -27,7 +36,11 @@ export async function generateMetadata({ params }: { params: Promise<{ league: s
   if (!detail) return { title: "Event — SportsBookISH" };
   const title = `${detail.event.title} — Kalshi vs Books | SportsBookISH`;
   const ogImage = `${SITE_URL}/api/og/sports-event?id=${id}`;
-  const url = `${SITE_URL}/sports/${league}/event/${id}`;
+  // Canonical URL is the slug route (search-engine-friendly). The UUID route
+  // 308s through the slug route via the [league]/[year]/[slug] entrypoint
+  // for incoming traffic; here we just ensure the indexed URL is the slug.
+  const slugUrl = canonicalSlugUrl(league, detail.event.title, detail.event.start_time);
+  const url = slugUrl ? `${SITE_URL}${slugUrl}` : `${SITE_URL}/sports/${league}/event/${id}`;
 
   // Build a snappy description: top edge + Kalshi vs books per side
   const m0 = detail.markets[0];
@@ -81,7 +94,9 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
   const titleMatch = detail.event.title.match(/(?:Game \d+:\s+)?(.+?)\s+(?:at|vs|@)\s+(.+)/i);
   const awayTeam = titleMatch?.[1]?.trim() || detail.event.title;
   const homeTeam = titleMatch?.[2]?.trim() || "";
-  const pageUrl = `/sports/${league}/event/${id}`;
+  // pageUrl is the canonical slug URL when computable, else legacy UUID route
+  const pageUrl = canonicalSlugUrl(league, detail.event.title, detail.event.start_time)
+    || `/sports/${league}/event/${id}`;
   const ldData = [
     breadcrumbLd([
       { name: "Home", url: "/" },
@@ -129,7 +144,7 @@ export default async function EventPage({ params }: { params: Promise<{ league: 
         </div>
 
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <ForceRefreshButton eventId={id} league={league} tier={tier} isAnonymous={isAnonymous} />
+          <ForceRefreshButton entityId={id} source="sports" league={league} tier={tier} isAnonymous={isAnonymous} />
         </div>
 
         {/* Quick log bet — Elite gets the interactive form, others see an upsell */}
