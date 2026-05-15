@@ -1,15 +1,11 @@
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { fetchEventBySlug } from "@/lib/sports-data";
+import EventView from "@/components/sports/EventView";
+import { fetchEventBySlug, fetchEventDetail } from "@/lib/sports-data";
 import { eventUrl } from "@/lib/slug";
 
-// SEO-friendly slug route for a single sports event.
-//
-// Today's behavior: resolve slug → id, then 308 to the existing /event/[id]
-// canonical render. The slug URL is the one we publish in nav, sitemap, share
-// links — Google will index this URL and follow the redirect to the rendered
-// content. (When EventView is extracted in Phase 2b this becomes the direct
-// render and the /event/[id] route flips to a 308 in the other direction.)
+// Canonical sports-event route. Renders the full event detail page directly
+// (no longer redirects to /event/[id] — that route now 308s here instead).
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -21,21 +17,30 @@ export async function generateMetadata({ params }: {
 }): Promise<Metadata> {
   const { league, year: yearStr, slug } = await params;
   const year = parseInt(yearStr, 10);
-  if (!Number.isFinite(year)) return { title: "Event — SportsBookISH" };
+  if (!Number.isFinite(year)) return { title: "Event" };
 
   const evt = await fetchEventBySlug(league, year, slug);
-  if (!evt) return { title: "Event not found — SportsBookISH" };
+  if (!evt) return { title: "Event not found" };
+
+  // Try to enrich the meta description with actual line data
+  const detail = await fetchEventDetail(evt.id);
+  const m0 = detail?.markets?.[0];
+  const m1 = detail?.markets?.[1];
+  const lines = [m0, m1].filter(Boolean).map((m) =>
+    `${m!.contestant_label}: Kalshi ${m!.implied_prob != null ? `${(m!.implied_prob * 100).toFixed(1)}%` : "—"} vs books ${m!.books_median != null ? `${(m!.books_median * 100).toFixed(1)}%` : "—"}`
+  ).join(" · ");
 
   const canonical = `${SITE_URL}${eventUrl(league, year, slug)}`;
-  // Layout template appends " | SportsBookISH" automatically — don't duplicate
+  const ogImage = `${SITE_URL}/api/og/sports-event?id=${evt.id}`;
+  // Layout template appends " | SportsBookISH" automatically
   const title = `${evt.title} ${year} odds — Kalshi vs sportsbooks`;
-  const description = `Live ${evt.title} odds comparison — Kalshi event-contract pricing vs DraftKings, FanDuel, BetMGM and 8+ more sportsbooks. Updated every 5 minutes.`;
+  const description = lines || `Live ${evt.title} odds — Kalshi event-contract prices vs DraftKings, FanDuel, BetMGM and 8+ sportsbooks. Updated every 5 minutes.`;
   return {
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "website", siteName: "SportsBookISH" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title, description, url: canonical, type: "website", images: [ogImage], siteName: "SportsBookISH" },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
   };
 }
 
@@ -49,8 +54,11 @@ export default async function SportsEventBySlug({ params }: {
   const evt = await fetchEventBySlug(league, year, slug);
   if (!evt) notFound();
 
-  // Until EventView is extracted (Phase 2b) we redirect to the UUID renderer.
-  // permanentRedirect returns a 308 so search engines treat the slug URL as
-  // the canonical entry point and the UUID URL as the fulfillment target.
-  permanentRedirect(`/sports/${league}/event/${evt.id}`);
+  return (
+    <EventView
+      eventId={evt.id}
+      league={league}
+      canonicalPath={eventUrl(league, year, slug)}
+    />
+  );
 }
