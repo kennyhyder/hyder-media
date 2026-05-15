@@ -89,6 +89,59 @@ export async function fetchEventBySlug(league: string, year: number, slug: strin
   }
 }
 
+export interface TeamMarket {
+  market_id: string;
+  contestant_label: string;
+  market_type: string;
+  event: { id: string; title: string; event_type: string; slug: string | null; season_year: number | null; start_time: string | null; status: string; kalshi_event_ticker: string | null };
+  kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string } | null;
+  books: { count: number; median: number; min: number; max: number; best: { book: string; american: number | null } | null } | null;
+}
+
+export interface TeamDetail {
+  team: { id: string; league: string; name: string; slug: string; abbreviation: string | null; normalized_name: string };
+  markets: TeamMarket[];
+  counts: { games: number; futures: number; total: number };
+}
+
+export interface TeamListItem {
+  id: string;
+  league: string;
+  name: string;
+  slug: string;
+  abbreviation: string | null;
+}
+
+export async function fetchTeams(league?: string): Promise<TeamListItem[]> {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const url = league
+      ? `${DATA_HOST}/api/sports/teams?league=${encodeURIComponent(league)}`
+      : `${DATA_HOST}/api/sports/teams`;
+    const r = await fetch(url, { next: { revalidate: 300 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.teams || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchTeamBySlug(league: string, slug: string): Promise<TeamDetail | null> {
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(`${DATA_HOST}/api/sports/team-by-slug?league=${encodeURIComponent(league)}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchEventSlugById(id: string): Promise<{ league: string; season_year: number; slug: string } | null> {
   try {
     const ctrl = new AbortController();

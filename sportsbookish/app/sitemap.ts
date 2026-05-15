@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { fetchLeagues, fetchEventsByLeague } from "@/lib/sports-data";
+import { fetchLeagues, fetchEventsByLeague, fetchTeams } from "@/lib/sports-data";
 import { fetchTournaments } from "@/lib/golf-data";
-import { eventUrl, tournamentUrl, slugify } from "@/lib/slug";
+import { eventUrl, tournamentUrl, teamUrl, slugify } from "@/lib/slug";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -83,7 +83,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
 
-    return [...staticUrls, ...leagueUrls, ...tournamentUrls, ...eventUrls];
+    // Team hub pages — one per (league, team_slug). Hundreds of indexable
+    // pages per active sport, each capturing long-tail "{team} odds" queries.
+    const teams = await fetchTeams();
+    const teamUrls: MetadataRoute.Sitemap = teams.map((t) => ({
+      url: `${SITE_URL}${teamUrl(t.league, t.slug)}`,
+      lastModified: now,
+      changeFrequency: "daily" as const,
+      priority: 0.6,
+    }));
+
+    return [...staticUrls, ...leagueUrls, ...tournamentUrls, ...eventUrls, ...teamUrls];
   } catch {
     return staticUrls;
   }
