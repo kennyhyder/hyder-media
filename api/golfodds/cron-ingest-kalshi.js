@@ -483,11 +483,44 @@ export default async function handler(req, res) {
     .update({ last_import: new Date().toISOString(), record_count: totalQuotes })
     .eq("name", "kalshi");
 
+  // Ping IndexNow about any tournaments newly inserted in the last 15 min.
+  // Best-effort; failure must not break the cron.
+  let indexnowSummary = null;
+  try {
+    const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { data: fresh } = await supabase
+      .from("golfodds_tournaments")
+      .select("slug, season_year, created_at")
+      .gte("created_at", cutoff)
+      .not("slug", "is", null);
+    const urls = (fresh || [])
+      .filter((t) => t.slug && t.season_year)
+      .map((t) => `https://sportsbookish.com/golf/${t.season_year}/${t.slug}`);
+    if (urls.length) {
+      const r = await fetch("https://api.indexnow.org/IndexNow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          host: "sportsbookish.com",
+          key: "620c7d50b41090ac7f0493e654f3219c",
+          keyLocation: "https://sportsbookish.com/620c7d50b41090ac7f0493e654f3219c.txt",
+          urlList: urls.slice(0, 10000),
+        }),
+      });
+      indexnowSummary = { submitted: Math.min(urls.length, 10000), status: r.status };
+    } else {
+      indexnowSummary = { submitted: 0, reason: "no new tournaments" };
+    }
+  } catch (e) {
+    indexnowSummary = { error: e.message };
+  }
+
   return res.status(200).json({
     started_at: startedAt,
     finished_at: new Date().toISOString(),
     total_quotes: totalQuotes,
     errors: totalErrors,
     by_series: summary,
+    indexnow: indexnowSummary,
   });
 }
