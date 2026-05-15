@@ -27,7 +27,6 @@ export default function AuthorPage() {
           jobTitle: "Founder, SportsBookISH",
           worksFor: { "@type": "Organization", name: "SportsBookISH", url: SITE_URL },
           sameAs: ["https://hyder.me", "https://twitter.com/kennyhyder", "https://x.com/kennyhyder"],
-          email: "kenny@hyder.me",
           description: "Digital marketing consultant (since 2009) and founder of SportsBookISH, a Kalshi vs sportsbook odds comparison platform.",
         },
       ]} />
@@ -76,7 +75,7 @@ export default function AuthorPage() {
 
           <h2 className="text-2xl font-bold mt-6">Contact</h2>
           <p>
-            Email: <a href="mailto:kenny@hyder.me" className="text-emerald-500 hover:underline">kenny@hyder.me</a><br />
+            Use the <Link href="/contact" className="text-emerald-500 hover:underline">contact form</Link> to send a message.<br />
             Twitter/X: <a href="https://x.com/kennyhyder" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">@kennyhyder</a><br />
             Personal site: <a href="https://hyder.me" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">hyder.me</a>
           </p>

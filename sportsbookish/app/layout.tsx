@@ -5,6 +5,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import ThemeProviderClient from "@/components/ThemeProviderClient";
 import ThemeToggle from "@/components/ThemeToggle";
 import SiteHeader from "@/components/nav/SiteHeader";
+import SiteFooter from "@/components/nav/SiteFooter";
 import { JsonLd, organizationLd, websiteLd, SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 
@@ -96,7 +97,8 @@ export default function RootLayout({
         </a>
         <ThemeProviderClient>
           <SiteHeader />
-          {children}
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
           <Toaster position="top-right" richColors />
         </ThemeProviderClient>
         <GoogleAnalytics gaId={GA_ID} />

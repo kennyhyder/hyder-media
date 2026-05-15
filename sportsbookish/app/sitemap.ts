@@ -50,6 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/about/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     // Public dataset
     { url: `${SITE_URL}/data`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     ...GLOSSARY.map((e) => ({
       url: `${SITE_URL}/learn/glossary/${e.slug}`,
       lastModified: now,

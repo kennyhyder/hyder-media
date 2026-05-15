@@ -207,16 +207,27 @@ const BOOKS: Record<string, BookProfile> = {
 };
 
 interface PageProps {
-  params: Promise<{ book: string }>;
+  params: Promise<{ slug: string }>;
+}
+
+// Next.js can't do partial-segment dynamic routes (kalshi-vs-[book] as a
+// folder name doesn't match URL patterns — the whole segment is dynamic).
+// So the route is /compare/[slug] where slug = "kalshi-vs-{book}" and we
+// strip the prefix to get the book key.
+function slugToBook(slug: string): string | null {
+  const prefix = "kalshi-vs-";
+  if (!slug.startsWith(prefix)) return null;
+  return slug.slice(prefix.length);
 }
 
 export async function generateStaticParams() {
-  return Object.keys(BOOKS).map((book) => ({ book }));
+  return Object.keys(BOOKS).map((book) => ({ slug: `kalshi-vs-${book}` }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { book } = await params;
-  const profile = BOOKS[book];
+  const { slug } = await params;
+  const book = slugToBook(slug);
+  const profile = book ? BOOKS[book] : null;
   if (!profile) return { title: "Compare Kalshi to sportsbooks" };
   const title = `Kalshi vs ${profile.name} — Live Odds Comparison`;
   const description = `${profile.intro.slice(0, 140)}... Compare Kalshi event-contract prices against ${profile.name} in real time across NBA, MLB, NHL, EPL, MLS and PGA.`;
@@ -230,8 +241,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ComparePage({ params }: PageProps) {
-  const { book } = await params;
-  const profile = BOOKS[book];
+  const { slug } = await params;
+  const book = slugToBook(slug);
+  const profile = book ? BOOKS[book] : null;
   if (!profile) notFound();
 
   const ld = [

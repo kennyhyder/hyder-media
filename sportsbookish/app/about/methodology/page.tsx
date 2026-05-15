@@ -148,7 +148,7 @@ net_buy_edge = gross_buy_edge - (fee_per_contract_cents / 100)`}
           </p>
 
           <p className="text-xs text-muted-foreground border-t border-border/40 pt-4 mt-8">
-            Questions or corrections? <a href="mailto:kenny@hyder.me" className="text-emerald-500 hover:underline">kenny@hyder.me</a>
+            Questions or corrections? Use the <Link href="/contact" className="text-emerald-500 hover:underline">contact form</Link>.
           </p>
         </div>
       </main>

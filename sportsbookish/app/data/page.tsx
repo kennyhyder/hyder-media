@@ -132,8 +132,8 @@ export default function DataPage() {
 
           <h2 className="text-2xl font-bold mt-6">Larger datasets</h2>
           <p>
-            For full historical archives, per-book price snapshots, or sub-minute updates, contact{" "}
-            <a href="mailto:kenny@hyder.me" className="text-emerald-500 hover:underline">kenny@hyder.me</a>. Research-grade access is available for academic / journalistic use cases.
+            For full historical archives, per-book price snapshots, or sub-minute updates, use the{" "}
+            <Link href="/contact" className="text-emerald-500 hover:underline">contact form</Link>. Research-grade access is available for academic / journalistic use cases.
           </p>
         </div>
       </main>
