@@ -28,9 +28,16 @@ export async function fetchMatchups(tournamentId: string, type?: string): Promis
   const url = new URL(`${DATA_HOST}/api/golfodds/matchups`);
   url.searchParams.set("tournament_id", tournamentId);
   if (type) url.searchParams.set("type", type);
-  const r = await fetch(url.toString(), { next: { revalidate: 30 } });
-  if (!r.ok) throw new Error(`matchups fetch: ${r.status}`);
-  return r.json();
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 10000);
+    const r = await fetch(url.toString(), { next: { revalidate: 30 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return { matchups: [], books: [] };
+    return await r.json();
+  } catch {
+    return { matchups: [], books: [] };
+  }
 }
 
 export interface PlayerMarket {
@@ -66,7 +73,14 @@ export interface PlayerData {
 
 export async function fetchPlayer(playerId: string, tournamentId: string): Promise<PlayerData | null> {
   const url = `${DATA_HOST}/api/golfodds/player?player_id=${playerId}&tournament_id=${tournamentId}`;
-  const r = await fetch(url, { next: { revalidate: 30 } });
-  if (!r.ok) return null;
-  return r.json();
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 10000);
+    const r = await fetch(url, { next: { revalidate: 30 }, signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
 }

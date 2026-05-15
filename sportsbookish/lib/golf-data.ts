@@ -164,7 +164,7 @@ export async function fetchTournamentInfo(id: string): Promise<TournamentInfo | 
 
 export interface PlayerComparisonRow {
   player_id: string;
-  player: { id: string; name: string; dg_id: number | null; owgr_rank: number | null };
+  player: { id: string; name: string; slug?: string | null; dg_id: number | null; owgr_rank: number | null };
   market_type: string;
   kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null } | null;
   datagolf: { dg_prob: number | null; dg_fit_prob: number | null } | null;

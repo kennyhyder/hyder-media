@@ -8,7 +8,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 interface Row {
   player_id: string;
-  player: { id: string; name: string } | null;
+  player: { id: string; name: string; slug?: string | null } | null;
   kalshi: { implied_prob: number | null } | null;
   datagolf: { dg_prob: number | null } | null;
   books_median: number | null;
@@ -116,9 +116,18 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
             <TableRow key={r.player_id}>
               <TableCell className="font-medium whitespace-nowrap">
                 {isPaidTier ? (
-                  <Link href={`/golf/tournament/player?id=${tournamentId}&player_id=${r.player_id}`} className="hover:text-emerald-500 hover:underline">
-                    {r.player?.name}
-                  </Link>
+                  // Prefer canonical /golf/players/{slug} hub when slug is
+                  // available (cross-tournament player profile). Falls back
+                  // to legacy tournament-scoped player detail otherwise.
+                  r.player?.slug ? (
+                    <Link href={`/golf/players/${r.player.slug}`} className="hover:text-emerald-500 hover:underline">
+                      {r.player.name}
+                    </Link>
+                  ) : (
+                    <Link href={`/golf/tournament/player?id=${tournamentId}&player_id=${r.player_id}`} className="hover:text-emerald-500 hover:underline">
+                      {r.player?.name}
+                    </Link>
+                  )
                 ) : (
                   <span>{r.player?.name}</span>
                 )}

@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     const { data: markets, error: mErr } = await supabase
       .from("golfodds_markets")
-      .select("id, player_id, market_type, golfodds_players(id, name, dg_id, owgr_rank)")
+      .select("id, player_id, market_type, golfodds_players(id, name, slug, dg_id, owgr_rank)")
       .eq("tournament_id", tournamentId)
       .eq("market_type", marketType)
       .range(0, 9999);

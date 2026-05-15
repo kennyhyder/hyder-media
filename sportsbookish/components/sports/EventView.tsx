@@ -17,6 +17,7 @@ import FaqSection from "@/components/FaqSection";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd, faqLd, faqForEventPage } from "@/lib/seo";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
+import { slugify, teamUrl } from "@/lib/slug";
 
 // Server component — renders the full event detail page. Used by both the
 // canonical /sports/[league]/[year]/[slug] route and the legacy
@@ -177,7 +178,18 @@ export default async function EventView({
                         league={league}
                         size="sm"
                       />
-                      <span className="truncate">{m.contestant_label}</span>
+                      {/* Link to team / contestant hub page. slug computed from label
+                          mirrors the sb_slugify() that ran on sports_contestants.name */}
+                      {(() => {
+                        const tslug = slugify(m.contestant_label);
+                        return tslug ? (
+                          <Link href={teamUrl(league, tslug)} className="truncate hover:text-emerald-500 hover:underline" title={`See all ${m.contestant_label} markets`}>
+                            {m.contestant_label}
+                          </Link>
+                        ) : (
+                          <span className="truncate">{m.contestant_label}</span>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       {hist && hist.points.length >= 2 && <PriceSpark points={hist.points} width={100} height={28} />}

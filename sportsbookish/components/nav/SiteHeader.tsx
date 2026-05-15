@@ -103,7 +103,7 @@ export default async function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/65">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
       <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between gap-3 px-4">
         <div className="flex items-center gap-1 min-w-0">
           <Link href={isAnonymous ? "/" : "/dashboard"} className="flex items-center gap-2 font-semibold mr-3 shrink-0">
