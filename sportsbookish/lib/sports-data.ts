@@ -61,7 +61,9 @@ export interface SportsLeagueData {
   books: string[];
 }
 
-// Resolve canonical event URL by league + year + slug. Service-role read.
+// Resolve canonical event URL by league + year + slug via the data-plane.
+// sports_events lives in the hyder.me Supabase project, NOT in the
+// sportsbookish-isolated auth project — so we go through the data plane.
 export interface EventSlugRow {
   id: string;
   league: string;
@@ -74,28 +76,18 @@ export interface EventSlugRow {
 }
 
 export async function fetchEventBySlug(league: string, year: number, slug: string): Promise<EventSlugRow | null> {
-  const { createServiceClient } = await import("@/lib/supabase/server");
-  const sb = createServiceClient();
-  const { data } = await sb
-    .from("sports_events")
-    .select("id, league, title, short_title, season_year, slug, start_time, event_type")
-    .eq("league", league)
-    .eq("season_year", year)
-    .eq("slug", slug)
-    .maybeSingle();
-  return data || null;
+  const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 } });
+  if (!r.ok) return null;
+  const data = await r.json();
+  return data.event || null;
 }
 
 export async function fetchEventSlugById(id: string): Promise<{ league: string; season_year: number; slug: string } | null> {
-  const { createServiceClient } = await import("@/lib/supabase/server");
-  const sb = createServiceClient();
-  const { data } = await sb
-    .from("sports_events")
-    .select("league, season_year, slug")
-    .eq("id", id)
-    .maybeSingle();
-  if (!data?.slug || !data?.season_year) return null;
-  return { league: data.league, season_year: data.season_year, slug: data.slug };
+  const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 } });
+  if (!r.ok) return null;
+  const data = await r.json();
+  if (!data.event?.slug || !data.event?.season_year) return null;
+  return { league: data.event.league, season_year: data.event.season_year, slug: data.event.slug };
 }
 
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {

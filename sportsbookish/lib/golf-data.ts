@@ -5,13 +5,11 @@
 // This keeps the ingestion + cron + alert pipeline running on the hyder-media
 // project unchanged. SportsBookish is a tiered presentation layer on top.
 
-import { createServiceClient } from "@/lib/supabase/server";
-
 const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
 
-// Resolve canonical tournament URL by slug + year (Supabase direct).
-// Cached for 60s to avoid hammering the DB on every visitor — the slugs
-// change rarely.
+// Resolve canonical tournament URL by slug + year via the data-plane endpoint.
+// The golfodds_* tables live in the hyder.me Supabase project, NOT in the
+// sportsbookish-isolated auth project — so we MUST go through the data plane.
 export interface TournamentSlugRow {
   id: string;
   name: string;
@@ -23,25 +21,18 @@ export interface TournamentSlugRow {
 }
 
 export async function fetchTournamentBySlug(year: number, slug: string): Promise<TournamentSlugRow | null> {
-  const sb = createServiceClient();
-  const { data } = await sb
-    .from("golfodds_tournaments")
-    .select("id, name, short_name, season_year, slug, start_date, is_major")
-    .eq("season_year", year)
-    .eq("slug", slug)
-    .maybeSingle();
-  return data || null;
+  const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 60 } });
+  if (!r.ok) return null;
+  const data = await r.json();
+  return data.tournament || null;
 }
 
 export async function fetchTournamentSlugById(id: string): Promise<{ season_year: number; slug: string } | null> {
-  const sb = createServiceClient();
-  const { data } = await sb
-    .from("golfodds_tournaments")
-    .select("season_year, slug")
-    .eq("id", id)
-    .maybeSingle();
-  if (!data?.slug || !data?.season_year) return null;
-  return { season_year: data.season_year, slug: data.slug };
+  const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 60 } });
+  if (!r.ok) return null;
+  const data = await r.json();
+  if (!data.tournament?.slug || !data.tournament?.season_year) return null;
+  return { season_year: data.tournament.season_year, slug: data.tournament.slug };
 }
 
 export interface Tournament {
