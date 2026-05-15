@@ -60,6 +60,7 @@ const SECTIONS = [
     links: [
       { label: "Pricing", href: "/pricing" },
       { label: "Public dataset", href: "/data" },
+      { label: "Press kit", href: "/press" },
       { label: "Methodology", href: "/about/methodology" },
       { label: "About", href: "/about/kenny-hyder" },
       { label: "Contact", href: "/contact" },

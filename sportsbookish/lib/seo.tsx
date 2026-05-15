@@ -12,14 +12,27 @@ export function organizationLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
+    foundingDate: "2026-05-12",
+    founder: { "@type": "Person", name: "Kenny Hyder", url: `${SITE_URL}/about/kenny-hyder`, sameAs: ["https://hyder.me", "https://x.com/kennyhyder"] },
+    // Full sameAs graph — anchors Wikidata claims + LLM disambiguation
     sameAs: [
       `https://twitter.com/${SOCIAL_HANDLE.replace("@", "")}`,
       `https://x.com/${SOCIAL_HANDLE.replace("@", "")}`,
+      "https://hyder.me",
+      "https://github.com/kennyhyder",
     ],
+    knowsAbout: ["Kalshi", "Sports betting", "Prediction markets", "Event contracts", "Sportsbook odds comparison"],
     description: SITE_DESCRIPTION,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "Customer support",
+      url: `${SITE_URL}/contact`,
+      availableLanguage: ["English"],
+    },
   };
 }
 

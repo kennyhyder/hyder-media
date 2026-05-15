@@ -67,6 +67,7 @@ export default async function sitemap(): Promise<Sm> {
   // ---- Authority / data ----
   urls.push(
     { url: `${SITE_URL}/data`,              lastModified: now, changeFrequency: "weekly",  priority: 0.75 },
+    { url: `${SITE_URL}/data/huggingface`,  lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/press`,             lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/about/methodology`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/about/kenny-hyder`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },

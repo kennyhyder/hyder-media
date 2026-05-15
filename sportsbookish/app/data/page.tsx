@@ -130,6 +130,11 @@ export default function DataPage() {
             <li>Stale references (&gt;30 minutes old) are filtered out, so a freshly-restarted league may temporarily show empty events.</li>
           </ul>
 
+          <h2 className="text-2xl font-bold mt-6">Hugging Face</h2>
+          <p>
+            We&apos;re publishing this dataset on Hugging Face Datasets. See <Link href="/data/huggingface" className="text-emerald-500 hover:underline">/data/huggingface</Link> for the dataset card, CSV format, and integration examples.
+          </p>
+
           <h2 className="text-2xl font-bold mt-6">Larger datasets</h2>
           <p>
             For full historical archives, per-book price snapshots, or sub-minute updates, use the{" "}
