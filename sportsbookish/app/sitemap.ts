@@ -39,6 +39,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/learn/kalshi-vs-prediction-markets`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     // Glossary
     { url: `${SITE_URL}/learn/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    // Free tools
+    { url: `${SITE_URL}/tools`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/tools/no-vig-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/tools/kelly-calculator`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/tools/odds-converter`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     ...GLOSSARY.map((e) => ({
       url: `${SITE_URL}/learn/glossary/${e.slug}`,
       lastModified: now,

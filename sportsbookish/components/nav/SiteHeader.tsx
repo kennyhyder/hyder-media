@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   LineChart, Trophy, Activity, TrendingUp, BookOpen, GitCompare,
-  Bell, Star, BarChart3, LayoutDashboard, Sparkles,
+  Bell, Star, BarChart3, LayoutDashboard, Sparkles, Calculator,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import UserMenu from "@/components/nav/UserMenu";
@@ -79,6 +79,7 @@ export default async function SiteHeader() {
     toolsItems.push({
       heading: "Resources",
       items: [
+        { label: "Free calculators", href: "/tools", description: "No-vig · Kelly · odds converter", icon: <Calculator className="h-4 w-4" /> },
         { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs DraftKings, FanDuel & more", icon: <GitCompare className="h-4 w-4" /> },
         { label: "Learn", href: "/learn", description: "Kalshi odds explained · no-vig math", icon: <BookOpen className="h-4 w-4" /> },
       ],
@@ -96,6 +97,7 @@ export default async function SiteHeader() {
     toolsItems.push({
       heading: "Discover",
       items: [
+        { label: "Free calculators", href: "/tools", description: "No-vig · Kelly · odds converter", icon: <Calculator className="h-4 w-4" /> },
         { label: "Compare sportsbooks", href: "/compare", description: "Kalshi vs each book", icon: <GitCompare className="h-4 w-4" /> },
         { label: "Learn", href: "/learn", description: "Kalshi odds explainers", icon: <BookOpen className="h-4 w-4" /> },
       ],
