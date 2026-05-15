@@ -152,7 +152,7 @@ export async function fetchTournamentInfo(id: string): Promise<TournamentInfo | 
   // graceful empty state.
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const tid = setTimeout(() => ctrl.abort(), 15000);
     const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-info?id=${id}`, { next: { revalidate: 30 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
@@ -189,12 +189,13 @@ export interface ComparisonResponse {
 
 export async function fetchComparison(tournamentId: string, marketType: string): Promise<ComparisonResponse> {
   const url = `${DATA_HOST}/api/golfodds/comparison?tournament_id=${tournamentId}&market_type=${marketType}`;
-  // 12s hard cap. The comparison response can be 500KB+ for a major; if the
-  // upstream is cold and slow we'd rather return an empty result than blow
-  // the function's maxDuration budget.
+  // 25s hard cap. The comparison response can be 500KB+ for a major and the
+  // endpoint typically runs 8-11s — the previous 12s timeout was cutting it
+  // too close and intermittently returning empty fallbacks. The page sets
+  // maxDuration:30 so 25s leaves headroom for json parse + render.
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 12000);
+    const tid = setTimeout(() => ctrl.abort(), 25000);
     const r = await fetch(url, { next: { revalidate: 30 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) throw new Error(`comparison fetch: ${r.status}`);
