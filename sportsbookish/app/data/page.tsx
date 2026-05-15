@@ -132,8 +132,17 @@ export default function DataPage() {
 
           <h2 className="text-2xl font-bold mt-6">Hugging Face</h2>
           <p>
-            We&apos;re publishing this dataset on Hugging Face Datasets. See <Link href="/data/huggingface" className="text-emerald-500 hover:underline">/data/huggingface</Link> for the dataset card, CSV format, and integration examples.
+            Mirrored on Hugging Face Datasets:{" "}
+            <a href="https://huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">
+              huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds
+            </a>
           </p>
+          <pre className="bg-card border border-border/60 rounded p-4 text-xs overflow-auto">
+{`from datasets import load_dataset
+ds = load_dataset("kennyhyder/sportsbookish-daily-odds", split="latest")
+df = ds.to_pandas()`}
+          </pre>
+          <p>See <Link href="/data/huggingface" className="text-emerald-500 hover:underline">/data/huggingface</Link> for the full schema + integration examples.</p>
 
           <h2 className="text-2xl font-bold mt-6">Larger datasets</h2>
           <p>

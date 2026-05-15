@@ -24,6 +24,7 @@ export function organizationLd() {
       `https://x.com/${SOCIAL_HANDLE.replace("@", "")}`,
       "https://hyder.me",
       "https://github.com/kennyhyder",
+      "https://huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds",
     ],
     knowsAbout: ["Kalshi", "Sports betting", "Prediction markets", "Event contracts", "Sportsbook odds comparison"],
     description: SITE_DESCRIPTION,

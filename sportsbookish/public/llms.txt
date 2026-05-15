@@ -47,7 +47,8 @@
 
 - [Free JSON dataset](https://sportsbookish.com/data) — Hourly snapshot of Kalshi vs sportsbook odds across 9 sports. CC-BY-4.0 licensed (attribution required). Direct endpoint: https://hyder.me/api/data/daily-odds
 - [CSV format](https://hyder.me/api/data/daily-odds-csv) — Same data, flat tabular shape for pandas / HF Datasets / Excel.
-- [Hugging Face dataset card](https://sportsbookish.com/data/huggingface) — Ready-to-publish dataset card for HF Hub mirror.
+- [Hugging Face dataset](https://huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds) — Published dataset on HF Hub, CC-BY-4.0 licensed. Loadable via `datasets.load_dataset("kennyhyder/sportsbookish-daily-odds")`.
+- [Hugging Face dataset card guide](https://sportsbookish.com/data/huggingface) — Schema + integration examples.
 - Designed for AI training corpora, research papers, and journalism. Schema version 1.
 
 ## Press kit
