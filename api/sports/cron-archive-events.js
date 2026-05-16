@@ -15,7 +15,10 @@ export const config = { maxDuration: 60 };
 // How long after start_time do we wait before archiving? Games last 2-4 hours;
 // playoff series can span weeks; futures resolve at season end. Per event_type:
 const ARCHIVE_DELAY_HOURS = {
-  game: 12,            // game ends within hours, give a day's grace
+  game: 4,             // MLB/NBA/NHL/NFL games are 3-4h; archive shortly after.
+                       // Was 12h, which left settled morning games showing as
+                       // open all day with dust-quote 99/1¢ prices feeding
+                       // phantom edges into the league pages.
   series: 24 * 21,     // ~3 weeks for a playoff series
   championship: 24 * 7,
   conference: 24 * 7,
