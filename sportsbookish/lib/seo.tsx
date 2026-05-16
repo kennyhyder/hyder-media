@@ -4,7 +4,7 @@
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 export const SITE_NAME = "SportsBookISH";
-export const SITE_DESCRIPTION = "Live Kalshi odds vs sportsbook consensus. Compare every Kalshi event-contract price against DraftKings, FanDuel, BetMGM, Caesars and 8+ more books in real time. Find the edge across NBA, MLB, NHL, EPL, MLS, and PGA Tour.";
+export const SITE_DESCRIPTION = "Live Kalshi and Polymarket event-contract odds vs US sportsbook consensus. Compare every price against DraftKings, FanDuel, BetMGM, Caesars and 8+ more books in real time. Find the edge across NFL, NBA, MLB, NHL, EPL, MLS, UCL, World Cup, and PGA Tour.";
 export const SOCIAL_HANDLE = "@sportsbookish";
 
 // Organization + WebSite — emit once in the root layout so every page benefits
