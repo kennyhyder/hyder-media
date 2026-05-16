@@ -106,13 +106,14 @@ async function ingestOne(supabase, cfg) {
               const probNovig = novigged[idx]?.prob_novig;
               quoteRows.push({
                 sports_event_id: evt.id,
+                league: cfg.league,
                 contestant_label: m.contestant_label,
                 contestant_norm: normalizeName(m.contestant_label),
                 market_type: "outrights",
                 book,
                 american: am,
-                implied_prob: probRaw != null ? Number(probRaw.toFixed(4)) : null,
-                implied_prob_novig: probNovig != null ? Number(probNovig.toFixed(4)) : null,
+                implied_prob_raw: probRaw != null ? Number(probRaw.toFixed(5)) : null,
+                implied_prob_novig: probNovig != null ? Number(probNovig.toFixed(5)) : null,
                 point: null,
                 fetched_at: now,
               });
