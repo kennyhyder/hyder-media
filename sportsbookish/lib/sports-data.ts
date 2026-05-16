@@ -220,17 +220,66 @@ export interface TotalRow {
   books: Record<string, { american: number | null; implied_prob_novig: number | null }>;
 }
 
+export interface PropThreshold {
+  prop_line: number | null;
+  prop_side: string | null;
+  implied_prob: number | null;
+  kalshi_ticker: string;
+}
+export interface PropPlayerRow {
+  name: string;
+  thresholds: PropThreshold[];
+  max_prob: number;
+}
+export interface PropEventRow {
+  id: string;
+  event_type: string;       // e.g. "player_prop_points"
+  title: string;            // e.g. "SAS at OKC: Points"
+  kalshi_event_ticker: string;
+  players: PropPlayerRow[];
+}
+
 export interface EventDetail {
   event: SportsEvent;
   markets: MarketRow[];
   spreads?: SpreadRow[];
   totals?: TotalRow[];
+  prop_events?: PropEventRow[];
 }
 
 export async function fetchEventDetail(eventId: string): Promise<EventDetail | null> {
   const r = await fetch(`${DATA_HOST}/api/sports/event?id=${eventId}`, { next: { revalidate: 15 } });
   if (!r.ok) return null;
   return r.json();
+}
+
+export interface PolymarketCompareRow {
+  league: string;
+  event_id: string;
+  event_title: string;
+  event_slug: string | null;
+  season_year: number | null;
+  event_type: string;
+  contestant_label: string;
+  kalshi_prob: number;
+  polymarket_prob: number;
+  polymarket_volume_usd: number | null;
+  edge_pct: number;       // polymarket - kalshi (positive = Kalshi cheaper)
+  abs_edge_pct: number;
+}
+
+export async function fetchPolymarketCompare(league?: string, minEdge = 0): Promise<PolymarketCompareRow[]> {
+  const params = new URLSearchParams();
+  if (league) params.set("league", league);
+  if (minEdge) params.set("min_edge", String(minEdge));
+  const q = params.toString();
+  const url = `${DATA_HOST}/api/sports/polymarket-comparison${q ? "?" + q : ""}`;
+  try {
+    const r = await fetch(url, { next: { revalidate: 30 } });
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.rows || [];
+  } catch { return []; }
 }
 
 // Archive listing — for sitemap, year-index, and pSEO coverage.

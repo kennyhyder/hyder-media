@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchEventDetail, fetchLeagues } from "@/lib/sports-data";
 import { fetchEventHistory, fetchMovements } from "@/lib/movements-data";
 import { getCurrentTier } from "@/lib/tier-guard";
@@ -310,6 +310,46 @@ export default async function EventView({
           <div className="mb-4">
             <TotalsTable rows={detail.totals} isPaidTier={isPaidTier && !isAnonymous} signupHref={isAnonymous ? `/signup?next=${encodeURIComponent(canonicalPath)}` : undefined} />
           </div>
+        )}
+
+        {detail.prop_events && detail.prop_events.length > 0 && (
+          <section aria-labelledby="game-props-heading" className="mb-4">
+            <h2 id="game-props-heading" className="text-sm font-semibold mb-2 uppercase tracking-wider text-muted-foreground">
+              Player props for this game ({detail.prop_events.reduce((s, e) => s + e.players.length, 0)} players)
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {detail.prop_events.map((pe) => {
+                const label = pe.event_type.replace(/^player_prop_/, "").replace(/_/g, " ");
+                return (
+                  <Card key={pe.id}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm capitalize">{label}</CardTitle>
+                      <CardDescription className="text-[10px] font-mono text-muted-foreground/70">{pe.kalshi_event_ticker}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+                      {pe.players.length === 0 && <div className="text-xs text-muted-foreground italic">No quotes yet</div>}
+                      {pe.players.map((p) => (
+                        <div key={p.name} className="border-t border-border/40 first:border-0 pt-1.5">
+                          <div className="text-xs font-medium truncate" title={p.name}>{p.name}</div>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                            {p.thresholds.map((t) => (
+                              <span key={t.kalshi_ticker} className="text-[10px] tabular-nums text-muted-foreground">
+                                <span className="text-foreground">{t.prop_line}+</span>
+                                {" "}
+                                <span className={t.implied_prob != null && t.implied_prob >= 0.5 ? "text-emerald-400 font-semibold" : "text-amber-500"}>
+                                  {t.implied_prob != null ? `${(t.implied_prob * 100).toFixed(0)}%` : "—"}
+                                </span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </section>
         )}
 
         {eventMoves.length > 0 && (

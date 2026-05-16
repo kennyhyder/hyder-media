@@ -4,6 +4,96 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
+// Extract (date, teams) from a Kalshi ticker so we can match a game event
+// to its related player-prop events. Game tickers carry a 4-char HHMM time
+// that prop tickers omit, so we strip it.
+//   game:  KXNBAGAME-26MAY161810CINCLE  → 26MAY16 + CINCLE
+//   prop:  KXNBASTL-26MAY16CINCLE        → 26MAY16 + CINCLE
+function gameTickerMatchKey(ticker) {
+  if (!ticker) return null;
+  const m = ticker.match(/-(\d{2}[A-Z]{3}\d{2})\d{4}([A-Z]+)$/);
+  return m ? m[1] + m[2] : null;
+}
+function propTickerMatchKey(ticker) {
+  if (!ticker) return null;
+  const m = ticker.match(/-(\d{2}[A-Z]{3}\d{2})([A-Z]+)$/);
+  return m ? m[1] + m[2] : null;
+}
+
+async function fetchRelatedProps(supabase, gameEvent) {
+  const key = gameTickerMatchKey(gameEvent.kalshi_event_ticker);
+  if (!key) return [];
+  // Get every open prop event in this league whose ticker matches the same
+  // date+teams pattern. With ~150-200 prop events per league we can fetch
+  // and filter in memory rather than constructing a regex query.
+  const { data: candidates } = await supabase
+    .from("sports_events")
+    .select("id, event_type, title, kalshi_event_ticker")
+    .eq("league", gameEvent.league)
+    .like("event_type", "player_prop_%")
+    .eq("status", "open");
+  const matches = (candidates || []).filter((e) => propTickerMatchKey(e.kalshi_event_ticker) === key);
+  if (!matches.length) return [];
+
+  // Pull markets + Kalshi quotes for the matched prop events
+  const propEventIds = matches.map((e) => e.id);
+  const { data: propMarkets } = await supabase
+    .from("sports_markets")
+    .select("id, event_id, contestant_label, market_type, prop_line, prop_side, kalshi_ticker")
+    .in("event_id", propEventIds);
+  const marketIds = (propMarkets || []).map((m) => m.id);
+  let kalshiQuotes = [];
+  const CHUNK = 150;
+  for (let i = 0; i < marketIds.length; i += CHUNK) {
+    const slice = marketIds.slice(i, i + CHUNK);
+    const { data } = await supabase
+      .from("sports_quotes_latest")
+      .select("market_id, implied_prob, yes_bid, yes_ask")
+      .in("market_id", slice);
+    if (data) kalshiQuotes.push(...data);
+  }
+  const qByMarket = new Map(kalshiQuotes.map((q) => [q.market_id, q]));
+
+  // Group markets by prop event, then by player within each event so the
+  // UI can render "Player → list of thresholds" cleanly.
+  const out = [];
+  for (const evt of matches) {
+    const evtMarkets = (propMarkets || []).filter((m) => m.event_id === evt.id);
+    const byPlayer = new Map();
+    for (const m of evtMarkets) {
+      const q = qByMarket.get(m.id);
+      const ip = q?.implied_prob != null ? Number(q.implied_prob) : null;
+      if (!byPlayer.has(m.contestant_label)) byPlayer.set(m.contestant_label, []);
+      byPlayer.get(m.contestant_label).push({
+        prop_line: m.prop_line != null ? Number(m.prop_line) : null,
+        prop_side: m.prop_side,
+        implied_prob: ip,
+        kalshi_ticker: m.kalshi_ticker,
+      });
+    }
+    // Sort each player's thresholds low → high
+    for (const list of byPlayer.values()) {
+      list.sort((a, b) => (a.prop_line ?? 0) - (b.prop_line ?? 0));
+    }
+    // Sort players by their highest implied_prob (most interesting first)
+    const players = Array.from(byPlayer.entries())
+      .map(([name, thresholds]) => ({
+        name,
+        thresholds,
+        max_prob: thresholds.reduce((mx, t) => Math.max(mx, t.implied_prob ?? 0), 0),
+      }))
+      .sort((a, b) => b.max_prob - a.max_prob);
+    out.push({
+      id: evt.id,
+      event_type: evt.event_type,
+      title: evt.title,
+      kalshi_event_ticker: evt.kalshi_event_ticker,
+      players,
+    });
+  }
+  return out;
+}
+
 // GET /api/sports/event?id=<uuid>
 // Returns event + each Kalshi market overlaid with sportsbook consensus
 // (h2h) AND separate spreads/totals tables aggregated from
@@ -164,11 +254,19 @@ export default async function handler(req, res) {
       return a.side.localeCompare(b.side);
     });
 
+    // For game events, fetch related player-prop events keyed on date+teams
+    // so the UI can show "props for THIS game" under the H2H/spreads/totals.
+    let propEvents = [];
+    if (event.event_type === "game") {
+      propEvents = await fetchRelatedProps(supabase, event).catch(() => []);
+    }
+
     return res.status(200).json({
       event,
       markets: marketsWithQuotes,
       spreads,
       totals,
+      prop_events: propEvents,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
