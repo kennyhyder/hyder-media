@@ -17,10 +17,13 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const PLANS = [
-  // Pro is monthly only ($10/mo)
-  { tier: "pro",   name: "SportsBookish Pro",   priceCents: 1000, interval: "month", envName: "STRIPE_PRICE_PRO" },
-  // Elite is annual only ($100/yr) — cheaper than Pro on annual basis to push commitment
-  { tier: "elite", name: "SportsBookish Elite", priceCents: 10000, interval: "year",  envName: "STRIPE_PRICE_ELITE" },
+  // UI tiers
+  { tier: "pro",   name: "SportsBookISH Pro",   priceCents: 1000, interval: "month", envName: "STRIPE_PRICE_PRO" },
+  { tier: "elite", name: "SportsBookISH Elite", priceCents: 10000, interval: "year",  envName: "STRIPE_PRICE_ELITE" },
+  // API add-on — same Product, two recurring intervals. Both grant
+  // 20,000 requests/month. Annual saves $100 vs 12 × monthly.
+  { tier: "api_monthly", name: "SportsBookISH API", priceCents: 5000,  interval: "month", envName: "STRIPE_PRICE_API_MONTHLY" },
+  { tier: "api_annual",  name: "SportsBookISH API", priceCents: 50000, interval: "year",  envName: "STRIPE_PRICE_API_ANNUAL" },
 ];
 
 async function findProductByName(name) {

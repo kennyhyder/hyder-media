@@ -1,7 +1,14 @@
 // SportsBookish tier definitions — single source of truth used by Stripe
 // setup, API filtering, UI, and pricing page.
+//
+// UI tiers (free / pro / elite) gate the WEB experience.
+// API tier (api_monthly / api_annual) is an INDEPENDENT add-on for developers
+// who want to consume our data via the /api/v1/* REST endpoints. A user can
+// hold a UI tier AND an API subscription simultaneously (two separate Stripe
+// subscriptions). API access is gated by sb_api_keys, not sb_subscriptions.tier.
 
 export type TierKey = "free" | "pro" | "elite";
+export type ApiTierKey = "free" | "api_monthly" | "api_annual" | "enterprise";
 
 export interface Tier {
   key: TierKey;
@@ -97,5 +104,105 @@ export function tierFromPriceId(priceId: string | null | undefined): TierKey {
 export function priceIdForTier(tier: TierKey): string | null {
   if (tier === "pro") return process.env.STRIPE_PRICE_PRO || null;
   if (tier === "elite") return process.env.STRIPE_PRICE_ELITE || null;
+  return null;
+}
+
+// ---- API tier definitions ----
+
+export interface ApiPlan {
+  key: ApiTierKey;
+  name: string;
+  priceCents: number;
+  interval: "month" | "year" | null;
+  monthlyQuota: number;
+  tagline: string;
+  features: string[];
+  stripeProductName: string | null;
+  stripePriceEnv: string | null;
+}
+
+export const API_PLANS: ApiPlan[] = [
+  {
+    key: "free",
+    name: "Demo",
+    priceCents: 0,
+    interval: null,
+    monthlyQuota: 1000,
+    tagline: "Public shared key — no signup, AI-friendly",
+    features: [
+      "Shared demo key in /api/docs",
+      "1,000 requests/month total (shared across all users)",
+      "Full read access to /v1/odds, /v1/edges, /v1/golf",
+      "Perfect for AI tool evaluation + small experiments",
+    ],
+    stripeProductName: null,
+    stripePriceEnv: null,
+  },
+  {
+    key: "api_monthly",
+    name: "API",
+    priceCents: 5000,
+    interval: "month",
+    monthlyQuota: 20000,
+    tagline: "For developers building on our data",
+    features: [
+      "20,000 requests/month per key",
+      "Personal API key (rotate any time)",
+      "Commercial usage rights",
+      "OpenAPI 3.1 spec + Python/JS examples",
+      "Edge-cached responses (sub-100ms steady state)",
+      "All endpoints: odds, edges, golf, future v1 additions",
+    ],
+    stripeProductName: "SportsBookISH API",
+    stripePriceEnv: "STRIPE_PRICE_API_MONTHLY",
+  },
+  {
+    key: "api_annual",
+    name: "API (annual)",
+    priceCents: 50000,
+    interval: "year",
+    monthlyQuota: 20000,
+    tagline: "Save $100/year on the API add-on",
+    features: [
+      "Everything in monthly",
+      "$500/yr ($41.67/mo equivalent — save $100/yr)",
+      "Same 20,000/mo quota",
+      "Priority email support",
+    ],
+    stripeProductName: "SportsBookISH API",
+    stripePriceEnv: "STRIPE_PRICE_API_ANNUAL",
+  },
+  {
+    key: "enterprise",
+    name: "Enterprise",
+    priceCents: 0,                  // contact-sales — no Stripe product
+    interval: null,
+    monthlyQuota: 0,                // custom
+    tagline: "Custom volume + WebSocket + historical archive",
+    features: [
+      "50,000+ requests/month (negotiable)",
+      "WebSocket streaming for real-time updates",
+      "Full historical archive (past 12+ months of quotes)",
+      "Dedicated SLA + Slack channel",
+      "Custom data exports + per-book detail",
+    ],
+    stripeProductName: null,
+    stripePriceEnv: null,
+  },
+];
+
+export const API_PLAN_BY_KEY: Record<ApiTierKey, ApiPlan> =
+  Object.fromEntries(API_PLANS.map((p) => [p.key, p])) as Record<ApiTierKey, ApiPlan>;
+
+export function apiTierFromPriceId(priceId: string | null | undefined): ApiTierKey {
+  if (!priceId) return "free";
+  if (priceId === process.env.STRIPE_PRICE_API_MONTHLY) return "api_monthly";
+  if (priceId === process.env.STRIPE_PRICE_API_ANNUAL) return "api_annual";
+  return "free";
+}
+
+export function priceIdForApiTier(tier: ApiTierKey): string | null {
+  if (tier === "api_monthly") return process.env.STRIPE_PRICE_API_MONTHLY || null;
+  if (tier === "api_annual") return process.env.STRIPE_PRICE_API_ANNUAL || null;
   return null;
 }
