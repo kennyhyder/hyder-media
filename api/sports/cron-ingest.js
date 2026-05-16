@@ -4,6 +4,7 @@ import {
 } from "./_lib.js";
 
 const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
+const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
 
 // Returns a Date from Kalshi's expected_expiration_time, falling back to
 // parsing the encoded YYMMMDDHHMM date out of the event ticker.
@@ -61,6 +62,16 @@ async function ingestLeague(supabase, league) {
       // UI as phantom +57% edges.
       const startTime = parseEventStartTime(e);
       const year = startTime ? startTime.getUTCFullYear() : new Date().getUTCFullYear();
+      // For repeating game-type matchups (MLB plays the same teams 3 days in a
+      // row), append the start date to disambiguate. Otherwise three events
+      // share the same slug and event-by-slug returns null because maybeSingle
+      // can't pick a winner.
+      let slug = slugify(title);
+      if (series.event_type === "game" && startTime) {
+        const mon = MONTH_NAMES[startTime.getUTCMonth()];
+        const dd = String(startTime.getUTCDate()).padStart(2, "0");
+        slug = `${slug}-${mon}-${dd}`;
+      }
       return {
         league: league.key,
         event_type: series.event_type,
@@ -69,7 +80,7 @@ async function ingestLeague(supabase, league) {
         kalshi_event_ticker: e.event_ticker,
         start_time: startTime ? startTime.toISOString() : null,
         season_year: year,
-        slug: slugify(title),
+        slug,
         status: "open",
       };
     });
