@@ -31,7 +31,7 @@ export const TIERS: Tier[] = [
     description: "Public access — top-line markets only. Great for casual fans.",
     stripeProductName: "SportsBookish First Line",
     features: [
-      { included: true, text: "Live Kalshi Live Kalshi vs book consensus Polymarket vs book consensus across every sport" },
+      { included: true, text: "Live Kalshi + Polymarket vs book consensus across every sport" },
       { included: true, text: "Game H2H + Spread + Total · books median + 5 major books" },
       { included: true, text: "Watchlist — bookmark teams and players" },
       { included: true, text: "Daily edge digest email (top 3 buy edges)" },

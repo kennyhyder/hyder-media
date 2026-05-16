@@ -54,19 +54,19 @@ export default function PricingCards() {
         const annualSavings = isAnnual ? 120 - totalDollars : 0;
 
         return (
-          <Card
-            key={tier.key}
-            className={
-              isFeatured
-                ? "border-amber-500/40 bg-amber-500/5 relative shadow-lg shadow-amber-500/10"
-                : "border-border"
-            }
-          >
+          <div key={tier.key} className="relative">
             {isFeatured && (
-              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-600 hover:bg-amber-600 text-white">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 bg-amber-600 hover:bg-amber-600 text-white">
                 Best value
               </Badge>
             )}
+          <Card
+            className={
+              isFeatured
+                ? "border-amber-500/40 bg-amber-500/5 shadow-lg shadow-amber-500/10"
+                : "border-border"
+            }
+          >
             <CardHeader>
               <CardTitle className="text-2xl">{tier.name}</CardTitle>
               <CardDescription>{tier.tagline}</CardDescription>
@@ -133,6 +133,7 @@ export default function PricingCards() {
               </ul>
             </CardContent>
           </Card>
+          </div>
         );
       })}
     </div>
