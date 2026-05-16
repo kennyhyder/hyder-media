@@ -13,8 +13,20 @@ export default function GameCard({ event, league }: Props) {
     ? new Date(event.start_time).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
     : null;
 
-  const markets = event.markets || [];
-  const anyBooks = markets.some((m) => (m.books_count ?? 0) > 0);
+  const allMarkets = event.markets || [];
+  const anyBooks = allMarkets.some((m) => (m.books_count ?? 0) > 0);
+
+  // Sort by implied_prob descending (favorites first), nulls last. For long
+  // futures like a 30-team championship, show top 8 and surface the rest via
+  // an "and N more" link to the event detail page.
+  const sorted = [...allMarkets].sort((a, b) => {
+    const ap = a.implied_prob ?? -1;
+    const bp = b.implied_prob ?? -1;
+    return bp - ap;
+  });
+  const VISIBLE_LIMIT = 8;
+  const markets = sorted.slice(0, VISIBLE_LIMIT);
+  const hiddenCount = Math.max(0, sorted.length - VISIBLE_LIMIT);
 
   return (
     <Link href={`/sports/${league}/event/${event.id}`} className="block">
@@ -58,9 +70,15 @@ export default function GameCard({ event, league }: Props) {
             );
           })}
 
+          {hiddenCount > 0 && (
+            <div className="text-[11px] text-emerald-400 mt-1.5 border-t border-border/40 pt-1.5">
+              + {hiddenCount} more {hiddenCount === 1 ? "outcome" : "outcomes"} →
+            </div>
+          )}
+
           <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-2">
-            <span>{startStr || ""}</span>
-            <span className="font-mono">{event.kalshi_event_ticker}</span>
+            <span>{startStr || `${sorted.length} ${sorted.length === 1 ? "market" : "markets"}`}</span>
+            <span className="font-mono truncate ml-2">{event.kalshi_event_ticker}</span>
           </div>
         </CardContent>
       </Card>
