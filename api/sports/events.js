@@ -36,21 +36,30 @@ export default async function handler(req, res) {
 
     const eventIds = events.map((e) => e.id);
 
+    // Explicit ranges — PostgREST defaults to 1000 rows per request. The
+    // markets query for NBA alone returns ~1200 winner markets, so without
+    // .range() the championship's 30 contestants got silently dropped and
+    // the card rendered "No markets yet". 10000 is a safe ceiling: a busy
+    // league won't exceed it short-term, and a single Supabase response of
+    // ~10K rows is still well under the 6MB body limit.
     const [{ data: markets }, { data: bookQuotes }, { data: polymarketQuotes }] = await Promise.all([
       supabase
         .from("sports_markets")
         .select("id, event_id, contestant_label, market_type")
         .in("event_id", eventIds)
-        .eq("market_type", "winner"),
+        .eq("market_type", "winner")
+        .range(0, 9999),
       supabase
         .from("sports_book_v_latest")
         .select("sports_event_id, contestant_norm, book, implied_prob_novig, american")
         .in("sports_event_id", eventIds)
-        .eq("market_type", "h2h"),
+        .eq("market_type", "h2h")
+        .range(0, 9999),
       supabase
         .from("sports_polymarket_v_latest")
         .select("sports_event_id, contestant_norm, implied_prob, volume_usd")
-        .in("sports_event_id", eventIds),
+        .in("sports_event_id", eventIds)
+        .range(0, 9999),
     ]);
 
     // 30-min staleness filter — drop quotes that haven't refreshed in one
