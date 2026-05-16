@@ -75,8 +75,8 @@ export default async function handler(req, res) {
     const mpIds = playersOut.map((p) => p.id);
 
     const [kalshiRows, bookRows] = await Promise.all([
-      fetchAllIn(() => supabase.from("golfodds_v_latest_matchup_kalshi").select("matchup_player_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at"), mpIds),
-      fetchAllIn(() => supabase.from("golfodds_v_latest_matchup_books").select("matchup_player_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), mpIds),
+      fetchAllIn(() => supabase.from("golfodds_matchup_kalshi_latest").select("matchup_player_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at"), mpIds),
+      fetchAllIn(() => supabase.from("golfodds_matchup_book_latest").select("matchup_player_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), mpIds),
     ]);
 
     const kalshiByMp = new Map(kalshiRows.map((r) => [r.matchup_player_id, r]));

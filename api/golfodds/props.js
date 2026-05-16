@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       for (let i = 0; i < outcomeIds.length; i += 100) {
         const chunk = outcomeIds.slice(i, i + 100);
         const { data, error } = await supabase
-          .from("golfodds_v_latest_prop")
+          .from("golfodds_prop_latest")
           .select("outcome_id, yes_bid, yes_ask, last_price, implied_prob, volume, open_interest, status, fetched_at")
           .in("outcome_id", chunk);
         if (error) return res.status(500).json({ error: error.message });
