@@ -82,6 +82,7 @@ async function ingestOne(supabase, cfg) {
   // outcomes inside. The future's outcomes get attached to whichever Kalshi
   // event in our DB matches (in the typical case there's just one).
   for (const oaEvent of api.body) {
+    const oaEventId = oaEvent.id;  // sports_book_quotes.odds_api_event_id is NOT NULL
     for (const bm of oaEvent.bookmakers || []) {
       const book = bm.key;
       for (const market of bm.markets || []) {
@@ -106,6 +107,7 @@ async function ingestOne(supabase, cfg) {
               const probNovig = novigged[idx]?.prob_novig;
               quoteRows.push({
                 sports_event_id: evt.id,
+                odds_api_event_id: oaEventId,
                 league: cfg.league,
                 contestant_label: m.contestant_label,
                 contestant_norm: normalizeName(m.contestant_label),
