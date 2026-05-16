@@ -90,21 +90,21 @@ export default function ApiDocsPage() {
 
         {/* Quick start */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-3">Quick start</h2>
+          <h2 className="text-2xl font-bold mb-3">Quick start — try it now</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            One <code>curl</code> command, see live data immediately.
+            Public demo key is embedded below — copy any curl command and run it. No signup required. The demo key has a 1,000 requests/month quota shared across all users.
           </p>
           <pre className="bg-card border border-border rounded-lg p-4 text-sm overflow-auto"><code>{`# Get every Kalshi vs sportsbook market for tonight's NBA games
 curl https://sportsbookish.com/api/v1/odds?league=nba \\
-  -H "Authorization: Bearer sbi_live_YOUR_KEY"
+  -H "Authorization: Bearer sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"
 
 # Get top 50 buy/sell edges across all sports
 curl https://sportsbookish.com/api/v1/edges?min_edge=0.02 \\
-  -H "Authorization: Bearer sbi_live_YOUR_KEY"
+  -H "Authorization: Bearer sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"
 
 # Active PGA Tour tournament with every player's Kalshi vs DataGolf
 curl https://sportsbookish.com/api/v1/golf?market_type=win \\
-  -H "Authorization: Bearer sbi_live_YOUR_KEY"`}</code></pre>
+  -H "Authorization: Bearer sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"`}</code></pre>
         </section>
 
         {/* Endpoints */}
@@ -246,7 +246,7 @@ curl https://sportsbookish.com/api/v1/golf?market_type=win \\
             <summary className="cursor-pointer font-semibold">Python</summary>
             <pre className="mt-3 text-sm overflow-auto"><code>{`import requests
 
-API_KEY = "sbi_live_YOUR_KEY"
+API_KEY = "sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
 # Top edges across all sports
@@ -277,7 +277,7 @@ console.log(\`\${events.length} NBA events with live Kalshi+book data\`);`}</cod
 from langchain.agents import create_openapi_agent
 
 spec = OpenAPISpec.from_url("https://sportsbookish.com/api/v1/openapi.json")
-agent = create_openapi_agent(spec, llm, headers={"Authorization": "Bearer sbi_live_YOUR_KEY"})
+agent = create_openapi_agent(spec, llm, headers={"Authorization": "Bearer sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"})
 
 agent.run("What's the best NBA edge right now?")`}</code></pre>
           </details>

@@ -47,6 +47,8 @@
 
 - [API docs](https://sportsbookish.com/api/docs) — REST API combining Kalshi event-contract prices, 13+ US sportsbooks, Polymarket, and DataGolf model probabilities in one normalized schema. The only public API with Kalshi data.
 - [OpenAPI 3.1 spec](https://sportsbookish.com/api/v1/openapi.json) — machine-readable spec for client generation and LLM tool-calling.
+- Public demo key (no signup, 1,000 req/mo shared): `sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5`
+- Try it: `curl https://sportsbookish.com/api/v1/edges -H "Authorization: Bearer sbi_live_84fdd6cc6a6b2df3e38a9f19a49537a5"`
 - Pricing: Free 100 req/mo, Builder $99/mo for 10k req, Business $499/mo for 100k req, Enterprise custom.
 - Endpoints:
   - `GET /api/v1/odds` — live odds across all sports
