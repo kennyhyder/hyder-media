@@ -2,23 +2,17 @@ import { createClient } from "@supabase/supabase-js";
 
 // Single-endpoint data-freshness audit.
 //
-// GET /api/sports/data-health → JSON with last-fetched age + 24h row counts
+// GET /api/sports/data-health → JSON with last-fetched age + 24h row count
 // for every ingest stream. Useful for:
-//   - Dashboard-side widget: "All systems green / X sources stale"
+//   - Dashboard widget: "All systems green / X sources stale"
 //   - Manual audit when something looks off
 //   - External uptime checks (Pingdom, BetterStack) — fail when any
 //     source age exceeds 2× its expected cadence
 //
-// Cron cadences (vercel.json):
-//   sports_quotes (Kalshi)         5m
-//   sports_book_quotes (TheOddsAPI) 30m
-//   sports_polymarket_quotes        15m
-//   golfodds_kalshi_quotes          5m
-//   golfodds_book_quotes            5m (driven by tournament cron)
-//   golfodds_dg_model (DataGolf)    10m
-//   golfodds_matchup_kalshi_quotes  5m
-//   golfodds_matchup_book_quotes    5m
-//   golfodds_prop_quotes            5m
+// Reads from the precomputed _latest tables when present (low row count,
+// instant query). Falls back to the raw quote table with an explicit ORDER
+// BY DESC LIMIT 1 — but a 1M+ row table without a fetched_at index will
+// time out, so prefer _latest wherever possible.
 
 export const config = { maxDuration: 30 };
 
@@ -27,15 +21,19 @@ function getSupabase() {
 }
 
 const SOURCES = [
-  { id: "sports_kalshi",        table: "sports_quotes",                  cadence_minutes: 5 },
-  { id: "sports_books",         table: "sports_book_quotes",             cadence_minutes: 30 },
-  { id: "sports_polymarket",    table: "sports_polymarket_quotes",       cadence_minutes: 15 },
-  { id: "golf_kalshi",          table: "golfodds_kalshi_quotes",         cadence_minutes: 5 },
-  { id: "golf_books",           table: "golfodds_book_quotes",           cadence_minutes: 5 },
-  { id: "golf_datagolf",        table: "golfodds_dg_model",              cadence_minutes: 10 },
-  { id: "golf_matchup_kalshi",  table: "golfodds_matchup_kalshi_quotes", cadence_minutes: 5 },
-  { id: "golf_matchup_books",   table: "golfodds_matchup_book_quotes",   cadence_minutes: 5 },
-  { id: "golf_props",           table: "golfodds_prop_quotes",           cadence_minutes: 5 },
+  // _latest tables (fast lookups)
+  { id: "sports_kalshi",         table: "sports_quotes_latest",           cadence_minutes: 5,  category: "live" },
+  { id: "golf_kalshi",           table: "golfodds_kalshi_latest",         cadence_minutes: 5,  category: "live" },
+  { id: "golf_datagolf",         table: "golfodds_dg_latest",             cadence_minutes: 10, category: "live" },
+  { id: "golf_matchup_kalshi",   table: "golfodds_matchup_kalshi_latest", cadence_minutes: 5,  category: "live" },
+  // Tables without _latest but small enough that ORDER BY fetched_at LIMIT 1 works
+  { id: "sports_books",          table: "sports_book_quotes",             cadence_minutes: 30, category: "live", small: true },
+  { id: "sports_polymarket",     table: "sports_polymarket_quotes",       cadence_minutes: 15, category: "live", small: true },
+  { id: "golf_books",            table: "golfodds_book_quotes",           cadence_minutes: 5,  category: "live", small: true },
+  // Known-empty streams — flag as "not_implemented" rather than stale.
+  // Adding actual ingesters is tracked in TODO.
+  { id: "golf_matchup_books",    table: "golfodds_matchup_book_latest",   cadence_minutes: 5,  category: "not_implemented", note: "Ingester not yet built — DataGolf provides matchup books but the cron isn't wired up" },
+  { id: "golf_props",            table: "golfodds_prop_latest",           cadence_minutes: 5,  category: "not_implemented", note: "Ingester not yet built — DataGolf provides player props but the cron isn't wired up" },
 ];
 
 export default async function handler(req, res) {
@@ -45,29 +43,48 @@ export default async function handler(req, res) {
   const now = Date.now();
 
   for (const src of SOURCES) {
-    const { data, error } = await supabase
-      .from(src.table)
-      .select("fetched_at")
-      .order("fetched_at", { ascending: false })
-      .limit(1);
-    const lastFetched = data?.[0]?.fetched_at || null;
+    let lastFetched = null;
+    let error = null;
+    try {
+      const q = supabase
+        .from(src.table)
+        .select("fetched_at")
+        .order("fetched_at", { ascending: false })
+        .limit(1);
+      const { data, error: qErr } = await q;
+      lastFetched = data?.[0]?.fetched_at || null;
+      if (qErr) error = qErr.message;
+    } catch (e) {
+      error = e instanceof Error ? e.message : "query failed";
+    }
+
     const ageSeconds = lastFetched ? Math.floor((now - new Date(lastFetched).getTime()) / 1000) : null;
-    const stale = ageSeconds == null ? true : ageSeconds > src.cadence_minutes * 60 * 2;
+    let status;
+    if (src.category === "not_implemented") status = "not_implemented";
+    else if (ageSeconds == null) status = error ? "error" : "empty";
+    else if (ageSeconds > src.cadence_minutes * 60 * 2) status = "stale";
+    else status = "fresh";
+
     out.push({
       id: src.id,
       table: src.table,
       cadence_minutes: src.cadence_minutes,
+      category: src.category,
       last_fetched_at: lastFetched,
       age_seconds: ageSeconds,
-      stale,
-      error: error?.message || null,
+      status,
+      ...(src.note && { note: src.note }),
+      ...(error && { error }),
     });
   }
 
-  const anyStale = out.some((s) => s.stale);
+  const liveStreams = out.filter((s) => s.category === "live");
+  const overall = liveStreams.every((s) => s.status === "fresh") ? "healthy"
+                : liveStreams.some((s) => s.status === "error" || s.status === "empty") ? "error"
+                : "degraded";
   return res.status(200).json({
     checked_at: new Date().toISOString(),
-    overall_status: anyStale ? "degraded" : "healthy",
+    overall_status: overall,
     sources: out,
   });
 }
