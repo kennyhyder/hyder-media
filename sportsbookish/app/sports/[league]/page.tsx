@@ -253,6 +253,7 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
       </header>
 
       <main id="main" className="container mx-auto max-w-[1800px] px-4 py-8">
+        <h1 className="sr-only">{meta.display_name} — live Kalshi & Polymarket vs sportsbook odds</h1>
         <div className="flex items-center gap-2 mb-4 text-xs">
           <Link href={`/sports/${league}/teams`} className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
             All {meta.display_name} teams →
@@ -274,8 +275,8 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
         )}
 
         {leagueMoves.length > 0 && (
-          <section className="mb-6">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">📈 Recent moves (24h)</div>
+          <section className="mb-6" aria-labelledby="recent-moves-heading">
+            <h2 id="recent-moves-heading" className="text-xs uppercase tracking-wide text-muted-foreground mb-2"><span aria-hidden="true">📈 </span>Recent moves (24h)</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
               {leagueMoves.map((m) => (
                 <Link key={m.id} href={eventLinkFor(league, { id: m.event_id, title: m.event_title || "", start_time: null })} className={`block rounded border p-2 text-xs hover:bg-muted/30 ${m.direction === "up" ? "border-emerald-500/30" : "border-rose-500/30"}`}>
