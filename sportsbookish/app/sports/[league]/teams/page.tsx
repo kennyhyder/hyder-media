@@ -50,7 +50,7 @@ export default async function TeamIndexPage({ params }: { params: Promise<{ leag
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-1">{meta.display_name} teams</h1>
           <p className="text-sm text-muted-foreground">
-            Every {meta.display_name} team with live Kalshi vs sportsbook odds. {teams.length} {teams.length === 1 ? "team" : "teams"} indexed.
+            Every {meta.display_name} team with live Kalshi vs Polymarket vs sportsbook odds. {teams.length} {teams.length === 1 ? "team" : "teams"} indexed.
           </p>
         </div>
 

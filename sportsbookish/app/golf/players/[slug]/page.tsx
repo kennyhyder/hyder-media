@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const canonical = `${SITE_URL}${golfPlayerUrl(slug)}`;
   const rankPart = p.player.owgr_rank ? ` (OWGR #${p.player.owgr_rank})` : "";
   // Layout template appends " | SportsBookISH"
-  const title = `${p.player.name}${rankPart} odds — Kalshi vs sportsbooks`;
+  const title = `${p.player.name}${rankPart} odds — Kalshi vs Polymarket vs sportsbooks`;
   const description = `Live ${p.player.name} odds across every PGA Tour market on Kalshi — win, top 5/10/20, make cut, first-round leader, head-to-head matchups. Compared against DraftKings, FanDuel, BetMGM and 11+ sportsbooks plus the DataGolf model baseline.`;
   return {
     title,

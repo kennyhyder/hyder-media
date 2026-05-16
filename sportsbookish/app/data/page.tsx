@@ -22,7 +22,7 @@ export default function DataPage() {
         {
           "@context": "https://schema.org",
           "@type": "Dataset",
-          name: "SportsBookISH daily Kalshi vs sportsbook odds dataset",
+          name: "SportsBookISH daily Kalshi vs Polymarket vs sportsbook odds dataset",
           description: "Hourly JSON snapshot of Kalshi event-contract prices alongside US sportsbook consensus.",
           url: `${SITE_URL}/data`,
           license: "https://creativecommons.org/licenses/by/4.0/",
@@ -105,7 +105,7 @@ export default function DataPage() {
           <p>BibTeX:</p>
           <pre className="bg-card border border-border/60 rounded p-4 text-xs">
 {`@misc{sportsbookish_dataset_2026,
-  title  = {SportsBookISH daily Kalshi vs sportsbook odds dataset},
+  title  = {SportsBookISH daily Kalshi vs Polymarket vs sportsbook odds dataset},
   author = {Hyder, Kenny},
   year   = {2026},
   url    = {https://sportsbookish.com/data}

@@ -95,7 +95,7 @@ export default function SiteFooter() {
           <div className="flex items-center gap-2">
             <LineChart className="h-4 w-4 text-emerald-500" aria-hidden="true" />
             <span className="font-semibold">SportsBookISH</span>
-            <span>· Live Kalshi vs sportsbook odds</span>
+            <span>· Live Kalshi vs Polymarket vs sportsbook odds</span>
           </div>
           <div className="text-[11px]">
             For entertainment + information. Not investment or legal advice. Bet responsibly.

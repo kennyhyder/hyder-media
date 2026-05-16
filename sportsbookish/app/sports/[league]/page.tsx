@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ league: s
   const leagues = await fetchLeagues();
   const meta = leagues.find((l) => l.key === league);
   if (!meta) return { title: "Sports — SportsBookISH" };
-  const title = `${meta.display_name} — Kalshi vs Books | SportsBookISH`;
-  const description = `Live ${meta.display_name} odds: every game compared between Kalshi and US sportsbooks. Find the best edge in seconds — free, no signup.`;
+  const title = `${meta.display_name} — Kalshi vs Polymarket vs Books | SportsBookISH`;
+  const description = `Live ${meta.display_name} odds: every game compared between Kalshi, Polymarket, and US sportsbooks. Find the best edge in seconds — free, no signup.`;
   return {
     title,
     description,

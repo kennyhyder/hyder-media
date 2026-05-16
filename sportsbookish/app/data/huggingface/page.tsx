@@ -6,7 +6,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com"
 const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
 
 export const metadata: Metadata = {
-  title: "Hugging Face dataset — Kalshi vs sportsbook odds",
+  title: "Hugging Face dataset — Kalshi vs Polymarket vs sportsbook odds",
   description: "Publishing SportsBookISH on Hugging Face Datasets. Dataset card markdown, schema, and citation block ready to copy.",
   alternates: { canonical: `${SITE_URL}/data/huggingface` },
 };
@@ -23,7 +23,7 @@ tags:
   - sports-analytics
 size_categories:
   - 1K<n<10K
-pretty_name: SportsBookISH Daily Kalshi vs Sportsbook Odds
+pretty_name: SportsBookISH Daily Kalshi vs Polymarket vs Sportsbook Odds
 task_categories:
   - tabular-regression
 configs:
@@ -33,7 +33,7 @@ configs:
         path: data/latest.csv
 ---
 
-# SportsBookISH Daily Kalshi vs Sportsbook Odds
+# SportsBookISH Daily Kalshi vs Polymarket vs Sportsbook Odds
 
 > Real-time pricing snapshot comparing Kalshi event-contract probabilities against US sportsbook consensus across nine sports.
 
@@ -83,7 +83,7 @@ df.sort_values("edge_pct", ascending=False).head(20)
 
 \`\`\`bibtex
 @misc{sportsbookish_dataset_2026,
-  title  = {SportsBookISH Daily Kalshi vs Sportsbook Odds},
+  title  = {SportsBookISH Daily Kalshi vs Polymarket vs Sportsbook Odds},
   author = {Hyder, Kenny},
   year   = {2026},
   url    = {https://sportsbookish.com/data},
@@ -91,7 +91,7 @@ df.sort_values("edge_pct", ascending=False).head(20)
 }
 \`\`\`
 
-APA: Hyder, K. (2026). *SportsBookISH Daily Kalshi vs Sportsbook Odds* [Data set]. SportsBookISH. https://sportsbookish.com/data
+APA: Hyder, K. (2026). *SportsBookISH Daily Kalshi vs Polymarket vs Sportsbook Odds* [Data set]. SportsBookISH. https://sportsbookish.com/data
 
 ## License
 

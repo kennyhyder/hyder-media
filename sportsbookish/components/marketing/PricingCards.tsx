@@ -43,7 +43,7 @@ export default function PricingCards() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3 pt-4">
       {TIERS.map((tier) => {
         const isFeatured = tier.key === "elite";
         const dollarsPerMonth = getPricePerMonth(tier);

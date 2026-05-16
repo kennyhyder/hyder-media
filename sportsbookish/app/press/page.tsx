@@ -27,8 +27,8 @@ export default function PressPage() {
           url: SITE_URL,
           foundingDate: "2026-05-12",
           founder: { "@type": "Person", name: "Kenny Hyder", url: `${SITE_URL}/about/kenny-hyder` },
-          description: "Real-time odds comparison platform between Kalshi (CFTC-regulated event-contract exchange) and US sportsbooks across nine sports.",
-          slogan: "Live Kalshi vs sportsbook odds",
+          description: "Real-time odds comparison platform between Kalshi (CFTC-regulated event-contract exchange), Polymarket (peer-to-peer prediction market), and US sportsbooks across nine sports.",
+          slogan: "Live Kalshi vs Polymarket vs sportsbook odds",
           knowsAbout: ["Kalshi", "Sports betting", "Prediction markets", "Event contracts", "Sportsbook odds comparison"],
           sameAs: [
             "https://hyder.me",
@@ -123,26 +123,26 @@ export default function PressPage() {
             <div className="rounded border border-border bg-card p-3">
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">APA</div>
               <code className="text-xs whitespace-pre-wrap block">
-                Hyder, K. (2026). SportsBookISH: Live Kalshi vs sportsbook odds comparison. Retrieved {new Date().toISOString().slice(0, 10)}, from https://sportsbookish.com
+                Hyder, K. (2026). SportsBookISH: Live Kalshi vs Polymarket vs sportsbook odds comparison. Retrieved {new Date().toISOString().slice(0, 10)}, from https://sportsbookish.com
               </code>
             </div>
 
             <div className="rounded border border-border bg-card p-3">
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">MLA</div>
               <code className="text-xs whitespace-pre-wrap block">
-                Hyder, Kenny. &ldquo;SportsBookISH: Live Kalshi vs Sportsbook Odds Comparison.&rdquo; SportsBookISH, 2026, sportsbookish.com.
+                Hyder, Kenny. &ldquo;SportsBookISH: Live Kalshi vs Polymarket vs Sportsbook Odds Comparison.&rdquo; SportsBookISH, 2026, sportsbookish.com.
               </code>
             </div>
 
             <div className="rounded border border-border bg-card p-3">
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Chicago / Wikipedia &lt;ref&gt;</div>
-              <code className="text-xs whitespace-pre-wrap block">{`<ref>{{cite web|url=https://sportsbookish.com|title=SportsBookISH: Live Kalshi vs Sportsbook Odds Comparison|author=Hyder, Kenny|year=2026|access-date=${new Date().toISOString().slice(0, 10)}}}</ref>`}</code>
+              <code className="text-xs whitespace-pre-wrap block">{`<ref>{{cite web|url=https://sportsbookish.com|title=SportsBookISH: Live Kalshi vs Polymarket vs Sportsbook Odds Comparison|author=Hyder, Kenny|year=2026|access-date=${new Date().toISOString().slice(0, 10)}}}</ref>`}</code>
             </div>
 
             <div className="rounded border border-border bg-card p-3">
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">BibTeX</div>
               <pre className="text-xs whitespace-pre overflow-auto">{`@misc{sportsbookish_2026,
-  title  = {SportsBookISH: Live Kalshi vs sportsbook odds comparison},
+  title  = {SportsBookISH: Live Kalshi vs Polymarket vs sportsbook odds comparison},
   author = {Hyder, Kenny},
   year   = {2026},
   url    = {https://sportsbookish.com},

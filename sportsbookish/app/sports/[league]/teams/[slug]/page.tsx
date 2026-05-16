@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: {
   if (!t) return { title: "Team not found" };
   const leagueName = leagues.find((l) => l.key === league)?.display_name || league.toUpperCase();
   const canonical = `${SITE_URL}${teamUrl(league, slug)}`;
-  const title = `${t.team.name} odds — ${leagueName} Kalshi vs sportsbooks`;
+  const title = `${t.team.name} odds — ${leagueName} Kalshi vs Polymarket vs sportsbooks`;
   const description = `Live Kalshi odds for ${t.team.name} across every market — ${t.counts.games} ${t.counts.games === 1 ? "game" : "games"} and ${t.counts.futures} futures. Compare against DraftKings, FanDuel, BetMGM and 8+ books.`;
   return {
     title,

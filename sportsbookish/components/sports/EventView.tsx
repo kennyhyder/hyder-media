@@ -91,7 +91,7 @@ export default async function EventView({
       startDate: detail.event.start_time,
       league,
       url: canonicalPath,
-      description: `Live Kalshi event-contract odds compared to DraftKings, FanDuel, BetMGM and 8+ books for ${detail.event.title}. Moneyline, spread, and total markets refreshed every 5 minutes.`,
+      description: `Live Kalshi Kalshi event-contract odds Polymarket event-contract odds compared to DraftKings, FanDuel, BetMGM and 8+ books for ${detail.event.title}. Moneyline, spread, and total markets refreshed every 5 minutes.`,
     }),
     faqLd(faqItems),
   ];

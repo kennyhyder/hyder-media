@@ -87,7 +87,7 @@ export default async function TournamentView({
         startDate: info.tournament.start_date,
         league: "pga",
         url: canonicalPath,
-        description: `Live Kalshi vs sportsbook odds for the ${info.tournament.name}. ${info.stats.unique_players} players · ${info.stats.total_markets} markets · ${info.books.length} books tracked.`,
+        description: `Live Kalshi vs Polymarket vs sportsbook odds for the ${info.tournament.name}. ${info.stats.unique_players} players · ${info.stats.total_markets} markets · ${info.books.length} books tracked.`,
       })
     );
   }

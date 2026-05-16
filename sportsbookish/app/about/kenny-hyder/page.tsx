@@ -27,7 +27,7 @@ export default function AuthorPage() {
           jobTitle: "Founder, SportsBookISH",
           worksFor: { "@type": "Organization", name: "SportsBookISH", url: SITE_URL },
           sameAs: ["https://hyder.me", "https://twitter.com/kennyhyder", "https://x.com/kennyhyder"],
-          description: "Digital marketing consultant (since 2009) and founder of SportsBookISH, a Kalshi vs sportsbook odds comparison platform.",
+          description: "Digital marketing consultant (since 2009) and founder of SportsBookISH, a Kalshi vs Polymarket vs sportsbook odds comparison platform.",
         },
       ]} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">

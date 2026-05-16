@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: {
   const canonical = `${SITE_URL}${eventUrl(league, year, slug)}`;
   const ogImage = `${SITE_URL}/api/og/sports-event?id=${evt.id}`;
   // Layout template appends " | SportsBookISH" automatically
-  const title = `${evt.title} ${year} odds — Kalshi vs sportsbooks`;
+  const title = `${evt.title} ${year} odds — Kalshi vs Polymarket vs sportsbooks`;
   const description = lines || `Live ${evt.title} odds — Kalshi event-contract prices vs DraftKings, FanDuel, BetMGM and 8+ sportsbooks. Updated every 5 minutes.`;
   return {
     title,

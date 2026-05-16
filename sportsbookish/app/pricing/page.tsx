@@ -48,11 +48,11 @@ export default function PricingPage() {
           </div>
           <div>
             <h3 className="font-semibold text-foreground mb-1">What sports are covered?</h3>
-            <p>PGA Tour golf, NFL, NBA, MLB, NHL, EPL, MLS, UEFA Champions League, FIFA World Cup. Live odds refresh every 5 minutes.</p>
+            <p>PGA Tour golf, NFL, NBA, MLB, NHL, EPL, MLS, UEFA Champions League, FIFA World Cup — nine sports. Kalshi quotes refresh every 5 minutes; sportsbook lines every 15-30 minutes; Polymarket every 15 minutes; DataGolf model every 10 minutes.</p>
           </div>
           <div>
             <h3 className="font-semibold text-foreground mb-1">Does SportsBookISH accept bets?</h3>
-            <p>No. SportsBookISH is an information service — it shows you where prices differ across Kalshi, Polymarket, and licensed sportsbooks. You place bets at the books or on Kalshi directly.</p>
+            <p>No. SportsBookISH is an information service — it shows you where prices differ across Kalshi, Polymarket, and licensed sportsbooks. You place bets at the books, on Kalshi directly, or on Polymarket directly.</p>
           </div>
         </div>
       </main>

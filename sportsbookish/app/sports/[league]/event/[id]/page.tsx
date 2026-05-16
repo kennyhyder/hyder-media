@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ league: s
   }
   const detail = await fetchEventDetail(id);
   if (!detail) return { title: "Event not found" };
-  const title = `${detail.event.title} — Kalshi vs Books`;
+  const title = `${detail.event.title} — Kalshi vs Polymarket vs Books`;
   return { title, alternates: { canonical: `${SITE_URL}/sports/${league}/event/${id}` } };
 }
 

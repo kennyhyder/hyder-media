@@ -7,7 +7,7 @@ import { JsonLd, breadcrumbLd, itemListLd, SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Learn — Kalshi Odds, No-Vig Math, Sports Edge Betting",
   description:
-    "Long-form explainers on Kalshi event-contract odds, de-vigging sportsbook prices, finding edges across NBA, MLB, NHL, EPL, MLS and PGA Tour markets.",
+    "Long-form explainers on Kalshi & Polymarket event-contract odds, de-vigging sportsbook prices, finding edges across NFL, NBA, MLB, NHL, EPL, MLS, UCL, World Cup, and PGA Tour markets.",
   alternates: { canonical: `${SITE_URL}/learn` },
 };
 
