@@ -31,8 +31,8 @@ export default function PricingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <ApiCard plan={apiDemo}    cta={{ label: "Use shared key", href: "/api/docs" }} />
-            <ApiCard plan={apiMonthly} cta={{ label: "Subscribe — $50/mo", href: "/signup?api=monthly" }} highlight />
-            <ApiCard plan={apiAnnual}  cta={{ label: "Subscribe — $500/yr", href: "/signup?api=annual" }} />
+            <ApiCard plan={apiMonthly} cta={{ label: "Subscribe — $50/mo", href: "/signup?tier=api_monthly&next=/settings/api-keys" }} highlight />
+            <ApiCard plan={apiAnnual}  cta={{ label: "Subscribe — $500/yr", href: "/signup?tier=api_annual&next=/settings/api-keys" }} />
             <ApiCard plan={apiEnterprise} cta={{ label: "Contact for pricing", href: "/contact?topic=api-enterprise" }} />
           </div>
         </section>

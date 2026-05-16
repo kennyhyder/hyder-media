@@ -1,8 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
-import { tierFromPriceId } from "@/lib/tiers";
+import { tierFromPriceId, apiTierFromPriceId } from "@/lib/tiers";
+import { quotaForTier } from "@/lib/api-auth";
 import type Stripe from "stripe";
+
+// A subscription is an "API" subscription if its price ID matches one of the
+// API plan envs. Otherwise it's a UI tier (free/pro/elite).
+function isApiPriceId(priceId: string | null): boolean {
+  if (!priceId) return false;
+  return priceId === process.env.STRIPE_PRICE_API_MONTHLY || priceId === process.env.STRIPE_PRICE_API_ANNUAL;
+}
 
 export const runtime = "nodejs";
 
@@ -44,20 +52,43 @@ export async function POST(request: NextRequest) {
         if (userId && subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const priceId = subscription.items.data[0]?.price?.id || null;
-          const tier = tierFromPriceId(priceId);
           const period = periodOf(subscription);
-          await supabase.from("sb_subscriptions").upsert({
-            user_id: userId,
-            tier,
-            stripe_customer_id: customerId,
-            stripe_subscription_id: subscriptionId,
-            stripe_price_id: priceId,
-            status: subscription.status,
-            current_period_start: period.start,
-            current_period_end: period.end,
-            cancel_at_period_end: subscription.cancel_at_period_end,
-            updated_at: new Date().toISOString(),
-          });
+
+          if (isApiPriceId(priceId)) {
+            const apiTier = apiTierFromPriceId(priceId);
+            await supabase.from("sb_api_subscriptions").upsert({
+              user_id: userId,
+              tier: apiTier,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              stripe_price_id: priceId,
+              status: subscription.status,
+              current_period_start: period.start,
+              current_period_end: period.end,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            });
+            // Auto-bump quota on any existing active keys owned by this user
+            await supabase
+              .from("sb_api_keys")
+              .update({ tier: apiTier, monthly_quota: quotaForTier(apiTier), stripe_subscription_id: subscriptionId })
+              .eq("user_id", userId)
+              .eq("status", "active");
+          } else {
+            const tier = tierFromPriceId(priceId);
+            await supabase.from("sb_subscriptions").upsert({
+              user_id: userId,
+              tier,
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              stripe_price_id: priceId,
+              status: subscription.status,
+              current_period_start: period.start,
+              current_period_end: period.end,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            });
+          }
         }
         break;
       }
@@ -66,33 +97,69 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.user_id;
         const priceId = subscription.items.data[0]?.price?.id || null;
-        const tier = tierFromPriceId(priceId);
         const period = periodOf(subscription);
         if (userId) {
-          await supabase.from("sb_subscriptions").upsert({
-            user_id: userId,
-            tier,
-            stripe_customer_id: subscription.customer as string,
-            stripe_subscription_id: subscription.id,
-            stripe_price_id: priceId,
-            status: subscription.status,
-            current_period_start: period.start,
-            current_period_end: period.end,
-            cancel_at_period_end: subscription.cancel_at_period_end,
-            canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
-            updated_at: new Date().toISOString(),
-          });
+          if (isApiPriceId(priceId)) {
+            const apiTier = apiTierFromPriceId(priceId);
+            await supabase.from("sb_api_subscriptions").upsert({
+              user_id: userId,
+              tier: apiTier,
+              stripe_customer_id: subscription.customer as string,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: priceId,
+              status: subscription.status,
+              current_period_start: period.start,
+              current_period_end: period.end,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+              updated_at: new Date().toISOString(),
+            });
+            await supabase
+              .from("sb_api_keys")
+              .update({ tier: apiTier, monthly_quota: quotaForTier(apiTier), stripe_subscription_id: subscription.id })
+              .eq("user_id", userId)
+              .eq("status", "active");
+          } else {
+            const tier = tierFromPriceId(priceId);
+            await supabase.from("sb_subscriptions").upsert({
+              user_id: userId,
+              tier,
+              stripe_customer_id: subscription.customer as string,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: priceId,
+              status: subscription.status,
+              current_period_start: period.start,
+              current_period_end: period.end,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+              updated_at: new Date().toISOString(),
+            });
+          }
         }
         break;
       }
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
         const userId = subscription.metadata?.user_id;
+        const priceId = subscription.items.data[0]?.price?.id || null;
         if (userId) {
-          await supabase
-            .from("sb_subscriptions")
-            .update({ tier: "free", status: "canceled", canceled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-            .eq("user_id", userId);
+          if (isApiPriceId(priceId)) {
+            await supabase
+              .from("sb_api_subscriptions")
+              .update({ tier: "free", status: "canceled", canceled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+              .eq("user_id", userId);
+            // Knock paid keys back down to free quota; don't revoke them automatically.
+            await supabase
+              .from("sb_api_keys")
+              .update({ tier: "free", monthly_quota: quotaForTier("free") })
+              .eq("user_id", userId)
+              .eq("status", "active");
+          } else {
+            await supabase
+              .from("sb_subscriptions")
+              .update({ tier: "free", status: "canceled", canceled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+              .eq("user_id", userId);
+          }
         }
         break;
       }

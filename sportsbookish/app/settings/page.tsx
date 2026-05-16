@@ -29,6 +29,10 @@ export default async function SettingsPage() {
           <div className="font-semibold text-sm">Settings</div>
           <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
         </div>
+        <nav className="container mx-auto max-w-3xl px-4 pb-3 flex gap-4 text-sm border-t border-border/30 pt-3">
+          <Link href="/settings" className="font-semibold text-emerald-400">Preferences</Link>
+          <Link href="/settings/api-keys" className="text-muted-foreground hover:text-foreground">API keys</Link>
+        </nav>
       </header>
 
       <main className="container mx-auto max-w-3xl px-4 py-8 space-y-6">

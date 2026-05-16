@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}/dashboard?invite_applied=1`);
       }
       // If they signed up with a paid tier intent (not an invite), jump to checkout
-      if (tier && (tier === "pro" || tier === "elite")) {
+      if (tier && ["pro", "elite", "api_monthly", "api_annual"].includes(tier)) {
         return NextResponse.redirect(`${origin}/api/stripe/checkout-redirect?tier=${tier}`);
       }
       return NextResponse.redirect(`${origin}${next}`);

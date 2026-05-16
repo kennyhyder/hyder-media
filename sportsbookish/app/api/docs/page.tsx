@@ -17,7 +17,7 @@ const FAQ = [
   },
   {
     question: "What's the pricing?",
-    answer: "Free tier: 100 requests/month, no signup required (use 'sbi_live_demo' as your test key for read-only access to a small slice). Builder: $99/month for 10,000 requests. Business: $499/month for 100,000 requests + WebSocket access. Enterprise: custom, includes historical archive access + dedicated support.",
+    answer: "Demo tier: 1,000 requests/month shared across all users (use the demo key embedded in the curl examples below — no signup). API ($50/mo) or API Annual ($500/yr — save $100): 20,000 requests/month per personal key, commercial usage rights. Enterprise: custom volume + WebSocket + historical archive, contact for pricing.",
   },
   {
     question: "How is this different from sportsbook APIs?",
@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     question: "Rate limits + quotas?",
-    answer: "Per-key monthly quota (resets at start of UTC month). Free: 100/mo. Builder: 10k/mo. Business: 100k/mo. No per-second rate limit on paid tiers — burst as needed. Every response includes a tier-aware Cache-Control header so HTTP caches (Cloudflare, AWS CloudFront, browser) can serve repeat queries without consuming your quota.",
+    answer: "Per-key monthly quota (resets at start of UTC month). Demo: 1,000/mo shared. API: 20,000/mo per personal key. Enterprise: custom. No per-second rate limit on paid tiers — burst as needed. Every response includes a tier-aware Cache-Control header so HTTP caches (Cloudflare, AWS CloudFront, browser) can serve repeat queries without consuming your quota.",
   },
 ];
 
@@ -85,7 +85,7 @@ export default function ApiDocsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
           <Card title="🎯 Unique data" body="Kalshi + Polymarket + DataGolf model that no other public sports API has." />
           <Card title="⚡ Pre-computed edges" body="Edge vs book consensus, best book per side, no-vig probabilities — all done server-side." />
-          <Card title="💰 Cheaper than alternatives" body="$99/mo for 10k requests vs $30/mo for 500 on the-odds-api.com Starter (and they don't have Kalshi at all)." />
+          <Card title="💰 Cheaper than alternatives" body="$50/mo for 20k requests + Kalshi + Polymarket + DataGolf. The-odds-api.com Starter is $30/mo for 500 requests and has none of those data sources." />
         </div>
 
         {/* Quick start */}
@@ -227,10 +227,10 @@ curl https://sportsbookish.com/api/v1/golf?market_type=win \\
         <section className="mb-10" id="pricing">
           <h2 className="text-2xl font-bold mb-4">API pricing</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <Tier name="Free" price="$0" reqs="100 / month" notes="No signup required. Use sbi_live_demo as your key." />
-            <Tier name="Builder" price="$99 / month" reqs="10,000 / month" notes="For indie devs, side projects, research. Commercial OK." highlight />
-            <Tier name="Business" price="$499 / month" reqs="100,000 / month" notes="WebSocket access, SLA, priority support." />
-            <Tier name="Enterprise" price="From $2,500/mo" reqs="Custom" notes="Historical archive, dedicated infra. Contact us." />
+            <Tier name="Demo" price="$0" reqs="1,000 / month" notes="Shared key — no signup. AI-friendly for tool evaluation." />
+            <Tier name="API" price="$50 / month" reqs="20,000 / month" notes="Personal key, commercial usage, full endpoints." highlight />
+            <Tier name="API Annual" price="$500 / year" reqs="20,000 / month" notes="Same as monthly, save $100/yr. Priority email support." />
+            <Tier name="Enterprise" price="Custom" reqs="50k+ / month" notes="WebSocket, historical archive, SLA. Contact us." />
           </div>
           <p className="text-xs text-muted-foreground mt-3">
             Quotas reset at the start of each UTC month. No overage charges — calls beyond your quota return 429 until reset (or upgrade).{" "}

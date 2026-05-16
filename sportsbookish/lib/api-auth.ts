@@ -1,33 +1,30 @@
-// API key authentication + rate limiting for /api/v1/* endpoints.
+// API key authentication + monthly quota enforcement for /api/v1/* endpoints.
 //
 // Keys format: sbi_live_<32 hex chars>  (sbi = SportsBookISH)
-// Stored in sb_api_keys as sha256 hash; only the user sees the plaintext once.
+// Stored as sha256 hash in sb_api_keys; only the user sees the plaintext once.
 //
-// Rate limits per tier (monthly):
-//   free:     100   (no signup hook; for "try it" docs page)
-//   builder:  10000   ($99/mo)
-//   business: 100000  ($499/mo)
-//   enterprise: custom (set via admin)
+// Tier and quota match lib/tiers.ts ApiTierKey:
+//   free:        1000 req/mo (shared demo key in /api/docs)
+//   api_monthly: 20000 req/mo ($50/mo)
+//   api_annual:  20000 req/mo ($500/yr)
+//   enterprise:  configurable (set via admin)
 
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-
-export type ApiTier = "free" | "builder" | "business" | "enterprise";
+import type { ApiTierKey } from "@/lib/tiers";
+import { API_PLAN_BY_KEY } from "@/lib/tiers";
 
 export interface ApiKeyContext {
   key_id: number;
-  user_id: string;
-  tier: ApiTier;
+  user_id: string | null;   // null for the system-owned demo key
+  tier: ApiTierKey;
   monthly_quota: number;
 }
 
-export const QUOTA_BY_TIER: Record<ApiTier, number> = {
-  free: 100,
-  builder: 10000,
-  business: 100000,
-  enterprise: 1000000,
-};
+export function quotaForTier(tier: ApiTierKey): number {
+  return API_PLAN_BY_KEY[tier]?.monthlyQuota ?? 1000;
+}
 
 function hashKey(plaintext: string): string {
   return crypto.createHash("sha256").update(plaintext).digest("hex");
@@ -39,7 +36,7 @@ export function generateApiKey(): { plaintext: string; hash: string; prefix: str
   return {
     plaintext,
     hash: hashKey(plaintext),
-    prefix: plaintext.slice(0, 16),  // sbi_live_xxxxxxxx — shown in dashboard for ID
+    prefix: plaintext.slice(0, 16),
   };
 }
 
@@ -63,7 +60,6 @@ export async function authenticateApiKey(req: Request): Promise<{ ctx: ApiKeyCon
     return { ctx: null, error: "API key not found or revoked", status: 401 };
   }
 
-  // Monthly quota enforcement — count usage since start of current calendar month UTC
   const monthStart = new Date();
   monthStart.setUTCDate(1);
   monthStart.setUTCHours(0, 0, 0, 0);
@@ -85,14 +81,13 @@ export async function authenticateApiKey(req: Request): Promise<{ ctx: ApiKeyCon
     ctx: {
       key_id: key.id,
       user_id: key.user_id,
-      tier: key.tier as ApiTier,
+      tier: key.tier as ApiTierKey,
       monthly_quota: key.monthly_quota,
     },
   };
 }
 
-// Record one API call against the key's usage. Updates last_used_at + inserts
-// usage row. Fire-and-forget — don't block the response on this.
+// Fire-and-forget — don't block the response on this.
 export async function recordApiCall(ctx: ApiKeyContext, endpoint: string, status: number): Promise<void> {
   const service = createServiceClient();
   try {
@@ -103,8 +98,6 @@ export async function recordApiCall(ctx: ApiKeyContext, endpoint: string, status
   } catch { /* best-effort */ }
 }
 
-// Convenience wrapper — call this at the top of every /api/v1/* handler.
-// Returns the auth context if valid, or a NextResponse with the error otherwise.
 export async function requireApiKey(req: Request, endpoint: string): Promise<{ ctx: ApiKeyContext } | NextResponse> {
   const { ctx, error, status } = await authenticateApiKey(req);
   if (!ctx) {
@@ -113,7 +106,6 @@ export async function requireApiKey(req: Request, endpoint: string): Promise<{ c
       { status: status || 401 }
     );
   }
-  // Fire usage record in background
   recordApiCall(ctx, endpoint, 200).catch(() => {});
   return { ctx };
 }
