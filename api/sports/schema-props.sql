@@ -34,10 +34,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS sports_markets_prop_uniq
   WHERE prop_line IS NOT NULL;
 
 -- Global kalshi_ticker uniqueness — lets the ingester upsert by ticker for
--- both legacy and prop rows without juggling constraint names
-CREATE UNIQUE INDEX IF NOT EXISTS sports_markets_kalshi_ticker_uniq
-  ON sports_markets (kalshi_ticker)
-  WHERE kalshi_ticker IS NOT NULL;
+-- both legacy and prop rows. Promoted from a partial unique index to a
+-- real CONSTRAINT so PostgREST's onConflict can match it (partial indexes
+-- don't satisfy onConflict resolution). All markets have a kalshi_ticker,
+-- so the implicit NOT NULL is safe.
+DROP INDEX IF EXISTS sports_markets_kalshi_ticker_uniq;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'sports_markets_kalshi_ticker_unique'
+  ) THEN
+    EXECUTE 'ALTER TABLE sports_markets ADD CONSTRAINT sports_markets_kalshi_ticker_unique UNIQUE (kalshi_ticker)';
+  END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS sports_markets_prop_event_idx
   ON sports_markets (event_id, market_type)

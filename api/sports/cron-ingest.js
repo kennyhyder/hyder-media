@@ -173,7 +173,7 @@ async function ingestLeague(supabase, league) {
     for (let i = 0; i < marketRows.length; i += 500) {
       const { data, error } = await supabase
         .from("sports_markets")
-        .upsert(marketRows.slice(i, i + 500), { onConflict: "event_id,contestant_id,market_type" })
+        .upsert(marketRows.slice(i, i + 500), { onConflict: "kalshi_ticker" })
         .select("id, event_id, contestant_id, market_type, kalshi_ticker");
       if (error) { summary.errors++; summary[series.ticker] = `markets: ${error.message}`; continue; }
       for (const mm of data) marketIdByKey.set(mm.kalshi_ticker, mm.id);
