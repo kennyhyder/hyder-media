@@ -151,18 +151,19 @@ export function toBigInt(v) {
 }
 
 export function computeImplied(yesBid, yesAsk, last) {
-  // Same logic as golfodds — only trust bid/ask midpoint when BOTH sides have
-  // real liquidity. Otherwise fall back to last trade. Prevents 0/1¢ dust
-  // asks (no real buyer) from being read as 0.5% probability.
+  // Trust bid/ask midpoint ONLY when both sides have real liquidity:
+  //   - yesBid > 0 (someone wants to buy)
+  //   - yesAsk < 1 (someone wants to sell below ceiling)
+  //   - spread <= 10¢ (tight market — bid and ask agree)
+  // A one-sided dust quote (bid=0, ask=$0.02) is NOT a price — averaging it
+  // produces 1% phantom edges that don't exist. Return null and let the UI
+  // show "—" rather than fabricate a number.
   if (yesBid != null && yesAsk != null
       && yesBid > 0 && yesAsk > yesBid
       && yesAsk - yesBid <= 0.1 && yesAsk < 1) {
     return Number(((yesBid + yesAsk) / 2).toFixed(4));
   }
   if (last != null && last > 0 && last < 1) return last;
-  if (yesBid != null && yesAsk != null && yesAsk < 1) {
-    return Number(((yesBid + yesAsk) / 2).toFixed(4));
-  }
   return null;
 }
 

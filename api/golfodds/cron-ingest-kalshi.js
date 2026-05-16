@@ -84,10 +84,10 @@ function computeImpliedFromQuote(yesBid, yesAsk, last) {
   }
   // Otherwise prefer last trade — it's what users actually paid most recently
   if (last != null && last > 0 && last < 1) return last;
-  // Last resort: midpoint of whatever (one-sided) book is left
-  if (yesBid != null && yesAsk != null && yesAsk < 1) {
-    return Number(((yesBid + yesAsk) / 2).toFixed(4));
-  }
+  // No reliable price — better to return null than fabricate one from a
+  // dust quote. Previously had a one-sided-book fallback that turned
+  // bid=0/ask=$0.02 into "1% implied probability" and surfaced phantom
+  // +57% edges in the UI.
   return null;
 }
 

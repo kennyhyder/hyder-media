@@ -3,6 +3,24 @@ import {
   listEventsForSeries, fetchMarketsForEvent, mapLimit, LEAGUES,
 } from "./_lib.js";
 
+const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
+
+// Returns a Date from Kalshi's expected_expiration_time, falling back to
+// parsing the encoded YYMMMDDHHMM date out of the event ticker.
+function parseEventStartTime(e) {
+  if (e.expected_expiration_time) {
+    const d = new Date(e.expected_expiration_time);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const ticker = e.event_ticker || "";
+  const m = ticker.match(/(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})(?:[A-Z]|$)/);
+  if (!m) return null;
+  const [, yy, mon, dd, hh, mi] = m;
+  const month = MONTHS[mon];
+  if (month == null) return null;
+  return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), Number(hh), Number(mi)));
+}
+
 // Generic Kalshi ingester for team sports. Walks LEAGUES config:
 //   for each league:
 //     for each series (championship, game, series winner, mvp, etc.):
@@ -36,7 +54,12 @@ async function ingestLeague(supabase, league) {
     // /sports/{league}/{year}/{slug} routes can resolve.
     const eventRows = events.map((e) => {
       const title = e.title || e.sub_title || e.event_ticker;
-      const startTime = e.expected_expiration_time ? new Date(e.expected_expiration_time) : null;
+      // Prefer Kalshi's expected_expiration_time when present; otherwise parse
+      // the encoded date out of the ticker (e.g. KXMLBGAME-26MAY161810CINCLE
+      // → 2026-05-16 18:10 UTC). Without a start_time, the archive cron skips
+      // the event and stale 99/1¢ settled-market values keep leaking into the
+      // UI as phantom +57% edges.
+      const startTime = parseEventStartTime(e);
       const year = startTime ? startTime.getUTCFullYear() : new Date().getUTCFullYear();
       return {
         league: league.key,
