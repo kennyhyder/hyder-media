@@ -1,6 +1,6 @@
 import {
   getSupabase, checkAuth, normalizeName, slugify, toUnit, toBigInt, computeImplied,
-  listEventsForSeries, fetchMarketsForEvent, mapLimit, LEAGUES,
+  listEventsForSeries, listSeriesByPrefix, fetchMarketsForEvent, mapLimit, LEAGUES,
 } from "./_lib.js";
 
 const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
@@ -31,10 +31,32 @@ function parseEventStartTime(e) {
 // Bulk batching keeps the whole thing under the 300s function timeout even
 // when MLB has 41 games × 2 markets and EPL has 21 games × 3 markets each.
 
+// Resolve a series config entry (literal ticker or prefix) into the list
+// of concrete tickers to ingest. Prefix entries pull every matching series
+// from Kalshi's /series listing (cached for the cron run).
+async function resolveSeriesTickers(seriesEntry) {
+  if (seriesEntry.ticker) return [{ ticker: seriesEntry.ticker, event_type: seriesEntry.event_type }];
+  if (seriesEntry.prefix) {
+    try {
+      const matches = await listSeriesByPrefix(seriesEntry.prefix);
+      return matches.map((t) => ({ ticker: t, event_type: seriesEntry.event_type }));
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 async function ingestLeague(supabase, league) {
   const summary = { league: league.key, quotes: 0, events: 0, errors: 0 };
 
-  for (const series of league.series) {
+  // Expand series entries (literal tickers + prefix matches)
+  const allSeries = [];
+  for (const entry of league.series) {
+    allSeries.push(...await resolveSeriesTickers(entry));
+  }
+
+  for (const series of allSeries) {
     let events;
     try {
       events = await listEventsForSeries(series.ticker);

@@ -22,17 +22,28 @@ export const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
 //   award           generic award (Cy Young, Hart, Norris, Vezina, CoY, RoY, DPoY)
 //   mvp             MVP (kept as its own type so it ranks above generic awards)
 //   trade           trade-related futures (one-off events; rarely book-comparable)
+// Series entries can specify either a literal `ticker` or a `prefix` that
+// the ingester expands to every matching series via Kalshi's /series list
+// (used for per-team season win totals like KXMLBWINS-BOS, KXMLBWINS-NYY, ...).
 export const LEAGUES = [
   {
     key: "nba",
     series: [
-      { ticker: "KXNBA",        event_type: "championship" },
-      { ticker: "KXNBAGAME",    event_type: "game" },
-      { ticker: "KXNBASERIES",  event_type: "series" },
-      { ticker: "KXNBAEAST",    event_type: "conference" },
-      { ticker: "KXNBAWEST",    event_type: "conference" },
-      { ticker: "KXNBAMVP",     event_type: "mvp" },
-      { ticker: "KXNBACOY",     event_type: "award" },
+      { ticker: "KXNBA",          event_type: "championship" },
+      { ticker: "KXNBAGAME",      event_type: "game" },
+      { ticker: "KXNBASERIES",    event_type: "series" },
+      { ticker: "KXNBAEAST",      event_type: "conference" },
+      { ticker: "KXNBAWEST",      event_type: "conference" },
+      { ticker: "KXNBAEAST1SEED", event_type: "division" },
+      { ticker: "KXNBAMVP",       event_type: "mvp" },
+      { ticker: "KXNBACOY",       event_type: "award" },
+      { ticker: "KXNBADPOY",      event_type: "award" },
+      { ticker: "KXNBAROY",       event_type: "award" },
+      { ticker: "KXNBACLUTCH",    event_type: "award" },
+      { ticker: "KXNBA1STTEAM",   event_type: "award" },
+      { ticker: "KXNBADRAFTTEAM", event_type: "trade" },
+      { ticker: "KXNBADRAFTPICK", event_type: "award" },
+      { ticker: "KXNBAWINS",      event_type: "win_total" },
     ],
   },
   {
@@ -47,24 +58,36 @@ export const LEAGUES = [
       { ticker: "KXMLBNLMVP",         event_type: "mvp" },
       { ticker: "KXMLBALCY",          event_type: "award" },
       { ticker: "KXMLBNLCY",          event_type: "award" },
+      { ticker: "KXMLBALCPOTY",       event_type: "award" },
+      { ticker: "KXMLBNLCPOTY",       event_type: "award" },
+      { ticker: "KXMLBWSMVP",         event_type: "mvp" },
       { ticker: "KXMLBALEAST",        event_type: "division" },
       { ticker: "KXMLBALWEST",        event_type: "division" },
       { ticker: "KXMLBNLEAST",        event_type: "division" },
       { ticker: "KXMLBNLWEST",        event_type: "division" },
       { ticker: "KXMLBTRADE",         event_type: "trade" },
+      { prefix: "KXMLBWINS-",         event_type: "win_total" },
     ],
   },
   {
     key: "nhl",
     series: [
-      { ticker: "KXNHL",        event_type: "championship" },
-      { ticker: "KXNHLGAME",    event_type: "game" },
-      { ticker: "KXNHLSERIES",  event_type: "series" },
-      { ticker: "KXNHLEAST",    event_type: "conference" },
-      { ticker: "KXNHLWEST",    event_type: "conference" },
-      { ticker: "KXNHLHART",    event_type: "mvp" },
-      { ticker: "KXNHLNORRIS",  event_type: "award" },
-      { ticker: "KXNHLVEZINA",  event_type: "award" },
+      { ticker: "KXNHL",              event_type: "championship" },
+      { ticker: "KXNHLGAME",          event_type: "game" },
+      { ticker: "KXNHLSERIES",        event_type: "series" },
+      { ticker: "KXNHLEAST",          event_type: "conference" },
+      { ticker: "KXNHLWEST",          event_type: "conference" },
+      { ticker: "KXNHLPACIFIC",       event_type: "division" },
+      { ticker: "KXNHLCENTRAL",       event_type: "division" },
+      { ticker: "KXNHLATLANTIC",      event_type: "division" },
+      { ticker: "KXNHLMETROPOLITAN",  event_type: "division" },
+      { ticker: "KXNHLHART",          event_type: "mvp" },
+      { ticker: "KXNHLNORRIS",        event_type: "award" },
+      { ticker: "KXNHLVEZINA",        event_type: "award" },
+      { ticker: "KXNHLROSS",          event_type: "award" },
+      { ticker: "KXNHLRICHARD",       event_type: "award" },
+      { ticker: "KXNHL1STTEAM",       event_type: "award" },
+      { ticker: "KXNHLWINS",          event_type: "win_total" },
     ],
   },
   {
@@ -72,7 +95,9 @@ export const LEAGUES = [
     series: [
       { ticker: "KXNFLGAME",      event_type: "game" },
       { ticker: "KXNFLMVP",       event_type: "mvp" },
-      { ticker: "KXNFLWINS",      event_type: "win_total" },
+      { ticker: "KXNFLSBMVP",     event_type: "mvp" },
+      { ticker: "KXNFLDPOY",      event_type: "award" },
+      { ticker: "KXNFLOPOY",      event_type: "award" },
       { ticker: "KXNFLAFCCHAMP",  event_type: "conference" },
       { ticker: "KXNFLNFCCHAMP",  event_type: "conference" },
       { ticker: "KXNFLAFCEAST",   event_type: "division" },
@@ -83,12 +108,18 @@ export const LEAGUES = [
       { ticker: "KXNFLNFCWEST",   event_type: "division" },
       { ticker: "KXNFLNFCNORTH",  event_type: "division" },
       { ticker: "KXNFLNFCSOUTH",  event_type: "division" },
+      { prefix: "KXNFLWINS-",     event_type: "win_total" },
     ],
   },
   {
     key: "epl",
     series: [
-      { ticker: "KXEPLGAME",    event_type: "game" },
+      { ticker: "KXEPLGAME",        event_type: "game" },
+      { ticker: "KXEPLTOP2",        event_type: "playoffs" },
+      { ticker: "KXEPLTOP4",        event_type: "playoffs" },
+      { ticker: "KXEPLTOP6",        event_type: "playoffs" },
+      { ticker: "KXEPLRELEGATION",  event_type: "playoffs" },
+      { ticker: "KXEPLPOY",         event_type: "award" },
     ],
   },
   {
@@ -96,6 +127,8 @@ export const LEAGUES = [
     series: [
       { ticker: "KXMLSGAME",    event_type: "game" },
       { ticker: "KXMLSCUP",     event_type: "championship" },
+      { ticker: "KXMLSEAST",    event_type: "conference" },
+      { ticker: "KXMLSWEST",    event_type: "conference" },
     ],
   },
   {
@@ -176,6 +209,22 @@ async function fetchJSON(url, attempt = 0) {
   }
   if (!r.ok) throw new Error(`Kalshi ${r.status} ${url}: ${await r.text().catch(() => "")}`);
   return r.json();
+}
+
+// Given a series-ticker prefix (e.g. "KXMLBWINS-"), return every matching
+// series ticker on Kalshi. Used to expand per-team configs into the full
+// roster (KXMLBWINS-BOS, KXMLBWINS-NYY, ...) without hardcoding 30 entries.
+// Cached in-process for the lifetime of one cron run.
+let _seriesCache = null;
+export async function listSeriesByPrefix(prefix) {
+  if (!_seriesCache) {
+    const url = new URL(`${KALSHI_BASE}/series`);
+    url.searchParams.set("category", "Sports");
+    url.searchParams.set("limit", "200");
+    const data = await fetchJSON(url.toString());
+    _seriesCache = (data.series || []).map((s) => s.ticker);
+  }
+  return _seriesCache.filter((t) => t.startsWith(prefix));
 }
 
 export async function listEventsForSeries(seriesTicker) {
