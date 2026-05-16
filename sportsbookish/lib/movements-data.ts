@@ -22,7 +22,7 @@ export async function fetchMovements({ sinceHours = 24, league, minDelta = 0, li
   url.searchParams.set("min_delta", String(minDelta));
   url.searchParams.set("limit", String(limit));
   if (league) url.searchParams.set("league", league);
-  const r = await fetch(url.toString(), { next: { revalidate: 30 } });
+  const r = await fetch(url.toString(), { cache: "no-store" });
   if (!r.ok) return [];
   const data = await r.json();
   return data.movements || [];
@@ -47,7 +47,7 @@ export interface ContestantData {
 }
 
 export async function fetchContestant(id: string): Promise<ContestantData | null> {
-  const r = await fetch(`${DATA_HOST}/api/sports/contestant?id=${id}`, { next: { revalidate: 30 } });
+  const r = await fetch(`${DATA_HOST}/api/sports/contestant?id=${id}`, { cache: "no-store" });
   if (!r.ok) return null;
   return r.json();
 }
@@ -56,7 +56,7 @@ export interface MarketHistoryPoint { t: string; p: number }
 export interface MarketHistory { market_id: string; contestant_label: string; points: MarketHistoryPoint[] }
 
 export async function fetchEventHistory(eventId: string, hours = 24): Promise<MarketHistory[]> {
-  const r = await fetch(`${DATA_HOST}/api/sports/event-history?id=${eventId}&hours=${hours}`, { next: { revalidate: 60 } });
+  const r = await fetch(`${DATA_HOST}/api/sports/event-history?id=${eventId}&hours=${hours}`, { cache: "no-store" });
   if (!r.ok) return [];
   const data = await r.json();
   return data.markets || [];

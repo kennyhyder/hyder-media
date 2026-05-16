@@ -176,6 +176,65 @@ const BOOKS: Record<string, BookProfile> = {
       },
     ],
   },
+  polymarket: {
+    slug: "polymarket",
+    name: "Polymarket",
+    emoji: "🟣",
+    intro:
+      "Polymarket is the largest crypto-native prediction market — peer-to-peer trading on USDC, hosted on Polygon, regulated outside the U.S. Kalshi and Polymarket are the two most-traded event-contract exchanges in the world, but they differ on legal access, fee structure, and market depth. This page compares the two head-to-head.",
+    strengths: [
+      "Deepest liquidity of any prediction market globally — often 10× more volume than Kalshi on overlapping events",
+      "Peer-to-peer matching with zero trading fee on most markets (gas fees only)",
+      "Long-tail political, geopolitical, and pop-culture markets Kalshi doesn't list",
+      "Crypto-native — instant withdrawals, no banking days",
+    ],
+    weaknesses: [
+      "Not legally accessible from the U.S. (since 2022 CFTC settlement — Polymarket geo-blocks U.S. IPs)",
+      "Gas + slippage costs can exceed Kalshi's flat trading fee on small positions",
+      "USDC-only deposits/withdrawals — extra step for non-crypto users",
+      "No fiat on-ramp; users need a self-custodial wallet",
+      "Sports market depth is thinner than Kalshi for U.S. leagues (NFL, NBA, MLB)",
+    ],
+    kalshiAdvantages: [
+      "Legal in all 50 U.S. states (CFTC-regulated Designated Contract Market)",
+      "Fiat deposits/withdrawals via ACH and debit card",
+      "Deeper U.S. sports market coverage (every NBA / NFL / MLB game with multiple bet types)",
+      "Predictable per-contract trading fee (max 7¢) vs Polymarket's variable gas costs",
+      "Operates under U.S. regulatory framework — no rug-pull risk, no offshore counterparty risk",
+    ],
+    faq: [
+      {
+        question: "Can U.S. residents use Polymarket?",
+        answer:
+          "Officially no. Polymarket settled with the CFTC in January 2022 and geo-blocks U.S. IP addresses. Some U.S. residents reportedly use VPNs to access the platform, but this violates Polymarket's terms of service. For legal U.S. event-contract trading, use Kalshi.",
+      },
+      {
+        question: "Which has cheaper fees: Kalshi or Polymarket?",
+        answer:
+          "Depends on bet size. Polymarket charges 0% trading fees but you pay gas to settle on-chain (typically $0.01-$0.50 per trade on Polygon). Kalshi charges max 7¢ per contract (peaks at 2¢ near 50% probability). For positions over ~30 contracts, Kalshi tends to be cheaper. For small positions, Polymarket's no-fee model wins.",
+      },
+      {
+        question: "Do Kalshi and Polymarket prices differ on the same event?",
+        answer:
+          "Yes, often by 1-5 percentage points on liquid markets, sometimes more on illiquid ones. The gap reflects: different user bases (Polymarket is more crypto-native + international; Kalshi is U.S. retail), different fee structures affecting marginal traders, and arbitrage friction (you can't easily move money between the two). SportsBookISH surfaces these gaps when both venues list the same market.",
+      },
+      {
+        question: "Is Polymarket safer than Kalshi?",
+        answer:
+          "From a U.S. regulatory perspective: no. Kalshi is CFTC-registered as a Designated Contract Market with full federal oversight, FDIC-equivalent customer fund segregation, and U.S. legal recourse for disputes. Polymarket operates outside U.S. jurisdiction — your funds sit in a self-custodial wallet (smart contract risk) and there's no consumer-protection framework if something goes wrong. From a smart-contract / decentralization perspective, Polymarket's contracts have been audited and operate transparently on-chain, which some users prefer.",
+      },
+      {
+        question: "Can I arbitrage Kalshi vs Polymarket?",
+        answer:
+          "Theoretically yes when the two venues price the same event meaningfully apart. Practically: capital lock-up across two platforms, FX/USDC conversion costs, gas fees on Polymarket, and counterparty risk on both sides eat most of the edge. SportsBookISH tracks the Kalshi vs Polymarket spread on overlapping markets so you can see when the gap is wide enough to be worth the friction.",
+      },
+      {
+        question: "Which platform has better political markets?",
+        answer:
+          "Polymarket — both by volume and breadth. Polymarket has historically led on election markets (presidential, primary, congressional) with hundreds of millions of dollars in volume per major election cycle. Kalshi has competitive election markets within its CFTC-approved categories but a smaller set of long-tail political contracts. For sports, the comparison flips: Kalshi has wider U.S. sports coverage.",
+      },
+    ],
+  },
   fanatics: {
     slug: "fanatics",
     name: "Fanatics",

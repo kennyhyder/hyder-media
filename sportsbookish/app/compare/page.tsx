@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 };
 
 const BOOKS = [
+  { slug: "polymarket", name: "Polymarket", emoji: "🟣", oneline: "The other major event-contract exchange — peer-to-peer, crypto-native, geo-blocked from the U.S. The exchange-vs-exchange comparison." },
   { slug: "draftkings", name: "DraftKings", emoji: "🟢", oneline: "America's largest legal sportsbook — broad market coverage, sharp pricing on majors." },
   { slug: "fanduel", name: "FanDuel", emoji: "🔵", oneline: "Daily-fantasy giant turned sportsbook — slight favorites bias on primetime games." },
   { slug: "betmgm", name: "BetMGM", emoji: "🟡", oneline: "Vegas heritage, frequent promo pricing — often the soft side of the consensus." },
-  { slug: "caesars", name: "Caesars", emoji: "🟣", oneline: "Massive parlay book — moneylines move slower than the market." },
+  { slug: "caesars", name: "Caesars", emoji: "🟠", oneline: "Massive parlay book — moneylines move slower than the market." },
   { slug: "betrivers", name: "BetRivers", emoji: "🔴", oneline: "Regional book — best-line opportunities especially on baseball." },
   { slug: "fanatics", name: "Fanatics", emoji: "⚫", oneline: "Newest entrant, often boosts on home-team markets." },
 ];

@@ -47,6 +47,7 @@ const SECTIONS = [
   {
     heading: "Compare books",
     links: [
+      { label: "Kalshi vs Polymarket", href: "/compare/kalshi-vs-polymarket" },
       { label: "Kalshi vs DraftKings", href: "/compare/kalshi-vs-draftkings" },
       { label: "Kalshi vs FanDuel", href: "/compare/kalshi-vs-fanduel" },
       { label: "Kalshi vs BetMGM", href: "/compare/kalshi-vs-betmgm" },

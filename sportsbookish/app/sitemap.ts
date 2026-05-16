@@ -60,8 +60,10 @@ export default async function sitemap(): Promise<Sm> {
   );
 
   // ---- Compare books ----
-  for (const book of ["draftkings", "fanduel", "betmgm", "caesars", "betrivers", "fanatics"]) {
-    urls.push({ url: `${SITE_URL}/compare/kalshi-vs-${book}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 });
+  for (const book of ["polymarket", "draftkings", "fanduel", "betmgm", "caesars", "betrivers", "fanatics"]) {
+    // Polymarket comparison gets higher priority — high Google Trends search volume
+    const pri = book === "polymarket" ? 0.85 : 0.7;
+    urls.push({ url: `${SITE_URL}/compare/kalshi-vs-${book}`, lastModified: now, changeFrequency: "weekly", priority: pri });
   }
 
   // ---- Authority / data ----
