@@ -5,13 +5,15 @@ function getSupabase() {
 }
 
 // Extract (date, teams) from a Kalshi ticker so we can match a game event
-// to its related player-prop events. Game tickers carry a 4-char HHMM time
-// that prop tickers omit, so we strip it.
-//   game:  KXNBAGAME-26MAY161810CINCLE  → 26MAY16 + CINCLE
-//   prop:  KXNBASTL-26MAY16CINCLE        → 26MAY16 + CINCLE
+// to its related player-prop events. Some leagues carry a 4-char HHMM time
+// in the game ticker (MLB), others don't (NBA). Both formats: strip the
+// optional time block so the YYMMMDD+TEAMS suffix matches the prop ticker.
+//   MLB game:  KXMLBGAME-26MAY161810CINCLE  → 26MAY16 + CINCLE
+//   NBA game:  KXNBAGAME-26MAY24OKCSAS      → 26MAY24 + OKCSAS
+//   prop:      KXNBASTL-26MAY18SASOKC       → 26MAY18 + SASOKC
 function gameTickerMatchKey(ticker) {
   if (!ticker) return null;
-  const m = ticker.match(/-(\d{2}[A-Z]{3}\d{2})\d{4}([A-Z]+)$/);
+  const m = ticker.match(/-(\d{2}[A-Z]{3}\d{2})(?:\d{4})?([A-Z]+)$/);
   return m ? m[1] + m[2] : null;
 }
 function propTickerMatchKey(ticker) {
