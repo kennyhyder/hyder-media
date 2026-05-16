@@ -6,6 +6,8 @@
   "crons": [
     { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
     { "path": "/api/golfodds/cron-ingest-datagolf", "schedule": "*/10 * * * *" },
+    { "path": "/api/golfodds/cron-ingest-matchup-books", "schedule": "*/10 * * * *" },
+    { "path": "/api/golfodds/cron-ingest-props",   "schedule": "*/10 * * * *" },
     { "path": "/api/golfodds/cron-detect-alerts",   "schedule": "*/5 * * * *" },
     { "path": "/api/sports/cron-ingest",            "schedule": "*/5 * * * *" },
     { "path": "/api/sports/cron-ingest-props",      "schedule": "2,12,22,32,42,52 * * * *" },

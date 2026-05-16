@@ -30,10 +30,12 @@ const SOURCES = [
   { id: "sports_books",          table: "sports_book_quotes",             cadence_minutes: 30, category: "live", small: true },
   { id: "sports_polymarket",     table: "sports_polymarket_quotes",       cadence_minutes: 15, category: "live", small: true },
   { id: "golf_books",            table: "golfodds_book_quotes",           cadence_minutes: 5,  category: "live", small: true },
-  // Known-empty streams — flag as "not_implemented" rather than stale.
-  // Adding actual ingesters is tracked in TODO.
-  { id: "golf_matchup_books",    table: "golfodds_matchup_book_latest",   cadence_minutes: 5,  category: "not_implemented", note: "Ingester not yet built — DataGolf provides matchup books but the cron isn't wired up" },
-  { id: "golf_props",            table: "golfodds_prop_latest",           cadence_minutes: 5,  category: "not_implemented", note: "Ingester not yet built — DataGolf provides player props but the cron isn't wired up" },
+  // Recently-built ingesters — go live as soon as they pull matching data.
+  // Both use 10-min crons. Initial loads may take a few cycles to populate;
+  // both also need overlap with existing Kalshi matchups/prop series so they
+  // can be empty even when running (no false alarm — just no matched data).
+  { id: "golf_matchup_books",    table: "golfodds_matchup_book_latest",   cadence_minutes: 10, category: "live" },
+  { id: "golf_props",            table: "golfodds_prop_latest",           cadence_minutes: 10, category: "live" },
 ];
 
 export default async function handler(req, res) {
