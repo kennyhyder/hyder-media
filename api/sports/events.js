@@ -51,9 +51,9 @@ export default async function handler(req, res) {
         .range(0, 9999),
       supabase
         .from("sports_book_v_latest")
-        .select("sports_event_id, contestant_norm, book, implied_prob_novig, american")
+        .select("sports_event_id, contestant_norm, book, implied_prob_novig, american, market_type")
         .in("sports_event_id", eventIds)
-        .eq("market_type", "h2h")
+        .in("market_type", ["h2h", "outrights"])
         .range(0, 9999),
       supabase
         .from("sports_polymarket_v_latest")
