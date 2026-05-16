@@ -62,6 +62,21 @@ const EVENT_TYPE_LABEL: Record<string, string> = {
   mvp: "MVP",
   award: "Awards",
   trade: "Trades & roster moves",
+  player_prop_points: "Player props · points",
+  player_prop_assists: "Player props · assists",
+  player_prop_rebounds: "Player props · rebounds",
+  player_prop_steals: "Player props · steals",
+  player_prop_blocks: "Player props · blocks",
+  player_prop_threes: "Player props · threes made",
+  player_prop_hits: "Player props · hits",
+  player_prop_home_runs: "Player props · home runs",
+  player_prop_strikeouts: "Player props · strikeouts",
+  player_prop_rbis: "Player props · RBIs",
+  player_prop_saves: "Player props · saves",
+  player_prop_anytime_goal: "Player props · anytime goalscorer",
+  player_prop_first_goal: "Player props · first goalscorer",
+  player_prop_anytime_td: "Player props · anytime TD",
+  player_prop_first_td: "Player props · first TD",
 };
 
 // Free tier sees only "game" type events. Pro+ sees every other event type.
@@ -77,6 +92,21 @@ const PAID_EVENT_TYPES = [
   "mvp",
   "award",
   "trade",
+  "player_prop_points",
+  "player_prop_assists",
+  "player_prop_rebounds",
+  "player_prop_steals",
+  "player_prop_blocks",
+  "player_prop_threes",
+  "player_prop_hits",
+  "player_prop_home_runs",
+  "player_prop_strikeouts",
+  "player_prop_rbis",
+  "player_prop_saves",
+  "player_prop_anytime_goal",
+  "player_prop_first_goal",
+  "player_prop_anytime_td",
+  "player_prop_first_td",
 ];
 
 function visibleEventTypesForTier(tier: string): string[] {
@@ -143,6 +173,24 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
     "record_worst",
     "win_total",
     "trade",
+    // Player props — grouped at the bottom because each is a long list of
+    // (player × threshold) events. Order within: counting stats first, then
+    // scoring/scorecard markets.
+    "player_prop_points",
+    "player_prop_assists",
+    "player_prop_rebounds",
+    "player_prop_steals",
+    "player_prop_blocks",
+    "player_prop_threes",
+    "player_prop_hits",
+    "player_prop_home_runs",
+    "player_prop_strikeouts",
+    "player_prop_rbis",
+    "player_prop_saves",
+    "player_prop_anytime_goal",
+    "player_prop_first_goal",
+    "player_prop_anytime_td",
+    "player_prop_first_td",
   ];
 
   // Stats for the strip at top — same shape as golf tournament page.

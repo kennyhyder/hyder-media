@@ -111,7 +111,10 @@ export default async function handler(req, res) {
   summary.scanned = events?.length || 0;
 
   for (const evt of events || []) {
-    const delay = ARCHIVE_DELAY_HOURS[evt.event_type] ?? 48;
+    // Player-prop events settle when the underlying game ends — use the same
+    // 4h game grace rather than the 48h default.
+    const isProp = (evt.event_type || "").startsWith("player_prop_");
+    const delay = isProp ? ARCHIVE_DELAY_HOURS.game : (ARCHIVE_DELAY_HOURS[evt.event_type] ?? 48);
     const startMs = new Date(evt.start_time).getTime();
     if (now - startMs < delay * 3600 * 1000) continue;  // not yet eligible
 

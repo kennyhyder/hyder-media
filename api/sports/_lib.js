@@ -22,6 +22,35 @@ export const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
 //   award           generic award (Cy Young, Hart, Norris, Vezina, CoY, RoY, DPoY)
 //   mvp             MVP (kept as its own type so it ranks above generic awards)
 //   trade           trade-related futures (one-off events; rarely book-comparable)
+// Player-prop series — one entry per stat per league. Each Kalshi event
+// is a (game × stat) combo; markets inside are (player × threshold). The
+// props ingester upserts each market by kalshi_ticker and parses
+// player + line + side from the market title/sub_title.
+export const PROP_SERIES = [
+  // NBA
+  { league: "nba", ticker: "KXNBAPTS",  market_type: "player_prop_points",   stat_label: "Points" },
+  { league: "nba", ticker: "KXNBAAST",  market_type: "player_prop_assists",  stat_label: "Assists" },
+  { league: "nba", ticker: "KXNBASTL",  market_type: "player_prop_steals",   stat_label: "Steals" },
+  { league: "nba", ticker: "KXNBAREB",  market_type: "player_prop_rebounds", stat_label: "Rebounds" },
+  { league: "nba", ticker: "KXNBABLK",  market_type: "player_prop_blocks",   stat_label: "Blocks" },
+  { league: "nba", ticker: "KXNBA3PM",  market_type: "player_prop_threes",   stat_label: "3-pointers made" },
+  // MLB
+  { league: "mlb", ticker: "KXMLBHIT",   market_type: "player_prop_hits",      stat_label: "Hits" },
+  { league: "mlb", ticker: "KXMLBHR",    market_type: "player_prop_home_runs", stat_label: "Home runs" },
+  { league: "mlb", ticker: "KXMLBSO",    market_type: "player_prop_strikeouts",stat_label: "Strikeouts (pitcher)" },
+  { league: "mlb", ticker: "KXMLBRBI",   market_type: "player_prop_rbis",      stat_label: "RBIs" },
+  // NHL
+  { league: "nhl", ticker: "KXNHLPTS",   market_type: "player_prop_points",   stat_label: "Points" },
+  { league: "nhl", ticker: "KXNHLSAVES", market_type: "player_prop_saves",    stat_label: "Saves" },
+  { league: "nhl", ticker: "KXNHLANYGOAL", market_type: "player_prop_anytime_goal", stat_label: "Anytime goalscorer" },
+  // NFL (game-time touchdown markets — player-level)
+  { league: "nfl", ticker: "KXNFLGAMETD",       market_type: "player_prop_anytime_td", stat_label: "Anytime touchdown" },
+  { league: "nfl", ticker: "KXNFLTEAMFIRSTTD",  market_type: "player_prop_first_td",   stat_label: "First touchdown scorer" },
+  // EPL
+  { league: "epl", ticker: "KXEPLANYGOAL",   market_type: "player_prop_anytime_goal", stat_label: "Anytime goalscorer" },
+  { league: "epl", ticker: "KXEPLFIRSTGOAL", market_type: "player_prop_first_goal",   stat_label: "First goalscorer" },
+];
+
 // Series entries can specify either a literal `ticker` or a `prefix` that
 // the ingester expands to every matching series via Kalshi's /series list
 // (used for per-team season win totals like KXMLBWINS-BOS, KXMLBWINS-NYY, ...).
