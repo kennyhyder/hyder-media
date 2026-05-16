@@ -114,8 +114,45 @@ function visibleEventTypesForTier(tier: string): string[] {
   return ["game", ...PAID_EVENT_TYPES];
 }
 
-export default async function LeaguePage({ params }: { params: Promise<{ league: string }> }) {
+// Tab categories — group related event types into one navigable bucket so
+// the league page doesn't require 14 sections of scroll. Order matches
+// what most sportsbook users expect to scan first.
+const TAB_CATEGORIES: { id: string; label: string; eventTypes: string[] }[] = [
+  { id: "games", label: "Games", eventTypes: ["game"] },
+  {
+    id: "props",
+    label: "Player props",
+    eventTypes: [
+      "player_prop_points", "player_prop_assists", "player_prop_rebounds",
+      "player_prop_steals", "player_prop_blocks", "player_prop_threes",
+      "player_prop_hits", "player_prop_home_runs", "player_prop_strikeouts",
+      "player_prop_rbis", "player_prop_saves",
+      "player_prop_anytime_goal", "player_prop_first_goal",
+      "player_prop_anytime_td", "player_prop_first_td",
+    ],
+  },
+  {
+    id: "futures",
+    label: "Futures",
+    eventTypes: ["championship", "conference", "division", "series", "playoffs", "record_best", "record_worst"],
+  },
+  { id: "win_totals", label: "Win totals", eventTypes: ["win_total"] },
+  { id: "awards",     label: "MVP & Awards", eventTypes: ["mvp", "award"] },
+  { id: "other",      label: "Other",        eventTypes: ["trade"] },
+];
+
+function resolveActiveTab(requested: string | undefined, counts: Record<string, number>): string {
+  if (requested && counts[requested] > 0) return requested;
+  const firstNonEmpty = TAB_CATEGORIES.find((t) => counts[t.id] > 0);
+  return firstNonEmpty?.id || "games";
+}
+
+export default async function LeaguePage({ params, searchParams }: {
+  params: Promise<{ league: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { league } = await params;
+  const { tab: requestedTab } = await searchParams;
   const { tier, userId } = await getCurrentTier();
   const isAnonymous = !userId;
 
@@ -137,6 +174,15 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
     if (!groups[e.event_type]) groups[e.event_type] = [];
     groups[e.event_type].push(e);
   }
+
+  // Compute per-tab counts so we can hide empty tabs and resolve the active one
+  const tabCounts: Record<string, number> = {};
+  for (const cat of TAB_CATEGORIES) {
+    tabCounts[cat.id] = cat.eventTypes.reduce((s, t) => s + (groups[t]?.length || 0), 0);
+  }
+  const activeTab = resolveActiveTab(requestedTab, tabCounts);
+  const activeCategory = TAB_CATEGORIES.find((t) => t.id === activeTab)!;
+  const activeEventTypes = new Set(activeCategory.eventTypes);
 
   // Flatten "game" events into team-rows for the unified book table
   const gameRows: SportsRow[] = [];
@@ -295,8 +341,39 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
           </div>
         )}
 
-        {/* Unified book table for game-type events */}
-        {(groups.game?.length ?? 0) > 0 && (
+        {/* Tab nav — each tab is a separate URL (?tab=games/props/...) so
+            navigation works without JS and each tab keeps its own back-stack
+            entry. Uses <nav> semantics rather than role=tablist because the
+            destination is a different URL, not a hidden panel toggle. */}
+        {events.length > 0 && (
+          <nav aria-label={`${meta.display_name} bet categories`} className="mb-6 -mx-4 px-4 overflow-x-auto">
+            <ul className="flex gap-1 min-w-max">
+              {TAB_CATEGORIES.filter((t) => tabCounts[t.id] > 0).map((t) => {
+                const isActive = t.id === activeTab;
+                const href = t.id === "games" ? `/sports/${league}` : `/sports/${league}?tab=${t.id}`;
+                return (
+                  <li key={t.id}>
+                    <Link
+                      href={href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                        isActive
+                          ? "bg-emerald-500 text-emerald-950 font-semibold"
+                          : "bg-card/40 text-muted-foreground hover:bg-card hover:text-foreground border border-border/60"
+                      }`}
+                    >
+                      <span>{t.label}</span>
+                      <span className={`text-xs tabular-nums ${isActive ? "text-emerald-900/70" : "text-muted-foreground/70"}`}>{tabCounts[t.id]}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        )}
+
+        {/* Unified book table for game-type events — only on the Games tab */}
+        {activeTab === "games" && (groups.game?.length ?? 0) > 0 && (
           <section className="mb-8">
             <div className="flex items-baseline gap-2 mb-3">
               <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Game slate ({groups.game!.length})</h2>
@@ -306,8 +383,10 @@ export default async function LeaguePage({ params }: { params: Promise<{ league:
           </section>
         )}
 
-        {/* Non-game event types rendered as cards, grouped + tier-gated */}
-        {order.map((type) => {
+        {/* Non-game event types rendered as cards, grouped + tier-gated.
+            Filtered to the active tab's event_types so each tab shows only
+            its own bucket of sections. */}
+        {order.filter((t) => activeEventTypes.has(t) && t !== "game").map((type) => {
           const list = groups[type];
           if (!list?.length) return null;
           const locked = !allowedTypes.includes(type);
