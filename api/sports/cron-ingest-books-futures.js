@@ -87,20 +87,23 @@ async function ingestOne(supabase, cfg) {
       for (const market of bm.markets || []) {
         if (market.key !== "outrights") continue;
         const outcomes = market.outcomes || [];
-        // De-vig the field: sum of implied probs across all outcomes should be 1
-        const rawProbs = outcomes.map((o) => americanToProb(o.price));
-        const novigs = devigOutcomes(rawProbs);
+        // devigOutcomes expects [{prob_raw}] objects and returns each with
+        // a prob_novig field added. Build the shape it wants, then read
+        // back .prob_novig per index.
+        const shaped = outcomes.map((o) => ({ prob_raw: americanToProb(o.price) }));
+        const novigged = devigOutcomes(shaped);
         outcomes.forEach((o, idx) => {
           const oName = o.name;
           if (!oName) return;
-          // Find the matching Kalshi market across our candidate events.
-          // Soft-match the outcome name against every market label.
+          const am = typeof o.price === "number" ? o.price : null;
+          if (am == null) return;
+          // Find the matching Kalshi market across our candidate events
           for (const evt of events) {
             for (const m of markets) {
               if (m.event_id !== evt.id) continue;
               if (!softLabelMatch(oName, m.contestant_label, cfg.league)) continue;
-              const am = typeof o.price === "number" ? o.price : null;
-              if (am == null) return;
+              const probRaw = shaped[idx].prob_raw;
+              const probNovig = novigged[idx]?.prob_novig;
               quoteRows.push({
                 sports_event_id: evt.id,
                 contestant_label: m.contestant_label,
@@ -108,8 +111,8 @@ async function ingestOne(supabase, cfg) {
                 market_type: "outrights",
                 book,
                 american: am,
-                implied_prob: rawProbs[idx] != null ? Number(rawProbs[idx].toFixed(4)) : null,
-                implied_prob_novig: novigs[idx] != null ? Number(novigs[idx].toFixed(4)) : null,
+                implied_prob: probRaw != null ? Number(probRaw.toFixed(4)) : null,
+                implied_prob_novig: probNovig != null ? Number(probNovig.toFixed(4)) : null,
                 point: null,
                 fetched_at: now,
               });

@@ -28,28 +28,19 @@ export const LEAGUE_TO_FUTURES_SPORT = {
   wc:  "soccer_fifa_world_cup_winner",
 };
 
-// Expanded futures sport_keys per (league, event_type). The Odds API serves
-// each futures market as its own sport, so championship/conference/MVP each
-// need a separate /odds call. We pull outrights for each + match contestant
-// labels back to the matching Kalshi championship/conference/MVP event.
+// Futures sport_keys we can actually pull from The Odds API. Discovered via
+// /v4/sports?all=true on 2026-05-16 — only championship/winners exist. MVP,
+// conference winners, division winners, awards, rookie-of-the-year etc. are
+// NOT served by The Odds API at any price tier; books data for those markets
+// would need a different vendor (or in-house scraper). For now, championship
+// winners give us books-vs-Kalshi coverage on the most-traded non-game
+// markets per league.
 export const FUTURES_MARKETS = [
-  // NBA
   { league: "nba", event_type: "championship", sport_key: "basketball_nba_championship_winner" },
-  { league: "nba", event_type: "mvp",          sport_key: "basketball_nba_mvp" },
-  { league: "nba", event_type: "conference",   sport_key: "basketball_nba_eastern_conference_winner" },
-  { league: "nba", event_type: "conference",   sport_key: "basketball_nba_western_conference_winner" },
-  // MLB
   { league: "mlb", event_type: "championship", sport_key: "baseball_mlb_world_series_winner" },
-  { league: "mlb", event_type: "mvp",          sport_key: "baseball_mlb_al_mvp" },
-  { league: "mlb", event_type: "mvp",          sport_key: "baseball_mlb_nl_mvp" },
-  // NHL
   { league: "nhl", event_type: "championship", sport_key: "icehockey_nhl_championship_winner" },
-  // NFL
   { league: "nfl", event_type: "championship", sport_key: "americanfootball_nfl_super_bowl_winner" },
-  { league: "nfl", event_type: "mvp",          sport_key: "americanfootball_nfl_mvp" },
-  // Soccer leagues
-  { league: "epl", event_type: "championship", sport_key: "soccer_epl_winner" },
-  { league: "ucl", event_type: "championship", sport_key: "soccer_uefa_champs_league_winner" },
+  { league: "ucl", event_type: "championship", sport_key: "soccer_uefa_champs_league" },
   { league: "wc",  event_type: "championship", sport_key: "soccer_fifa_world_cup_winner" },
 ];
 
