@@ -73,11 +73,15 @@ export default async function handler(req, res) {
 
     const marketIds = markets.map((m) => m.id);
 
-    // Use pagination helper to bypass the 1000-row cap on view queries.
+    // Read from precomputed _latest tables maintained by triggers — single
+    // small indexed lookup per view. Replaces the slow DISTINCT ON view
+    // scans that were timing out at the Supabase pooler statement_timeout.
+    // These tables stay in sync via AFTER INSERT triggers on the underlying
+    // quote tables.
     const [kalshiRows, dgRows, bookRows] = await Promise.all([
-      fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
-      fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
-      fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_kalshi_latest").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_dg_latest").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_book_latest").select("market_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), marketIds),
     ]);
 
     const kalshiByMarket = new Map(kalshiRows.map((r) => [r.market_id, r]));
