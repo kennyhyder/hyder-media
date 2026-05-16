@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { fetchTournaments } from "@/lib/golf-data";
+import { fetchTournaments, fetchArchivedTournaments } from "@/lib/golf-data";
 import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { tournamentUrl } from "@/lib/slug";
@@ -28,8 +28,11 @@ export default async function GolfYearIndexPage({ params }: { params: Promise<{ 
   const year = parseInt(yearStr, 10);
   if (!Number.isFinite(year) || year < 2024 || year > 2099) notFound();
 
-  const all = await fetchTournaments();
-  const tournaments = all.filter((t) => {
+  const [open, closed] = await Promise.all([fetchTournaments(), fetchArchivedTournaments(year)]);
+  const seen = new Set<string>();
+  const tournaments = [...closed, ...open].filter((t) => {
+    if (seen.has(t.id)) return false;
+    seen.add(t.id);
     if (t.season_year != null) return t.season_year === year;
     if (t.start_date) return new Date(t.start_date).getUTCFullYear() === year;
     return false;

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { fetchLeagues, fetchEventsByLeague, fetchTeams } from "@/lib/sports-data";
-import { fetchTournaments, fetchGolfers } from "@/lib/golf-data";
+import { fetchLeagues, fetchEventsByLeague, fetchArchivedEventsByLeague, fetchTeams } from "@/lib/sports-data";
+import { fetchTournaments, fetchArchivedTournaments, fetchGolfers } from "@/lib/golf-data";
 import { eventUrl, tournamentUrl, teamUrl, playerUrl, golfPlayerUrl, slugify } from "@/lib/slug";
 import { GLOSSARY } from "@/lib/glossary";
 
@@ -95,37 +95,73 @@ export default async function sitemap(): Promise<Sm> {
       );
     }
 
-    // Individual sports events
+    // Individual sports events — open (live + upcoming) + closed (archive)
+    const yearsSeen = new Map<string, Set<number>>(); // league -> Set<year> for year-index URLs
     for (const l of leagues) {
-      let events;
-      try { events = await fetchEventsByLeague(l.key); } catch { continue; }
-      for (const e of events) {
+      const seenIds = new Set<string>();
+      yearsSeen.set(l.key, new Set());
+      const [openEvents, closedEvents] = await Promise.all([
+        fetchEventsByLeague(l.key).catch(() => []),
+        fetchArchivedEventsByLeague(l.key).catch(() => []),
+      ]);
+      for (const e of [...openEvents, ...closedEvents]) {
+        if (seenIds.has(e.id)) continue;
+        seenIds.add(e.id);
         const year = e.season_year || (e.start_time ? new Date(e.start_time).getUTCFullYear() : now.getUTCFullYear());
+        yearsSeen.get(l.key)!.add(year);
         const slug = e.slug || slugify(e.title);
         if (!slug) continue;
         const startTime = e.start_time ? new Date(e.start_time) : null;
-        const upcoming = !startTime || startTime > now;
+        const isClosed = e.status === "closed";
+        const upcoming = !isClosed && (!startTime || startTime > now);
         urls.push({
           url: `${SITE_URL}${eventUrl(l.key, year, slug)}`,
           lastModified: now,
-          changeFrequency: upcoming ? "hourly" : "weekly",
-          priority: upcoming ? 0.7 : 0.4,
+          changeFrequency: upcoming ? "hourly" : (isClosed ? "yearly" : "weekly"),
+          priority: upcoming ? 0.7 : (isClosed ? 0.45 : 0.4),
         });
       }
     }
 
-    // Golf tournaments
-    for (const t of tournaments) {
+    // Year-index pages per (league, year)
+    for (const [leagueKey, years] of yearsSeen.entries()) {
+      for (const year of years) {
+        urls.push({
+          url: `${SITE_URL}/sports/${leagueKey}/${year}`,
+          lastModified: now,
+          changeFrequency: "weekly",
+          priority: 0.5,
+        });
+      }
+    }
+
+    // Golf tournaments — open + archived
+    const archivedTournaments = await fetchArchivedTournaments().catch(() => []);
+    const golfYearsSeen = new Set<number>();
+    const seenT = new Set<string>();
+    for (const t of [...tournaments, ...archivedTournaments]) {
+      if (seenT.has(t.id)) continue;
+      seenT.add(t.id);
       const year = t.season_year || (t.start_date ? new Date(t.start_date).getUTCFullYear() : now.getUTCFullYear());
+      golfYearsSeen.add(year);
       const slug = t.slug || slugify(t.name);
       const url = slug ? `${SITE_URL}${tournamentUrl(year, slug)}` : `${SITE_URL}/golf/tournament?id=${t.id}`;
       const start = t.start_date ? new Date(t.start_date) : null;
-      const upcoming = !start || start > now;
+      const isClosed = t.status === "closed";
+      const upcoming = !isClosed && (!start || start > now);
       urls.push({
         url,
         lastModified: now,
-        changeFrequency: upcoming ? "hourly" : "monthly",
-        priority: upcoming ? 0.8 : 0.5,
+        changeFrequency: upcoming ? "hourly" : (isClosed ? "yearly" : "monthly"),
+        priority: upcoming ? 0.8 : (isClosed ? 0.55 : 0.5),
+      });
+    }
+    for (const year of golfYearsSeen) {
+      urls.push({
+        url: `${SITE_URL}/golf/${year}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
       });
     }
 

@@ -13,6 +13,7 @@
     { "path": "/api/sports/cron-detect-movements",  "schedule": "*/5 * * * *" },
     { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" },
     { "path": "/api/sports/cron-archive-events",    "schedule": "0 * * * *" },
+    { "path": "/api/golfodds/cron-archive-tournaments", "schedule": "0 * * * *" },
     { "path": "/api/data/sync-huggingface",         "schedule": "0 7 * * *" },
     { "path": "/api/seo/cron-indexnow-sweep",       "schedule": "0 3 * * 0" },
     { "path": "/api/seo/cron-health-check",         "schedule": "0 12 * * *" },

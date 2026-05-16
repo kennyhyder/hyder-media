@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { fetchLeagues, fetchEventsByLeague } from "@/lib/sports-data";
+import { fetchLeagues, fetchEventsByLeague, fetchArchivedEventsByLeague } from "@/lib/sports-data";
 import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { eventUrl } from "@/lib/slug";
@@ -31,12 +31,19 @@ export default async function LeagueYearIndexPage({ params }: { params: Promise<
   const year = parseInt(yearStr, 10);
   if (!Number.isFinite(year) || year < 2024 || year > 2099) notFound();
 
-  const [leagues, allEvents] = await Promise.all([fetchLeagues(), fetchEventsByLeague(league)]);
+  const [leagues, openEvents, closedEvents] = await Promise.all([
+    fetchLeagues(),
+    fetchEventsByLeague(league),
+    fetchArchivedEventsByLeague(league, year),
+  ]);
   const meta = leagues.find((l) => l.key === league);
   if (!meta) notFound();
 
-  // Filter to events in this year (by season_year or start_time year)
-  const events = allEvents.filter((e) => {
+  // Merge open + closed; dedupe by id; filter to this year
+  const seen = new Set<string>();
+  const events = [...closedEvents, ...openEvents].filter((e) => {
+    if (seen.has(e.id)) return false;
+    seen.add(e.id);
     if (e.season_year != null) return e.season_year === year;
     if (e.start_time) return new Date(e.start_time).getUTCFullYear() === year;
     return false;
@@ -107,14 +114,19 @@ export default async function LeagueYearIndexPage({ params }: { params: Promise<
                       const slug = e.slug || "event";
                       const href = eventUrl(league, year, slug);
                       const dateStr = e.start_time ? new Date(e.start_time).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+                      const isClosed = e.status === "closed";
                       return (
                         <li key={e.id}>
                           <Link
                             href={href}
-                            className="block rounded border border-border/60 bg-card/40 hover:border-emerald-500/40 px-3 py-2 transition-colors"
+                            className={`block rounded border px-3 py-2 transition-colors ${isClosed ? "border-border/40 bg-card/20 hover:border-muted-foreground/40" : "border-border/60 bg-card/40 hover:border-emerald-500/40"}`}
+                            aria-label={isClosed ? `${e.title} — final result` : `${e.title} — live odds`}
                           >
-                            <div className="font-medium text-sm">{e.title}</div>
-                            {dateStr && <div className="text-xs text-muted-foreground mt-0.5">{dateStr} · {e.status}</div>}
+                            <div className="flex items-center gap-2 font-medium text-sm">
+                              <span>{e.title}</span>
+                              {isClosed && <span className="text-[10px] uppercase tracking-wider rounded bg-muted-foreground/15 text-muted-foreground px-1.5 py-0.5" aria-hidden="true">Final</span>}
+                            </div>
+                            {dateStr && <div className="text-xs text-muted-foreground mt-0.5">{dateStr}{isClosed ? " · settled" : ` · ${e.status}`}</div>}
                           </Link>
                         </li>
                       );

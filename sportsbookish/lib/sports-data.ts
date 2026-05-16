@@ -73,6 +73,9 @@ export interface EventSlugRow {
   slug: string;
   start_time: string | null;
   event_type: string;
+  status?: string;
+  kalshi_event_ticker?: string | null;
+  closed_at?: string | null;
 }
 
 export async function fetchEventBySlug(league: string, year: number, slug: string): Promise<EventSlugRow | null> {
@@ -228,4 +231,49 @@ export async function fetchEventDetail(eventId: string): Promise<EventDetail | n
   const r = await fetch(`${DATA_HOST}/api/sports/event?id=${eventId}`, { next: { revalidate: 15 } });
   if (!r.ok) return null;
   return r.json();
+}
+
+// Archive listing — for sitemap, year-index, and pSEO coverage.
+// Cached longer than live data (snapshots don't change).
+export async function fetchArchivedEventsByLeague(league: string, year?: number): Promise<SportsEvent[]> {
+  const yq = year != null ? `&year=${year}` : "";
+  const r = await fetch(`${DATA_HOST}/api/sports/archived-events?league=${encodeURIComponent(league)}${yq}`, { next: { revalidate: 600 } });
+  if (!r.ok) return [];
+  const data = await r.json();
+  return data.events || [];
+}
+
+// Per-side row inside the snapshot. Mirrors what cron-archive-events writes.
+export interface ArchiveMarketSnap {
+  market_id: string;
+  contestant_label: string;
+  market_type: string;
+  kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string | null } | null;
+  books: { count: number; median: number | null; per_book: { book: string; american: number | null; novig: number | null }[] };
+}
+
+export interface ArchiveSnapshot {
+  title: string;
+  event_type: string;
+  start_time: string | null;
+  kalshi_event_ticker: string | null;
+  markets: ArchiveMarketSnap[];
+}
+
+export interface EventArchiveResult {
+  event: SportsEvent | null;
+  archive: { closed_at: string; final_snapshot: ArchiveSnapshot } | null;
+}
+
+export async function fetchEventArchive(league: string, year: number, slug: string): Promise<EventArchiveResult> {
+  try {
+    const r = await fetch(
+      `${DATA_HOST}/api/sports/event-archive?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!r.ok) return { event: null, archive: null };
+    return r.json();
+  } catch {
+    return { event: null, archive: null };
+  }
 }

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import TournamentView from "@/components/golf/TournamentView";
-import { fetchTournamentBySlug } from "@/lib/golf-data";
+import ClosedTournamentView from "@/components/golf/ClosedTournamentView";
+import { fetchTournamentBySlug, fetchTournamentArchive } from "@/lib/golf-data";
 import { tournamentUrl } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
@@ -23,9 +24,27 @@ export async function generateMetadata({ params, searchParams }: {
 
   const url = tournamentUrl(year, slug);
   const marketLabel = mt === "win" ? "outright winner" : mt;
-  // Layout template appends " | SportsBookISH" automatically — don't duplicate
-  const title = `${t.name} ${year} odds — Kalshi vs Polymarket vs sportsbooks`;
-  const description = `Live ${marketLabel} odds for the ${t.name} ${year}. Compare every player's Kalshi price against DraftKings, FanDuel, BetMGM and 11+ more sportsbooks plus the DataGolf model. Updated every 5 minutes.`;
+  let title: string;
+  let description: string;
+
+  if (t.status === "closed") {
+    const arch = await fetchTournamentArchive(year, slug);
+    const winRows = (arch.archive?.final_snapshot?.rows || [])
+      .filter((r) => r.market_type === "win" && r.kalshi?.implied_prob != null)
+      .sort((a, b) => (b.kalshi!.implied_prob! - a.kalshi!.implied_prob!));
+    const top = winRows[0];
+    const topName = top?.player?.name;
+    const topPct = top?.kalshi?.implied_prob != null ? `${(top.kalshi.implied_prob * 100).toFixed(0)}%` : null;
+    title = topName && topPct
+      ? `${t.name} ${year} final odds — Kalshi closed ${topName} at ${topPct}`
+      : `${t.name} ${year} — final Kalshi & sportsbook odds`;
+    description = topName
+      ? `Final Kalshi outright winner odds for the ${t.name} (${year}). Kalshi closed with ${topName} as the favorite${topPct ? ` at ${topPct}` : ""}. Includes DataGolf model and book consensus across 11+ sportsbooks.`
+      : `Archived Kalshi, DataGolf, and sportsbook odds for the ${t.name} (${year}).`;
+  } else {
+    title = `${t.name} ${year} odds — Kalshi vs Polymarket vs sportsbooks`;
+    description = `Live ${marketLabel} odds for the ${t.name} ${year}. Compare every player's Kalshi price against DraftKings, FanDuel, BetMGM and 11+ more sportsbooks plus the DataGolf model. Updated every 5 minutes.`;
+  }
 
   return {
     title,
@@ -50,6 +69,18 @@ export default async function GolfTournamentBySlugPage({
 
   const t = await fetchTournamentBySlug(year, slug);
   if (!t) notFound();
+
+  if (t.status === "closed") {
+    const { archive } = await fetchTournamentArchive(year, slug);
+    return (
+      <ClosedTournamentView
+        tournament={t}
+        year={year}
+        archive={archive}
+        canonicalPath={tournamentUrl(year, slug)}
+      />
+    );
+  }
 
   return (
     <TournamentView

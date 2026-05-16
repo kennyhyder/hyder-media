@@ -18,6 +18,7 @@ export interface TournamentSlugRow {
   slug: string;
   start_date: string | null;
   is_major: boolean;
+  status?: string;
 }
 
 // Golfer hub data + sitemap support
@@ -125,6 +126,51 @@ export async function fetchTournaments(): Promise<Tournament[]> {
     return data.tournaments || [];
   } catch {
     return [];
+  }
+}
+
+export async function fetchArchivedTournaments(year?: number): Promise<Tournament[]> {
+  try {
+    const yq = year != null ? `?year=${year}` : "";
+    const r = await fetch(`${DATA_HOST}/api/golfodds/archived-tournaments${yq}`, { next: { revalidate: 600 } });
+    if (!r.ok) return [];
+    const data = await r.json();
+    return data.tournaments || [];
+  } catch {
+    return [];
+  }
+}
+
+export interface ArchivedPlayerRow {
+  market_id: string;
+  market_type: string;
+  player: { id: string | null; name: string | null; dg_id: number | null };
+  kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string | null } | null;
+  datagolf: { dg_prob: number | null; dg_fit_prob: number | null; fetched_at: string | null } | null;
+  books: { count: number; median: number | null; per_book: { book: string; american: number | null; novig: number | null }[] };
+}
+
+export interface TournamentArchiveSnapshot {
+  tournament: Tournament;
+  rows: ArchivedPlayerRow[];
+  counts: { players: number; markets: number; with_kalshi: number; with_books: number; with_dg: number };
+}
+
+export interface TournamentArchiveResult {
+  tournament: Tournament | null;
+  archive: { closed_at: string; final_snapshot: TournamentArchiveSnapshot } | null;
+}
+
+export async function fetchTournamentArchive(year: number, slug: string): Promise<TournamentArchiveResult> {
+  try {
+    const r = await fetch(
+      `${DATA_HOST}/api/golfodds/tournament-archive?year=${year}&slug=${encodeURIComponent(slug)}`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!r.ok) return { tournament: null, archive: null };
+    return r.json();
+  } catch {
+    return { tournament: null, archive: null };
   }
 }
 
