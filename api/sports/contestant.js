@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     if (markets && markets.length > 0) {
       const ids = markets.map((m) => m.id);
       const { data: quotes } = await supabase
-        .from("sports_v_latest_quotes")
+        .from("sports_quotes_latest")
         .select("market_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at")
         .in("market_id", ids);
       const qByMarket = new Map((quotes || []).map((q) => [q.market_id, q]));

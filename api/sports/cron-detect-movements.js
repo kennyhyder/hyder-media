@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   const latestRows = [];
   for (let i = 0; i < marketIds.length; i += 100) {
     const { data } = await supabase
-      .from("sports_v_latest_quotes")
+      .from("sports_quotes_latest")
       .select("market_id, implied_prob, fetched_at")
       .in("market_id", marketIds.slice(i, i + 100));
     if (data) latestRows.push(...data);

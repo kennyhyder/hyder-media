@@ -47,11 +47,11 @@ async function detectForTournament(supabase, tournament) {
 
   // Pull latest quotes
   const kalshiRows = await chunked(marketIds, 100, async (chunk) => {
-    const { data } = await supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob, fetched_at").in("market_id", chunk).range(0, 9999);
+    const { data } = await supabase.from("golfodds_kalshi_latest").select("market_id, implied_prob, fetched_at").in("market_id", chunk).range(0, 9999);
     return data || [];
   });
   const bookRows = await chunked(marketIds, 100, async (chunk) => {
-    const { data } = await supabase.from("golfodds_v_latest_books").select("market_id, novig_prob, book").in("market_id", chunk).range(0, 9999);
+    const { data } = await supabase.from("golfodds_book_latest").select("market_id, novig_prob, book").in("market_id", chunk).range(0, 9999);
     return data || [];
   });
 

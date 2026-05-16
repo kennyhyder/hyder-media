@@ -51,7 +51,7 @@ export default async function handler(req, res) {
           .eq("market_type", "win");
         const ids = (markets || []).map((m) => m.id);
         const { data: k } = await supabase
-          .from("golfodds_v_latest_kalshi")
+          .from("golfodds_kalshi_latest")
           .select("market_id, implied_prob")
           .in("market_id", ids);
         const kBy = new Map((k || []).map((x) => [x.market_id, x.implied_prob]));
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
         const ids = (markets || []).map((m) => m.id);
         if (!ids.length) continue;
         const { data: q } = await supabase
-          .from("sports_v_latest_quotes")
+          .from("sports_quotes_latest")
           .select("market_id, implied_prob")
           .in("market_id", ids);
         const qBy = new Map((q || []).map((x) => [x.market_id, x.implied_prob]));

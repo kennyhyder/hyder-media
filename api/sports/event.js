@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     if (marketsWithQuotes.length > 0) {
       const ids = marketsWithQuotes.map((m) => m.id);
       const { data: kalshiQuotes } = await supabase
-        .from("sports_v_latest_quotes")
+        .from("sports_quotes_latest")
         .select("market_id, yes_bid, yes_ask, last_price, implied_prob, fetched_at")
         .in("market_id", ids);
 

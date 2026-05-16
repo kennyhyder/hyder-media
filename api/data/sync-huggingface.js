@@ -53,7 +53,7 @@ async function buildCsv(supabase) {
         .eq("market_type", "win");
       const ids = (markets || []).map((m) => m.id);
       const { data: k } = ids.length
-        ? await supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob").in("market_id", ids)
+        ? await supabase.from("golfodds_kalshi_latest").select("market_id, implied_prob").in("market_id", ids)
         : { data: [] };
       const kBy = new Map((k || []).map((x) => [x.market_id, x.implied_prob]));
       for (const m of markets || []) {
@@ -89,7 +89,7 @@ async function buildCsv(supabase) {
         const ids = (markets || []).map((m) => m.id);
         if (!ids.length) continue;
         const { data: q } = await supabase
-          .from("sports_v_latest_quotes")
+          .from("sports_quotes_latest")
           .select("market_id, implied_prob")
           .in("market_id", ids);
         const qBy = new Map((q || []).map((x) => [x.market_id, x.implied_prob]));

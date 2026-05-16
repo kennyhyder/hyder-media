@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   let kalshiByMarket = new Map();
   if (marketIds.length) {
     const { data: kalshi } = await supabase
-      .from("sports_v_latest_quotes")
+      .from("sports_quotes_latest")
       .select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at")
       .in("market_id", marketIds);
     kalshiByMarket = new Map((kalshi || []).map((k) => [k.market_id, k]));

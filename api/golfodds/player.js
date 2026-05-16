@@ -69,9 +69,9 @@ export default async function handler(req, res) {
     let kalshiRows = [], dgRows = [], bookRows = [];
     if (marketIds.length) {
       [kalshiRows, dgRows, bookRows] = await Promise.all([
-        fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
-        fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
-        fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, book, price_american, implied_prob, novig_prob, fetched_at"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_kalshi_latest").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_dg_latest").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_book_latest").select("market_id, book, price_american, implied_prob, novig_prob, fetched_at"), marketIds),
       ]);
     }
     const kalshiByMarket = new Map(kalshiRows.map((r) => [r.market_id, r]));

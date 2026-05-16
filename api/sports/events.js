@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const marketIds = (markets || []).map((m) => m.id);
     const { data: kalshiQuotes } = marketIds.length
       ? await supabase
-          .from("sports_v_latest_quotes")
+          .from("sports_quotes_latest")
           .select("market_id, implied_prob, yes_bid, yes_ask")
           .in("market_id", marketIds)
       : { data: [] };

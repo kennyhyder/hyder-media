@@ -63,9 +63,9 @@ export default async function handler(req, res) {
 
     if (marketIds.length) {
       const [kalshiRows, dgRows, bookRows] = await Promise.all([
-        fetchAllIn(() => supabase.from("golfodds_v_latest_kalshi").select("market_id"), marketIds),
-        fetchAllIn(() => supabase.from("golfodds_v_latest_dg").select("market_id"), marketIds),
-        fetchAllIn(() => supabase.from("golfodds_v_latest_books").select("market_id, book"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_kalshi_latest").select("market_id"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_dg_latest").select("market_id"), marketIds),
+        fetchAllIn(() => supabase.from("golfodds_book_latest").select("market_id, book"), marketIds),
       ]);
       kalshiCount = kalshiRows.length;
       dgCount = dgRows.length;

@@ -40,7 +40,7 @@ async function snapshotEvent(supabase, evt) {
   if (!marketIds.length) return null;
 
   const { data: kalshi } = await supabase
-    .from("sports_v_latest_quotes")
+    .from("sports_quotes_latest")
     .select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at")
     .in("market_id", marketIds);
   const kBy = new Map((kalshi || []).map((k) => [k.market_id, k]));

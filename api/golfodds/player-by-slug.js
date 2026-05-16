@@ -54,19 +54,19 @@ export default async function handler(req, res) {
 
   // Latest Kalshi quotes (use the view)
   const { data: kalshi } = await supabase
-    .from("golfodds_v_latest_kalshi")
+    .from("golfodds_kalshi_latest")
     .select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at")
     .in("market_id", marketIds);
   const kByMarket = new Map((kalshi || []).map((k) => [k.market_id, k]));
 
   const { data: dg } = await supabase
-    .from("golfodds_v_latest_dg")
+    .from("golfodds_dg_latest")
     .select("market_id, dg_prob, dg_fit_prob, fetched_at")
     .in("market_id", marketIds);
   const dgByMarket = new Map((dg || []).map((d) => [d.market_id, d]));
 
   const { data: books } = await supabase
-    .from("golfodds_v_latest_books")
+    .from("golfodds_book_latest")
     .select("market_id, book, price_american, novig_prob");
   const booksByMarket = new Map();
   for (const b of books || []) {
