@@ -81,8 +81,11 @@ export default async function handler(req, res) {
   }
 
   const liveStreams = out.filter((s) => s.category === "live");
-  const overall = liveStreams.every((s) => s.status === "fresh") ? "healthy"
-                : liveStreams.some((s) => s.status === "error" || s.status === "empty") ? "error"
+  // 'empty' is informational (ingester configured + running but source has
+  // no data right now — e.g. DG only offers matchups during certain rounds).
+  // Only true 'error' or 'stale' impacts overall_status.
+  const overall = liveStreams.every((s) => s.status === "fresh" || s.status === "empty") ? "healthy"
+                : liveStreams.some((s) => s.status === "error") ? "error"
                 : "degraded";
   return res.status(200).json({
     checked_at: new Date().toISOString(),
