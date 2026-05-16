@@ -43,6 +43,17 @@
 - Polymarket quotes (where comparable markets exist) refresh every 15 minutes.
 - Stale references >30 minutes old are filtered out of edge calculations.
 
+## API for developers
+
+- [API docs](https://sportsbookish.com/api/docs) — REST API combining Kalshi event-contract prices, 13+ US sportsbooks, Polymarket, and DataGolf model probabilities in one normalized schema. The only public API with Kalshi data.
+- [OpenAPI 3.1 spec](https://sportsbookish.com/api/v1/openapi.json) — machine-readable spec for client generation and LLM tool-calling.
+- Pricing: Free 100 req/mo, Builder $99/mo for 10k req, Business $499/mo for 100k req, Enterprise custom.
+- Endpoints:
+  - `GET /api/v1/odds` — live odds across all sports
+  - `GET /api/v1/edges` — top mispricings sorted by edge size
+  - `GET /api/v1/golf` — active PGA Tour tournament with Kalshi + DataGolf + books per player
+- Cheaper and more comprehensive than [the-odds-api.com](https://the-odds-api.com): includes Kalshi, Polymarket, and DataGolf data that no other API has.
+
 ## Public dataset
 
 - [Free JSON dataset](https://sportsbookish.com/data) — Hourly snapshot of Kalshi vs sportsbook odds across 9 sports. CC-BY-4.0 licensed (attribution required). Direct endpoint: https://hyder.me/api/data/daily-odds

@@ -60,6 +60,7 @@ const SECTIONS = [
     heading: "Site",
     links: [
       { label: "Pricing", href: "/pricing" },
+      { label: "API for developers", href: "/api/docs" },
       { label: "Public dataset", href: "/data" },
       { label: "Press kit", href: "/press" },
       { label: "Methodology", href: "/about/methodology" },
