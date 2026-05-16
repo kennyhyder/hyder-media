@@ -5,17 +5,17 @@ function getSupabase() {
 }
 
 // Supabase REST caps at 1000 rows per query AND has a URL-length ceiling that
-// caps `.in()` lists at ~100-200 IDs. Chunk the IDs and run chunks IN PARALLEL
-// (previously sequential, which was the dominant latency contributor — for
-// 172 markets, 2 sequential chunks × 3 views = 6 sequential RTTs ≈ 6s warm).
-// With parallel chunks: max(chunk1, chunk2) ≈ 1 RTT ≈ 500ms.
-async function fetchAllIn(query, marketIds, idChunkSize = 100, rowPageSize = 1000) {
+// caps `.in()` lists at ~100-200 IDs. Chunks run SEQUENTIALLY within each view
+// (parallel chunks were overwhelming the Supabase pooler and triggering
+// statement-timeout errors under concurrent load). The 3 views are still
+// parallelized via Promise.all outside this helper — that gives the right
+// concurrency: 3 simultaneous queries to Supabase per request, not 6+.
+// Bumped idChunkSize to 200 to reduce the number of round-trips per view.
+async function fetchAllIn(query, marketIds, idChunkSize = 200, rowPageSize = 1000) {
   if (!marketIds.length) return [];
-  const chunks = [];
-  for (let i = 0; i < marketIds.length; i += idChunkSize) chunks.push(marketIds.slice(i, i + idChunkSize));
-
-  const results = await Promise.all(chunks.map(async (chunk) => {
-    const out = [];
+  const out = [];
+  for (let i = 0; i < marketIds.length; i += idChunkSize) {
+    const chunk = marketIds.slice(i, i + idChunkSize);
     let page = 0;
     while (true) {
       const start = page * rowPageSize;
@@ -26,10 +26,8 @@ async function fetchAllIn(query, marketIds, idChunkSize = 100, rowPageSize = 100
       if (data.length < rowPageSize) break;
       page++;
     }
-    return out;
-  }));
-
-  return results.flat();
+  }
+  return out;
 }
 
 function median(values) {

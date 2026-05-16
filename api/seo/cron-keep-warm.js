@@ -75,8 +75,13 @@ export default async function handler(req, res) {
   urls.push(`${SITE_HOST}/api/golfodds/tournaments`);
   urls.push(`${SITE_HOST}/api/sports/leagues`);
 
-  // Fire all in parallel — we don't care about responses, just that CDN gets refreshed
-  const results = await Promise.all(urls.map(warm));
+  // Sequential warming — spreads load across the minute so Supabase pooler
+  // never sees 28 simultaneous queries. We have ~55 seconds before the next
+  // cron tick; 28 URLs × ~1.5s warm = ~42s, leaves plenty of headroom.
+  const results = [];
+  for (const url of urls) {
+    results.push(await warm(url));
+  }
 
   const ok = results.filter((r) => r.status === 200).length;
   const failed = results.filter((r) => r.error || r.status !== 200);
