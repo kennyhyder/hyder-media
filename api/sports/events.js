@@ -66,15 +66,23 @@ export default async function handler(req, res) {
       if (freshBook(p)) polyByEventContestant.set(`${p.sports_event_id}|${p.contestant_norm}`, p);
     }
 
+    // Chunk the kalshi-quotes lookup — a single .in() with 969 UUIDs
+    // produces a ~36KB URL that Supabase's gateway rejects with HTTP 400,
+    // silently returning no rows and leaving every market with
+    // implied_prob=null. 150 IDs per batch keeps each URL under ~6KB.
     const marketIds = (markets || []).map((m) => m.id);
-    const { data: kalshiQuotes } = marketIds.length
-      ? await supabase
-          .from("sports_quotes_latest")
-          .select("market_id, implied_prob, yes_bid, yes_ask")
-          .in("market_id", marketIds)
-      : { data: [] };
+    const kalshiQuotes = [];
+    const CHUNK = 150;
+    for (let i = 0; i < marketIds.length; i += CHUNK) {
+      const slice = marketIds.slice(i, i + CHUNK);
+      const { data } = await supabase
+        .from("sports_quotes_latest")
+        .select("market_id, implied_prob, yes_bid, yes_ask")
+        .in("market_id", slice);
+      if (data) kalshiQuotes.push(...data);
+    }
 
-    const qByMarket = new Map((kalshiQuotes || []).map((q) => [q.market_id, q]));
+    const qByMarket = new Map(kalshiQuotes.map((q) => [q.market_id, q]));
     // Group book quotes by (event_id, contestant_norm) — age-filtered
     const booksByEventContestant = new Map();
     for (const b of bookQuotes || []) {
