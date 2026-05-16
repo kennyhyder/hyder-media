@@ -5,12 +5,17 @@ function getSupabase() {
 }
 
 // Supabase REST caps at 1000 rows per query AND has a URL-length ceiling that
-// caps `.in()` lists at ~100-200 IDs. Chunk the IDs into small batches, then
-// paginate within each batch to bypass the row cap.
+// caps `.in()` lists at ~100-200 IDs. Chunk the IDs and run chunks IN PARALLEL
+// (previously sequential, which was the dominant latency contributor — for
+// 172 markets, 2 sequential chunks × 3 views = 6 sequential RTTs ≈ 6s warm).
+// With parallel chunks: max(chunk1, chunk2) ≈ 1 RTT ≈ 500ms.
 async function fetchAllIn(query, marketIds, idChunkSize = 100, rowPageSize = 1000) {
-  const out = [];
-  for (let i = 0; i < marketIds.length; i += idChunkSize) {
-    const chunk = marketIds.slice(i, i + idChunkSize);
+  if (!marketIds.length) return [];
+  const chunks = [];
+  for (let i = 0; i < marketIds.length; i += idChunkSize) chunks.push(marketIds.slice(i, i + idChunkSize));
+
+  const results = await Promise.all(chunks.map(async (chunk) => {
+    const out = [];
     let page = 0;
     while (true) {
       const start = page * rowPageSize;
@@ -21,8 +26,10 @@ async function fetchAllIn(query, marketIds, idChunkSize = 100, rowPageSize = 100
       if (data.length < rowPageSize) break;
       page++;
     }
-  }
-  return out;
+    return out;
+  }));
+
+  return results.flat();
 }
 
 function median(values) {
@@ -41,6 +48,12 @@ function median(values) {
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  // Edge cache for 30s + serve stale for 2 min while revalidating in the
+  // background. With this, repeat visitors get sub-100ms responses from
+  // Vercel's CDN; only cache-miss requests pay the upstream Supabase cost.
+  // Data refreshes at most every 30s for users — which is more than enough
+  // since the live Kalshi cron only runs every 5 min anyway.
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 

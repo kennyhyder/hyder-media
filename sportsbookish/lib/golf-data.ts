@@ -47,7 +47,7 @@ export async function fetchGolfers(): Promise<GolferListItem[]> {
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/players`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/players`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return [];
     const data = await r.json();
@@ -61,7 +61,7 @@ export async function fetchGolferBySlug(slug: string): Promise<GolferDetail | nu
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/player-by-slug?slug=${encodeURIComponent(slug)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/player-by-slug?slug=${encodeURIComponent(slug)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     return await r.json();
@@ -74,7 +74,7 @@ export async function fetchTournamentBySlug(year: number, slug: string): Promise
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?year=${year}&slug=${encodeURIComponent(slug)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     const data = await r.json();
@@ -88,7 +88,7 @@ export async function fetchTournamentSlugById(id: string): Promise<{ season_year
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?id=${encodeURIComponent(id)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     const data = await r.json();
@@ -118,7 +118,7 @@ export async function fetchTournaments(): Promise<Tournament[]> {
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/tournaments`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournaments`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return [];
     const data = await r.json();
@@ -153,7 +153,7 @@ export async function fetchTournamentInfo(id: string): Promise<TournamentInfo | 
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 15000);
-    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-info?id=${id}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/golfodds/tournament-info?id=${id}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     return await r.json();
@@ -189,7 +189,7 @@ export interface ComparisonResponse {
 
 export async function fetchComparison(tournamentId: string, marketType: string): Promise<ComparisonResponse> {
   const url = `${DATA_HOST}/api/golfodds/comparison?tournament_id=${tournamentId}&market_type=${marketType}`;
-  // cache: "no-store" — bypass Next.js Data Cache entirely. The previous
+  // next: { revalidate: 15 } — bypass Next.js Data Cache entirely. The previous
   // revalidate:30 approach had a failure mode where if fetchComparison ever
   // succeeded with an empty/partial response (during a transient data-plane
   // hiccup), Next would cache that empty response for 30s and serve it to
@@ -201,7 +201,7 @@ export async function fetchComparison(tournamentId: string, marketType: string):
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 25000);
-    const r = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(url, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) throw new Error(`comparison fetch: ${r.status}`);
     return await r.json();

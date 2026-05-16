@@ -15,7 +15,7 @@ export interface League {
 }
 
 export async function fetchLeagues(): Promise<League[]> {
-  const r = await fetch(`${DATA_HOST}/api/sports/leagues`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/sports/leagues`, { next: { revalidate: 15 } });
   if (!r.ok) return [];
   const data = await r.json();
   return data.leagues || [];
@@ -79,7 +79,7 @@ export async function fetchEventBySlug(league: string, year: number, slug: strin
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?league=${encodeURIComponent(league)}&year=${year}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     const data = await r.json();
@@ -121,7 +121,7 @@ export async function fetchTeams(league?: string, kind?: "team" | "player"): Pro
     if (league) params.set("league", league);
     if (kind) params.set("kind", kind);
     const url = `${DATA_HOST}/api/sports/teams${params.toString() ? "?" + params.toString() : ""}`;
-    const r = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(url, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return [];
     const data = await r.json();
@@ -135,7 +135,7 @@ export async function fetchTeamBySlug(league: string, slug: string): Promise<Tea
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(`${DATA_HOST}/api/sports/team-by-slug?league=${encodeURIComponent(league)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/sports/team-by-slug?league=${encodeURIComponent(league)}&slug=${encodeURIComponent(slug)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     return await r.json();
@@ -148,7 +148,7 @@ export async function fetchEventSlugById(id: string): Promise<{ league: string; 
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 5000);
-    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?id=${encodeURIComponent(id)}`, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(`${DATA_HOST}/api/sports/event-by-slug?id=${encodeURIComponent(id)}`, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     const data = await r.json();
@@ -160,14 +160,14 @@ export async function fetchEventSlugById(id: string): Promise<{ league: string; 
 }
 
 export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]> {
-  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open`, { next: { revalidate: 15 } });
   if (!r.ok) return [];
   const data = await r.json();
   return data.events || [];
 }
 
 export async function fetchLeagueData(league: string): Promise<SportsLeagueData> {
-  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open&with=markets`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open&with=markets`, { next: { revalidate: 15 } });
   if (!r.ok) return { events: [], books: [] };
   const data = await r.json();
   return { events: data.events || [], books: data.books || [] };
@@ -225,7 +225,7 @@ export interface EventDetail {
 }
 
 export async function fetchEventDetail(eventId: string): Promise<EventDetail | null> {
-  const r = await fetch(`${DATA_HOST}/api/sports/event?id=${eventId}`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/sports/event?id=${eventId}`, { next: { revalidate: 15 } });
   if (!r.ok) return null;
   return r.json();
 }

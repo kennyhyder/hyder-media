@@ -6,6 +6,7 @@ function getSupabase() {
 
 // GET /api/sports/leagues — list of active leagues for the UI
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });

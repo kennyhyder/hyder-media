@@ -12,6 +12,7 @@ function getSupabase() {
 }
 
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from("golfodds_players")

@@ -13,6 +13,7 @@ function getSupabase() {
 }
 
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   const { league, kind } = req.query;
   const supabase = getSupabase();
 

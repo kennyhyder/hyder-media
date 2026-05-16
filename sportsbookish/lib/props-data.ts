@@ -20,7 +20,7 @@ export interface PropEvent {
 }
 
 export async function fetchProps(tournamentId: string): Promise<PropEvent[]> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/props?tournament_id=${tournamentId}`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/golfodds/props?tournament_id=${tournamentId}`, { next: { revalidate: 15 } });
   if (!r.ok) return [];
   const data = await r.json();
   return data.props || [];
@@ -41,7 +41,7 @@ export interface LadderRow {
 }
 
 export async function fetchLadder(tournamentId: string): Promise<LadderRow[]> {
-  const r = await fetch(`${DATA_HOST}/api/golfodds/ladder?tournament_id=${tournamentId}`, { cache: "no-store" });
+  const r = await fetch(`${DATA_HOST}/api/golfodds/ladder?tournament_id=${tournamentId}`, { next: { revalidate: 15 } });
   if (!r.ok) return [];
   const data = await r.json();
   return data.players || [];

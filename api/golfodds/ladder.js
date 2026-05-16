@@ -40,6 +40,7 @@ const TYPE_RANK = { win: 1, t5: 5, t10: 10, t20: 20, mc: 999 };
  * violation, plus the Win->T5/T10/T20 ratio drift.
  */
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();

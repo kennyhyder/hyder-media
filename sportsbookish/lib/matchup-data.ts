@@ -31,7 +31,7 @@ export async function fetchMatchups(tournamentId: string, type?: string): Promis
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 10000);
-    const r = await fetch(url.toString(), { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(url.toString(), { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return { matchups: [], books: [] };
     return await r.json();
@@ -76,7 +76,7 @@ export async function fetchPlayer(playerId: string, tournamentId: string): Promi
   try {
     const ctrl = new AbortController();
     const tid = setTimeout(() => ctrl.abort(), 10000);
-    const r = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+    const r = await fetch(url, { next: { revalidate: 15 }, signal: ctrl.signal });
     clearTimeout(tid);
     if (!r.ok) return null;
     return await r.json();

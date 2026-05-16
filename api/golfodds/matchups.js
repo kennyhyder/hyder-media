@@ -36,6 +36,7 @@ async function fetchAllIn(query, ids, idChunkSize = 100, rowPageSize = 1000) {
  * player legs with Kalshi quote, per-book quotes, and buy-edge vs book median.
  */
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
