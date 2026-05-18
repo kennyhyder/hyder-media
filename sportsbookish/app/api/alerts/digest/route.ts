@@ -47,13 +47,17 @@ async function sendEmail(to: string, subject: string, html: string) {
   return { ok: true };
 }
 
-function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[]): string {
+function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[], topMovers: FeedAlert[]): string {
   const dateStr = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
-  const renderRows = (alerts: FeedAlert[], buyMode: boolean) =>
+  const renderRows = (alerts: FeedAlert[], mode: "buy" | "sell" | "mover") =>
     alerts.map((a) => {
       const emoji = SPORT_EMOJI[a.league] || "🎯";
-      const pctDelta = `${a.delta >= 0 ? "+" : ""}${(a.delta * 100).toFixed(1)}%`;
-      const color = buyMode ? "#059669" : "#dc2626";
+      const sign = a.delta >= 0 ? "+" : "";
+      const pctDelta = `${sign}${(a.delta * 100).toFixed(1)}%`;
+      const color = mode === "buy" ? "#059669" : mode === "sell" ? "#dc2626" : (a.delta >= 0 ? "#059669" : "#dc2626");
+      const subline = mode === "mover"
+        ? `Kalshi ${(a.probability * 100).toFixed(1)}% (was ${(a.reference * 100).toFixed(1)}%)`
+        : `Kalshi ${(a.probability * 100).toFixed(1)}%`;
       return `<tr>
         <td style="padding: 12px 0; border-top: 1px solid #e5e5e5;">
           <a href="${SITE_URL}${a.link}" style="color: #111; text-decoration: none;">
@@ -63,7 +67,7 @@ function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[]): string {
         </td>
         <td style="padding: 12px 0; border-top: 1px solid #e5e5e5; text-align: right;">
           <div style="font-size: 18px; font-weight: 700; color: ${color};">${pctDelta}</div>
-          <div style="font-size: 11px; color: #999;">Kalshi ${(a.probability * 100).toFixed(1)}%</div>
+          <div style="font-size: 11px; color: #999;">${subline}</div>
         </td>
       </tr>`;
     }).join("");
@@ -78,13 +82,19 @@ function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[]): string {
   ${topBuys.length > 0 ? `
   <h2 style="font-size: 16px; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 0;">🟢 Top buys</h2>
   <p style="font-size: 12px; color: #666; margin: 4px 0 0;">Kalshi cheaper than book consensus — bet YES on Kalshi.</p>
-  <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${renderRows(topBuys, true)}</table>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${renderRows(topBuys, "buy")}</table>
   ` : ""}
 
   ${topSells.length > 0 ? `
   <h2 style="font-size: 16px; color: #dc2626; text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 0;">🔴 Most overpriced</h2>
   <p style="font-size: 12px; color: #666; margin: 4px 0 0;">Kalshi above book consensus — sell on Kalshi or bet at the books.</p>
-  <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${renderRows(topSells, false)}</table>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${renderRows(topSells, "sell")}</table>
+  ` : ""}
+
+  ${topMovers.length > 0 ? `
+  <h2 style="font-size: 16px; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 0;">📊 Biggest line moves (24h)</h2>
+  <p style="font-size: 12px; color: #666; margin: 4px 0 0;">Kalshi quotes that moved the most over the last day — different signal than edges (no book comparison needed).</p>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${renderRows(topMovers, "mover")}</table>
   ` : ""}
 
   <div style="margin-top: 32px; padding: 16px; background: #f5f5f5; border-radius: 8px; text-align: center; font-size: 13px; color: #555;">
@@ -184,7 +194,26 @@ export async function GET(req: Request) {
   const buys = topByDirection("buy", 2, 8);
   const sells = topByDirection("sell", 2, 8);
 
-  if (buys.length === 0 && sells.length === 0) {
+  // Top movers — biggest absolute Kalshi line moves regardless of buy/sell.
+  // Pulls from sports_alerts (alert_type='movement') since golf alerts are
+  // edge-based not movement-based. Excludes anything already in buys/sells
+  // to avoid the same row appearing twice.
+  const shownIds = new Set([...buys, ...sells].map((a) => a.id));
+  const movers = alerts
+    .filter((a) => a.source === "sports" && !shownIds.has(a.id))
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+  const moversStratified: FeedAlert[] = [];
+  const moversPerSport = new Map<string, number>();
+  for (const a of movers) {
+    const sport = a.sport || a.source;
+    const used = moversPerSport.get(sport) || 0;
+    if (used >= 2) continue;
+    moversStratified.push(a);
+    moversPerSport.set(sport, used + 1);
+    if (moversStratified.length >= 6) break;
+  }
+
+  if (buys.length === 0 && sells.length === 0 && moversStratified.length === 0) {
     return NextResponse.json({ ok: true, skipped: "no alerts today", date: today });
   }
 
@@ -216,7 +245,7 @@ export async function GET(req: Request) {
     page++;
   }
 
-  const html = digestHtml(buys, sells);
+  const html = digestHtml(buys, sells, moversStratified);
   const subject = `📊 Today's top sports edges — SportsBookISH`;
 
   // 3. Send + record. Insert dispatch record first (uniqueness prevents duplicates).
@@ -243,9 +272,12 @@ export async function GET(req: Request) {
     ok: true,
     duration_ms: Date.now() - startedAt,
     date: today,
-    alerts_pool: alerts.length,
+    alerts_pool_raw: rawAlerts.length,
+    alerts_pool_live: liveAlerts.length,
+    alerts_pool_deduped: alerts.length,
     top_buys: buys.length,
     top_sells: sells.length,
+    top_movers: moversStratified.length,
     eligible_users: allUsers.length,
     sent,
     failed,

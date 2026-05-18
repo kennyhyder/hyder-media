@@ -7,7 +7,7 @@ import { getSupabase, checkAuth } from "./_lib.js";
 //
 // Cron: every 5 min, scans all open events with recent quote activity.
 
-const MOVEMENT_THRESHOLD = 0.03;   // 3% move in 15 min
+const MOVEMENT_THRESHOLD = 0.02;   // 2% move in 15 min (lowered from 3% to surface more candidates)
 const LOOKBACK_MIN = 15;
 const DEDUP_MIN = 30;
 

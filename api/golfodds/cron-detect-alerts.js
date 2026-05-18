@@ -15,8 +15,8 @@ const MARKET_LABELS = {
 };
 
 // Thresholds. Positive edge = Kalshi is CHEAPER than book median → buy on Kalshi.
-const BUY_EDGE_THRESHOLD = 0.03;   // +3% buy edge
-const SELL_EDGE_THRESHOLD = -0.05; // -5% (Kalshi overpriced) sell edge
+const BUY_EDGE_THRESHOLD = 0.02;   // +2% buy edge (lowered from 3% to surface more candidates)
+const SELL_EDGE_THRESHOLD = -0.03; // -3% sell edge (lowered from -5% for symmetry)
 const MIN_BOOK_COUNT = 3;          // require ≥3 books quoting for reliability
 const DEDUP_WINDOW_MIN = 30;       // don't refire same alert within 30 min
 
