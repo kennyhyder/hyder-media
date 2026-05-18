@@ -31,7 +31,19 @@ export default function handler(req, res) {
     const authUrl = new URL('https://www.facebook.com/v22.0/dialog/oauth');
     authUrl.searchParams.set('client_id', appId);
     authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('scope', 'ads_read,business_management');
+    // Expanded scope set — Kenny enabled advanced access on the Hyder Ads Dashboard
+    // app, so we request: read + write + leads + pages. Meta will only grant what
+    // the user actually has approval for; missing ones silently drop.
+    authUrl.searchParams.set('scope', [
+        'ads_read',
+        'ads_management',
+        'business_management',
+        'leads_retrieval',
+        'pages_show_list',
+        'pages_manage_metadata',
+        'pages_manage_ads',
+        'pages_read_engagement',
+    ].join(','));
     authUrl.searchParams.set('state', state);
 
     res.redirect(302, authUrl.toString());
