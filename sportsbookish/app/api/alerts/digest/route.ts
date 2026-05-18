@@ -127,26 +127,50 @@ export async function GET(req: Request) {
   const { alerts: rawAlerts = [] }: { alerts?: FeedAlert[] } = await alertsRes.json();
 
   // 1a. Filter out alerts whose underlying tournament/event has already
-  // settled. Same player can fire many alerts intra-day as the line moves,
-  // and the PGA Championship ending Sunday afternoon would still appear in
-  // Monday's 4am digest without this filter.
+  // settled. Two layers because tournament metadata isn't always set:
+  //
+  //   Layer A — explicit status: parent_status='closed' or end_date/
+  //             start_time clearly in the past
+  //   Layer B — recent-activity proxy: if no NEW alerts have fired for
+  //             this golf tournament in the last 6h, the market is done
+  //             even if status still says 'open' or 'upcoming'
+  //             (DataGolf-created tournaments never get their dates set
+  //             until the Kalshi archive cron closes them, so the user's
+  //             PGA Championship ended-Sunday alerts kept flowing into
+  //             Monday's digest with status='upcoming', end_date=NULL).
   const nowMs = Date.now();
-  const liveAlerts = rawAlerts.filter((a) => {
+  const liveAlerts0 = rawAlerts.filter((a) => {
     if (a.parent_status === "closed") return false;
-    // For sports events with a start_time in the past + no other status info,
-    // assume the game is over after a 6h buffer (longer than any MLB/NBA game).
     if (a.source === "sports" && a.parent_end_at) {
       const startMs = new Date(a.parent_end_at).getTime();
       if (Number.isFinite(startMs) && nowMs - startMs > 6 * 3600 * 1000) return false;
     }
-    // For golf, tournament end_date is the last day; treat the tournament as
-    // closed once it's been 18h past midnight UTC of end_date (covers a Sun
-    // 6pm ET finish reaching Mon ~1pm UTC).
     if (a.source === "golf" && a.parent_end_at) {
       const endMs = new Date(a.parent_end_at).getTime() + 24 * 3600 * 1000;
       if (Number.isFinite(endMs) && nowMs > endMs) return false;
     }
     return true;
+  });
+  // Layer B — drop golf tournaments whose most recent alert is >6h old
+  const latestByTournament = new Map<string, number>();
+  for (const a of liveAlerts0) {
+    if (a.source !== "golf") continue;
+    const tName = a.subtitle.split(" · ").pop() || a.subtitle;
+    const ts = new Date(a.fired_at).getTime();
+    if (!latestByTournament.has(tName) || ts > latestByTournament.get(tName)!) {
+      latestByTournament.set(tName, ts);
+    }
+  }
+  const STALE_TOURNAMENT_MS = 6 * 3600 * 1000;
+  const staleTournaments = new Set(
+    Array.from(latestByTournament.entries())
+      .filter(([, ts]) => nowMs - ts > STALE_TOURNAMENT_MS)
+      .map(([name]) => name)
+  );
+  const liveAlerts = liveAlerts0.filter((a) => {
+    if (a.source !== "golf") return true;
+    const tName = a.subtitle.split(" · ").pop() || a.subtitle;
+    return !staleTournaments.has(tName);
   });
 
   // 1b. Dedupe by (title, subtitle) — keep only the largest-|delta| alert
