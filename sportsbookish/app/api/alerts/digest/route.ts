@@ -14,6 +14,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com"
 interface FeedAlert {
   source: "golf" | "sports";
   id: string;
+  sport?: string;                       // 'golf' for golf alerts, league key for sports
   league: string;
   fired_at: string;
   alert_type: string;
@@ -149,9 +150,39 @@ export async function GET(req: Request) {
   }
   const alerts = Array.from(bestByKey.values());
 
-  // Split by direction and pick top 5 of each
-  const buys = alerts.filter((a) => a.direction === "buy" || a.direction === "up").sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 5);
-  const sells = alerts.filter((a) => a.direction === "sell" || a.direction === "down").sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 5);
+  // Stratify by sport so no single league (almost always golf, since its
+  // 100+ player futures naturally produce the biggest absolute edges)
+  // crowds out the others. Take top 2 per sport, then fill remaining
+  // slots from the global pool. Result: a digest where MLB/NBA/NHL/EPL/
+  // NFL/MLS actually appear instead of 8 golf rows + 2 others.
+  function topByDirection(direction: "buy" | "sell" | "up" | "down", maxPerSport = 2, maxTotal = 8) {
+    const filtered = alerts.filter((a) => a.direction === direction || (direction === "buy" && a.direction === "up") || (direction === "sell" && a.direction === "down"));
+    const sorted = [...filtered].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    const perSport = new Map<string, number>();
+    const taken: FeedAlert[] = [];
+    // Pass 1: enforce per-sport cap
+    for (const a of sorted) {
+      const sport = a.sport || a.source;
+      const used = perSport.get(sport) || 0;
+      if (used >= maxPerSport) continue;
+      taken.push(a);
+      perSport.set(sport, used + 1);
+      if (taken.length >= maxTotal) break;
+    }
+    // Pass 2: fill any remaining slots from any sport (in case some sports
+    // had < maxPerSport so we ended up with < maxTotal total)
+    if (taken.length < maxTotal) {
+      const takenIds = new Set(taken.map((a) => a.id));
+      for (const a of sorted) {
+        if (takenIds.has(a.id)) continue;
+        taken.push(a);
+        if (taken.length >= maxTotal) break;
+      }
+    }
+    return taken;
+  }
+  const buys = topByDirection("buy", 2, 8);
+  const sells = topByDirection("sell", 2, 8);
 
   if (buys.length === 0 && sells.length === 0) {
     return NextResponse.json({ ok: true, skipped: "no alerts today", date: today });
