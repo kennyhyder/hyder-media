@@ -24,6 +24,8 @@ interface FeedAlert {
   title: string;
   subtitle: string;
   link: string;
+  parent_status?: string | null;        // tournament/event status
+  parent_end_at?: string | null;        // tournament end_date or event start_time
 }
 
 const SPORT_EMOJI: Record<string, string> = { pga: "⛳", golf: "⛳", nba: "🏀", mlb: "⚾", nhl: "🏒", epl: "⚽", mls: "⚽" };
@@ -111,7 +113,41 @@ export async function GET(req: Request) {
   // 1. Fetch top alerts from the data plane (last 24h)
   const alertsRes = await fetch(`${DATA_HOST}/api/golfodds/all-alerts?since_hours=24&limit=300`);
   if (!alertsRes.ok) return NextResponse.json({ error: `data-plane ${alertsRes.status}` }, { status: 502 });
-  const { alerts = [] }: { alerts?: FeedAlert[] } = await alertsRes.json();
+  const { alerts: rawAlerts = [] }: { alerts?: FeedAlert[] } = await alertsRes.json();
+
+  // 1a. Filter out alerts whose underlying tournament/event has already
+  // settled. Same player can fire many alerts intra-day as the line moves,
+  // and the PGA Championship ending Sunday afternoon would still appear in
+  // Monday's 4am digest without this filter.
+  const nowMs = Date.now();
+  const liveAlerts = rawAlerts.filter((a) => {
+    if (a.parent_status === "closed") return false;
+    // For sports events with a start_time in the past + no other status info,
+    // assume the game is over after a 6h buffer (longer than any MLB/NBA game).
+    if (a.source === "sports" && a.parent_end_at) {
+      const startMs = new Date(a.parent_end_at).getTime();
+      if (Number.isFinite(startMs) && nowMs - startMs > 6 * 3600 * 1000) return false;
+    }
+    // For golf, tournament end_date is the last day; treat the tournament as
+    // closed once it's been 18h past midnight UTC of end_date (covers a Sun
+    // 6pm ET finish reaching Mon ~1pm UTC).
+    if (a.source === "golf" && a.parent_end_at) {
+      const endMs = new Date(a.parent_end_at).getTime() + 24 * 3600 * 1000;
+      if (Number.isFinite(endMs) && nowMs > endMs) return false;
+    }
+    return true;
+  });
+
+  // 1b. Dedupe by (title, subtitle) — keep only the largest-|delta| alert
+  // per unique market so a player whose line moved 5 times intra-day
+  // appears once, not five times.
+  const bestByKey = new Map<string, FeedAlert>();
+  for (const a of liveAlerts) {
+    const key = `${a.title}|${a.subtitle}|${a.direction}`;
+    const prev = bestByKey.get(key);
+    if (!prev || Math.abs(a.delta) > Math.abs(prev.delta)) bestByKey.set(key, a);
+  }
+  const alerts = Array.from(bestByKey.values());
 
   // Split by direction and pick top 5 of each
   const buys = alerts.filter((a) => a.direction === "buy" || a.direction === "up").sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 5);

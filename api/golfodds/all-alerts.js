@@ -17,16 +17,19 @@ export default async function handler(req, res) {
   const supabase = getSupabase();
 
   try {
+    // Also pull the parent tournament/event status so downstream consumers
+    // (the daily digest, in particular) can filter out alerts whose
+    // underlying market settled before the email was sent.
     const [golfRes, sportsRes] = await Promise.all([
       supabase
         .from("golfodds_alerts")
-        .select("id, tournament_id, player_id, market_id, market_type, alert_type, direction, edge_value, kalshi_prob, reference_prob, book_count, fired_at, notified_at, golfodds_players(name), golfodds_tournaments(name)")
+        .select("id, tournament_id, player_id, market_id, market_type, alert_type, direction, edge_value, kalshi_prob, reference_prob, book_count, fired_at, notified_at, golfodds_players(name), golfodds_tournaments(name, status, end_date)")
         .gte("fired_at", sinceISO)
         .order("fired_at", { ascending: false })
         .limit(limit),
       supabase
         .from("sports_alerts")
-        .select("id, league, event_id, market_id, alert_type, direction, delta, kalshi_prob_now, kalshi_prob_baseline, baseline_minutes_ago, fired_at, sports_events(title, league), sports_markets(contestant_label)")
+        .select("id, league, event_id, market_id, alert_type, direction, delta, kalshi_prob_now, kalshi_prob_baseline, baseline_minutes_ago, fired_at, sports_events(title, league, status, start_time), sports_markets(contestant_label)")
         .gte("fired_at", sinceISO)
         .order("fired_at", { ascending: false })
         .limit(limit),
@@ -48,6 +51,8 @@ export default async function handler(req, res) {
       subtitle: `${a.market_type} · ${a.golfodds_tournaments?.name || ""}`,
       book_count: a.book_count,
       link: `/golf/tournament/player?id=${a.tournament_id}&player_id=${a.player_id}`,
+      parent_status: a.golfodds_tournaments?.status || null,
+      parent_end_at: a.golfodds_tournaments?.end_date || null,
     }));
     const sportsAlerts = (sportsRes.data || []).map((a) => ({
       source: "sports",
@@ -65,6 +70,8 @@ export default async function handler(req, res) {
       subtitle: `${a.sports_events?.title || ""}`,
       book_count: 0,
       link: `/sports/${a.league}/event/${a.event_id}`,
+      parent_status: a.sports_events?.status || null,
+      parent_end_at: a.sports_events?.start_time || null,
     }));
     const merged = [...golfAlerts, ...sportsAlerts]
       .sort((a, b) => new Date(b.fired_at).getTime() - new Date(a.fired_at).getTime())
