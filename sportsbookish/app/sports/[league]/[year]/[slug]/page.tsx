@@ -28,7 +28,17 @@ export async function generateMetadata({ params }: {
   if (!evt) return { title: "Event not found" };
 
   const canonical = `${SITE_URL}${eventUrl(league, year, slug)}`;
-  const ogImage = `${SITE_URL}/api/og/sports-event?id=${evt.id}`;
+  // X / Twitter and Facebook crawlers fail with "Internal error (Card error)"
+  // when og:image is served from a query-string URL without explicit
+  // og:image:width / og:image:height tags. Wrap the URL in an OG image
+  // object so Next.js emits the dimension meta tags too.
+  const ogImage = {
+    url: `${SITE_URL}/api/og/sports-event?id=${evt.id}`,
+    width: 1200,
+    height: 630,
+    type: "image/png",
+    alt: `${evt.title} — Kalshi vs sportsbooks live odds`,
+  };
 
   // Closed events get a results-focused title; open events get the live title.
   if (evt.status === "closed") {
