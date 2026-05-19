@@ -40,15 +40,20 @@ async function createPortalSession(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const result = await createPortalSession(request);
   const wantsJson = (request.headers.get("accept") || "").includes("json");
-  if ("error" in result) {
+  if ("error" in result && result.error) {
+    const errMsg: string = result.error;
+    const errStatus = result.status;
     if (wantsJson) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
+      return NextResponse.json({ error: errMsg }, { status: errStatus });
     }
     // Form submit (HTML accept) — redirect back to settings with the
     // failure reason instead of dumping the user on a 500 page.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-    const reason = encodeURIComponent(result.error.slice(0, 200));
+    const reason = encodeURIComponent(errMsg.slice(0, 200));
     return NextResponse.redirect(`${siteUrl}/settings?error=portal_failed&reason=${reason}`, 303);
+  }
+  if (!("url" in result) || !result.url) {
+    return NextResponse.json({ error: "no portal url" }, { status: 500 });
   }
   if (wantsJson) return NextResponse.json({ url: result.url });
   return NextResponse.redirect(result.url, 303);

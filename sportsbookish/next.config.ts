@@ -26,7 +26,12 @@ const csp = [
   "media-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self' https://checkout.stripe.com",
+  // billing.stripe.com is the Customer Portal — the /api/stripe/portal route
+  // 303s the form submit to billing.stripe.com/p/session/... and browsers
+  // check form-action against the FINAL redirect destination, not the
+  // initial POST target. Without this entry, "Manage subscription / billing"
+  // is blocked at the browser with "violates form-action 'self'...".
+  "form-action 'self' https://checkout.stripe.com https://billing.stripe.com",
   "frame-ancestors 'none'",
   "upgrade-insecure-requests",
 ].join("; ");
