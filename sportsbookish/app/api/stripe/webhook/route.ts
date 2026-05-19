@@ -17,7 +17,9 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   const stripe = getStripe();
   const sig = request.headers.get("stripe-signature");
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  // .trim() — same Vercel-env-trailing-newline defense as lib/stripe.ts.
+  // A whsec_* with \n at the end silently fails every signature check.
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
   if (!sig || !webhookSecret) {
     return NextResponse.json({ error: "missing signature or secret" }, { status: 400 });
   }

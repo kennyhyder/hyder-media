@@ -94,16 +94,26 @@ export function getPricePerMonth(tier: Tier): number {
   return tier.priceCents / 100;
 }
 
+// Trim() every env-derived price ID — Vercel CLI `echo | env add` leaves
+// trailing newlines that pass equality checks against the raw env but
+// fail when sent to Stripe's API ("No such price: 'price_1TXY2...\n'").
+// See lib/stripe.ts for the same defense on the secret key.
+function envPrice(name: string): string | null {
+  const v = process.env[name];
+  return v ? v.trim() : null;
+}
+
 export function tierFromPriceId(priceId: string | null | undefined): TierKey {
   if (!priceId) return "free";
-  if (priceId === process.env.STRIPE_PRICE_PRO) return "pro";
-  if (priceId === process.env.STRIPE_PRICE_ELITE) return "elite";
+  const trimmed = priceId.trim();
+  if (trimmed === envPrice("STRIPE_PRICE_PRO")) return "pro";
+  if (trimmed === envPrice("STRIPE_PRICE_ELITE")) return "elite";
   return "free";
 }
 
 export function priceIdForTier(tier: TierKey): string | null {
-  if (tier === "pro") return process.env.STRIPE_PRICE_PRO || null;
-  if (tier === "elite") return process.env.STRIPE_PRICE_ELITE || null;
+  if (tier === "pro") return envPrice("STRIPE_PRICE_PRO");
+  if (tier === "elite") return envPrice("STRIPE_PRICE_ELITE");
   return null;
 }
 
@@ -196,13 +206,14 @@ export const API_PLAN_BY_KEY: Record<ApiTierKey, ApiPlan> =
 
 export function apiTierFromPriceId(priceId: string | null | undefined): ApiTierKey {
   if (!priceId) return "free";
-  if (priceId === process.env.STRIPE_PRICE_API_MONTHLY) return "api_monthly";
-  if (priceId === process.env.STRIPE_PRICE_API_ANNUAL) return "api_annual";
+  const trimmed = priceId.trim();
+  if (trimmed === envPrice("STRIPE_PRICE_API_MONTHLY")) return "api_monthly";
+  if (trimmed === envPrice("STRIPE_PRICE_API_ANNUAL")) return "api_annual";
   return "free";
 }
 
 export function priceIdForApiTier(tier: ApiTierKey): string | null {
-  if (tier === "api_monthly") return process.env.STRIPE_PRICE_API_MONTHLY || null;
-  if (tier === "api_annual") return process.env.STRIPE_PRICE_API_ANNUAL || null;
+  if (tier === "api_monthly") return envPrice("STRIPE_PRICE_API_MONTHLY");
+  if (tier === "api_annual") return envPrice("STRIPE_PRICE_API_ANNUAL");
   return null;
 }
