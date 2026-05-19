@@ -1,21 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 import { postSocial, formatMoveAlert } from "./_social.js";
+import { getBudgetState, alertCanRun } from "./_social_budget.js";
 
-// Threshold-gated Bluesky alert posting. Runs frequently and posts when a
-// Kalshi line moves >= MIN_DELTA in the configured lookback window AND we
-// haven't posted about that alert before.
+// Threshold-gated social posting. Runs frequently and posts when a Kalshi
+// line moves >= MIN_DELTA in the configured lookback window AND we haven't
+// posted about that alert before AND we have Make-tier budget left.
 //
-// Rate-limited per (event_id, direction) via sb_social_posts.dedup_key so
-// a market that whipsaws doesn't flood the feed.
+// MIN_DELTA scales dynamically based on monthly budget burn — early-month
+// alerts at 7%, late-month bumped to 9-11% so we save slots for big moves
+// only. See _social_budget.js.
 //
 // GET /api/sports/cron-social-alerts
 //   Authorization: Bearer <CRON_SECRET>
 
 export const config = { maxDuration: 30 };
 
-const MIN_DELTA = 0.07;                  // 7% move — rarer than the 2% detection threshold
 const SINCE_MIN = 15;                    // only fire on fresh alerts (last 15 min)
-const MAX_POSTS_PER_RUN = 3;             // protect from spammy slates
+const MAX_POSTS_PER_RUN = 3;             // protect from spammy slates (also bounded by daily budget)
 const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
 const SITE_URL = process.env.SOCIAL_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -30,6 +31,18 @@ function checkAuth(req) {
 export default async function handler(req, res) {
   if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
   const supabase = getSupabase();
+
+  // Budget gate — skip the whole run if we're out of daily or monthly slots.
+  // Reserves 1 slot for the daily digest by checking against alertCanRun().
+  const budget = await getBudgetState();
+  if (!alertCanRun(budget)) {
+    return res.status(200).json({
+      skipped: "out of Make budget",
+      budget,
+    });
+  }
+  const MIN_DELTA = budget.move_threshold;
+  const dailySlotsLeft = Math.min(budget.day_remaining - 1, MAX_POSTS_PER_RUN); // reserve 1 for digest
 
   const sinceISO = new Date(Date.now() - SINCE_MIN * 60 * 1000).toISOString();
   const alertsRes = await fetch(`${DATA_HOST}/api/golfodds/all-alerts?since_hours=1&limit=100`);
@@ -70,7 +83,7 @@ export default async function handler(req, res) {
   const postedByEvent = new Set();
   const results = [];
   for (const a of candidates) {
-    if (results.length >= MAX_POSTS_PER_RUN) break;
+    if (results.length >= dailySlotsLeft) break;
     const eventKey = `${a.id || ""}`;
     const eventDir = `${a.title}|${a.subtitle}|${a.direction}`;
     if (postedByEvent.has(eventDir)) continue;
@@ -121,6 +134,9 @@ export default async function handler(req, res) {
   return res.status(200).json({
     posted: results.length,
     candidates: candidates.length,
+    daily_slots_left: dailySlotsLeft,
+    threshold_used: MIN_DELTA,
+    budget,
     results,
   });
 }

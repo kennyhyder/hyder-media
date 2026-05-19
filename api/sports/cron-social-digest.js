@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { postSocial, formatDigestPost } from "./_social.js";
+import { getBudgetState, digestCanRun } from "./_social_budget.js";
 
 // Daily social digest post — pulls the same edges feed the email digest
 // uses, formats top 3 buys + biggest mover into a single post, and
@@ -31,11 +32,17 @@ export default async function handler(req, res) {
   const { data: existing } = await supabase
     .from("sb_social_posts")
     .select("id, status")
-    .eq("platform", "bluesky")
+    .eq("platform", "x")
     .eq("dedup_key", dedupKey)
     .maybeSingle();
   if (existing && existing.status === "sent") {
     return res.status(200).json({ skipped: "already sent today", dedup_key: dedupKey });
+  }
+
+  // Budget gate
+  const budget = await getBudgetState();
+  if (!digestCanRun(budget)) {
+    return res.status(200).json({ skipped: "out of Make budget", budget });
   }
 
   // Pull alerts pool (same source as email digest) + apply the same filters
