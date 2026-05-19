@@ -48,18 +48,28 @@ export async function GET(request: NextRequest) {
     ? `${siteUrl}/settings/api-keys?upgraded=1`
     : `${siteUrl}/dashboard?upgraded=1`;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: successUrl,
-    cancel_url: `${siteUrl}/pricing?canceled=1`,
-    customer: existingCustomerId,
-    customer_email: existingCustomerId ? undefined : user.email || undefined,
-    client_reference_id: user.id,
-    metadata: { user_id: user.id, tier },
-    subscription_data: { metadata: { user_id: user.id, tier } },
-    allow_promotion_codes: true,
-  });
-
-  return NextResponse.redirect(session.url!);
+  // Wrap the Stripe call so failures surface a usable error in the URL +
+  // server logs instead of an opaque 500. The most common cause is a stale
+  // STRIPE_PRICE_* env var on a freshly-rotated Stripe product, which
+  // otherwise just shows up as "page isn't working".
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: successUrl,
+      cancel_url: `${siteUrl}/pricing?canceled=1`,
+      customer: existingCustomerId,
+      customer_email: existingCustomerId ? undefined : user.email || undefined,
+      client_reference_id: user.id,
+      metadata: { user_id: user.id, tier },
+      subscription_data: { metadata: { user_id: user.id, tier } },
+      allow_promotion_codes: true,
+    });
+    return NextResponse.redirect(session.url!);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[checkout-redirect] Stripe create failed", { tier, priceId, customerId: existingCustomerId, email: user.email, error: msg });
+    const reason = encodeURIComponent(msg.slice(0, 200));
+    return NextResponse.redirect(`${siteUrl}/pricing?error=checkout_failed&reason=${reason}`);
+  }
 }
