@@ -47,9 +47,13 @@ export async function GET(request: NextRequest) {
     const existingCustomerId = uiSubRes.data?.stripe_customer_id || apiSubRes.data?.stripe_customer_id || undefined;
 
     const stripe = getStripe();
+    // Include tier in the success URL so ConversionTracker can fire the
+    // GA4 purchase event with the right value even if Stripe's webhook
+    // hasn't reached us yet to update sb_subscriptions (this happens ~every
+    // time — the browser redirect lands milliseconds before the webhook).
     const successUrl = isApiTier(tier)
-      ? `${siteUrl}/settings/api-keys?upgraded=1`
-      : `${siteUrl}/dashboard?upgraded=1`;
+      ? `${siteUrl}/settings/api-keys?upgraded=1&tier=${tier}`
+      : `${siteUrl}/dashboard?upgraded=1&tier=${tier}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

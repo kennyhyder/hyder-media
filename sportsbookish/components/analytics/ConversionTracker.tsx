@@ -35,12 +35,15 @@ export default function ConversionTracker({ tier, transactionId }: Props) {
     firedRef.current = true;
 
     if (isUpgraded) {
-      // Paid conversion — fire purchase. We pass the subscription id as
-      // transaction_id so GA4 dedupes on it. If we don't have one yet
-      // (webhook still processing), use a deterministic fallback so it
-      // still tracks; GA4 will dedupe the real one when it lands.
-      const txid = transactionId || `${tier}-${Date.now()}`;
-      trackPurchase(tier, txid);
+      // Paid conversion — fire purchase. Prefer tier from the URL (set by
+      // Stripe success_url) because the DB-side tier may still read 'free'
+      // for ~200ms after Stripe's redirect lands — that's the webhook
+      // arriving AFTER the browser does. The URL is authoritative for the
+      // *intent* of this checkout; the DB will catch up shortly.
+      const urlTier = params.get("tier") || tier;
+      const txid = transactionId || `${urlTier}-${Date.now()}`;
+      trackPurchase(urlTier, txid);
+      params.delete("tier");
     } else if (isWelcome) {
       // Free signup arriving from /auth/callback. Tier will be 'free' here
       // since the Supabase trigger creates the row before this page renders.

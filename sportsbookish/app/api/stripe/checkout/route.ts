@@ -47,9 +47,11 @@ export async function POST(request: NextRequest) {
 
   const stripe = getStripe();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+  // ?tier=... in the success URL so ConversionTracker has the right amount
+  // for the GA4 purchase event without depending on the webhook race.
   const successUrl = isApiTier(tier)
-    ? `${siteUrl}/settings/api-keys?upgraded=1`
-    : `${siteUrl}/dashboard?upgraded=1`;
+    ? `${siteUrl}/settings/api-keys?upgraded=1&tier=${tier}`
+    : `${siteUrl}/dashboard?upgraded=1&tier=${tier}`;
   const cancelUrl = `${siteUrl}/pricing?canceled=1`;
 
   const session = await stripe.checkout.sessions.create({
