@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { LineChart, Mail } from "lucide-react";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 function SignupInner() {
   const params = useSearchParams();
@@ -30,6 +31,13 @@ function SignupInner() {
         options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
       });
       if (error) throw error;
+      // Funnel step: user committed to a paid tier by requesting the magic
+      // link (their next click goes straight to Stripe Checkout). Fire here
+      // for API tiers since they use direct <Link> CTAs; PricingCards fires
+      // its own begin_checkout for pro/elite before that path.
+      if (tier && (tier === "api_monthly" || tier === "api_annual")) {
+        trackBeginCheckout(tier);
+      }
       setSent(true);
       toast.success("Magic link sent — check your email.");
     } catch (e) {

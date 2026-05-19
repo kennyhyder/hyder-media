@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { TIERS, type TierKey, getPricePerMonth } from "@/lib/tiers";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 export default function PricingCards() {
   const router = useRouter();
@@ -18,6 +19,9 @@ export default function PricingCards() {
       router.push("/signup");
       return;
     }
+    // Fire begin_checkout BEFORE the redirect so GA4 captures the funnel
+    // step even if Stripe load fails or the user bails on the hosted page.
+    trackBeginCheckout(tier);
     setLoading(tier);
     try {
       const r = await fetch("/api/stripe/checkout", {

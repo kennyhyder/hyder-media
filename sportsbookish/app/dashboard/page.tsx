@@ -9,6 +9,7 @@ import { LineChart, Settings, LogOut } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { fetchLeagues } from "@/lib/sports-data";
 import { isAdminEmail } from "@/lib/admin";
+import ConversionTracker from "@/components/analytics/ConversionTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export default async function DashboardPage() {
   const [{ data: sub }, leagues] = await Promise.all([
     supabase
       .from("sb_subscriptions")
-      .select("tier, status, current_period_end, cancel_at_period_end")
+      .select("tier, status, current_period_end, cancel_at_period_end, stripe_subscription_id")
       .eq("user_id", user.id)
       .maybeSingle(),
     fetchLeagues(),
@@ -32,6 +33,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen">
+      <ConversionTracker tier={tier} transactionId={sub?.stripe_subscription_id || null} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">

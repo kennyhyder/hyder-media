@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { API_PLAN_BY_KEY, type ApiTierKey } from "@/lib/tiers";
 import ApiKeysClient from "./ApiKeysClient";
+import ConversionTracker from "@/components/analytics/ConversionTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export default async function ApiKeysPage() {
   const service = createServiceClient();
   const { data: apiSub } = await service
     .from("sb_api_subscriptions")
-    .select("tier, status, current_period_end")
+    .select("tier, status, current_period_end, stripe_subscription_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -57,6 +58,7 @@ export default async function ApiKeysPage() {
 
   return (
     <div className="min-h-screen">
+      <ConversionTracker tier={tier} transactionId={apiSub?.stripe_subscription_id || null} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">← Dashboard</Link>
