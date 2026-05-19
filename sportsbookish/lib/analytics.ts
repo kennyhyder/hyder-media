@@ -12,13 +12,22 @@ declare global {
       action: string,
       params?: Record<string, unknown>,
     ) => void;
+    dataLayer?: unknown[];
   }
 }
 
+// Push directly to window.dataLayer rather than calling window.gtag().
+// @next/third-parties loads the GA4 script with strategy="afterInteractive",
+// which can race with React's useEffect on first mount — if useEffect
+// runs before the script loads, window.gtag is undefined and any guard
+// like `if (typeof window.gtag !== "function") return` silently drops the
+// event. The dataLayer queue is initialized synchronously by the
+// <GoogleAnalytics> component, so push goes through regardless, and the
+// real GA4 script drains the queue when it eventually loads.
 function gtag(action: string, params?: Record<string, unknown>) {
   if (typeof window === "undefined") return;
-  if (typeof window.gtag !== "function") return;
-  window.gtag("event", action, params);
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(["event", action, params]);
 }
 
 // ---- Tier metadata used in purchase events ----
