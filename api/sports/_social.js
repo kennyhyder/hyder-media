@@ -119,8 +119,22 @@ export async function postSocial(text, meta = {}) {
 
 // ---- Formatters (X = 280 char limit, Bluesky = 300 — format for the tighter one) ----
 
+// Rotate digest headlines by day-of-year so each daily post has a different
+// opening line — X's dedup compares against recent posts, and changing the
+// lead prevents the digest from looking like yesterday's.
+const DIGEST_HEADERS = [
+  "📊 Today's top sportsbook edges",
+  "📈 Where Kalshi is mispriced today",
+  "🎯 Daily edge sweep",
+  "📊 Kalshi vs the books — today's gaps",
+  "🔥 Today's biggest sportsbook edges",
+  "📈 Daily Kalshi mispricing report",
+  "🎯 Today's edge picks",
+];
+
 export function formatDigestPost(buys, movers, siteUrl) {
-  const lines = [`📊 Today's top sportsbook edges`];
+  const dayOfYear = Math.floor((Date.now() - Date.UTC(new Date().getUTCFullYear(), 0, 0)) / 86400000);
+  const lines = [DIGEST_HEADERS[dayOfYear % DIGEST_HEADERS.length]];
   for (const a of buys.slice(0, 3)) {
     const pct = `${a.delta >= 0 ? "+" : ""}${(a.delta * 100).toFixed(1)}%`;
     const subtitle = a.subtitle.length > 28 ? a.subtitle.slice(0, 28) + "…" : a.subtitle;
@@ -139,15 +153,55 @@ export function formatDigestPost(buys, movers, siteUrl) {
   return text;
 }
 
+// Move-alert templates — rotated by hash(alert.id) so the same alert always
+// renders the same way but consecutive alerts use different structures. X's
+// fuzzy duplicate-content filter rejects posts that share too many tokens
+// in the same order; with 5 templates the chance of two consecutive posts
+// matching closely drops below X's threshold.
+const MOVE_TEMPLATES = [
+  (a, url) => {
+    const sign = a.delta >= 0 ? "↗" : "↘";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const was = `${(a.reference * 100).toFixed(0)}%`;
+    return `${sign} Kalshi line move\n${a.title} (${a.subtitle})\nNow ${now} (was ${was}, ${a.delta >= 0 ? "+" : ""}${pct})\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const arrow = a.delta >= 0 ? "📈" : "📉";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    return `${arrow} ${a.title} ${sign}${pct} on Kalshi\n${a.subtitle}\nTrading at ${now}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const direction = a.delta >= 0 ? "up" : "down";
+    const pct = `${Math.abs(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const was = `${(a.reference * 100).toFixed(0)}%`;
+    return `Sharp move — ${a.title} ${direction} ${pct}\n${was}% → ${now}% • ${a.subtitle}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    return `🚨 ${a.subtitle}\n${a.title} ${sign}${pct} (Kalshi ${now} now)\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const was = `${(a.reference * 100).toFixed(0)}%`;
+    return `Heads up: ${a.title} (${a.subtitle})\nKalshi shifted from ${was}% to ${now}% — ${sign}${pct}\n${url}${a.link}`;
+  },
+];
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 export function formatMoveAlert(alert, siteUrl) {
-  const sign = alert.delta >= 0 ? "↗" : "↘";
-  const pct = `${(alert.delta * 100).toFixed(1)}%`;
-  const probNow = `${(alert.probability * 100).toFixed(0)}%`;
-  const probWas = `${(alert.reference * 100).toFixed(0)}%`;
-  return [
-    `${sign} Kalshi line move`,
-    `${alert.title} (${alert.subtitle})`,
-    `Now ${probNow} (was ${probWas}, ${alert.delta >= 0 ? "+" : ""}${pct})`,
-    `${siteUrl}${alert.link}`,
-  ].join("\n").slice(0, 280);
+  const idx = hashStr(alert.id || alert.title || "") % MOVE_TEMPLATES.length;
+  return MOVE_TEMPLATES[idx](alert, siteUrl).slice(0, 280);
 }
