@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { postBluesky, formatMoveAlert } from "./_social.js";
+import { postSocial, formatMoveAlert } from "./_social.js";
 
 // Threshold-gated Bluesky alert posting. Runs frequently and posts when a
 // Kalshi line moves >= MIN_DELTA in the configured lookback window AND we
@@ -76,22 +76,22 @@ export default async function handler(req, res) {
     if (postedByEvent.has(eventDir)) continue;
     const dedupKey = `move:${eventKey}`;
 
-    // Skip if already in DB
+    // Skip if we've already posted this alert id on X (the primary)
     const { data: existing } = await supabase
       .from("sb_social_posts")
       .select("id")
-      .eq("platform", "bluesky")
+      .eq("platform", "x")
       .eq("dedup_key", dedupKey)
       .maybeSingle();
     if (existing) continue;
 
-    // Also skip if we posted ANY move alert for this (event, direction) in the last 2h
-    // (prevents whipsawing markets from spamming)
+    // Whipsaw guard: skip if we posted ANY move alert for this (event, direction)
+    // on X in the last 2h.
     const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
     const { data: recentSame } = await supabase
       .from("sb_social_posts")
       .select("id")
-      .eq("platform", "bluesky")
+      .eq("platform", "x")
       .eq("kind", "move_alert")
       .like("text", `%${a.title}%`)
       .gte("posted_at", twoHoursAgo)
@@ -99,21 +99,23 @@ export default async function handler(req, res) {
     if (recentSame && recentSame.length > 0) continue;
 
     const text = formatMoveAlert(a, SITE_URL);
-    const result = await postBluesky(text);
+    const result = await postSocial(text, { kind: "move_alert", dedup_key: dedupKey });
 
-    await supabase.from("sb_social_posts").upsert({
-      platform: "bluesky",
-      kind: "move_alert",
-      dedup_key: dedupKey,
-      text,
-      post_uri: result.uri || null,
-      post_cid: result.cid || null,
-      status: result.ok ? "sent" : (result.skipped ? "skipped" : "failed"),
-      error: result.error || result.reason || null,
-    }, { onConflict: "platform,dedup_key" });
+    for (const { platform, res: r } of [{ platform: "x", res: result.x }, { platform: "bluesky", res: result.bluesky }]) {
+      await supabase.from("sb_social_posts").upsert({
+        platform,
+        kind: "move_alert",
+        dedup_key: dedupKey,
+        text,
+        post_uri: r.uri || null,
+        post_cid: r.cid || null,
+        status: r.ok ? "sent" : (r.skipped ? "skipped" : "failed"),
+        error: r.error || r.reason || null,
+      }, { onConflict: "platform,dedup_key" });
+    }
 
     postedByEvent.add(eventDir);
-    results.push({ ok: result.ok, title: a.title, delta: a.delta, text });
+    results.push({ any_sent: result.any_sent, title: a.title, delta: a.delta, text });
   }
 
   return res.status(200).json({

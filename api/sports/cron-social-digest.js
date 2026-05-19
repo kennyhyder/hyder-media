@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import { postBluesky, formatDigestPost } from "./_social.js";
+import { postSocial, formatDigestPost } from "./_social.js";
 
-// Daily Bluesky digest post — pulls the same edges feed the email digest
+// Daily social digest post — pulls the same edges feed the email digest
 // uses, formats top 3 buys + biggest mover into a single post, and
 // publishes it. Idempotent per (platform, date) via sb_social_posts.dedup_key.
 //
@@ -91,25 +91,32 @@ export default async function handler(req, res) {
   }
 
   const text = formatDigestPost(buys, movers, SITE_URL);
-  const result = await postBluesky(text);
+  const result = await postSocial(text, { kind: "daily_digest", dedup_key: dedupKey });
 
-  // Record the attempt
-  await supabase.from("sb_social_posts").upsert({
-    platform: "bluesky",
-    kind: "daily_digest",
-    dedup_key: dedupKey,
-    text,
-    post_uri: result.uri || null,
-    post_cid: result.cid || null,
-    status: result.ok ? "sent" : (result.skipped ? "skipped" : "failed"),
-    error: result.error || result.reason || null,
-  }, { onConflict: "platform,dedup_key" });
+  // Record per-platform: one row per platform per dedup_key
+  const rows = [
+    { platform: "x", res: result.x },
+    { platform: "bluesky", res: result.bluesky },
+  ];
+  for (const { platform, res: r } of rows) {
+    await supabase.from("sb_social_posts").upsert({
+      platform,
+      kind: "daily_digest",
+      dedup_key: dedupKey,
+      text,
+      post_uri: r.uri || null,
+      post_cid: r.cid || null,
+      status: r.ok ? "sent" : (r.skipped ? "skipped" : "failed"),
+      error: r.error || r.reason || null,
+    }, { onConflict: "platform,dedup_key" });
+  }
 
   return res.status(200).json({
-    ok: result.ok,
+    any_sent: result.any_sent,
     text,
     text_length: text.length,
-    bluesky: result,
+    x: result.x,
+    bluesky: result.bluesky,
     counts: { buys: buys.length, movers: movers.length },
   });
 }
