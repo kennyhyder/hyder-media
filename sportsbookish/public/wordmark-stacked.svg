@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect width="1024" height="1024" rx="180" ry="180" fill="#0a0a0a"/>
+  <!-- Stacked wordmark: Sports / Book / ISH (ISH emerald)
+       System bold sans-serif matching the site's Geist heading style.
+       Tracking tightened to keep three lines visually unified. -->
+  <g font-family="-apple-system, 'SF Pro Display', 'Segoe UI', Geist, Inter, system-ui, sans-serif"
+     font-weight="900"
+     text-anchor="middle"
+     letter-spacing="-6">
+    <text x="512" y="380" font-size="220" fill="#fafafa">Sports</text>
+    <text x="512" y="600" font-size="220" fill="#fafafa">Book</text>
+    <text x="512" y="820" font-size="220" fill="#10b981">ISH</text>
+  </g>
+</svg>
