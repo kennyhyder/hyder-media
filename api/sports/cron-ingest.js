@@ -7,19 +7,33 @@ const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV
 const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
 
 // Returns a Date from Kalshi's expected_expiration_time, falling back to
-// parsing the encoded YYMMMDDHHMM date out of the event ticker.
+// parsing the encoded date out of the event ticker. Two ticker shapes:
+//   - YYMMMDDHHMM (older MLB):     KXMLBGAME-26MAY161810CINCLE  → 18:10 UTC
+//   - YYMMMDD     (newer NBA/EPL): KXNBAGAME-26MAY25NYKCLE      → 23:00 UTC default
 function parseEventStartTime(e) {
   if (e.expected_expiration_time) {
     const d = new Date(e.expected_expiration_time);
     if (!isNaN(d.getTime())) return d;
   }
   const ticker = e.event_ticker || "";
-  const m = ticker.match(/(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})(?:[A-Z]|$)/);
-  if (!m) return null;
-  const [, yy, mon, dd, hh, mi] = m;
-  const month = MONTHS[mon];
-  if (month == null) return null;
-  return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), Number(hh), Number(mi)));
+  // Try YYMMMDDHHMM first (with embedded time)
+  let m = ticker.match(/(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})(?:[A-Z]|$)/);
+  if (m) {
+    const [, yy, mon, dd, hh, mi] = m;
+    const month = MONTHS[mon];
+    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), Number(hh), Number(mi)));
+  }
+  // Fall back to bare YYMMMDD — default to 23:00 UTC (~7pm ET, typical game time).
+  // Without this branch, every NBA / EPL / NHL game event gets start_time=null
+  // and the archive cron never sweeps settled games, so dust 99/1¢ quotes
+  // bleed into league pages indefinitely.
+  m = ticker.match(/-(\d{2})([A-Z]{3})(\d{2})(?:[A-Z]|$)/);
+  if (m) {
+    const [, yy, mon, dd] = m;
+    const month = MONTHS[mon];
+    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), 23, 0));
+  }
+  return null;
 }
 
 // Generic Kalshi ingester for team sports. Walks LEAGUES config:

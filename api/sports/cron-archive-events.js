@@ -95,28 +95,68 @@ async function snapshotEvent(supabase, evt) {
   };
 }
 
+// Kalshi-staleness fallback: events that never got a parseable start_time
+// (some prefixes like KXNBASERIES-26MINSASR2 or KXNBADRAFTPICK-26-13 carry
+// no date in the ticker, and Kalshi sometimes omits expected_expiration_time)
+// are detected as settled when their latest Kalshi quote across all markets
+// is older than this threshold. The Kalshi ingester only fetches events with
+// status=open on Kalshi's side, so once an event settles there our latest
+// fetched_at stops advancing — that's a reliable "this event is done" signal.
+const KALSHI_STALE_HOURS = 6;
+
+async function isKalshiStale(supabase, eventId, thresholdMs) {
+  const { data: markets } = await supabase
+    .from("sports_markets")
+    .select("id")
+    .eq("event_id", eventId);
+  const ids = (markets || []).map((m) => m.id);
+  if (!ids.length) return false; // no markets — leave alone
+  const { data: latest } = await supabase
+    .from("sports_quotes_latest")
+    .select("fetched_at")
+    .in("market_id", ids)
+    .order("fetched_at", { ascending: false })
+    .limit(1);
+  if (!latest?.length) return true; // no quotes at all — definitely stale
+  return Date.now() - new Date(latest[0].fetched_at).getTime() > thresholdMs;
+}
+
 export default async function handler(req, res) {
   if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
 
   const supabase = getSupabase();
-  const summary = { scanned: 0, archived: 0, errors: [] };
+  const summary = { scanned: 0, archived: 0, archived_no_start: 0, errors: [] };
   const now = Date.now();
 
-  // Pull every open event with a known start_time
+  // Pull every open event (with or without start_time). Null-start events
+  // get the Kalshi-staleness check; start_time events get the per-type delay.
   const { data: events } = await supabase
     .from("sports_events")
-    .select("id, league, title, event_type, start_time, kalshi_event_ticker, status, slug")
-    .eq("status", "open")
-    .not("start_time", "is", null);
+    .select("id, league, title, event_type, start_time, kalshi_event_ticker, status, slug, created_at")
+    .eq("status", "open");
   summary.scanned = events?.length || 0;
 
   for (const evt of events || []) {
-    // Player-prop events settle when the underlying game ends — use the same
-    // 4h game grace rather than the 48h default.
-    const isProp = (evt.event_type || "").startsWith("player_prop_");
-    const delay = isProp ? ARCHIVE_DELAY_HOURS.game : (ARCHIVE_DELAY_HOURS[evt.event_type] ?? 48);
-    const startMs = new Date(evt.start_time).getTime();
-    if (now - startMs < delay * 3600 * 1000) continue;  // not yet eligible
+    // Eligibility: either start_time + grace elapsed, or null start_time + Kalshi quotes stale
+    let eligible = false;
+    let viaStaleness = false;
+    if (evt.start_time) {
+      const isProp = (evt.event_type || "").startsWith("player_prop_");
+      const delay = isProp ? ARCHIVE_DELAY_HOURS.game : (ARCHIVE_DELAY_HOURS[evt.event_type] ?? 48);
+      const startMs = new Date(evt.start_time).getTime();
+      if (now - startMs >= delay * 3600 * 1000) eligible = true;
+    } else {
+      // Require the event to have existed for at least KALSHI_STALE_HOURS so a
+      // freshly-ingested event with no quotes yet doesn't get archived as "stale".
+      const createdMs = new Date(evt.created_at || 0).getTime();
+      if (now - createdMs >= KALSHI_STALE_HOURS * 3600 * 1000) {
+        if (await isKalshiStale(supabase, evt.id, KALSHI_STALE_HOURS * 3600 * 1000)) {
+          eligible = true;
+          viaStaleness = true;
+        }
+      }
+    }
+    if (!eligible) continue;
 
     try {
       const snap = await snapshotEvent(supabase, evt);
@@ -141,6 +181,7 @@ export default async function handler(req, res) {
       if (evtErr) { summary.errors.push({ id: evt.id, reason: evtErr.message }); continue; }
 
       summary.archived++;
+      if (viaStaleness) summary.archived_no_start++;
     } catch (e) {
       summary.errors.push({ id: evt.id, reason: e.message });
     }
