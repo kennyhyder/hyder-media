@@ -193,6 +193,39 @@ const MOVE_TEMPLATES = [
     const was = `${(a.reference * 100).toFixed(0)}%`;
     return `Heads up: ${a.title} (${a.subtitle})\nKalshi shifted from ${was}% to ${now}% — ${sign}${pct}\n${url}${a.link}`;
   },
+  (a, url) => {
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const verb = a.delta >= 0 ? "climbed" : "dropped";
+    return `${a.title} just ${verb} ${Math.abs(a.delta * 100).toFixed(1)}% on Kalshi.\n${a.subtitle} • now ${now}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    return `Watching: ${a.subtitle}\n→ ${a.title} ${sign}${pct} • Kalshi ${now}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const was = `${(a.reference * 100).toFixed(0)}%`;
+    return `${a.subtitle}\n${a.title}: ${was}% → ${now}% ${sign}${pct}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const sign = a.delta >= 0 ? "+" : "";
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const word = a.delta >= 0 ? "rising" : "falling";
+    return `${a.title} ${word} fast — ${sign}${pct} on Kalshi (${now} now)\n${a.subtitle}\n${url}${a.link}`;
+  },
+  (a, url) => {
+    const pct = `${(a.delta * 100).toFixed(1)}%`;
+    const now = `${(a.probability * 100).toFixed(0)}%`;
+    const was = `${(a.reference * 100).toFixed(0)}%`;
+    const emoji = a.delta >= 0 ? "🟢" : "🔴";
+    return `${emoji} Move alert\n${a.title} on ${a.subtitle}\n${was}% → ${now}% (${a.delta >= 0 ? "+" : ""}${pct})\n${url}${a.link}`;
+  },
 ];
 
 function hashStr(s) {

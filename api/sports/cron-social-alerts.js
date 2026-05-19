@@ -16,7 +16,8 @@ import { getBudgetState, alertCanRun } from "./_social_budget.js";
 export const config = { maxDuration: 30 };
 
 const SINCE_MIN = 15;                    // only fire on fresh alerts (last 15 min)
-const MAX_POSTS_PER_RUN = 3;             // protect from spammy slates (also bounded by daily budget)
+const MAX_POSTS_PER_RUN = 1;             // 1 per run × 10-min cadence = ≥10-min spacing between tweets
+                                          // (X's fuzzy dedup flagged tweets posted in rapid succession even with rotating templates)
 const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
 const SITE_URL = process.env.SOCIAL_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 

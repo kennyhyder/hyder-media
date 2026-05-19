@@ -1,22 +1,26 @@
-// Budget tracker for the Make.com free tier (1000 ops/month, 2 ops per tweet
-// = 500 tweets/month max). We budget below the ceiling so a spike day doesn't
-// blow it:
+// Two safety layers:
 //
-//   MAX_POSTS_PER_MONTH = 450   (90 ops headroom — 4.5% safety margin)
-//   MAX_POSTS_PER_DAY   = 18    (450/25 days = 18/day; gives 5 cushion days)
+// 1) X DEDUP — never post >1 tweet per cron run. Burst posting (3 in the
+//    same second) caused 'looks like you've posted that one recently'
+//    errors even with rotating templates, because X compares semantic
+//    content across tweets posted in rapid succession. With 1/run and a
+//    10-min cadence, consecutive tweets are always ≥10 min apart.
 //
-// We also scale the move-alert threshold dynamically. As monthly usage
-// climbs, we get pickier so the remaining budget goes to bigger moves only:
+// 2) MAKE FREE TIER — 1000 ops/month, 2 ops per tweet:
+//      MAX_POSTS_PER_MONTH = 350   (300 ops headroom on 500-tweet ceiling)
+//      MAX_POSTS_PER_DAY   = 12    (user target: 10-12/day)
 //
-//   <60%  burn rate → threshold = base (7%)
-//   60-80%          → threshold = 9%
-//   80-95%          → threshold = 11%
-//   >95%            → skip alerts entirely (digest still protected)
+// Threshold scales as monthly burn climbs so remaining slots go to bigger
+// moves only:
+//   <60% burn → threshold = 7% (base)
+//   60-80%    → 9%
+//   80-95%    → 11%
+//   >95%      → skip alerts entirely (digest still protected)
 
 import { createClient } from "@supabase/supabase-js";
 
-export const MAX_POSTS_PER_DAY = 18;
-export const MAX_POSTS_PER_MONTH = 450;
+export const MAX_POSTS_PER_DAY = 12;
+export const MAX_POSTS_PER_MONTH = 350;
 export const BASE_MOVE_THRESHOLD = 0.07;   // 7%
 
 function getSupabase() {
