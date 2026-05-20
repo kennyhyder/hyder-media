@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="What Kenny Hyder actually builds — custom marketing dashboards, multi-platform data pipelines, full-stack SaaS, and AI-enabled tooling. Production work across six client engagements and four shipped products." />
+    <meta name="keywords" content="Kenny Hyder, marketing engineering, custom dashboards, Google Ads API, Meta API, Supabase, Next.js, full-stack consultant, AI tooling, performance marketing" />
+    <meta name="author" content="Kenny Hyder" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Capabilities — What I Build | Hyder Media" />
+    <meta property="og:description" content="Custom marketing systems, full-stack SaaS, and AI tooling — built end-to-end, not licensed." />
+    <meta property="og:url" content="https://hyder.me/capabilities" />
+    <meta property="og:site_name" content="Hyder Media" />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <title>Capabilities — What I Build | Hyder Media</title>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/imgs/logos/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/imgs/logos/favicon.png" />
+    <link rel="canonical" href="https://hyder.me/capabilities" />
+
+    <!-- Site CSS first so we can override carefully -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- Add PT Serif as an editorial companion to PT Sans for big display headlines -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- Dark mode init (matches homepage) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') document.documentElement.classList.add('dark-mode');
+            else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark-mode');
+        })();
+    </script>
+
+    <style>
+        /* ----- Typography reset for THIS page only ----- */
+        /* Site default is Roboto Mono everywhere — unreadable in long-form.
+           Override with PT Sans for body, reserve Roboto Mono for tiny accents,
+           introduce PT Serif for editorial display headlines. */
+        .cap-page,
+        .cap-page p,
+        .cap-page li,
+        .cap-page td {
+            font-family: 'PT Sans', sans-serif;
+        }
+        .cap-page p,
+        .cap-page li {
+            font-size: 1.0625rem;
+            line-height: 1.65;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-page p,
+        html.dark-mode .cap-page li,
+        html.dark-mode .cap-page td { color: var(--light-body-color); }
+
+        .cap-page .cap-display {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .cap-mono {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ----- Layout containers ----- */
+        .cap-section { padding: 96px 0; position: relative; }
+        @media (max-width: 768px) { .cap-section { padding: 64px 0; } }
+
+        .cap-section--tinted-brown { background-color: rgba(121, 82, 50, 0.05); }
+        .cap-section--tinted-purple { background-color: rgba(76, 44, 75, 0.06); }
+        .cap-section--tinted-cream { background-color: var(--light-body-color); }
+        html.dark-mode .cap-section--tinted-brown { background-color: rgba(225, 212, 43, 0.04); }
+        html.dark-mode .cap-section--tinted-purple { background-color: rgba(225, 212, 43, 0.06); }
+        html.dark-mode .cap-section--tinted-cream { background-color: rgba(255, 255, 255, 0.025); }
+
+        .cap-narrow { max-width: 760px; }
+        .cap-wide   { max-width: 1140px; }
+
+        /* ----- Section headers ----- */
+        .cap-eyebrow {
+            color: var(--crimson-red-color);
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        html.dark-mode .cap-eyebrow { color: var(--sand-yellow-color); }
+
+        .cap-h2 {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+            line-height: 1.05;
+            letter-spacing: -0.015em;
+            margin-bottom: 22px;
+        }
+        html.dark-mode .cap-h2 { color: var(--light-body-color); }
+
+        .cap-h3 {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            line-height: 1.2;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+        }
+        html.dark-mode .cap-h3 { color: var(--yellow-color); }
+
+        .cap-lede {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 720px;
+            margin-bottom: 0;
+        }
+        html.dark-mode .cap-lede { color: var(--light-body-color); }
+
+        /* ----- Hero polish ----- */
+        .cap-hero-meta {
+            margin-top: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px 36px;
+            align-items: center;
+        }
+        .cap-hero-stat-num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--dark-brown-color);
+        }
+        html.dark-mode .cap-hero-stat-num { color: var(--yellow-color); }
+        .cap-hero-stat-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+            margin-top: 6px;
+        }
+        html.dark-mode .cap-hero-stat-label { color: rgba(255,255,240,0.6); }
+
+        /* ----- Logo strips ----- */
+        .cap-logo-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 36px 44px;
+            align-items: center;
+            margin: 40px 0 0;
+        }
+        .cap-logo {
+            width: 28px; height: 28px;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+        .cap-logo--lg { width: 36px; height: 36px; }
+        .cap-logo--sm { width: 20px; height: 20px; }
+        .cap-logo:hover { opacity: 1; }
+        html.dark-mode .cap-logo {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+            opacity: 0.9;
+        }
+
+        .cap-logo-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            align-items: center;
+            margin-top: 14px;
+            margin-bottom: 18px;
+        }
+        .cap-logo-row .cap-logo { width: 22px; height: 22px; }
+
+        /* ----- Cards ----- */
+        .cap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+        @media (min-width: 992px) {
+            .cap-grid--2 { grid-template-columns: repeat(2, 1fr); }
+            .cap-grid--3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .cap-card {
+            background-color: var(--white-color);
+            border: 1px solid rgba(121, 82, 50, 0.25);
+            border-radius: 2px;
+            padding: 30px 28px;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        html.dark-mode .cap-card {
+            background-color: rgba(255, 255, 255, 0.035);
+            border-color: rgba(225, 212, 43, 0.18);
+        }
+        .cap-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--dark-brown-color);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+        html.dark-mode .cap-card:hover {
+            border-color: var(--yellow-color);
+            box-shadow: 0 12px 28px rgba(225, 212, 43, 0.08);
+        }
+        .cap-card__industry {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--crimson-red-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-card__industry { color: var(--sand-yellow-color); }
+        .cap-card__pillar-num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        html.dark-mode .cap-card__pillar-num { color: var(--sand-yellow-color); opacity: 0.85; }
+        .cap-card__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            line-height: 1.2;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+        html.dark-mode .cap-card__title { color: var(--light-body-color); }
+        .cap-card__sub {
+            font-family: 'PT Sans', sans-serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--light-text-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-card__sub { color: rgba(255,255,240,0.65); }
+        .cap-card__body {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.985rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            flex-grow: 1;
+        }
+        html.dark-mode .cap-card__body { color: var(--light-body-color); }
+
+        .cap-card__metrics {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(121, 82, 50, 0.18);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
+        }
+        html.dark-mode .cap-card__metrics { border-top-color: rgba(225, 212, 43, 0.18); }
+        .cap-metric__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--crimson-red-color);
+            line-height: 1;
+        }
+        html.dark-mode .cap-metric__num { color: var(--sand-yellow-color); }
+        .cap-metric__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.66rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+            margin-top: 4px;
+        }
+        html.dark-mode .cap-metric__label { color: rgba(255,255,240,0.65); }
+
+        .cap-card__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--crimson-red-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--crimson-red-color);
+            padding-bottom: 2px;
+            align-self: flex-start;
+            transition: all 0.2s ease;
+        }
+        html.dark-mode .cap-card__cta {
+            color: var(--sand-yellow-color);
+            border-bottom-color: var(--sand-yellow-color);
+        }
+        .cap-card__cta:hover {
+            color: var(--deep-orange-color);
+            border-bottom-color: var(--deep-orange-color);
+            gap: 12px;
+        }
+        html.dark-mode .cap-card__cta:hover {
+            color: var(--yellow-color);
+            border-bottom-color: var(--yellow-color);
+        }
+
+        /* ----- Stats strip ----- */
+        .cap-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0;
+            margin-top: 56px;
+            border: 1px solid rgba(121, 82, 50, 0.3);
+        }
+        html.dark-mode .cap-stats { border-color: rgba(225, 212, 43, 0.25); }
+        .cap-stat {
+            padding: 32px 24px;
+            text-align: left;
+            border-right: 1px solid rgba(121, 82, 50, 0.18);
+            border-bottom: 1px solid rgba(121, 82, 50, 0.18);
+        }
+        html.dark-mode .cap-stat {
+            border-right-color: rgba(225, 212, 43, 0.15);
+            border-bottom-color: rgba(225, 212, 43, 0.15);
+        }
+        .cap-stat:last-child { border-right: none; }
+        .cap-stat__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.6rem;
+            color: var(--dark-brown-color);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        html.dark-mode .cap-stat__num { color: var(--yellow-color); }
+        .cap-stat__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+        }
+        html.dark-mode .cap-stat__label { color: rgba(255,255,240,0.65); }
+
+        /* ----- Stack section (logo-first) ----- */
+        .cap-stack-section { padding: 96px 0; }
+        .cap-stack-cluster {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin-top: 56px;
+        }
+        @media (min-width: 768px) { .cap-stack-cluster { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .cap-stack-cluster { grid-template-columns: repeat(3, 1fr); } }
+        .cap-stack-group {
+            padding: 28px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-left: 3px solid var(--dark-brown-color);
+        }
+        html.dark-mode .cap-stack-group {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left-color: var(--yellow-color);
+        }
+        .cap-stack-group h4 {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 20px;
+        }
+        html.dark-mode .cap-stack-group h4 { color: var(--yellow-color); }
+        .cap-stack-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 18px;
+        }
+        .cap-stack-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.92rem;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-stack-item { color: var(--light-body-color); }
+        .cap-stack-item img { width: 18px; height: 18px; object-fit: contain; opacity: 0.85; }
+        html.dark-mode .cap-stack-item img {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+        }
+
+        /* ----- Comparison table ----- */
+        .cap-compare {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 48px;
+            font-family: 'PT Sans', sans-serif;
+        }
+        .cap-compare th, .cap-compare td {
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.2);
+            vertical-align: top;
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }
+        .cap-compare thead th {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            border-bottom: 2px solid var(--dark-brown-color);
+            text-align: left;
+            background: transparent;
+            padding-bottom: 14px;
+        }
+        html.dark-mode .cap-compare thead th { color: var(--yellow-color); border-bottom-color: var(--yellow-color); }
+        .cap-compare tbody tr:hover { background-color: rgba(121, 82, 50, 0.04); }
+        html.dark-mode .cap-compare tbody tr:hover { background-color: rgba(225,212,43,0.04); }
+        .cap-compare td.cap-rowlabel {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            width: 25%;
+        }
+        html.dark-mode .cap-compare td.cap-rowlabel { color: var(--sand-yellow-color); }
+        .cap-compare small { font-size: 0.8rem; color: var(--light-text-color); display: block; margin-top: 4px; }
+        html.dark-mode .cap-compare small { color: rgba(255,255,240,0.55); }
+        html.dark-mode .cap-compare th, html.dark-mode .cap-compare td { border-bottom-color: rgba(225, 212, 43, 0.18); }
+
+        /* ----- Engagement steps ----- */
+        .cap-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin-top: 56px;
+        }
+        @media (min-width: 900px) { .cap-steps { grid-template-columns: repeat(3, 1fr); } }
+        .cap-step {
+            padding: 36px 32px;
+            border-right: 1px solid rgba(121, 82, 50, 0.18);
+            position: relative;
+        }
+        @media (max-width: 899px) {
+            .cap-step { border-right: none; border-bottom: 1px solid rgba(121, 82, 50, 0.18); }
+        }
+        html.dark-mode .cap-step { border-color: rgba(225, 212, 43, 0.15); }
+        .cap-step:last-child { border-right: none; border-bottom: none; }
+        .cap-step__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 3.6rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--dark-brown-color);
+            opacity: 0.25;
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-step__num { color: var(--sand-yellow-color); opacity: 0.5; }
+        .cap-step__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        html.dark-mode .cap-step__title { color: var(--light-body-color); }
+        .cap-step__body {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-step__body { color: rgba(255,255,240,0.85); }
+
+        /* ----- Pull-quote / callout ----- */
+        .cap-pullquote {
+            margin: 64px auto;
+            max-width: 820px;
+            padding: 0 32px;
+            border-left: 3px solid var(--crimson-red-color);
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-pullquote {
+            border-left-color: var(--sand-yellow-color);
+            color: var(--light-body-color);
+        }
+        .cap-pullquote cite {
+            display: block;
+            margin-top: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--dark-brown-color);
+            font-style: normal;
+        }
+        html.dark-mode .cap-pullquote cite { color: var(--yellow-color); }
+
+        /* ----- Body copy max width override for sections ----- */
+        .cap-prose p { max-width: 720px; }
+    </style>
+</head>
+
+<body class="cap-page">
+
+    <!-- Theme toggle (same widget as homepage) -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div><div class="moon"></div>
+                    <div class="cloud cloud1"></div><div class="cloud cloud2"></div>
+                    <div class="star star1"></div><div class="star star2"></div>
+                    <div class="star star3"></div><div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+
+    <main class="main">
+
+        <!-- ===== HERO ===== -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            CAPABILITIES
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            What I actually
+                            <br />build
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1">
+                                    <a href="/" class="hero__link fw-light text-uppercase">Home</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#contact" class="hero__link fw-light text-uppercase">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INTRO ===== -->
+        <section class="cap-section cap-prose">
+            <div class="container">
+                <div class="section__block mx-auto cap-narrow">
+                    <p>
+                        Most marketing consultants stop at strategy decks and templated dashboards. I keep going.
+                    </p>
+                    <p>
+                        What follows is a working tour of the systems I've built — for clients, as products, and as research. Custom dashboards that replace $7K&ndash;$21K/yr of off-the-shelf tooling. Multi-platform data pipelines across every major ad network. Full-stack SaaS products with auth, billing, and AI. And the marketing engineering glue that holds it all together.
+                    </p>
+                    <p>
+                        If you're hiring a marketing operator who can't ship code, you're locking yourself into someone else's product roadmap forever. I'm the alternative.
+                    </p>
+                </div>
+
+                <!-- Subtle logo strip — what I work with daily -->
+                <div class="section__block mx-auto cap-wide" style="margin-top: 64px;">
+                    <p class="cap-mono" style="color: var(--light-text-color); margin-bottom: 20px;">Production integrations</p>
+                    <div class="cap-logo-strip">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads" title="Google Ads">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta" title="Meta Ads">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/tiktok/000000" alt="TikTok" title="TikTok Ads">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/microsoft/737373" alt="Microsoft Ads" title="Microsoft Advertising">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/googleanalytics/E37400" alt="Google Analytics 4" title="GA4">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/googlesearchconsole/458CF5" alt="Search Console" title="Google Search Console">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe" title="Stripe">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase" title="Supabase">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/anthropic/D97757" alt="Anthropic" title="Anthropic">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/openai/412991" alt="OpenAI" title="OpenAI">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js" title="Next.js">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel" title="Vercel">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/cloudflare/F38020" alt="Cloudflare" title="Cloudflare">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio" title="Twilio">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/airtable/18BFFF" alt="Airtable" title="Airtable">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/zapier/FF4F00" alt="Zapier" title="Zapier">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL" title="PostgreSQL">
+                        <img class="cap-logo cap-logo--lg" src="https://cdn.simpleicons.org/googlebigquery/669DF6" alt="BigQuery" title="Google BigQuery">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== AT-A-GLANCE STATS ===== -->
+        <section class="cap-section cap-section--tinted-brown" style="padding-top: 64px; padding-bottom: 64px;">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">By the numbers</span>
+                    <h2 class="cap-h2">Scale of work in flight today</h2>
+                    <p class="cap-lede">Live systems, datasets actively maintained, and products with paying users — not aspirational case studies.</p>
+
+                    <div class="cap-stats">
+                        <div class="cap-stat">
+                            <div class="cap-stat__num">6+</div>
+                            <div class="cap-stat__label">Client dashboards live</div>
+                        </div>
+                        <div class="cap-stat">
+                            <div class="cap-stat__num">4</div>
+                            <div class="cap-stat__label">SaaS products shipped</div>
+                        </div>
+                        <div class="cap-stat">
+                            <div class="cap-stat__num">25+</div>
+                            <div class="cap-stat__label">Ad accounts wired up</div>
+                        </div>
+                        <div class="cap-stat">
+                            <div class="cap-stat__num">9</div>
+                            <div class="cap-stat__label">Marketing APIs in production</div>
+                        </div>
+                        <div class="cap-stat">
+                            <div class="cap-stat__num">~1M</div>
+                            <div class="cap-stat__label">Rows under management</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOUR PILLARS ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">What I build</span>
+                    <h2 class="cap-h2">Four pillars</h2>
+                    <p class="cap-lede">The work falls into four categories. Most engagements cross more than one — a dashboard isn't useful without the data pipeline behind it; a SaaS isn't useful without the marketing tooling around it.</p>
+
+                    <div class="cap-grid cap-grid--2">
+                        <div class="cap-card">
+                            <div class="cap-card__pillar-num">i.</div>
+                            <h3 class="cap-card__title">Custom client dashboards</h3>
+                            <p class="cap-card__sub">Branded, live, yours.</p>
+                            <p class="cap-card__body">Hash-routed multi-tab dashboards pulling from any marketing API. Real-time refresh. Per-client branding tuned to each customer. PDF and CSV export. Password-gated access. Drilldown from account to campaign to ad group to individual asset performance.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt="Chart.js" title="Chart.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/react/61DAFB" alt="React" title="React">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js" title="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel" title="Vercel">
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__pillar-num">ii.</div>
+                            <h3 class="cap-card__title">Marketing data plumbing</h3>
+                            <p class="cap-card__sub">The unsexy work that makes everything else possible.</p>
+                            <p class="cap-card__body">OAuth flows across six providers. Token refresh logic. Multi-account merges that roll nine ad accounts into one brand/non-brand view. BigQuery joins between GA4 events and Google Ads conversion actions. Conversion-action segmentation. Custom UTM frameworks with dynamic ad-group slug injection.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads" title="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta" title="Meta">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleanalytics/E37400" alt="GA4" title="GA4">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googlebigquery/669DF6" alt="BigQuery" title="BigQuery">
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__pillar-num">iii.</div>
+                            <h3 class="cap-card__title">Full-stack SaaS products</h3>
+                            <p class="cap-card__sub">Multi-tenant, billed, secured.</p>
+                            <p class="cap-card__body">Next.js plus Supabase Auth plus Stripe checkout plus webhook reconciliation plus row-level security plus tier-gated feature flags. Alerting engines, watchlists, API key management, email and SMS notifications. Built so a real human can sign up, pay, and use it — not just a demo.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase" title="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe" title="Stripe">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js" title="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind" title="Tailwind CSS">
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__pillar-num">iv.</div>
+                            <h3 class="cap-card__title">AI-enabled tooling</h3>
+                            <p class="cap-card__sub">Useful Claude and GPT integrations — not chatbots.</p>
+                            <p class="cap-card__body">Natural-language search that compiles to SQL. Intent classification routing prompts to the right tool. Content-generation pipelines with compliance scanning that blocks the model from introducing violations. Vector embeddings plus pgvector for semantic similarity. Multi-model dispatch with model-specific quirks handled.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/anthropic/D97757" alt="Anthropic" title="Anthropic">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/openai/412991" alt="OpenAI" title="OpenAI">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL" title="PostgreSQL + pgvector">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/python/3776AB" alt="Python" title="Python">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PULL QUOTE ===== -->
+        <section style="padding: 32px 0;">
+            <div class="container">
+                <blockquote class="cap-pullquote">
+                    The fastest way to be locked into your competitor's product roadmap is to build your stack out of other people's products. The fastest way to outflank them is to build your own.
+                </blockquote>
+            </div>
+        </section>
+
+        <!-- ===== CLIENT WORK ===== -->
+        <section class="cap-section cap-section--tinted-cream">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Live client work</span>
+                    <h2 class="cap-h2">Systems running for real businesses</h2>
+                    <p class="cap-lede">Each of these is delivering data to a paying client today. Specific client names are kept private; described here by industry and shape of the engagement.</p>
+
+                    <div class="cap-grid cap-grid--2">
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">European affiliate marketing platform</div>
+                            <h3 class="cap-card__title">Competitive intel suite + live performance reporting</h3>
+                            <p class="cap-card__sub">Two-part build delivered as a unified client portal.</p>
+                            <p class="cap-card__body">A keyword competitive-intelligence platform scraped and enriched tens of thousands of keywords across six direct competitors, segmented by brand, topic, and intent. Alongside it, a six-tab live performance dashboard with vendor-versus-affiliate signup attribution that joins the client's GA4 BigQuery export with Google Ads per-conversion-action data — closing an attribution gap that GA4 alone can't.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleanalytics/E37400" alt="GA4">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googlebigquery/669DF6" alt="BigQuery">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt="Chart.js">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">31K</div>
+                                    <div class="cap-metric__label">Keywords analyzed</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">6</div>
+                                    <div class="cap-metric__label">Competitors tracked</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">2</div>
+                                    <div class="cap-metric__label">Attribution sources joined</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">6-tab</div>
+                                    <div class="cap-metric__label">Live reporting suite</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Commercial auto-glass installer</div>
+                            <h3 class="cap-card__title">Financial operations + multi-source ops layer</h3>
+                            <p class="cap-card__sub">High-stakes engagement supporting a court-overseen restructuring.</p>
+                            <p class="cap-card__body">Six years of margin reports, ad spend, bank statements, debts, and forecast scenarios merged into a financial dashboard used in court filings. Alongside it, a live ops layer: tens of thousands of call records ingested through a custom CSV pipeline, ActiveCampaign CRM integration that creates deals on missed calls via Outlook → Zapier email-parser → custom webhook, and an Airtable rebates sync exposing six-figure outstanding payments.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/airtable/18BFFF" alt="Airtable">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/zapier/FF4F00" alt="Zapier">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">75K</div>
+                                    <div class="cap-metric__label">Calls ingested</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">54K</div>
+                                    <div class="cap-metric__label">Jobs analyzed</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">6 yr</div>
+                                    <div class="cap-metric__label">Financial history</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">7</div>
+                                    <div class="cap-metric__label">Dashboard tabs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Online fine-art gallery</div>
+                            <h3 class="cap-card__title">Cross-platform reporting + SEO audit + Squarespace asset</h3>
+                            <p class="cap-card__sub">Read-only ad performance across four platforms, on a single screen.</p>
+                            <p class="cap-card__body">A multi-platform dashboard merging Google Ads, three separate Meta accounts unified into one view, TikTok Ads, and Google Search Console. Warm-gold and cream design matching the gallery's print aesthetic. Plus a standalone local-SEO audit diagnosing Map Pack absence, and an Instagram-reviews snippet drop-in for the client's Squarespace site.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/tiktok/000000" alt="TikTok">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googlesearchconsole/458CF5" alt="Search Console">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">5</div>
+                                    <div class="cap-metric__label">Ad platforms unified</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">3→1</div>
+                                    <div class="cap-metric__label">Meta accts merged</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">9</div>
+                                    <div class="cap-metric__label">Reporting tabs</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">+SEO</div>
+                                    <div class="cap-metric__label">Audit deliverable</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Personal injury law firm · Texas</div>
+                            <h3 class="cap-card__title">Multi-platform paid media + expert-witness production</h3>
+                            <p class="cap-card__sub">Two engagements in one — paid media reporting and litigation deliverables.</p>
+                            <p class="cap-card__body">A reporting layer pulling Google Ads, Meta, and Microsoft Advertising. The Bing integration required a hand-rolled SOAP XML client because Microsoft's REST endpoints don't reliably work for the operations needed. Plus Google Business Profile location export and an expert-witness production line — rebuttal reports, PDF generation, exhibit packaging via Chrome headless rendering.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/microsoft/737373" alt="Microsoft Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googlemybusiness/4285F4" alt="Google Business Profile">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">4</div>
+                                    <div class="cap-metric__label">Data platforms</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">SOAP</div>
+                                    <div class="cap-metric__label">Custom Bing XML client</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">Azure</div>
+                                    <div class="cap-metric__label">AD app provisioning</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">PDF</div>
+                                    <div class="cap-metric__label">Expert-witness pipeline</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Nine-brand Usenet portfolio</div>
+                            <h3 class="cap-card__title">Multi-account portfolio rollup</h3>
+                            <p class="cap-card__sub">One dashboard, nine Google Ads accounts, unified across the portfolio.</p>
+                            <p class="cap-card__body">Single-pane reporting across nine separate Google Ads accounts spanning the holding company's brands. Custom brand-versus-non-brand classification with priority logic. Monthly trend aggregation. Per-account conversion-action breakdowns. Linkable tab routing so the executive team can share precise drilldowns by URL.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt="Chart.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">9</div>
+                                    <div class="cap-metric__label">Accounts unified</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">MCC+</div>
+                                    <div class="cap-metric__label">OAuth across access tiers</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">Brand /<br>Non-brand</div>
+                                    <div class="cap-metric__label">Priority classification</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">#hash</div>
+                                    <div class="cap-metric__label">Shareable tab routing</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Automotive detailing studio</div>
+                            <h3 class="cap-card__title">Pattern-source dashboard</h3>
+                            <p class="cap-card__sub">The first build of this generation — pattern source for everything that came after.</p>
+                            <p class="cap-card__body">Single Google Ads account, five tabs covering overview, campaigns, ad creative with per-asset performance labels (Best / Good / Learning / Low), search terms, and keywords with quality-score visibility. Asset-level performance surfacing isn't typically available in templated dashboards; here it's the centerpiece.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt="Chart.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript">
+                            </div>
+                            <div class="cap-card__metrics">
+                                <div>
+                                    <div class="cap-metric__num">5</div>
+                                    <div class="cap-metric__label">Dashboard tabs</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">Asset</div>
+                                    <div class="cap-metric__label">Per-headline ratings</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">QS</div>
+                                    <div class="cap-metric__label">Keyword quality scores</div>
+                                </div>
+                                <div>
+                                    <div class="cap-metric__num">Pattern</div>
+                                    <div class="cap-metric__label">Reference architecture</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INDEPENDENT PRODUCTS ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Independent products</span>
+                    <h2 class="cap-h2">SaaS I've shipped on my own</h2>
+                    <p class="cap-lede">Each of these is publicly accessible — designed, built, deployed, and operated end-to-end. They're the proof that the same systems thinking that delivers your client work also ships real businesses.</p>
+
+                    <div class="cap-grid cap-grid--2">
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">SaaS · Live</div>
+                            <h3 class="cap-card__title">SportsBookish</h3>
+                            <p class="cap-card__sub">Pricing-edge analytics across Kalshi versus traditional sportsbooks.</p>
+                            <p class="cap-card__body">A three-tier SaaS surfacing arbitrage between Kalshi event contracts and the sportsbook market. Free, $19 Pro, and $39 Elite tiers with Stripe checkout, magic-link auth via Supabase, tier-gated feature flags, an alert dispatch engine, watchlist presets, and a public API with key management plus usage tracking. The data plane pulls from DataGolf Scratch+ and free Kalshi REST/WebSocket feeds.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/resend/000000" alt="Resend">
+                            </div>
+                            <a class="cap-card__cta" href="https://sportsbookish.com" target="_blank" rel="noopener">Visit sportsbookish.com →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">SaaS · Live</div>
+                            <h3 class="cap-card__title">AutomateDojo</h3>
+                            <p class="cap-card__sub">Done-for-you websites and marketing for martial arts dojos.</p>
+                            <p class="cap-card__body">A multi-tenant platform that generates branded dojo websites with AI-edited content. Two Claude engines work in concert — Opus for content edits, Haiku for extraction — with an intent classifier dispatching each prompt to the right tool. Per-template fallback registries. Compliance scanning that blocks the model from introducing violations. Version snapshotting for one-click rollback. Plus an integrations layer covering Meta, Stripe, and Twilio.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/anthropic/D97757" alt="Anthropic">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
+                            </div>
+                            <a class="cap-card__cta" href="https://automatedojo.com" target="_blank" rel="noopener">Visit automatedojo.com →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">AI search · Live</div>
+                            <h3 class="cap-card__title">MarkSearch.ai</h3>
+                            <p class="cap-card__sub">Natural-language search across the entire USPTO trademark database.</p>
+                            <p class="cap-card__body">Plain-English search over the federal trademark register. Maps business descriptions to Nice Classification codes (1–45) automatically. OpenAI embeddings plus Postgres pgvector for semantic similarity. Layered with Meilisearch for full-text speed and Qdrant for vector queries at scale. Includes domain availability checks and lead capture for IP law firms.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/openai/412991" alt="OpenAI">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meilisearch/FF5CAA" alt="Meilisearch">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/qdrant/DC244C" alt="Qdrant">
+                            </div>
+                            <a class="cap-card__cta" href="https://marksearch.ai" target="_blank" rel="noopener">Visit marksearch.ai →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Monitoring · Live</div>
+                            <h3 class="cap-card__title">SubredMonitor</h3>
+                            <p class="cap-card__sub">Real-time Reddit keyword alerts. Multi-user.</p>
+                            <p class="cap-card__body">Tracks unlimited keywords across any subreddit and fires email plus SMS alerts the moment matches surface. Multi-user auth, persistent SQLite storage with dedupe, configurable polling intervals, a web dashboard with real-time stats. Vercel-deployed Python and Flask — proof that "marketing engineering" doesn't always mean Next.js.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/python/3776AB" alt="Python">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/flask/000000" alt="Flask">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/reddit/FF4500" alt="Reddit">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
+                            </div>
+                            <a class="cap-card__cta" href="https://subredmonitor.com" target="_blank" rel="noopener">Visit subredmonitor.com →</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== RESEARCH / INVESTOR-FACING ===== -->
+        <section class="cap-section cap-section--tinted-purple">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Research initiatives</span>
+                    <h2 class="cap-h2">Internal products + investor-facing builds</h2>
+                    <p class="cap-lede">Builds that aren't paid client work — research, fundraising material, and platforms used as proof-of-concept for new ventures.</p>
+
+                    <div class="cap-grid cap-grid--3">
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Infra intelligence</div>
+                            <h3 class="cap-card__title">GridScout</h3>
+                            <p class="cap-card__sub">Datacenter site selection platform.</p>
+                            <p class="cap-card__body">Interactive map plus scoring engine for evaluating datacenter buildouts. 164,000 sites scored across nine site types — greenfield, industrial, substation-adjacent, mine-reuse, federal, manufacturing, shovel-ready, brownfield, and former military base reuse — using a ten-factor weighted readiness score. Custom weights, location search, hyperscaler tracking. Built originally for an institutional infrastructure investor pitch.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">164K</div><div class="cap-metric__label">Sites scored</div></div>
+                                <div><div class="cap-metric__num">52K</div><div class="cap-metric__label">Transmission lines</div></div>
+                                <div><div class="cap-metric__num">21</div><div class="cap-metric__label">API endpoints</div></div>
+                                <div><div class="cap-metric__num">10</div><div class="cap-metric__label">Scoring factors</div></div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Equipment market intel</div>
+                            <h3 class="cap-card__title">SolarTrack</h3>
+                            <p class="cap-card__sub">Commercial and utility-scale solar installation database.</p>
+                            <p class="cap-card__body">Every commercial (≥25 kW) and utility-scale (≥1 MW) solar installation in the United States, enriched and searchable. Aggregates 26 primary federal and state ingest pipelines, 75 city/county permit portals, and 30 enrichment scripts. Geospatial "near me" search without PostGIS. Built for a solar equipment reseller targeting commercial accounts.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">726K</div><div class="cap-metric__label">Installations</div></div>
+                                <div><div class="cap-metric__num">33K</div><div class="cap-metric__label">Installers profiled</div></div>
+                                <div><div class="cap-metric__num">101</div><div class="cap-metric__label">Data sources</div></div>
+                                <div><div class="cap-metric__num">3.4M</div><div class="cap-metric__label">Events ingested</div></div>
+                            </div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Market data R&amp;D</div>
+                            <h3 class="cap-card__title">GolfOdds</h3>
+                            <p class="cap-card__sub">Live Kalshi-versus-sportsbook arbitrage scanner.</p>
+                            <p class="cap-card__body">The R&amp;D platform that became SportsBookish. Pulls Kalshi market quotes alongside a 14-book consensus from DataGolf and surfaces pricing edges in real time. Postgres data plane. WebSocket primary with REST fallback. Identified meaningful edges at a major championship — the kind of signal that justified building the productized subscription on top.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">8K+</div><div class="cap-metric__label">Daily book quotes</div></div>
+                                <div><div class="cap-metric__num">14</div><div class="cap-metric__label">Books polled</div></div>
+                                <div><div class="cap-metric__num">WS</div><div class="cap-metric__label">+REST fallback</div></div>
+                                <div><div class="cap-metric__num">→</div><div class="cap-metric__label">Productized as SaaS</div></div>
+                            </div>
+                            <a class="cap-card__cta" href="/golfodds" target="_blank" rel="noopener">View at hyder.me/golfodds →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Investor research</div>
+                            <h3 class="cap-card__title">Token Opportunity Framework</h3>
+                            <p class="cap-card__sub">Capex business plans from the Ribbit Capital token letter.</p>
+                            <p class="cap-card__body">A static-export Next.js analysis of 150+ companies across the token economy framework. Nineteen detailed capex business plans, each with executive summary, full plan, and financials tabs — TAM, CAGR, LTV-to-CAC ratios, seed asks. Built originally to evaluate which framework opportunities were ready for productization.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">150+</div><div class="cap-metric__label">Companies analyzed</div></div>
+                                <div><div class="cap-metric__num">19</div><div class="cap-metric__label">Capex plans</div></div>
+                                <div><div class="cap-metric__num">RSC</div><div class="cap-metric__label">Static React export</div></div>
+                                <div><div class="cap-metric__num">SEO</div><div class="cap-metric__label">Pre-rendered</div></div>
+                            </div>
+                            <a class="cap-card__cta" href="/tokens" target="_blank" rel="noopener">View at hyder.me/tokens →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Investor decks</div>
+                            <h3 class="cap-card__title">Custom HTML pitch decks</h3>
+                            <p class="cap-card__sub">Full-screen, navigable, animated.</p>
+                            <p class="cap-card__body">When a slide deck has to do real work and Google Slides feels apologetic, I build full-screen HTML decks with custom progress bars, prev/next plus keyboard nav, and CSS-animated mockups. Examples: "Distribution Control in the Age of AI" (token framework) and a CalibrateNet pitch for an ADAS calibration network opportunity.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">2</div><div class="cap-metric__label">Investor decks shipped</div></div>
+                                <div><div class="cap-metric__num">~20</div><div class="cap-metric__label">Slides each</div></div>
+                                <div><div class="cap-metric__num">⌨️</div><div class="cap-metric__label">Keyboard navigable</div></div>
+                                <div><div class="cap-metric__num">CSS</div><div class="cap-metric__label">Animated mockups</div></div>
+                            </div>
+                            <a class="cap-card__cta" href="/decks/framework/" target="_blank" rel="noopener">View framework deck →</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Public utilities</div>
+                            <h3 class="cap-card__title">Free marketing tools</h3>
+                            <p class="cap-card__sub">Calculators and generators at hyder.me/tools.</p>
+                            <p class="cap-card__body">Five public tools — Ad Spend ROI calculator, Keyword Match Type generator, UTM Builder, YouTube video search, Backup Power calculator. Each is a single-file HTML page that works offline, no signup required. Direct, useful, and uncluttered — exactly the experience clients ask me to bring to their internal tooling.</p>
+                            <div class="cap-card__metrics">
+                                <div><div class="cap-metric__num">5+</div><div class="cap-metric__label">Public tools</div></div>
+                                <div><div class="cap-metric__num">0</div><div class="cap-metric__label">Backend required</div></div>
+                                <div><div class="cap-metric__num">Free</div><div class="cap-metric__label">No signup</div></div>
+                                <div><div class="cap-metric__num">SEO</div><div class="cap-metric__label">Inbound channel</div></div>
+                            </div>
+                            <a class="cap-card__cta" href="/tools" target="_blank" rel="noopener">View at hyder.me/tools →</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STACK / TECH SECTION ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Working stack</span>
+                    <h2 class="cap-h2">What I work in, day to day</h2>
+                    <p class="cap-lede">Not a brochure list — these are the tools and APIs I have running code against right now, this week.</p>
+
+                    <div class="cap-stack-cluster">
+
+                        <div class="cap-stack-group">
+                            <h4>Languages</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/typescript/3178C6" alt=""> TypeScript</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""> Python</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt=""> JavaScript</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> SQL</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/html5/E34F26" alt=""> HTML/CSS</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/gnubash/4EAA25" alt=""> Bash</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Frameworks</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/nextdotjs/000000" alt=""> Next.js 16</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/react/61DAFB" alt=""> React</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/flask/000000" alt=""> Flask</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt=""> Tailwind v4</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/bootstrap/7952B3" alt=""> Bootstrap 5</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/shadcnui/000000" alt=""> shadcn/ui</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Databases &amp; data infra</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/supabase/3FCF8E" alt=""> Supabase Postgres</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> pgvector</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/postgis/336791" alt=""> PostGIS</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/googlebigquery/669DF6" alt=""> BigQuery</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/sqlite/003B57" alt=""> SQLite</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/meilisearch/FF5CAA" alt=""> Meilisearch</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/qdrant/DC244C" alt=""> Qdrant</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Marketing &amp; ad APIs</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/googleads/4285F4" alt=""> Google Ads v23</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/meta/0467DF" alt=""> Meta Marketing API</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/tiktok/000000" alt=""> TikTok Marketing API</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/microsoft/737373" alt=""> Microsoft Ads (SOAP)</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/googleanalytics/E37400" alt=""> GA4</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/googlesearchconsole/458CF5" alt=""> Search Console</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/googlemybusiness/4285F4" alt=""> Business Profile</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>AI / ML</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/anthropic/D97757" alt=""> Claude (Opus + Haiku)</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/openai/412991" alt=""> OpenAI (GPT-4, embeddings)</span>
+                                <span class="cap-stack-item">Intent classification</span>
+                                <span class="cap-stack-item">Vector search</span>
+                                <span class="cap-stack-item">RAG pipelines</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Payments, auth &amp; messaging</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/stripe/635BFF" alt=""> Stripe v22</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/supabase/3FCF8E" alt=""> Supabase Auth</span>
+                                <span class="cap-stack-item">OAuth 2.0 (6+ providers)</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/twilio/F22F46" alt=""> Twilio</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/resend/000000" alt=""> Resend</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>CRM &amp; ops integrations</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item">ActiveCampaign</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/airtable/18BFFF" alt=""> Airtable</span>
+                                <span class="cap-stack-item">Vonage VBC</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/zapier/FF4F00" alt=""> Zapier</span>
+                                <span class="cap-stack-item">DataGolf</span>
+                                <span class="cap-stack-item">Kalshi</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Infrastructure</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/vercel/000000" alt=""> Vercel</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/cloudflare/F38020" alt=""> Cloudflare</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/githubactions/2088FF" alt=""> GitHub Actions</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/amazons3/569A31" alt=""> AWS S3</span>
+                                <span class="cap-stack-item">Cron schedules</span>
+                            </div>
+                        </div>
+
+                        <div class="cap-stack-group">
+                            <h4>Data visualization</h4>
+                            <div class="cap-stack-items">
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt=""> Chart.js v4</span>
+                                <span class="cap-stack-item">Recharts</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/leaflet/199900" alt=""> Leaflet</span>
+                                <span class="cap-stack-item"><img src="https://cdn.simpleicons.org/mapbox/000000" alt=""> Mapbox</span>
+                                <span class="cap-stack-item">jsPDF</span>
+                                <span class="cap-stack-item">html2canvas</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== BUILD VS BUY ===== -->
+        <section class="cap-section cap-section--tinted-brown">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Build vs buy</span>
+                    <h2 class="cap-h2">Why custom — not Supermetrics</h2>
+                    <p class="cap-lede">A six-client agency rolled up into one mega-account needs roughly 25 ad accounts across nine unique data sources. Here's what that looks like in a tools-first world versus a custom one.</p>
+
+                    <div style="overflow-x: auto;">
+                        <table class="cap-compare">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Supermetrics + Looker Studio</th>
+                                    <th>Custom build (what I deliver)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cap-rowlabel">Annual cost</td>
+                                    <td>$7,400 – $21,000<br><small>Pro tier with add-ons; higher tier required for BigQuery as destination</small></td>
+                                    <td>~$0 in tooling<br><small>Supabase + Vercel free tiers under fair-use limits</small></td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Annual commitment</td>
+                                    <td>Required — no monthly billing</td>
+                                    <td>None — you own the code</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Visualization</td>
+                                    <td>Looker Studio templates — generic layout, generic charts</td>
+                                    <td>100% custom per client — branding, drilldowns, exports, your reporting metaphors</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Refresh cadence</td>
+                                    <td>Hourly (Pro tier) or daily (lower tiers)</td>
+                                    <td>On-click, every time the user opens a tab</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Multi-account merges</td>
+                                    <td>Rows dumped — you build the merge logic yourself</td>
+                                    <td>Built in: 3 Meta accounts unified into one view, 9 Google Ads accounts rolled up with priority brand/non-brand classification</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Cross-source joins</td>
+                                    <td>Custom SQL in BigQuery only (extra cost tier)</td>
+                                    <td>Built: GA4 ↔ Google Ads vendor/affiliate attribution, AC ↔ Vonage missed-call attribution</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Non-API sources</td>
+                                    <td>Out of scope (no Vonage call pipeline, no Airtable nuance, no voicemail webhook)</td>
+                                    <td>Built (75K call records ingested, $250K+ Airtable rebates synced, voicemail → CRM deal flow)</td>
+                                </tr>
+                                <tr>
+                                    <td class="cap-rowlabel">Per-client branding</td>
+                                    <td>Limited theme controls</td>
+                                    <td>Distinct visual identity per client — gallery gold, financial blue, dark navy, your color</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p style="margin-top: 32px; font-style: italic; color: var(--light-text-color); max-width: 760px;">
+                        The catch: Supermetrics still can't deliver about 20–30% of what's running across these dashboards (Vonage pipelines, Airtable workflows, voicemail webhooks, real-time CRM deal creation, custom conversion-action joins, per-client UX). You'd be paying for an incomplete answer.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ENGAGEMENT MODEL ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Engagement model</span>
+                    <h2 class="cap-h2">How working together works</h2>
+                    <p class="cap-lede">I take on a small number of engagements at any given time — through existing relationships, referrals, and direct outreach from companies I want to work with. Three structures: <strong>retainer</strong>, <strong>project</strong>, or <strong>advisor</strong>. The discovery call is a real conversation about fit, not a sales pitch.</p>
+
+                    <div class="cap-steps">
+                        <div class="cap-step">
+                            <div class="cap-step__num">01</div>
+                            <div class="cap-step__title">Conversation</div>
+                            <div class="cap-step__body">A direct call. Where you are, where you want to go, whether the chemistry is right on both sides. I don't take on speculative work and I don't run pre-engagement spec exercises.</div>
+                        </div>
+                        <div class="cap-step">
+                            <div class="cap-step__num">02</div>
+                            <div class="cap-step__title">Terms &amp; kickoff</div>
+                            <div class="cap-step__body">Scope, structure, and rate agreed. SOW signed. Deposit in. Kickoff typically within one to two weeks — depending on calendar and capacity at the time.</div>
+                        </div>
+                        <div class="cap-step">
+                            <div class="cap-step__num">03</div>
+                            <div class="cap-step__title">Delivery &amp; continuity</div>
+                            <div class="cap-step__body">Weekly cadence. Deploys to a password-gated staging URL. Working software at every checkpoint. Continued hosted on hyder.me with monthly monitoring and iteration, or full source handoff to your team — your call.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTACT ===== -->
+        <section class="contact contact--section" id="contact">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                        <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                            START A CONVERSATION
+                        </h2>
+                    </div>
+
+                    <div class="contact__form">
+                        <form class="form" id="contactForm">
+                            <div style="display:none;">
+                                <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="row form__row g-3">
+                                <div class="col-lg-6">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="name" class="form__label fs-sm">Your name <span style="color: red;">*</span></label>
+                                        <input type="text" id="name" name="name" placeholder="John Doe" class="form__input" required />
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="email" class="form__label fs-sm">Email <span style="color: red;">*</span></label>
+                                        <input type="email" id="email" name="email" placeholder="john@example.com" class="form__input" required />
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="message" class="form__label fs-sm">What are you trying to build, replace, or fix? <span style="color: red;">*</span></label>
+                                        <textarea id="message" name="message" placeholder="Tell me about your project — current tools, biggest reporting headache, what you'd build if Supermetrics didn't exist..." class="form__input form__textarea" required></textarea>
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                        <small style="color: #666; font-size: 0.875rem;"><span id="charCount">0</span>/1000 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form__item d-flex flex-column align-items-center">
+                                        <button type="submit" class="form__submit btn" id="submitBtn">SEND MESSAGE</button>
+                                        <div id="formMessage" style="margin-top: 1rem; display: none; padding: 0.75rem; border-radius: 4px; width: 100%; text-align: center;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2026 <span itemprop="name">Hyder Media</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
