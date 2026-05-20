@@ -106,17 +106,19 @@ export default async function handler(req, res) {
     if (existing) continue;
 
     // Whipsaw guard: skip if we posted ANY move alert for this EVENT on X
-    // in the last 2h. Was matching on player name (a.title), which never
-    // collided across players in the same event — three tweets in one
-    // hour all pointing to the same Hits event slipped through.
-    const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
+    // in the last 24h. Was 2h originally but every player who crosses the
+    // threshold within a same game generates a new alert, and the feed
+    // ended up with "all tweets in the past hour have the same link".
+    // 24h cap means each event_id gets at most one tweet per day; the loop
+    // continues to the next candidate, so other games still get coverage.
+    const dayAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
     const { data: recentSame } = await supabase
       .from("sb_social_posts")
       .select("id")
       .eq("platform", "x")
       .eq("kind", "move_alert")
       .like("text", `%${a.link}%`)
-      .gte("posted_at", twoHoursAgo)
+      .gte("posted_at", dayAgo)
       .limit(1);
     if (recentSame && recentSame.length > 0) continue;
 
