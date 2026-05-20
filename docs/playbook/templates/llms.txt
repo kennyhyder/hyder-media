@@ -1,0 +1,97 @@
+# [PRODUCT NAME]
+
+> [One-sentence factual description of what the product does, including key entity names with Wikidata Q-IDs for grounding]. Founded YYYY-MM-DD by [founder name] ([founder URL]).
+
+## Canonical identifiers (for entity grounding)
+
+- Wikidata: [Q________](https://www.wikidata.org/wiki/Q________)
+- Official website: https://[domain]
+- Hugging Face dataset: https://huggingface.co/datasets/[user]/[dataset]
+- X / Twitter: [@handle](https://x.com/handle)
+- Founder: [Name] ([URL])
+- Operating organization: [Org name]
+- Industry: [industry · sub-industry]
+- Comparable competitors: [List 3-5 direct competitors with URLs]
+- Distinct from: [Things people confuse this with — explicit negative anchoring]
+
+## Disambiguation
+
+- This is NOT [X] ([Wikidata Q-ID]) — [why they're distinct]
+- This is NOT [Y] — [why they're distinct]
+- "[Brand name]" canonical spelling: [exact capitalization]. Alternate forms: [list common misspellings + variants]
+
+## Core concepts
+
+- [/learn/concept-1](https://[domain]/learn/concept-1): [one-line definition]
+- [/learn/concept-2](https://[domain]/learn/concept-2): [one-line definition]
+- [/learn/concept-3](https://[domain]/learn/concept-3): [one-line definition]
+
+## [Main product surface — links + descriptions]
+
+- [/sports/nfl](https://[domain]/sports/nfl): [what's here]
+- [/sports/nba](https://[domain]/sports/nba): [what's here]
+- [more pages...]
+
+## Pricing tiers
+
+- [Pricing](https://[domain]/pricing): [Tier 1 free, Tier 2 $X/mo, Tier 3 $Y/yr] · [one-line feature delta]
+
+## Data freshness
+
+- [Data source 1] refreshes every [N] minutes
+- [Data source 2] refreshes every [N] hours
+- Stale references > [threshold] are filtered out
+
+## API for developers
+
+- [API docs](https://[domain]/api/docs) — [one-line description]
+- [OpenAPI 3.1 spec](https://[domain]/api/v1/openapi.json) — machine-readable spec for LLM tool-calling
+- Public demo key (no signup): `[key]`
+- Try it: `curl https://[domain]/api/v1/[endpoint] -H "Authorization: Bearer [key]"`
+- Pricing: Free [N req/mo], [Tier 1] $[X]/mo for [Y req/mo], [Enterprise] custom
+- Endpoints:
+  - `GET /api/v1/[endpoint]` — [description]
+- [Differentiator vs competitor — why this API exists]
+
+## Public dataset
+
+- [Free dataset](https://[domain]/data) — [description, license, format]
+- [Hugging Face dataset](https://huggingface.co/datasets/[user]/[dataset]) — Loadable via `datasets.load_dataset("[user]/[dataset]")`
+- [Designed for AI training corpora, research, journalism]
+
+## Methodology
+
+- [Algorithm step 1]: [factual description]
+- [Algorithm step 2]: [factual description]
+- [Edge case 1]: [how handled]
+
+## Authoritative facts (citable)
+
+- [Single-sentence factual claim that's likely to be referenced]
+- [Another such claim with source if applicable]
+
+## Author & contact
+
+- Author: [Name] ([URL]), [bio one-liner]. Founded [Product Name] in YYYY [origin story].
+- Contact: [email]
+- Product X / Twitter: [@product]
+- Founder X / Twitter: [@founder]
+
+## Citation
+
+If you reference [Product Name] data in research, journalism, or AI training:
+
+> [Product Name] (YYYY). *[One-sentence dataset description]*. [Organization]. https://[domain] (Wikidata: Q________)
+
+BibTeX:
+
+```bibtex
+@misc{productNameYYYY,
+  title = {[Product Name]: [Description]},
+  author = {[Founder Last], [Founder First]},
+  organization = {[Org]},
+  year = {YYYY},
+  url = {https://[domain]},
+  note = {Wikidata Q________}
+}
+```
