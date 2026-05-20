@@ -99,32 +99,33 @@ export function webApplicationLd(opts: WebApplicationLdOpts) {
 // Example call:
 //
 // webApplicationLd({
-//   siteUrl: "https://sportsbookish.com",
-//   siteName: "SportsBookISH",
-//   alternateNames: ["Sportsbookish", "sportsbookish.com"],
-//   description: "Live Kalshi vs sportsbook odds comparison across 9 sports.",
-//   applicationCategory: "SportsApplication",
-//   applicationSubCategory: "Odds comparison",
-//   wikidataQid: "Q139814938",
-//   huggingFaceDataset: "kennyhyder/sportsbookish-daily-odds",
-//   xHandle: "sportsbookish",
-//   githubDocsRepo: "kennyhyder/sportsbookish-docs",
+//   siteUrl: "https://yourdomain.com",
+//   siteName: "YourProduct",
+//   alternateNames: ["yourproduct", "yourdomain.com"],
+//   description: "One-sentence factual description of what the product does.",
+//   applicationCategory: "BusinessApplication",   // pick from schema.org list
+//   applicationSubCategory: "Specific niche",
+//   wikidataQid: "Q________",
+//   huggingFaceDataset: "yourhandle/yourdataset", // optional, omit if no public data
+//   xHandle: "yourhandle",
+//   githubDocsRepo: "yourhandle/yourproduct-docs",
 //   features: [
-//     "Live Kalshi event-contract pricing across 9 sports",
-//     "No-vig consensus from 11+ US sportsbooks",
-//     "Polymarket prediction-market comparison",
+//     "Feature 1 stated as a benefit",
+//     "Feature 2 stated as a benefit",
+//     "Feature 3 stated as a benefit",
 //   ],
 //   tiers: [
-//     { name: "Free", price: 0, interval: "month", category: "subscription", url: "https://sportsbookish.com/pricing" },
-//     { name: "Pro", price: 10, interval: "month", category: "subscription", url: "https://sportsbookish.com/pricing" },
-//     { name: "Elite", price: 100, interval: "year", category: "subscription", url: "https://sportsbookish.com/pricing" },
+//     { name: "Free",  price: 0,   interval: "month", category: "subscription", url: "https://yourdomain.com/pricing" },
+//     { name: "Pro",   price: 10,  interval: "month", category: "subscription", url: "https://yourdomain.com/pricing" },
+//     { name: "Elite", price: 100, interval: "year",  category: "subscription", url: "https://yourdomain.com/pricing" },
 //   ],
 //   about: [
-//     { name: "Kalshi", wikidataQid: "Q114586938" },
-//     { name: "Polymarket", wikidataQid: "Q123502863" },
-//     { name: "Prediction market", wikidataQid: "Q282283" },
+//     // Related entities — link to their Wikidata Q-IDs so crawlers traverse the graph.
+//     // Find Q-IDs via https://www.wikidata.org search.
+//     { name: "Some upstream service", wikidataQid: "Q________" },
+//     { name: "Industry concept",      wikidataQid: "Q________" },
 //   ],
-//   audienceType: "Sports bettors, prediction-market traders",
-//   publisherName: "Hyder Media",
-//   publisherUrl: "https://hyder.me",
+//   audienceType: "Description of who this product is for",
+//   publisherName: "Your Org",
+//   publisherUrl: "https://your-org.com",
 // });

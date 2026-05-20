@@ -1,6 +1,6 @@
 # The Modern AI-Discoverable SaaS Playbook
 
-Everything Kenny Hyder / Hyder Media learned shipping SportsBookISH in May 2026 — every optimization, every defensive pattern, every checklist. Distilled into a playbook reusable on any project.
+The vendor-agnostic playbook Hyder Media uses on every web product we ship. Every optimization, every defensive pattern, every checklist. Reusable on any project.
 
 ## Structure
 
@@ -10,6 +10,7 @@ Everything Kenny Hyder / Hyder Media learned shipping SportsBookISH in May 2026 
 - **`patterns/`** — Defensive engineering patterns with exact code.
 - **`templates/`** — Ready-to-paste templates (llms.txt, JSON-LD blocks, OpenAPI skeleton, etc.).
 - **`publish/`** — Instructions for converting to PDF and publishing on hyder.me.
+- **`business/`** — Monetization options, pricing, landing-page copy, and a launch sequence for the playbook itself as a product.
 
 ## Three ways to use this
 
@@ -21,10 +22,11 @@ Everything Kenny Hyder / Hyder Media learned shipping SportsBookISH in May 2026 
 
 | Topic | Playbook section |
 |---|---|
+| Pre-flight: domain, DNS, GA4, Search Console, Bing WMT, email auth | §0 |
 | Wikidata + llms.txt + JSON-LD identity | §3 |
 | Per-page SEO schemas + OpenAPI for LLM tool calling | §4 |
 | CSP, headers, RLS, secret management | §5 |
 | GA4 events without webhook races | §6 |
 | Launch distribution (10 channels, ranked) | §7 |
-| Defensive patterns ("the Stripe newline bug", etc.) | §8 |
+| Defensive patterns (12 named bugs by symptom) | §8 |
 | Pre-launch / weekly / recovery checklists | §9 |

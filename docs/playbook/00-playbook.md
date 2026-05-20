@@ -1,6 +1,6 @@
 # The Modern AI-Discoverable SaaS Launch Playbook
 
-*Every optimization, defensive pattern, and launch tactic learned shipping SportsBookISH in May 2026 — distilled into a reusable playbook for any web project.*
+*Every optimization, defensive engineering pattern, and launch tactic Hyder Media uses on every web product we ship — distilled into a vendor-agnostic playbook for any builder.*
 
 — Kenny Hyder, Hyder Media
 
@@ -10,7 +10,7 @@
 
 Building for the web in 2026 is fundamentally different from building for the web in 2022.
 
-In 2022, "discoverability" meant one thing: Google. You wrote keyword-targeted content, you earned backlinks, you waited for the search rankings to compound. Bing, Yandex, DuckDuckGo existed but were rounding errors.
+In 2022, "discoverability" meant one thing: Google. You wrote keyword-targeted content, you earned backlinks, you waited for rankings to compound. Bing, Yandex, DuckDuckGo existed but were rounding errors.
 
 That world is gone. The traffic you used to get from a #1 Google ranking now splits across at least seven distinct surfaces:
 
@@ -20,13 +20,169 @@ That world is gone. The traffic you used to get from a #1 Google ranking now spl
 4. **ChatGPT search** — same family of behaviors as Perplexity, different surfacing logic
 5. **Claude (Anthropic) web tools** — grounding from documents the user attaches, real-time fetches, and the model's training corpus
 6. **Bing/Copilot** — small organic share, but where IndexNow actually lives + where Bing AI grounds
-7. **Vertical AI tools** — every domain-specific AI (code agents, sports research bots, finance research tools, etc.) is increasingly using OpenAI tool-calling against APIs you might not even know about
+7. **Vertical AI tools** — every domain-specific AI (code agents, research bots, finance tools, etc.) is increasingly using OpenAI tool-calling against APIs you might not even know about
 
 Each of these surfaces consumes a different signal. Google AI Overview wants `FAQPage` JSON-LD. Perplexity wants clean canonical text and Wikidata grounding. Claude's tool calling wants a polished OpenAPI 3.1 spec. Bing wants IndexNow pings.
 
 The new mandate: **build for every surface simultaneously, with one set of files**. That's what this playbook is.
 
-It's organized in five layers, from the deepest signal (entity identity) to the most visible (distribution). Skip nothing — they compound.
+It's organized in five layers (plus a pre-flight chapter), built from foundation up. Skip nothing — they compound.
+
+---
+
+## §0. Pre-flight: accounts and verifications
+
+Before you can apply Layers 1-5, the foundation accounts have to exist and be verified. This is the boring, one-time setup that most playbooks skip — but you can't build entity grounding on top of an unverified domain.
+
+If you've already built a few products, you can skim this and confirm everything's in place. If you're shipping your first one, do these in order before touching anything in §1.
+
+### 0.1 Domain registration
+
+- **Registrar matters less than you think.** Cloudflare Registrar, Namecheap, Porkbun are all fine. Cloudflare Registrar charges wholesale (~$8-10/yr for `.com`) with no markup and includes WHOIS privacy. Pick that unless you have a reason not to.
+- **Use a `.com` if available.** Not for SEO — search engines don't care — but because humans still mentally complete `.com` first when they hear a brand. Avoid `.io` for consumer products (associated with crypto/dev tools); fine for B2B/dev.
+- **Auto-renew + email forwarding.** Set auto-renew immediately. Forward `hello@`, `support@`, `legal@`, `security@`, `dmarc@` to your real email so you receive abuse reports + transactional sender feedback.
+
+### 0.2 DNS — use Cloudflare even if you're not on Cloudflare for hosting
+
+Move DNS to Cloudflare even if your domain is registered elsewhere and your site is hosted on Vercel/Netlify/etc. Reasons:
+
+- Cloudflare's DNS propagation is the fastest in the industry (~30s vs hours for some registrars)
+- Free DNS-level DDoS mitigation
+- Cloudflare Email Routing (free) — lets you set up `support@yourdomain.com` → your real Gmail without paying for Google Workspace
+- Page Rules / Transform Rules let you add cache headers without code changes
+- Analytics that don't require JavaScript on the page
+
+Configure these records day 1:
+
+```
+A      @                  → [your host IP, e.g. Vercel's 76.76.21.21]
+CNAME  www                → cname.vercel-dns.com  (or your host's CNAME target)
+TXT    @                  → "v=spf1 include:_spf.google.com include:resend.io ~all"  (see 0.7)
+TXT    _dmarc             → "v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com"
+```
+
+### 0.3 Hosting
+
+For most SaaS products today, the right choice is **Vercel** (Next.js-friendly, generous free tier, fast cold starts) or **Cloudflare Pages** (cheaper at scale, slightly more setup). Netlify, Railway, and Render are also fine.
+
+What this playbook assumes:
+
+- Your host gives you serverless functions for API routes
+- It auto-deploys from GitHub on push to `main`
+- Custom domains land within seconds, not hours
+- Environment variables can be set via CLI or dashboard
+
+If your host doesn't do these, the patterns still apply but the exact commands differ.
+
+### 0.4 Database + Auth
+
+**Supabase** is the default for new SaaS in 2026: Postgres + Auth + Storage + Realtime in one product, generous free tier, RLS-first. **Neon** + **Clerk** is a common alternative (Neon for Postgres, Clerk for Auth). **Convex** if you want reactive queries instead of REST.
+
+Pick one early — switching halfway through is painful because schema + auth assumptions ripple through your code.
+
+Whatever you pick:
+
+- **Enable RLS** (Row Level Security) on every table the moment you create it. Default-deny.
+- **Have two clients**: an anon-key client for browser, a service-role client for serverless functions. Never expose the service-role key to the browser.
+- **Use a managed Postgres connection pooler** if you're on serverless. Supabase ships one (`aws-0-us-west-2.pooler.supabase.com` on port 6543). Without it, cold-starting functions exhaust your connection limit fast.
+
+### 0.5 Payments — Stripe setup
+
+- **Create a Stripe account immediately**, even if you're not charging yet. The "live mode" account takes a few days for some verifications to clear. Don't wait until launch week.
+- **Activate Stripe Customer Portal** at `https://dashboard.stripe.com/settings/billing/portal` BEFORE you ship the "Manage subscription" button. Without this configured, the portal API throws errors and the button silently fails. Check the boxes for: cancel subscription, update payment method, view invoices, download receipts. Save in both Test and Live mode separately.
+- **Create products + prices in code** via a setup script, not in the dashboard. The script is reusable across Test/Live mode and survives the inevitable "let me delete this old price" cleanup. Keep your Price IDs in env vars, never hardcoded.
+- **Set up webhooks** with explicit event lists. Don't subscribe to "all events" — narrow to the ones you actually handle (`checkout.session.completed`, `customer.subscription.{created,updated,deleted}`, `invoice.payment_{succeeded,failed}`).
+
+### 0.6 Analytics — Google Analytics 4
+
+- **Create a GA4 property** at https://analytics.google.com → Admin → Create Property. Name it your product name; timezone matters (set to your reporting timezone, not the data timezone). Currency in USD unless you have a strong reason otherwise.
+- **Add a Web data stream**. Copy the Measurement ID (looks like `G-XXXXXXXXXX`) — you'll reference this in code.
+- **Enable Enhanced Measurement** (the toggle is in the stream settings). This gives you pageviews, scroll depth, outbound clicks, file downloads, and form interactions automatically — saves you from manually instrumenting basic events.
+- **Disable Google Signals** if you care about strict privacy/cookie compliance. Enable if you want demographic data and don't mind the consent banner implications.
+- **Set up Conversions early.** Custom events fire as regular events by default; only events marked as "key events" appear in Conversion reports and can be imported into Google Ads. Mark `sign_up`, `purchase`, `begin_checkout` immediately (they auto-register after first fire, then you toggle them).
+
+### 0.7 Email sender domain + SPF/DKIM/DMARC
+
+**This is the single most-skipped step in modern SaaS launches.** If your transactional emails aren't authenticated, they go to spam — which means password resets, magic links, receipts, and alerts all fail silently. Users blame your product. You can't debug it without tooling that shows you the spam-folder verdict.
+
+**Use Resend** (cleanest API, free up to 3,000 emails/mo) or **Postmark** (best deliverability, higher cost). Avoid SendGrid for new accounts — their shared IPs are reputation-damaged.
+
+Setup steps:
+
+1. In Resend (or your provider), add your sending domain (e.g. `yourdomain.com`).
+2. Resend shows you DNS records to add — copy them all into your DNS:
+   - **SPF** (TXT record on root): `v=spf1 include:resend.io ~all`. If you already have Google Workspace, combine: `v=spf1 include:_spf.google.com include:resend.io ~all`. You can only have ONE SPF record.
+   - **DKIM** (TXT record on a specific subdomain like `resend._domainkey`): the long string Resend gives you. Copy verbatim.
+   - **MX records** for return-path / bounce handling: Resend provides; usually a Resend-specific subdomain.
+3. **DMARC** (TXT record on `_dmarc`): start at `p=quarantine` (suspicious mail goes to spam, not deleted). After 30 days with no false-positives, escalate to `p=reject`. Include `rua=mailto:dmarc@yourdomain.com` to get aggregate reports.
+4. **Wait up to 48h for DNS propagation** (usually minutes with Cloudflare, hours with other registrars).
+5. **Verify with mail-tester.com**: send a test email from your app to the address it provides → score 10/10. Anything less than 9/10 means a header is wrong; fix before launching.
+
+This setup also protects you against email spoofing (someone sending phishing emails pretending to be you). DMARC + DKIM make that very hard.
+
+### 0.8 Google Search Console
+
+GSC is how Google tells you what queries you're ranking for, what URLs are crawl-errored, and what AI Overviews / featured snippets they've pulled from your site. Free, no excuse not to set up.
+
+1. Go to https://search.google.com/search-console and click **Add property**.
+2. Choose **Domain property** (not URL prefix) — covers all subdomains and protocols.
+3. Verify via DNS TXT record. Cloudflare-hosted DNS = paste their TXT record, verify in 30 seconds.
+4. Once verified:
+   - **Submit your sitemap** at Settings → Sitemaps → `https://yourdomain.com/sitemap.xml`
+   - **Set the preferred domain** (with `www.` or without — pick one, redirect the other)
+   - **Configure international targeting** if you're targeting a specific country
+   - **Add a property for each subdomain** you care about (e.g. `docs.yourdomain.com`) — domain-property covers them but sub-property gives you separate reports
+5. **Connect to Google Analytics** at GA4 Admin → Search Console links → Link. Lets you see search query attribution in GA4.
+
+### 0.9 Bing Webmaster Tools
+
+Smaller traffic but where IndexNow + Bing AI grounding originate.
+
+1. Sign in at https://www.bing.com/webmasters with the same Google account as GSC.
+2. Click **Import from Google Search Console** — pulls your verified properties + sitemaps automatically. Saves 20 minutes of manual setup.
+3. Confirm verification.
+4. **Generate your IndexNow API key** under Settings → IndexNow. Save it; you'll deploy it at `https://yourdomain.com/[key].txt` and reference it on every IndexNow ping.
+
+### 0.10 Stack diagram before you write a single line of code
+
+Before opening the editor, draw the stack on paper:
+
+```
+Domain (registrar) → DNS (Cloudflare) → Host (Vercel)
+                                          │
+              ┌───────────────────────────┼────────────────────────┐
+              │                           │                        │
+        DB (Supabase)              Payment (Stripe)         Email (Resend)
+        Postgres + Auth            Subscriptions             Transactional
+              │
+        RLS policies on every table
+        Service-role key for cron, anon key for browser
+
+         Analytics:  GA4 (web + conversion events)
+         Search:     GSC + Bing WMT
+         AI grounding: Wikidata + llms.txt + JSON-LD + OpenAPI
+         Datasets:   Hugging Face (if you publish open data)
+```
+
+Knowing the dependency graph prevents "wait, where does Stripe send the webhook again?" debugging mid-build.
+
+### 0.11 Pre-flight verification checklist
+
+Before you write a single feature, all of these must pass:
+
+- [ ] Domain registered, auto-renew on
+- [ ] DNS on Cloudflare (or equivalent fast DNS)
+- [ ] Email forwarding for `hello@`, `support@`, `dmarc@` works (test it)
+- [ ] Hosting account created, GitHub repo connected, hello-world page deploys on push
+- [ ] Supabase (or alt) project created, two clients (anon + service-role) tested
+- [ ] Stripe account created, Customer Portal configured, test webhook event fires
+- [ ] Resend domain verified, mail-tester.com score 10/10
+- [ ] DMARC report email arrives within 24h
+- [ ] GA4 property created, Measurement ID copied
+- [ ] Search Console property verified, sitemap accepted
+- [ ] Bing Webmaster Tools imported, IndexNow key generated and deployed
+
+This checklist will save you a week of mid-build interruptions. Get it done in one sitting.
 
 ---
 
@@ -51,9 +207,9 @@ It's organized in five layers, from the deepest signal (entity identity) to the 
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Each layer requires the one below it. You can't get good GA4 conversion attribution if your URLs aren't canonical (layer 2). You can't get into Google AI Overviews if your headers leak mixed content (layer 3). You can't pitch journalists effectively if your Wikidata entry is broken (layer 1).
+Each layer requires the one below it. You can't get good GA4 conversion attribution if your URLs aren't canonical (Layer 2). You can't get into Google AI Overviews if your headers leak mixed content (Layer 3). You can't pitch journalists effectively if your Wikidata entry is broken (Layer 1).
 
-Build bottom-up. Reading top-down (skipping foundations) is the most common reason people's launches don't compound.
+Build bottom-up. Reading top-down (skipping foundations) is the most common reason launches don't compound.
 
 ---
 
@@ -63,28 +219,24 @@ If you take one architectural idea from this playbook, take this one:
 
 **Don't write SEO content, then separately write LLM-grounding content, then separately write API docs.** Write each piece of canonical information *once*, in a structured format, and project it into every surface that needs it.
 
-Concrete examples from SportsBookISH:
+Concrete example — your product's tier metadata lives in `lib/tiers.ts` (TypeScript) and is consumed by:
 
-- **The site's tier metadata** lives in `lib/tiers.ts` (TypeScript) and is consumed by:
-  - The pricing page UI (rendering)
-  - The Stripe checkout flow (price ID lookup)
-  - The JSON-LD `WebApplication` `offers` block (SEO + AI)
-  - The OpenAPI spec's response examples (developer docs)
-  - The GA4 `purchase` event's `item_id` and `value` (analytics)
-  - The `llms.txt` pricing block (AI grounding)
-  - The press release boilerplate (distribution)
-
-- **The Wikidata Q-ID** (`Q139814938`) lives in `lib/seo.ts` and is referenced by:
-  - JSON-LD `sameAs` arrays on the homepage
-  - The `llms.txt` canonical-identifier block
-  - The OpenAPI `info.x-wikidata` extension
-  - The Hugging Face dataset README citation block
-  - The GitHub docs repo's README + `CITATION.cff`
-  - The press release's "about" boilerplate
+- The pricing page UI (rendering)
+- The Stripe checkout flow (price ID lookup)
+- The JSON-LD `WebApplication` `offers` block (SEO + AI)
+- The OpenAPI spec's response examples (developer docs)
+- The GA4 `purchase` event's `item_id` and `value` (analytics)
+- The `llms.txt` pricing block (AI grounding)
+- The press release boilerplate (distribution)
 
 When any one of these changes, you change it in one place. Drift between surfaces is what causes LLMs to lose confidence in your entity ("which is the canonical price — the one in the pricing page or the one in the API docs?") and downrank you as a source.
 
-The corollary: don't put canonical facts in CMS-rendered marketing pages. Put them in code/config, render the marketing pages from that, and project the same facts into the AI-readable formats.
+Same pattern applies to your Wikidata Q-ID, your canonical product name, your pricing tiers, and any other "the source of truth" data:
+
+- Q-ID lives in your config → referenced by JSON-LD `sameAs`, llms.txt, OpenAPI `x-wikidata` extension, citation blocks, press release
+- Canonical product name in your config → rendered into every meta title, JSON-LD `name`, OG image, llms.txt header
+
+**The corollary:** don't put canonical facts in CMS-rendered marketing pages. Put them in code/config, render the marketing pages from that, and project the same facts into the AI-readable formats.
 
 ---
 
@@ -102,27 +254,27 @@ A Wikidata Q-item is the canonical anchor that lets multilingual LLMs disambigua
 
 | Property | Use | Notes |
 |---|---|---|
-| `P31` (instance of) | What kind of thing this is | At minimum `Q35127` (website) + `Q1668024` (web application). Avoid using "date of establishment" (Q3406134) — that's not a class. |
+| `P31` (instance of) | What kind of thing this is | At minimum `Q35127` (website) + `Q1668024` (web application). Avoid using "date of establishment" (`Q3406134`) — that's not a class. |
 | `P17` (country) | Where you're based | E.g. `Q30` for United States |
 | `P856` (official website) | Your URL | One claim |
 | `P571` (inception) | Launch date | Use full date precision (precision 11) |
 | `P112` (founded by) | Founder Q-ID | Create a Q-ID for yourself first if you don't have one |
 | `P127` (owned by) | Operating org Q-ID | Same |
 | `P154` (logo image) | Commons filename of your logo | See §3.1.2 below |
-| `P2002` (X/Twitter username) | Without the `@` | E.g. `sportsbookish` |
-| `P1813` (short name) | Your brand short form | With language tag, e.g. `en:"SportsBookISH"` |
+| `P2002` (X/Twitter username) | Without the `@` | E.g. `yourbrand` |
+| `P1813` (short name) | Your brand short form | With language tag, e.g. `en:"YourBrand"` |
 | `P527` (has part) | Q-IDs of upstream services or data sources | Anchors the entity graph |
 | `P921` (main subject) | What the product is about | Often the same Q-IDs as P527 |
-| `P452` (industry) | Industry Q-ID | E.g. `Q1506462` for sports betting |
+| `P452` (industry) | Industry Q-ID | Search Wikidata for your industry to find its Q-ID |
 
 **Avoid these mistakes:**
 
-- Don't use `P275` (copyright license) unless your *entire site content* is CC-licensed. SaaS products usually aren't. The fact that you have a CC-BY dataset doesn't make the whole site CC.
-- Don't put marketing copy in descriptions. Wikidata descriptions are factual, single-sentence, and translatable. Save the marketing voice for your llms.txt and the website itself.
+- Don't use `P275` (copyright license) unless your *entire site content* is CC-licensed. SaaS products usually aren't.
+- Don't put marketing copy in descriptions. Wikidata descriptions are factual, single-sentence, and translatable.
 
 **Multilingual labels.** Add labels in 10+ languages (the brand name in each — usually the English form works for tech products). Multilingual LLMs ground better when the entity is recognized in their training language.
 
-**Aliases.** Add every search-query variation users might type: "Kalshi odds tracker", "Kalshi vs sportsbooks", "Kalshi event contract odds", etc. These are what query expansion uses internally.
+**Aliases.** Add every search-query variation users might type. These are what query expansion uses internally.
 
 #### 3.1.1 Editing at scale: QuickStatements vs bot password vs UI
 
@@ -132,15 +284,15 @@ For new accounts (under 4 days old + under 50 edits), Wikidata's "autoconfirmed"
 2. **Bot password** — Create a scoped bot password at `Special:BotPasswords` with only "Edit existing pages" granted. Write a script that uses the MediaWiki API. Bot passwords bypass autoconfirmed for `wbeditentity` on existing items.
 3. **Manual UI edits** — Slow but always works for existing items. Use for handful-of-edits cases.
 
-**Defensive note on bot passwords:** they're tied to your account but separate from your main password. Revoke immediately after the batch run completes. They're listed in `Special:BotPasswords` for one-click deletion.
+**Defensive note on bot passwords:** they're tied to your account but separate from your main password. Revoke immediately after the batch run completes.
 
 #### 3.1.2 Logo on Wikimedia Commons
 
 For Google Knowledge Panel, you need `P154` populated. That requires the logo file to be hosted on Wikimedia Commons (not your own site).
 
-Upload via `Special:UploadWizard`. The wizard will warn you about logos uploaded as "Own work" with CC licenses because that combination is the common-vandalism pattern. If you are genuinely the copyright holder (you designed or commissioned the logo and you're licensing it CC), you can proceed past the warning. Best practices:
+Upload via `Special:UploadWizard`. The wizard will warn you about logos uploaded as "Own work" with CC licenses because that combination is the common-vandalism pattern. If you are genuinely the copyright holder, you can proceed past the warning. Best practices:
 
-- In the file description, disclose constituent parts. "Composite work — line-chart glyph adapted from Lucide icon library (ISC license), background and color original."
+- In the file description, disclose constituent parts honestly. ("Composite work — icon adapted from [library] (ISC license), background and color original.")
 - Choose `CC-BY-SA-4.0` for "own work" cases, or `PD-textlogo`/`PD-shape` for logos that are clearly below the originality threshold for copyright (basic shapes + text).
 
 #### 3.1.3 Deprecating wrong claims when you can't delete them
@@ -181,15 +333,15 @@ Mount four schemas on every page:
 1. **`Organization`** — your company / founder. Include `sameAs` array pointing at Wikidata, GitHub, HF, X.
 2. **`WebSite`** — your domain. Include a `SearchAction` pointing at your site search URL so Google's sitelinks search box can render.
 3. **`WebApplication`** — your product. Most important schema for SaaS. Include:
-   - `applicationCategory` (e.g. `SportsApplication`, `FinanceApplication`)
+   - `applicationCategory` (e.g. `BusinessApplication`, `FinanceApplication`, `UtilitiesApplication`)
    - `operatingSystem: "Web"`
    - Full `offers` array with each pricing tier's `price`, `priceCurrency`, `priceSpecification.unitText` (`MON`/`ANN`)
    - `sameAs` array (same as Organization, repeated — schemas don't inherit)
    - `about[]` array referencing related Wikidata Q-IDs so crawlers traverse the graph
    - `audience.audienceType` description
-4. **`FAQPage`** — per-page Q&A. Generate dynamically from real data on the page (we built `faqForLeaguePage`, `faqForEventPage`, `faqForGolfTournament` helpers). Each Q&A becomes a Google AI Overview answer candidate.
+4. **`FAQPage`** — per-page Q&A. Generate dynamically from real data on the page. Each Q&A becomes a Google AI Overview answer candidate.
 
-**Mounting pattern:**
+**Mounting pattern (Next.js example):**
 
 ```tsx
 // app/layout.tsx — sitewide schemas
@@ -197,19 +349,21 @@ Mount four schemas on every page:
   <JsonLd data={[organizationLd(), websiteLd(), webApplicationLd()]} />
 </head>
 
-// app/sports/[league]/page.tsx — per-page schemas
+// app/[some-page]/page.tsx — per-page schemas
 <JsonLd data={[breadcrumbLd(items), itemListLd(name, items), faqLd(qaItems)]} />
 ```
 
 Always emit JSON-LD inline via `<script type="application/ld+json">`. Never via external URL — crawlers don't follow.
 
+See `/templates/webApplicationLd.ts` for a typed TypeScript generator.
+
 ---
 
 ## §4. Layer 2 — Search & Answer Engines
 
-### 4.1 Per-page metadata in Next.js (or equivalent)
+### 4.1 Per-page metadata
 
-Every page should export `generateMetadata` returning:
+Every page should export `generateMetadata` (Next.js App Router) or equivalent returning:
 
 - `title` (≤60 chars, includes brand)
 - `description` (≤155 chars, action-oriented)
@@ -223,7 +377,7 @@ Every page should export `generateMetadata` returning:
 - PNG with non-empty body
 - Wrapped in object form with explicit `width`, `height`, `type`, `alt` properties (X / Twitter crawler bug: it surfaces "Card error" if you only provide URL)
 
-Generate OG images dynamically via Next.js `next/og` `ImageResponse`. Wrap in try/catch with a brand-fallback card — `ImageResponse` can throw mid-render on edge cases (rare data shapes, unicode glyphs missing in fonts) and an empty 200 response will silently break previews on every social platform.
+Generate OG images dynamically via Next.js `next/og` `ImageResponse` (or equivalent). Wrap in try/catch with a brand-fallback card — `ImageResponse` can throw mid-render on edge cases (rare data shapes, unicode glyphs missing in fonts) and an empty 200 response will silently break previews on every social platform.
 
 ### 4.2 OpenAPI 3.1 spec (for LLM tool-calling, not just developer docs)
 
@@ -252,6 +406,31 @@ If your product has an API, ship a fully-fleshed OpenAPI spec — not because hu
 
 - **`/sitemap.xml`** — every public page. For high-volume sites, split into `sitemap-index.xml` + sub-sitemaps. Update on every cron tick that produces new content.
 - **`/robots.txt`** — explicit `Allow: /` for AI crawler user agents (GPTBot, ClaudeBot, PerplexityBot, etc.) unless you intend to block them. Many sites block these by accident copying old robots templates.
+
+**Recommended robots.txt for AI-friendly indexing:**
+
+```
+User-agent: *
+Allow: /
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Explicitly allow AI crawlers (some sites block by default)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+```
+
 - **IndexNow** — Bing/Yandex/Naver use this protocol. After every batch of new URLs, POST to `https://api.indexnow.org/IndexNow` with your key (deployed at `/keyfile.txt` matching the key value). Google doesn't use IndexNow but discovers via sitemap re-crawl, so you still need the sitemap.
 
 Bundle IndexNow into your cron ingestion. Every new URL gets submitted within minutes, not days.
@@ -262,7 +441,7 @@ Canonical URLs are the foundation of SEO + cross-source citation. Three rules:
 
 1. **Slugs must be unique per entity instance.** If your data model has events that repeat over time (sports games on multiple dates, recurring meetings, daily snapshots), include a date suffix in the slug. Otherwise `slug` collides, your DB lookup uses `maybeSingle()`, and the URL 404s.
 
-2. **One canonical URL per resource.** Use a redirect chain from legacy / aliased URLs to the canonical. For SportsBookISH this is `/sports/[league]/event/[id]` (legacy UUID URL) → 307-redirects to `/sports/[league]/[year]/[slug]` (canonical SEO URL).
+2. **One canonical URL per resource.** Use a redirect chain from legacy / aliased URLs to the canonical.
 
 3. **Use 307 (temporary), not 308 (permanent), for slug-redirects.** Permanent redirects get aggressively cached by browsers and CDNs. If you ever rename a slug (which happens — collision fixes, taxonomy changes), the cached 308 will keep sending users to the old URL until per-browser cache expires (could be days). 307 keeps redirects dynamic at the cost of slight SEO equity. Crawlers still see the canonical via the `<link rel="canonical">` tag in HTML, so you don't lose ranking.
 
@@ -270,22 +449,9 @@ Canonical URLs are the foundation of SEO + cross-source citation. Three rules:
 
 Static FAQ pages are dead weight in the AI Overview era. Google AIO + Perplexity rank dynamic, page-specific FAQ schemas higher because they answer the user's intent for *that page*.
 
-Generate `FAQPage` schema per page from real data:
+Generate `FAQPage` schema per page from real data your application already knows. Each Q&A pair becomes both visible HTML (renders in a `<details>` block on the page) AND `FAQPage` JSON-LD. The same data drives both, so they can't drift.
 
-```tsx
-// For a sports league page
-faqForLeaguePage({
-  leagueDisplayName: "NBA",
-  totalGames: 12,         // actual count from DB
-  totalMarkets: 48,       // actual count
-  bestEdgeContestant: "Lakers",  // actual top edge right now
-  bestEdgePct: 0.043,
-})
-```
-
-Each Q&A pair becomes both visible HTML (renders in a `<details>` block on the page) AND `FAQPage` JSON-LD. The same data drives both, so they can't drift.
-
-Build FAQ generators for every page type: league index, individual event, product detail, pricing, tools.
+Build FAQ generators for every page type: category index, individual item, product detail, pricing, tools.
 
 ---
 
@@ -293,11 +459,11 @@ Build FAQ generators for every page type: league index, individual event, produc
 
 ### 5.1 Content-Security-Policy (the one that breaks the most launches)
 
-CSP is the header that breaks more launches than any other. Strict CSP is essential for protecting against XSS, but every third-party integration you add (Stripe, GA4, Supabase, fonts, Twilio) adds to your allowlist.
+CSP is the header that breaks more launches than any other. Strict CSP is essential for protecting against XSS, but every third-party integration you add (Stripe, GA4, Supabase, fonts, etc.) adds to your allowlist.
 
 **The mistakes you'll make:**
 
-- **`form-action`** must include every domain a form might submit to *after redirects*. Browsers check `form-action` against the **final** destination, not the initial POST target. If your form posts to `/api/stripe/portal` which 303-redirects to `billing.stripe.com`, your CSP must include `https://billing.stripe.com` in `form-action`. We hit this exact bug — the portal button silently failed in browser console with `form-action 'self'` violation.
+- **`form-action`** must include every domain a form might submit to *after redirects*. Browsers check `form-action` against the **final** destination, not the initial POST target. If your form posts to `/api/stripe/portal` which 303-redirects to `billing.stripe.com`, your CSP must include `https://billing.stripe.com` in `form-action`. This is a common bug — the portal button silently fails in browser console with `form-action 'self'` violation.
 
 - **`script-src`** for `@next/third-parties/google` (GA4 loader) requires `https://www.googletagmanager.com` AND `https://*.google-analytics.com`. Both are needed; only one isn't sufficient.
 
@@ -307,7 +473,7 @@ CSP is the header that breaks more launches than any other. Strict CSP is essent
 
 - **`'unsafe-inline'` on `script-src`** is required by Next.js App Router's RSC payload bootstrap. Nonce-based CSP would be more secure but breaks Turbopack dev mode. Accept `'unsafe-inline'` for now; revisit when Next.js ships nonce support that works with Turbopack.
 
-A reference CSP for SaaS with Stripe + GA4 + Supabase is in `/patterns/csp-reference.md`.
+A reference CSP for SaaS with Stripe + GA4 + Supabase is in `/templates/csp-reference.md`.
 
 ### 5.2 The other security headers (set them all)
 
@@ -328,26 +494,26 @@ After deployment, score yourself at https://securityheaders.com — aim for A+.
 
 If you're on Supabase / Postgres: **enable Row Level Security on every table the moment you create it**. Default-deny. Then write explicit policies for each access pattern.
 
-The most common mistake: shipping a table with RLS enabled but no policies. That blocks legitimate reads. Symptoms: app works for the service-role client (in Vercel functions) but everything is empty for end users via the anon-key client.
+The most common mistake: shipping a table with RLS enabled but no policies. That blocks legitimate reads. Symptoms: app works for the service-role client (in serverless functions) but everything is empty for end users via the anon-key client.
 
 Always have:
 - A read policy that gates by `auth.uid()` for user-owned rows
 - A write policy that gates the same way
 - A service-role bypass for cron jobs (the service role key bypasses RLS automatically — that's the design)
 
-For analytics / billing tables, RLS keeps users from reading each other's billing history. For ingest tables (your scraped data), often you want public read with no write — `CREATE POLICY ... FOR SELECT USING (true)` works.
+For analytics / billing tables, RLS keeps users from reading each other's billing history. For ingest tables (your scraped or public data), often you want public read with no write — `CREATE POLICY ... FOR SELECT USING (true)` works.
 
-### 5.4 Environment variable hygiene (the Stripe newline bug)
+### 5.4 Environment variable hygiene (the trailing-newline bug)
 
-If you set environment variables via CLI piped from `echo`, the trailing newline becomes part of the value. `vercel env add NAME prod` reads stdin verbatim. So `echo "value" | vercel env add` stores `"value\n"`.
+If you set environment variables via CLI piped from `echo`, the trailing newline becomes part of the value. `vercel env add NAME prod` (and most other CLI tools) read stdin verbatim. So `echo "value" | vercel env add` stores `"value\n"`.
 
-We hit this on every single SportsBookISH Stripe env var. The Stripe SDK put `sk_live_…wn\n` into the `Authorization` header. The embedded `\n` corrupted the HTTP header, requests never reached Stripe, the SDK retried twice, then threw "An error occurred with our connection to Stripe. Request was retried 2 times."
+The Stripe SDK, when constructed with a key containing a trailing newline, puts that into the `Authorization` header. The embedded `\n` corrupts the HTTP header, requests never reach Stripe, the SDK retries twice, then throws "An error occurred with our connection to Stripe. Request was retried 2 times."
 
 The error message *sounds* like a network problem. It's not. It's local header corruption from a stored newline.
 
 **Rules:**
 
-1. **Always use `printf %s "value" | vercel env add`**, never `echo`. `printf %s` doesn't add a newline.
+1. **Always use `printf %s "value" | <cli> env add`**, never `echo`. `printf %s` doesn't add a newline.
 2. **In code, `.trim()` every env var read** before use:
    ```ts
    const key = process.env.STRIPE_SECRET_KEY?.trim();
@@ -372,14 +538,14 @@ Every webhook endpoint must:
 
 ### 5.6 Secret-rotation hygiene
 
-Rotate any secret that gets logged, displayed in an error message, or pasted in a chat / ticket. We had a near-incident where a bot password was visible in a screenshot — we rotated it immediately.
+Rotate any secret that gets logged, displayed in an error message, or pasted in a chat / ticket. If you see a key in a screenshot, in someone's terminal history, or in a Slack message — rotate immediately.
 
 Maintain a rotation log:
 
 ```
-2026-05-19  Stripe webhook secret rotated (was visible in test webhook URL)
-2026-05-20  Wikidata bot password revoked (one-time use complete)
-2026-05-XX  ...
+2026-MM-DD  Stripe webhook secret rotated (was visible in test webhook URL)
+2026-MM-DD  Wikidata bot password revoked (one-time use complete)
+2026-MM-DD  ...
 ```
 
 ---
@@ -467,7 +633,7 @@ try {
 }
 ```
 
-This pattern turns "this page isn't working" 500s into actionable URLs. When a user reports a problem, they paste the URL → you see the actual Stripe error message immediately. No log spelunking required.
+This pattern turns "this page isn't working" 500s into actionable URLs. When a user reports a problem, they paste the URL → you see the actual error message immediately. No log spelunking required.
 
 ---
 
@@ -478,7 +644,7 @@ This pattern turns "this page isn't working" 500s into actionable URLs. When a u
 Not all channels are equal. Ranked by ROI per minute spent:
 
 1. **Wikidata + JSON-LD** (already shipped, day-0)
-2. **Hugging Face dataset card** (already shipped, day-0)
+2. **Hugging Face dataset card** (if you have public data, day-0)
 3. **GitHub public docs repo** (already shipped, day-0)
 4. **Direct journalist pitches** (5 reporters, ~30 min, highest conversion to actual press)
 5. **Your own X/LinkedIn/Bluesky** (3 min total)
@@ -499,8 +665,6 @@ Don't reuse the same copy across platforms. Each platform's algorithm and audien
 - **Bluesky**: 5 posts, 300 chars each. Smaller audience but scraped by Claude/Perplexity.
 - **Show HN**: title + URL + body. First comment within 10 min is critical — it anchors discussion and prevents "no comments" decay.
 - **Reddit**: each sub gets a distinct framing. Cross-posted identical text gets removed by mods.
-
-Templates for all of these in `/docs/launch/` (we shipped them for SportsBookISH; pattern is reusable).
 
 ### 7.3 Journalist outreach
 
@@ -538,7 +702,7 @@ Bing, Yandex, Naver pick it up within hours. Google doesn't but discovers via si
 
 ## §8. Defensive engineering patterns
 
-The patterns we hit hard enough to internalize. Reuse on every project.
+The named bugs that have cost real launches real hours. Apply by symptom-matching:
 
 ### 8.1 The Stripe newline bug
 
@@ -566,34 +730,34 @@ The patterns we hit hard enough to internalize. Reuse on every project.
 
 ### 8.5 The slug collision 404
 
-**Symptom:** URLs like `/team-a-vs-team-b-hits` return 404 even though the resource exists.
-**Root cause:** Multiple resources have the same slug (e.g., the same matchup repeats across days). `maybeSingle()` returns null when multiple rows match.
+**Symptom:** URLs return 404 even though the resource exists.
+**Root cause:** Multiple resources have the same slug (e.g., the same matchup repeats across days, daily snapshots, recurring meetings). `maybeSingle()` returns null when multiple rows match.
 **Fix:** Append a uniqueness suffix to the slug for repeating resource types (e.g., date for sports games, instance ID for recurring events).
 
 ### 8.6 The Turbopack RGBA favicon
 
 **Symptom:** Next.js builds fail with "The PNG is not in RGBA format" on `app/favicon.ico`.
-**Root cause:** PNG optimization tools (oxipng with max settings) detect that your logo has no alpha variation and strip the alpha channel to save bytes. Turbopack's ICO parser strictly requires color_type=6 (RGBA).
-**Fix:** Force RGBA in the PNG entries inside the ICO. Use Pillow's `optimize=True` only — don't run oxipng on `favicon.ico`'s contents.
+**Root cause:** PNG optimization tools (oxipng with max settings) detect that your logo has no alpha variation and strip the alpha channel to save bytes. Turbopack's ICO parser strictly requires `color_type=6` (RGBA).
+**Fix:** Force RGBA in the PNG entries inside the ICO. Use Pillow's `optimize=True` only — don't run aggressive optimizers on `favicon.ico`'s contents.
 
 ### 8.7 The X dedup filter
 
-**Symptom:** X (Twitter) starts marking your automated tweets as "duplicates" even if they're not literally identical.
-**Root cause:** X has a fuzzy duplicate-detection filter that flags tweets sharing too many tokens in the same order.
+**Symptom:** X (Twitter) starts marking your automated posts as "duplicates" even if they're not literally identical.
+**Root cause:** X has a fuzzy duplicate-detection filter that flags posts sharing too many tokens in the same order.
 **Fix:**
-1. Use 10+ template variants for any automated content (we use template rotation by `hash(id) % templates.length`).
-2. Cap posts per cron run to 1 (so consecutive posts are ≥10 minutes apart).
-3. Dedup per resource (e.g., per event_id) for 24h via DB lookup, not just per-run Set.
+1. Use 10+ template variants for any automated content (rotate by `hash(id) % templates.length`).
+2. Cap posts per cron run to 1 (consecutive posts are ≥10 minutes apart).
+3. Dedup per resource for 24h via DB lookup, not just per-run Set.
 
-### 8.8 The Kalshi dust-quote phantom
+### 8.8 The settled-market "phantom price" trap
 
-**Symptom:** Aggregated pricing data shows 1% / 99% probabilities on resolved markets, polluting league pages and edge alerts.
-**Root cause:** Settled exchange markets keep broadcasting their final settlement prices forever. If you fall back to "last trade price" when bid/ask is unavailable, settled markets feed in.
+**Symptom:** Aggregated pricing data shows 1% / 99% (or similar near-extreme) values on resolved markets, polluting category pages and edge alerts.
+**Root cause:** Settled exchange/market data sources keep broadcasting their final settlement prices forever. If you fall back to "last trade price" when bid/ask is unavailable, settled markets feed in.
 **Fix:**
 1. Require valid bid AND ask with reasonable spread before using midpoint (e.g., `bid > 0`, `ask - bid <= 0.1`, `ask < 1.00`).
-2. Archive events whose source data has stopped advancing (`fetched_at` stale > 6h) even if no `start_time` is set.
+2. Archive resources whose source data has stopped advancing (`fetched_at` stale > 6h) even if no explicit `closed_at` is set.
 
-### 8.9 The favicon-cache-on-OG-trap
+### 8.9 The OG-cache-on-social trap
 
 **Symptom:** Even after fixing OG image generation, X/Twitter/Facebook show old broken card previews on shared links.
 **Root cause:** Social platforms cache OG cards aggressively (sometimes for days). They don't re-fetch unless you tell them.
@@ -611,7 +775,7 @@ For each platform, paste the URL and click their re-scrape button.
 
 ### 8.11 The Vercel build → silent old-deploy trap
 
-**Symptom:** Your `git push` "succeeded" but production still shows old behavior. You assume Vercel didn't deploy.
+**Symptom:** Your `git push` "succeeded" but production still shows old behavior. You assume the deploy didn't happen.
 **Root cause:** Vercel **did** try to deploy, but the build failed. Vercel keeps serving the last "Ready" deployment when new builds fail. Without checking deploy status, you'll waste hours debugging code that isn't even live.
 **Fix:** After every push, check `vercel ls` output. Look at the latest deployment status:
 - `Ready` = live, your code is serving
@@ -620,38 +784,49 @@ For each platform, paste the URL and click their re-scrape button.
 
 This is the #1 "ghost bug" pattern. Always verify deploys.
 
+### 8.12 The deliverability degradation
+
+**Symptom:** Magic-link emails stop arriving for some users; gradually more users report it; eventually password resets fail for everyone.
+**Root cause:** Sender domain reputation has degraded — usually because SPF / DKIM / DMARC were set up wrong, or because a small number of users marked your emails as spam.
+**Fix:**
+1. Verify SPF + DKIM + DMARC at mail-tester.com — must be 10/10.
+2. Check Google Postmaster Tools (https://postmaster.google.com) — shows your domain's spam rate and reputation.
+3. If reputation is low, slow your send volume to known-good recipients (your own team, paying customers) for 7-14 days. Reputation recovers gradually.
+4. Never buy email lists. Never send marketing email from your transactional domain — use a subdomain (e.g. `marketing@news.yourdomain.com`).
+
 ---
 
 ## §9. Checklists
 
 ### 9.1 Pre-launch checklist (week before)
 
-Day -7:
+**Day -7 (Layer 1):**
 - [ ] Wikidata entity created with all P-claims (§3.1)
 - [ ] llms.txt published at `/llms.txt` (§3.2)
 - [ ] JSON-LD Organization + WebSite + WebApplication on every page (§3.3)
 
-Day -5:
+**Day -5 (Layer 2):**
 - [ ] OpenAPI spec at `/api/v1/openapi.json` with examples on every endpoint (§4.2)
 - [ ] Sitemap at `/sitemap.xml`, robots at `/robots.txt`
 - [ ] FAQ schemas generated per page type (§4.5)
 
-Day -3:
+**Day -3 (Layer 3):**
 - [ ] Security headers configured (CSP, HSTS, X-Frame-Options, Permissions-Policy)
 - [ ] securityheaders.com score = A+
 - [ ] RLS enabled on every table with explicit policies (§5.3)
 - [ ] All env vars set with `printf %s`, not `echo` (§5.4)
 - [ ] All third-party API calls wrapped in try/catch with reason-surfacing (§6.5)
 
-Day -1:
+**Day -1 (Layer 4):**
 - [ ] GA4 events fire correctly (verify via DevTools `window.dataLayer` inspect)
 - [ ] OG cards render properly on every page type (verify with platform debuggers)
 - [ ] Stripe success_url includes tier param (§6.2)
 - [ ] Test the full signup → checkout → success flow in incognito with a fresh email
-- [ ] All recent Vercel deployments show "Ready" status (§8.11)
+- [ ] All recent deployments show "Ready" status (§8.11)
+- [ ] mail-tester.com 10/10 (§0.7)
 
-Launch day:
-- [ ] Hugging Face dataset README live (auto-uploads via cron)
+**Launch day (Layer 5):**
+- [ ] Hugging Face dataset README live (if you have a public dataset)
 - [ ] GitHub public docs repo published with topics set
 - [ ] IndexNow fired for every important URL
 - [ ] Social posts queued (X thread, LinkedIn, Bluesky)
@@ -663,27 +838,27 @@ Launch day:
 
 Every Monday morning:
 
-- [ ] `vercel ls` for each project — no failed builds in last 7 days
+- [ ] Hosting dashboard — no failed builds in last 7 days
 - [ ] GA4 Realtime — `purchase` events firing as expected
 - [ ] Stripe webhook delivery rate (Stripe dashboard → Developers → Webhooks) — should be 100%
-- [ ] Email digest delivery (Resend dashboard) — bounce rate < 2%
+- [ ] Email deliverability (sender provider dashboard) — bounce rate < 2%, spam rate < 0.1%
 - [ ] securityheaders.com still A+ on production URL
 - [ ] Wikidata entity hasn't been vandalized (visit + spot-check)
-- [ ] Hugging Face dataset has fresh `latest.csv` (last updated ≤ 24h ago)
-- [ ] Sitemap is reachable + up-to-date
-- [ ] llms.txt is reachable
+- [ ] Sitemap reachable + up-to-date
+- [ ] llms.txt reachable
+- [ ] DMARC report email arrived for the previous week
 
 ### 9.3 Recovery playbook for common bugs
 
 **"This page isn't working" on production:**
-1. Check Vercel deploy status: `vercel ls`. Most recent must be "Ready".
-2. If "Error", read build logs: `vercel inspect <url> --logs`. Common cause: TypeScript type error you didn't catch locally.
-3. If "Ready" but page broken, stream runtime logs: `vercel logs <url>`. Reproduce the bug in your browser — runtime logs are real-time only.
+1. Check deploy status. Most recent must be "Ready".
+2. If "Error", read build logs. Common cause: TypeScript type error you didn't catch locally.
+3. If "Ready" but page broken, stream runtime logs. Reproduce the bug in your browser — runtime logs are real-time only.
 
 **Stripe SDK returns "Connection error":**
-1. `vercel env pull /tmp/env.txt --environment=production` and inspect the Stripe vars
+1. Pull production env vars and inspect the Stripe vars
 2. Look for trailing `\n` text or newline character in the values
-3. Re-set with `printf %s "value" | vercel env add NAME production`
+3. Re-set with `printf %s "value" | <cli> env add`
 4. Verify code path also does `.trim()` defensively
 
 **GA4 events not appearing in Realtime:**
@@ -704,7 +879,13 @@ Every Monday morning:
 **Social previews still broken after OG fix:**
 1. Fetch your OG URL directly with curl — must return image data, status 200, content-type `image/png`
 2. Use platform-specific re-scrape tools (X, Facebook, LinkedIn — links in §8.9)
-3. If using `@vercel/og` / `next-og`, verify your edge runtime hasn't crashed (`vercel logs`)
+3. If using edge-runtime OG generation, verify your edge runtime hasn't crashed
+
+**Magic-link emails not arriving:**
+1. Check mail-tester.com score on a freshly-sent message
+2. Check Google Postmaster Tools for reputation degradation
+3. Verify SPF / DKIM / DMARC records via your DNS console
+4. Test from a different recipient (Gmail vs Outlook vs Yahoo) — pattern often reveals the failure mode
 
 ---
 
@@ -713,10 +894,8 @@ Every Monday morning:
 See `/templates/` for ready-to-paste artifacts:
 
 - `llms.txt` — fill-in-the-blanks template
-- `webApplicationLd.ts` — JSON-LD WebApplication generator
-- `openapi-skeleton.json` — OpenAPI 3.1 spec with LLM-friendly extensions
-- `huggingface-readme.md` — HF dataset card with proper YAML frontmatter
-- `csp-reference.md` — Reference CSP for SaaS with Stripe + GA4 + Supabase + Resend
+- `webApplicationLd.ts` — JSON-LD WebApplication generator (typed)
+- `csp-reference.md` — Reference CSP for SaaS with Stripe + GA4 + Supabase
 - `journalist-pitch.md` — Outreach email template
 - `wikidata-quickstatements.md` — QS batch script template
 
@@ -734,6 +913,6 @@ Build all five. The compounding is what works.
 
 ---
 
-*Kenny Hyder runs Hyder Media, a digital marketing consultancy in Honolulu, Hawaii. He's been doing performance marketing, conversion optimization, and analytics since 2009. SportsBookISH (sportsbookish.com) is his first consumer SaaS product. Reach him at kenny@hyder.me.*
+*Kenny Hyder runs Hyder Media, a digital marketing consultancy. He's been doing performance marketing, conversion optimization, and analytics since 2009. Reach him at kenny@hyder.me or [hyder.me](https://hyder.me).*
 
-*This playbook is open-source. Fork it, adapt it, distribute it. If you publish a derivative, attribution to Hyder Media (or this playbook URL) is appreciated but not required.*
+*This playbook is documented from real production deployments. Fork it, adapt it, distribute it. If you publish a derivative, attribution to Hyder Media (or this playbook URL) is appreciated but not required.*

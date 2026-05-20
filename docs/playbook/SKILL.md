@@ -1,6 +1,6 @@
 ---
 name: saas-launch-playbook
-description: Apply the Hyder Media AI-discoverable SaaS playbook to the current project. Covers 5 layers — Wikidata + JSON-LD identity, per-page SEO + OpenAPI for LLM tool calling, security headers + RLS + secret hygiene, GA4 conversion events without webhook races, and multi-channel launch distribution. Use this when starting a new SaaS / web product, auditing an existing one before launch, or fixing AI-discoverability gaps. Includes defensive engineering patterns for the bugs that have bitten us before (Stripe newline corruption, 308 cache poisoning, gtag race conditions, slug collisions, CSP form-action redirects, Vercel ghost-deploy failures).
+description: Apply the Hyder Media AI-discoverable SaaS playbook to the current project. Covers pre-flight account setup + 5 optimization layers — Wikidata + JSON-LD identity, per-page SEO + OpenAPI for LLM tool calling, security headers + RLS + secret hygiene, GA4 conversion events without webhook races, and multi-channel launch distribution. Use this when starting a new SaaS / web product, auditing an existing one before launch, or fixing AI-discoverability gaps. Includes 12 defensive engineering patterns named by symptom (Stripe newline corruption, 308 cache poisoning, gtag race conditions, slug collisions, CSP form-action redirects, Vercel ghost-deploy failures, deliverability degradation, more).
 ---
 
 # SaaS Launch Playbook
@@ -25,7 +25,25 @@ Also use proactively when:
 
 ## How to operate
 
-This playbook is 5 layers, build bottom-up. Don't skip layers — they compound.
+This playbook is pre-flight + 5 layers, build bottom-up. Don't skip layers — they compound.
+
+### Step 0 — Pre-flight (before any code)
+
+Confirm these accounts exist + are verified for the project:
+
+```
+[ ] Domain registered (auto-renew on) + DNS on Cloudflare or equivalent fast DNS
+[ ] Hosting (Vercel/Netlify/Cloudflare Pages) connected to GitHub repo
+[ ] Database+Auth provider (Supabase/Neon+Clerk/Convex) — anon + service-role clients tested
+[ ] Stripe account created, Customer Portal CONFIGURED in dashboard.stripe.com
+[ ] Resend (or alt) sending domain verified: SPF + DKIM + DMARC live
+[ ] mail-tester.com score = 10/10 on a freshly-sent message
+[ ] GA4 property created, Measurement ID known
+[ ] Google Search Console verified (domain property, not URL prefix)
+[ ] Bing Webmaster Tools imported from GSC, IndexNow key deployed
+```
+
+If any of these are missing, walk the user through setup per playbook §0 before moving on. Layer 1 won't work without Layer 0.
 
 ### Step 1 — Audit current state
 
