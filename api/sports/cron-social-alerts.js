@@ -81,13 +81,19 @@ export default async function handler(req, res) {
   // alert id each time so we'd post the new one, but only if it's also
   // dedup-clear at the (event, direction) level — that's what posted_by_event
   // takes care of within this run.
+  // One tweet per EVENT per window, not per (player x event). Without this,
+  // a player-prop event like "New York Mets vs Washington: Hits" — which
+  // contains many markets (one per player) — fires three separate tweets
+  // when three players cross the threshold at the same time. Use a.link
+  // (which embeds the event_id) as the dedup signal since candidates is
+  // sorted by abs(delta) desc, so the biggest mover for any event wins
+  // and subsequent players for that event are skipped.
   const postedByEvent = new Set();
   const results = [];
   for (const a of candidates) {
     if (results.length >= dailySlotsLeft) break;
     const eventKey = `${a.id || ""}`;
-    const eventDir = `${a.title}|${a.subtitle}|${a.direction}`;
-    if (postedByEvent.has(eventDir)) continue;
+    if (postedByEvent.has(a.link)) continue;
     const dedupKey = `move:${eventKey}`;
 
     // Skip if we've already posted this alert id on X (the primary)
@@ -99,15 +105,17 @@ export default async function handler(req, res) {
       .maybeSingle();
     if (existing) continue;
 
-    // Whipsaw guard: skip if we posted ANY move alert for this (event, direction)
-    // on X in the last 2h.
+    // Whipsaw guard: skip if we posted ANY move alert for this EVENT on X
+    // in the last 2h. Was matching on player name (a.title), which never
+    // collided across players in the same event — three tweets in one
+    // hour all pointing to the same Hits event slipped through.
     const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString();
     const { data: recentSame } = await supabase
       .from("sb_social_posts")
       .select("id")
       .eq("platform", "x")
       .eq("kind", "move_alert")
-      .like("text", `%${a.title}%`)
+      .like("text", `%${a.link}%`)
       .gte("posted_at", twoHoursAgo)
       .limit(1);
     if (recentSame && recentSame.length > 0) continue;
@@ -128,7 +136,7 @@ export default async function handler(req, res) {
       }, { onConflict: "platform,dedup_key" });
     }
 
-    postedByEvent.add(eventDir);
+    postedByEvent.add(a.link);
     results.push({ any_sent: result.any_sent, title: a.title, delta: a.delta, text });
   }
 
