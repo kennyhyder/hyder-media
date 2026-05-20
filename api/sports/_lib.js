@@ -210,6 +210,52 @@ export function slugify(s) {
     .replace(/-{2,}/g, "-") || null;
 }
 
+const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
+export const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+
+// Returns a Date from Kalshi's expected_expiration_time, falling back to
+// parsing the encoded date out of the event ticker. Two ticker shapes in
+// production:
+//   - YYMMMDDHHMM (older MLB):     KXMLBGAME-26MAY161810CINCLE   -> 18:10 UTC
+//   - YYMMMDD     (newer NBA/EPL): KXNBAGAME-26MAY25NYKCLE       -> 23:00 UTC default
+// Without this, ~80% of events on NBA/EPL/NHL/player-props get start_time=null
+// and the archive cron's settlement detection breaks. See [[kalshi-dust-quote-trap]].
+export function parseEventStartTime(e) {
+  if (e.expected_expiration_time) {
+    const d = new Date(e.expected_expiration_time);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const ticker = e.event_ticker || "";
+  let m = ticker.match(/(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})(?:[A-Z]|$)/);
+  if (m) {
+    const [, yy, mon, dd, hh, mi] = m;
+    const month = MONTHS[mon];
+    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), Number(hh), Number(mi)));
+  }
+  m = ticker.match(/-(\d{2})([A-Z]{3})(\d{2})(?:[A-Z]|$)/);
+  if (m) {
+    const [, yy, mon, dd] = m;
+    const month = MONTHS[mon];
+    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), 23, 0));
+  }
+  return null;
+}
+
+// Slug-disambiguation helper. Repeating matchups (MLB series, daily NBA
+// player-prop events) collide because they share a title. Append the start
+// date for event types that recur. Without this, event-by-slug runs
+// maybeSingle() against multiple rows and returns null — which surfaces
+// as a 404 on tweeted alert links and SEO pages.
+export function dateSuffixedSlug(title, eventType, startTime) {
+  const base = slugify(title);
+  if (!base) return null;
+  const repeats = eventType === "game" || (eventType || "").startsWith("player_prop_");
+  if (!repeats || !startTime) return base;
+  const mon = MONTH_NAMES[startTime.getUTCMonth()];
+  const dd = String(startTime.getUTCDate()).padStart(2, "0");
+  return `${base}-${mon}-${dd}`;
+}
+
 export function toUnit(v) {
   if (v == null) return null;
   const n = Number(v);

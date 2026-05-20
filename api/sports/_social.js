@@ -178,7 +178,7 @@ const MOVE_TEMPLATES = [
     const pct = `${Math.abs(a.delta * 100).toFixed(1)}%`;
     const now = `${(a.probability * 100).toFixed(0)}%`;
     const was = `${(a.reference * 100).toFixed(0)}%`;
-    return `Sharp move — ${a.title} ${direction} ${pct}\n${was}% → ${now}% • ${a.subtitle}\n${url}${a.link}`;
+    return `Sharp move — ${a.title} ${direction} ${pct}\n${was} → ${now} • ${a.subtitle}\n${url}${a.link}`;
   },
   (a, url) => {
     const sign = a.delta >= 0 ? "+" : "";
@@ -210,7 +210,7 @@ const MOVE_TEMPLATES = [
     const pct = `${(a.delta * 100).toFixed(1)}%`;
     const now = `${(a.probability * 100).toFixed(0)}%`;
     const was = `${(a.reference * 100).toFixed(0)}%`;
-    return `${a.subtitle}\n${a.title}: ${was}% → ${now}% ${sign}${pct}\n${url}${a.link}`;
+    return `${a.subtitle}\n${a.title}: ${was} → ${now} ${sign}${pct}\n${url}${a.link}`;
   },
   (a, url) => {
     const sign = a.delta >= 0 ? "+" : "";
@@ -224,7 +224,7 @@ const MOVE_TEMPLATES = [
     const now = `${(a.probability * 100).toFixed(0)}%`;
     const was = `${(a.reference * 100).toFixed(0)}%`;
     const emoji = a.delta >= 0 ? "🟢" : "🔴";
-    return `${emoji} Move alert\n${a.title} on ${a.subtitle}\n${was}% → ${now}% (${a.delta >= 0 ? "+" : ""}${pct})\n${url}${a.link}`;
+    return `${emoji} Move alert\n${a.title} on ${a.subtitle}\n${was} → ${now} (${a.delta >= 0 ? "+" : ""}${pct})\n${url}${a.link}`;
   },
 ];
 

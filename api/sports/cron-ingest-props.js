@@ -1,6 +1,7 @@
 import {
   getSupabase, checkAuth, normalizeName, slugify, toUnit, toBigInt, computeImplied,
   listEventsForSeries, fetchMarketsForEvent, mapLimit, PROP_SERIES,
+  parseEventStartTime, dateSuffixedSlug,
 } from "./_lib.js";
 
 // Player-prop ingester.
@@ -63,8 +64,15 @@ async function ingestPropSeries(supabase, series) {
   // 1) Upsert events (one per game × stat)
   const eventRows = events.map((e) => {
     const title = e.title || e.sub_title || e.event_ticker;
-    const startTime = e.expected_expiration_time ? new Date(e.expected_expiration_time) : null;
+    // parseEventStartTime falls back to ticker date when Kalshi omits
+    // expected_expiration_time (which it does for most prop events —
+    // KXNBASTL-26MAY18SASOKC carries the date in the ticker only).
+    const startTime = parseEventStartTime(e);
     const year = startTime ? startTime.getUTCFullYear() : new Date().getUTCFullYear();
+    // dateSuffixedSlug appends YYYMMDD for repeating-title events. Without
+    // it, every "Boston vs Kansas City: Hits" prop in a 3-game series
+    // collides on the same slug -> /sports/mlb/2026/<slug> 404s because
+    // maybeSingle can't pick a winner.
     return {
       league: series.league,
       event_type: series.market_type,         // e.g. "player_prop_steals"
@@ -73,7 +81,7 @@ async function ingestPropSeries(supabase, series) {
       kalshi_event_ticker: e.event_ticker,
       start_time: startTime ? startTime.toISOString() : null,
       season_year: year,
-      slug: slugify(title),
+      slug: dateSuffixedSlug(title, series.market_type, startTime),
       status: "open",
     };
   });

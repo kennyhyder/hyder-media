@@ -1,40 +1,8 @@
 import {
   getSupabase, checkAuth, normalizeName, slugify, toUnit, toBigInt, computeImplied,
   listEventsForSeries, listSeriesByPrefix, fetchMarketsForEvent, mapLimit, LEAGUES,
+  parseEventStartTime, dateSuffixedSlug,
 } from "./_lib.js";
-
-const MONTHS = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
-const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
-
-// Returns a Date from Kalshi's expected_expiration_time, falling back to
-// parsing the encoded date out of the event ticker. Two ticker shapes:
-//   - YYMMMDDHHMM (older MLB):     KXMLBGAME-26MAY161810CINCLE  → 18:10 UTC
-//   - YYMMMDD     (newer NBA/EPL): KXNBAGAME-26MAY25NYKCLE      → 23:00 UTC default
-function parseEventStartTime(e) {
-  if (e.expected_expiration_time) {
-    const d = new Date(e.expected_expiration_time);
-    if (!isNaN(d.getTime())) return d;
-  }
-  const ticker = e.event_ticker || "";
-  // Try YYMMMDDHHMM first (with embedded time)
-  let m = ticker.match(/(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})(?:[A-Z]|$)/);
-  if (m) {
-    const [, yy, mon, dd, hh, mi] = m;
-    const month = MONTHS[mon];
-    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), Number(hh), Number(mi)));
-  }
-  // Fall back to bare YYMMMDD — default to 23:00 UTC (~7pm ET, typical game time).
-  // Without this branch, every NBA / EPL / NHL game event gets start_time=null
-  // and the archive cron never sweeps settled games, so dust 99/1¢ quotes
-  // bleed into league pages indefinitely.
-  m = ticker.match(/-(\d{2})([A-Z]{3})(\d{2})(?:[A-Z]|$)/);
-  if (m) {
-    const [, yy, mon, dd] = m;
-    const month = MONTHS[mon];
-    if (month != null) return new Date(Date.UTC(2000 + Number(yy), month, Number(dd), 23, 0));
-  }
-  return null;
-}
 
 // Generic Kalshi ingester for team sports. Walks LEAGUES config:
 //   for each league:
@@ -98,16 +66,10 @@ async function ingestLeague(supabase, league) {
       // UI as phantom +57% edges.
       const startTime = parseEventStartTime(e);
       const year = startTime ? startTime.getUTCFullYear() : new Date().getUTCFullYear();
-      // For repeating game-type matchups (MLB plays the same teams 3 days in a
-      // row), append the start date to disambiguate. Otherwise three events
-      // share the same slug and event-by-slug returns null because maybeSingle
-      // can't pick a winner.
-      let slug = slugify(title);
-      if (series.event_type === "game" && startTime) {
-        const mon = MONTH_NAMES[startTime.getUTCMonth()];
-        const dd = String(startTime.getUTCDate()).padStart(2, "0");
-        slug = `${slug}-${mon}-${dd}`;
-      }
+      // Slug disambiguation handled by dateSuffixedSlug() (in _lib.js).
+      // Game + player_prop_* events share titles across a series, so we
+      // append the start date to keep slugs unique per occurrence.
+      const slug = dateSuffixedSlug(title, series.event_type, startTime);
       return {
         league: league.key,
         event_type: series.event_type,
