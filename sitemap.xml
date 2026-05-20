@@ -12,6 +12,14 @@
         <priority>1.0</priority>
     </url>
 
+    <!-- Playbook (flagship product) -->
+    <url>
+        <loc>https://hyder.me/playbook</loc>
+        <lastmod>2026-05-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.95</priority>
+    </url>
+
     <!-- Tools Landing Page -->
     <url>
         <loc>https://hyder.me/tools.html</loc>

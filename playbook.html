@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-731HHGLMJS');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="The complete playbook for shipping a SaaS that ranks on Google AI Overview, gets cited by Perplexity, and shows up in Claude's answers. 5 layers + 12 named defensive patterns + pre-launch checklists. Free intro + $79 full playbook + done-for-you launches." />
+    <meta name="keywords" content="ai discoverability, saas launch playbook, llms.txt, wikidata, json-ld, openapi, ga4 conversion events, stripe webhooks, generative engine optimization, gEO, modern seo" />
+    <meta name="author" content="Kenny Hyder" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="The Modern AI-Discoverable SaaS Launch Playbook — Hyder Media" />
+    <meta property="og:description" content="Every optimization, defensive pattern, and launch tactic for shipping a SaaS that ranks on Google AI Overview, Perplexity, ChatGPT, and Claude. By an operator who's done it." />
+    <meta property="og:url" content="https://hyder.me/playbook" />
+    <meta property="og:site_name" content="Hyder Media" />
+    <meta property="og:image" content="https://hyder.me/assets/imgs/playbook-og.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="The Modern AI-Discoverable SaaS Launch Playbook" />
+    <meta property="twitter:description" content="5 layers + 12 named defensive patterns + checklists. Free intro, $79 full playbook, $2.5–5k done-for-you launches." />
+    <meta property="twitter:creator" content="@kennyhyder" />
+
+    <title>The Modern AI-Discoverable SaaS Launch Playbook — Hyder Media</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/imgs/logos/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/imgs/logos/favicon.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://hyder.me/playbook" />
+
+    <!-- JSON-LD: Article + Product + FAQPage (eat your own dogfood) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "TechArticle",
+          "headline": "The Modern AI-Discoverable SaaS Launch Playbook",
+          "description": "Pre-launch + 5 optimization layers + 12 defensive engineering patterns for shipping SaaS that ranks across Google AI Overview, Perplexity, ChatGPT search, and Claude.",
+          "author": { "@type": "Person", "name": "Kenny Hyder", "url": "https://hyder.me", "sameAs": ["https://x.com/kennyhyder"] },
+          "publisher": { "@type": "Organization", "name": "Hyder Media", "url": "https://hyder.me", "logo": { "@type": "ImageObject", "url": "https://hyder.me/assets/imgs/logos/hyder-media-logo.png" } },
+          "datePublished": "2026-05-20",
+          "dateModified": "2026-05-20",
+          "url": "https://hyder.me/playbook",
+          "image": "https://hyder.me/assets/imgs/playbook-og.png",
+          "articleSection": "AI Discoverability",
+          "keywords": ["wikidata", "llms.txt", "json-ld", "openapi", "ga4", "stripe", "saas launch", "generative engine optimization"]
+        },
+        {
+          "@type": "Product",
+          "name": "The Modern AI-Discoverable SaaS Launch Playbook (Full)",
+          "description": "Complete 40+ page playbook + templates + Claude skill + code snippets. Lifetime use within one organization. 12 months of free updates.",
+          "brand": { "@type": "Brand", "name": "Hyder Media" },
+          "category": "Digital Product",
+          "image": "https://hyder.me/assets/imgs/playbook-cover.png",
+          "offers": {
+            "@type": "Offer",
+            "price": "79.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "url": "https://hyder.me/playbook#buy"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Is this just AI SEO?", "acceptedAnswer": { "@type": "Answer", "text": "No. It's a complete pre-launch + launch playbook covering Wikidata entity grounding, security headers, RLS, conversion event tracking, defensive engineering patterns, and distribution. AI discoverability is one layer of five." } },
+            { "@type": "Question", "name": "Do I need to be on Next.js or Vercel?", "acceptedAnswer": { "@type": "Answer", "text": "No. The patterns are vendor-agnostic. Code examples are in TypeScript but the principles apply to any modern stack. CSP, JSON-LD, Wikidata, RLS — none of these depend on the framework." } },
+            { "@type": "Question", "name": "Will this work for my specific industry?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — the patterns are stack-agnostic and industry-agnostic. You'll customize the specific entities + Wikidata claims to match your domain, but the structural recipe is the same whether you're building B2B SaaS, ecommerce, fintech, or anything else web-facing." } },
+            { "@type": "Question", "name": "How is this different from random AI SEO courses?", "acceptedAnswer": { "@type": "Answer", "text": "Most AI SEO content is theoretical or focused on content marketing. This is a production engineering playbook with named defensive patterns (\"the Stripe newline bug\", \"the gtag race condition\") from real shipped code." } },
+            { "@type": "Question", "name": "Do you offer refunds?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — 7-day money-back guarantee if the playbook doesn't apply to your project." } }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- Dark mode init -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <style>
+        /* Playbook landing page — uses Hyder Media design system */
+        .pb-hero {
+            padding: 80px 0 60px;
+            position: relative;
+        }
+
+        .pb-hero__eyebrow {
+            font-family: var(--roboto-mono);
+            color: var(--dark-brown-color);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            opacity: 0.85;
+        }
+
+        html.dark-mode .pb-hero__eyebrow {
+            color: var(--yellow-color);
+        }
+
+        .pb-hero__title {
+            font-size: clamp(2rem, 4.5vw, 3.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 24px;
+        }
+
+        html.dark-mode .pb-hero__title {
+            color: var(--white-color);
+        }
+
+        .pb-hero__lede {
+            font-size: 1.15rem;
+            line-height: 1.55;
+            color: var(--text-color);
+            max-width: 720px;
+            margin-bottom: 32px;
+        }
+
+        html.dark-mode .pb-hero__lede {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .pb-cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .pb-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            font-family: var(--roboto-mono);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            border-radius: 0;
+            border: 2px solid var(--dark-brown-color);
+            background: var(--dark-brown-color);
+            color: var(--white-color) !important;
+            transition: all 0.2s ease;
+        }
+
+        .pb-btn:hover {
+            background: transparent;
+            color: var(--dark-brown-color) !important;
+        }
+
+        .pb-btn--secondary {
+            background: transparent;
+            color: var(--dark-brown-color) !important;
+        }
+
+        .pb-btn--secondary:hover {
+            background: var(--dark-brown-color);
+            color: var(--white-color) !important;
+        }
+
+        html.dark-mode .pb-btn {
+            border-color: var(--yellow-color);
+            background: var(--yellow-color);
+            color: var(--black-color) !important;
+        }
+
+        html.dark-mode .pb-btn:hover {
+            background: transparent;
+            color: var(--yellow-color) !important;
+        }
+
+        html.dark-mode .pb-btn--secondary {
+            background: transparent;
+            color: var(--yellow-color) !important;
+        }
+
+        html.dark-mode .pb-btn--secondary:hover {
+            background: var(--yellow-color);
+            color: var(--black-color) !important;
+        }
+
+        .pb-trust {
+            font-family: var(--roboto-mono);
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        html.dark-mode .pb-trust {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Sections */
+        .pb-section {
+            padding: 64px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark-mode .pb-section {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .pb-section__eyebrow {
+            font-family: var(--roboto-mono);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.75rem;
+            color: var(--dark-brown-color);
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+
+        html.dark-mode .pb-section__eyebrow {
+            color: var(--yellow-color);
+        }
+
+        .pb-section__title {
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            line-height: 1.15;
+            letter-spacing: -0.015em;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 24px;
+            max-width: 800px;
+        }
+
+        html.dark-mode .pb-section__title {
+            color: var(--white-color);
+        }
+
+        .pb-section__lede {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 720px;
+            margin-bottom: 32px;
+        }
+
+        html.dark-mode .pb-section__lede {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Problem bullets */
+        .pb-problem-list {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0 0;
+        }
+
+        .pb-problem-list li {
+            position: relative;
+            padding: 16px 0 16px 32px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+        }
+
+        .pb-problem-list li:last-child { border-bottom: 0; }
+
+        .pb-problem-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            top: 16px;
+            color: var(--dark-brown-color);
+            font-family: var(--roboto-mono);
+            font-weight: 700;
+        }
+
+        html.dark-mode .pb-problem-list li {
+            color: rgba(255, 255, 255, 0.85);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html.dark-mode .pb-problem-list li::before {
+            color: var(--yellow-color);
+        }
+
+        /* Layer cards */
+        .pb-layer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        @media (min-width: 768px) {
+            .pb-layer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .pb-layer {
+            padding: 28px;
+            background: rgba(0, 0, 0, 0.03);
+            border-left: 3px solid var(--dark-brown-color);
+        }
+
+        html.dark-mode .pb-layer {
+            background: rgba(255, 255, 255, 0.04);
+            border-left-color: var(--yellow-color);
+        }
+
+        .pb-layer__num {
+            font-family: var(--roboto-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dark-brown-color);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        html.dark-mode .pb-layer__num {
+            color: var(--yellow-color);
+        }
+
+        .pb-layer__title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        html.dark-mode .pb-layer__title {
+            color: var(--white-color);
+        }
+
+        .pb-layer__body {
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: var(--text-color);
+        }
+
+        html.dark-mode .pb-layer__body {
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        /* Tier cards (Free / $79 / DFY) */
+        .pb-tier-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        @media (min-width: 992px) {
+            .pb-tier-grid {
+                grid-template-columns: 1fr 1.15fr 1fr;
+            }
+        }
+
+        .pb-tier {
+            padding: 32px 28px;
+            background: var(--white-color);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pb-tier--featured {
+            border-color: var(--dark-brown-color);
+            background: var(--white-color);
+            position: relative;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        html.dark-mode .pb-tier {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        html.dark-mode .pb-tier--featured {
+            border-color: var(--yellow-color);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .pb-tier__featured-tag {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background: var(--dark-brown-color);
+            color: var(--white-color);
+            font-family: var(--roboto-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 4px 12px;
+            font-weight: 700;
+        }
+
+        html.dark-mode .pb-tier__featured-tag {
+            background: var(--yellow-color);
+            color: var(--black-color);
+        }
+
+        .pb-tier__label {
+            font-family: var(--roboto-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--dark-brown-color);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        html.dark-mode .pb-tier__label {
+            color: var(--yellow-color);
+        }
+
+        .pb-tier__price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--dark-brown-color);
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        html.dark-mode .pb-tier__price {
+            color: var(--white-color);
+        }
+
+        .pb-tier__price-sub {
+            font-family: var(--roboto-mono);
+            font-size: 0.75rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        html.dark-mode .pb-tier__price-sub {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .pb-tier__list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px;
+            flex-grow: 1;
+        }
+
+        .pb-tier__list li {
+            padding: 6px 0 6px 24px;
+            position: relative;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        .pb-tier__list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--dark-brown-color);
+            font-weight: 700;
+        }
+
+        html.dark-mode .pb-tier__list li {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        html.dark-mode .pb-tier__list li::before {
+            color: var(--yellow-color);
+        }
+
+        /* FAQ */
+        .pb-faq {
+            margin-top: 32px;
+        }
+
+        .pb-faq details {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+        }
+
+        html.dark-mode .pb-faq details {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .pb-faq summary {
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--dark-brown-color);
+            list-style: none;
+            padding-right: 32px;
+            position: relative;
+        }
+
+        .pb-faq summary::-webkit-details-marker { display: none; }
+
+        .pb-faq summary::after {
+            content: "+";
+            position: absolute;
+            right: 0;
+            top: -2px;
+            font-size: 1.4rem;
+            color: var(--dark-brown-color);
+            font-weight: 300;
+            transition: transform 0.2s ease;
+        }
+
+        .pb-faq details[open] summary::after { transform: rotate(45deg); }
+
+        html.dark-mode .pb-faq summary {
+            color: var(--white-color);
+        }
+
+        html.dark-mode .pb-faq summary::after {
+            color: var(--yellow-color);
+        }
+
+        .pb-faq__answer {
+            margin-top: 14px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            padding-right: 24px;
+        }
+
+        html.dark-mode .pb-faq__answer {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Email capture form */
+        .pb-capture {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 540px;
+        }
+
+        .pb-capture__input {
+            flex: 1;
+            min-width: 220px;
+            padding: 14px 16px;
+            border: 2px solid var(--dark-brown-color);
+            background: var(--white-color);
+            color: var(--black-color);
+            font-family: var(--roboto-mono);
+            font-size: 0.95rem;
+            border-radius: 0;
+        }
+
+        html.dark-mode .pb-capture__input {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--yellow-color);
+            color: var(--white-color);
+        }
+
+        .pb-capture__status {
+            margin-top: 12px;
+            font-family: var(--roboto-mono);
+            font-size: 0.85rem;
+            min-height: 1.2em;
+        }
+
+        .pb-capture__status.success { color: #2d8c4e; }
+        .pb-capture__status.error { color: #c0392b; }
+
+        /* Author block */
+        .pb-author {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            padding: 32px;
+            background: rgba(0, 0, 0, 0.03);
+            margin-top: 32px;
+        }
+
+        html.dark-mode .pb-author {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .pb-author__img {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .pb-author__body p {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        html.dark-mode .pb-author__body p {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .pb-author__name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-brown-color);
+            margin-bottom: 4px;
+        }
+
+        html.dark-mode .pb-author__name {
+            color: var(--white-color);
+        }
+
+        /* Inline code styling */
+        code {
+            font-family: var(--roboto-mono);
+            background: rgba(0, 0, 0, 0.06);
+            padding: 1px 6px;
+            border-radius: 2px;
+            font-size: 0.88em;
+        }
+
+        html.dark-mode code {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme toggle -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div>
+                    <div class="moon"></div>
+                    <div class="cloud cloud1"></div>
+                    <div class="cloud cloud2"></div>
+                    <div class="star star1"></div>
+                    <div class="star star2"></div>
+                    <div class="star star3"></div>
+                    <div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Hero -->
+        <section class="pb-hero">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-hero__eyebrow">HYDER MEDIA · PLAYBOOK · v1.0</p>
+                    <h1 class="pb-hero__title">The Modern AI-Discoverable<br>SaaS Launch Playbook</h1>
+                    <p class="pb-hero__lede">
+                        Every optimization, defensive pattern, and launch tactic for shipping a SaaS that ranks on Google AI Overview, gets cited by Perplexity, and shows up in Claude's answers. Documented from real production code.
+                    </p>
+                    <div class="pb-cta-row">
+                        <a href="#buy" class="pb-btn" id="hero-buy-cta">Get the playbook — $79</a>
+                        <a href="#free-intro" class="pb-btn pb-btn--secondary">Get the free intro</a>
+                    </div>
+                    <p class="pb-trust">7-day refund · Updated every quarter · 100+ pages, 12 named patterns</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem -->
+        <section class="pb-section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">THE PROBLEM</p>
+                    <h2 class="pb-section__title">Your product is invisible to the AI search engines that now answer a growing share of queries.</h2>
+                    <p class="pb-section__lede">
+                        Three years ago, "discoverability" meant Google. You optimized for blue links, you waited for rankings to compound, you eventually got traffic.
+                    </p>
+                    <p class="pb-section__lede">
+                        That world is gone. Your traffic now splits across:
+                    </p>
+                    <ul class="pb-problem-list">
+                        <li><strong>Google AI Overviews</strong> — pulls a different signal than blue-link search, lives or dies by structured data</li>
+                        <li><strong>Perplexity, ChatGPT search, Claude</strong> — cite sources visibly, have completely different ranking logic</li>
+                        <li><strong>Vertical AI tools</strong> — every domain agent is using OpenAPI tool-calling against APIs that aren't yours</li>
+                        <li><strong>Bing, Yandex, Naver</strong> — IndexNow lives here, and most builders skip the 30-second setup</li>
+                    </ul>
+                    <p class="pb-section__lede" style="margin-top: 24px; font-weight: 600;">
+                        Each surface consumes a different signal. Optimizing for one and ignoring the rest is the new "ranks on page 2."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's in it -->
+        <section class="pb-section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">WHAT'S IN THE PLAYBOOK</p>
+                    <h2 class="pb-section__title">Pre-flight setup + 5 optimization layers + 12 defensive patterns from real shipped code.</h2>
+
+                    <div class="pb-layer-grid">
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§0 — PRE-FLIGHT</div>
+                            <div class="pb-layer__title">Foundation accounts most playbooks skip</div>
+                            <div class="pb-layer__body">Domain + DNS + DB + Stripe + Resend + GA4 + Search Console + Bing WMT + SPF/DKIM/DMARC. The boring infra that determines whether anything else compounds.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§3 — LAYER 1</div>
+                            <div class="pb-layer__title">Entity identity</div>
+                            <div class="pb-layer__body">Wikidata entity creation, llms.txt for AI grounding, sitewide JSON-LD WebApplication schema. The deepest signal LLMs use to decide whether to cite you.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§4 — LAYER 2</div>
+                            <div class="pb-layer__title">Search & answer engines</div>
+                            <div class="pb-layer__body">Per-page schemas, OpenAPI 3.1 for LLM tool calling, sitemap + IndexNow strategy, slug uniqueness rules. The bridge between traditional SEO and modern AI search.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§5 — LAYER 3</div>
+                            <div class="pb-layer__title">Compliance & security</div>
+                            <div class="pb-layer__body">Production CSP for Stripe + GA4 + Supabase with every gotcha annotated. All 9 security headers. RLS defaults. The env-var hygiene that prevents the "Connection error, retried 2 times" bug.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§6 — LAYER 4</div>
+                            <div class="pb-layer__title">Conversion & analytics</div>
+                            <div class="pb-layer__body">GA4 event firing without the gtag race condition. Stripe success URL pattern to avoid webhook timing bugs. Error handling that surfaces causes via URL.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§7 — LAYER 5</div>
+                            <div class="pb-layer__title">Distribution</div>
+                            <div class="pb-layer__body">Ranked launch channels by ROI per minute. X / LinkedIn / Bluesky / Show HN / Reddit / journalist outreach / paid wire. With pre-written templates.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§8 — PATTERNS</div>
+                            <div class="pb-layer__title">12 named defensive bugs</div>
+                            <div class="pb-layer__body">The Stripe newline bug. The 308 cache-poisoning trap. The gtag race condition. The webhook race condition. The slug collision 404. Everything that's cost real launches real hours, organized by symptom.</div>
+                        </div>
+                        <div class="pb-layer">
+                            <div class="pb-layer__num">§9 — CHECKLISTS</div>
+                            <div class="pb-layer__title">Day-by-day workflow</div>
+                            <div class="pb-layer__body">Pre-launch checklist (day -7 / -5 / -3 / -1 / 0). Weekly health checks. Recovery playbook for the most common production bugs.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing tiers -->
+        <section class="pb-section" id="buy">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">CHOOSE YOUR PATH</p>
+                    <h2 class="pb-section__title">Three ways to get what you need.</h2>
+                    <p class="pb-section__lede">One playbook, three buyer intents. Free if you're curious, $79 if you're building, $2,500+ if you want it done for you.</p>
+
+                    <div class="pb-tier-grid">
+                        <div class="pb-tier">
+                            <div class="pb-tier__label">FREE INTRO</div>
+                            <div class="pb-tier__price">$0</div>
+                            <div class="pb-tier__price-sub">Instant download</div>
+                            <ul class="pb-tier__list">
+                                <li>5-page condensed playbook PDF</li>
+                                <li>The 5-layer model framework</li>
+                                <li>Three named defensive patterns</li>
+                                <li>Email-gated; no spam, unsubscribe anytime</li>
+                            </ul>
+                            <a href="#free-intro" class="pb-btn pb-btn--secondary">Get the intro</a>
+                        </div>
+                        <div class="pb-tier pb-tier--featured">
+                            <div class="pb-tier__featured-tag">Most popular</div>
+                            <div class="pb-tier__label">FULL PLAYBOOK</div>
+                            <div class="pb-tier__price">$79</div>
+                            <div class="pb-tier__price-sub">One-time · lifetime use within one org</div>
+                            <ul class="pb-tier__list">
+                                <li>Complete 100+ page playbook (PDF + HTML + source markdown)</li>
+                                <li>All templates: llms.txt, JSON-LD generator, reference CSP, journalist pitches, Wikidata QuickStatements</li>
+                                <li>Production code snippets ready to paste</li>
+                                <li>The Claude skill (apply to any project via <code>/saas-launch-playbook</code>)</li>
+                                <li>Pre-launch + weekly + recovery checklists</li>
+                                <li>12 months of free updates</li>
+                                <li>7-day money-back guarantee</li>
+                            </ul>
+                            <a href="https://hyder-media.lemonsqueezy.com/buy/PLACEHOLDER" class="pb-btn" id="buy-cta">Buy now — $79</a>
+                        </div>
+                        <div class="pb-tier">
+                            <div class="pb-tier__label">DONE-FOR-YOU</div>
+                            <div class="pb-tier__price">$2,500+</div>
+                            <div class="pb-tier__price-sub">2-week engagement · solo to enterprise</div>
+                            <ul class="pb-tier__list">
+                                <li>I apply the playbook to your project directly</li>
+                                <li>90-min kickoff + async work + 60-min handoff</li>
+                                <li>Wikidata + JSON-LD + OpenAPI shipped</li>
+                                <li>Security headers + RLS audit</li>
+                                <li>GA4 events + conversion tracking wired</li>
+                                <li>Launch kit prepped + 5 journalist pitches</li>
+                            </ul>
+                            <a href="/contact?topic=playbook-dfy" class="pb-btn pb-btn--secondary">Book a fit call</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Free intro capture -->
+        <section class="pb-section" id="free-intro">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">FREE INTRO</p>
+                    <h2 class="pb-section__title">5 pages. Three patterns. 10 minutes to read.</h2>
+                    <p class="pb-section__lede">
+                        The condensed version of the playbook. The 5-layer model + three of the most-painful named bugs (the Stripe newline, the gtag race, the slug collision 404). Enough to tell you if the full $79 playbook is for you.
+                    </p>
+                    <form id="introForm" class="pb-capture">
+                        <input type="email" id="introEmail" class="pb-capture__input" placeholder="you@yourdomain.com" required />
+                        <button type="submit" class="pb-btn">Send me the intro</button>
+                        <!-- Honeypot -->
+                        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true">
+                    </form>
+                    <div id="introStatus" class="pb-capture__status"></div>
+                    <p class="pb-trust" style="margin-top: 16px;">Unsubscribe any time. We email when the playbook updates — typically 1-2x per quarter, not more.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="pb-section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">FAQ</p>
+                    <h2 class="pb-section__title">Questions you might have.</h2>
+
+                    <div class="pb-faq">
+                        <details>
+                            <summary>Is this just AI SEO?</summary>
+                            <div class="pb-faq__answer">No. It's a complete pre-launch + launch playbook covering Wikidata entity grounding, security headers, RLS, conversion event tracking, defensive engineering patterns, and distribution. AI discoverability is one layer of five.</div>
+                        </details>
+                        <details>
+                            <summary>Do I need to be on Next.js or Vercel?</summary>
+                            <div class="pb-faq__answer">No. The patterns are vendor-agnostic. Code examples are in TypeScript (most universal) but the principles apply to any modern stack. CSP, JSON-LD, Wikidata, RLS — none of these depend on the framework.</div>
+                        </details>
+                        <details>
+                            <summary>Will this work for my specific industry?</summary>
+                            <div class="pb-faq__answer">Yes — the patterns are stack-agnostic and industry-agnostic. You'll customize the specific entities + Wikidata claims to match your domain, but the structural recipe is the same whether you're building B2B SaaS, ecommerce, fintech, or anything else web-facing.</div>
+                        </details>
+                        <details>
+                            <summary>How is this different from random AI SEO courses?</summary>
+                            <div class="pb-faq__answer">Most AI SEO content is theoretical or focused on content marketing. This is a production engineering playbook with named defensive patterns ("the Stripe newline bug", "the gtag race condition") from real shipped code. The patterns are organized by symptom so you can find the fix while debugging.</div>
+                        </details>
+                        <details>
+                            <summary>Do you offer refunds?</summary>
+                            <div class="pb-faq__answer">Yes — 7-day money-back guarantee, no questions asked. Forward your Lemon Squeezy receipt to kenny@hyder.me and the refund processes within 24h.</div>
+                        </details>
+                        <details>
+                            <summary>Can I share with my team?</summary>
+                            <div class="pb-faq__answer">The license is for use within one organization (your company / startup). Larger team licenses available — email kenny@hyder.me with the headcount and we'll send a fair price.</div>
+                        </details>
+                        <details>
+                            <summary>What's the update cadence?</summary>
+                            <div class="pb-faq__answer">Updates ship quarterly. Defensive patterns are added when I encounter new production bugs worth documenting. All updates are free for 12 months from purchase; after that, v2 ships at a 50% upgrade discount for prior buyers.</div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Author -->
+        <section class="pb-section">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <p class="pb-section__eyebrow">WHO WROTE THIS</p>
+                    <h2 class="pb-section__title">Kenny Hyder · Hyder Media</h2>
+                    <div class="pb-author">
+                        <img src="assets/imgs/kenny-hyder.jpg" alt="Kenny Hyder" class="pb-author__img" />
+                        <div class="pb-author__body">
+                            <div class="pb-author__name">Kenny Hyder</div>
+                            <p>Performance marketing consultant since 2009. Hyder Media has shipped landing pages, ad funnels, dashboards, and SaaS products across finance, ecommerce, B2B SaaS, fitness, automotive, and education verticals.</p>
+                            <p>This playbook is documented from real production code shipped in the last 12 months — not theoretical SEO advice. If you want me to apply it to your project directly, that's an engagement I do — see <a href="/contact?topic=playbook-dfy">Done-for-you launches</a>.</p>
+                            <p style="font-family: var(--roboto-mono); font-size: 0.9rem; margin-top: 16px;">
+                                <a href="mailto:kenny@hyder.me">kenny@hyder.me</a> ·
+                                <a href="https://x.com/kennyhyder" rel="noopener">@kennyhyder</a> ·
+                                <a href="https://hyder.me">hyder.me</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="pb-section">
+            <div class="container">
+                <div class="section__block mx-auto text-center">
+                    <h2 class="pb-section__title" style="margin: 0 auto 32px;">Ready when you are.</h2>
+                    <div class="pb-cta-row justify-content-center">
+                        <a href="https://hyder-media.lemonsqueezy.com/buy/PLACEHOLDER" class="pb-btn" id="footer-buy-cta">Buy the playbook — $79</a>
+                        <a href="#free-intro" class="pb-btn pb-btn--secondary">Or get the free intro</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2026 Hyder Media · <a href="/" style="color: inherit;">hyder.me</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+
+    <script>
+        // Email capture form — posts to the existing /api/contact endpoint
+        // with topic=playbook-intro so it routes through the same email pipeline.
+        document.getElementById('introForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('introEmail').value.trim();
+            const honeypot = this.querySelector('input[name="website"]').value;
+            const status = document.getElementById('introStatus');
+
+            if (honeypot) { return; } // bot caught
+
+            status.className = 'pb-capture__status';
+            status.textContent = 'Sending...';
+
+            try {
+                const r = await fetch('/api/playbook-intro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, website: honeypot }),
+                });
+                if (r.ok) {
+                    status.className = 'pb-capture__status success';
+                    status.textContent = '✓ Check your inbox in the next 2 minutes for the free intro PDF.';
+                    document.getElementById('introEmail').value = '';
+
+                    // GA4: track the lead capture conversion
+                    if (window.gtag) {
+                        gtag('event', 'generate_lead', {
+                            currency: 'USD', value: 0,
+                            method: 'playbook-intro-form',
+                        });
+                    }
+                } else {
+                    const data = await r.json().catch(() => ({}));
+                    status.className = 'pb-capture__status error';
+                    status.textContent = data.error || 'Submission failed. Email kenny@hyder.me directly.';
+                }
+            } catch (err) {
+                status.className = 'pb-capture__status error';
+                status.textContent = 'Network error. Email kenny@hyder.me directly.';
+            }
+        });
+
+        // GA4 events for buy buttons (helps measure the funnel)
+        ['hero-buy-cta', 'buy-cta', 'footer-buy-cta'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el && window.gtag) {
+                el.addEventListener('click', function() {
+                    gtag('event', 'begin_checkout', {
+                        currency: 'USD', value: 79,
+                        items: [{
+                            item_id: 'playbook-full',
+                            item_name: 'Modern AI-Discoverable SaaS Launch Playbook',
+                            item_category: 'digital_product',
+                            price: 79, quantity: 1,
+                        }],
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
