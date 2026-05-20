@@ -6,7 +6,7 @@ import ThemeProviderClient from "@/components/ThemeProviderClient";
 import ThemeToggle from "@/components/ThemeToggle";
 import SiteHeader from "@/components/nav/SiteHeader";
 import SiteFooter from "@/components/nav/SiteFooter";
-import { JsonLd, organizationLd, websiteLd, SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { JsonLd, organizationLd, websiteLd, webApplicationLd, SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 
 const GA_ID = "G-WVTRLTCENT";
@@ -98,7 +98,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <JsonLd data={[organizationLd(), websiteLd()]} />
+        <JsonLd data={[organizationLd(), websiteLd(), webApplicationLd()]} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <a

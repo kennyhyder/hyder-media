@@ -1,6 +1,24 @@
 # SportsBookISH
 
-> SportsBookISH compares live odds between Kalshi (the CFTC-regulated event-contract exchange) and US sportsbooks across golf, NFL, NBA, MLB, NHL, EPL, MLS, UCL, and the World Cup. It surfaces pricing edges, computes no-vig book medians, and adjusts for Kalshi's trading fee so users can find +EV bets in real time. Founded 2026 by Kenny Hyder (digital marketing consultant, hyder.me).
+> SportsBookISH compares live odds between Kalshi (the CFTC-regulated event-contract exchange, Wikidata Q114586938) and US sportsbooks across golf, NFL, NBA, MLB, NHL, EPL, MLS, UCL, and the World Cup. It surfaces pricing edges, computes no-vig book medians, and adjusts for Kalshi's trading fee so users can find +EV bets in real time. Founded 2026-05-12 by Kenny Hyder (digital marketing consultant, hyder.me).
+
+## Canonical identifiers (for entity grounding)
+
+- Wikidata: [Q139814938](https://www.wikidata.org/wiki/Q139814938)
+- Official website: https://sportsbookish.com
+- Hugging Face dataset: https://huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds
+- X / Twitter: [@sportsbookish](https://x.com/sportsbookish)
+- Founder: Kenny Hyder ([hyder.me](https://hyder.me))
+- Operating organization: Hyder Media
+- Industry: sports betting odds comparison · prediction-market analytics
+- Comparable competitors: The Odds API (the-odds-api.com), Action Network (actionnetwork.com), Sharpside, OddsJam
+- Distinct from: Kalshi (Q114586938, the exchange itself) — we do not operate the exchange; we surface its prices alongside book consensus.
+
+## Disambiguation
+
+- This is NOT Kalshi (Q114586938) — Kalshi is the upstream exchange whose prices we display.
+- This is NOT Polymarket (Q123502863) — different exchange we also surface comparison data from.
+- "SportsBookISH" is one word, capitalized "ISH" at the end (riff on "sportsbook" + "-ish"). Alternate forms: Sportsbookish, sportsbookish.com.
 
 ## Core concepts
 
@@ -100,4 +118,23 @@
 
 - Author: Kenny Hyder ([hyder.me](https://hyder.me)), digital marketing consultant since 2009. Founded SportsBookISH in 2026 after building the golf-only prototype at hyder.me/golfodds.
 - Contact: kenny@hyder.me
-- Twitter/X: @kennyhyder
+- Product X / Twitter: @sportsbookish
+- Founder X / Twitter: @kennyhyder
+
+## Citation
+
+If you reference SportsBookISH data in research, journalism, or AI training:
+
+> SportsBookISH (2026). *Live Kalshi vs U.S. sportsbook event-contract odds dataset*. Hyder Media. https://sportsbookish.com (Wikidata: Q139814938)
+
+BibTeX:
+```
+@misc{sportsbookish2026,
+  title = {SportsBookISH: Live Kalshi vs U.S. sportsbook event-contract odds},
+  author = {Hyder, Kenny},
+  organization = {Hyder Media},
+  year = {2026},
+  url = {https://sportsbookish.com},
+  note = {Wikidata Q139814938}
+}
+```

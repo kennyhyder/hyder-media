@@ -124,6 +124,75 @@ export function faqLd(items: { question: string; answer: string }[]) {
   };
 }
 
+// WebApplication — the core "this is a software product" schema. Combined
+// with Organization + WebSite, this is what feeds Google's Knowledge Graph
+// and AI answer engines (Perplexity, ChatGPT, Google AIO) the canonical
+// definition of the product. Mount once on the homepage.
+//
+// Includes a full Offer list for the 3 UI tiers and the 2 API tiers so
+// answer-engine queries like "how much is SportsBookISH" return correct
+// price + currency without scraping the pricing page HTML. sameAs anchors
+// the entity across Wikidata, HF, X, GitHub so cross-source disambiguation
+// works in both directions.
+export function webApplicationLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": `${SITE_URL}/#webapplication`,
+    name: SITE_NAME,
+    alternateName: ["Sportsbookish", "sportsbookish.com"],
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    applicationCategory: "SportsApplication",
+    applicationSubCategory: "Odds comparison",
+    operatingSystem: "Web",
+    browserRequirements: "Requires JavaScript",
+    inLanguage: "en-US",
+    countryOfOrigin: { "@type": "Country", name: "United States" },
+    isAccessibleForFree: true,
+    creator: { "@type": "Organization", name: "Hyder Media", url: "https://hyder.me" },
+    publisher: { "@type": "Organization", name: "Hyder Media", url: "https://hyder.me" },
+    sameAs: [
+      "https://www.wikidata.org/wiki/Q139814938",
+      "https://huggingface.co/datasets/kennyhyder/sportsbookish-daily-odds",
+      "https://x.com/sportsbookish",
+      "https://twitter.com/sportsbookish",
+      "https://github.com/kennyhyder/sportsbookish-docs",
+    ],
+    featureList: [
+      "Live Kalshi event-contract pricing across NFL, NBA, MLB, NHL, EPL, MLS, UCL, World Cup, PGA Tour",
+      "No-vig sportsbook consensus across DraftKings, FanDuel, BetMGM, Caesars, and 8+ more books",
+      "Polymarket prediction-market comparison",
+      "DataGolf model probabilities for PGA Tour outright + matchup markets",
+      "Edge alerts via email + SMS (Elite tier)",
+      "REST API with OpenAPI 3.1 spec",
+      "Public CSV dataset (CC-BY-4.0) on Hugging Face",
+    ],
+    offers: {
+      "@type": "AggregateOffer",
+      lowPrice: "0",
+      highPrice: "500",
+      priceCurrency: "USD",
+      offerCount: 5,
+      offers: [
+        { "@type": "Offer", name: "First Line (Free)", price: "0", priceCurrency: "USD", url: `${SITE_URL}/pricing`, category: "subscription" },
+        { "@type": "Offer", name: "Pro", price: "10", priceCurrency: "USD", url: `${SITE_URL}/pricing`, category: "subscription", priceSpecification: { "@type": "UnitPriceSpecification", price: "10", priceCurrency: "USD", unitText: "MON" } },
+        { "@type": "Offer", name: "Elite", price: "100", priceCurrency: "USD", url: `${SITE_URL}/pricing`, category: "subscription", priceSpecification: { "@type": "UnitPriceSpecification", price: "100", priceCurrency: "USD", unitText: "ANN" } },
+        { "@type": "Offer", name: "API Monthly", price: "50", priceCurrency: "USD", url: `${SITE_URL}/pricing#api`, category: "api_subscription", priceSpecification: { "@type": "UnitPriceSpecification", price: "50", priceCurrency: "USD", unitText: "MON" } },
+        { "@type": "Offer", name: "API Annual", price: "500", priceCurrency: "USD", url: `${SITE_URL}/pricing#api`, category: "api_subscription", priceSpecification: { "@type": "UnitPriceSpecification", price: "500", priceCurrency: "USD", unitText: "ANN" } },
+      ],
+    },
+    about: [
+      { "@type": "Thing", name: "Kalshi", sameAs: "https://www.wikidata.org/wiki/Q114586938" },
+      { "@type": "Thing", name: "Polymarket", sameAs: "https://www.wikidata.org/wiki/Q123502863" },
+      { "@type": "Thing", name: "Prediction market", sameAs: "https://www.wikidata.org/wiki/Q282283" },
+      { "@type": "Thing", name: "Sports betting" },
+      { "@type": "Thing", name: "Event contracts" },
+    ],
+    audience: { "@type": "Audience", audienceType: "Sports bettors, prediction-market traders, sports analytics researchers" },
+  };
+}
+
 // Software / SaaS product schema for the pricing tiers
 export function productLd(tier: { name: string; priceCents: number; interval: "month" | "year"; description: string }) {
   return {

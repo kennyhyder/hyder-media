@@ -1,5 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { uploadFiles } from "@huggingface/hub";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 // Daily cron that pushes the latest data snapshot to the Hugging Face
 // dataset repo kennyhyder/sportsbookish-daily-odds. Keeps the public
@@ -129,11 +132,30 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: false, reason: "no rows produced — skipping HF push to avoid clobbering" });
   }
 
+  // Also push the dataset card (README.md) so the HF dataset page renders
+  // tags, schema docs, citation block, and usage examples. The file lives
+  // in this same directory and gets shipped with each deploy; uploading on
+  // every cron tick is harmless because HF dedupes by content hash.
+  let readmeContent = null;
+  try {
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    readmeContent = await readFile(join(__dirname, "huggingface-readme.md"), "utf8");
+  } catch (e) {
+    console.warn("[hf-sync] README not found, skipping:", e.message);
+  }
+
+  const filesToUpload = [
+    { path: HF_FILE, content: new Blob([csv], { type: "text/csv" }) },
+  ];
+  if (readmeContent) {
+    filesToUpload.push({ path: "README.md", content: new Blob([readmeContent], { type: "text/markdown" }) });
+  }
+
   try {
     await uploadFiles({
       repo: { type: "dataset", name: HF_REPO },
       accessToken: process.env.HF_TOKEN,
-      files: [{ path: HF_FILE, content: new Blob([csv], { type: "text/csv" }) }],
+      files: filesToUpload,
       commitTitle: `Daily snapshot ${generated.slice(0, 10)}`,
       commitDescription: `Auto-sync from hyder.me/api/data/sync-huggingface. ${rowCount} rows. Generated ${generated}.`,
     });
