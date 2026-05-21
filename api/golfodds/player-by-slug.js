@@ -54,7 +54,7 @@ export default async function handler(req, res) {
 
   const { data: markets } = await supabase
     .from("golfodds_markets")
-    .select("id, market_type, tournament:golfodds_tournaments(id, name, short_name, slug, season_year, start_date, is_major, status)")
+    .select("id, market_type, tournament:golfodds_tournaments(id, name, short_name, slug, season_year, start_date, end_date, is_major, status)")
     .eq("player_id", player.id);
 
   const openMarkets = (markets || []).filter((m) => m.tournament?.status !== "closed");
