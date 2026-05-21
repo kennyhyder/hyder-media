@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { fetchGolfers } from "@/lib/golf-data";
 import { golfPlayerUrl } from "@/lib/slug";
 import { JsonLd, breadcrumbLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
@@ -21,21 +22,31 @@ export default async function GolferIndexPage() {
   const top = players.filter((p) => p.owgr_rank != null && p.owgr_rank <= 100);
   const rest = players.filter((p) => p.owgr_rank == null || p.owgr_rank > 100);
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
-      <JsonLd data={breadcrumbLd([
-        { name: "Home", url: "/" },
-        { name: "Golf", url: "/golf" },
-        { name: "Players", url: "/golf/players" },
-      ])} />
+      <JsonLd data={[
+        breadcrumbLd([
+          { name: "Home", url: "/" },
+          { name: "Golf", url: "/golf" },
+          { name: "Players", url: "/golf/players" },
+        ]),
+        datasetFreshnessLd({
+          name: "PGA Tour player index with live Kalshi odds",
+          description: "Index of every PGA Tour golfer with active Kalshi event-contract markets — win, top 5/10/20, make cut, head-to-head matchups. Sorted by OWGR world ranking.",
+          pageUrl: `${SITE_URL}/golf/players`,
+          dateModified: renderTime,
+        }),
+      ]} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4">
-          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground/80">← Golf</Link>
-          <div className="flex items-center gap-2 font-semibold text-sm">
+        <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 gap-2">
+          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground/80 shrink-0">← Golf</Link>
+          <div className="flex items-center gap-2 font-semibold text-sm truncate">
             <span>⛳</span>
             <span>PGA Tour players</span>
           </div>
-          <div className="w-12" aria-hidden="true" />
+          <LastUpdated iso={renderTime} variant="header" />
         </div>
       </header>
 

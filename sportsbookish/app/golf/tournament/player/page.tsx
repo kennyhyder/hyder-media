@@ -7,6 +7,7 @@ import { fetchPlayer } from "@/lib/matchup-data";
 import { getCurrentTier, getUserPreferences, canSeeMarket } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import PaywallCard from "@/components/PaywallCard";
+import { LastUpdated } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
 
@@ -58,12 +59,17 @@ export default async function PlayerPage({ searchParams }: { searchParams: Promi
   // Filter markets by tier (free wouldn't reach here, but pro/elite see all)
   const visibleMarkets = data.markets.filter((m) => canSeeMarket(tier, m.market_type));
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link href={`/golf/tournament?id=${id}`} className="text-sm text-muted-foreground hover:text-foreground">← {data.tournament.name}</Link>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4 gap-2">
+          <Link href={`/golf/tournament?id=${id}`} className="text-sm text-muted-foreground hover:text-foreground shrink-0">← {data.tournament.name}</Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          </div>
         </div>
       </header>
 

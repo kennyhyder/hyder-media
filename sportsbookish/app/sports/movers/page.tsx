@@ -6,9 +6,13 @@ import { fetchMovements } from "@/lib/movements-data";
 import { fetchLeagues } from "@/lib/sports-data";
 import { fmtPctSigned } from "@/lib/format";
 import UpsellBanner from "@/components/UpsellBanner";
+import { JsonLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 const SPORT_ICON: Record<string, string> = { nba: "🏀", mlb: "⚾", nhl: "🏒", epl: "⚽", mls: "⚽" };
 
@@ -38,21 +42,38 @@ export default async function MoversPage({ searchParams }: { searchParams: Promi
   const ups = movements.filter((m) => m.direction === "up");
   const downs = movements.filter((m) => m.direction === "down");
 
+  // Freshness = latest movement's fired_at, or render time as floor
+  const movementsFreshest = movements.length > 0
+    ? movements.reduce((max, m) => {
+        const t = m.fired_at ? new Date(m.fired_at).getTime() : 0;
+        return t > max ? t : max;
+      }, 0)
+    : 0;
+  const freshestAt = movementsFreshest ? new Date(movementsFreshest).toISOString() : new Date().toISOString();
+
   return (
     <div className="min-h-screen">
+      <JsonLd data={datasetFreshnessLd({
+        name: `Top Kalshi movers — ${league ? league.toUpperCase() : "all sports"} (last ${hours}h)`,
+        description: `Live ledger of the largest Kalshi event-contract price movements in the last ${hours} hours across ${league ? league.toUpperCase() : "all sports"}. Detected every 5 minutes.`,
+        pageUrl: `${SITE_URL}/sports/movers${league ? `?league=${league}` : ""}`,
+        dateModified: freshestAt,
+        variableMeasured: ["Price delta", "Kalshi implied probability change", "Movement direction"],
+      })} />
       {isAnonymous && <UpsellBanner variant="anonymous" next="/sports/movers" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground/80">← Sports</Link>
-          <div className="flex items-center gap-2 font-semibold text-sm">
+        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4 gap-2">
+          <Link href="/sports" className="text-sm text-muted-foreground hover:text-foreground/80 shrink-0">← Sports</Link>
+          <div className="flex items-center gap-2 font-semibold text-sm truncate">
             <TrendingUp className="h-4 w-4 text-emerald-500" />
             <span>Top Movers</span>
           </div>
-          {isAnonymous ? (
-            <Link href="/signup?next=/sports/movers" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
-          ) : (
-            <div className="w-12" />
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={freshestAt} variant="header" />
+            {isAnonymous && (
+              <Link href="/signup?next=/sports/movers" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            )}
+          </div>
         </div>
       </header>
 

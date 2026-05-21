@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { fetchTeams, fetchLeagues } from "@/lib/sports-data";
 import { teamUrl, playerUrl } from "@/lib/slug";
 import { JsonLd, breadcrumbLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
@@ -27,22 +28,35 @@ export default async function TeamIndexPage({ params }: { params: Promise<{ leag
   const meta = leagues.find((l) => l.key === league);
   if (!meta) notFound();
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
-      <JsonLd data={breadcrumbLd([
-        { name: "Home", url: "/" },
-        { name: "Sports", url: "/sports" },
-        { name: meta.display_name, url: `/sports/${league}` },
-        { name: "Teams", url: `/sports/${league}/teams` },
-      ])} />
+      <JsonLd data={[
+        breadcrumbLd([
+          { name: "Home", url: "/" },
+          { name: "Sports", url: "/sports" },
+          { name: meta.display_name, url: `/sports/${league}` },
+          { name: "Teams", url: `/sports/${league}/teams` },
+        ]),
+        datasetFreshnessLd({
+          name: `${meta.display_name} team index with live Kalshi odds`,
+          description: `Index of every ${meta.display_name} team with live Kalshi event-contract pricing across game lines and futures markets.`,
+          pageUrl: `${SITE_URL}/sports/${league}/teams`,
+          dateModified: renderTime,
+        }),
+      ]} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4">
-          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {meta.display_name}</Link>
-          <div className="flex items-center gap-2 font-semibold text-sm">
+        <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 gap-2">
+          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80 shrink-0">← {meta.display_name}</Link>
+          <div className="flex items-center gap-2 font-semibold text-sm truncate">
             <span className="text-base">{meta.icon}</span>
             <span>{meta.display_name} teams</span>
           </div>
-          <Link href={`/sports/${league}/players`} className="text-xs text-emerald-500 hover:underline">Players →</Link>
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            <Link href={`/sports/${league}/players`} className="text-xs text-emerald-500 hover:underline">Players →</Link>
+          </div>
         </div>
       </header>
 

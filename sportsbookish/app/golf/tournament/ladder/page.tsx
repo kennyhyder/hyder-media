@@ -8,6 +8,7 @@ import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import { fmtPct, fmtPctSigned, edgeTextClass, MARKET_LABELS } from "@/lib/format";
 import PaywallCard from "@/components/PaywallCard";
+import { LastUpdated } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
 
@@ -45,13 +46,18 @@ export default async function LadderPage({ searchParams }: { searchParams: Promi
   const issuesCount = rows.filter((r) => r.issues.length > 0).length;
   const kalshiCount = rows.filter((r) => r.has_kalshi_data).length;
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between px-4">
-          <Link href={`/golf/tournament?id=${id}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {info?.tournament?.name || "Tournament"}</Link>
-          <div className="font-semibold text-sm">Ladder · Internal consistency</div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+        <div className="container mx-auto flex h-14 max-w-[1800px] items-center justify-between px-4 gap-2">
+          <Link href={`/golf/tournament?id=${id}`} className="text-sm text-muted-foreground hover:text-foreground/80 shrink-0">← {info?.tournament?.name || "Tournament"}</Link>
+          <div className="font-semibold text-sm truncate">Ladder · Internal consistency</div>
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          </div>
         </div>
       </header>
 

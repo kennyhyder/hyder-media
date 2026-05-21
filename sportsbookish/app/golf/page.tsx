@@ -7,32 +7,57 @@ import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import UpsellBanner from "@/components/UpsellBanner";
 import { slugify, tournamentUrl } from "@/lib/slug";
+import { JsonLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 export default async function GolfHome() {
   const { tier, userId } = await getCurrentTier();
   const isAnonymous = !userId;
   const tournaments = await fetchTournaments();
   const tierInfo = TIER_BY_KEY[tier];
+  const renderTime = new Date().toISOString();
+
+  // Chronological sort: in-progress + upcoming first (end_date ASC), then past
+  // (end_date DESC). Next event first per user's site-wide preference.
+  const sortedTournaments = [...tournaments].sort((a, b) => {
+    const aClosed = a.status === "closed";
+    const bClosed = b.status === "closed";
+    if (aClosed !== bClosed) return aClosed ? 1 : -1;
+    const da = a.end_date || a.start_date || "9999-12-31";
+    const db = b.end_date || b.start_date || "9999-12-31";
+    return aClosed ? db.localeCompare(da) : da.localeCompare(db);
+  });
 
   return (
     <div className="min-h-screen">
+      <JsonLd data={datasetFreshnessLd({
+        name: "PGA Tour golf — Kalshi vs sportsbook odds hub",
+        description: "Active PGA Tour tournaments with live Kalshi event-contract pricing, DataGolf model probabilities, and US sportsbook consensus. Refreshed every 5 minutes.",
+        pageUrl: `${SITE_URL}/golf`,
+        dateModified: renderTime,
+      })} />
       {isAnonymous && <UpsellBanner variant="anonymous" next="/golf" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground">
+        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4 gap-2">
+          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground shrink-0">
             ← {isAnonymous ? "Home" : "Dashboard"}
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 truncate">
             <Trophy className="h-4 w-4 text-emerald-500" />
             <span className="font-semibold">Golf — PGA Tour</span>
           </div>
-          {isAnonymous ? (
-            <Link href="/signup?next=/golf" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
-          ) : (
-            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            {isAnonymous ? (
+              <Link href="/signup?next=/golf" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            ) : (
+              <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+            )}
+          </div>
         </div>
       </header>
 
@@ -60,7 +85,7 @@ export default async function GolfHome() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tournaments.map((t) => {
+          {sortedTournaments.map((t) => {
             // Use the DB-stored slug + season_year (canonical). Fall back to a
             // computed slug from t.name only if backfill hasn't run yet, and
             // the legacy ?id= URL if both are missing.

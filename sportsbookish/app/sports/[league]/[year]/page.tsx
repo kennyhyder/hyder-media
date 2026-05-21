@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { fetchLeagues, fetchEventsByLeague, fetchArchivedEventsByLeague } from "@/lib/sports-data";
 import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { Card, CardContent } from "@/components/ui/card";
 import { eventUrl } from "@/lib/slug";
 
@@ -61,6 +62,9 @@ export default async function LeagueYearIndexPage({ params }: { params: Promise<
     return { name: e.title, url: eventUrl(league, year, slug) };
   });
 
+  // force-dynamic + cron-driven upstream = page is fresh as of this render
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
       <JsonLd data={[
@@ -71,15 +75,22 @@ export default async function LeagueYearIndexPage({ params }: { params: Promise<
           { name: String(year), url: `/sports/${league}/${year}` },
         ]),
         itemListLd(`${meta.display_name} ${year} events`, itemList),
+        datasetFreshnessLd({
+          name: `${meta.display_name} ${year} odds archive`,
+          description: `Kalshi event-contract pricing, US sportsbook consensus, and Polymarket overlay for every ${meta.display_name} event in ${year}.`,
+          pageUrl: `${SITE_URL}/sports/${league}/${year}`,
+          dateModified: renderTime,
+          variableMeasured: ["Kalshi implied probability", "Sportsbook consensus", "Polymarket implied probability"],
+        }),
       ]} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground">← {meta.display_name}</Link>
-          <div className="flex items-center gap-2 font-semibold text-sm">
+        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4 gap-2">
+          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground shrink-0">← {meta.display_name}</Link>
+          <div className="flex items-center gap-2 font-semibold text-sm truncate">
             <span className="text-base">{meta.icon}</span>
             <span>{meta.display_name} · {year}</span>
           </div>
-          <div className="w-12" aria-hidden="true" />
+          <LastUpdated iso={renderTime} variant="header" />
         </div>
       </header>
 
@@ -109,7 +120,18 @@ export default async function LeagueYearIndexPage({ params }: { params: Promise<
                 <h2 className="text-xl font-semibold mb-3 capitalize">{type.replaceAll("_", " ")} ({list.length})</h2>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {list
-                    .sort((a, b) => (b.start_time || "").localeCompare(a.start_time || ""))
+                    .sort((a, b) => {
+                      // Next event first chronologically: open events
+                      // (start_time ASC, upcoming first), then closed events
+                      // (start_time DESC, most-recent-resolved first).
+                      const aOpen = a.status !== "closed";
+                      const bOpen = b.status !== "closed";
+                      if (aOpen !== bOpen) return aOpen ? -1 : 1;
+                      const sa = a.start_time || "";
+                      const sb = b.start_time || "";
+                      // Open: ASC (next event first). Closed: DESC (recent first).
+                      return aOpen ? sa.localeCompare(sb) : sb.localeCompare(sa);
+                    })
                     .map((e) => {
                       const slug = e.slug || "event";
                       const href = eventUrl(league, year, slug);

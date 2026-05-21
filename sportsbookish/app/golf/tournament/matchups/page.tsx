@@ -8,6 +8,7 @@ import { fetchMatchups, type Matchup } from "@/lib/matchup-data";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import TournamentTabs from "@/components/TournamentTabs";
 import PaywallCard from "@/components/PaywallCard";
+import { LastUpdated } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
 
@@ -43,13 +44,18 @@ export default async function MatchupsPage({ searchParams }: { searchParams: Pro
   const h2h = data.matchups.filter((m) => m.matchup_type === "h2h").length;
   const threeBall = data.matchups.filter((m) => m.matchup_type === "3ball").length;
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground">← Tournaments</Link>
-          <div className="font-semibold text-sm">{info?.tournament?.name || "Tournament"}</div>
-          <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4 gap-2">
+          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground shrink-0">← Tournaments</Link>
+          <div className="font-semibold text-sm truncate">{info?.tournament?.name || "Tournament"}</div>
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+          </div>
         </div>
       </header>
 

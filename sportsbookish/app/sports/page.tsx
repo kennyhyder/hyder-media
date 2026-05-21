@@ -6,29 +6,43 @@ import { fetchLeagues } from "@/lib/sports-data";
 import { getCurrentTier } from "@/lib/tier-guard";
 import { TIER_BY_KEY } from "@/lib/tiers";
 import UpsellBanner from "@/components/UpsellBanner";
+import { JsonLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 export default async function SportsHub() {
   const { tier, userId } = await getCurrentTier();
   const isAnonymous = !userId;
   const leagues = await fetchLeagues();
   const tierInfo = TIER_BY_KEY[tier];
+  const renderTime = new Date().toISOString();
 
   return (
     <div className="min-h-screen">
+      <JsonLd data={datasetFreshnessLd({
+        name: "All sports — Kalshi vs sportsbook odds hub",
+        description: "Entry point for live Kalshi event-contract pricing across all 9 sports tracked by SportsBookISH — NFL, NBA, MLB, NHL, EPL, MLS, UCL, World Cup, PGA Tour.",
+        pageUrl: `${SITE_URL}/sports`,
+        dateModified: renderTime,
+      })} />
       {isAnonymous && <UpsellBanner variant="anonymous" next="/sports" />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground">
+        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4 gap-2">
+          <Link href={isAnonymous ? "/" : "/dashboard"} className="text-sm text-muted-foreground hover:text-foreground shrink-0">
             ← {isAnonymous ? "Home" : "Dashboard"}
           </Link>
           <div className="font-semibold text-sm">All Sports</div>
-          {isAnonymous ? (
-            <Link href="/signup?next=/sports" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
-          ) : (
-            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={renderTime} variant="header" />
+            {isAnonymous ? (
+              <Link href="/signup?next=/sports" className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            ) : (
+              <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">{tierInfo.name}</Badge>
+            )}
+          </div>
         </div>
       </header>
 

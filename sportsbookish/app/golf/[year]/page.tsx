@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { fetchTournaments, fetchArchivedTournaments } from "@/lib/golf-data";
 import { JsonLd, breadcrumbLd, itemListLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { Card, CardContent } from "@/components/ui/card";
 import { tournamentUrl } from "@/lib/slug";
 
@@ -45,6 +46,8 @@ export default async function GolfYearIndexPage({ params }: { params: Promise<{ 
     .filter((t) => t.slug)
     .map((t) => ({ name: t.name, url: tournamentUrl(year, t.slug!) }));
 
+  const renderTime = new Date().toISOString();
+
   return (
     <div className="min-h-screen">
       <JsonLd data={[
@@ -54,12 +57,19 @@ export default async function GolfYearIndexPage({ params }: { params: Promise<{ 
           { name: String(year), url: `/golf/${year}` },
         ]),
         itemListLd(`PGA Tour ${year} tournaments`, itemList),
+        datasetFreshnessLd({
+          name: `PGA Tour ${year} odds archive`,
+          description: `Kalshi event-contract pricing, DataGolf model probabilities, and US sportsbook consensus for every PGA Tour tournament in ${year}.`,
+          pageUrl: `${SITE_URL}/golf/${year}`,
+          dateModified: renderTime,
+          variableMeasured: ["Kalshi implied probability", "DataGolf model probability", "Sportsbook consensus"],
+        }),
       ]} />
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground">← Golf</Link>
+        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4 gap-2">
+          <Link href="/golf" className="text-sm text-muted-foreground hover:text-foreground shrink-0">← Golf</Link>
           <div className="font-semibold text-sm">PGA Tour · {year}</div>
-          <div className="w-12" aria-hidden="true" />
+          <LastUpdated iso={renderTime} variant="header" />
         </div>
       </header>
 
