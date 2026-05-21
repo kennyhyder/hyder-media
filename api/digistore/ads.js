@@ -160,15 +160,22 @@ async function fetchRSAMetrics(headers, start, end) {
 }
 
 async function fetchAssetPerformance(headers, start, end) {
-    // Date-segmented to match the UI's evaluation window. Without a date filter,
-    // Google can return stale/aggregated labels that don't match the Ads UI.
+    // v23 added full metrics support for RSA assets in ad_group_ad_asset_view.
+    // We pull impressions/clicks/cost/conversions per asset for the date range —
+    // these surface next to each headline/description on the ad card.
     const query = `
         SELECT
             ad_group_ad_asset_view.ad_group_ad,
+            ad_group_ad_asset_view.asset,
             ad_group_ad_asset_view.field_type,
             ad_group_ad_asset_view.performance_label,
             asset.text_asset.text,
-            asset.resource_name
+            asset.resource_name,
+            metrics.impressions,
+            metrics.clicks,
+            metrics.cost_micros,
+            metrics.conversions,
+            metrics.conversions_value
         FROM ad_group_ad_asset_view
         WHERE segments.date BETWEEN '${start}' AND '${end}'
             AND ad_group_ad_asset_view.field_type IN ('HEADLINE', 'DESCRIPTION')
@@ -177,10 +184,23 @@ async function fetchAssetPerformance(headers, start, end) {
 }
 
 function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
-    // Build asset label lookup from ad_group_ad_asset_view (used as fallback if the
-    // RSA itself didn't expose asset_performance_label).
-    // Structure: adId -> { headlines: {text: bestLabel}, descriptions: {text: bestLabel} }
-    const assetLabels = {};
+    // Build asset lookup from ad_group_ad_asset_view, indexed by
+    // (adId, asset resource name) so we can join cleanly back to the RSA's
+    // headline/description list. Each entry carries the label plus metrics
+    // (impressions/clicks/spend/conversions) summed across date segments.
+    // Also build a text-fallback index in case the asset resource name on
+    // the headline doesn't match (rare, but defensive).
+    const assetByResource = {};   // (adId, resourceName) → { label, metrics }
+    const assetByText = {};       // (adId, fieldType, text) → { label, metrics }
+
+    const addAssetMetrics = (entry, m) => {
+        entry.metrics.impressions += parseInt(m.impressions || 0, 10);
+        entry.metrics.clicks += parseInt(m.clicks || 0, 10);
+        entry.metrics.spend += parseFloat(m.costMicros || 0) / 1000000;
+        entry.metrics.conversions += parseFloat(m.conversions || 0);
+        entry.metrics.conversionValue += parseFloat(m.conversionsValue || 0);
+    };
+
     if (assetData) {
         for (const row of assetData) {
             const view = row.adGroupAdAssetView || {};
@@ -188,20 +208,44 @@ function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
             const adIdMatch = adResourceName.match(/~(\d+)$/);
             if (!adIdMatch) continue;
             const adId = adIdMatch[1];
+            const assetResourceName = view.asset || row.asset?.resourceName || '';
             const fieldType = view.fieldType;
             const rawLabel = view.performanceLabel;
             const text = (row.asset?.textAsset?.text || '').trim();
-            if (!text) continue;
+            const m = row.metrics || {};
 
-            if (!assetLabels[adId]) assetLabels[adId] = { headlines: {}, descriptions: {} };
-            const bucket = fieldType === 'HEADLINE' ? assetLabels[adId].headlines
-                         : fieldType === 'DESCRIPTION' ? assetLabels[adId].descriptions : null;
-            if (!bucket) continue;
-            // Keep the strongest label seen for this asset (same asset can appear
-            // across multiple date segments / ad groups)
-            bucket[text] = bestLabel(bucket[text], rawLabel);
+            const keyRes = `${adId}|${assetResourceName}`;
+            if (!assetByResource[keyRes]) {
+                assetByResource[keyRes] = {
+                    label: null,
+                    metrics: { impressions: 0, clicks: 0, spend: 0, conversions: 0, conversionValue: 0 },
+                };
+            }
+            assetByResource[keyRes].label = bestLabel(assetByResource[keyRes].label, rawLabel);
+            addAssetMetrics(assetByResource[keyRes], m);
+
+            if (text && (fieldType === 'HEADLINE' || fieldType === 'DESCRIPTION')) {
+                const keyText = `${adId}|${fieldType}|${text}`;
+                if (!assetByText[keyText]) {
+                    assetByText[keyText] = {
+                        label: null,
+                        metrics: { impressions: 0, clicks: 0, spend: 0, conversions: 0, conversionValue: 0 },
+                    };
+                }
+                assetByText[keyText].label = bestLabel(assetByText[keyText].label, rawLabel);
+                addAssetMetrics(assetByText[keyText], m);
+            }
         }
     }
+
+    const lookupAsset = (adId, fieldType, asset) => {
+        const text = (asset.text || '').trim();
+        const resourceName = asset.asset || '';
+        // Try resource-name first, fall back to text
+        const byRes = resourceName ? assetByResource[`${adId}|${resourceName}`] : null;
+        const byText = text ? assetByText[`${adId}|${fieldType}|${text}`] : null;
+        return byRes || byText || null;
+    };
 
     // Build metrics lookup by ad ID (aggregate if duplicate rows)
     const metricsByAdId = {};
@@ -228,21 +272,27 @@ function mergeAdsAndMetrics(liveAds, adMetrics, assetData) {
 
         const headlines = (ad.responsiveSearchAd?.headlines || []).map(h => {
             const direct = normalizeLabel(h.assetPerformanceLabel);
-            const fromView = assetLabels[adId]?.headlines[(h.text || '').trim()];
+            const viewMatch = lookupAsset(adId, 'HEADLINE', h);
+            const label = direct || normalizeLabel(viewMatch?.label) || null;
             return {
                 text: h.text,
+                asset: h.asset || null,
                 pinned: h.pinnedField || null,
-                performanceLabel: direct || normalizeLabel(fromView) || null,
+                performanceLabel: label,
+                metrics: viewMatch?.metrics || null,
             };
         });
 
         const descriptions = (ad.responsiveSearchAd?.descriptions || []).map(d => {
             const direct = normalizeLabel(d.assetPerformanceLabel);
-            const fromView = assetLabels[adId]?.descriptions[(d.text || '').trim()];
+            const viewMatch = lookupAsset(adId, 'DESCRIPTION', d);
+            const label = direct || normalizeLabel(viewMatch?.label) || null;
             return {
                 text: d.text,
+                asset: d.asset || null,
                 pinned: d.pinnedField || null,
-                performanceLabel: direct || normalizeLabel(fromView) || null,
+                performanceLabel: label,
+                metrics: viewMatch?.metrics || null,
             };
         });
 

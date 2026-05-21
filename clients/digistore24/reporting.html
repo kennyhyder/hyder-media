@@ -365,19 +365,158 @@
         }
         .asset-item {
             display: flex;
+            flex-direction: column;
+            padding: 6px 0;
+            font-size: 0.8rem;
+            gap: 3px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .asset-item:last-child { border-bottom: none; }
+        .asset-row {
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 0;
-            font-size: 0.8rem;
             gap: 8px;
         }
         .asset-text { color: var(--text-primary); flex: 1; min-width: 0; }
+        .asset-metrics {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            letter-spacing: 0.02em;
+        }
+        .asset-metrics .am-num { color: var(--text-primary); font-weight: 600; }
+        .asset-metrics .am-zero { opacity: 0.4; }
         .pinned-badge {
             font-size: 0.65rem;
             color: var(--purple);
             background: rgba(139,92,246,0.15);
             padding: 1px 6px;
             border-radius: 8px;
+        }
+
+        /* ----- Ad combinations modal ----- */
+        .combo-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+        .combo-modal-overlay.active { display: flex; }
+        .combo-modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 1100px;
+            margin: auto 0;
+        }
+        .combo-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            gap: 16px;
+        }
+        .combo-modal-title { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); }
+        .combo-modal-sub {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .combo-modal-close {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .combo-modal-close:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+        }
+        .combo-modal-body {
+            padding: 20px 24px;
+        }
+        .combo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .combo-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .combo-section-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 4px;
+        }
+        .combo-text {
+            font-size: 0.84rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+        .combo-bar-wrap {
+            margin-top: auto;
+            padding-top: 8px;
+        }
+        .combo-bar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 99px;
+            height: 4px;
+            overflow: hidden;
+        }
+        .combo-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 99px;
+        }
+        .combo-bar-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+        .combo-bar-label .cb-num { color: var(--text-primary); font-weight: 600; }
+        .combo-empty {
+            padding: 32px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .combo-cta-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .combo-cta-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--text-primary);
         }
 
         /* Leaderboard */
@@ -1939,7 +2078,10 @@ function renderAdCard(ad) {
                 <div class="ad-card-campaign">${esc(ad.campaign)} &rsaquo; ${esc(ad.adGroup)}</div>
                 <div style="font-size:0.7rem; color: var(--text-secondary); margin-top:2px;">Ad ID: ${esc(ad.adId)}</div>
             </div>
-            <div class="ad-card-rank"><span class="status-dot enabled"></span>Live</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="combo-cta-btn" onclick="openCombinationsModal('${esc(ad.adId)}', '${esc(ad.campaign + ' › ' + ad.adGroup)}')">View combinations</button>
+                <div class="ad-card-rank"><span class="status-dot enabled"></span>Live</div>
+            </div>
         </div>
         ${labelSummary}
         <div class="ad-preview">
@@ -1976,12 +2118,13 @@ function buildDisplayUrl(ad) {
 
 function renderLabelSummary(counts) {
     if (!counts) return '';
+    // Skip PENDING — Google's "still gathering data" state isn't informative;
+    // the per-asset metrics below carry that signal already.
     const parts = [];
     if (counts.BEST) parts.push(`<span class="label-pill best">${counts.BEST} Best</span>`);
     if (counts.GOOD) parts.push(`<span class="label-pill good">${counts.GOOD} Good</span>`);
     if (counts.LEARNING) parts.push(`<span class="label-pill learning">${counts.LEARNING} Learning</span>`);
     if (counts.LOW) parts.push(`<span class="label-pill low">${counts.LOW} Low</span>`);
-    if (counts.PENDING) parts.push(`<span class="label-pill pending">${counts.PENDING} Pending</span>`);
     if (parts.length === 0) return '';
     return `<div class="label-summary">${parts.join('')}</div>`;
 }
@@ -1991,11 +2134,34 @@ function renderAssetList(title, assets) {
     return `<div class="asset-list">
         <h4>${title}</h4>
         ${assets.map(a => `<div class="asset-item">
-            <span class="asset-text">${esc(a.text)}</span>
-            ${a.pinned ? `<span class="pinned-badge">Pin ${a.pinned.replace('HEADLINE_','H').replace('DESCRIPTION_','D')}</span>` : ''}
-            ${a.performanceLabel ? badgeHTML(a.performanceLabel) : ''}
+            <div class="asset-row">
+                <span class="asset-text">${esc(a.text)}</span>
+                ${a.pinned ? `<span class="pinned-badge">Pin ${a.pinned.replace('HEADLINE_','H').replace('DESCRIPTION_','D')}</span>` : ''}
+                ${a.performanceLabel ? badgeHTML(a.performanceLabel) : ''}
+            </div>
+            ${renderAssetMetricsLine(a.metrics)}
         </div>`).join('')}
     </div>`;
+}
+
+function renderAssetMetricsLine(m) {
+    if (!m) return '';
+    // Show impressions + conversions inline. Both being zero = the asset has
+    // no traffic in this window; we still render the line (faded) so the
+    // status is explicit, not just an empty row.
+    const imprStr = m.impressions > 0
+        ? `<span class="am-num">${fmt(m.impressions, 'n')}</span> impr`
+        : `<span class="am-zero">0 impr</span>`;
+    const convStr = m.conversions > 0
+        ? `<span class="am-num">${fmt(m.conversions, 'f1')}</span> conv`
+        : `<span class="am-zero">0 conv</span>`;
+    const clickStr = m.clicks > 0
+        ? `<span class="am-num">${fmt(m.clicks, 'n')}</span> clk`
+        : null;
+    const parts = [imprStr];
+    if (clickStr) parts.push(clickStr);
+    parts.push(convStr);
+    return `<div class="asset-metrics">${parts.join(' · ')}</div>`;
 }
 
 function renderLeaderboard(items) {
@@ -2010,7 +2176,9 @@ function renderLeaderboard(items) {
 }
 
 function badgeHTML(label) {
-    if (!label) return '';
+    // PENDING isn't informative (Google's default state for unrated assets) —
+    // the metrics line below carries that signal more usefully.
+    if (!label || label === 'PENDING') return '';
     const cls = String(label).toLowerCase();
     const display = String(label).charAt(0) + String(label).slice(1).toLowerCase();
     return `<span class="asset-badge ${cls}">${display}</span>`;
@@ -2485,9 +2653,106 @@ async function captureChartImages(nextFrame) {
     return images;
 }
 
+// ===== Combinations modal =====
+// Opens an overlay with the served combinations for a specific RSA, pulled
+// from /api/digistore/ad-combinations. Google's combinations report is
+// impressions-only — that's reflected in the columns shown here.
+async function openCombinationsModal(adId, label) {
+    const overlay = document.getElementById('comboModalOverlay');
+    const titleEl = document.getElementById('comboModalTitle');
+    const subEl = document.getElementById('comboModalSub');
+    const bodyEl = document.getElementById('comboModalBody');
+
+    titleEl.textContent = label || 'Ad combinations';
+    subEl.textContent = `Ad ID: ${adId} · Loading combinations…`;
+    bodyEl.innerHTML = '<div class="combo-empty">Loading…</div>';
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    try {
+        const dp = dateParams();
+        const bust = `_t=${Date.now()}`;
+        const res = await fetch(`${API_BASE}/ad-combinations?adId=${encodeURIComponent(adId)}&${dp}&${bust}`).then(r => r.json());
+
+        if (res.status !== 'success') {
+            bodyEl.innerHTML = `<div class="combo-empty">Error: ${esc(res.error || 'Failed to load combinations')}</div>`;
+            subEl.textContent = `Ad ID: ${adId}`;
+            return;
+        }
+
+        const combos = res.combinations || [];
+        const total = res.totalImpressions || combos.reduce((s, c) => s + c.impressions, 0);
+
+        if (combos.length === 0) {
+            bodyEl.innerHTML = '<div class="combo-empty">No combinations served in this date range yet.</div>';
+            subEl.textContent = `Ad ID: ${adId} · ${res.dateRange?.start} → ${res.dateRange?.end}`;
+            return;
+        }
+
+        subEl.textContent = `Ad ID: ${adId} · ${total.toLocaleString()} impressions across ${combos.length} combination${combos.length === 1 ? '' : 's'} · ${res.dateRange?.start} → ${res.dateRange?.end}`;
+
+        bodyEl.innerHTML = `<div class="combo-grid">${combos.map(c => renderComboCard(c, total)).join('')}</div>`;
+    } catch (err) {
+        bodyEl.innerHTML = `<div class="combo-empty">Failed to load combinations: ${esc(err.message)}</div>`;
+        subEl.textContent = `Ad ID: ${adId}`;
+    }
+}
+
+function renderComboCard(c, total) {
+    const pct = total > 0 ? (c.impressions / total) * 100 : 0;
+    const headlineLine = (c.headlines || []).join(' | ') || '(no headlines)';
+    const descLine = (c.descriptions || []).join(' ') || '(no descriptions)';
+    return `<div class="combo-card">
+        <div>
+            <div class="combo-section-label">Headline</div>
+            <div class="combo-text">${esc(headlineLine)}</div>
+        </div>
+        <div>
+            <div class="combo-section-label">Description</div>
+            <div class="combo-text">${esc(descLine)}</div>
+        </div>
+        <div class="combo-bar-wrap">
+            <div class="combo-bar-track">
+                <div class="combo-bar-fill" style="width:${pct.toFixed(2)}%;"></div>
+            </div>
+            <div class="combo-bar-label"><span class="cb-num">${c.impressions.toLocaleString()}</span> impressions · ${pct.toFixed(1)}%</div>
+        </div>
+    </div>`;
+}
+
+function closeCombinationsModal() {
+    const overlay = document.getElementById('comboModalOverlay');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close on overlay click + ESC
+document.addEventListener('click', (e) => {
+    const overlay = document.getElementById('comboModalOverlay');
+    if (overlay && e.target === overlay) closeCombinationsModal();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCombinationsModal();
+});
+
 // ===== Init =====
 initTabs();
 loadAllData();
 </script>
+
+<!-- Combinations modal (hidden until opened by openCombinationsModal) -->
+<div class="combo-modal-overlay" id="comboModalOverlay">
+    <div class="combo-modal" role="dialog" aria-modal="true" aria-labelledby="comboModalTitle">
+        <div class="combo-modal-header">
+            <div>
+                <div class="combo-modal-title" id="comboModalTitle">Ad combinations</div>
+                <div class="combo-modal-sub" id="comboModalSub">Loading…</div>
+            </div>
+            <button class="combo-modal-close" onclick="closeCombinationsModal()" aria-label="Close">✕ Close</button>
+        </div>
+        <div class="combo-modal-body" id="comboModalBody"></div>
+    </div>
+</div>
+
 </body>
 </html>
