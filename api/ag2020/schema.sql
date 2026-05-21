@@ -140,3 +140,47 @@ CREATE TABLE IF NOT EXISTS ag2020_call_queue (
 CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_called ON ag2020_call_queue(called_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_pending ON ag2020_call_queue(triaged_at, called_at DESC) WHERE triaged_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_ag2020_call_queue_caller ON ag2020_call_queue(caller_number);
+
+-- ============================================================================
+-- Autodial / speed-to-lead: when a lead arrives (web form submit, or later a
+-- missed call via CallRail), Twilio places an outbound call to the customer.
+-- When the customer answers we bridge them to AG2020's inbound rep line.
+-- One row per dial attempt; Twilio StatusCallbacks update it through the call.
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ag2020_autodial_attempts (
+    id BIGSERIAL PRIMARY KEY,
+    customer_number VARCHAR(20) NOT NULL,
+    customer_name VARCHAR(200),
+    source VARCHAR(50) NOT NULL DEFAULT 'form_submit',  -- form_submit | missed_call | manual
+    ac_contact_id VARCHAR(50),
+    trigger_payload JSONB,
+    -- Lifecycle status:
+    --  deferred          queued (arrived outside business hours), awaits the cron
+    --  dialing           Twilio call placed, ringing the customer
+    --  customer_answered customer picked up
+    --  machine           answering machine / voicemail detected, no bridge
+    --  bridged           rep answered, customer + rep connected
+    --  no_answer         customer never picked up
+    --  rep_no_answer     customer answered but no rep picked up the inbound line
+    --  failed            Twilio error placing or running the call
+    --  skipped_duplicate same customer dialed too recently
+    --  completed         call finished (terminal; see bridge_status for outcome)
+    status VARCHAR(30) NOT NULL DEFAULT 'dialing',
+    dial_after TIMESTAMP WITH TIME ZONE,                -- set for deferred rows
+    -- Twilio call detail
+    twilio_call_sid VARCHAR(50),
+    answered_by VARCHAR(30),                            -- AMD result: human | machine_* | unknown
+    customer_call_status VARCHAR(30),                   -- last StatusCallback CallStatus
+    customer_call_duration INTEGER,
+    bridge_status VARCHAR(30),                          -- <Dial> DialCallStatus: completed|no-answer|busy|failed
+    bridge_duration INTEGER,                            -- seconds rep+customer were connected
+    rep_number VARCHAR(20),
+    error TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_ag2020_autodial_created ON ag2020_autodial_attempts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ag2020_autodial_number ON ag2020_autodial_attempts(customer_number, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ag2020_autodial_deferred ON ag2020_autodial_attempts(dial_after) WHERE status = 'deferred';
+CREATE INDEX IF NOT EXISTS idx_ag2020_autodial_sid ON ag2020_autodial_attempts(twilio_call_sid);
