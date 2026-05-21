@@ -30,6 +30,16 @@ export interface GolferListItem {
   owgr_rank: number | null;
 }
 
+export type GolfMarketDataStatus =
+  | "full"           // kalshi + dg + books
+  | "kalshi_dg"
+  | "kalshi_books"
+  | "dg_books"
+  | "kalshi_only"
+  | "dg_only"
+  | "books_only"
+  | "no_data";
+
 export interface GolferDetail {
   player: { id: string; name: string; slug: string; dg_id: number | null; owgr_rank: number | null; country: string | null };
   tournaments: Array<{
@@ -39,9 +49,20 @@ export interface GolferDetail {
       market_type: string;
       kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string } | null;
       dg: { dg_prob: number | null; dg_fit_prob: number | null; fetched_at: string } | null;
-      books: { count: number; median: number | null; best: { book: string; american: number | null } | null } | null;
+      books: {
+        count: number;
+        median: number | null;
+        min: number | null;
+        max: number | null;
+        best: { book: string; american: number | null } | null;
+        per_book: Array<{ book: string; american: number | null; novig: number | null }>;
+      } | null;
+      data_status: GolfMarketDataStatus;
+      freshest_at: string | null;
     }>;
+    freshest_at: string | null;
   }>;
+  freshest_at: string | null;
 }
 
 export async function fetchGolfers(): Promise<GolferListItem[]> {

@@ -92,19 +92,47 @@ export async function fetchEventBySlug(league: string, year: number, slug: strin
   }
 }
 
+export interface TeamMarketPerBook {
+  book: string;
+  american: number | null;
+  novig: number | null;
+  fetched_at: string | null;
+}
+
+export type TeamMarketDataStatus =
+  | "full"               // Kalshi + books + Polymarket
+  | "kalshi_books"       // Kalshi + books, no Polymarket
+  | "kalshi_polymarket"  // Kalshi + Polymarket, no books
+  | "kalshi_only"
+  | "books_only"
+  | "polymarket_only"
+  | "no_data";
+
 export interface TeamMarket {
   market_id: string;
   contestant_label: string;
   market_type: string;
   event: { id: string; title: string; event_type: string; slug: string | null; season_year: number | null; start_time: string | null; status: string; kalshi_event_ticker: string | null };
   kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null; fetched_at: string } | null;
-  books: { count: number; median: number; min: number; max: number; best: { book: string; american: number | null } | null } | null;
+  books: {
+    count: number;
+    median: number;
+    min: number;
+    max: number;
+    best: { book: string; american: number | null } | null;
+    per_book: TeamMarketPerBook[];
+    latest_fetched_at: string | null;
+  } | null;
+  polymarket: { implied_prob: number; volume_usd: number | null; fetched_at: string | null } | null;
+  data_status: TeamMarketDataStatus;
+  freshest_at: string | null;
 }
 
 export interface TeamDetail {
   team: { id: string; league: string; name: string; slug: string; kind: "team" | "player" | null; abbreviation: string | null; normalized_name: string };
   markets: TeamMarket[];
   counts: { games: number; futures: number; total: number };
+  freshest_at: string | null;
 }
 
 export interface TeamListItem {
