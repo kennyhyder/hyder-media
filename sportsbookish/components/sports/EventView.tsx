@@ -16,8 +16,11 @@ import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd, faqLd, faqForEventPage } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { netBuyEdge, kalshiFeeFraction } from "@/lib/kalshi";
 import { slugify, teamUrl } from "@/lib/slug";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 // Server component — renders the full event detail page. Used by both the
 // canonical /sports/[league]/[year]/[slug] route and the legacy
@@ -77,7 +80,7 @@ export default async function EventView({
     bookCount: detail.markets[0]?.books_count ?? 0,
   });
 
-  const ldData = [
+  const ldData: object[] = [
     breadcrumbLd([
       { name: "Home", url: "/" },
       { name: "Sports", url: "/sports" },
@@ -95,20 +98,33 @@ export default async function EventView({
     }),
     faqLd(faqItems),
   ];
+  // dateModified signal for "quality deserves freshness" — Google ranks
+  // pages with fresh dateModified higher than stale ones on time-sensitive
+  // intents ("[matchup] odds today"). Always include when we have any data.
+  if (detail.freshest_at) {
+    ldData.push(datasetFreshnessLd({
+      name: `${detail.event.title} live odds dataset`,
+      description: `Real-time Kalshi event-contract pricing, Polymarket overlay, and US sportsbook consensus for every active market on ${detail.event.title}. Refreshed every 5 minutes.`,
+      pageUrl: `${SITE_URL}${canonicalPath}`,
+      dateModified: detail.freshest_at,
+      variableMeasured: ["Kalshi implied probability", "Sportsbook consensus (no-vig)", "Polymarket implied probability", "Per-book American odds", "Best book per side", "Spreads + totals across all books"],
+    }));
+  }
 
   return (
     <div className="min-h-screen">
       <JsonLd data={ldData} />
       {isAnonymous && <UpsellBanner variant="anonymous" next={canonicalPath} />}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80">← {meta.display_name}</Link>
-          <div className="text-sm font-semibold capitalize">{detail.event.event_type}</div>
-          {isAnonymous ? (
-            <Link href={`/signup?next=${encodeURIComponent(canonicalPath)}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
-          ) : (
-            <div className="w-12" aria-hidden="true" />
-          )}
+        <div className="container mx-auto flex h-14 max-w-3xl items-center justify-between px-4 gap-2">
+          <Link href={`/sports/${league}`} className="text-sm text-muted-foreground hover:text-foreground/80 shrink-0">← {meta.display_name}</Link>
+          <div className="text-sm font-semibold capitalize truncate hidden sm:block">{detail.event.event_type}</div>
+          <div className="flex items-center gap-2 shrink-0">
+            <LastUpdated iso={detail.freshest_at} variant="header" />
+            {isAnonymous && (
+              <Link href={`/signup?next=${encodeURIComponent(canonicalPath)}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -149,8 +165,10 @@ export default async function EventView({
               <span className="text-xs font-normal text-muted-foreground">
                 {anyBooks ? (
                   <><span className="text-amber-500">Kalshi</span> vs book consensus{isPaidTier ? "" : " (free shows 5 of N books)"}</>
+                ) : detail.event.event_type === "game" ? (
+                  <span className="text-muted-foreground/70">Sportsbooks haven&apos;t posted lines for this game yet — typically 1-2 days before tipoff. Kalshi is the canonical signal until books open.</span>
                 ) : (
-                  <span className="text-muted-foreground/70">Books haven&apos;t posted lines for this game yet — typically 1-2 days before tipoff</span>
+                  <span className="text-muted-foreground/70">US sportsbooks don&apos;t publish per-contestant pricing for {detail.event.event_type.replace(/_/g, " ")} markets. Kalshi is the cleanest signal here.</span>
                 )}
               </span>
             </CardTitle>

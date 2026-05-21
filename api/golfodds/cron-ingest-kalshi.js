@@ -164,6 +164,14 @@ async function ingestBinarySeries(supabase, series) {
     const rows = events.map((e) => {
       const name = canonicalTournamentName(e.title || e.sub_title || e.event_ticker);
       const year = new Date().getUTCFullYear();
+      // expected_expiration_time on Kalshi = roughly tournament end (when
+      // the winner market resolves). Use it as end_date for chronological
+      // sorting on player pages — without it, Tom Kim's US Open + current
+      // tournament render in arbitrary order.
+      const endTime = e.expected_expiration_time ? new Date(e.expected_expiration_time) : null;
+      const endDate = endTime && !isNaN(endTime.getTime())
+        ? endTime.toISOString().slice(0, 10)
+        : null;
       return {
         tour: "pga",
         name,
@@ -172,6 +180,7 @@ async function ingestBinarySeries(supabase, series) {
         season_year: year,
         slug: slugifyKalshi(name),
         status: "upcoming",
+        end_date: endDate,
       };
     });
     const { data, error } = await supabase

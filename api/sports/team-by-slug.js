@@ -210,14 +210,22 @@ export default async function handler(req, res) {
     };
   });
 
-  // Sort: games first (by start_time), then futures (by event_type alphabetical)
+  // Sort: NEXT event first chronologically. Games come before futures since
+  // they resolve sooner. Within games, sort by start_time ASC (soonest first).
+  // Within futures, sort by start_time ASC where present, then event_type
+  // alphabetical for those without start_time (championship futures often
+  // have no specific start). Null start_times sort LAST within their group
+  // so concrete scheduled events outrank unscheduled ones.
   out.sort((a, b) => {
     const ta = a.event?.event_type === "game" ? 0 : 1;
     const tb = b.event?.event_type === "game" ? 0 : 1;
     if (ta !== tb) return ta - tb;
-    if (a.event?.event_type === "game" && b.event?.event_type === "game") {
-      return (a.event?.start_time || "").localeCompare(b.event?.start_time || "");
-    }
+    const sa = a.event?.start_time;
+    const sb = b.event?.start_time;
+    if (sa && sb) return sa.localeCompare(sb);
+    if (sa && !sb) return -1;  // a has time, b doesn't — a first
+    if (!sa && sb) return 1;   // b has time, a doesn't — b first
+    // Neither has start_time — fall back to event_type alphabetical
     return (a.event?.event_type || "").localeCompare(b.event?.event_type || "");
   });
 

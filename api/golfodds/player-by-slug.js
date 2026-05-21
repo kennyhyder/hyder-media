@@ -168,6 +168,12 @@ export default async function handler(req, res) {
     });
   }
 
+  // Sort: NEXT event first chronologically. Prefer end_date (when the
+  // tournament resolves on Kalshi); fall back to start_date; in-progress
+  // tournaments (end_date in past or today) come BEFORE future ones.
+  // Without this, multiple upcoming tournaments render in arbitrary
+  // order — Tom Kim's US Open showed before this week's CJ Cup.
+  const todayISO = new Date().toISOString().slice(0, 10);
   const tournaments = Array.from(byTournament.values())
     .map((t) => ({
       tournament: t.tournament,
@@ -175,9 +181,13 @@ export default async function handler(req, res) {
       freshest_at: t._freshest ? new Date(t._freshest).toISOString() : null,
     }))
     .sort((a, b) => {
-      const da = a.tournament.start_date || "";
-      const db = b.tournament.start_date || "";
-      return db.localeCompare(da);
+      // Use end_date (Kalshi resolution date) as primary; falls back to
+      // start_date if end_date is null
+      const dateA = a.tournament.end_date || a.tournament.start_date || "9999-12-31";
+      const dateB = b.tournament.end_date || b.tournament.start_date || "9999-12-31";
+      // In-progress (end >= today but with fresh market data) ranks first
+      // Pure date ASC handles both in-progress and future correctly.
+      return dateA.localeCompare(dateB);
     });
 
   return res.status(200).json({

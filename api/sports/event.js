@@ -263,12 +263,30 @@ export default async function handler(req, res) {
       propEvents = await fetchRelatedProps(supabase, event).catch(() => []);
     }
 
+    // Page-level freshness — max(fetched_at) across all data sources.
+    // Surfaced as `freshest_at` so the UI can render "Updated N min ago"
+    // and emit JSON-LD dateModified for Google's freshness signal.
+    let pageFreshest = 0;
+    function track(iso) {
+      if (!iso) return;
+      const t = new Date(iso).getTime();
+      if (t > pageFreshest) pageFreshest = t;
+    }
+    for (const m of marketsWithQuotes) {
+      track(m.fetched_at);
+      track(m.polymarket_fetched_at);
+      for (const b of m.book_prices || []) track(b.fetched_at);
+    }
+    for (const s of spreads) for (const k in s.books) track(s.books[k].fetched_at);
+    for (const t of totals) for (const k in t.books) track(t.books[k].fetched_at);
+
     return res.status(200).json({
       event,
       markets: marketsWithQuotes,
       spreads,
       totals,
       prop_events: propEvents,
+      freshest_at: pageFreshest ? new Date(pageFreshest).toISOString() : null,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

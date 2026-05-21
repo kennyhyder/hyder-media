@@ -86,9 +86,31 @@ export default async function handler(req, res) {
       const slice = marketIds.slice(i, i + CHUNK);
       const { data } = await supabase
         .from("sports_quotes_latest")
-        .select("market_id, implied_prob, yes_bid, yes_ask")
+        .select("market_id, implied_prob, yes_bid, yes_ask, fetched_at")
         .in("market_id", slice);
       if (data) kalshiQuotes.push(...data);
+    }
+
+    // Track page-level freshness across all data sources for the response.
+    // Used by the league index page header + dateModified JSON-LD.
+    let pageFreshest = 0;
+    for (const q of kalshiQuotes) {
+      if (q.fetched_at) {
+        const t = new Date(q.fetched_at).getTime();
+        if (t > pageFreshest) pageFreshest = t;
+      }
+    }
+    for (const b of bookQuotes || []) {
+      if (b.fetched_at) {
+        const t = new Date(b.fetched_at).getTime();
+        if (t > pageFreshest) pageFreshest = t;
+      }
+    }
+    for (const p of polymarketQuotes || []) {
+      if (p.fetched_at) {
+        const t = new Date(p.fetched_at).getTime();
+        if (t > pageFreshest) pageFreshest = t;
+      }
     }
 
     const qByMarket = new Map(kalshiQuotes.map((q) => [q.market_id, q]));
@@ -168,6 +190,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       events: enriched,
       books: Array.from(booksSeen).sort(),
+      freshest_at: pageFreshest ? new Date(pageFreshest).toISOString() : null,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

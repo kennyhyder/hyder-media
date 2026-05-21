@@ -13,6 +13,9 @@ import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookT
 import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
 import { JsonLd, breadcrumbLd, itemListLd, faqLd, faqForLeaguePage } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
+
+const SITE_URL_LEAGUE = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 import FaqSection from "@/components/FaqSection";
 import { slugify, eventUrl } from "@/lib/slug";
 
@@ -269,7 +272,7 @@ export default async function LeaguePage({ params, searchParams }: {
     hasFutures: order.some((t) => (groups[t] || []).length > 0),
   });
 
-  const ldData = [
+  const ldData: object[] = [
     breadcrumbLd([
       { name: "Home", url: "/" },
       { name: "Sports", url: "/sports" },
@@ -278,6 +281,15 @@ export default async function LeaguePage({ params, searchParams }: {
     itemListLd(`${meta.display_name} games with Kalshi odds`, eventList),
     faqLd(faqItems),
   ];
+  if (leagueData.freshest_at) {
+    ldData.push(datasetFreshnessLd({
+      name: `${meta.display_name} live odds dataset`,
+      description: `Live Kalshi event-contract pricing, US sportsbook consensus, and Polymarket overlay across all active ${meta.display_name} markets. Refreshed every 5 minutes.`,
+      pageUrl: `${SITE_URL_LEAGUE}/sports/${league}`,
+      dateModified: leagueData.freshest_at,
+      variableMeasured: ["Kalshi implied probability", "Sportsbook consensus", "Polymarket implied probability"],
+    }));
+  }
 
   return (
     <div className="min-h-screen">
@@ -290,11 +302,12 @@ export default async function LeaguePage({ params, searchParams }: {
             <span className="text-base">{meta.icon}</span>
             <span>{meta.display_name}</span>
           </div>
-          {isAnonymous ? (
-            <Link href={`/signup?next=/sports/${league}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
-          ) : (
-            <div className="w-12" />
-          )}
+          <div className="flex items-center gap-2">
+            <LastUpdated iso={leagueData.freshest_at} variant="header" />
+            {isAnonymous && (
+              <Link href={`/signup?next=/sports/${league}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
+            )}
+          </div>
         </div>
       </header>
 

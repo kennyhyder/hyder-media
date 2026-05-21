@@ -59,6 +59,7 @@ export interface SportsEventWithMarkets extends SportsEvent {
 export interface SportsLeagueData {
   events: SportsEventWithMarkets[];
   books: string[];
+  freshest_at?: string | null;
 }
 
 // Resolve canonical event URL by league + year + slug via the data-plane.
@@ -199,9 +200,9 @@ export async function fetchEventsByLeague(league: string): Promise<SportsEvent[]
 
 export async function fetchLeagueData(league: string): Promise<SportsLeagueData> {
   const r = await fetch(`${DATA_HOST}/api/sports/events?league=${league}&status=open&with=markets`, { next: { revalidate: 15 } });
-  if (!r.ok) return { events: [], books: [] };
+  if (!r.ok) return { events: [], books: [], freshest_at: null };
   const data = await r.json();
-  return { events: data.events || [], books: data.books || [] };
+  return { events: data.events || [], books: data.books || [], freshest_at: data.freshest_at || null };
 }
 
 export interface BookPrice {
@@ -273,6 +274,7 @@ export interface EventDetail {
   spreads?: SpreadRow[];
   totals?: TotalRow[];
   prop_events?: PropEventRow[];
+  freshest_at?: string | null;  // ISO datetime — max of all fetched_at on this page
 }
 
 export async function fetchEventDetail(eventId: string): Promise<EventDetail | null> {

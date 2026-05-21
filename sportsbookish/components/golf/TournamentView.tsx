@@ -15,6 +15,9 @@ import UpsellBanner from "@/components/UpsellBanner";
 import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
 import { JsonLd, faqLd, faqForGolfTournament, breadcrumbLd, sportsEventLd } from "@/lib/seo";
+import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
+
+const SITE_URL_GOLF = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 // Server component — renders the whole tournament page. Used by BOTH the
 // canonical slug route /golf/{year}/{slug} AND the legacy /golf/tournament?id=
@@ -92,6 +95,23 @@ export default async function TournamentView({
     );
   }
 
+  // Page-level freshness. The PlayerComparisonRow shape doesn't carry
+  // fetched_at per row, but this page is server-rendered with
+  // `dynamic = "force-dynamic"` so the data was fetched fresh from the
+  // data-plane on this request. Use render time as the dateModified —
+  // not lying (the page IS fresh as of now). Upstream cron is every 5 min;
+  // the page itself revalidates on every request.
+  const pageFreshestAt = info?.tournament ? new Date().toISOString() : null;
+  if (pageFreshestAt && info?.tournament) {
+    ldData.push(datasetFreshnessLd({
+      name: `${info.tournament.name} live golf odds dataset`,
+      description: `Real-time Kalshi event-contract pricing, DataGolf model probabilities, and US sportsbook consensus for every active market on the ${info.tournament.name}. Refreshed every 5 minutes.`,
+      pageUrl: `${SITE_URL_GOLF}${canonicalPath}`,
+      dateModified: pageFreshestAt,
+      variableMeasured: ["Kalshi implied probability", "DataGolf model probability", "Sportsbook consensus (no-vig)", "Per-book American odds"],
+    }));
+  }
+
   return (
     <div className="min-h-screen">
       <JsonLd data={ldData} />
@@ -103,6 +123,9 @@ export default async function TournamentView({
             <span>⛳</span>
             <span>{info?.tournament?.name || "Tournament"}</span>
             {info?.tournament?.is_major && <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20">Major</Badge>}
+          </div>
+          <div className="flex items-center gap-2">
+            <LastUpdated iso={pageFreshestAt} variant="header" />
           </div>
           {isAnonymous ? (
             <Link href={`/signup?next=${encodeURIComponent(canonicalPath)}`} className="text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 font-semibold">Sign up free</Link>
