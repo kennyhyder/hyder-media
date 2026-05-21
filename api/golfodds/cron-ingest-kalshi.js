@@ -161,18 +161,35 @@ async function ingestBinarySeries(supabase, series) {
   // 2) Upsert tournaments (winner series only) OR look up existing
   let tournamentByTicker = new Map();
   if (series.isWinner) {
-    const rows = events.map((e) => {
+    // Build end_date per event with TWO fallback layers. Kalshi's
+    // event.expected_expiration_time is often null for golf series
+    // (PGA tournaments use a per-market expiration, not event-level).
+    // We then look at the first market inside the event-with-markets we
+    // already fetched. If still null, fall back to the latest market's
+    // expected_expiration_time. Without these fallbacks, the cron-ingest
+    // overwrites our backfilled end_date with null on every tick and
+    // chronological sorting on player pages breaks (Tom Kim showed
+    // US Open before this-week's CJ Cup).
+    function eventEndDate(e, markets) {
+      const sources = [
+        e.expected_expiration_time,
+        e.settle_time,
+        e.strike_date,
+        ...(markets || []).slice(0, 5).map((m) => m.expected_expiration_time),
+        ...(markets || []).slice(0, 5).map((m) => m.settle_time),
+        ...(markets || []).slice(0, 5).map((m) => m.close_time),
+      ].filter(Boolean);
+      for (const s of sources) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+      }
+      return null;
+    }
+    const rows = eventsWithMarkets.map(({ event: e, markets }) => {
       const name = canonicalTournamentName(e.title || e.sub_title || e.event_ticker);
       const year = new Date().getUTCFullYear();
-      // expected_expiration_time on Kalshi = roughly tournament end (when
-      // the winner market resolves). Use it as end_date for chronological
-      // sorting on player pages — without it, Tom Kim's US Open + current
-      // tournament render in arbitrary order.
-      const endTime = e.expected_expiration_time ? new Date(e.expected_expiration_time) : null;
-      const endDate = endTime && !isNaN(endTime.getTime())
-        ? endTime.toISOString().slice(0, 10)
-        : null;
-      return {
+      const endDate = eventEndDate(e, markets);
+      const row = {
         tour: "pga",
         name,
         short_name: e.sub_title || null,
@@ -180,8 +197,11 @@ async function ingestBinarySeries(supabase, series) {
         season_year: year,
         slug: slugifyKalshi(name),
         status: "upcoming",
-        end_date: endDate,
       };
+      // Only include end_date when we derived a value — don't overwrite an
+      // existing populated end_date with null on every cron tick.
+      if (endDate) row.end_date = endDate;
+      return row;
     });
     const { data, error } = await supabase
       .from("golfodds_tournaments")
