@@ -108,27 +108,29 @@ async function fetchQuery(headers, query) {
 }
 
 async function fetchAdAssetMap(headers, adId) {
-    // Pull the RSA's headlines/descriptions so we have asset_resource_name → text.
-    // No date filter — these are structural.
+    // The `asset` field on inline RSA headlines (AdTextAsset.asset) is usually
+    // empty in v23 responses — Google doesn't echo it back when the headline
+    // is stored inline. Instead query ad_group_ad_asset_view, which always
+    // gives us the resolved asset resource name + linked text for the ad.
     const query = `
         SELECT
-            ad_group_ad.ad.id,
-            ad_group_ad.ad.responsive_search_ad.headlines,
-            ad_group_ad.ad.responsive_search_ad.descriptions
-        FROM ad_group_ad
+            ad_group_ad_asset_view.asset,
+            ad_group_ad_asset_view.field_type,
+            asset.text_asset.text
+        FROM ad_group_ad_asset_view
         WHERE ad_group_ad.ad.id = ${adId}
-        LIMIT 1
+            AND ad_group_ad_asset_view.field_type IN ('HEADLINE', 'DESCRIPTION')
     `;
     const rows = await fetchQuery(headers, query);
-    const map = {}; // assetResourceName → { text, fieldType: 'HEADLINE'|'DESCRIPTION', pinned }
-    if (rows.length === 0) return map;
-    const rsa = rows[0].adGroupAd?.ad?.responsiveSearchAd || {};
-    (rsa.headlines || []).forEach(h => {
-        if (h.asset) map[h.asset] = { text: h.text || '', fieldType: 'HEADLINE', pinned: h.pinnedField || null };
-    });
-    (rsa.descriptions || []).forEach(d => {
-        if (d.asset) map[d.asset] = { text: d.text || '', fieldType: 'DESCRIPTION', pinned: d.pinnedField || null };
-    });
+    const map = {}; // assetResourceName → { text, fieldType }
+    for (const row of rows) {
+        const view = row.adGroupAdAssetView || {};
+        const assetRef = view.asset || '';
+        const text = row.asset?.textAsset?.text || '';
+        const fieldType = view.fieldType || '';
+        if (!assetRef || !text) continue;
+        map[assetRef] = { text, fieldType };
+    }
     return map;
 }
 

@@ -2146,21 +2146,32 @@ function renderAssetList(title, assets) {
 
 function renderAssetMetricsLine(m) {
     if (!m) return '';
-    // Show impressions + conversions inline. Both being zero = the asset has
-    // no traffic in this window; we still render the line (faded) so the
-    // status is explicit, not just an empty row.
-    const imprStr = m.impressions > 0
+    // impressions · clicks · CTR · conversions · conv rate
+    // All segments are rendered (faded when zero) so the status is explicit.
+    const ctr = m.impressions > 0 ? m.clicks / m.impressions : 0;
+    const cvr = m.clicks > 0 ? m.conversions / m.clicks : 0;
+    const parts = [];
+
+    parts.push(m.impressions > 0
         ? `<span class="am-num">${fmt(m.impressions, 'n')}</span> impr`
-        : `<span class="am-zero">0 impr</span>`;
-    const convStr = m.conversions > 0
-        ? `<span class="am-num">${fmt(m.conversions, 'f1')}</span> conv`
-        : `<span class="am-zero">0 conv</span>`;
-    const clickStr = m.clicks > 0
+        : `<span class="am-zero">0 impr</span>`);
+
+    parts.push(m.clicks > 0
         ? `<span class="am-num">${fmt(m.clicks, 'n')}</span> clk`
-        : null;
-    const parts = [imprStr];
-    if (clickStr) parts.push(clickStr);
-    parts.push(convStr);
+        : `<span class="am-zero">0 clk</span>`);
+
+    parts.push(m.impressions > 0
+        ? `<span class="am-num">${fmt(ctr, '%')}</span> CTR`
+        : `<span class="am-zero">— CTR</span>`);
+
+    parts.push(m.conversions > 0
+        ? `<span class="am-num">${fmt(m.conversions, 'f1')}</span> conv`
+        : `<span class="am-zero">0 conv</span>`);
+
+    parts.push(m.clicks > 0
+        ? `<span class="am-num">${fmt(cvr, '%')}</span> CvR`
+        : `<span class="am-zero">— CvR</span>`);
+
     return `<div class="asset-metrics">${parts.join(' · ')}</div>`;
 }
 
