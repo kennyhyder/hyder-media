@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         ));
     }
 
-    const { from, repNumber } = twilioCreds();
+    const { repNumber, bridgeCallerId } = twilioCreds();
     const body = req.body || {};
     const answeredBy = (body.AnsweredBy || req.query.AnsweredBy || '').toString();
     const isMachine = answeredBy.startsWith('machine') || answeredBy === 'fax';
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     return res.status(200).send(xml(
         `<Response>` +
         `<Say voice="Polly.Joanna">Thanks for contacting Auto Glass 2020. Please hold while we connect you with a glass specialist.</Say>` +
-        `<Dial answerOnBridge="true" callerId="${esc(from)}" timeout="25" action="${esc(actionUrl)}" method="POST">` +
+        `<Dial answerOnBridge="true" callerId="${esc(bridgeCallerId)}" timeout="25" action="${esc(actionUrl)}" method="POST">` +
         `<Number url="${esc(whisperUrl)}" method="POST">${esc(repNumber)}</Number>` +
         `</Dial>` +
         `<Say voice="Polly.Joanna">We could not reach a specialist. We'll call you right back. Goodbye.</Say>` +

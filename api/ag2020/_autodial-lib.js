@@ -23,6 +23,9 @@
  *                                       recommended. No fallback — if unset,
  *                                       no call is placed (fail-safe).
  *   AG2020_REP_INBOUND_NUMBER           (required) the sales line to bridge to.
+ *   AG2020_AUTODIAL_BRIDGE_CALLER_ID    owned Twilio number used as caller ID
+ *                                       on the bridge leg to the rep line;
+ *                                       defaults to AG2020_AUTODIAL_FROM_NUMBER.
  *   AG2020_AUTODIAL_SECRET              secret for the trigger webhook; falls
  *                                       back to AG2020_MISSED_CALL_WEBHOOK_SECRET.
  *   AG2020_AUTODIAL_FORM_IDS            comma-separated AC form IDs allowed to
@@ -62,6 +65,10 @@ export function twilioCreds() {
         token: process.env.AG2020_AUTODIAL_TWILIO_AUTH_TOKEN,
         from: process.env.AG2020_AUTODIAL_FROM_NUMBER,
         repNumber: process.env.AG2020_REP_INBOUND_NUMBER,
+        // Caller ID shown to the REP on the bridge leg. Must be an OWNED Twilio
+        // number, distinct from the rep line — a line can't be dialed showing
+        // its own number as caller ID. Falls back to `from`.
+        bridgeCallerId: process.env.AG2020_AUTODIAL_BRIDGE_CALLER_ID || process.env.AG2020_AUTODIAL_FROM_NUMBER,
     };
 }
 
