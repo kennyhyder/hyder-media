@@ -112,6 +112,33 @@ export default async function handler(req, res) {
     const queueRow = (queueRows && queueRows[0]) || null;
     const wasNew = queueRow && !queueRow.triaged_at;
 
+    // For missed calls, also fire an instant autodial callback (speed-to-lead).
+    // Reuses POST /api/ag2020/autodial — the same engine as form-submit leads.
+    // The autodial endpoint's own 6h de-dupe collapses repeat notifications of
+    // the same call. NOTE: this path only sees callers who left a voicemail
+    // (the VBC voicemail-to-email pipeline) — pure hangups still need CallRail.
+    let autodialResult = { triggered: false, status: 'skipped' };
+    if (!answered) {
+        try {
+            const secret = process.env.AG2020_AUTODIAL_SECRET || process.env.AG2020_MISSED_CALL_WEBHOOK_SECRET || '';
+            const apiBase = (process.env.AG2020_PUBLIC_BASE_URL || 'https://hyder.me').replace(/\/$/, '');
+            const adResp = await fetch(`${apiBase}/api/ag2020/autodial`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Webhook-Secret': secret },
+                body: JSON.stringify({ phone: callerNumber, name: callerName, source: 'missed_call' }),
+            });
+            const adBody = await adResp.json().catch(() => ({}));
+            autodialResult = {
+                triggered: adResp.ok,
+                status: adBody.status || String(adResp.status),
+                id: adBody.id || null,
+                error: adBody.error || null,
+            };
+        } catch (err) {
+            autodialResult = { triggered: false, status: 'error', error: err.message };
+        }
+    }
+
     return res.status(200).json({
         status: 'success',
         callerNumber,
@@ -124,6 +151,7 @@ export default async function handler(req, res) {
             error: queueErr?.message || null,
         },
         sms: smsResult,
+        autodial: autodialResult,
     });
 }
 
