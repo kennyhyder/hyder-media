@@ -76,24 +76,23 @@ async function handleTrigger(req, res, supabase) {
     const source = strOrNull(body.source)?.slice(0, 50) || 'form_submit';
     const acContactId = strOrNull(body.ac_contact_id || cf('id'))?.slice(0, 50) || null;
 
-    // --- ActiveCampaign form gating (fail-closed) ------------------------
-    // AC's native webhook fires for EVERY form/list in the account. Only the
-    // designated lead forms (AG2020_AUTODIAL_FORM_IDS) may trigger a callback.
-    // AC webhooks always carry a `type` field; the form id may arrive as
-    // form[id], form.id, or a scalar `form`. An AC webhook that can't be tied
-    // to an allowed form is LOGGED and SKIPPED — never dialed (fail-closed).
+    // --- ActiveCampaign trigger gating (fail-closed) ---------------------
+    // AG2020's lead forms don't subscribe contacts to a list, so AC fires no
+    // usable subscribe / contact-created event — but every new lead receives
+    // the "NEW LEAD ALERT" tag. We trigger on the `contact_tag_added` event
+    // and only proceed when the added tag is in AG2020_AUTODIAL_TAGS (matched
+    // by tag name OR id, case-insensitive; the payload key/shape varies). Any
+    // other AC webhook is logged and skipped — never dialed (fail-closed).
     // Non-AC triggers (manual, missed_call) carry no `type` and pass through.
     const isAcWebhook = body.type != null;
-    let formId = body['form[id]'] ?? body.form?.id ?? null;
-    if (formId == null && (typeof body.form === 'string' || typeof body.form === 'number')) {
-        formId = body.form;
-    }
     if (isAcWebhook) {
-        const allow = (process.env.AG2020_AUTODIAL_FORM_IDS || '')
-            .split(',').map(s => s.trim()).filter(Boolean);
-        if (formId == null || allow.length === 0 || !allow.includes(String(formId))) {
-            // Log it (with the full payload) so the real AC shape is auditable,
-            // then stop. No call is placed.
+        const allowTags = (process.env.AG2020_AUTODIAL_TAGS || '')
+            .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+        const tagCandidates = extractAcTags(body);
+        const matched = body.type === 'contact_tag_added'
+            && tagCandidates.some(t => allowTags.includes(t.toLowerCase()));
+        if (!matched) {
+            // Log with the full payload so the real AC shape stays auditable.
             await supabase.from('ag2020_autodial_attempts').insert({
                 customer_number: customerNumber || 'unknown',
                 customer_name: name,
@@ -101,13 +100,13 @@ async function handleTrigger(req, res, supabase) {
                 ac_contact_id: acContactId,
                 trigger_payload: body,
                 status: 'skipped_form',
-                error: `AC webhook type=${body.type}; form=${formId ?? 'none'} not in allowlist`,
+                error: `AC webhook type=${body.type}; tags=[${tagCandidates.join('|') || 'none'}] not an autodial trigger`,
             });
             return res.status(200).json({
                 status: 'skipped',
-                reason: formId == null ? 'form_id_unresolved' : 'form_not_allowed',
-                formId: formId != null ? String(formId) : null,
+                reason: 'not_autodial_trigger',
                 type: String(body.type),
+                tags: tagCandidates,
             });
         }
     }
@@ -184,4 +183,18 @@ function strOrNull(v) {
     if (v == null) return null;
     const s = String(v).trim();
     return s || null;
+}
+
+// The contact_tag_added payload may carry the added tag under several keys, as
+// a scalar (name or id) or an object — collect every plausible representation
+// so the allowlist match works regardless of AC's exact payload shape.
+function extractAcTags(body) {
+    const out = [];
+    const push = (v) => { if (v != null && String(v).trim()) out.push(String(v).trim()); };
+    const t = body.tag;
+    if (t != null && typeof t === 'object') { push(t.tag); push(t.id); push(t.name); }
+    else push(t);
+    push(body['tag[tag]']); push(body['tag[id]']); push(body['tag[name]']);
+    push(body.tag_id); push(body.tag_name);
+    return out;
 }
