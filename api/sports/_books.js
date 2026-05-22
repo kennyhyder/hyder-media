@@ -36,12 +36,26 @@ export const LEAGUE_TO_FUTURES_SPORT = {
 // winners give us books-vs-Kalshi coverage on the most-traded non-game
 // markets per league.
 export const FUTURES_MARKETS = [
-  { league: "nba", event_type: "championship", sport_key: "basketball_nba_championship_winner" },
-  { league: "mlb", event_type: "championship", sport_key: "baseball_mlb_world_series_winner" },
-  { league: "nhl", event_type: "championship", sport_key: "icehockey_nhl_championship_winner" },
-  { league: "nfl", event_type: "championship", sport_key: "americanfootball_nfl_super_bowl_winner" },
-  { league: "ucl", event_type: "championship", sport_key: "soccer_uefa_champs_league" },
-  { league: "wc",  event_type: "championship", sport_key: "soccer_fifa_world_cup_winner" },
+  // Major-league championships
+  { league: "nba", event_type: "championship", sport_key: "basketball_nba_championship_winner", active: true },
+  { league: "mlb", event_type: "championship", sport_key: "baseball_mlb_world_series_winner", active: true },
+  { league: "nhl", event_type: "championship", sport_key: "icehockey_nhl_championship_winner", active: true },
+  { league: "nfl", event_type: "championship", sport_key: "americanfootball_nfl_super_bowl_winner", active: true },
+  { league: "ucl", event_type: "championship", sport_key: "soccer_uefa_champs_league_winner", active: true },
+  { league: "wc",  event_type: "championship", sport_key: "soccer_fifa_world_cup_winner", active: true },
+
+  // NCAAF championship — added 2026-05-21
+  { league: "ncaaf", event_type: "championship", sport_key: "americanfootball_ncaaf_championship_winner", active: true },
+
+  // PGA Tour majors — outright winner futures per major.
+  // active:false markets skip silently (between seasons).
+  { league: "pga", event_type: "championship", sport_key: "golf_us_open_winner", active: true },
+  { league: "pga", event_type: "championship", sport_key: "golf_the_open_championship_winner", active: true },
+  { league: "pga", event_type: "championship", sport_key: "golf_masters_tournament_winner", active: false },
+  { league: "pga", event_type: "championship", sport_key: "golf_pga_championship_winner", active: false },
+
+  // Soccer Euro championship — inactive between editions
+  { league: "euro", event_type: "championship", sport_key: "soccer_uefa_european_championship", active: false },
 ];
 
 // Hand overrides per league for cases the heuristics can't resolve.

@@ -37,22 +37,29 @@ function relativeTime(iso: string | null): string {
   return `${Math.floor(ms / 86_400_000)} days ago`;
 }
 
-// Most market types where books offer outright pricing for a contestant.
-// h2h = game lines (Lakers vs Celtics moneyline). outrights = futures
-// (NBA champion). Others (totals, spreads) are event-level not contestant.
+// Honest copy for "no books data" cases. We currently pull championship
+// futures from The Odds API; everything else (MVP, awards, win totals,
+// division winners, draft picks) is published by books on their own sites
+// but isn't yet in our comparison index. Don't claim books "don't publish"
+// these — they do. Be transparent that we're adding coverage.
 function bookTrackingExplanation(eventType: string): string {
   const typeNames: Record<string, string> = {
-    award: "individual award markets (e.g. draft picks, Coach of the Year)",
+    award: "award markets (Coach of the Year, draft picks, etc.)",
     mvp: "MVP voting markets",
-    record_best: "best-record futures",
-    record_worst: "worst-record futures",
+    record_best: "best-record season futures",
+    record_worst: "worst-record season futures",
+    win_total: "season win-total markets",
     trade: "player trade markets",
+    series: "playoff series outrights",
+    playoffs: "make/miss playoffs markets",
+    division: "division winner futures",
+    conference: "conference winner futures",
   };
   const label = typeNames[eventType];
   if (label) {
-    return `Standard US sportsbooks (DraftKings, FanDuel, BetMGM, Caesars, etc.) don't publish per-contestant pricing for ${label}. Kalshi pricing is the cleanest signal for this market type.`;
+    return `${label.charAt(0).toUpperCase() + label.slice(1)} aren't in our sportsbook comparison index yet. Books like DraftKings, FanDuel, and BetMGM do publish these prices on their own sites — we're working on getting them into the index. Kalshi is the canonical signal here for now.`;
   }
-  return "Sportsbook pricing for this market type isn't tracked. Kalshi data is the canonical signal here.";
+  return "Sportsbook lines for this market type aren't in our index yet. Kalshi is the canonical signal here for now.";
 }
 
 export default async function ContestantView({

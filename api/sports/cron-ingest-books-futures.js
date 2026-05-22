@@ -36,6 +36,10 @@ function checkAuth(req) {
 async function ingestOne(supabase, cfg) {
   const summary = { league: cfg.league, event_type: cfg.event_type, sport_key: cfg.sport_key, events_matched: 0, quotes: 0 };
 
+  // Skip entries marked inactive (between seasons). Avoids 404s + wasted
+  // API credits.
+  if (cfg.active === false) { summary.skipped = "active=false (between seasons)"; return summary; }
+
   // 1. Pull the candidate Kalshi events (event_type matches, status=open)
   const { data: events } = await supabase
     .from("sports_events")
@@ -60,7 +64,8 @@ async function ingestOne(supabase, cfg) {
     marketByKey.set(`${m.event_id}|${normalizeForMatch(m.contestant_label)}`, m.id);
   }
 
-  // 2. Pull outrights from Odds API
+  // 2. Pull outrights from Odds API. 404 on inactive sport_keys is normal
+  // (between seasons) — skip without raising errors.
   let api;
   try {
     api = await fetchOddsApi(`/sports/${cfg.sport_key}/odds`, {
@@ -70,6 +75,10 @@ async function ingestOne(supabase, cfg) {
     summary.api_calls = 1;
     summary.credit_remaining = api.credits.remaining;
   } catch (e) {
+    if (e.message?.includes("404") || e.message?.includes("UNKNOWN_SPORT") || e.message?.includes("INACTIVE_SPORT")) {
+      summary.skipped = `Odds API inactive for ${cfg.sport_key}`;
+      return summary;
+    }
     summary.error = e.message;
     return summary;
   }

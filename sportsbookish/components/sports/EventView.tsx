@@ -167,8 +167,12 @@ export default async function EventView({
                   <><span className="text-amber-500">Kalshi</span> vs book consensus{isPaidTier ? "" : " (free shows 5 of N books)"}</>
                 ) : detail.event.event_type === "game" ? (
                   <span className="text-muted-foreground/70">Sportsbooks haven&apos;t posted lines for this game yet — typically 1-2 days before tipoff. Kalshi is the canonical signal until books open.</span>
+                ) : detail.event.event_type === "championship" ? (
+                  <span className="text-muted-foreground/70">Sportsbook lines for this championship aren&apos;t in our index yet — checking The Odds API every 30 min. Kalshi is the live signal in the meantime.</span>
                 ) : (
-                  <span className="text-muted-foreground/70">US sportsbooks don&apos;t publish per-contestant pricing for {detail.event.event_type.replace(/_/g, " ")} markets. Kalshi is the cleanest signal here.</span>
+                  <span className="text-muted-foreground/70">
+                    Sportsbook lines for {detail.event.event_type.replace(/_/g, " ")} markets aren&apos;t in our index yet. Books like DraftKings, FanDuel and BetMGM do publish these prices on their sites — we&apos;re working on getting them into the comparison. Kalshi is the canonical signal here for now.
+                  </span>
                 )}
               </span>
             </CardTitle>
