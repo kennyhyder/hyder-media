@@ -14,6 +14,7 @@ import QuickLogBet from "@/components/bets/QuickLogBet";
 import BookLink from "@/components/BookLink";
 import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
+import { NoBooksDataNote } from "@/components/sports/NoBooksDataNote";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd, faqLd, faqForEventPage } from "@/lib/seo";
 import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
@@ -170,9 +171,7 @@ export default async function EventView({
                 ) : detail.event.event_type === "championship" ? (
                   <span className="text-muted-foreground/70">Sportsbook lines for this championship aren&apos;t in our index yet — checking The Odds API every 30 min. Kalshi is the live signal in the meantime.</span>
                 ) : (
-                  <span className="text-muted-foreground/70">
-                    Sportsbook lines for {detail.event.event_type.replace(/_/g, " ")} markets aren&apos;t in our index yet. Books like DraftKings, FanDuel and BetMGM do publish these prices on their sites — we&apos;re working on getting them into the comparison. Kalshi is the canonical signal here for now.
-                  </span>
+                  <NoBooksDataNote eventType={detail.event.event_type} tier={tier} />
                 )}
               </span>
             </CardTitle>

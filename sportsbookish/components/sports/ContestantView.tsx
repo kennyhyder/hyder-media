@@ -7,6 +7,8 @@ import type { TeamMarket } from "@/lib/sports-data";
 import { eventUrl } from "@/lib/slug";
 import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel } from "@/lib/format";
 import FaqSection from "@/components/FaqSection";
+import { NoBooksDataNote } from "@/components/sports/NoBooksDataNote";
+import { getCurrentTier } from "@/lib/tier-guard";
 import { JsonLd, breadcrumbLd, faqLd } from "@/lib/seo";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
@@ -37,31 +39,6 @@ function relativeTime(iso: string | null): string {
   return `${Math.floor(ms / 86_400_000)} days ago`;
 }
 
-// Honest copy for "no books data" cases. We currently pull championship
-// futures from The Odds API; everything else (MVP, awards, win totals,
-// division winners, draft picks) is published by books on their own sites
-// but isn't yet in our comparison index. Don't claim books "don't publish"
-// these — they do. Be transparent that we're adding coverage.
-function bookTrackingExplanation(eventType: string): string {
-  const typeNames: Record<string, string> = {
-    award: "award markets (Coach of the Year, draft picks, etc.)",
-    mvp: "MVP voting markets",
-    record_best: "best-record season futures",
-    record_worst: "worst-record season futures",
-    win_total: "season win-total markets",
-    trade: "player trade markets",
-    series: "playoff series outrights",
-    playoffs: "make/miss playoffs markets",
-    division: "division winner futures",
-    conference: "conference winner futures",
-  };
-  const label = typeNames[eventType];
-  if (label) {
-    return `${label.charAt(0).toUpperCase() + label.slice(1)} aren't in our sportsbook comparison index yet. Books like DraftKings, FanDuel, and BetMGM do publish these prices on their own sites — we're working on getting them into the index. Kalshi is the canonical signal here for now.`;
-  }
-  return "Sportsbook lines for this market type aren't in our index yet. Kalshi is the canonical signal here for now.";
-}
-
 export default async function ContestantView({
   league,
   slug,
@@ -73,7 +50,11 @@ export default async function ContestantView({
   expectedKind: "team" | "player";
   canonicalPath: string;
 }) {
-  const [t, leagues] = await Promise.all([fetchTeamBySlug(league, slug), fetchLeagues()]);
+  const [t, leagues, { tier }] = await Promise.all([
+    fetchTeamBySlug(league, slug),
+    fetchLeagues(),
+    getCurrentTier(),
+  ]);
   if (!t) notFound();
   const leagueMeta = leagues.find((l) => l.key === league);
   if (!leagueMeta) notFound();
@@ -252,7 +233,7 @@ export default async function ContestantView({
                 </h2>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {list.map((m) => <MarketCard key={m.market_id} m={m} league={league} />)}
+                {list.map((m) => <MarketCard key={m.market_id} m={m} league={league} tier={tier} />)}
               </div>
             </section>
           );
@@ -274,7 +255,7 @@ export default async function ContestantView({
 // Polymarket overlay + best book + per-book grid + freshness. When data is
 // genuinely unavailable (e.g. books don't publish per-player futures), shows
 // an explicit explanation instead of empty cells.
-function MarketCard({ m, league }: { m: TeamMarket; league: string }) {
+function MarketCard({ m, league, tier }: { m: TeamMarket; league: string; tier: import("@/lib/tiers").TierKey }) {
   const e = m.event;
   const href = e.slug && e.season_year ? eventUrl(league, e.season_year, e.slug) : `/sports/${league}/event/${e.id}`;
   const edge = (m.kalshi?.implied_prob != null && m.books?.median != null)
@@ -320,8 +301,8 @@ function MarketCard({ m, league }: { m: TeamMarket; league: string }) {
               valueClass="text-emerald-300"
             />
           ) : showBookExplain ? (
-            <div className="text-[10px] text-muted-foreground/70 italic py-1">
-              {bookTrackingExplanation(e.event_type)}
+            <div className="text-[10px] italic py-1">
+              <NoBooksDataNote eventType={e.event_type} tier={tier} />
             </div>
           ) : null}
           {m.polymarket && (
