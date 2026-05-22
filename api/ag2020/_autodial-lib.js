@@ -13,16 +13,21 @@
  *      customer to whichever rep picks up.
  *   4. Twilio StatusCallbacks + the <Dial> action callback update the row.
  *
- * Env vars:
- *   AG2020_TWILIO_ACCOUNT_SID      (required)
- *   AG2020_TWILIO_AUTH_TOKEN       (required)
- *   AG2020_AUTODIAL_FROM_NUMBER    number shown to the customer; falls back to
- *                                  AG2020_TWILIO_FROM_NUMBER. Use a LOCAL AZ
- *                                  number for answer rates.
- *   AG2020_REP_INBOUND_NUMBER      (required) the sales line to bridge to.
- *   AG2020_AUTODIAL_SECRET         shared secret for the trigger webhook;
- *                                  falls back to AG2020_MISSED_CALL_WEBHOOK_SECRET.
- *   AG2020_PUBLIC_BASE_URL         base for Twilio callback URLs (default https://hyder.me).
+ * Env vars (the autodialer runs on AG2020's OWN Twilio account — its own
+ * dedicated vars, deliberately NOT the shared AG2020_TWILIO_* vars which
+ * belong to a different account):
+ *   AG2020_AUTODIAL_TWILIO_ACCOUNT_SID  (required) AG2020's Twilio account SID
+ *   AG2020_AUTODIAL_TWILIO_AUTH_TOKEN   (required) auth token for that account
+ *   AG2020_AUTODIAL_FROM_NUMBER         (required) a number IN that account,
+ *                                       shown to the customer. Local AZ number
+ *                                       recommended. No fallback — if unset,
+ *                                       no call is placed (fail-safe).
+ *   AG2020_REP_INBOUND_NUMBER           (required) the sales line to bridge to.
+ *   AG2020_AUTODIAL_SECRET              secret for the trigger webhook; falls
+ *                                       back to AG2020_MISSED_CALL_WEBHOOK_SECRET.
+ *   AG2020_AUTODIAL_FORM_IDS            comma-separated AC form IDs allowed to
+ *                                       trigger a callback.
+ *   AG2020_PUBLIC_BASE_URL              Twilio callback base (default https://hyder.me).
  */
 
 import crypto from 'crypto';
@@ -49,10 +54,13 @@ export function autodialSecret() {
 }
 
 export function twilioCreds() {
+    // AG2020's OWN Twilio account only. No fallback to the shared AG2020_TWILIO_*
+    // vars — those are a different account. If these are unset, placeCall()
+    // fails safe (no call) rather than dialing from the wrong account/number.
     return {
-        sid: process.env.AG2020_TWILIO_ACCOUNT_SID,
-        token: process.env.AG2020_TWILIO_AUTH_TOKEN,
-        from: process.env.AG2020_AUTODIAL_FROM_NUMBER || process.env.AG2020_TWILIO_FROM_NUMBER,
+        sid: process.env.AG2020_AUTODIAL_TWILIO_ACCOUNT_SID,
+        token: process.env.AG2020_AUTODIAL_TWILIO_AUTH_TOKEN,
+        from: process.env.AG2020_AUTODIAL_FROM_NUMBER,
         repNumber: process.env.AG2020_REP_INBOUND_NUMBER,
     };
 }
