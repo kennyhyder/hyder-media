@@ -899,7 +899,121 @@ The schema (`/api/google-ads/schema.sql`) defines 11 tables:
 
 ---
 
+## Reusable Patterns Library
+
+Patterns and gotchas worth pulling into any new project in this monorepo. Cross-references to the relevant source files + memory notes.
+
+### Vercel serverless + ESM
+- **Vercel auto-compiles `api/**/*.js` ESM → CJS** when `package.json` lacks `"type": "module"` (deploy log shows: `Compiling "X.js" from ESM to CommonJS`). Constructs that don't survive: `import.meta.url`, top-level `await`, dynamic ESM-only imports.
+  - Symptom: `FUNCTION_INVOCATION_FAILED` with no JSON body. Vercel `logs` won't show the underlying error.
+  - Fix: avoid `import.meta.url`; either embed file contents inline or hardcode paths. See `api/data/sync-huggingface.js` for a worked example (README upload removed after this bit us in May 2026).
+- **All `api/**/*.js` should be self-contained for serverless cold start.** Don't import from `../lib/` outside `api/`.
+- **CRON_SECRET pattern**: every cron handler accepts `Authorization: Bearer ${CRON_SECRET}`. Test locally with `curl -H "Authorization: Bearer $(grep ^CRON_SECRET= .env.local | cut -d= -f2)" https://hyder.me/api/...`.
+
+### Supabase + Postgres performance
+- **Pooler ports matter for index ops.** Port `6543` (transaction mode) wraps everything in a transaction, so `CREATE INDEX CONCURRENTLY` fails with "cannot run inside a transaction block". Use port `5432` (session mode) for DDL. Region = `us-west-2`, not us-west-1.
+- **High-volume tables: avoid `count('exact')`.** Past ~1M rows the count query times out (>10s) under serverless 10s limit, returns null, coalesces to 0, fires false alerts. Switch to latest-row recency check: `select fetched_at order by fetched_at desc limit 1` (O(1) with a `fetched_at DESC` index). See `api/seo/cron-health-check.js` for pattern.
+- **Add a `fetched_at DESC` index on any quote/log table** that grows by >100k rows/day. Without it, even "find latest row" is a seq scan.
+- **Service-role key naming**: in `api/*.js` serverless functions use `SUPABASE_URL` + `SUPABASE_SERVICE_KEY`. The `NEXT_PUBLIC_*` prefix is only for client-side Next.js bundles — won't be available server-side in API routes.
+
+### Stripe gotchas
+- **`echo` adds trailing newlines** when piped to `vercel env add`. The `\n` ends up baked into `STRIPE_SECRET_KEY`, the SDK puts it into the Authorization header, request never reaches Stripe, error reads as "connection error, retried 2 times" (sounds network — is local). Always `.trim()` defensively when reading Stripe env vars; use `printf %s` not `echo` to set them. Documented in [[stripe-env-trailing-newline]].
+- **Customer Portal CSP**: `form-action` must include `https://billing.stripe.com`. Browsers check `form-action` against the final redirect destination, not just the immediate POST target.
+- **Stripe v22 moved subscription period dates** to `subscription.items[0]` (was on `subscription` directly). Webhook handlers need `periodOf(sub)` helpers.
+- **Webhook race with checkout success URL**: pass tier as a URL param to `success_url` rather than waiting for the webhook to update DB, so `purchase` GA4 events have correct value instantly.
+
+### SEO + freshness ("quality deserves freshness")
+- Reusable `<LastUpdated iso={...} variant="header|inline|footer" />` component lives in `sportsbookish/components/LastUpdated.tsx`. Renders `<time datetime="...">` + relative time ("3 min ago"). Helper `datasetFreshnessLd()` emits `Dataset` JSON-LD with `dateModified`.
+- Apply across all page surfaces that change (event detail, league hub, player profile, team profile, leaderboards, movers, etc). For tournament/event lists: sort `next event first chronologically` (open events ASC, closed DESC).
+- Pages with `export const dynamic = "force-dynamic"` can honestly use render time as the freshness signal — Vercel cron + dynamic rendering means "now" is genuinely fresh.
+
+### GA4 conversion events
+- **Don't trust `window.gtag` from useEffect** — it's race-y with `@next/third-parties/google`. Push to `window.dataLayer` directly:
+  ```js
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "purchase", value: 19, currency: "USD" });
+  ```
+- For SaaS funnels track: `sign_up` (post-magic-link), `begin_checkout` (Stripe checkout creation), `purchase` (success_url landing with tier param).
+
+### AI / LLM discoverability
+- Standard package per site: `llms.txt`, `JSON-LD WebApplication`, `JSON-LD Dataset` with `dateModified`, `OpenAPI spec` at `/api/openapi.json`, `Hugging Face dataset mirror` (cron pushes daily CSV — see `api/data/sync-huggingface.js`), IndexNow ping on publish, Wikidata entity with P-claims.
+- HF push via `@huggingface/hub` `uploadFiles({ repo: { type: "dataset", name: "..." }, accessToken: process.env.HF_TOKEN, files: [...] })`. Don't bundle README in the cron — push schema docs manually.
+- Wikidata entity edits via MediaWiki API (`wbeditentity`, `wbcreateclaim`) with bot password. New accounts can't create new batches in QuickStatements — use direct API or run via Firefox (third-party cookie issue in Chrome).
+
+### Sportsbook futures data vendor gap
+- The Odds API ($30/mo) only exposes ~14 futures `sport_key`s (championship/winner). MVP, win-totals, awards, division winners are NOT in the feed at any tier. Books DO publish these prices on their own sites; **don't claim books "don't publish"** in user copy.
+- `NoBooksDataNote` component pattern (in `sportsbookish/components/sports/`): for missing market types, render a tier-aware CTA — non-Elite → `/pricing` upsell, Elite → `mailto:` to capture demand signals. See [[sportsbookish-futures-data-vendor]].
+
+### Health-check pattern (any project)
+- Daily cron pings: sitemap reachability + URL count, HF dataset `lastModified` age, latest-quote recency per table, slug coverage %.
+- Use Resend `alerts@<domain>` for email when checks fail. Only alert when something is meaningfully broken — false alarms erode trust.
+- See `api/seo/cron-health-check.js` for the full pattern.
+
+### Pre-deploy verification (sportsbookish has this baked into CLAUDE.md)
+- TypeScript: `npx tsc --noEmit`
+- Build: `npm run build`
+- Post-deploy security headers, W3C validation, WAVE accessibility
+- See `sportsbookish/CLAUDE.md` for full curl commands
+
+---
+
+## The Playbook Product (May 2026 launch)
+
+Vendor-agnostic SaaS launch playbook, productized after building SportsBookISH. Designed so it can be applied to ANY future client/project here.
+
+### Three-tier model
+1. **Free intro PDF (5pg)** — lead magnet. Email signup → drip series.
+2. **$79 full bundle** — PDF + templates + Claude Code skill. Bundle ready as `downloads/playbook-bundle-v1.zip`. Awaiting Lemon Squeezy product creation.
+3. **$2.5k-$5k DFY engagement** — Kenny implements the playbook for a client.
+
+### Live assets
+- **Landing page**: `https://hyder.me/playbook` (`playbook.html` in root). Full Bootstrap theme matching hyder.me, JSON-LD schemas (Product, FAQPage, BreadcrumbList), GA4 conversion events.
+- **Free intro endpoint**: `POST /api/playbook-intro` — captures email, sends intro PDF via Gmail SMTP. Defensive `.trim()` on env reads (dogfoods §5.4 of the playbook itself).
+- **Email drip series**: 5 emails in `docs/playbook/emails/` (intro → product → DFY pitch).
+- **Bundle**: `downloads/playbook-bundle-v1.zip` — PDF + Notion templates + `.claude/agents/playbook.md` skill file.
+
+### Pending manual work
+- Lemon Squeezy product setup (2 placeholder URLs in `playbook.html` to replace once live)
+- Verify drip series sender domain DNS
+
+### Playbook topics covered (chapters)
+1. Tier definition + Stripe products + webhooks
+2. Supabase Auth (magic-link), tier guards, RLS
+3. Cron-driven ingestion pipelines (Vercel)
+4. SEO + freshness + AI discoverability stack
+5. **Compliance baseline** (W3C, security headers, WAVE, robots, sitemap, OG, JSON-LD)
+6. Conversion event tracking (GA4 dataLayer pattern)
+7. Stripe Customer Portal + cancellation flows
+8. Health-check cron + Resend alerts
+9. Vercel deploy gotchas (ESM→CJS, env var trim, region pinning)
+10. Cross-platform reporting (Google + Meta + others)
+11. Wikidata + Hugging Face + IndexNow for AI discoverability
+
+### When applying to a new project
+- Start from `docs/playbook/templates/` (Stripe setup script, schema.sql skeleton, tier-guard.ts, LastUpdated component, cron-health-check.js, NoBooksDataNote-style upsell pattern)
+- Compliance baseline: lives in `automatedojo/lib/compliance.ts` — apply to platform-deployed sites
+- Stripe products: idempotent `scripts/setup-stripe-products.mjs` pattern works for ANY new SaaS
+
+See memory: [[playbook-product]] for distribution status, [[sportsbookish]] for the source-of-truth implementation, [[sportsbookish-futures-data-vendor]] for the "Request data →" Elite upsell pattern.
+
+---
+
 ## Recent Changes Log
+
+### 2026-05-22 (SportsBookISH optimizations + Playbook product)
+- **Futures markets expanded** (`api/sports/_books.js`): NCAAF + golf majors + Euro added to FUTURES_MARKETS. Fixed UCL sport_key (`soccer_uefa_champs_league` → `_winner`). `active: false` flag skips between-seasons silently; 404/INACTIVE_SPORT now skip gracefully.
+- **NoBooksDataNote component** (`sportsbookish/components/sports/NoBooksDataNote.tsx`): shared by EventView + ContestantView. Non-Elite users see `→ /pricing` upsell; Elite users see `mailto:kenny@hyder.me` with subject pre-filled per market type. Captures demand signal for vendor-upgrade prioritization.
+- **Health check rewrite** (`api/seo/cron-health-check.js`): switched `sports_quotes` recency from `count('exact')` (timeout on 11M-row table) to latest-row recency check. Added `idx_sports_quotes_fetched_at` + `idx_sports_book_quotes_fetched_at` Postgres indexes via session-mode pooler.
+- **HuggingFace sync fixed** (`api/data/sync-huggingface.js`): removed `import.meta.url` README read that broke during Vercel's ESM→CJS compilation. Daily cron now only pushes CSV.
+- **GA4 conversion events** wired up: `sign_up`, `begin_checkout`, `purchase` events fire via `window.dataLayer.push()` (not `gtag()` which races). Tier passed in Stripe `success_url` so `purchase` value is accurate even before webhook lands.
+- **Stripe Customer Portal fix**: CSP `form-action` updated to include `https://billing.stripe.com` (browser checks against final redirect target, not just immediate POST target).
+- **Stripe env var defensive trim**: all `STRIPE_*` env reads `.trim()`'d to defend against trailing-newline corruption from `echo`-based `vercel env add`.
+- **LastUpdated freshness signal**: reusable component applied across 18 page surfaces — event detail, league hub, players/teams indexes, movers, golf tournaments, ladder/matchups/props pages. Emits `<time datetime>` + Dataset JSON-LD with `dateModified`.
+- **Chronological sort**: player/athlete profiles now show next-event-first (e.g. Tom Kim's page shows this-week's CJ Cup before the future US Open).
+- **Polymarket overlay** added to team/player pages alongside Kalshi + sportsbook lines (dust-filtered, no display if no Polymarket data).
+- **Wikidata Q139814938** cleaned up via bot password API (`Kennyhyder@claude-q139814938`): logo uploaded to Commons, P-claims fixed, multilingual labels, bad claim marked deprecated with P2241 qualifier.
+- **AI discoverability pass**: `llms.txt`, JSON-LD WebApplication, OpenAPI spec at `/api/openapi.json`, Hugging Face dataset `kennyhyder/sportsbookish-daily-odds`, GitHub docs repo, IndexNow weekly sweep.
+- **The Playbook product** (`/playbook`): packaged the above as a vendor-agnostic launch playbook — free intro PDF + $79 bundle + DFY consulting tier. Email-signup endpoint `/api/playbook-intro`, 5-email drip in `docs/playbook/emails/`, bundle ZIP at `downloads/playbook-bundle-v1.zip`. Pending Lemon Squeezy product creation.
 
 ### 2026-02-05 (Auto Glass 2020 - Court Presentation)
 - **Added court presentation document** (`court-presentation.html`) - standalone password-protected page
@@ -983,3 +1097,41 @@ The schema (`/api/google-ads/schema.sql`) defines 11 tables:
 2. Restore: `git checkout HEAD -- <file-path>`
 3. Or force iCloud download: `brctl download <file>`
 4. Always deploy from GitHub, not local
+
+## Pre-deploy checklist (run before every push)
+
+Before pushing changes that touch UI / routes / nav / data layer, run:
+
+```bash
+# 1. TypeScript
+npx tsc --noEmit
+
+# 2. Build
+npm run build
+
+# 3. Security headers (post-deploy, against live URL)
+curl -sI https://sportsbookish.com | grep -iE "^(strict-transport|content-security|x-frame|x-content-type|referrer-policy|permissions-policy):"
+
+# 4. W3C validation (post-deploy)
+curl -s https://sportsbookish.com | curl -s --data-binary @- -H "Content-Type: text/html" "https://validator.w3.org/nu/?out=json" | python3 -c "import sys,json;r=json.load(sys.stdin);print(f'errors: {len([m for m in r[\"messages\"] if m[\"type\"]==\"error\"])}, warnings: {len([m for m in r[\"messages\"] if m.get(\"subType\")==\"warning\"])}')"
+
+# 5. WAVE accessibility (manual: load page in https://wave.webaim.org/extension/ or use https://wave.webaim.org/api/request)
+
+# 6. Smoke-test core flows in incognito + signed-in:
+#    - / (homepage)
+#    - /sports/mlb (or any in-season league)
+#    - /sports/mlb/event/<id> (any active game)
+#    - /alerts (Pro+ only)
+#    - /bets (Elite only)
+#    - /admin (admin only)
+#    - Pricing checkout (don't actually pay — load /pricing and click Subscribe)
+```
+
+Targets:
+- Security headers: 100/100 (HSTS preload, full CSP, COOP/CORP, Permissions-Policy)
+- W3C: 0 errors, 0 warnings (info-only "trailing slash on void element" notes are OK)
+- WAVE: 0 errors, ≤2 alerts max
+- Build: clean compile, no new console errors in dev
+- Smoke tests: no broken routes, no missing data on event pages with active markets
+
+Any regressions on these → revert or patch BEFORE merging.
