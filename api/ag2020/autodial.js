@@ -115,14 +115,17 @@ async function handleTrigger(req, res, supabase) {
         return res.status(400).json({ error: 'A customer phone number is required (phone | customer_number | contact[phone])' });
     }
 
-    // De-dupe: skip if this number was already triggered recently.
+    // De-dupe: skip if this number was actually dialed recently. Statuses that
+    // never placed a call — failed, skipped_duplicate, skipped_form — do NOT
+    // count; otherwise a non-trigger tag webhook (logged skipped_form) would
+    // block the real NEW LEAD ALERT trigger that arrives moments later.
     const since = new Date(Date.now() - DEDUPE_HOURS * 3600 * 1000).toISOString();
     const { data: recent } = await supabase
         .from('ag2020_autodial_attempts')
         .select('id,status,created_at')
         .eq('customer_number', customerNumber)
         .gte('created_at', since)
-        .not('status', 'in', '(failed,skipped_duplicate)')
+        .not('status', 'in', '(failed,skipped_duplicate,skipped_form)')
         .limit(1);
 
     if (recent && recent.length > 0) {
