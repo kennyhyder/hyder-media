@@ -1,8 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { uploadFiles } from "@huggingface/hub";
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 
 // Daily cron that pushes the latest data snapshot to the Hugging Face
 // dataset repo kennyhyder/sportsbookish-daily-odds. Keeps the public
@@ -132,24 +129,14 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: false, reason: "no rows produced — skipping HF push to avoid clobbering" });
   }
 
-  // Also push the dataset card (README.md) so the HF dataset page renders
-  // tags, schema docs, citation block, and usage examples. The file lives
-  // in this same directory and gets shipped with each deploy; uploading on
-  // every cron tick is harmless because HF dedupes by content hash.
-  let readmeContent = null;
-  try {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    readmeContent = await readFile(join(__dirname, "huggingface-readme.md"), "utf8");
-  } catch (e) {
-    console.warn("[hf-sync] README not found, skipping:", e.message);
-  }
-
+  // Daily cron only pushes the CSV. The dataset card (README.md) is
+  // updated manually when the schema changes — embedding it here used
+  // `import.meta.url` which Vercel's ESM→CJS compilation breaks. To
+  // refresh the README, push manually via the HF web UI or a one-off
+  // script that reads the local file.
   const filesToUpload = [
     { path: HF_FILE, content: new Blob([csv], { type: "text/csv" }) },
   ];
-  if (readmeContent) {
-    filesToUpload.push({ path: "README.md", content: new Blob([readmeContent], { type: "text/markdown" }) });
-  }
 
   try {
     await uploadFiles({
