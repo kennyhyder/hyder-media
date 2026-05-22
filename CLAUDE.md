@@ -955,6 +955,34 @@ Patterns and gotchas worth pulling into any new project in this monorepo. Cross-
 - Post-deploy security headers, W3C validation, WAVE accessibility
 - See `sportsbookish/CLAUDE.md` for full curl commands
 
+### Speed-to-lead autodialer (outbound auto-callback + bridge)
+- **What:** Trigger fires → Twilio calls the **customer** → on answer, bridges them to a sales rep line. Source-agnostic engine — same code handles CRM form-submit webhooks, missed-call webhooks, manual triggers. Reference implementation: `clients/ag2020/CLAUDE.md` + `/api/ag2020/_autodial-lib.js` + 4 sibling `autodial-*.js`. Live since 2026-05-22 for forms + voicemail-leaver missed calls.
+- **File pattern (per client, ~600 LOC total) in `/api/<client>/`:**
+  - `_autodial-lib.js` — shared: phone normalize, HMAC callback tokens, business-hours math, `placeCall()`. Underscore-prefixed so Vercel doesn't route it.
+  - `autodial.js` — `POST` trigger receiver + `GET` recent attempts. Source-aware gating, 6h dedupe, business-hours deferral, row insert, calls lib `placeCall`.
+  - `autodial-twiml.js` — TwiML returned to Twilio on customer answer. AMD voicemail guard; on human → hold message + `<Dial>` bridge with rep whisper TwiML.
+  - `autodial-status.js` — Twilio StatusCallback (customer leg) + `<Dial>` action callback (bridge leg). Updates the attempt row.
+  - `autodial-cron.js` — Vercel `*/15` cron that drains `deferred` (off-hours) attempts when the business reopens.
+- **Table `<client>_autodial_attempts`** — one row per attempt with full `trigger_payload` JSONB for audit. Status state machine: `deferred → dialing → (customer_answered | machine | no_answer | failed) → (bridged →) completed | rep_no_answer`, plus `skipped_duplicate` and `skipped_form`. Indexes: `(created_at DESC)`, `(customer_number, created_at DESC)`, partial `(dial_after) WHERE status='deferred'`.
+- **ActiveCampaign trigger gotchas (the AG2020 build hit all of these):**
+  - `subscribe` is **not** a reliable form-submit trigger — only fires when the form subscribes contacts to a list. Many integrations don't.
+  - `contact_add` is **NOT** a valid AC event name — `GET /api/3/webhook/events` returns the canonical list (~42 events). Don't trust intuition; check.
+  - The reliable form-submit signal is usually a unifying "new lead" tag + `contact_tag_added` event, filtered by tag id/name. AG2020's tag is `NEW LEAD ALERT` (id 2487).
+  - **AC API cannot create automations** (UI-only), but it CAN create account-level webhooks (`POST /api/3/webhooks` with `events`, `sources`, `url`).
+  - AC webhook payloads have varied shapes — handle scalar `tag` vs `tag[id]`/`tag[name]` vs nested `tag.id`/`tag.name`. Defensive extraction.
+- **Fail-closed gating** on CRM webhooks: log the full payload to a `skipped_*` row and do NOT dial when the trigger can't be tied to an allowlist entry. Otherwise the first novel payload shape silently autodials everyone in the CRM.
+- **Dedupe gotcha (production-breaking if missed):** dedupe must exclude `failed`, `skipped_duplicate`, AND `skipped_form` (every `skipped_*` status). A skipped row is not a dial. A non-trigger tag webhook lands as `skipped_form` and would otherwise block the real trigger tag webhook that fires moments later. See AG2020 commit `97999f2f`.
+- **Twilio call/bridge pattern:**
+  - `MachineDetection=Enable` + check `AnsweredBy` in the TwiML — never bridge a rep to a voicemail recording.
+  - `answerOnBridge="true"` on `<Dial>` so the customer hears ringback during rep ring, not dead air.
+  - **Customer-facing From vs bridge `<Dial callerId>` MUST be different numbers.** Dialing the rep line showing the rep line's own number as caller ID (From == To) is pathological. Use an owned Twilio number for the bridge caller ID.
+  - HMAC token on Twilio callback URLs (TwiML + StatusCallback) so they can't be replayed/forged externally.
+- **"Callback from the number they dialed":** requires that number to be Twilio-usable — either owned in the account, or **verified as an outgoing caller ID** via `POST /Accounts/{SID}/OutgoingCallerIds.json` (Twilio places a verification call with a 6-digit `validation_code`; someone at the number enters it). Verified caller IDs get lower STIR/SHAKEN attestation than owned numbers (more spam-flag risk) — accept the tradeoff for recognition and pair with branded calling.
+- **Branded calling:** Twilio's own Branded Calling **requires owned Twilio numbers** (verified caller IDs aren't eligible) and currently covers only T-Mobile + Verizon (US Public Beta, no AT&T). For verified-caller-ID setups, use **First Orion INFORM** — works with the existing number wherever it's hosted, all 4 major US carriers + iPhone+Android, free business-number registration tier (paid plans from $31/mo at 250 calls for logo + call reason).
+- **Per-client env vars:** dedicated Twilio account creds (`*_AUTODIAL_TWILIO_ACCOUNT_SID/AUTH_TOKEN` — don't co-mingle with other clients' Twilio accounts); `*_AUTODIAL_FROM_NUMBER` (customer-facing); `*_AUTODIAL_BRIDGE_CALLER_ID` (owned, distinct); `*_REP_INBOUND_NUMBER`; trigger allowlist (`*_AUTODIAL_TAGS` for AC tag triggering); webhook `*_AUTODIAL_SECRET`. Use `printf %s` (not `echo`) when adding any of these via `vercel env add` — see Stripe gotcha above for why.
+- **Business hours:** Mon–Sat 7am–6pm local (Arizona = fixed UTC-7, no DST math). Off-hours triggers insert `status=deferred` with `dial_after = nextBusinessOpen()`; the `*/15` cron picks them up at open.
+- **Trigger sources (live at AG2020):** (1) form submits via AC `contact_tag_added` webhook → autodial; (2) missed calls via existing `call-event-webhook.js` (voicemail-to-email pipeline) → autodial; (3) Phase 2 = CallRail webhook for pure-hangup missed calls → autodial (no code change needed, engine is source-agnostic).
+
 ---
 
 ## The Playbook Product (May 2026 launch)
