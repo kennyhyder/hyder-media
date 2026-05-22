@@ -76,20 +76,38 @@ async function handleTrigger(req, res, supabase) {
     const source = strOrNull(body.source)?.slice(0, 50) || 'form_submit';
     const acContactId = strOrNull(body.ac_contact_id || cf('id'))?.slice(0, 50) || null;
 
-    // Form allowlist. ActiveCampaign's native form webhook fires for ALL forms
-    // in the account; only genuine lead/quote forms should trigger a callback.
-    // A form-sourced trigger carries a form id and must match one in
-    // AG2020_AUTODIAL_FORM_IDS. Non-form triggers (manual, missed_call) carry
-    // no form id and are unaffected.
-    const formId = body['form[id]'] ?? body.form?.id ?? null;
-    if (formId != null) {
+    // --- ActiveCampaign form gating (fail-closed) ------------------------
+    // AC's native webhook fires for EVERY form/list in the account. Only the
+    // designated lead forms (AG2020_AUTODIAL_FORM_IDS) may trigger a callback.
+    // AC webhooks always carry a `type` field; the form id may arrive as
+    // form[id], form.id, or a scalar `form`. An AC webhook that can't be tied
+    // to an allowed form is LOGGED and SKIPPED — never dialed (fail-closed).
+    // Non-AC triggers (manual, missed_call) carry no `type` and pass through.
+    const isAcWebhook = body.type != null;
+    let formId = body['form[id]'] ?? body.form?.id ?? null;
+    if (formId == null && (typeof body.form === 'string' || typeof body.form === 'number')) {
+        formId = body.form;
+    }
+    if (isAcWebhook) {
         const allow = (process.env.AG2020_AUTODIAL_FORM_IDS || '')
             .split(',').map(s => s.trim()).filter(Boolean);
-        if (allow.length === 0 || !allow.includes(String(formId))) {
+        if (formId == null || allow.length === 0 || !allow.includes(String(formId))) {
+            // Log it (with the full payload) so the real AC shape is auditable,
+            // then stop. No call is placed.
+            await supabase.from('ag2020_autodial_attempts').insert({
+                customer_number: customerNumber || 'unknown',
+                customer_name: name,
+                source: 'form_submit',
+                ac_contact_id: acContactId,
+                trigger_payload: body,
+                status: 'skipped_form',
+                error: `AC webhook type=${body.type}; form=${formId ?? 'none'} not in allowlist`,
+            });
             return res.status(200).json({
                 status: 'skipped',
-                reason: allow.length === 0 ? 'form_allowlist_not_configured' : 'form_not_allowed',
-                formId: String(formId),
+                reason: formId == null ? 'form_id_unresolved' : 'form_not_allowed',
+                formId: formId != null ? String(formId) : null,
+                type: String(body.type),
             });
         }
     }
