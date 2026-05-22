@@ -76,6 +76,24 @@ async function handleTrigger(req, res, supabase) {
     const source = strOrNull(body.source)?.slice(0, 50) || 'form_submit';
     const acContactId = strOrNull(body.ac_contact_id || cf('id'))?.slice(0, 50) || null;
 
+    // Form allowlist. ActiveCampaign's native form webhook fires for ALL forms
+    // in the account; only genuine lead/quote forms should trigger a callback.
+    // A form-sourced trigger carries a form id and must match one in
+    // AG2020_AUTODIAL_FORM_IDS. Non-form triggers (manual, missed_call) carry
+    // no form id and are unaffected.
+    const formId = body['form[id]'] ?? body.form?.id ?? null;
+    if (formId != null) {
+        const allow = (process.env.AG2020_AUTODIAL_FORM_IDS || '')
+            .split(',').map(s => s.trim()).filter(Boolean);
+        if (allow.length === 0 || !allow.includes(String(formId))) {
+            return res.status(200).json({
+                status: 'skipped',
+                reason: allow.length === 0 ? 'form_allowlist_not_configured' : 'form_not_allowed',
+                formId: String(formId),
+            });
+        }
+    }
+
     if (!customerNumber) {
         return res.status(400).json({ error: 'A customer phone number is required (phone | customer_number | contact[phone])' });
     }
