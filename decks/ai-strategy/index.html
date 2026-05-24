@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutomateDojo: The AI Master Plan | Hyder Media</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/logos/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --bg: #0b0f14;
+            --bg-2: #11171f;
+            --bg-card: #1a232e;
+            --text: #e6edf3;
+            --text-dim: #8b9aab;
+            --gold: #f5d76e;
+            --cyan: #4cc9f0;
+            --magenta: #f72585;
+            --green: #4ade80;
+            --red: #ef4444;
+            --orange: #fb923c;
+            --border: #243240;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+        .deck-container { height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .slide.active { opacity: 1; visibility: visible; }
+        .slide-title {
+            background: radial-gradient(circle at 30% 20%, rgba(76,201,240,0.15), transparent 60%),
+                        radial-gradient(circle at 70% 80%, rgba(247,37,133,0.12), transparent 60%),
+                        var(--bg);
+        }
+        .slide-dark { background: var(--bg); }
+        .slide-card { background: var(--bg-2); }
+        .slide-accent {
+            background: linear-gradient(135deg, #1a0b1f 0%, #0b0f14 50%, #051621 100%);
+        }
+        .slide-warn {
+            background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(11,15,20,1));
+        }
+        .slide-win {
+            background: linear-gradient(135deg, rgba(74,222,128,0.12), rgba(11,15,20,1));
+        }
+        .logo {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            height: 32px;
+            opacity: 0.85;
+        }
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        .slide-tag {
+            position: absolute;
+            top: 36px;
+            right: 40px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        h1 {
+            font-family: var(--sans);
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        h2 {
+            font-family: var(--sans);
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 32px;
+        }
+        h3 {
+            font-family: var(--sans);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .subtitle {
+            font-size: 22px;
+            color: var(--text-dim);
+            text-align: center;
+            max-width: 800px;
+            line-height: 1.4;
+        }
+        .content {
+            max-width: 1200px;
+            width: 100%;
+        }
+        .content-narrow { max-width: 900px; }
+        .eyebrow {
+            font-family: var(--mono);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--cyan);
+            margin-bottom: 16px;
+            display: block;
+        }
+        .eyebrow-magenta { color: var(--magenta); }
+        .eyebrow-gold { color: var(--gold); }
+        .eyebrow-green { color: var(--green); }
+        .eyebrow-red { color: var(--red); }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 100%;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+        .card-cyan { border-top: 3px solid var(--cyan); }
+        .card-magenta { border-top: 3px solid var(--magenta); }
+        .card-gold { border-top: 3px solid var(--gold); }
+        .card-green { border-top: 3px solid var(--green); }
+        .card-red { border-top: 3px solid var(--red); }
+        .card-orange { border-top: 3px solid var(--orange); }
+        .card h3 { font-size: 18px; margin-bottom: 8px; }
+        .card h3.cyan { color: var(--cyan); }
+        .card h3.magenta { color: var(--magenta); }
+        .card h3.gold { color: var(--gold); }
+        .card h3.green { color: var(--green); }
+        .card h3.red { color: var(--red); }
+        .card p, .card li { font-size: 15px; line-height: 1.55; color: var(--text); }
+        .card .meta { font-family: var(--mono); font-size: 12px; color: var(--text-dim); margin-top: 12px; }
+        ul.bullets { list-style: none; padding-left: 0; }
+        ul.bullets li {
+            padding: 7px 0 7px 24px;
+            position: relative;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        ul.bullets li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--cyan);
+            font-weight: 700;
+        }
+        ul.bullets.magenta li::before { color: var(--magenta); }
+        ul.bullets.gold li::before { color: var(--gold); }
+        ul.bullets.green li::before { color: var(--green); }
+        ul.bullets.red li::before { content: "✕"; color: var(--red); }
+        .stat-box { text-align: center; padding: 16px 8px; }
+        .stat-num {
+            font-family: var(--sans);
+            font-size: 56px;
+            font-weight: 900;
+            color: var(--gold);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+        .stat-num.cyan { color: var(--cyan); }
+        .stat-num.magenta { color: var(--magenta); }
+        .stat-num.green { color: var(--green); }
+        .stat-num.red { color: var(--red); }
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+        .big-quote {
+            font-size: 32px;
+            font-weight: 600;
+            line-height: 1.35;
+            max-width: 900px;
+            border-left: 4px solid var(--cyan);
+            padding-left: 28px;
+        }
+        .mono { font-family: var(--mono); }
+        .code-block {
+            background: #0a0d11;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .pill {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin-right: 6px;
+        }
+        .pill-cyan { background: rgba(76,201,240,0.12); color: var(--cyan); border-color: rgba(76,201,240,0.3); }
+        .pill-magenta { background: rgba(247,37,133,0.12); color: var(--magenta); border-color: rgba(247,37,133,0.3); }
+        .pill-gold { background: rgba(245,215,110,0.12); color: var(--gold); border-color: rgba(245,215,110,0.3); }
+        .pill-green { background: rgba(74,222,128,0.12); color: var(--green); border-color: rgba(74,222,128,0.3); }
+        .pill-red { background: rgba(239,68,68,0.15); color: var(--red); border-color: rgba(239,68,68,0.3); }
+        .stage-row {
+            display: grid;
+            grid-template-columns: 80px 200px 1fr;
+            gap: 20px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .stage-num {
+            font-family: var(--mono);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+        .stage-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--gold);
+        }
+        .stage-desc {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.45;
+        }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+        }
+        .month-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--cyan);
+            border-radius: 10px;
+            padding: 16px 14px;
+        }
+        .month-card.m2 { border-top-color: var(--cyan); }
+        .month-card.m3 { border-top-color: var(--gold); }
+        .month-card.m4 { border-top-color: var(--gold); }
+        .month-card.m5 { border-top-color: var(--magenta); }
+        .month-card.m6 { border-top-color: var(--magenta); }
+        .month-card h4 {
+            font-family: var(--mono);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        .month-card p {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        /* Navigation */
+        .nav-controls {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            background: var(--cyan);
+            color: var(--bg);
+            border-color: var(--cyan);
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            h1 { font-size: 48px; }
+            h2 { font-size: 34px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .stage-row { grid-template-columns: 1fr; }
+            .timeline { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <div class="deck-container">
+
+    <!-- 1. Title -->
+    <div class="slide slide-title active" data-slide="1">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="eyebrow eyebrow-magenta">AutomateDojo · Strategic Brief · May 2026</span>
+        <h1>The AI Master Plan</h1>
+        <p class="subtitle">How AutomateDojo builds a defensible, distillation-driven AI moat — without the unicorn-sized GPU bill.</p>
+        <span class="slide-number">01 / 15</span>
+    </div>
+
+    <!-- 2. TL;DR -->
+    <div class="slide slide-dark" data-slide="2">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">TL;DR</span>
+        <div class="content content-narrow">
+            <h2>The thesis, in one sentence.</h2>
+            <p class="big-quote">
+                Accumulate the world's largest labeled corpus of <span style="color: var(--gold);">small-business website edit requests → expert AI drafts → owner-accepted shipped versions</span> for the home-services vertical, then distill cheaper-and-cheaper specialist models that beat frontier APIs on our specific workload.
+            </p>
+            <div class="grid-3" style="margin-top: 36px;">
+                <div class="card card-cyan"><h3 class="cyan">Data</h3><p>Interactions only we see, because of the customer relationship.</p></div>
+                <div class="card card-magenta"><h3 class="magenta">Distribution</h3><p>Hundreds-to-thousands of paying dojos already trust the dashboard.</p></div>
+                <div class="card card-gold"><h3 class="gold">Distillation</h3><p>Small fine-tuned models cheaper than competitors' frontier inference.</p></div>
+            </div>
+        </div>
+        <span class="slide-number">02 / 15</span>
+    </div>
+
+    <!-- 3. Why Now — wasted data signal -->
+    <div class="slide slide-warn" data-slide="3">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Why Now</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-red">The data we're already throwing away</span>
+            <h2>Every Claude interaction today produces a free training signal.<br>We capture <span style="color: var(--red);">none of it</span>.</h2>
+            <div class="grid-2" style="margin-top: 24px;">
+                <div class="card card-red">
+                    <h3 class="red">The current loop</h3>
+                    <ul class="bullets">
+                        <li>Owner asks Claude to edit their hero copy</li>
+                        <li>Claude produces a draft</li>
+                        <li>Owner accepts, edits, or rejects</li>
+                        <li class="mono" style="color: var(--red);">→ We log only "Claude ran"</li>
+                    </ul>
+                </div>
+                <div class="card card-green">
+                    <h3 class="green">What we should capture</h3>
+                    <ul class="bullets green">
+                        <li>Prompt + Claude's output (already there)</li>
+                        <li>What the owner shipped after editing</li>
+                        <li>Downstream metric movement (leads / conversion)</li>
+                        <li class="mono" style="color: var(--green);">→ Labeled preference data, free</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 28px; font-size: 17px; color: var(--text-dim); text-align: center;">
+                Frontier model labs <em>cannot</em> get this data. ChatGPT cannot. <strong style="color: var(--gold);">Only AutomateDojo can.</strong>
+            </p>
+        </div>
+        <span class="slide-number">03 / 15</span>
+    </div>
+
+    <!-- 4. Three Scaling Dimensions (Kimi map) -->
+    <div class="slide slide-dark" data-slide="4">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Source: Zhilin Yang · Moonshot AI · GTC 2026</span>
+        <div class="content">
+            <span class="eyebrow">The Three Scaling Dimensions</span>
+            <h2>Kimi's research roadmap → AutomateDojo's product roadmap</h2>
+            <div class="grid-3" style="margin-top: 24px;">
+                <div class="card card-cyan">
+                    <span class="pill pill-cyan">Token Efficiency</span>
+                    <h3 class="cyan" style="margin-top: 12px;">MuonClip optimizer</h3>
+                    <p>2× tokens / loss; zero training spikes across 15.5T tokens.</p>
+                    <p class="meta" style="color: var(--gold);">For us: caching + batch + tier routing. <strong>Build now.</strong></p>
+                </div>
+                <div class="card card-magenta">
+                    <span class="pill pill-magenta">Long Context</span>
+                    <h3 class="magenta" style="margin-top: 12px;">Kimi Linear · Attn Residuals</h3>
+                    <p>75% KV-cache cut · 6× decoding throughput at 1M context.</p>
+                    <p class="meta" style="color: var(--text-dim);">For us: irrelevant until self-hosting. <strong>Don't build.</strong></p>
+                </div>
+                <div class="card card-gold">
+                    <span class="pill pill-gold">Agent Swarms</span>
+                    <h3 class="gold" style="margin-top: 12px;">PARL reward</h3>
+                    <p>300 sub-agents · 4,000 steps · α·instantiation + β·finish + γ·outcome</p>
+                    <p class="meta" style="color: var(--gold);">For us: train the master orchestrator with this. <strong>Steal directly.</strong></p>
+                </div>
+            </div>
+            <p style="margin-top: 28px; font-size: 16px; color: var(--text-dim); text-align: center;">
+                Most of Kimi's work is <em>pre-training</em> tech. We do not pre-train. We use it where it transfers.
+            </p>
+        </div>
+        <span class="slide-number">04 / 15</span>
+    </div>
+
+    <!-- 5. The Honest Economics -->
+    <div class="slide slide-warn" data-slide="5">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Brutal Math</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-red">Self-Host vs Anthropic API</span>
+            <h2>Self-hosting Kimi K2.6 is a Series-A move.<br>We're not at Series A.</h2>
+            <div class="grid-2" style="margin-top: 28px;">
+                <div class="card card-red">
+                    <h3 class="red">Self-host K2.6</h3>
+                    <p style="font-size: 14px; line-height: 1.55;">1T params · 594 GB INT4</p>
+                    <p style="font-size: 14px; line-height: 1.55;">8× H200 SXM5 box · ~$35/hr · ~$25k/mo</p>
+                    <p style="font-size: 14px; line-height: 1.55;">+ storage, networking, vLLM/SGLang SRE</p>
+                    <div class="stat-box" style="margin-top: 12px;">
+                        <div class="stat-num red">$35–45k</div>
+                        <div class="stat-label">/ month, before serving anyone</div>
+                    </div>
+                </div>
+                <div class="card card-green">
+                    <h3 class="green">Anthropic API · Opus 4.7</h3>
+                    <p style="font-size: 14px; line-height: 1.55;">$5 / $25 per MTok (in / out)</p>
+                    <p style="font-size: 14px; line-height: 1.55;">Prompt caching → 90% off cached reads</p>
+                    <p style="font-size: 14px; line-height: 1.55;">Batch API → 50% off async jobs</p>
+                    <div class="stat-box" style="margin-top: 12px;">
+                        <div class="stat-num green">20–30×</div>
+                        <div class="stat-label">Effective cost reduction available <em>today</em></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">05 / 15</span>
+    </div>
+
+    <!-- 6. Break-even -->
+    <div class="slide slide-dark" data-slide="6">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Break-Even</span>
+        <div class="content content-narrow">
+            <span class="eyebrow eyebrow-gold">Where the curves cross</span>
+            <h2>K2.6 breakeven = <span style="color: var(--gold);">~10,000+ dojos.</span><br>Distilled 7B breakeven = <span style="color: var(--cyan);">~200 dojos.</span></h2>
+            <div class="code-block" style="margin: 28px 0; font-size: 14px;">
+$40k / mo flat  ÷  $25 / MTok output  =  1.6 BILLION output tokens / month
+                                       ≈ 13,300 dojos × 4 requests / day × 1k tok
+            </div>
+            <div class="grid-2">
+                <div class="card card-red">
+                    <h3 class="red">Self-hosted K2.6</h3>
+                    <p>Breakeven only beyond <strong>10k+ paying dojos</strong>. Until then, you pay rent to make calls Anthropic would charge ~30-50% as much for.</p>
+                </div>
+                <div class="card card-cyan">
+                    <h3 class="cyan">Distilled 7-14B specialist</h3>
+                    <p>Single H100 (~$2/hr) or serverless. <strong>Multi-LoRA serving</strong> = thousands of dojos on one GPU. Per-LoRA training cost: ~$150-300.</p>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">06 / 15</span>
+    </div>
+
+    <!-- 7. The Three-Layer Moat -->
+    <div class="slide slide-accent" data-slide="7">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">The Moat</span>
+        <div class="content">
+            <span class="eyebrow">The unicorn shape</span>
+            <h2>Three layers that compound.</h2>
+            <div class="grid-3" style="margin-top: 32px;">
+                <div class="card card-cyan">
+                    <div class="stat-box"><div class="stat-num cyan">1</div></div>
+                    <h3 class="cyan" style="text-align: center;">Data</h3>
+                    <p style="text-align: center;">200 dojos × 5 edits/wk × 50 wks = <strong>50k preference pairs / year</strong> in our exact distribution.</p>
+                </div>
+                <div class="card card-magenta">
+                    <div class="stat-box"><div class="stat-num magenta">2</div></div>
+                    <h3 class="magenta" style="text-align: center;">Distribution</h3>
+                    <p style="text-align: center;">Paying customers we already serve trust the dashboard. We don't have to acquire them again.</p>
+                </div>
+                <div class="card card-gold">
+                    <div class="stat-box"><div class="stat-num gold">3</div></div>
+                    <h3 class="gold" style="text-align: center;">Distillation</h3>
+                    <p style="text-align: center;">Specialist models cheaper than competitors' frontier inference, on tasks they don't have data for.</p>
+                </div>
+            </div>
+            <p style="margin-top: 36px; font-size: 18px; text-align: center; color: var(--text-dim);">
+                Effective cost / customer-request → 0  ×  customers → many  =  <span style="color: var(--gold); font-weight: 700;">margin moat</span>
+            </p>
+        </div>
+        <span class="slide-number">07 / 15</span>
+    </div>
+
+    <!-- 8. Token efficiency wins (immediate) -->
+    <div class="slide slide-win" data-slide="8">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Stage 1 · Ship This Month</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-green">Token efficiency wins · no training required</span>
+            <h2>20–30× cost reduction available today.</h2>
+            <div class="grid-4" style="margin-top: 24px;">
+                <div class="card card-green">
+                    <div class="stat-num green">10×</div>
+                    <div class="stat-label">Prompt caching</div>
+                    <p style="font-size: 13px; margin-top: 12px;">Cache reads = 10% of base input. Wrap stable system prompts.</p>
+                </div>
+                <div class="card card-green">
+                    <div class="stat-num green">2×</div>
+                    <div class="stat-label">Batch API</div>
+                    <p style="font-size: 13px; margin-top: 12px;">50% off for 24h-tolerant async jobs. Most extractions + reply drafts qualify.</p>
+                </div>
+                <div class="card card-green">
+                    <div class="stat-num green">3×</div>
+                    <div class="stat-label">Tier routing</div>
+                    <p style="font-size: 13px; margin-top: 12px;">Haiku ($1/$5) for 60% of calls. Reserve Opus for the 15% that needs it.</p>
+                </div>
+                <div class="card card-gold">
+                    <div class="stat-num gold">∞</div>
+                    <div class="stat-label">Funds everything else</div>
+                    <p style="font-size: 13px; margin-top: 12px;">Cost cut pays for the SFT runs that build the data flywheel.</p>
+                </div>
+            </div>
+            <p style="margin-top: 28px; font-size: 14px; color: var(--text-dim); text-align: center;" class="mono">
+                M1 of the 6-month plan. All four levers live in production today via Anthropic SDK. Zero training risk.
+            </p>
+        </div>
+        <span class="slide-number">08 / 15</span>
+    </div>
+
+    <!-- 9. The Data Flywheel (schema) -->
+    <div class="slide slide-dark" data-slide="9">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Stage 0 · Foundation</span>
+        <div class="content">
+            <span class="eyebrow">The Data Flywheel</span>
+            <h2>One migration. Everything downstream depends on it.</h2>
+            <div class="code-block" style="margin: 24px 0;">-- migration 021_training_corpus.sql
+
+alter table "9dm_claude_messages"
+  add column outcome              text default 'unknown',  -- accepted | edited | rejected | timeout
+  add column customer_final_output jsonb,                  -- what owner actually shipped
+  add column reward_signal         numeric,                 -- downstream metric delta
+  add column reward_recorded_at    timestamptz;
+
+create view v_training_preference_pairs as
+  select m.*, s.dojo_id, d.vertical
+  from "9dm_claude_messages" m
+  join "9dm_claude_sessions" s on s.id = m.session_id
+  left join "9dm_dojos" d      on d.id = s.dojo_id
+  where m.outcome in ('accepted','edited')
+    and (d.ai_training_opt_in is null or d.ai_training_opt_in = true);
+</div>
+            <p style="font-size: 15px; color: var(--text-dim); text-align: center;">
+                <span class="pill pill-green">Shipped</span> in branch <span class="mono">kenny/ai-strategy-month-1</span> as of today.
+            </p>
+        </div>
+        <span class="slide-number">09 / 15</span>
+    </div>
+
+    <!-- 10. The 7-Stage RL Roadmap -->
+    <div class="slide slide-dark" data-slide="10">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Stages 0–7</span>
+        <div class="content">
+            <span class="eyebrow">The Roadmap</span>
+            <h2>From instrumentation to swarm-RL, one stage at a time.</h2>
+            <div style="margin-top: 20px;">
+                <div class="stage-row"><div class="stage-num">0</div><div class="stage-name">Instrumentation</div><div class="stage-desc">Outcome capture, TOS, cost observatory · <span class="mono" style="color: var(--green);">Month 1</span></div></div>
+                <div class="stage-row"><div class="stage-num">1</div><div class="stage-name">Cost reduction</div><div class="stage-desc">Caching, batch, tier router · <span class="mono" style="color: var(--green);">Month 1–2</span></div></div>
+                <div class="stage-row"><div class="stage-num">2</div><div class="stage-name">SFT specialist</div><div class="stage-desc">Qwen 3 14B LoRA on accepted pairs · <span class="mono" style="color: var(--gold);">Month 3–4</span></div></div>
+                <div class="stage-row"><div class="stage-num">3</div><div class="stage-name">Multi-LoRA serving</div><div class="stage-desc">Per-task adapters on one GPU · <span class="mono" style="color: var(--gold);">Month 4–5</span></div></div>
+                <div class="stage-row"><div class="stage-num">4</div><div class="stage-name">DPO</div><div class="stage-desc">Train on (claude_output vs customer_edit) pairs · <span class="mono" style="color: var(--magenta);">Month 5–6</span></div></div>
+                <div class="stage-row"><div class="stage-num">5</div><div class="stage-name">RLAIF</div><div class="stage-desc">Opus as judge, synthetic preference labels at scale · <span class="mono" style="color: var(--magenta);">Month 6–9</span></div></div>
+                <div class="stage-row"><div class="stage-num">6</div><div class="stage-name">Swarm RL (PARL)</div><div class="stage-desc">Train the master onboarding orchestrator on α·instantiation + β·finish + γ·outcome · <span class="mono" style="color: var(--magenta);">Month 9–12+</span></div></div>
+            </div>
+        </div>
+        <span class="slide-number">10 / 15</span>
+    </div>
+
+    <!-- 11. PARL — the one steal -->
+    <div class="slide slide-accent" data-slide="11">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">The One Thing We Steal</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-magenta">Parallel Agent Reinforcement Learning</span>
+            <h2>PARL is what Kimi got right.<br>It's what our orchestrator <em>already does</em>.</h2>
+            <div class="code-block" style="margin: 24px 0; font-size: 16px; text-align: center;">total_reward = α(t) · instantiation_reward
+             + β(t) · finish_reward
+             + γ    · outcome_reward</div>
+            <div class="grid-3" style="margin-top: 20px;">
+                <div class="card card-cyan">
+                    <h3 class="cyan">Orchestrator</h3>
+                    <p>Master onboarding flow OR bulk-strategy dispatcher. Already decomposes 1 customer ask into 15+ parallel tool calls.</p>
+                </div>
+                <div class="card card-magenta">
+                    <h3 class="magenta">Sub-agents</h3>
+                    <p>Parallel tool calls: <span class="mono">submit_citation, draft_review_reply, update_dojo_content, provision_phone…</span></p>
+                </div>
+                <div class="card card-gold">
+                    <h3 class="gold">Outcome reward</h3>
+                    <p>Customer-marked "launch checklist complete & approved." Real signal, not a proxy.</p>
+                </div>
+            </div>
+            <p style="margin-top: 24px; font-size: 16px; color: var(--text-dim); text-align: center;">
+                When we train the orchestrator with PARL, we stop being "a SaaS that uses Claude" and become <span style="color: var(--gold);">a SaaS that beats Claude on its workload</span>.
+            </p>
+        </div>
+        <span class="slide-number">11 / 15</span>
+    </div>
+
+    <!-- 12. What we explicitly won't do -->
+    <div class="slide slide-warn" data-slide="12">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Discipline</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-red">Explicitly Out of Scope</span>
+            <h2>The discipline list. Saying no is half the strategy.</h2>
+            <ul class="bullets red" style="margin-top: 20px; font-size: 17px;">
+                <li><strong>Don't pre-train from scratch.</strong> $50M+, 12+ months, dedicated research team.</li>
+                <li><strong>Don't reimplement MuonClip, Kimi Linear, or Attention Residuals.</strong> Pre-training tech. Adoption comes free with next-gen open bases.</li>
+                <li><strong>Don't self-host K2.6 to "save money"</strong> before 10k+ dojos. Burns capital while losing the cost race.</li>
+                <li><strong>Don't fine-tune without a golden eval set.</strong> 200 hand-graded golden requests come first. Always.</li>
+                <li><strong>Don't train on customer data without TOS + opt-out.</strong> Legal and reputational radioactive. Fix at 4 customers, not 400.</li>
+                <li><strong>Don't conflate "agentic" with "swarmy."</strong> Most customer asks want one good call. PARL training belongs on the onboarding orchestrator, not the chat box.</li>
+            </ul>
+        </div>
+        <span class="slide-number">12 / 15</span>
+    </div>
+
+    <!-- 13. The 6-Month Build Sequence -->
+    <div class="slide slide-dark" data-slide="13">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Execution</span>
+        <div class="content">
+            <span class="eyebrow">The 6-Month Build</span>
+            <h2>Concrete shipping calendar.</h2>
+            <div class="timeline" style="margin-top: 28px;">
+                <div class="month-card m1">
+                    <h4>Month 1</h4>
+                    <p><strong>Foundation</strong> — migration 021, outcome capture UX, TOS, cost observatory, caching + batch + tier routing, banner price-fix.</p>
+                </div>
+                <div class="month-card m2">
+                    <h4>Month 2</h4>
+                    <p><strong>Golden set</strong> — 200 hand-graded examples, corpus export script, base-model eval (Qwen vs Llama).</p>
+                </div>
+                <div class="month-card m3">
+                    <h4>Month 3</h4>
+                    <p><strong>SFT v1</strong> — review-reply LoRA on Qwen 3 14B. Shadow-route 10% of traffic. Compare blind.</p>
+                </div>
+                <div class="month-card m4">
+                    <h4>Month 4</h4>
+                    <p><strong>Multi-LoRA</strong> — vLLM serves N adapters on 1 GPU. Add ad-copy adapter. Promote on win.</p>
+                </div>
+                <div class="month-card m5">
+                    <h4>Month 5</h4>
+                    <p><strong>DPO</strong> — first preference-optimization cycle on (claude_output vs customer_edit) pairs. Add site-copy adapter.</p>
+                </div>
+                <div class="month-card m6">
+                    <h4>Month 6</h4>
+                    <p><strong>RLAIF + verticals</strong> — Opus-as-judge synthesizes preference data. First per-vertical adapter (martial arts).</p>
+                </div>
+            </div>
+            <p style="margin-top: 24px; font-size: 14px; color: var(--text-dim); text-align: center;" class="mono">
+                Customer-feature shipping paused. AI infrastructure becomes the main thread. Full bandwidth.
+            </p>
+        </div>
+        <span class="slide-number">13 / 15</span>
+    </div>
+
+    <!-- 14. Success Metrics -->
+    <div class="slide slide-dark" data-slide="14">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="slide-tag">Measurement</span>
+        <div class="content">
+            <span class="eyebrow eyebrow-gold">Success metrics</span>
+            <h2>What we're optimizing.</h2>
+            <div class="grid-3" style="margin-top: 28px;">
+                <div class="card card-cyan">
+                    <h3 class="cyan">Cost</h3>
+                    <ul class="bullets" style="margin-top: 12px;">
+                        <li>$/customer-request ↓ 80% by EoY1</li>
+                        <li>In-house model handles 50%+ of traffic</li>
+                        <li>Opus reserved for the genuinely-hard 15%</li>
+                    </ul>
+                </div>
+                <div class="card card-magenta">
+                    <h3 class="magenta">Quality</h3>
+                    <ul class="bullets magenta" style="margin-top: 12px;">
+                        <li>Customer-accept rate ↑ each quarter</li>
+                        <li>Edit-distance owner→ship ↓</li>
+                        <li>Golden-set score monotonic up</li>
+                    </ul>
+                </div>
+                <div class="card card-gold">
+                    <h3 class="gold">Business</h3>
+                    <ul class="bullets gold" style="margin-top: 12px;">
+                        <li>NPS lift on AI-assisted features</li>
+                        <li>Retention: high-AI vs low-AI cohort</li>
+                        <li>MRR/dojo uplift on AI-included tiers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">14 / 15</span>
+    </div>
+
+    <!-- 15. Close -->
+    <div class="slide slide-title" data-slide="15">
+        <img src="/assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media" class="logo">
+        <span class="eyebrow eyebrow-magenta">Why this matters</span>
+        <h1 style="font-size: 56px;">Effective cost → 0<br>×  customers → many<br>= <span style="color: var(--gold);">unicorn margin</span></h1>
+        <p class="subtitle" style="margin-top: 32px;">
+            The path is unglamorous: instrument first, route + cache before training, SFT before RL, vertical before horizontal. Every piece exists today, is open-source where it needs to be, and is achievable solo or with a 2-person team if we stay disciplined about what <strong style="color: var(--cyan);">not</strong> to build.
+        </p>
+        <div style="margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <span class="pill pill-cyan">Full plan · /docs/ai-strategy.md</span>
+            <span class="pill pill-magenta">Branch · kenny/ai-strategy-month-1</span>
+            <span class="pill pill-gold">automatedojo.com</span>
+        </div>
+        <span class="slide-number">15 / 15</span>
+    </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&larr;</button>
+        <button class="nav-btn" onclick="nextSlide()">&rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 15;
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.querySelector(`[data-slide="${n}"]`).classList.add('active');
+            currentSlide = n;
+            document.getElementById('progress').style.width = `${(n/totalSlides)*100}%`;
+            history.replaceState(null, '', `#${n}`);
+        }
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'Home') showSlide(1);
+            else if (e.key === 'End') showSlide(totalSlides);
+        });
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (dx < -50) nextSlide();
+            else if (dx > 50) prevSlide();
+        });
+        const hash = parseInt(window.location.hash.slice(1), 10);
+        if (!isNaN(hash)) showSlide(hash);
+        else showSlide(1);
+    </script>
+</body>
+</html>
