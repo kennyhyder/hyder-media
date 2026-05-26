@@ -1,11 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
-  <!-- Solid dark bg matching the site header (#0a0a0a) -->
-  <rect width="400" height="400" rx="72" ry="72" fill="#0a0a0a"/>
-  <!-- Lucide LineChart icon, centered, scaled to ~55% of canvas.
-       Original viewBox is 0 0 24 24 with stroke-width 2.
-       Place at x=80 y=80, scale 240 / 24 = 10 → stroke 2 × 10 = 20 (too thick).
-       Use a thinner stroke instead: render at scale 10 but stroke 14 keeps it
-       balanced for this size. -->
   <g transform="translate(80 80) scale(10)" fill="none" stroke="#10b981" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3 3v18h18"/>
     <path d="m19 9-5 5-4-4-3 3"/>
