@@ -628,12 +628,12 @@
             cursor: pointer;
         }
 
-        .brand-awin { background: #3b82f6; color: white; }
-        .brand-samcart { background: #8b5cf6; color: white; }
-        .brand-clickbank { background: #22c55e; color: white; }
-        .brand-maxweb { background: #f59e0b; color: white; }
-        .brand-impact { background: #ec4899; color: white; }
-        .brand-realize { background: #14b8a6; color: white; }
+        .brand-clickfunnels { background: #e34620; color: white; }
+        .brand-systemeio { background: #fec325; color: black; }
+        .brand-gohighlevel { background: #10b981; color: white; }
+        .brand-kartra { background: #1f7ae0; color: white; }
+        .brand-kajabi { background: #0f0f0f; color: white; }
+        .brand-leadpages { background: #1d8aff; color: white; }
 
         .brand-details {
             display: flex;
@@ -951,7 +951,7 @@
     <div class="container">
         <header>
             <h1>PPC Keyword Analysis Tool</h1>
-            <p class="subtitle">31K+ keywords from SimilarWeb + Google Keyword Planner · Awin, ClickBank, MaxWeb, Impact, Realize & SamCart</p>
+            <p class="subtitle">70 researched keywords (Google Keyword Planner) · ClickFunnels, Leadpages, Kartra, Kajabi, Systeme.io & GoHighLevel</p>
         </header>
 
         <!-- Legend -->
@@ -977,12 +977,12 @@
             <div class="legend-section">
                 <div class="legend-title">Brands</div>
                 <div class="legend-items">
-                    <span class="brand-pill brand-awin tooltip-trigger" data-tooltip="Awin - Global affiliate network">awin</span>
-                    <span class="brand-pill brand-clickbank tooltip-trigger" data-tooltip="ClickBank - Digital product marketplace">clickbank</span>
-                    <span class="brand-pill brand-maxweb tooltip-trigger" data-tooltip="MaxWeb - Affiliate network">maxweb</span>
-                    <span class="brand-pill brand-impact tooltip-trigger" data-tooltip="Impact - Partnership automation platform">impact</span>
-                    <span class="brand-pill brand-realize tooltip-trigger" data-tooltip="Realize - Affiliate management">realize</span>
-                    <span class="brand-pill brand-samcart tooltip-trigger" data-tooltip="SamCart - Shopping cart platform">samcart</span>
+                    <span class="brand-pill brand-clickfunnels tooltip-trigger" data-tooltip="ClickFunnels — Premium funnel-builder ecosystem">clickfunnels</span>
+                    <span class="brand-pill brand-gohighlevel tooltip-trigger" data-tooltip="GoHighLevel — Agency-focused all-in-one platform">gohighlevel</span>
+                    <span class="brand-pill brand-kartra tooltip-trigger" data-tooltip="Kartra — All-in-one marketing platform">kartra</span>
+                    <span class="brand-pill brand-kajabi tooltip-trigger" data-tooltip="Kajabi — Premium knowledge-business platform">kajabi</span>
+                    <span class="brand-pill brand-leadpages tooltip-trigger" data-tooltip="Leadpages — AI landing page builder">leadpages</span>
+                    <span class="brand-pill brand-systemeio tooltip-trigger" data-tooltip="Systeme.io — Free-tier-led all-in-one platform">systemeio</span>
                 </div>
             </div>
         </div>
@@ -1017,28 +1017,28 @@
         <!-- Brand spend breakdown -->
         <div class="stats-bar" id="brand-spend-bar">
             <div class="stat-card">
-                <div class="stat-label">Impact Spend</div>
-                <div class="stat-value small spend-cell" id="stat-impact">-</div>
+                <div class="stat-label">ClickFunnels Spend</div>
+                <div class="stat-value small spend-cell" id="stat-clickfunnels">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Awin Spend</div>
-                <div class="stat-value small spend-cell" id="stat-awin">-</div>
+                <div class="stat-label">GoHighLevel Spend</div>
+                <div class="stat-value small spend-cell" id="stat-gohighlevel">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">ClickBank Spend</div>
-                <div class="stat-value small spend-cell" id="stat-clickbank">-</div>
+                <div class="stat-label">Kajabi Spend</div>
+                <div class="stat-value small spend-cell" id="stat-kajabi">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">MaxWeb Spend</div>
-                <div class="stat-value small spend-cell" id="stat-maxweb">-</div>
+                <div class="stat-label">Kartra Spend</div>
+                <div class="stat-value small spend-cell" id="stat-kartra">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Realize Spend</div>
-                <div class="stat-value small spend-cell" id="stat-realize">-</div>
+                <div class="stat-label">Leadpages Spend</div>
+                <div class="stat-value small spend-cell" id="stat-leadpages">-</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">SamCart Spend</div>
-                <div class="stat-value small spend-cell" id="stat-samcart">-</div>
+                <div class="stat-label">Systeme.io Spend</div>
+                <div class="stat-value small spend-cell" id="stat-systemeio">-</div>
             </div>
         </div>
 
@@ -1178,7 +1178,7 @@
                 }
                 allData = await response.json();
                 initializeUI();
-                // Use onBrandFilterChange to set initial state (respects samcart being unchecked)
+                // Use onBrandFilterChange to set initial state (respects all brands checked by default)
                 onBrandFilterChange();
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -1351,7 +1351,7 @@
                 filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
 
             // Calculate brand-specific spend using active CPC
-            const brandSpend = { awin: 0, samcart: 0, clickbank: 0, maxweb: 0, impact: 0, realize: 0 };
+            const brandSpend = { clickfunnels: 0, systemeio: 0, gohighlevel: 0, kartra: 0, kajabi: 0, leadpages: 0 };
             filteredData.forEach(kw => {
                 kw.brands.forEach(b => {
                     if (brandSpend.hasOwnProperty(b.name)) {
@@ -1361,18 +1361,18 @@
             });
 
             // Update brand spend stats
-            document.getElementById('stat-impact').textContent = selectedBrands.includes('impact')
-                ? '$' + formatNumber(brandSpend.impact) : '-';
-            document.getElementById('stat-awin').textContent = selectedBrands.includes('awin')
-                ? '$' + formatNumber(brandSpend.awin) : '-';
-            document.getElementById('stat-clickbank').textContent = selectedBrands.includes('clickbank')
-                ? '$' + formatNumber(brandSpend.clickbank) : '-';
-            document.getElementById('stat-maxweb').textContent = selectedBrands.includes('maxweb')
-                ? '$' + formatNumber(brandSpend.maxweb) : '-';
-            document.getElementById('stat-realize').textContent = selectedBrands.includes('realize')
-                ? '$' + formatNumber(brandSpend.realize) : '-';
-            document.getElementById('stat-samcart').textContent = selectedBrands.includes('samcart')
-                ? '$' + formatNumber(brandSpend.samcart) : '-';
+            document.getElementById('stat-clickfunnels').textContent = selectedBrands.includes('kajabi')
+                ? '$' + formatNumber(brandSpend.kajabi) : '-';
+            document.getElementById('stat-gohighlevel').textContent = selectedBrands.includes('clickfunnels')
+                ? '$' + formatNumber(brandSpend.clickfunnels) : '-';
+            document.getElementById('stat-kajabi').textContent = selectedBrands.includes('gohighlevel')
+                ? '$' + formatNumber(brandSpend.gohighlevel) : '-';
+            document.getElementById('stat-kartra').textContent = selectedBrands.includes('kartra')
+                ? '$' + formatNumber(brandSpend.kartra) : '-';
+            document.getElementById('stat-leadpages').textContent = selectedBrands.includes('leadpages')
+                ? '$' + formatNumber(brandSpend.leadpages) : '-';
+            document.getElementById('stat-systemeio').textContent = selectedBrands.includes('systemeio')
+                ? '$' + formatNumber(brandSpend.systemeio) : '-';
 
             if (filteredData.length > 0) {
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
