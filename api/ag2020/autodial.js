@@ -29,6 +29,11 @@ import {
     normalizePhone, autodialSecret, isBusinessHours, nextBusinessOpen,
     placeCall, DEDUPE_HOURS,
 } from './_autodial-lib.js';
+import {
+    upsertJourney, insertTouchpoint, classifySource,
+} from './_attribution-lib.js';
+
+const TENANT = 'ag2020';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -108,6 +113,38 @@ async function handleTrigger(req, res, supabase) {
                 type: String(body.type),
                 tags: tagCandidates,
             });
+        }
+
+        // --- Live-forward attribution: write journey + touchpoint ---------
+        // The matched AC contact_tag_added webhook is a real new-lead event.
+        // Upsert into lead_journey (phone-keyed) and log a touchpoint so the
+        // attribution table stays fresh as new leads arrive. Failure here MUST
+        // NOT break the autodial — wrap in try/catch and continue.
+        try {
+            const acEmail = cf('email');
+            const cls = classifySource(TENANT, { tag_names: tagCandidates });
+            const tpAt = body.date_time || new Date().toISOString();
+            if (customerNumber || acEmail) {
+                const jid = await upsertJourney(supabase, TENANT, {
+                    phone: rawPhone,
+                    email: acEmail,
+                    name,
+                    firstTouchAt: tpAt,
+                    firstTouchSource: cls.source,
+                    firstTouchChannel: cls.channel,
+                    acContactId,
+                    rawFirstTouch: body,
+                });
+                await insertTouchpoint(supabase, TENANT, jid, {
+                    touchpointAt: tpAt,
+                    touchpointType: 'ac_tag_added',
+                    source: cls.source,
+                    channel: cls.channel,
+                    payload: { tag: body.tag, type: body.type, contact_id: acContactId, tag_names: tagCandidates },
+                });
+            }
+        } catch (err) {
+            console.error('attribution write failed (continuing autodial):', err.message);
         }
     }
 

@@ -46,24 +46,37 @@ const DEFAULT_TENANT = 'ag2020';
 
 /**
  * AG2020 source map — derived from `docs/ag2020-ac-tag-inventory.md`
- * (manual addendum, 2026-05-27). Keys are stringified AC tag ids.
+ * (manual addendum, 2026-05-27). Keys are stringified AC tag ids AND
+ * lowercase tag names (AC webhooks send names; backfill scripts may use ids).
+ * Lookups are case-insensitive on lowercase keys.
  */
 const TENANT_SOURCE_MAPS = {
     ag2020: {
-        // AC tag id → source classification
         tag_to_source: {
-            '2449': { source: 'google_paid', channel: 'general' },        // "NEW Google ad"
-            '2467': { source: 'google_paid', channel: 'lead_form' },      // "NEW LEAD FORM (G.Ads)"
-            '2471': { source: 'google_paid', channel: 'contact_page' },   // "NewGoogle-CNTCT"
-            '2472': { source: 'google_paid', channel: 'landing_page' },   // "NewGoogle-LP"
-            '2473': { source: 'google_paid', channel: 'homepage_form' },  // "NewGoogle-HP"
-            '2474': { source: 'google_paid', channel: 'service_page' },   // "NewGoogle-SRV"
-            '2450': { source: 'organic',     channel: 'landing_page' },   // "Organic Landing page"
-            '2484': { source: 'referral',    channel: 'referral_program' }, // "Referral Program Introduced"
+            // Google-paid — by id
+            '2449': { source: 'google_paid', channel: 'general' },
+            '2467': { source: 'google_paid', channel: 'lead_form' },
+            '2471': { source: 'google_paid', channel: 'contact_page' },
+            '2472': { source: 'google_paid', channel: 'landing_page' },
+            '2473': { source: 'google_paid', channel: 'homepage_form' },
+            '2474': { source: 'google_paid', channel: 'service_page' },
+            // Google-paid — by lowercase name (AC webhooks send `tag` as name)
+            'new google ad':           { source: 'google_paid', channel: 'general' },
+            'new lead form (g.ads)':   { source: 'google_paid', channel: 'lead_form' },
+            'newgoogle-cntct':         { source: 'google_paid', channel: 'contact_page' },
+            'newgoogle-lp':            { source: 'google_paid', channel: 'landing_page' },
+            'newgoogle-hp':            { source: 'google_paid', channel: 'homepage_form' },
+            'newgoogle-srv':           { source: 'google_paid', channel: 'service_page' },
+            // Organic / referral — id + name
+            '2450': { source: 'organic',  channel: 'landing_page' },
+            'organic landing page':       { source: 'organic',  channel: 'landing_page' },
+            '2484': { source: 'referral', channel: 'referral_program' },
+            'referral program introduced':{ source: 'referral', channel: 'referral_program' },
         },
         // AC native contact.source / contact.referrer value → classification
         native_source_map: {
             'Facebook Business': { source: 'meta_paid', channel: 'lead_form' },
+            'facebook business': { source: 'meta_paid', channel: 'lead_form' },
         },
         // Tags that trigger the autodialer (NOT source classifiers).
         trigger_tags: ['NEW LEAD ALERT', '2487'],
@@ -92,20 +105,21 @@ export function classifySource(tenantId, classifier = {}) {
     const tagIds = (classifier.tag_ids || []).map(String);
     const tagNames = classifier.tag_names || [];
 
-    // Tag id match takes priority (most specific)
-    for (const id of tagIds) {
-        if (map.tag_to_source[id]) return map.tag_to_source[id];
-    }
-    // Tag name fallback (case-insensitive against the source map's tag names)
-    if (tagNames.length) {
-        const lowerNames = new Set(tagNames.map(n => String(n).toLowerCase()));
-        // map keys are ids; we don't have name→id here. If callers want
-        // name-based matching they can pre-resolve via the AC tags endpoint.
-        // For now, fall through.
+    // Lookup either by id or by lowercase name — the source map holds both.
+    for (const v of [...tagIds, ...tagNames]) {
+        const key = String(v).trim().toLowerCase();
+        if (map.tag_to_source[key]) return map.tag_to_source[key];
+        // Also try uncased (ids are numeric strings, unaffected by lowercasing)
+        const rawKey = String(v).trim();
+        if (map.tag_to_source[rawKey]) return map.tag_to_source[rawKey];
     }
     // Native AC source field (e.g. "Facebook Business" from the FB integration)
     const nat = classifier.ac_native_source;
-    if (nat && map.native_source_map[nat]) return map.native_source_map[nat];
+    if (nat) {
+        if (map.native_source_map[nat]) return map.native_source_map[nat];
+        const nkey = String(nat).trim().toLowerCase();
+        if (map.native_source_map[nkey]) return map.native_source_map[nkey];
+    }
 
     return { source: 'unknown', channel: null };
 }

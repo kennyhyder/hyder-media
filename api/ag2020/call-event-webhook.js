@@ -28,6 +28,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { upsertJourney, insertTouchpoint } from './_attribution-lib.js';
+
+const TENANT = 'ag2020';
 
 const DEFAULT_SMS_BODY =
     "Hi! This is Auto Glass 2020 — sorry we missed your call. Reply here with your vehicle year/make/model and we'll get you a quick quote. — Cash";
@@ -112,6 +115,40 @@ export default async function handler(req, res) {
     const queueRow = (queueRows && queueRows[0]) || null;
     const wasNew = queueRow && !queueRow.triaged_at;
 
+    // --- Live-forward attribution: write journey + touchpoint --------------
+    // Every inbound call (answered, missed, or voicemail) is a touchpoint on
+    // the customer's journey. Upsert by phone — first inbound from a new phone
+    // creates a journey with first_touch_source='call_inbound'. Failure here
+    // MUST NOT break the queue insert or autodial — wrap in try/catch.
+    let attributionResult = { logged: false, error: null };
+    try {
+        // Source from the queue table source comment chain: zapier-vbc-voicemail,
+        // etc. → call_voicemail; answered → call_inbound; otherwise → call_missed.
+        const isVoicemail = (source || '').toLowerCase().includes('voicemail');
+        const tpType = answered ? 'call_inbound' : (isVoicemail ? 'call_voicemail' : 'call_missed');
+        const jid = await upsertJourney(supabase, TENANT, {
+            phone: callerNumber,
+            name: callerName,
+            firstTouchAt: calledAt,
+            firstTouchSource: 'call_inbound',
+            firstTouchChannel: 'vonage',
+            rawFirstTouch: { vbc_event: body, queue_id: queueRow?.id },
+        });
+        await insertTouchpoint(supabase, TENANT, jid, {
+            touchpointAt: calledAt,
+            touchpointType: tpType,
+            source: 'call_inbound',
+            channel: 'vonage',
+            direction: 'inbound',
+            payload: { source, answered, queue_id: queueRow?.id, raw: body },
+            durationSeconds: isFinite(ringDuration) ? ringDuration : null,
+        });
+        attributionResult = { logged: true, journey_id: jid };
+    } catch (err) {
+        attributionResult = { logged: false, error: err.message };
+        console.error('attribution write failed (continuing handler):', err.message);
+    }
+
     // For missed calls, also fire an instant autodial callback (speed-to-lead).
     // Reuses POST /api/ag2020/autodial — the same engine as form-submit leads.
     // The autodial endpoint's own 6h de-dupe collapses repeat notifications of
@@ -152,6 +189,7 @@ export default async function handler(req, res) {
         },
         sms: smsResult,
         autodial: autodialResult,
+        attribution: attributionResult,
     });
 }
 
