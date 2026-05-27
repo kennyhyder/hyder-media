@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Ads | PageWheel Competitive Intel</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Standardized Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand:hover {
+            color: var(--accent-hover);
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+
+        .main-nav .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 0;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .nav-links {
+            margin-top: 12px;
+        }
+
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .competitor-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        .tab-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-btn .domain {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .tab-btn.unavailable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .content-area {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .content-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .content-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 700px;
+            background: white;
+        }
+
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .fallback-message {
+            padding: 60px;
+            text-align: center;
+        }
+
+        .fallback-message h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .fallback-message p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .competitor-info {
+            padding: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .info-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-card p {
+            font-size: 1rem;
+        }
+
+        .info-card a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .quick-link {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: var(--border);
+        }
+
+        /* Sample Ads Gallery */
+        .sample-ads-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sample-ads-section h3 {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ads-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .ad-card {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .ad-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .ad-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #fff;
+        }
+
+        .ad-card .ad-meta {
+            padding: 12px;
+        }
+
+        .ad-card .ad-type {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .ad-card .ad-headline {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .ad-card .ad-description {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .ad-placeholder {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ad-placeholder .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        .no-ads-message {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .no-ads-message .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .warning-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-banner .icon {
+            font-size: 1.5rem;
+        }
+
+        .warning-banner .text {
+            flex: 1;
+        }
+
+        .warning-banner .text strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .warning-banner .text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .competitor-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    
+        /* Brand switcher (cross-client nav) */
+        .brand-switcher {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .brand-switcher:hover { background: var(--border); }
+        .brand-switcher option { background: var(--bg-secondary); color: var(--text-primary); }
+
+    
+        .page-header { padding: 20px 0 32px; }
+        .page-header h1 { font-size: 2rem; margin-bottom: 12px; }
+        .subtitle { color: var(--text-secondary); font-size: 1.05rem; max-width: 760px; }
+        .competitor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .competitor-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+        .competitor-header { padding-left: 14px; margin-bottom: 14px; }
+        .competitor-name { font-size: 1.3rem; margin: 0; color: var(--text-primary); }
+        .competitor-domain { font-size: 0.78rem; color: var(--text-secondary); }
+        .competitor-tagline { font-style: italic; color: var(--text-secondary); margin: 12px 0 18px; padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 6px; }
+        .competitor-meta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+        .meta-item { display: flex; flex-direction: column; gap: 2px; }
+        .meta-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+        .meta-value { font-size: 0.88rem; color: var(--text-primary); line-height: 1.4; }
+        .competitor-actions { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); }
+        .action-btn { padding: 7px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; font-size: 0.78rem; text-decoration: none; }
+        .action-btn:hover { background: var(--border); }
+        .action-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+        .action-btn.primary:hover { background: var(--accent-hover); }
+        .page-footer { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 40px; }
+        .page-footer h2 { font-size: 1.2rem; margin-bottom: 14px; }
+        .page-footer ol { padding-left: 22px; color: var(--text-secondary); }
+        .page-footer li { margin-bottom: 8px; line-height: 1.5; }
+        .page-footer strong { color: var(--text-primary); }
+
+    </style>
+</head>
+<body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <!-- Standardized Navigation -->
+    <nav class="main-nav">
+    <a href="pagewheel-competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">PageWheel Competitive Intel</a>
+    <div class="nav-links">
+        <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
+            <option value="competitive-intel-summary.html">Switch to PageWheel ↓</option>
+            <option value="pagewheel-competitive-intel-summary.html" selected>PageWheel ✓</option>
+        </select>
+            <a href="pagewheel-competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="nav-link active">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="pagewheel-projection-tool.html" class="nav-link">Projections</a>
+            <a href="reporting.html" class="nav-link">Reporting</a>
+    </div>
+</nav>
+
+    
+    <div class="container">
+        <section class="page-header">
+            <h1>Competitor Ad Research</h1>
+            <p class="subtitle">Direct access to live Google Ads and Meta Ads for each of PageWheel's six tracked competitors. Use the Transparency Center links below to see what ads they're running right now.</p>
+        </section>
+
+        <section class="competitor-grid">
+            <div class="competitor-card" data-brand="clickfunnels">
+                <div class="competitor-header" style="border-left: 4px solid #e34620;">
+                    <h3 class="competitor-name">ClickFunnels</h3>
+                    <span class="competitor-domain">clickfunnels.com</span>
+                </div>
+                <p class="competitor-tagline">"You're one funnel away from changing the world"</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$450K-650K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">Premium funnel-builder ecosystem with community and education. 100K+ users, 1M+ funnels created.</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Solopreneurs, coaches, course creators, online marketers</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">basic: $97/mo · pro: $297/mo · funnel_hacker: $497/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">Premium price point, established brand, complete ecosystem vs PageWheel's $27 starter and AI-first templates</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=clickfunnels.com" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=clickfunnels" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://clickfunnels.com" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/clickfunnels.com/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+
+            <div class="competitor-card" data-brand="leadpages">
+                <div class="competitor-header" style="border-left: 4px solid #1d8aff;">
+                    <h3 class="competitor-name">Leadpages</h3>
+                    <span class="competitor-domain">leadpages.com</span>
+                </div>
+                <p class="competitor-tagline">"Build pages that convert. No developer needed."</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$120K-180K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">AI landing pages, smart traffic routing, A/B testing. Marketers + agencies.</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Marketers, agencies, SaaS, ecommerce, performance marketing teams</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">grow: $99/mo · optimize: $199/mo · scale: $399/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">Page-builder DNA without the full funnel/checkout/community layer; higher price, more marketing-focused</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=leadpages.com" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=leadpages" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://leadpages.com" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/leadpages.com/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+
+            <div class="competitor-card" data-brand="kartra">
+                <div class="competitor-header" style="border-left: 4px solid #1f7ae0;">
+                    <h3 class="competitor-name">Kartra</h3>
+                    <span class="competitor-domain">kartra.com</span>
+                </div>
+                <p class="competitor-tagline">"Earn more with the most powerful all-in-one platform"</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$80K-120K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">All-in-one platform: pages + email + courses + funnels + affiliates + webinars</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Coaches, experts, creators, consultants, course creators</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">starter: $119/mo · growth: $229/mo · professional: $549/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">Heavier all-in-one stack at higher price; PageWheel wins on simplicity and price</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=kartra.com" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=kartra" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://kartra.com" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/kartra.com/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+
+            <div class="competitor-card" data-brand="kajabi">
+                <div class="competitor-header" style="border-left: 4px solid #000000;">
+                    <h3 class="competitor-name">Kajabi</h3>
+                    <span class="competitor-domain">kajabi.com</span>
+                </div>
+                <p class="competitor-tagline">"Turn What You Know Into What You're Known For"</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$650K-900K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">Premium knowledge-business platform: courses, coaching, communities, memberships. $11B+ earned by users.</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Experts, coaches, solopreneurs building knowledge businesses</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">kickstarter: $89/mo · basic: $149/mo · growth: $199/mo · pro: $399/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">Premium tier ($149+); PageWheel competes on price and template-first quick-launch</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=kajabi.com" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=kajabi" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://kajabi.com" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/kajabi.com/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+
+            <div class="competitor-card" data-brand="systemeio">
+                <div class="competitor-header" style="border-left: 4px solid #fec325;">
+                    <h3 class="competitor-name">Systeme.io</h3>
+                    <span class="competitor-domain">systeme.io</span>
+                </div>
+                <p class="competitor-tagline">"The only tool you need to launch your online business"</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$60K-90K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">Free-tier-led all-in-one platform. Direct price competitor to PageWheel.</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Entrepreneurs launching online businesses; freelancers, educators, creators</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">free: $0/mo (limited) · startup: $27/mo · webinar: $47/mo · unlimited: $97/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">MOST DIRECT COMPETITOR on pricing ($27/mo entry matches PageWheel exactly). Differentiator: PageWheel emphasizes AI templates + done-for-you setup; Systeme.io emphasizes free tier and feature breadth.</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=systeme.io" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=systeme.io" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://systeme.io" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/systeme.io/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+
+            <div class="competitor-card" data-brand="gohighlevel">
+                <div class="competitor-header" style="border-left: 4px solid #1f1f1f;">
+                    <h3 class="competitor-name">GoHighLevel</h3>
+                    <span class="competitor-domain">gohighlevel.com</span>
+                </div>
+                <p class="competitor-tagline">"The all-in-one sales & marketing platform"</p>
+                <div class="competitor-meta">
+                    <div class="meta-item"><span class="meta-label">Est. US Monthly Spend</span><span class="meta-value">$300K-450K</span></div>
+                    <div class="meta-item"><span class="meta-label">Positioning</span><span class="meta-value">Agency-focused white-label platform; CRM + funnels + email + SMS + calendars</span></div>
+                    <div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">Marketing agencies and SaaS resellers (not direct creators)</span></div>
+                    <div class="meta-item"><span class="meta-label">Pricing</span><span class="meta-value">starter: $97/mo · unlimited: $297/mo · agency_pro: $497/mo</span></div>
+                    <div class="meta-item"><span class="meta-label">Differentiator vs PageWheel</span><span class="meta-value">Agency tool, not creator tool. Different buyer entirely — included as adjacent competitor for branded keyword overlap.</span></div>
+                </div>
+                <div class="competitor-actions">
+                    <a href="https://adstransparency.google.com/?region=US&domain=gohighlevel.com" target="_blank" rel="noopener" class="action-btn primary">Google Ads Transparency</a>
+                    <a href="https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=gohighlevel" target="_blank" rel="noopener" class="action-btn">Meta Ads Library</a>
+                    <a href="https://gohighlevel.com" target="_blank" rel="noopener" class="action-btn">Visit Live Site</a>
+                    <a href="https://www.similarweb.com/website/gohighlevel.com/" target="_blank" rel="noopener" class="action-btn">SimilarWeb</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-footer">
+            <h2>How to use this</h2>
+            <ol>
+                <li><strong>Click Google Ads Transparency</strong> on each competitor to see every active ad they are running today in the US.</li>
+                <li><strong>Click Meta Ads Library</strong> to see their Facebook + Instagram ads, including video creative.</li>
+                <li><strong>Screenshot the best-performing-looking ones</strong> — Google sorts the Transparency feed by ad spend, so the top results are typically their highest-priority campaigns.</li>
+                <li><strong>Note headline and offer patterns</strong> across competitors — repeated themes tell you what the category responds to (e.g., "no tech skills needed", "X minutes to launch", AI-assisted templates).</li>
+            </ol>
+        </section>
+    </div>
+
+</body>
+</html>

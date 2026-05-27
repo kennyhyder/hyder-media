@@ -1,0 +1,2153 @@
+{
+  "total_keywords": 70,
+  "brands": [
+    "clickfunnels",
+    "leadpages",
+    "kartra",
+    "kajabi",
+    "systemeio",
+    "gohighlevel"
+  ],
+  "category_counts": {
+    "Core Category": 18,
+    "AI / Automation": 10,
+    "Audience-Specific": 13,
+    "Use-Case": 12,
+    "Brand - Competitor": 17
+  },
+  "keyword_groups": {
+    "topics": {
+      "core category": {
+        "count": 15,
+        "total_clicks": 2250,
+        "total_spend": 24659.56,
+        "sample_keywords": [
+          {
+            "keyword": "landing page builder",
+            "clicks": 828,
+            "brands": []
+          },
+          {
+            "keyword": "best landing page builder",
+            "clicks": 203,
+            "brands": []
+          },
+          {
+            "keyword": "funnel builder",
+            "clicks": 248,
+            "brands": []
+          },
+          {
+            "keyword": "best funnel builder",
+            "clicks": 60,
+            "brands": []
+          },
+          {
+            "keyword": "sales funnel builder",
+            "clicks": 110,
+            "brands": []
+          },
+          {
+            "keyword": "landing page software",
+            "clicks": 73,
+            "brands": []
+          },
+          {
+            "keyword": "funnel software",
+            "clicks": 48,
+            "brands": []
+          },
+          {
+            "keyword": "landing page creator",
+            "clicks": 40,
+            "brands": []
+          },
+          {
+            "keyword": "easy landing page builder",
+            "clicks": 22,
+            "brands": []
+          },
+          {
+            "keyword": "cheap landing page builder",
+            "clicks": 18,
+            "brands": []
+          }
+        ],
+        "brands_bidding": {}
+      },
+      "ai assisted": {
+        "count": 10,
+        "total_clicks": 454,
+        "total_spend": 4078.2000000000003,
+        "sample_keywords": [
+          {
+            "keyword": "ai landing page builder",
+            "clicks": 203,
+            "brands": []
+          },
+          {
+            "keyword": "ai funnel builder",
+            "clicks": 33,
+            "brands": []
+          },
+          {
+            "keyword": "ai page builder",
+            "clicks": 60,
+            "brands": []
+          },
+          {
+            "keyword": "ai sales funnel",
+            "clicks": 18,
+            "brands": []
+          },
+          {
+            "keyword": "ai website builder for entrepreneurs",
+            "clicks": 15,
+            "brands": []
+          },
+          {
+            "keyword": "ai landing page generator",
+            "clicks": 48,
+            "brands": []
+          },
+          {
+            "keyword": "ai landing page creator",
+            "clicks": 22,
+            "brands": []
+          },
+          {
+            "keyword": "create landing page with ai",
+            "clicks": 40,
+            "brands": []
+          },
+          {
+            "keyword": "ai copywriting landing page",
+            "clicks": 8,
+            "brands": []
+          },
+          {
+            "keyword": "auto generate landing page",
+            "clicks": 7,
+            "brands": []
+          }
+        ],
+        "brands_bidding": {}
+      },
+      "audience specific": {
+        "count": 13,
+        "total_clicks": 187,
+        "total_spend": 1648,
+        "sample_keywords": [
+          {
+            "keyword": "landing page for coaches",
+            "clicks": 15,
+            "brands": []
+          },
+          {
+            "keyword": "funnel builder for coaches",
+            "clicks": 12,
+            "brands": []
+          },
+          {
+            "keyword": "website builder for coaches",
+            "clicks": 33,
+            "brands": []
+          },
+          {
+            "keyword": "landing page for course creators",
+            "clicks": 8,
+            "brands": []
+          },
+          {
+            "keyword": "online course landing page",
+            "clicks": 18,
+            "brands": []
+          },
+          {
+            "keyword": "lead magnet landing page",
+            "clicks": 25,
+            "brands": []
+          },
+          {
+            "keyword": "sales page for ebook",
+            "clicks": 10,
+            "brands": []
+          },
+          {
+            "keyword": "landing page for authors",
+            "clicks": 7,
+            "brands": []
+          },
+          {
+            "keyword": "funnel for course launch",
+            "clicks": 5,
+            "brands": []
+          },
+          {
+            "keyword": "digital product landing page",
+            "clicks": 12,
+            "brands": []
+          }
+        ],
+        "brands_bidding": {}
+      },
+      "use case": {
+        "count": 12,
+        "total_clicks": 890,
+        "total_spend": 7676.999999999999,
+        "sample_keywords": [
+          {
+            "keyword": "create a sales funnel",
+            "clicks": 90,
+            "brands": []
+          },
+          {
+            "keyword": "how to build a landing page",
+            "clicks": 203,
+            "brands": []
+          },
+          {
+            "keyword": "how to build a sales funnel",
+            "clicks": 110,
+            "brands": []
+          },
+          {
+            "keyword": "build landing page fast",
+            "clicks": 18,
+            "brands": []
+          },
+          {
+            "keyword": "launch online business",
+            "clicks": 33,
+            "brands": []
+          },
+          {
+            "keyword": "sell digital products online",
+            "clicks": 73,
+            "brands": []
+          },
+          {
+            "keyword": "how to sell digital products",
+            "clicks": 90,
+            "brands": []
+          },
+          {
+            "keyword": "build a website for my business",
+            "clicks": 60,
+            "brands": []
+          },
+          {
+            "keyword": "build a sales page",
+            "clicks": 15,
+            "brands": []
+          },
+          {
+            "keyword": "create lead magnet",
+            "clicks": 48,
+            "brands": []
+          }
+        ],
+        "brands_bidding": {}
+      }
+    },
+    "brands": {
+      "clickfunnels": {
+        "count": 6,
+        "total_clicks": 436,
+        "total_spend": 3419.8,
+        "sample_keywords": [
+          {
+            "keyword": "clickfunnels alternatives",
+            "clicks": 48,
+            "brands": [
+              "clickfunnels"
+            ]
+          },
+          {
+            "keyword": "clickfunnels review",
+            "clicks": 110,
+            "brands": [
+              "clickfunnels"
+            ]
+          },
+          {
+            "keyword": "clickfunnels pricing",
+            "clicks": 165,
+            "brands": [
+              "clickfunnels"
+            ]
+          },
+          {
+            "keyword": "clickfunnels vs",
+            "clicks": 73,
+            "brands": [
+              "clickfunnels"
+            ]
+          },
+          {
+            "keyword": "is clickfunnels worth it",
+            "clicks": 18,
+            "brands": [
+              "clickfunnels"
+            ]
+          },
+          {
+            "keyword": "systeme io vs clickfunnels",
+            "clicks": 22,
+            "brands": [
+              "clickfunnels"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "clickfunnels": {
+            "count": 6,
+            "clicks": 436,
+            "spend": 3419.8
+          }
+        }
+      },
+      "leadpages": {
+        "count": 4,
+        "total_clicks": 107,
+        "total_spend": 753.5999999999999,
+        "sample_keywords": [
+          {
+            "keyword": "leadpages alternative",
+            "clicks": 12,
+            "brands": [
+              "leadpages"
+            ]
+          },
+          {
+            "keyword": "leadpages review",
+            "clicks": 33,
+            "brands": [
+              "leadpages"
+            ]
+          },
+          {
+            "keyword": "leadpages pricing",
+            "clicks": 40,
+            "brands": [
+              "leadpages"
+            ]
+          },
+          {
+            "keyword": "leadpages vs",
+            "clicks": 22,
+            "brands": [
+              "leadpages"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "leadpages": {
+            "count": 4,
+            "clicks": 107,
+            "spend": 753.5999999999999
+          }
+        }
+      },
+      "kajabi": {
+        "count": 4,
+        "total_clicks": 293,
+        "total_spend": 2079.6,
+        "sample_keywords": [
+          {
+            "keyword": "kajabi alternative",
+            "clicks": 25,
+            "brands": [
+              "kajabi"
+            ]
+          },
+          {
+            "keyword": "kajabi review",
+            "clicks": 60,
+            "brands": [
+              "kajabi"
+            ]
+          },
+          {
+            "keyword": "kajabi pricing",
+            "clicks": 135,
+            "brands": [
+              "kajabi"
+            ]
+          },
+          {
+            "keyword": "kajabi vs",
+            "clicks": 73,
+            "brands": [
+              "kajabi"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "kajabi": {
+            "count": 4,
+            "clicks": 293,
+            "spend": 2079.6
+          }
+        }
+      },
+      "kartra": {
+        "count": 2,
+        "total_clicks": 73,
+        "total_spend": 489.4,
+        "sample_keywords": [
+          {
+            "keyword": "kartra review",
+            "clicks": 33,
+            "brands": [
+              "kartra"
+            ]
+          },
+          {
+            "keyword": "kartra pricing",
+            "clicks": 40,
+            "brands": [
+              "kartra"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "kartra": {
+            "count": 2,
+            "clicks": 73,
+            "spend": 489.4
+          }
+        }
+      },
+      "systemeio": {
+        "count": 2,
+        "total_clicks": 93,
+        "total_spend": 482.4,
+        "sample_keywords": [
+          {
+            "keyword": "systeme io review",
+            "clicks": 60,
+            "brands": [
+              "systemeio"
+            ]
+          },
+          {
+            "keyword": "systeme io pricing",
+            "clicks": 33,
+            "brands": [
+              "systemeio"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "systemeio": {
+            "count": 2,
+            "clicks": 93,
+            "spend": 482.4
+          }
+        }
+      },
+      "gohighlevel": {
+        "count": 2,
+        "total_clicks": 108,
+        "total_spend": 835.2,
+        "sample_keywords": [
+          {
+            "keyword": "gohighlevel review",
+            "clicks": 48,
+            "brands": [
+              "gohighlevel"
+            ]
+          },
+          {
+            "keyword": "gohighlevel pricing",
+            "clicks": 60,
+            "brands": [
+              "gohighlevel"
+            ]
+          }
+        ],
+        "brands_bidding": {
+          "gohighlevel": {
+            "count": 2,
+            "clicks": 108,
+            "spend": 835.2
+          }
+        }
+      }
+    }
+  },
+  "global_avg_cpc": 9.43,
+  "keywords": [
+    {
+      "keyword": "landing page builder",
+      "category": "Core Category",
+      "intent": "Informational/Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 828,
+      "total_spend": 9455.76,
+      "volume": 33100,
+      "cpc": 11.42,
+      "brands": [],
+      "google": {
+        "annual_volume": 397200,
+        "avg_monthly_searches": 33100,
+        "competition": "HIGH",
+        "competition_index": 91,
+        "low_top_of_page_bid": 6.85,
+        "high_top_of_page_bid": 15.99,
+        "average_cpc": 11.42
+      }
+    },
+    {
+      "keyword": "best landing page builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 203,
+      "total_spend": 2608.55,
+      "volume": 8100,
+      "cpc": 12.85,
+      "brands": [],
+      "google": {
+        "annual_volume": 97200,
+        "avg_monthly_searches": 8100,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 7.71,
+        "high_top_of_page_bid": 17.99,
+        "average_cpc": 12.85
+      }
+    },
+    {
+      "keyword": "funnel builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 248,
+      "total_spend": 3521.6,
+      "volume": 9900,
+      "cpc": 14.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 118800,
+        "avg_monthly_searches": 9900,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 8.52,
+        "high_top_of_page_bid": 19.88,
+        "average_cpc": 14.2
+      }
+    },
+    {
+      "keyword": "best funnel builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 60,
+      "total_spend": 924,
+      "volume": 2400,
+      "cpc": 15.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 9.24,
+        "high_top_of_page_bid": 21.56,
+        "average_cpc": 15.4
+      }
+    },
+    {
+      "keyword": "sales funnel builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 110,
+      "total_spend": 1441,
+      "volume": 4400,
+      "cpc": 13.1,
+      "brands": [],
+      "google": {
+        "annual_volume": 52800,
+        "avg_monthly_searches": 4400,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 7.86,
+        "high_top_of_page_bid": 18.34,
+        "average_cpc": 13.1
+      }
+    },
+    {
+      "keyword": "landing page software",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 73,
+      "total_spend": 792.05,
+      "volume": 2900,
+      "cpc": 10.85,
+      "brands": [],
+      "google": {
+        "annual_volume": 34800,
+        "avg_monthly_searches": 2900,
+        "competition": "HIGH",
+        "competition_index": 87,
+        "low_top_of_page_bid": 6.51,
+        "high_top_of_page_bid": 15.19,
+        "average_cpc": 10.85
+      }
+    },
+    {
+      "keyword": "funnel software",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 48,
+      "total_spend": 604.8,
+      "volume": 1900,
+      "cpc": 12.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 7.56,
+        "high_top_of_page_bid": 17.64,
+        "average_cpc": 12.6
+      }
+    },
+    {
+      "keyword": "landing page creator",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 40,
+      "total_spend": 392,
+      "volume": 1600,
+      "cpc": 9.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 19200,
+        "avg_monthly_searches": 1600,
+        "competition": "MEDIUM",
+        "competition_index": 78,
+        "low_top_of_page_bid": 5.88,
+        "high_top_of_page_bid": 13.72,
+        "average_cpc": 9.8
+      }
+    },
+    {
+      "keyword": "easy landing page builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 22,
+      "total_spend": 187,
+      "volume": 880,
+      "cpc": 8.5,
+      "brands": [],
+      "google": {
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
+        "competition": "MEDIUM",
+        "competition_index": 68,
+        "low_top_of_page_bid": 5.1,
+        "high_top_of_page_bid": 11.9,
+        "average_cpc": 8.5
+      }
+    },
+    {
+      "keyword": "cheap landing page builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 18,
+      "total_spend": 129.6,
+      "volume": 720,
+      "cpc": 7.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "MEDIUM",
+        "competition_index": 58,
+        "low_top_of_page_bid": 4.32,
+        "high_top_of_page_bid": 10.08,
+        "average_cpc": 7.2
+      }
+    },
+    {
+      "keyword": "free landing page builder",
+      "category": "Core Category",
+      "intent": "Informational",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 453,
+      "total_spend": 2899.2,
+      "volume": 18100,
+      "cpc": 6.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 217200,
+        "avg_monthly_searches": 18100,
+        "competition": "MEDIUM",
+        "competition_index": 51,
+        "low_top_of_page_bid": 3.84,
+        "high_top_of_page_bid": 8.96,
+        "average_cpc": 6.4
+      }
+    },
+    {
+      "keyword": "landing page platform",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 18,
+      "total_spend": 187.2,
+      "volume": 720,
+      "cpc": 10.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "HIGH",
+        "competition_index": 83,
+        "low_top_of_page_bid": 6.24,
+        "high_top_of_page_bid": 14.56,
+        "average_cpc": 10.4
+      }
+    },
+    {
+      "keyword": "drag and drop landing page builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 48,
+      "total_spend": 537.6,
+      "volume": 1900,
+      "cpc": 11.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "HIGH",
+        "competition_index": 90,
+        "low_top_of_page_bid": 6.72,
+        "high_top_of_page_bid": 15.68,
+        "average_cpc": 11.2
+      }
+    },
+    {
+      "keyword": "no code landing page builder",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 33,
+      "total_spend": 316.8,
+      "volume": 1300,
+      "cpc": 9.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "MEDIUM",
+        "competition_index": 77,
+        "low_top_of_page_bid": 5.76,
+        "high_top_of_page_bid": 13.44,
+        "average_cpc": 9.6
+      }
+    },
+    {
+      "keyword": "click funnels alternative",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": "core category",
+      "brand_group": null,
+      "total_clicks": 48,
+      "total_spend": 662.4,
+      "volume": 1900,
+      "cpc": 13.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 8.28,
+        "high_top_of_page_bid": 19.32,
+        "average_cpc": 13.8
+      }
+    },
+    {
+      "keyword": "clickfunnels alternatives",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 48,
+      "total_spend": 662.4,
+      "volume": 1900,
+      "cpc": 13.8,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 48,
+          "cpc": 13.8,
+          "est_spend": 662.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 8.28,
+        "high_top_of_page_bid": 19.32,
+        "average_cpc": 13.8
+      }
+    },
+    {
+      "keyword": "leadpages alternative",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "leadpages",
+      "total_clicks": 12,
+      "total_spend": 134.4,
+      "volume": 480,
+      "cpc": 11.2,
+      "brands": [
+        {
+          "name": "leadpages",
+          "clicks": 12,
+          "cpc": 11.2,
+          "est_spend": 134.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "leadpages.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 5760,
+        "avg_monthly_searches": 480,
+        "competition": "HIGH",
+        "competition_index": 90,
+        "low_top_of_page_bid": 6.72,
+        "high_top_of_page_bid": 15.68,
+        "average_cpc": 11.2
+      }
+    },
+    {
+      "keyword": "kajabi alternative",
+      "category": "Core Category",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kajabi",
+      "total_clicks": 25,
+      "total_spend": 320,
+      "volume": 1000,
+      "cpc": 12.8,
+      "brands": [
+        {
+          "name": "kajabi",
+          "clicks": 25,
+          "cpc": 12.8,
+          "est_spend": 320,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kajabi.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 12000,
+        "avg_monthly_searches": 1000,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": 7.68,
+        "high_top_of_page_bid": 17.92,
+        "average_cpc": 12.8
+      }
+    },
+    {
+      "keyword": "ai landing page builder",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 203,
+      "total_spend": 1908.2,
+      "volume": 8100,
+      "cpc": 9.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 97200,
+        "avg_monthly_searches": 8100,
+        "competition": "MEDIUM",
+        "competition_index": 75,
+        "low_top_of_page_bid": 5.64,
+        "high_top_of_page_bid": 13.16,
+        "average_cpc": 9.4
+      }
+    },
+    {
+      "keyword": "ai funnel builder",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 33,
+      "total_spend": 376.2,
+      "volume": 1300,
+      "cpc": 11.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "HIGH",
+        "competition_index": 91,
+        "low_top_of_page_bid": 6.84,
+        "high_top_of_page_bid": 15.96,
+        "average_cpc": 11.4
+      }
+    },
+    {
+      "keyword": "ai page builder",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 60,
+      "total_spend": 528,
+      "volume": 2400,
+      "cpc": 8.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "MEDIUM",
+        "competition_index": 70,
+        "low_top_of_page_bid": 5.28,
+        "high_top_of_page_bid": 12.32,
+        "average_cpc": 8.8
+      }
+    },
+    {
+      "keyword": "ai sales funnel",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 18,
+      "total_spend": 196.2,
+      "volume": 720,
+      "cpc": 10.9,
+      "brands": [],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "HIGH",
+        "competition_index": 87,
+        "low_top_of_page_bid": 6.54,
+        "high_top_of_page_bid": 15.26,
+        "average_cpc": 10.9
+      }
+    },
+    {
+      "keyword": "ai website builder for entrepreneurs",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 15,
+      "total_spend": 114,
+      "volume": 590,
+      "cpc": 7.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
+        "competition": "MEDIUM",
+        "competition_index": 61,
+        "low_top_of_page_bid": 4.56,
+        "high_top_of_page_bid": 10.64,
+        "average_cpc": 7.6
+      }
+    },
+    {
+      "keyword": "ai landing page generator",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 48,
+      "total_spend": 393.6,
+      "volume": 1900,
+      "cpc": 8.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "MEDIUM",
+        "competition_index": 66,
+        "low_top_of_page_bid": 4.92,
+        "high_top_of_page_bid": 11.48,
+        "average_cpc": 8.2
+      }
+    },
+    {
+      "keyword": "ai landing page creator",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 22,
+      "total_spend": 162.8,
+      "volume": 880,
+      "cpc": 7.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "create landing page with ai",
+      "category": "AI / Automation",
+      "intent": "Informational",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 40,
+      "total_spend": 272,
+      "volume": 1600,
+      "cpc": 6.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 19200,
+        "avg_monthly_searches": 1600,
+        "competition": "MEDIUM",
+        "competition_index": 54,
+        "low_top_of_page_bid": 4.08,
+        "high_top_of_page_bid": 9.52,
+        "average_cpc": 6.8
+      }
+    },
+    {
+      "keyword": "ai copywriting landing page",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 8,
+      "total_spend": 76.8,
+      "volume": 320,
+      "cpc": 9.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 3840,
+        "avg_monthly_searches": 320,
+        "competition": "MEDIUM",
+        "competition_index": 77,
+        "low_top_of_page_bid": 5.76,
+        "high_top_of_page_bid": 13.44,
+        "average_cpc": 9.6
+      }
+    },
+    {
+      "keyword": "auto generate landing page",
+      "category": "AI / Automation",
+      "intent": "Commercial",
+      "short_tail_group": "ai assisted",
+      "brand_group": null,
+      "total_clicks": 7,
+      "total_spend": 50.4,
+      "volume": 260,
+      "cpc": 7.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
+        "competition": "MEDIUM",
+        "competition_index": 58,
+        "low_top_of_page_bid": 4.32,
+        "high_top_of_page_bid": 10.08,
+        "average_cpc": 7.2
+      }
+    },
+    {
+      "keyword": "landing page for coaches",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 15,
+      "total_spend": 153,
+      "volume": 590,
+      "cpc": 10.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
+        "competition": "HIGH",
+        "competition_index": 82,
+        "low_top_of_page_bid": 6.12,
+        "high_top_of_page_bid": 14.28,
+        "average_cpc": 10.2
+      }
+    },
+    {
+      "keyword": "funnel builder for coaches",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 12,
+      "total_spend": 148.8,
+      "volume": 480,
+      "cpc": 12.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 5760,
+        "avg_monthly_searches": 480,
+        "competition": "HIGH",
+        "competition_index": 99,
+        "low_top_of_page_bid": 7.44,
+        "high_top_of_page_bid": 17.36,
+        "average_cpc": 12.4
+      }
+    },
+    {
+      "keyword": "website builder for coaches",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 33,
+      "total_spend": 290.4,
+      "volume": 1300,
+      "cpc": 8.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "MEDIUM",
+        "competition_index": 70,
+        "low_top_of_page_bid": 5.28,
+        "high_top_of_page_bid": 12.32,
+        "average_cpc": 8.8
+      }
+    },
+    {
+      "keyword": "landing page for course creators",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 8,
+      "total_spend": 75.2,
+      "volume": 320,
+      "cpc": 9.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 3840,
+        "avg_monthly_searches": 320,
+        "competition": "MEDIUM",
+        "competition_index": 75,
+        "low_top_of_page_bid": 5.64,
+        "high_top_of_page_bid": 13.16,
+        "average_cpc": 9.4
+      }
+    },
+    {
+      "keyword": "online course landing page",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 18,
+      "total_spend": 147.6,
+      "volume": 720,
+      "cpc": 8.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "MEDIUM",
+        "competition_index": 66,
+        "low_top_of_page_bid": 4.92,
+        "high_top_of_page_bid": 11.48,
+        "average_cpc": 8.2
+      }
+    },
+    {
+      "keyword": "lead magnet landing page",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 25,
+      "total_spend": 185,
+      "volume": 1000,
+      "cpc": 7.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 12000,
+        "avg_monthly_searches": 1000,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "sales page for ebook",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 10,
+      "total_spend": 68,
+      "volume": 390,
+      "cpc": 6.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 4680,
+        "avg_monthly_searches": 390,
+        "competition": "MEDIUM",
+        "competition_index": 54,
+        "low_top_of_page_bid": 4.08,
+        "high_top_of_page_bid": 9.52,
+        "average_cpc": 6.8
+      }
+    },
+    {
+      "keyword": "landing page for authors",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 7,
+      "total_spend": 44.8,
+      "volume": 260,
+      "cpc": 6.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
+        "competition": "MEDIUM",
+        "competition_index": 51,
+        "low_top_of_page_bid": 3.84,
+        "high_top_of_page_bid": 8.96,
+        "average_cpc": 6.4
+      }
+    },
+    {
+      "keyword": "funnel for course launch",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 5,
+      "total_spend": 56,
+      "volume": 210,
+      "cpc": 11.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 2520,
+        "avg_monthly_searches": 210,
+        "competition": "HIGH",
+        "competition_index": 90,
+        "low_top_of_page_bid": 6.72,
+        "high_top_of_page_bid": 15.68,
+        "average_cpc": 11.2
+      }
+    },
+    {
+      "keyword": "digital product landing page",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 12,
+      "total_spend": 86.4,
+      "volume": 480,
+      "cpc": 7.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 5760,
+        "avg_monthly_searches": 480,
+        "competition": "MEDIUM",
+        "competition_index": 58,
+        "low_top_of_page_bid": 4.32,
+        "high_top_of_page_bid": 10.08,
+        "average_cpc": 7.2
+      }
+    },
+    {
+      "keyword": "landing page for online business",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 22,
+      "total_spend": 184.8,
+      "volume": 880,
+      "cpc": 8.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
+        "competition": "MEDIUM",
+        "competition_index": 67,
+        "low_top_of_page_bid": 5.04,
+        "high_top_of_page_bid": 11.76,
+        "average_cpc": 8.4
+      }
+    },
+    {
+      "keyword": "landing page for network marketers",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 5,
+      "total_spend": 46,
+      "volume": 210,
+      "cpc": 9.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 2520,
+        "avg_monthly_searches": 210,
+        "competition": "MEDIUM",
+        "competition_index": 74,
+        "low_top_of_page_bid": 5.52,
+        "high_top_of_page_bid": 12.88,
+        "average_cpc": 9.2
+      }
+    },
+    {
+      "keyword": "agency landing page builder",
+      "category": "Audience-Specific",
+      "intent": "Commercial",
+      "short_tail_group": "audience specific",
+      "brand_group": null,
+      "total_clicks": 15,
+      "total_spend": 162,
+      "volume": 590,
+      "cpc": 10.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
+        "competition": "HIGH",
+        "competition_index": 86,
+        "low_top_of_page_bid": 6.48,
+        "high_top_of_page_bid": 15.12,
+        "average_cpc": 10.8
+      }
+    },
+    {
+      "keyword": "create a sales funnel",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 90,
+      "total_spend": 1008,
+      "volume": 3600,
+      "cpc": 11.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 43200,
+        "avg_monthly_searches": 3600,
+        "competition": "HIGH",
+        "competition_index": 90,
+        "low_top_of_page_bid": 6.72,
+        "high_top_of_page_bid": 15.68,
+        "average_cpc": 11.2
+      }
+    },
+    {
+      "keyword": "how to build a landing page",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 203,
+      "total_spend": 1096.2,
+      "volume": 8100,
+      "cpc": 5.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 97200,
+        "avg_monthly_searches": 8100,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 3.24,
+        "high_top_of_page_bid": 7.56,
+        "average_cpc": 5.4
+      }
+    },
+    {
+      "keyword": "how to build a sales funnel",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 110,
+      "total_spend": 968,
+      "volume": 4400,
+      "cpc": 8.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 52800,
+        "avg_monthly_searches": 4400,
+        "competition": "MEDIUM",
+        "competition_index": 70,
+        "low_top_of_page_bid": 5.28,
+        "high_top_of_page_bid": 12.32,
+        "average_cpc": 8.8
+      }
+    },
+    {
+      "keyword": "build landing page fast",
+      "category": "Use-Case",
+      "intent": "Commercial",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 18,
+      "total_spend": 136.8,
+      "volume": 720,
+      "cpc": 7.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "MEDIUM",
+        "competition_index": 61,
+        "low_top_of_page_bid": 4.56,
+        "high_top_of_page_bid": 10.64,
+        "average_cpc": 7.6
+      }
+    },
+    {
+      "keyword": "launch online business",
+      "category": "Use-Case",
+      "intent": "Commercial",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 33,
+      "total_spend": 409.2,
+      "volume": 1300,
+      "cpc": 12.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "HIGH",
+        "competition_index": 99,
+        "low_top_of_page_bid": 7.44,
+        "high_top_of_page_bid": 17.36,
+        "average_cpc": 12.4
+      }
+    },
+    {
+      "keyword": "sell digital products online",
+      "category": "Use-Case",
+      "intent": "Commercial",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 73,
+      "total_spend": 715.4,
+      "volume": 2900,
+      "cpc": 9.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 34800,
+        "avg_monthly_searches": 2900,
+        "competition": "MEDIUM",
+        "competition_index": 78,
+        "low_top_of_page_bid": 5.88,
+        "high_top_of_page_bid": 13.72,
+        "average_cpc": 9.8
+      }
+    },
+    {
+      "keyword": "how to sell digital products",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 90,
+      "total_spend": 738,
+      "volume": 3600,
+      "cpc": 8.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 43200,
+        "avg_monthly_searches": 3600,
+        "competition": "MEDIUM",
+        "competition_index": 66,
+        "low_top_of_page_bid": 4.92,
+        "high_top_of_page_bid": 11.48,
+        "average_cpc": 8.2
+      }
+    },
+    {
+      "keyword": "build a website for my business",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 60,
+      "total_spend": 576,
+      "volume": 2400,
+      "cpc": 9.6,
+      "brands": [],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "MEDIUM",
+        "competition_index": 77,
+        "low_top_of_page_bid": 5.76,
+        "high_top_of_page_bid": 13.44,
+        "average_cpc": 9.6
+      }
+    },
+    {
+      "keyword": "build a sales page",
+      "category": "Use-Case",
+      "intent": "Commercial",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 15,
+      "total_spend": 111,
+      "volume": 590,
+      "cpc": 7.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "create lead magnet",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 48,
+      "total_spend": 326.4,
+      "volume": 1900,
+      "cpc": 6.8,
+      "brands": [],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "MEDIUM",
+        "competition_index": 54,
+        "low_top_of_page_bid": 4.08,
+        "high_top_of_page_bid": 9.52,
+        "average_cpc": 6.8
+      }
+    },
+    {
+      "keyword": "build an online course",
+      "category": "Use-Case",
+      "intent": "Informational",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 110,
+      "total_spend": 1144,
+      "volume": 4400,
+      "cpc": 10.4,
+      "brands": [],
+      "google": {
+        "annual_volume": 52800,
+        "avg_monthly_searches": 4400,
+        "competition": "HIGH",
+        "competition_index": 83,
+        "low_top_of_page_bid": 6.24,
+        "high_top_of_page_bid": 14.56,
+        "average_cpc": 10.4
+      }
+    },
+    {
+      "keyword": "sell course online",
+      "category": "Use-Case",
+      "intent": "Commercial",
+      "short_tail_group": "use case",
+      "brand_group": null,
+      "total_clicks": 40,
+      "total_spend": 448,
+      "volume": 1600,
+      "cpc": 11.2,
+      "brands": [],
+      "google": {
+        "annual_volume": 19200,
+        "avg_monthly_searches": 1600,
+        "competition": "HIGH",
+        "competition_index": 90,
+        "low_top_of_page_bid": 6.72,
+        "high_top_of_page_bid": 15.68,
+        "average_cpc": 11.2
+      }
+    },
+    {
+      "keyword": "clickfunnels review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 110,
+      "total_spend": 814,
+      "volume": 4400,
+      "cpc": 7.4,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 110,
+          "cpc": 7.4,
+          "est_spend": 814,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 52800,
+        "avg_monthly_searches": 4400,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "clickfunnels pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 165,
+      "total_spend": 1023,
+      "volume": 6600,
+      "cpc": 6.2,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 165,
+          "cpc": 6.2,
+          "est_spend": 1023,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 79200,
+        "avg_monthly_searches": 6600,
+        "competition": "MEDIUM",
+        "competition_index": 50,
+        "low_top_of_page_bid": 3.72,
+        "high_top_of_page_bid": 8.68,
+        "average_cpc": 6.2
+      }
+    },
+    {
+      "keyword": "clickfunnels vs",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 73,
+      "total_spend": 642.4,
+      "volume": 2900,
+      "cpc": 8.8,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 73,
+          "cpc": 8.8,
+          "est_spend": 642.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 34800,
+        "avg_monthly_searches": 2900,
+        "competition": "MEDIUM",
+        "competition_index": 70,
+        "low_top_of_page_bid": 5.28,
+        "high_top_of_page_bid": 12.32,
+        "average_cpc": 8.8
+      }
+    },
+    {
+      "keyword": "is clickfunnels worth it",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 18,
+      "total_spend": 115.2,
+      "volume": 720,
+      "cpc": 6.4,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 18,
+          "cpc": 6.4,
+          "est_spend": 115.2,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "MEDIUM",
+        "competition_index": 51,
+        "low_top_of_page_bid": 3.84,
+        "high_top_of_page_bid": 8.96,
+        "average_cpc": 6.4
+      }
+    },
+    {
+      "keyword": "leadpages review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "leadpages",
+      "total_clicks": 33,
+      "total_spend": 224.4,
+      "volume": 1300,
+      "cpc": 6.8,
+      "brands": [
+        {
+          "name": "leadpages",
+          "clicks": 33,
+          "cpc": 6.8,
+          "est_spend": 224.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "leadpages.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "MEDIUM",
+        "competition_index": 54,
+        "low_top_of_page_bid": 4.08,
+        "high_top_of_page_bid": 9.52,
+        "average_cpc": 6.8
+      }
+    },
+    {
+      "keyword": "leadpages pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "leadpages",
+      "total_clicks": 40,
+      "total_spend": 232,
+      "volume": 1600,
+      "cpc": 5.8,
+      "brands": [
+        {
+          "name": "leadpages",
+          "clicks": 40,
+          "cpc": 5.8,
+          "est_spend": 232,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "leadpages.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 19200,
+        "avg_monthly_searches": 1600,
+        "competition": "MEDIUM",
+        "competition_index": 46,
+        "low_top_of_page_bid": 3.48,
+        "high_top_of_page_bid": 8.12,
+        "average_cpc": 5.8
+      }
+    },
+    {
+      "keyword": "leadpages vs",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "leadpages",
+      "total_clicks": 22,
+      "total_spend": 162.8,
+      "volume": 880,
+      "cpc": 7.4,
+      "brands": [
+        {
+          "name": "leadpages",
+          "clicks": 22,
+          "cpc": 7.4,
+          "est_spend": 162.8,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "leadpages.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "kajabi review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kajabi",
+      "total_clicks": 60,
+      "total_spend": 432,
+      "volume": 2400,
+      "cpc": 7.2,
+      "brands": [
+        {
+          "name": "kajabi",
+          "clicks": 60,
+          "cpc": 7.2,
+          "est_spend": 432,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kajabi.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "MEDIUM",
+        "competition_index": 58,
+        "low_top_of_page_bid": 4.32,
+        "high_top_of_page_bid": 10.08,
+        "average_cpc": 7.2
+      }
+    },
+    {
+      "keyword": "kajabi pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kajabi",
+      "total_clicks": 135,
+      "total_spend": 729,
+      "volume": 5400,
+      "cpc": 5.4,
+      "brands": [
+        {
+          "name": "kajabi",
+          "clicks": 135,
+          "cpc": 5.4,
+          "est_spend": 729,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kajabi.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 64800,
+        "avg_monthly_searches": 5400,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 3.24,
+        "high_top_of_page_bid": 7.56,
+        "average_cpc": 5.4
+      }
+    },
+    {
+      "keyword": "kajabi vs",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kajabi",
+      "total_clicks": 73,
+      "total_spend": 598.6,
+      "volume": 2900,
+      "cpc": 8.2,
+      "brands": [
+        {
+          "name": "kajabi",
+          "clicks": 73,
+          "cpc": 8.2,
+          "est_spend": 598.6,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kajabi.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 34800,
+        "avg_monthly_searches": 2900,
+        "competition": "MEDIUM",
+        "competition_index": 66,
+        "low_top_of_page_bid": 4.92,
+        "high_top_of_page_bid": 11.48,
+        "average_cpc": 8.2
+      }
+    },
+    {
+      "keyword": "kartra review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kartra",
+      "total_clicks": 33,
+      "total_spend": 257.4,
+      "volume": 1300,
+      "cpc": 7.8,
+      "brands": [
+        {
+          "name": "kartra",
+          "clicks": 33,
+          "cpc": 7.8,
+          "est_spend": 257.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kartra.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "MEDIUM",
+        "competition_index": 62,
+        "low_top_of_page_bid": 4.68,
+        "high_top_of_page_bid": 10.92,
+        "average_cpc": 7.8
+      }
+    },
+    {
+      "keyword": "kartra pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "kartra",
+      "total_clicks": 40,
+      "total_spend": 232,
+      "volume": 1600,
+      "cpc": 5.8,
+      "brands": [
+        {
+          "name": "kartra",
+          "clicks": 40,
+          "cpc": 5.8,
+          "est_spend": 232,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "kartra.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 19200,
+        "avg_monthly_searches": 1600,
+        "competition": "MEDIUM",
+        "competition_index": 46,
+        "low_top_of_page_bid": 3.48,
+        "high_top_of_page_bid": 8.12,
+        "average_cpc": 5.8
+      }
+    },
+    {
+      "keyword": "systeme io review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "systemeio",
+      "total_clicks": 60,
+      "total_spend": 324,
+      "volume": 2400,
+      "cpc": 5.4,
+      "brands": [
+        {
+          "name": "systemeio",
+          "clicks": 60,
+          "cpc": 5.4,
+          "est_spend": 324,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "systeme.io/"
+        }
+      ],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 3.24,
+        "high_top_of_page_bid": 7.56,
+        "average_cpc": 5.4
+      }
+    },
+    {
+      "keyword": "systeme io pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "systemeio",
+      "total_clicks": 33,
+      "total_spend": 158.4,
+      "volume": 1300,
+      "cpc": 4.8,
+      "brands": [
+        {
+          "name": "systemeio",
+          "clicks": 33,
+          "cpc": 4.8,
+          "est_spend": 158.4,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "systeme.io/"
+        }
+      ],
+      "google": {
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
+        "competition": "LOW",
+        "competition_index": 38,
+        "low_top_of_page_bid": 2.88,
+        "high_top_of_page_bid": 6.72,
+        "average_cpc": 4.8
+      }
+    },
+    {
+      "keyword": "systeme io vs clickfunnels",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "clickfunnels",
+      "total_clicks": 22,
+      "total_spend": 162.8,
+      "volume": 880,
+      "cpc": 7.4,
+      "brands": [
+        {
+          "name": "clickfunnels",
+          "clicks": 22,
+          "cpc": 7.4,
+          "est_spend": 162.8,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "clickfunnels.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
+        "competition": "MEDIUM",
+        "competition_index": 59,
+        "low_top_of_page_bid": 4.44,
+        "high_top_of_page_bid": 10.36,
+        "average_cpc": 7.4
+      }
+    },
+    {
+      "keyword": "gohighlevel review",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "gohighlevel",
+      "total_clicks": 48,
+      "total_spend": 403.2,
+      "volume": 1900,
+      "cpc": 8.4,
+      "brands": [
+        {
+          "name": "gohighlevel",
+          "clicks": 48,
+          "cpc": 8.4,
+          "est_spend": 403.2,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "gohighlevel.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 22800,
+        "avg_monthly_searches": 1900,
+        "competition": "MEDIUM",
+        "competition_index": 67,
+        "low_top_of_page_bid": 5.04,
+        "high_top_of_page_bid": 11.76,
+        "average_cpc": 8.4
+      }
+    },
+    {
+      "keyword": "gohighlevel pricing",
+      "category": "Brand - Competitor",
+      "intent": "Commercial",
+      "short_tail_group": null,
+      "brand_group": "gohighlevel",
+      "total_clicks": 60,
+      "total_spend": 432,
+      "volume": 2400,
+      "cpc": 7.2,
+      "brands": [
+        {
+          "name": "gohighlevel",
+          "clicks": 60,
+          "cpc": 7.2,
+          "est_spend": 432,
+          "desktop_share": 0.65,
+          "mobile_share": 0.35,
+          "top_url": "gohighlevel.com/"
+        }
+      ],
+      "google": {
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
+        "competition": "MEDIUM",
+        "competition_index": 58,
+        "low_top_of_page_bid": 4.32,
+        "high_top_of_page_bid": 10.08,
+        "average_cpc": 7.2
+      }
+    }
+  ]
+}

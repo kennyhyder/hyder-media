@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPC Keyword Analysis | Digistore24</title>
+    <title>Keyword Tool | PageWheel Competitive Intel</title>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -903,7 +903,7 @@
             }
         }
     
-        /* Brand switcher */
+        /* Brand switcher (cross-client nav) */
         .brand-switcher {
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
@@ -933,20 +933,20 @@
 
     <!-- Standardized Navigation -->
     <nav class="main-nav">
-        <a href="keyword-tool.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">Digistore24 Competitive Intel</a>
-        <div class="nav-links">
-            <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
-            <option value="keyword-tool.html" selected>Digistore24 ✓</option>
-            <option value="pagewheel-keyword-tool.html">Switch to PageWheel ↓</option>
+    <a href="pagewheel-competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">PageWheel Competitive Intel</a>
+    <div class="nav-links">
+        <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
+            <option value="competitive-intel-summary.html">Switch to PageWheel ↓</option>
+            <option value="pagewheel-competitive-intel-summary.html" selected>PageWheel ✓</option>
         </select>
-        <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
-            <a href="keyword-tool.html" class="nav-link active">Keyword Tool</a>
-            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
-            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
-            <a href="projection-tool.html" class="nav-link">Projections</a>
+            <a href="pagewheel-competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="nav-link active">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="pagewheel-projection-tool.html" class="nav-link">Projections</a>
             <a href="reporting.html" class="nav-link">Reporting</a>
-        </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container">
         <header>
@@ -1172,7 +1172,7 @@
 
         async function loadData() {
             try {
-                const response = await fetch('data/keywords-combined.json');
+                const response = await fetch('data/pagewheel-keywords-combined.json');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
@@ -1183,7 +1183,7 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('table-body').innerHTML =
-                    `<tr><td colspan="9" class="loading">Error loading data: ${error.message}. Make sure keywords-combined.json exists.</td></tr>`;
+                    `<tr><td colspan="9" class="loading">Error loading data: ${error.message}. Make sure pagewheel-keywords-combined.json exists.</td></tr>`;
             }
         }
 

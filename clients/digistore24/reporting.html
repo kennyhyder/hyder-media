@@ -750,6 +750,22 @@
             }
             body.pdf-current-only .pdf-section-title { display: none !important; }
         }
+    
+        /* Brand switcher */
+        .brand-switcher {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .brand-switcher:hover { background: var(--border); }
+        .brand-switcher option { background: var(--bg-secondary); color: var(--text-primary); }
+
     </style>
 </head>
 <body>
@@ -759,7 +775,11 @@
             Digistore24 Competitive Intel
         </a>
         <div class="nav-links">
-            <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
+            <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
+            <option value="reporting.html" selected>Digistore24 ✓</option>
+            <option value="reporting.html">Switch to PageWheel ↓</option>
+        </select>
+        <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
             <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
             <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
             <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>

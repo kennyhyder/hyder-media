@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Analysis | PageWheel Competitive Intel</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+
+            /* Competitor brand colors */
+            --clickbank: #2c20df;
+            --maxweb: #ff7529;
+            --awin: #6b21a8;
+            --samcart: #2f37f5;
+            --impact: #ec4899;
+            --realize: #14b8a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Standardized Navigation */
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand:hover {
+            color: var(--accent-hover);
+        }
+
+        .nav-brand img {
+            height: 32px;
+            width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+
+        .main-nav .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+        }
+
+        .nav-links {
+            margin-top: 12px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .brand-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .brand-clickbank { background: var(--clickbank); }
+        .brand-maxweb { background: var(--maxweb); }
+        .brand-awin { background: var(--awin); }
+        .brand-samcart { background: var(--samcart); }
+        .brand-impact { background: var(--impact); }
+        .brand-realize { background: var(--realize); }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .landing-pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .landing-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .landing-card-preview {
+            height: 200px;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landing-card-preview iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+
+        .landing-card-preview .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(15, 23, 42, 0.9));
+            display: flex;
+            align-items: flex-end;
+            padding: 16px;
+        }
+
+        .landing-card-content {
+            padding: 16px;
+        }
+
+        .landing-card-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .landing-card-url {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .landing-card-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .landing-card-stats .value {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .landing-card-link {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .landing-card-link:hover {
+            background: var(--accent-hover);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .insight-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .insight-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .insight-card p, .insight-card ul {
+            font-size: 0.95rem;
+        }
+
+        .insight-card ul {
+            padding-left: 20px;
+        }
+
+        .insight-card li {
+            margin-bottom: 6px;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .element-analysis {
+            margin-top: 16px;
+        }
+
+        .element-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .element-row:last-child {
+            border-bottom: none;
+        }
+
+        .element-label {
+            min-width: 120px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .element-value {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .key-patterns {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid var(--success);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .key-patterns h3 {
+            color: var(--success);
+            margin-bottom: 16px;
+        }
+
+        .pattern-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .pattern-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .pattern-item .icon {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #146dc7, #0ad6c7);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .cta-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .cta-section .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: white;
+            color: #146dc7;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .cta-section .btn:hover {
+            background: #f0f0f0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            background: rgba(59, 130, 246, 0.1);
+        }
+    
+        /* Brand switcher (cross-client nav) */
+        .brand-switcher {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .brand-switcher:hover { background: var(--border); }
+        .brand-switcher option { background: var(--bg-secondary); color: var(--text-primary); }
+
+    
+        .page-header { padding: 20px 0 32px; }
+        .page-header h1 { font-size: 2rem; margin-bottom: 12px; }
+        .subtitle { color: var(--text-secondary); font-size: 1.05rem; max-width: 760px; }
+        .lp-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .lp-tab-btn { padding: 8px 18px; background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 6px; font-size: 0.88rem; font-weight: 500; cursor: pointer; }
+        .lp-tab-btn:hover { background: var(--border); color: var(--text-primary); }
+        .lp-tab-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .lp-tab-content { display: none; }
+        .lp-tab-content.active { display: block; }
+        .lp-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 30px; }
+        .lp-card-head { padding-left: 14px; margin-bottom: 18px; }
+        .lp-card-head h2 { font-size: 1.5rem; margin: 0; }
+        .lp-link { font-size: 0.85rem; color: var(--accent); text-decoration: none; }
+        .lp-link:hover { color: var(--accent-hover); }
+        .lp-section { padding: 16px 0; border-top: 1px solid var(--border); }
+        .lp-section h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+        .lp-section p { color: var(--text-secondary); line-height: 1.55; margin-bottom: 8px; font-size: 0.92rem; }
+        .lp-section strong { color: var(--text-primary); }
+        .lp-quote { font-style: italic; color: var(--text-primary); padding: 14px 16px; background: rgba(255,255,255,0.04); border-left: 3px solid var(--accent); margin-bottom: 12px; }
+        .lp-mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 8px; }
+        .lp-mini-grid div { display: flex; flex-direction: column; gap: 4px; }
+        .lp-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.06em; }
+        .lp-val { font-size: 0.88rem; color: var(--text-primary); }
+        .lp-takeaway { background: rgba(34, 197, 94, 0.06); border-radius: 8px; padding: 16px; }
+        .page-footer { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 40px; }
+        .page-footer h2 { font-size: 1.2rem; margin-bottom: 14px; }
+        .page-footer ul { padding-left: 22px; color: var(--text-secondary); }
+        .page-footer li { margin-bottom: 8px; line-height: 1.55; }
+        .page-footer strong { color: var(--text-primary); }
+
+    </style>
+</head>
+<body>
+    <!-- Auth Check -->
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <!-- Standardized Navigation -->
+    <nav class="main-nav">
+    <a href="pagewheel-competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">PageWheel Competitive Intel</a>
+    <div class="nav-links">
+        <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
+            <option value="competitive-intel-summary.html">Switch to PageWheel ↓</option>
+            <option value="pagewheel-competitive-intel-summary.html" selected>PageWheel ✓</option>
+        </select>
+            <a href="pagewheel-competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="nav-link active">Landing Pages</a>
+            <a href="pagewheel-projection-tool.html" class="nav-link">Projections</a>
+            <a href="reporting.html" class="nav-link">Reporting</a>
+    </div>
+</nav>
+
+    
+    
+    <div class="container">
+        <section class="page-header">
+            <h1>Competitor Landing Page Teardowns</h1>
+            <p class="subtitle">Hero treatment, social proof, trust signals, design style, and pricing visibility for each of PageWheel's six tracked competitors. Use these to inform PageWheel's own LP and ad-landing-page strategy.</p>
+        </section>
+
+        <div class="lp-tabs">
+            <button class="lp-tab-btn active" data-tab="clickfunnels">ClickFunnels</button>
+            <button class="lp-tab-btn" data-tab="leadpages">Leadpages</button>
+            <button class="lp-tab-btn" data-tab="kartra">Kartra</button>
+            <button class="lp-tab-btn" data-tab="kajabi">Kajabi</button>
+            <button class="lp-tab-btn" data-tab="systemeio">Systeme.io</button>
+            <button class="lp-tab-btn" data-tab="gohighlevel">GoHighLevel</button>
+        </div>
+
+        
+        <div class="lp-tab-content active" id="lp-tab-clickfunnels">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #e34620;">
+                    <div>
+                        <h2>ClickFunnels</h2>
+                        <a href="https://www.clickfunnels.com/" target="_blank" rel="noopener" class="lp-link">https://www.clickfunnels.com/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"You're one funnel away from changing the world"</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">Yes</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Email only on hero; pricing gated behind plan selection</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Try for Free</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> 100K+ users, 1M+ funnels created</p>
+                    <p><strong>Trust signals:</strong> Customer logos, case studies, founder authority (Russell Brunson)</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Bold, brand-heavy, dark sections + bright accents. Heavy storytelling and authority signals throughout.</p>
+                    <p><strong>Page length:</strong> Very long — 12+ sections, deep narrative</p>
+                    <p><strong>Pricing visibility:</strong> Hidden — must click through</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>Sells the dream first, pricing second. Heavy on storytelling, light on feature lists.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> Premium price point, established brand, complete ecosystem vs PageWheel's $27 starter and AI-first templates</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lp-tab-content" id="lp-tab-leadpages">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #1d8aff;">
+                    <div>
+                        <h2>Leadpages</h2>
+                        <a href="https://www.leadpages.com/" target="_blank" rel="noopener" class="lp-link">https://www.leadpages.com/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"Build pages that convert. No developer needed."</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">No</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Email on hero</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Start Free 7-Day Trial</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> Customer testimonials, 5-star reviews</p>
+                    <p><strong>Trust signals:</strong> Trustpilot rating, G2 badges, customer count</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Clean, modern, lots of product screenshots. Bright blue accent on white.</p>
+                    <p><strong>Page length:</strong> Medium — feature-focused with screenshots</p>
+                    <p><strong>Pricing visibility:</strong> Visible on dedicated pricing page; CTAs guide to it</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>Feature-first, product-screenshot-heavy. Clear positioning on AI + conversion.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> Page-builder DNA without the full funnel/checkout/community layer; higher price, more marketing-focused</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lp-tab-content" id="lp-tab-kartra">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #1f7ae0;">
+                    <div>
+                        <h2>Kartra</h2>
+                        <a href="https://kartra.com/" target="_blank" rel="noopener" class="lp-link">https://kartra.com/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"Earn more with the most powerful all-in-one platform"</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">Yes</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Email + name on signup; checkout flow gated</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Try Kartra Now (14-day free trial)</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> Customer count, success stories</p>
+                    <p><strong>Trust signals:</strong> Founder credibility (Andy Jenkins legacy), platform tour</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Deep blue + orange accent. Heavy on platform tour graphics.</p>
+                    <p><strong>Page length:</strong> Long — covers each feature in depth</p>
+                    <p><strong>Pricing visibility:</strong> Linked from nav; not on homepage hero</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>Sells the breadth of integration (replaces 8-12 tools). Less storytelling than CF, more feature emphasis.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> Heavier all-in-one stack at higher price; PageWheel wins on simplicity and price</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lp-tab-content" id="lp-tab-kajabi">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #000000;">
+                    <div>
+                        <h2>Kajabi</h2>
+                        <a href="https://kajabi.com/" target="_blank" rel="noopener" class="lp-link">https://kajabi.com/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"Turn What You Know Into What You're Known For"</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">Yes</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Email on hero</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Get Started — Save 50%</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> 100K+ businesses, $11B+ earned by users, customer logos</p>
+                    <p><strong>Trust signals:</strong> Earnings milestones, named creator success stories, 8-figure case studies</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Premium black + white + accent. Editorial photography. Quiet luxury vibe.</p>
+                    <p><strong>Page length:</strong> Long — sells the dream of knowledge-business</p>
+                    <p><strong>Pricing visibility:</strong> Hidden behind 'See plans' CTA; 50% promo emphasized</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>Aspirational and prestige-positioned. Sells the lifestyle/status of being a knowledge entrepreneur. Premium pricing reflects.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> Premium tier ($149+); PageWheel competes on price and template-first quick-launch</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lp-tab-content" id="lp-tab-systemeio">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #fec325;">
+                    <div>
+                        <h2>Systeme.io</h2>
+                        <a href="https://systeme.io/" target="_blank" rel="noopener" class="lp-link">https://systeme.io/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"The only tool you need to launch your online business"</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">No</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Email-only signup, instant free account</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Get started for free</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> Customer count, testimonials</p>
+                    <p><strong>Trust signals:</strong> Founder accessibility, free-forever messaging</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Bright yellow + clean white. Cheerful, accessible, low-friction.</p>
+                    <p><strong>Page length:</strong> Medium — feature breadth emphasized</p>
+                    <p><strong>Pricing visibility:</strong> Clear free tier emphasis throughout</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>FREE-TIER-LED ACQUISITION. Direct counter to PageWheel's $27 starter — Systeme uses 'free forever' as the wedge.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> MOST DIRECT COMPETITOR on pricing ($27/mo entry matches PageWheel exactly). Differentiator: PageWheel emphasizes AI templates + done-for-you setup; Systeme.io emphasizes free tier and feature breadth.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lp-tab-content" id="lp-tab-gohighlevel">
+            <div class="lp-card">
+                <div class="lp-card-head" style="border-left: 4px solid #1f1f1f;">
+                    <div>
+                        <h2>GoHighLevel</h2>
+                        <a href="https://www.gohighlevel.com/" target="_blank" rel="noopener" class="lp-link">https://www.gohighlevel.com/ (open)</a>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Hero Treatment</h3>
+                    <div class="lp-quote">"The all-in-one sales & marketing platform"</div>
+                    <div class="lp-mini-grid">
+                        <div><span class="lp-label">Hero video</span><span class="lp-val">Yes</span></div>
+                        <div><span class="lp-label">Form fields</span><span class="lp-val">Multi-step signup with agency name + use case</span></div>
+                        <div><span class="lp-label">Primary CTA</span><span class="lp-val">Start 14 Day Free Trial</span></div>
+                    </div>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Trust &amp; Social Proof</h3>
+                    <p><strong>Social proof:</strong> Agency customer count, white-label messaging</p>
+                    <p><strong>Trust signals:</strong> Heavy agency-focused testimonials, scale-of-business proof</p>
+                </div>
+
+                <div class="lp-section">
+                    <h3>Design &amp; Layout</h3>
+                    <p><strong>Style:</strong> Dark theme with brand-accent. Heavy feature/screenshot grid.</p>
+                    <p><strong>Page length:</strong> Long — feature-grid heavy</p>
+                    <p><strong>Pricing visibility:</strong> Linked from nav</p>
+                </div>
+
+                <div class="lp-section lp-takeaway">
+                    <h3>Key Takeaway for PageWheel</h3>
+                    <p>Agency platform, different buyer. Included for comparison/conquest opportunity only — PageWheel doesn't directly compete here.</p>
+                    <p style="margin-top: 12px;"><strong>Differentiation lane:</strong> Agency tool, not creator tool. Different buyer entirely — included as adjacent competitor for branded keyword overlap.</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="page-footer">
+            <h2>Cross-competitor patterns</h2>
+            <ul>
+                <li><strong>Premium brands hide pricing</strong> (ClickFunnels, Kajabi) — they sell the dream first, sticker shock is gated. PageWheel can do the opposite and lead with $27 as a competitive wedge.</li>
+                <li><strong>All-in-one platforms emphasize tool replacement</strong> (Kartra, GoHighLevel) — "replaces 8-12 tools." This is not PageWheel's lane — PageWheel sells speed-to-launch, not feature breadth.</li>
+                <li><strong>Systeme.io leads with free</strong> — direct counter to PageWheel's $27. PageWheel's wedge against Systeme: AI-first templates + done-for-you setup vs Systeme's bare-bones DIY breadth.</li>
+                <li><strong>Kajabi is aspirational</strong> — sells the prestige of being a knowledge entrepreneur. Different positioning entirely; PageWheel can win the "I just want to ship something" buyer that Kajabi over-sells to.</li>
+                <li><strong>Video heroes dominate</strong> at the premium tier (CF, Kartra, Kajabi, GHL). At PageWheel's price point, a clear hero image + 30-second demo is sufficient and converts faster.</li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        document.querySelectorAll('.lp-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lp-tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.lp-tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('lp-tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

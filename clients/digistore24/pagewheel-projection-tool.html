@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPC Projection Tool | Digistore24</title>
+    <title>Projection Tool | PageWheel Competitive Intel</title>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -553,7 +553,7 @@
             color: var(--text-secondary);
         }
     
-        /* Brand switcher */
+        /* Brand switcher (cross-client nav) */
         .brand-switcher {
             background: var(--bg-tertiary);
             border: 1px solid var(--border);
@@ -583,20 +583,20 @@
 
     <!-- Navigation -->
     <nav class="main-nav">
-        <a href="keyword-tool.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">Digistore24 Competitive Intel</a>
-        <div class="nav-links">
-            <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
-            <option value="projection-tool.html" selected>Digistore24 ✓</option>
-            <option value="pagewheel-projection-tool.html">Switch to PageWheel ↓</option>
+    <a href="pagewheel-competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">PageWheel Competitive Intel</a>
+    <div class="nav-links">
+        <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
+            <option value="competitive-intel-summary.html">Switch to PageWheel ↓</option>
+            <option value="pagewheel-competitive-intel-summary.html" selected>PageWheel ✓</option>
         </select>
-        <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
-            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
-            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
-            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
-            <a href="projection-tool.html" class="nav-link active">Projections</a>
+            <a href="pagewheel-competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="pagewheel-projection-tool.html" class="nav-link active">Projections</a>
             <a href="reporting.html" class="nav-link">Reporting</a>
-        </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container">
         <header>
@@ -709,14 +709,14 @@
                         </div>
 
                         <div class="input-group">
-                            <label class="tooltip-trigger" data-tooltip="Customer Lifetime Value over 30 days. Digistore24 benchmark: $1,500">
+                            <label class="tooltip-trigger" data-tooltip="Customer Lifetime Value over 30 days. PageWheel benchmark: $1,500">
                                 LTV30 (30-Day Lifetime Value)
                             </label>
                             <div class="input-with-unit">
                                 <input type="number" id="ltv" value="1500" min="100" step="50">
                                 <span class="input-unit">USD</span>
                             </div>
-                            <div class="input-hint">Digistore24 LTV30: $1,500</div>
+                            <div class="input-hint">PageWheel LTV30: $1,500</div>
                         </div>
                     </div>
                 </div>
@@ -1221,5 +1221,35 @@
         // Initialize
         loadData();
     </script>
+
+    <script>
+        // PageWheel-specific default values for the projection model
+        document.addEventListener('DOMContentLoaded', () => {
+            const setIfExists = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) { el.value = val; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }
+            };
+            // LTV: blended $384 (Starter $27×8mo × 60%, Business $47×12mo × 40%)
+            setIfExists('ltv', 384);
+            setIfExists('ltvInput', 384);
+            // Avg CPC for the category
+            setIfExists('avgCpc', 9.43);
+            setIfExists('cpcInput', 9.43);
+            // Conversion rate: 0.75% click→paid (category benchmark for SaaS w/ free trial)
+            setIfExists('convRate', 0.75);
+            setIfExists('cvrInput', 0.75);
+            // AOV / per-customer revenue
+            setIfExists('aov', 384);
+            setIfExists('avgOrderValue', 384);
+            // Monthly budget starting point
+            setIfExists('budget', 8000);
+            setIfExists('monthlyBudget', 8000);
+            // Trigger any recalculate functions
+            if (typeof calculate === 'function') calculate();
+            if (typeof recalculate === 'function') recalculate();
+            if (typeof updateProjections === 'function') updateProjections();
+        });
+    </script>
+
 </body>
 </html>
