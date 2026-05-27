@@ -638,7 +638,7 @@
         .brand-elementor { background: #ed2059; color: white; }
         .brand-lovable { background: #7c3aed; color: white; }
         .brand-shopify { background: #95bf47; color: black; }
-        .brand-squarespace { background: #000000; color: white; }
+        .brand-squarespace { background: #111111; color: white; }
         .brand-wix { background: #fbe000; color: black; }
 
         .brand-details {
@@ -957,7 +957,7 @@
     <div class="container">
         <header>
             <h1>PPC Keyword Analysis Tool</h1>
-            <p class="subtitle">~50K keywords from SimilarWeb (12-month) + Google Keyword Planner enrichment · ClickFunnels, Leadpages, Kartra, Kajabi, Systeme.io, GoHighLevel, base44, Elementor, Lovable, Shopify, Squarespace &amp; Wix</p>
+            <p class="subtitle">~50K keywords from SimilarWeb (12-month) · ClickFunnels, Leadpages, Kartra, Kajabi, Systeme.io, GoHighLevel, base44, Elementor, Lovable, Shopify, Squarespace &amp; Wix</p>
         </header>
 
         <!-- Legend -->
@@ -988,12 +988,12 @@
                     <span class="brand-pill brand-kartra tooltip-trigger" data-tooltip="Kartra — All-in-one marketing platform">kartra</span>
                     <span class="brand-pill brand-kajabi tooltip-trigger" data-tooltip="Kajabi — Premium knowledge-business platform">kajabi</span>
                     <span class="brand-pill brand-leadpages tooltip-trigger" data-tooltip="Leadpages — AI landing page builder">leadpages</span>
-                    <span class="brand-pill brand-base44 tooltip-trigger" data-tooltip="base44 — AI website builder (Israeli startup, AI-first)">base44</span>
-                    <span class="brand-pill brand-elementor tooltip-trigger" data-tooltip="Elementor — WordPress page builder (4M+ active installs)">elementor</span>
-                    <span class="brand-pill brand-lovable tooltip-trigger" data-tooltip="Lovable — AI app builder (Anthropic-tier AI-first builder)">lovable</span>
-                    <span class="brand-pill brand-shopify tooltip-trigger" data-tooltip="Shopify — Ecommerce platform (adjacent, broader category)">shopify</span>
-                    <span class="brand-pill brand-squarespace tooltip-trigger" data-tooltip="Squarespace — Website builder (broad SMB / creator)">squarespace</span>
-                    <span class="brand-pill brand-wix tooltip-trigger" data-tooltip="Wix — Website builder (broad SMB / drag-and-drop)">wix</span>
+                    <span class="brand-pill brand-base44 tooltip-trigger" data-tooltip="base44 — AI no-code app builder">base44</span>
+                    <span class="brand-pill brand-elementor tooltip-trigger" data-tooltip="Elementor — WordPress page builder (4M+ installs)">elementor</span>
+                    <span class="brand-pill brand-lovable tooltip-trigger" data-tooltip="Lovable — Conversational AI app builder">lovable</span>
+                    <span class="brand-pill brand-shopify tooltip-trigger" data-tooltip="Shopify — Ecommerce platform">shopify</span>
+                    <span class="brand-pill brand-squarespace tooltip-trigger" data-tooltip="Squarespace — Design-forward website builder">squarespace</span>
+                    <span class="brand-pill brand-wix tooltip-trigger" data-tooltip="Wix — Largest brand-name website builder">wix</span>
                     <span class="brand-pill brand-systemeio tooltip-trigger" data-tooltip="Systeme.io — Free-tier-led all-in-one platform">systemeio</span>
                 </div>
             </div>
@@ -1028,12 +1028,30 @@
 
         <!-- Brand spend breakdown -->
         <div class="stats-bar" id="brand-spend-bar">
-            <div class="stat-card" id="spend-card-0"><div class="stat-label" id="spend-label-0">—</div><div class="stat-value small spend-cell" id="spend-value-0">-</div></div>
-            <div class="stat-card" id="spend-card-1"><div class="stat-label" id="spend-label-1">—</div><div class="stat-value small spend-cell" id="spend-value-1">-</div></div>
-            <div class="stat-card" id="spend-card-2"><div class="stat-label" id="spend-label-2">—</div><div class="stat-value small spend-cell" id="spend-value-2">-</div></div>
-            <div class="stat-card" id="spend-card-3"><div class="stat-label" id="spend-label-3">—</div><div class="stat-value small spend-cell" id="spend-value-3">-</div></div>
-            <div class="stat-card" id="spend-card-4"><div class="stat-label" id="spend-label-4">—</div><div class="stat-value small spend-cell" id="spend-value-4">-</div></div>
-            <div class="stat-card" id="spend-card-5"><div class="stat-label" id="spend-label-5">—</div><div class="stat-value small spend-cell" id="spend-value-5">-</div></div>
+            <div class="stat-card">
+                <div class="stat-label">ClickFunnels Spend</div>
+                <div class="stat-value small spend-cell" id="stat-clickfunnels">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">GoHighLevel Spend</div>
+                <div class="stat-value small spend-cell" id="stat-gohighlevel">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Kajabi Spend</div>
+                <div class="stat-value small spend-cell" id="stat-kajabi">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Kartra Spend</div>
+                <div class="stat-value small spend-cell" id="stat-kartra">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Leadpages Spend</div>
+                <div class="stat-value small spend-cell" id="stat-leadpages">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Systeme.io Spend</div>
+                <div class="stat-value small spend-cell" id="stat-systemeio">-</div>
+            </div>
         </div>
 
         <div class="filters">
@@ -1345,591 +1363,28 @@
                 filteredData.filter(k => k.brand_count > 1).length.toLocaleString();
 
             // Calculate brand-specific spend using active CPC
-            // Aggregate spend across all 12 brands then show top 6 by spend
-            const brandSpend = {};
-            allData.brands.forEach(b => { brandSpend[b] = 0; });
-            filteredKeywords.forEach(kw => {
+            const brandSpend = { clickfunnels: 0, systemeio: 0, gohighlevel: 0, kartra: 0, kajabi: 0, leadpages: 0 };
+            filteredData.forEach(kw => {
                 kw.brands.forEach(b => {
-                    if (selectedBrands.includes(b.name) && brandSpend.hasOwnProperty(b.name)) {
-                        brandSpend[b.name] += b.est_spend || 0;
+                    if (brandSpend.hasOwnProperty(b.name)) {
+                        brandSpend[b.name] += b.clicks * kw.active_cpc;
                     }
                 });
             });
-            // Sort + take top 6
-            const topSpend = Object.entries(brandSpend)
-                .filter(([_, v]) => v > 0)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 6);
-            // Brand labels for display
-            const BRAND_LABELS = {
-                clickfunnels: 'ClickFunnels', leadpages: 'Leadpages', kartra: 'Kartra',
-                kajabi: 'Kajabi', systemeio: 'Systeme.io', gohighlevel: 'GoHighLevel',
-                base44: 'base44', elementor: 'Elementor', lovable: 'Lovable',
-                shopify: 'Shopify', squarespace: 'Squarespace', wix: 'Wix',
-            };
-            for (let i = 0; i < 6; i++) {
-                const labelEl = document.getElementById('spend-label-' + i);
-                const valueEl = document.getElementById('spend-value-' + i);
-                if (topSpend[i]) {
-                    const [brand, spend] = topSpend[i];
-                    labelEl.textContent = (BRAND_LABELS[brand] || brand) + ' Spend';
-                    valueEl.textContent = '
 
-            if (filteredData.length > 0) {
-                const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
-                const avgCpc = filteredData.filter(k => k.active_cpc > 0).reduce((sum, k) => sum + k.active_cpc, 0) /
-                    filteredData.filter(k => k.active_cpc > 0).length || 0;
-                const totalSpend = filteredData.reduce((sum, k) => sum + k.calc_spend, 0);
-
-                document.getElementById('stat-volume').textContent = formatNumber(avgVolume);
-                document.getElementById('stat-cpc').textContent = '$' + avgCpc.toFixed(2);
-                document.getElementById('stat-spend').textContent = '$' + formatNumber(totalSpend);
-            } else {
-                document.getElementById('stat-volume').textContent = '-';
-                document.getElementById('stat-cpc').textContent = '-';
-                document.getElementById('stat-spend').textContent = '-';
-            }
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            const startIdx = (currentPage - 1) * pageSize;
-            const endIdx = startIdx + pageSize;
-            const pageData = filteredData.slice(startIdx, endIdx);
-
-            document.querySelectorAll('th[data-sort]').forEach(th => {
-                th.classList.remove('sorted-asc', 'sorted-desc');
-                if (th.dataset.sort === sortColumn) {
-                    th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-                }
-            });
-
-            if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="loading">No keywords match your filters</td></tr>';
-            } else {
-                tbody.innerHTML = pageData.map((kw, idx) => {
-                    const rowId = `row-${currentPage}-${idx}`;
-                    return `
-                    <tr>
-                        <td>
-                            <span class="brand-count brand-count-${kw.brand_count}">${kw.brand_count}</span>
-                        </td>
-                        <td class="keyword-cell">${escapeHtml(kw.keyword)}</td>
-                        <td>
-                            <span class="category-pill tooltip-trigger" data-tooltip="${getCategoryTooltip(kw.category)}">${kw.category}</span>
-                        </td>
-                        <td class="number-cell">${kw.volume > 0 ? kw.volume.toLocaleString() : '-'}</td>
-                        <td class="number-cell">${kw.google_volume > 0 ? kw.google_volume.toLocaleString() : '-'}</td>
-                        <td class="number-cell">${kw.cpc > 0 ? '$' + kw.cpc.toFixed(2) : '-'}</td>
-                        <td class="number-cell">${formatGoogleBid(kw.google)}</td>
-                        <td class="number-cell">${kw.total_clicks > 0 ? kw.total_clicks.toLocaleString() : '-'}</td>
-                        <td class="number-cell spend-cell">${kw.calc_spend > 0 ? '$' + formatNumber(kw.calc_spend) : '-'}</td>
-                        <td>${formatIntent(kw.intent)}</td>
-                        <td>${formatBrandDetails(kw.brands, rowId, kw.active_cpc)}</td>
-                    </tr>
-                `}).join('');
-            }
-
-            const totalPages = Math.ceil(filteredData.length / pageSize);
-            document.getElementById('page-info').textContent =
-                `Page ${currentPage} of ${totalPages || 1}`;
-            document.getElementById('table-info').textContent =
-                `Showing ${startIdx + 1}-${Math.min(endIdx, filteredData.length)} of ${filteredData.length.toLocaleString()} keywords`;
-            document.getElementById('prev-btn').disabled = currentPage <= 1;
-            document.getElementById('next-btn').disabled = currentPage >= totalPages;
-        }
-
-        function formatBrandDetails(brands, rowId, activeCpc) {
-            // Summary chips (always visible) - use active CPC for spend calculation
-            const summaryChips = brands.map(b => {
-                const brandSpend = b.clicks * (activeCpc || 0);
-                return `
-                <span class="brand-chip brand-${b.name}">
-                    ${b.name}
-                    <span class="brand-chip-spend">$${formatNumber(brandSpend)}</span>
-                </span>
-            `}).join('');
-
-            // Detailed cards (hidden by default)
-            const detailCards = brands.map(b => {
-                const brandSpend = b.clicks * (activeCpc || 0);
-                const desktopPct = (b.desktop_share * 100).toFixed(0);
-                const mobilePct = (b.mobile_share * 100).toFixed(0);
-                const urlDisplay = b.top_url ? shortenUrl(b.top_url) : '';
-                const fullUrl = b.top_url || '';
-
-                return `
-                    <div class="brand-card">
-                        <div class="brand-card-header">
-                            <span class="brand-card-name brand-${b.name}">${b.name}</span>
-                            <span class="brand-card-spend">$${formatNumber(brandSpend)}</span>
-                        </div>
-                        <div class="brand-card-stats">
-                            <span title="Clicks from this brand">${b.clicks.toLocaleString()} clicks</span>
-                            <span title="Desktop traffic share">🖥 ${desktopPct}%</span>
-                            <span title="Mobile traffic share">📱 ${mobilePct}%</span>
-                            ${activeCpc > 0 ? `<span title="Active CPC">$${activeCpc.toFixed(2)} CPC</span>` : ''}
-                        </div>
-                        ${fullUrl ? `<div class="brand-card-url"><a href="${makeAbsoluteUrl(fullUrl)}" target="_blank" rel="noopener" title="${escapeHtml(fullUrl)}">${escapeHtml(urlDisplay)}</a></div>` : ''}
-                    </div>
-                `;
-            }).join('');
-
-            return `
-                <div class="brand-summary">
-                    ${summaryChips}
-                    <button class="expand-btn" onclick="toggleDetails(this, '${rowId}')">
-                        <span class="arrow">▼</span> Details
-                    </button>
-                </div>
-                <div class="brand-details-panel" id="details-${rowId}">
-                    ${detailCards}
-                </div>
-            `;
-        }
-
-        function toggleDetails(btn, rowId) {
-            const panel = document.getElementById('details-' + rowId);
-            const isExpanded = panel.classList.contains('expanded');
-
-            if (isExpanded) {
-                panel.classList.remove('expanded');
-                btn.classList.remove('expanded');
-            } else {
-                panel.classList.add('expanded');
-                btn.classList.add('expanded');
-            }
-        }
-
-        function shortenUrl(url) {
-            try {
-                const u = new URL(url.startsWith('http') ? url : 'https://' + url);
-                let path = u.pathname;
-                if (path.length > 40) {
-                    path = path.substring(0, 37) + '...';
-                }
-                return u.hostname + path;
-            } catch {
-                return url.length > 50 ? url.substring(0, 47) + '...' : url;
-            }
-        }
-
-        function makeAbsoluteUrl(url) {
-            if (!url) return '';
-            // If URL already has protocol, return as-is
-            if (url.startsWith('http://') || url.startsWith('https://')) {
-                return escapeHtml(url);
-            }
-            // Otherwise prepend https://
-            return 'https://' + escapeHtml(url);
-        }
-
-        function getCategoryTooltip(category) {
-            const tooltips = {
-                'Brand - Competitor': 'Keywords containing competitor brand names',
-                'Affiliate/Network': 'Affiliate marketing, networks, partner programs',
-                'Marketing/Strategy': 'Digital marketing, advertising, SEO/SEM terms',
-                'E-commerce/Cart': 'Shopping carts, checkout, e-commerce platforms',
-                'Course/Education': 'Online courses, education, training',
-                'Product/Digital': 'Digital products, downloads, memberships',
-                'Money/Income': 'Earning money, passive income, commissions',
-                'Sign Up/Login': 'Account creation, registration, login',
-                'Review/Comparison': 'Reviews, comparisons, best-of lists',
-                'Other': 'Keywords not matching other categories',
-            };
-            return tooltips[category] || category;
-        }
-
-        function changePage(delta) {
-            const totalPages = Math.ceil(filteredData.length / pageSize);
-            currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
-            renderTable();
-        }
-
-        function resetFilters() {
-            document.getElementById('search').value = '';
-            document.getElementById('category').value = '';
-            document.getElementById('min-brands').value = '1';
-            document.getElementById('intent').value = '';
-            document.getElementById('cpc-source').value = 'google_avg';
-            // Reset brand checkboxes (all checked by default)
-            document.querySelectorAll('#brand-filters input').forEach(cb => {
-                cb.checked = true;
-            });
-            sortColumn = 'calc_spend';
-            sortDirection = 'desc';
-            activeGroupFilter = null;
-            // Reset to Topics tab
-            activeKeywordTab = 'topics';
-            document.querySelectorAll('.groups-tab').forEach(t => {
-                t.classList.toggle('active', t.textContent.includes('Topic'));
-            });
-            document.getElementById('groups-brands').style.display = 'none';
-            document.getElementById('groups-topics').style.display = 'grid';
-            updateGroupFilterDisplay();
-            onBrandFilterChange();
-        }
-
-        function exportCSV() {
-            const cpcSource = document.getElementById('cpc-source').value;
-            const headers = ['Keyword', 'Brand Count', 'Brands', 'Category', 'SW Volume', 'Google Volume', 'SW CPC', 'Google Bid Low', 'Google Bid High', 'Google Competition', 'Active CPC', 'Clicks', 'Est Spend', 'Intent', 'Brand Details'];
-            const rows = filteredData.map(kw => [
-                kw.keyword,
-                kw.brand_count,
-                kw.brands.map(b => b.name).join('; '),
-                kw.category,
-                kw.volume,
-                kw.google_volume,
-                kw.cpc,
-                kw.google?.low_top_of_page_bid || '',
-                kw.google?.high_top_of_page_bid || '',
-                kw.google?.competition || '',
-                kw.active_cpc,
-                kw.total_clicks,
-                kw.calc_spend,
-                kw.intent,
-                kw.brands.map(b => `${b.name}: ${b.clicks} clicks, ${(b.desktop_share*100).toFixed(0)}% desktop, ${(b.mobile_share*100).toFixed(0)}% mobile`).join(' | ')
-            ]);
-
-            const csv = [headers, ...rows]
-                .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-                .join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `keywords-export-${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
-        function formatGoogleBid(google) {
-            if (!google || (!google.low_top_of_page_bid && !google.high_top_of_page_bid)) {
-                return '<span style="color: var(--text-secondary);">-</span>';
-            }
-            const low = google.low_top_of_page_bid ? '$' + google.low_top_of_page_bid.toFixed(2) : '-';
-            const high = google.high_top_of_page_bid ? '$' + google.high_top_of_page_bid.toFixed(2) : '-';
-            const comp = google.competition || '';
-            const compClass = comp === 'HIGH' ? 'var(--danger)' : comp === 'MEDIUM' ? 'var(--warning)' : comp === 'LOW' ? 'var(--success)' : 'var(--text-secondary)';
-            return `<span title="Competition: ${comp || 'Unknown'}" style="color: ${compClass};">${low} - ${high}</span>`;
-        }
-
-        function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return Math.round(num).toLocaleString();
-        }
-
-        function formatIntent(intent) {
-            if (!intent) return '-';
-            const tooltips = {
-                'Transactional': 'User is ready to buy or take action',
-                'Navigational': 'User is looking for a specific website',
-                'Informational': 'User is researching or learning',
-            };
-            return intent.split(', ').map(i => {
-                const cls = i.toLowerCase().replace(/[^a-z]/g, '');
-                const shortName = i.substring(0, 3).toUpperCase();
-                return `<span class="intent-pill intent-${cls} tooltip-trigger" data-tooltip="${tooltips[i] || i}">${shortName}</span>`;
-            }).join('');
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        }
-
-        // Called when brand checkboxes change - updates groups and stats
-        function onBrandFilterChange() {
-            selectedBrands = Array.from(document.querySelectorAll('#brand-filters input:checked'))
-                .map(cb => cb.value);
-
-            // Recalculate keyword groups based on selected brands
-            recalculateKeywordGroups();
-
-            // Apply filters (which will also update stats)
-            applyFilters();
-        }
-
-        // Recalculate keyword group counts based on selected brands
-        function recalculateKeywordGroups() {
-            // Filter keywords to only those with at least one selected brand
-            const filteredKeywords = allData.keywords.filter(kw =>
-                kw.brands.some(b => selectedBrands.includes(b.name))
-            );
-
-            // Recalculate brand groups and topic groups with full info
-            const brandGroups = {};
-            const topicGroups = {};
-
-            filteredKeywords.forEach(kw => {
-                // Filter brands to only selected ones
-                const kwBrands = kw.brands.filter(b => selectedBrands.includes(b.name));
-                const kwTotalClicks = kwBrands.reduce((sum, b) => sum + b.clicks, 0);
-
-                // Process brand_group
-                if (kw.brand_group) {
-                    if (!brandGroups[kw.brand_group]) {
-                        brandGroups[kw.brand_group] = {
-                            count: 0,
-                            total_clicks: 0,
-                            sample_keywords: [],
-                            brands_bidding: {}
-                        };
-                    }
-                    brandGroups[kw.brand_group].count++;
-                    brandGroups[kw.brand_group].total_clicks += kwTotalClicks;
-
-                    // Add sample keywords (max 10)
-                    if (brandGroups[kw.brand_group].sample_keywords.length < 10) {
-                        brandGroups[kw.brand_group].sample_keywords.push({
-                            keyword: kw.keyword,
-                            clicks: kwTotalClicks,
-                            brands: kwBrands.map(b => b.name)
-                        });
-                    }
-
-                    // Track brands bidding
-                    kwBrands.forEach(b => {
-                        if (!brandGroups[kw.brand_group].brands_bidding[b.name]) {
-                            brandGroups[kw.brand_group].brands_bidding[b.name] = { count: 0, clicks: 0 };
-                        }
-                        brandGroups[kw.brand_group].brands_bidding[b.name].count++;
-                        brandGroups[kw.brand_group].brands_bidding[b.name].clicks += b.clicks;
-                    });
-                }
-
-                // Process short_tail_group (topic)
-                if (kw.short_tail_group) {
-                    if (!topicGroups[kw.short_tail_group]) {
-                        topicGroups[kw.short_tail_group] = {
-                            count: 0,
-                            total_clicks: 0,
-                            sample_keywords: [],
-                            brands_bidding: {}
-                        };
-                    }
-                    topicGroups[kw.short_tail_group].count++;
-                    topicGroups[kw.short_tail_group].total_clicks += kwTotalClicks;
-
-                    // Add sample keywords (max 10, will sort later)
-                    if (topicGroups[kw.short_tail_group].sample_keywords.length < 10) {
-                        topicGroups[kw.short_tail_group].sample_keywords.push({
-                            keyword: kw.keyword,
-                            clicks: kwTotalClicks,
-                            brands: kwBrands.map(b => b.name)
-                        });
-                    }
-
-                    // Track brands bidding
-                    kwBrands.forEach(b => {
-                        if (!topicGroups[kw.short_tail_group].brands_bidding[b.name]) {
-                            topicGroups[kw.short_tail_group].brands_bidding[b.name] = { count: 0, clicks: 0 };
-                        }
-                        topicGroups[kw.short_tail_group].brands_bidding[b.name].count++;
-                        topicGroups[kw.short_tail_group].brands_bidding[b.name].clicks += b.clicks;
-                    });
-                }
-            });
-
-            // Sort sample_keywords by clicks within each group
-            Object.values(brandGroups).forEach(g => {
-                g.sample_keywords.sort((a, b) => b.clicks - a.clicks);
-            });
-            Object.values(topicGroups).forEach(g => {
-                g.sample_keywords.sort((a, b) => b.clicks - a.clicks);
-            });
-
-            // Update the display
-            const brandCount = Object.keys(brandGroups).length;
-            const topicCount = Object.keys(topicGroups).length;
-
-            document.getElementById('brand-count').textContent = brandCount;
-            document.getElementById('topic-count').textContent = topicCount;
-            document.getElementById('groups-summary').textContent = `${brandCount} brand groups, ${topicCount} topic groups`;
-
-            // Render brand groups
-            const brandsContainer = document.getElementById('groups-brands');
-            brandsContainer.innerHTML = Object.entries(brandGroups)
-                .sort((a, b) => b[1].count - a[1].count)
-                .map(([name, info]) => createGroupCard(name, info, 'brand'))
-                .join('');
-
-            // Render topic groups
-            const topicsContainer = document.getElementById('groups-topics');
-            topicsContainer.innerHTML = Object.entries(topicGroups)
-                .sort((a, b) => b[1].count - a[1].count)
-                .map(([name, info]) => createGroupCard(name, info, 'topic'))
-                .join('');
-
-            // Update total keywords stat to reflect filtered count
-            document.getElementById('stat-total').textContent = filteredKeywords.length.toLocaleString();
-        }
-
-        // Keyword Groups functionality
-        function toggleGroupsSection(header) {
-            header.classList.toggle('collapsed');
-            const content = document.getElementById('groups-content');
-            content.classList.toggle('show');
-        }
-
-        function switchGroupTab(tab, btn) {
-            document.querySelectorAll('.groups-tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-
-            document.getElementById('groups-brands').style.display = tab === 'brands' ? 'grid' : 'none';
-            document.getElementById('groups-topics').style.display = tab === 'topics' ? 'grid' : 'none';
-
-            // Update active keyword tab and refilter table
-            activeKeywordTab = tab;
-            // Clear any specific group filter when switching tabs
-            activeGroupFilter = null;
-            updateGroupFilterDisplay();
-            applyFilters();
-        }
-
-        function renderKeywordGroups(data) {
-            const groups = data.keyword_groups;
-            if (!groups) {
-                document.getElementById('groups-summary').textContent = 'No groups available';
-                return;
-            }
-
-            const brandCount = Object.keys(groups.brands || {}).length;
-            const topicCount = Object.keys(groups.topics || {}).length;
-
-            document.getElementById('brand-count').textContent = brandCount;
-            document.getElementById('topic-count').textContent = topicCount;
-            document.getElementById('groups-summary').textContent = `${brandCount} brand groups, ${topicCount} topic groups`;
-
-            // Render brand groups
-            const brandsContainer = document.getElementById('groups-brands');
-            brandsContainer.innerHTML = Object.entries(groups.brands || {})
-                .sort((a, b) => b[1].count - a[1].count)
-                .map(([name, info]) => createGroupCard(name, info, 'brand'))
-                .join('');
-
-            // Render topic groups
-            const topicsContainer = document.getElementById('groups-topics');
-            topicsContainer.innerHTML = Object.entries(groups.topics || {})
-                .sort((a, b) => b[1].count - a[1].count)
-                .map(([name, info]) => createGroupCard(name, info, 'topic'))
-                .join('');
-        }
-
-        function createGroupCard(name, info, type) {
-            const cardId = `group-${type}-${name.replace(/[^a-zA-Z0-9]/g, '-')}`;
-            const sampleKeywords = (info.sample_keywords || []).slice(0, 8);
-            const brandsBidding = info.brands_bidding || {};
-            const brandsList = Object.entries(brandsBidding)
-                .filter(([b]) => selectedBrands.includes(b))
-                .sort((a, b) => b[1].clicks - a[1].clicks);
-
-            // Format sample keywords with brand pills
-            const sampleHtml = sampleKeywords.map(sample => {
-                // Handle both old format (string) and new format (object)
-                const kw = typeof sample === 'string' ? sample : sample.keyword;
-                const brands = typeof sample === 'object' && sample.brands ? sample.brands : [];
-                const filteredBrands = brands.filter(b => selectedBrands.includes(b));
-
-                return `
-                    <div class="group-keyword" onclick="filterByKeyword('${escapeHtml(kw).replace(/'/g, "\\'")}')">
-                        <span>${escapeHtml(kw)}</span>
-                        <span class="group-kw-brands">
-                            ${filteredBrands.map(b => `<span class="brand-mini brand-${b}" title="${b}">${b.charAt(0).toUpperCase()}</span>`).join('')}
-                        </span>
-                    </div>
-                `;
-            }).join('');
-
-            // Format brands bidding summary
-            const brandsHtml = brandsList.length > 0 ? `
-                <div class="group-brands-summary">
-                    <div class="group-brands-title">Brands bidding:</div>
-                    ${brandsList.map(([brand, data]) => `
-                        <div class="group-brand-row">
-                            <span class="brand-chip brand-${brand}">${brand}</span>
-                            <span class="group-brand-stats">${data.count} kws · ${formatNumber(data.clicks)} clicks</span>
-                        </div>
-                    `).join('')}
-                </div>
-            ` : '';
-
-            return `
-                <div class="group-card" id="${cardId}">
-                    <div class="group-card-header" onclick="toggleGroupCard('${cardId}')">
-                        <span class="group-card-name">${escapeHtml(name)}</span>
-                        <span class="group-card-count">${info.count.toLocaleString()}</span>
-                    </div>
-                    <div class="group-card-body">
-                        ${brandsHtml}
-                        <div class="group-keywords-list">
-                            ${sampleHtml}
-                        </div>
-                        <button class="group-filter-btn" onclick="filterByGroup('${type}', '${escapeHtml(name).replace(/'/g, "\\'")}')">
-                            Show all ${info.count.toLocaleString()} keywords
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function toggleGroupCard(cardId) {
-            const card = document.getElementById(cardId);
-            card.classList.toggle('expanded');
-        }
-
-        function filterByKeyword(keyword) {
-            document.getElementById('search').value = keyword;
-            applyFilters();
-            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function filterByGroup(type, groupName) {
-            activeGroupFilter = { type, name: groupName };
-            updateGroupFilterDisplay();
-            applyFilters();
-            document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function clearGroupFilter() {
-            activeGroupFilter = null;
-            updateGroupFilterDisplay();
-            applyFilters();
-        }
-
-        function updateGroupFilterDisplay() {
-            const indicator = document.getElementById('group-filter-indicator');
-            if (activeGroupFilter) {
-                const typeLabel = activeGroupFilter.type === 'brand' ? 'Brand' : 'Topic';
-                indicator.innerHTML = `
-                    <span>Filtered by ${typeLabel}: <strong>${escapeHtml(activeGroupFilter.name)}</strong></span>
-                    <button onclick="clearGroupFilter()" style="background: var(--danger); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Clear Filter</button>
-                `;
-                indicator.style.display = 'flex';
-            } else {
-                indicator.style.display = 'none';
-            }
-        }
-
-        loadData();
-    </script>
-</body>
-</html>
- + formatNumber(spend);
-                } else {
-                    labelEl.textContent = '—';
-                    valueEl.textContent = '-';
-                }
-            }
+            // Update brand spend stats
+            document.getElementById('stat-clickfunnels').textContent = selectedBrands.includes('kajabi')
+                ? '$' + formatNumber(brandSpend.kajabi) : '-';
+            document.getElementById('stat-gohighlevel').textContent = selectedBrands.includes('clickfunnels')
+                ? '$' + formatNumber(brandSpend.clickfunnels) : '-';
+            document.getElementById('stat-kajabi').textContent = selectedBrands.includes('gohighlevel')
+                ? '$' + formatNumber(brandSpend.gohighlevel) : '-';
+            document.getElementById('stat-kartra').textContent = selectedBrands.includes('kartra')
+                ? '$' + formatNumber(brandSpend.kartra) : '-';
+            document.getElementById('stat-leadpages').textContent = selectedBrands.includes('leadpages')
+                ? '$' + formatNumber(brandSpend.leadpages) : '-';
+            document.getElementById('stat-systemeio').textContent = selectedBrands.includes('systemeio')
+                ? '$' + formatNumber(brandSpend.systemeio) : '-';
 
             if (filteredData.length > 0) {
                 const avgVolume = filteredData.reduce((sum, k) => sum + k.volume, 0) / filteredData.length;
