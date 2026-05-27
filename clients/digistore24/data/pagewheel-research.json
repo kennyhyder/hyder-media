@@ -169,6 +169,155 @@
       "differentiator_vs_pagewheel": "Agency tool, not creator tool. Different buyer entirely — included as adjacent competitor for branded keyword overlap.",
       "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=gohighlevel.com",
       "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=gohighlevel"
+    },
+    "base44": {
+      "name": "base44",
+      "domain": "base44.com",
+      "color": "#00d4ff",
+      "hex": "00d4ff",
+      "tagline": "AI no-code platform — build apps with natural language",
+      "pricing": {
+        "free": "$0/mo",
+        "paid": "$16/mo+ (credit-based)"
+      },
+      "positioning": "AI-powered no-code app builder. Closest spiritual sibling to PageWheel's AI-first approach, but app-focused vs page-focused.",
+      "estimated_us_monthly_spend": "$80K-130K",
+      "key_features": [
+        "AI-generated apps from prompts",
+        "Auto backend infrastructure",
+        "Credit-based AI generation",
+        "Internal tools focus",
+        "44% off yearly promo"
+      ],
+      "audience": "Non-technical entrepreneurs building internal tools, portals, productivity apps",
+      "differentiator_vs_pagewheel": "App-focused (workflows, internal tools) vs PageWheel's page/funnel focus. Adjacent — both AI-first for non-coders.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=base44.com",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=base44"
+    },
+    "elementor": {
+      "name": "Elementor",
+      "domain": "elementor.com",
+      "color": "#ed2059",
+      "hex": "ed2059",
+      "tagline": "The industry-leading visual website builder for WordPress",
+      "pricing": {
+        "free": "$0/mo (Editor)",
+        "pro": "Editor Pro tier",
+        "agency": "Elementor One Agency unlimited"
+      },
+      "positioning": "4M+ active WordPress installs. Drag-and-drop with integrated AI tools. Different category entirely (WordPress-dependent) but bids broadly on page-builder keywords.",
+      "estimated_us_monthly_spend": "$400K-650K",
+      "key_features": [
+        "Drag-and-drop WordPress editor",
+        "Integrated AI tools",
+        "Performance focus",
+        "Theme builder",
+        "Agency licensing"
+      ],
+      "audience": "WordPress users — web creators, agencies, freelancers, enterprises",
+      "differentiator_vs_pagewheel": "WordPress-dependent (requires WP install + hosting). PageWheel is standalone all-in-one. Different buyer entirely; PageWheel wins simplicity, Elementor wins for WP-committed users.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=elementor.com",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=elementor"
+    },
+    "lovable": {
+      "name": "Lovable",
+      "domain": "lovable.dev",
+      "color": "#7c3aed",
+      "hex": "7c3aed",
+      "tagline": "Build something Lovable — AI app builder via conversation",
+      "pricing": {
+        "free": "Trial",
+        "paid": "Tiered (see lovable.dev/pricing)"
+      },
+      "positioning": "Conversational AI app builder. Hot AI startup positioning. Targets broad builder personas from students to enterprise teams.",
+      "estimated_us_monthly_spend": "$200K-400K",
+      "key_features": [
+        "Chat-driven app/website generation",
+        "Real-time prototyping",
+        "Template library",
+        "Multi-persona targeting (student → enterprise)"
+      ],
+      "audience": "Students, founders, product managers, designers, marketers, enterprise teams",
+      "differentiator_vs_pagewheel": "App-builder positioning (more general-purpose) vs PageWheel's specific creator/coach niche. Big AI-startup brand momentum; PageWheel competes on category fit + price.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=lovable.dev",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=lovable.dev"
+    },
+    "shopify": {
+      "name": "Shopify",
+      "domain": "shopify.com",
+      "color": "#95bf47",
+      "hex": "95bf47",
+      "tagline": "The complete commerce platform",
+      "pricing": {
+        "basic": "$29/mo",
+        "shopify": "$79/mo",
+        "advanced": "$299/mo"
+      },
+      "positioning": "Ecommerce platform for selling physical/digital products. Bids broadly on website-builder and online-business keywords.",
+      "estimated_us_monthly_spend": "$2M-3M",
+      "key_features": [
+        "Ecommerce checkout",
+        "Inventory management",
+        "Multi-channel selling",
+        "App ecosystem",
+        "POS integration"
+      ],
+      "audience": "Ecommerce sellers, DTC brands, physical/digital product businesses",
+      "differentiator_vs_pagewheel": "Different category (ecommerce vs creator funnels). Both bid on \"online business\" / \"sell digital products\" terms but solve different problems. PageWheel is creator-first; Shopify is store-first.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=shopify.com",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=shopify"
+    },
+    "squarespace": {
+      "name": "Squarespace",
+      "domain": "squarespace.com",
+      "color": "#000000",
+      "hex": "000000",
+      "tagline": "Website builder for creatives, brands, and small businesses",
+      "pricing": {
+        "personal": "$16/mo",
+        "business": "$23/mo",
+        "commerce_basic": "$28/mo",
+        "commerce_advanced": "$49/mo"
+      },
+      "positioning": "Design-forward website builder. Strong brand recognition. Bids on \"website builder\" and adjacent terms heavily.",
+      "estimated_us_monthly_spend": "$1.5M-2.2M",
+      "key_features": [
+        "Beautiful templates",
+        "Built-in SEO",
+        "Ecommerce + bookings",
+        "Domain registration",
+        "Email campaigns"
+      ],
+      "audience": "Creatives, photographers, designers, small businesses, restaurants",
+      "differentiator_vs_pagewheel": "General website builder, no funnel/checkout/community focus. Different buyer; PageWheel competes on funnel-specific use cases vs Squarespace's general-site lane.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=squarespace.com",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=squarespace"
+    },
+    "wix": {
+      "name": "Wix",
+      "domain": "wix.com",
+      "color": "#fbe000",
+      "hex": "fbe000",
+      "tagline": "Create a website you're proud of",
+      "pricing": {
+        "light": "$17/mo",
+        "core": "$29/mo",
+        "business": "$36/mo",
+        "business_elite": "$159/mo"
+      },
+      "positioning": "Largest brand-name website builder. Heavy paid search spend. Wix bids on \"page builder\" and adjacent broad terms massively.",
+      "estimated_us_monthly_spend": "$3M-5M",
+      "key_features": [
+        "Drag-and-drop editor",
+        "Wix AI (Wix ADI)",
+        "App marketplace",
+        "Built-in marketing tools",
+        "Mobile-first templates"
+      ],
+      "audience": "SMBs, freelancers, hobbyists, small ecommerce",
+      "differentiator_vs_pagewheel": "Largest brand in this set — bids broadly on every website-builder keyword. PageWheel's wedge: AI-first templates targeted at creators (not generic SMBs) at half the price.",
+      "transparency_center_url": "https://adstransparency.google.com/?region=US&domain=wix.com",
+      "transparency_facebook_url": "https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=US&search_type=page&q=wix"
     }
   },
   "keyword_groups": {
@@ -176,100 +325,467 @@
       "label": "Core category — landing page + funnel builders",
       "description": "High-intent searches for the product category itself. PageWheel directly competes for these.",
       "keywords": [
-        { "kw": "landing page builder", "intent": "Informational/Commercial", "est_volume": 33100, "est_cpc": 11.42 },
-        { "kw": "best landing page builder", "intent": "Commercial", "est_volume": 8100, "est_cpc": 12.85 },
-        { "kw": "funnel builder", "intent": "Commercial", "est_volume": 9900, "est_cpc": 14.20 },
-        { "kw": "best funnel builder", "intent": "Commercial", "est_volume": 2400, "est_cpc": 15.40 },
-        { "kw": "sales funnel builder", "intent": "Commercial", "est_volume": 4400, "est_cpc": 13.10 },
-        { "kw": "landing page software", "intent": "Commercial", "est_volume": 2900, "est_cpc": 10.85 },
-        { "kw": "funnel software", "intent": "Commercial", "est_volume": 1900, "est_cpc": 12.60 },
-        { "kw": "landing page creator", "intent": "Commercial", "est_volume": 1600, "est_cpc": 9.80 },
-        { "kw": "easy landing page builder", "intent": "Commercial", "est_volume": 880, "est_cpc": 8.50 },
-        { "kw": "cheap landing page builder", "intent": "Commercial", "est_volume": 720, "est_cpc": 7.20 },
-        { "kw": "free landing page builder", "intent": "Informational", "est_volume": 18100, "est_cpc": 6.40 },
-        { "kw": "landing page platform", "intent": "Commercial", "est_volume": 720, "est_cpc": 10.40 },
-        { "kw": "drag and drop landing page builder", "intent": "Commercial", "est_volume": 1900, "est_cpc": 11.20 },
-        { "kw": "no code landing page builder", "intent": "Commercial", "est_volume": 1300, "est_cpc": 9.60 },
-        { "kw": "click funnels alternative", "intent": "Commercial", "est_volume": 1900, "est_cpc": 13.80 },
-        { "kw": "clickfunnels alternatives", "intent": "Commercial", "est_volume": 1900, "est_cpc": 13.80 },
-        { "kw": "leadpages alternative", "intent": "Commercial", "est_volume": 480, "est_cpc": 11.20 },
-        { "kw": "kajabi alternative", "intent": "Commercial", "est_volume": 1000, "est_cpc": 12.80 }
+        {
+          "kw": "landing page builder",
+          "intent": "Informational/Commercial",
+          "est_volume": 33100,
+          "est_cpc": 11.42
+        },
+        {
+          "kw": "best landing page builder",
+          "intent": "Commercial",
+          "est_volume": 8100,
+          "est_cpc": 12.85
+        },
+        {
+          "kw": "funnel builder",
+          "intent": "Commercial",
+          "est_volume": 9900,
+          "est_cpc": 14.2
+        },
+        {
+          "kw": "best funnel builder",
+          "intent": "Commercial",
+          "est_volume": 2400,
+          "est_cpc": 15.4
+        },
+        {
+          "kw": "sales funnel builder",
+          "intent": "Commercial",
+          "est_volume": 4400,
+          "est_cpc": 13.1
+        },
+        {
+          "kw": "landing page software",
+          "intent": "Commercial",
+          "est_volume": 2900,
+          "est_cpc": 10.85
+        },
+        {
+          "kw": "funnel software",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 12.6
+        },
+        {
+          "kw": "landing page creator",
+          "intent": "Commercial",
+          "est_volume": 1600,
+          "est_cpc": 9.8
+        },
+        {
+          "kw": "easy landing page builder",
+          "intent": "Commercial",
+          "est_volume": 880,
+          "est_cpc": 8.5
+        },
+        {
+          "kw": "cheap landing page builder",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 7.2
+        },
+        {
+          "kw": "free landing page builder",
+          "intent": "Informational",
+          "est_volume": 18100,
+          "est_cpc": 6.4
+        },
+        {
+          "kw": "landing page platform",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 10.4
+        },
+        {
+          "kw": "drag and drop landing page builder",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 11.2
+        },
+        {
+          "kw": "no code landing page builder",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 9.6
+        },
+        {
+          "kw": "click funnels alternative",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 13.8
+        },
+        {
+          "kw": "clickfunnels alternatives",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 13.8
+        },
+        {
+          "kw": "leadpages alternative",
+          "intent": "Commercial",
+          "est_volume": 480,
+          "est_cpc": 11.2
+        },
+        {
+          "kw": "kajabi alternative",
+          "intent": "Commercial",
+          "est_volume": 1000,
+          "est_cpc": 12.8
+        }
       ]
     },
     "ai_assisted": {
       "label": "AI page-builder searches — PageWheel's positioning sweet spot",
       "description": "Searches with AI/automation intent. This is where PageWheel differentiates.",
       "keywords": [
-        { "kw": "ai landing page builder", "intent": "Commercial", "est_volume": 8100, "est_cpc": 9.40 },
-        { "kw": "ai funnel builder", "intent": "Commercial", "est_volume": 1300, "est_cpc": 11.40 },
-        { "kw": "ai page builder", "intent": "Commercial", "est_volume": 2400, "est_cpc": 8.80 },
-        { "kw": "ai sales funnel", "intent": "Commercial", "est_volume": 720, "est_cpc": 10.90 },
-        { "kw": "ai website builder for entrepreneurs", "intent": "Commercial", "est_volume": 590, "est_cpc": 7.60 },
-        { "kw": "ai landing page generator", "intent": "Commercial", "est_volume": 1900, "est_cpc": 8.20 },
-        { "kw": "ai landing page creator", "intent": "Commercial", "est_volume": 880, "est_cpc": 7.40 },
-        { "kw": "create landing page with ai", "intent": "Informational", "est_volume": 1600, "est_cpc": 6.80 },
-        { "kw": "ai copywriting landing page", "intent": "Commercial", "est_volume": 320, "est_cpc": 9.60 },
-        { "kw": "auto generate landing page", "intent": "Commercial", "est_volume": 260, "est_cpc": 7.20 }
+        {
+          "kw": "ai landing page builder",
+          "intent": "Commercial",
+          "est_volume": 8100,
+          "est_cpc": 9.4
+        },
+        {
+          "kw": "ai funnel builder",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 11.4
+        },
+        {
+          "kw": "ai page builder",
+          "intent": "Commercial",
+          "est_volume": 2400,
+          "est_cpc": 8.8
+        },
+        {
+          "kw": "ai sales funnel",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 10.9
+        },
+        {
+          "kw": "ai website builder for entrepreneurs",
+          "intent": "Commercial",
+          "est_volume": 590,
+          "est_cpc": 7.6
+        },
+        {
+          "kw": "ai landing page generator",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 8.2
+        },
+        {
+          "kw": "ai landing page creator",
+          "intent": "Commercial",
+          "est_volume": 880,
+          "est_cpc": 7.4
+        },
+        {
+          "kw": "create landing page with ai",
+          "intent": "Informational",
+          "est_volume": 1600,
+          "est_cpc": 6.8
+        },
+        {
+          "kw": "ai copywriting landing page",
+          "intent": "Commercial",
+          "est_volume": 320,
+          "est_cpc": 9.6
+        },
+        {
+          "kw": "auto generate landing page",
+          "intent": "Commercial",
+          "est_volume": 260,
+          "est_cpc": 7.2
+        }
       ]
     },
     "audience_specific": {
       "label": "Audience-specific intent — coaches, course creators, authors",
       "description": "PageWheel's stated target personas.",
       "keywords": [
-        { "kw": "landing page for coaches", "intent": "Commercial", "est_volume": 590, "est_cpc": 10.20 },
-        { "kw": "funnel builder for coaches", "intent": "Commercial", "est_volume": 480, "est_cpc": 12.40 },
-        { "kw": "website builder for coaches", "intent": "Commercial", "est_volume": 1300, "est_cpc": 8.80 },
-        { "kw": "landing page for course creators", "intent": "Commercial", "est_volume": 320, "est_cpc": 9.40 },
-        { "kw": "online course landing page", "intent": "Commercial", "est_volume": 720, "est_cpc": 8.20 },
-        { "kw": "lead magnet landing page", "intent": "Commercial", "est_volume": 1000, "est_cpc": 7.40 },
-        { "kw": "sales page for ebook", "intent": "Commercial", "est_volume": 390, "est_cpc": 6.80 },
-        { "kw": "landing page for authors", "intent": "Commercial", "est_volume": 260, "est_cpc": 6.40 },
-        { "kw": "funnel for course launch", "intent": "Commercial", "est_volume": 210, "est_cpc": 11.20 },
-        { "kw": "digital product landing page", "intent": "Commercial", "est_volume": 480, "est_cpc": 7.20 },
-        { "kw": "landing page for online business", "intent": "Commercial", "est_volume": 880, "est_cpc": 8.40 },
-        { "kw": "landing page for network marketers", "intent": "Commercial", "est_volume": 210, "est_cpc": 9.20 },
-        { "kw": "agency landing page builder", "intent": "Commercial", "est_volume": 590, "est_cpc": 10.80 }
+        {
+          "kw": "landing page for coaches",
+          "intent": "Commercial",
+          "est_volume": 590,
+          "est_cpc": 10.2
+        },
+        {
+          "kw": "funnel builder for coaches",
+          "intent": "Commercial",
+          "est_volume": 480,
+          "est_cpc": 12.4
+        },
+        {
+          "kw": "website builder for coaches",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 8.8
+        },
+        {
+          "kw": "landing page for course creators",
+          "intent": "Commercial",
+          "est_volume": 320,
+          "est_cpc": 9.4
+        },
+        {
+          "kw": "online course landing page",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 8.2
+        },
+        {
+          "kw": "lead magnet landing page",
+          "intent": "Commercial",
+          "est_volume": 1000,
+          "est_cpc": 7.4
+        },
+        {
+          "kw": "sales page for ebook",
+          "intent": "Commercial",
+          "est_volume": 390,
+          "est_cpc": 6.8
+        },
+        {
+          "kw": "landing page for authors",
+          "intent": "Commercial",
+          "est_volume": 260,
+          "est_cpc": 6.4
+        },
+        {
+          "kw": "funnel for course launch",
+          "intent": "Commercial",
+          "est_volume": 210,
+          "est_cpc": 11.2
+        },
+        {
+          "kw": "digital product landing page",
+          "intent": "Commercial",
+          "est_volume": 480,
+          "est_cpc": 7.2
+        },
+        {
+          "kw": "landing page for online business",
+          "intent": "Commercial",
+          "est_volume": 880,
+          "est_cpc": 8.4
+        },
+        {
+          "kw": "landing page for network marketers",
+          "intent": "Commercial",
+          "est_volume": 210,
+          "est_cpc": 9.2
+        },
+        {
+          "kw": "agency landing page builder",
+          "intent": "Commercial",
+          "est_volume": 590,
+          "est_cpc": 10.8
+        }
       ]
     },
     "use_case": {
       "label": "Use-case searches — what people are trying to build",
       "description": "Bottom-of-funnel searches with strong purchase intent.",
       "keywords": [
-        { "kw": "create a sales funnel", "intent": "Informational", "est_volume": 3600, "est_cpc": 11.20 },
-        { "kw": "how to build a landing page", "intent": "Informational", "est_volume": 8100, "est_cpc": 5.40 },
-        { "kw": "how to build a sales funnel", "intent": "Informational", "est_volume": 4400, "est_cpc": 8.80 },
-        { "kw": "build landing page fast", "intent": "Commercial", "est_volume": 720, "est_cpc": 7.60 },
-        { "kw": "launch online business", "intent": "Commercial", "est_volume": 1300, "est_cpc": 12.40 },
-        { "kw": "sell digital products online", "intent": "Commercial", "est_volume": 2900, "est_cpc": 9.80 },
-        { "kw": "how to sell digital products", "intent": "Informational", "est_volume": 3600, "est_cpc": 8.20 },
-        { "kw": "build a website for my business", "intent": "Informational", "est_volume": 2400, "est_cpc": 9.60 },
-        { "kw": "build a sales page", "intent": "Commercial", "est_volume": 590, "est_cpc": 7.40 },
-        { "kw": "create lead magnet", "intent": "Informational", "est_volume": 1900, "est_cpc": 6.80 },
-        { "kw": "build an online course", "intent": "Informational", "est_volume": 4400, "est_cpc": 10.40 },
-        { "kw": "sell course online", "intent": "Commercial", "est_volume": 1600, "est_cpc": 11.20 }
+        {
+          "kw": "create a sales funnel",
+          "intent": "Informational",
+          "est_volume": 3600,
+          "est_cpc": 11.2
+        },
+        {
+          "kw": "how to build a landing page",
+          "intent": "Informational",
+          "est_volume": 8100,
+          "est_cpc": 5.4
+        },
+        {
+          "kw": "how to build a sales funnel",
+          "intent": "Informational",
+          "est_volume": 4400,
+          "est_cpc": 8.8
+        },
+        {
+          "kw": "build landing page fast",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 7.6
+        },
+        {
+          "kw": "launch online business",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 12.4
+        },
+        {
+          "kw": "sell digital products online",
+          "intent": "Commercial",
+          "est_volume": 2900,
+          "est_cpc": 9.8
+        },
+        {
+          "kw": "how to sell digital products",
+          "intent": "Informational",
+          "est_volume": 3600,
+          "est_cpc": 8.2
+        },
+        {
+          "kw": "build a website for my business",
+          "intent": "Informational",
+          "est_volume": 2400,
+          "est_cpc": 9.6
+        },
+        {
+          "kw": "build a sales page",
+          "intent": "Commercial",
+          "est_volume": 590,
+          "est_cpc": 7.4
+        },
+        {
+          "kw": "create lead magnet",
+          "intent": "Informational",
+          "est_volume": 1900,
+          "est_cpc": 6.8
+        },
+        {
+          "kw": "build an online course",
+          "intent": "Informational",
+          "est_volume": 4400,
+          "est_cpc": 10.4
+        },
+        {
+          "kw": "sell course online",
+          "intent": "Commercial",
+          "est_volume": 1600,
+          "est_cpc": 11.2
+        }
       ]
     },
     "brand_competitor": {
       "label": "Branded competitor searches — opportunity for conquesting",
       "description": "PageWheel can bid on these (review intent, comparison intent) to capture share-of-voice from competitor brand searches.",
       "keywords": [
-        { "kw": "clickfunnels review", "intent": "Commercial", "est_volume": 4400, "est_cpc": 7.40, "brand": "clickfunnels" },
-        { "kw": "clickfunnels pricing", "intent": "Commercial", "est_volume": 6600, "est_cpc": 6.20, "brand": "clickfunnels" },
-        { "kw": "clickfunnels vs", "intent": "Commercial", "est_volume": 2900, "est_cpc": 8.80, "brand": "clickfunnels" },
-        { "kw": "is clickfunnels worth it", "intent": "Commercial", "est_volume": 720, "est_cpc": 6.40, "brand": "clickfunnels" },
-        { "kw": "leadpages review", "intent": "Commercial", "est_volume": 1300, "est_cpc": 6.80, "brand": "leadpages" },
-        { "kw": "leadpages pricing", "intent": "Commercial", "est_volume": 1600, "est_cpc": 5.80, "brand": "leadpages" },
-        { "kw": "leadpages vs", "intent": "Commercial", "est_volume": 880, "est_cpc": 7.40, "brand": "leadpages" },
-        { "kw": "kajabi review", "intent": "Commercial", "est_volume": 2400, "est_cpc": 7.20, "brand": "kajabi" },
-        { "kw": "kajabi pricing", "intent": "Commercial", "est_volume": 5400, "est_cpc": 5.40, "brand": "kajabi" },
-        { "kw": "kajabi vs", "intent": "Commercial", "est_volume": 2900, "est_cpc": 8.20, "brand": "kajabi" },
-        { "kw": "kartra review", "intent": "Commercial", "est_volume": 1300, "est_cpc": 7.80, "brand": "kartra" },
-        { "kw": "kartra pricing", "intent": "Commercial", "est_volume": 1600, "est_cpc": 5.80, "brand": "kartra" },
-        { "kw": "systeme io review", "intent": "Commercial", "est_volume": 2400, "est_cpc": 5.40, "brand": "systemeio" },
-        { "kw": "systeme io pricing", "intent": "Commercial", "est_volume": 1300, "est_cpc": 4.80, "brand": "systemeio" },
-        { "kw": "systeme io vs clickfunnels", "intent": "Commercial", "est_volume": 880, "est_cpc": 7.40, "brand": "systemeio" },
-        { "kw": "gohighlevel review", "intent": "Commercial", "est_volume": 1900, "est_cpc": 8.40, "brand": "gohighlevel" },
-        { "kw": "gohighlevel pricing", "intent": "Commercial", "est_volume": 2400, "est_cpc": 7.20, "brand": "gohighlevel" }
+        {
+          "kw": "clickfunnels review",
+          "intent": "Commercial",
+          "est_volume": 4400,
+          "est_cpc": 7.4,
+          "brand": "clickfunnels"
+        },
+        {
+          "kw": "clickfunnels pricing",
+          "intent": "Commercial",
+          "est_volume": 6600,
+          "est_cpc": 6.2,
+          "brand": "clickfunnels"
+        },
+        {
+          "kw": "clickfunnels vs",
+          "intent": "Commercial",
+          "est_volume": 2900,
+          "est_cpc": 8.8,
+          "brand": "clickfunnels"
+        },
+        {
+          "kw": "is clickfunnels worth it",
+          "intent": "Commercial",
+          "est_volume": 720,
+          "est_cpc": 6.4,
+          "brand": "clickfunnels"
+        },
+        {
+          "kw": "leadpages review",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 6.8,
+          "brand": "leadpages"
+        },
+        {
+          "kw": "leadpages pricing",
+          "intent": "Commercial",
+          "est_volume": 1600,
+          "est_cpc": 5.8,
+          "brand": "leadpages"
+        },
+        {
+          "kw": "leadpages vs",
+          "intent": "Commercial",
+          "est_volume": 880,
+          "est_cpc": 7.4,
+          "brand": "leadpages"
+        },
+        {
+          "kw": "kajabi review",
+          "intent": "Commercial",
+          "est_volume": 2400,
+          "est_cpc": 7.2,
+          "brand": "kajabi"
+        },
+        {
+          "kw": "kajabi pricing",
+          "intent": "Commercial",
+          "est_volume": 5400,
+          "est_cpc": 5.4,
+          "brand": "kajabi"
+        },
+        {
+          "kw": "kajabi vs",
+          "intent": "Commercial",
+          "est_volume": 2900,
+          "est_cpc": 8.2,
+          "brand": "kajabi"
+        },
+        {
+          "kw": "kartra review",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 7.8,
+          "brand": "kartra"
+        },
+        {
+          "kw": "kartra pricing",
+          "intent": "Commercial",
+          "est_volume": 1600,
+          "est_cpc": 5.8,
+          "brand": "kartra"
+        },
+        {
+          "kw": "systeme io review",
+          "intent": "Commercial",
+          "est_volume": 2400,
+          "est_cpc": 5.4,
+          "brand": "systemeio"
+        },
+        {
+          "kw": "systeme io pricing",
+          "intent": "Commercial",
+          "est_volume": 1300,
+          "est_cpc": 4.8,
+          "brand": "systemeio"
+        },
+        {
+          "kw": "systeme io vs clickfunnels",
+          "intent": "Commercial",
+          "est_volume": 880,
+          "est_cpc": 7.4,
+          "brand": "systemeio"
+        },
+        {
+          "kw": "gohighlevel review",
+          "intent": "Commercial",
+          "est_volume": 1900,
+          "est_cpc": 8.4,
+          "brand": "gohighlevel"
+        },
+        {
+          "kw": "gohighlevel pricing",
+          "intent": "Commercial",
+          "est_volume": 2400,
+          "est_cpc": 7.2,
+          "brand": "gohighlevel"
+        }
       ]
     }
   },
@@ -278,7 +794,7 @@
     "total_estimated_monthly_search_volume": 247940,
     "total_estimated_competitor_monthly_spend_usd": "$1.66M - $2.39M",
     "category_average_cpc": 8.85,
-    "highest_intent_band_avg_cpc": 11.40,
+    "highest_intent_band_avg_cpc": 11.4,
     "pagewheel_addressable_keyword_count": 75,
     "pagewheel_addressable_brand_competitor_count": 17,
     "data_source_note": "Volumes are researched estimates based on category knowledge and public Google Keyword Planner data points. For production planning, run these through the Hyder Media Google Keyword Planner endpoint at /api/google-ads/keywords for live volumes against the actual Digistore24 account."
@@ -361,6 +877,84 @@
       "page_length": "Long — feature-grid heavy",
       "pricing_visibility": "Linked from nav",
       "key_takeaway": "Agency platform, different buyer. Included for comparison/conquest opportunity only — PageWheel doesn't directly compete here."
+    },
+    "base44": {
+      "lp_url": "https://base44.com/",
+      "hero_headline": "AI no-code platform — build apps with natural language",
+      "hero_video": true,
+      "primary_cta": "Start Building",
+      "social_proof": "44% off yearly promo, growing user base",
+      "trust_signals": "Israeli startup credibility, app gallery, customer logos",
+      "design_style": "Modern tech aesthetic, cyan accent on dark theme, motion graphics demonstrate AI generation in real-time",
+      "form_fields": "Email on signup",
+      "page_length": "Medium",
+      "pricing_visibility": "Pricing in nav, free tier emphasized",
+      "key_takeaway": "PageWheel's AI-first positioning has direct competition here — but base44 is app-focused (internal tools, workflows) while PageWheel is page/funnel-focused. PageWheel can own the creator niche; base44 owns the operator niche."
+    },
+    "elementor": {
+      "lp_url": "https://elementor.com/",
+      "hero_headline": "The industry-leading visual website builder for WordPress",
+      "hero_video": false,
+      "primary_cta": "Get started",
+      "social_proof": "4M+ active WordPress installs, customer logos, community size",
+      "trust_signals": "Massive install base, agency case studies, developer community",
+      "design_style": "Pink/red accent, screenshot-heavy, feature-grid layout",
+      "form_fields": "Email on signup",
+      "page_length": "Long",
+      "pricing_visibility": "Free + paid tiers clear in nav",
+      "key_takeaway": "Different buyer (WordPress committed). PageWheel's standalone all-in-one approach removes the WordPress prerequisite — easier first-time setup but no fallback into existing WP sites."
+    },
+    "lovable": {
+      "lp_url": "https://lovable.dev/",
+      "hero_headline": "Build something Lovable",
+      "hero_video": true,
+      "primary_cta": "Build something Lovable",
+      "social_proof": "Enterprise customer logos, template gallery, social mentions",
+      "trust_signals": "AI-startup brand cachet, developer community, app showcase",
+      "design_style": "Purple gradient, AI-startup minimalism, conversational UI demo",
+      "form_fields": "Email + use case",
+      "page_length": "Medium",
+      "pricing_visibility": "Linked from nav",
+      "key_takeaway": "Hot brand momentum in AI space. PageWheel wins where the buyer wants pages/funnels specifically (vs Lovable's broad app-builder positioning). Lovable is the brand-recognition leader in AI builders right now."
+    },
+    "shopify": {
+      "lp_url": "https://www.shopify.com/",
+      "hero_headline": "The complete commerce platform",
+      "hero_video": true,
+      "primary_cta": "Start free trial",
+      "social_proof": "Millions of merchants, customer earnings data, enterprise logos",
+      "trust_signals": "Massive scale + ubiquitous brand recognition, GMV totals",
+      "design_style": "Green accent on white, product/store screenshots, retail aesthetic",
+      "form_fields": "Email signup",
+      "page_length": "Long",
+      "pricing_visibility": "Clear in nav",
+      "key_takeaway": "Different category (ecommerce). Includes for keyword overlap on \"online business\" / \"sell digital products\" terms. PageWheel doesn't directly compete on inventory/shipping; PageWheel wins the digital-only creator."
+    },
+    "squarespace": {
+      "lp_url": "https://www.squarespace.com/",
+      "hero_headline": "Website builder for creatives, brands, and small businesses",
+      "hero_video": true,
+      "primary_cta": "Get started",
+      "social_proof": "Customer logos (Keanu Reeves, John Malkovich brands), award wins",
+      "trust_signals": "Celebrity brand collaborations, design awards, longevity",
+      "design_style": "Editorial photography, black accent, beautiful template showcase",
+      "form_fields": "Email signup",
+      "page_length": "Medium-long",
+      "pricing_visibility": "Clear pricing page",
+      "key_takeaway": "Design-first positioning aimed at creatives + brands. PageWheel's funnel/checkout/lead-magnet specialization is invisible here. They cross-bid heavily but solve different problems."
+    },
+    "wix": {
+      "lp_url": "https://www.wix.com/",
+      "hero_headline": "Create a website you're proud of",
+      "hero_video": true,
+      "primary_cta": "Get Started",
+      "social_proof": "Millions of users, customer site showcase, ad spend visible everywhere",
+      "trust_signals": "Massive brand recognition, AI/ADI feature emphasis, partner ecosystem",
+      "design_style": "Yellow accent, drag-and-drop demos prominent, big bold blocks",
+      "form_fields": "Email signup",
+      "page_length": "Long",
+      "pricing_visibility": "In nav",
+      "key_takeaway": "Largest brand spender in this set. Bids on every page-builder keyword. PageWheel's wedge: niche-specific to creators (not generic SMBs), AI-first templates with done-for-you setup, half the price."
     }
   },
   "projection_assumptions": {
@@ -374,8 +968,8 @@
       "ltv_basis": "Starter $27 × 8mo = $216; Business $47 × 12mo = $564. Blended assumes 60/40 starter/business mix = $216×0.6 + $564×0.4 = $355. Round to $384 to account for upsells/annual conversions."
     },
     "category_conversion_rates": {
-      "click_to_trial_signup": 0.0250,
-      "trial_to_paid": 0.30,
+      "click_to_trial_signup": 0.025,
+      "trial_to_paid": 0.3,
       "click_to_paid_blended": 0.0075,
       "basis": "Category benchmark — SaaS w/ free trial typically converts 2.5-3% click→trial and 25-35% trial→paid. 0.75% click→paid is realistic for cold paid search."
     },
