@@ -477,7 +477,7 @@
       }
     }
   },
-  "global_avg_cpc": 9.43,
+  "global_avg_cpc": 15.97,
   "keywords": [
     {
       "keyword": "landing page builder",
@@ -485,19 +485,19 @@
       "intent": "Informational/Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 828,
-      "total_spend": 9455.76,
-      "volume": 33100,
-      "cpc": 11.42,
+      "total_clicks": 90,
+      "total_spend": 1786.5,
+      "volume": 3600,
+      "cpc": 19.85,
       "brands": [],
       "google": {
-        "annual_volume": 397200,
-        "avg_monthly_searches": 33100,
-        "competition": "HIGH",
-        "competition_index": 91,
-        "low_top_of_page_bid": 6.85,
-        "high_top_of_page_bid": 15.99,
-        "average_cpc": 11.42
+        "annual_volume": 43200,
+        "avg_monthly_searches": 3600,
+        "competition": "LOW",
+        "competition_index": 31,
+        "low_top_of_page_bid": 7.564665,
+        "high_top_of_page_bid": 32.126858,
+        "average_cpc": 19.85
       }
     },
     {
@@ -506,19 +506,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 203,
-      "total_spend": 2608.55,
-      "volume": 8100,
-      "cpc": 12.85,
+      "total_clicks": 12,
+      "total_spend": 231,
+      "volume": 480,
+      "cpc": 19.25,
       "brands": [],
       "google": {
-        "annual_volume": 97200,
-        "avg_monthly_searches": 8100,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 7.71,
-        "high_top_of_page_bid": 17.99,
-        "average_cpc": 12.85
+        "annual_volume": 5760,
+        "avg_monthly_searches": 480,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 5.149126,
+        "high_top_of_page_bid": 33.35196,
+        "average_cpc": 19.25
       }
     },
     {
@@ -527,19 +527,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 248,
-      "total_spend": 3521.6,
-      "volume": 9900,
-      "cpc": 14.2,
+      "total_clicks": 90,
+      "total_spend": 1603.8,
+      "volume": 3600,
+      "cpc": 17.82,
       "brands": [],
       "google": {
-        "annual_volume": 118800,
-        "avg_monthly_searches": 9900,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 8.52,
-        "high_top_of_page_bid": 19.88,
-        "average_cpc": 14.2
+        "annual_volume": 43200,
+        "avg_monthly_searches": 3600,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 5.642965,
+        "high_top_of_page_bid": 29.990054,
+        "average_cpc": 17.82
       }
     },
     {
@@ -548,19 +548,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 60,
-      "total_spend": 924,
-      "volume": 2400,
-      "cpc": 15.4,
+      "total_clicks": 2,
+      "total_spend": 41.08,
+      "volume": 90,
+      "cpc": 20.54,
       "brands": [],
       "google": {
-        "annual_volume": 28800,
-        "avg_monthly_searches": 2400,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 9.24,
-        "high_top_of_page_bid": 21.56,
-        "average_cpc": 15.4
+        "annual_volume": 1080,
+        "avg_monthly_searches": 90,
+        "competition": "LOW",
+        "competition_index": 23,
+        "low_top_of_page_bid": 5.106674,
+        "high_top_of_page_bid": 35.97988,
+        "average_cpc": 20.54
       }
     },
     {
@@ -569,19 +569,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 110,
-      "total_spend": 1441,
-      "volume": 4400,
-      "cpc": 13.1,
+      "total_clicks": 90,
+      "total_spend": 1603.8,
+      "volume": 3600,
+      "cpc": 17.82,
       "brands": [],
       "google": {
-        "annual_volume": 52800,
-        "avg_monthly_searches": 4400,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 7.86,
-        "high_top_of_page_bid": 18.34,
-        "average_cpc": 13.1
+        "annual_volume": 43200,
+        "avg_monthly_searches": 3600,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 5.642965,
+        "high_top_of_page_bid": 29.990054,
+        "average_cpc": 17.82
       }
     },
     {
@@ -590,19 +590,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 73,
-      "total_spend": 792.05,
-      "volume": 2900,
-      "cpc": 10.85,
+      "total_clicks": 5,
+      "total_spend": 58.35,
+      "volume": 210,
+      "cpc": 11.67,
       "brands": [],
       "google": {
-        "annual_volume": 34800,
-        "avg_monthly_searches": 2900,
-        "competition": "HIGH",
-        "competition_index": 87,
-        "low_top_of_page_bid": 6.51,
-        "high_top_of_page_bid": 15.19,
-        "average_cpc": 10.85
+        "annual_volume": 2520,
+        "avg_monthly_searches": 210,
+        "competition": "MEDIUM",
+        "competition_index": 34,
+        "low_top_of_page_bid": 4.575481,
+        "high_top_of_page_bid": 18.7709,
+        "average_cpc": 11.67
       }
     },
     {
@@ -611,19 +611,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 48,
-      "total_spend": 604.8,
-      "volume": 1900,
-      "cpc": 12.6,
+      "total_clicks": 4,
+      "total_spend": 61.36,
+      "volume": 140,
+      "cpc": 15.34,
       "brands": [],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 7.56,
-        "high_top_of_page_bid": 17.64,
-        "average_cpc": 12.6
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
+        "competition": "MEDIUM",
+        "competition_index": 44,
+        "low_top_of_page_bid": 4.26865,
+        "high_top_of_page_bid": 26.402394,
+        "average_cpc": 15.34
       }
     },
     {
@@ -632,19 +632,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 40,
-      "total_spend": 392,
-      "volume": 1600,
-      "cpc": 9.8,
+      "total_clicks": 25,
+      "total_spend": 541.25,
+      "volume": 1000,
+      "cpc": 21.65,
       "brands": [],
       "google": {
-        "annual_volume": 19200,
-        "avg_monthly_searches": 1600,
+        "annual_volume": 12000,
+        "avg_monthly_searches": 1000,
         "competition": "MEDIUM",
-        "competition_index": 78,
-        "low_top_of_page_bid": 5.88,
-        "high_top_of_page_bid": 13.72,
-        "average_cpc": 9.8
+        "competition_index": 60,
+        "low_top_of_page_bid": 8.42161,
+        "high_top_of_page_bid": 34.8821,
+        "average_cpc": 21.65
       }
     },
     {
@@ -653,19 +653,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 22,
-      "total_spend": 187,
-      "volume": 880,
-      "cpc": 8.5,
+      "total_clicks": 1,
+      "total_spend": 32.23,
+      "volume": 50,
+      "cpc": 32.23,
       "brands": [],
       "google": {
-        "annual_volume": 10560,
-        "avg_monthly_searches": 880,
-        "competition": "MEDIUM",
-        "competition_index": 68,
-        "low_top_of_page_bid": 5.1,
-        "high_top_of_page_bid": 11.9,
-        "average_cpc": 8.5
+        "annual_volume": 600,
+        "avg_monthly_searches": 50,
+        "competition": "HIGH",
+        "competition_index": 73,
+        "low_top_of_page_bid": 12.502499,
+        "high_top_of_page_bid": 51.958248,
+        "average_cpc": 32.23
       }
     },
     {
@@ -674,19 +674,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 18,
-      "total_spend": 129.6,
-      "volume": 720,
-      "cpc": 7.2,
+      "total_clicks": 2,
+      "total_spend": 31.02,
+      "volume": 70,
+      "cpc": 15.51,
       "brands": [],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "MEDIUM",
-        "competition_index": 58,
-        "low_top_of_page_bid": 4.32,
-        "high_top_of_page_bid": 10.08,
-        "average_cpc": 7.2
+        "annual_volume": 840,
+        "avg_monthly_searches": 70,
+        "competition": "HIGH",
+        "competition_index": 73,
+        "low_top_of_page_bid": 5.819824,
+        "high_top_of_page_bid": 25.203574,
+        "average_cpc": 15.51
       }
     },
     {
@@ -695,19 +695,19 @@
       "intent": "Informational",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 453,
-      "total_spend": 2899.2,
-      "volume": 18100,
-      "cpc": 6.4,
+      "total_clicks": 18,
+      "total_spend": 259.02,
+      "volume": 720,
+      "cpc": 14.39,
       "brands": [],
       "google": {
-        "annual_volume": 217200,
-        "avg_monthly_searches": 18100,
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
         "competition": "MEDIUM",
-        "competition_index": 51,
-        "low_top_of_page_bid": 3.84,
-        "high_top_of_page_bid": 8.96,
-        "average_cpc": 6.4
+        "competition_index": 59,
+        "low_top_of_page_bid": 5.789608,
+        "high_top_of_page_bid": 22.99308,
+        "average_cpc": 14.39
       }
     },
     {
@@ -716,19 +716,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 18,
-      "total_spend": 187.2,
-      "volume": 720,
-      "cpc": 10.4,
+      "total_clicks": 3,
+      "total_spend": 53.55,
+      "volume": 110,
+      "cpc": 17.85,
       "brands": [],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "HIGH",
-        "competition_index": 83,
-        "low_top_of_page_bid": 6.24,
-        "high_top_of_page_bid": 14.56,
-        "average_cpc": 10.4
+        "annual_volume": 1320,
+        "avg_monthly_searches": 110,
+        "competition": "LOW",
+        "competition_index": 24,
+        "low_top_of_page_bid": 5.702656,
+        "high_top_of_page_bid": 30,
+        "average_cpc": 17.85
       }
     },
     {
@@ -737,19 +737,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 48,
-      "total_spend": 537.6,
-      "volume": 1900,
-      "cpc": 11.2,
+      "total_clicks": 1,
+      "total_spend": 15.92,
+      "volume": 50,
+      "cpc": 15.92,
       "brands": [],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
-        "competition": "HIGH",
-        "competition_index": 90,
-        "low_top_of_page_bid": 6.72,
-        "high_top_of_page_bid": 15.68,
-        "average_cpc": 11.2
+        "annual_volume": 600,
+        "avg_monthly_searches": 50,
+        "competition": "LOW",
+        "competition_index": 9,
+        "low_top_of_page_bid": 11.266267,
+        "high_top_of_page_bid": 20.580872,
+        "average_cpc": 15.92
       }
     },
     {
@@ -758,19 +758,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 33,
-      "total_spend": 316.8,
-      "volume": 1300,
+      "total_clicks": 4,
+      "total_spend": 38.4,
+      "volume": 140,
       "cpc": 9.6,
       "brands": [],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "MEDIUM",
-        "competition_index": 77,
-        "low_top_of_page_bid": 5.76,
-        "high_top_of_page_bid": 13.44,
-        "average_cpc": 9.6
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
+        "competition": "LOW",
+        "competition_index": 2,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -779,19 +779,19 @@
       "intent": "Commercial",
       "short_tail_group": "core category",
       "brand_group": null,
-      "total_clicks": 48,
-      "total_spend": 662.4,
-      "volume": 1900,
-      "cpc": 13.8,
+      "total_clicks": 7,
+      "total_spend": 105.14,
+      "volume": 260,
+      "cpc": 15.02,
       "brands": [],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 8.28,
-        "high_top_of_page_bid": 19.32,
-        "average_cpc": 13.8
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
+        "competition": "LOW",
+        "competition_index": 23,
+        "low_top_of_page_bid": 5,
+        "high_top_of_page_bid": 25.035064,
+        "average_cpc": 15.02
       }
     },
     {
@@ -800,10 +800,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 48,
-      "total_spend": 662.4,
-      "volume": 1900,
-      "cpc": 13.8,
+      "total_clicks": 7,
+      "total_spend": 105.14,
+      "volume": 260,
+      "cpc": 15.02,
       "brands": [
         {
           "name": "clickfunnels",
@@ -816,13 +816,13 @@
         }
       ],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 8.28,
-        "high_top_of_page_bid": 19.32,
-        "average_cpc": 13.8
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
+        "competition": "LOW",
+        "competition_index": 23,
+        "low_top_of_page_bid": 5,
+        "high_top_of_page_bid": 25.035064,
+        "average_cpc": 15.02
       }
     },
     {
@@ -831,10 +831,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "leadpages",
-      "total_clicks": 12,
-      "total_spend": 134.4,
-      "volume": 480,
-      "cpc": 11.2,
+      "total_clicks": 4,
+      "total_spend": 75.28,
+      "volume": 170,
+      "cpc": 18.82,
       "brands": [
         {
           "name": "leadpages",
@@ -847,13 +847,13 @@
         }
       ],
       "google": {
-        "annual_volume": 5760,
-        "avg_monthly_searches": 480,
-        "competition": "HIGH",
-        "competition_index": 90,
-        "low_top_of_page_bid": 6.72,
-        "high_top_of_page_bid": 15.68,
-        "average_cpc": 11.2
+        "annual_volume": 2040,
+        "avg_monthly_searches": 170,
+        "competition": "LOW",
+        "competition_index": 7,
+        "low_top_of_page_bid": 7.28776,
+        "high_top_of_page_bid": 30.35614,
+        "average_cpc": 18.82
       }
     },
     {
@@ -862,10 +862,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kajabi",
-      "total_clicks": 25,
-      "total_spend": 320,
-      "volume": 1000,
-      "cpc": 12.8,
+      "total_clicks": 8,
+      "total_spend": 169.04,
+      "volume": 320,
+      "cpc": 21.13,
       "brands": [
         {
           "name": "kajabi",
@@ -878,13 +878,13 @@
         }
       ],
       "google": {
-        "annual_volume": 12000,
-        "avg_monthly_searches": 1000,
-        "competition": "HIGH",
-        "competition_index": 100,
-        "low_top_of_page_bid": 7.68,
-        "high_top_of_page_bid": 17.92,
-        "average_cpc": 12.8
+        "annual_volume": 3840,
+        "avg_monthly_searches": 320,
+        "competition": "MEDIUM",
+        "competition_index": 60,
+        "low_top_of_page_bid": 6.26844,
+        "high_top_of_page_bid": 35.989072,
+        "average_cpc": 21.13
       }
     },
     {
@@ -893,19 +893,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 203,
-      "total_spend": 1908.2,
-      "volume": 8100,
-      "cpc": 9.4,
+      "total_clicks": 15,
+      "total_spend": 294.9,
+      "volume": 590,
+      "cpc": 19.66,
       "brands": [],
       "google": {
-        "annual_volume": 97200,
-        "avg_monthly_searches": 8100,
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
         "competition": "MEDIUM",
-        "competition_index": 75,
-        "low_top_of_page_bid": 5.64,
-        "high_top_of_page_bid": 13.16,
-        "average_cpc": 9.4
+        "competition_index": 44,
+        "low_top_of_page_bid": 8.022685,
+        "high_top_of_page_bid": 31.302544,
+        "average_cpc": 19.66
       }
     },
     {
@@ -914,19 +914,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 33,
-      "total_spend": 376.2,
-      "volume": 1300,
-      "cpc": 11.4,
+      "total_clicks": 4,
+      "total_spend": 69.84,
+      "volume": 170,
+      "cpc": 17.46,
       "brands": [],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "HIGH",
-        "competition_index": 91,
-        "low_top_of_page_bid": 6.84,
-        "high_top_of_page_bid": 15.96,
-        "average_cpc": 11.4
+        "annual_volume": 2040,
+        "avg_monthly_searches": 170,
+        "competition": "MEDIUM",
+        "competition_index": 54,
+        "low_top_of_page_bid": 8.120554,
+        "high_top_of_page_bid": 26.79918,
+        "average_cpc": 17.46
       }
     },
     {
@@ -935,19 +935,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 60,
-      "total_spend": 528,
-      "volume": 2400,
-      "cpc": 8.8,
+      "total_clicks": 5,
+      "total_spend": 83.9,
+      "volume": 210,
+      "cpc": 16.78,
       "brands": [],
       "google": {
-        "annual_volume": 28800,
-        "avg_monthly_searches": 2400,
+        "annual_volume": 2520,
+        "avg_monthly_searches": 210,
         "competition": "MEDIUM",
-        "competition_index": 70,
-        "low_top_of_page_bid": 5.28,
-        "high_top_of_page_bid": 12.32,
-        "average_cpc": 8.8
+        "competition_index": 42,
+        "low_top_of_page_bid": 7.447777,
+        "high_top_of_page_bid": 26.115908,
+        "average_cpc": 16.78
       }
     },
     {
@@ -956,19 +956,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 18,
-      "total_spend": 196.2,
-      "volume": 720,
-      "cpc": 10.9,
+      "total_clicks": 1,
+      "total_spend": 18.13,
+      "volume": 50,
+      "cpc": 18.13,
       "brands": [],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "HIGH",
-        "competition_index": 87,
-        "low_top_of_page_bid": 6.54,
-        "high_top_of_page_bid": 15.26,
-        "average_cpc": 10.9
+        "annual_volume": 600,
+        "avg_monthly_searches": 50,
+        "competition": "MEDIUM",
+        "competition_index": 48,
+        "low_top_of_page_bid": 8.558459,
+        "high_top_of_page_bid": 27.711266,
+        "average_cpc": 18.13
       }
     },
     {
@@ -983,13 +983,13 @@
       "cpc": 7.6,
       "brands": [],
       "google": {
-        "annual_volume": 7080,
-        "avg_monthly_searches": 590,
-        "competition": "MEDIUM",
-        "competition_index": 61,
-        "low_top_of_page_bid": 4.56,
-        "high_top_of_page_bid": 10.64,
-        "average_cpc": 7.6
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -998,19 +998,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 48,
-      "total_spend": 393.6,
-      "volume": 1900,
-      "cpc": 8.2,
+      "total_clicks": 7,
+      "total_spend": 111.51,
+      "volume": 260,
+      "cpc": 15.93,
       "brands": [],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
         "competition": "MEDIUM",
-        "competition_index": 66,
-        "low_top_of_page_bid": 4.92,
-        "high_top_of_page_bid": 11.48,
-        "average_cpc": 8.2
+        "competition_index": 53,
+        "low_top_of_page_bid": 6.824917,
+        "high_top_of_page_bid": 25.027858,
+        "average_cpc": 15.93
       }
     },
     {
@@ -1019,19 +1019,19 @@
       "intent": "Commercial",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 22,
-      "total_spend": 162.8,
-      "volume": 880,
-      "cpc": 7.4,
+      "total_clicks": 1,
+      "total_spend": 22.96,
+      "volume": 50,
+      "cpc": 22.96,
       "brands": [],
       "google": {
-        "annual_volume": 10560,
-        "avg_monthly_searches": 880,
+        "annual_volume": 600,
+        "avg_monthly_searches": 50,
         "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "competition_index": 47,
+        "low_top_of_page_bid": 9.348027,
+        "high_top_of_page_bid": 36.573164,
+        "average_cpc": 22.96
       }
     },
     {
@@ -1040,19 +1040,19 @@
       "intent": "Informational",
       "short_tail_group": "ai assisted",
       "brand_group": null,
-      "total_clicks": 40,
-      "total_spend": 272,
-      "volume": 1600,
-      "cpc": 6.8,
+      "total_clicks": 2,
+      "total_spend": 44.22,
+      "volume": 70,
+      "cpc": 22.11,
       "brands": [],
       "google": {
-        "annual_volume": 19200,
-        "avg_monthly_searches": 1600,
-        "competition": "MEDIUM",
-        "competition_index": 54,
-        "low_top_of_page_bid": 4.08,
-        "high_top_of_page_bid": 9.52,
-        "average_cpc": 6.8
+        "annual_volume": 840,
+        "avg_monthly_searches": 70,
+        "competition": "HIGH",
+        "competition_index": 69,
+        "low_top_of_page_bid": 8.800604,
+        "high_top_of_page_bid": 35.42836,
+        "average_cpc": 22.11
       }
     },
     {
@@ -1067,13 +1067,13 @@
       "cpc": 9.6,
       "brands": [],
       "google": {
-        "annual_volume": 3840,
-        "avg_monthly_searches": 320,
-        "competition": "MEDIUM",
-        "competition_index": 77,
-        "low_top_of_page_bid": 5.76,
-        "high_top_of_page_bid": 13.44,
-        "average_cpc": 9.6
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1088,13 +1088,13 @@
       "cpc": 7.2,
       "brands": [],
       "google": {
-        "annual_volume": 3120,
-        "avg_monthly_searches": 260,
-        "competition": "MEDIUM",
-        "competition_index": 58,
-        "low_top_of_page_bid": 4.32,
-        "high_top_of_page_bid": 10.08,
-        "average_cpc": 7.2
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1103,19 +1103,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 15,
-      "total_spend": 153,
-      "volume": 590,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
       "cpc": 10.2,
       "brands": [],
       "google": {
-        "annual_volume": 7080,
-        "avg_monthly_searches": 590,
-        "competition": "HIGH",
-        "competition_index": 82,
-        "low_top_of_page_bid": 6.12,
-        "high_top_of_page_bid": 14.28,
-        "average_cpc": 10.2
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
+        "competition": "LOW",
+        "competition_index": 6,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1130,13 +1130,13 @@
       "cpc": 12.4,
       "brands": [],
       "google": {
-        "annual_volume": 5760,
-        "avg_monthly_searches": 480,
-        "competition": "HIGH",
-        "competition_index": 99,
-        "low_top_of_page_bid": 7.44,
-        "high_top_of_page_bid": 17.36,
-        "average_cpc": 12.4
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1145,19 +1145,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 33,
-      "total_spend": 290.4,
-      "volume": 1300,
-      "cpc": 8.8,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
+      "cpc": 11.81,
       "brands": [],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
         "competition": "MEDIUM",
-        "competition_index": 70,
-        "low_top_of_page_bid": 5.28,
-        "high_top_of_page_bid": 12.32,
-        "average_cpc": 8.8
+        "competition_index": 51,
+        "low_top_of_page_bid": 6.822373,
+        "high_top_of_page_bid": 16.804516,
+        "average_cpc": 11.81
       }
     },
     {
@@ -1172,13 +1172,13 @@
       "cpc": 9.4,
       "brands": [],
       "google": {
-        "annual_volume": 3840,
-        "avg_monthly_searches": 320,
-        "competition": "MEDIUM",
-        "competition_index": 75,
-        "low_top_of_page_bid": 5.64,
-        "high_top_of_page_bid": 13.16,
-        "average_cpc": 9.4
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1187,19 +1187,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 18,
-      "total_spend": 147.6,
-      "volume": 720,
+      "total_clicks": 1,
+      "total_spend": 8.2,
+      "volume": 40,
       "cpc": 8.2,
       "brands": [],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "MEDIUM",
-        "competition_index": 66,
-        "low_top_of_page_bid": 4.92,
-        "high_top_of_page_bid": 11.48,
-        "average_cpc": 8.2
+        "annual_volume": 480,
+        "avg_monthly_searches": 40,
+        "competition": "LOW",
+        "competition_index": 15,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1208,19 +1208,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 25,
-      "total_spend": 185,
-      "volume": 1000,
-      "cpc": 7.4,
+      "total_clicks": 3,
+      "total_spend": 48.87,
+      "volume": 110,
+      "cpc": 16.29,
       "brands": [],
       "google": {
-        "annual_volume": 12000,
-        "avg_monthly_searches": 1000,
-        "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "annual_volume": 1320,
+        "avg_monthly_searches": 110,
+        "competition": "LOW",
+        "competition_index": 28,
+        "low_top_of_page_bid": 5.20327,
+        "high_top_of_page_bid": 27.375602,
+        "average_cpc": 16.29
       }
     },
     {
@@ -1229,19 +1229,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 10,
-      "total_spend": 68,
-      "volume": 390,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
       "cpc": 6.8,
       "brands": [],
       "google": {
-        "annual_volume": 4680,
-        "avg_monthly_searches": 390,
-        "competition": "MEDIUM",
-        "competition_index": 54,
-        "low_top_of_page_bid": 4.08,
-        "high_top_of_page_bid": 9.52,
-        "average_cpc": 6.8
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1256,13 +1256,13 @@
       "cpc": 6.4,
       "brands": [],
       "google": {
-        "annual_volume": 3120,
-        "avg_monthly_searches": 260,
-        "competition": "MEDIUM",
-        "competition_index": 51,
-        "low_top_of_page_bid": 3.84,
-        "high_top_of_page_bid": 8.96,
-        "average_cpc": 6.4
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1277,13 +1277,13 @@
       "cpc": 11.2,
       "brands": [],
       "google": {
-        "annual_volume": 2520,
-        "avg_monthly_searches": 210,
-        "competition": "HIGH",
-        "competition_index": 90,
-        "low_top_of_page_bid": 6.72,
-        "high_top_of_page_bid": 15.68,
-        "average_cpc": 11.2
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1292,19 +1292,19 @@
       "intent": "Commercial",
       "short_tail_group": "audience specific",
       "brand_group": null,
-      "total_clicks": 12,
-      "total_spend": 86.4,
-      "volume": 480,
-      "cpc": 7.2,
+      "total_clicks": 1,
+      "total_spend": 5.65,
+      "volume": 20,
+      "cpc": 5.65,
       "brands": [],
       "google": {
-        "annual_volume": 5760,
-        "avg_monthly_searches": 480,
-        "competition": "MEDIUM",
-        "competition_index": 58,
-        "low_top_of_page_bid": 4.32,
-        "high_top_of_page_bid": 10.08,
-        "average_cpc": 7.2
+        "annual_volume": 240,
+        "avg_monthly_searches": 20,
+        "competition": "HIGH",
+        "competition_index": 74,
+        "low_top_of_page_bid": 2.339284,
+        "high_top_of_page_bid": 8.954672,
+        "average_cpc": 5.65
       }
     },
     {
@@ -1319,13 +1319,13 @@
       "cpc": 8.4,
       "brands": [],
       "google": {
-        "annual_volume": 10560,
-        "avg_monthly_searches": 880,
-        "competition": "MEDIUM",
-        "competition_index": 67,
-        "low_top_of_page_bid": 5.04,
-        "high_top_of_page_bid": 11.76,
-        "average_cpc": 8.4
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1340,13 +1340,13 @@
       "cpc": 9.2,
       "brands": [],
       "google": {
-        "annual_volume": 2520,
-        "avg_monthly_searches": 210,
-        "competition": "MEDIUM",
-        "competition_index": 74,
-        "low_top_of_page_bid": 5.52,
-        "high_top_of_page_bid": 12.88,
-        "average_cpc": 9.2
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1361,13 +1361,13 @@
       "cpc": 10.8,
       "brands": [],
       "google": {
-        "annual_volume": 7080,
-        "avg_monthly_searches": 590,
-        "competition": "HIGH",
-        "competition_index": 86,
-        "low_top_of_page_bid": 6.48,
-        "high_top_of_page_bid": 15.12,
-        "average_cpc": 10.8
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1376,19 +1376,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 90,
-      "total_spend": 1008,
-      "volume": 3600,
-      "cpc": 11.2,
+      "total_clicks": 4,
+      "total_spend": 56.24,
+      "volume": 140,
+      "cpc": 14.06,
       "brands": [],
       "google": {
-        "annual_volume": 43200,
-        "avg_monthly_searches": 3600,
-        "competition": "HIGH",
-        "competition_index": 90,
-        "low_top_of_page_bid": 6.72,
-        "high_top_of_page_bid": 15.68,
-        "average_cpc": 11.2
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
+        "competition": "MEDIUM",
+        "competition_index": 43,
+        "low_top_of_page_bid": 3.731438,
+        "high_top_of_page_bid": 24.394608,
+        "average_cpc": 14.06
       }
     },
     {
@@ -1397,19 +1397,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 203,
-      "total_spend": 1096.2,
-      "volume": 8100,
-      "cpc": 5.4,
+      "total_clicks": 4,
+      "total_spend": 60.24,
+      "volume": 140,
+      "cpc": 15.06,
       "brands": [],
       "google": {
-        "annual_volume": 97200,
-        "avg_monthly_searches": 8100,
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
         "competition": "MEDIUM",
-        "competition_index": 43,
-        "low_top_of_page_bid": 3.24,
-        "high_top_of_page_bid": 7.56,
-        "average_cpc": 5.4
+        "competition_index": 61,
+        "low_top_of_page_bid": 4.05387,
+        "high_top_of_page_bid": 26.065398,
+        "average_cpc": 15.06
       }
     },
     {
@@ -1418,19 +1418,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 110,
-      "total_spend": 968,
-      "volume": 4400,
-      "cpc": 8.8,
+      "total_clicks": 4,
+      "total_spend": 34.72,
+      "volume": 140,
+      "cpc": 8.68,
       "brands": [],
       "google": {
-        "annual_volume": 52800,
-        "avg_monthly_searches": 4400,
-        "competition": "MEDIUM",
-        "competition_index": 70,
-        "low_top_of_page_bid": 5.28,
-        "high_top_of_page_bid": 12.32,
-        "average_cpc": 8.8
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
+        "competition": "LOW",
+        "competition_index": 26,
+        "low_top_of_page_bid": 2.887739,
+        "high_top_of_page_bid": 14.478134,
+        "average_cpc": 8.68
       }
     },
     {
@@ -1445,13 +1445,13 @@
       "cpc": 7.6,
       "brands": [],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "MEDIUM",
-        "competition_index": 61,
-        "low_top_of_page_bid": 4.56,
-        "high_top_of_page_bid": 10.64,
-        "average_cpc": 7.6
+        "annual_volume": 0,
+        "avg_monthly_searches": 0,
+        "competition": "UNKNOWN",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1460,19 +1460,19 @@
       "intent": "Commercial",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 33,
-      "total_spend": 409.2,
-      "volume": 1300,
-      "cpc": 12.4,
+      "total_clicks": 1,
+      "total_spend": 9.72,
+      "volume": 30,
+      "cpc": 9.72,
       "brands": [],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "HIGH",
-        "competition_index": 99,
-        "low_top_of_page_bid": 7.44,
-        "high_top_of_page_bid": 17.36,
-        "average_cpc": 12.4
+        "annual_volume": 360,
+        "avg_monthly_searches": 30,
+        "competition": "MEDIUM",
+        "competition_index": 41,
+        "low_top_of_page_bid": 4.507662,
+        "high_top_of_page_bid": 14.929856,
+        "average_cpc": 9.72
       }
     },
     {
@@ -1481,19 +1481,19 @@
       "intent": "Commercial",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 73,
-      "total_spend": 715.4,
-      "volume": 2900,
-      "cpc": 9.8,
+      "total_clicks": 33,
+      "total_spend": 239.25,
+      "volume": 1300,
+      "cpc": 7.25,
       "brands": [],
       "google": {
-        "annual_volume": 34800,
-        "avg_monthly_searches": 2900,
+        "annual_volume": 15600,
+        "avg_monthly_searches": 1300,
         "competition": "MEDIUM",
-        "competition_index": 78,
-        "low_top_of_page_bid": 5.88,
-        "high_top_of_page_bid": 13.72,
-        "average_cpc": 9.8
+        "competition_index": 58,
+        "low_top_of_page_bid": 2.191352,
+        "high_top_of_page_bid": 12.309249,
+        "average_cpc": 7.25
       }
     },
     {
@@ -1502,19 +1502,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 90,
-      "total_spend": 738,
-      "volume": 3600,
-      "cpc": 8.2,
+      "total_clicks": 60,
+      "total_spend": 385.8,
+      "volume": 2400,
+      "cpc": 6.43,
       "brands": [],
       "google": {
-        "annual_volume": 43200,
-        "avg_monthly_searches": 3600,
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
         "competition": "MEDIUM",
-        "competition_index": 66,
-        "low_top_of_page_bid": 4.92,
-        "high_top_of_page_bid": 11.48,
-        "average_cpc": 8.2
+        "competition_index": 60,
+        "low_top_of_page_bid": 2.043104,
+        "high_top_of_page_bid": 10.813637,
+        "average_cpc": 6.43
       }
     },
     {
@@ -1524,18 +1524,18 @@
       "short_tail_group": "use case",
       "brand_group": null,
       "total_clicks": 60,
-      "total_spend": 576,
+      "total_spend": 1819.2,
       "volume": 2400,
-      "cpc": 9.6,
+      "cpc": 30.32,
       "brands": [],
       "google": {
         "annual_volume": 28800,
         "avg_monthly_searches": 2400,
-        "competition": "MEDIUM",
-        "competition_index": 77,
-        "low_top_of_page_bid": 5.76,
-        "high_top_of_page_bid": 13.44,
-        "average_cpc": 9.6
+        "competition": "HIGH",
+        "competition_index": 76,
+        "low_top_of_page_bid": 14.03245,
+        "high_top_of_page_bid": 46.615492,
+        "average_cpc": 30.32
       }
     },
     {
@@ -1544,19 +1544,19 @@
       "intent": "Commercial",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 15,
-      "total_spend": 111,
-      "volume": 590,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
       "cpc": 7.4,
       "brands": [],
       "google": {
-        "annual_volume": 7080,
-        "avg_monthly_searches": 590,
-        "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
+        "competition": "HIGH",
+        "competition_index": 100,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1565,19 +1565,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 48,
-      "total_spend": 326.4,
-      "volume": 1900,
-      "cpc": 6.8,
+      "total_clicks": 4,
+      "total_spend": 69.08,
+      "volume": 140,
+      "cpc": 17.27,
       "brands": [],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
+        "annual_volume": 1680,
+        "avg_monthly_searches": 140,
         "competition": "MEDIUM",
-        "competition_index": 54,
-        "low_top_of_page_bid": 4.08,
-        "high_top_of_page_bid": 9.52,
-        "average_cpc": 6.8
+        "competition_index": 39,
+        "low_top_of_page_bid": 5.964462,
+        "high_top_of_page_bid": 28.572058,
+        "average_cpc": 17.27
       }
     },
     {
@@ -1586,19 +1586,19 @@
       "intent": "Informational",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 110,
-      "total_spend": 1144,
-      "volume": 4400,
-      "cpc": 10.4,
+      "total_clicks": 25,
+      "total_spend": 672.25,
+      "volume": 1000,
+      "cpc": 26.89,
       "brands": [],
       "google": {
-        "annual_volume": 52800,
-        "avg_monthly_searches": 4400,
-        "competition": "HIGH",
-        "competition_index": 83,
-        "low_top_of_page_bid": 6.24,
-        "high_top_of_page_bid": 14.56,
-        "average_cpc": 10.4
+        "annual_volume": 12000,
+        "avg_monthly_searches": 1000,
+        "competition": "MEDIUM",
+        "competition_index": 40,
+        "low_top_of_page_bid": 8.939497,
+        "high_top_of_page_bid": 44.838564,
+        "average_cpc": 26.89
       }
     },
     {
@@ -1607,19 +1607,19 @@
       "intent": "Commercial",
       "short_tail_group": "use case",
       "brand_group": null,
-      "total_clicks": 40,
-      "total_spend": 448,
-      "volume": 1600,
-      "cpc": 11.2,
+      "total_clicks": 15,
+      "total_spend": 213.3,
+      "volume": 590,
+      "cpc": 14.22,
       "brands": [],
       "google": {
-        "annual_volume": 19200,
-        "avg_monthly_searches": 1600,
-        "competition": "HIGH",
-        "competition_index": 90,
-        "low_top_of_page_bid": 6.72,
-        "high_top_of_page_bid": 15.68,
-        "average_cpc": 11.2
+        "annual_volume": 7080,
+        "avg_monthly_searches": 590,
+        "competition": "MEDIUM",
+        "competition_index": 42,
+        "low_top_of_page_bid": 4.648517,
+        "high_top_of_page_bid": 23.792634,
+        "average_cpc": 14.22
       }
     },
     {
@@ -1628,10 +1628,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 110,
-      "total_spend": 814,
-      "volume": 4400,
-      "cpc": 7.4,
+      "total_clicks": 10,
+      "total_spend": 101,
+      "volume": 390,
+      "cpc": 10.1,
       "brands": [
         {
           "name": "clickfunnels",
@@ -1644,13 +1644,13 @@
         }
       ],
       "google": {
-        "annual_volume": 52800,
-        "avg_monthly_searches": 4400,
-        "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "annual_volume": 4680,
+        "avg_monthly_searches": 390,
+        "competition": "LOW",
+        "competition_index": 31,
+        "low_top_of_page_bid": 3.863925,
+        "high_top_of_page_bid": 16.33,
+        "average_cpc": 10.1
       }
     },
     {
@@ -1659,10 +1659,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 165,
-      "total_spend": 1023,
-      "volume": 6600,
-      "cpc": 6.2,
+      "total_clicks": 22,
+      "total_spend": 214.06,
+      "volume": 880,
+      "cpc": 9.73,
       "brands": [
         {
           "name": "clickfunnels",
@@ -1675,13 +1675,13 @@
         }
       ],
       "google": {
-        "annual_volume": 79200,
-        "avg_monthly_searches": 6600,
+        "annual_volume": 10560,
+        "avg_monthly_searches": 880,
         "competition": "MEDIUM",
-        "competition_index": 50,
-        "low_top_of_page_bid": 3.72,
-        "high_top_of_page_bid": 8.68,
-        "average_cpc": 6.2
+        "competition_index": 45,
+        "low_top_of_page_bid": 5.249734,
+        "high_top_of_page_bid": 14.203463,
+        "average_cpc": 9.73
       }
     },
     {
@@ -1690,10 +1690,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 73,
-      "total_spend": 642.4,
-      "volume": 2900,
-      "cpc": 8.8,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
+      "cpc": 9.45,
       "brands": [
         {
           "name": "clickfunnels",
@@ -1706,13 +1706,13 @@
         }
       ],
       "google": {
-        "annual_volume": 34800,
-        "avg_monthly_searches": 2900,
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
         "competition": "MEDIUM",
-        "competition_index": 70,
-        "low_top_of_page_bid": 5.28,
-        "high_top_of_page_bid": 12.32,
-        "average_cpc": 8.8
+        "competition_index": 48,
+        "low_top_of_page_bid": 3.03,
+        "high_top_of_page_bid": 15.879117,
+        "average_cpc": 9.45
       }
     },
     {
@@ -1721,10 +1721,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 18,
-      "total_spend": 115.2,
-      "volume": 720,
-      "cpc": 6.4,
+      "total_clicks": 1,
+      "total_spend": 10.73,
+      "volume": 30,
+      "cpc": 10.73,
       "brands": [
         {
           "name": "clickfunnels",
@@ -1737,13 +1737,13 @@
         }
       ],
       "google": {
-        "annual_volume": 8640,
-        "avg_monthly_searches": 720,
-        "competition": "MEDIUM",
-        "competition_index": 51,
-        "low_top_of_page_bid": 3.84,
-        "high_top_of_page_bid": 8.96,
-        "average_cpc": 6.4
+        "annual_volume": 360,
+        "avg_monthly_searches": 30,
+        "competition": "LOW",
+        "competition_index": 33,
+        "low_top_of_page_bid": 4.016471,
+        "high_top_of_page_bid": 17.45,
+        "average_cpc": 10.73
       }
     },
     {
@@ -1752,10 +1752,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "leadpages",
-      "total_clicks": 33,
-      "total_spend": 224.4,
-      "volume": 1300,
-      "cpc": 6.8,
+      "total_clicks": 4,
+      "total_spend": 49.56,
+      "volume": 170,
+      "cpc": 12.39,
       "brands": [
         {
           "name": "leadpages",
@@ -1768,13 +1768,13 @@
         }
       ],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "MEDIUM",
-        "competition_index": 54,
-        "low_top_of_page_bid": 4.08,
-        "high_top_of_page_bid": 9.52,
-        "average_cpc": 6.8
+        "annual_volume": 2040,
+        "avg_monthly_searches": 170,
+        "competition": "LOW",
+        "competition_index": 7,
+        "low_top_of_page_bid": 3.695546,
+        "high_top_of_page_bid": 21.082146,
+        "average_cpc": 12.39
       }
     },
     {
@@ -1783,10 +1783,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "leadpages",
-      "total_clicks": 40,
-      "total_spend": 232,
-      "volume": 1600,
-      "cpc": 5.8,
+      "total_clicks": 8,
+      "total_spend": 125.04,
+      "volume": 320,
+      "cpc": 15.63,
       "brands": [
         {
           "name": "leadpages",
@@ -1799,13 +1799,13 @@
         }
       ],
       "google": {
-        "annual_volume": 19200,
-        "avg_monthly_searches": 1600,
-        "competition": "MEDIUM",
-        "competition_index": 46,
-        "low_top_of_page_bid": 3.48,
-        "high_top_of_page_bid": 8.12,
-        "average_cpc": 5.8
+        "annual_volume": 3840,
+        "avg_monthly_searches": 320,
+        "competition": "LOW",
+        "competition_index": 24,
+        "low_top_of_page_bid": 4.863542,
+        "high_top_of_page_bid": 26.39,
+        "average_cpc": 15.63
       }
     },
     {
@@ -1814,9 +1814,9 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "leadpages",
-      "total_clicks": 22,
-      "total_spend": 162.8,
-      "volume": 880,
+      "total_clicks": 0,
+      "total_spend": 0,
+      "volume": 10,
       "cpc": 7.4,
       "brands": [
         {
@@ -1830,13 +1830,13 @@
         }
       ],
       "google": {
-        "annual_volume": 10560,
-        "avg_monthly_searches": 880,
-        "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "annual_volume": 120,
+        "avg_monthly_searches": 10,
+        "competition": "LOW",
+        "competition_index": 0,
+        "low_top_of_page_bid": null,
+        "high_top_of_page_bid": null,
+        "average_cpc": null
       }
     },
     {
@@ -1845,10 +1845,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kajabi",
-      "total_clicks": 60,
-      "total_spend": 432,
-      "volume": 2400,
-      "cpc": 7.2,
+      "total_clicks": 10,
+      "total_spend": 108.2,
+      "volume": 390,
+      "cpc": 10.82,
       "brands": [
         {
           "name": "kajabi",
@@ -1861,13 +1861,13 @@
         }
       ],
       "google": {
-        "annual_volume": 28800,
-        "avg_monthly_searches": 2400,
+        "annual_volume": 4680,
+        "avg_monthly_searches": 390,
         "competition": "MEDIUM",
-        "competition_index": 58,
-        "low_top_of_page_bid": 4.32,
-        "high_top_of_page_bid": 10.08,
-        "average_cpc": 7.2
+        "competition_index": 39,
+        "low_top_of_page_bid": 3.096736,
+        "high_top_of_page_bid": 18.54933,
+        "average_cpc": 10.82
       }
     },
     {
@@ -1876,10 +1876,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kajabi",
-      "total_clicks": 135,
-      "total_spend": 729,
-      "volume": 5400,
-      "cpc": 5.4,
+      "total_clicks": 60,
+      "total_spend": 934.8,
+      "volume": 2400,
+      "cpc": 15.58,
       "brands": [
         {
           "name": "kajabi",
@@ -1892,13 +1892,13 @@
         }
       ],
       "google": {
-        "annual_volume": 64800,
-        "avg_monthly_searches": 5400,
+        "annual_volume": 28800,
+        "avg_monthly_searches": 2400,
         "competition": "MEDIUM",
-        "competition_index": 43,
-        "low_top_of_page_bid": 3.24,
-        "high_top_of_page_bid": 7.56,
-        "average_cpc": 5.4
+        "competition_index": 64,
+        "low_top_of_page_bid": 1.92,
+        "high_top_of_page_bid": 29.246606,
+        "average_cpc": 15.58
       }
     },
     {
@@ -1907,10 +1907,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kajabi",
-      "total_clicks": 73,
-      "total_spend": 598.6,
-      "volume": 2900,
-      "cpc": 8.2,
+      "total_clicks": 2,
+      "total_spend": 38.58,
+      "volume": 70,
+      "cpc": 19.29,
       "brands": [
         {
           "name": "kajabi",
@@ -1923,13 +1923,13 @@
         }
       ],
       "google": {
-        "annual_volume": 34800,
-        "avg_monthly_searches": 2900,
-        "competition": "MEDIUM",
-        "competition_index": 66,
-        "low_top_of_page_bid": 4.92,
-        "high_top_of_page_bid": 11.48,
-        "average_cpc": 8.2
+        "annual_volume": 840,
+        "avg_monthly_searches": 70,
+        "competition": "LOW",
+        "competition_index": 26,
+        "low_top_of_page_bid": 7.093213,
+        "high_top_of_page_bid": 31.483568,
+        "average_cpc": 19.29
       }
     },
     {
@@ -1938,10 +1938,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kartra",
-      "total_clicks": 33,
-      "total_spend": 257.4,
-      "volume": 1300,
-      "cpc": 7.8,
+      "total_clicks": 2,
+      "total_spend": 35.22,
+      "volume": 90,
+      "cpc": 17.61,
       "brands": [
         {
           "name": "kartra",
@@ -1954,13 +1954,13 @@
         }
       ],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "MEDIUM",
-        "competition_index": 62,
-        "low_top_of_page_bid": 4.68,
-        "high_top_of_page_bid": 10.92,
-        "average_cpc": 7.8
+        "annual_volume": 1080,
+        "avg_monthly_searches": 90,
+        "competition": "LOW",
+        "competition_index": 9,
+        "low_top_of_page_bid": 8.358347,
+        "high_top_of_page_bid": 26.86849,
+        "average_cpc": 17.61
       }
     },
     {
@@ -1969,10 +1969,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "kartra",
-      "total_clicks": 40,
-      "total_spend": 232,
-      "volume": 1600,
-      "cpc": 5.8,
+      "total_clicks": 7,
+      "total_spend": 224,
+      "volume": 260,
+      "cpc": 32,
       "brands": [
         {
           "name": "kartra",
@@ -1985,13 +1985,13 @@
         }
       ],
       "google": {
-        "annual_volume": 19200,
-        "avg_monthly_searches": 1600,
+        "annual_volume": 3120,
+        "avg_monthly_searches": 260,
         "competition": "MEDIUM",
         "competition_index": 46,
-        "low_top_of_page_bid": 3.48,
-        "high_top_of_page_bid": 8.12,
-        "average_cpc": 5.8
+        "low_top_of_page_bid": 7.200821,
+        "high_top_of_page_bid": 56.806264,
+        "average_cpc": 32
       }
     },
     {
@@ -2000,10 +2000,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "systemeio",
-      "total_clicks": 60,
-      "total_spend": 324,
-      "volume": 2400,
-      "cpc": 5.4,
+      "total_clicks": 12,
+      "total_spend": 105.48,
+      "volume": 480,
+      "cpc": 8.79,
       "brands": [
         {
           "name": "systemeio",
@@ -2016,13 +2016,13 @@
         }
       ],
       "google": {
-        "annual_volume": 28800,
-        "avg_monthly_searches": 2400,
-        "competition": "MEDIUM",
-        "competition_index": 43,
-        "low_top_of_page_bid": 3.24,
-        "high_top_of_page_bid": 7.56,
-        "average_cpc": 5.4
+        "annual_volume": 5760,
+        "avg_monthly_searches": 480,
+        "competition": "LOW",
+        "competition_index": 31,
+        "low_top_of_page_bid": 0.883444,
+        "high_top_of_page_bid": 16.690001,
+        "average_cpc": 8.79
       }
     },
     {
@@ -2031,10 +2031,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "systemeio",
-      "total_clicks": 33,
-      "total_spend": 158.4,
-      "volume": 1300,
-      "cpc": 4.8,
+      "total_clicks": 18,
+      "total_spend": 201.96,
+      "volume": 720,
+      "cpc": 11.22,
       "brands": [
         {
           "name": "systemeio",
@@ -2047,13 +2047,13 @@
         }
       ],
       "google": {
-        "annual_volume": 15600,
-        "avg_monthly_searches": 1300,
-        "competition": "LOW",
-        "competition_index": 38,
-        "low_top_of_page_bid": 2.88,
-        "high_top_of_page_bid": 6.72,
-        "average_cpc": 4.8
+        "annual_volume": 8640,
+        "avg_monthly_searches": 720,
+        "competition": "MEDIUM",
+        "competition_index": 52,
+        "low_top_of_page_bid": 3.521333,
+        "high_top_of_page_bid": 18.924326,
+        "average_cpc": 11.22
       }
     },
     {
@@ -2062,10 +2062,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "clickfunnels",
-      "total_clicks": 22,
-      "total_spend": 162.8,
-      "volume": 880,
-      "cpc": 7.4,
+      "total_clicks": 1,
+      "total_spend": 13.85,
+      "volume": 50,
+      "cpc": 13.85,
       "brands": [
         {
           "name": "clickfunnels",
@@ -2078,13 +2078,13 @@
         }
       ],
       "google": {
-        "annual_volume": 10560,
-        "avg_monthly_searches": 880,
-        "competition": "MEDIUM",
-        "competition_index": 59,
-        "low_top_of_page_bid": 4.44,
-        "high_top_of_page_bid": 10.36,
-        "average_cpc": 7.4
+        "annual_volume": 600,
+        "avg_monthly_searches": 50,
+        "competition": "LOW",
+        "competition_index": 13,
+        "low_top_of_page_bid": 4.668155,
+        "high_top_of_page_bid": 23.03,
+        "average_cpc": 13.85
       }
     },
     {
@@ -2093,10 +2093,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "gohighlevel",
-      "total_clicks": 48,
-      "total_spend": 403.2,
-      "volume": 1900,
-      "cpc": 8.4,
+      "total_clicks": 25,
+      "total_spend": 352.25,
+      "volume": 1000,
+      "cpc": 14.09,
       "brands": [
         {
           "name": "gohighlevel",
@@ -2109,13 +2109,13 @@
         }
       ],
       "google": {
-        "annual_volume": 22800,
-        "avg_monthly_searches": 1900,
+        "annual_volume": 12000,
+        "avg_monthly_searches": 1000,
         "competition": "MEDIUM",
-        "competition_index": 67,
-        "low_top_of_page_bid": 5.04,
-        "high_top_of_page_bid": 11.76,
-        "average_cpc": 8.4
+        "competition_index": 42,
+        "low_top_of_page_bid": 3.877542,
+        "high_top_of_page_bid": 24.29937,
+        "average_cpc": 14.09
       }
     },
     {
@@ -2124,10 +2124,10 @@
       "intent": "Commercial",
       "short_tail_group": null,
       "brand_group": "gohighlevel",
-      "total_clicks": 60,
-      "total_spend": 432,
-      "volume": 2400,
-      "cpc": 7.2,
+      "total_clicks": 135,
+      "total_spend": 1169.1,
+      "volume": 5400,
+      "cpc": 8.66,
       "brands": [
         {
           "name": "gohighlevel",
@@ -2140,13 +2140,13 @@
         }
       ],
       "google": {
-        "annual_volume": 28800,
-        "avg_monthly_searches": 2400,
+        "annual_volume": 64800,
+        "avg_monthly_searches": 5400,
         "competition": "MEDIUM",
-        "competition_index": 58,
-        "low_top_of_page_bid": 4.32,
-        "high_top_of_page_bid": 10.08,
-        "average_cpc": 7.2
+        "competition_index": 47,
+        "low_top_of_page_bid": 8.659802,
+        "high_top_of_page_bid": 1000,
+        "average_cpc": 8.66
       }
     }
   ]
