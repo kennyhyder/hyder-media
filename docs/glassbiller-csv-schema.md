@@ -11,14 +11,12 @@
 
 ## TL;DR
 
-GlassBiller exports **two complementary reports** that join 1:1 on `Invoice #`:
+GlassBiller has **two export formats** worth knowing about:
 
-- **Margin Report** — per-invoice financials (materials, labor, part cost, commissions, rebate, margin) plus customer name. **No dates, no contact info.**
-- **Sales Report** — per-invoice date, payer, external referral #, gross sales. **No customer name, no contact info.**
+- **🟢 PREFERRED — "Sales and Margin Report" XLSX** (e.g. `Sales-and-margin-report-(last-7-days)_2026-05-27.xlsx`) — single combined sheet with **`Contact Phone 1`, `Customer Email`, `Contact Name`, `Invoice Date`, `Location Name`, and all financials**. Phone is present → phone-key match into `lead_journey` works out-of-the-box. This is the format the Phase 1 ingester targets. See §6.
+- **🟡 LEGACY — Margin Report + Sales Report CSV pair** — join 1:1 on `Invoice #` to give invoice, date, customer name, payer, referral #, and financials. **No phone, email, or address.** Documented for historical context (and for the existing performance tab's 6-year backfill from `ag2020-margins-jan2020_jan2026.csv` + `ag2020-sales-jan2020_jan2026.csv`).
 
-Joined, they give us: invoice #, date, customer name, payer (insurance/cash), referral #, full financials. **They DO NOT give us phone, email, or address.**
-
-That last point is the critical Phase 0 finding — see §5.
+The legacy pair is documented in §1–§5; the preferred XLSX format is in §6. Use the XLSX format going forward; keep the legacy docs for the historical backfill.
 
 ## 1. Margin Report — column spec
 
@@ -141,3 +139,74 @@ crm_csv_schemas:
 ```
 
 Different CRM = different schema entry. Same ingester. Same linker.
+
+---
+
+## 6. 🟢 Preferred export format — "Sales and Margin Report" XLSX
+
+**Confirmed 2026-05-27** — AG2020 generated a `Sales-and-margin-report-(last-7-days)_2026-05-27.xlsx` that resolves the §5 phone-gap. This is the format the Phase 1 ingester targets.
+
+### File facts
+
+- Format: XLSX (Excel), single sheet named `Report`
+- 15 columns × ~4,475 rows in the sample (despite the "last 7 days" in the filename, the export appears to be broader — confirm date scoping with AG2020 before relying on the cadence)
+- Filename pattern: `Sales-and-margin-report-(<range>)_<YYYY-MM-DD>.xlsx`
+
+### Column spec
+
+| # | Column | Type | Example | Notes |
+|---|---|---|---|---|
+| 1 | _(unnamed)_ | int | `1` | GlassBiller row number — ignore on ingest |
+| 2 | `Contact Name` | string | `John Doe` or `' - '` | Customer name; can be missing |
+| 3 | `Customer Email` | string | `j@example.com` or `' - '` | Secondary join key |
+| 4 | **`Contact Phone 1`** | string | `(419) 280-2036` | **Primary join key** — normalize to E.164 (`+14192802036`) |
+| 5 | `Invoice Date` | date | `06/08/2025` | US format `MM/DD/YYYY` — parse to `DATE` |
+| 6 | `Total Margin` | currency | `$270.45` | Strip `$` and `,` before parsing |
+| 7 | `Total Cost` (first) | currency | `$106.26` | **Duplicate header** — see note |
+| 8 | `Total after taxes` | currency | `$450.00` | = invoice amount |
+| 9 | `Total balance after payments` | currency | `$0.00` | `0.00` ⇒ paid |
+| 10 | `Total Cost` (second) | currency | `$106.26` | **Duplicate header** — appears identical in sample data; pick the first occurrence to avoid ambiguity |
+| 11 | `Total Customer Rebate` | currency | `' - '` or `$50` | Often `' - '` (no rebate); strip before parse |
+| 12 | `Total subtotal` | currency | `$441.71` | |
+| 13 | `Total taxes` | currency | `$8.29` | |
+| 14 | `Total labor` | currency | `$335.45` | |
+| 15 | **`Location Name`** | string | `JESSE GOOGLE` or `' - '` | **Rep + source signal.** Values seen: `JESSE GOOGLE` etc. — concatenates the responsible rep name (Jesse, one of the AC pipeline owners) and the lead source (GOOGLE). When populated, this is a *secondary* attribution signal alongside AC tags |
+
+### Empty value convention
+
+GlassBiller exports empty/null fields as the literal string `' - '` (space-dash-space) or `None`. The ingester must treat both as null.
+
+### Mapping to `crm_jobs`
+
+| `crm_jobs` column | XLSX source |
+|---|---|
+| `source_system` | constant `'glassbiller'` |
+| `source_job_id` | **No invoice # in this report** — synthesize as `${phone_normalized}_${invoice_date}_${total_after_taxes}` for now, OR ask AG2020 to add an `Invoice #` column to the export config |
+| `customer_name` | `Contact Name` |
+| `customer_phone` | `Contact Phone 1` (raw) |
+| `customer_phone_normalized` | `normalizePhone(Contact Phone 1)` |
+| `customer_email` | `Customer Email` (lowercased) |
+| `invoice_date` | parsed `Invoice Date` |
+| `invoice_amount` | `Total after taxes` |
+| `cogs_amount` | `Total Cost` (first occurrence) |
+| `margin_amount` | `Total Margin` |
+| `rebate_amount` | `Total Customer Rebate` (when not `' - '`) |
+| `location_name` | `Location Name` |
+| `paid_at` | derived: `invoice_date` if `Total balance after payments` is `0`, else null |
+| `raw_row` | the whole row as JSON |
+
+### One small ask to AG2020
+
+If GlassBiller's report builder allows it, please **add an `Invoice #` column** to the Sales-and-Margin export. The current synthesized `source_job_id` works but a real Invoice # is more durable (handles future re-payment / amendment scenarios cleanly).
+
+### Phase 1 ingester behavior (XLSX path)
+
+`api/ag2020/_adapters/glassbiller-xlsx.js`:
+
+1. Accept multipart upload of the XLSX (use `xlsx` npm package — already a root dep).
+2. Validate the sheet name is `Report` and the 15-column header matches the spec above; reject with clear error otherwise.
+3. For each row, normalize values (strip `$,`, parse dates, treat `' - '` as null).
+4. Upsert into `ag2020_crm_jobs` keyed by `(tenant_id, source_system, source_job_id)`. Idempotent re-uploads.
+5. Match each row to a `lead_journey` via `customer_phone_normalized` (exact match), with `customer_email_normalized` as the fallback when phone is missing.
+6. Update `lead_journey.crm_job_ids[]`, `crm_invoice_ids[]`, and financial denormalized fields.
+7. Set `journey_state = 'completed'` when `paid_at` is non-null.
