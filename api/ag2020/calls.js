@@ -1,5 +1,5 @@
 /**
- * AG2020 - VBC Call Logs (from uploaded CSV data)
+ * AG2020 - VBC Call Logs
  * GET /api/ag2020/calls
  *
  * Query params:
@@ -8,12 +8,24 @@
  *   startDate, endDate - explicit range override
  *   limit      - max recent calls to return (default 50, max 500)
  *
- * Data source: ag2020_call_logs Supabase table (populated via CSV upload at
- * /api/ag2020/call-log-upload).
+ * Data sources (queried + UNIONed):
+ *   1) ag2020_call_logs — populated by /api/ag2020/call-log-upload (the old
+ *      "All Calls" Vonage CSV format with no phone numbers but unique ids).
+ *   2) ag2020_lead_touchpoints WHERE touchpoint_type IN
+ *      (call_inbound, call_outbound, voicemail, missed_call) — populated by
+ *      the Vonage "Company Report" CSV backfill (newer format, has phones).
+ *      This is the more current source going forward.
  *
- * Why CSV: VBC account 400386 is below the 50-extension threshold Vonage
- * requires for direct API access. Manual CSV export from bc.vonage.com is
- * the practical workaround.
+ * Why both: VBC account 400386 is below the 50-extension threshold Vonage
+ * requires for direct API access. We're stuck on CSV exports. The Company
+ * Report format is the only one with phone numbers, so it's what the
+ * attribution pipeline ingests. We merge both so the dashboard sees every
+ * call regardless of which CSV format brought it in.
+ *
+ * Dedupe: touchpoints don't carry the call_logs.call_hash, so we dedupe
+ * by `(direction, timestamp-bucketed-to-minute, duration_seconds)` — close
+ * enough for display purposes; a stray duplicate is far better than missing
+ * a month of data.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -39,18 +51,21 @@ export default async function handler(req, res) {
     try {
         const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-        // Check if any call data exists
-        const { count: totalCallsInDb, error: countErr } = await supabase
-            .from('ag2020_call_logs')
-            .select('id', { count: 'exact', head: true });
+        // Check if any call data exists (either source)
+        const [{ count: logsCount, error: logsErr }, { count: tpCount, error: tpErr }] = await Promise.all([
+            supabase.from('ag2020_call_logs').select('id', { count: 'exact', head: true }),
+            supabase.from('ag2020_lead_touchpoints').select('id', { count: 'exact', head: true })
+                .in('touchpoint_type', ['call_inbound', 'call_outbound', 'voicemail', 'missed_call']),
+        ]);
+        const totalCallsInDb = (logsCount || 0) + (tpCount || 0);
 
-        if (countErr) {
-            result.errors.push({ step: 'count_check', error: countErr.message });
+        if (logsErr && tpErr) {
+            result.errors.push({ step: 'count_check', error: (logsErr || tpErr).message });
             result.status = 'error';
             return res.status(200).json(result);
         }
 
-        if (!totalCallsInDb || totalCallsInDb === 0) {
+        if (totalCallsInDb === 0) {
             return res.status(200).json({
                 ...result,
                 status: 'not_configured',
@@ -125,15 +140,85 @@ async function selectAll(queryFactory, pageSize = 1000, hardLimit = 200000) {
     return rows;
 }
 
-async function fetchSummary(supabase, startIso, endIso) {
-    const data = await selectAll(() =>
+// Pull calls from both ag2020_call_logs and ag2020_lead_touchpoints in the
+// window, normalize into a common shape {ts, direction, answered, duration},
+// dedupe by (direction, minute, duration). Returns the merged array.
+async function fetchMergedCalls(supabase, startIso, endIso, extraFields = false) {
+    const fromLogs = await selectAll(() =>
         supabase
             .from('ag2020_call_logs')
-            .select('id,direction,answered,duration_seconds')
+            .select(extraFields
+                ? 'id,call_time,direction,answered,duration_seconds,from_number,to_number,extension,user_name,status'
+                : 'call_time,direction,answered,duration_seconds')
             .gte('call_time', startIso)
             .lte('call_time', endIso)
             .order('call_time', { ascending: true })
     );
+    const fromTouch = await selectAll(() =>
+        supabase
+            .from('ag2020_lead_touchpoints')
+            .select(extraFields
+                ? 'id,touchpoint_at,touchpoint_type,direction,duration_seconds,payload'
+                : 'touchpoint_at,touchpoint_type,direction,duration_seconds')
+            .in('touchpoint_type', ['call_inbound', 'call_outbound', 'voicemail', 'missed_call'])
+            .gte('touchpoint_at', startIso)
+            .lte('touchpoint_at', endIso)
+            .order('touchpoint_at', { ascending: true })
+    );
+    const merged = [];
+    for (const r of fromLogs) {
+        merged.push({
+            source: 'call_logs',
+            ts: r.call_time,
+            direction: r.direction || 'other',
+            answered: !!r.answered,
+            duration_seconds: r.duration_seconds || 0,
+            ...(extraFields && {
+                id: `cl-${r.id}`,
+                from_number: r.from_number,
+                to_number: r.to_number,
+                extension: r.extension,
+                user_name: r.user_name,
+                status: r.status,
+            }),
+        });
+    }
+    for (const r of fromTouch) {
+        const type = r.touchpoint_type;
+        const answered = type === 'call_inbound' || type === 'call_outbound'; // missed_call + voicemail = unanswered
+        merged.push({
+            source: 'touchpoints',
+            ts: r.touchpoint_at,
+            direction: r.direction || (type.includes('outbound') ? 'outbound' : 'inbound'),
+            answered,
+            duration_seconds: r.duration_seconds || 0,
+            ...(extraFields && {
+                id: `tp-${r.id}`,
+                from_number: r.payload?.From || r.payload?.from || r.payload?.Caller || null,
+                to_number: r.payload?.To || r.payload?.to || r.payload?.Called || null,
+                extension: null,
+                user_name: r.payload?.user || null,
+                status: type,
+            }),
+        });
+    }
+    // Dedupe by (direction, minute-bucket of ts, duration_seconds). When a
+    // touchpoint and a call_logs row describe the same call, the touchpoint
+    // wins (more accurate phone/payload fields).
+    const seen = new Map();
+    for (const r of merged) {
+        const minute = (r.ts || '').slice(0, 16); // YYYY-MM-DDTHH:MM
+        const key = `${r.direction}|${minute}|${r.duration_seconds}`;
+        const existing = seen.get(key);
+        if (!existing || (existing.source === 'call_logs' && r.source === 'touchpoints')) {
+            seen.set(key, r);
+        }
+    }
+    return [...seen.values()].sort((a, b) => a.ts.localeCompare(b.ts));
+}
+
+async function fetchSummary(supabase, startIso, endIso) {
+    const data = await fetchMergedCalls(supabase, startIso, endIso);
 
     let inbound = 0, outbound = 0, internal = 0, other = 0;
     let answered = 0, missed = 0;
@@ -165,14 +250,7 @@ async function fetchSummary(supabase, startIso, endIso) {
 }
 
 async function fetchDaily(supabase, startIso, endIso, startDate, endDate) {
-    const data = await selectAll(() =>
-        supabase
-            .from('ag2020_call_logs')
-            .select('call_time,answered,duration_seconds,direction')
-            .gte('call_time', startIso)
-            .lte('call_time', endIso)
-            .order('call_time', { ascending: true })
-    );
+    const data = await fetchMergedCalls(supabase, startIso, endIso);
 
     const byDay = {};
     const cur = new Date(startDate);
@@ -184,7 +262,7 @@ async function fetchDaily(supabase, startIso, endIso, startDate, endDate) {
     }
 
     for (const r of data || []) {
-        const key = r.call_time.slice(0, 10);
+        const key = (r.ts || '').slice(0, 10);
         if (!byDay[key]) byDay[key] = { date: key, count: 0, answered: 0, missed: 0, inbound: 0, outbound: 0, totalSeconds: 0 };
         byDay[key].count += 1;
         if (r.answered) byDay[key].answered += 1; else byDay[key].missed += 1;
@@ -197,16 +275,20 @@ async function fetchDaily(supabase, startIso, endIso, startDate, endDate) {
 }
 
 async function fetchRecent(supabase, startIso, endIso, limit) {
-    const { data, error } = await supabase
-        .from('ag2020_call_logs')
-        .select('id,call_time,direction,from_number,to_number,extension,user_name,duration_seconds,answered,status')
-        .gte('call_time', startIso)
-        .lte('call_time', endIso)
-        .order('call_time', { ascending: false })
-        .limit(limit);
-
-    if (error) throw new Error(error.message);
-    return data || [];
+    const data = await fetchMergedCalls(supabase, startIso, endIso, true);
+    // most recent first, capped at `limit`
+    return data.sort((a, b) => b.ts.localeCompare(a.ts)).slice(0, limit).map(r => ({
+        id: r.id,
+        call_time: r.ts,
+        direction: r.direction,
+        from_number: r.from_number,
+        to_number: r.to_number,
+        extension: r.extension,
+        user_name: r.user_name,
+        duration_seconds: r.duration_seconds,
+        answered: r.answered,
+        status: r.status,
+    }));
 }
 
 async function fetchUploads(supabase) {
