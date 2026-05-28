@@ -116,6 +116,112 @@ function welchT(xs, ys) {
     return { t: +t.toFixed(3), df: +df.toFixed(1), p: +tTwoSidedP(Math.abs(t), df).toFixed(4) };
 }
 
+// ---------------------------------------------------------------------------
+// Multiple linear regression via normal equations β = (XᵀX)⁻¹ Xᵀy.
+// Used for the deseasonalized/detrended halo regression — isolates the ad
+// spend coefficient after controlling for time trend + monthly seasonality.
+// ---------------------------------------------------------------------------
+function matT(A) {
+    const r = A.length, c = A[0].length;
+    const out = Array.from({ length: c }, () => new Array(r));
+    for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) out[j][i] = A[i][j];
+    return out;
+}
+function matMul(A, B) {
+    const r = A.length, m = A[0].length, c = B[0].length;
+    const out = Array.from({ length: r }, () => new Array(c).fill(0));
+    for (let i = 0; i < r; i++) for (let k = 0; k < m; k++) {
+        const a = A[i][k];
+        for (let j = 0; j < c; j++) out[i][j] += a * B[k][j];
+    }
+    return out;
+}
+function matInv(M) {
+    const n = M.length;
+    const a = M.map((row, i) => [...row, ...row.map((_, j) => i === j ? 1 : 0)]);
+    for (let i = 0; i < n; i++) {
+        let piv = i;
+        for (let k = i + 1; k < n; k++) if (Math.abs(a[k][i]) > Math.abs(a[piv][i])) piv = k;
+        if (Math.abs(a[piv][i]) < 1e-12) throw new Error('matInv: singular at col ' + i);
+        if (piv !== i) [a[i], a[piv]] = [a[piv], a[i]];
+        const d = a[i][i];
+        for (let j = 0; j < 2 * n; j++) a[i][j] /= d;
+        for (let k = 0; k < n; k++) {
+            if (k === i) continue;
+            const f = a[k][i];
+            if (f === 0) continue;
+            for (let j = 0; j < 2 * n; j++) a[k][j] -= f * a[i][j];
+        }
+    }
+    return a.map(row => row.slice(n));
+}
+function olsMulti(X, y) {
+    const n = y.length, k = X[0].length;
+    if (n <= k) return null;
+    const Xt = matT(X);
+    const XtXinv = matInv(matMul(Xt, X));
+    const beta = matMul(XtXinv, matMul(Xt, y.map(v => [v]))).map(r => r[0]);
+    const yhat = X.map(row => row.reduce((s, v, j) => s + v * beta[j], 0));
+    const res = y.map((v, i) => v - yhat[i]);
+    const rss = res.reduce((s, r) => s + r * r, 0);
+    const ymean = y.reduce((a, b) => a + b, 0) / n;
+    const tss = y.reduce((s, v) => s + (v - ymean) ** 2, 0);
+    const r2 = 1 - rss / tss;
+    const sigma2 = rss / (n - k);
+    const se = XtXinv.map((row, i) => Math.sqrt(sigma2 * row[i]));
+    return { beta, se, r2, rss, sigma2, n, k };
+}
+function fP(F, df1, df2) {
+    if (F <= 0) return 1;
+    const x = df2 / (df2 + df1 * F);
+    return betaInc(x, df2 / 2, df1 / 2);
+}
+function monthOf(iso) { return parseInt(iso.slice(5, 7), 10); }
+
+/**
+ * Build (controlled) halo coefficient for one revenue series.
+ * Design matrix: [intercept, spend, trend, Feb..Dec (11 dummies, Jan=ref)]
+ * Returns the spend coefficient + SE + t + p + partial F-test vs reduced
+ * model (intercept + trend + season; no spend).
+ */
+function controlledHalo(rows, yKey) {
+    // need >= 14 obs for the 14-col design matrix; demand a healthy buffer
+    if (rows.length < 24) return null;
+    const buildX = (includeSpend) => rows.map((r, i) => {
+        const month = monthOf(r.period);
+        const row = [1];
+        if (includeSpend) row.push(r.spend);
+        row.push(i);
+        for (let m = 2; m <= 12; m++) row.push(month === m ? 1 : 0);
+        return row;
+    });
+    const y = rows.map(r => r[yKey]);
+    const full = olsMulti(buildX(true), y);
+    const reduced = olsMulti(buildX(false), y);
+    if (!full || !reduced) return null;
+    const SPEND_IDX = 1;
+    const beta = full.beta[SPEND_IDX], se = full.se[SPEND_IDX];
+    const df = full.n - full.k;
+    const t = beta / se;
+    const p = tTwoSidedP(Math.abs(t), df);
+    const F = ((reduced.rss - full.rss) / 1) / (full.rss / df);
+    const Fp = fP(F, 1, df);
+    return {
+        spend_coef:    +beta.toFixed(4),
+        spend_se:      +se.toFixed(4),
+        spend_ci95:    [+(beta - 1.96 * se).toFixed(4), +(beta + 1.96 * se).toFixed(4)],
+        t:             +t.toFixed(3),
+        p:             +p.toFixed(6),
+        df,
+        full_r2:       +full.r2.toFixed(4),
+        reduced_r2:    +reduced.r2.toFixed(4),
+        delta_r2:      +(full.r2 - reduced.r2).toFixed(4),
+        partial_F:     +F.toFixed(3),
+        partial_F_p:   +Fp.toFixed(6),
+        n: full.n,
+    };
+}
+
 function weekKey(isoDate) {
     const d = new Date(isoDate + 'T00:00:00Z');
     const dow = (d.getUTCDay() + 6) % 7;
@@ -211,11 +317,21 @@ export default async function handler(req, res) {
             corrs[`lag${lag}_total`]        = pearson(spends.slice(0, -lag), totals.slice(lag));
         }
 
-        // OLS
+        // OLS (simple — no controls)
         const ols = {
             unattributed_per_spend: olsSimple(spends, unattribs),
             total_per_spend:        olsSimple(spends, totals),
         };
+
+        // Controlled multi-regression — only if we're in weekly mode with
+        // enough observations to fit the 14-col design matrix.
+        let controlled = null;
+        if (bucket === 'week' && both.length >= 24) {
+            controlled = {
+                unattributed: controlledHalo(both, 'unattributed'),
+                total:        controlledHalo(both, 'total'),
+            };
+        }
 
         // Quartile
         let quartile = null;
@@ -243,7 +359,9 @@ export default async function handler(req, res) {
         const totAttr  = attribs.reduce((a, b) => a + b, 0);
         const totUnat  = unattribs.reduce((a, b) => a + b, 0);
         const totAll   = totals.reduce((a, b) => a + b, 0);
-        const slope = ols.unattributed_per_spend?.slope || 0;
+        // Use the CONTROLLED coefficient for halo revenue if available — it's
+        // a much better estimate of true causal lift than the simple OLS.
+        const slope = controlled?.unattributed?.spend_coef ?? ols.unattributed_per_spend?.slope ?? 0;
         const haloRev = Math.max(0, slope * totSpend);
         const naiveAttrRate = totAll > 0 ? totAttr / totAll : 0;
         const adjustedAttrRate = totAll > 0 ? Math.min(1, (totAttr + haloRev) / totAll) : 0;
@@ -255,6 +373,7 @@ export default async function handler(req, res) {
             weeks_analyzed: both.length,
             correlations: corrs,
             ols,
+            controlled,  // multi-regression with trend + monthly seasonality
             quartile,
             totals: {
                 spend: +totSpend.toFixed(2),
