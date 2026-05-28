@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto Glass 2020 LLC - Bankruptcy Court Presentation</title>
-    <script>
-    (function() {
-        var AUTH_KEY = 'ag2020_dashboard_auth';
-        if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
-            window.location.href = 'password.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash);
-        }
-    })();
-    </script>
+    <!-- Supabase auth gate (any signed-in AG2020 user can view this page) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-check.js"></script>
     <style>
         /* Reset and base styles */
         * {

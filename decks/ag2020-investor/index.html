@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Glass 2020 — Tech-Enabled Auto Glass Platform | Investor Deck</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/logos/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --roboto-mono: 'Roboto Mono', monospace;
+            --pt-sans: 'PT Sans', sans-serif;
+            --bg-dark: #0f1c2e;
+            --bg-mid: #16263d;
+            --ink: #f4f7fc;
+            --ink-dim: #b9c5d6;
+            --ag-blue: #1B4B82;
+            --ag-blue-light: #6BA4D0;
+            --accent-gold: #f6c64f;
+            --accent-emerald: #34d399;
+            --accent-rose:   #fb7185;
+            --rule: rgba(255,255,255,0.12);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            font-family: var(--roboto-mono);
+            background: var(--bg-dark);
+            color: var(--ink);
+            overflow: hidden;
+        }
+        .deck-container { height: 100vh; width: 100vw; overflow: hidden; position: relative; }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 60px 80px;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .slide.active { opacity: 1; visibility: visible; }
+
+        /* slide variants */
+        .slide-title { background: linear-gradient(135deg, var(--ag-blue) 0%, var(--bg-dark) 100%); }
+        .slide-dark  { background: var(--bg-dark); }
+        .slide-mid   { background: var(--bg-mid); }
+        .slide-light { background: #f7fafc; color: #0f1c2e; }
+        .slide-gold  { background: linear-gradient(135deg, #b08323, #5a3c0e); }
+        .slide-emerald { background: linear-gradient(135deg, #064e3b, #022c22); }
+        .slide-rose  { background: linear-gradient(135deg, #7f1d1d, #3f0a0a); }
+
+        .badge {
+            position: absolute; top: 28px; left: 36px;
+            font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--ink-dim); font-family: var(--roboto-mono);
+        }
+        .slide-light .badge { color: #475569; }
+        .slide-number {
+            position: absolute; bottom: 28px; right: 36px;
+            font-size: 12px; opacity: 0.55; font-family: var(--roboto-mono);
+        }
+
+        h1 {
+            font-family: var(--pt-sans); font-size: 60px; font-weight: 700;
+            line-height: 1.05; letter-spacing: -0.01em; text-align: center; max-width: 1100px;
+        }
+        h2 {
+            font-family: var(--pt-sans); font-size: 44px; font-weight: 700;
+            line-height: 1.15; margin-bottom: 24px; max-width: 1100px;
+        }
+        h3 {
+            font-family: var(--pt-sans); font-size: 24px; font-weight: 700;
+            margin-bottom: 12px;
+        }
+        h4 {
+            font-family: var(--pt-sans); font-size: 18px; font-weight: 700; margin-bottom: 8px;
+        }
+        p, li { font-size: 16px; line-height: 1.55; }
+        .subtitle { font-size: 22px; color: var(--ink-dim); text-align: center; max-width: 800px; margin-top: 20px; }
+        .content { max-width: 1100px; width: 100%; }
+        .lede { font-size: 24px; line-height: 1.5; color: var(--ink); max-width: 900px; margin-bottom: 32px; }
+        .slide-light .lede { color: #1e293b; }
+
+        /* number / stat */
+        .big-stat {
+            font-family: var(--pt-sans); font-size: 96px; font-weight: 700;
+            line-height: 1; color: var(--accent-gold);
+        }
+        .mid-stat {
+            font-family: var(--pt-sans); font-size: 58px; font-weight: 700;
+            line-height: 1; color: var(--ag-blue-light);
+        }
+        .slide-light .mid-stat { color: var(--ag-blue); }
+        .stat-label { font-size: 13px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 10px; }
+        .slide-light .stat-label { color: #64748b; }
+
+        /* grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            padding: 22px 24px;
+        }
+        .slide-light .card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-gold { border-left: 4px solid var(--accent-gold); }
+        .card-emerald { border-left: 4px solid var(--accent-emerald); }
+        .card-rose { border-left: 4px solid var(--accent-rose); }
+        .card-blue { border-left: 4px solid var(--ag-blue-light); }
+
+        .card h3 { color: var(--accent-gold); font-size: 20px; }
+        .slide-light .card h3 { color: var(--ag-blue); }
+        .card-emerald h3 { color: var(--accent-emerald); }
+        .card-rose h3    { color: var(--accent-rose); }
+        .card-blue h3    { color: var(--ag-blue-light); }
+        .slide-light .card-blue h3 { color: var(--ag-blue); }
+
+        .card p, .card li { font-size: 14px; line-height: 1.6; color: var(--ink-dim); }
+        .slide-light .card p, .slide-light .card li { color: #475569; }
+        .card ul { padding-left: 18px; margin-top: 6px; }
+        .card ul li { list-style: disc; padding: 4px 0; }
+
+        ul.bullet { list-style: none; padding: 0; }
+        ul.bullet li { padding: 10px 0 10px 28px; position: relative; }
+        ul.bullet li::before {
+            content: "▸"; position: absolute; left: 0; color: var(--accent-gold); font-weight: bold;
+        }
+        .slide-light ul.bullet li::before { color: var(--ag-blue); }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px; overflow: hidden;
+            font-family: var(--roboto-mono); font-size: 14px;
+        }
+        .slide-light table { background: white; border: 1px solid #e2e8f0; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--rule); }
+        .slide-light th, .slide-light td { border-bottom: 1px solid #e2e8f0; }
+        th { background: rgba(255,255,255,0.08); color: var(--ink); font-weight: 700; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .slide-light th { background: var(--ag-blue); color: white; }
+        td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        tr.highlight td { background: rgba(246,198,79,0.08); color: var(--accent-gold); font-weight: 700; }
+        .slide-light tr.highlight td { background: rgba(27,75,130,0.08); color: var(--ag-blue); }
+
+        .pill {
+            display: inline-block; padding: 3px 10px; border-radius: 999px;
+            background: var(--accent-gold); color: var(--bg-dark); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .pill-emerald { background: var(--accent-emerald); color: #022c22; }
+        .pill-rose    { background: var(--accent-rose); color: #3f0a0a; }
+        .pill-blue    { background: var(--ag-blue-light); color: var(--bg-dark); }
+
+        .quote {
+            font-family: var(--pt-sans); font-size: 28px; line-height: 1.4;
+            font-style: italic; border-left: 4px solid var(--accent-gold);
+            padding-left: 28px; max-width: 900px;
+        }
+
+        .arrow-flow {
+            display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr;
+            align-items: center; gap: 12px; margin-top: 28px;
+        }
+        .arrow-flow .step {
+            background: rgba(255,255,255,0.06); border: 1px solid var(--rule);
+            border-radius: 8px; padding: 18px 16px; text-align: center;
+        }
+        .arrow-flow .arrow { text-align: center; font-size: 28px; color: var(--accent-gold); }
+
+        /* progress + nav */
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--accent-gold);
+            transition: width 0.3s ease; z-index: 100;
+        }
+        .nav-controls {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 100;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.12); border: none; color: white;
+            width: 38px; height: 38px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; transition: all 0.2s;
+        }
+        .nav-btn:hover { background: var(--accent-gold); color: var(--bg-dark); }
+
+        .footnote { font-size: 11px; color: var(--ink-dim); margin-top: 24px; max-width: 900px; text-align: center; }
+        .slide-light .footnote { color: #94a3b8; }
+
+        .source { font-size: 10px; color: var(--ink-dim); opacity: 0.7; margin-top: 18px; }
+        .slide-light .source { color: #94a3b8; }
+
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            h1 { font-size: 38px; }
+            h2 { font-size: 28px; }
+            .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+            .big-stat { font-size: 64px; }
+        }
+
+        /* Print stylesheet for PDF export */
+        @media print {
+            @page { size: 1280px 720px; margin: 0; }
+            html, body { background: white; overflow: visible; height: auto; }
+            .deck-container { height: auto; overflow: visible; }
+            .slide {
+                position: relative;
+                opacity: 1 !important; visibility: visible !important;
+                page-break-after: always;
+                height: 720px;
+                transition: none;
+            }
+            .progress-bar, .nav-controls { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <div class="deck-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide slide-title active" data-slide="1">
+            <span class="badge" style="color: rgba(255,255,255,0.6);">Confidential · For investor discussion only</span>
+            <h1>The Phoenix Auto-Glass Platform</h1>
+            <p class="subtitle">A proven, profitable shop with a measurable competitive moat —
+                positioned to consolidate a $4B fragmented US market.</p>
+            <p style="margin-top: 28px; font-size: 14px; color: var(--ink-dim); letter-spacing: 0.08em;">AUTO GLASS 2020 · Cash &amp; Kenny</p>
+            <span class="slide-number">1 / 22</span>
+        </div>
+
+        <!-- Slide 2: The Opportunity in One Slide -->
+        <div class="slide slide-dark" data-slide="2">
+            <span class="badge">The opportunity, in one slide</span>
+            <div class="content">
+                <h2>An undervalued, undercapitalized leader in the best auto-glass market in America — with a software moat nobody else has built.</h2>
+                <div class="grid-4" style="margin-top: 36px;">
+                    <div class="card card-gold">
+                        <div class="mid-stat">$3.2M</div>
+                        <div class="stat-label">Annual revenue</div>
+                    </div>
+                    <div class="card card-emerald">
+                        <div class="mid-stat" style="color: var(--accent-emerald);">45%</div>
+                        <div class="stat-label">Gross margin</div>
+                    </div>
+                    <div class="card card-blue">
+                        <div class="mid-stat">$2.81</div>
+                        <div class="stat-label">Halo revenue per $1 ad spend<br><span style="opacity:0.7">(p&lt;0.00001)</span></div>
+                    </div>
+                    <div class="card card-gold">
+                        <div class="mid-stat">10%</div>
+                        <div class="stat-label">of <em>all</em> US auto-glass claims happen in AZ</div>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 32px; text-align: center;">
+                    What we're raising: capital to clear a legacy balance sheet and capitalize the rollout
+                    of a tech-enabled shop network across Arizona and the Southwest.
+                </p>
+            </div>
+            <span class="slide-number">2 / 22</span>
+        </div>
+
+        <!-- Slide 3: Why Arizona -->
+        <div class="slide slide-mid" data-slide="3">
+            <span class="badge">The geography</span>
+            <div class="content">
+                <h2>Arizona is the single best auto-glass market in the United States.</h2>
+                <div class="grid-2">
+                    <div class="card card-gold">
+                        <h3>The numbers don't lie</h3>
+                        <p style="margin-bottom: 16px;">Arizona files <strong style="color:white;">10% of all US auto-glass claims</strong> despite having only <strong style="color:white;">2% of the US population</strong>. More claims than California or Texas — combined.</p>
+                        <ul class="bullet">
+                            <li>Monsoon hail + chip-prone freeways</li>
+                            <li>Year-round driving (no winter dormancy)</li>
+                            <li>Population growth +1.5%/yr</li>
+                        </ul>
+                    </div>
+                    <div class="card card-emerald">
+                        <h3>The regulatory tailwind</h3>
+                        <p style="margin-bottom: 16px;"><strong style="color:white;">Arizona Revised Statute § 20-263</strong>: insurers must offer $0-deductible glass coverage on any comprehensive policy. Insurers <em>cannot</em> raise premiums on glass-only claims.</p>
+                        <ul class="bullet">
+                            <li>Consumer friction to replace = essentially zero</li>
+                            <li>Direct insurance billing relationships are the moat</li>
+                            <li>$4.5B in recent AZ hail-related insured losses</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="source">Sources: NICB; ARS § 20-263; Insurance Journal (West, 2020)</p>
+            </div>
+            <span class="slide-number">3 / 22</span>
+        </div>
+
+        <!-- Slide 4: Market Size -->
+        <div class="slide slide-dark" data-slide="4">
+            <span class="badge">Market context</span>
+            <div class="content">
+                <h2>$20B and growing — with a secular tailwind nobody can stop.</h2>
+                <div class="grid-3">
+                    <div class="card card-blue">
+                        <div class="mid-stat">$20.2B</div>
+                        <div class="stat-label">US aftermarket auto glass (2025)</div>
+                        <p style="margin-top:14px;">→ $28.5B by 2030<br>7.15% CAGR</p>
+                    </div>
+                    <div class="card card-blue">
+                        <div class="mid-stat">$4.8B</div>
+                        <div class="stat-label">ADAS calibration TAM (2025)</div>
+                        <p style="margin-top:14px;">→ $11.6B by 2032<br>13.4% CAGR</p>
+                    </div>
+                    <div class="card card-blue">
+                        <div class="mid-stat">$170M</div>
+                        <div class="stat-label">Auto Glass Now sold to Driven Brands</div>
+                        <p style="margin-top:14px;">8.0× EBITDA · 2021<br>Now a standalone reporting segment</p>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 32px;">Every new vehicle now ships with ADAS cameras
+                mounted to the windshield. Every windshield replacement requires recalibration. Every recalibration
+                is <strong>$150–$600 of additional, higher-margin revenue</strong>. The market is moving the right way.</p>
+                <p class="source">Sources: Mordor Intelligence; Coherent Market Insights; Driven Brands Form 8-K (Dec 2021)</p>
+            </div>
+            <span class="slide-number">4 / 22</span>
+        </div>
+
+        <!-- Slide 5: Fragmentation -->
+        <div class="slide slide-mid" data-slide="5">
+            <span class="badge">Market structure</span>
+            <div class="content">
+                <h2>A fragmented, consolidatable industry — with one giant and a thousand mom-and-pops.</h2>
+                <div class="grid-2">
+                    <div>
+                        <table>
+                            <thead><tr><th>Operator</th><th>Scale</th><th>Type</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Safelite</strong></td><td>$3.3B+ rev · ~20% share</td><td>Corporate</td></tr>
+                                <tr><td>Auto Glass Now</td><td>~140 locations</td><td>Corporate (Driven Brands)</td></tr>
+                                <tr><td>PGW Auto Glass</td><td>~160 branches</td><td>PE (One Equity)</td></tr>
+                                <tr><td>Glass Doctor</td><td>~140 units</td><td>Franchise (Neighborly)</td></tr>
+                                <tr><td>Novus Glass</td><td>~100 units</td><td>Franchise</td></tr>
+                                <tr class="highlight"><td><strong>Everyone else</strong></td><td><strong>Hundreds of independents</strong></td><td>Mom-and-pop</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent-gold);">The arbitrage</h3>
+                        <ul class="bullet">
+                            <li>Single shops sell at <strong>2.5–4.5× SDE</strong></li>
+                            <li>Multi-shop operators (MSOs) sell at <strong>3.5–6.5× EBITDA</strong></li>
+                            <li>Platforms (10+ locations) sell at <strong>7–10×+ EBITDA</strong></li>
+                            <li>Tech-enabled platforms get a <strong>+1.5–2 turn premium</strong> on exit</li>
+                        </ul>
+                        <p style="margin-top:18px; color: var(--accent-emerald);">→ Build a platform from independents at 4×, exit the bundle at 8×. The math is well-understood. The question is execution.</p>
+                    </div>
+                </div>
+                <p class="source">Sources: CT Acquisitions (PE in auto repair 2026); EBIT Community; FDD Item 19 disclosures</p>
+            </div>
+            <span class="slide-number">5 / 22</span>
+        </div>
+
+        <!-- Slide 6: AG2020 Today -->
+        <div class="slide slide-dark" data-slide="6">
+            <span class="badge">Where we are today</span>
+            <div class="content">
+                <h2>Auto Glass 2020 — a real, profitable shop, run by an industry veteran.</h2>
+                <div class="grid-4" style="margin-bottom: 28px;">
+                    <div class="card">
+                        <div class="mid-stat">$3.2M</div>
+                        <div class="stat-label">Annual revenue</div>
+                    </div>
+                    <div class="card">
+                        <div class="mid-stat">45%</div>
+                        <div class="stat-label">Gross margin</div>
+                    </div>
+                    <div class="card">
+                        <div class="mid-stat">~4,500</div>
+                        <div class="stat-label">Jobs / year</div>
+                    </div>
+                    <div class="card">
+                        <div class="mid-stat">~$700</div>
+                        <div class="stat-label">Average ticket</div>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="card card-emerald">
+                        <h3>Above the median</h3>
+                        <p>Industry single-shop AUV averages <strong style="color:white;">$1.2-1.5M</strong>. AG2020 is doing 2-2.5× that — and with healthier gross margins than chains operating at scale.</p>
+                    </div>
+                    <div class="card card-gold">
+                        <h3>Founded 2020, operating since</h3>
+                        <p>Built and run by Cash, an auto-glass operator with <strong style="color:white;">decades of profitable shop-running history</strong>. Phoenix shop. Insurance + retail revenue mix. Direct billing relationships in place.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">6 / 22</span>
+        </div>
+
+        <!-- Slide 7: The Problem -->
+        <div class="slide slide-rose" data-slide="7">
+            <span class="badge">Why this market hasn't been consolidated</span>
+            <div class="content">
+                <h2>Every independent shop fights blind — and loses to Safelite by default.</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--accent-rose);">The four cuts that bleed independents</h3>
+                        <ul class="bullet" style="font-size: 18px;">
+                            <li><strong>No attribution:</strong> Owners spend on Google, Meta, billboards, referrals — and have no idea which dollar earned which job.</li>
+                            <li><strong>No speed-to-lead:</strong> Web form fills sit in an inbox. Calls go to voicemail at lunch. Safelite picks the customer up.</li>
+                            <li><strong>No data integration:</strong> Ads platform, CRM, scheduling, billing, insurance EDI — five disconnected systems, three people retyping.</li>
+                            <li><strong>No transferable playbook:</strong> Owner retires; the business loses 30% in 18 months. No SOP, no acquirer.</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: rgba(0,0,0,0.3); border-color: var(--accent-rose);">
+                        <p class="quote" style="font-size: 22px;">"Most independent operators can't tell you their CAC, their LTV, or their ad ROAS to two decimal places. We can — and the spread is the opportunity."</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">7 / 22</span>
+        </div>
+
+        <!-- Slide 8: The Platform Overview -->
+        <div class="slide slide-mid" data-slide="8">
+            <span class="badge">What we've built</span>
+            <div class="content">
+                <h2>A purpose-built operating system for the modern auto-glass shop.</h2>
+                <div class="grid-3">
+                    <div class="card card-gold">
+                        <h3>Lead engine</h3>
+                        <ul class="bullet" style="font-size: 13px;">
+                            <li>Multi-channel attribution (Google, Meta, organic, referral, walk-in)</li>
+                            <li>Phone tracking + AC sync</li>
+                            <li>Speed-to-lead autodialer: form fill → live call to customer within 60 seconds, bridged to a rep</li>
+                            <li>Branded outbound caller ID</li>
+                        </ul>
+                    </div>
+                    <div class="card card-emerald">
+                        <h3>Conversion + ops</h3>
+                        <ul class="bullet" style="font-size: 13px;">
+                            <li>CRM ↔ scheduling ↔ billing fully integrated</li>
+                            <li>SMS thread continuity (no rep retyping)</li>
+                            <li>Missed-call rescue (returns calls automatically during business hours)</li>
+                            <li>Call triage queue + outcome capture</li>
+                        </ul>
+                    </div>
+                    <div class="card card-blue">
+                        <h3>Closed-loop attribution</h3>
+                        <ul class="bullet" style="font-size: 13px;">
+                            <li>Every closed invoice traced back to first-touch source</li>
+                            <li>Per-source CAC, LTV, ROAS in real time</li>
+                            <li>6 years of historical revenue layered in</li>
+                            <li>Statistically tested halo-lift coefficient (see next slide)</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 24px; text-align: center;">
+                    Already running. Already deployed. Already generating the numbers on the next slide.
+                </p>
+            </div>
+            <span class="slide-number">8 / 22</span>
+        </div>
+
+        <!-- Slide 9: The Halo Lift -->
+        <div class="slide slide-gold" data-slide="9">
+            <span class="badge" style="color: rgba(255,255,255,0.7);">The headline result</span>
+            <div class="content" style="text-align: center;">
+                <h2 style="text-align: center; color: white;">Every $1 of ad spend lifts <em>unattributed</em> weekly revenue by <span style="color: white; text-decoration: underline; text-decoration-color: white;">$2.81</span>.</h2>
+                <p class="lede" style="text-align: center; margin: 0 auto 28px; color: rgba(255,255,255,0.92);">
+                    Deseasonalized. Detrended. Multiple regression on 117 weekly observations. Result holds at 1-, 2-, and 4-week lag.
+                    No serious statistical objection survives.
+                </p>
+                <div class="grid-4" style="margin-top: 32px;">
+                    <div style="background: rgba(0,0,0,0.25); padding: 24px; border-radius: 10px;">
+                        <div class="mid-stat" style="color: white;">$2.81</div>
+                        <div class="stat-label" style="color: rgba(255,255,255,0.85);">per $1 spend</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 24px; border-radius: 10px;">
+                        <div class="mid-stat" style="color: white;">t=6.83</div>
+                        <div class="stat-label" style="color: rgba(255,255,255,0.85);">on 103 df</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 24px; border-radius: 10px;">
+                        <div class="mid-stat" style="color: white;">&lt;1 / 100k</div>
+                        <div class="stat-label" style="color: rgba(255,255,255,0.85);">probability this is noise</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 24px; border-radius: 10px;">
+                        <div class="mid-stat" style="color: white;">$2.00&ndash;$3.62</div>
+                        <div class="stat-label" style="color: rgba(255,255,255,0.85);">95% confidence interval</div>
+                    </div>
+                </div>
+                <p class="footnote" style="color: rgba(255,255,255,0.8);">Most operators cite "marketing works" as a feeling. We can prove it with a 95% confidence interval that doesn't cross zero — and translate it into per-shop economics.</p>
+            </div>
+            <span class="slide-number" style="color: rgba(255,255,255,0.7);">9 / 22</span>
+        </div>
+
+        <!-- Slide 10: Halo Detail / quartile comparison -->
+        <div class="slide slide-mid" data-slide="10">
+            <span class="badge">The result in plain English</span>
+            <div class="content">
+                <h2>When ad spend rises, total revenue rises — across the entire customer base, not just attributable conversions.</h2>
+                <div class="grid-2">
+                    <div>
+                        <table>
+                            <thead><tr><th>Week Type</th><th class="num">Avg Spend</th><th class="num">Avg Total Rev</th></tr></thead>
+                            <tbody>
+                                <tr><td>Bottom-quartile spend weeks (n=29)</td><td class="num">$1,725</td><td class="num">$98,609</td></tr>
+                                <tr><td>Top-quartile spend weeks (n=29)</td><td class="num">$17,394</td><td class="num">$141,348</td></tr>
+                                <tr class="highlight"><td><strong>Lift</strong></td><td class="num">+10×</td><td class="num"><strong>+43%</strong></td></tr>
+                            </tbody>
+                        </table>
+                        <p class="source" style="margin-top: 16px;">Welch's t-test: p = 0.008. The lift is real, not noise.</p>
+                    </div>
+                    <div class="card card-emerald">
+                        <h3>What this means for an expansion thesis</h3>
+                        <p style="font-size: 16px;">If each new shop replicates AG2020's spend-to-revenue relationship,
+                        <strong style="color:white;">every $100K of ad budget produces $310K of total revenue lift</strong>
+                        — including walk-in, referral, and repeat customers ads don't get direct credit for.</p>
+                        <p style="font-size: 16px; margin-top: 14px;">That's how you out-bid Safelite in a market and still come out ahead.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">10 / 22</span>
+        </div>
+
+        <!-- Slide 11: Unit economics -->
+        <div class="slide slide-light" data-slide="11">
+            <span class="badge">Unit economics</span>
+            <div class="content">
+                <h2>The per-shop model — credible numbers, conservative assumptions.</h2>
+                <table>
+                    <thead><tr>
+                        <th>Metric</th>
+                        <th class="num">AG2020 Today</th>
+                        <th class="num">Year 1 (Established)</th>
+                        <th class="num">Year 2 (Mature)</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>Annual revenue</td><td class="num">$3.2M</td><td class="num">$1.5M</td><td class="num">$2.4M</td></tr>
+                        <tr><td>Gross margin %</td><td class="num">45%</td><td class="num">42%</td><td class="num">45%</td></tr>
+                        <tr><td>Gross profit</td><td class="num">$1.44M</td><td class="num">$630K</td><td class="num">$1.08M</td></tr>
+                        <tr><td>Operating overhead (rent, labor, ops)</td><td class="num">$1.0M</td><td class="num">$520K</td><td class="num">$700K</td></tr>
+                        <tr><td>Ad spend (model: 8% of revenue)</td><td class="num">$256K</td><td class="num">$120K</td><td class="num">$192K</td></tr>
+                        <tr><td>Platform license (3% of revenue)</td><td class="num">—</td><td class="num">$45K</td><td class="num">$72K</td></tr>
+                        <tr class="highlight"><td><strong>Shop EBITDA</strong></td><td class="num"><strong>~$184K</strong></td><td class="num"><strong>~-$55K</strong></td><td class="num"><strong>~$116K</strong></td></tr>
+                        <tr><td><strong>EBITDA margin</strong></td><td class="num"><strong>5.8%</strong></td><td class="num">(ramp)</td><td class="num"><strong>4.8%</strong></td></tr>
+                    </tbody>
+                </table>
+                <p class="source" style="margin-top: 18px;">New-shop ramp assumes 6 months to revenue + 12 months to stable margin. Mature-shop EBITDA conservatively held below AG2020's current level to reflect new-market discovery costs. Add ADAS-calibration upside not modeled here.</p>
+            </div>
+            <span class="slide-number">11 / 22</span>
+        </div>
+
+        <!-- Slide 12: 5-Year Expansion -->
+        <div class="slide slide-dark" data-slide="12">
+            <span class="badge">The expansion plan</span>
+            <div class="content">
+                <h2>From 1 shop to 5 — and a credible platform exit in 36–48 months.</h2>
+                <table>
+                    <thead><tr>
+                        <th>Year</th><th class="num">Shops</th>
+                        <th class="num">System Revenue</th><th class="num">System EBITDA</th>
+                        <th>Milestone</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>Y0 (today)</td><td class="num">1</td><td class="num">$3.2M</td><td class="num">$184K</td><td>Acquire bolt-on #1 in Phoenix metro</td></tr>
+                        <tr><td>Y1</td><td class="num">2</td><td class="num">$4.7M</td><td class="num">$160K</td><td>Bolt-on #2 acquired; platform deployed</td></tr>
+                        <tr><td>Y2</td><td class="num">3-4</td><td class="num">$9.1M</td><td class="num">$700K</td><td>Tucson + 2nd Phoenix shop</td></tr>
+                        <tr><td>Y3</td><td class="num">5</td><td class="num">$13.5M</td><td class="num">$1.6M</td><td>Las Vegas / Albuquerque footprint</td></tr>
+                        <tr class="highlight"><td><strong>Y4 Exit</strong></td><td class="num"><strong>5+</strong></td><td class="num"><strong>$15-18M</strong></td><td class="num"><strong>$2.5-3M</strong></td><td><strong>Platform exit at 7-8× EBITDA → $18-24M EV</strong></td></tr>
+                    </tbody>
+                </table>
+                <div class="grid-3" style="margin-top: 28px;">
+                    <div class="card card-gold">
+                        <h3>Acquisition channel</h3>
+                        <p>Phoenix metro alone has hundreds of independents. AG2020 is well-known in the market — we have a relationship-led pipeline of 8-12 targets at any time.</p>
+                    </div>
+                    <div class="card card-emerald">
+                        <h3>Platform deployment</h3>
+                        <p>The tech stack drops into a new shop in 2-4 weeks. Lead-flow lift is visible within 60 days. Bolt-ons earn their multiple expansion fast.</p>
+                    </div>
+                    <div class="card card-blue">
+                        <h3>Roll-up arbitrage</h3>
+                        <p>Buy at 4× SDE → operate at platform scale → exit at 8× EBITDA + 1.5-turn tech-enabled premium = 3-3.5× multiple expansion per add-on.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">12 / 22</span>
+        </div>
+
+        <!-- Slide 13: The Team -->
+        <div class="slide slide-mid" data-slide="13">
+            <span class="badge">The team</span>
+            <div class="content">
+                <h2>Two complementary operators. One has run the shop profitably for decades. The other has built the tech.</h2>
+                <div class="grid-2">
+                    <div class="card card-gold">
+                        <h3>Cash — CEO, Operator</h3>
+                        <ul class="bullet">
+                            <li>Decades of profitable auto-glass operating experience</li>
+                            <li>Phoenix-market insurance and direct-billing relationships</li>
+                            <li>Day-to-day operational lead: hiring, customer service, vendor management, insurance EDI</li>
+                            <li>Owner-operator commitment: skin in the game, post-deal vesting on equity</li>
+                        </ul>
+                    </div>
+                    <div class="card card-blue">
+                        <h3>Kenny — Tech &amp; Growth</h3>
+                        <ul class="bullet">
+                            <li>Built the entire attribution + autodialer + integration stack</li>
+                            <li>Background: digital marketing consultancy serving SMB &amp; mid-market for 15+ years</li>
+                            <li>Owns the technology IP; will license to the operating company under a long-term agreement</li>
+                            <li>Continuing investment in the platform — ADAS-calibration scheduling, fleet portal, multi-shop ops dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 28px; text-align: center;">
+                    Neither one of us alone could pitch this deal credibly.
+                    Together, we are the only people in Arizona who can.
+                </p>
+            </div>
+            <span class="slide-number">13 / 22</span>
+        </div>
+
+        <!-- Slide 14: Recommended Structure - HoldCo (Angle C) -->
+        <div class="slide slide-emerald" data-slide="14">
+            <span class="badge" style="color: rgba(255,255,255,0.7);">Recommended deal structure</span>
+            <div class="content">
+                <h2 style="color: white;">HoldCo with two operating subsidiaries — ringfencing IP, aligning incentives.</h2>
+                <div class="arrow-flow">
+                    <div class="step">
+                        <h4 style="color: var(--accent-gold);">Investor Capital</h4>
+                        <p style="color: rgba(255,255,255,0.85); font-size: 13px;">$5-7M for 50-60% of HoldCo</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="step" style="background: rgba(246,198,79,0.15); border-color: var(--accent-gold);">
+                        <h4 style="color: white;">HoldCo</h4>
+                        <p style="color: rgba(255,255,255,0.95); font-size: 13px;">Investor 50-60%<br>Cash 25-30%<br>Kenny 15-20%</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="step">
+                        <h4 style="color: var(--ag-blue-light);">2 subsidiaries</h4>
+                        <p style="color: rgba(255,255,255,0.85); font-size: 13px;">OpsCo + TechCo</p>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 28px;">
+                    <div class="card" style="background: rgba(0,0,0,0.3);">
+                        <h3 style="color: var(--ag-blue-light);">OpsCo — the shops</h3>
+                        <ul class="bullet" style="font-size: 14px;">
+                            <li>Owns AG2020 + acquired bolt-ons</li>
+                            <li>Cash: 25-30% (operator equity)</li>
+                            <li>Kenny: 5-8% (alignment)</li>
+                            <li>HoldCo: balance</li>
+                            <li>Licenses platform from TechCo at 3% of revenue</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: rgba(0,0,0,0.3);">
+                        <h3 style="color: var(--accent-gold);">TechCo — the platform</h3>
+                        <ul class="bullet" style="font-size: 14px;">
+                            <li>Owns the IP, source code, models</li>
+                            <li>Kenny: 75-85% (creator equity)</li>
+                            <li>HoldCo: balance</li>
+                            <li>Internal revenue: 3% of OpsCo system revenue</li>
+                            <li>Optional: external licensing to non-competing shops</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 28px; text-align: center; color: white;">
+                    Why this structure: protects the investor from key-man risk on Kenny, gives Cash clean operator equity,
+                    and creates a second exit lever (TechCo on its own SaaS-like multiple).
+                </p>
+            </div>
+            <span class="slide-number" style="color: rgba(255,255,255,0.7);">14 / 22</span>
+        </div>
+
+        <!-- Slide 15: The Use of Capital -->
+        <div class="slide slide-dark" data-slide="15">
+            <span class="badge">Use of capital</span>
+            <div class="content">
+                <h2>Where the $5-7M goes — three pools, each with measurable milestones.</h2>
+                <div class="grid-3">
+                    <div class="card card-rose">
+                        <h3>1. Balance-sheet reset</h3>
+                        <p><strong style="color:white;">~$1.5M</strong></p>
+                        <p style="margin-top:12px;">Pay off AG2020's confirmed Chapter 11 plan obligations at close. Free the operating entity from all legacy claims. Clean cap table from day one. Plan terms are a known, court-approved liability — no surprises.</p>
+                    </div>
+                    <div class="card card-gold">
+                        <h3>2. Bolt-on acquisitions</h3>
+                        <p><strong style="color:white;">~$2.5-3.5M</strong></p>
+                        <p style="margin-top:12px;">Acquire 2-3 Phoenix-metro shops over 18 months at 4× SDE. Each adds $1-2M of revenue + becomes a deployment site for the platform. Pipeline of 8-12 candidate targets already mapped.</p>
+                    </div>
+                    <div class="card card-emerald">
+                        <h3>3. Working capital + ramp</h3>
+                        <p><strong style="color:white;">~$1-2M</strong></p>
+                        <p style="margin-top:12px;">12-18 months of new-shop ramp-cost buffer, platform engineering investment, marketing acceleration, and contingency reserve.</p>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 32px; text-align: center;">
+                    Capital is deployed against milestones — not in one tranche. The investor controls the gating.
+                </p>
+            </div>
+            <span class="slide-number">15 / 22</span>
+        </div>
+
+        <!-- Slide 16: Returns to Investor -->
+        <div class="slide slide-mid" data-slide="16">
+            <span class="badge">Investor returns</span>
+            <div class="content">
+                <h2>The model: 4-5× MOIC over 4 years on a $5-7M check.</h2>
+                <table>
+                    <thead><tr>
+                        <th>Scenario</th><th class="num">Y4 System EV</th><th class="num">Investor %</th>
+                        <th class="num">Investor Proceeds</th><th class="num">MOIC</th><th class="num">~IRR</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>Downside (Y4 EBITDA $1.8M, 6× exit)</td><td class="num">$10.8M</td><td class="num">55%</td><td class="num">$5.9M</td><td class="num">1.2×</td><td class="num">4%</td></tr>
+                        <tr><td>Base (Y4 EBITDA $2.5M, 7× exit)</td><td class="num">$17.5M</td><td class="num">55%</td><td class="num">$9.6M</td><td class="num">1.9×</td><td class="num">18%</td></tr>
+                        <tr class="highlight"><td><strong>Target (Y4 EBITDA $3M, 8× exit + tech premium)</strong></td><td class="num"><strong>$28M</strong></td><td class="num">55%</td><td class="num"><strong>$15.4M</strong></td><td class="num"><strong>3.1×</strong></td><td class="num"><strong>32%</strong></td></tr>
+                        <tr><td>Upside (5 shops + 2nd-state expansion, 9× exit)</td><td class="num">$42M</td><td class="num">55%</td><td class="num">$23.1M</td><td class="num">4.6×</td><td class="num">46%</td></tr>
+                    </tbody>
+                </table>
+                <div class="grid-2" style="margin-top: 28px;">
+                    <div class="card card-emerald">
+                        <h3>Why this beats a fund-style PE return</h3>
+                        <p>Direct operator alignment, 100% of upside accrues to capital + management (no GP carry above the line), and the tech moat compounds across every new unit. Best-case: TechCo carved out and sold separately at 10-15× ARR for another $5-15M.</p>
+                    </div>
+                    <div class="card card-rose">
+                        <h3>Why an LP would walk</h3>
+                        <p>Sub-$10M check size, operationally intensive, Arizona-concentrated, and the lead operator carrying personal Chapter 11 history (cleared at close, but it's there). This is a deal for an investor who likes to roll up their sleeves.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">16 / 22</span>
+        </div>
+
+        <!-- Slide 17: Alternative Structure (Angle A) -->
+        <div class="slide slide-mid" data-slide="17">
+            <span class="badge">Alternative structure</span>
+            <div class="content">
+                <h2>If you prefer a simpler structure: pure OpsCo roll-up with a tech licensing carve-out.</h2>
+                <div class="grid-2">
+                    <div class="card card-blue">
+                        <h3>Single OpsCo, tech as a vendor</h3>
+                        <ul class="bullet">
+                            <li>Investor funds $4-6M for 55-65% of OpsCo</li>
+                            <li>Cash retains 20-30% of OpsCo + management contract</li>
+                            <li>Kenny retains 10-15% of OpsCo</li>
+                            <li>Kenny separately owns TechCo, which licenses the platform to OpsCo at 3% of revenue</li>
+                            <li>OpsCo and TechCo enter into a long-term licensing agreement at close</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--accent-gold);">Trade-offs vs. HoldCo structure</h3>
+                        <table style="font-size: 13px;">
+                            <thead><tr><th></th><th>HoldCo (rec.)</th><th>Pure OpsCo</th></tr></thead>
+                            <tbody>
+                                <tr><td>Investor exposure to tech upside</td><td>Direct</td><td>Indirect (via license fee)</td></tr>
+                                <tr><td>Cash's payout at exit</td><td>$4.5-7.2M</td><td>$3.6-4.8M</td></tr>
+                                <tr><td>Kenny's payout at exit</td><td>$7-12M</td><td>$2.5-4M + royalty</td></tr>
+                                <tr><td>Deal complexity</td><td>Higher</td><td>Lower</td></tr>
+                                <tr><td>Investor governance</td><td>1 HoldCo board</td><td>1 OpsCo board + license review</td></tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top:16px; color: var(--accent-gold);">→ Both deliver bankruptcy clearance + scaled rollout. The HoldCo simply captures more value at exit.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">17 / 22</span>
+        </div>
+
+        <!-- Slide 18: The Tech Moat (Why we win) -->
+        <div class="slide slide-dark" data-slide="18">
+            <span class="badge">Why we win</span>
+            <div class="content">
+                <h2>The platform is the moat. Replication takes 18-24 months and millions of dollars — if the team has the chops.</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--accent-gold);">What competitors would have to build</h3>
+                        <ul class="bullet">
+                            <li>Multi-channel attribution wired into GlassBiller (the industry's dominant POS) and ActiveCampaign</li>
+                            <li>Real-time autodialer with verified caller ID + branded calling</li>
+                            <li>Statistical halo-lift methodology that survives peer-review-quality scrutiny</li>
+                            <li>6 years of cleaned, normalized historical data to fit the model against</li>
+                            <li>Cron-driven Google + Meta + Bing spend ingestion with cost reconciliation</li>
+                            <li>End-to-end identity normalization (phone, email) across all touchpoints</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--ag-blue-light);">What we already have, deployed</h3>
+                        <ul class="bullet">
+                            <li>All of the above, running in production at AG2020 today</li>
+                            <li>The Halo Lift API (the proof on slides 9-10) is a live endpoint serving the operations dashboard</li>
+                            <li>Multi-user dashboard with per-user permissions live for the AG2020 team</li>
+                            <li>Cron ingestion runs nightly, attribution recomputes weekly, no manual touch required</li>
+                            <li>Built on a stack we own outright — no SaaS lock-in, no rent extracted by a vendor</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="lede" style="margin-top: 24px; text-align: center;">
+                    Safelite has the brand. We have the math. The math is more transferable across markets than the brand.
+                </p>
+            </div>
+            <span class="slide-number">18 / 22</span>
+        </div>
+
+        <!-- Slide 19: Comparable Deals -->
+        <div class="slide slide-light" data-slide="19">
+            <span class="badge">Comparable transactions</span>
+            <div class="content">
+                <h2>The market pays for what we're building.</h2>
+                <table>
+                    <thead><tr>
+                        <th>Deal</th><th>Year</th><th class="num">Price</th>
+                        <th class="num">Multiple</th><th>Notes</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td><strong>Driven Brands acquires Auto Glass Now</strong></td><td>Dec 2021</td><td class="num">$170M</td><td class="num">8.0× EBITDA</td><td>~$85M revenue at acquisition</td></tr>
+                        <tr><td><strong>CD&amp;R secondary on Belron (Safelite parent)</strong></td><td>Oct 2024</td><td class="num">€21B EV</td><td class="num">—</td><td>$7B revenue, IPO planned 2026 at $35B+</td></tr>
+                        <tr><td>PGW → Dakotaland Autoglass</td><td>May 2025</td><td class="num">undisclosed</td><td class="num">—</td><td>13-location bolt-on</td></tr>
+                        <tr><td>Driven Brands AGN segment (Q4 2024)</td><td>FY24</td><td class="num">—</td><td class="num">10% segment EBITDA</td><td>+7.9% same-store growth, promoted to standalone segment</td></tr>
+                        <tr class="highlight"><td><strong>Our exit target</strong></td><td><strong>Y4</strong></td><td class="num"><strong>$18-28M EV</strong></td><td class="num"><strong>7-8× + tech premium</strong></td><td><strong>5+ shops, $15-18M revenue, AZ + 1 adjacent state</strong></td></tr>
+                    </tbody>
+                </table>
+                <p class="source" style="margin-top:18px;">Tech-enabled platforms in lower-MM auto services typically capture a 1.5-2 turn premium on exit multiple (PwC, 2024).</p>
+            </div>
+            <span class="slide-number">19 / 22</span>
+        </div>
+
+        <!-- Slide 20: Risks -->
+        <div class="slide slide-mid" data-slide="20">
+            <span class="badge">Risks &amp; mitigations</span>
+            <div class="content">
+                <h2>The honest list. None are deal-killers if structured correctly.</h2>
+                <table>
+                    <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cash's prior bankruptcy</strong></td>
+                            <td>Court-confirmed plan paid off in full at deal close. Operating entity emerges with clean balance sheet. No surviving creditor claims against post-deal cash flows.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Key-man risk (Cash)</strong></td>
+                            <td>4-year vesting on Cash's post-deal equity. Non-compete + non-solicit. GM hired in Y1 to depersonalize operations. AG2020 SOPs already documented in the platform.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Key-man risk (Kenny / tech)</strong></td>
+                            <td>HoldCo structure ringfences IP in TechCo. Source code escrowed. Continued development under formal license + maintenance agreement with SLA. Backup engineering capacity contracted day-one.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Acquisition execution</strong></td>
+                            <td>Pipeline of 8-12 candidate Phoenix shops mapped before close. Independent operator network gives us proprietary deal flow. Investor approval gate on each acquisition.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Geographic concentration (AZ)</strong></td>
+                            <td>By design. Arizona is the best US market for the next 3-5 years. Geographic expansion (Tucson, Las Vegas, Albuquerque) sequenced for Y2-3 once AZ playbook is proven across multiple shops.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Insurer DRP relationships</strong></td>
+                            <td>AG2020 already has direct-billing relationships in place. New shops inherit them at acquisition. Insurer-relations playbook documented.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Macro auto-claim cyclicality</strong></td>
+                            <td>Auto-glass is one of the most counter-cyclical segments in automotive. Recessions don't reduce broken windshields; weather and driving habits drive demand.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <span class="slide-number">20 / 22</span>
+        </div>
+
+        <!-- Slide 21: The Ask -->
+        <div class="slide slide-gold" data-slide="21">
+            <span class="badge" style="color: rgba(255,255,255,0.7);">The ask</span>
+            <div class="content" style="text-align: center;">
+                <h2 style="color: white; text-align: center;">$5-7M for 50-60% of a Phoenix-built auto-glass platform with a measurable moat.</h2>
+                <div class="grid-3" style="margin: 36px 0;">
+                    <div style="background: rgba(0,0,0,0.25); padding: 26px; border-radius: 12px;">
+                        <h3 style="color: white; font-size: 20px;">Clean balance sheet</h3>
+                        <p style="color: rgba(255,255,255,0.92);">~$1.5M of $5-7M pays off the confirmed Chapter 11 plan at close. Operating entity emerges debt-free.</p>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 26px; border-radius: 12px;">
+                        <h3 style="color: white; font-size: 20px;">Funded growth</h3>
+                        <p style="color: rgba(255,255,255,0.92);">$2.5-3.5M for 2-3 bolt-on acquisitions over 18 months. $1-2M working capital + ramp buffer.</p>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 26px; border-radius: 12px;">
+                        <h3 style="color: white; font-size: 20px;">Aligned team</h3>
+                        <p style="color: rgba(255,255,255,0.92);">Cash 25-30% of OpsCo + 4-year vest. Kenny 5-8% OpsCo + 75-85% TechCo. Investor 50-60% HoldCo + board control.</p>
+                    </div>
+                </div>
+                <p class="lede" style="text-align:center; color: white;">
+                    The plan does not require a single thing we haven't already done in production.
+                    It requires capital, time, and a willing partner.
+                </p>
+            </div>
+            <span class="slide-number" style="color: rgba(255,255,255,0.7);">21 / 22</span>
+        </div>
+
+        <!-- Slide 22: Close -->
+        <div class="slide slide-title" data-slide="22">
+            <h1 style="color: white;">Let's build the Southwest's<br>tech-enabled auto-glass platform.</h1>
+            <p class="subtitle" style="color: rgba(255,255,255,0.85);">
+                AUTO GLASS 2020 · Phoenix, Arizona
+            </p>
+            <p style="margin-top: 32px; font-size: 18px; color: rgba(255,255,255,0.95);">
+                Cash · CEO &amp; Operator<br>
+                Kenny Hyder · Technology &amp; Growth<br>
+                <span style="font-size: 14px; color: var(--ink-dim);">kenny@hyder.me · hyder.me</span>
+            </p>
+            <span class="slide-number" style="color: rgba(255,255,255,0.6);">22 / 22</span>
+        </div>
+
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()" aria-label="Previous">◀</button>
+        <button class="nav-btn" onclick="nextSlide()" aria-label="Next">▶</button>
+    </div>
+
+    <script>
+        const totalSlides = 22;
+        let currentSlide = 1;
+
+        function showSlide(n) {
+            if (n < 1) n = 1;
+            if (n > totalSlides) n = totalSlides;
+            document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
+            document.querySelector(`[data-slide="${n}"]`).classList.add('active');
+            currentSlide = n;
+            document.getElementById('progress').style.width = `${(n / totalSlides) * 100}%`;
+            history.replaceState(null, null, `#${n}`);
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) { (diff > 0 ? nextSlide : prevSlide)(); }
+        });
+
+        window.addEventListener('load', () => {
+            const hash = parseInt(window.location.hash.replace('#', ''));
+            if (hash >= 1 && hash <= totalSlides) showSlide(hash);
+        });
+    </script>
+</body>
+</html>
