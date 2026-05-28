@@ -42,36 +42,30 @@ export default async function handler(req, res) {
         supabase.from('ag2020_crm_jobs').select('id', { count: 'exact', head: true }).eq('tenant_id', TENANT).is('journey_id', null),
     ]);
 
-    // --- Revenue by source (page through journeys with revenue > 0) ------
+    // --- Revenue by source — WINDOWED (jobs INVOICED in the date window) -
+    // This is what the user expects when they change the date dropdown:
+    // numbers should move. Uses the ag2020_revenue_by_source_window RPC for
+    // a single fast SQL aggregation joining crm_jobs ↔ lead_journey by date.
     const bySource = {};
-    let off = 0;
-    for (;;) {
-        const { data } = await supabase
-            .from('ag2020_lead_journey')
-            .select('first_touch_source, revenue_total, margin_total')
-            .eq('tenant_id', TENANT)
-            .gt('revenue_total', 0)
-            .range(off, off + 999);
-        if (!data || !data.length) break;
-        for (const r of data) {
+    const wRes = await supabase.rpc('ag2020_revenue_by_source_window', {
+        p_tenant_id: TENANT, p_start: startDate, p_end: endDate,
+    });
+    if (wRes.error) {
+        // Surface the issue but don't 500 — return empty bySource so the UI
+        // at least loads (likely cause: the SQL function isn't applied yet).
+        console.error('ag2020_revenue_by_source_window failed:', wRes.error.message);
+    } else {
+        for (const r of wRes.data || []) {
             const s = r.first_touch_source || 'unknown';
-            bySource[s] = bySource[s] || { source: s, journeys: 0, revenue: 0, margin: 0, spend: 0, cac: null, roas: null };
-            bySource[s].journeys++;
-            bySource[s].revenue += Number(r.revenue_total) || 0;
-            bySource[s].margin += Number(r.margin_total) || 0;
+            bySource[s] = bySource[s] || {
+                source: s, journeys: 0, jobs: 0, revenue: 0, margin: 0,
+                spend: 0, cac: null, roas: null,
+            };
+            bySource[s].journeys += Number(r.journeys) || 0;
+            bySource[s].jobs += Number(r.jobs) || 0;
+            bySource[s].revenue += Number(r.revenue) || 0;
+            bySource[s].margin += Number(r.margin) || 0;
         }
-        if (data.length < 1000) break;
-        off += 1000;
-    }
-    // Also enumerate sources that have 0 revenue, for completeness
-    const sourceCountQ = await supabase
-        .from('ag2020_lead_journey')
-        .select('first_touch_source')
-        .eq('tenant_id', TENANT)
-        .range(0, 999); // sample only — used to enumerate observed sources
-    for (const r of sourceCountQ.data || []) {
-        const s = r.first_touch_source || 'unknown';
-        if (!bySource[s]) bySource[s] = { source: s, journeys: 0, revenue: 0, margin: 0, spend: 0, cac: null, roas: null };
     }
 
     // --- Ad spend by platform (sum over date range) ----------------------
@@ -123,6 +117,19 @@ export default async function handler(req, res) {
     // Sort sources by revenue desc for stable UI
     const bySourceArr = Object.values(bySource).sort((a, b) => b.revenue - a.revenue);
 
+    // All-time revenue (separate from windowed) — useful for the lifetime card
+    const { data: allTimeRev } = await supabase
+        .from('ag2020_lead_journey')
+        .select('revenue_total, margin_total')
+        .eq('tenant_id', TENANT)
+        .gt('revenue_total', 0);
+    const allTimeRevenue = (allTimeRev || []).reduce((a, b) => a + (Number(b.revenue_total) || 0), 0);
+    const allTimeMargin = (allTimeRev || []).reduce((a, b) => a + (Number(b.margin_total) || 0), 0);
+
+    const windowedRevenue = Object.values(bySource).reduce((a, b) => a + b.revenue, 0);
+    const windowedMargin = Object.values(bySource).reduce((a, b) => a + b.margin, 0);
+    const windowedJobs = Object.values(bySource).reduce((a, b) => a + (b.jobs || 0), 0);
+
     return res.status(200).json({
         status: 'success',
         date_range: { start: startDate, end: endDate, days },
@@ -133,8 +140,14 @@ export default async function handler(req, res) {
             jobs_unlinked: jobsUnlinked || 0,
             link_pct: jobsLinked + jobsUnlinked > 0
                 ? +(jobsLinked / (jobsLinked + jobsUnlinked) * 100).toFixed(1) : 0,
-            revenue_total: +Object.values(bySource).reduce((a, b) => a + b.revenue, 0).toFixed(2),
-            margin_total: +Object.values(bySource).reduce((a, b) => a + b.margin, 0).toFixed(2),
+            // Windowed (move with the date dropdown)
+            revenue_window: +windowedRevenue.toFixed(2),
+            margin_window: +windowedMargin.toFixed(2),
+            jobs_in_window: windowedJobs,
+            // All-time (for the lifetime card)
+            revenue_all_time: +allTimeRevenue.toFixed(2),
+            margin_all_time: +allTimeMargin.toFixed(2),
+            // Ad spend (windowed)
             ad_spend_total: +(googleSpend + metaSpend).toFixed(2),
             google_spend: +googleSpend.toFixed(2),
             meta_spend: +metaSpend.toFixed(2),
@@ -142,6 +155,7 @@ export default async function handler(req, res) {
         by_source: bySourceArr.map(b => ({
             source: b.source,
             journeys: b.journeys,
+            jobs: b.jobs || 0,
             revenue: +b.revenue.toFixed(2),
             margin: +b.margin.toFixed(2),
             spend: +b.spend.toFixed(2),

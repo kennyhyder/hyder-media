@@ -78,6 +78,50 @@ $$;
 -- from its linked crm_jobs. Run after every ingest + on the daily attribution
 -- rollup cron.
 -- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+-- ag2020_revenue_by_source_window
+--
+-- Sum revenue/margin/cogs from CRM jobs INVOICED in a date window, attributed
+-- back to the journey's first_touch_source. This is what powers the
+-- Attribution dashboard's date-windowed view — when you change "last 30 days"
+-- to "last 90 days", these numbers move.
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ag2020_revenue_by_source_window(
+    p_tenant_id VARCHAR DEFAULT 'ag2020',
+    p_start DATE DEFAULT (NOW() - INTERVAL '30 days')::date,
+    p_end DATE DEFAULT NOW()::date
+)
+RETURNS TABLE (
+    first_touch_source VARCHAR,
+    first_touch_channel VARCHAR,
+    jobs BIGINT,
+    journeys BIGINT,
+    revenue NUMERIC,
+    margin NUMERIC,
+    cogs NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        COALESCE(j.first_touch_source, 'unknown')::VARCHAR AS first_touch_source,
+        j.first_touch_channel::VARCHAR AS first_touch_channel,
+        COUNT(c.id)::BIGINT AS jobs,
+        COUNT(DISTINCT j.id)::BIGINT AS journeys,
+        SUM(COALESCE(c.invoice_amount, 0))::NUMERIC AS revenue,
+        SUM(COALESCE(c.margin_amount, 0))::NUMERIC AS margin,
+        SUM(COALESCE(c.cogs_amount, 0))::NUMERIC AS cogs
+    FROM ag2020_crm_jobs c
+    JOIN ag2020_lead_journey j ON j.id = c.journey_id
+    WHERE c.tenant_id = p_tenant_id
+      AND j.tenant_id = p_tenant_id
+      AND c.invoice_date BETWEEN p_start AND p_end
+    GROUP BY j.first_touch_source, j.first_touch_channel
+    ORDER BY revenue DESC;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION ag2020_rollup_journey_financials(
     p_tenant_id VARCHAR DEFAULT 'ag2020'
 )
