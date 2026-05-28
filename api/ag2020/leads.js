@@ -267,14 +267,19 @@ async function fetchTagBreakdown(_baseUrl, _headers, startDate, endDate, _errors
         referral:      'Referral',
         call_inbound:  'Inbound Call',
         call_outbound: 'Outbound Call',
-        unknown:       'Unknown / Historical',
     };
 
-    // Aggregate by source AND by source/channel
+    // Aggregate by source AND by source/channel.
+    // EXCLUDE the 'unknown' bucket from the Top Tags chart — it's dominated
+    // by bulk-import AC contacts (tag 2492 "ALL contacts from ALL sources
+    // import") that aren't real leads. Track its count separately so the UI
+    // can show "+ X,XXX unclassified" as a footnote if it wants.
     const bySource = {};
     const byChannel = {};
+    let unclassifiedCount = 0;
     for (const r of rows) {
         const src = r.first_touch_source || 'unknown';
+        if (src === 'unknown') { unclassifiedCount++; continue; }
         const ch = r.first_touch_channel || null;
         bySource[src] = (bySource[src] || 0) + 1;
         const key = ch ? `${src}::${ch}` : src;
@@ -293,7 +298,12 @@ async function fetchTagBreakdown(_baseUrl, _headers, startDate, endDate, _errors
         }))
         .sort((a, b) => b.count - a.count);
 
-    return { total: rows.length, tags, source: 'ag2020_lead_journey' };
+    return {
+        total: rows.length - unclassifiedCount,
+        tags,
+        unclassified: unclassifiedCount,
+        source: 'ag2020_lead_journey',
+    };
 }
 
 // Previously: paginated 100K+ AC contacts with include=contactLists.list.

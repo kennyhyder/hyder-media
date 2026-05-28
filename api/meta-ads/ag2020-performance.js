@@ -218,7 +218,47 @@ async function fetchSummary(accessToken, startDate, endDate) {
     });
     const totals = emptyMetrics();
     for (const row of rows) addInsightRow(totals, row);
-    return derivedMetrics(totals);
+    const derived = derivedMetrics(totals);
+
+    // Override ROAS with AG2020-attributed revenue from our journey/jobs
+    // tables. Meta's `action_values` is empty because the pixel isn't
+    // sending purchase values, so the raw Meta ROAS is always 0. We have
+    // the real data via attribution — use it.
+    try {
+        const attributed = await fetchAttributedMetaRevenue(startDate, endDate);
+        if (attributed != null) {
+            derived.conversionValue = attributed.revenue;
+            derived.roas = totals.spend > 0 ? attributed.revenue / totals.spend : 0;
+            derived.attributedJobs = attributed.jobs;
+            derived.roasSource = 'ag2020_attribution';
+        }
+    } catch (e) {
+        // non-fatal — leave Meta's (0) roas in place
+        derived.roasError = e.message;
+    }
+    return derived;
+}
+
+// Pull Meta-attributed revenue for a window from our own attribution tables.
+// Returns { revenue, jobs } or null if Supabase isn't configured.
+async function fetchAttributedMetaRevenue(startDate, endDate) {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await sb.rpc('ag2020_revenue_by_source_window', {
+        p_tenant_id: 'ag2020', p_start: startDate, p_end: endDate,
+    });
+    if (error) throw new Error('rev rpc: ' + error.message);
+    let rev = 0, jobs = 0;
+    for (const r of (data || [])) {
+        if (r.first_touch_source === 'meta_paid') {
+            rev += Number(r.revenue) || 0;
+            jobs += Number(r.jobs) || 0;
+        }
+    }
+    return { revenue: rev, jobs };
 }
 
 async function fetchTimeSeries(accessToken, startDate, endDate, granularity) {
