@@ -296,48 +296,56 @@ async function fetchTagBreakdown(_baseUrl, _headers, startDate, endDate, _errors
     return { total: rows.length, tags, source: 'ag2020_lead_journey' };
 }
 
-async function fetchListBreakdown(baseUrl, headers, startDate, endDate, errors) {
-    // Fetch contacts with list includes
-    const filter = dateFilter(startDate, endDate);
-    const listCounts = {};
-    const listNames = {};
-    let totalContacts = 0;
-    let offset = 0;
-
-    for (let page = 0; page < AC_MAX_PAGES; page++) {
-        const params = {
-            ...filter,
-            limit: AC_PAGE_SIZE,
-            offset,
-            include: 'contactLists.list',
-            'orders[cdate]': 'DESC',
-        };
-        const url = `${baseUrl}/contacts?${buildQuery(params)}`;
-        const data = await acGet(url, headers);
-
-        totalContacts = parseInt(data.meta?.total || totalContacts, 10);
-
-        const listMap = {};
-        for (const l of (data.lists || [])) listMap[l.id] = l.name;
-
-        for (const cl of (data.contactLists || [])) {
-            // only count subscribed (status==1), not unsubscribed
-            if (String(cl.status) !== '1') continue;
-            const name = listMap[cl.list] || `list-${cl.list}`;
-            listCounts[cl.list] = (listCounts[cl.list] || 0) + 1;
-            listNames[cl.list] = name;
-        }
-
-        const got = (data.contacts || []).length;
-        if (got < AC_PAGE_SIZE) break;
-        offset += AC_PAGE_SIZE;
+// Previously: paginated 100K+ AC contacts with include=contactLists.list.
+// Timed out. New strategy: fetch the (small) list of AC lists, then in
+// parallel get each list's active-subscriber count via the contactLists
+// endpoint (which DOES respect filters[list]+filters[status]). 25-50 small
+// requests, total ~3-5 sec, well under the 30s function timeout. We ignore
+// the date window here — "Top Lists" is more useful as all-time subscriber
+// counts than as "new subs in last 30 days" (which is sparse).
+async function fetchListBreakdown(baseUrl, headers, _startDate, _endDate, errors) {
+    let listsResp;
+    try {
+        listsResp = await acGet(`${baseUrl}/lists?limit=100`, headers);
+    } catch (e) {
+        errors.push({ step: 'fetch_lists', error: e.message });
+        return { total: 0, lists: [] };
     }
+    const lists = listsResp.lists || [];
+    if (lists.length === 0) return { total: 0, lists: [] };
 
-    const lists = Object.entries(listCounts)
-        .map(([id, count]) => ({ id, name: listNames[id], count }))
+    // Count subscribers per list in parallel — AC limits ~5 req/s, so cap
+    // concurrency at 5 and stagger.
+    const results = [];
+    const CONCURRENCY = 5;
+    let idx = 0;
+    async function worker() {
+        while (idx < lists.length) {
+            const i = idx++;
+            const l = lists[i];
+            try {
+                const r = await acGet(
+                    `${baseUrl}/contactLists?filters%5Blist%5D=${l.id}&filters%5Bstatus%5D=1&limit=1`,
+                    headers,
+                );
+                const count = parseInt(r.meta?.total || 0, 10);
+                results.push({ id: String(l.id), name: l.name, count });
+            } catch (e) {
+                results.push({ id: String(l.id), name: l.name, count: 0, error: e.message });
+            }
+        }
+    }
+    await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+
+    const filtered = results
+        .filter(r => r.count > 0)
         .sort((a, b) => b.count - a.count);
 
-    return { total: totalContacts, lists };
+    return {
+        total: filtered.reduce((s, r) => s + r.count, 0),
+        lists: filtered,
+        note: 'All-time active subscribers (date window does not apply to lists)',
+    };
 }
 
 async function fetchRecent(baseUrl, headers, startDate, endDate, limit) {
