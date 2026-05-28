@@ -72,8 +72,38 @@ const TENANT_SOURCE_MAPS = {
             'organic landing page':       { source: 'organic',  channel: 'landing_page' },
             '2484': { source: 'referral', channel: 'referral_program' },
             'referral program introduced':{ source: 'referral', channel: 'referral_program' },
+            // "AC Form-*" series — AC's native embedded-form integration.
+            // Found 2026-05-27 in Tag Trends report; the "AC Form Organic" /
+            // "AC Form-Website" entries cover website form submits w/o ad
+            // params, "AC Form-Google Ad(s)" cover Google-tagged form submits.
+            '2451': { source: 'organic',     channel: 'ac_form' },
+            '2452': { source: 'organic',     channel: 'ac_form_website' },
+            '2454': { source: 'google_paid', channel: 'ac_form' },
+            '2461': { source: 'google_paid', channel: 'ac_form' },
+            'ac form organic':       { source: 'organic',     channel: 'ac_form' },
+            'ac form-website':       { source: 'organic',     channel: 'ac_form_website' },
+            'ac form-google ads':    { source: 'google_paid', channel: 'ac_form' },
+            'ac form-google ad':     { source: 'google_paid', channel: 'ac_form' },
+            // Meta-paid — Facebook Lead Ads → AC. Real active tags (2026-05-28
+            // Scribe investigation): tag 2463 alone has 1,051 contacts and is
+            // the one Rick filters on for the manual Meta workflow.
+            '2462': { source: 'meta_paid', channel: 'lead_form_c' },
+            '2463': { source: 'meta_paid', channel: 'lead_form_d' },
+            '2465': { source: 'meta_paid', channel: 'lead_form_c_ali' },
+            '2486': { source: 'meta_paid', channel: 'general' },
+            '9':    { source: 'meta_paid', channel: 'legacy' },
+            'fb leads c - revised':           { source: 'meta_paid', channel: 'lead_form_c' },
+            'fb leads d - revised':           { source: 'meta_paid', channel: 'lead_form_d' },
+            'fb leads c - revised - ali update': { source: 'meta_paid', channel: 'lead_form_c_ali' },
+            'fb':                              { source: 'meta_paid', channel: 'general' },
+            'facebook':                        { source: 'meta_paid', channel: 'legacy' },
         },
-        // AC native contact.source / contact.referrer value → classification
+        // Meta — every active Meta lead at AG2020 gets one of these "FB Leads *"
+        // tags from the Facebook Lead Ads → AC flow. Found 2026-05-28 after the
+        // Scribe-based investigation: 1,051 contacts on 2463 alone.
+        // (Added to tag_to_source below — these alias entries keep them all
+        // pointing at meta_paid even as Rick adds new tag variants.)
+        // AC native contact.source / contact.referrer (when AC integrations set it)
         native_source_map: {
             'Facebook Business': { source: 'meta_paid', channel: 'lead_form' },
             'facebook business': { source: 'meta_paid', channel: 'lead_form' },
