@@ -340,7 +340,10 @@
                     (NEXT_URL && NEXT_URL !== 'index.html' ? '?next=' + encodeURIComponent(NEXT_URL) : '');
                 const { error } = await sb.auth.signInWithOtp({
                     email,
-                    options: { emailRedirectTo: redirectTo, shouldCreateUser: false },
+                    // shouldCreateUser:true lets new invited users register themselves
+                    // via magic-link. AuthGate still blocks dashboard access until an
+                    // admin grants them an ag2020_users row.
+                    options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
                 });
                 if (error) throw error;
                 showInfo('Check your inbox — we sent a one-click sign-in link to ' + email + '.');
