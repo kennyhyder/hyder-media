@@ -324,8 +324,11 @@ async function fetchListBreakdown(baseUrl, headers, _startDate, _endDate, errors
             const i = idx++;
             const l = lists[i];
             try {
+                // contacts?listid=N is the only filter AC honors for list
+                // membership counts. filters[list] on /contactLists is broken
+                // (returns the same total for every list — verified 2026-05-28).
                 const r = await acGet(
-                    `${baseUrl}/contactLists?filters%5Blist%5D=${l.id}&filters%5Bstatus%5D=1&limit=1`,
+                    `${baseUrl}/contacts?listid=${l.id}&limit=1`,
                     headers,
                 );
                 const count = parseInt(r.meta?.total || 0, 10);
