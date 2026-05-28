@@ -66,7 +66,19 @@ function parseDate(v) {
 }
 
 export function parseGlassbillerXlsx(filePath) {
-    const wb = XLSX.readFile(filePath);
+    return parseGlassbillerWorkbook(XLSX.readFile(filePath));
+}
+
+/**
+ * Parse a GlassBiller workbook (loaded from any source — file, buffer, etc.)
+ * into normalized rows. Use this when the XLSX is in-memory (e.g., from an
+ * email-parser POST payload).
+ */
+export function parseGlassbillerBuffer(buffer) {
+    return parseGlassbillerWorkbook(XLSX.read(buffer, { type: 'buffer' }));
+}
+
+export function parseGlassbillerWorkbook(wb) {
     const sheetName = wb.SheetNames[0];
     const sheet = wb.Sheets[sheetName];
     if (!sheet) throw new Error('No sheet in workbook');
