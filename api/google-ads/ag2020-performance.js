@@ -215,7 +215,47 @@ async function fetchSummaryMerged(accounts, buildHeaders, dateRange, errors) {
             errors.push({ account: acc.name, step: 'summary', error: err.message });
         }
     }));
-    return derivedMetrics(totals);
+    const derived = derivedMetrics(totals);
+
+    // Overlay AG2020-attributed Google revenue from our journey/jobs tables.
+    // Google's reported `conversions_value` is mostly placeholder ($100/conv
+    // defaults) — the actual revenue is in our attribution data.
+    try {
+        const attributed = await fetchAttributedGoogleRevenue(dateRange.start, dateRange.end);
+        if (attributed != null) {
+            derived.conversionValue = attributed.revenue;
+            derived.roas = totals.spend > 0 ? attributed.revenue / totals.spend : 0;
+            derived.attributedJobs = attributed.jobs;
+            derived.roasSource = 'ag2020_attribution';
+        }
+    } catch (e) {
+        derived.roasError = e.message;
+    }
+    // Layer halo lift on top — see /api/ag2020/_halo-coefficient.js.
+    const { applyHalo } = await import('../ag2020/_halo-coefficient.js');
+    applyHalo(derived);
+    return derived;
+}
+
+// Pull Google-attributed revenue from ag2020_revenue_by_source_window RPC.
+async function fetchAttributedGoogleRevenue(startDate, endDate) {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return null;
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await sb.rpc('ag2020_revenue_by_source_window', {
+        p_tenant_id: 'ag2020', p_start: startDate, p_end: endDate,
+    });
+    if (error) throw new Error('rev rpc: ' + error.message);
+    let rev = 0, jobs = 0;
+    for (const r of (data || [])) {
+        if (r.first_touch_source === 'google_paid') {
+            rev += Number(r.revenue) || 0;
+            jobs += Number(r.jobs) || 0;
+        }
+    }
+    return { revenue: rev, jobs };
 }
 
 async function fetchSummaryPerAccount(accounts, buildHeaders, dateRange, errors) {

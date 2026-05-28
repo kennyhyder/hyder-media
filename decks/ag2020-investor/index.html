@@ -200,6 +200,68 @@
             .big-stat { font-size: 64px; }
         }
 
+        /* Phone breakpoint — make slides actually readable on a phone */
+        @media (max-width: 700px) {
+            html, body {
+                /* Allow scroll instead of forcing a single fullscreen slide.
+                   Slide content frequently exceeds phone viewport. */
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            .deck-container { height: auto; min-height: 100vh; }
+            .slide {
+                position: relative;        /* let slides stack instead of overlap */
+                opacity: 1; visibility: visible;
+                transition: none;
+                padding: 28px 18px 80px;
+                min-height: 100vh;
+                page-break-after: always;
+                border-bottom: 1px solid var(--rule);
+            }
+            .slide-light { border-bottom-color: #e2e8f0; }
+            .badge {
+                position: static; display: block;
+                margin-bottom: 12px;
+                font-size: 10px;
+            }
+            .slide-number {
+                position: static; display: block;
+                margin-top: 20px; text-align: center;
+                font-size: 11px;
+            }
+            h1 { font-size: 28px; max-width: 100%; }
+            h2 { font-size: 22px; margin-bottom: 16px; max-width: 100%; line-height: 1.2; }
+            h3 { font-size: 18px; margin-bottom: 8px; }
+            h4 { font-size: 15px; }
+            p, li { font-size: 14px; }
+            .subtitle { font-size: 15px; margin-top: 12px; }
+            .lede { font-size: 16px; margin-bottom: 18px; }
+            .quote { font-size: 17px; padding-left: 16px; }
+            .big-stat { font-size: 44px; }
+            .mid-stat { font-size: 30px; }
+            .stat-label { font-size: 11px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 12px; }
+            .card { padding: 14px 16px; border-radius: 8px; }
+            .card h3 { font-size: 16px; }
+            .card p, .card li { font-size: 13px; line-height: 1.5; }
+
+            /* Tables: scroll horizontally instead of squishing */
+            .content { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { font-size: 12px; min-width: 480px; }
+            th, td { padding: 8px 10px; }
+
+            /* Flow steps: stack arrows */
+            .arrow-flow {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            .arrow-flow .arrow { transform: rotate(90deg); margin: -4px 0; }
+
+            /* Hide the prev/next floating buttons — swipe + scroll work fine */
+            .nav-controls { display: none; }
+            .progress-bar { display: none; }
+        }
+
         /* Print stylesheet for PDF export */
         @media print {
             @page { size: 1280px 720px; margin: 0; }
@@ -1001,19 +1063,29 @@
         function nextSlide() { showSlide(currentSlide + 1); }
         function prevSlide() { showSlide(currentSlide - 1); }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
-        });
-
-        let touchStartX = 0;
-        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
-        document.addEventListener('touchend', (e) => {
-            const diff = touchStartX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 50) { (diff > 0 ? nextSlide : prevSlide)(); }
-        });
+        // Phone: let the CSS render all slides stacked. Don't hijack swipe
+        // gestures (they're for scrolling), don't bind keyboard nav.
+        const isPhone = window.matchMedia('(max-width: 700px)').matches;
+        if (isPhone) {
+            // Reveal all slides on phone (override the .slide.active hide rule
+            // by adding .active to everything — CSS @media also handles this
+            // but belt + suspenders).
+            document.querySelectorAll('.slide').forEach(s => s.classList.add('active'));
+        } else {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+                else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+            });
+            let touchStartX = 0;
+            document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+            document.addEventListener('touchend', (e) => {
+                const diff = touchStartX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) { (diff > 0 ? nextSlide : prevSlide)(); }
+            });
+        }
 
         window.addEventListener('load', () => {
+            if (isPhone) return; // hash routing pointless when all slides stack
             const hash = parseInt(window.location.hash.replace('#', ''));
             if (hash >= 1 && hash <= totalSlides) showSlide(hash);
         });

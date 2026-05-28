@@ -236,6 +236,10 @@ async function fetchSummary(accessToken, startDate, endDate) {
         // non-fatal — leave Meta's (0) roas in place
         derived.roasError = e.message;
     }
+    // Layer halo lift on top — see /api/ag2020/_halo-coefficient.js for the
+    // statistical rationale ($2.81/$1, p<0.00001, deseasonalized).
+    const { applyHalo } = await import('../ag2020/_halo-coefficient.js');
+    applyHalo(derived);
     return derived;
 }
 
