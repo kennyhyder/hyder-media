@@ -21,6 +21,7 @@ const TENANT = 'ag2020';
 const GOOGLE_ACCOUNTS = [
     { id: '5053365860', mcc: '6736988718', name: 'AG2020 Current' },
     { id: '4399614856', mcc: '4399614856', name: 'AG2020 Historical' },
+    { id: '3762740423', mcc: '6736988718', name: 'AG2020 New (duplicate setup)' },
 ];
 const META_ACCOUNT_ID = 'act_1455451028117748';
 const GRAPH_BASE = 'https://graph.facebook.com/v22.0';
