@@ -185,7 +185,12 @@ async function fetchMergedCalls(supabase, startIso, endIso, extraFields = false)
     }
     for (const r of fromTouch) {
         const type = r.touchpoint_type;
-        const answered = type === 'call_inbound' || type === 'call_outbound'; // missed_call + voicemail = unanswered
+        // Prefer the Vonage payload.result field ('answered'/'missed'/etc) when
+        // the backfill captured it; otherwise infer from touchpoint_type.
+        const result = (r.payload?.result || '').toLowerCase();
+        const answered = result
+            ? result === 'answered'
+            : (type === 'call_inbound' || type === 'call_outbound');
         merged.push({
             source: 'touchpoints',
             ts: r.touchpoint_at,
