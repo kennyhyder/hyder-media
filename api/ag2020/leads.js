@@ -219,59 +219,81 @@ async function fetchDaily(baseUrl, headers, startDate, endDate, errors) {
     };
 }
 
-async function fetchTagBreakdown(baseUrl, headers, startDate, endDate, errors) {
-    const { contacts, total, truncated } = await fetchAllContacts(baseUrl, headers, startDate, endDate);
-    if (truncated) errors.push({ step: 'pagination', error: `Truncated at ${contacts.length} of ${total}` });
+// Pulled out of AC pagination — paginating 100K+ "recent" AC contacts with
+// tag includes hit the 30s function timeout. AC's contactTags endpoint
+// doesn't honor date filters either (verified 2026-05-28). Solution: read
+// from our own ag2020_lead_journey table, which already has first_touch_at
+// + first_touch_source/channel + ac_contact_id, indexed and instant.
+//
+// We expose two layers of "tags":
+//   1. Friendly source labels (Google Ads, Meta Ads, Organic, …) grouped by
+//      first_touch_source. These map back to the AC tags that classified
+//      them (see /api/ag2020/_attribution-lib.js source_map).
+//   2. Channel breakdown within each source (lead_form_d, homepage_form, …)
+//      so you can see which specific AC tag drove the lead.
+async function fetchTagBreakdown(_baseUrl, _headers, startDate, endDate, _errors) {
+    const { createClient } = await import('@supabase/supabase-js');
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-    // Need tag names -> fetch all tags used on these contacts
-    // First, collect tag IDs from contactTags links
-    const contactIds = contacts.map(c => c.id);
-    if (contactIds.length === 0) return { total: 0, tags: [] };
+    const startIso = `${startDate}T00:00:00Z`;
+    // include the full end date by adding one day
+    const endPlus = new Date(endDate); endPlus.setDate(endPlus.getDate() + 1);
+    const endIso = endPlus.toISOString().slice(0, 19) + 'Z';
 
-    // Pull contactTag relations via include (included in fetchAllContacts response)
-    // But since we fetched includes, we need to re-fetch with includes parsed
-    // Simpler: fetch /contactTags for each contact. Too slow.
-    // Best: fetch tags in range as a separate query by contact
-    // For performance, fetch all contactTags for these contacts
-    const tagCounts = {};
-    const tagNames = {};
-
-    // Batch: fetch contacts with full tag includes
-    // We already did that via include=contactTags.tag; parsed result from fetchAllContacts throws away include data
-    // Re-fetch with include and parse
-    const filter = dateFilter(startDate, endDate);
-    let offset = 0;
-    for (let page = 0; page < AC_MAX_PAGES; page++) {
-        const params = {
-            ...filter,
-            limit: AC_PAGE_SIZE,
-            offset,
-            include: 'contactTags.tag',
-            'orders[cdate]': 'DESC',
-        };
-        const url = `${baseUrl}/contacts?${buildQuery(params)}`;
-        const data = await acGet(url, headers);
-
-        // data.contactTags is a list of { id, contact, tag }
-        // data.tags is a list of { id, tag, tagType }
-        const tagMap = {};
-        for (const t of (data.tags || [])) tagMap[t.id] = t.tag;
-
-        for (const ct of (data.contactTags || [])) {
-            const name = tagMap[ct.tag] || `tag-${ct.tag}`;
-            tagCounts[ct.tag] = (tagCounts[ct.tag] || 0) + 1;
-            tagNames[ct.tag] = name;
-        }
-
-        if ((data.contacts || []).length < AC_PAGE_SIZE) break;
-        offset += AC_PAGE_SIZE;
+    // Paginate ag2020_lead_journey rows in the window (Supabase 1000-row cap)
+    const rows = [];
+    let off = 0;
+    const PAGE = 1000;
+    for (let page = 0; page < 100; page++) {
+        const { data, error } = await sb
+            .from('ag2020_lead_journey')
+            .select('first_touch_source, first_touch_channel')
+            .eq('tenant_id', 'ag2020')
+            .gte('first_touch_at', startIso)
+            .lt('first_touch_at', endIso)
+            .range(off, off + PAGE - 1);
+        if (error) throw new Error('Supabase journeys: ' + error.message);
+        if (!data || !data.length) break;
+        rows.push(...data);
+        if (data.length < PAGE) break;
+        off += PAGE;
     }
 
-    const tags = Object.entries(tagCounts)
-        .map(([id, count]) => ({ id, name: tagNames[id], count }))
+    // SOURCE_LABELS — keep in sync with DashboardTab.tsx / AttributionTab.tsx
+    const labels = {
+        google_paid:   'Google Ads',
+        meta_paid:     'Meta Ads',
+        organic:       'Organic',
+        referral:      'Referral',
+        call_inbound:  'Inbound Call',
+        call_outbound: 'Outbound Call',
+        unknown:       'Unknown / Historical',
+    };
+
+    // Aggregate by source AND by source/channel
+    const bySource = {};
+    const byChannel = {};
+    for (const r of rows) {
+        const src = r.first_touch_source || 'unknown';
+        const ch = r.first_touch_channel || null;
+        bySource[src] = (bySource[src] || 0) + 1;
+        const key = ch ? `${src}::${ch}` : src;
+        byChannel[key] = (byChannel[key] || 0) + 1;
+    }
+
+    const tags = Object.entries(bySource)
+        .map(([src, count]) => ({
+            id: src,
+            name: labels[src] || src,
+            count,
+            channels: Object.entries(byChannel)
+                .filter(([k]) => k.startsWith(src + '::'))
+                .map(([k, c]) => ({ name: k.slice(src.length + 2), count: c }))
+                .sort((a, b) => b.count - a.count),
+        }))
         .sort((a, b) => b.count - a.count);
 
-    return { total: contacts.length, tags };
+    return { total: rows.length, tags, source: 'ag2020_lead_journey' };
 }
 
 async function fetchListBreakdown(baseUrl, headers, startDate, endDate, errors) {
