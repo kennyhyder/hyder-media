@@ -9,16 +9,18 @@
  *   endDate    - explicit end date (YYYY-MM-DD, overrides `days`)
  *   compare    - "true" to also fetch previous same-length period (summary only)
  *
- * Merges data from both AG2020 Google Ads accounts:
- *   - 505-336-5860 (current, via MCC 673-698-8718)
- *   - 439-961-4856 (historical, direct access)
+ * Merges data from all three AG2020 Google Ads accounts:
+ *   - 376-274-0423 (LIVE — new account from May 2026, via MCC 673-698-8718)
+ *   - 505-336-5860 (historical, recent — superseded by 376-274-0423)
+ *   - 439-961-4856 (historical, older — disabled long ago)
  */
 
 import { createClient } from '@supabase/supabase-js';
 
 const AG2020_ACCOUNTS = [
-    { id: '5053365860', name: 'AG2020 Current', mcc: '6736988718', color: '#1B4B82' },
-    { id: '4399614856', name: 'AG2020 Historical', mcc: '4399614856', color: '#6BA4D0' },
+    { id: '3762740423', name: 'AG2020 Live',             mcc: '6736988718', color: '#1B4B82' },
+    { id: '5053365860', name: 'AG2020 Historical (recent)', mcc: '6736988718', color: '#6BA4D0' },
+    { id: '4399614856', name: 'AG2020 Historical (older)',  mcc: '4399614856', color: '#94a3b8' },
 ];
 
 export default async function handler(req, res) {

@@ -19,9 +19,9 @@ import { createClient } from '@supabase/supabase-js';
 const TENANT = 'ag2020';
 
 const GOOGLE_ACCOUNTS = [
-    { id: '5053365860', mcc: '6736988718', name: 'AG2020 Current' },
-    { id: '4399614856', mcc: '4399614856', name: 'AG2020 Historical' },
-    { id: '3762740423', mcc: '6736988718', name: 'AG2020 New (duplicate setup)' },
+    { id: '3762740423', mcc: '6736988718', name: 'AG2020 Live' },
+    { id: '5053365860', mcc: '6736988718', name: 'AG2020 Historical (recent)' },
+    { id: '4399614856', mcc: '4399614856', name: 'AG2020 Historical (older)' },
 ];
 const META_ACCOUNT_ID = 'act_1455451028117748';
 const GRAPH_BASE = 'https://graph.facebook.com/v22.0';
