@@ -41,9 +41,13 @@ export default async function handler(req, res) {
         }
     }
 
+    // Accept explicit start/end (YYYY-MM-DD) for historical backfills, else
+    // ?days=N anchored at today. Max 90 days/call to stay under serverless
+    // timeouts; loop the endpoint to cover longer windows.
     const days = Math.max(1, Math.min(parseInt(req.query.days, 10) || 7, 90));
-    const startDate = todayISO(-days);
-    const endDate = todayISO(0);
+    const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+    const startDate = ISO_RE.test(req.query.start || '') ? req.query.start : todayISO(-days);
+    const endDate   = ISO_RE.test(req.query.end || '')   ? req.query.end   : todayISO(0);
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const stats = {
