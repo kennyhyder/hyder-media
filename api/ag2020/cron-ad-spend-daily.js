@@ -88,7 +88,7 @@ export default async function handler(req, res) {
                         const { error } = await supabase
                             .from('ag2020_ad_spend_daily')
                             .upsert(chunk, {
-                                onConflict: 'tenant_id,platform,account_id,campaign_id,ad_group_id,date',
+                                onConflict: 'tenant_id,platform,account_id,campaign_id,date',
                             });
                         if (error) stats.google_ads.errors.push(`acct ${acct.id} upsert: ${error.message}`);
                         else stats.google_ads.rows_upserted += chunk.length;
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
                 const { error } = await supabase
                     .from('ag2020_ad_spend_daily')
                     .upsert(chunk, {
-                        onConflict: 'tenant_id,platform,account_id,campaign_id,ad_group_id,date',
+                        onConflict: 'tenant_id,platform,account_id,campaign_id,date',
                     });
                 if (error) stats.meta_ads.errors.push(`upsert: ${error.message}`);
                 else stats.meta_ads.rows_upserted += chunk.length;

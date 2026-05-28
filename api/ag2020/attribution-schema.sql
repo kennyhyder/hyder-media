@@ -179,10 +179,10 @@ CREATE TABLE IF NOT EXISTS ag2020_ad_spend_daily (
     fetched_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Plain unique index (no COALESCE) so PostgREST upsert(onConflict=…) works.
+-- campaign_id is always populated by the Google/Meta adapters; ad_group_id is
+-- excluded from the key entirely since we don't break down by ad group yet.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_ag2020_ad_spend_unique
-    ON ag2020_ad_spend_daily(
-        tenant_id, platform, account_id,
-        COALESCE(campaign_id, ''), COALESCE(ad_group_id, ''), date
-    );
+    ON ag2020_ad_spend_daily(tenant_id, platform, account_id, campaign_id, date);
 CREATE INDEX IF NOT EXISTS idx_ag2020_ad_spend_tenant_date
     ON ag2020_ad_spend_daily(tenant_id, date DESC, platform);
