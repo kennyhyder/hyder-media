@@ -90,8 +90,9 @@ export default async function handler(req, res) {
       const booksMedian = median(novigVals);
       const booksMin = novigVals.length ? Math.min(...novigVals) : null;
       const kalshiProb = k?.implied_prob ?? null;
-      const bookMap = {};
-      for (const b of books) bookMap[b.book] = { american: b.price_american, novig: b.novig_prob, implied: b.implied_prob };
+      const rawBookMap = {};
+      for (const b of books) rawBookMap[b.book] = { american: b.price_american, novig: b.novig_prob, implied: b.implied_prob };
+      const bookMap = bucketBookPriceMap(rawBookMap);
       return {
         market_id: m.id,
         market_type: m.market_type,

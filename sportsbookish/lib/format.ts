@@ -46,25 +46,26 @@ export const PROP_LABELS: Record<string, string> = {
   cut_line: "Cut Line",
 };
 
+// Display labels for sportsbooks. Only regulated US books are named —
+// everything else routes to "Other" via displayBookLabel. See lib/books.ts.
 export const BOOK_LABELS: Record<string, string> = {
   draftkings: "DraftKings",
   fanduel: "FanDuel",
   betmgm: "BetMGM",
   caesars: "Caesars",
   circa: "Circa",
-  pinnacle: "Pinnacle",
-  bet365: "bet365",
-  betonline: "BetOnline",
-  bovada: "Bovada",
-  skybet: "SkyBet",
-  williamhill: "William Hill",
+  betrivers: "BetRivers",
+  fanatics: "Fanatics",
   pointsbet: "PointsBet",
-  unibet: "Unibet",
-  betcris: "Betcris",
-  betway: "Betway",
+  other: "Other",
 };
 
+// Returns the user-facing book name. Non-regulated keys collapse to "Other"
+// so the UI never names offshore brands (regulated affiliate compliance).
+import { isRegulatedUS } from "./books";
 export function bookLabel(key: string): string {
+  if (key === "other") return "Other";
+  if (!isRegulatedUS(key)) return "Other";
   return BOOK_LABELS[key] || key;
 }
 

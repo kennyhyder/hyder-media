@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookEntries } from "./_book_classification.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -181,8 +182,11 @@ export default async function handler(req, res) {
         }));
         const novigs = books.map((b) => b.implied_prob_novig).filter((v) => v != null).sort((a, b) => a - b);
         const median = novigs.length ? novigs[Math.floor(novigs.length / 2)] : null;
+        // best_book — bucketing: if the best price is on an offshore book,
+        // surface it as { book: "other" } so we don't name the offshore brand.
         let bestBook = null;
-        const sortedBest = [...books].filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
+        const bucketedBooks = bucketBookEntries(books);
+        const sortedBest = [...bucketedBooks].filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
         if (sortedBest.length) bestBook = { book: sortedBest[0].book, implied_prob_novig: sortedBest[0].implied_prob_novig, american: sortedBest[0].american };
         const kalshi = q?.implied_prob ?? null;
         const edge_vs_median = (kalshi != null && median != null) ? Number((median - kalshi).toFixed(5)) : null;
@@ -208,7 +212,7 @@ export default async function handler(req, res) {
           books_median: median,
           books_min: novigs.length ? novigs[0] : null,
           books_max: novigs.length ? novigs[novigs.length - 1] : null,
-          book_prices: books,
+          book_prices: bucketBookEntries(books),
           best_book: bestBook,
           edge_vs_books_median: edge_vs_median,
           edge_vs_best_book: edge_vs_best,

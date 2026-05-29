@@ -128,20 +128,26 @@ export default async function handler(req, res) {
       // is the book to compare Kalshi against — if Kalshi's price is lower
       // still, Kalshi is the place; if it's higher, the bettor should use
       // that book instead.
+      // Bucket offshore books before picking "best" so we never surface
+      // an offshore brand name as the recommended buy.
       let bestBookForBet = null;
       if (books.length) {
-        const sorted = [...books].filter((b) => b.novig_prob != null).sort((a, b) => a.novig_prob - b.novig_prob);
-        if (sorted.length) bestBookForBet = { book: sorted[0].book, novig_prob: sorted[0].novig_prob, price_american: sorted[0].price_american };
+        const candidates = bucketBookEntries(books.map((b) => ({
+          book: b.book, novig: b.novig_prob, american: b.price_american,
+        })));
+        const sorted = candidates.filter((b) => b.novig != null).sort((a, b) => a.novig - b.novig);
+        if (sorted.length) bestBookForBet = { book: sorted[0].book, novig_prob: sorted[0].novig, price_american: sorted[0].american };
       }
-      const bookMap = {};
+      const rawBookMap = {};
       for (const b of books) {
-        bookMap[b.book] = {
+        rawBookMap[b.book] = {
           american: b.price_american,
           decimal: b.price_decimal,
           implied: b.implied_prob,
           novig: b.novig_prob,
         };
       }
+      const bookMap = bucketBookPriceMap(rawBookMap);
       // Edge convention: positive = Kalshi's YES price is CHEAPER than the
       // reference → good buy on Kalshi. Negative = Kalshi is overpriced.
       //   edge = reference_prob - kalshi_prob

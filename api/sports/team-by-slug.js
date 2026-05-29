@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookEntries } from "./_book_classification.js";
 
 // Look up a sports team / contestant by (league, slug) and return all current
 // markets with FULL pricing data: Kalshi + per-book + Polymarket overlay.
@@ -142,15 +143,19 @@ export default async function handler(req, res) {
     if (!novigs.length) return null;
     const mid = Math.floor(novigs.length / 2);
     const median = novigs.length % 2 ? novigs[mid] : (novigs[mid - 1] + novigs[mid]) / 2;
-    // Sort per_book by best price (longest american) descending
-    const sortedBooks = [...agg.per_book].sort((a, b) => (b.american || -99999) - (a.american || -99999));
+    // Sort per_book by best price (longest american) descending then bucket
+    // offshore books into an aggregated "other" entry.
+    const sortedRaw = [...agg.per_book].sort((a, b) => (b.american || -99999) - (a.american || -99999));
+    const bucketed = bucketBookEntries(sortedRaw);
+    // Best — pull from bucketed list so we don't point at an offshore brand
+    const bucketedBest = bucketed.find((b) => b.novig != null) || null;
     return {
       count: novigs.length,
       median: Number(median.toFixed(4)),
       min: Number(novigs[0].toFixed(4)),
       max: Number(novigs[novigs.length - 1].toFixed(4)),
-      best: agg.best,
-      per_book: sortedBooks,
+      best: bucketedBest,
+      per_book: bucketed,
       latest_fetched_at: agg.latest ? new Date(agg.latest).toISOString() : null,
     };
   }

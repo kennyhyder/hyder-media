@@ -66,41 +66,11 @@ const DEFAULTS: Record<string, AffiliateInfo> = {
     status: "pending",
     commission: "TBD — newer launch",
   },
-  bovada: {
-    network: "Bovada Affiliates (direct)",
-    baseUrl: process.env.AFFILIATE_BOVADA_URL || "https://www.bovada.lv/",
-    signupHint: "https://www.bovadaaffiliates.com — offshore, no US licensing required",
-    status: "pending",
-    commission: "Rev share 25-45% lifetime",
-  },
-  betonline: {
-    network: "Revenue Giants (BetOnline.ag)",
-    baseUrl: process.env.AFFILIATE_BETONLINE_URL || "https://www.betonline.ag/",
-    signupHint: "https://www.revenuegiants.com — multi-brand offshore network",
-    status: "pending",
-    commission: "Rev share 25-35% lifetime",
-  },
-  lowvig: {
-    network: "Revenue Giants (LowVig.ag — same parent as BetOnline)",
-    baseUrl: process.env.AFFILIATE_LOWVIG_URL || "https://www.lowvig.ag/",
-    signupHint: "https://www.revenuegiants.com (joint program with BetOnline)",
-    status: "pending",
-    commission: "Rev share 25-35% lifetime",
-  },
-  mybookie: {
-    network: "MyBookie Agents (direct)",
-    baseUrl: process.env.AFFILIATE_MYBOOKIE_URL || "https://www.mybookie.ag/",
-    signupHint: "https://www.mybookieagents.ag",
-    status: "pending",
-    commission: "Rev share 30-50% (high vs other networks)",
-  },
-  betus: {
-    network: "BetUS Partners (direct)",
-    baseUrl: process.env.AFFILIATE_BETUS_URL || "https://www.betus.com.pa/",
-    signupHint: "https://www.betuspartners.com",
-    status: "pending",
-    commission: "Rev share 30-50% lifetime",
-  },
+  // Offshore books (bovada, betonline, lowvig, mybookie, betus, pinnacle, etc.)
+  // are intentionally NOT in this map. Vault Network + every regulated US
+  // affiliate program forbids co-promoting regulated and offshore brands.
+  // affiliateUrl() returns null for those keys; the UI bucket them into an
+  // unnamed "Other" entry via lib/books.ts.
   kalshi: {
     // Kalshi has a referral program rather than a traditional affiliate network
     network: "Kalshi Referral",

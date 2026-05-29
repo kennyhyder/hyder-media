@@ -32,21 +32,15 @@ interface Props {
   allBooks: string[];
 }
 
+// Only regulated US books — keep in sync with lib/format.ts BOOK_LABELS.
 const BOOK_LABELS: Record<string, string> = {
   draftkings: "DraftKings",
   fanduel: "FanDuel",
   betmgm: "BetMGM",
   caesars: "Caesars",
+  betrivers: "BetRivers",
+  fanatics: "Fanatics",
   circa: "Circa",
-  pinnacle: "Pinnacle",
-  bet365: "bet365",
-  betonline: "BetOnline",
-  bovada: "Bovada",
-  skybet: "SkyBet",
-  williamhill: "William Hill",
-  pointsbet: "PointsBet",
-  unibet: "Unibet",
-  betcris: "Betcris",
 };
 
 export default function SettingsForm({ tier, initial, allBooks }: Props) {

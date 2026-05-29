@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookPriceMap, bucketBookEntries, isRegulatedUS } from "./_book_classification.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -145,17 +146,22 @@ export default async function handler(req, res) {
       const minProb = novigs.length ? novigs[0] : null;
       const kalshi = q?.implied_prob ?? null;
       const edge = (kalshi != null && median != null) ? Number((median - kalshi).toFixed(5)) : null;
-      // best book = lowest no-vig prob (cheapest YES → longest American)
+      // best book = lowest no-vig prob (cheapest YES → longest American).
+      // Bucket offshore books into "other" so we don't surface offshore
+      // brand names as the "best" pointer.
       let bestBook = null;
-      const sorted = [...bookList].filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
+      const sourceForBest = bucketBookEntries(bookList.map((b) => ({ book: b.book, implied_prob_novig: b.implied_prob_novig, american: b.american })));
+      const sorted = sourceForBest.filter((b) => b.implied_prob_novig != null).sort((a, b) => a.implied_prob_novig - b.implied_prob_novig);
       if (sorted.length) bestBook = sorted[0];
       const edgeBest = (kalshi != null && bestBook?.implied_prob_novig != null) ? Number((bestBook.implied_prob_novig - kalshi).toFixed(5)) : null;
 
       for (const b of bookList) booksSeen.add(b.book);
 
-      // book_prices: stable map by book key, lookup at render time
-      const bookPrices = {};
-      for (const b of bookList) bookPrices[b.book] = { american: b.american, novig: b.implied_prob_novig };
+      // book_prices: stable map by book key, lookup at render time. Bucket
+      // offshore brands into an aggregated "other" entry — never named.
+      const rawBookPrices = {};
+      for (const b of bookList) rawBookPrices[b.book] = { american: b.american, novig: b.implied_prob_novig };
+      const bookPrices = bucketBookPriceMap(rawBookPrices);
 
       // Polymarket overlay for this contestant on this event
       const poly = polyByEventContestant.get(`${m.event_id}|${norm}`);

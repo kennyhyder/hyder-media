@@ -110,8 +110,15 @@ export default async function handler(req, res) {
       const sortedBooks = [...bArr]
         .filter((b) => b.price_american != null || b.novig_prob != null)
         .sort((a, b) => (b.price_american || -99999) - (a.price_american || -99999));
-      const best = sortedBooks[0] && sortedBooks[0].price_american != null
-        ? { book: sortedBooks[0].book, american: sortedBooks[0].price_american }
+      // Bucket offshore books into a single "other" entry. Best is pulled
+      // from bucketed list so we don't point at an offshore brand by name.
+      const bucketed = bucketBookEntries(sortedBooks.map((b) => ({
+        book: b.book,
+        american: b.price_american,
+        novig: b.novig_prob != null ? Number(b.novig_prob.toFixed(4)) : null,
+      })));
+      const best = bucketed[0] && bucketed[0].american != null
+        ? { book: bucketed[0].book, american: bucketed[0].american }
         : null;
       books = {
         count: bArr.length,
@@ -119,11 +126,7 @@ export default async function handler(req, res) {
         min: novigs.length ? Number(novigs[0].toFixed(4)) : null,
         max: novigs.length ? Number(novigs[novigs.length - 1].toFixed(4)) : null,
         best,
-        per_book: sortedBooks.map((b) => ({
-          book: b.book,
-          american: b.price_american,
-          novig: b.novig_prob != null ? Number(b.novig_prob.toFixed(4)) : null,
-        })),
+        per_book: bucketed,
       };
       for (const b of bArr) {
         if (b.fetched_at) {

@@ -10,9 +10,12 @@ import SettingsForm from "@/components/SettingsForm";
 
 export const dynamic = "force-dynamic";
 
+// Only regulated US books are exposed as selectable home_book / excluded_books
+// options. Offshore quotes still flow through as an aggregated "Other"
+// entry but the user can't pick "Bovada" as their home book — there are no
+// affiliate links for offshore, and naming them violates regulated-program ToS.
 const ALL_BOOKS = [
-  "draftkings", "fanduel", "betmgm", "caesars", "circa", "pinnacle",
-  "bet365", "betonline", "bovada", "skybet", "williamhill", "pointsbet", "unibet", "betcris",
+  "draftkings", "fanduel", "betmgm", "caesars", "betrivers", "fanatics", "circa",
 ];
 
 export default async function SettingsPage() {

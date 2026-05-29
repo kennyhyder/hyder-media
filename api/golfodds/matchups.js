@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookPriceMap } from "../sports/_book_classification.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -103,8 +104,9 @@ export default async function handler(req, res) {
         const booksMedian = median(novigVals);
         const booksMin = novigVals.length ? Math.min(...novigVals) : null;
         const kalshiProb = k?.implied_prob ?? null;
-        const bookMap = {};
-        for (const b of books) bookMap[b.book] = { american: b.price_american, novig: b.novig_prob, implied: b.implied_prob };
+        const rawBookMap = {};
+        for (const b of books) rawBookMap[b.book] = { american: b.price_american, novig: b.novig_prob, implied: b.implied_prob };
+        const bookMap = bucketBookPriceMap(rawBookMap);
         return {
           matchup_player_id: p.id,
           player_id: p.player_id,
