@@ -274,8 +274,12 @@ export async function attachContext(candidates) {
 // ---- Step 4: insight gate ----
 
 export function passesInsightGate(c) {
-  // Volume floor — illiquid markets have no signal
-  if (c.kalshi_volume_24h < MIN_VOLUME_24H) {
+  // Volume floor — only apply when we have meaningful volume data.
+  // sports_quotes_latest.volume is currently null/0 for the entire table
+  // (Kalshi ingest mapping issue — separate fix). Treating that as "fail"
+  // would block every tweet forever. So: if volume > 0, enforce the floor;
+  // if volume is 0/null/unknown, fall through to the other signal gates.
+  if (c.kalshi_volume_24h > 0 && c.kalshi_volume_24h < MIN_VOLUME_24H) {
     return { pass: false, reason: `volume too low (${c.kalshi_volume_24h})` };
   }
 

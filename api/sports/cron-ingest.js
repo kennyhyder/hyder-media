@@ -170,7 +170,11 @@ async function ingestLeague(supabase, league) {
           yes_ask: yesAsk,
           last_price: last,
           implied_prob: computeImplied(yesBid, yesAsk, last),
-          volume: toBigInt(m.volume ?? m.volume_24h),
+          // Kalshi field names migrated from `volume` / `volume_24h` to
+          // `volume_fp` / `volume_24h_fp` (fixed-point cents). Keep legacy
+          // names as fallback in case Kalshi reverts or different markets
+          // ship different shapes.
+          volume: toBigInt(m.volume_24h_fp ?? m.volume_fp ?? m.volume_24h ?? m.volume),
           open_interest: toBigInt(m.open_interest_fp ?? m.open_interest),
           status: m.status || null,
         });
