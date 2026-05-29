@@ -31,6 +31,7 @@ export default async function sitemap(): Promise<Sm> {
     { url: `${SITE_URL}/pricing`,         lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${SITE_URL}/sports`,          lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
     { url: `${SITE_URL}/sports/movers`,   lastModified: now, changeFrequency: "hourly",  priority: 0.7 },
+    { url: `${SITE_URL}/sports/positive-ev`, lastModified: now, changeFrequency: "hourly", priority: 0.95 },
     { url: `${SITE_URL}/golf`,            lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
     { url: `${SITE_URL}/golf/players`,    lastModified: now, changeFrequency: "daily",   priority: 0.7 },
     { url: `${SITE_URL}/compare`,         lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
