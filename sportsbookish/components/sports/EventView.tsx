@@ -99,6 +99,16 @@ export default async function EventView({
       league,
       url: canonicalPath,
       description: `Live Kalshi & Polymarket event-contract odds compared to DraftKings, FanDuel, BetMGM and 8+ books for ${detail.event.title}. Moneyline, spread, and total markets refreshed every 5 minutes.`,
+      // Per-book Offer markup — feeds Google's sportsbook-odds rich-results
+      // card. One Offer per (contestant, book) with decimal odds = 1/novig.
+      offers: detail.markets.flatMap((m) =>
+        (m.book_prices || []).filter((p) => p.implied_prob_novig != null && p.implied_prob_novig > 0)
+          .map((p) => ({
+            contestant: m.contestant_label,
+            book: bookLabel(p.book),
+            decimalOdds: 1 / Number(p.implied_prob_novig),
+          })),
+      ),
     }),
     faqLd(faqItems),
   ];

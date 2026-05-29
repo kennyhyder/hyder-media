@@ -164,10 +164,15 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
                         </TableCell>
                       );
                     }
+                    // Highlight cell when this book IS the best price on
+                    // the market — gives users an instant visual signal of
+                    // where to actually place the bet.
+                    const isBest = r.best_book && r.best_book.book === b && px.novig != null && r.best_book.implied_prob_novig === px.novig;
                     return (
-                      <TableCell key={b} className="text-right tabular-nums text-muted-foreground">
-                        <span title={`american ${fmtAmerican(px.american)}, no-vig ${fmtPct(px.novig)}`}>
+                      <TableCell key={b} className={`text-right tabular-nums ${isBest ? "text-emerald-300 font-semibold bg-emerald-500/5" : "text-muted-foreground"}`}>
+                        <span title={`american ${fmtAmerican(px.american)}, no-vig ${fmtPct(px.novig)}${isBest ? " — BEST PRICE" : ""}`}>
                           {fmtPct(px.novig)}
+                          {isBest && <span className="ml-1 text-[9px] text-emerald-400 font-bold">★</span>}
                         </span>
                       </TableCell>
                     );

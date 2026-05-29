@@ -33,6 +33,7 @@ export default async function sitemap(): Promise<Sm> {
     { url: `${SITE_URL}/sports/movers`,   lastModified: now, changeFrequency: "hourly",  priority: 0.7 },
     { url: `${SITE_URL}/sports/positive-ev`, lastModified: now, changeFrequency: "hourly", priority: 0.95 },
     { url: `${SITE_URL}/sports/arbitrage`,   lastModified: now, changeFrequency: "hourly", priority: 0.9 },
+    { url: `${SITE_URL}/sports/middles`,     lastModified: now, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/sportsbook-promos`,  lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/golf`,            lastModified: now, changeFrequency: "hourly",  priority: 0.9 },
     { url: `${SITE_URL}/golf/players`,    lastModified: now, changeFrequency: "daily",   priority: 0.7 },
@@ -68,6 +69,22 @@ export default async function sitemap(): Promise<Sm> {
     // Polymarket comparison gets higher priority — high Google Trends search volume
     const pri = book === "polymarket" ? 0.85 : 0.7;
     urls.push({ url: `${SITE_URL}/compare/kalshi-vs-${book}`, lastModified: now, changeFrequency: "weekly", priority: pri });
+  }
+
+  // ---- Programmatic /odds/[sport]/[market] pages ----
+  const ODDS_SPORTS: Record<string, string[]> = {
+    nba: ["moneyline", "spread", "total"],
+    mlb: ["moneyline", "spread", "total"],
+    nfl: ["moneyline", "spread", "total", "championship"],
+    nhl: ["moneyline", "spread", "total"],
+    ncaaf: ["moneyline", "spread", "total"],
+    epl: ["moneyline"], ucl: ["moneyline"], mls: ["moneyline"],
+    wc: ["moneyline", "championship"], pga: ["winner"],
+  };
+  for (const [sport, mkts] of Object.entries(ODDS_SPORTS)) {
+    for (const m of mkts) {
+      urls.push({ url: `${SITE_URL}/odds/${sport}/${m}`, lastModified: now, changeFrequency: "hourly", priority: 0.8 });
+    }
   }
 
   // ---- /sportsbooks hub + ~43 programmatic comparison pages ----

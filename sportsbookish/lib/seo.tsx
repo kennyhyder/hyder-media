@@ -80,7 +80,19 @@ export function itemListLd(name: string, items: { name: string; url: string }[])
   };
 }
 
-// SportsEvent — for game pages. Google supports for major sports.
+// SportsEvent — for game pages. Google supports SportsEvent + Offer in
+// Search rich results since the 2023 sportsbook-odds update, so we
+// include per-book Offer markup with implied prob → price for each
+// outcome. This is what unlocks the odds rich-result card in SERPs.
+//
+// Per Google docs: Offer.price = the *outcome implied probability* as a
+// decimal-odds equivalent; Offer.priceCurrency must be USD; seller is
+// the sportsbook entity. We materialize one Offer per (contestant, book).
+interface OfferInput {
+  contestant: string;       // "Lakers", "Spurs"
+  book: string;             // "DraftKings", "FanDuel", etc.
+  decimalOdds: number;      // 1 / implied_prob_novig
+}
 export function sportsEventLd(opts: {
   name: string;                            // e.g. "Lakers vs Spurs"
   homeTeam: string;
@@ -89,12 +101,13 @@ export function sportsEventLd(opts: {
   league: string;                          // 'nba', 'mlb', etc.
   url: string;
   description: string;
+  offers?: OfferInput[];
 }) {
   const SPORT_NAME: Record<string, string> = {
     nba: "Basketball", mlb: "Baseball", nhl: "Ice Hockey", nfl: "American Football",
     epl: "Soccer", mls: "Soccer", ucl: "Soccer", wc: "Soccer", pga: "Golf",
   };
-  return {
+  const base = {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: opts.name,
@@ -107,6 +120,34 @@ export function sportsEventLd(opts: {
     homeTeam: { "@type": "SportsTeam", name: opts.homeTeam },
     awayTeam: { "@type": "SportsTeam", name: opts.awayTeam },
   };
+  if (!opts.offers?.length) return base;
+  // Group offers per contestant — Google wants AggregateOffer per outcome.
+  const byContestant = new Map<string, OfferInput[]>();
+  for (const o of opts.offers) {
+    if (!byContestant.has(o.contestant)) byContestant.set(o.contestant, []);
+    byContestant.get(o.contestant)!.push(o);
+  }
+  const aggregateOffers = Array.from(byContestant.entries()).map(([contestant, offers]) => {
+    const prices = offers.map((o) => o.decimalOdds).filter((p) => p > 1);
+    const lowPrice = prices.length ? Math.min(...prices) : null;
+    const highPrice = prices.length ? Math.max(...prices) : null;
+    return {
+      "@type": "AggregateOffer",
+      name: `${contestant} to win`,
+      priceCurrency: "USD",
+      ...(lowPrice != null ? { lowPrice: lowPrice.toFixed(2) } : {}),
+      ...(highPrice != null ? { highPrice: highPrice.toFixed(2) } : {}),
+      offerCount: offers.length,
+      offers: offers.map((o) => ({
+        "@type": "Offer",
+        price: o.decimalOdds.toFixed(2),
+        priceCurrency: "USD",
+        seller: { "@type": "Organization", name: o.book },
+        category: "sports betting odds",
+      })),
+    };
+  });
+  return { ...base, offers: aggregateOffers };
 }
 
 // FAQ blocks — used on pricing, homepage, and league pages so Google has
