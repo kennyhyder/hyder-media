@@ -64,7 +64,7 @@ function greet(ctx) {
 // Welcome sequence (D0 → D21)
 // ============================================================
 
-export const TEMPLATES: Record<string, (ctx) => EmailRender> = {
+export const TEMPLATES = {
   // ----- D0: Welcome (~1 min after signup) -----
   welcome_d0(ctx) {
     const subject = "You're in. Here's how SportsBookISH actually works.";
