@@ -46,21 +46,35 @@ async function main() {
     const data = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf8'));
     console.log(`Found ${data.keywords.length} keywords`);
 
-    // Strip synthetic google estimates so the real API data replaces them
-    data.keywords = data.keywords.map(kw => {
-        const { google, ...rest } = kw;
-        return rest;
-    });
+    // Build map of keywords that ALREADY have real google data, so we can resume
+    const alreadyFetched = new Map();
+    for (const kw of data.keywords) {
+        if (kw.google && typeof kw.google.avg_monthly_searches === 'number') {
+            alreadyFetched.set(kw.keyword.toLowerCase(), kw.google);
+        }
+    }
+    console.log(`Already have Google data for ${alreadyFetched.size} keywords — skipping those`);
 
-    const allKeywords = [...new Set(data.keywords.map(kw => kw.keyword))];
-    console.log(`${allKeywords.length} unique keywords to fetch`);
+    const allKeywords = [...new Set(data.keywords.map(kw => kw.keyword))]
+        .filter(k => !alreadyFetched.has(k.toLowerCase()));
 
-    const googleDataMap = new Map();
+    const googleDataMap = new Map(alreadyFetched);
     const totalBatches = Math.ceil(allKeywords.length / BATCH_SIZE);
-    console.log(`Processing in ${totalBatches} batches of ${BATCH_SIZE}...\n`);
+    const CHECKPOINT_EVERY = 50; // batches
+    console.log(`Processing ${allKeywords.length} new keywords in ${totalBatches} batches of ${BATCH_SIZE}...\n`);
 
     let successCount = 0;
     let failCount = 0;
+
+    const checkpoint = () => {
+        // Merge what we have so far back into data + write to disk (without indent)
+        const snapshot = JSON.parse(JSON.stringify(data));
+        snapshot.keywords = snapshot.keywords.map(kw => {
+            const g = googleDataMap.get(kw.keyword.toLowerCase());
+            return g ? { ...kw, google: g } : kw;
+        });
+        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(snapshot));
+    };
 
     for (let i = 0; i < allKeywords.length; i += BATCH_SIZE) {
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
@@ -86,6 +100,11 @@ async function main() {
         } else {
             failCount += batch.length;
             console.log(`✗ Failed`);
+        }
+
+        if (batchNum % CHECKPOINT_EVERY === 0) {
+            checkpoint();
+            console.log(`  → checkpoint saved (${googleDataMap.size} keywords cached)`);
         }
 
         if (i + BATCH_SIZE < allKeywords.length) {
@@ -131,7 +150,7 @@ async function main() {
         console.log(`Updated global_avg_cpc: $${data.global_avg_cpc} (from ${withGoogle.length} real data points)`);
     }
 
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data));
     const stats = fs.statSync(OUTPUT_FILE);
     console.log(`\nSaved to ${OUTPUT_FILE}`);
     console.log(`File size: ${(stats.size / 1024).toFixed(1)} KB`);
