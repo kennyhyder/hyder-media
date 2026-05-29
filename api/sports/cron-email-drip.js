@@ -157,9 +157,12 @@ export default async function handler(req, res) {
   if (!process.env.RESEND_API_KEY) {
     return res.status(503).json({ error: "RESEND_API_KEY missing" });
   }
+  // ?dry=1 — preview which users would receive which emails without sending.
+  // Highly recommended for first run, schema changes, copy revisions.
+  const dryRun = req.query?.dry === "1" || req.url?.includes("dry=1");
   const supabase = getSupabase();
   const startedAt = new Date().toISOString();
-  const summary = { started_at: startedAt, considered: 0, sent: 0, skipped: 0, errored: 0, results: [] };
+  const summary = { started_at: startedAt, dry_run: dryRun, considered: 0, sent: 0, skipped: 0, errored: 0, results: [] };
 
   // Live aggregates (same numbers used across all emails in this run)
   const liveAgg = await fetchLiveAggregates(supabase);
@@ -181,24 +184,31 @@ export default async function handler(req, res) {
     }
   } catch { /* live numbers degrade gracefully */ }
 
-  // Pull users to consider — anyone with signup in last 60d, plus 30d
-  // inactive (winback). We do this via auth.users + sb_subscriptions join.
+  // Pull users to consider — anyone with signup in last 60d. Email lookup
+  // happens per-user via admin API (cross-schema PostgREST joins to auth.users
+  // are blocked by Supabase for security).
   const cutoff = new Date(Date.now() - 60 * 86400000).toISOString();
   const { data: users } = await supabase
     .from("sb_subscriptions")
-    .select("user_id, tier, created_at, email:auth_users(email, raw_user_meta_data)")
+    .select("user_id, tier, created_at")
     .gte("created_at", cutoff)
     .limit(500);
-  // Fallback if the FK alias doesn't work — query auth.users directly
   const userList = users || [];
 
   for (const u of userList) {
     summary.considered++;
     if (u.tier !== "free") continue; // Drip is for free users → paid
 
-    // Resolve email
-    const userEmail = u.email?.email
-      || (await supabase.auth.admin.getUserById(u.user_id)).data?.user?.email;
+    // Resolve email + first_name from Supabase Auth admin API
+    let userEmail = null;
+    let firstName = null;
+    try {
+      const { data: authData } = await supabase.auth.admin.getUserById(u.user_id);
+      userEmail = authData?.user?.email || null;
+      firstName = authData?.user?.user_metadata?.first_name
+        || authData?.user?.raw_user_meta_data?.first_name
+        || null;
+    } catch { /* fall through */ }
     if (!userEmail) { summary.skipped++; continue; }
 
     // Honor unsubscribes
@@ -213,7 +223,7 @@ export default async function handler(req, res) {
     const ctx = {
       user_id: u.user_id,
       email: userEmail,
-      first_name: u.email?.raw_user_meta_data?.first_name || null,
+      first_name: firstName,
       signup_at: u.created_at,
       tier: u.tier,
       ...activity,
@@ -249,23 +259,28 @@ export default async function handler(req, res) {
     if (!tpl) { summary.errored++; continue; }
     const rendered = tpl(ctx);
 
-    const sendRes = await sendOne({
-      to: userEmail,
-      subject: rendered.subject,
-      html: rendered.html,
-      text: rendered.text,
-      unsubToken: prefs.unsub_token,
-      messageTags: [["email_key", chosen.key], ["tier", u.tier]],
-    });
+    const sendRes = dryRun
+      ? { ok: true, dry: true, resend_id: null }
+      : await sendOne({
+          to: userEmail,
+          subject: rendered.subject,
+          html: rendered.html,
+          text: rendered.text,
+          unsubToken: prefs.unsub_token,
+          messageTags: [["email_key", chosen.key], ["tier", u.tier]],
+        });
 
-    // Log regardless of success — preserves the audit trail
-    await supabase.from("sb_email_sends").insert({
-      user_id: u.user_id,
-      email_key: chosen.key,
-      resend_id: sendRes.resend_id || null,
-      subject: rendered.subject,
-      to_email: userEmail,
-    });
+    // Log only on actual send — dry runs skip the audit row so they can be
+    // re-run without consuming the idempotency key.
+    if (!dryRun && sendRes.ok) {
+      await supabase.from("sb_email_sends").insert({
+        user_id: u.user_id,
+        email_key: chosen.key,
+        resend_id: sendRes.resend_id || null,
+        subject: rendered.subject,
+        to_email: userEmail,
+      });
+    }
 
     if (sendRes.ok) summary.sent++;
     else summary.errored++;
