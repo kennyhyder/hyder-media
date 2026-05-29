@@ -1,24 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
-import { postSocial, formatMoveAlert } from "./_social.js";
+import { postSocial } from "./_social.js";
 import { getBudgetState, alertCanRun } from "./_social_budget.js";
+import {
+  fetchCandidates, attachContext, passesInsightGate,
+  composeSharp, validateTweet,
+} from "./_sharp_alert.js";
 
-// Threshold-gated social posting. Runs frequently and posts when a Kalshi
-// line moves >= MIN_DELTA in the configured lookback window AND we haven't
-// posted about that alert before AND we have Make-tier budget left.
+// SHARP move-alert poster. Replaces the old template-driven cron that fired
+// on raw delta — that flow tweeted post-settlement noise (e.g. "Schwarber HR
+// market +32% to 99%" after he hit the HR). Now:
 //
-// MIN_DELTA scales dynamically based on monthly budget burn — early-month
-// alerts at 7%, late-month bumped to 9-11% so we save slots for big moves
-// only. See _social_budget.js.
+//   1. Hard filters drop settled / illiquid / mid-game-resolution alerts.
+//   2. Cross-source + ladder + volume context is joined per survivor.
+//   3. Insight gate requires at least one of: cross-source gap ≥5pp,
+//      volume concentration on this ladder rung ≥70%, pre-event drift
+//      ≥5pp on liquid market, or ladder consistency violation.
+//   4. Claude composes the tweet with full context — no templates.
+//   5. Output is validated against forbidden phrases + template fingerprints.
+//
+// Kill switch: SOCIAL_ALERTS_DISABLED=1 disables this entire path.
 //
 // GET /api/sports/cron-social-alerts
 //   Authorization: Bearer <CRON_SECRET>
 
-export const config = { maxDuration: 30 };
+export const config = { maxDuration: 60 };
 
-const SINCE_MIN = 15;                    // only fire on fresh alerts (last 15 min)
-const MAX_POSTS_PER_RUN = 1;             // 1 per run × 10-min cadence = ≥10-min spacing between tweets
-                                          // (X's fuzzy dedup flagged tweets posted in rapid succession even with rotating templates)
-const DATA_HOST = process.env.GOLFODDS_API_HOST || "https://hyder.me";
+const MAX_POSTS_PER_RUN = 1;
 const SITE_URL = process.env.SOCIAL_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
 function getSupabase() {
@@ -31,106 +38,120 @@ function checkAuth(req) {
 
 export default async function handler(req, res) {
   if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
-  const supabase = getSupabase();
 
-  // Budget gate — skip the whole run if we're out of daily or monthly slots.
-  // Reserves 1 slot for the daily digest by checking against alertCanRun().
+  if (process.env.SOCIAL_ALERTS_DISABLED === "1") {
+    return res.status(200).json({ skipped: "SOCIAL_ALERTS_DISABLED=1" });
+  }
+
+  const supabase = getSupabase();
   const budget = await getBudgetState();
   if (!alertCanRun(budget)) {
+    return res.status(200).json({ skipped: "out of Make budget", budget });
+  }
+  const dailySlotsLeft = Math.min(budget.day_remaining - 1, MAX_POSTS_PER_RUN);
+
+  // 1+2. Pull candidates + apply hard filters
+  let candidates;
+  try {
+    candidates = await fetchCandidates({ sinceMin: 60 });
+  } catch (e) {
+    return res.status(500).json({ error: `fetchCandidates: ${e.message}` });
+  }
+  if (!candidates.length) {
+    return res.status(200).json({ skipped: "no candidates after hard filter", checked: 0 });
+  }
+
+  // 3. Attach cross-source + ladder + volume context
+  let withCtx;
+  try {
+    withCtx = await attachContext(candidates);
+  } catch (e) {
+    return res.status(500).json({ error: `attachContext: ${e.message}` });
+  }
+
+  // 4. Insight gate — drop anything without a real signal beyond "% moved"
+  const gated = [];
+  for (const c of withCtx) {
+    const g = passesInsightGate(c);
+    if (g.pass) {
+      c.insight_reasons = g.reasons;
+      gated.push(c);
+    }
+  }
+  // Sort by sharpest signal strength (cross_source_gap magnitude as proxy)
+  gated.sort((a, b) => Math.abs(b.cross_source_gap || 0) - Math.abs(a.cross_source_gap || 0));
+
+  if (!gated.length) {
     return res.status(200).json({
-      skipped: "out of Make budget",
-      budget,
+      skipped: "no candidates passed insight gate",
+      candidates_before_gate: candidates.length,
+      candidates_with_context: withCtx.length,
+      example_skipped: withCtx.slice(0, 3).map((c) => ({
+        contestant: c.market.contestant_label,
+        kalshi_now: c.kalshi_now,
+        volume: c.kalshi_volume_24h,
+      })),
     });
   }
-  const MIN_DELTA = budget.move_threshold;
-  const dailySlotsLeft = Math.min(budget.day_remaining - 1, MAX_POSTS_PER_RUN); // reserve 1 for digest
 
-  const sinceISO = new Date(Date.now() - SINCE_MIN * 60 * 1000).toISOString();
-  const alertsRes = await fetch(`${DATA_HOST}/api/golfodds/all-alerts?since_hours=1&limit=100`);
-  if (!alertsRes.ok) return res.status(502).json({ error: `data-plane ${alertsRes.status}` });
-  const { alerts: raw = [] } = await alertsRes.json();
-
-  // Same closed-tournament filter as the digest
-  const nowMs = Date.now();
-  const live = raw.filter((a) => {
-    if (a.parent_status === "closed") return false;
-    if (a.source === "sports" && a.parent_end_at) {
-      const startMs = new Date(a.parent_end_at).getTime();
-      if (Number.isFinite(startMs) && nowMs - startMs > 6 * 3600 * 1000) return false;
-    }
-    if (a.source === "golf" && a.parent_end_at) {
-      const endMs = new Date(a.parent_end_at).getTime() + 24 * 3600 * 1000;
-      if (Number.isFinite(endMs) && nowMs > endMs) return false;
-    }
-    return true;
-  });
-
-  // Filter to fresh, large-move sports alerts
-  const candidates = live
-    .filter((a) => a.source === "sports")
-    .filter((a) => new Date(a.fired_at).toISOString() >= sinceISO)
-    .filter((a) => Math.abs(a.delta) >= MIN_DELTA)
-    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
-
-  if (candidates.length === 0) {
-    return res.status(200).json({ skipped: "no qualifying alerts", checked: live.length });
-  }
-
-  // Dedup check — only post each (alert.id) once. We use the alert id (a UUID
-  // per fire) as the natural dedup key. Same line whipsawing fires a new
-  // alert id each time so we'd post the new one, but only if it's also
-  // dedup-clear at the (event, direction) level — that's what posted_by_event
-  // takes care of within this run.
-  // One tweet per EVENT per window, not per (player x event). Without this,
-  // a player-prop event like "New York Mets vs Washington: Hits" — which
-  // contains many markets (one per player) — fires three separate tweets
-  // when three players cross the threshold at the same time. Use a.link
-  // (which embeds the event_id) as the dedup signal since candidates is
-  // sorted by abs(delta) desc, so the biggest mover for any event wins
-  // and subsequent players for that event are skipped.
-  const postedByEvent = new Set();
+  // 5. Compose via Claude, validate, dedup, post
   const results = [];
-  for (const a of candidates) {
-    if (results.length >= dailySlotsLeft) break;
-    const eventKey = `${a.id || ""}`;
-    if (postedByEvent.has(a.link)) continue;
-    const dedupKey = `move:${eventKey}`;
+  for (const c of gated) {
+    if (results.filter((r) => r.posted).length >= dailySlotsLeft) break;
 
-    // Skip if we've already posted this alert id on X (the primary)
-    const { data: existing } = await supabase
-      .from("sb_social_posts")
-      .select("id")
-      .eq("platform", "x")
-      .eq("dedup_key", dedupKey)
-      .maybeSingle();
-    if (existing) continue;
-
-    // Whipsaw guard: skip if we posted ANY move alert for this EVENT on X
-    // in the last 24h. Was 2h originally but every player who crosses the
-    // threshold within a same game generates a new alert, and the feed
-    // ended up with "all tweets in the past hour have the same link".
-    // 24h cap means each event_id gets at most one tweet per day; the loop
-    // continues to the next candidate, so other games still get coverage.
+    // Per-event 24h dedup (same as before — avoid spamming same event)
     const dayAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const eventLink = `/sports/${c.league}/event/${c.event.id}`;
     const { data: recentSame } = await supabase
       .from("sb_social_posts")
       .select("id")
       .eq("platform", "x")
       .eq("kind", "move_alert")
-      .like("text", `%${a.link}%`)
+      .like("text", `%${eventLink}%`)
       .gte("posted_at", dayAgo)
       .limit(1);
-    if (recentSame && recentSame.length > 0) continue;
+    if (recentSame?.length) {
+      results.push({ contestant: c.market.contestant_label, skipped: "event_dedup_24h" });
+      continue;
+    }
 
-    const text = formatMoveAlert(a, SITE_URL);
-    const result = await postSocial(text, { kind: "move_alert", dedup_key: dedupKey });
+    const composed = await composeSharp(c, SITE_URL);
+    if (!composed.tweet_text) {
+      results.push({
+        contestant: c.market.contestant_label,
+        signals: c.insight_reasons,
+        skipped: "Claude returned null",
+        reasoning: composed.reasoning,
+      });
+      continue;
+    }
+    const vErr = validateTweet(composed.tweet_text);
+    if (vErr) {
+      results.push({
+        contestant: c.market.contestant_label,
+        skipped: `validation:${vErr}`,
+        attempted_text: composed.tweet_text,
+      });
+      continue;
+    }
+    if (composed.confidence < 0.7) {
+      results.push({
+        contestant: c.market.contestant_label,
+        skipped: `confidence_${composed.confidence.toFixed(2)}`,
+        attempted_text: composed.tweet_text,
+        reasoning: composed.reasoning,
+      });
+      continue;
+    }
 
-    for (const { platform, res: r } of [{ platform: "x", res: result.x }, { platform: "bluesky", res: result.bluesky }]) {
+    const dedupKey = `sharp:${c.alert_id}`;
+    const postRes = await postSocial(composed.tweet_text, { kind: "move_alert", dedup_key: dedupKey });
+    for (const { platform, r } of [{ platform: "x", r: postRes.x }, { platform: "bluesky", r: postRes.bluesky }]) {
       await supabase.from("sb_social_posts").upsert({
         platform,
         kind: "move_alert",
         dedup_key: dedupKey,
-        text,
+        text: composed.tweet_text,
         post_uri: r.uri || null,
         post_cid: r.cid || null,
         status: r.ok ? "sent" : (r.skipped ? "skipped" : "failed"),
@@ -138,15 +159,20 @@ export default async function handler(req, res) {
       }, { onConflict: "platform,dedup_key" });
     }
 
-    postedByEvent.add(a.link);
-    results.push({ any_sent: result.any_sent, title: a.title, delta: a.delta, text });
+    results.push({
+      contestant: c.market.contestant_label,
+      tweet: composed.tweet_text,
+      confidence: composed.confidence,
+      signals: c.insight_reasons,
+      posted: !!postRes.x?.ok,
+    });
   }
 
   return res.status(200).json({
-    posted: results.length,
-    candidates: candidates.length,
-    daily_slots_left: dailySlotsLeft,
-    threshold_used: MIN_DELTA,
+    candidates_before_gate: candidates.length,
+    candidates_with_context: withCtx.length,
+    gated: gated.length,
+    posted: results.filter((r) => r.posted).length,
     budget,
     results,
   });
