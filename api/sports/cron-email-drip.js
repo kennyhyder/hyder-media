@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { TEMPLATES } from "./_email_templates.js";
 
 // Daily drip cron. Reads user signups + activity + subscription state,
 // determines which (user, email_key) pair is "due" to send, builds the
@@ -149,8 +150,7 @@ async function sendOne({ to, subject, html, text, unsubToken, messageTags }) {
   }
 }
 
-import { TEMPLATES } from "./_email_templates.js";
-async function getTemplates() { return TEMPLATES; }
+// Templates imported at top — direct reference TEMPLATES below.
 
 export default async function handler(req, res) {
   if (!checkAuth(req)) return res.status(401).json({ error: "unauthorized" });
@@ -245,7 +245,6 @@ export default async function handler(req, res) {
     }
     if (!chosen) { summary.skipped++; continue; }
 
-    const TEMPLATES = await getTemplates();
     const tpl = TEMPLATES[chosen.template];
     if (!tpl) { summary.errored++; continue; }
     const rendered = tpl(ctx);
