@@ -17,6 +17,7 @@
     { "path": "/api/sports/cron-detect-movements",  "schedule": "*/5 * * * *" },
     { "path": "/api/sports/cron-social-digest",     "schedule": "15 14 * * *" },
     { "path": "/api/sports/cron-social-alerts",     "schedule": "*/10 * * * *" },
+    { "path": "/api/sports/cron-email-drip",        "schedule": "30 14 * * *" },
     { "path": "/api/sports/cron-twitter-watch",     "schedule": "*/15 * * * *" },
     { "path": "/api/sports/cron-twitter-reply",     "schedule": "5,20,35,50 * * * *" },
     { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" },
