@@ -52,7 +52,12 @@ export default async function handler(req, res) {
         .range(0, 9999),
       supabase
         .from("sports_book_v_latest")
-        .select("sports_event_id, contestant_norm, book, implied_prob_novig, american, market_type")
+        // fetched_at is required for the staleness filter on line ~121.
+        // Without it `b.fetched_at` is undefined → freshBook short-circuits
+        // to true → stale (e.g. 3h-old) offshore quotes get mixed with
+        // fresh in-game regulated quotes, producing misleading "Other"
+        // median (saw 56.9% on Texas when fresh offshore would be ~12%).
+        .select("sports_event_id, contestant_norm, book, implied_prob_novig, american, market_type, fetched_at")
         .in("sports_event_id", eventIds)
         .in("market_type", ["h2h", "outrights"])
         .range(0, 9999),

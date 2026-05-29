@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookPriceMap, bucketBookEntries } from "../sports/_book_classification.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

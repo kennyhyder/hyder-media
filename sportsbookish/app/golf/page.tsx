@@ -21,16 +21,20 @@ export default async function GolfHome() {
   const tierInfo = TIER_BY_KEY[tier];
   const renderTime = new Date().toISOString();
 
-  // Chronological sort: in-progress + upcoming first (end_date ASC), then past
-  // (end_date DESC). Next event first per user's site-wide preference.
-  const sortedTournaments = [...tournaments].sort((a, b) => {
-    const aClosed = a.status === "closed";
-    const bClosed = b.status === "closed";
-    if (aClosed !== bClosed) return aClosed ? 1 : -1;
-    const da = a.end_date || a.start_date || "9999-12-31";
-    const db = b.end_date || b.start_date || "9999-12-31";
-    return aClosed ? db.localeCompare(da) : da.localeCompare(db);
-  });
+  // Active = anything not closed (upcoming + in-progress). Closed tournaments
+  // are surfaced via /golf/[year] archive pages instead — keeps the hub
+  // focused on live betting opportunities. Chronological: nearest end_date
+  // first per the site-wide "next event first" rule.
+  const sortedTournaments = [...tournaments]
+    .filter((t) => t.status !== "closed")
+    .sort((a, b) => {
+      const da = a.end_date || a.start_date || "9999-12-31";
+      const db = b.end_date || b.start_date || "9999-12-31";
+      return da.localeCompare(db);
+    });
+  // Year(s) where closed tournaments exist — link out to archive page.
+  const closedYears = Array.from(new Set(tournaments.filter((t) => t.status === "closed").map((t) => t.season_year).filter(Boolean) as number[]))
+    .sort((a, b) => b - a);
 
   return (
     <div className="min-h-screen">
@@ -62,10 +66,15 @@ export default async function GolfHome() {
       </header>
 
       <main id="main" className="container mx-auto max-w-6xl px-4 py-10">
-        <div className="flex items-center gap-2 mb-4 text-xs">
+        <div className="flex items-center gap-2 mb-4 text-xs flex-wrap">
           <Link href="/golf/players" className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
             All PGA Tour golfers →
           </Link>
+          {closedYears.slice(0, 3).map((yr) => (
+            <Link key={yr} href={`/golf/${yr}`} className="rounded border border-border bg-card/50 px-3 py-1.5 hover:border-emerald-500/40 hover:bg-card transition-colors">
+              {yr} archive →
+            </Link>
+          ))}
         </div>
         <div className="mb-6">
           <h1 className="text-3xl font-bold">Active tournaments</h1>

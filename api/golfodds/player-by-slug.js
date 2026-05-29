@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { bucketBookEntries } from "../sports/_book_classification.js";
 
 // Look up a golf player by slug + return their markets across every active
 // tournament. Used for /golf/players/[slug] hub pages.
