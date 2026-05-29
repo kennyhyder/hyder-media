@@ -3,6 +3,7 @@ import { fetchLeagues, fetchEventsByLeague, fetchArchivedEventsByLeague, fetchTe
 import { fetchTournaments, fetchArchivedTournaments, fetchGolfers } from "@/lib/golf-data";
 import { eventUrl, tournamentUrl, teamUrl, playerUrl, golfPlayerUrl, slugify } from "@/lib/slug";
 import { GLOSSARY } from "@/lib/glossary";
+import { allSportsbookSlugs } from "@/lib/sportsbook-meta";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
 
@@ -59,11 +60,25 @@ export default async function sitemap(): Promise<Sm> {
     { url: `${SITE_URL}/tools/parlay-calculator`,     lastModified: now, changeFrequency: "monthly", priority: 0.75 },
   );
 
-  // ---- Compare books ----
+  // ---- Compare books (legacy /compare/* paths) ----
   for (const book of ["polymarket", "draftkings", "fanduel", "betmgm", "caesars", "betrivers", "fanatics"]) {
     // Polymarket comparison gets higher priority — high Google Trends search volume
     const pri = book === "polymarket" ? 0.85 : 0.7;
     urls.push({ url: `${SITE_URL}/compare/kalshi-vs-${book}`, lastModified: now, changeFrequency: "weekly", priority: pri });
+  }
+
+  // ---- /sportsbooks hub + ~43 programmatic comparison pages ----
+  urls.push({ url: `${SITE_URL}/sportsbooks`, lastModified: now, changeFrequency: "daily", priority: 0.95 });
+  for (const slug of allSportsbookSlugs()) {
+    // Single book reviews + kalshi/poly comparisons get higher priority than
+    // book-vs-book (latter is more competitive).
+    const isHeadToHead = slug.includes("-vs-") && !slug.startsWith("kalshi-") && !slug.startsWith("polymarket-");
+    urls.push({
+      url: `${SITE_URL}/sportsbooks/${slug}`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: isHeadToHead ? 0.7 : 0.85,
+    });
   }
 
   // ---- Authority / data ----
