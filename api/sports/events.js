@@ -155,13 +155,17 @@ export default async function handler(req, res) {
       if (sorted.length) bestBook = sorted[0];
       const edgeBest = (kalshi != null && bestBook?.implied_prob_novig != null) ? Number((bestBook.implied_prob_novig - kalshi).toFixed(5)) : null;
 
-      for (const b of bookList) booksSeen.add(b.book);
-
       // book_prices: stable map by book key, lookup at render time. Bucket
-      // offshore brands into an aggregated "other" entry — never named.
+      // offshore brands into a single aggregated "other" entry — never named.
       const rawBookPrices = {};
       for (const b of bookList) rawBookPrices[b.book] = { american: b.american, novig: b.implied_prob_novig };
       const bookPrices = bucketBookPriceMap(rawBookPrices);
+
+      // booksSeen tracks the columns the frontend renders in the table.
+      // Populate from BUCKETED keys (regulated names + a single "other"),
+      // not from raw — otherwise each offshore book name produced its own
+      // "Other" column because they all bookLabel() → "Other".
+      for (const k of Object.keys(bookPrices)) booksSeen.add(k);
 
       // Polymarket overlay for this contestant on this event
       const poly = polyByEventContestant.get(`${m.event_id}|${norm}`);
