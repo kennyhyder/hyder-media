@@ -8,6 +8,8 @@ import { fmtPct, fmtPctSigned, fmtAmerican, bookLabel, edgeTextClass } from "@/l
 import { eventUrl, slugify } from "@/lib/slug";
 import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { JsonLd, breadcrumbLd, faqLd } from "@/lib/seo";
+import { trackIfUser } from "@/lib/track-event";
+import { getCurrentTier } from "@/lib/tier-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +71,11 @@ const HUB_FAQ = [
 export default async function PositiveEVPage() {
   const leagues = await fetchLeagues();
   const renderTime = new Date().toISOString();
+  // Behavior signal — surfacing positive_ev_view differentiates a casual
+  // visitor from someone running the scanner, which is the strongest free →
+  // Pro intent we have.
+  const { userId } = await getCurrentTier();
+  await trackIfUser(userId, "positive_ev_view");
 
   // Pull events across every active league in parallel
   const leagueData = await Promise.all(

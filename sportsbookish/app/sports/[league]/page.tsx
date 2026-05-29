@@ -13,6 +13,7 @@ import SportsBookTable, { type SportsRow } from "@/components/sports/SportsBookT
 import SportsBestBets from "@/components/sports/SportsBestBets";
 import UpsellBanner from "@/components/UpsellBanner";
 import { JsonLd, breadcrumbLd, itemListLd, faqLd, faqForLeaguePage } from "@/lib/seo";
+import { trackIfUser } from "@/lib/track-event";
 import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 
 const SITE_URL_LEAGUE = process.env.NEXT_PUBLIC_SITE_URL || "https://sportsbookish.com";
@@ -158,6 +159,9 @@ export default async function LeaguePage({ params, searchParams }: {
   const { tab: requestedTab } = await searchParams;
   const { tier, userId } = await getCurrentTier();
   const isAnonymous = !userId;
+  // Track league_view with the sport dim — feeds drip personalization
+  // (top_sport per user → tailored subject lines)
+  void trackIfUser(userId, "league_view", { sport: league });
 
   const [leagues, leagueData, leagueMoves] = await Promise.all([
     fetchLeagues(),

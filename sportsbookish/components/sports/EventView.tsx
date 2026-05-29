@@ -15,6 +15,7 @@ import BookLink from "@/components/BookLink";
 import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
 import { NoBooksDataNote } from "@/components/sports/NoBooksDataNote";
+import { trackIfUser } from "@/lib/track-event";
 import { createClient } from "@/lib/supabase/server";
 import { JsonLd, breadcrumbLd, sportsEventLd, faqLd, faqForEventPage } from "@/lib/seo";
 import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
@@ -37,6 +38,8 @@ export default async function EventView({
   canonicalPath: string;
 }) {
   const { tier, userId } = await getCurrentTier();
+  // Track event_view with sport dim — feeds drip personalization
+  void trackIfUser(userId, "event_view", { sport: league, props: { event_id: eventId } });
 
   const [leagues, detail, history, allMovements] = await Promise.all([
     fetchLeagues(),

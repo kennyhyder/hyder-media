@@ -3,8 +3,17 @@ import PricingCards from "@/components/marketing/PricingCards";
 import { Card, CardContent } from "@/components/ui/card";
 import { API_PLANS } from "@/lib/tiers";
 import { Check } from "lucide-react";
+import { trackIfUser } from "@/lib/track-event";
+import { getCurrentTier } from "@/lib/tier-guard";
 
-export default function PricingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function PricingPage() {
+  // Behavior signal for drip — emitted on every pricing view, even repeats.
+  // The cron uses pricing_views count over 30d to fire behavior_pricing_indecision.
+  const { userId } = await getCurrentTier();
+  await trackIfUser(userId, "pricing_view");
+
   const apiDemo = API_PLANS.find((p) => p.key === "free")!;
   const apiMonthly = API_PLANS.find((p) => p.key === "api_monthly")!;
   const apiAnnual = API_PLANS.find((p) => p.key === "api_annual")!;
