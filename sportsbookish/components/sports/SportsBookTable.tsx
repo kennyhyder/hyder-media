@@ -129,10 +129,19 @@ export default function SportsBookTable({ league, rows, books, isPaidTier }: Pro
               return (
                 <TableRow key={r.market_id}>
                   <TableCell className="whitespace-nowrap">
-                    <Link href={`/sports/${league}/event/${r.event_id}`} className="hover:underline">
-                      <div className="font-medium">{r.contestant_label}</div>
-                      <div className="text-[10px] text-muted-foreground truncate max-w-[16ch]">{r.event_title}</div>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link href={`/sports/${league}/event/${r.event_id}`} className="hover:underline">
+                        <div className="font-medium">{r.contestant_label}</div>
+                        <div className="text-[10px] text-muted-foreground truncate max-w-[16ch]">{r.event_title}</div>
+                      </Link>
+                      <Link
+                        href={`/sports/${league}/event/${r.event_id}?contestant=${encodeURIComponent(r.contestant_label)}#log-bet`}
+                        className="opacity-40 hover:opacity-100 text-[10px] rounded border border-border/60 hover:border-emerald-500/60 px-1.5 py-0.5 hover:text-emerald-400 transition"
+                        title="Log this bet"
+                      >
+                        + Log
+                      </Link>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-amber-500">{fmtPct(r.implied_prob)}</TableCell>
                   <TableCell className="text-right tabular-nums" style={{ color: r.polymarket_prob != null ? "#a855f7" : undefined }}>

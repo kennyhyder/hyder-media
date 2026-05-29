@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -39,6 +39,25 @@ export default function QuickLogBet({ eventId, eventLabel, league, contestants, 
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+
+  // Auto-open when URL hash is #log-bet (deep-link from inline "+" button
+  // on league-page tables). Also accept ?contestant= and ?book= to
+  // pre-fill the form with the row the user clicked.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (hash !== "#log-bet" && !hash.startsWith("#log-bet=")) return;
+    setOpen(true);
+    const search = new URLSearchParams(window.location.search);
+    const wantedContestant = search.get("contestant");
+    const wantedBook = search.get("book");
+    if (wantedContestant && contestants.some((c) => c.label === wantedContestant)) {
+      setPick(wantedContestant);
+    }
+    if (wantedBook) setBook(wantedBook);
+    // Scroll into view
+    setTimeout(() => document.getElementById("log-bet-form")?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+  }, [contestants]);
 
   const pickRow = useMemo(() => contestants.find((c) => c.label === pick) || contestants[0], [pick, contestants]);
 
@@ -139,7 +158,7 @@ export default function QuickLogBet({ eventId, eventLabel, league, contestants, 
               <X className="h-4 w-4 text-muted-foreground hover:text-foreground" aria-hidden="true" />
             </button>
           </div>
-          <form onSubmit={submit} className="space-y-3">
+          <form id="log-bet-form" onSubmit={submit} className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="qlb-pick">Pick</Label>
