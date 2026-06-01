@@ -126,6 +126,42 @@ export async function GET(req: Request) {
   if (!alertsRes.ok) return NextResponse.json({ error: `data-plane ${alertsRes.status}` }, { status: 502 });
   const { alerts: rawAlerts = [] }: { alerts?: FeedAlert[] } = await alertsRes.json();
 
+  // 1a-prefilter. Sharpness gate — drop settlement-driven movement noise
+  // BEFORE the existing live/closed check. The old digest was including
+  // things like "miss-cut odds on Sunday" because the cut had resolved
+  // Friday + the market just settled to 0% → 100%, which trivially passes
+  // a delta threshold. Cut these explicitly.
+  //
+  // Rules:
+  //  - kalshi_now in [0.85, 1.0] or [0.0, 0.15] AND |delta| > 0.20  → settlement noise
+  //  - golf "make_cut" / "miss_cut" market_type when title contains those phrases
+  //    AND the alert is after Friday 6pm local of a typical tournament week
+  //  - "winner" market on a closed sport_event (parent_status check already does this)
+  //
+  // These are conservative — we'd rather miss a sharp signal than include
+  // a settled one (which destroys the email's reputation as "edge content").
+  const SHARP_HARD_MIN = 0.18;
+  const SHARP_HARD_MAX = 0.82;
+  const dayOfWeekUTC = new Date().getUTCDay(); // 0=Sun, 5=Fri, 6=Sat
+  const isPastCutDay = dayOfWeekUTC === 0 || dayOfWeekUTC === 6; // Sat/Sun = cut already happened
+  function isSharpMove(a: FeedAlert): boolean {
+    // Extreme zone reject — these are post-settlement movements
+    if (a.probability != null) {
+      if (a.probability >= SHARP_HARD_MAX || a.probability <= SHARP_HARD_MIN) return false;
+    }
+    // Golf cut-line markets after the cut has happened
+    const subTitle = (a.subtitle || "").toLowerCase();
+    const titl = (a.title || "").toLowerCase();
+    const isCutMarket = /\b(make cut|miss cut|made the cut|missed the cut|cut line)\b/.test(subTitle + " " + titl);
+    if (a.source === "golf" && isCutMarket && isPastCutDay) return false;
+    // Golf "winner" markets after Saturday → likely settling toward winner
+    if (a.source === "golf" && /\bwinner\b/.test(subTitle + " " + titl) && dayOfWeekUTC === 0) {
+      // Sunday — keep only if probability < 65% (still genuinely uncertain)
+      if (a.probability != null && a.probability >= 0.65) return false;
+    }
+    return true;
+  }
+
   // 1a. Filter out alerts whose underlying tournament/event has already
   // settled. Two layers because tournament metadata isn't always set:
   //
@@ -139,7 +175,9 @@ export async function GET(req: Request) {
   //             PGA Championship ended-Sunday alerts kept flowing into
   //             Monday's digest with status='upcoming', end_date=NULL).
   const nowMs = Date.now();
-  const liveAlerts0 = rawAlerts.filter((a) => {
+  // Apply sharpness gate before any other filter — drops the obvious settlement noise.
+  const sharpAlerts = rawAlerts.filter(isSharpMove);
+  const liveAlerts0 = sharpAlerts.filter((a) => {
     if (a.parent_status === "closed") return false;
     if (a.source === "sports" && a.parent_end_at) {
       const startMs = new Date(a.parent_end_at).getTime();
