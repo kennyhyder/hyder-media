@@ -343,7 +343,15 @@
                     // shouldCreateUser:true lets new invited users register themselves
                     // via magic-link. AuthGate still blocks dashboard access until an
                     // admin grants them an ag2020_users row.
-                    options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
+                    // data.product='ag2020' tells the shared-project auth.users
+                    // triggers (9dm_handle_new_user, sb_handle_new_user) that this
+                    // signup is NOT for their products — they skip creating their
+                    // rows for AG2020 users.
+                    options: {
+                        emailRedirectTo: redirectTo,
+                        shouldCreateUser: true,
+                        data: { product: 'ag2020' },
+                    },
                 });
                 if (error) throw error;
                 showInfo('Check your inbox — we sent a one-click sign-in link to ' + email + '.');
