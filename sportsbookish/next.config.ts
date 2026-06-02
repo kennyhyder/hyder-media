@@ -50,8 +50,18 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   async headers() {
+    // CSP for embed routes: allow embedding from any origin (the whole point).
+    // Strip frame-ancestors restriction, drop X-Frame-Options entirely.
+    const embedCsp = csp.replace(/;\s*frame-ancestors[^;]+/i, "; frame-ancestors *");
+    const embedSecurityHeaders = securityHeaders
+      .filter((h) => h.key !== "X-Frame-Options" && h.key !== "Content-Security-Policy")
+      .concat([{ key: "Content-Security-Policy", value: embedCsp }]);
     return [
+      // Default: strict frame-ancestors 'none' from the original CSP
       { source: "/(.*)", headers: securityHeaders },
+      // Embed routes — relaxed framing so third-party sites can iframe us.
+      // These pages are noindex'd so search ranking isn't impacted.
+      { source: "/embed/:path*", headers: embedSecurityHeaders },
       {
         // OG images need to be loadable cross-origin by social crawlers
         source: "/api/og/:path*",
