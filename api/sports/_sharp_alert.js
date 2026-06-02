@@ -319,33 +319,111 @@ export function passesInsightGate(c) {
 
 // ---- Step 5: Claude-driven sharp composer ----
 
-const COMPOSER_SYSTEM = `You write betting-market analysis tweets for @sportsbookish. Voice: quant peer, no hype.
+// ============================================================
+// MARKET-STRUCTURE LENS LIBRARY
+// ============================================================
+//
+// Curated explanations of WHY a particular data pattern shows up in
+// betting markets. The composer picks the most relevant lens for the
+// triggered signal + market state and weaves a 1-sentence structural
+// note into the tweet. Elevates output from "look at this number" to
+// "look at this number AND here's the microstructure reason it exists" —
+// the difference between a data-bot post and a peer-trader post.
+//
+// Each lens has: a `key` (for selection logic), an `applies_when`
+// predicate function over context, and a `frame` string with the
+// crisp 1-sentence claim. The composer picks the highest-priority
+// applicable lens and includes its frame as guidance.
+export const STRUCTURE_LENSES = [
+  {
+    key: "settlement_risk_in_play",
+    priority: 10,
+    applies_when: (c) => c.event_started === true && (c.kalshi_yes_ask_cents - c.kalshi_yes_bid_cents) >= 4,
+    frame: "Mid-game Kalshi lines carry a settlement-risk premium that sportsbook lines don't — cancellation/suspension risk gets baked in once leverage shifts. The exchange isn't just pricing outcome, it's pricing payout-reliability too.",
+  },
+  {
+    key: "leverage_shift_drift",
+    priority: 9,
+    applies_when: (c) => c.event_started === true && Math.abs(c.kalshi_4h_delta_pp || 0) >= 5 && c.kalshi_volume_24h >= 1000,
+    frame: "Mid-game drift on liquid markets reflects both score state AND leverage exit — once a side's contracts go deep, holders pay a discount to unwind. The line moves more than the win probability strictly justifies.",
+  },
+  {
+    key: "books_lag_sharp_money",
+    priority: 8,
+    applies_when: (c) => c.event_started === false && Math.abs(c.cross_source_gap_pp || 0) >= 6 && c.kalshi_volume_24h >= 500,
+    frame: "Books target balanced action; Kalshi targets fair price. When the exchange has moved on volume but the book consensus hasn't, sharp money has located the right side faster than the bookmaker's risk desk has reacted.",
+  },
+  {
+    key: "ladder_volume_concentration",
+    priority: 7,
+    applies_when: (c) => (c.volume_share_of_ladder_pct || 0) >= 70 && c.ladder?.length >= 3,
+    frame: "Volume concentration on one threshold means price discovery is happening there alone — adjacent rungs trade light enough that their prices are statistical noise, not signal.",
+  },
+  {
+    key: "ladder_consistency_violation",
+    priority: 7,
+    applies_when: (c) => (c.insight_signals || []).some((s) => String(s).startsWith("ladder_violation")),
+    frame: "Adjacent ladder rungs failing the monotonicity check (T20 ≤ T10 prob) is a pure market-maker mistake, not a real signal — but real enough to arb if liquidity supports it.",
+  },
+  {
+    key: "polymarket_vs_kalshi_divergence",
+    priority: 6,
+    applies_when: (c) => c.polymarket_pct != null && Math.abs((c.polymarket_pct - c.kalshi_now_pct)) >= 5,
+    frame: "Kalshi/Polymarket disagreements of this size are unusual — both are CFTC-regulated peer-to-peer exchanges, so the gap is liquidity-induced (one venue has thinner activity) more than information-induced.",
+  },
+  {
+    key: "early_pregame_consensus_lag",
+    priority: 5,
+    applies_when: (c) => c.event_started === false && Math.abs(c.cross_source_gap_pp || 0) >= 5,
+    frame: "Pre-event gaps this wide usually close in the final 60 min before tip as books reprice on closing volume. The exchange tends to anchor closer to the true number earlier in the cycle.",
+  },
+  {
+    key: "default_no_lens",
+    priority: 0,
+    applies_when: () => true,
+    frame: "",
+  },
+];
 
-You'll get JSON with one market move + its full context (Kalshi price, cross-source comparison vs sportsbook fair, Polymarket, volume on this rung, the ladder of related rungs, and what insight signal triggered this candidate).
+function pickLens(context) {
+  const candidates = STRUCTURE_LENSES.filter((l) => {
+    try { return l.applies_when(context); }
+    catch { return false; }
+  });
+  candidates.sort((a, b) => b.priority - a.priority);
+  return candidates[0];
+}
+
+const COMPOSER_SYSTEM = `You write betting-market analysis tweets for @sportsbookish. Voice: quant peer who actually understands market microstructure — not a data-bot reading off numbers.
+
+You'll get JSON with one market move + its full context (Kalshi price, cross-source comparison vs sportsbook fair, Polymarket, volume on this rung, the ladder of related rungs, and what insight signal triggered this candidate). You'll ALSO get a "structure_lens" field with a 1-sentence frame explaining WHY this pattern shows up — settlement risk, leverage exit, books-lag-sharp-money, ladder volume concentration, etc.
 
 Hard rules:
-- NEVER announce the move as the headline. Lead with the INSIGHT (cross-source gap, volume concentration, ladder violation, pre-event drift). The move itself is just the news hook.
+- NEVER announce the move as the headline. Lead with the INSIGHT.
+- WEAVE the structural lens into your tweet when it's non-empty. The lens tells the READER why the data matters — it's the difference between reporting and analysis. Do not copy the lens verbatim; integrate its concept naturally into your tweet as the second sentence (or as a sentence-fragment trailing the data).
 - NEVER use templated emoji-header structures like "📈 Move alert" or "🔴 Heads up". One emoji max anywhere.
 - NEVER use words: "lock", "smash", "hammer", "lfg", "tail", "watching", "live", "fade"
 - Lead with a concrete number (¢, %, pp, x volume ratio)
-- 1-2 short sentences. Under 240 characters.
+- 2-3 short sentences. Under 270 characters.
 - Include the URL provided at the end with nothing after it.
 - If the data is genuinely uninteresting (you don't see why the move matters), return tweet_text = null. Better to skip than post junk.
 
-Examples of the voice you're aiming for:
+Examples of the voice you're aiming for (note the second sentence: structural reasoning):
 
-GOOD: "Schwarber HR ladder: 2+ rung at 18¢ on 1.3k contracts; the 1+ rung carries 92% of volume but trades at 84. Pricing concentrated on the boring threshold."
+GOOD: "Kalshi has Minnesota mid-game at 66.5%; 158-book consensus prices the spot at 50%. 16.5pp gap on $361k of in-play volume. That kind of mid-game drift is the exchange pricing settlement + leverage-exit risk, not just outcome — Kalshi typically lags book lines once contracts go deep."
 
-GOOD: "Cross-source gap: Kalshi has Wemby blocks 2+ at 31%, sportsbook fair 24%. 7pp wide on 2.1k Kalshi contracts."
+GOOD: "Schwarber HR ladder: 2+ rung at 18¢ on 1.3k contracts; the 1+ rung carries 92% of volume but trades at 84. Volume concentration means price discovery is happening only on the headline threshold — adjacent rungs are statistical noise."
 
-BAD: "🔴 Move alert: Wemby blocks +12% to 31%"  (template, no insight)
-BAD: "📈 Watching: Wemby blocks +12% Kalshi 31%" (template variation, still no insight)
+GOOD: "Cross-source gap: Kalshi has Wemby blocks 2+ at 31% on 2.1k contracts, sportsbook fair sits at 24%. Books target balanced action; exchanges target fair price. The 7pp gap is sharp money locating the right side ahead of the risk desk."
+
+BAD: "🔴 Move alert: Wemby blocks +12% to 31%"  (template, no insight, no structure)
+BAD: "📈 Cross-source gap on Wemby blocks: Kalshi 31% / books 24%. 7pp."  (data without the microstructure reason)
 
 Output JSON only:
 {
   "tweet_text": "string or null",
   "confidence": 0.0,
-  "reasoning": "one sentence: why this is sharp, or why you skipped"
+  "reasoning": "one sentence: why this is sharp, what lens you used, or why you skipped"
 }`;
 
 export async function composeSharp(context, siteUrl) {
@@ -379,6 +457,25 @@ export async function composeSharp(context, siteUrl) {
       ? Number((context.volume_share_of_ladder * 100).toFixed(0)) : null,
     event_started: context.event.start_time ? new Date(context.event.start_time).getTime() <= Date.now() : null,
     insight_signals: context.insight_reasons || [],
+    // Structural lens — the highest-priority applicable microstructure
+    // frame for this context. Gives Claude the "why" behind the data.
+    structure_lens: (() => {
+      const ctxForLens = {
+        event_started: context.event.start_time ? new Date(context.event.start_time).getTime() <= Date.now() : false,
+        kalshi_yes_bid_cents: context.kalshi_yes_bid != null ? Math.round(context.kalshi_yes_bid * 100) : 0,
+        kalshi_yes_ask_cents: context.kalshi_yes_ask != null ? Math.round(context.kalshi_yes_ask * 100) : 100,
+        kalshi_4h_delta_pp: context.kalshi_4h_delta != null ? Number((context.kalshi_4h_delta * 100).toFixed(1)) : 0,
+        kalshi_volume_24h: context.kalshi_volume_24h || 0,
+        cross_source_gap_pp: context.cross_source_gap != null ? Number((context.cross_source_gap * 100).toFixed(1)) : 0,
+        polymarket_pct: context.polymarket_now != null ? Number((context.polymarket_now * 100).toFixed(1)) : null,
+        kalshi_now_pct: Number((context.kalshi_now * 100).toFixed(1)),
+        volume_share_of_ladder_pct: context.volume_share_of_ladder != null ? Number((context.volume_share_of_ladder * 100).toFixed(0)) : 0,
+        ladder: context.ladder,
+        insight_signals: context.insight_reasons || [],
+      };
+      const lens = pickLens(ctxForLens);
+      return { key: lens.key, frame: lens.frame };
+    })(),
     site_url_for_event: url,
   };
 
