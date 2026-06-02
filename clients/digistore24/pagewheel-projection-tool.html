@@ -836,23 +836,23 @@
                                 <div class="benchmark-source">WordStream 2024</div>
                             </div>
                             <div class="benchmark-item">
-                                <div class="benchmark-label">Affiliate Platform Avg CPC</div>
+                                <div class="benchmark-label">Page-Builder Avg CPC</div>
                                 <div class="benchmark-value" id="benchmark-cpc">$2.50</div>
                                 <div class="benchmark-source">Competitor Data</div>
                             </div>
                             <div class="benchmark-item">
-                                <div class="benchmark-label">ClickBank Est. Monthly Spend</div>
-                                <div class="benchmark-value" id="benchmark-clickbank">-</div>
+                                <div class="benchmark-label">Wix Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-wix">-</div>
                                 <div class="benchmark-source">SimilarWeb Data</div>
                             </div>
                             <div class="benchmark-item">
-                                <div class="benchmark-label">Impact Est. Monthly Spend</div>
-                                <div class="benchmark-value" id="benchmark-impact">-</div>
+                                <div class="benchmark-label">Shopify Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-shopify">-</div>
                                 <div class="benchmark-source">SimilarWeb Data</div>
                             </div>
                             <div class="benchmark-item">
-                                <div class="benchmark-label">Awin Est. Monthly Spend</div>
-                                <div class="benchmark-value" id="benchmark-awin">-</div>
+                                <div class="benchmark-label">Squarespace Est. Monthly Spend</div>
+                                <div class="benchmark-value" id="benchmark-squarespace">-</div>
                                 <div class="benchmark-source">SimilarWeb Data</div>
                             </div>
                             <div class="benchmark-item">
@@ -867,8 +867,8 @@
                             <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.8;">
                                 <li><strong>Comparison keywords convert highest</strong> - "X vs Y" and "X alternative" keywords show 2-3x higher intent</li>
                                 <li><strong>Brand bidding is expensive but effective</strong> - Competitors spend 40%+ of budget on brand terms</li>
-                                <li><strong>Mobile traffic is growing</strong> - 35-45% of affiliate platform searches are mobile</li>
-                                <li><strong>Long-tail keywords offer better CPA</strong> - Specific terms like "affiliate program for [niche]" convert at lower cost</li>
+                                <li><strong>Mobile traffic is growing</strong> - 35-45% of page-builder / website-builder searches are mobile</li>
+                                <li><strong>Long-tail keywords offer better CPA</strong> - Specific terms like "page builder for [niche]" or "AI website builder for coaches" convert at lower cost</li>
                             </ul>
                         </div>
                     </div>
@@ -921,7 +921,7 @@
         // Load keyword data
         async function loadData() {
             try {
-                const response = await fetch('data/keywords-combined.json');
+                const response = await fetch('data/pagewheel-keywords-combined.json');
                 keywordData = await response.json();
                 renderGroupSelector();
                 updateBenchmarks();
@@ -1178,8 +1178,8 @@
 
         // Update benchmarks from data
         function updateBenchmarks() {
-            // Calculate competitor spend estimates
-            const brandSpend = { clickbank: 0, impact: 0, awin: 0 };
+            // Calculate competitor spend estimates (annual based on 12-month SimilarWeb data)
+            const brandSpend = { wix: 0, shopify: 0, squarespace: 0 };
 
             keywordData.keywords.forEach(kw => {
                 const gCpc = ((kw.google?.high_top_of_page_bid || 0) + (kw.google?.low_top_of_page_bid || 0)) / 2;
@@ -1187,14 +1187,15 @@
 
                 kw.brands.forEach(b => {
                     if (brandSpend.hasOwnProperty(b.name)) {
-                        brandSpend[b.name] += b.clicks * cpc;
+                        brandSpend[b.name] += (b.clicks || 0) * cpc;
                     }
                 });
             });
 
-            document.getElementById('benchmark-clickbank').textContent = '$' + formatNumber(brandSpend.clickbank);
-            document.getElementById('benchmark-impact').textContent = '$' + formatNumber(brandSpend.impact);
-            document.getElementById('benchmark-awin').textContent = '$' + formatNumber(brandSpend.awin);
+            // SimilarWeb dataset spans 12 months — divide for monthly view
+            document.getElementById('benchmark-wix').textContent = '$' + formatNumber(brandSpend.wix / 12);
+            document.getElementById('benchmark-shopify').textContent = '$' + formatNumber(brandSpend.shopify / 12);
+            document.getElementById('benchmark-squarespace').textContent = '$' + formatNumber(brandSpend.squarespace / 12);
 
             // Global avg CPC
             document.getElementById('benchmark-cpc').textContent = '$' + (keywordData.global_avg_cpc || 2.50).toFixed(2);
