@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Moving Checklist · 162 items</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;color:#e4e4e7;line-height:1.4;overscroll-behavior-y:none}
+button{font-family:inherit;cursor:pointer}
+
+/* Top sticky bar */
+.bar{position:sticky;top:0;z-index:20;background:#0a0a0a;border-bottom:1px solid #1f1f1f;padding:10px 12px}
+.bar-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.title{font-size:14px;font-weight:700;color:#10b981}
+.title small{color:#9ca3af;font-weight:400;margin-left:6px;font-size:12px}
+.spacer{flex:1}
+.btn-sm{background:#1f1f1f;color:#e4e4e7;border:1px solid #2a2a2a;border-radius:6px;padding:6px 10px;font-size:12px}
+.btn-sm:hover{background:#2a2a2a}
+.btn-sm.danger:hover{background:#3a1212;border-color:#dc2626;color:#fca5a5}
+
+/* Progress */
+.progress{height:6px;background:#1f1f1f;border-radius:999px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);transition:width 0.3s}
+.stats{display:flex;gap:14px;margin-top:8px;font-size:12px;color:#9ca3af}
+.stats span{display:inline-flex;align-items:center;gap:4px}
+.stats b{color:#e4e4e7;font-weight:600}
+.stat-ok b{color:#10b981}
+.stat-miss b{color:#f87171}
+.stat-damage b{color:#fbbf24}
+
+/* Search */
+.search{display:flex;gap:8px;margin-top:8px}
+.search input{flex:1;background:#1f1f1f;border:1px solid #2a2a2a;border-radius:6px;padding:8px 10px;color:#e4e4e7;font-size:14px;font-family:inherit;outline:none;min-width:0}
+.search input:focus{border-color:#10b981}
+
+/* Filter chips */
+.chips{display:flex;gap:6px;margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.chip{flex-shrink:0;background:#1f1f1f;color:#9ca3af;border:1px solid #2a2a2a;border-radius:999px;padding:5px 11px;font-size:12px;white-space:nowrap}
+.chip.active{background:rgba(16,185,129,0.15);color:#10b981;border-color:rgba(16,185,129,0.4)}
+.chip.miss.active{background:rgba(248,113,113,0.15);color:#fca5a5;border-color:rgba(248,113,113,0.4)}
+.chip.dmg.active{background:rgba(251,191,36,0.15);color:#fcd34d;border-color:rgba(251,191,36,0.4)}
+
+/* Items */
+.list{padding:12px}
+.item{background:#111;border:1px solid #1f1f1f;border-radius:10px;margin-bottom:8px;display:flex;gap:12px;padding:12px;transition:opacity 0.2s,border-color 0.2s}
+.item.delivered{opacity:0.55}
+.item.delivered{border-color:rgba(16,185,129,0.35)}
+.item.missing{border-color:rgba(248,113,113,0.5);background:#1a0f0f}
+.item.damaged{border-color:rgba(251,191,36,0.5);background:#1a160c}
+
+.thumb{width:80px;height:80px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1f1f1f;display:flex;align-items:center;justify-content:center;color:#525252;font-size:11px;cursor:pointer;border:1px solid #2a2a2a}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+.body{flex:1;min-width:0}
+.body-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:4px}
+.num{background:#1f1f1f;color:#10b981;font-weight:700;font-size:13px;padding:3px 8px;border-radius:6px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.desc{font-size:14px;font-weight:600;color:#f4f4f5;flex:1;min-width:0;word-break:break-word}
+.meta{font-size:11px;color:#6b7280;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.meta span{display:inline-flex;align-items:center;gap:3px}
+.meta b{color:#9ca3af;font-weight:600}
+.note{font-size:12px;color:#fbbf24;background:rgba(251,191,36,0.08);border-left:2px solid rgba(251,191,36,0.5);padding:4px 8px;border-radius:0 4px 4px 0;margin-bottom:6px}
+.usernote{font-size:12px;color:#a3a3a3;background:#1a1a1a;padding:4px 8px;border-radius:4px;margin-bottom:6px;font-style:italic}
+
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.act{background:#1f1f1f;color:#9ca3af;border:1px solid #2a2a2a;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;flex:1;min-width:60px}
+.act:hover{background:#2a2a2a}
+.act.delivered{background:rgba(16,185,129,0.18);color:#10b981;border-color:rgba(16,185,129,0.5)}
+.act.missing{background:rgba(248,113,113,0.18);color:#fca5a5;border-color:rgba(248,113,113,0.5)}
+.act.damaged{background:rgba(251,191,36,0.18);color:#fcd34d;border-color:rgba(251,191,36,0.5)}
+.act.notebtn{background:#1f1f1f;color:#9ca3af;border-color:#2a2a2a;flex:0;padding:6px 8px}
+.act.notebtn.has{color:#a3a3a3;background:#262626}
+
+/* Lightbox */
+.lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;padding:20px;flex-direction:column;gap:12px}
+.lb.show{display:flex}
+.lb img{max-width:100%;max-height:80vh;border-radius:8px}
+.lb-cap{color:#e4e4e7;font-size:14px;text-align:center;max-width:600px}
+.lb-cap b{color:#10b981}
+.lb-close{position:absolute;top:14px;right:14px;background:#1f1f1f;color:#e4e4e7;border:1px solid #2a2a2a;border-radius:6px;width:36px;height:36px;font-size:18px}
+
+/* Note modal */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:20px;max-width:500px;width:100%}
+.modal-card h3{font-size:16px;margin-bottom:10px;color:#10b981}
+.modal-card textarea{width:100%;min-height:120px;background:#0a0a0a;border:1px solid #2a2a2a;color:#e4e4e7;padding:10px;border-radius:6px;font-family:inherit;font-size:14px;resize:vertical;outline:none}
+.modal-card textarea:focus{border-color:#10b981}
+.modal-actions{display:flex;gap:8px;margin-top:12px}
+.modal-actions button{flex:1;padding:10px;border-radius:6px;font-size:14px;font-weight:600;border:0;background:#1f1f1f;color:#e4e4e7}
+.modal-actions button.primary{background:#10b981;color:#022c22}
+
+/* Empty state */
+.empty{padding:40px 20px;text-align:center;color:#6b7280;font-size:13px}
+
+@media (max-width: 640px) {
+  .thumb{width:64px;height:64px}
+  .num{font-size:12px;padding:2px 6px}
+  .desc{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-row">
+    <div class="title">📦 Moving Checklist <small>order #100345695</small></div>
+    <div class="spacer"></div>
+    <button class="btn-sm" id="exportBtn">⬇ Export</button>
+    <button class="btn-sm danger" id="resetBtn">Reset</button>
+  </div>
+  <div class="progress"><div class="progress-fill" id="pf"></div></div>
+  <div class="stats">
+    <span class="stat-ok">✓ <b id="sOk">0</b> delivered</span>
+    <span class="stat-miss">✗ <b id="sMiss">0</b> missing</span>
+    <span class="stat-damage">⚠ <b id="sDmg">0</b> damaged</span>
+    <span>· <b id="sTotal">0</b> total</span>
+  </div>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search by item number, description, or note..." autocomplete="off">
+    <button class="btn-sm" id="qClear" style="display:none">×</button>
+  </div>
+  <div class="chips">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="pending">Unchecked</button>
+    <button class="chip" data-filter="delivered">Delivered</button>
+    <button class="chip miss" data-filter="missing">Missing</button>
+    <button class="chip dmg" data-filter="damaged">Damaged</button>
+    <button class="chip" data-filter="hasimg">Has photo</button>
+    <button class="chip" data-filter="hasnote">Has note</button>
+  </div>
+</div>
+
+<div class="list" id="list"></div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb">
+  <button class="lb-close" id="lbClose">×</button>
+  <img id="lbImg" alt="">
+  <div class="lb-cap" id="lbCap"></div>
+</div>
+
+<!-- Note editor -->
+<div class="modal" id="noteModal">
+  <div class="modal-card">
+    <h3>Note for <span id="noteFor"></span></h3>
+    <textarea id="noteText" placeholder="e.g. left in garage, mirror cracked, missing pillow inside, picked up by separate truck..."></textarea>
+    <div class="modal-actions">
+      <button id="noteCancel">Cancel</button>
+      <button id="noteSave" class="primary">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const AUTH_KEY = 'moving_checklist_auth_2026';
+const STATE_KEY = 'moving_checklist_state_2026';
+if (sessionStorage.getItem(AUTH_KEY) !== '1') {
+  location.replace('../');
+}
+
+let ITEMS = [];
+let STATE = {}; // { itemNum: { status: 'delivered'|'missing'|'damaged'|null, note: '' } }
+let filter = 'all';
+let query = '';
+
+function loadState() {
+  try { STATE = JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); }
+  catch { STATE = {}; }
+}
+function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); }
+function getRow(n) { return STATE[n] || { status: null, note: '' }; }
+function setStatus(n, status) {
+  const cur = getRow(n);
+  // toggle off if clicking same status
+  STATE[n] = { ...cur, status: cur.status === status ? null : status };
+  saveState();
+  render();
+}
+function setNote(n, note) {
+  STATE[n] = { ...getRow(n), note: note.trim() };
+  saveState();
+  render();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function matchesFilter(item) {
+  const row = getRow(item.number);
+  if (filter === 'pending' && row.status) return false;
+  if (filter === 'delivered' && row.status !== 'delivered') return false;
+  if (filter === 'missing' && row.status !== 'missing') return false;
+  if (filter === 'damaged' && row.status !== 'damaged') return false;
+  if (filter === 'hasimg' && !item.image) return false;
+  if (filter === 'hasnote' && !row.note && !item.note) return false;
+  if (query) {
+    const q = query.toLowerCase();
+    const hay = `${item.number} ${item.description} ${item.note || ''} ${row.note || ''}`.toLowerCase();
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function render() {
+  // Stats
+  const counts = { ok: 0, miss: 0, dmg: 0, total: ITEMS.length };
+  for (const it of ITEMS) {
+    const s = getRow(it.number).status;
+    if (s === 'delivered') counts.ok++;
+    else if (s === 'missing') counts.miss++;
+    else if (s === 'damaged') counts.dmg++;
+  }
+  document.getElementById('sOk').textContent = counts.ok;
+  document.getElementById('sMiss').textContent = counts.miss;
+  document.getElementById('sDmg').textContent = counts.dmg;
+  document.getElementById('sTotal').textContent = counts.total;
+  const pct = counts.total ? Math.round((counts.ok / counts.total) * 100) : 0;
+  document.getElementById('pf').style.width = pct + '%';
+
+  const list = document.getElementById('list');
+  const filtered = ITEMS.filter(matchesFilter);
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty">No items match the current filter.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(it => {
+    const row = getRow(it.number);
+    const itemCls = row.status ? row.status : '';
+    const thumbHtml = it.image
+      ? `<img src="img/${it.image}" alt="Item ${it.number}" loading="lazy">`
+      : '<span>No photo</span>';
+    const noteFromMover = it.note
+      ? `<div class="note">📋 ${escapeHtml(it.note)}</div>`
+      : '';
+    const userNote = row.note
+      ? `<div class="usernote">📝 ${escapeHtml(row.note)}</div>`
+      : '';
+    const blnkt = it.blnkt ? `<span>🧵 <b>${it.blnkt}</b> blankets</span>` : '';
+    const qty = it.qty && it.qty > 1 ? `<span>× <b>${it.qty}</b></span>` : '';
+    return `
+<div class="item ${itemCls}" data-n="${it.number}">
+  <div class="thumb" data-img="${it.image || ''}" data-num="${it.number}" data-desc="${escapeHtml(it.description)}">${thumbHtml}</div>
+  <div class="body">
+    <div class="body-top">
+      <span class="num">#${it.number}</span>
+      <span class="desc">${escapeHtml(it.description)}</span>
+    </div>
+    <div class="meta">${qty}${blnkt}</div>
+    ${noteFromMover}
+    ${userNote}
+    <div class="actions">
+      <button class="act ${row.status === 'delivered' ? 'delivered' : ''}" data-act="delivered" data-num="${it.number}">✓ Delivered</button>
+      <button class="act ${row.status === 'missing' ? 'missing' : ''}" data-act="missing" data-num="${it.number}">✗ Missing</button>
+      <button class="act ${row.status === 'damaged' ? 'damaged' : ''}" data-act="damaged" data-num="${it.number}">⚠ Damaged</button>
+      <button class="act notebtn ${row.note ? 'has' : ''}" data-act="note" data-num="${it.number}">📝</button>
+    </div>
+  </div>
+</div>`;
+  }).join('');
+}
+
+function exportCsv() {
+  const rows = [['Item #', 'Description', 'Status', 'Mover Note', 'My Note', 'Blankets', 'Qty']];
+  for (const it of ITEMS) {
+    const row = getRow(it.number);
+    rows.push([
+      it.number,
+      it.description,
+      row.status || 'unchecked',
+      it.note || '',
+      row.note || '',
+      it.blnkt || '',
+      it.qty || ''
+    ]);
+  }
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `moving-checklist-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+async function init() {
+  const res = await fetch('items.json');
+  const items = await res.json();
+  // Load image mapping
+  const imgRes = await fetch('img/image-mapping.json');
+  const imgMap = await imgRes.json();
+  ITEMS = items.map(it => ({
+    ...it,
+    image: imgMap[it.number] || null,
+  }));
+  loadState();
+  render();
+}
+init();
+
+// Event delegation
+document.getElementById('list').addEventListener('click', e => {
+  const actBtn = e.target.closest('[data-act]');
+  if (actBtn) {
+    const n = Number(actBtn.dataset.num);
+    const act = actBtn.dataset.act;
+    if (act === 'note') {
+      openNoteModal(n);
+    } else {
+      setStatus(n, act);
+    }
+    return;
+  }
+  const thumb = e.target.closest('.thumb');
+  if (thumb && thumb.dataset.img) {
+    document.getElementById('lbImg').src = `img/${thumb.dataset.img}`;
+    document.getElementById('lbCap').innerHTML = `<b>#${thumb.dataset.num}</b> · ${escapeHtml(thumb.dataset.desc)}`;
+    document.getElementById('lb').classList.add('show');
+  }
+});
+document.querySelectorAll('.chip').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    filter = b.dataset.filter;
+    render();
+  });
+});
+const qInput = document.getElementById('q');
+qInput.addEventListener('input', () => {
+  query = qInput.value.trim();
+  document.getElementById('qClear').style.display = query ? 'inline-block' : 'none';
+  render();
+});
+document.getElementById('qClear').addEventListener('click', () => {
+  qInput.value = '';
+  query = '';
+  document.getElementById('qClear').style.display = 'none';
+  render();
+});
+document.getElementById('exportBtn').addEventListener('click', exportCsv);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Reset all check marks + notes? This wipes the local data only.')) {
+    STATE = {}; saveState(); render();
+  }
+});
+
+// Lightbox
+document.getElementById('lbClose').addEventListener('click', () => document.getElementById('lb').classList.remove('show'));
+document.getElementById('lb').addEventListener('click', e => {
+  if (e.target.id === 'lb') document.getElementById('lb').classList.remove('show');
+});
+
+// Note modal
+let noteTarget = null;
+function openNoteModal(n) {
+  noteTarget = n;
+  const it = ITEMS.find(x => x.number === n);
+  document.getElementById('noteFor').textContent = `#${n} · ${it.description}`;
+  document.getElementById('noteText').value = getRow(n).note || '';
+  document.getElementById('noteModal').classList.add('show');
+  setTimeout(() => document.getElementById('noteText').focus(), 50);
+}
+document.getElementById('noteCancel').addEventListener('click', () => {
+  document.getElementById('noteModal').classList.remove('show');
+});
+document.getElementById('noteSave').addEventListener('click', () => {
+  if (noteTarget != null) setNote(noteTarget, document.getElementById('noteText').value);
+  document.getElementById('noteModal').classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('lb').classList.remove('show');
+    document.getElementById('noteModal').classList.remove('show');
+  }
+});
+</script>
+</body>
+</html>
