@@ -30,6 +30,7 @@
     { "path": "/api/data/sync-huggingface",         "schedule": "0 7 * * *" },
     { "path": "/api/seo/cron-indexnow-sweep",       "schedule": "0 3 * * 0" },
     { "path": "/api/seo/cron-sitemap-diff",         "schedule": "0 */6 * * *" },
+    { "path": "/api/seo/cron-route-canary",         "schedule": "*/15 * * * *" },
     { "path": "/api/seo/cron-health-check",         "schedule": "0 12 * * *" },
     { "path": "/api/seo/cron-keep-warm",            "schedule": "* * * * *" },
     { "path": "/api/ag2020/autodial-cron",          "schedule": "*/15 * * * *" },
