@@ -36,27 +36,17 @@ async function lookupExact(fromPath: string): Promise<{ to: string; status: numb
   }
 }
 
-// Smart fallback rules — auto-derive a redirect target without a DB row
-// for patterns we know belong to extinct sub-paths. Conservative — we only
-// route to safer parent pages, never invent new slug-level routes.
-const SMART_FALLBACK_RULES: Array<{ pattern: RegExp; target: (m: RegExpMatchArray) => string }> = [
-  // /sports/<league>/<year>/<slug>  →  /sports/<league>/<year>
-  { pattern: /^\/sports\/([^/]+)\/(20\d{2})\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/${m[2]}` },
-  // /sports/<league>/players/<slug>  →  /sports/<league>/players
-  { pattern: /^\/sports\/([^/]+)\/players\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/players` },
-  // /sports/<league>/teams/<slug>    →  /sports/<league>/teams
-  { pattern: /^\/sports\/([^/]+)\/teams\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/teams` },
-  // /sports/<league>/event/<id>      →  /sports/<league> (deprecated event-id route)
-  { pattern: /^\/sports\/([^/]+)\/event\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}` },
-  // /golf/<year>/<slug>              →  /golf/<year>
-  { pattern: /^\/golf\/(20\d{2})\/[^/]+\/?$/, target: (m) => `/golf/${m[1]}` },
-];
-
-function smartFallback(fromPath: string): string | null {
-  for (const { pattern, target } of SMART_FALLBACK_RULES) {
-    const m = fromPath.match(pattern);
-    if (m) return target(m);
-  }
+// Smart pattern fallback is DISABLED. Earlier version hijacked every live
+// /sports/<league>/<year>/<slug>, /golf/<year>/<slug>, /sports/<league>/
+// players/<slug>, /teams/<slug>, /event/<id> URL → 301 to parent. Catastrophic
+// for SEO + UX because we have valid live routes at all those shapes.
+//
+// We can't know in middleware whether a route 404s without actually rendering
+// it, so any pattern-based "smart" rule risks killing live URLs. The DB-backed
+// exact-match table (sb_url_redirects) handles known-dead URLs explicitly,
+// which is the correct surface for this. The sitemap-diff cron registers
+// exact redirects (also fine), not patterns.
+function smartFallback(_fromPath: string): string | null {
   return null;
 }
 

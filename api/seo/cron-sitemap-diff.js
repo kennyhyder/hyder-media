@@ -28,15 +28,12 @@ function checkAuth(req) {
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 
-// Same smart-fallback rules as the middleware. Kept in sync deliberately.
-const FALLBACK_RULES = [
-  { pattern: /^\/sports\/([^/]+)\/(20\d{2})\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/${m[2]}` },
-  { pattern: /^\/sports\/([^/]+)\/players\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/players` },
-  { pattern: /^\/sports\/([^/]+)\/teams\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}/teams` },
-  { pattern: /^\/sports\/([^/]+)\/event\/[^/]+\/?$/, target: (m) => `/sports/${m[1]}` },
-  { pattern: /^\/golf\/(20\d{2})\/[^/]+\/?$/, target: (m) => `/golf/${m[1]}` },
-  { pattern: /^\/sports\/([^/]+)\/?$/, target: (m) => `/sports/${m[1]}` },   // league hub itself shouldn't 404
-];
+// Conservative fallback rules only. The previous version included
+// /sports/<league>/<year>/<slug> → /sports/<league>/<year> and
+// /golf/<year>/<slug> → /golf/<year>, both of which described LIVE
+// routes (event detail, tournament detail) and registered redirects
+// that hijacked live pages. Removed.
+const FALLBACK_RULES = [];
 
 function fallbackTarget(path) {
   for (const { pattern, target } of FALLBACK_RULES) {

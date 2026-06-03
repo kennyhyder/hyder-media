@@ -102,10 +102,14 @@ export default async function handler(req, res) {
   const summary = { scanned: 0, archived: 0, errors: [] };
   const now = Date.now();
 
+  // Includes BOTH 'open' and 'upcoming' — Kalshi-ingested tournaments never
+  // transition from upcoming → open in our pipeline, so filtering to open
+  // alone left a backlog of past-end_date 'upcoming' tournaments stuck on
+  // /golf forever.
   const { data: tournaments } = await supabase
     .from("golfodds_tournaments")
     .select("id, tour, name, short_name, season_year, start_date, end_date, course_name, location, is_major, kalshi_event_ticker, dg_event_id, status, slug")
-    .eq("status", "open")
+    .in("status", ["open", "upcoming"])
     .not("end_date", "is", null);
   summary.scanned = tournaments?.length || 0;
 
