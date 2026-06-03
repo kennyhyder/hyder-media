@@ -131,17 +131,19 @@ async function checkTablesExist(supabase) {
     .then(() => ({ data: null, error: { message: "no rpc" } }))
     .catch(() => ({ data: null, error: { message: "no rpc" } }));
 
-  // Per-table fallback (this is the default path — we don't have a generic
-  // exec_sql RPC and don't want to add one for this single check).
+  // Per-table existence check. Use select('*').limit(0) — returns no rows
+  // but successfully type-checks if the table exists. Independent of
+  // primary-key shape (some tables use composite keys, no 'id' column).
+  //
+  // 42P01 ("relation does not exist") is the ONLY error code that means
+  // the table is missing. Other errors (RLS, timeout, network) are
+  // transient and count as present-but-unverified.
   for (const table of CRITICAL_TABLES) {
-    const { error } = await supabase.from(table).select("id").limit(1);
+    const { error } = await supabase.from(table).select("*").limit(0);
     if (error) {
-      if (error.code === "42P01" || /does not exist/i.test(error.message || "")) {
+      if (error.code === "42P01" || /relation .* does not exist/i.test(error.message || "")) {
         failures.push({ kind: "table_missing", table, error: error.message });
       } else {
-        // Could be missing 'id' column (some tables use composite keys),
-        // RLS, or a transient query timeout. None of these mean the table
-        // is gone, so we count them as present-but-unverified.
         transient.push({ table, error: error.message });
         present.push(table);
       }
