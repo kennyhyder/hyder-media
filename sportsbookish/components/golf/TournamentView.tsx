@@ -187,11 +187,13 @@ export default async function TournamentView({
                 player: r.player,
                 kalshi: r.kalshi ? { implied_prob: r.kalshi.implied_prob } : null,
                 datagolf: r.datagolf ? { dg_prob: r.datagolf.dg_prob } : null,
+                polymarket: r.polymarket ? { implied_prob: r.polymarket.implied_prob, volume_usd: r.polymarket.volume_usd } : null,
                 books_median: r.books_median,
                 books_min: r.books_min,
                 book_count: r.book_count,
                 edge_vs_books_median: r.edge_vs_books_median,
                 edge_vs_dg: r.edge_vs_dg,
+                edge_vs_polymarket: r.edge_vs_polymarket,
                 edge_vs_best_book: r.edge_vs_best_book,
                 best_book_for_bet: r.best_book_for_bet,
                 book_prices: Object.fromEntries(

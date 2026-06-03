@@ -235,6 +235,7 @@ export interface PlayerComparisonRow {
   market_type: string;
   kalshi: { implied_prob: number | null; yes_bid: number | null; yes_ask: number | null; last_price: number | null } | null;
   datagolf: { dg_prob: number | null; dg_fit_prob: number | null } | null;
+  polymarket: { implied_prob: number | null; yes_price: number | null; no_price: number | null; volume_usd: number | null } | null;
   book_prices: Record<string, { american: number | null; decimal: number | null; implied: number | null; novig: number | null }>;
   book_count: number;
   books_median: number | null;
@@ -244,6 +245,7 @@ export interface PlayerComparisonRow {
   edge_vs_books_median: number | null;
   edge_vs_best_book: number | null;
   edge_vs_dg: number | null;
+  edge_vs_polymarket: number | null;
 }
 
 export interface ComparisonResponse {

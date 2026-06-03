@@ -39,6 +39,8 @@ const FRESHNESS_TARGETS = [
   { table: "golfodds_dg_latest", column: "fetched_at", label: "Golf DataGolf model", cron_minutes: 10, stale_after_minutes: 40 },
   // Golf — sportsbooks (via DataGolf)
   { table: "golfodds_book_latest", column: "fetched_at", label: "Golf book quotes", cron_minutes: 10, stale_after_minutes: 40 },
+  // Golf — Polymarket
+  { table: "golfodds_polymarket_latest", column: "fetched_at", label: "Golf Polymarket quotes", cron_minutes: 15, stale_after_minutes: 60 },
   // Sports alerts (movement detector)
   { table: "sports_alerts", column: "fired_at", label: "Sports movement alerts", cron_minutes: 5, stale_after_minutes: 60 /* alerts are episodic, not constant */ },
 ];

@@ -79,14 +79,16 @@ export default async function handler(req, res) {
     // scans that were timing out at the Supabase pooler statement_timeout.
     // These tables stay in sync via AFTER INSERT triggers on the underlying
     // quote tables.
-    const [kalshiRows, dgRows, bookRows] = await Promise.all([
+    const [kalshiRows, dgRows, bookRows, polyRows] = await Promise.all([
       fetchAllIn(() => supabase.from("golfodds_kalshi_latest").select("market_id, implied_prob, yes_bid, yes_ask, last_price, fetched_at"), marketIds),
       fetchAllIn(() => supabase.from("golfodds_dg_latest").select("market_id, dg_prob, dg_fit_prob, fetched_at"), marketIds),
       fetchAllIn(() => supabase.from("golfodds_book_latest").select("market_id, book, price_american, price_decimal, implied_prob, novig_prob, fetched_at"), marketIds),
+      fetchAllIn(() => supabase.from("golfodds_polymarket_latest").select("market_id, yes_price, no_price, implied_prob, volume_usd, fetched_at"), marketIds),
     ]);
 
     const kalshiByMarket = new Map(kalshiRows.map((r) => [r.market_id, r]));
     const dgByMarket = new Map(dgRows.map((r) => [r.market_id, r]));
+    const polyByMarket = new Map(polyRows.map((r) => [r.market_id, r]));
     const booksByMarket = new Map();
     const bookSet = new Set();
     for (const r of bookRows) {
@@ -118,10 +120,13 @@ export default async function handler(req, res) {
     const players = markets.map((m) => {
       const k = kalshiByMarket.get(m.id);
       const dg = dgByMarket.get(m.id);
+      const poly = polyByMarket.get(m.id);
       let books = booksByMarket.get(m.id) || [];
-      // Drop DG/books quotes that haven't refreshed in the last 30 min
+      // Drop DG/books/Polymarket quotes that haven't refreshed in the last 30 min
       const dgStale = dg && isStale(dg.fetched_at);
       const dgEffective = dgStale ? null : dg;
+      const polyStale = poly && isStale(poly.fetched_at);
+      const polyEffective = polyStale ? null : poly;
       books = books.filter((b) => !isStale(b.fetched_at));
       const novigVals = books.map((b) => b.novig_prob).filter((p) => p != null);
       const booksMedian = median(novigVals);
@@ -163,6 +168,9 @@ export default async function handler(req, res) {
         kalshi: k ? { implied_prob: kalshiProb, yes_bid: k.yes_bid, yes_ask: k.yes_ask, last_price: k.last_price, fetched_at: k.fetched_at } : null,
         datagolf: dgEffective ? { dg_prob: dgEffective.dg_prob, dg_fit_prob: dgEffective.dg_fit_prob, fetched_at: dgEffective.fetched_at } : null,
         dg_stale: dgStale,
+        polymarket: polyEffective ? { implied_prob: polyEffective.implied_prob, yes_price: polyEffective.yes_price, no_price: polyEffective.no_price, volume_usd: polyEffective.volume_usd, fetched_at: polyEffective.fetched_at } : null,
+        polymarket_stale: polyStale,
+        edge_vs_polymarket: kalshiProb != null && polyEffective?.implied_prob != null ? Number((polyEffective.implied_prob - kalshiProb).toFixed(4)) : null,
         book_prices: bookMap,
         book_count: books.length,
         books_median: booksMedian,

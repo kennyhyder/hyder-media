@@ -11,11 +11,13 @@ interface Row {
   player: { id: string; name: string; slug?: string | null } | null;
   kalshi: { implied_prob: number | null } | null;
   datagolf: { dg_prob: number | null } | null;
+  polymarket: { implied_prob: number | null; volume_usd: number | null } | null;
   books_median: number | null;
   books_min: number | null;
   book_count: number;
   edge_vs_books_median: number | null;
   edge_vs_dg: number | null;
+  edge_vs_polymarket: number | null;
   edge_vs_best_book: number | null;
   best_book_for_bet: { book: string; novig_prob: number; price_american: number | null } | null;
   book_prices: Record<string, { american: number | null; novig: number | null }>;
@@ -34,9 +36,11 @@ type SortKey =
   | "name"
   | "kalshi"
   | "dg"
+  | "polymarket"
   | "books_median"
   | "user_edge"
   | "edge_vs_dg"
+  | "edge_vs_polymarket"
   | "edge_vs_best_book"
   | "book_count"
   | `book:${string}`;
@@ -65,9 +69,11 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
       if (key === "name") return r.player?.name || "";
       if (key === "kalshi") return r.kalshi?.implied_prob ?? null;
       if (key === "dg") return r.datagolf?.dg_prob ?? null;
+      if (key === "polymarket") return r.polymarket?.implied_prob ?? null;
       if (key === "books_median") return r.books_median;
       if (key === "user_edge") return r.user_edge;
       if (key === "edge_vs_dg") return r.edge_vs_dg;
+      if (key === "edge_vs_polymarket") return r.edge_vs_polymarket;
       if (key === "edge_vs_best_book") return r.edge_vs_best_book;
       if (key === "book_count") return r.book_count;
       if (key.startsWith("book:")) {
@@ -95,9 +101,11 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
           <SortHead k="name" current={sort} onClick={toggle} align="left">Player</SortHead>
           <SortHead k="kalshi" current={sort} onClick={toggle}><span className="text-amber-500">Kalshi</span></SortHead>
           <SortHead k="dg" current={sort} onClick={toggle}><span className="text-sky-500">DG</span></SortHead>
+          <SortHead k="polymarket" current={sort} onClick={toggle}><span className="text-fuchsia-500">Poly</span></SortHead>
           <SortHead k="books_median" current={sort} onClick={toggle}>Books med</SortHead>
           <SortHead k="user_edge" current={sort} onClick={toggle}>Buy edge</SortHead>
           <SortHead k="edge_vs_dg" current={sort} onClick={toggle}>vs DG</SortHead>
+          <SortHead k="edge_vs_polymarket" current={sort} onClick={toggle}>vs Poly</SortHead>
           <SortHead k="edge_vs_best_book" current={sort} onClick={toggle}>vs best book</SortHead>
           <SortHead k="book_count" current={sort} onClick={toggle}>#</SortHead>
           {books.map((b) => (
@@ -111,6 +119,7 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
         {sorted.map((r) => {
           const userEdge = r.user_edge;
           const dgEdge = r.edge_vs_dg;
+          const polyEdge = r.edge_vs_polymarket;
           const bestEdge = r.edge_vs_best_book;
           return (
             <TableRow key={r.player_id}>
@@ -135,9 +144,11 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
               </TableCell>
               <TableCell className="text-right tabular-nums text-amber-500">{fmtPct(r.kalshi?.implied_prob)}</TableCell>
               <TableCell className="text-right tabular-nums text-sky-500">{fmtPct(r.datagolf?.dg_prob)}</TableCell>
+              <TableCell className="text-right tabular-nums text-fuchsia-500">{fmtPct(r.polymarket?.implied_prob)}</TableCell>
               <TableCell className="text-right tabular-nums">{fmtPct(r.books_median)}</TableCell>
               <TableCell className={`text-right tabular-nums ${edgeTextClass(userEdge)} ${edgeBgClass(userEdge)}`}>{fmtPctSigned(userEdge)}</TableCell>
               <TableCell className={`text-right tabular-nums ${edgeTextClass(dgEdge)}`}>{fmtPctSigned(dgEdge)}</TableCell>
+              <TableCell className={`text-right tabular-nums ${edgeTextClass(polyEdge)}`}>{fmtPctSigned(polyEdge)}</TableCell>
               <TableCell className={`text-right tabular-nums ${edgeTextClass(bestEdge)}`}>
                 {fmtPctSigned(bestEdge)}
                 {r.best_book_for_bet && (
@@ -166,7 +177,7 @@ export default function OutrightTable({ tournamentId, rows, books, isPaidTier }:
         })}
         {sorted.length === 0 && (
           <TableRow>
-            <TableCell colSpan={books.length + 8} className="text-center py-8 text-muted-foreground">
+            <TableCell colSpan={books.length + 10} className="text-center py-8 text-muted-foreground">
               No data for this market type. Kalshi T5/T10/T20 coverage is inconsistent outside majors.
             </TableCell>
           </TableRow>
