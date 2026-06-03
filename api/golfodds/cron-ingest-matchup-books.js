@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { resolveTournament } from "./_tournament_resolver.js";
 import { americanToDecimal, decimalToImplied, devigProbs } from "../_platform/odds.js";
+import { normalizeName } from "../_platform/names.js";
 
 // DataGolf matchup-book ingester.
 //
@@ -36,8 +37,6 @@ function checkAuth(req) {
   if (!process.env.CRON_SECRET) return true;
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
-
-const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
 
 function canonicalPlayerName(raw) {
   if (!raw || typeof raw !== "string") return "";

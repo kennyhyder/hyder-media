@@ -195,7 +195,7 @@ export function checkAuth(req) {
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 
-export const normalizeName = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+export { normalizeName } from "../_platform/names.js";
 
 // URL-safe slug for SEO permalinks. Mirrors the sb_slugify() Postgres function
 // so cron writes and DB backfill produce identical slugs.

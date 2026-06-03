@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { resolveTournament } from "./_tournament_resolver.js";
+import { normalizeNameUnicode as normalizeName } from "../_platform/names.js";
 
 // Polymarket golf ingester. Mirrors the sports ingester pattern but
 // targets golf-tagged events and resolves each player market against
@@ -34,15 +35,6 @@ function checkAuth(req) {
   if (req.query?.secret === process.env.CRON_SECRET) return true;
   return false;
 }
-
-const normalizeName = (s) =>
-  (s || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9 ]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 
 // Pull the tournament name out of the Polymarket event title.
 // "PGA Tour: the Memorial Tournament presented by Workday Winner" → strip prefix + suffix.

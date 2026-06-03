@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { normalizeName } from "../_platform/names.js";
 
 const KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2";
 
@@ -28,8 +29,6 @@ function checkAuth(req) {
   if (!process.env.CRON_SECRET) return true;
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
-
-const normalizeName = (s) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
 function slugifyKalshi(s) {
   if (!s) return null;

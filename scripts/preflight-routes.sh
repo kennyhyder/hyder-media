@@ -59,8 +59,14 @@ else
     -H "apikey: ${SK}" -H "Authorization: Bearer ${SK}")
   echo "$events" | python3 -c "
 import sys, json
-for e in json.load(sys.stdin):
-    if e.get('slug') and e.get('season_year'):
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+if not isinstance(data, list):
+    sys.exit(0)
+for e in data:
+    if isinstance(e, dict) and e.get('slug') and e.get('season_year') and e.get('league'):
         print(f'/sports/{e[\"league\"]}/{e[\"season_year\"]}/{e[\"slug\"]}')
 " | while read url; do
     code=$(curl -s -o /dev/null -w "%{http_code}" --max-redirs 0 "${BASE}${url}")
