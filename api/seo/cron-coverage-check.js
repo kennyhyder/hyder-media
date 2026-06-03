@@ -1,6 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
-import { readFile, readdir, stat } from "node:fs/promises";
+import { stat } from "node:fs/promises";
 import path from "node:path";
+// Import vercel.json directly so Vercel's bundler includes it in the
+// function's deployed artifact. Reading from disk via process.cwd() does
+// not work because vercel.json is NOT in /var/task on Vercel — only files
+// explicitly imported (or in node_modules) ship with the function.
+import vercelConfig from "../../vercel.json" with { type: "json" };
 
 // Cron + schema coverage canary. Runs hourly.
 //
@@ -78,24 +83,18 @@ function checkAuth(req) {
 // ── Check 1: cron schedules ↔ files ─────────────────────────────────────────
 
 async function checkCronCoverage() {
-  // On Vercel, the deployed bundle includes vercel.json in the root of the
-  // function's filesystem. Locally we read from REPO_ROOT.
+  // vercel.json is bundled into this function via the JSON import at top.
+  // The cron file lookup uses REPO_ROOT (process.cwd or LAMBDA_TASK_ROOT) —
+  // on Vercel that's /var/task and api/ files ARE bundled there as Vercel
+  // includes the parent directory of every function in the deployment.
   const failures = [];
   const checked = { scheduled: 0, files_referenced: 0 };
-  let vercel;
-  try {
-    const raw = await readFile(path.join(REPO_ROOT, "vercel.json"), "utf8");
-    vercel = JSON.parse(raw);
-  } catch (e) {
-    return { ok: false, failures: [{ kind: "vercel_json", error: e.message }], checked };
-  }
 
-  const crons = vercel.crons || [];
+  const crons = vercelConfig?.crons || [];
   checked.scheduled = crons.length;
 
   for (const c of crons) {
     if (!c.path) continue;
-    // Translate "/api/foo/bar" → "api/foo/bar.js"
     const rel = c.path.replace(/^\//, "") + ".js";
     const abs = path.join(REPO_ROOT, rel);
     try {
