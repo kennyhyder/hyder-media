@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { bucketBookPriceMap, bucketBookEntries } from "../sports/_book_classification.js";
+import { bucketBookPriceMap, bucketBookEntries, isRegulatedUS } from "../sports/_book_classification.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -92,7 +92,11 @@ export default async function handler(req, res) {
     for (const r of bookRows) {
       if (!booksByMarket.has(r.market_id)) booksByMarket.set(r.market_id, []);
       booksByMarket.get(r.market_id).push(r);
-      bookSet.add(r.book);
+      // Track BUCKETED keys (regulated names + at most one "other"), not
+      // raw quote keys. Same bug class as the May events.js fix: tracking
+      // raw offshore names made each offshore book render its own "Other"
+      // column in the UI because every key bookLabel()s to "Other".
+      bookSet.add(isRegulatedUS(r.book) ? r.book : "other");
     }
     const allBooks = Array.from(bookSet).sort();
 
