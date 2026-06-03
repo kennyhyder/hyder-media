@@ -1,10 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { stat } from "node:fs/promises";
-import path from "node:path";
-// Import vercel.json directly so Vercel's bundler includes it in the
-// function's deployed artifact. Reading from disk via process.cwd() does
-// not work because vercel.json is NOT in /var/task on Vercel — only files
-// explicitly imported (or in node_modules) ship with the function.
+// Bundle vercel.json into this function so we can read scheduled crons at
+// runtime — Vercel doesn't include vercel.json in /var/task by default.
 import vercelConfig from "../../vercel.json" with { type: "json" };
 
 // Cron + schema coverage canary. Runs hourly.
@@ -40,7 +36,7 @@ import vercelConfig from "../../vercel.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
 
-const REPO_ROOT = process.env.LAMBDA_TASK_ROOT || process.cwd();
+const SITE = "https://hyder.me";
 const ALERT_TO = "kenny@hyder.me";
 
 // Critical tables. If any of these go missing, alert immediately — the
@@ -83,27 +79,41 @@ function checkAuth(req) {
 // ── Check 1: cron schedules ↔ files ─────────────────────────────────────────
 
 async function checkCronCoverage() {
-  // vercel.json is bundled into this function via the JSON import at top.
-  // The cron file lookup uses REPO_ROOT (process.cwd or LAMBDA_TASK_ROOT) —
-  // on Vercel that's /var/task and api/ files ARE bundled there as Vercel
-  // includes the parent directory of every function in the deployment.
+  // For every scheduled cron, HEAD its URL. A 404 means the schedule
+  // points at a function that isn't actually deployed (typo in vercel.json,
+  // or file was renamed/deleted without updating the schedule). A 401 is
+  // expected (we don't pass CRON_SECRET) and indicates the function IS
+  // deployed and reachable. We treat anything other than 404 / 5xx as OK.
+  //
+  // We can't use the filesystem here: each Vercel serverless function gets
+  // its own isolated bundle in /var/task, so sibling api/ files aren't
+  // present at runtime. Calling the URL is the most accurate way to verify
+  // the deployed surface.
   const failures = [];
-  const checked = { scheduled: 0, files_referenced: 0 };
-
+  const checked = { scheduled: 0, urls_probed: 0, urls_404: 0, urls_5xx: 0 };
   const crons = vercelConfig?.crons || [];
   checked.scheduled = crons.length;
 
-  for (const c of crons) {
-    if (!c.path) continue;
-    const rel = c.path.replace(/^\//, "") + ".js";
-    const abs = path.join(REPO_ROOT, rel);
+  await Promise.all(crons.map(async (c) => {
+    if (!c.path) return;
+    checked.urls_probed++;
     try {
-      await stat(abs);
-      checked.files_referenced++;
-    } catch {
-      failures.push({ kind: "schedule_without_file", path: c.path, expected_file: rel });
+      const r = await fetch(`${SITE}${c.path}`, {
+        method: "GET",
+        redirect: "manual",
+        headers: { "User-Agent": "sportsbookish-coverage-check/1.0" },
+      });
+      if (r.status === 404) {
+        checked.urls_404++;
+        failures.push({ kind: "schedule_404", path: c.path, status: r.status });
+      } else if (r.status >= 500) {
+        checked.urls_5xx++;
+        failures.push({ kind: "schedule_5xx", path: c.path, status: r.status });
+      }
+    } catch (e) {
+      failures.push({ kind: "schedule_unreachable", path: c.path, error: e.message });
     }
-  }
+  }));
 
   return { ok: failures.length === 0, failures, checked };
 }
