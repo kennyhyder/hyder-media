@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { resolveTournament } from "./_tournament_resolver.js";
 
 const DG_BASE = "https://feeds.datagolf.com";
 
@@ -64,22 +65,12 @@ async function ingestMarket(supabase, dgMarket, marketType) {
   const players = Array.isArray(payload.odds) ? payload.odds.filter((p) => p && typeof p === "object" && p.player_name) : [];
   if (!players.length) return { book: 0, model: 0, skipped: typeof payload.odds === "string" ? `DG: ${payload.odds.slice(0, 80)}` : "no players" };
 
-  // Find tournament by name (DG name matches our canonical "PGA Championship" etc.)
-  const { data: tdata } = await supabase
-    .from("golfodds_tournaments")
-    .select("id")
-    .eq("name", eventName)
-    .maybeSingle();
-  let tournamentId = tdata?.id;
-  if (!tournamentId) {
-    const { data, error } = await supabase
-      .from("golfodds_tournaments")
-      .insert({ tour: "pga", name: eventName, status: "upcoming" })
-      .select("id")
-      .single();
-    if (error) throw new Error(`create tournament: ${error.message}`);
-    tournamentId = data.id;
-  }
+  // Resolve via shared name-resolver so sponsor-laden DG names route
+  // to the canonical Kalshi tournament instead of creating duplicate
+  // orphan rows. See _tournament_resolver.js.
+  const resolved = await resolveTournament(supabase, eventName, { allowCreate: true });
+  if (!resolved.id) throw new Error(`resolve tournament: ${resolved.reason}`);
+  const tournamentId = resolved.id;
 
   // Players (canonical names)
   const playerMap = new Map();

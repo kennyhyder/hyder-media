@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { resolveTournament } from "./_tournament_resolver.js";
 
 // DataGolf matchup-book ingester.
 //
@@ -95,17 +96,16 @@ async function ingestMarket(supabase, dgConfig) {
     return summary;
   }
 
-  // Look up tournament by name. If DG knows about the event but we don't yet,
-  // the kalshi ingester will create it next cycle — for now just skip.
-  const { data: tournament } = await supabase
-    .from("golfodds_tournaments")
-    .select("id")
-    .eq("name", eventName)
-    .maybeSingle();
-  if (!tournament?.id) {
-    summary.skipped = `tournament '${eventName}' not in DB yet`;
+  // Look up tournament via shared name-resolver. Don't auto-create
+  // here — matchups exist only when Kalshi has already seeded the
+  // tournament; if the resolver can't find it, the Kalshi ingester
+  // will create it next cycle.
+  const resolved = await resolveTournament(supabase, eventName, { allowCreate: false });
+  if (!resolved.id) {
+    summary.skipped = resolved.reason || `tournament '${eventName}' not in DB yet`;
     return summary;
   }
+  const tournament = { id: resolved.id };
 
   // Pull every existing Kalshi-driven matchup for this tournament + matchup_type
   // plus the players in each matchup. Build an index keyed by normalized
