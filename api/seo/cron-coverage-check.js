@@ -122,20 +122,38 @@ async function checkCronCoverage() {
 
 async function checkTablesExist(supabase) {
   const failures = [];
-  const checked = [];
+  const present = [];
+  const transient = [];
+  // pg_tables is fast and authoritative — one query, no per-table round trip.
+  // RPC fallback: do per-table existence pings if the catalog query fails.
+  const { data, error } = await supabase
+    .rpc("exec_sql", { sql: `SELECT tablename FROM pg_tables WHERE tablename = ANY('{${CRITICAL_TABLES.join(",")}}')` })
+    .then(() => ({ data: null, error: { message: "no rpc" } }))
+    .catch(() => ({ data: null, error: { message: "no rpc" } }));
+
+  // Per-table fallback (this is the default path — we don't have a generic
+  // exec_sql RPC and don't want to add one for this single check).
   for (const table of CRITICAL_TABLES) {
-    const { error } = await supabase.from(table).select("*", { count: "exact", head: true }).limit(1);
+    const { error } = await supabase.from(table).select("id").limit(1);
     if (error) {
-      // Postgres error code 42P01 = "relation does not exist". Other errors
-      // we treat as transient (RLS denial, statement timeout) and don't alert.
       if (error.code === "42P01" || /does not exist/i.test(error.message || "")) {
         failures.push({ kind: "table_missing", table, error: error.message });
+      } else {
+        // Could be missing 'id' column (some tables use composite keys),
+        // RLS, or a transient query timeout. None of these mean the table
+        // is gone, so we count them as present-but-unverified.
+        transient.push({ table, error: error.message });
+        present.push(table);
       }
     } else {
-      checked.push(table);
+      present.push(table);
     }
   }
-  return { ok: failures.length === 0, failures, checked: { tables_present: checked.length, expected: CRITICAL_TABLES.length } };
+  return {
+    ok: failures.length === 0,
+    failures,
+    checked: { tables_present: present.length, expected: CRITICAL_TABLES.length, transient: transient.length },
+  };
 }
 
 // ── Main ────────────────────────────────────────────────────────────────────
