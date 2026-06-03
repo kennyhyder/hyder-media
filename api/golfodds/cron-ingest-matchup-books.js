@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { resolveTournament } from "./_tournament_resolver.js";
+import { americanToDecimal, decimalToImplied, devigProbs } from "../_platform/odds.js";
 
 // DataGolf matchup-book ingester.
 //
@@ -56,15 +57,7 @@ function parseAmerican(v) {
   return Number.isFinite(n) ? n : null;
 }
 
-const americanToDecimal = (a) => (a == null ? null : a > 0 ? a / 100 + 1 : 100 / Math.abs(a) + 1);
-const decimalToImplied = (d) => (d ? 1 / d : null);
-
-function devig(probs) {
-  // De-vig a row of N probabilities so they sum to 1.
-  const total = probs.reduce((s, p) => s + (p || 0), 0);
-  if (!total) return probs.map(() => null);
-  return probs.map((p) => (p == null ? null : p / total));
-}
+// americanToDecimal, decimalToImplied, devigProbs imported from _platform/odds.js
 
 async function fetchDG(path, params = {}) {
   const url = new URL(`${DG_BASE}${path}`);
@@ -174,7 +167,7 @@ async function ingestMarket(supabase, dgConfig) {
       const americans = players.map((p) => parseAmerican(perBook[p.slot]));
       if (americans.every((a) => a == null)) continue;
       const rawProbs = americans.map((a) => decimalToImplied(americanToDecimal(a)));
-      const novigs = devig(rawProbs);
+      const novigs = devigProbs(rawProbs);
       players.forEach((p, idx) => {
         const am = americans[idx];
         if (am == null) return;

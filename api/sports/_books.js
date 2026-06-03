@@ -165,25 +165,10 @@ export function softLabelMatch(oddsName, kalshiLabel, league) {
   return false;
 }
 
-// Convert American odds → raw implied prob (no de-vig)
-export function americanToProb(american) {
-  if (american == null) return null;
-  const a = Number(american);
-  if (!Number.isFinite(a) || a === 0) return null;
-  if (a > 0) return 100 / (a + 100);
-  return -a / (-a + 100);
-}
-
-// De-vig a set of mutually-exclusive prices for one event/market/book.
-// outcomes: [{ name, prob_raw }, ...]
-export function devigOutcomes(outcomes) {
-  const sum = outcomes.reduce((s, o) => s + (o.prob_raw ?? 0), 0);
-  if (sum <= 0) return outcomes.map((o) => ({ ...o, prob_novig: null }));
-  return outcomes.map((o) => ({
-    ...o,
-    prob_novig: o.prob_raw != null ? Number((o.prob_raw / sum).toFixed(5)) : null,
-  }));
-}
+// americanToProb + devigOutcomes are defined in _platform/odds.js (shared
+// with golf). Re-exported here so existing imports from "../sports/_books.js"
+// keep working without an edit to every caller.
+export { americanToProb, devigOutcomes } from "../_platform/odds.js";
 
 // Throttled fetch w/ backoff + credit header capture
 export async function fetchOddsApi(path, params, attempt = 0) {

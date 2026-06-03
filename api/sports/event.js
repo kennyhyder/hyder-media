@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { bucketBookEntries } from "./_book_classification.js";
+import { STALE_THRESHOLD_MS } from "../_platform/constants.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -136,11 +137,11 @@ export default async function handler(req, res) {
         .eq("sports_event_id", id),
     ]);
 
-    // Drop any book or polymarket quote older than 30 min — books update
-    // live during games and our cron is 30 min, so anything beyond one
-    // cycle is likely stale (e.g. game ended, book closed market) and
-    // shouldn't drive an edge calculation against the moving Kalshi tick.
-    const STALE_THRESHOLD_MS = 30 * 60 * 1000;
+    // Drop any book or polymarket quote older than the shared staleness
+    // threshold (see _platform/constants.js). Books update live during
+    // games and our cron is 30 min, so anything beyond one cycle is
+    // likely stale and shouldn't drive an edge calculation against the
+    // moving Kalshi tick.
     const nowMs = Date.now();
     const fresh = (row) => !row?.fetched_at || (nowMs - new Date(row.fetched_at).getTime()) <= STALE_THRESHOLD_MS;
 

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { resolveTournament } from "./_tournament_resolver.js";
+import { americanToDecimal, decimalToImplied, devigToSum } from "../_platform/odds.js";
 
 const DG_BASE = "https://feeds.datagolf.com";
 
@@ -36,15 +37,7 @@ function parseAmerican(v) {
   return Number.isFinite(n) ? n : null;
 }
 
-const americanToDecimal = (a) => (a == null ? null : a > 0 ? a / 100 + 1 : 100 / Math.abs(a) + 1);
-const decimalToImplied = (d) => (d ? 1 / d : null);
-
-function devigField(rawProbs, expectedSum) {
-  const total = rawProbs.reduce((s, p) => s + (p || 0), 0);
-  if (!total) return rawProbs.map(() => null);
-  const scale = expectedSum / total;
-  return rawProbs.map((p) => (p == null ? null : p * scale));
-}
+// americanToDecimal, decimalToImplied, devigToSum imported from _platform/odds.js
 
 async function fetchDG(path, params = {}) {
   const url = new URL(`${DG_BASE}${path}`);
@@ -128,7 +121,7 @@ async function ingestMarket(supabase, dgMarket, marketType) {
   const novigByBook = {};
   for (const book of bookCols) {
     const raw = players.map((p) => decimalToImplied(americanToDecimal(parseAmerican(p[book]))));
-    novigByBook[book] = expectedSum != null ? devigField(raw, expectedSum) : raw;
+    novigByBook[book] = expectedSum != null ? devigToSum(raw, expectedSum) : raw;
   }
 
   // Build book quote rows + DG model rows

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { bucketBookPriceMap, bucketBookEntries, isRegulatedUS } from "../sports/_book_classification.js";
+import { STALE_THRESHOLD_MS } from "../_platform/constants.js";
 
 function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -102,15 +103,9 @@ export default async function handler(req, res) {
     }
     const allBooks = Array.from(bookSet).sort();
 
-    // Staleness threshold: absolute wall-clock age. Books DO update live
-    // during games (recreational books move on every score change), and our
-    // golf books cron runs every 10 min, sports books every 30 min. Anything
-    // older than 30 min is one missed cron cycle of grace — drop it.
-    //
-    // DataGolf closes some markets mid-event (make_cut after R2, r1lead after
-    // R1) and our cached snapshot sits unchanged for 12+ hours while Kalshi
-    // keeps moving — this filter catches that case AND any genuine cron lag.
-    const STALE_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+    // Staleness threshold lives in _platform/constants.js (shared with
+    // sports/event.js). Drops DG/books/Polymarket quotes whose wall-clock
+    // age exceeds one missed cron cycle of grace.
     const now = Date.now();
     const isStale = (refFetched) => {
       if (!refFetched) return false;
