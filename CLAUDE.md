@@ -63,6 +63,18 @@ Vercel serverless functions (Node.js)
 **Digistore24 API:** `/api/digistore/`
 - `keywords.js` - Keyword data endpoint
 
+**Cross-pipeline shared libs:** `/api/_platform/` (added 2026-06-03)
+- `odds.js` — americanToDecimal, decimalToImplied, americanToProb, devigProbs, devigToSum, devigOutcomes
+- `constants.js` — STALE_THRESHOLD_MS (30 min), isStaleQuote()
+- `names.js` — normalizeName (ASCII default — DB-keying convention), normalizeNameUnicode (NFD-stripped, for matching external sources like Polymarket)
+- **Rule:** Before copy-pasting odds math / constants / normalization between sports/ and golfodds/, add it here. Sports + golf had drifted into 3 independent copies of americanToDecimal and 5 of normalizeName before extraction. See `memory/api-platform-shared-libs.md`.
+
+**Three-canary observability:** `/api/seo/` (full system live 2026-06-03)
+- `cron-route-canary.js` (every 15 min) — every critical URL returns 200; alerts on 2nd-consecutive 4xx/5xx
+- `cron-data-freshness.js` (every 15 min) — every critical ingest table has had a write in the last cron-cycle×3; alerts on 2nd-consecutive stale
+- `cron-coverage-check.js` (hourly) — every scheduled cron URL is deployed (not 404/5xx) + every critical Postgres table exists; alerts on 2nd-consecutive same-kind drift
+- All three persist to `sb_route_health`, `sb_data_freshness_log`, `sb_coverage_log`. All alert via Resend to kenny@hyder.me. The trio caught a real bug on first deploy: `cron-data-freshness` was scheduled in vercel.json but the schedule entry never made it into the commit — the coverage canary surfaced it within an hour.
+
 **Current Issue:** Google Ads API returns 501 UNIMPLEMENTED error. See FOLLOWUP-NOTES.md for investigation status.
 - **Blocked since:** January 27, 2026
 - **What works:** OAuth flow, developer token (Basic Access), Google Cloud setup
@@ -1027,6 +1039,42 @@ See memory: [[playbook-product]] for distribution status, [[sportsbookish]] for 
 ---
 
 ## Recent Changes Log
+
+### 2026-06-02 → 2026-06-03 (Golf-parity + platform bulletproofing — 5-stage sprint)
+Multi-day audit triggered by "ALL OF GOLF IS BROKEN" incident. Five staged shipments, each verified live before moving on. Final commit: `dde2faff`.
+
+- **Stage 1** (commit `ceaf9d2f`) — Golf `/api/golfodds/comparison.js` book-key bucketing. The `allBooks` set was tracking RAW quote keys (bovada, mybookie, lowvig, betonline, betus), each of which the UI's `bookLabel()` renders as "Other" — so the table grew 5 separate Other columns. Now tracks BUCKETED keys (regulated names + at most one "other"). Same bug class as the May `sports/events.js` fix.
+
+- **Stage 2** (same commit) — `/api/seo/cron-data-freshness.js` ships. Every 15 min checks MAX(fetched_at) on 8 critical ingest tables (sports_quotes, sports_book_quotes, sports_polymarket_quotes, golfodds_kalshi_latest, golfodds_dg_latest, golfodds_book_latest, golfodds_polymarket_latest, sports_alerts). Alerts via Resend on 2nd consecutive stale. Schema: `sb_data_freshness_log`.
+
+- **Stage 3** (commit `e223f286`) — Golf Polymarket pipeline (full parity with sports/*).
+  - Schema: `golfodds_polymarket_quotes`, `golfodds_polymarket_latest` (trigger-maintained), `golfodds_polymarket_events_map`.
+  - `/api/golfodds/cron-ingest-polymarket.js`, every 15 min, `tag_slug=golf` filter (NOT `tag=golf` — that param does NOT filter on Polymarket).
+  - Reuses `_tournament_resolver.js` so sponsor-laden Polymarket titles ("PGA Tour: the Memorial Tournament presented by Workday Winner") route to canonical tournament rows.
+  - `comparison.js` returns `polymarket` + `edge_vs_polymarket` per player.
+  - `sportsbookish/components/OutrightTable.tsx` renders fuchsia-500 Poly column + "vs Poly" edge column.
+  - Memorial Tournament 2026 verified live: 68/77 player markets ingested. Scheffler Kalshi 21.5% vs Poly 22.5%.
+
+- **Stage 4** (commits `b3f741c5` + `a7dd2fe5`) — Extracted `/api/_platform/` with `odds.js`, `constants.js`, `names.js`. 3 copies of americanToDecimal and 5 copies of normalizeName collapsed to single source. Sports and golf had drifted; the audit caught the divergence pattern. Behavior-preserving (Scheffler edge identical pre/post). `sports/_books.js` + `sports/_lib.js` re-export shared symbols so existing callers don't change.
+
+- **Stage 5** (commits `97fc9ef5` → `dde2faff`, 5 iterations) — `/api/seo/cron-coverage-check.js` ships. Hourly check that (1) every vercel.json `crons[].path` URL is reachable (not 404/5xx) and (2) every critical Postgres table exists. Caught a real bug on first run: `cron-data-freshness` was scheduled-but-not-committed in Stage 2's vercel.json (Edit succeeded locally but the change didn't make it into the git commit). Schedule re-added retroactively. Schema: `sb_coverage_log`. Iteration cycle: stat() didn't work (Vercel functions have isolated bundles), JSON-import of vercel.json works, URL probing of cron paths works.
+
+**Net effect**: The hyder-media platform now runs three independent canaries that together catch every silent-failure class we've seen — route 4xx/5xx, ingest stalls, infrastructure drift. Golf has full Polymarket parity with sports. Pipeline divergence is largely fixed.
+
+See memory: [[api-platform-shared-libs]], [[golf-polymarket-integration]], [[session-2026-06-02-platform-bulletproofing]].
+
+### 2026-05-28 → 2026-05-29 (AutomateDojo enterprise-readiness sweep — 30 blocks)
+Overnight session shipped Blocks 31-60: full B2B-SaaS trust + compliance + customer-success + sales-enablement stack on AutomateDojo. Detailed list in `automatedojo/CLAUDE.md` (Enterprise-readiness sweep section) and `automatedojo/CHANGELOG.md` (nights 1-7). Highlights:
+
+- **Trust/compliance pages**: /sla, /price-lock, /subprocessors, /data-request (GDPR DSR), /how-we-sell, plus extended /security, /refund-policy. /llms.txt + /ai.txt for AI crawler discoverability.
+- **Customer surfaces**: /client/<slug>/{cancel (retention flow), team (multi-user invites), api-tokens (read-only Bearer), integrations/webhooks (HMAC-signed outbound)}. <OnboardingChecklist> + <AnnualUpgradeCard> embedded.
+- **Admin surfaces**: /admin/{customer-success, ab-experiments, nps, incidents, promo-codes, affiliates}.
+- **Sales enablement**: /demo/sandbox (read-only fake dojo), /case-studies (programmatic from testimonials), /changelog.rss, public REST endpoint GET /api/v1/leads.
+- **Migrations 040-052** applied to Supabase. **4 new crons** (stripe-reconcile nightly, dormant-reengagement weekly, nps-trigger daily, accrue-affiliate-commissions monthly).
+- **First A/B experiment live**: `pricing_setup_fee_framing` (control vs monthly_first).
+- **Reusable libs** (drop-in for SportsBookish / GolfOdds / etc): `lib/ab.ts`, `lib/api-tokens.ts`, `lib/customer-webhooks.ts`, `lib/affiliate-attribution.ts`, `lib/lead-abuse.ts`.
+
+See memory: [[automatedojo-enterprise-readiness-may2026]] for operator summary, [[saas-enterprise-readiness-patterns]] for the cross-project pattern library.
 
 ### 2026-05-22 (SportsBookISH optimizations + Playbook product)
 - **Futures markets expanded** (`api/sports/_books.js`): NCAAF + golf majors + Euro added to FUTURES_MARKETS. Fixed UCL sport_key (`soccer_uefa_champs_league` → `_winner`). `active: false` flag skips between-seasons silently; 404/INACTIVE_SPORT now skip gracefully.
