@@ -4,6 +4,10 @@ import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Check, X } from "lucide-react";
 import { JsonLd, breadcrumbLd, faqLd, SITE_URL } from "@/lib/seo";
+import { getBrandProfile, brandOrganizationLd, BRAND_PROFILES } from "@/lib/brand-profiles";
+import BrandProfileCard from "@/components/BrandProfileCard";
+import FeatureComparisonTable from "@/components/FeatureComparisonTable";
+import TradingCtaRow from "@/components/TradingCtaRow";
 
 interface BookProfile {
   slug: string;
@@ -305,6 +309,13 @@ export default async function ComparePage({ params }: PageProps) {
   const profile = book ? BOOKS[book] : null;
   if (!profile) notFound();
 
+  // Pull structured brand facts from the shared registry. If the book isn't
+  // in the registry yet, we fall back gracefully (no deep card, just legacy
+  // editorial content). bookProfile may be null for legacy entries (betrivers
+  // exists in registry; others may need to be added over time).
+  const kalshiProfile = BRAND_PROFILES.kalshi;
+  const bookProfile = getBrandProfile(profile.slug);
+
   const ld = [
     breadcrumbLd([
       { name: "Home", url: "/" },
@@ -312,12 +323,25 @@ export default async function ComparePage({ params }: PageProps) {
       { name: `Kalshi vs ${profile.name}`, url: `/compare/kalshi-vs-${profile.slug}` },
     ]),
     faqLd(profile.faq),
+    brandOrganizationLd(kalshiProfile),
+    ...(bookProfile ? [brandOrganizationLd(bookProfile)] : []),
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: `Kalshi vs ${profile.name} — Live Odds Comparison`,
+      description: profile.intro,
+      author: { "@type": "Person", name: "Kenny Hyder", url: `${SITE_URL}/about/kenny-hyder` },
+      publisher: { "@type": "Organization", name: "SportsBookISH", url: SITE_URL },
+      mainEntityOfPage: `${SITE_URL}/compare/kalshi-vs-${profile.slug}`,
+      datePublished: "2026-05-12",
+      dateModified: new Date().toISOString().slice(0, 10),
+    },
   ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <JsonLd data={ld} />
-      <main id="main" className="container mx-auto max-w-3xl px-4 py-16">
+      <main id="main" className="container mx-auto max-w-5xl px-4 py-16">
         <nav className="text-sm text-muted-foreground mb-6 flex items-center gap-2" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-foreground">Home</Link>
           <span aria-hidden="true">/</span>
@@ -332,7 +356,51 @@ export default async function ComparePage({ params }: PageProps) {
             Kalshi vs {profile.name}
           </h1>
         </div>
-        <p className="text-lg text-muted-foreground mb-10 leading-relaxed">{profile.intro}</p>
+        <p className="text-lg text-muted-foreground mb-6 leading-relaxed max-w-3xl">{profile.intro}</p>
+
+        {/* Universal Trade-with CTAs. Showing only Kalshi side since the
+            sportsbook side typically has its own per-state regulator and
+            doesn't fit the prediction-market affiliate pattern. */}
+        <TradingCtaRow campaign={`compare-kalshi-vs-${profile.slug}`} showPolymarket={false} className="mb-10" />
+
+        {/* Side-by-side brand profile cards if the sportsbook is in the
+            registry. Renders the at-a-glance structured facts (founded, HQ,
+            regulator, fees, scale, funding, mobile, etc.) so a researcher
+            can compare every dimension at once. */}
+        {bookProfile && (
+          <section aria-labelledby="profiles-heading" className="mb-10">
+            <h2 id="profiles-heading" className="text-xl font-semibold mb-1">Platform profiles at a glance</h2>
+            <p className="text-sm text-muted-foreground mb-4">Founding, scale, regulation, fees, payments — both venues side-by-side. Updated {kalshiProfile.asOf} from public filings, official sites, and third-party trackers.</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <BrandProfileCard profile={kalshiProfile} campaign={`compare-kalshi-vs-${profile.slug}-profile`} accentClass="border-amber-500/40" highlightClass="text-amber-400" />
+              <BrandProfileCard profile={bookProfile} campaign={`compare-kalshi-vs-${profile.slug}-profile`} accentClass="border-emerald-500/40" highlightClass="text-emerald-400" />
+            </div>
+          </section>
+        )}
+
+        {bookProfile && (
+          <section aria-labelledby="features-heading" className="mb-10">
+            <h2 id="features-heading" className="text-xl font-semibold mb-3">Feature-by-feature comparison</h2>
+            <FeatureComparisonTable left={kalshiProfile} right={bookProfile} caption={`Side-by-side dimensions that matter when choosing between Kalshi and ${profile.name}. Volumes are best-effort estimates as of ${kalshiProfile.asOf}.`} />
+          </section>
+        )}
+
+        {bookProfile && (
+          <section aria-labelledby="usecase-heading" className="mb-10 grid md:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-5">
+              <h2 id="usecase-heading" className="text-lg font-semibold text-amber-400 mb-2">Use Kalshi when…</h2>
+              <ul className="space-y-2 text-sm list-disc pl-5">
+                {kalshiProfile.bestFor.map((s) => <li key={s}>{s}</li>)}
+              </ul>
+            </div>
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+              <h2 className="text-lg font-semibold text-emerald-400 mb-2">Use {bookProfile.name} when…</h2>
+              <ul className="space-y-2 text-sm list-disc pl-5">
+                {bookProfile.bestFor.map((s) => <li key={s}>{s}</li>)}
+              </ul>
+            </div>
+          </section>
+        )}
 
         <div className="grid md:grid-cols-2 gap-4 mb-10">
           <Card>
@@ -391,6 +459,33 @@ export default async function ComparePage({ params }: PageProps) {
             ))}
           </div>
         </section>
+
+        {bookProfile && (
+          <section aria-labelledby="sources-heading" className="mt-10 rounded-lg border border-border/60 bg-card/30 p-5">
+            <h2 id="sources-heading" className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Sources and further reading</h2>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h3 className="font-semibold text-amber-400 mb-1">{kalshiProfile.name}</h3>
+                <ul className="space-y-1">
+                  {kalshiProfile.sources.map((s) => (
+                    <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">{s.label} ↗</a></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-emerald-400 mb-1">{bookProfile.name}</h3>
+                <ul className="space-y-1">
+                  {bookProfile.sources.map((s) => (
+                    <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">{s.label} ↗</a></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">
+              All figures best-effort as of {kalshiProfile.asOf}. Funding, valuations, and volume are sourced from public filings, official communications, and third-party trackers (Crunchbase, Wikipedia). Re-verify against primary sources before quoting in compliance-sensitive contexts.
+            </p>
+          </section>
+        )}
 
         <div className="mt-12 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-6 text-center">
           <h2 className="text-xl font-bold mb-2">See live Kalshi vs {profile.name} edges</h2>
