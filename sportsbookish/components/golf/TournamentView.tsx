@@ -12,6 +12,7 @@ import BestBetsCards from "@/components/BestBetsCards";
 import TournamentTabs from "@/components/TournamentTabs";
 import OutrightTable from "@/components/OutrightTable";
 import PolymarketPromo from "@/components/PolymarketPromo";
+import TradingCtaRow from "@/components/TradingCtaRow";
 import UpsellBanner from "@/components/UpsellBanner";
 import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
@@ -211,8 +212,14 @@ export default async function TournamentView({
           </CardContent>
         </Card>
 
+        {/* Trade-with CTAs — universal affiliate links to Kalshi + Polymarket
+            (the latter shown only when Polymarket also has coverage on this
+            tournament). The iOS-gated $50 promo card sits below the row. */}
+        <div className="mt-6">
+          <TradingCtaRow campaign={`golf-tournament-${tournamentId}`} showPolymarket={hasPolymarketCoverage} />
+        </div>
         {hasPolymarketCoverage && (
-          <div className="mt-6 flex justify-center">
+          <div className="mt-4 flex justify-center">
             <PolymarketPromo size="300x250" campaign={`golf-tournament-${tournamentId}`} />
           </div>
         )}

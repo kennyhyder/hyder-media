@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { fetchLeagues, fetchPolymarketCompare } from "@/lib/sports-data";
+import { affiliateUrl } from "@/lib/affiliates";
+import PolymarketPromo from "@/components/PolymarketPromo";
 import { JsonLd, breadcrumbLd, faqLd } from "@/lib/seo";
 import { eventUrl } from "@/lib/slug";
 
@@ -108,6 +110,30 @@ export default async function PolymarketComparePage({ searchParams }: { searchPa
           Live event-contract pricing on the {rows.length} contestants where both Kalshi and Polymarket have current quotes. Sorted by edge size — biggest mispricings first.
         </p>
 
+        {/* Trade-with CTAs — affiliate links to both exchanges. Universal on
+            every device; the iOS-gated $50 promo card sits further down. */}
+        <div className="flex flex-wrap gap-3 mb-6">
+          <a
+            href={affiliateUrl("kalshi", { campaign: "compare-poly-vs-kalshi" }) || "https://kalshi.com/"}
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 transition px-4 py-2 text-sm font-semibold text-amber-300"
+            title="Trade on Kalshi (affiliate link)"
+          >
+            Trade on Kalshi →
+          </a>
+          <a
+            href={affiliateUrl("polymarket", { campaign: "compare-poly-vs-kalshi" }) || "https://polymarket.com/"}
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-md border border-fuchsia-500/40 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition px-4 py-2 text-sm font-semibold text-fuchsia-300"
+            title="Trade on Polymarket (affiliate link)"
+          >
+            Trade on Polymarket →
+          </a>
+          <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground self-center">Sponsored · code <span className="font-mono text-foreground/80">SPORTSBOOKISH</span> on Polymarket (iOS)</span>
+        </div>
+
         {rows.length === 0 && (
           <div className="rounded-lg border border-border/60 bg-card/40 p-8 text-center">
             <p className="text-sm text-muted-foreground">No current overlap between Kalshi and Polymarket{league ? ` for ${league.toUpperCase()}` : ""}. Try removing the league filter or check back during an active slate.</p>
@@ -122,6 +148,12 @@ export default async function PolymarketComparePage({ searchParams }: { searchPa
             <ComparisonTable rows={buyKalshi} />
           </section>
         )}
+
+        {/* iOS-only promo card. Hidden on Android/desktop; the universal
+            Polymarket CTA above still works for those visitors. */}
+        <div className="mb-8 flex justify-center">
+          <PolymarketPromo size="300x250" campaign="compare-poly-vs-kalshi" />
+        </div>
 
         {buyPoly.length > 0 && (
           <section aria-labelledby="buy-poly-heading" className="mb-8">
@@ -163,8 +195,12 @@ function ComparisonTable({ rows }: { rows: { league: string; event_id: string; e
           <tr>
             <th scope="col" className="text-left px-3 py-2">Contestant</th>
             <th scope="col" className="text-left px-3 py-2">Event</th>
-            <th scope="col" className="text-right px-3 py-2">Kalshi</th>
-            <th scope="col" className="text-right px-3 py-2">Polymarket</th>
+            <th scope="col" className="text-right px-3 py-2">
+              <a href={affiliateUrl("kalshi", { campaign: "compare-poly-vs-kalshi-th" }) || "https://kalshi.com/"} target="_blank" rel="sponsored noopener noreferrer" className="hover:text-amber-400" title="Trade on Kalshi (affiliate link)">Kalshi ↗</a>
+            </th>
+            <th scope="col" className="text-right px-3 py-2">
+              <a href={affiliateUrl("polymarket", { campaign: "compare-poly-vs-kalshi-th" }) || "https://polymarket.com/"} target="_blank" rel="sponsored noopener noreferrer" className="hover:text-fuchsia-400" title="Trade on Polymarket (affiliate link)">Polymarket ↗</a>
+            </th>
             <th scope="col" className="text-right px-3 py-2">Edge</th>
             <th scope="col" className="text-right px-3 py-2">Poly vol</th>
           </tr>
