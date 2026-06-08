@@ -87,6 +87,8 @@ All required for the app to run. Production values are in Vercel project `sports
 | `STRIPE_PRICE_ELITE` | $100/yr Price ID | Per-env (test/live differ) |
 | `NEXT_PUBLIC_SITE_URL` | `https://sportsbookish.com` (prod) or staging URL | Per-env |
 | `RESEND_API_KEY` | Transactional email | All envs |
+| `VAULT_API_KEY` | Vault Network sub-affiliate API key (for /admin/affiliates dashboard) | All envs |
+| `AFFILIATE_POLYMARKET_URL` | Optional override of the Polymarket affiliate URL — defaults to the Routy SPORTSBOOKISH link | All envs |
 
 **Critical**: production uses `sk_live_*` keys — real charges. Staging should use `sk_test_*` keys.
 
@@ -157,6 +159,28 @@ For TEST mode, run `scripts/setup-stripe-webhook.mjs` with `sk_test_*` and a dif
 - Local dev: `npm run dev` (http://localhost:3000)
 - Manual deploy: `vercel --prod` (Pro plan, no CI yet)
 - Git push: triggers Vercel Preview on any branch; only `main` → production (configure in Vercel dashboard)
+
+## Affiliate monetisation (Vault Network)
+
+Polymarket and other prediction-market brands are monetised through Vault Network (sub-affiliate program — see `docs/Vault Sports - Sub-Affiliate Agreement_Rate Guide (SportsBookISH).pdf`). The Polymarket entry is wired in `lib/affiliates.ts` with the Routy tracking URL; constants `POLYMARKET_AFFILIATE_URL`, `POLYMARKET_PROMO_CODE`, `POLYMARKET_PROMO_HEADLINE` are exported for reuse.
+
+- **Affiliate URL is universal** — every Polymarket label uses it on every device.
+- **Visual promo ads are iOS-only** — the $20-deposit / $50-trading-bonus offer is restricted to the Polymarket iOS app per Vault terms. `<PolymarketPromo>` (server component) detects iOS via `lib/device.ts` and renders `null` on non-iOS. Five ad sizes live under `public/affiliate-ads/polymarket/`.
+- **Compliance language** — when a verb targets Kalshi or Polymarket, use *trade / predict / buy a position / combo*, never *bet / wager / stake / gamble / parlay*. Sportsbook-side language is unrestricted (FanDuel/DraftKings can be "bet" against). See `docs/Vault Affiliate Network.pdf` Sales/DFS/Sweeps/Prediction-markets language sheet.
+
+### Vault API integration (`lib/vault.ts`)
+
+POST-only API at `https://api.vaultnetwork.io`. Auth via `apiKey` in JSON body (not header). Two endpoints used:
+
+- `POST /External/MyBrands` → `[{ brand, states, cpa, notes }]` — offers we're allowed to promote with state availability + CPA (split applied).
+- `POST /External/DailyStats` → `[{ brand, link, region, date, registrations, ftds, qualifications, clicks, commission }]` for a date window.
+
+Surfaces in this app:
+- `GET /api/admin/vault/brands` — proxied to MyBrands. Admin-only.
+- `GET /api/admin/vault/stats?days=N&brands=...` — proxied to DailyStats + per-brand rollup. Admin-only.
+- `/admin/affiliates` — server-rendered dashboard. Window selector (7d/30d/90d). Renders top-line totals (clicks/regs/FTDs/qualified/commission), per-brand rollup with funnel rates + $/click, and an Active offers table from MyBrands. Server cache 10 min via `next.revalidate`.
+
+API key handling mirrors `lib/stripe.ts` defensive-trim pattern (`vercel env add` echoes append `\n`). When `VAULT_API_KEY` is missing the page renders a setup card with the `printf %s "key" | vercel env add ...` recipe instead of crashing.
 
 ## Connection to hyder-media monorepo
 

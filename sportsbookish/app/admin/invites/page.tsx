@@ -49,6 +49,8 @@ export default async function AdminInvitesPage() {
         <div className="flex items-center gap-1 mb-5 border-b border-border/40">
           <Link href="/admin" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Users</Link>
           <Link href="/admin/invites" className="px-4 py-2 text-sm border-b-2 border-emerald-500 text-foreground">Invite codes ({codes.length})</Link>
+          <Link href="/admin/distribute" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Distribute</Link>
+          <Link href="/admin/affiliates" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Affiliates</Link>
         </div>
 
         <AdminInvitesPanel initialCodes={codes} redemptions={redemptions} />

@@ -71,6 +71,7 @@ export default async function AdminPage() {
           <Link href="/admin" className="px-4 py-2 text-sm border-b-2 border-emerald-500 text-foreground">Users ({users.length})</Link>
           <Link href="/admin/invites" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Invite codes</Link>
           <Link href="/admin/distribute" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Distribute</Link>
+          <Link href="/admin/affiliates" className="px-4 py-2 text-sm border-b-2 border-transparent text-muted-foreground hover:text-foreground">Affiliates</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
