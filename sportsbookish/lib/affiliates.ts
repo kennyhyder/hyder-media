@@ -80,12 +80,24 @@ const DEFAULTS: Record<string, AffiliateInfo> = {
     commission: "$10-25 per qualified signup",
   },
   polymarket: {
-    network: "Polymarket — no public affiliate program",
-    baseUrl: "https://polymarket.com/",
-    signupHint: "Polymarket does not currently run a public affiliate program",
-    status: "unavailable",
+    network: "Vault Network — Polymarket",
+    baseUrl: process.env.AFFILIATE_POLYMARKET_URL || "https://affiliates.routy.app/route/367547?affId=10159&ts=5017819",
+    signupHint: "https://vaultsportshq.com — Vault Network affiliate platform (offer code SPORTSBOOKISH)",
+    status: "active",
+    commission: "CPA — $20 deposit / $50 trading bonus (iOS only, US-eligible states); rev share via Vault Network",
   },
 };
+
+// Public constants used by promo components, drip emails, and outbound CTAs.
+// The affiliate URL is universal — every device can click it. The promo
+// bonus ($20 deposit → $50 trading bonus) is iOS-restricted, so visual ads
+// that pitch the bonus are gated to iOS UA. Code "SPORTSBOOKISH" applies
+// equivalently for users who land on the iOS app via search.
+export const POLYMARKET_AFFILIATE_URL =
+  process.env.AFFILIATE_POLYMARKET_URL || "https://affiliates.routy.app/route/367547?affId=10159&ts=5017819";
+export const POLYMARKET_PROMO_CODE = "SPORTSBOOKISH";
+export const POLYMARKET_PROMO_HEADLINE = "Deposit $20, get a $50 trading bonus";
+export const POLYMARKET_PROMO_SUBLINE = "iOS only · code SPORTSBOOKISH";
 
 export function getAffiliate(book: string): AffiliateInfo | null {
   const key = book.toLowerCase().trim();

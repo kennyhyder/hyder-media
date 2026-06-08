@@ -144,7 +144,7 @@ export default function Article() {
 
         <h2 className="text-2xl font-bold mt-10 mb-3">What this means for betting strategy</h2>
         <p>
-          The gap is not always an arbitrage. If you sell Kalshi YES at $0.75 (effectively betting
+          The gap is not always an arbitrage. If you sell Kalshi YES at $0.75 (effectively taking a position
           AGAINST the favorite via a NO position) and back the favorite at -880 on a sportsbook,
           you&apos;re long the cancellation tail. Most weeks that pays you the gap. The week a
           game gets cancelled, you lose meaningfully on the sportsbook side (your -880 wager
@@ -191,7 +191,7 @@ export default function Article() {
           outcome with no settlement uncertainty.
         </p>
         <p>
-          If you bet on Kalshi, this changes how you size positions on deep favorites in-play.
+          If you trade on Kalshi, this changes how you size positions on deep favorites in-play.
           If you bet at sportsbooks, the gap is a useful sanity check — when Kalshi is sitting
           well under book consensus, ask yourself what the exchange knows about settlement that
           the book might not be pricing.

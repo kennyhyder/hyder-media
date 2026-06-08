@@ -31,6 +31,10 @@ const SEQUENCE = [
   { key: "welcome_d0",      template: "welcome_d0",      triggerDays: { min: 0, max: 0 } },
   { key: "value_d2",        template: "value_d2",        triggerDays: { min: 2, max: 2 } },
   { key: "tactic_d4",       template: "tactic_d4",       triggerDays: { min: 4, max: 4 } },
+  // D5 — Polymarket affiliate offer (iOS only). Inserted between value/tactic
+  // emails and the first upsell so the offer lands while engagement is high.
+  // Template self-discloses the iOS restriction; non-iOS recipients can ignore.
+  { key: "polymarket_promo_d5", template: "polymarket_promo_d5", triggerDays: { min: 5, max: 5 } },
   { key: "upsell_d7",       template: "upsell_d7",       triggerDays: { min: 7, max: 7 } },
   { key: "activation_d10",  template: "activation_d10",  triggerDays: { min: 10, max: 10 } },
   { key: "upsell_d14",      template: "upsell_d14",      triggerDays: { min: 14, max: 14 } },

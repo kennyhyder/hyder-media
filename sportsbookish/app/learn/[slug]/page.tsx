@@ -31,7 +31,7 @@ const ARTICLES: Record<string, Article> = {
       { type: "h2", text: "How to read a Kalshi price" },
       {
         type: "p",
-        text: "If 'Will the Lakers beat the Spurs?' is trading at 67¢ YES on Kalshi, that means the market is pricing the Lakers' win probability at 67%. A NO share trades at 33¢ (100¢ - 67¢). Buying YES at 67¢ pays out $1.00 if the Lakers win, for a profit of 33¢ — or +49% on your stake. The American-odds equivalent of 67% implied probability is roughly -204.",
+        text: "If 'Will the Lakers beat the Spurs?' is trading at 67¢ YES on Kalshi, that means the market is pricing the Lakers' win probability at 67%. A NO share trades at 33¢ (100¢ - 67¢). Buying YES at 67¢ pays out $1.00 if the Lakers win, for a profit of 33¢ — or +49% on your position. The American-odds equivalent of 67% implied probability is roughly -204.",
       },
       { type: "h2", text: "How Kalshi differs from sportsbook odds" },
       {
@@ -56,10 +56,10 @@ const ARTICLES: Record<string, Article> = {
           "PGA Tour — tournament winner, Top 5/10/20/40, Make Cut, head-to-head matchups, round leaders, props",
         ],
       },
-      { type: "h2", text: "Should I bet on Kalshi instead of a sportsbook?" },
+      { type: "h2", text: "Should I trade on Kalshi instead of betting a sportsbook?" },
       {
         type: "p",
-        text: "Kalshi's advantages are: no vig (cheaper pricing on the same outcome), no limits (you can bet as much as the orderbook supports without being capped), federal regulation (CFTC oversight), and operation in all 50 states. Sportsbooks have wider market coverage (props, parlays, live in-game), faster cashouts, and stronger promo offers. Sharp bettors often hold both and shop the price.",
+        text: "Kalshi's advantages are: no vig (cheaper pricing on the same outcome), no limits (you can take positions as large as the orderbook supports without being capped), federal regulation (CFTC oversight), and operation in all 50 states. Sportsbooks have wider market coverage (props, parlays, live in-game), faster cashouts, and stronger promo offers. Sharp users often hold both and shop the price.",
       },
       { type: "h2", text: "How SportsBookISH helps" },
       {
@@ -84,9 +84,9 @@ const ARTICLES: Record<string, Article> = {
           "For a YES price under 50¢: American = 100 / (price/100) - 100, then add the sign. For a YES price over 50¢: American = -1 × price / (1 - price) × 100. Example: 67¢ → roughly -203. Most converters online will do this automatically.",
       },
       {
-        question: "What's the minimum bet on Kalshi?",
+        question: "What's the minimum position size on Kalshi?",
         answer:
-          "Kalshi has no minimum dollar bet — you can buy as few as 1 contract (worth between 1¢ and 99¢). This is much lower than sportsbook minimums (often $1–$5).",
+          "Kalshi has no minimum dollar position — you can buy as few as 1 contract (worth between 1¢ and 99¢). This is much lower than sportsbook minimums (often $1–$5).",
       },
     ],
     relatedLinks: [
@@ -172,7 +172,7 @@ const ARTICLES: Record<string, Article> = {
           "1.5–3% — small edge. Worth tracking but usually not enough to overcome variance.",
           "3–5% — actionable. SportsBookISH's default Pro alert threshold sits here.",
           "5–10% — rare, worth investigating. Often a sign of a stale book line or fresh news.",
-          "10%+ — almost always a data anomaly. Double-check the market URL on Kalshi before betting.",
+          "10%+ — almost always a data anomaly. Double-check the market URL on Kalshi before trading.",
         ],
       },
       { type: "h2", text: "Best book vs books median" },
@@ -204,7 +204,7 @@ const ARTICLES: Record<string, Article> = {
           "Theoretically, if your edge math is accurate and you bet flat units, you should win 51.5% of plus-money bets at a 3% edge — yielding ~3% ROI before variance. Variance is high in small samples; expect drawdowns of 10+ units even with positive expected value.",
       },
       {
-        question: "Can I bet both Kalshi and the books for arbitrage?",
+        question: "Can I trade Kalshi and bet the books for arbitrage?",
         answer:
           "Yes, when the sum of YES on Kalshi plus the book's de-vigged NO is below 100%, you can lock a guaranteed profit. Look for negative implied-sum spreads in the 'edge vs best book' column.",
       },
@@ -249,7 +249,7 @@ const ARTICLES: Record<string, Article> = {
       {
         type: "ul",
         items: [
-          "Kalshi — Charges trading fees (0.07% per side, capped at 7¢ per share) plus settlement fees. Effective cost on a winning bet is ~1–2%.",
+          "Kalshi — Charges trading fees (0.07% per side, capped at 7¢ per share) plus settlement fees. Effective cost on a winning trade is ~1–2%.",
           "Polymarket — No trading fees; small gas fees for on-chain settlement (Polygon network, usually <$0.50).",
           "PredictIt — 10% withdrawal fee + 5% profit fee. Highest fees of the three.",
         ],

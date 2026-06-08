@@ -11,6 +11,7 @@ import MarketTabs from "@/components/MarketTabs";
 import BestBetsCards from "@/components/BestBetsCards";
 import TournamentTabs from "@/components/TournamentTabs";
 import OutrightTable from "@/components/OutrightTable";
+import PolymarketPromo from "@/components/PolymarketPromo";
 import UpsellBanner from "@/components/UpsellBanner";
 import ForceRefreshButton from "@/components/ForceRefreshButton";
 import FaqSection from "@/components/FaqSection";
@@ -72,6 +73,10 @@ export default async function TournamentView({
     ...r,
     user_edge: r._user_edge.edge,
   }));
+
+  // Show the iOS-only Polymarket affiliate promo only when this tournament
+  // actually has Polymarket coverage — otherwise the CTA is incongruous.
+  const hasPolymarketCoverage = rows.some((r) => r.polymarket?.implied_prob != null);
 
   // JSON-LD that lives on every variant of the page (canonical + legacy)
   const ldData: object[] = [
@@ -205,6 +210,12 @@ export default async function TournamentView({
             />
           </CardContent>
         </Card>
+
+        {hasPolymarketCoverage && (
+          <div className="mt-6 flex justify-center">
+            <PolymarketPromo size="300x250" campaign={`golf-tournament-${tournamentId}`} />
+          </div>
+        )}
 
         <div className="mt-4 text-xs text-muted-foreground space-y-1">
           <p>

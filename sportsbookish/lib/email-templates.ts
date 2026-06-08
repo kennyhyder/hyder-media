@@ -154,6 +154,29 @@ ${live}
     return { subject, html: chrome({ content: body, preheader, unsubToken: ctx.unsub_token }), text: textFromHtml(body) };
   },
 
+  // ----- D5: Affiliate offer — Polymarket trading bonus (iOS only) -----
+  // Promotes the Vault Network / Polymarket SPORTSBOOKISH offer: deposit $20,
+  // get a $50 trading bonus. iOS-restricted per affiliate terms. Compliant
+  // language: "trade / buy a position", never "bet / wager / gamble / stake".
+  polymarket_promo_d5(ctx) {
+    const subject = "Free $50 trading bonus on Polymarket (code SPORTSBOOKISH)";
+    const preheader = "Deposit $20, get $50 to trade with. iOS only.";
+    const body = html(`
+<p>${greet(ctx)}</p>
+<p>Quick one. Polymarket is running an offer for SportsBookISH readers: <strong>deposit $20 and they'll credit you a $50 trading bonus</strong> to buy positions on event contracts. Code is <code style="background:#1f1f1f;padding:2px 6px;border-radius:4px;color:#10b981;">SPORTSBOOKISH</code>.</p>
+<p>Three things to know up front:</p>
+<ul style="padding-left:20px;line-height:1.7;">
+<li><strong>iOS only.</strong> The bonus is restricted to the Polymarket iOS app — Android and desktop sign-ups don't qualify per their terms.</li>
+<li><strong>Real Polymarket prices.</strong> The same contracts we compare on SportsBookISH — golf majors, NFL/NBA/MLB game lines, election markets, the works.</li>
+<li><strong>No catch on our side.</strong> SportsBookISH gets a referral credit if you fund. You getting the $50 is the whole point.</li>
+</ul>
+<p>Why this matters to you: if you've been using SportsBookISH to spot Kalshi-vs-Polymarket gaps, having a funded Polymarket position lets you actually act on the ones where Poly is the cheaper buy. $50 of house money is a low-cost way to start.</p>
+<p>${btn("https://affiliates.routy.app/route/367547?affId=10159&ts=5017819", "Claim the $50 bonus (iOS) →")}</p>
+<p style="color:#9ca3af;font-size:13px;">If you're not on iOS, ignore this one — the bonus won't apply. Prediction-market trading involves risk; only buy positions you can afford to lose. Trade responsibly.</p>
+`);
+    return { subject, html: chrome({ content: body, preheader, unsubToken: ctx.unsub_token }), text: textFromHtml(body) };
+  },
+
   // ----- D7: First upsell (gentle, Pro positioning) -----
   upsell_d7(ctx) {
     const usageLine = ctx.event_views > 5
@@ -164,7 +187,7 @@ ${live}
     const body = html(`
 <p>${greet(ctx)}</p>
 <p>${usageLine}</p>
-<p>Free shows you 5 of the 14 sportsbooks we track. Pro at $19/mo opens up everything: every book on every market, your home-book lens (every edge recolored against <em>your</em> sportsbook instead of consensus), the bet log, and excluded-book filtering.</p>
+<p>Free shows you 5 of the 14 sportsbooks we track. Pro at $10/mo opens up everything: every book on every market, your home-book lens (every edge recolored against <em>your</em> sportsbook instead of consensus), the bet log, and excluded-book filtering.</p>
 <p>Where Pro pays for itself: a single 2pp edge on a $100 bet gets you most of the way to a month's subscription. The whole point of the tool is finding those edges.</p>
 <p>${btn(SITE + "/pricing", "See Pro vs Free →")} ${btn(SITE + "/sports/positive-ev", "Find an edge first", false)}</p>
 <p style="color:#9ca3af;font-size:13px;">No FOMO email — just letting you know. You'll get more value walking your usage up first if you'd rather.</p>
@@ -207,7 +230,7 @@ ${live}
     const body = html(`
 <p>${greet(ctx)}</p>
 ${lede}
-<p><strong>Pro at $19/mo gets you:</strong></p>
+<p><strong>Pro at $10/mo gets you:</strong></p>
 <ul style="padding-left:20px;line-height:1.7;">
 <li>Every book on every market (free shows 5 of 14)</li>
 <li>Home-book lens — every edge recolored against the book you actually bet at</li>
@@ -215,7 +238,7 @@ ${lede}
 <li>Bet log with closing line value (CLV) tracking</li>
 <li>Player props and futures depth</li>
 </ul>
-<p><strong>Elite at $39/mo adds:</strong> email + SMS alerts, sub-minute Kalshi updates, watchlist, custom alert thresholds.</p>
+<p><strong>Elite at $100/year adds:</strong> email + SMS alerts, sub-minute Kalshi updates, watchlist, custom alert thresholds.</p>
 <p>${btn(SITE + "/pricing", "Compare plans →")} ${btn(SITE + "/sports/positive-ev", "One more browse", false)}</p>
 <p style="color:#9ca3af;font-size:13px;">If price is a thing, reply to this — I'll send a code. The goal here is users who get real value, not maximum revenue.</p>
 `);
@@ -225,7 +248,7 @@ ${lede}
   // ----- D21: Last in series, social proof + final close -----
   finalupsell_d21(ctx) {
     const subject = "What our paid users actually use SportsBookISH for";
-    const preheader = "Three workflows that justify the $19. Pick the one closest to yours.";
+    const preheader = "Three workflows that justify the $10/mo. Pick the one closest to yours.";
     const body = html(`
 <p>${greet(ctx)}</p>
 <p>Three weeks of data. Here's the honest breakdown of how Pro and Elite users actually spend their time on the platform.</p>
@@ -262,8 +285,8 @@ ${lede}
     const body = html(`
 <p>${greet(ctx)}</p>
 <p>You've come back to pricing a few times. Most likely question: Pro vs Elite, what's the difference?</p>
-<p><strong>Pro ($19/mo)</strong> is for users who check the platform once a day, line shop before placing bets, and track CLV. Active use.</p>
-<p><strong>Elite ($39/mo)</strong> is for users who want the platform to tap them on the shoulder — email + SMS alerts when Kalshi moves >X%, sub-minute Kalshi updates, custom thresholds per sport. Passive coverage.</p>
+<p><strong>Pro ($10/mo)</strong> is for users who check the platform once a day, line shop before placing bets, and track CLV. Active use.</p>
+<p><strong>Elite ($100/year)</strong> is for users who want the platform to tap them on the shoulder — email + SMS alerts when Kalshi moves >X%, sub-minute Kalshi updates, custom thresholds per sport. Passive coverage.</p>
 <p>If you're checking 1-2x/day already, Pro is the right answer. If you'd rather have the platform watch for you, Elite.</p>
 <p>${btn(SITE + "/pricing", "Pick a plan →")}</p>
 <p style="color:#9ca3af;font-size:13px;">Stuck on something else? Reply — I'll get you an answer fast.</p>

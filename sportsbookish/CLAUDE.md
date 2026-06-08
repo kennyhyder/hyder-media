@@ -21,11 +21,13 @@
 
 Source of truth: `lib/tiers.ts`. Schema mirror: `sb_subscription_tiers` (Supabase).
 
-| Tier | Name | $/mo | Stripe Price | Feature flags |
+| Tier | Name | Price | Stripe Price | Feature flags |
 |---|---|---|---|---|
 | `free` | First Line | $0 | (none — no Stripe entry) | `win_only: true` |
-| `pro` | Pro | $19 | `price_1TWUT0EI9W6dG0u9aXzidX4Z` | all markets, home_book, book_filter, props, matchups |
-| `elite` | Elite | $39 | `price_1TWUT0EI9W6dG0u9lmIAf8TZ` | all Pro + alerts (email + SMS), custom thresholds, sub-min updates, watchlist |
+| `pro` | Pro | $10/mo | `price_1TWUT0EI9W6dG0u9aXzidX4Z` | all markets, home_book, book_filter, props, matchups |
+| `elite` | Elite | $100/yr | `price_1TWUT0EI9W6dG0u9lmIAf8TZ` | all Pro + alerts (email + SMS), custom thresholds, sub-min updates, watchlist |
+
+Source of truth for pricing is `lib/tiers.ts` — `priceCents` + `interval`. Stripe Price IDs are LIVE-mode in the project Vercel env. Email templates + landing copy MUST match these numbers (last sync 2026-06-08 from $19/$39 → $10/$100 — drip emails were stale, fixed in same commit as the Polymarket affiliate wiring).
 
 Product IDs are LIVE-mode and stored in Stripe under names `SportsBookish Pro` / `SportsBookish Elite`. For TEST mode, re-run `scripts/setup-stripe-products.mjs` with a `sk_test_*` key.
 
@@ -81,8 +83,8 @@ All required for the app to run. Production values are in Vercel project `sports
 | `STRIPE_SECRET_KEY` | `sk_live_*` in prod, `sk_test_*` in preview/staging | Per-env |
 | `STRIPE_PUBLISHABLE_KEY` | `pk_live_*` / `pk_test_*` | Per-env |
 | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (from Stripe dashboard or `setup-stripe-webhook.mjs`) | Per-env |
-| `STRIPE_PRICE_PRO` | $19/mo Price ID | Per-env (test/live differ) |
-| `STRIPE_PRICE_ELITE` | $39/mo Price ID | Per-env (test/live differ) |
+| `STRIPE_PRICE_PRO` | $10/mo Price ID | Per-env (test/live differ) |
+| `STRIPE_PRICE_ELITE` | $100/yr Price ID | Per-env (test/live differ) |
 | `NEXT_PUBLIC_SITE_URL` | `https://sportsbookish.com` (prod) or staging URL | Per-env |
 | `RESEND_API_KEY` | Transactional email | All envs |
 

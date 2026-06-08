@@ -44,11 +44,11 @@ const LEAGUE_DISPLAY: Record<string, string> = {
 const HUB_FAQ = [
   {
     question: "What is sports arbitrage?",
-    answer: "An arbitrage opportunity exists when the implied probabilities of opposing outcomes on the same market sum to less than 100%. If YES is offered at 48% on Kalshi and NO is offered at 49% on DraftKings (combined 97%), a properly split bet on both produces a guaranteed ~3% profit regardless of which side wins.",
+    answer: "An arbitrage opportunity exists when the implied probabilities of opposing outcomes on the same market sum to less than 100%. If YES is offered at 48% on Kalshi and NO is offered at 49% on DraftKings (combined 97%), a properly sized position on both produces a guaranteed ~3% profit regardless of which side wins.",
   },
   {
-    question: "How do I bet an arb?",
-    answer: "Stake each side in proportion to the inverse of its probability so both sides pay the same amount. For a 97% combined arb on a $1,000 total bankroll: stake $1000 × (49% ÷ 97%) ≈ $505 on YES at Kalshi and $1000 × (48% ÷ 97%) ≈ $495 on NO at DraftKings. Both legs return ~$1,030 — guaranteed ~$30 profit.",
+    question: "How do I execute an arb?",
+    answer: "Size each side in proportion to the inverse of its probability so both sides pay the same amount. For a 97% combined arb on a $1,000 total bankroll: $1000 × (49% ÷ 97%) ≈ $505 buying YES on Kalshi and $1000 × (48% ÷ 97%) ≈ $495 on NO at DraftKings. Both legs return ~$1,030 — guaranteed ~$30 profit.",
   },
   {
     question: "Are sportsbook + Kalshi arbs sustainable?",
@@ -56,7 +56,7 @@ const HUB_FAQ = [
   },
   {
     question: "How fresh is this data?",
-    answer: "Kalshi quotes refresh every 5 minutes. Sportsbook quotes every 15-30 minutes. Polymarket every 15 minutes. Arbitrages close fast — what's visible here is what was true at page render time; verify both legs in their respective platforms before staking.",
+    answer: "Kalshi quotes refresh every 5 minutes. Sportsbook quotes every 15-30 minutes. Polymarket every 15 minutes. Arbitrages close fast — what's visible here is what was true at page render time; verify both legs in their respective platforms before sizing positions.",
   },
 ];
 

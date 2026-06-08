@@ -28,7 +28,7 @@ export default async function BetsPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-muted-foreground">
             <p>
-              Log every bet you place — at Kalshi or any sportsbook — and get a real-time <strong className="text-foreground">Skill Score</strong> (0–1000) that grades you on CLV, ROI, calibration, difficulty, and risk-adjusted return.
+              Log every position — Kalshi trades or sportsbook bets — and get a real-time <strong className="text-foreground">Skill Score</strong> (0–1000) that grades you on CLV, ROI, calibration, difficulty, and risk-adjusted return.
             </p>
             <p className="text-xs">
               Not just W-L. The algorithm weighs harder bets more, rewards beating the closing line, and surfaces whether your edges are genuine skill or short-term variance.
