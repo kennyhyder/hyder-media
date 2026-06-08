@@ -14,6 +14,16 @@ const MARKET_LABELS = {
   r1lead: "R1 Leader", r2lead: "R2 Leader", r3lead: "R3 Leader",
 };
 
+// Markets that settle DURING a tournament (not at tournament end). Once these
+// resolve, Kalshi pins to ~0.01 / ~0.99 but books often leave their pre-cut /
+// pre-round lines stuck in `golfodds_book_latest`, producing phantom 70-90%
+// "edges" against a settled Kalshi side. We skip these alerts entirely.
+const MID_TOURNAMENT_RESOLVING = new Set(["mc", "r1lead", "r2lead", "r3lead", "t40"]);
+const RESOLVED_KALSHI_HIGH = 0.95;
+const RESOLVED_KALSHI_LOW = 0.05;
+// Books haven't quoted in this long → lines are stale, skip the alert.
+const BOOK_STALENESS_MS = 6 * 60 * 60 * 1000;
+
 // Thresholds. Positive edge = Kalshi is CHEAPER than book median → buy on Kalshi.
 const BUY_EDGE_THRESHOLD = 0.02;   // +2% buy edge (lowered from 3% to surface more candidates)
 const SELL_EDGE_THRESHOLD = -0.03; // -3% sell edge (lowered from -5% for symmetry)
@@ -51,7 +61,7 @@ async function detectForTournament(supabase, tournament) {
     return data || [];
   });
   const bookRows = await chunked(marketIds, 100, async (chunk) => {
-    const { data } = await supabase.from("golfodds_book_latest").select("market_id, novig_prob, book").in("market_id", chunk).range(0, 9999);
+    const { data } = await supabase.from("golfodds_book_latest").select("market_id, novig_prob, book, fetched_at").in("market_id", chunk).range(0, 9999);
     return data || [];
   });
 
@@ -61,6 +71,7 @@ async function detectForTournament(supabase, tournament) {
     if (!booksByMarket.has(r.market_id)) booksByMarket.set(r.market_id, []);
     booksByMarket.get(r.market_id).push(r);
   }
+  const nowMs = Date.now();
 
   // Find recent alerts to dedupe
   const cutoff = new Date(Date.now() - DEDUP_WINDOW_MIN * 60_000).toISOString();
@@ -77,9 +88,25 @@ async function detectForTournament(supabase, tournament) {
     const kalshi = kalshiByMarket.get(m.id);
     const kProb = kalshi?.implied_prob;
     if (kProb == null) continue;
+
+    // Mid-tournament-resolving markets (mc, rNlead, t40): once Kalshi pins to
+    // an extreme the market has settled, but book lines often stay stuck at
+    // their pre-resolution consensus. Skip — every "edge" here is phantom.
+    if (MID_TOURNAMENT_RESOLVING.has(m.market_type) &&
+        (kProb >= RESOLVED_KALSHI_HIGH || kProb <= RESOLVED_KALSHI_LOW)) continue;
+
     const books = booksByMarket.get(m.id) || [];
     if (books.length < MIN_BOOK_COUNT) continue;
-    const novigVals = books.map((b) => b.novig_prob).filter((v) => v != null);
+
+    // Skip when book lines are stale — they stopped quoting hours ago and any
+    // edge against them is just measuring book-side latency, not value.
+    const freshBooks = books.filter((b) => {
+      if (!b.fetched_at) return false;
+      return nowMs - new Date(b.fetched_at).getTime() <= BOOK_STALENESS_MS;
+    });
+    if (freshBooks.length < MIN_BOOK_COUNT) continue;
+
+    const novigVals = freshBooks.map((b) => b.novig_prob).filter((v) => v != null);
     if (novigVals.length < MIN_BOOK_COUNT) continue;
     const booksMed = median(novigVals);
     if (booksMed == null) continue;
@@ -218,11 +245,15 @@ export default async function handler(req, res) {
     .select("id")
     .single();
 
-  // Active tournaments (not settled)
+  // Active tournaments only. The status taxonomy is upcoming → open → closed
+  // (set by cron-archive-tournaments). The prior filter `.neq("status","settled")`
+  // was effectively a no-op because no tournament ever has status="settled",
+  // so closed tournaments kept generating phantom mc/round-leader alerts for
+  // days after they ended.
   const { data: tournaments } = await supabase
     .from("golfodds_tournaments")
     .select("id, name")
-    .neq("status", "settled")
+    .in("status", ["upcoming", "open"])
     .range(0, 99);
 
   const allNewAlerts = [];

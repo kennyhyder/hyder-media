@@ -35,7 +35,20 @@ export default async function handler(req, res) {
         .limit(limit),
     ]);
 
-    const golfAlerts = (golfRes.data || []).map((a) => ({
+    // Belt-and-braces filter for phantom mid-tournament-resolved alerts.
+    // mc / r1lead / r2lead / r3lead / t40 markets settle DURING a tournament;
+    // once Kalshi pins to ~0.01 or ~0.99, book lines that haven't been pulled
+    // produce huge phantom "edges". cron-detect-alerts also filters these at
+    // write time, but pre-patch alerts can sit in golfodds_alerts for 24h.
+    const MID_TOURNAMENT_RESOLVING = new Set(["mc", "r1lead", "r2lead", "r3lead", "t40"]);
+    const golfAlerts = (golfRes.data || [])
+      .filter((a) => {
+        if (!MID_TOURNAMENT_RESOLVING.has(a.market_type)) return true;
+        const k = a.kalshi_prob;
+        if (k == null) return true;
+        return k > 0.05 && k < 0.95;
+      })
+      .map((a) => ({
       source: "golf",
       id: a.id,
       sport: "golf",
@@ -49,6 +62,7 @@ export default async function handler(req, res) {
       reference_label: "books_median",
       title: a.golfodds_players?.name || "Unknown",
       subtitle: `${a.market_type} · ${a.golfodds_tournaments?.name || ""}`,
+      market_type: a.market_type,
       book_count: a.book_count,
       link: `/golf/tournament/player?id=${a.tournament_id}&player_id=${a.player_id}`,
       parent_status: a.golfodds_tournaments?.status || null,

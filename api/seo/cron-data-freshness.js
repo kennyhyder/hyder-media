@@ -39,8 +39,19 @@ const FRESHNESS_TARGETS = [
   { table: "golfodds_dg_latest", column: "fetched_at", label: "Golf DataGolf model", cron_minutes: 10, stale_after_minutes: 40 },
   // Golf — sportsbooks (via DataGolf)
   { table: "golfodds_book_latest", column: "fetched_at", label: "Golf book quotes", cron_minutes: 10, stale_after_minutes: 40 },
-  // Golf — Polymarket
-  { table: "golfodds_polymarket_latest", column: "fetched_at", label: "Golf Polymarket quotes", cron_minutes: 15, stale_after_minutes: 60 },
+  // Golf — Polymarket. Tournament-gated: Polymarket only opens tournament-level
+  // win/top5/top10/top20 markets ~3-5 days before an event and closes them
+  // after. Between tournaments (gaps of 1-2 weeks happen) there is genuinely
+  // no data to ingest. The `skipUnless` predicate suppresses the check when
+  // no open/upcoming tournament is within the coverage window.
+  {
+    table: "golfodds_polymarket_latest",
+    column: "fetched_at",
+    label: "Golf Polymarket quotes",
+    cron_minutes: 15,
+    stale_after_minutes: 60,
+    skipUnless: hasActiveGolfTournament,
+  },
   // Sports alerts (movement detector)
   { table: "sports_alerts", column: "fired_at", label: "Sports movement alerts", cron_minutes: 5, stale_after_minutes: 60 /* alerts are episodic, not constant */ },
 ];
@@ -53,7 +64,28 @@ function checkAuth(req) {
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 
+// Returns true when there's an open or imminent golf tournament where
+// Polymarket coverage is expected. "Imminent" = within 5 days; Polymarket
+// typically opens tournament markets ~3-5 days before play begins.
+async function hasActiveGolfTournament(supabase) {
+  const horizonIso = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("golfodds_tournaments")
+    .select("id")
+    .in("status", ["open", "upcoming"])
+    .gte("end_date", todayIso)
+    .lte("start_date", horizonIso)
+    .limit(1);
+  if (error) return true; // fail-open: if the gate query breaks, keep checking
+  return (data?.length || 0) > 0;
+}
+
 async function checkOne(supabase, target) {
+  if (typeof target.skipUnless === "function") {
+    const ok = await target.skipUnless(supabase);
+    if (!ok) return { ...target, status: "skipped", skip_reason: "no_work_expected" };
+  }
   const { data, error } = await supabase
     .from(target.table)
     .select(target.column)
