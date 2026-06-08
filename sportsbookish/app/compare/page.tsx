@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { JsonLd, breadcrumbLd, itemListLd, SITE_URL } from "@/lib/seo";
+import { BRAND_PROFILES } from "@/lib/brand-profiles";
+import TradingCtaRow from "@/components/TradingCtaRow";
 
 export const metadata: Metadata = {
   title: "Compare Kalshi to DraftKings, FanDuel, BetMGM & More",
@@ -36,9 +38,11 @@ export default function ComparePage() {
       <JsonLd data={ld} />
       <main id="main" className="container mx-auto max-w-5xl px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">Kalshi vs the sportsbooks</h1>
-        <p className="text-lg text-muted-foreground mb-10 max-w-3xl">
-          Kalshi is a CFTC-regulated event-contract exchange — its prices float on supply and demand, with no house edge baked in. US sportsbooks set their own lines and bake in vigorish (the &ldquo;vig&rdquo;). After de-vigging book odds, the two markets often disagree by 1–10%+, especially on smaller games and futures.
+        <p className="text-lg text-muted-foreground mb-6 max-w-3xl">
+          Kalshi is a CFTC-regulated event-contract exchange (legal in all 50 US states) — its prices float on supply and demand with no house edge baked in. US sportsbooks set their own lines and bake in vigorish (the &ldquo;vig&rdquo; — typically 4–5% on moneylines). After de-vigging book odds, the two markets often disagree by 1–10%+, especially on smaller games and futures. The deep-research pages below break down each pairing with brand profiles, funding/scale facts, feature-by-feature tables, regulatory comparisons, and live edge feeds.
         </p>
+
+        <TradingCtaRow campaign="compare-hub" className="mb-10" />
 
         <h2 className="text-2xl font-bold mb-4">Side-by-side comparisons</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
@@ -62,6 +66,43 @@ export default function ComparePage() {
             </Link>
           ))}
         </div>
+
+        {/* Brand-at-a-glance summary table — every brand in the registry
+            with founded year + regulator + monthly volume + valuation. */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-3">Every brand we compare</h2>
+          <p className="text-sm text-muted-foreground mb-4">Quick-reference facts on all 9 brands SportsBookISH covers. Click any name for the full review (with funding rounds, key investors, feature comparison table, FAQ, and citations).</p>
+          <div className="overflow-x-auto rounded-lg border border-border/60">
+            <table className="w-full text-sm">
+              <thead className="bg-card/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th scope="col" className="text-left px-3 py-2">Brand</th>
+                  <th scope="col" className="text-left px-3 py-2">Category</th>
+                  <th scope="col" className="text-left px-3 py-2">Founded</th>
+                  <th scope="col" className="text-left px-3 py-2">Regulator</th>
+                  <th scope="col" className="text-left px-3 py-2">Monthly volume</th>
+                  <th scope="col" className="text-left px-3 py-2">Valuation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(BRAND_PROFILES).map((p) => (
+                  <tr key={p.slug} className="border-t border-border/40 align-top">
+                    <th scope="row" className="text-left px-3 py-2 font-medium whitespace-nowrap">
+                      <Link href={`/sportsbooks/${p.slug}`} className="hover:text-emerald-400">
+                        <span aria-hidden="true">{p.emoji} </span>{p.name} →
+                      </Link>
+                    </th>
+                    <td className="px-3 py-2 text-muted-foreground capitalize">{p.category.replace("-", " ")}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{p.founded}</td>
+                    <td className="px-3 py-2 text-muted-foreground text-xs">{p.regulator}</td>
+                    <td className="px-3 py-2 text-muted-foreground text-xs">{p.monthlyVolumeUsd || "—"}</td>
+                    <td className="px-3 py-2 text-muted-foreground text-xs">{p.valuationUsd || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <section className="prose prose-invert max-w-none">
           <h2 className="text-2xl font-bold mb-3">Why compare Kalshi to sportsbooks?</h2>

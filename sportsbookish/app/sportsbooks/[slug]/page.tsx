@@ -12,6 +12,11 @@ import { fmtPct, fmtAmerican } from "@/lib/format";
 import { JsonLd, breadcrumbLd, faqLd } from "@/lib/seo";
 import { LastUpdated, datasetFreshnessLd } from "@/components/LastUpdated";
 import { affiliateUrl } from "@/lib/affiliates";
+import { getBrandProfile, brandOrganizationLd, type BrandProfile } from "@/lib/brand-profiles";
+import BrandProfileCard from "@/components/BrandProfileCard";
+import FeatureComparisonTable from "@/components/FeatureComparisonTable";
+import TradingCtaRow from "@/components/TradingCtaRow";
+import PolymarketPromo from "@/components/PolymarketPromo";
 
 export const dynamic = "force-dynamic";
 
@@ -144,6 +149,12 @@ export default async function SportsbookComparisonPage({ params }: PageProps) {
   const renderTime = new Date().toISOString();
   const faqItems = buildFaq(parsed)!;
 
+  // Pull deep brand profiles from the central registry. The registry is the
+  // source of truth for funding/scale/regulator/citations; sportsbook-meta.ts
+  // is the thin promo-summary layer used for tabular display.
+  const primaryProfile: BrandProfile | null = getBrandProfile(parsed.primary.key);
+  const secondaryProfile: BrandProfile | null = parsed.secondary ? getBrandProfile(parsed.secondary.key) : null;
+
   return (
     <div className="min-h-screen">
       <JsonLd data={breadcrumbLd([
@@ -158,6 +169,19 @@ export default async function SportsbookComparisonPage({ params }: PageProps) {
         pageUrl: `${SITE_URL}/sportsbooks/${slug}`,
         dateModified: renderTime,
       })} />
+      {primaryProfile && <JsonLd data={brandOrganizationLd(primaryProfile)} />}
+      {secondaryProfile && <JsonLd data={brandOrganizationLd(secondaryProfile)} />}
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: title,
+        description,
+        author: { "@type": "Person", name: "Kenny Hyder", url: `${SITE_URL}/about/kenny-hyder` },
+        publisher: { "@type": "Organization", name: "SportsBookISH", url: SITE_URL },
+        mainEntityOfPage: `${SITE_URL}/sportsbooks/${slug}`,
+        datePublished: "2026-05-12",
+        dateModified: renderTime.slice(0, 10),
+      }} />
 
       <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4 gap-2">
@@ -174,11 +198,90 @@ export default async function SportsbookComparisonPage({ params }: PageProps) {
           <p className="text-muted-foreground mt-3 max-w-3xl">{description}</p>
         </section>
 
-        {/* Book quick facts (or both books for vs pages) */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <BookFacts entity={parsed.primary} kind={parsed.type === "kalshi_vs_book" || parsed.type === "polymarket_vs_book" ? "exchange" : "book"} />
-          {parsed.secondary && <BookFacts entity={parsed.secondary} kind="book" />}
+        {/* Top-of-page CTAs — universal Trade-on-Kalshi/Polymarket affiliate
+            links plus, for kalshi-vs-X or polymarket-vs-X pages, an inline
+            iOS-gated $50 Polymarket promo card. */}
+        <section>
+          <TradingCtaRow
+            campaign={`sportsbooks-${slug}`}
+            showKalshi={true}
+            showPolymarket={parsed.type === "polymarket_vs_book" || parsed.type === "single"}
+          />
         </section>
+
+        {/* Deep brand profiles. Falls back to the thin BookFacts card for
+            any brand not in the registry (shouldn't happen — all major
+            brands are now seeded). */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {primaryProfile
+            ? <BrandProfileCard profile={primaryProfile} campaign={`sportsbooks-${slug}-profile`} accentClass={parsed.type.includes("kalshi") ? "border-amber-500/40" : parsed.type.includes("polymarket") ? "border-fuchsia-500/40" : "border-emerald-500/40"} highlightClass={parsed.type.includes("kalshi") ? "text-amber-400" : parsed.type.includes("polymarket") ? "text-fuchsia-400" : "text-emerald-400"} />
+            : <BookFacts entity={parsed.primary} kind={parsed.type === "kalshi_vs_book" || parsed.type === "polymarket_vs_book" ? "exchange" : "book"} />}
+          {parsed.secondary && (
+            secondaryProfile
+              ? <BrandProfileCard profile={secondaryProfile} campaign={`sportsbooks-${slug}-profile`} accentClass="border-emerald-500/40" highlightClass="text-emerald-400" />
+              : <BookFacts entity={parsed.secondary} kind="book" />
+          )}
+        </section>
+
+        {/* Feature-by-feature comparison table — only renders on vs pages
+            where both sides exist in the registry. */}
+        {primaryProfile && secondaryProfile && (
+          <section>
+            <h2 className="text-xl font-semibold mb-3">Feature-by-feature comparison</h2>
+            <FeatureComparisonTable
+              left={primaryProfile}
+              right={secondaryProfile}
+              caption={`Side-by-side dimensions that matter when choosing between ${primaryProfile.name} and ${secondaryProfile.name}. Volumes are best-effort as of ${primaryProfile.asOf}.`}
+            />
+          </section>
+        )}
+
+        {/* "When to use which" picker — drives AI-overview-friendly extracts. */}
+        {primaryProfile && secondaryProfile && (
+          <section className="grid md:grid-cols-2 gap-4">
+            <div className={`rounded-lg border p-5 ${parsed.type.includes("kalshi") ? "border-amber-500/30 bg-amber-500/5" : parsed.type.includes("polymarket") ? "border-fuchsia-500/30 bg-fuchsia-500/5" : "border-emerald-500/30 bg-emerald-500/5"}`}>
+              <h2 className={`text-lg font-semibold mb-2 ${parsed.type.includes("kalshi") ? "text-amber-400" : parsed.type.includes("polymarket") ? "text-fuchsia-400" : "text-emerald-400"}`}>Use {primaryProfile.name} when…</h2>
+              <ul className="space-y-2 text-sm list-disc pl-5">
+                {primaryProfile.bestFor.map((s) => <li key={s}>{s}</li>)}
+              </ul>
+            </div>
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+              <h2 className="text-lg font-semibold text-emerald-400 mb-2">Use {secondaryProfile.name} when…</h2>
+              <ul className="space-y-2 text-sm list-disc pl-5">
+                {secondaryProfile.bestFor.map((s) => <li key={s}>{s}</li>)}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        {/* Strengths & trade-offs side-by-side (vs pages) or stacked (single). */}
+        {primaryProfile && (
+          <section className={parsed.secondary && secondaryProfile ? "grid md:grid-cols-2 gap-4" : ""}>
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+              <h3 className="text-sm font-semibold text-emerald-400 mb-2">{primaryProfile.name} strengths</h3>
+              <ul className="space-y-1.5 text-sm list-disc pl-5">{primaryProfile.strengths.map((s) => <li key={s}>{s}</li>)}</ul>
+              <h3 className="text-sm font-semibold text-rose-400 mt-4 mb-2">{primaryProfile.name} trade-offs</h3>
+              <ul className="space-y-1.5 text-sm list-disc pl-5">{primaryProfile.weaknesses.map((s) => <li key={s}>{s}</li>)}</ul>
+            </div>
+            {parsed.secondary && secondaryProfile && (
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-5">
+                <h3 className="text-sm font-semibold text-emerald-400 mb-2">{secondaryProfile.name} strengths</h3>
+                <ul className="space-y-1.5 text-sm list-disc pl-5">{secondaryProfile.strengths.map((s) => <li key={s}>{s}</li>)}</ul>
+                <h3 className="text-sm font-semibold text-rose-400 mt-4 mb-2">{secondaryProfile.name} trade-offs</h3>
+                <ul className="space-y-1.5 text-sm list-disc pl-5">{secondaryProfile.weaknesses.map((s) => <li key={s}>{s}</li>)}</ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* iOS-only Polymarket bonus card — shows on polymarket-vs-X pages
+            and the standalone polymarket review (parsed.type === "single"
+            with primary.key === "polymarket"). */}
+        {(parsed.type === "polymarket_vs_book" || (parsed.type === "single" && parsed.primary.key === "polymarket")) && (
+          <section className="flex justify-center">
+            <PolymarketPromo size="300x250" campaign={`sportsbooks-${slug}`} />
+          </section>
+        )}
 
         {/* Live odds table */}
         <section>
@@ -267,6 +370,39 @@ export default async function SportsbookComparisonPage({ params }: PageProps) {
             </CardContent>
           </Card>
         </section>
+
+        {/* Sources & citations — feeds AI overviews + Perplexity with a
+            verifiable trail back to primary sources. */}
+        {(primaryProfile || secondaryProfile) && (
+          <section className="rounded-lg border border-border/60 bg-card/30 p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">Sources and further reading</h2>
+            <div className={`grid gap-4 text-sm ${primaryProfile && secondaryProfile ? "md:grid-cols-2" : ""}`}>
+              {primaryProfile && (
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">{primaryProfile.name}</h3>
+                  <ul className="space-y-1">
+                    {primaryProfile.sources.map((s) => (
+                      <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">{s.label} ↗</a></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {secondaryProfile && (
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">{secondaryProfile.name}</h3>
+                  <ul className="space-y-1">
+                    {secondaryProfile.sources.map((s) => (
+                      <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">{s.label} ↗</a></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-4">
+              All figures best-effort as of {(primaryProfile || secondaryProfile)?.asOf}. Funding, valuations, and volume are sourced from public filings, official communications, and third-party trackers (Crunchbase, Wikipedia). Affiliate disclosure: SportsBookISH may receive a referral commission when readers sign up for a regulated sportsbook or prediction market via links on this page.
+            </p>
+          </section>
+        )}
 
         {/* Related comparisons */}
         <RelatedLinks parsed={parsed} />

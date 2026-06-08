@@ -784,6 +784,98 @@ const BETRIVERS: BrandProfile = {
   ],
 };
 
+const CIRCA: BrandProfile = {
+  slug: "circa",
+  name: "Circa Sports",
+  legalName: "Circa Sports LLC (Stevens family ownership)",
+  category: "sportsbook",
+  emoji: "♠️",
+  tagline: "The sharp's sportsbook — highest limits in the regulated US market",
+  oneSentence:
+    "Circa Sports is the sportsbook arm of Circa Resort & Casino (Derek and Greg Stevens, downtown Las Vegas), known for the highest limits in regulated US sports betting, no per-account caps for sharps, and the legendary Circa Million / Circa Survivor contests.",
+  intro:
+    "Launched in 2019 alongside the Circa Resort opening, Circa Sports is the only major US sportsbook that explicitly does NOT limit winning bettors. It runs the largest US sports betting contest (Circa Million, $14M+ guaranteed prize pool) and the Circa Survivor NFL pool. Operates retail kiosks in Nevada plus app/retail in Colorado, Iowa, Illinois, and Kentucky. Private and family-owned — no SPAC, no IPO, no public valuation pressure.",
+
+  founded: 2019,
+  foundersText: "Derek Stevens, Greg Stevens (Stevens family)",
+  hq: "Las Vegas, NV",
+  ceo: "Derek Stevens (also CEO of Circa Resort & Casino)",
+  employeesText: "~150 (Circa Sports specifically)",
+  parentCompany: "Circa Resort & Casino LLC (Stevens family)",
+  publicTicker: null,
+
+  regulator: "Nevada Gaming Control Board + state gaming commissions (CO, IA, IL, KY)",
+  regulatoryStatus:
+    "Nevada Gaming Control Board licensed (gold-standard US gaming regulator). Family-owned, no SPAC overhang, no public earnings pressure.",
+  statesAvailable: "Nevada (kiosk + app); Colorado, Iowa, Illinois, Kentucky retail",
+
+  asOf: "2025-Q4",
+  monthlyVolumeUsd: "Undisclosed (private); reportedly $50–100M/month handle",
+  annualVolumeUsd: "Undisclosed (private)",
+  userCountText: "Niche — sharps + serious recreational; not retail-mass-market",
+
+  totalRaisedUsd: "N/A — privately held by the Stevens family",
+  lastRoundLabel: "N/A — bootstrapped within Circa Resort holdings",
+  lastRoundUsd: null,
+  valuationUsd: "N/A — private",
+  keyInvestors: ["Stevens family (sole owners)"],
+
+  feeStructure: "Standard sportsbook vig (~3–4% on moneylines, often tighter than DK/FD)",
+  minPosition: "$0.50 minimum bet",
+  maxPosition: "Highest limits in the regulated US market — published max limits, no winner limiting",
+  paymentMethods: ["Cash (retail)", "Debit card", "VIP Preferred", "Wire (high-volume)"],
+  settlementCurrency: "USD",
+  withdrawalSpeed: "Same-day in Nevada retail; 1–3 business days for app withdrawals",
+  mobileApps: "iOS, Android (Nevada + Colorado + Iowa + Illinois + Kentucky)",
+  supportedMarkets: [
+    "NFL, NBA, MLB, NHL",
+    "NCAA football + basketball",
+    "Golf, tennis, MMA, F1",
+    "Limited prop coverage vs DK/FD",
+    "No same-game parlays (intentional — Circa rejects SGP economics)",
+    "Famous for sharp opening lines on NFL",
+  ],
+  productCategories: ["Sports betting (sharp-focused)", "Sports betting contests ($14M+ Circa Million)", "Circa Survivor NFL pool"],
+
+  strengths: [
+    "Only major US sportsbook that doesn't limit winning bettors — published, repeatedly confirmed",
+    "Highest accepted bet limits in regulated US ($25k+ on NFL sides routinely)",
+    "Sharp opening lines on NFL — Circa is often the price discovery venue",
+    "Family-owned, no public-earnings-pressure to maximize hold against sharps",
+    "Legendary contests (Circa Million $14M+, Circa Survivor) — competition-level engagement",
+  ],
+  weaknesses: [
+    "Limited state availability (NV + CO + IA + IL + KY — not in 25+ states like DK/FD)",
+    "Shallow player-prop coverage vs DraftKings/FanDuel",
+    "No same-game parlays — by design, but a deal-breaker for SGP-focused recreational users",
+    "No traditional new-user promo (Circa's pitch is sharp lines, not deposit bonuses)",
+    "App polish trails DK/FD",
+  ],
+  bestFor: [
+    "Sharps who get limited at DraftKings/FanDuel",
+    "NFL bettors who want sharpest opening lines",
+    "Contest players (Circa Million, Circa Survivor are best-in-class)",
+    "Anyone willing to trade promo dollars for line quality",
+  ],
+  notFor: [
+    "Same-game parlay players (Circa doesn't offer SGPs)",
+    "Players outside Nevada / Colorado / Iowa / Illinois / Kentucky",
+    "Promo-chasers (no traditional first-bet bonus)",
+    "Player-prop specialists (limited coverage)",
+  ],
+
+  officialSite: "https://www.circasports.com",
+  crunchbaseUrl: null,
+  wikipediaUrl: "https://en.wikipedia.org/wiki/Circa_Resort_%26_Casino",
+  twitterHandle: "@CircaSports",
+
+  sources: [
+    { label: "Circa Sports official", url: "https://www.circasports.com" },
+    { label: "Wikipedia: Circa Resort & Casino", url: "https://en.wikipedia.org/wiki/Circa_Resort_%26_Casino" },
+    { label: "Nevada Gaming Control Board", url: "https://gaming.nv.gov" },
+  ],
+};
+
 // ============================================================================
 // Registry export
 // ============================================================================
@@ -797,6 +889,7 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
   caesars: CAESARS,
   fanatics: FANATICS,
   betrivers: BETRIVERS,
+  circa: CIRCA,
 };
 
 export function getBrandProfile(slug: string): BrandProfile | null {
