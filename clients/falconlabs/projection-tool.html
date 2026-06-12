@@ -126,7 +126,7 @@
 
     <div class="container">
         <h1>Budget &amp; Merchant Acquisition Projections</h1>
-        <p class="page-sub">Select keyword groups to project the <strong>monthly budget needed</strong> to capture them, at real Google Keyword Planner top-of-page bids (volume-weighted across all keywords in each group). Toggle between Google's <strong>Low</strong>, <strong>Average</strong>, and <strong>High</strong> bid scenarios — Average is the default planning basis — then follow the funnel through installs, activated merchants, and recurring platform revenue.</p>
+        <p class="page-sub">Select keyword groups to project the <strong>monthly budget needed</strong> to capture them, at real Google Keyword Planner top-of-page bids (volume-weighted across all keywords in each group). Google's bid range maps to ad position: <strong>Low</strong> = bottom of the top-of-page ads, <strong>High</strong> = absolute-top premium placement — and higher positions earn higher click-through rates, so the capture rate moves with the bid basis (you can still override it). Capture defaults are calibrated to position-CTR curves and benchmarks from well-targeted accounts we operate.</p>
 
         <div class="layout">
             <div class="panel">
@@ -147,9 +147,9 @@
 
                 <h2 style="margin-top:8px;">Funnel Assumptions</h2>
                 <div class="field">
-                    <label for="capture">Search Capture Rate <span class="val" id="capture-val">10%</span></label>
-                    <input type="range" id="capture" min="3" max="30" step="1" value="10">
-                    <label><span style="font-size:0.74rem;">share of monthly searches won as ad clicks (impression share × CTR)</span></label>
+                    <label for="capture">Search Capture Rate <span class="val" id="capture-val">12%</span></label>
+                    <input type="range" id="capture" min="3" max="30" step="1" value="12">
+                    <label><span style="font-size:0.74rem;">share of monthly searches won as ad clicks (impression share × position CTR). Auto-syncs with bid basis — Low 6% / Average 12% / High 18% — adjustable.</span></label>
                 </div>
                 <div class="field">
                     <label for="cvr">Click → Install Rate <span class="val" id="cvr-val">4.0%</span></label>
@@ -196,39 +196,65 @@
 
     <script>
         // Volume-weighted Google Keyword Planner bids computed from data/keywords-combined.json
-        // (low/high = KP top-of-page bid range; avg = midpoint). Conquest excludes ambiguous
-        // terms ("uptick" alone, rokt etf/glassdoor/stock).
+        // (low/high = KP top-of-page bid range; avg = midpoint). Ambiguous terms excluded
+        // ("uptick" bare, rokt etf/glassdoor/stock). Groups marked est: too few KP bid
+        // samples — bids estimated from their category's weighted bids.
         const GROUPS = [
-            { key: 'category',  name: 'Post-Purchase / Thank-You Page', vol: 1020,  low: 6.74,  high: 42.49, on: true,
-              desc: 'post purchase offers/upsell, thank you page, order confirmation, checkout upsell, AOV — 71 keywords' },
-            { key: 'shopify',   name: 'Shopify / App Terms',            vol: 3700,  low: 3.85,  high: 30.72, on: true,
+            { section: 'Category & Platform Terms' },
+            { key: 'postpurchase', name: 'Post-Purchase Offers & Upsell',     vol: 670,   low: 6.74,  high: 42.49, on: true,
+              desc: 'post purchase offers/upsell/ads, AOV, comparison terms — 34 keywords' },
+            { key: 'thankyou',     name: 'Thank-You / Order-Confirmation',    vol: 410,   low: 6.74,  high: 42.49, on: true, est: true,
+              desc: 'thank you page, order confirmation page, checkout upsell — 40 keywords (bids est. from post-purchase category)' },
+            { key: 'shopify',      name: 'Shopify / App Terms',               vol: 3700,  low: 3.85,  high: 30.72, on: true,
               desc: 'shopify upsell/post-purchase/thank-you-page apps + platform app terms — 151 keywords' },
-            { key: 'conquest',  name: 'Competitor Conquesting',         vol: 17110, low: 2.36,  high: 20.69, on: true,
-              desc: 'rokt, aftersell, uptick, disco, fluent, momentscience + alternatives/vs terms — 99 keywords (ambiguous terms excluded)' },
-            { key: 'monetize',  name: 'Ecommerce Monetization',         vol: 11980, low: 6.67,  high: 57.10, on: false,
-              desc: 'website/ecommerce monetization + commerce media — 116 keywords, broader intent' },
-            { key: 'advertiser',name: 'Advertiser / Demand Side',       vol: 3620,  low: 13.12, high: 65.34, on: false,
+            { key: 'commedia',     name: 'Commerce Media / Retail Media',     vol: 3370,  low: 10.83, high: 84.37, on: true,
+              desc: 'commerce media network/platform, retail media — 45 keywords, category-defining enterprise terms' },
+            { key: 'monetize',     name: 'Ecommerce Monetization (broad)',    vol: 8610,  low: 5.03,  high: 46.27, on: false,
+              desc: 'website/ecommerce monetization — 71 keywords, broader intent, expansion tier' },
+            { key: 'advertiser',   name: 'Advertiser / Demand Side',          vol: 3620,  low: 13.12, high: 65.34, on: false,
               desc: 'native ad networks, customer acquisition, post-transaction advertising — brand-side recruitment, 31 keywords' },
+            { section: 'Competitor Conquesting' },
+            { key: 'rokt',         name: 'Rokt',                              vol: 13750, low: 1.54,  high: 17.72, on: true,
+              desc: 'rokt + alternatives/reviews/pricing — 32 keywords (etf/careers noise excluded; includes brand-curiosity volume)' },
+            { key: 'aftersell',    name: 'AfterSell',                         vol: 1090,  low: 3.89,  high: 36.82, on: true,
+              desc: 'aftersell + shopify/reviews/pricing/alternatives — 10 keywords' },
+            { key: 'uptick',       name: 'Uptick',                            vol: 40,    low: 7.50,  high: 44.00, on: true, est: true,
+              desc: 'uptick offers/shopify/thank you page — 6 keywords (bare "uptick" excluded as ambiguous; bids est.)' },
+            { key: 'disco',        name: 'Disco / DiscoFeed',                 vol: 240,   low: 27.88, high: 67.73, on: true,
+              desc: 'disco network, discofeed, disco cross sell — 5 keywords' },
+            { key: 'fluent',       name: 'Fluent / AdFlow',                   vol: 200,   low: 7.50,  high: 44.00, on: true, est: true,
+              desc: 'fluent adflow, adflow, rebuy ads — 5 keywords (bids est.)' },
+            { key: 'momentsci',    name: 'MomentScience / AdsPostX',          vol: 160,   low: 11.65, high: 51.48, on: true,
+              desc: 'momentscience, adspostx, momentperks — 4 keywords' },
+            { key: 'adjacent',     name: 'Adjacent Apps (ReConvert, Zipify…)',vol: 1630,  low: 5.35,  high: 28.96, on: true,
+              desc: 'reconvert, zipify ocu, paylode, carro, honeycomb — 37 keywords; own-product upsell apps occupying the same page real estate' },
         ];
-        GROUPS.forEach(g => g.avg = +((g.low + g.high) / 2).toFixed(2));
+        GROUPS.forEach(g => { if (g.key) g.avg = +((g.low + g.high) / 2).toFixed(2); });
 
         let basis = 'avg';
+        // Higher top-of-page bids buy higher ad positions, and higher positions earn higher
+        // CTR (position-CTR curve). Capture default moves with the bid basis; user-adjustable.
+        const CAPTURE_BY_BASIS = { low: 6, avg: 12, high: 18 };
 
         const $ = id => document.getElementById(id);
         const fmt$ = n => '$' + Math.round(n).toLocaleString();
         const fmt$2 = n => '$' + n.toFixed(2);
         const fmt = n => Math.round(n).toLocaleString();
 
-        // group rows
+        // group rows (section headers + selectable groups)
         const kwBody = $('kw-body');
         GROUPS.forEach((g, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${g.on ? 'checked' : ''}></td>
-                <td class="gname" title="${g.desc}">${g.name}</td>
-                <td class="num">${g.vol.toLocaleString()}</td>
-                <td class="num cpc-cell" data-b="low">${fmt$2(g.low)}</td>
-                <td class="num cpc-cell" data-b="avg">${fmt$2(g.avg)}</td>
-                <td class="num cpc-cell" data-b="high">${fmt$2(g.high)}</td>`;
+            if (g.section) {
+                tr.innerHTML = `<td colspan="6" style="padding-top:12px;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.6px;color:var(--gold);font-weight:800;border-bottom:1px solid var(--border);">${g.section}</td>`;
+            } else {
+                tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${g.on ? 'checked' : ''}></td>
+                    <td class="gname" title="${g.desc}">${g.name}${g.est ? ' <span style="color:var(--text-secondary);font-weight:400" title="bids estimated — too few KP samples">~</span>' : ''}</td>
+                    <td class="num">${g.vol.toLocaleString()}</td>
+                    <td class="num cpc-cell" data-b="low">${fmt$2(g.low)}</td>
+                    <td class="num cpc-cell" data-b="avg">${fmt$2(g.avg)}</td>
+                    <td class="num cpc-cell" data-b="high">${fmt$2(g.high)}</td>`;
+            }
             kwBody.appendChild(tr);
         });
 
@@ -252,7 +278,7 @@
             $('orders-val').textContent = fmt(orders);
             highlightBasis();
 
-            const sel = GROUPS.filter((g, i) => kwBody.querySelector(`input[data-i="${i}"]`).checked);
+            const sel = GROUPS.filter((g, i) => g.key && kwBody.querySelector(`input[data-i="${i}"]`)?.checked);
             if (!sel.length) {
                 $('budget-needed').textContent = '$0';
                 $('budget-range').innerHTML = 'Select at least one keyword group.';
@@ -306,7 +332,8 @@
                 Each month's cohort of ${fmt(activated)} merchants generates ${fmt$(newMRR)}/mo recurring. At ${(churn*100).toFixed(0)}% monthly churn,
                 cohort LTV ≈ ${fmt$(newMRR / churn)} (${(1/churn).toFixed(0)}-mo avg lifetime) vs ${fmt$(budget)} acquisition cost —
                 <strong style="color:var(--text-primary)">LTV:CAC ${(newMRR / churn / Math.max(budget,1)).toFixed(1)}:1</strong>.
-                Real-world CPCs typically land below KP Average for well-managed accounts with strong Quality Scores — treat Low as the optimized-account target.`;
+                Real-world CPCs typically land below KP Average for well-managed accounts with strong Quality Scores — treat Low as the optimized-account target.
+                <strong style="color:var(--text-primary)">Cost per activated merchant (${fmt$(cpm_)}) is the KPI this channel should be managed — and compensated — against.</strong>`;
 
             let merchants = 0, totalSpend = 0, totalRev = 0;
             let html = '<thead><tr><th>Month</th><th class="num">Spend</th><th class="num">New Merchants</th><th class="num">Active Merchants</th><th class="num">Platform Rev</th><th class="num">Cumulative Net</th></tr></thead><tbody>';
@@ -327,6 +354,8 @@
                 basis = b.dataset.basis;
                 document.querySelectorAll('.cpc-btn').forEach(x => x.classList.remove('active'));
                 b.classList.add('active');
+                // position-CTR coupling: higher bid basis = higher ad position = higher CTR
+                $('capture').value = CAPTURE_BY_BASIS[basis];
                 calc();
             });
         });
