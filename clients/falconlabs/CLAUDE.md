@@ -49,13 +49,31 @@ Adjacent (monitor, different model): ReConvert, Zipify OCU, Honeycomb, Carro, Pa
 
 ## Data
 
-- `data/keywords-combined.json` — 514 keywords: category, intent, brand_group XOR
+- `data/keywords-combined.json` — 872 keywords: category, intent, brand_group XOR
   short_tail_group (DG24 mutual-exclusion convention), KP volume / low_bid / high_bid /
-  competition. Generated June 2026.
+  competition, plus per-keyword `brands` array (SimilarWeb 12-mo paid data: clicks,
+  cpc, est_spend, top_url per competitor) and top-level `similarweb.paid_summary`.
+- `data/Website Keywords-<domain>-(999)-(2025_06-2026_05).xlsx` — SimilarWeb 12-mo
+  "All keywords" exports for all 6 competitors (added 2026-06-12). Paid activity =
+  Clicks × Paid share. Sheet: `Website_Keywords`.
+- `data/sw-parsed.json` — parsed SW exports (all keywords incl. organic-only)
 - `data/keyword-seed.json` — 110 seed keywords by category (input)
 - `data/kp-raw.json` — raw KP API responses (110 exact + 579 related ideas)
-- Regenerate: re-run seeds through `POST https://hyder.me/api/google-ads/keywords`
-  (batch 15, 1.5s delay, `exactOnly: false` to harvest related ideas)
+- Regenerate KP side: re-run seeds through `POST https://hyder.me/api/google-ads/keywords`
+  (batch 15, 1.5s delay, `exactOnly: false`). SW-added rows have `source: 'similarweb'`
+  and `volume: null` (SW volumes aren't KP-comparable — junk generics filtered:
+  kept only category-relevant / brand-group / ≥$100-spend terms).
+
+### SimilarWeb paid findings (12mo, Jun 2025–May 2026) — THE pitch ammunition
+| Brand | Est. spend | Brand-defense share | Non-brand |
+|---|---|---|---|
+| Rokt | $161K | 96% of paid clicks | $2.3K only |
+| AfterSell | $355K | 68% | $30K — ONLY real non-brand spender |
+| MomentScience | $21.7K | 0% | 100% conquesting (rokt, aftersell, fluent) |
+| Uptick / Disco / Fluent | $0 | — | ZERO paid search |
+
+AfterSell's #1 non-brand paid kw = "rokt" ($7.3K). Everyone conquests Rokt; nobody
+defends. Real CPC validation: "post purchase upsell shopify" $16.45 actual.
 
 ## Keyword data caveats
 

@@ -133,7 +133,7 @@
 
     <div class="container">
         <h1>Keyword Universe</h1>
-        <p class="page-sub">514 keywords researched for the post-purchase monetization category, enriched with live Google Keyword Planner data (June 2026): monthly volume, top-of-page bid range, and competition. Click a group card to filter; click column headers to sort.</p>
+        <p class="page-sub">872 keywords researched for the post-purchase monetization category: live Google Keyword Planner data (volume, top-of-page bids, competition) merged with 12 months of SimilarWeb paid-search history for all six competitors (Jun 2025 – May 2026). The <strong>Competitors Bidding</strong> column shows who actually pays for each term — hover a dot for their clicks and spend. Click a group card to filter; click column headers to sort.</p>
 
         <div class="stats-row" id="stats-row"></div>
 
@@ -163,6 +163,7 @@
                 <option>HIGH</option>
             </select>
             <label>Min volume <input type="number" id="min-vol" value="0" style="width:80px;background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);border-radius:6px;padding:8px;"></label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="paid-only" style="accent-color:var(--accent);width:15px;height:15px;"> Competitor-paid only</label>
             <button class="btn-sm btn-ghost" id="clear-btn">Clear Filters</button>
             <button class="btn-sm" id="export-btn" style="margin-left:auto;">Export CSV</button>
         </div>
@@ -181,10 +182,11 @@
                         <th class="num" data-sort="low_bid">Low Bid</th>
                         <th class="num" data-sort="high_bid">High Bid</th>
                         <th data-sort="competition">Competition</th>
+                        <th class="num" data-sort="paid_spend">Competitors Bidding</th>
                     </tr>
                 </thead>
                 <tbody id="kw-body">
-                    <tr><td colspan="8" class="loading">Loading keyword data…</td></tr>
+                    <tr><td colspan="9" class="loading">Loading keyword data…</td></tr>
                 </tbody>
             </table>
         </div>
@@ -198,8 +200,13 @@
         let selectedGroupType = null;
         let groupTab = 'topics';
 
+        const BRAND_COLORS = {
+            rokt: '#ec4899', aftersell: '#3b82f6', uptick: '#22c55e',
+            disco: '#f59e0b', fluent: '#8b5cf6', momentscience: '#14b8a6',
+        };
         const fmt = n => n == null ? '—' : n.toLocaleString();
         const fmtBid = b => b == null ? '—' : '$' + b.toFixed(2);
+        const paidSpend = k => (k.brands || []).reduce((s, b) => s + (b.est_spend || 0), 0);
 
         async function load() {
             try {
@@ -211,7 +218,7 @@
                 render();
             } catch (e) {
                 document.getElementById('kw-body').innerHTML =
-                    `<tr><td colspan="8" class="loading">Error loading data: ${e.message}</td></tr>`;
+                    `<tr><td colspan="9" class="loading">Error loading data: ${e.message}</td></tr>`;
             }
         }
 
@@ -226,14 +233,18 @@
 
         function renderStats() {
             const kws = allData.keywords;
-            const totalVol = kws.reduce((s, k) => s + (k.volume || 0), 0);
+            // volume stat scoped to KP-verified keywords — SimilarWeb-added terms include
+            // ambiguous generics whose raw volumes would inflate the number meaninglessly
+            const totalVol = kws.filter(k => k.source !== 'similarweb').reduce((s, k) => s + (k.volume || 0), 0);
             const withBids = kws.filter(k => k.high_bid);
             const avgHigh = withBids.length ? withBids.reduce((s, k) => s + k.high_bid, 0) / withBids.length : 0;
-            const brandVol = kws.filter(k => k.brand_group && k.brand_group !== 'adjacent').reduce((s, k) => s + k.volume, 0);
+            const swSpend = allData.similarweb?.total_competitor_spend_12mo || 0;
+            const paidKws = kws.filter(k => (k.brands || []).length).length;
             document.getElementById('stats-row').innerHTML = `
                 <div class="stat-card"><div class="value">${fmt(allData.total_keywords)}</div><div class="label">Keywords</div></div>
-                <div class="stat-card"><div class="value">${fmt(totalVol)}</div><div class="label">Total Monthly Searches</div></div>
-                <div class="stat-card"><div class="value">${fmt(brandVol)}</div><div class="label">Competitor-Brand Volume</div></div>
+                <div class="stat-card"><div class="value">${fmt(totalVol)}</div><div class="label">KP-Verified Monthly Searches</div></div>
+                <div class="stat-card"><div class="value">$${Math.round(swSpend / 1000)}K</div><div class="label">Competitor Paid Spend (12mo)</div></div>
+                <div class="stat-card"><div class="value">${fmt(paidKws)}</div><div class="label">Competitor-Paid Keywords</div></div>
                 <div class="stat-card"><div class="value">$${avgHigh.toFixed(2)}</div><div class="label">Avg High Top-of-Page Bid</div></div>
                 <div class="stat-card"><div class="value">${Object.keys(allData.keyword_groups.topics).length + Object.keys(allData.keyword_groups.brands).length}</div><div class="label">Keyword Groups</div></div>`;
         }
@@ -266,12 +277,14 @@
             const intent = document.getElementById('intent-filter').value;
             const comp = document.getElementById('comp-filter').value;
             const minVol = parseInt(document.getElementById('min-vol').value) || 0;
+            const paidOnly = document.getElementById('paid-only').checked;
             return allData.keywords.filter(k => {
                 if (q && !k.keyword.includes(q)) return false;
                 if (cat && k.category !== cat) return false;
                 if (intent && k.intent !== intent) return false;
                 if (comp && k.competition !== comp) return false;
                 if (k.volume < minVol) return false;
+                if (paidOnly && !(k.brands || []).length) return false;
                 if (selectedGroup) {
                     if (selectedGroupType === 'brands' && k.brand_group !== selectedGroup) return false;
                     if (selectedGroupType === 'topics' && k.short_tail_group !== selectedGroup) return false;
@@ -285,6 +298,7 @@
             rows.sort((a, b) => {
                 let av, bv;
                 if (sortKey === 'group') { av = a.brand_group || a.short_tail_group || ''; bv = b.brand_group || b.short_tail_group || ''; }
+                else if (sortKey === 'paid_spend') { av = paidSpend(a); bv = paidSpend(b); }
                 else { av = a[sortKey]; bv = b[sortKey]; }
                 if (av == null) av = sortDir === 1 ? Infinity : -Infinity;
                 if (bv == null) bv = sortDir === 1 ? Infinity : -Infinity;
@@ -299,6 +313,10 @@
                 const group = k.brand_group
                     ? `<span class="tag tag-brand">${k.brand_group}</span>`
                     : (k.short_tail_group ? `<span class="tag tag-topic">${k.short_tail_group}</span>` : '—');
+                const bidding = (k.brands || []).map(b =>
+                    `<span title="${b.name}: ${b.clicks.toLocaleString()} paid clicks, $${(b.est_spend||0).toLocaleString()} est. spend (12mo)${b.cpc ? ', $' + b.cpc.toFixed(2) + ' CPC' : ''}" style="display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:3px;background:${BRAND_COLORS[b.name] || '#a59fb8'};cursor:help;"></span>`
+                ).join('');
+                const spend = paidSpend(k);
                 return `<tr>
                     <td>${k.keyword}</td>
                     <td><span class="tag tag-cat">${k.category}</span></td>
@@ -308,16 +326,20 @@
                     <td class="num">${fmtBid(k.low_bid)}</td>
                     <td class="num">${fmtBid(k.high_bid)}</td>
                     <td class="comp-${k.competition}">${k.competition}</td>
+                    <td class="num">${bidding || '—'}${spend ? `<span style="font-size:0.74rem;color:var(--text-secondary);margin-left:6px;">$${spend.toLocaleString()}</span>` : ''}</td>
                 </tr>`;
-            }).join('') || '<tr><td colspan="8" class="loading">No keywords match the current filters.</td></tr>';
+            }).join('') || '<tr><td colspan="9" class="loading">No keywords match the current filters.</td></tr>';
         }
 
         function exportCsv() {
             const rows = getFiltered();
-            const header = 'keyword,category,group,intent,monthly_volume,low_top_of_page_bid,high_top_of_page_bid,competition';
+            const header = 'keyword,category,group,intent,monthly_volume,low_top_of_page_bid,high_top_of_page_bid,competition,competitors_bidding,competitor_paid_clicks_12mo,competitor_est_spend_12mo';
             const lines = rows.map(k => [
                 `"${k.keyword}"`, `"${k.category}"`, `"${k.brand_group || k.short_tail_group || ''}"`,
-                k.intent, k.volume, k.low_bid ?? '', k.high_bid ?? '', k.competition
+                k.intent, k.volume, k.low_bid ?? '', k.high_bid ?? '', k.competition,
+                `"${(k.brands || []).map(b => b.name).join('; ')}"`,
+                (k.brands || []).reduce((s, b) => s + b.clicks, 0) || '',
+                paidSpend(k) || ''
             ].join(','));
             const blob = new Blob([header + '\n' + lines.join('\n')], { type: 'text/csv' });
             const a = document.createElement('a');
@@ -344,7 +366,7 @@
                 renderGroups();
             });
         });
-        ['search', 'category-filter', 'intent-filter', 'comp-filter', 'min-vol'].forEach(id => {
+        ['search', 'category-filter', 'intent-filter', 'comp-filter', 'min-vol', 'paid-only'].forEach(id => {
             document.getElementById(id).addEventListener('input', render);
         });
         document.getElementById('clear-btn').addEventListener('click', () => {
@@ -353,6 +375,7 @@
             document.getElementById('intent-filter').value = '';
             document.getElementById('comp-filter').value = '';
             document.getElementById('min-vol').value = 0;
+            document.getElementById('paid-only').checked = false;
             selectedGroup = null; selectedGroupType = null;
             renderGroups();
             render();
