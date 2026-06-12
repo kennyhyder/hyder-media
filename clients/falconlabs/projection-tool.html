@@ -39,46 +39,61 @@
         }
         .nav-link:hover { background: var(--border); color: var(--text-primary); }
         .nav-link.active { background: var(--accent); color: white; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+        .container { max-width: 1240px; margin: 0 auto; padding: 24px 20px; }
         h1 { font-size: 1.6rem; margin-bottom: 4px; }
-        .page-sub { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; max-width: 920px; }
+        .page-sub { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; max-width: 950px; }
 
-        .layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        .layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 950px) { .layout { grid-template-columns: 1fr; } }
 
         .panel { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-        .panel h2 { font-size: 1.05rem; margin-bottom: 16px; }
+        .panel h2 { font-size: 1.05rem; margin-bottom: 14px; }
         .panel h2 .hint { font-weight: 400; font-size: 0.78rem; color: var(--text-secondary); display: block; }
 
-        .field { margin-bottom: 16px; }
-        .field label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+        .kw-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 18px; }
+        .kw-table th { text-align: left; padding: 6px 6px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-secondary); border-bottom: 2px solid var(--border); }
+        .kw-table th.num, .kw-table td.num { text-align: right; }
+        .kw-table td { padding: 7px 6px; border-bottom: 1px solid rgba(51,45,69,.5); vertical-align: middle; }
+        .kw-table tr:last-child td { border-bottom: none; }
+        .kw-table input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; vertical-align: middle; }
+        .kw-table .gname { font-weight: 600; font-size: 0.84rem; cursor: help; }
+        .kw-table .cpc-active { color: var(--accent); font-weight: 700; }
+
+        .cpc-basis { display: flex; gap: 6px; margin-bottom: 18px; }
+        .cpc-btn {
+            flex: 1; padding: 9px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-tertiary);
+            color: var(--text-secondary); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s;
+        }
+        .cpc-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .cpc-label { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .field { margin-bottom: 14px; }
+        .field label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500; }
         .field label .val { color: var(--accent); font-weight: 700; }
         .field input[type="range"] { width: 100%; accent-color: var(--accent); }
-        .field input[type="number"], .field select {
-            width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
-            border-radius: 6px; padding: 9px 12px; font-size: 0.92rem; outline: none; font-family: inherit;
+
+        .budget-hero {
+            background: linear-gradient(135deg, rgba(254,111,80,0.2), rgba(255,200,0,0.1));
+            border: 1px solid var(--accent); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px;
         }
-        .field input:focus, .field select:focus { border-color: var(--accent); }
+        .budget-hero .b-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-secondary); font-weight: 700; margin-bottom: 2px; }
+        .budget-hero .b-value { font-size: 2.3rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
+        .budget-hero .b-range { font-size: 0.88rem; color: var(--text-secondary); }
+        .budget-hero .b-range strong { color: var(--text-primary); }
 
-        .kw-groups { margin-bottom: 8px; }
-        .kw-check { display: flex; align-items: center; gap: 10px; padding: 7px 4px; font-size: 0.88rem; border-bottom: 1px solid rgba(51,45,69,.5); }
-        .kw-check:last-child { border-bottom: none; }
-        .kw-check input { accent-color: var(--accent); width: 16px; height: 16px; }
-        .kw-check .meta { margin-left: auto; color: var(--text-secondary); font-size: 0.78rem; white-space: nowrap; }
-
-        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .r-card { background: var(--bg-tertiary); border-radius: 10px; padding: 16px 18px; }
-        .r-card .r-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 700; }
-        .r-card .r-value { font-size: 1.5rem; font-weight: 800; }
-        .r-card .r-sub { font-size: 0.75rem; color: var(--text-secondary); }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .r-card { background: var(--bg-tertiary); border-radius: 10px; padding: 14px 16px; }
+        .r-card .r-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 700; }
+        .r-card .r-value { font-size: 1.35rem; font-weight: 800; }
+        .r-card .r-sub { font-size: 0.74rem; color: var(--text-secondary); }
         .r-card.hl { background: linear-gradient(135deg, rgba(254,111,80,0.18), rgba(255,200,0,0.1)); border: 1px solid var(--accent); }
         .r-card.hl .r-value { color: var(--accent); }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { text-align: left; padding: 8px 10px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); border-bottom: 2px solid var(--border); }
-        th.num, td.num { text-align: right; }
-        td { padding: 8px 10px; border-bottom: 1px solid rgba(51,45,69,.5); }
-        tr.total td { font-weight: 800; border-top: 2px solid var(--border); border-bottom: none; }
+        table.res { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        table.res th { text-align: left; padding: 8px 10px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); border-bottom: 2px solid var(--border); }
+        table.res th.num, table.res td.num { text-align: right; }
+        table.res td { padding: 8px 10px; border-bottom: 1px solid rgba(51,45,69,.5); }
+        table.res tr.total td { font-weight: 800; border-top: 2px solid var(--border); border-bottom: none; }
 
         .note {
             background: var(--bg-tertiary); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0;
@@ -110,20 +125,31 @@
     </nav>
 
     <div class="container">
-        <h1>Merchant Acquisition Projections</h1>
-        <p class="page-sub">Models a Google Ads merchant-acquisition funnel for Falcon Labs: keyword-group spend → clicks → app installs → activated merchants → monthly platform revenue at Falcon's rev-share economics. CPCs default to the real Keyword Planner mid-bid for each selected group; every assumption is adjustable.</p>
+        <h1>Budget &amp; Merchant Acquisition Projections</h1>
+        <p class="page-sub">Select keyword groups to project the <strong>monthly budget needed</strong> to capture them, at real Google Keyword Planner top-of-page bids (volume-weighted across all keywords in each group). Toggle between Google's <strong>Low</strong>, <strong>Average</strong>, and <strong>High</strong> bid scenarios — Average is the default planning basis — then follow the funnel through installs, activated merchants, and recurring platform revenue.</p>
 
         <div class="layout">
             <div class="panel">
-                <h2>Campaign Inputs</h2>
+                <h2>Keyword Groups <span class="hint">Volume-weighted Google KP bids per group. Check to include in the plan.</span></h2>
+                <table class="kw-table">
+                    <thead>
+                        <tr><th></th><th>Group</th><th class="num">Vol/mo</th><th class="num">Low</th><th class="num">Avg</th><th class="num">High</th></tr>
+                    </thead>
+                    <tbody id="kw-body"></tbody>
+                </table>
 
-                <div class="kw-groups" id="kw-groups">
-                    <h2 style="font-size:0.85rem;margin-bottom:6px;">Keyword Groups <span class="hint">CPC = Keyword Planner mid-bid for the group</span></h2>
+                <div class="cpc-label">CPC Planning Basis (Google Keyword Planner)</div>
+                <div class="cpc-basis">
+                    <button class="cpc-btn" data-basis="low">Low</button>
+                    <button class="cpc-btn active" data-basis="avg">Average</button>
+                    <button class="cpc-btn" data-basis="high">High</button>
                 </div>
 
+                <h2 style="margin-top:8px;">Funnel Assumptions</h2>
                 <div class="field">
-                    <label for="budget">Monthly Budget <span class="val" id="budget-val">$10,000</span></label>
-                    <input type="range" id="budget" min="2000" max="50000" step="1000" value="10000">
+                    <label for="capture">Search Capture Rate <span class="val" id="capture-val">10%</span></label>
+                    <input type="range" id="capture" min="3" max="30" step="1" value="10">
+                    <label><span style="font-size:0.74rem;">share of monthly searches won as ad clicks (impression share × CTR)</span></label>
                 </div>
                 <div class="field">
                     <label for="cvr">Click → Install Rate <span class="val" id="cvr-val">4.0%</span></label>
@@ -140,7 +166,6 @@
                 <div class="field">
                     <label for="rpt">Falcon Net Revenue / Transaction <span class="val" id="rpt-val">$0.40</span></label>
                     <input type="range" id="rpt" min="0.10" max="1.50" step="0.05" value="0.40">
-                    <label style="margin-top:4px;"><span style="font-size:0.75rem;">Platform's gross take per merchant transaction (merchant payout side is separate)</span></label>
                 </div>
                 <div class="field">
                     <label for="churn">Monthly Merchant Churn <span class="val" id="churn-val">5%</span></label>
@@ -149,125 +174,169 @@
             </div>
 
             <div>
+                <div class="budget-hero">
+                    <div class="b-label">Projected Monthly Budget Needed</div>
+                    <div class="b-value" id="budget-needed">$0</div>
+                    <div class="b-range" id="budget-range"></div>
+                </div>
+
                 <div class="panel" style="margin-bottom: 20px;">
-                    <h2>Monthly Snapshot (Steady-State Spend)</h2>
+                    <h2>Monthly Funnel at Projected Budget</h2>
                     <div class="results-grid" id="results-grid"></div>
-                    <table id="group-table"></table>
+                    <table class="res" id="group-table"></table>
                     <div class="note" id="payback-note"></div>
                 </div>
 
                 <div class="panel">
-                    <h2>12-Month Compounding Projection <span class="hint">Activated merchants accumulate; churn applied monthly. This is the rev-share flywheel: unlike lead-gen, every acquired merchant keeps paying.</span></h2>
-                    <table id="annual-table"></table>
+                    <h2>12-Month Compounding Projection <span class="hint">Activated merchants accumulate month over month; churn applied. The rev-share flywheel: every acquired merchant keeps paying.</span></h2>
+                    <table class="res" id="annual-table"></table>
                 </div>
             </div>
         </div>
 
         <footer class="footer">
-            <p>Competitive Intelligence Suite prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a> for Falcon Labs · CPC data: Google Keyword Planner, June 2026</p>
+            <p>Competitive Intelligence Suite prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a> for Falcon Labs · CPCs: Google Keyword Planner top-of-page bids, volume-weighted per group, June 2026</p>
         </footer>
     </div>
 
     <script>
-        // CPC defaults = volume-weighted mid-bid from the keyword universe (data/keywords-combined.json)
+        // Volume-weighted Google Keyword Planner bids computed from data/keywords-combined.json
+        // (low/high = KP top-of-page bid range; avg = midpoint). Conquest excludes ambiguous
+        // terms ("uptick" alone, rokt etf/glassdoor/stock).
         const GROUPS = [
-            { key: 'category',  name: 'Post-Purchase / Thank-You Page', vol: 750,   cpc: 9.50,  on: true,  desc: 'post purchase offers, thank you page ads, order confirmation' },
-            { key: 'shopify',   name: 'Shopify / App Terms',            vol: 2630,  cpc: 12.00, on: true,  desc: 'shopify upsell app, post purchase app, thank you page app' },
-            { key: 'conquest',  name: 'Competitor Conquesting',         vol: 7200,  cpc: 8.00,  on: true,  desc: 'rokt/aftersell/uptick/disco alternatives + brand terms (excl. ambiguous)' },
-            { key: 'monetize',  name: 'Ecommerce Monetization',         vol: 8670,  cpc: 14.00, on: false, desc: 'broader monetization terms — wider intent, test later' },
-            { key: 'advertiser',name: 'Advertiser / Demand Side',       vol: 3500,  cpc: 22.00, on: false, desc: 'commerce media, native ad network — brand-side recruitment' },
+            { key: 'category',  name: 'Post-Purchase / Thank-You Page', vol: 1020,  low: 6.74,  high: 42.49, on: true,
+              desc: 'post purchase offers/upsell, thank you page, order confirmation, checkout upsell, AOV — 71 keywords' },
+            { key: 'shopify',   name: 'Shopify / App Terms',            vol: 3700,  low: 3.85,  high: 30.72, on: true,
+              desc: 'shopify upsell/post-purchase/thank-you-page apps + platform app terms — 151 keywords' },
+            { key: 'conquest',  name: 'Competitor Conquesting',         vol: 17110, low: 2.36,  high: 20.69, on: true,
+              desc: 'rokt, aftersell, uptick, disco, fluent, momentscience + alternatives/vs terms — 99 keywords (ambiguous terms excluded)' },
+            { key: 'monetize',  name: 'Ecommerce Monetization',         vol: 11980, low: 6.67,  high: 57.10, on: false,
+              desc: 'website/ecommerce monetization + commerce media — 116 keywords, broader intent' },
+            { key: 'advertiser',name: 'Advertiser / Demand Side',       vol: 3620,  low: 13.12, high: 65.34, on: false,
+              desc: 'native ad networks, customer acquisition, post-transaction advertising — brand-side recruitment, 31 keywords' },
         ];
+        GROUPS.forEach(g => g.avg = +((g.low + g.high) / 2).toFixed(2));
+
+        let basis = 'avg';
 
         const $ = id => document.getElementById(id);
         const fmt$ = n => '$' + Math.round(n).toLocaleString();
+        const fmt$2 = n => '$' + n.toFixed(2);
         const fmt = n => Math.round(n).toLocaleString();
 
-        // build group checkboxes
-        const kwEl = $('kw-groups');
+        // group rows
+        const kwBody = $('kw-body');
         GROUPS.forEach((g, i) => {
-            const row = document.createElement('label');
-            row.className = 'kw-check';
-            row.innerHTML = `<input type="checkbox" data-i="${i}" ${g.on ? 'checked' : ''}>
-                <span title="${g.desc}">${g.name}</span>
-                <span class="meta">${g.vol.toLocaleString()}/mo · ~$${g.cpc.toFixed(2)} CPC</span>`;
-            kwEl.appendChild(row);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="checkbox" data-i="${i}" ${g.on ? 'checked' : ''}></td>
+                <td class="gname" title="${g.desc}">${g.name}</td>
+                <td class="num">${g.vol.toLocaleString()}</td>
+                <td class="num cpc-cell" data-b="low">${fmt$2(g.low)}</td>
+                <td class="num cpc-cell" data-b="avg">${fmt$2(g.avg)}</td>
+                <td class="num cpc-cell" data-b="high">${fmt$2(g.high)}</td>`;
+            kwBody.appendChild(tr);
         });
 
-        function inputs() {
-            return {
-                budget: +$('budget').value,
-                cvr: +$('cvr').value / 100,
-                act: +$('act').value / 100,
-                orders: +$('orders').value,
-                rpt: +$('rpt').value,
-                churn: +$('churn').value / 100,
-                groups: GROUPS.filter((g, i) => kwEl.querySelector(`input[data-i="${i}"]`).checked),
-            };
+        function highlightBasis() {
+            document.querySelectorAll('.cpc-cell').forEach(td => {
+                td.classList.toggle('cpc-active', td.dataset.b === basis);
+            });
         }
 
         function calc() {
-            const I = inputs();
-            $('budget-val').textContent = fmt$(I.budget);
-            $('cvr-val').textContent = (I.cvr * 100).toFixed(1) + '%';
-            $('act-val').textContent = (I.act * 100).toFixed(0) + '%';
-            $('orders-val').textContent = fmt(I.orders);
-            $('rpt-val').textContent = '$' + I.rpt.toFixed(2);
-            $('churn-val').textContent = (I.churn * 100).toFixed(0) + '%';
+            const capture = +$('capture').value / 100;
+            const cvr = +$('cvr').value / 100;
+            const act = +$('act').value / 100;
+            const orders = +$('orders').value;
+            const rpt = +$('rpt').value;
+            const churn = +$('churn').value / 100;
 
-            if (!I.groups.length) {
-                $('results-grid').innerHTML = '<div class="r-card"><div class="r-value">—</div><div class="r-sub">Select at least one keyword group</div></div>';
-                $('group-table').innerHTML = ''; $('annual-table').innerHTML = ''; $('payback-note').innerHTML = '';
+            $('capture-val').textContent = (capture * 100).toFixed(0) + '%';
+            $('cvr-val').textContent = (cvr * 100).toFixed(1) + '%';
+            $('act-val').textContent = (act * 100).toFixed(0) + '%';
+            $('orders-val').textContent = fmt(orders);
+            $('rpt-val').textContent = fmt$2(rpt);
+            $('churn-val').textContent = (churn * 100).toFixed(0) + '%';
+            highlightBasis();
+
+            const sel = GROUPS.filter((g, i) => kwBody.querySelector(`input[data-i="${i}"]`).checked);
+            if (!sel.length) {
+                $('budget-needed').textContent = '$0';
+                $('budget-range').innerHTML = 'Select at least one keyword group.';
+                $('results-grid').innerHTML = ''; $('group-table').innerHTML = '';
+                $('annual-table').innerHTML = ''; $('payback-note').innerHTML = '';
                 return;
             }
 
-            // Allocate budget across groups proportional to volume, capped by available clicks
-            const totalVol = I.groups.reduce((s, g) => s + g.vol, 0);
-            let rows = I.groups.map(g => {
-                const share = g.vol / totalVol;
-                let spend = I.budget * share;
-                // capture ceiling: ~25% of searches clickable at strong position
-                const maxClicks = g.vol * 0.25;
-                let clicks = spend / g.cpc;
-                if (clicks > maxClicks) { clicks = maxClicks; spend = clicks * g.cpc; }
-                return { ...g, spend, clicks };
+            // Needed budget = volume × capture × CPC(basis), per group
+            const rows = sel.map(g => {
+                const clicks = g.vol * capture;
+                return { ...g, clicks,
+                    spendLow: clicks * g.low, spendAvg: clicks * g.avg, spendHigh: clicks * g.high,
+                    spend: clicks * g[basis] };
             });
-            const spend = rows.reduce((s, r) => s + r.spend, 0);
-            const clicks = rows.reduce((s, r) => s + r.clicks, 0);
-            const installs = clicks * I.cvr;
-            const activated = installs * I.act;
-            const revPerMerchant = I.orders * I.rpt;
+            const sum = k => rows.reduce((s, r) => s + r[k], 0);
+            const budget = sum('spend'), budgetLow = sum('spendLow'), budgetHigh = sum('spendHigh');
+            const clicks = sum('clicks');
+            const installs = clicks * cvr;
+            const activated = installs * act;
+            const revPerMerchant = orders * rpt;
             const newMRR = activated * revPerMerchant;
-            const cpi = installs ? spend / installs : 0;
-            const cpm_ = activated ? spend / activated : 0;
-            const payback = newMRR ? (spend / newMRR) : 0;
+            const cpi = installs ? budget / installs : 0;
+            const cpm_ = activated ? budget / activated : 0;
+
+            $('budget-needed').textContent = fmt$(budget);
+            $('budget-range').innerHTML = `at Google <strong>${basis === 'avg' ? 'Average' : basis === 'low' ? 'Low' : 'High'}</strong> top-of-page bids ·
+                full range: <strong>${fmt$(budgetLow)}</strong> (low) – <strong>${fmt$(budgetHigh)}</strong> (high) ·
+                ${fmt(clicks)} clicks at ${(capture*100).toFixed(0)}% capture of ${fmt(sel.reduce((s,g)=>s+g.vol,0))} monthly searches`;
 
             $('results-grid').innerHTML = `
-                <div class="r-card"><div class="r-label">Effective Spend</div><div class="r-value">${fmt$(spend)}</div><div class="r-sub">${spend < I.budget ? 'volume-capped below budget' : 'full budget deployed'}</div></div>
-                <div class="r-card"><div class="r-label">Clicks</div><div class="r-value">${fmt(clicks)}</div><div class="r-sub">blended CPC ${fmt$(spend / clicks)}</div></div>
+                <div class="r-card"><div class="r-label">Clicks</div><div class="r-value">${fmt(clicks)}</div><div class="r-sub">blended CPC ${fmt$2(budget / clicks)}</div></div>
                 <div class="r-card"><div class="r-label">Installs</div><div class="r-value">${fmt(installs)}</div><div class="r-sub">CPI ${fmt$(cpi)}</div></div>
                 <div class="r-card"><div class="r-label">Activated Merchants</div><div class="r-value">${fmt(activated)}</div><div class="r-sub">cost/merchant ${fmt$(cpm_)}</div></div>
-                <div class="r-card hl"><div class="r-label">New Platform Rev / Mo</div><div class="r-value">${fmt$(newMRR)}</div><div class="r-sub">${fmt$(revPerMerchant)}/merchant/mo</div></div>`;
+                <div class="r-card"><div class="r-label">Rev / Merchant / Mo</div><div class="r-value">${fmt$(revPerMerchant)}</div><div class="r-sub">${fmt(orders)} orders × ${fmt$2(rpt)}</div></div>
+                <div class="r-card hl"><div class="r-label">New Platform Rev / Mo</div><div class="r-value">${fmt$(newMRR)}</div><div class="r-sub">per monthly cohort</div></div>`;
 
             $('group-table').innerHTML = `
-                <thead><tr><th>Group</th><th class="num">Volume</th><th class="num">CPC</th><th class="num">Spend</th><th class="num">Clicks</th></tr></thead>
-                <tbody>${rows.map(r => `<tr><td>${r.name}</td><td class="num">${fmt(r.vol)}</td><td class="num">$${r.cpc.toFixed(2)}</td><td class="num">${fmt$(r.spend)}</td><td class="num">${fmt(r.clicks)}</td></tr>`).join('')}
-                <tr class="total"><td>Total</td><td class="num">${fmt(totalVol)}</td><td class="num"></td><td class="num">${fmt$(spend)}</td><td class="num">${fmt(clicks)}</td></tr></tbody>`;
+                <thead><tr><th>Group</th><th class="num">Searches</th><th class="num">Clicks</th><th class="num">CPC (${basis})</th><th class="num">Budget Low</th><th class="num">Budget Avg</th><th class="num">Budget High</th></tr></thead>
+                <tbody>${rows.map(r => `<tr>
+                    <td>${r.name}</td><td class="num">${fmt(r.vol)}</td><td class="num">${fmt(r.clicks)}</td>
+                    <td class="num">${fmt$2(r[basis])}</td>
+                    <td class="num"${basis==='low' ? ' style="color:var(--accent);font-weight:700"' : ''}>${fmt$(r.spendLow)}</td>
+                    <td class="num"${basis==='avg' ? ' style="color:var(--accent);font-weight:700"' : ''}>${fmt$(r.spendAvg)}</td>
+                    <td class="num"${basis==='high' ? ' style="color:var(--accent);font-weight:700"' : ''}>${fmt$(r.spendHigh)}</td></tr>`).join('')}
+                <tr class="total"><td>Total</td><td class="num">${fmt(sel.reduce((s,g)=>s+g.vol,0))}</td><td class="num">${fmt(clicks)}</td><td class="num"></td>
+                    <td class="num">${fmt$(budgetLow)}</td><td class="num">${fmt$(budget === budgetLow || budget === budgetHigh ? sum('spendAvg') : budget)}</td><td class="num">${fmt$(budgetHigh)}</td></tr></tbody>`;
 
+            const payback = newMRR ? budget / newMRR : 0;
             $('payback-note').innerHTML = `<strong style="color:var(--gold)">Payback: ${payback ? payback.toFixed(1) : '—'} months per cohort.</strong>
-                Each month's acquired merchants generate ${fmt$(newMRR)}/mo in recurring platform revenue. At ${(I.churn*100).toFixed(0)}% monthly churn, a cohort's lifetime value is ~${fmt$(newMRR / I.churn)} (${(1/I.churn).toFixed(0)}-month avg lifetime) against ${fmt$(spend)} acquisition cost — LTV:CAC of ${(newMRR / I.churn / Math.max(spend,1)).toFixed(1)}:1.`;
+                Each month's cohort of ${fmt(activated)} merchants generates ${fmt$(newMRR)}/mo recurring. At ${(churn*100).toFixed(0)}% monthly churn,
+                cohort LTV ≈ ${fmt$(newMRR / churn)} (${(1/churn).toFixed(0)}-mo avg lifetime) vs ${fmt$(budget)} acquisition cost —
+                <strong style="color:var(--text-primary)">LTV:CAC ${(newMRR / churn / Math.max(budget,1)).toFixed(1)}:1</strong>.
+                Real-world CPCs typically land below KP Average for well-managed accounts with strong Quality Scores — treat Low as the optimized-account target.`;
 
-            // 12-month compounding
-            let merchants = 0, totalSpend = 0, totalRev = 0, html = '<thead><tr><th>Month</th><th class="num">Spend</th><th class="num">New Merchants</th><th class="num">Active Merchants</th><th class="num">Platform Rev</th><th class="num">Cumulative Net</th></tr></thead><tbody>';
+            let merchants = 0, totalSpend = 0, totalRev = 0;
+            let html = '<thead><tr><th>Month</th><th class="num">Spend</th><th class="num">New Merchants</th><th class="num">Active Merchants</th><th class="num">Platform Rev</th><th class="num">Cumulative Net</th></tr></thead><tbody>';
             for (let m = 1; m <= 12; m++) {
-                merchants = merchants * (1 - I.churn) + activated;
+                merchants = merchants * (1 - churn) + activated;
                 const rev = merchants * revPerMerchant;
-                totalSpend += spend; totalRev += rev;
-                html += `<tr><td>M${m}</td><td class="num">${fmt$(spend)}</td><td class="num">${fmt(activated)}</td><td class="num">${fmt(merchants)}</td><td class="num">${fmt$(rev)}</td><td class="num" style="color:${totalRev - totalSpend >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt$(totalRev - totalSpend)}</td></tr>`;
+                totalSpend += budget; totalRev += rev;
+                const net = totalRev - totalSpend;
+                html += `<tr><td>M${m}</td><td class="num">${fmt$(budget)}</td><td class="num">${fmt(activated)}</td><td class="num">${fmt(merchants)}</td><td class="num">${fmt$(rev)}</td><td class="num" style="color:${net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt$(net)}</td></tr>`;
             }
-            html += `<tr class="total"><td>Year 1</td><td class="num">${fmt$(totalSpend)}</td><td class="num">${fmt(activated * 12)}</td><td class="num">${fmt(merchants)}</td><td class="num">${fmt$(totalRev)}</td><td class="num" style="color:${totalRev - totalSpend >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt$(totalRev - totalSpend)}</td></tr></tbody>`;
+            const netY = totalRev - totalSpend;
+            html += `<tr class="total"><td>Year 1</td><td class="num">${fmt$(totalSpend)}</td><td class="num">${fmt(activated * 12)}</td><td class="num">${fmt(merchants)}</td><td class="num">${fmt$(totalRev)}</td><td class="num" style="color:${netY >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmt$(netY)}</td></tr></tbody>`;
             $('annual-table').innerHTML = html;
         }
 
+        document.querySelectorAll('.cpc-btn').forEach(b => {
+            b.addEventListener('click', () => {
+                basis = b.dataset.basis;
+                document.querySelectorAll('.cpc-btn').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                calc();
+            });
+        });
         document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
         calc();
     </script>
