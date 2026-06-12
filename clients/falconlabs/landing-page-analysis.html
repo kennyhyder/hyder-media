@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Analysis | Falcon Labs Competitive Intel</title>
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0915;
+            --bg-secondary: #151221;
+            --bg-tertiary: #241f33;
+            --text-primary: #fffcf5;
+            --text-secondary: #a59fb8;
+            --accent: #fe6f50;
+            --accent-hover: #f94b25;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #332d45;
+            --purple: #ffc800;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh;
+        }
+        .main-nav {
+            background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .nav-brand { font-size: 1.1rem; font-weight: 700; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-brand img { height: 32px; width: 32px; border-radius: 7px; }
+        .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+        .nav-link {
+            padding: 8px 16px; border-radius: 6px; color: var(--text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; transition: all 0.2s; background: var(--bg-tertiary);
+        }
+        .nav-link:hover { background: var(--border); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent); color: white; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+        h1 { font-size: 1.6rem; margin-bottom: 4px; }
+        .page-sub { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; max-width: 900px; }
+
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tab {
+            padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-secondary);
+            color: var(--text-secondary); font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all .15s;
+        }
+        .tab:hover { color: var(--text-primary); }
+        .tab.active { color: white; border-color: transparent; }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .lp-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+        .lp-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+        .lp-swatch { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
+        .lp-title { font-size: 1.3rem; font-weight: 700; }
+        .lp-url { font-size: 0.85rem; color: var(--text-secondary); }
+        .lp-url a { color: var(--accent); text-decoration: none; }
+
+        .field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .field { background: var(--bg-tertiary); border-radius: 8px; padding: 14px 16px; }
+        .field .f-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 700; }
+        .field .f-value { font-size: 0.92rem; line-height: 1.6; }
+        .field .f-value em { color: var(--accent); font-style: normal; font-weight: 600; }
+        .quote { font-style: italic; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .chip { font-size: 0.78rem; background: rgba(254,111,80,0.14); color: #ffb39e; border-radius: 10px; padding: 2px 10px; }
+
+        .takeaway {
+            border-left: 3px solid var(--success); background: rgba(34,197,94,0.07);
+            border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 0.92rem;
+        }
+        .takeaway strong { color: var(--success); }
+
+        .patterns-section { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-top: 28px; }
+        .patterns-section h2 { font-size: 1.3rem; margin-bottom: 16px; }
+        .pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+        .pattern { background: var(--bg-tertiary); border-radius: 8px; padding: 16px 18px; }
+        .pattern h3 { font-size: 0.95rem; margin-bottom: 8px; color: var(--accent); }
+        .pattern p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65; }
+        .footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--accent); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            const AUTH_KEY = 'falconlabs_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <nav class="main-nav">
+        <a href="competitive-intel-summary.html" class="nav-brand"><img src="assets/falcon-touch-icon.png" alt="Falcon Labs">Falcon Labs Competitive Intel</a>
+        <div class="nav-links">
+            <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link active">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link">Projections</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Landing Page Teardowns</h1>
+        <p class="page-sub">Direct review of each competitor's primary landing page (June 2026): exact headline and CTA copy, claimed metrics, social-proof inventory, and pricing visibility — with the takeaway for Falcon's own landing page strategy.</p>
+
+        <div class="tabs" id="tabs"></div>
+        <div id="panels"></div>
+
+        <section class="patterns-section">
+            <h2>Category Patterns &amp; Falcon's LP Strategy</h2>
+            <div class="pattern-grid">
+                <div class="pattern">
+                    <h3>The "$ per transaction" number is the category's lingua franca</h3>
+                    <p>Uptick leads with "~$0.35 profit per transaction," Fluent claims "$0.35 per digital transaction," Falcon's own calculator shows "$0.35–$0.45." Buyers comparison-shop on this single number — Falcon's LP should anchor it in the hero, not bury it in a calculator.</p>
+                </div>
+                <div class="pattern">
+                    <h3>Every competitor hides pricing — Falcon shouldn't</h3>
+                    <p>Zero of six pages show pricing. Falcon's model (free install, pure rev-share) is itself the pricing message. Saying "no cost, no contract, rev-share only" in the hero converts the category's biggest friction point into Falcon's headline differentiator.</p>
+                </div>
+                <div class="pattern">
+                    <h3>Demo-gating is universal at the top; self-serve wins below</h3>
+                    <p>Rokt, Uptick, Fluent, MomentScience all gate behind "Talk to us / Request a demo." Only AfterSell offers "Start Free Trial." Falcon's Shopify one-click install is structurally more self-serve than everyone except AfterSell — the LP should let merchants install without a call.</p>
+                </div>
+                <div class="pattern">
+                    <h3>Per-order earnings testimonials beat logos</h3>
+                    <p>Uptick's most persuasive elements are merchant quotes citing exact figures ("an additional $0.64 of bottom line profit per order"). Falcon has equivalent quotes in its Shopify reviews ("GREAT way to generate added revenue at no cost") — collect and quantify these early.</p>
+                </div>
+                <div class="pattern">
+                    <h3>Calculator as conversion device</h3>
+                    <p>Both Falcon and Uptick embed revenue calculators. Uptick pairs theirs with a CTA ("Calculate My Revenue"). Falcon should make the calculator the ad landing experience for non-brand traffic: traffic in → personalized revenue estimate → install CTA.</p>
+                </div>
+                <div class="pattern">
+                    <h3>Brand-safety language is the enterprise table stake</h3>
+                    <p>"Premium brand partnerships," "vetted advertisers," "without compromising brand integrity" appear across every page. Merchants' #1 fear is junk ads after checkout. Falcon's curation story needs named example brands as proof, not adjectives.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Competitive Intelligence Suite prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a> for Falcon Labs · Teardowns captured June 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        const COMPETITORS = [
+            {
+                key: 'rokt', name: 'Rokt', color: '#ec4899', url: 'https://www.rokt.com',
+                headline: 'Unlock the Moment That Matters Most',
+                subhead: 'Our AI-powered Brain and scaled global Network deliver unmatched relevance and results, earning the trust of 33,000+ clients and powering 10B+ transactions annually.',
+                cta: '"Talk to an expert" (primary, repeated) · "Explore a demo" (secondary)',
+                claims: ['33,000+ clients', '10B+ transactions/yr', 'Up to 25% more revenue (Upcart)', 'Up to 30% more (Aftersell)', '+150% CTR via offer testing', '$300K avg value per 1M transactions (Newegg)'],
+                proof: 'Logo wall: Ticketmaster, Domino’s, PayPal, Southwest, Uber, Kohl’s, Fanatics, AMC, Petco. Case studies: Booking.com (15% above target ROAS), BJ’s (300% YoY member growth).',
+                pricing: 'None — pure enterprise sales motion.',
+                takeaway: 'Rokt sells scale and AI to the Fortune 500. Their LP is unusable by an SMB merchant — no self-serve path, no per-order economics. <strong>Falcon’s counter:</strong> own the "Rokt for the rest of us" position; per-transaction numbers and instant install where Rokt offers a sales call.'
+            },
+            {
+                key: 'aftersell', name: 'AfterSell (Rokt)', color: '#3b82f6', url: 'https://www.aftersell.com',
+                headline: 'Upselling without the sacrifice',
+                subhead: 'Aftersell is the ecommerce platform that helps you transform upselling opportunities into relevant moments for your customers — all in just a few clicks.',
+                cta: '"Book a demo" + "Start Free Trial" (dual path)',
+                claims: ['40,000+ brands', '$1B+ additional revenue generated', 'AOV +30% (HexClad)', 'CVR up to 35% (Goodprotein)', '11,803% monthly ROI (Jones Road)', '1,000+ five-star reviews'],
+                proof: '40 brand logos (Jones Road, HexClad, Ridge, DIFF), 6 case studies with named executives (Ben Yahalom/True Classic, Nick Shackelford/BRĒZ), Shopify Partner badge.',
+                pricing: 'Separate /pricing page — SaaS tiers + monetization rev-share.',
+                takeaway: 'The most complete search playbook in the category: dual CTA, conquesting pages (/uptick-alternatives, /disco-alternatives), named-person testimonials. <strong>Falcon’s counter:</strong> AfterSell leads with own-product upsells; network offers are an add-on. Falcon is monetization-first with zero SaaS fee — "keep your upsell app, add a profit channel."'
+            },
+            {
+                key: 'uptick', name: 'Uptick', color: '#22c55e', url: 'https://www.uptick.com',
+                headline: 'Incremental Profit on Every Order',
+                subhead: 'Uptick unlocks a new stream of income by presenting tailored, valuable offers on your order confirmation page',
+                cta: '"Request a Demo" (primary) · "Calculate My Revenue" (secondary)',
+                claims: ['~$0.35 profit per transaction', '"Typically increase profit by 25–40%" vs competitors', '100+ brands', 'Install in under 5 minutes (one line of code)', 'Customer-reported $0.61–$0.64 per order'],
+                proof: '15+ logos (Sur La Table, Corkcicle, Good American, Ashley Stewart), 15+ executive testimonials with exact per-order earnings figures.',
+                pricing: 'None shown — revenue calculator instead.',
+                takeaway: 'The closest mirror of Falcon’s pitch, executed well. Demo-gated though: no self-serve install. <strong>Falcon’s counter:</strong> match the per-order specificity, beat them on activation ("live on Shopify in one click — no demo call"), and conquest "uptick alternatives" before they conquest Falcon.'
+            },
+            {
+                key: 'disco', name: 'Disco', color: '#f59e0b', url: 'https://www.disconetwork.com',
+                headline: 'Disco: Commerce Media Network for Post-Purchase & Beyond',
+                subhead: '(JS-rendered site — full hero copy not crawlable; positioning from page title and category research)',
+                cta: 'Demo-gated (per category research; site is a JS app)',
+                claims: ['~1,000 DTC brands in network (reported)', 'DiscoFeed cross-sell placement', 'A16Z-backed'],
+                proof: 'DTC peer-brand network — the product IS the social proof (brands recommend each other).',
+                pricing: 'None visible.',
+                takeaway: 'Disco’s supply is peer DTC brands, not premium advertisers — merchants show competitors’ products on their own thank-you page. <strong>Falcon’s counter:</strong> "monetize with premium non-competing brands, not your rivals." Note AfterSell already runs /disco-alternatives — validated conquest demand.'
+            },
+            {
+                key: 'fluent', name: 'Fluent / AdFlow', color: '#8b5cf6', url: 'https://www.fluentco.com',
+                headline: 'The commerce media platform that turns discovery into growth sales conversions',
+                subhead: 'Target the right customers with the right offer at the right moment and give them a reason to come back.',
+                cta: '"I want to advertise" / "I want to monetize" (two-sided split)',
+                claims: ['1.2B+ annual commerce moments', '200M+ first-party profiles', 'Up to 40% more revenue per transaction', '$0.35 per digital transaction, 20–40% profit lift', '1,300% install volume increase (case study)'],
+                proof: 'Enterprise logo wall: Walmart Connect, Dick’s, Hulu, HBO MAX, Audible, HelloFresh, Brooks Brothers. Case metrics: 39% post-purchase ad revenue boost (Posh Peanut).',
+                pricing: 'None — enterprise/partnership motion.',
+                takeaway: 'The clearest two-sided marketplace framing in the set — the same structure Falcon has. Distribution via Rebuy partnership is their Shopify wedge. <strong>Falcon’s counter:</strong> Fluent is an adtech giant retrofitting SMB distribution; Falcon is SMB-native. Speed and simplicity win the long tail.'
+            },
+            {
+                key: 'momentscience', name: 'MomentScience', color: '#14b8a6', url: 'https://www.momentscience.com',
+                headline: 'AI-Powered Post-Transaction Advertising Platform for Monetizing Key Customer Moments',
+                subhead: 'MomentScience delivers value and delights customers at key moments along their journey.',
+                cta: '"Talk To Us" (single, repeated)',
+                claims: ['130M+ moments served', '3 of 4 customers say perks improve experience', '97% more likely to return after a perk', 'Triple-digit eCPM, double-digit CTR', '3–5x CPM over standard IAB units'],
+                proof: 'Partner logos: Costco, Hulu, SiriusXM, Upside. All stats cite "MomentScience Custom Study" (self-attributed).',
+                pricing: 'None.',
+                takeaway: 'Perks/loyalty positioning aimed at retail programs, not e-commerce SMBs. Rebrand from AdsPostX split their search equity across two names. <strong>Falcon’s counter:</strong> low direct threat in Shopify SERPs; monitor their API/embedded distribution instead.'
+            },
+        ];
+
+        const tabsEl = document.getElementById('tabs');
+        const panelsEl = document.getElementById('panels');
+        COMPETITORS.forEach((c, i) => {
+            const tab = document.createElement('button');
+            tab.className = 'tab' + (i === 0 ? ' active' : '');
+            tab.textContent = c.name;
+            tab.dataset.key = c.key;
+            if (i === 0) tab.style.background = c.color;
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.style.background = ''; });
+                tab.classList.add('active');
+                tab.style.background = c.color;
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('panel-' + c.key).classList.add('active');
+            });
+            tabsEl.appendChild(tab);
+
+            const panel = document.createElement('div');
+            panel.className = 'panel' + (i === 0 ? ' active' : '');
+            panel.id = 'panel-' + c.key;
+            panel.innerHTML = `
+                <div class="lp-card">
+                    <div class="lp-header">
+                        <div class="lp-swatch" style="background:${c.color}">${c.name[0]}</div>
+                        <div>
+                            <div class="lp-title">${c.name}</div>
+                            <div class="lp-url"><a href="${c.url}" target="_blank">${c.url.replace('https://', '')}</a></div>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field">
+                            <div class="f-label">Headline (H1)</div>
+                            <div class="f-value quote">&ldquo;${c.headline}&rdquo;</div>
+                        </div>
+                        <div class="field">
+                            <div class="f-label">Subheadline</div>
+                            <div class="f-value quote">${c.subhead}</div>
+                        </div>
+                        <div class="field">
+                            <div class="f-label">Primary CTA</div>
+                            <div class="f-value">${c.cta}</div>
+                        </div>
+                        <div class="field">
+                            <div class="f-label">Pricing Visibility</div>
+                            <div class="f-value">${c.pricing}</div>
+                        </div>
+                        <div class="field" style="grid-column: 1 / -1;">
+                            <div class="f-label">Claimed Metrics</div>
+                            <div class="chips">${c.claims.map(cl => `<span class="chip">${cl}</span>`).join('')}</div>
+                        </div>
+                        <div class="field" style="grid-column: 1 / -1;">
+                            <div class="f-label">Social Proof Inventory</div>
+                            <div class="f-value">${c.proof}</div>
+                        </div>
+                    </div>
+                    <div class="takeaway">${c.takeaway}</div>
+                </div>`;
+            panelsEl.appendChild(panel);
+        });
+    </script>
+</body>
+</html>

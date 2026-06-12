@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitor Ads | Falcon Labs Competitive Intel</title>
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0915;
+            --bg-secondary: #151221;
+            --bg-tertiary: #241f33;
+            --text-primary: #fffcf5;
+            --text-secondary: #a59fb8;
+            --accent: #fe6f50;
+            --accent-hover: #f94b25;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #332d45;
+            --purple: #ffc800;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh;
+        }
+        .main-nav {
+            background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .nav-brand { font-size: 1.1rem; font-weight: 700; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-brand img { height: 32px; width: 32px; border-radius: 7px; }
+        .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+        .nav-link {
+            padding: 8px 16px; border-radius: 6px; color: var(--text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; transition: all 0.2s; background: var(--bg-tertiary);
+        }
+        .nav-link:hover { background: var(--border); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent); color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+        h1 { font-size: 1.6rem; margin-bottom: 4px; }
+        .page-sub { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px; max-width: 900px; }
+        .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+        .comp-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .comp-head { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+        .comp-swatch { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: #0f172a; flex-shrink: 0; }
+        .comp-name { font-size: 1.2rem; font-weight: 700; }
+        .comp-domain { font-size: 0.82rem; color: var(--text-secondary); }
+        .comp-class { margin-left: auto; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 10px; background: var(--bg-tertiary); color: var(--text-secondary); white-space: nowrap; }
+        .comp-body { padding: 20px 24px; }
+        .comp-body p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.7; }
+        .facts { list-style: none; margin-bottom: 16px; }
+        .facts li { font-size: 0.86rem; padding: 6px 0; border-bottom: 1px solid rgba(51,45,69,.6); display: flex; justify-content: space-between; gap: 12px; }
+        .facts li:last-child { border-bottom: none; }
+        .facts .k { color: var(--text-secondary); white-space: nowrap; }
+        .facts .v { text-align: right; }
+        .links { display: flex; flex-wrap: wrap; gap: 8px; }
+        .link-btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px;
+            font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: all .15s;
+            background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border);
+        }
+        .link-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .link-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+        .link-btn.primary:hover { background: var(--accent-hover); color: white; }
+        .note-box {
+            background: var(--bg-secondary); border: 1px solid var(--border); border-left: 3px solid var(--warning);
+            border-radius: 8px; padding: 16px 20px; margin: 24px 0; font-size: 0.9rem; color: var(--text-secondary);
+        }
+        .footer { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 0.85rem; }
+        .footer a { color: var(--accent); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            const AUTH_KEY = 'falconlabs_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+
+    <nav class="main-nav">
+        <a href="competitive-intel-summary.html" class="nav-brand"><img src="assets/falcon-touch-icon.png" alt="Falcon Labs">Falcon Labs Competitive Intel</a>
+        <div class="nav-links">
+            <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link active">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link">Projections</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Competitor Ad Research</h1>
+        <p class="page-sub">Live ad transparency links and company profiles for all six tracked competitors. Google Ads Transparency Center shows every search/display/YouTube ad a domain runs; Meta Ad Library shows active Facebook/Instagram creative. Use these to monitor messaging shifts before and after launch.</p>
+
+        <div class="comp-grid">
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#ec4899">R</div>
+                    <div>
+                        <div class="comp-name">Rokt</div>
+                        <div class="comp-domain">rokt.com</div>
+                    </div>
+                    <div class="comp-class">Enterprise</div>
+                </div>
+                <div class="comp-body">
+                    <p>The category creator and dominant player in post-transaction monetization. Powers Ticketmaster, PayPal, Uber, Domino's. Acquired AfterSell (2024) for SMB reach and mParticle (2025, ~$300M) for data infrastructure. Sells via enterprise sales motion — search is not their growth engine, which leaves the SERP open.</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">33,000+ clients · 10B+ transactions/yr</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">12,100/mo ("rokt")</span></li>
+                        <li><span class="k">Model</span><span class="v">Enterprise contracts, AI "Brain"</span></li>
+                        <li><span class="k">Watch for</span><span class="v">Mixed search intent: ETF + careers queries</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=rokt.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=Rokt&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://www.rokt.com" target="_blank">Site</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#3b82f6">A</div>
+                    <div>
+                        <div class="comp-name">AfterSell <span style="font-weight:400;font-size:0.8rem;color:var(--text-secondary)">by Rokt</span></div>
+                        <div class="comp-domain">aftersell.com</div>
+                    </div>
+                    <div class="comp-class">Shopify mid-market</div>
+                </div>
+                <div class="comp-body">
+                    <p>Rokt's Shopify arm — checkout/post-purchase upsell suite + "network ads" monetization. The most aggressive search marketer in the set: runs dedicated conquesting pages (/uptick-alternatives, /disco-alternatives). Their playbook is the blueprint for what works in this category's SERP.</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">40,000+ brands · $1B+ revenue generated</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">~1,090/mo (brand group)</span></li>
+                        <li><span class="k">Model</span><span class="v">SaaS tiers + monetization rev-share</span></li>
+                        <li><span class="k">Watch for</span><span class="v">Alternatives/comparison LP playbook</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=aftersell.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=AfterSell&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://apps.shopify.com/aftersell" target="_blank">Shopify App</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#22c55e">U</div>
+                    <div>
+                        <div class="comp-name">Uptick</div>
+                        <div class="comp-domain">uptick.com</div>
+                    </div>
+                    <div class="comp-class">Direct comp</div>
+                </div>
+                <div class="comp-body">
+                    <p>The closest like-for-like competitor: thank-you-page offer network, one-line install, ~$0.35 profit/transaction pitch, platform-agnostic (Shopify, BigCommerce, Magento, WooCommerce, custom). Founded by Rob Jewell (Power Digital). Their messaging and calculator UX are the closest analog to Falcon's own positioning.</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">100+ brands (Good American, Corkcicle)</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">5,400/mo ("uptick" — partly ambiguous)</span></li>
+                        <li><span class="k">Model</span><span class="v">Rev-share offer network</span></li>
+                        <li><span class="k">Watch for</span><span class="v">"$0.61–0.64/order" testimonial claims</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=uptick.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=Uptick&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://www.uptick.com" target="_blank">Site</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#f59e0b">D</div>
+                    <div>
+                        <div class="comp-name">Disco</div>
+                        <div class="comp-domain">disconetwork.com</div>
+                    </div>
+                    <div class="comp-class">DTC network</div>
+                </div>
+                <div class="comp-body">
+                    <p>DTC-brand cross-sell network (DiscoFeed) repositioning as a "Commerce Media Network for Post-Purchase &amp; Beyond." A16Z-backed. Network is built from peer DTC brands recommending each other — a different supply model than Falcon's curated premium-brand offers, which is a positioning lever against them.</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">~1,000 DTC brands (reported)</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">~240/mo (brand group)</span></li>
+                        <li><span class="k">Model</span><span class="v">Brand-to-brand cross-sell network</span></li>
+                        <li><span class="k">Watch for</span><span class="v">AfterSell actively conquests them</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=disconetwork.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=Disco%20Network&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://www.disconetwork.com" target="_blank">Site</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#8b5cf6">F</div>
+                    <div>
+                        <div class="comp-name">Fluent / AdFlow</div>
+                        <div class="comp-domain">fluentco.com</div>
+                    </div>
+                    <div class="comp-class">Public adtech</div>
+                </div>
+                <div class="comp-body">
+                    <p>Public adtech company (NASDAQ: FLNT) pivoted hard into commerce media. AdFlow is the post-purchase product; the Rebuy partnership ("Rebuy Ads powered by Fluent") gives them embedded Shopify distribution. Two-sided pitch mirrors Falcon's: "I want to advertise" / "I want to monetize."</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">1.2B+ commerce moments · 200M profiles</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">~200/mo (product terms)</span></li>
+                        <li><span class="k">Model</span><span class="v">Commerce media marketplace</span></li>
+                        <li><span class="k">Watch for</span><span class="v">"$0.35 per digital transaction" claim — identical number to Uptick/Falcon</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=fluentco.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=Fluent&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://www.fluentco.com" target="_blank">Site</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comp-card">
+                <div class="comp-head">
+                    <div class="comp-swatch" style="background:#14b8a6">M</div>
+                    <div>
+                        <div class="comp-name">MomentScience</div>
+                        <div class="comp-domain">momentscience.com</div>
+                    </div>
+                    <div class="comp-class">Perks / loyalty</div>
+                </div>
+                <div class="comp-body">
+                    <p>Formerly AdsPostX. AI post-transaction advertising with a loyalty/perks angle ("MomentPerks") — placements across homepage, cart, checkout, post-purchase email. Targets retail loyalty programs more than pure e-commerce checkout. Claims 130M+ moments served, 3–5x CPM over standard IAB units.</p>
+                    <ul class="facts">
+                        <li><span class="k">Claimed scale</span><span class="v">130M+ moments · Costco, Hulu, SiriusXM</span></li>
+                        <li><span class="k">Brand search volume</span><span class="v">~160/mo (brand group)</span></li>
+                        <li><span class="k">Model</span><span class="v">Perks network + APIs</span></li>
+                        <li><span class="k">Watch for</span><span class="v">Rebrand splits their search equity (adspostx → momentscience)</span></li>
+                    </ul>
+                    <div class="links">
+                        <a class="link-btn primary" href="https://adstransparency.google.com/?region=US&domain=momentscience.com" target="_blank">Google Ads Transparency →</a>
+                        <a class="link-btn" href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=MomentScience&search_type=keyword_unordered" target="_blank">Meta Ad Library</a>
+                        <a class="link-btn" href="https://www.momentscience.com" target="_blank">Site</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="note-box">
+            <strong>Adjacent players worth monitoring</strong> (compete for the same thank-you-page real estate with own-product upsells rather than network offers): ReConvert (reconvert.io, 590/mo brand volume), Zipify OneClickUpsell, Honeycomb Upsell, Carro, and Paylode (perks marketing, 260/mo). If a merchant installs one of these first, the thank-you page is occupied — they are conquesting targets for "alternative" campaigns even though their business model differs.
+        </div>
+
+        <footer class="footer">
+            <p>Competitive Intelligence Suite prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a> for Falcon Labs · June 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
