@@ -163,13 +163,8 @@
                     <label for="orders">Avg Merchant Orders / Month <span class="val" id="orders-val">2,500</span></label>
                     <input type="range" id="orders" min="250" max="20000" step="250" value="2500">
                 </div>
-                <div class="field">
-                    <label for="rpt">Falcon Net Revenue / Transaction <span class="val" id="rpt-val">$0.40</span></label>
-                    <input type="range" id="rpt" min="0.10" max="1.50" step="0.05" value="0.40">
-                </div>
-                <div class="field">
-                    <label for="churn">Monthly Merchant Churn <span class="val" id="churn-val">5%</span></label>
-                    <input type="range" id="churn" min="1" max="20" step="1" value="5">
+                <div class="note" style="margin-top:10px; font-size:0.78rem;">
+                    Fixed model constants: Falcon net revenue <strong>$0.40/transaction</strong> (midpoint of the published $0.35–$0.45 merchant payout range) and <strong>5% monthly merchant churn</strong>.
                 </div>
             </div>
 
@@ -248,15 +243,13 @@
             const cvr = +$('cvr').value / 100;
             const act = +$('act').value / 100;
             const orders = +$('orders').value;
-            const rpt = +$('rpt').value;
-            const churn = +$('churn').value / 100;
+            const rpt = 0.40;   // Falcon net rev/transaction — midpoint of published $0.35–$0.45
+            const churn = 0.05; // assumed monthly merchant churn
 
             $('capture-val').textContent = (capture * 100).toFixed(0) + '%';
             $('cvr-val').textContent = (cvr * 100).toFixed(1) + '%';
             $('act-val').textContent = (act * 100).toFixed(0) + '%';
             $('orders-val').textContent = fmt(orders);
-            $('rpt-val').textContent = fmt$2(rpt);
-            $('churn-val').textContent = (churn * 100).toFixed(0) + '%';
             highlightBasis();
 
             const sel = GROUPS.filter((g, i) => kwBody.querySelector(`input[data-i="${i}"]`).checked);
