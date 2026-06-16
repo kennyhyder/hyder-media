@@ -55,9 +55,12 @@ function softLabelMatch(polyText, kalshiLabel) {
 }
 
 function extractTeamFromMarketQuestion(question) {
-  // Polymarket market question is typically "Will the <team> win the <event>?".
-  // Extract the team name in between "the " and " win".
-  const m = question.match(/will\s+the\s+(.+?)\s+win\s+the/i);
+  // Polymarket market question is typically "Will the <team> win the <event>?"
+  // for franchise teams ("Will the Lakers win..."), but country/national-team
+  // questions drop the article ("Will Spain win the 2026 FIFA World Cup?").
+  // Make "the" optional on both sides so World Cup / Euros / Olympic country
+  // markets parse the same as NBA/MLB franchise markets.
+  const m = question.match(/will\s+(?:the\s+)?(.+?)\s+win\s+(?:the\s+)?/i);
   if (m) return m[1].trim();
   // Fallback for game-level questions: "<team> vs <team>"
   const m2 = question.match(/^(.+?)\s+(?:vs\.?|@)\s+(.+?)$/i);
