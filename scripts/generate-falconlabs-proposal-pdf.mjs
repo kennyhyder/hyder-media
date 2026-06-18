@@ -1,14 +1,51 @@
 #!/usr/bin/env node
 import puppeteer from 'puppeteer-core';
 import path from 'path';
+import http from 'http';
 import { fileURLToPath } from 'url';
-import { existsSync } from 'fs';
+import { existsSync, createReadStream, statSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const PROPOSAL_PATH = path.join(REPO_ROOT, 'clients/falconlabs/proposal.html');
 const OUTPUT_PATH = path.join(REPO_ROOT, 'clients/falconlabs/falcon-labs-proposal.pdf');
 const PASSWORD = 'FLPROPOSAL';
+const SERVE_PORT = 47821;
+
+const MIME = {
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css',
+    '.js': 'application/javascript',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ico': 'image/x-icon',
+};
+
+const server = http.createServer((req, res) => {
+    let urlPath = decodeURIComponent(req.url.split('?')[0]);
+    if (urlPath === '/falcon-proposal' || urlPath === '/falcon-proposal/') {
+        urlPath = '/clients/falconlabs/proposal.html';
+    } else if (urlPath.endsWith('/')) {
+        urlPath += 'index.html';
+    } else if (!path.extname(urlPath)) {
+        urlPath += '.html';
+    }
+    const filePath = path.join(REPO_ROOT, urlPath);
+    if (!filePath.startsWith(REPO_ROOT) || !existsSync(filePath) || !statSync(filePath).isFile()) {
+        res.writeHead(404);
+        res.end('Not Found');
+        return;
+    }
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });
+    createReadStream(filePath).pipe(res);
+});
+
+await new Promise((resolve) => server.listen(SERVE_PORT, resolve));
+const PROPOSAL_URL = `http://localhost:${SERVE_PORT}/falcon-proposal`;
+console.log(`Local server running at http://localhost:${SERVE_PORT}`);
 
 const CHROME_CANDIDATES = [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -36,9 +73,8 @@ const browser = await puppeteer.launch({
 
 const page = await browser.newPage();
 
-const fileUrl = `file://${PROPOSAL_PATH}`;
-console.log(`Loading: ${fileUrl}`);
-await page.goto(fileUrl, { waitUntil: 'networkidle0', timeout: 60000 });
+console.log(`Loading: ${PROPOSAL_URL}`);
+await page.goto(PROPOSAL_URL, { waitUntil: 'networkidle0', timeout: 60000 });
 
 // Authenticate
 console.log('Entering password...');
@@ -91,4 +127,5 @@ await page.pdf({
 });
 
 await browser.close();
+server.close();
 console.log(`PDF generated: ${OUTPUT_PATH}`);
