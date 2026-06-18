@@ -3,6 +3,9 @@
   "redirects": [
     { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
   ],
+  "rewrites": [
+    { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal.html" }
+  ],
   "crons": [
     { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
     { "path": "/api/golfodds/cron-ingest-datagolf", "schedule": "*/10 * * * *" },

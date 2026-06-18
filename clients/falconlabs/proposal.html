@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Channel Growth Partnership Proposal | Hyder Media × Falcon Labs</title>
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/falcon-icon.png">
+    <script>
+        (function() {
+            const AUTH_KEY = 'falconlabs_proposal_auth';
+            if (sessionStorage.getItem(AUTH_KEY) === 'authenticated') {
+                document.documentElement.classList.add('authenticated');
+            }
+        })();
+    </script>
+    <style>
+        @page { size: letter; margin: 0.75in; }
+
+        :root {
+            --coral: #fe6f50;
+            --coral-hover: #f94b25;
+            --coral-bg: rgba(254, 111, 80, 0.08);
+            --coral-border: rgba(254, 111, 80, 0.3);
+            --gold: #ffc800;
+            --gold-bg: rgba(255, 200, 0, 0.08);
+            --gold-border: rgba(255, 200, 0, 0.3);
+            --green: #4ade80;
+            --green-bg: rgba(74, 222, 128, 0.08);
+            --green-border: rgba(74, 222, 128, 0.3);
+            --dark: #0a0915;
+            --dark-2: #161425;
+            --dark-3: #1f1d33;
+            --line: rgba(255, 255, 255, 0.08);
+            --line-2: rgba(255, 255, 255, 0.16);
+            --text: #ededf0;
+            --text-2: #b4b4be;
+            --text-3: #74747e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Switzer', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* Auth Gate */
+        .auth-gate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at top, #1f1d33 0%, var(--dark) 60%);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        html.authenticated .auth-gate { display: none; }
+        .proposal-content { display: none; }
+        html.authenticated .proposal-content { display: block; }
+
+        .auth-card { width: 100%; max-width: 420px; padding: 20px; }
+        .auth-card-inner {
+            background: var(--dark-2);
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            padding: 56px 44px;
+            text-align: center;
+        }
+        .auth-card-inner img { width: 56px; height: 56px; margin-bottom: 28px; }
+        .auth-card-inner h1 { color: #fff; font-size: 1.35rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+        .auth-card-inner p { color: var(--text-3); font-size: 0.92rem; margin-bottom: 28px; }
+
+        .auth-input {
+            width: 100%; padding: 14px 16px;
+            background: var(--dark); border: 1px solid var(--line-2); border-radius: 10px;
+            color: #fff; font-family: inherit; font-size: 1rem;
+            text-align: center; letter-spacing: 4px; font-weight: 600;
+            outline: none; transition: border-color 0.2s;
+        }
+        .auth-input:focus { border-color: var(--coral); }
+        .auth-input.error { border-color: #f87171; animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
+
+        .auth-btn {
+            width: 100%; padding: 14px;
+            background: var(--coral); color: var(--dark);
+            border: none; border-radius: 10px;
+            font-family: inherit; font-size: 1rem; font-weight: 700;
+            cursor: pointer; margin-top: 14px;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background: var(--coral-hover); }
+
+        /* Cover */
+        .cover {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 60px 40px;
+            background:
+                radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(255, 200, 0, 0.08) 0%, transparent 50%),
+                var(--dark);
+            position: relative;
+        }
+        .cover-cobrand {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+        .cover-cobrand img {
+            object-fit: contain;
+        }
+        .cover-cobrand img.falcon-logo {
+            width: 72px;
+            height: 72px;
+        }
+        .cover-cobrand img.hyder-logo {
+            width: 96px;
+            height: 96px;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+        }
+        .cover-cobrand .x-sep {
+            color: var(--text-3);
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1;
+        }
+        .cover-logo { width: 72px; height: 72px; margin-bottom: 36px; }
+        .cover-label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 5px;
+            color: var(--coral); margin-bottom: 24px; font-weight: 600;
+        }
+        .cover h1 {
+            font-size: 3.2rem; font-weight: 800;
+            line-height: 1.08; margin-bottom: 18px;
+            max-width: 820px; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, #b8b8c8 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cover .subtitle {
+            font-size: 1.25rem; color: var(--text-2);
+            margin-bottom: 64px; max-width: 720px; font-weight: 400;
+        }
+        .cover-meta {
+            display: grid; grid-template-columns: repeat(4, auto); gap: 56px;
+            color: var(--text-3); font-size: 0.9rem;
+        }
+        .cover-meta strong { color: #fff; display: block; margin-bottom: 4px; font-weight: 600; }
+
+        /* Document */
+        .document { max-width: 920px; margin: 0 auto; padding: 80px 40px; }
+        .section { margin-bottom: 64px; page-break-inside: avoid; }
+        .section-number {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 4px;
+            color: var(--coral); font-weight: 700; margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 2rem; font-weight: 700; color: #fff;
+            margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.015em;
+        }
+        h3 {
+            font-size: 1.2rem; font-weight: 600; color: #fff;
+            margin-bottom: 14px; margin-top: 32px;
+        }
+        h4 {
+            font-size: 1rem; font-weight: 600; color: var(--coral);
+            margin-bottom: 8px; margin-top: 20px;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+        }
+        p { margin-bottom: 16px; color: var(--text-2); }
+        p.lead { font-size: 1.15rem; color: var(--text); line-height: 1.7; }
+
+        /* Callouts */
+        .callout {
+            border-radius: 12px; padding: 22px 26px; margin: 22px 0;
+            border: 1px solid var(--line);
+        }
+        .callout-coral { background: var(--coral-bg); border-color: var(--coral-border); }
+        .callout-gold { background: var(--gold-bg); border-color: var(--gold-border); }
+        .callout-green { background: var(--green-bg); border-color: var(--green-border); }
+        .callout-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 8px; color: #fff; }
+        .callout-coral .callout-title { color: var(--coral); }
+        .callout-gold .callout-title { color: var(--gold); }
+        .callout-green .callout-title { color: var(--green); }
+        .callout p { margin-bottom: 8px; font-size: 0.95rem; color: var(--text-2); }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout strong { color: var(--text); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 0.92rem; }
+        thead th {
+            background: var(--dark-2); color: var(--text-2);
+            font-weight: 600; text-transform: uppercase;
+            font-size: 0.72rem; letter-spacing: 1.5px;
+            padding: 12px 16px; text-align: left;
+            border-bottom: 1px solid var(--line-2);
+        }
+        thead th.right { text-align: right; }
+        tbody td {
+            padding: 13px 16px; border-bottom: 1px solid var(--line);
+            color: var(--text-2);
+        }
+        tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
+        tbody td.bold { font-weight: 600; color: var(--text); }
+        tbody tr.total-row { background: var(--dark-2); font-weight: 600; }
+        tbody tr.total-row td {
+            color: #fff; border-top: 1px solid var(--line-2);
+            border-bottom: 1px solid var(--line-2);
+            padding: 16px;
+        }
+        tbody tr.phase-header td {
+            background: var(--coral-bg); color: var(--coral);
+            font-weight: 600; font-size: 0.78rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 8px 16px;
+        }
+        .highlight { color: var(--green) !important; font-weight: 600; }
+        .muted { color: var(--text-3) !important; }
+
+        /* Channel cards */
+        .channel-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+            margin: 24px 0;
+        }
+        .channel-card {
+            background: var(--dark-2); border: 1px solid var(--line);
+            border-radius: 12px; padding: 24px 26px;
+        }
+        .channel-card h4 { margin-top: 0; margin-bottom: 6px; }
+        .channel-card .lede { font-size: 0.93rem; color: var(--text-2); margin-bottom: 14px; }
+        .channel-card ul { padding-left: 18px; margin-top: 10px; }
+        .channel-card li { font-size: 0.88rem; color: var(--text-2); margin-bottom: 6px; }
+
+        /* Tier cards */
+        .tier-cards {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+            margin: 28px 0;
+        }
+        .tier-card {
+            background: var(--dark-2); border: 1px solid var(--line);
+            border-radius: 14px; padding: 28px 22px; text-align: center;
+        }
+        .tier-label {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); font-weight: 600; margin-bottom: 12px;
+        }
+        .tier-rate {
+            font-size: 2.6rem; font-weight: 800; color: var(--coral);
+            line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em;
+        }
+        .tier-rate span { font-size: 1.2rem; color: var(--text-3); }
+        .tier-range { font-size: 0.85rem; color: var(--text-3); margin-top: 8px; }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 36px; margin: 24px 0; }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 7px; top: 4px; bottom: 4px;
+            width: 2px; background: var(--line-2);
+        }
+        .timeline-item { position: relative; margin-bottom: 24px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item::before {
+            content: ''; position: absolute;
+            left: -31px; top: 6px; width: 12px; height: 12px;
+            border-radius: 50%; background: var(--coral);
+            box-shadow: 0 0 0 3px var(--coral-bg);
+        }
+        .timeline-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .timeline-desc { font-size: 0.92rem; color: var(--text-2); }
+
+        ul { padding-left: 22px; margin: 12px 0; }
+        li { margin-bottom: 8px; color: var(--text-2); }
+
+        .divider {
+            border: none; height: 1px;
+            background: var(--line-2); margin: 56px 0;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px; margin: 28px 0;
+        }
+        .stat-card {
+            text-align: center; padding: 22px 16px;
+            background: var(--dark-2); border-radius: 12px;
+            border: 1px solid var(--line);
+        }
+        .stat-value {
+            font-size: 1.85rem; font-weight: 800; color: var(--coral);
+            letter-spacing: -0.02em;
+        }
+        .stat-label {
+            font-size: 0.78rem; color: var(--text-3); margin-top: 4px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* Stack audit table */
+        .stack-table { font-size: 0.88rem; }
+        .stack-table td { padding: 11px 14px; }
+        .stack-tag {
+            display: inline-block; padding: 3px 9px;
+            border-radius: 4px; font-size: 0.72rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+        }
+        .stack-tag.good { background: var(--green-bg); color: var(--green); }
+        .stack-tag.bad { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+        .stack-tag.warn { background: var(--gold-bg); color: var(--gold); }
+
+        /* Get Started */
+        .get-started-card {
+            background:
+                radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.2) 0%, transparent 60%),
+                var(--dark-2);
+            border: 1px solid var(--coral-border);
+            border-radius: 18px;
+            padding: 52px 44px;
+            text-align: center;
+            margin: 36px 0;
+        }
+        .get-started-card h3 {
+            color: #fff; font-size: 1.6rem;
+            margin-top: 0; margin-bottom: 10px;
+        }
+        .get-started-card > p {
+            color: var(--text-2); margin-bottom: 36px;
+        }
+        .upfront-breakdown {
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+            align-items: center; max-width: 600px; margin: 0 auto 32px;
+        }
+        .upfront-item { padding: 22px 26px; }
+        .upfront-item .label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); margin-bottom: 8px;
+        }
+        .upfront-item .amount {
+            font-size: 1.85rem; font-weight: 800; color: var(--coral);
+            letter-spacing: -0.02em;
+        }
+        .upfront-plus { font-size: 1.4rem; color: var(--text-3); font-weight: 300; }
+        .upfront-total {
+            margin-top: 22px; padding-top: 22px;
+            border-top: 1px solid var(--line);
+        }
+        .upfront-total .label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); margin-bottom: 8px;
+        }
+        .upfront-total .amount {
+            font-size: 2.6rem; font-weight: 800; color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .upfront-total .note { font-size: 0.85rem; color: var(--text-3); margin-top: 6px; }
+
+        .contact-line { margin-top: 32px; font-size: 0.95rem; }
+        .contact-line a { color: var(--coral); text-decoration: none; font-weight: 600; }
+        .contact-line a:hover { text-decoration: underline; }
+
+        /* Prepared by block (end of proposal) */
+        .prepared-by {
+            margin-top: 64px; padding: 40px 0 28px;
+            border-top: 1px solid var(--line);
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        .prepared-by-cobrand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .prepared-by-cobrand img {
+            object-fit: contain;
+        }
+        .prepared-by-cobrand img.falcon-logo {
+            width: 36px;
+            height: 36px;
+        }
+        .prepared-by-cobrand img.hyder-logo {
+            width: 48px;
+            height: 48px;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
+        .prepared-by-cobrand .x-sep {
+            color: var(--text-3);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+        .prepared-by-text {
+            font-size: 0.95rem;
+            color: var(--text-2);
+            margin-bottom: 6px;
+        }
+        .prepared-by-text strong {
+            color: #fff;
+            font-weight: 600;
+        }
+        .prepared-by-contact {
+            font-size: 0.82rem;
+            color: var(--text-3);
+        }
+        .prepared-by-contact a {
+            color: var(--coral);
+            text-decoration: none;
+        }
+        .prepared-by-contact a:hover { text-decoration: underline; }
+
+        .footnotes {
+            margin-top: 24px; padding-top: 20px;
+            border-top: 1px solid var(--line);
+        }
+        .footnotes p { font-size: 0.78rem; color: var(--text-3); margin-bottom: 4px; }
+
+        /* PDF download button (screen only) */
+        .pdf-download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--coral);
+            color: var(--dark);
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pdf-download-btn:hover {
+            background: var(--coral-hover);
+            transform: translateY(-1px);
+        }
+        .pdf-download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Print + PDF generation: light theme */
+        @media print {
+            @page {
+                size: letter;
+                margin: 0.5in;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .auth-gate, .pdf-download-btn { display: none !important; }
+            .proposal-content { display: block !important; }
+
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                font-size: 11pt;
+                line-height: 1.55;
+            }
+
+            /* Cover page */
+            .cover {
+                background:
+                    radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.10) 0%, transparent 55%),
+                    radial-gradient(ellipse at bottom left, rgba(255, 200, 0, 0.08) 0%, transparent 55%),
+                    #ffffff !important;
+                min-height: 9.5in;
+                padding: 80px 60px;
+                page-break-after: always;
+            }
+            .cover-label {
+                color: #fe6f50 !important;
+            }
+            .cover h1 {
+                background: linear-gradient(135deg, #0f172a 0%, #475569 100%) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                color: transparent !important;
+            }
+            .cover .subtitle {
+                color: #475569 !important;
+            }
+            .cover-meta {
+                color: #94a3b8 !important;
+            }
+            .cover-meta strong {
+                color: #0f172a !important;
+            }
+            .cover-cobrand img.hyder-logo {
+                filter: none !important;
+                opacity: 1 !important;
+            }
+            .cover-cobrand .x-sep {
+                color: #94a3b8 !important;
+            }
+
+            /* Document body */
+            .document {
+                padding: 0;
+                max-width: 100%;
+            }
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 40px;
+            }
+            .section-number {
+                color: #fe6f50 !important;
+            }
+            h2 {
+                color: #0f172a !important;
+            }
+            h3, h4 {
+                color: #0f172a !important;
+            }
+            h4 {
+                color: #fe6f50 !important;
+            }
+            p {
+                color: #475569 !important;
+            }
+            p.lead {
+                color: #0f172a !important;
+            }
+            ul li, ol li {
+                color: #475569 !important;
+            }
+
+            /* Dividers */
+            .divider {
+                background: rgba(15, 23, 42, 0.12) !important;
+            }
+
+            /* Tables */
+            table {
+                color: #475569;
+            }
+            thead th {
+                background: #f1f5f9 !important;
+                color: #475569 !important;
+                border-bottom-color: rgba(15, 23, 42, 0.15) !important;
+            }
+            tbody td {
+                color: #475569 !important;
+                border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+            }
+            tbody td.bold {
+                color: #0f172a !important;
+            }
+            tbody tr.total-row {
+                background: #f1f5f9 !important;
+            }
+            tbody tr.total-row td {
+                color: #0f172a !important;
+                border-top-color: rgba(15, 23, 42, 0.15) !important;
+                border-bottom-color: rgba(15, 23, 42, 0.15) !important;
+            }
+            tbody tr.phase-header td {
+                background: rgba(254, 111, 80, 0.08) !important;
+                color: #fe6f50 !important;
+            }
+            .highlight {
+                color: #16a34a !important;
+            }
+            .muted {
+                color: #94a3b8 !important;
+            }
+
+            /* Callouts */
+            .callout {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .callout-coral {
+                background: rgba(254, 111, 80, 0.06) !important;
+                border-color: rgba(254, 111, 80, 0.35) !important;
+            }
+            .callout-gold {
+                background: rgba(255, 200, 0, 0.08) !important;
+                border-color: rgba(255, 200, 0, 0.4) !important;
+            }
+            .callout-green {
+                background: rgba(34, 197, 94, 0.06) !important;
+                border-color: rgba(34, 197, 94, 0.35) !important;
+            }
+            .callout-title {
+                color: #0f172a !important;
+            }
+            .callout-coral .callout-title {
+                color: #ea580c !important;
+            }
+            .callout-gold .callout-title {
+                color: #b08800 !important;
+            }
+            .callout-green .callout-title {
+                color: #16a34a !important;
+            }
+            .callout p {
+                color: #475569 !important;
+            }
+            .callout strong {
+                color: #0f172a !important;
+            }
+
+            /* Channel cards */
+            .channel-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .channel-card .lede {
+                color: #475569 !important;
+            }
+            .channel-card li {
+                color: #475569 !important;
+            }
+
+            /* Tier cards */
+            .tier-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .tier-label {
+                color: #94a3b8 !important;
+            }
+            .tier-rate {
+                color: #fe6f50 !important;
+            }
+            .tier-rate span {
+                color: #94a3b8 !important;
+            }
+            .tier-range {
+                color: #94a3b8 !important;
+            }
+
+            /* Stat cards */
+            .stat-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .stat-value {
+                color: #fe6f50 !important;
+            }
+            .stat-label {
+                color: #94a3b8 !important;
+            }
+
+            /* Timeline */
+            .timeline::before {
+                background: rgba(15, 23, 42, 0.15) !important;
+            }
+            .timeline-title {
+                color: #0f172a !important;
+            }
+            .timeline-desc {
+                color: #475569 !important;
+            }
+            .timeline-item::before {
+                background: #fe6f50 !important;
+                box-shadow: 0 0 0 3px rgba(254, 111, 80, 0.18) !important;
+            }
+
+            /* Stack tags */
+            .stack-tag.good {
+                background: rgba(34, 197, 94, 0.15) !important;
+                color: #16a34a !important;
+            }
+            .stack-tag.bad {
+                background: rgba(220, 38, 38, 0.12) !important;
+                color: #dc2626 !important;
+            }
+            .stack-tag.warn {
+                background: rgba(255, 200, 0, 0.18) !important;
+                color: #b08800 !important;
+            }
+
+            /* Get started card */
+            .get-started-card {
+                background:
+                    radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.12) 0%, transparent 60%),
+                    #ffffff !important;
+                border-color: rgba(254, 111, 80, 0.4) !important;
+            }
+            .get-started-card h3 {
+                color: #0f172a !important;
+            }
+            .get-started-card > p {
+                color: #475569 !important;
+            }
+            .upfront-item .label, .upfront-total .label {
+                color: #94a3b8 !important;
+            }
+            .upfront-item .amount {
+                color: #fe6f50 !important;
+            }
+            .upfront-total {
+                border-top-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .upfront-total .amount {
+                color: #0f172a !important;
+            }
+            .upfront-total .note {
+                color: #94a3b8 !important;
+            }
+            .contact-line a {
+                color: #fe6f50 !important;
+            }
+
+            /* Prepared by block */
+            .prepared-by {
+                border-top-color: rgba(15, 23, 42, 0.12) !important;
+            }
+            .prepared-by-cobrand img.hyder-logo {
+                filter: none !important;
+                opacity: 1 !important;
+            }
+            .prepared-by-cobrand .x-sep {
+                color: #94a3b8 !important;
+            }
+            .prepared-by-text {
+                color: #475569 !important;
+            }
+            .prepared-by-text strong {
+                color: #0f172a !important;
+            }
+            .prepared-by-contact {
+                color: #94a3b8 !important;
+            }
+            .prepared-by-contact a {
+                color: #fe6f50 !important;
+            }
+
+            /* Footnotes */
+            .footnotes {
+                border-top-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .footnotes p {
+                color: #94a3b8 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cover h1 { font-size: 2.1rem; }
+            .cover-meta { grid-template-columns: 1fr 1fr; gap: 24px; }
+            .tier-cards { grid-template-columns: 1fr; }
+            .channel-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .document { padding: 40px 20px; }
+            .upfront-breakdown { grid-template-columns: 1fr; }
+            .upfront-plus { display: none; }
+            .get-started-card { padding: 36px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div class="auth-gate">
+    <div class="auth-card">
+        <div class="auth-card-inner">
+            <img src="assets/falcon-touch-icon.png" alt="Falcon Labs">
+            <h1>Proposal Access</h1>
+            <p>Enter the access code to view this document.</p>
+            <form id="authForm">
+                <input type="password" class="auth-input" id="authInput" placeholder="Access Code" autocomplete="off" autofocus>
+                <button type="submit" class="auth-btn">View Proposal</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Proposal -->
+<div class="proposal-content">
+
+<a href="falcon-labs-proposal.pdf" class="pdf-download-btn" download="Falcon Labs Proposal.pdf">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Download PDF
+</a>
+
+<!-- Cover -->
+<div class="cover">
+    <div class="cover-cobrand">
+        <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media" class="hyder-logo">
+        <span class="x-sep">&times;</span>
+        <img src="assets/falcon-touch-icon.png" alt="Falcon Labs" class="falcon-logo">
+    </div>
+    <div class="cover-label">Services Proposal</div>
+    <h1>Multi-Channel Growth Partnership</h1>
+    <p class="subtitle">Building, launching, and operating Falcon Labs' acquisition and lifecycle engine from zero across paid search, paid social, paid B2B, and the full email program.</p>
+    <div class="cover-meta">
+        <div><strong>Prepared For</strong>Falcon Labs</div>
+        <div><strong>Prepared By</strong>Kenny Hyder, Hyder Media</div>
+        <div><strong>Date</strong>June 2026</div>
+        <div><strong>Valid Through</strong>August 31, 2026</div>
+    </div>
+</div>
+
+<!-- Body -->
+<div class="document">
+
+    <!-- 1. Executive Summary -->
+    <div class="section">
+        <div class="section-number">Section 01</div>
+        <h2>Executive Summary</h2>
+        <p class="lead">A 12 month engagement to build a full marketing operations stack for Falcon Labs. Four acquisition channels, a complete email program, conversion tracking infrastructure, and the reporting + admin dashboards needed to operate.</p>
+
+        <p>Falcon shared the underlying acquisition math: an average marketing-acquired merchant produces <strong>$63,000 in annual profit</strong> (50K monthly orders, $0.35 per order, 30% margin). That number anchors the engagement.</p>
+
+        <p>The first 60 days are an intensive build phase: tracking foundation, ESP setup, all four channels launched, dashboards live. From month 4 forward, the engagement transitions to ongoing optimization and scaling, with specific performance targets set together once baseline data exists.</p>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-value">$63K</div><div class="stat-label">LTV per Merchant (Yr 1)</div></div>
+            <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">Channels Launched</div></div>
+            <div class="stat-card"><div class="stat-value">60</div><div class="stat-label">Days to Full Launch</div></div>
+            <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Month Engagement</div></div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 2. Where Falcon Labs Is Today -->
+    <div class="section">
+        <div class="section-number">Section 02</div>
+        <h2>Where Falcon Labs Is Today</h2>
+        <p>Pre-engagement audit of falconlabs.com (BuiltWith + manual review, June 2026):</p>
+
+        <table class="stack-table">
+            <thead>
+                <tr>
+                    <th>Layer</th>
+                    <th>Current state</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Website</td>
+                    <td>Framer (managed)</td>
+                    <td><span class="stack-tag warn">Constrained</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Analytics</td>
+                    <td>GA4 deployed</td>
+                    <td><span class="stack-tag good">Foundation present</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Tag management</td>
+                    <td>Google Tag Manager already deployed</td>
+                    <td><span class="stack-tag good">Foundation present</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Meta Pixel</td>
+                    <td>Not deployed</td>
+                    <td><span class="stack-tag bad">Missing</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">LinkedIn Insight Tag</td>
+                    <td>Not deployed</td>
+                    <td><span class="stack-tag bad">Missing</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Conversions API (server-side)</td>
+                    <td>Not deployed on any platform</td>
+                    <td><span class="stack-tag bad">Missing</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Email service provider</td>
+                    <td>None. Transactional and marketing emails are hand-sent through Google Workspace</td>
+                    <td><span class="stack-tag bad">From zero</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Sales engagement</td>
+                    <td>Apollo.io (confirmed deployed)</td>
+                    <td><span class="stack-tag good">Keep + integrate</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">CDP / customer data</td>
+                    <td>None. No Segment, Customer.io, or equivalent</td>
+                    <td><span class="stack-tag bad">From zero</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">Product analytics</td>
+                    <td>None. No Mixpanel, Heap, or Amplitude</td>
+                    <td><span class="stack-tag warn">Out of scope (this engagement)</span></td>
+                </tr>
+                <tr>
+                    <td class="bold">DNS / email auth</td>
+                    <td>Cloudflare DNS, SPF present, multiple legacy mail hosts in MX records</td>
+                    <td><span class="stack-tag warn">Needs cleanup</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">What this means for the engagement</div>
+            <p>This is a true zero-state build, not an optimization engagement. The first 30 days are foundational. Conversion tracking deployed across all four platforms, Meta Pixel + Conversions API live, LinkedIn Insight Tag live, ESP selected and warmed, sending domain authenticated. Without that foundation, ad spend and email volume both deliver compromised data. Once it's in place, channel launches happen fast.</p>
+        </div>
+
+        <h3>Dependency: Framer site access</h3>
+        <p>Conversion tracking requires deploying tags and event listeners across the Framer site. If full Framer editor access can be granted, this is routine. If access is restricted, fallback is to host conversion-critical landing pages on a subdomain we control (acquisition.falconlabs.com or similar) and route paid traffic there. Noted as a project dependency.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 3. Unit Economics -->
+    <div class="section">
+        <div class="section-number">Section 03</div>
+        <h2>Unit Economics</h2>
+        <p>Falcon shared the following per-merchant economics, anchoring the engagement:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th class="right">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Target customer profile</td>
+                    <td class="right">DTC brand, 50K+ monthly orders</td>
+                </tr>
+                <tr>
+                    <td class="bold">Per-order monetization</td>
+                    <td class="right">$0.35</td>
+                </tr>
+                <tr>
+                    <td class="bold">Monthly revenue per merchant</td>
+                    <td class="right">$17,500</td>
+                </tr>
+                <tr>
+                    <td class="bold">Annual revenue per merchant</td>
+                    <td class="right">$210,000</td>
+                </tr>
+                <tr>
+                    <td class="bold">Take rate (margin)</td>
+                    <td class="right">30%</td>
+                </tr>
+                <tr class="total-row">
+                    <td>Annual profit per merchant</td>
+                    <td class="right">$63,000</td>
+                </tr>
+                <tr>
+                    <td class="bold">Monthly profit per merchant</td>
+                    <td class="right">$5,250</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>(Enterprise accounts excluded. Those originate through direct sales and BD, not paid marketing or the email program.)</p>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">Performance targets and benchmarks</div>
+            <p>Customer acquisition cost (CAC) targets, scale gates, and the performance bonus structure are intentionally not pre-set in this proposal. Falcon does not yet have a paid-marketing CAC baseline. Until real numbers exist, any target written here would be a guess.</p>
+            <p>The Build &amp; Test phase (months 1 to 3) establishes that baseline across all channels. At the end of month 3, we agree together on Prove, Scale, and Optimize phase targets anchored in actual observed performance. These targets then govern the performance bonus structure (Section 07) and the spend scaling gates (Section 08).</p>
+            <p>The $63K annual profit figure stays the LTV anchor either way. The unknown is how efficiently we can acquire each one.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 4. Scope of Work -->
+    <div class="section">
+        <div class="section-number">Section 04</div>
+        <h2>Scope of Work</h2>
+        <p>I'll own the marketing operations stack end to end: tracking foundation, three paid acquisition channels, the email program (its own channel, treated separately), and the dashboards that keep everything visible. Target audience throughout: established DTC brands at the 50K+ monthly-orders profile Falcon defined.</p>
+
+        <h3>4.1 Conversion Tracking Foundation</h3>
+        <p>The infrastructure layer that makes everything else trustworthy. Built first, deployed across all platforms.</p>
+        <ul>
+            <li>GTM container architecture, with consolidated tags for GA4, Meta, LinkedIn, Google Ads, and server-side endpoints</li>
+            <li>GA4 event schema design and instrumentation</li>
+            <li>Meta Pixel + Conversions API deployment (server-side)</li>
+            <li>LinkedIn Insight Tag + server-side conversion events</li>
+            <li>Google Ads conversion tracking with enhanced conversions</li>
+            <li>Cross-channel deduplication and attribution modeling</li>
+            <li>Conversion validation across all platforms before any paid spend launches</li>
+        </ul>
+
+        <h3>4.2 Paid Acquisition Channels</h3>
+        <div class="channel-grid">
+            <div class="channel-card">
+                <h4>Google Ads</h4>
+                <p class="lede">Search-first, with YouTube layered where it earns its place. Built on the competitive intelligence work already completed.</p>
+                <ul>
+                    <li>Search campaign architecture for high-intent capture and category demand</li>
+                    <li>Brand defense layer (Rokt, AfterSell conquest targeting where appropriate)</li>
+                    <li>Non-brand category and intent capture</li>
+                    <li>YouTube campaigns layered on top once tracking and audiences are seasoned</li>
+                    <li>Ad copy aligned to Falcon's free install / rev-share differentiator</li>
+                    <li>Landing page recommendations and copy iteration</li>
+                </ul>
+            </div>
+            <div class="channel-card">
+                <h4>Meta Ads</h4>
+                <p class="lede">Audience seeding from existing CRM, lookalike scale, decision-maker layers.</p>
+                <ul>
+                    <li>Custom audience build from Falcon's existing merchant contact lists, since these are already the right customer profile</li>
+                    <li>Lookalike modeling (1 to 3% quality and 5 to 10% scale tiers) seeded against Falcon's paying customer list</li>
+                    <li>Layered B2B targeting against business decision-makers, e-commerce job titles, and Shopify Plus / mid-market DTC interest signals</li>
+                    <li>Creative testing across video and static formats with founder-led, problem-framed angles</li>
+                    <li>Lead Gen Forms as secondary low-friction capture</li>
+                </ul>
+            </div>
+            <div class="channel-card">
+                <h4>LinkedIn Ads</h4>
+                <p class="lede">High-fit B2B reach against the mid-market DTC audience. LinkedIn is best suited to this profile.</p>
+                <ul>
+                    <li>Matched-audience upload of Falcon's CRM</li>
+                    <li>Account-list targeting against curated mid-market DTC brand lists (50K+ monthly-orders profile)</li>
+                    <li>Job-title targeting (Founder, Head of Growth, VP eCommerce, Director of CX)</li>
+                    <li>Sponsored Content + Lead Gen Forms as primary formats; Document Ads for lead-magnet capture</li>
+                    <li>Discovery sprint in month 2 to validate audience hypotheses before scaled spend</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>4.3 Email Program (built from zero)</h3>
+        <p>Email is treated as its own complete channel, not a paid acquisition channel. Currently Falcon has no email program: transactional and customer communication is hand-sent through Google Workspace. This builds the full system from infrastructure up.</p>
+        <ul>
+            <li>ESP selection and setup (Customer.io and Klaviyo as candidates, decided in week 1)</li>
+            <li>Domain authentication: SPF / DKIM / DMARC + dedicated sending subdomain</li>
+            <li>Sending IP warm-up plan</li>
+            <li>Migration of currently hand-sent transactional emails into automated flows</li>
+            <li>First three lifecycle flows: new-merchant onboarding, activation rescue, performance celebration</li>
+            <li>Monthly merchant newsletter program (Falcon supplies content and angle, I handle copy refinement, formatting, send, and reporting)</li>
+            <li>Behavior-triggered re-engagement and win-back</li>
+            <li>Apollo.io kept for outbound sales sequences; ESP layered for transactional, lifecycle, and marketing</li>
+        </ul>
+
+        <h3>4.4 Reporting &amp; Operations Dashboards</h3>
+        <p>Two custom-built dashboards that consolidate everything into one place: one for Falcon, one for day-to-day email operations.</p>
+
+        <h4>Falcon Labs Performance Dashboard</h4>
+        <ul>
+            <li>Per-channel performance (Google, Meta, LinkedIn) with blended ROAS and CAC by channel</li>
+            <li>Email program metrics: deliverability, open / click / conversion rates by flow, list growth, cohort retention</li>
+            <li>Cross-channel attribution view with conversion-source breakdown</li>
+            <li>Spend pacing, budget forecast, and projection rollups</li>
+        </ul>
+
+        <h4>Email Operations Admin</h4>
+        <ul>
+            <li>Live flow status (which lifecycle sequences are firing, send volumes, errors)</li>
+            <li>Deliverability monitoring (bounce rate, spam complaints, IP / domain reputation)</li>
+            <li>A/B test queue and result tracking</li>
+            <li>List segmentation and hygiene tools</li>
+        </ul>
+
+        <p>Both dashboards are <strong>custom-built software</strong> deployed on infrastructure under our control during the engagement and migrated to a Falcon Labs subdomain on signing. License terms covered in <strong>Section 09</strong>.</p>
+
+        <h3>4.5 Ongoing Management (Monthly)</h3>
+        <ul>
+            <li>Per-channel optimization: bid management, audience refinement, creative iteration, search-query analysis, negative keyword management</li>
+            <li>Email: newsletter copy refinement and formatting (from Falcon-provided content), A/B test cadence, new flow build (one per quarter included), deliverability monitoring, list hygiene</li>
+            <li>Cross-channel attribution review and budget reallocation</li>
+            <li>Dashboard maintenance, data integrity checks, anomaly investigation</li>
+        </ul>
+
+        <h3>4.6 Reporting &amp; Communication</h3>
+        <ul>
+            <li>Weekly performance snapshots (Monday morning KPI email)</li>
+            <li>Bi-weekly strategy calls (30 to 45 min)</li>
+            <li>Monthly performance report with cross-channel analysis and recommendations</li>
+            <li>Quarterly business review with forward strategy</li>
+        </ul>
+
+        <p style="font-size: 0.88rem; color: var(--text-3); margin-top: 24px;">Note on creative scope: I produce text copy and landing pages. Image and video creative for paid platforms sit outside my scope of production. Falcon's in-house designer can produce these, or I can refer creative partners I work with for that production.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 5. Fee Structure -->
+    <div class="section">
+        <div class="section-number">Section 05</div>
+        <h2>Fee Structure</h2>
+
+        <h3>Setup: $45,000 total, split across two invoices</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice</th>
+                    <th>Timing</th>
+                    <th class="right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">1: Foundation</td>
+                    <td>On signing</td>
+                    <td class="right">$30,000</td>
+                </tr>
+                <tr>
+                    <td class="bold">2: Launch build</td>
+                    <td>Start of month 2</td>
+                    <td class="right">$15,000</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Total Setup</td>
+                    <td class="right">$45,000</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>The setup phase is 60 days of build work across four interlocking systems, plus site and stack optimization that comes from having editor access. Breakdown by work category below.</p>
+
+        <h4>Conversion tracking infrastructure</h4>
+        <ul>
+            <li>Tech-stack audit and conversion-tracking strategy document</li>
+            <li>GTM container architecture, tag consolidation across all platforms</li>
+            <li>GA4 event schema design and full instrumentation</li>
+            <li>Meta Pixel deployment (browser-side)</li>
+            <li>Meta Conversions API deployment (server-side, with full event matching)</li>
+            <li>LinkedIn Insight Tag deployment</li>
+            <li>LinkedIn server-side conversion events</li>
+            <li>Google Ads enhanced conversions configuration</li>
+            <li>Cross-channel event deduplication and attribution modeling</li>
+            <li>End-to-end testing across all platforms before any paid spend launches</li>
+        </ul>
+
+        <h4>Email program infrastructure</h4>
+        <ul>
+            <li>ESP evaluation and selection (Customer.io and Klaviyo as candidates)</li>
+            <li>ESP account setup and full configuration</li>
+            <li>SPF, DKIM, DMARC DNS records configured</li>
+            <li>Dedicated sending subdomain setup</li>
+            <li>Sending IP warm-up plan and execution schedule</li>
+            <li>Email template system architecture</li>
+            <li>Apollo.io integration audit and migration plan</li>
+            <li>Audit and replacement plan for all currently hand-sent transactional emails</li>
+        </ul>
+
+        <h4>Ad account setups (Google, Meta, LinkedIn)</h4>
+        <ul>
+            <li>Google Ads campaign architecture: account structure, ad groups, keyword research applied, ad copy, extensions, bid strategy, conversion mapping</li>
+            <li>Meta Ads campaign architecture: account structure, audience build from CRM, lookalike modeling tiers, creative testing framework, conversion event setup</li>
+            <li>LinkedIn Ads campaign architecture: account structure, matched audience uploads, account-list targeting build, sponsored content setup, lead-gen form templates</li>
+            <li>First campaigns live on each platform</li>
+        </ul>
+
+        <h4>Dashboard architecture and v1 build</h4>
+        <ul>
+            <li>Performance dashboard architecture, data model, API endpoints</li>
+            <li>Email admin dashboard architecture, data model</li>
+            <li>Backend integrations to Google, Meta, LinkedIn, ESP, GA4</li>
+            <li>UX layout and visual design for both dashboards</li>
+            <li>Performance dashboard v1 live</li>
+            <li>Email admin v1 live</li>
+        </ul>
+
+        <h4>Email program first wave (three lifecycle flows)</h4>
+        <ul>
+            <li>Transactional email rebuild replacing currently hand-sent emails</li>
+            <li>New-merchant onboarding flow built and live</li>
+            <li>Activation-rescue flow built and live</li>
+            <li>Performance-celebration flow built and live</li>
+            <li>Email template design system and initial copywriting</li>
+        </ul>
+
+        <h4>Site and stack optimization (the bonus you get for granting site access)</h4>
+        <ul>
+            <li>SEO audit and on-page optimization recommendations across the site</li>
+            <li>AEO (Answer Engine Optimization) review for AI-driven discovery surfaces</li>
+            <li>Schema markup recommendations</li>
+            <li>Meta data and Open Graph optimization across all key pages</li>
+            <li>Sitemap and robots.txt review and recommendations</li>
+            <li>Core Web Vitals review</li>
+        </ul>
+
+        <p style="font-size: 0.88rem; color: var(--text-3);">Setup is broken into two invoices so Falcon isn't paying for 60 days of work in one lump. Foundation covers the strategic and infrastructure work that has to be in place before any spend launches. Launch covers the going-live work: ad account builds, first lifecycle flows, dashboard v1 deployments.</p>
+
+        <h3>Monthly Recurring (starts month 3)</h3>
+
+        <h4>Email Program Management</h4>
+        <p>Tiered by active subscriber list size. The tier steps up as the list scales because the ongoing work (segmentation complexity, deliverability monitoring, lifecycle touchpoints, newsletter performance across cohorts) scales with it.</p>
+
+        <div class="tier-cards">
+            <div class="tier-card">
+                <div class="tier-label">Tier 1</div>
+                <div class="tier-rate">$5K<span>/mo</span></div>
+                <div class="tier-range">Up to 25K active subscribers</div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-label">Tier 2</div>
+                <div class="tier-rate">$7.5K<span>/mo</span></div>
+                <div class="tier-range">25K &ndash; 100K subscribers</div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-label">Tier 3</div>
+                <div class="tier-rate">$10K<span>/mo</span></div>
+                <div class="tier-range">100K+ subscribers</div>
+            </div>
+        </div>
+
+        <p>Includes: all lifecycle flows, one new flow build per quarter, monthly merchant newsletter (Falcon supplies content; I handle copy refinement, formatting, deliverability, send, and reporting), list hygiene, A/B test cadence, cohort reporting. Additional new flow builds beyond one per quarter are scoped separately at $1,500 each.</p>
+
+        <h4>Paid Media Management (Google + Meta + LinkedIn combined)</h4>
+        <p>Tiered percentage of combined monthly paid spend across all three platforms, calculated on marginal tiers (each tier applies only to spend within its range). A $7,500/month minimum applies when the percentage calculation falls below that threshold.</p>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">Why the $7,500 minimum (vs. $5,000 for a single-channel engagement)</div>
+            <p>My standard ad management minimum for managing a single ad account in isolation is $5,000/month. The $7,500 minimum here reflects that this engagement runs three platforms simultaneously: Google, Meta, and LinkedIn. Each one has its own conversion tracking, audience layer, creative cadence, bid management, and reporting needs. Even at lower spend levels, three platforms is materially more work than one. The $7,500 floor reflects that reality, and once spend scales, the percentage calculation takes over.</p>
+        </div>
+
+        <div class="tier-cards">
+            <div class="tier-card">
+                <div class="tier-label">Tier 1</div>
+                <div class="tier-rate">8<span>%</span></div>
+                <div class="tier-range">First $100K / month</div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-label">Tier 2</div>
+                <div class="tier-rate">6<span>%</span></div>
+                <div class="tier-range">$100K &ndash; $250K / month</div>
+            </div>
+            <div class="tier-card">
+                <div class="tier-label">Tier 3</div>
+                <div class="tier-rate">4<span>%</span></div>
+                <div class="tier-range">$250K+ / month</div>
+            </div>
+        </div>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">How marginal tiers work</div>
+            <p>At $275,000 in combined monthly paid spend, the fee calculation is ($100,000 &times; 8%) + ($150,000 &times; 6%) + ($25,000 &times; 4%) = $8,000 + $9,000 + $1,000 = <strong>$18,000</strong> (6.5% effective rate). The effective rate naturally decreases as spend scales.</p>
+        </div>
+
+        <h3>Total monthly minimum: $12,500</h3>
+        <p>$5,000 email (Tier 1) + $7,500 paid media floor. This is the absolute floor on monthly fees regardless of spend level.</p>
+
+        <h3>Fees at illustrative spend benchmarks</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Combined paid spend</th>
+                    <th class="right">Paid mgmt fee</th>
+                    <th class="right">+ Email (Tier 1)</th>
+                    <th class="right">Total monthly</th>
+                    <th class="right">Eff. on paid spend</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">$50K</td>
+                    <td class="right">$7,500 (min)</td>
+                    <td class="right">$5,000</td>
+                    <td class="right bold">$12,500</td>
+                    <td class="right muted">15.0%*</td>
+                </tr>
+                <tr>
+                    <td class="bold">$100K</td>
+                    <td class="right">$8,000</td>
+                    <td class="right">$5,000</td>
+                    <td class="right bold">$13,000</td>
+                    <td class="right">8.0%</td>
+                </tr>
+                <tr>
+                    <td class="bold">$200K</td>
+                    <td class="right">$14,000</td>
+                    <td class="right">$5,000</td>
+                    <td class="right bold">$19,000</td>
+                    <td class="right">7.0%</td>
+                </tr>
+                <tr>
+                    <td class="bold">$400K</td>
+                    <td class="right">$23,000</td>
+                    <td class="right">$5,000</td>
+                    <td class="right bold">$28,000</td>
+                    <td class="right">5.75%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 0.82rem; color: var(--text-3);">* At $50K combined spend, the $7,500 minimum applies (the percentage calculation of $50K &times; 8% = $4,000 falls below the minimum). The 15% effective rate is a function of the floor, not the tier structure.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 6. Performance Targets -->
+    <div class="section">
+        <div class="section-number">Section 06</div>
+        <h2>Performance Targets</h2>
+        <p>The primary paid-channel performance metric is <strong>blended CAC</strong>: ad spend across Google + Meta + LinkedIn divided by acquired merchants. Specific numeric targets are not preset in this proposal. Falcon does not yet have a paid-marketing CAC baseline, and any number written here today would be a guess.</p>
+
+        <h3>Phase structure</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Months</th>
+                    <th class="right">CAC target</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Build &amp; Test</td>
+                    <td>1 to 3</td>
+                    <td class="right muted">No target</td>
+                    <td>Validate tracking, establish channel-by-channel CAC baselines, collect creative learnings</td>
+                </tr>
+                <tr>
+                    <td class="bold">Prove</td>
+                    <td>4</td>
+                    <td class="right muted">Set together at end of month 3</td>
+                    <td>Demonstrate channel viability at agreed-upon CAC. Floor for any further spend ramp.</td>
+                </tr>
+                <tr>
+                    <td class="bold">Scale</td>
+                    <td>5 to 9</td>
+                    <td class="right muted">Set together at end of month 3</td>
+                    <td>Steady-state target across all paid channels. Spend ramps gated to this CAC.</td>
+                </tr>
+                <tr>
+                    <td class="bold">Optimize</td>
+                    <td>10 to 12</td>
+                    <td class="right muted">Set together at end of month 3</td>
+                    <td>Best-in-class efficiency at full velocity once channels have matured.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">Why the targets defer</div>
+            <p>The Build &amp; Test phase is where the CAC baseline gets measured. By end of month 3 there is real data: channel-by-channel CPCs, conversion rates, audience response, install-to-active-merchant rates. The Prove, Scale, and Optimize targets are then set together based on what that data shows is achievable.</p>
+            <p>This avoids writing speculative numbers into a contract. It also means the targets that govern the performance bonus (Section 07) and the spend scaling gates (Section 08) are anchored in reality, not in guesswork at proposal stage.</p>
+        </div>
+
+        <h3>Email program metrics</h3>
+        <p>Email is measured separately on its own KPIs and is excluded from the paid-channel performance bonus in Section 07:</p>
+        <ul>
+            <li><strong>Deliverability:</strong> inbox-placement rate and spam-complaint rate against industry benchmarks</li>
+            <li><strong>Lifecycle conversion:</strong> onboarding-to-activation and activation-rescue rates (specific targets set at end of month 3 with real baselines)</li>
+            <li><strong>List health:</strong> active subscriber growth and engagement-decay tracking</li>
+            <li><strong>Newsletter performance:</strong> open and click rates by cohort, contribution to merchant retention</li>
+        </ul>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 7. Performance Incentive -->
+    <div class="section">
+        <div class="section-number">Section 07</div>
+        <h2>Performance Incentive</h2>
+        <p>To align interests beyond the base management fees, a quarterly performance bonus structure exists in principle. Specific bonus-trigger thresholds and rates are set together at the end of month 3, after the Build &amp; Test phase has produced real CAC data.</p>
+
+        <div class="callout callout-green">
+            <div class="callout-title">Structure (specific numbers set together at end of month 3)</div>
+            <p><strong>Floor (always applies):</strong> the engagement must be net positive for Falcon (annualized profit run-rate from acquired merchants exceeds total cost) before any bonus triggers. No bonus is paid when Falcon isn't ahead.</p>
+            <p><strong>Two-tier upside:</strong> a base bonus tier and an exceptional-performance tier, both calibrated against the agreed Scale-phase CAC target. Lower CAC, higher bonus. Falcon retains the majority of the upside at every level.</p>
+            <p><strong>Calculation basis:</strong> share of net profit, where net profit is the annualized profit run-rate from acquired merchants in the measurement period less total cost (ad spend + Hyder Media fees) in the same period.</p>
+            <p><strong>Scope:</strong> Google + Meta + LinkedIn combined. Email is measured on its own metrics and excluded from the bonus calculation.</p>
+            <p><strong>First eligible measurement period:</strong> months 4 to 6, assessed at end of month 6.</p>
+        </div>
+
+        <h3>Illustrative example (using placeholder numbers)</h3>
+        <p>The numbers below are placeholders to illustrate the structure, not commitments. The actual Scale CAC target ($X) and bonus-trigger thresholds are agreed at end of month 3 against measured baseline.</p>
+        <ul>
+            <li><strong>If CAC at agreed Scale target:</strong> $0 bonus. Falcon keeps 100% of the value created.</li>
+            <li><strong>If CAC meaningfully below agreed Scale target:</strong> bonus triggers at Tier 1 rate (5% of net profit).</li>
+            <li><strong>If CAC exceptionally below agreed Scale target:</strong> bonus triggers at Tier 2 rate (10% of net profit).</li>
+        </ul>
+
+        <p style="font-size: 0.88rem; color: var(--text-3); margin-top: 16px;">The base management fees are unchanged regardless of bonus eligibility. The bonus is upside only, never a floor. The "set together at end of month 3" commitment is documented as a binding addendum to the executed contract once baseline data is observed.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 8. Scaling Framework -->
+    <div class="section">
+        <div class="section-number">Section 08</div>
+        <h2>Scaling Framework</h2>
+        <p>Spend ramps are performance-gated to make sure unit economics hold before scaling. The specific gate thresholds are set together at end of month 3, against the same baseline data that anchors the Section 06 phase targets and Section 07 bonus thresholds.</p>
+
+        <p>The principle is straightforward: above a low-risk testing threshold, additional spend ramp requires that trailing-period CAC stays at or below the agreed Prove-phase target. Past the next threshold, it requires staying at or below the Scale-phase target. Falcon's capital doesn't get deployed at higher velocity than measured performance supports.</p>
+
+        <h3>Projected build &amp; launch sequence</h3>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 1 to 2: Foundation (tracking + ESP)</div>
+                <div class="timeline-desc">Tech audit, GTM container build, Meta Pixel + CAPI deployment, LinkedIn Insight Tag, Google enhanced conversions, ESP selection and domain authentication. Validate every conversion event end to end before any paid spend.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 3 to 4: Email infrastructure</div>
+                <div class="timeline-desc">Sending IP warm-up begins, transactional template rebuild, Apollo-to-ESP sync, list hygiene pass, deliverability monitoring live.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 5 to 6: First channels live (Google + first lifecycle flows)</div>
+                <div class="timeline-desc">Google Ads architecture and launch. Transactional emails firing through ESP. New-merchant onboarding flow live.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 7 to 8: Meta + activation rescue</div>
+                <div class="timeline-desc">Meta CRM upload, lookalike build, first campaigns launched. Activation-rescue flow live.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 9 to 10: LinkedIn launch + dashboards v1</div>
+                <div class="timeline-desc">LinkedIn discovery sprint completes, first campaigns launched. Performance dashboard and email admin v1 live. Full multi-channel reporting operational.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Weeks 11 to 12: First newsletter + CAC baseline locked</div>
+                <div class="timeline-desc">First monthly merchant newsletter sent. End of Build &amp; Test phase. Channel-by-channel CAC baselines documented. Prove, Scale, and Optimize phase targets set together for the rest of the engagement.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-title">Months 4 to 12: Scale and optimize</div>
+                <div class="timeline-desc">Performance-gated spend increases across all paid channels. Additional lifecycle flows (one per quarter). Quarterly business reviews. Continuous channel and creative optimization.</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 9. Terms -->
+    <div class="section">
+        <div class="section-number">Section 09</div>
+        <h2>Terms &amp; Conditions</h2>
+
+        <h3>What is contractually binding vs. directional</h3>
+        <div class="callout callout-coral">
+            <div class="callout-title">Binding (carried into the executed contract)</div>
+            <p>Scope of work (Section 04). Fee structure: setup invoices, email tier schedule, paid-media marginal tier percentages, $7,500 paid-media minimum (Section 05). Term length, renewal, invoicing, and termination provisions (this section). Performance-bonus structure and formula (Section 07), with specific bonus-trigger CAC thresholds documented in a binding addendum at end of month 3. Account ownership and custom software perpetual license (this section). Confidentiality.</p>
+        </div>
+        <div class="callout callout-gold">
+            <div class="callout-title">Directional (set together later, not committed up front)</div>
+            <p>The $63K annual profit per merchant figure shared by Falcon is the LTV anchor for the engagement, but the proposal does not contractually commit Falcon to that number being accurate. If actual paid-acquired merchant LTV differs once measured, that informs the targets we set together at end of month 3.</p>
+            <p>Specific CAC numbers for the Prove, Scale, and Optimize phase targets (Section 06), the bonus-trigger thresholds (Section 07), and the spend scaling gates (Section 08) are deferred to end of month 3 when real baseline data exists. They become binding via the addendum at that point.</p>
+        </div>
+
+        <h3>Term &amp; renewal</h3>
+        <p>Initial engagement term is <strong>12 months</strong> from the date of commencement. Upon completion of the initial term, the engagement <strong>auto-renews on a quarterly basis</strong> under identical terms unless either party provides 60 days' written notice of non-renewal.</p>
+
+        <h3>Invoicing &amp; payment</h3>
+        <ul>
+            <li><strong>Setup invoice 1 ($30,000):</strong> due upon signing, prior to commencement of work.</li>
+            <li><strong>Setup invoice 2 ($15,000):</strong> invoiced and due at start of month 2.</li>
+            <li><strong>Email program fee:</strong> invoiced on the 1st of each month at the applicable list-size tier. Net 15 terms.</li>
+            <li><strong>Paid media management fee:</strong> invoiced on the 1st of each month based on the prior month's actual combined ad spend. Net 15 terms.</li>
+            <li><strong>Performance bonus:</strong> invoiced quarterly (if applicable), within 15 days of quarter close. Net 15 terms.</li>
+        </ul>
+
+        <h3>Account ownership</h3>
+        <p>All Google Ads, Meta Ads, LinkedIn Ads, ESP, GTM, and GA4 accounts, along with campaign assets, conversion data, keyword and audience lists, ad creative, and email content created during the engagement, remain the property of Falcon Labs. Hyder Media has managed access to these accounts for the duration of the engagement.</p>
+
+        <h3>Custom software license (dashboards and admin tools)</h3>
+        <div class="callout callout-coral">
+            <div class="callout-title">Perpetual license, support tied to engagement</div>
+            <p>The Falcon Labs Performance Dashboard, Email Operations Admin, and any other custom software built during this engagement (collectively, the "Software") are licensed to Falcon Labs on a <strong>perpetual, irrevocable, royalty-free basis</strong> upon delivery.</p>
+            <p><strong>While Falcon Labs is an active client</strong> of Hyder Media: Hyder Media hosts, maintains, monitors, updates, and supports the Software as part of the ongoing engagement, deployed at a Falcon Labs subdomain (e.g. <em>dash.falconlabs.com</em>) once requested.</p>
+            <p><strong>Upon termination of the engagement</strong> (for any reason, by either party): the perpetual license to the Software survives termination unaffected. Falcon Labs retains the right to use, modify, host, and operate the Software in perpetuity, and Hyder Media will deliver the source code, build artifacts, and operational documentation within 30 days of termination. Hyder Media's hosting, support, maintenance, monitoring, and update obligations cease at termination. Falcon Labs is responsible for the Software thereafter.</p>
+        </div>
+
+        <h3>Early termination</h3>
+        <p>Either party may terminate the engagement with <strong>30 days' written notice</strong> after the initial 90-day Build &amp; Test phase. During the Build &amp; Test phase, the engagement may only be terminated for cause. All fees for services rendered through the termination date remain due. The custom software license and termination-handover provisions above apply in either case.</p>
+
+        <h3>Reporting &amp; transparency</h3>
+        <p>Falcon Labs retains full owner access to all advertising accounts, ESP, GTM, and GA4 at all times. All spend, performance metrics, optimization actions, and email program activity are visible in real time through the dashboards and through direct account access. No data is proprietary to Hyder Media.</p>
+
+        <h3>Confidentiality</h3>
+        <p>Both parties agree to maintain confidentiality of proprietary business information, including but not limited to: conversion rates, per-merchant LTV data, customer acquisition costs, campaign strategies, audience lists, keyword intelligence, and email content shared during this engagement.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 10. Why This Structure -->
+    <div class="section">
+        <div class="section-number">Section 10</div>
+        <h2>Why This Structure</h2>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">What this proposal optimizes for</div>
+            <p><strong>Setup paid in two halves.</strong> $30K up front gets the foundation built before any spend launches. The $15K Launch invoice covers the going-live work: ad account builds, lifecycle flow deployments, dashboard v1 deliveries. Falcon isn't paying for 60 days of work in one lump.</p>
+            <p><strong>Email priced flat and tiered on list size.</strong> No spend-percentage gamesmanship on a service that isn't spend-based. The tier steps up as the list scales because the work scales with it.</p>
+            <p><strong>Paid media tiered marginally.</strong> The effective rate decreases as spend grows. At $400K/month combined spend, the blended rate is under 6%.</p>
+            <p><strong>Performance targets defer to data.</strong> The Prove / Scale / Optimize CAC targets, bonus thresholds, and scaling gates get set together at end of month 3, against measured baseline. The proposal doesn't lock either party into speculative numbers before the data exists.</p>
+            <p><strong>Performance bonus aligned to upside, not at-target performance.</strong> The bonus only triggers when measured CAC is meaningfully better than the agreed Scale target. At target, $0 bonus. Falcon keeps the majority of upside in every scenario.</p>
+            <p><strong>Software license outlives the engagement.</strong> The dashboards and admin tools are Falcon's perpetually. If the engagement ends, you keep operating the Software. You don't get the ongoing support, updates, and hosting that come with an active engagement, but the software stays yours.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 11. Get Started -->
+    <div class="section">
+        <div class="section-number">Section 11</div>
+        <h2>Get Started</h2>
+        <p>To begin the engagement, an upfront payment covers the Foundation invoice. Once received, the Build &amp; Test phase begins immediately.</p>
+
+        <div class="get-started-card">
+            <h3>Initial investment to commence</h3>
+            <p>Foundation work (conversion tracking infrastructure, email program setup, dashboard architecture, site optimization) delivered in weeks 1 to 4, before any channel launches.</p>
+
+            <div class="upfront-total">
+                <div class="label">Foundation Invoice</div>
+                <div class="amount">$30,000</div>
+                <div class="note">Launch invoice ($15,000) due at start of month 2. Recurring retainer fees begin in month 3.</div>
+            </div>
+
+            <div class="contact-line">
+                <p>Ready to move forward? Reach out to discuss next steps.</p>
+                <p><a href="mailto:kenny@hyder.me">kenny@hyder.me</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="prepared-by">
+        <div class="prepared-by-cobrand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media" class="hyder-logo">
+            <span class="x-sep">&times;</span>
+            <img src="assets/falcon-touch-icon.png" alt="Falcon Labs" class="falcon-logo">
+        </div>
+        <p class="prepared-by-text">Prepared by <strong>Hyder Media</strong> for <strong>Falcon Labs</strong></p>
+        <p class="prepared-by-contact">Kenny Hyder &middot; <a href="mailto:kenny@hyder.me">kenny@hyder.me</a> &middot; hyder.me</p>
+    </div>
+
+    <div class="footnotes">
+        <p>This proposal is valid through August 31, 2026. All dollar amounts are in USD. The $63K annual profit per merchant figure (50K monthly orders, $0.35 per order, 30% take rate) was provided by Falcon in June 2026 and serves as the LTV anchor for the engagement. Specific CAC targets, performance-bonus thresholds, and spend scaling gates are intentionally not preset; they get established together at end of month 3 based on baseline data measured during the Build &amp; Test phase. The binding vs. directional breakdown is in Section 09. Pre-engagement technical audit conducted June 2026 via BuiltWith plus manual review of falconlabs.com.</p>
+    </div>
+
+</div>
+
+</div><!-- /proposal-content -->
+
+<script>
+    (function() {
+        const AUTH_KEY = 'falconlabs_proposal_auth';
+        const PASS = 'FLPROPOSAL';
+        if (sessionStorage.getItem(AUTH_KEY) === 'authenticated') return;
+        const form = document.getElementById('authForm');
+        const input = document.getElementById('authInput');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value === PASS) {
+                sessionStorage.setItem(AUTH_KEY, 'authenticated');
+                document.documentElement.classList.add('authenticated');
+            } else {
+                input.classList.add('error');
+                input.value = '';
+                setTimeout(function() { input.classList.remove('error'); }, 400);
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>
