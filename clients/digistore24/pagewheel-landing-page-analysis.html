@@ -1041,6 +1041,391 @@
                 <li><strong>Video heroes dominate</strong> at the premium tier (CF, Kartra, Kajabi, GHL). At PageWheel's price point, a clear hero image + 30-second demo is sufficient and converts faster.</li>
             </ul>
         </section>
+
+        <!-- ====== LANDING PAGE ROADMAP ====== -->
+        <style>
+            .roadmap-section { margin-top: 56px; padding-top: 40px; border-top: 2px solid var(--border); }
+            .roadmap-section > h2 { font-size: 1.8rem; margin-bottom: 8px; color: var(--text-primary); }
+            .roadmap-section .lede { color: var(--text-secondary); font-size: 1.02rem; max-width: 820px; margin-bottom: 28px; line-height: 1.65; }
+            .strategy-callout { background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(34, 197, 94, 0.08)); border: 1px solid var(--accent); border-radius: 10px; padding: 22px 26px; margin-bottom: 32px; }
+            .strategy-callout h3 { color: var(--accent); font-size: 1.1rem; margin-bottom: 10px; }
+            .strategy-callout p { color: var(--text-primary); margin-bottom: 10px; line-height: 1.65; }
+            .strategy-callout p:last-child { margin-bottom: 0; }
+            .angle-table { margin: 24px 0 36px; }
+            .angle-table th { background: var(--bg-tertiary); color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; }
+            .angle-table td { font-size: 0.92rem; }
+            .angle-table .vol-cell { color: var(--success); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+            .phase-block { margin: 32px 0; }
+            .phase-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+            .phase-badge { background: var(--accent); color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+            .phase-title { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
+            .phase-sub { color: var(--text-secondary); font-size: 0.9rem; margin-left: auto; }
+
+            .lp-brief { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 26px 28px; margin-bottom: 20px; }
+            .lp-brief-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+            .lp-brief-num { background: var(--bg-tertiary); color: var(--text-secondary); width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0; }
+            .lp-brief-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); flex: 1; }
+            .lp-brief-url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; color: var(--accent); background: var(--bg-tertiary); padding: 4px 10px; border-radius: 4px; }
+            .lp-brief-vol { background: rgba(34, 197, 94, 0.12); color: var(--success); padding: 4px 10px; border-radius: 4px; font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
+
+            .brief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 18px; }
+            @media (max-width: 768px) { .brief-grid { grid-template-columns: 1fr; } }
+            .brief-block h4 { color: var(--text-secondary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; margin-bottom: 10px; }
+            .brief-block p, .brief-block ul { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; }
+            .brief-block ul { padding-left: 18px; margin-top: 6px; }
+            .brief-block li { margin-bottom: 6px; }
+            .brief-block .headline { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4; }
+            .brief-block .subhead { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55; }
+
+            .kw-table { width: 100%; font-size: 0.86rem; margin-top: 8px; }
+            .kw-table th { background: var(--bg-tertiary); color: var(--text-secondary); padding: 8px 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; }
+            .kw-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+            .kw-table td:nth-child(2), .kw-table td:nth-child(3) { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+            .kw-table tr:last-child td { border-bottom: none; }
+            .kw-table tfoot td { color: var(--success); font-weight: 700; border-top: 1px solid var(--border); border-bottom: none; }
+
+            .cta-row { background: var(--bg-tertiary); border-left: 3px solid var(--accent); padding: 14px 18px; border-radius: 4px; margin-top: 14px; }
+            .cta-row .cta-primary { font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+            .cta-row .cta-secondary { color: var(--text-secondary); font-size: 0.88rem; }
+
+            .compact-lp { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 18px 22px; margin-bottom: 14px; }
+            .compact-lp-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+            .compact-lp-num { background: var(--bg-tertiary); color: var(--text-secondary); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; }
+            .compact-lp-title { font-weight: 700; color: var(--text-primary); }
+            .compact-lp-url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: var(--accent); }
+            .compact-lp-vol { color: var(--success); font-size: 0.82rem; font-weight: 600; margin-left: auto; }
+            .compact-lp-kws { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 6px; }
+            .compact-lp-angle { color: var(--text-primary); font-size: 0.9rem; }
+
+            .defer-list { background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 18px 22px; }
+            .defer-list h3 { color: var(--danger); font-size: 1.05rem; margin-bottom: 10px; }
+            .defer-list ul { padding-left: 22px; }
+            .defer-list li { color: var(--text-primary); font-size: 0.92rem; margin-bottom: 8px; line-height: 1.5; }
+        </style>
+
+        <section class="roadmap-section">
+            <h2>PageWheel Landing Page Roadmap</h2>
+            <p class="lede">Nine landing pages across three phases, anchored in the cleaned non-brand keyword universe (35,724 pure-intent kws after filtering competitor brands, WordPress/CMS noise, and AI-tool noise). Phase 1 has full briefs ready for build. Phases 2 and 3 are scoped at the keyword cluster level.</p>
+
+            <div class="strategy-callout">
+                <h3>Strategic direction: lead with AI, not "landing page builder"</h3>
+                <p>The largest commercial-intent volume sits in the broad "landing page builder" cluster (~50K/mo), but ClickFunnels, LeadPages, and every category incumbent already own that positioning. PageWheel is the only player whose product can credibly claim AI-first generation as the lead, not a feature buried on a tour page.</p>
+                <p><strong>The AI-assisted cluster (~15K/mo of high-intent searches) is uncontested and grows fast.</strong> The roadmap leads with it, then layers in the broader category and persona-specific pages once PageWheel owns AI-first messaging.</p>
+            </div>
+
+            <h3 style="margin-top: 28px; color: var(--text-primary);">Five non-brand angles ranked by opportunity</h3>
+            <table class="angle-table">
+                <thead>
+                    <tr><th>Angle</th><th>Why it works</th><th>Volume signal</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>AI-assisted positioning</strong></td><td>Matches the product, defensible, no competitor leads with it</td><td class="vol-cell">~15K/mo high-intent</td></tr>
+                    <tr><td><strong>Audience-specific (coaches, course creators, authors)</strong></td><td>PageWheel's stated personas, lower CPC than category</td><td class="vol-cell">~8K/mo combined</td></tr>
+                    <tr><td><strong>Use-case educational ("how to build X")</strong></td><td>Top-of-funnel acquisition, low CPC, demos PageWheel naturally</td><td class="vol-cell">~36K/mo combined</td></tr>
+                    <tr><td><strong>Templates / design gallery</strong></td><td>SEO play with product hook, big tail in broader pool</td><td class="vol-cell">1,195 kws @ $8.67 avg CPC</td></tr>
+                    <tr><td><strong>Speed / no-tech ("build in minutes")</strong></td><td>Maps to "Digital-Business-in-a-Box" tagline, differentiated</td><td class="vol-cell">Smaller but high-convert</td></tr>
+                </tbody>
+            </table>
+
+            <!-- PHASE 1 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <span class="phase-badge">Phase 1</span>
+                    <span class="phase-title">Foundation — 3 category pages</span>
+                    <span class="phase-sub">Weeks 1–4 · ~85K/mo addressable</span>
+                </div>
+
+                <!-- LP 1 -->
+                <div class="lp-brief">
+                    <div class="lp-brief-head">
+                        <span class="lp-brief-num">1</span>
+                        <span class="lp-brief-title">AI Landing Page Builder</span>
+                        <span class="lp-brief-url">/ai-landing-page-builder</span>
+                        <span class="lp-brief-vol">~17.7K/mo</span>
+                    </div>
+                    <div class="brief-grid">
+                        <div class="brief-block">
+                            <h4>Target Keywords</h4>
+                            <table class="kw-table">
+                                <thead><tr><th>Keyword</th><th>Vol</th><th>CPC</th></tr></thead>
+                                <tbody>
+                                    <tr><td>ai landing page builder</td><td>8,100</td><td>$9.40</td></tr>
+                                    <tr><td>ai page builder</td><td>2,400</td><td>$8.80</td></tr>
+                                    <tr><td>ai landing page generator</td><td>1,900</td><td>$8.20</td></tr>
+                                    <tr><td>create landing page with ai</td><td>1,600</td><td>$6.80</td></tr>
+                                    <tr><td>ai funnel builder</td><td>1,300</td><td>$11.40</td></tr>
+                                    <tr><td>ai landing page creator</td><td>880</td><td>$7.40</td></tr>
+                                    <tr><td>ai sales funnel</td><td>720</td><td>$10.90</td></tr>
+                                    <tr><td>ai website builder for entrepreneurs</td><td>590</td><td>$7.60</td></tr>
+                                    <tr><td>ai copywriting landing page</td><td>320</td><td>$9.60</td></tr>
+                                </tbody>
+                                <tfoot><tr><td>Total</td><td>17,810</td><td>—</td></tr></tfoot>
+                            </table>
+                        </div>
+                        <div class="brief-block">
+                            <h4>Headline & Hero</h4>
+                            <div class="headline">Describe your offer. PageWheel builds the landing page in 60 seconds.</div>
+                            <div class="subhead">AI-assisted landing pages for coaches, course creators, and digital entrepreneurs. No design skills, no template wrestling. Start free.</div>
+
+                            <h4 style="margin-top: 18px;">Value Props (3-up grid below hero)</h4>
+                            <ul>
+                                <li><strong>60-second generation</strong> — prompt to live page, no design work</li>
+                                <li><strong>Built for non-designers</strong> — every output is conversion-tested by default</li>
+                                <li><strong>$27/mo, half the price</strong> of ClickFunnels and Kajabi</li>
+                            </ul>
+
+                            <div class="cta-row">
+                                <div class="cta-primary">Primary CTA: "Generate Your First Page Free →"</div>
+                                <div class="cta-secondary">Secondary CTA: "Watch 90-second demo"</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brief-block">
+                        <h4>Content Outline</h4>
+                        <ol style="padding-left: 22px; color: var(--text-primary); font-size: 0.92rem; line-height: 1.7;">
+                            <li><strong>Hero</strong> — headline + looping AI generation demo (30s: prompt → finished page)</li>
+                            <li><strong>The pain</strong> — "You shouldn't need a designer (or $97/mo) to launch your next offer"</li>
+                            <li><strong>How it works</strong> — 3 steps: prompt → review → publish (with animated illustrations)</li>
+                            <li><strong>What's included</strong> — hosting, A/B testing, conversions, analytics, custom domain (badge grid)</li>
+                            <li><strong>Built for</strong> — persona icon row: coaches, course creators, authors, affiliates, agencies</li>
+                            <li><strong>Live interactive demo</strong> — embedded AI generator users can try without signup</li>
+                            <li><strong>Pricing card</strong> — $27/mo highlighted with 14-day free trial</li>
+                            <li><strong>Compare table</strong> — PageWheel AI vs ClickFunnels manual builder (time-to-launch + cost)</li>
+                            <li><strong>Social proof</strong> — testimonials from real users with specific results ("launched my course funnel in 2 hours")</li>
+                            <li><strong>FAQ</strong> — what's the AI built on, can I edit, do I keep the page if I cancel, etc.</li>
+                            <li><strong>Final CTA</strong> — repeat primary CTA + risk reversal (free trial, cancel anytime)</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- LP 2 -->
+                <div class="lp-brief">
+                    <div class="lp-brief-head">
+                        <span class="lp-brief-num">2</span>
+                        <span class="lp-brief-title">Landing Page Builder (category authority)</span>
+                        <span class="lp-brief-url">/landing-page-builder</span>
+                        <span class="lp-brief-vol">~50K/mo</span>
+                    </div>
+                    <div class="brief-grid">
+                        <div class="brief-block">
+                            <h4>Target Keywords</h4>
+                            <table class="kw-table">
+                                <thead><tr><th>Keyword</th><th>Vol</th><th>CPC</th></tr></thead>
+                                <tbody>
+                                    <tr><td>landing page builder</td><td>33,100</td><td>$11.42</td></tr>
+                                    <tr><td>best landing page builder</td><td>8,100</td><td>$12.85</td></tr>
+                                    <tr><td>landing page software</td><td>2,900</td><td>$10.85</td></tr>
+                                    <tr><td>drag and drop landing page builder</td><td>1,900</td><td>$11.20</td></tr>
+                                    <tr><td>landing page creator</td><td>1,600</td><td>$9.80</td></tr>
+                                    <tr><td>no code landing page builder</td><td>1,300</td><td>$9.60</td></tr>
+                                    <tr><td>easy landing page builder</td><td>880</td><td>$8.50</td></tr>
+                                    <tr><td>cheap landing page builder</td><td>720</td><td>$7.20</td></tr>
+                                    <tr><td>landing page platform</td><td>720</td><td>$10.40</td></tr>
+                                </tbody>
+                                <tfoot><tr><td>Total</td><td>51,220</td><td>—</td></tr></tfoot>
+                            </table>
+                        </div>
+                        <div class="brief-block">
+                            <h4>Headline & Hero</h4>
+                            <div class="headline">The Easiest Landing Page Builder for Non-Designers.</div>
+                            <div class="subhead">Drag-and-drop, AI-assisted, no code. Launch high-converting pages in minutes — not weeks. $27/mo, free trial.</div>
+
+                            <h4 style="margin-top: 18px;">Value Props (5-up feature grid)</h4>
+                            <ul>
+                                <li><strong>AI generation</strong> — prompt-to-page in 60 seconds (the differentiator)</li>
+                                <li><strong>Drag-and-drop editor</strong> — table-stakes for category, customize anything</li>
+                                <li><strong>100+ industry templates</strong> — coaches, courses, ecommerce, agencies</li>
+                                <li><strong>Built-in A/B testing</strong> + conversion analytics</li>
+                                <li><strong>Hosting + custom domain</strong> included, no extra setup</li>
+                            </ul>
+
+                            <div class="cta-row">
+                                <div class="cta-primary">Primary CTA: "Start Free Trial — Build in 5 Minutes"</div>
+                                <div class="cta-secondary">Secondary CTA: "See template gallery"</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brief-block">
+                        <h4>Content Outline</h4>
+                        <ol style="padding-left: 22px; color: var(--text-primary); font-size: 0.92rem; line-height: 1.7;">
+                            <li><strong>Hero</strong> — headline + animated drag-and-drop demo (above the fold, no signup required to interact)</li>
+                            <li><strong>Built for</strong> — persona row: coaches, course creators, ecommerce, affiliates, agencies, freelancers</li>
+                            <li><strong>Features grid</strong> — 6 features with icons: AI generation, drag-drop, templates, A/B, analytics, hosting</li>
+                            <li><strong>Template gallery preview</strong> — scrolling carousel by industry with "see all 100+ templates" CTA</li>
+                            <li><strong>Pricing comparison table</strong> — PageWheel $27 vs LeadPages $49 vs ClickFunnels $97 vs Kajabi $149 — feature parity check</li>
+                            <li><strong>Use cases section</strong> — 4 short scenarios (lead capture, course sales, webinar, product launch)</li>
+                            <li><strong>Customer logos + testimonials</strong> — with specific outcomes ("$47K launch in 3 weeks")</li>
+                            <li><strong>FAQ</strong> — does it integrate with X, what about hosting, who owns my pages, etc.</li>
+                            <li><strong>Final CTA</strong> — free trial + 14-day money back</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- LP 3 -->
+                <div class="lp-brief">
+                    <div class="lp-brief-head">
+                        <span class="lp-brief-num">3</span>
+                        <span class="lp-brief-title">Funnel Builder (sales funnel intent)</span>
+                        <span class="lp-brief-url">/funnel-builder</span>
+                        <span class="lp-brief-vol">~20K/mo</span>
+                    </div>
+                    <div class="brief-grid">
+                        <div class="brief-block">
+                            <h4>Target Keywords</h4>
+                            <table class="kw-table">
+                                <thead><tr><th>Keyword</th><th>Vol</th><th>CPC</th></tr></thead>
+                                <tbody>
+                                    <tr><td>funnel builder</td><td>9,900</td><td>$14.20</td></tr>
+                                    <tr><td>sales funnel builder</td><td>4,400</td><td>$13.10</td></tr>
+                                    <tr><td>best funnel builder</td><td>2,400</td><td>$15.40</td></tr>
+                                    <tr><td>funnel software</td><td>1,900</td><td>$12.60</td></tr>
+                                    <tr><td>ai funnel builder</td><td>1,300</td><td>$11.40</td></tr>
+                                    <tr><td>ai sales funnel</td><td>720</td><td>$10.90</td></tr>
+                                </tbody>
+                                <tfoot><tr><td>Total</td><td>20,620</td><td>—</td></tr></tfoot>
+                            </table>
+                        </div>
+                        <div class="brief-block">
+                            <h4>Headline & Hero</h4>
+                            <div class="headline">Build a Complete Sales Funnel in Under an Hour.</div>
+                            <div class="subhead">Landing page + checkout + email follow-up + thank-you sequence. All in one AI-assisted builder. $27/mo.</div>
+
+                            <h4 style="margin-top: 18px;">Value Props (5-up grid)</h4>
+                            <ul>
+                                <li><strong>Full funnel, not just pages</strong> — landing → checkout → upsell → thank-you, all connected</li>
+                                <li><strong>AI generates each step</strong> from one prompt — no rebuilding 6 times</li>
+                                <li><strong>Built-in payments + email</strong> — no Stripe + Mailchimp duct-tape</li>
+                                <li><strong>Funnel templates by type</strong> — lead magnet, tripwire, webinar, course launch</li>
+                                <li><strong>Visual funnel mapper</strong> — see your flow, not a list of disconnected pages</li>
+                            </ul>
+
+                            <div class="cta-row">
+                                <div class="cta-primary">Primary CTA: "Build Your First Funnel Free"</div>
+                                <div class="cta-secondary">Secondary CTA: "See funnel templates"</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brief-block">
+                        <h4>Content Outline</h4>
+                        <ol style="padding-left: 22px; color: var(--text-primary); font-size: 0.92rem; line-height: 1.7;">
+                            <li><strong>Hero</strong> — headline + visual funnel diagram showing all stages connected</li>
+                            <li><strong>The problem</strong> — "most 'funnel builders' just build pages — you still wire up checkout, email, upsells yourself" — point at ClickFunnels' complexity without naming</li>
+                            <li><strong>What's in a PageWheel funnel</strong> — components diagram: landing, order form, OTO, thank-you, email sequence, all editable in one view</li>
+                            <li><strong>AI funnel generation demo</strong> — prompt → complete funnel in 60s</li>
+                            <li><strong>Funnel templates by type</strong> — lead magnet, tripwire, webinar registration, course launch, agency lead-gen</li>
+                            <li><strong>Built-in payments + email</strong> — so you don't need separate Stripe + ESP setup (badge row showing what's integrated)</li>
+                            <li><strong>Pricing</strong> — $27/mo with "what you'd pay for the equivalent stack" comparison ($300+ stack vs $27 PageWheel)</li>
+                            <li><strong>Case studies</strong> — 2–3 funnel performance examples with revenue and conversion rate numbers</li>
+                            <li><strong>vs ClickFunnels</strong> — direct comparison: price, time-to-build, included tools, AI generation</li>
+                            <li><strong>FAQ</strong> — can I import existing funnels, does it work with X payment processor, etc.</li>
+                            <li><strong>Final CTA</strong> — free trial</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHASE 2 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <span class="phase-badge" style="background: var(--success);">Phase 2</span>
+                    <span class="phase-title">Persona pages — 3 audience LPs</span>
+                    <span class="phase-sub">Weeks 5–8 · ~12K/mo addressable</span>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">4</span>
+                        <span class="compact-lp-title">PageWheel for Coaches</span>
+                        <span class="compact-lp-url">/for-coaches</span>
+                        <span class="compact-lp-vol">~2.4K/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> website builder for coaches (1,300), landing page for coaches (590), funnel builder for coaches (480)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> "Launch your coaching business in a weekend." Sell the speed-to-revenue, not the feature checklist. Use case-study format showing real coaches who launched within X days, plus templates pre-built for discovery call funnels, lead magnet capture, and program landing pages.</div>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">5</span>
+                        <span class="compact-lp-title">PageWheel for Course Creators</span>
+                        <span class="compact-lp-url">/for-course-creators</span>
+                        <span class="compact-lp-vol">~5.7K/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> build an online course (4,400 informational), online course landing page (720), landing page for course creators (320), funnel for course launch (210)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> Position as the "launch your course" alternative to Kajabi at a fraction of the price. Lead with the launch funnel template (lead magnet → webinar → course sale → thank-you) pre-built. Counter Kajabi's $149/mo with $27 + full funnel. Educational top-of-page content for the 4,400/mo "build an online course" SEO play.</div>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">6</span>
+                        <span class="compact-lp-title">PageWheel for Authors / Digital Products</span>
+                        <span class="compact-lp-url">/for-digital-products</span>
+                        <span class="compact-lp-vol">~4K/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> sell digital products online (2,900), digital product landing page (480), sales page for ebook (390), landing page for authors (260)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> "Sell your ebook, template pack, course, or PDF in under an hour." Position against Gumroad and Stan Store as the "real landing page, not just a buy button" option. Pre-built sales page templates for digital downloads with built-in delivery + checkout. Strong AI-headline-generator hook for non-copywriters.</div>
+                </div>
+            </div>
+
+            <!-- PHASE 3 -->
+            <div class="phase-block">
+                <div class="phase-header">
+                    <span class="phase-badge" style="background: var(--warning); color: #1a1a1a;">Phase 3</span>
+                    <span class="phase-title">Educational use-case LPs</span>
+                    <span class="phase-sub">Weeks 9–12 · ~16K/mo addressable</span>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">7</span>
+                        <span class="compact-lp-title">How to Build a Landing Page</span>
+                        <span class="compact-lp-url">/how-to-build-a-landing-page</span>
+                        <span class="compact-lp-vol">8,100/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> how to build a landing page (8,100), build a website for my business (2,400), build landing page fast (720)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> Tutorial format with PageWheel as the answer at every step. Walk through "what is a landing page → what makes one convert → how to build one fast → here's how PageWheel does it in 60 seconds." Educational SEO with a built-in product demo at every checkpoint. Ideal for top-of-funnel paid social acquisition.</div>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">8</span>
+                        <span class="compact-lp-title">How to Build a Sales Funnel</span>
+                        <span class="compact-lp-url">/how-to-build-a-sales-funnel</span>
+                        <span class="compact-lp-vol">8,000/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> how to build a sales funnel (4,400), create a sales funnel (3,600)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> Tutorial covering funnel anatomy, stages, conversion rate benchmarks, then demonstrating PageWheel as the build tool. Plays well for paid Meta acquisition of the "I want to do this myself" buyer. Cross-link to LP3 (Funnel Builder) for direct purchase intent.</div>
+                </div>
+
+                <div class="compact-lp">
+                    <div class="compact-lp-head">
+                        <span class="compact-lp-num">9</span>
+                        <span class="compact-lp-title">How to Sell Digital Products Online</span>
+                        <span class="compact-lp-url">/how-to-sell-digital-products</span>
+                        <span class="compact-lp-vol">3,600/mo</span>
+                    </div>
+                    <div class="compact-lp-kws"><strong>Keywords:</strong> how to sell digital products (3,600)</div>
+                    <div class="compact-lp-angle"><strong>Angle:</strong> Top-of-funnel guide for would-be digital entrepreneurs. Walks through "what to sell → how to price → how to set up payments → how to drive traffic." PageWheel positioned as the entire infrastructure layer. Cross-link to LP6 (Digital Products).</div>
+                </div>
+            </div>
+
+            <!-- DEFER -->
+            <div class="defer-list" style="margin-top: 36px;">
+                <h3>What to defer (intentionally not in Phase 1–3)</h3>
+                <ul>
+                    <li><strong>All competitor brand-comparison LPs</strong> (<code>/clickfunnels-alternative</code>, <code>/kajabi-vs-pagewheel</code>, etc.) — strong intent but premature without first establishing PageWheel's positioning and trust signals. Revisit as Phase 4 once Phase 1–3 LPs are converting.</li>
+                    <li><strong>"Free landing page builder"</strong> (18,100/mo) — high volume but the searcher intent is "I don't want to pay." Burns budget on non-converters unless PageWheel has a freemium tier or genuine "free starter templates" hook. Skip until a freemium offer is decided.</li>
+                    <li><strong>WordPress / Gutenberg / Divi adjacent</strong> — different buyer mindset (WP ecosystem loyalty), won't convert to PageWheel. Not a fit even with massive volume.</li>
+                    <li><strong>Generic "AI" search</strong> (Claude, ChatGPT, etc.) — adjacent but not commercial-intent for page-building. The AI-assisted cluster in Phase 1 captures the real buyers without burning on broad-AI search.</li>
+                </ul>
+            </div>
+
+            <div class="strategy-callout" style="margin-top: 32px;">
+                <h3>What the 9 LPs together unlock</h3>
+                <p><strong>~155K monthly addressable searches</strong> across the full Phase 1–3 roadmap, at average ~$9 blended CPC. At conservative 2% LP conversion across paid + organic traffic, this is the foundation of a substantial, defensible pipeline that puts PageWheel in front of buyers in three distinct mindsets: <em>"I want an AI tool"</em> (Phase 1), <em>"I am a [persona] needing this"</em> (Phase 2), <em>"I want to learn how to do X"</em> (Phase 3).</p>
+                <p>Brand-competitor conquesting (Phase 4) layers on top of this foundation later, not before it.</p>
+            </div>
+        </section>
     </div>
 
     <script>
