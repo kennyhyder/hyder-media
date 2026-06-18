@@ -515,8 +515,45 @@
                 max-width: 100%;
             }
             .section {
+                margin-bottom: 32px;
+            }
+            /* Granular page-break rules for clean pagination */
+            .callout,
+            .channel-card,
+            .tier-card,
+            .stat-card,
+            .tier-cards,
+            .stats-row,
+            .channel-grid,
+            .timeline-item,
+            .get-started-card,
+            .prepared-by {
                 page-break-inside: avoid;
-                margin-bottom: 40px;
+                break-inside: avoid;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            thead {
+                display: table-header-group;
+            }
+            h2, h3, h4 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            h2 + p, h3 + p, h4 + p,
+            h2 + table, h3 + table, h4 + table,
+            h2 + ul, h3 + ul, h4 + ul {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+            .divider {
+                page-break-after: avoid;
+                break-after: avoid;
             }
             .section-number {
                 color: #fe6f50 !important;

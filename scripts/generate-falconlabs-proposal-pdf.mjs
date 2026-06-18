@@ -97,32 +97,13 @@ await page.emulateMediaType('print');
 // Small delay for any final font/image loading
 await new Promise(r => setTimeout(r, 1500));
 
-const footerTemplate = `
-    <div style="
-        width: 100%;
-        font-size: 8px;
-        color: #94a3b8;
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        padding: 0 0.5in;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    ">
-        <span style="color: #475569;">Hyder Media &times; Falcon Labs</span>
-        <span style="color: #94a3b8;">Multi-Channel Growth Partnership Proposal</span>
-        <span style="color: #94a3b8;"><span class="pageNumber"></span> / <span class="totalPages"></span></span>
-    </div>
-`;
-
 console.log('Generating PDF...');
 await page.pdf({
     path: OUTPUT_PATH,
     format: 'Letter',
     printBackground: true,
-    displayHeaderFooter: true,
-    headerTemplate: '<div></div>',
-    footerTemplate,
-    margin: { top: '0.5in', bottom: '0.65in', left: '0.5in', right: '0.5in' },
+    displayHeaderFooter: false,
+    margin: { top: '0.6in', right: '0.6in', bottom: '0.6in', left: '0.6in' },
     preferCSSPageSize: false
 });
 
