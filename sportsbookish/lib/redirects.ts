@@ -11,29 +11,59 @@ import { NextResponse, type NextRequest } from "next/server";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// We DO need a fresh fetch per request so the cache is current after
-// new redirect rows are added. To keep latency low, the middleware only
-// consults this for paths that match patterns where we've previously
-// shipped a 404 (sports/* paths) — skipped for static + API routes.
-async function lookupExact(fromPath: string): Promise<{ to: string; status: number } | null> {
+// In-memory micro-cache, per edge isolate. The Next Data Cache
+// (`next: { revalidate }`) does NOT apply to fetches inside middleware, so
+// without this every single page load would do a live Supabase round-trip on
+// the hot path. NEGATIVE caching matters most: the vast majority of paths have
+// no redirect row, and we must not re-hit Supabase for every live URL. TTL is
+// short so newly-added redirect rows take effect within ~a minute.
+type RedirectResult = { to: string; status: number } | null;
+const _cache = new Map<string, { value: RedirectResult; expires: number }>();
+const CACHE_TTL_MS = 60_000;
+const NEG_CACHE_ON_ERROR_MS = 5_000; // shorter, so a transient Supabase blip recovers fast
+const LOOKUP_TIMEOUT_MS = 1_200;     // fail-open ceiling — never hang the middleware
+const CACHE_MAX = 4_000;             // crude cap so an isolate can't grow unbounded
+
+// The redirect table is an edge-case surface (only dead URLs need a row), so a
+// slow Supabase must NEVER stall page rendering. We hard-timeout the lookup and
+// fail OPEN (treat as "no redirect"). This is the fix for the site-wide 504s:
+// previously this fetch had no timeout, so a slow Supabase hung the middleware
+// on EVERY request and the gateway 504'd before the page could render.
+async function lookupExact(fromPath: string): Promise<RedirectResult> {
   if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+
+  const cached = _cache.get(fromPath);
+  if (cached && cached.expires > Date.now()) return cached.value;
+
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), LOOKUP_TIMEOUT_MS);
   try {
     const url = `${SUPABASE_URL}/rest/v1/sb_url_redirects?from_path=eq.${encodeURIComponent(fromPath)}&select=to_path,status_code&limit=1`;
     const r = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-      // 60s edge cache — new redirects propagate within a minute.
-      next: { revalidate: 60 },
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+      signal: ctrl.signal,
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      setCache(fromPath, null, CACHE_TTL_MS);
+      return null;
+    }
     const rows = await r.json();
-    if (!rows?.[0]) return null;
-    return { to: rows[0].to_path, status: rows[0].status_code || 301 };
+    const value: RedirectResult = rows?.[0] ? { to: rows[0].to_path, status: rows[0].status_code || 301 } : null;
+    setCache(fromPath, value, CACHE_TTL_MS);
+    return value;
   } catch {
+    // Timeout or network error → fail OPEN. Brief negative cache so we don't
+    // hammer a struggling Supabase on every request.
+    setCache(fromPath, null, NEG_CACHE_ON_ERROR_MS);
     return null;
+  } finally {
+    clearTimeout(tid);
   }
+}
+
+function setCache(key: string, value: RedirectResult, ttlMs: number): void {
+  if (_cache.size >= CACHE_MAX) _cache.clear();
+  _cache.set(key, { value, expires: Date.now() + ttlMs });
 }
 
 // Smart pattern fallback is DISABLED. Earlier version hijacked every live
