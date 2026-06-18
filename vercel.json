@@ -1,10 +1,12 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 }
+    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 },
+    { "source": "/falcon-proposal/", "destination": "/falcon-proposal", "statusCode": 301 },
+    { "source": "/falcon-proposal.html", "destination": "/falcon-proposal", "statusCode": 301 }
   ],
   "rewrites": [
-    { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal.html" }
+    { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal" }
   ],
   "crons": [
     { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
