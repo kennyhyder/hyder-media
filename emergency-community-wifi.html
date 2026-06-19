@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Emergency Community Internet — Clubhouse WiFi Spec | Hyder Media</title>
+    <link rel="shortcut icon" href="assets/imgs/logos/favicon.png" type="image/x-icon" />
+    <meta name="description" content="Specification for a fair-use, managed clubhouse WiFi system that shares a community Starlink connection during emergencies — per-user data caps, time limits, and a fair queue, with no recurring software cost." />
+    <meta name="robots" content="noindex" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Emergency Community Internet — Clubhouse WiFi Spec" />
+    <meta property="og:description" content="A fair-use managed WiFi system over a community Starlink for emergencies. One-time hardware, no recurring software fees, managed remotely." />
+    <meta property="og:url" content="https://hyder.me/emergency-community-wifi.html" />
+    <meta property="og:site_name" content="Hyder Media" />
+
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            } else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <style>
+        :root { --spec-accent: var(--dark-brown-color); --spec-pop: var(--yellow-color); }
+        .spec--section { padding: 28px 0 72px; }
+        .spec-doc { max-width: 880px; margin: 0 auto; font-family: var(--pt-sans); }
+
+        .spec-meta {
+            display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: baseline;
+            font-family: var(--roboto-mono); font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.08em; opacity: 0.7; margin-bottom: 28px;
+            border-bottom: 1px solid rgba(121,82,50,0.25); padding-bottom: 16px;
+        }
+        html.dark-mode .spec-meta { border-color: rgba(225,212,43,0.22); }
+        .spec-meta b { opacity: 1; font-weight: 700; }
+
+        .spec-lead {
+            font-size: 1.06rem; line-height: 1.6; max-width: 760px; margin-bottom: 36px;
+        }
+
+        .spec-h2 {
+            font-family: var(--pt-sans); font-weight: 700; font-size: 1.18rem;
+            color: var(--dark-brown-color); margin: 40px 0 14px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        html.dark-mode .spec-h2 { color: var(--yellow-color); }
+        .spec-h2 .num {
+            flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+            background: var(--dark-brown-color); color: var(--white-color);
+            font-family: var(--roboto-mono); font-size: 0.85rem; font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        html.dark-mode .spec-h2 .num { background: var(--yellow-color); color: var(--black-color); }
+
+        .spec-list { list-style: none; padding: 0; margin: 0 0 6px; }
+        .spec-list li {
+            position: relative; padding: 7px 0 7px 30px; line-height: 1.5;
+            border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 0.96rem;
+        }
+        html.dark-mode .spec-list li { border-color: rgba(255,255,255,0.07); }
+        .spec-list li:last-child { border-bottom: none; }
+        .spec-list li::before {
+            content: "✓"; position: absolute; left: 2px; top: 7px;
+            color: var(--dark-brown-color); font-weight: 700;
+        }
+        html.dark-mode .spec-list li::before { color: var(--yellow-color); }
+        .spec-list li b { font-weight: 700; }
+
+        table.spec-bom {
+            width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 6px 0 4px;
+        }
+        .spec-bom th {
+            text-align: left; font-family: var(--roboto-mono); font-size: 0.68rem;
+            text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.65;
+            padding: 8px 12px; border-bottom: 2px solid var(--dark-brown-color);
+        }
+        html.dark-mode .spec-bom th { border-color: var(--yellow-color); }
+        .spec-bom td { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); vertical-align: top; }
+        html.dark-mode .spec-bom td { border-color: rgba(255,255,255,0.08); }
+        .spec-bom td.num, .spec-bom th.num { text-align: right; font-family: var(--roboto-mono); white-space: nowrap; }
+        .spec-bom tr.total td { font-weight: 700; border-top: 2px solid var(--dark-brown-color); border-bottom: none; }
+        html.dark-mode .spec-bom tr.total td { border-color: var(--yellow-color); }
+        .spec-bom small { opacity: 0.6; display: block; font-size: 0.78rem; }
+
+        .spec-callout {
+            border: 1px solid var(--dark-brown-color); border-left-width: 5px;
+            border-radius: 6px; padding: 16px 20px; margin: 18px 0; font-size: 0.94rem; line-height: 1.55;
+        }
+        html.dark-mode .spec-callout { border-color: var(--yellow-color); }
+        .spec-callout .tag {
+            font-family: var(--roboto-mono); font-size: 0.66rem; text-transform: uppercase;
+            letter-spacing: 0.08em; font-weight: 700; color: var(--dark-brown-color); display: block; margin-bottom: 6px;
+        }
+        html.dark-mode .spec-callout .tag { color: var(--yellow-color); }
+        .spec-callout.pop { background: rgba(225,212,43,0.12); }
+
+        .spec-cost {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 8px 0 4px;
+            border: 1px solid rgba(121,82,50,0.4); border-radius: 8px; overflow: hidden;
+        }
+        html.dark-mode .spec-cost { border-color: rgba(225,212,43,0.35); }
+        .spec-cost > div { padding: 18px 22px; }
+        .spec-cost > div:first-child { border-right: 1px solid rgba(121,82,50,0.4); }
+        html.dark-mode .spec-cost > div:first-child { border-color: rgba(225,212,43,0.35); }
+        .spec-cost .label { font-family: var(--roboto-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.65; }
+        .spec-cost .amount { font-size: 1.5rem; font-weight: 700; color: var(--dark-brown-color); margin-top: 4px; line-height: 1.1; }
+        html.dark-mode .spec-cost .amount { color: var(--yellow-color); }
+        .spec-cost .amount small { display:block; font-size: 0.7rem; font-weight: 400; opacity: 0.7; margin-top: 4px; font-family: var(--roboto-mono); }
+
+        .spec-split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        @media (max-width: 640px) { .spec-split, .spec-cost { grid-template-columns: 1fr; } .spec-cost > div:first-child { border-right: none; border-bottom: 1px solid rgba(121,82,50,0.4); } }
+
+        .spec-print-btn {
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+            background: var(--dark-brown-color); color: var(--white-color); border: none;
+            font-family: var(--roboto-mono); font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.06em; padding: 10px 18px; border-radius: 4px; transition: opacity .15s;
+        }
+        html.dark-mode .spec-print-btn { background: var(--yellow-color); color: var(--black-color); }
+        .spec-print-btn:hover { opacity: 0.85; }
+
+        .spec-sig { margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(121,82,50,0.25); font-size: 0.9rem; }
+        html.dark-mode .spec-sig { border-color: rgba(225,212,43,0.22); }
+        .spec-sig a { color: var(--dark-brown-color); font-weight: 700; }
+        html.dark-mode .spec-sig a { color: var(--yellow-color); }
+
+        @media print {
+            .header, .footer, .spec-print-btn, .no-print { display: none !important; }
+            .spec--section { padding: 0; }
+            body { font-size: 11pt; }
+            .spec-h2 { page-break-after: avoid; }
+            .spec-callout, table.spec-bom, .spec-cost { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            HYDER MEDIA &middot; SYSTEM SPEC
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            Emergency Community<br />Internet — Clubhouse WiFi
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="spec--section">
+            <div class="container">
+                <div class="spec-doc">
+
+                    <div class="spec-meta">
+                        <span><b>Prepared for:</b> Community Emergency Preparedness</span>
+                        <span><b>Connection:</b> Community Starlink</span>
+                        <span><b>Coverage:</b> Clubhouse &amp; common areas</span>
+                        <span><b>Recurring software cost:</b> $0</span>
+                    </div>
+
+                    <p class="spec-lead">
+                        A simple, fair way for residents to share the community Starlink connection at the
+                        clubhouse during an emergency — so everyone gets a turn, no one monopolizes the
+                        bandwidth, and the system runs itself. Built on standard, off-the-shelf networking
+                        gear with <b>no monthly software fees</b> and full <b>remote management</b>, so no
+                        on-site IT person is needed once it's installed.
+                    </p>
+
+                    <!-- 1. How it works -->
+                    <h2 class="spec-h2"><span class="num">1</span> How it works</h2>
+                    <p>
+                        The Starlink connects to a small network gateway that broadcasts WiFi across the
+                        clubhouse through ceiling-mounted access points. Residents join the network and sign
+                        in with a personal access code handed out in advance. The gateway runs a login page
+                        ("captive portal") and automatically enforces fair-use rules — there's nothing for a
+                        volunteer to police by hand. The whole system is configured and maintained remotely.
+                    </p>
+
+                    <!-- 2. Fair-use controls -->
+                    <h2 class="spec-h2"><span class="num">2</span> Fair-use controls (automatic)</h2>
+                    <ul class="spec-list">
+                        <li><b>Personal login per resident</b> — access codes generated from the resident roster and distributed before an emergency.</li>
+                        <li><b>Data cap per session</b> — the connection ends automatically once a user hits their allotment, freeing the slot for the next person.</li>
+                        <li><b>Time limit per session</b> — enforced <i>only when others are waiting</i>, so no one is bumped off when there's room to spare.</li>
+                        <li><b>Speed cap per user</b> — each person gets a fair, equal slice so a single user can't swamp the connection.</li>
+                        <li><b>Streaming &amp; large downloads blocked</b> — emergency communications only (messaging, email, news, maps), which protects the shared data plan.</li>
+                        <li><b>Concurrent-user cap with a fair queue</b> — when the network is full, new users see a "you're next in line" page and are admitted in order as slots open.</li>
+                        <li><b>First-come, first-served</b> — no assigned time slots or schedules to argue over.</li>
+                        <li><b>Optional priority lane</b> — emergency/medical responders can be exempted from the queue.</li>
+                    </ul>
+
+                    <!-- 3. Equipment -->
+                    <h2 class="spec-h2"><span class="num">3</span> Equipment (one-time purchase)</h2>
+                    <table class="spec-bom">
+                        <thead>
+                            <tr><th>Item</th><th>Purpose</th><th class="num">Qty</th><th class="num">Est. price</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>UniFi Cloud Gateway (UCG-Ultra)</td><td>Runs the login portal, fair-use rules &amp; remote management</td><td class="num">1</td><td class="num">$129</td></tr>
+                            <tr><td>UniFi U7 Pro Access Points</td><td>Clubhouse WiFi coverage (~40–50 users each)</td><td class="num">3</td><td class="num">$567</td></tr>
+                            <tr><td>UniFi PoE Switch (USW-Lite-8-PoE)</td><td>Powers the access points over the network cable</td><td class="num">1</td><td class="num">$109</td></tr>
+                            <tr><td>Outdoor Access Point <small>(only if patio is exposed)</small></td><td>Weatherproof coverage for an open patio/common area</td><td class="num">0–1</td><td class="num">$0–199</td></tr>
+                            <tr><td>Starlink → gateway connection</td><td>Built-in Ethernet + "Bypass Mode" — no adapter needed (Gen 3)</td><td class="num">—</td><td class="num">$0</td></tr>
+                            <tr><td>Cabling, mounts &amp; misc</td><td>Network cable runs and access-point mounting</td><td class="num">—</td><td class="num">$100–200</td></tr>
+                            <tr class="total"><td colspan="3">One-time hardware total</td><td class="num">~$900–$1,200</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size:0.8rem; opacity:0.6; margin-top:8px;">Prices are US street prices as of mid-2026 and may vary ±10%. No software licenses or subscriptions are required for any of this equipment.</p>
+
+                    <!-- 4. Internet plan -->
+                    <h2 class="spec-h2"><span class="num">4</span> Starlink plan</h2>
+                    <p>
+                        The existing <b>Local Priority 500&nbsp;GB</b> plan is well-suited to episodic emergency
+                        use — roughly <b>30+ hours</b> of a packed, 150-person room doing messaging, email and
+                        maps (with streaming blocked). Because the system activates only during emergencies, the
+                        most economical approach is to <b>keep the base service active (~$30/mo) so the dish stays
+                        ready, and purchase a data bucket only in the month an emergency occurs.</b>
+                    </p>
+                    <div class="spec-callout">
+                        <span class="tag">Plan note</span>
+                        Starlink discontinued the free "$0 pause" in 2025 — a paused account is now ~$5/month
+                        ("Standby Mode"), or it can be fully cancelled for $0 and reactivated when needed. Worth
+                        confirming the exact standby terms with Starlink for budgeting.
+                    </div>
+
+                    <!-- 5. Install + power -->
+                    <h2 class="spec-h2"><span class="num">5</span> Installation &amp; operation</h2>
+                    <div class="spec-split">
+                        <div>
+                            <p style="font-weight:700; margin-bottom:8px;">Physical install (on-site, ~half a day)</p>
+                            <ul class="spec-list">
+                                <li>Mount the gateway &amp; switch near the Starlink.</li>
+                                <li>Run network cable to 3 access-point locations &amp; mount them.</li>
+                                <li>Connect Starlink and power on.</li>
+                            </ul>
+                            <p style="font-size:0.85rem; opacity:0.75; margin-top:8px;">A local low-voltage/network installer or a handy volunteer can do this from pre-configured, ship-ready equipment.</p>
+                        </div>
+                        <div>
+                            <p style="font-weight:700; margin-bottom:8px;">Configuration (100% remote)</p>
+                            <ul class="spec-list">
+                                <li>Login portal, fair-use rules &amp; resident codes.</li>
+                                <li>Network security &amp; guest isolation.</li>
+                                <li>Ongoing tweaks &amp; "turn it on" for an event.</li>
+                            </ul>
+                            <p style="font-size:0.85rem; opacity:0.75; margin-top:8px;">All software is set up and maintained remotely via the manufacturer's free cloud — no recurring cost, no on-site IT.</p>
+                        </div>
+                    </div>
+                    <div class="spec-callout pop">
+                        <span class="tag">Important — backup power</span>
+                        This is an emergency system, so it must keep running when the grid is down. The Starlink
+                        and networking gear need <b>backup power</b> — a battery/UPS at minimum, ideally tied to a
+                        generator or battery the clubhouse already has. Without it, the system goes dark exactly
+                        when it's needed most.
+                    </div>
+
+                    <!-- 6. Cost summary -->
+                    <h2 class="spec-h2"><span class="num">6</span> Cost summary</h2>
+                    <div class="spec-cost">
+                        <div>
+                            <div class="label">One-time hardware</div>
+                            <div class="amount">~$900–$1,200<small>Purchased once. No subscription.</small></div>
+                        </div>
+                        <div>
+                            <div class="label">Recurring software cost</div>
+                            <div class="amount">$0<small>Free self-hosted &amp; cloud management</small></div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.9rem; margin-top:14px;">
+                        For comparison, hosted "captive portal" subscription services run roughly <b>$3–$250 per
+                        month, indefinitely</b>, and are built to harvest marketing data rather than ration
+                        bandwidth fairly. This specification deliberately avoids any recurring software fee — the
+                        only ongoing cost is the community's existing Starlink service.
+                    </p>
+                    <p style="font-size:0.9rem; margin-top:8px;">
+                        <b>Setup &amp; configuration</b> (pre-configuring the equipment, generating resident access
+                        codes, building the login portal and fair-queue logic, and remote setup after install) is
+                        available as a one-time professional service — quoted separately, with no forced recurring
+                        contract.
+                    </p>
+
+                    <button class="spec-print-btn no-print mt-3" onclick="window.print()">⤓ Print / Save as PDF</button>
+
+                    <div class="spec-sig">
+                        Prepared by <b>Kenny Hyder</b>, Hyder Media &nbsp;·&nbsp;
+                        <a href="https://hyder.me">hyder.me</a> &nbsp;·&nbsp;
+                        <a href="mailto:kenny@hyder.me">kenny@hyder.me</a>
+                        <div style="opacity:0.6; font-size:0.8rem; margin-top:6px;">
+                            Equipment recommendations reflect mid-2026 pricing and availability and are provided for planning purposes.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer footer--area">
+        <div class="footer__topbar">
+            <span class="footer__topbar__line d-block"></span>
+            <span class="footer__topbar__line d-block"></span>
+            <span class="footer__topbar__line d-block"></span>
+            <span class="footer__topbar__line d-block"></span>
+            <span class="footer__topbar__line d-block"></span>
+        </div>
+    </footer>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
