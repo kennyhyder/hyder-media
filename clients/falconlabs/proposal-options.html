@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engagement Options — Revised | Hyder Media × Falcon Labs</title>
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&display=swap" rel="stylesheet">
+    <link rel="icon" href="/clients/falconlabs/assets/falcon-icon.png">
+    <script>
+        (function() {
+            const AUTH_KEY = 'falconlabs_options_auth';
+            if (sessionStorage.getItem(AUTH_KEY) === 'authenticated') {
+                document.documentElement.classList.add('authenticated');
+            }
+        })();
+    </script>
+    <style>
+        @page { size: letter; margin: 0.75in; }
+
+        :root {
+            --coral: #fe6f50;
+            --coral-hover: #f94b25;
+            --coral-bg: rgba(254, 111, 80, 0.08);
+            --coral-border: rgba(254, 111, 80, 0.3);
+            --gold: #ffc800;
+            --gold-bg: rgba(255, 200, 0, 0.08);
+            --gold-border: rgba(255, 200, 0, 0.3);
+            --green: #4ade80;
+            --green-bg: rgba(74, 222, 128, 0.08);
+            --green-border: rgba(74, 222, 128, 0.3);
+            --dark: #0a0915;
+            --dark-2: #161425;
+            --dark-3: #1f1d33;
+            --line: rgba(255, 255, 255, 0.08);
+            --line-2: rgba(255, 255, 255, 0.16);
+            --text: #ededf0;
+            --text-2: #b4b4be;
+            --text-3: #74747e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Switzer', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* Auth Gate */
+        .auth-gate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at top, #1f1d33 0%, var(--dark) 60%);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        html.authenticated .auth-gate { display: none; }
+        .proposal-content { display: none; }
+        html.authenticated .proposal-content { display: block; }
+
+        .auth-card { width: 100%; max-width: 420px; padding: 20px; }
+        .auth-card-inner {
+            background: var(--dark-2);
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            padding: 56px 44px;
+            text-align: center;
+        }
+        .auth-card-inner img { width: 56px; height: 56px; margin-bottom: 28px; }
+        .auth-card-inner h1 { color: #fff; font-size: 1.35rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+        .auth-card-inner p { color: var(--text-3); font-size: 0.92rem; margin-bottom: 28px; }
+
+        .auth-input {
+            width: 100%; padding: 14px 16px;
+            background: var(--dark); border: 1px solid var(--line-2); border-radius: 10px;
+            color: #fff; font-family: inherit; font-size: 1rem;
+            text-align: center; letter-spacing: 4px; font-weight: 600;
+            outline: none; transition: border-color 0.2s;
+        }
+        .auth-input:focus { border-color: var(--coral); }
+        .auth-input.error { border-color: #f87171; animation: shake 0.4s; }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
+
+        .auth-btn {
+            width: 100%; padding: 14px;
+            background: var(--coral); color: var(--dark);
+            border: none; border-radius: 10px;
+            font-family: inherit; font-size: 1rem; font-weight: 700;
+            cursor: pointer; margin-top: 14px;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background: var(--coral-hover); }
+
+        /* Cover */
+        .cover {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 60px 40px;
+            background:
+                radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(255, 200, 0, 0.08) 0%, transparent 50%),
+                var(--dark);
+            position: relative;
+        }
+        .cover-cobrand {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+        .cover-cobrand img {
+            object-fit: contain;
+        }
+        .cover-cobrand img.falcon-logo {
+            width: 72px;
+            height: 72px;
+        }
+        .cover-cobrand img.hyder-logo {
+            width: 96px;
+            height: 96px;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+        }
+        .cover-cobrand .x-sep {
+            color: var(--text-3);
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1;
+        }
+        .cover-logo { width: 72px; height: 72px; margin-bottom: 36px; }
+        .cover-label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 5px;
+            color: var(--coral); margin-bottom: 24px; font-weight: 600;
+        }
+        .cover h1 {
+            font-size: 3.2rem; font-weight: 800;
+            line-height: 1.08; margin-bottom: 20px;
+            max-width: 820px; letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #fff 0%, #b8b8c8 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cover .subtitle {
+            font-size: 1.2rem; color: var(--text-2);
+            margin-bottom: 64px; max-width: 700px; font-weight: 400;
+            line-height: 1.55;
+        }
+        .cover-meta {
+            display: grid; grid-template-columns: repeat(4, auto); gap: 48px;
+            color: var(--text-3); font-size: 0.88rem;
+        }
+        .cover-meta strong {
+            color: #fff; display: block; margin-bottom: 6px;
+            font-weight: 600; font-size: 0.72rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+        }
+
+        /* Document */
+        .document { max-width: 920px; margin: 0 auto; padding: 80px 40px; }
+        .section { margin-bottom: 72px; page-break-inside: avoid; }
+        .section:last-of-type { margin-bottom: 0; }
+        .section-number {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 4px;
+            color: var(--coral); font-weight: 700; margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 2rem; font-weight: 700; color: #fff;
+            margin-bottom: 24px; line-height: 1.2; letter-spacing: -0.02em;
+        }
+        h3 {
+            font-size: 1.2rem; font-weight: 600; color: #fff;
+            margin-bottom: 14px; margin-top: 36px;
+            letter-spacing: -0.005em;
+        }
+        h4 {
+            font-weight: 700; color: var(--coral);
+            margin-bottom: 10px; margin-top: 20px;
+            text-transform: uppercase; letter-spacing: 1.2px; font-size: 0.78rem;
+        }
+        p { margin-bottom: 14px; color: var(--text-2); line-height: 1.65; }
+        p:last-child { margin-bottom: 0; }
+        p.lead { font-size: 1.12rem; color: var(--text); line-height: 1.65; margin-bottom: 20px; }
+
+        /* Callouts */
+        .callout {
+            border-radius: 12px; padding: 22px 26px; margin: 24px 0;
+            border: 1px solid var(--line);
+        }
+        .callout-coral { background: var(--coral-bg); border-color: var(--coral-border); }
+        .callout-gold { background: var(--gold-bg); border-color: var(--gold-border); }
+        .callout-green { background: var(--green-bg); border-color: var(--green-border); }
+        .callout-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 10px; color: #fff; letter-spacing: -0.005em; }
+        .callout-coral .callout-title { color: var(--coral); }
+        .callout-gold .callout-title { color: var(--gold); }
+        .callout-green .callout-title { color: var(--green); }
+        .callout p { margin-bottom: 8px; font-size: 0.95rem; color: var(--text-2); }
+        .callout p:last-child { margin-bottom: 0; }
+        .callout strong { color: var(--text); }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 0.92rem; }
+        thead th {
+            background: var(--dark-2); color: var(--text-2);
+            font-weight: 600; text-transform: uppercase;
+            font-size: 0.72rem; letter-spacing: 1.5px;
+            padding: 12px 16px; text-align: left;
+            border-bottom: 1px solid var(--line-2);
+        }
+        thead th.right { text-align: right; }
+        tbody td {
+            padding: 13px 16px; border-bottom: 1px solid var(--line);
+            color: var(--text-2);
+        }
+        tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
+        tbody td.bold { font-weight: 600; color: var(--text); white-space: nowrap; }
+        .stack-table tbody td.bold { white-space: normal; }
+        tbody tr.total-row { background: var(--dark-2); font-weight: 600; }
+        tbody tr.total-row td {
+            color: #fff; border-top: 1px solid var(--line-2);
+            border-bottom: 1px solid var(--line-2);
+            padding: 16px;
+        }
+        tbody tr.phase-header td {
+            background: var(--coral-bg); color: var(--coral);
+            font-weight: 600; font-size: 0.78rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 8px 16px;
+        }
+        .highlight { color: var(--green) !important; font-weight: 600; }
+        .muted { color: var(--text-3) !important; }
+
+        /* Channel cards */
+        .channel-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+            margin: 24px 0;
+            align-items: stretch;
+        }
+        .channel-card {
+            background: var(--dark-2); border: 1px solid var(--line);
+            border-radius: 12px; padding: 24px 22px;
+            display: flex; flex-direction: column;
+        }
+        .channel-card h4 { margin-top: 0; margin-bottom: 6px; }
+        .channel-card .lede { font-size: 0.92rem; color: var(--text-2); margin-bottom: 14px; line-height: 1.5; }
+        .channel-card ul { padding-left: 18px; margin-top: 10px; margin-bottom: 0; }
+        .channel-card li { font-size: 0.86rem; color: var(--text-2); margin-bottom: 8px; line-height: 1.5; }
+        .channel-card li:last-child { margin-bottom: 0; }
+
+        /* Tier cards */
+        .tier-cards {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+            margin: 28px 0;
+        }
+        .tier-card {
+            background: var(--dark-2); border: 1px solid var(--line);
+            border-radius: 14px; padding: 28px 22px; text-align: center;
+        }
+        .tier-label {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); font-weight: 600; margin-bottom: 12px;
+        }
+        .tier-rate {
+            font-size: 2.6rem; font-weight: 800; color: var(--coral);
+            line-height: 1; margin-bottom: 6px; letter-spacing: -0.03em;
+        }
+        .tier-rate span {
+            font-size: 1.1rem;
+            color: var(--text-3);
+            margin-left: -0.05em;
+            vertical-align: baseline;
+            font-weight: 700;
+        }
+        .tier-range { font-size: 0.85rem; color: var(--text-3); margin-top: 8px; line-height: 1.4; }
+
+        /* Timeline */
+        .timeline { position: relative; padding-left: 36px; margin: 24px 0; }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 7px; top: 4px; bottom: 4px;
+            width: 2px; background: var(--line-2);
+        }
+        .timeline-item { position: relative; margin-bottom: 24px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item::before {
+            content: ''; position: absolute;
+            left: -31px; top: 6px; width: 12px; height: 12px;
+            border-radius: 50%; background: var(--coral);
+            box-shadow: 0 0 0 3px var(--coral-bg);
+        }
+        .timeline-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .timeline-desc { font-size: 0.92rem; color: var(--text-2); }
+
+        ul, ol { padding-left: 22px; margin: 14px 0; }
+        ul:last-child, ol:last-child { margin-bottom: 0; }
+        li { margin-bottom: 8px; color: var(--text-2); line-height: 1.6; }
+        li:last-child { margin-bottom: 0; }
+        li strong { color: var(--text); }
+
+        .divider {
+            border: none; height: 1px;
+            background: var(--line-2); margin: 48px 0;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 14px; margin: 32px 0;
+        }
+        .stat-card {
+            text-align: center; padding: 24px 14px;
+            background: var(--dark-2); border-radius: 12px;
+            border: 1px solid var(--line);
+            display: flex; flex-direction: column;
+            justify-content: center;
+            min-height: 110px;
+        }
+        .stat-value {
+            font-size: 1.85rem; font-weight: 800; color: var(--coral);
+            letter-spacing: -0.025em;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem; color: var(--text-3); margin-top: 8px;
+            text-transform: uppercase; letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        /* Stack audit table */
+        .stack-table { font-size: 0.88rem; }
+        .stack-table td { padding: 11px 14px; }
+        .stack-tag {
+            display: inline-block; padding: 3px 9px;
+            border-radius: 4px; font-size: 0.72rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px;
+        }
+        .stack-tag.good { background: var(--green-bg); color: var(--green); }
+        .stack-tag.bad { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+        .stack-tag.warn { background: var(--gold-bg); color: var(--gold); }
+
+        /* Get Started */
+        .get-started-card {
+            background:
+                radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.2) 0%, transparent 60%),
+                var(--dark-2);
+            border: 1px solid var(--coral-border);
+            border-radius: 18px;
+            padding: 52px 44px;
+            text-align: center;
+            margin: 36px 0;
+        }
+        .get-started-card h3 {
+            color: #fff; font-size: 1.6rem;
+            margin-top: 0; margin-bottom: 10px;
+        }
+        .get-started-card > p {
+            color: var(--text-2); margin-bottom: 36px;
+        }
+        .upfront-breakdown {
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+            align-items: center; max-width: 600px; margin: 0 auto 32px;
+        }
+        .upfront-item { padding: 22px 26px; }
+        .upfront-item .label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); margin-bottom: 8px;
+        }
+        .upfront-item .amount {
+            font-size: 1.85rem; font-weight: 800; color: var(--coral);
+            letter-spacing: -0.02em;
+        }
+        .upfront-plus { font-size: 1.4rem; color: var(--text-3); font-weight: 300; }
+        .upfront-total {
+            margin-top: 22px; padding-top: 22px;
+            border-top: 1px solid var(--line);
+        }
+        .upfront-total .label {
+            font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-3); margin-bottom: 8px;
+        }
+        .upfront-total .amount {
+            font-size: 2.6rem; font-weight: 800; color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .upfront-total .note { font-size: 0.85rem; color: var(--text-3); margin-top: 6px; }
+
+        .contact-line { margin-top: 32px; font-size: 0.95rem; }
+        .contact-line a { color: var(--coral); text-decoration: none; font-weight: 600; }
+        .contact-line a:hover { text-decoration: underline; }
+
+        /* Prepared by block (end of proposal) */
+        .prepared-by {
+            margin-top: 64px; padding: 40px 0 28px;
+            border-top: 1px solid var(--line);
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        .prepared-by-cobrand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .prepared-by-cobrand img {
+            object-fit: contain;
+        }
+        .prepared-by-cobrand img.falcon-logo {
+            width: 36px;
+            height: 36px;
+        }
+        .prepared-by-cobrand img.hyder-logo {
+            width: 48px;
+            height: 48px;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
+        .prepared-by-cobrand .x-sep {
+            color: var(--text-3);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+        .prepared-by-text {
+            font-size: 0.95rem;
+            color: var(--text-2);
+            margin-bottom: 6px;
+        }
+        .prepared-by-text strong {
+            color: #fff;
+            font-weight: 600;
+        }
+        .prepared-by-contact {
+            font-size: 0.82rem;
+            color: var(--text-3);
+        }
+        .prepared-by-contact a {
+            color: var(--coral);
+            text-decoration: none;
+        }
+        .prepared-by-contact a:hover { text-decoration: underline; }
+
+        .footnotes {
+            margin-top: 24px; padding-top: 20px;
+            border-top: 1px solid var(--line);
+        }
+        .footnotes p { font-size: 0.78rem; color: var(--text-3); margin-bottom: 4px; }
+
+        /* PDF download button (screen only) */
+        .pdf-download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--coral);
+            color: var(--dark);
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: background 0.2s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pdf-download-btn:hover {
+            background: var(--coral-hover);
+            transform: translateY(-1px);
+        }
+        .pdf-download-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Print + PDF generation: light theme */
+        @media print {
+            @page {
+                size: letter;
+                margin: 0.5in;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .auth-gate, .pdf-download-btn { display: none !important; }
+            .proposal-content { display: block !important; }
+
+            body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                font-size: 11pt;
+                line-height: 1.55;
+            }
+
+            /* Cover page */
+            .cover {
+                background:
+                    radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.10) 0%, transparent 55%),
+                    radial-gradient(ellipse at bottom left, rgba(255, 200, 0, 0.08) 0%, transparent 55%),
+                    #ffffff !important;
+                min-height: 9.5in;
+                padding: 80px 60px;
+                page-break-after: always;
+            }
+            .cover-label {
+                color: #fe6f50 !important;
+            }
+            .cover h1 {
+                background: linear-gradient(135deg, #0f172a 0%, #475569 100%) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                color: transparent !important;
+            }
+            .cover .subtitle {
+                color: #475569 !important;
+            }
+            .cover-meta {
+                color: #94a3b8 !important;
+            }
+            .cover-meta strong {
+                color: #0f172a !important;
+            }
+            .cover-cobrand img.hyder-logo {
+                filter: none !important;
+                opacity: 1 !important;
+            }
+            .cover-cobrand .x-sep {
+                color: #94a3b8 !important;
+            }
+
+            /* Document body */
+            .document {
+                padding: 0;
+                max-width: 100%;
+            }
+            .section {
+                margin-bottom: 32px;
+            }
+            /* Granular page-break rules for clean pagination */
+            .callout,
+            .channel-card,
+            .tier-card,
+            .stat-card,
+            .tier-cards,
+            .stats-row,
+            .channel-grid,
+            .timeline-item,
+            .get-started-card,
+            .prepared-by {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            thead {
+                display: table-header-group;
+            }
+            h2, h3, h4 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            h2 + p, h3 + p, h4 + p,
+            h2 + table, h3 + table, h4 + table,
+            h2 + ul, h3 + ul, h4 + ul {
+                page-break-before: avoid;
+                break-before: avoid;
+            }
+            .divider {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .section-number {
+                color: #fe6f50 !important;
+            }
+            h2 {
+                color: #0f172a !important;
+            }
+            h3, h4 {
+                color: #0f172a !important;
+            }
+            h4 {
+                color: #fe6f50 !important;
+            }
+            p {
+                color: #475569 !important;
+            }
+            p.lead {
+                color: #0f172a !important;
+            }
+            ul li, ol li {
+                color: #475569 !important;
+            }
+
+            /* Dividers */
+            .divider {
+                background: rgba(15, 23, 42, 0.12) !important;
+            }
+
+            /* Tables */
+            table {
+                color: #475569;
+            }
+            thead th {
+                background: #f1f5f9 !important;
+                color: #475569 !important;
+                border-bottom-color: rgba(15, 23, 42, 0.15) !important;
+            }
+            tbody td {
+                color: #475569 !important;
+                border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+            }
+            tbody td.bold {
+                color: #0f172a !important;
+            }
+            tbody tr.total-row {
+                background: #f1f5f9 !important;
+            }
+            tbody tr.total-row td {
+                color: #0f172a !important;
+                border-top-color: rgba(15, 23, 42, 0.15) !important;
+                border-bottom-color: rgba(15, 23, 42, 0.15) !important;
+            }
+            tbody tr.phase-header td {
+                background: rgba(254, 111, 80, 0.08) !important;
+                color: #fe6f50 !important;
+            }
+            .highlight {
+                color: #16a34a !important;
+            }
+            .muted {
+                color: #94a3b8 !important;
+            }
+
+            /* Callouts */
+            .callout {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .callout-coral {
+                background: rgba(254, 111, 80, 0.06) !important;
+                border-color: rgba(254, 111, 80, 0.35) !important;
+            }
+            .callout-gold {
+                background: rgba(255, 200, 0, 0.08) !important;
+                border-color: rgba(255, 200, 0, 0.4) !important;
+            }
+            .callout-green {
+                background: rgba(34, 197, 94, 0.06) !important;
+                border-color: rgba(34, 197, 94, 0.35) !important;
+            }
+            .callout-title {
+                color: #0f172a !important;
+            }
+            .callout-coral .callout-title {
+                color: #ea580c !important;
+            }
+            .callout-gold .callout-title {
+                color: #b08800 !important;
+            }
+            .callout-green .callout-title {
+                color: #16a34a !important;
+            }
+            .callout p {
+                color: #475569 !important;
+            }
+            .callout strong {
+                color: #0f172a !important;
+            }
+
+            /* Channel cards */
+            .channel-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .channel-card .lede {
+                color: #475569 !important;
+            }
+            .channel-card li {
+                color: #475569 !important;
+            }
+
+            /* Tier cards */
+            .tier-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .tier-label {
+                color: #94a3b8 !important;
+            }
+            .tier-rate {
+                color: #fe6f50 !important;
+            }
+            .tier-rate span {
+                color: #94a3b8 !important;
+            }
+            .tier-range {
+                color: #94a3b8 !important;
+            }
+
+            /* Stat cards */
+            .stat-card {
+                background: #f8fafc !important;
+                border-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .stat-value {
+                color: #fe6f50 !important;
+            }
+            .stat-label {
+                color: #94a3b8 !important;
+            }
+
+            /* Timeline */
+            .timeline::before {
+                background: rgba(15, 23, 42, 0.15) !important;
+            }
+            .timeline-title {
+                color: #0f172a !important;
+            }
+            .timeline-desc {
+                color: #475569 !important;
+            }
+            .timeline-item::before {
+                background: #fe6f50 !important;
+                box-shadow: 0 0 0 3px rgba(254, 111, 80, 0.18) !important;
+            }
+
+            /* Stack tags */
+            .stack-tag.good {
+                background: rgba(34, 197, 94, 0.15) !important;
+                color: #16a34a !important;
+            }
+            .stack-tag.bad {
+                background: rgba(220, 38, 38, 0.12) !important;
+                color: #dc2626 !important;
+            }
+            .stack-tag.warn {
+                background: rgba(255, 200, 0, 0.18) !important;
+                color: #b08800 !important;
+            }
+
+            /* Get started card */
+            .get-started-card {
+                background:
+                    radial-gradient(ellipse at top right, rgba(254, 111, 80, 0.12) 0%, transparent 60%),
+                    #ffffff !important;
+                border-color: rgba(254, 111, 80, 0.4) !important;
+            }
+            .get-started-card h3 {
+                color: #0f172a !important;
+            }
+            .get-started-card > p {
+                color: #475569 !important;
+            }
+            .upfront-item .label, .upfront-total .label {
+                color: #94a3b8 !important;
+            }
+            .upfront-item .amount {
+                color: #fe6f50 !important;
+            }
+            .upfront-total {
+                border-top-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .upfront-total .amount {
+                color: #0f172a !important;
+            }
+            .upfront-total .note {
+                color: #94a3b8 !important;
+            }
+            .contact-line a {
+                color: #fe6f50 !important;
+            }
+
+            /* Prepared by block */
+            .prepared-by {
+                border-top-color: rgba(15, 23, 42, 0.12) !important;
+            }
+            .prepared-by-cobrand img.hyder-logo {
+                filter: none !important;
+                opacity: 1 !important;
+            }
+            .prepared-by-cobrand .x-sep {
+                color: #94a3b8 !important;
+            }
+            .prepared-by-text {
+                color: #475569 !important;
+            }
+            .prepared-by-text strong {
+                color: #0f172a !important;
+            }
+            .prepared-by-contact {
+                color: #94a3b8 !important;
+            }
+            .prepared-by-contact a {
+                color: #fe6f50 !important;
+            }
+
+            /* Footnotes */
+            .footnotes {
+                border-top-color: rgba(15, 23, 42, 0.1) !important;
+            }
+            .footnotes p {
+                color: #94a3b8 !important;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .channel-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .cover h1 { font-size: 2.1rem; }
+            .cover .subtitle { font-size: 1.05rem; margin-bottom: 48px; }
+            .cover-meta { grid-template-columns: 1fr 1fr; gap: 24px; }
+            .cover-cobrand { gap: 18px; margin-bottom: 28px; }
+            .cover-cobrand img.falcon-logo { width: 56px; height: 56px; }
+            .cover-cobrand img.hyder-logo { width: 76px; height: 76px; }
+            .tier-cards { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .document { padding: 40px 20px; }
+            .section { margin-bottom: 48px; }
+            .divider { margin: 36px 0; }
+            h2 { font-size: 1.55rem; }
+            h3 { font-size: 1.1rem; }
+            p.lead { font-size: 1.05rem; }
+            .upfront-breakdown { grid-template-columns: 1fr; }
+            .upfront-plus { display: none; }
+            .get-started-card { padding: 36px 24px; }
+            .pdf-download-btn { padding: 10px 16px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div class="auth-gate">
+    <div class="auth-card">
+        <div class="auth-card-inner">
+            <img src="/clients/falconlabs/assets/falcon-touch-icon.png" alt="Falcon Labs">
+            <h1>Proposal Access</h1>
+            <p>Enter the access code to view this document.</p>
+            <form id="authForm">
+                <input type="password" class="auth-input" id="authInput" placeholder="Access Code" autocomplete="off" autofocus>
+                <button type="submit" class="auth-btn">View Proposal</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Proposal -->
+<div class="proposal-content">
+
+<a href="/clients/falconlabs/falcon-labs-engagement-options.pdf" class="pdf-download-btn" download="Falcon Labs Engagement Options.pdf">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Download PDF
+</a>
+
+<!-- Cover -->
+<div class="cover">
+    <div class="cover-cobrand">
+        <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media" class="hyder-logo">
+        <span class="x-sep">&times;</span>
+        <img src="/clients/falconlabs/assets/falcon-touch-icon.png" alt="Falcon Labs" class="falcon-logo">
+    </div>
+    <div class="cover-label">Engagement Options &mdash; Revised</div>
+    <h1>Three Paths Forward</h1>
+    <p class="subtitle">Restructured delivery to reduce upfront and monthly cash outlay, expanded performance upside as fair trade. Same per-unit rate, same scope of work, paced differently.</p>
+    <div class="cover-meta">
+        <div><strong>Prepared For</strong>Falcon Labs</div>
+        <div><strong>Prepared By</strong>Kenny Hyder, Hyder Media</div>
+        <div><strong>Date</strong>June 22, 2026</div>
+        <div><strong>Valid Through</strong>August 31, 2026</div>
+    </div>
+</div>
+
+<!-- Body -->
+<div class="document">
+
+    <!-- 1. Where We Landed -->
+    <div class="section">
+        <div class="section-number">Section 01</div>
+        <h2>Where We Landed</h2>
+        <p class="lead">Falcon's feedback was clear: the original 12-month compressed engagement was meaningfully above budget. Rather than discount the work, these three options restructure delivery to lower upfront and monthly cash outlay through phasing and term extension, with expanded performance upside as fair trade.</p>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">What changed, what didn't</div>
+            <p><strong>What didn't change:</strong> the per-unit rates, the scope of work, the technical approach. All four channels still get built. The conversion tracking foundation still gets built. The email program still gets built. Falcon still gets the dashboards and reporting infrastructure (license treatment varies by option below).</p>
+            <p><strong>What did change:</strong> the cadence. Email + tracking infrastructure goes first (it's the foundation for everything that comes after). Paid ad channels are then layered in one at a time, two months apart, instead of launching all three in parallel. The minimum term extends from 12 to 18 or 24 months depending on the option.</p>
+            <p><strong>What got bigger:</strong> the performance bonus. In exchange for the structural concessions, bonus tier triggers are intentionally accessible and the upside percentages doubled. Section 07 has the detail.</p>
+        </div>
+
+        <p>Full technical scope, channel-by-channel build detail, and dashboard architecture are inherited from the original proposal at <a href="https://hyder.me/falcon-proposal" style="color: var(--coral); text-decoration: none; font-weight: 600;">hyder.me/falcon-proposal</a> except where explicitly modified below.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 2. Unit Economics — Same Anchor -->
+    <div class="section">
+        <div class="section-number">Section 02</div>
+        <h2>Unit Economics &mdash; Same Anchor</h2>
+        <p>The performance model still anchors on the per-merchant economics Falcon shared:</p>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-value">$63K</div><div class="stat-label">Annual LTV / Merchant</div></div>
+            <div class="stat-card"><div class="stat-value">$0.35</div><div class="stat-label">Per Order Monetization</div></div>
+            <div class="stat-card"><div class="stat-value">30%</div><div class="stat-label">Take Rate / Margin</div></div>
+            <div class="stat-card"><div class="stat-value">50K+</div><div class="stat-label">Monthly Orders (ICP)</div></div>
+        </div>
+
+        <p>The expanded performance bonus in Section 07 is calibrated against this $63K LTV. The size of the upside compensates for the structural reductions in upfront and recurring fees.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 3. The Three Paths -->
+    <div class="section">
+        <div class="section-number">Section 03</div>
+        <h2>The Three Paths</h2>
+        <p>Three structural alternatives, each holding the line on per-unit rates while reducing Falcon's cash outlay through different mechanisms.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th class="right">Path A &mdash; Recommended</th>
+                    <th class="right">Path B &mdash; Lower Setup</th>
+                    <th class="right">Path C &mdash; Maximum Flexibility</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Total setup</td>
+                    <td class="right">$42K</td>
+                    <td class="right">$37K</td>
+                    <td class="right">Up to $42K</td>
+                </tr>
+                <tr>
+                    <td class="bold">Foundation invoice (on signing)</td>
+                    <td class="right">$20K</td>
+                    <td class="right">$15K</td>
+                    <td class="right">$20K</td>
+                </tr>
+                <tr>
+                    <td class="bold">Email-only monthly (mo. 2&ndash;3)</td>
+                    <td class="right">$5K</td>
+                    <td class="right">$5K</td>
+                    <td class="right">$5K</td>
+                </tr>
+                <tr>
+                    <td class="bold">Monthly at full deployment</td>
+                    <td class="right">$12.5K min</td>
+                    <td class="right">$12.5K min</td>
+                    <td class="right">$12.5K min</td>
+                </tr>
+                <tr>
+                    <td class="bold">Minimum term</td>
+                    <td class="right">18 months</td>
+                    <td class="right">24 months</td>
+                    <td class="right">24 months</td>
+                </tr>
+                <tr>
+                    <td class="bold">Ad platform pace</td>
+                    <td class="right">Sequential, fixed</td>
+                    <td class="right">Sequential, fixed</td>
+                    <td class="right">Falcon-triggered</td>
+                </tr>
+                <tr>
+                    <td class="bold">Dashboard ownership</td>
+                    <td class="right">Falcon (perpetual license)</td>
+                    <td class="right">Hyder Media (retained)</td>
+                    <td class="right">Falcon (perpetual license)</td>
+                </tr>
+                <tr>
+                    <td class="bold">Best for</td>
+                    <td class="right">Lowest total cost</td>
+                    <td class="right">Lowest upfront</td>
+                    <td class="right">Lowest early monthly</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-size: 0.88rem; color: var(--text-3);">All three paths include the same expanded performance bonus structure (Section 07). All three start with Email + Tracking Foundation as Phase 1, then layer in Google, Meta, and LinkedIn ads in sequence. Detailed phase mechanics in Section 08.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 4. Path A -->
+    <div class="section">
+        <div class="section-number">Path A</div>
+        <h2>Phased Launch, 18-Month Term <span style="color: var(--coral); font-size: 1rem; vertical-align: middle; margin-left: 8px;">RECOMMENDED</span></h2>
+        <p class="lead">Same full scope as the original proposal, paced across 18 months instead of compressed into 12. Email + tracking first, then ad platforms one at a time. Lowest total cost of any option.</p>
+
+        <h3>Setup &amp; recurring schedule</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Timing</th>
+                    <th class="right">Setup invoice</th>
+                    <th class="right">Monthly added</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">1: Email + Tracking</td>
+                    <td>Months 1&ndash;3</td>
+                    <td class="right">$20,000 on signing</td>
+                    <td class="right">$5K email (starts mo. 2)</td>
+                </tr>
+                <tr>
+                    <td class="bold">2: Google Ads</td>
+                    <td>Months 4&ndash;5</td>
+                    <td class="right">$8,000 start of mo. 4</td>
+                    <td class="right">+$5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">3: Meta Ads</td>
+                    <td>Months 6&ndash;7</td>
+                    <td class="right">$7,000 start of mo. 6</td>
+                    <td class="right">bumps to $7.5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">4: LinkedIn Ads</td>
+                    <td>Months 8&ndash;9</td>
+                    <td class="right">$7,000 start of mo. 8</td>
+                    <td class="right">$7.5K paid min holds</td>
+                </tr>
+                <tr class="phase-header">
+                    <td colspan="4">Steady state: months 10&ndash;18 at full deployment</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Total Setup</td>
+                    <td class="right">$42,000</td>
+                    <td class="right">&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Key terms</h3>
+        <ul>
+            <li><strong>Term:</strong> 18-month minimum, auto-renews quarterly</li>
+            <li><strong>Software:</strong> Perpetual irrevocable license on all custom dashboards and admin tools, same as original proposal Section 09</li>
+            <li><strong>Performance bonus:</strong> Expanded structure per Section 07 below</li>
+            <li><strong>Year-1 cash outlay to Falcon:</strong> ~$110K (vs. ~$165K in the original compressed structure)</li>
+        </ul>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">Why this is the recommended path</div>
+            <p>Path A is the closest to the original proposal in everything that matters operationally: full scope, full license, full dashboard handoff. The only thing that changed is the pace. Falcon pays roughly the same total across the engagement, just spread across an extra six months. The 18-month minimum compensates Hyder Media for carrying that delivery risk longer.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 5. Path B -->
+    <div class="section">
+        <div class="section-number">Path B</div>
+        <h2>Lower Setup, Retained Software, 24-Month Term</h2>
+        <p class="lead">Same phased structure as Path A, but Hyder Media retains ownership and hosting of the custom dashboards. Saves $5K on the Foundation invoice and reduces total setup to $37K, in exchange for the longer term and no software handoff at termination.</p>
+
+        <h3>Setup &amp; recurring schedule</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Timing</th>
+                    <th class="right">Setup invoice</th>
+                    <th class="right">Monthly added</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">1: Email + Tracking</td>
+                    <td>Months 1&ndash;3</td>
+                    <td class="right">$15,000 on signing</td>
+                    <td class="right">$5K email (starts mo. 2)</td>
+                </tr>
+                <tr>
+                    <td class="bold">2: Google Ads</td>
+                    <td>Months 4&ndash;5</td>
+                    <td class="right">$8,000 start of mo. 4</td>
+                    <td class="right">+$5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">3: Meta Ads</td>
+                    <td>Months 6&ndash;7</td>
+                    <td class="right">$7,000 start of mo. 6</td>
+                    <td class="right">bumps to $7.5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">4: LinkedIn Ads</td>
+                    <td>Months 8&ndash;9</td>
+                    <td class="right">$7,000 start of mo. 8</td>
+                    <td class="right">$7.5K paid min holds</td>
+                </tr>
+                <tr class="phase-header">
+                    <td colspan="4">Steady state: months 10&ndash;24 at full deployment</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Total Setup</td>
+                    <td class="right">$37,000</td>
+                    <td class="right">&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Key terms</h3>
+        <ul>
+            <li><strong>Term:</strong> 24-month minimum, auto-renews quarterly</li>
+            <li><strong>Software:</strong> Custom dashboards and admin tools remain property of Hyder Media. Falcon has access via hyder.me-hosted infrastructure during the engagement. <em>Access ends upon termination.</em> No source code handoff.</li>
+            <li><strong>Setup savings explained:</strong> The $5K reduction on the Foundation invoice reflects work not required for a Hyder-retained build (client-handover architecture, deployment to client subdomain, source documentation for handoff). The build itself is equivalent.</li>
+            <li><strong>Performance bonus:</strong> Expanded structure per Section 07 below</li>
+        </ul>
+
+        <div class="callout callout-gold">
+            <div class="callout-title">The trade clearly stated</div>
+            <p>Falcon saves $5K upfront and gets a structurally lower total entry cost. In exchange, Falcon doesn't own the software at the end. If the engagement ends, Falcon retains all paid media accounts, ESP data, conversion tracking, and operating knowledge &mdash; but the reporting dashboards stop being accessible. The longer 24-month term reflects that this is a deeper integration.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 6. Path C -->
+    <div class="section">
+        <div class="section-number">Path C</div>
+        <h2>Email-First, Ads on Falcon's Schedule, 24-Month Term</h2>
+        <p class="lead">Maximum flexibility for Falcon. Email + tracking gets built in months 1&ndash;3 as the foundation. Ad platforms launch on Falcon's schedule once email + attribution data informs the decision. Lowest possible early monthly cash outlay.</p>
+
+        <h3>Setup &amp; recurring schedule</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>Timing</th>
+                    <th class="right">Setup invoice</th>
+                    <th class="right">Monthly added</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">1: Email + Tracking</td>
+                    <td>Months 1&ndash;3</td>
+                    <td class="right">$20,000 on signing</td>
+                    <td class="right">$5K email (starts mo. 2)</td>
+                </tr>
+                <tr>
+                    <td class="bold">2: Google Ads</td>
+                    <td>Falcon-triggered (by mo. 13)</td>
+                    <td class="right">$8,000 at activation</td>
+                    <td class="right">+$5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">3: Meta Ads</td>
+                    <td>Falcon-triggered</td>
+                    <td class="right">$7,000 at activation</td>
+                    <td class="right">bumps to $7.5K paid min</td>
+                </tr>
+                <tr>
+                    <td class="bold">4: LinkedIn Ads</td>
+                    <td>Falcon-triggered</td>
+                    <td class="right">$7,000 at activation</td>
+                    <td class="right">$7.5K paid min holds</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2">Total setup if all platforms activated</td>
+                    <td class="right">$42,000</td>
+                    <td class="right">&nbsp;</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Key terms</h3>
+        <ul>
+            <li><strong>Term:</strong> 24-month minimum, auto-renews quarterly</li>
+            <li><strong>Software:</strong> Perpetual irrevocable license (same as original proposal)</li>
+            <li><strong>Phase 2 trigger requirement:</strong> Google Ads must launch by end of month 12. If Falcon defers past that, a $5,000 phase-deferral fee applies at start of months 13 and 16 if still not launched. This compensates Hyder Media for missed paid management ramp-up.</li>
+            <li><strong>Performance bonus:</strong> Expanded structure per Section 07 below</li>
+            <li><strong>Minimum monthly during email-only phase:</strong> $5K (the lowest of any option)</li>
+        </ul>
+
+        <div class="callout callout-coral">
+            <div class="callout-title">When this option fits</div>
+            <p>Path C makes sense if Falcon wants to see email + attribution working first before committing to the full paid ramp. The trade is the longer 24-month minimum term and the deferral fee structure, which protect Hyder Media against an indefinite email-only engagement at sub-target monthly recurring.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 7. Expanded Performance Upside -->
+    <div class="section">
+        <div class="section-number">Section 07</div>
+        <h2>Expanded Performance Upside</h2>
+        <p class="lead">The performance bonus is the compensating mechanism for Falcon's structural reductions. Triggers are intentionally accessible. Upside percentages are doubled from the original proposal. Falcon retains the majority of upside at every tier.</p>
+
+        <h3>What's new vs. the original proposal</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th class="right">Original proposal</th>
+                    <th class="right">Revised options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Tier 1 threshold</td>
+                    <td class="right">CAC meaningfully below Scale target</td>
+                    <td class="right highlight">CAC &le; Scale target (matching triggers it)</td>
+                </tr>
+                <tr>
+                    <td class="bold">Tier 1 bonus</td>
+                    <td class="right">5% of net profit</td>
+                    <td class="right highlight">10% of net profit</td>
+                </tr>
+                <tr>
+                    <td class="bold">Tier 2 threshold</td>
+                    <td class="right">CAC well below Scale target</td>
+                    <td class="right highlight">CAC &le; 20% below Scale target</td>
+                </tr>
+                <tr>
+                    <td class="bold">Tier 2 bonus</td>
+                    <td class="right">10% of net profit</td>
+                    <td class="right highlight">15% of net profit</td>
+                </tr>
+                <tr>
+                    <td class="bold">Tier 3</td>
+                    <td class="right muted">(none in original)</td>
+                    <td class="right highlight">20% of net profit at CAC &le; 40% below Scale target</td>
+                </tr>
+                <tr>
+                    <td class="bold">Scale target calibration</td>
+                    <td class="right">TBD at end of mo. 3</td>
+                    <td class="right highlight">Trailing 60-day actual &times; 1.25 (25% buffer)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout callout-green">
+            <div class="callout-title">Three deliberately accessible tiers</div>
+            <p><strong>Floor (always applies):</strong> the engagement must be net positive for Falcon &mdash; annualized profit run-rate from acquired merchants exceeds total cost &mdash; before any bonus tier triggers. No bonus is paid when Falcon isn't ahead.</p>
+            <p><strong>Tier 1 &mdash; 10% of net profit:</strong> trailing 3-month blended CAC is at or below the Scale-phase target. Note: <em>matching the target triggers bonus</em>. This is not "beat by X%". It is "hit target".</p>
+            <p><strong>Tier 2 &mdash; 15% of net profit:</strong> trailing 3-month blended CAC is 20% below the Scale-phase target.</p>
+            <p><strong>Tier 3 &mdash; 20% of net profit:</strong> trailing 3-month blended CAC is 40% below the Scale-phase target. Exceptional performance, calibrated to Falcon's high LTV.</p>
+            <p><strong>Net profit defined:</strong> (merchants acquired in period &times; $63,000 annualized LTV) &minus; (total ad spend + Hyder Media fees in period). The bonus is a share of incremental profit generated, not a tax on baseline performance.</p>
+        </div>
+
+        <div class="callout callout-gold">
+            <div class="callout-title">How the Scale target gets set: deliberately conservative</div>
+            <p>At end of month 3, the Build &amp; Test phase has produced trailing 60-day blended CAC across all activated channels. The Scale-phase target is set at <strong>that actual blended CAC &times; 1.25</strong> &mdash; a 25% buffer above what was already achieved.</p>
+            <p>What this means in practice: if the actual trailing CAC during Build &amp; Test was $4,000, the Scale target gets set at $5,000. Tier 1 bonus then triggers when ongoing performance matches the original $4,000 actual. Tier 2 triggers at $4,000 (20% below the $5,000 target). Tier 3 triggers at $3,000 (40% below).</p>
+            <p>The target is calibrated for upside, not gatekeeping. Falcon never loses; either CAC stays at trailing or improves, in which case bonus tiers trigger and both sides win. If CAC degrades meaningfully from trailing, no bonus triggers and the engagement is still operating at a known-acceptable level by definition.</p>
+        </div>
+
+        <h3>Mechanics</h3>
+        <ul>
+            <li><strong>Measurement period:</strong> rolling trailing 3 months, assessed at end of each calendar quarter</li>
+            <li><strong>First eligible period:</strong> months 4&ndash;6, assessed at end of month 6</li>
+            <li><strong>Scope:</strong> Google + Meta + LinkedIn combined. Email is measured on its own KPIs and excluded from the bonus calculation.</li>
+            <li><strong>Bonus invoiced:</strong> within 15 days of quarter close, Net 15 payment terms</li>
+            <li><strong>Falcon's share at every tier:</strong> Tier 1 = Falcon keeps 90%, Tier 2 = Falcon keeps 85%, Tier 3 = Falcon keeps 80%. Bonus is share of upside, not a flat cost</li>
+        </ul>
+
+        <p style="font-size: 0.88rem; color: var(--text-3); margin-top: 16px;">The original proposal's bonus structure (5% / 10% with no Tier 3) reflected a 12-month engagement with full upfront delivery. The expanded structure here reflects Falcon carrying less upfront cost and committing to a longer term. Both parties have more skin in the long-term outcome &mdash; the bonus structure reflects that.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 8. Phasing Mechanics -->
+    <div class="section">
+        <div class="section-number">Section 08</div>
+        <h2>Phasing Mechanics</h2>
+        <p>How phased delivery actually works across all three paths.</p>
+
+        <h3>Phase 1 always: Email + Tracking Foundation</h3>
+        <p>Email is the foundation for everything that follows. Without it built first, three things break:</p>
+        <ul>
+            <li><strong>Attribution is impossible.</strong> Without email program data, ad platforms can't be tied through to actual customer outcomes. Every dollar spent on ads becomes unmeasurable.</li>
+            <li><strong>CAC measurement is impossible.</strong> Section 07's bonus structure depends on knowing real cost-to-acquired-merchant. That number requires the email + attribution layer to exist.</li>
+            <li><strong>Lifecycle conversion is impossible.</strong> Acquired traffic that lands without a follow-up flow churns at far higher rates than industry baseline.</li>
+        </ul>
+        <p>This is why all three paths start identically with Phase 1 = Email + Tracking Foundation, regardless of how the ad platforms phase from there.</p>
+
+        <h3>What Phase 1 includes (all three paths)</h3>
+        <ul>
+            <li>ESP selection and full setup (Customer.io and Klaviyo as candidates)</li>
+            <li>Domain authentication (SPF / DKIM / DMARC), dedicated sending subdomain, sending IP warm-up</li>
+            <li>Migration of currently hand-sent transactional emails into automated flows</li>
+            <li>First three lifecycle flows: new-merchant onboarding, activation rescue, performance celebration</li>
+            <li>GTM container architecture, conversion tracking foundation across all platforms (deployed even if those platforms haven't launched yet, so they're ready when Phase 2&ndash;4 activate)</li>
+            <li>GA4 event schema, Meta Pixel + Conversions API, LinkedIn Insight Tag, Google enhanced conversions</li>
+            <li>Email admin dashboard v1</li>
+            <li>Site audit + SEO/AEO optimization recommendations</li>
+        </ul>
+
+        <h3>Ad platform phases (Phases 2&ndash;4)</h3>
+        <p>Each ad platform phase is approximately two months and follows the same shape:</p>
+        <ol>
+            <li><strong>Setup invoice</strong> due at start of phase</li>
+            <li><strong>Campaign architecture + audience build</strong> in first month of phase</li>
+            <li><strong>Launch + initial optimization</strong> in second month of phase</li>
+            <li><strong>Monthly recurring fee for that platform</strong> activates at start of phase, included in combined paid management minimum</li>
+        </ol>
+
+        <p>Phases 2&ndash;4 default sequence: <strong>Google Ads &rarr; Meta Ads &rarr; LinkedIn Ads</strong>. This is the order most likely to produce early ROAS (Google high-intent first, then Meta CRM-seeded lookalikes once data exists, then LinkedIn last because it has the steepest learning curve and Hyder Media has explicitly framed it as a discovery-sprint channel).</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 9. Modified Terms -->
+    <div class="section">
+        <div class="section-number">Section 09</div>
+        <h2>Modified Terms</h2>
+        <p>Inheriting from the original proposal Section 09 except where modified here.</p>
+
+        <h3>What changed across all three options</h3>
+        <ul>
+            <li><strong>Minimum term length:</strong> 18 months (Path A) or 24 months (Paths B and C), up from 12 in original</li>
+            <li><strong>Foundation invoice:</strong> $15K (Path B) or $20K (Paths A and C), down from $30K in original</li>
+            <li><strong>Launch invoice replaced with phased setup invoices:</strong> $7K&ndash;$8K per phase, due at activation of that phase</li>
+            <li><strong>Performance bonus structure expanded</strong> per Section 07</li>
+        </ul>
+
+        <h3>What's option-specific</h3>
+        <div class="callout callout-coral">
+            <div class="callout-title">Path A (Recommended)</div>
+            <p>18-month minimum. Perpetual irrevocable software license (same as original). Phase timing is fixed (sequential, 2 months apart per platform). Total setup $42K.</p>
+        </div>
+
+        <div class="callout callout-gold">
+            <div class="callout-title">Path B (Lower Setup)</div>
+            <p>24-month minimum. NO perpetual license. Custom dashboards remain property of Hyder Media, hosted on hyder.me infrastructure. On termination, dashboard access ends and no source code handoff occurs. All Google Ads / Meta / LinkedIn / ESP / GA4 accounts and data still remain Falcon's property. Phase timing fixed. Total setup $37K.</p>
+        </div>
+
+        <div class="callout callout-green">
+            <div class="callout-title">Path C (Maximum Flexibility)</div>
+            <p>24-month minimum. Perpetual irrevocable license. Phase 2 (Google Ads) must launch by end of month 12 or a $5,000 deferral fee applies at start of months 13 and 16 if still not launched. Phases 3 and 4 are Falcon-triggered with no hard deadline. Total setup up to $42K depending on activation timing.</p>
+        </div>
+
+        <h3>What didn't change</h3>
+        <p>Account ownership, confidentiality, reporting transparency, invoicing terms (Net 15), early termination provisions, and email retainer tiered schedule all carry forward from the original proposal Section 09 unchanged.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 10. Get Started -->
+    <div class="section">
+        <div class="section-number">Section 10</div>
+        <h2>Get Started</h2>
+        <p>Pick a path. Sign. Foundation invoice due on signing. Build &amp; Test phase begins immediately.</p>
+
+        <div class="get-started-card">
+            <h3>Initial investment to commence</h3>
+            <p>Foundation work (email infrastructure, conversion tracking across all platforms, dashboard architecture, site optimization) delivered in weeks 1 to 4, before any channel launches.</p>
+
+            <div class="upfront-breakdown">
+                <div class="upfront-item">
+                    <div class="label">Path A or C</div>
+                    <div class="amount">$20,000</div>
+                </div>
+                <div class="upfront-plus">or</div>
+                <div class="upfront-item">
+                    <div class="label">Path B</div>
+                    <div class="amount">$15,000</div>
+                </div>
+            </div>
+
+            <div class="upfront-total">
+                <div class="label">Foundation Invoice (on signing)</div>
+                <div class="amount">$15K&ndash;$20K</div>
+                <div class="note">Phase 2 setup invoice ($8K) due at start of month 4. Subsequent phase setups follow per chosen path. Recurring email fee begins month 2.</div>
+            </div>
+
+            <div class="contact-line">
+                <p>Ready to move forward, or have questions on any path? Reach out anytime.</p>
+                <p><a href="mailto:kenny@hyder.me">kenny@hyder.me</a></p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="prepared-by">
+        <div class="prepared-by-cobrand">
+            <img src="/assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media" class="hyder-logo">
+            <span class="x-sep">&times;</span>
+            <img src="/clients/falconlabs/assets/falcon-touch-icon.png" alt="Falcon Labs" class="falcon-logo">
+        </div>
+        <p class="prepared-by-text">Prepared by <strong>Hyder Media</strong> for <strong>Falcon Labs</strong></p>
+        <p class="prepared-by-contact">Kenny Hyder &middot; <a href="mailto:kenny@hyder.me">kenny@hyder.me</a> &middot; hyder.me</p>
+    </div>
+
+    <div class="footnotes">
+        <p>This document presents revised structural options to the original engagement proposal at <a href="https://hyder.me/falcon-proposal" style="color: var(--coral); text-decoration: none;">hyder.me/falcon-proposal</a>. Scope of work, technical approach, channel-by-channel build detail, account ownership, confidentiality, and the dependency on Framer site access are all inherited from the original except where explicitly modified here. The $63K annual profit per merchant figure (50K monthly orders, $0.35 per order, 30% take rate) was provided by Falcon in June 2026 and serves as the LTV anchor. Specific Scale-phase CAC target is set at end of month 3 against trailing 60-day actual &times; 1.25 (a 25% conservative buffer). Document valid through August 31, 2026. All dollar amounts USD.</p>
+    </div>
+
+</div>
+
+</div><!-- /proposal-content -->
+
+<script>
+    (function() {
+        const AUTH_KEY = 'falconlabs_options_auth';
+        const PASS = 'FLPROPOSAL';
+        if (sessionStorage.getItem(AUTH_KEY) === 'authenticated') return;
+        const form = document.getElementById('authForm');
+        const input = document.getElementById('authInput');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value === PASS) {
+                sessionStorage.setItem(AUTH_KEY, 'authenticated');
+                document.documentElement.classList.add('authenticated');
+            } else {
+                input.classList.add('error');
+                input.value = '';
+                setTimeout(function() { input.classList.remove('error'); }, 400);
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>
