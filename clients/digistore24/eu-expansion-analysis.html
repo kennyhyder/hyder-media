@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU Expansion Keyword Analysis | Digistore24</title>
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        .main-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-brand img {
+            height: 32px; width: auto;
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%);
+        }
+        .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+        .nav-link {
+            padding: 8px 16px; border-radius: 6px;
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            background: var(--bg-tertiary);
+        }
+        .nav-link:hover { background: var(--border); color: var(--text-primary); }
+        .nav-link.active { background: var(--accent); color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.9rem; margin-bottom: 8px; }
+        .page-header .subtitle {
+            color: var(--text-secondary); font-size: 0.98rem; max-width: 850px;
+        }
+        .page-header .meta {
+            color: var(--text-muted); font-size: 0.82rem; margin-top: 6px;
+        }
+
+        .verdict-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(245, 158, 11, 0.08));
+            border: 1px solid var(--warning);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 28px;
+        }
+        .verdict-card .label {
+            color: var(--warning);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .verdict-card h2 {
+            font-size: 1.5rem; margin-bottom: 12px;
+        }
+        .verdict-card p {
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .verdict-card p:last-child { margin-bottom: 0; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+        }
+        .stat-card .label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 2rem; font-weight: 700; line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-card .sub {
+            font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;
+        }
+        .stat-card.bad .value { color: var(--danger); }
+        .stat-card.warn .value { color: var(--warning); }
+        .stat-card.good .value { color: var(--success); }
+        .stat-card.neutral .value { color: var(--accent); }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px 26px;
+            margin-bottom: 24px;
+        }
+        .card h2 {
+            font-size: 1.25rem; font-weight: 600; margin-bottom: 8px;
+        }
+        .card .card-sub {
+            color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.92rem;
+        }
+        th {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.74rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th.right, td.right {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:last-child td { border-bottom: none; }
+        td.vol { color: var(--success); font-weight: 600; }
+        td.kw { font-weight: 500; }
+        td.group {
+            font-family: ui-monospace, SFMono-Regular, monospace;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        td.cpc { color: var(--accent); }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pill.research { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .pill.commercial { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .pill.broad { background: rgba(59, 130, 246, 0.15); color: var(--accent); }
+
+        .approach-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .approach-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        .approach-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .approach-card .rank {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .approach-card .approach-meta {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .approach-card p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+        }
+        .approach-card p:last-child { margin-bottom: 0; }
+        .approach-card strong { color: var(--text-primary); }
+
+        .methodology-card {
+            background: var(--bg-secondary);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 18px 22px;
+        }
+        .methodology-card h3 {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 12px;
+        }
+        .methodology-card p, .methodology-card li {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+        }
+        .methodology-card ul { padding-left: 22px; }
+        .methodology-card code {
+            background: var(--bg-tertiary);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 0.84rem;
+        }
+
+        .winning-groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .winner-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+        }
+        .winner-card .name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .winner-card .metrics {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+        .winner-card .conv {
+            color: var(--success);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="reporting.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Digistore24 Reporting
+        </a>
+        <div class="nav-links">
+            <a href="competitive-intel-summary.html" class="nav-link">Summary</a>
+            <a href="reporting.html" class="nav-link">Performance</a>
+            <a href="weekly-signups-report.html" class="nav-link">Weekly Signups</a>
+            <a href="eu-expansion-analysis.html" class="nav-link active">EU Expansion</a>
+            <a href="keyword-tool.html" class="nav-link">Keyword Tool</a>
+            <a href="competitor-ads.html" class="nav-link">Competitor Ads</a>
+            <a href="landing-page-analysis.html" class="nav-link">Landing Pages</a>
+            <a href="projection-tool.html" class="nav-link">Projections</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>EU Expansion Keyword Analysis</h1>
+            <p class="subtitle">Volume analysis for keywords US-based vendors might use to research expanding into European markets. Tests 660 EU-modifier variations against the 5 ad groups currently producing the bulk of vendor signups, plus 35 standalone EU-expansion phrases.</p>
+            <p class="meta">Generated June 23, 2026 · Source: Google Keyword Planner API, US geo-targeting, English</p>
+        </div>
+
+        <div class="verdict-card">
+            <div class="label">Verdict</div>
+            <h2>The search demand to support a paid-search-led EU-expansion campaign does not exist.</h2>
+            <p>US-based vendors are not actively searching for terms like "sell digital products in Europe", "selling to European customers", or country-specific equivalents. <strong>97% of tested variants return zero measurable search volume.</strong> Only one keyword exceeds 500 monthly searches ("eu digital services act"), and it's regulatory research intent, not commercial intent.</p>
+            <p>Even at maximum match-type breadth across all 13 keywords with any measurable volume, the combined addressable US search universe for EU-expansion intent is roughly <strong>800 monthly searches</strong>. After accounting for non-commercial intent (regulation lookups), the genuinely actionable pool is approximately <strong>120 searches/month</strong>.</p>
+            <p>This is too small to anchor a paid search initiative. Search can play a supporting role, but it cannot be the primary channel. Recommended alternatives in the section below.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card neutral">
+                <div class="label">Variants Tested</div>
+                <div class="value">660</div>
+                <div class="sub">Across 5 winning ad groups + standalone</div>
+            </div>
+            <div class="stat-card bad">
+                <div class="label">Zero Volume</div>
+                <div class="value">643</div>
+                <div class="sub">97.4% of tested variants</div>
+            </div>
+            <div class="stat-card warn">
+                <div class="label">10+ Mo. Searches</div>
+                <div class="value">13</div>
+                <div class="sub">~2% of variants</div>
+            </div>
+            <div class="stat-card good">
+                <div class="label">Total Addressable</div>
+                <div class="value">800</div>
+                <div class="sub">Monthly searches across all qualifying terms</div>
+            </div>
+            <div class="stat-card warn">
+                <div class="label">Commercial Intent</div>
+                <div class="value">~120</div>
+                <div class="sub">Monthly searches after removing research intent</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Winning DG24 ad groups used as seeds</h2>
+            <p class="card-sub">90-day spend + signup data. EU-modifier variations were generated against the top keywords in each group, then KP-validated.</p>
+            <div class="winning-groups-grid">
+                <div class="winner-card">
+                    <div class="name">Sell Digital Products</div>
+                    <div class="metrics">$38K spend &middot; <span class="conv">1,082 conv</span> &middot; $36 CPA</div>
+                </div>
+                <div class="winner-card">
+                    <div class="name">Sell Ebooks</div>
+                    <div class="metrics">$13K spend &middot; <span class="conv">386 conv</span> &middot; $33 CPA</div>
+                </div>
+                <div class="winner-card">
+                    <div class="name">Digital Products Store</div>
+                    <div class="metrics">$6K spend &middot; <span class="conv">218 conv</span> &middot; $27 CPA</div>
+                </div>
+                <div class="winner-card">
+                    <div class="name">Digital Products Marketplace</div>
+                    <div class="metrics">$5K spend &middot; <span class="conv">108 conv</span> &middot; $44 CPA</div>
+                </div>
+                <div class="winner-card">
+                    <div class="name">Sell Online Courses</div>
+                    <div class="metrics">$3K spend &middot; <span class="conv">50 conv</span> &middot; $55 CPA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>The 13 keywords with any measurable volume</h2>
+            <p class="card-sub">Sorted by monthly search volume. All other 647 variants return zero. Note that KP rounds low-volume searches into the "10/mo" bucket — actual volume may be anywhere from 1 to ~50.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Keyword</th>
+                        <th>Source Group</th>
+                        <th>Intent</th>
+                        <th class="right">Vol / mo</th>
+                        <th class="right">Top of Page Bid</th>
+                        <th class="right">Competition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="kw">eu digital services act</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill research">Research</span></td>
+                        <td class="right vol">590</td>
+                        <td class="right cpc">$8.68</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">global digital marketplace</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill broad">Broad</span></td>
+                        <td class="right vol">110</td>
+                        <td class="right cpc">$10.21</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">sell to europe</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">selling to europe</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">european ecommerce platform</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">eu vat moss</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill research">Research</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">expand to europe</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">how to sell digital products uk</td>
+                        <td class="group">sell_digital_products</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">sell digital products uk</td>
+                        <td class="group">sell_digital_products</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">sell online courses uk</td>
+                        <td class="group">sell_online_courses</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">sell in europe</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">LOW</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">expand business to europe</td>
+                        <td class="group">standalone_eu</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                    <tr>
+                        <td class="kw">selling digital products uk</td>
+                        <td class="group">sell_digital_products</td>
+                        <td><span class="pill commercial">Commercial</span></td>
+                        <td class="right vol">10</td>
+                        <td class="right cpc">&mdash;</td>
+                        <td class="right">UNKNOWN</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Where search CAN play a role</h2>
+            <p class="card-sub">Honest answer: it's a "capture what's there" play, not a primary channel.</p>
+            <p style="margin-bottom: 14px; color: var(--text-primary);">A small, low-budget campaign targeting the 6&ndash;7 commercial-intent terms above can capture this audience efficiently. Estimated reasonable spend ceiling: <strong>$500&ndash;$1,000 per month</strong> against this micro-pool. Anything more than that is wasted impressions.</p>
+            <p style="color: var(--text-primary);"><strong>Specific recommendation:</strong> One new ad group ("EU Expansion - Catch-All") under the existing Nonbrand campaign, exact + phrase match against the 6 commercial terms, low max CPC, send to a dedicated <code>/sell-in-europe</code> landing page that explicitly addresses US-vendor EU concerns (VAT compliance via OSS, payment processing, language localization, distance-selling rules).</p>
+        </div>
+
+        <div class="card">
+            <h2>What needs to drive the EU-expansion initiative instead</h2>
+            <p class="card-sub">If search demand existed, we'd lead with it. It doesn't, so we have to reach this audience proactively.</p>
+            <div class="approach-grid">
+                <div class="approach-card">
+                    <h3><span class="rank">1</span>Email to existing US vendor base</h3>
+                    <div class="approach-meta">Highest leverage</div>
+                    <p>DG24 already has a list of active US vendors who are NOT currently selling in EU. This is the most concentrated, highest-intent audience for this initiative.</p>
+                    <p><strong>Tactic:</strong> 4&ndash;6 email lifecycle sequence: "your product is ready for EU", VAT-OSS made simple, payment + language details, social proof from US vendors who've expanded, soft activation CTA.</p>
+                </div>
+                <div class="approach-card">
+                    <h3><span class="rank">2</span>LinkedIn Ads to US digital-seller titles</h3>
+                    <div class="approach-meta">Audience known, reachable</div>
+                    <p>"Course creator", "Digital product creator", "Ecommerce founder", "Course business owner" — all reachable on LinkedIn even if they don't search for "sell in Europe".</p>
+                    <p><strong>Tactic:</strong> Lead Gen Forms with EU-expansion guide PDF; Sponsored Content with US vendor case studies; retarget existing US vendor list via Matched Audiences.</p>
+                </div>
+                <div class="approach-card">
+                    <h3><span class="rank">3</span>Sponsored content / partnerships</h3>
+                    <div class="approach-meta">Authority + intent</div>
+                    <p>Sponsored placements in newsletters and on sites the US digital-seller audience reads: Indie Hackers, Creator Economy reports, Foundr, Smart Passive Income. Co-publish with payment processors or VAT-compliance vendors who already have the audience's attention.</p>
+                </div>
+                <div class="approach-card">
+                    <h3><span class="rank">4</span>SEO content for adjacent intent</h3>
+                    <div class="approach-meta">Long-term compound</div>
+                    <p>Capture US sellers who are searching adjacent terms: "vat for digital products", "selling to europe sales tax", "ecommerce international expansion". Publish authoritative guides on dg24.com with strong commercial follow-through.</p>
+                </div>
+                <div class="approach-card">
+                    <h3><span class="rank">5</span>Geo flip: target EU buyers directly</h3>
+                    <div class="approach-meta">Different audience entirely</div>
+                    <p>Separate initiative worth considering: instead of asking US vendors to expand to EU, run paid search in EU markets ("vender productos digitales", "online digitale produkte verkaufen", "vendre des produits numeriques") to attract EU vendors to DG24 directly. Volume in native EU languages will dwarf the US-to-EU expansion search universe.</p>
+                </div>
+                <div class="approach-card">
+                    <h3><span class="rank">6</span>Direct sales outreach to high-GMV US vendors</h3>
+                    <div class="approach-meta">Concentrated value</div>
+                    <p>For DG24's top US vendors by GMV, the activation value of expanding them into EU is high enough to justify named-account outreach. White-glove EU activation support as a sales motion, not a marketing one.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="methodology-card">
+            <h3>Methodology</h3>
+            <p>For each of the 5 top-performing ad groups (by 90-day spend and conversions), 6&ndash;8 of the highest-performing seed keywords were extracted. 19 suffix patterns (<code>{base} europe</code>, <code>{base} in eu</code>, <code>{base} uk</code>, etc.) and 2 prefix patterns (<code>european {base}</code>, <code>eu {base}</code>) were applied to each seed, plus 35 standalone EU-expansion phrases (<code>expand to europe</code>, <code>vat for digital products eu</code>, <code>sell to european customers</code>, etc.). Total: 660 unique keyword variations.</p>
+            <p>Each variation was sent through Google's Keyword Planner API at batch size 15 (the validated stable batch size for this account) with <code>exactOnly: true</code> matching against US geo (<code>geoTargetConstants/2840</code>), English language. Returned data: average monthly searches (12-month trailing), competition tier, top-of-page bid range.</p>
+            <p>"Zero volume" in this analysis means Google has no recorded searches for the phrase in the last 12 months in the US. KP buckets low-volume terms into a "10/mo" floor, so a result of 10 means somewhere between 1 and ~50 actual searches. The 800/mo total addressable estimate is therefore the high end of the realistic range.</p>
+            <ul style="margin-top: 12px;">
+                <li>Raw data: <code>/clients/digistore24/data/eu-expansion-kw-results.json</code></li>
+                <li>Source endpoint: <code>POST /api/google-ads/keywords</code></li>
+                <li>Generated: June 23, 2026</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
