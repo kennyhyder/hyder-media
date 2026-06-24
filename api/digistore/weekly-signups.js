@@ -103,8 +103,15 @@ async function getGoogleAdsAccessToken() {
     return accessToken;
 }
 
-// Returns { 'YYYY-MM-DD': { vendor, affiliate } } for the GA4 window.
-// Uses live BigQuery export when GA4_PROPERTY_ID is set; otherwise returns empty.
+// Returns { 'YYYY-MM-DD': { vendor, affiliate, approx? } } for the GA4 window.
+// Uses live BigQuery export when GA4_PROPERTY_ID is set. For days in the
+// requested range that have no live data (early April, before the live export
+// was provisioned), falls back to the historical 28-day aggregate distributed
+// uniformly across its coverage window (Mar 30 - Apr 26).
+const HISTORICAL_COVERAGE_START = '2026-03-30';
+const HISTORICAL_COVERAGE_END = '2026-04-26';
+const HISTORICAL_COVERAGE_DAYS = 28;
+
 async function fetchGA4DailySignups(start, end) {
     if (!GA4_PROPERTY_ID) {
         return { daily: {}, note: 'GA4_BQ_PROPERTY_ID not set; GA4 source returned empty' };
@@ -112,7 +119,9 @@ async function fetchGA4DailySignups(start, end) {
     const bq = getBigQueryClient();
     const startSuffix = start.replace(/-/g, '');
     const endSuffix = end.replace(/-/g, '');
-    const query = `
+
+    // 1. Live BigQuery export per-day (works from ~Apr 23 onward typically).
+    const liveQuery = `
         SELECT
             event_date,
             COALESCE(
@@ -130,20 +139,104 @@ async function fetchGA4DailySignups(start, end) {
           AND session_traffic_source_last_click.google_ads_campaign.customer_id = '${CUSTOMER_ID}'
         GROUP BY 1, 2
     `;
-    const [job] = await bq.createQueryJob({ query, location: 'US' });
-    const [rows] = await job.getQueryResults();
 
     const daily = {};
-    for (const r of rows) {
-        const date = r.event_date;
-        if (!date) continue;
-        const isoDate = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
-        if (!daily[isoDate]) daily[isoDate] = { vendor: 0, affiliate: 0 };
-        const bucket = r.account_type === 'vendor' ? 'vendor'
-                     : r.account_type === 'affiliate' ? 'affiliate'
-                     : null;
-        if (bucket) daily[isoDate][bucket] += Number(r.users) || 0;
+    try {
+        const [job] = await bq.createQueryJob({ query: liveQuery, location: 'US' });
+        const [rows] = await job.getQueryResults();
+        for (const r of rows) {
+            const date = r.event_date;
+            if (!date) continue;
+            const isoDate = `${date.slice(0,4)}-${date.slice(4,6)}-${date.slice(6,8)}`;
+            if (!daily[isoDate]) daily[isoDate] = { vendor: 0, affiliate: 0, approx: false };
+            const bucket = r.account_type === 'vendor' ? 'vendor'
+                         : r.account_type === 'affiliate' ? 'affiliate'
+                         : null;
+            if (bucket) daily[isoDate][bucket] += Number(r.users) || 0;
+        }
+    } catch (err) {
+        // Live query may fail if the export table doesn't exist yet; continue
+        // and fill from historical aggregate.
+        if (!err.message?.includes('Not found')) throw err;
     }
+
+    // 2. Identify days in the requested range with no live data.
+    const allDays = [];
+    {
+        const cursor = new Date(start + 'T00:00:00Z');
+        const endDate = new Date(end + 'T00:00:00Z');
+        while (cursor <= endDate) {
+            allDays.push(cursor.toISOString().split('T')[0]);
+            cursor.setUTCDate(cursor.getUTCDate() + 1);
+        }
+    }
+    const missingDays = allDays.filter(d => !daily[d]);
+
+    // 3. If gap days fall within the historical coverage window, distribute
+    // historical aggregate uniformly across the historical days and fill the
+    // gap days with the per-day rate. This is an approximation (early-period
+    // signup volume probably wasn't perfectly uniform) but it's the best
+    // available source for that window.
+    const gapWithinHist = missingDays.filter(d =>
+        d >= HISTORICAL_COVERAGE_START && d <= HISTORICAL_COVERAGE_END
+    );
+
+    if (gapWithinHist.length > 0) {
+        try {
+            const histTable = HISTORY_TABLE.replace(/^ds24_views\./, '');
+            const schemaQuery = `
+                SELECT column_name
+                FROM \`${GA4_PROJECT_ID}.ds24_views.INFORMATION_SCHEMA.COLUMNS\`
+                WHERE table_name = '${histTable}'
+            `;
+            const [schemaJob] = await bq.createQueryJob({ query: schemaQuery, location: 'US' });
+            const [schemaRows] = await schemaJob.getQueryResults();
+            const cols = schemaRows.map(r => r.column_name);
+            const findCol = (...patterns) => {
+                for (const p of patterns) {
+                    const found = cols.find(c => c.toLowerCase() === p.toLowerCase());
+                    if (found) return found;
+                }
+                for (const p of patterns) {
+                    const found = cols.find(c => c.toLowerCase().includes(p.toLowerCase()));
+                    if (found) return found;
+                }
+                return null;
+            };
+            const accountTypeCol = findCol('account_type', 'Account_Type');
+            const usersCol = findCol('active_users', 'Active_users');
+            if (accountTypeCol && usersCol) {
+                const histQuery = `
+                    SELECT
+                        \`${accountTypeCol}\` AS account_type,
+                        SUM(\`${usersCol}\`) AS active_users
+                    FROM \`${GA4_PROJECT_ID}.${HISTORY_TABLE}\`
+                    GROUP BY 1
+                `;
+                const [histJob] = await bq.createQueryJob({ query: histQuery, location: 'US' });
+                const [histRows] = await histJob.getQueryResults();
+                let vendor = 0, affiliate = 0;
+                for (const r of histRows) {
+                    const users = Number(r.active_users) || 0;
+                    if (r.account_type === 'vendor') vendor += users;
+                    else if (r.account_type === 'affiliate') affiliate += users;
+                }
+                const vendorPerDay = vendor / HISTORICAL_COVERAGE_DAYS;
+                const affiliatePerDay = affiliate / HISTORICAL_COVERAGE_DAYS;
+                for (const day of gapWithinHist) {
+                    daily[day] = {
+                        vendor: vendorPerDay,
+                        affiliate: affiliatePerDay,
+                        approx: true,
+                    };
+                }
+            }
+        } catch (err) {
+            // Historical fallback failed; gap days stay empty.
+            return { daily, note: `historical fallback failed: ${err.message}` };
+        }
+    }
+
     return { daily };
 }
 
@@ -197,7 +290,7 @@ export default async function handler(req, res) {
 
     const errors = [];
     const sources = [];
-    const dailyCombined = {}; // YYYY-MM-DD → { vendor, affiliate, source }
+    const dailyCombined = {}; // YYYY-MM-DD → { vendor, affiliate, source, approx? }
 
     // GA4 window (Apr 10 - Apr 30, clamped to reportEnd if earlier)
     const ga4End = reportEnd < GA4_LAST_DATE ? reportEnd : GA4_LAST_DATE;
@@ -205,10 +298,15 @@ export default async function handler(req, res) {
         try {
             const { daily: ga4Daily, note } = await fetchGA4DailySignups(reportStart, ga4End);
             if (note) errors.push({ step: 'ga4_query', note });
+            let hasApprox = false, hasLive = false;
             for (const [d, v] of Object.entries(ga4Daily)) {
-                dailyCombined[d] = { ...v, source: 'ga4' };
+                dailyCombined[d] = { vendor: v.vendor, affiliate: v.affiliate, source: 'ga4', approx: !!v.approx };
+                if (v.approx) hasApprox = true; else hasLive = true;
             }
-            sources.push(`GA4 BigQuery (${reportStart} → ${ga4End})`);
+            const parts = [];
+            if (hasLive) parts.push(`live BigQuery export`);
+            if (hasApprox) parts.push(`historical 28d aggregate (uniform daily distribution)`);
+            sources.push(`GA4 ${reportStart} → ${ga4End} (${parts.join(' + ') || 'no data'})`);
         } catch (err) {
             errors.push({ step: 'ga4_query', error: err.message });
         }
@@ -219,16 +317,16 @@ export default async function handler(req, res) {
         try {
             const { daily: gadsDaily } = await fetchGoogleAdsDailySignups(GADS_FIRST_DATE, reportEnd);
             for (const [d, v] of Object.entries(gadsDaily)) {
-                dailyCombined[d] = { ...v, source: 'google_ads' };
+                dailyCombined[d] = { vendor: v.vendor, affiliate: v.affiliate, source: 'google_ads', approx: false };
             }
-            sources.push(`Google Ads conversion actions (${GADS_FIRST_DATE} → ${reportEnd})`);
+            sources.push(`Google Ads conversion actions ${GADS_FIRST_DATE} → ${reportEnd}`);
         } catch (err) {
             errors.push({ step: 'google_ads_query', error: err.message });
         }
     }
 
     // Bucket into ISO weeks (Monday-start)
-    const weekMap = {}; // weekStart → { weekStart, weekEnd, vendor, affiliate, daysCovered: Set<date>, sources: Set<string> }
+    const weekMap = {};
     for (const [date, v] of Object.entries(dailyCombined)) {
         if (date < reportStart || date > reportEnd) continue;
         const { weekStart, weekEnd } = isoWeekBounds(date);
@@ -238,12 +336,14 @@ export default async function handler(req, res) {
                 vendor: 0, affiliate: 0,
                 daysWithData: new Set(),
                 sources: new Set(),
+                anyApprox: false,
             };
         }
         weekMap[weekStart].vendor += v.vendor;
         weekMap[weekStart].affiliate += v.affiliate;
         weekMap[weekStart].daysWithData.add(date);
         weekMap[weekStart].sources.add(v.source);
+        if (v.approx) weekMap[weekStart].anyApprox = true;
     }
 
     // Also include weeks that fall in the report range but have no data, so the
@@ -261,6 +361,7 @@ export default async function handler(req, res) {
                     vendor: 0, affiliate: 0,
                     daysWithData: new Set(),
                     sources: new Set(),
+                    anyApprox: false,
                 };
             }
             cursor.setUTCDate(cursor.getUTCDate() + 7);
@@ -289,6 +390,7 @@ export default async function handler(req, res) {
                 affiliatePct: total > 0 ? Math.round((w.affiliate / total) * 1000) / 10 : 0,
                 sources: [...w.sources],
                 isPartial: possibleDays < 7,
+                isApprox: w.anyApprox,
             };
         });
 

@@ -224,6 +224,17 @@
             margin-left: 6px;
             vertical-align: middle;
         }
+        .approx-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
         .source-pill {
             display: inline-block;
             padding: 2px 8px;
@@ -364,7 +375,8 @@
 
             <div class="notes">
                 <p><strong>Methodology.</strong> Vendor and affiliate signup attribution requires two data sources because Google Ads couldn't distinguish them until May 1.</p>
-                <p style="margin-top: 8px;"><strong>April 10 &ndash; April 30:</strong> GA4 BigQuery export, split by the <code>acct_type</code> event parameter set on <code>signup_success</code>. Filtered to sessions where last-click Google Ads <code>customer_id</code> = <code>2466246400</code> (Digistore24's account).</p>
+                <p style="margin-top: 8px;"><strong>April 10 &ndash; April 22 (approximate):</strong> GA4 BigQuery live export only goes back to ~April 23. For the earlier window, values are distributed uniformly from the 28-day historical backfill aggregate (Mar 30 &ndash; Apr 26). These weeks are tagged <span class="approx-pill" style="margin: 0;">approx</span> in the table. The split between vendor and affiliate is reliable; per-day volume within the week is a uniform-distribution estimate, not a per-day actual.</p>
+                <p style="margin-top: 6px;"><strong>April 23 &ndash; April 30:</strong> GA4 BigQuery live export, split by the <code>acct_type</code> event parameter set on <code>signup_success</code>. Filtered to sessions where last-click Google Ads <code>customer_id</code> = <code>2466246400</code> (Digistore24's account).</p>
                 <p style="margin-top: 6px;"><strong>May 1 &ndash; today:</strong> Google Ads conversion actions <code>Vendor Sign-up</code> + <code>Affiliate Sign-up</code> via the v23 API. The legacy combined conversion action ran in parallel from April 30 through May 2 and was disabled May 3, so the May 1 cutover prevents double-counting.</p>
             </div>
         </div>
@@ -586,10 +598,11 @@
             tbody.innerHTML = weeks.map(w => {
                 const sources = w.sources.length ? w.sources.map(s => `<span class="source-pill">${s}</span>`).join(' ') : '<span style="color: var(--text-muted);">no data</span>';
                 const partial = w.isPartial ? `<span class="partial-pill">${w.possibleDays}d</span>` : '';
+                const approx = w.isApprox ? `<span class="approx-pill" title="Distributed from historical 28d aggregate (Mar 30 - Apr 26). Per-day live data not available for this period.">approx</span>` : '';
                 return `
                     <tr>
                         <td>
-                            <div class="week-label">Week of ${new Date(w.weekStart + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}${partial}</div>
+                            <div class="week-label">Week of ${new Date(w.weekStart + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}${partial}${approx}</div>
                             <div class="week-dates">${fmtWeekRange(w.effectiveStart, w.effectiveEnd)}</div>
                         </td>
                         <td class="right vendor-col">${fmtNum(w.vendor)}</td>
@@ -618,18 +631,19 @@
 
         function exportCSV() {
             if (!cachedData) return;
-            const headers = ['Week Start', 'Week End', 'Effective Start', 'Effective End', 'Vendor Signups', 'Affiliate Signups', 'Total Signups', 'Vendor %', 'Affiliate %', 'Partial Week', 'Source'];
+            const headers = ['Week Start', 'Week End', 'Effective Start', 'Effective End', 'Vendor Signups', 'Affiliate Signups', 'Total Signups', 'Vendor %', 'Affiliate %', 'Partial Week', 'Approximate', 'Source'];
             const rows = cachedData.weeks.map(w => [
                 w.weekStart, w.weekEnd, w.effectiveStart, w.effectiveEnd,
                 w.vendor, w.affiliate, w.total,
                 w.vendorPct, w.affiliatePct,
                 w.isPartial ? `yes (${w.possibleDays}d)` : 'no',
+                w.isApprox ? 'yes (distributed from historical aggregate)' : 'no',
                 w.sources.join('; '),
             ]);
             rows.push([
                 'TOTAL', '', '', '',
                 cachedData.totals.vendor, cachedData.totals.affiliate, cachedData.totals.total,
-                cachedData.totals.vendorPct, cachedData.totals.affiliatePct, '', '',
+                cachedData.totals.vendorPct, cachedData.totals.affiliatePct, '', '', '',
             ]);
             const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
