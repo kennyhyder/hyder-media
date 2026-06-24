@@ -33,7 +33,7 @@ const AFFILIATE_NAME = 'Affiliate Sign-up';
 
 const GA4_PROJECT_ID = (process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338').trim();
 const GA4_PROPERTY_ID = (process.env.GA4_BQ_PROPERTY_ID || '').trim() || null;
-const GA4_HISTORY_TABLE = (process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
+const GA4_GA4_HISTORY_TABLE = (process.env.GA4_BQ_GA4_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
 
 function todayISO() {
     return new Date().toISOString().split('T')[0];
@@ -183,7 +183,7 @@ async function fetchGA4DailySignups(start, end) {
 
     if (gapWithinHist.length > 0) {
         try {
-            const histTable = HISTORY_TABLE.replace(/^ds24_views\./, '');
+            const histTable = GA4_HISTORY_TABLE.replace(/^ds24_views\./, '');
             const schemaQuery = `
                 SELECT column_name
                 FROM \`${GA4_PROJECT_ID}.ds24_views.INFORMATION_SCHEMA.COLUMNS\`
@@ -210,7 +210,7 @@ async function fetchGA4DailySignups(start, end) {
                     SELECT
                         \`${accountTypeCol}\` AS account_type,
                         SUM(\`${usersCol}\`) AS active_users
-                    FROM \`${GA4_PROJECT_ID}.${HISTORY_TABLE}\`
+                    FROM \`${GA4_PROJECT_ID}.${GA4_HISTORY_TABLE}\`
                     GROUP BY 1
                 `;
                 const [histJob] = await bq.createQueryJob({ query: histQuery, location: 'US' });
