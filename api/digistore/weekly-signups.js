@@ -33,7 +33,7 @@ const AFFILIATE_NAME = 'Affiliate Sign-up';
 
 const GA4_PROJECT_ID = (process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338').trim();
 const GA4_PROPERTY_ID = (process.env.GA4_BQ_PROPERTY_ID || '').trim() || null;
-const GA4_GA4_HISTORY_TABLE = (process.env.GA4_BQ_GA4_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
+const GA4_HISTORY_TABLE = (process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
 
 function todayISO() {
     return new Date().toISOString().split('T')[0];
