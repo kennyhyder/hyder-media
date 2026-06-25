@@ -7,7 +7,7 @@ import { existsSync, createReadStream, statSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const OUTPUT_PATH = path.join(REPO_ROOT, 'clients/falconlabs/falcon-labs-paid-channel-options.pdf');
+const OUTPUT_PATH = path.join(REPO_ROOT, 'clients/falconlabs/falcon-labs-paid-channel-proposal.pdf');
 const PASSWORD = 'FLPROPOSAL';
 const SERVE_PORT = 47823;
 
