@@ -7,7 +7,11 @@
     { "source": "/falcon-options/", "destination": "/falcon-options", "statusCode": 301 },
     { "source": "/falcon-options.html", "destination": "/falcon-options", "statusCode": 301 },
     { "source": "/falcon-revised/", "destination": "/falcon-revised", "statusCode": 301 },
-    { "source": "/falcon-revised.html", "destination": "/falcon-revised", "statusCode": 301 }
+    { "source": "/falcon-revised.html", "destination": "/falcon-revised", "statusCode": 301 },
+    { "source": "/resume", "destination": "/about", "statusCode": 301 },
+    { "source": "/resume/", "destination": "/about", "statusCode": 301 },
+    { "source": "/resume.html", "destination": "/about", "statusCode": 301 },
+    { "source": "/cv", "destination": "/about", "statusCode": 301 }
   ],
   "rewrites": [
     { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal" },

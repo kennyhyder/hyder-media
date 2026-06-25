@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="Kenny Hyder — twenty years in digital marketing, six years now building the systems behind it. Fortune 500 client portfolio, four shipped SaaS products, custom dashboards across nine marketing APIs, AI-enabled tooling in production." />
+    <meta name="keywords" content="Kenny Hyder, resume, about, senior marketing operator, marketing engineering, full-stack consultant, Fortune 500 marketing, search marketing expert, AI tooling" />
+    <meta name="author" content="Kenny Hyder" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Kenny Hyder — Marketing Operator + Software Engineer | Hyder Media" />
+    <meta property="og:description" content="Twenty years in digital marketing. Six years now also building the systems behind it. The rarity is the combination." />
+    <meta property="og:url" content="https://hyder.me/about" />
+    <meta property="og:site_name" content="Hyder Media" />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <title>Kenny Hyder — Marketing Operator + Software Engineer | Hyder Media</title>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/imgs/logos/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/imgs/logos/favicon.png" />
+    <link rel="canonical" href="https://hyder.me/about" />
+
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') document.documentElement.classList.add('dark-mode');
+            else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark-mode');
+        })();
+    </script>
+
+    <style>
+        /* ---------- Typography reset for this page only ---------- */
+        .ab-page,
+        .ab-page p,
+        .ab-page li,
+        .ab-page td {
+            font-family: 'PT Sans', sans-serif;
+        }
+        .ab-page p,
+        .ab-page li {
+            font-size: 1.0625rem;
+            line-height: 1.65;
+            color: var(--text-color);
+        }
+        html.dark-mode .ab-page p,
+        html.dark-mode .ab-page li,
+        html.dark-mode .ab-page td { color: var(--light-body-color); }
+
+        .ab-mono {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ---------- Layout ---------- */
+        .ab-section { padding: 96px 0; position: relative; }
+        @media (max-width: 768px) { .ab-section { padding: 64px 0; } }
+        .ab-section--tinted-brown { background-color: rgba(121, 82, 50, 0.05); }
+        .ab-section--tinted-purple { background-color: rgba(76, 44, 75, 0.06); }
+        .ab-section--tinted-cream { background-color: var(--light-body-color); }
+        html.dark-mode .ab-section--tinted-brown { background-color: rgba(225, 212, 43, 0.04); }
+        html.dark-mode .ab-section--tinted-purple { background-color: rgba(225, 212, 43, 0.06); }
+        html.dark-mode .ab-section--tinted-cream { background-color: rgba(255, 255, 255, 0.025); }
+
+        .ab-narrow { max-width: 760px; }
+        .ab-wide   { max-width: 1140px; }
+
+        /* ---------- Section headers ---------- */
+        .ab-eyebrow {
+            color: var(--crimson-red-color);
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        html.dark-mode .ab-eyebrow { color: var(--sand-yellow-color); }
+
+        .ab-h2 {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+            line-height: 1.05;
+            letter-spacing: -0.015em;
+            margin-bottom: 22px;
+        }
+        html.dark-mode .ab-h2 { color: var(--light-body-color); }
+
+        .ab-h3 {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            line-height: 1.2;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+        }
+        html.dark-mode .ab-h3 { color: var(--yellow-color); }
+
+        .ab-lede {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 720px;
+            margin-bottom: 0;
+        }
+        html.dark-mode .ab-lede { color: var(--light-body-color); }
+
+        /* ---------- Stats strip ---------- */
+        .ab-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0;
+            margin-top: 56px;
+            border: 1px solid rgba(121, 82, 50, 0.3);
+        }
+        html.dark-mode .ab-stats { border-color: rgba(225, 212, 43, 0.25); }
+        .ab-stat {
+            padding: 32px 24px;
+            text-align: left;
+            border-right: 1px solid rgba(121, 82, 50, 0.18);
+            border-bottom: 1px solid rgba(121, 82, 50, 0.18);
+        }
+        html.dark-mode .ab-stat {
+            border-right-color: rgba(225, 212, 43, 0.15);
+            border-bottom-color: rgba(225, 212, 43, 0.15);
+        }
+        .ab-stat:last-child { border-right: none; }
+        .ab-stat__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.4rem;
+            color: var(--dark-brown-color);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        html.dark-mode .ab-stat__num { color: var(--yellow-color); }
+        .ab-stat__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+            line-height: 1.4;
+        }
+        html.dark-mode .ab-stat__label { color: rgba(255,255,240,0.65); }
+
+        /* ---------- Cards ---------- */
+        .ab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+        @media (min-width: 992px) {
+            .ab-grid--2 { grid-template-columns: repeat(2, 1fr); }
+            .ab-grid--3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .ab-card {
+            background-color: var(--white-color);
+            border: 1px solid rgba(121, 82, 50, 0.25);
+            border-radius: 2px;
+            padding: 30px 28px;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        html.dark-mode .ab-card {
+            background-color: rgba(255, 255, 255, 0.035);
+            border-color: rgba(225, 212, 43, 0.18);
+        }
+        .ab-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--dark-brown-color);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+        html.dark-mode .ab-card:hover {
+            border-color: var(--yellow-color);
+            box-shadow: 0 12px 28px rgba(225, 212, 43, 0.08);
+        }
+        .ab-card__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--crimson-red-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .ab-card__label { color: var(--sand-yellow-color); }
+        .ab-card__pillar-num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        html.dark-mode .ab-card__pillar-num { color: var(--sand-yellow-color); opacity: 0.85; }
+        .ab-card__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            line-height: 1.2;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+        html.dark-mode .ab-card__title { color: var(--light-body-color); }
+        .ab-card__sub {
+            font-family: 'PT Sans', sans-serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--light-text-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .ab-card__sub { color: rgba(255,255,240,0.65); }
+        .ab-card__body {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.985rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            flex-grow: 1;
+        }
+        html.dark-mode .ab-card__body { color: var(--light-body-color); }
+        .ab-card__body ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .ab-card__body ul li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        /* ---------- Logo strips ---------- */
+        .ab-logo-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 36px 44px;
+            align-items: center;
+            margin: 40px 0 0;
+        }
+        .ab-logo {
+            width: 28px; height: 28px;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+        .ab-logo--lg { width: 36px; height: 36px; }
+        .ab-logo:hover { opacity: 1; }
+        html.dark-mode .ab-logo {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+            opacity: 0.9;
+        }
+
+        /* ---------- Timeline / role list ---------- */
+        .ab-timeline {
+            margin-top: 48px;
+            border-left: 2px solid rgba(121, 82, 50, 0.3);
+            padding-left: 32px;
+        }
+        html.dark-mode .ab-timeline { border-left-color: rgba(225, 212, 43, 0.25); }
+        .ab-role {
+            position: relative;
+            margin-bottom: 38px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.15);
+        }
+        html.dark-mode .ab-role { border-bottom-color: rgba(225, 212, 43, 0.12); }
+        .ab-role:last-child { border-bottom: none; padding-bottom: 0; }
+        .ab-role::before {
+            content: '';
+            position: absolute;
+            left: -39px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--dark-brown-color);
+        }
+        html.dark-mode .ab-role::before { background: var(--yellow-color); }
+        .ab-role__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .ab-role__co {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            color: var(--dark-brown-color);
+            line-height: 1.2;
+        }
+        html.dark-mode .ab-role__co { color: var(--yellow-color); }
+        .ab-role__loc {
+            font-family: 'PT Sans', sans-serif;
+            font-style: italic;
+            font-size: 0.92rem;
+            font-weight: 400;
+            color: var(--light-text-color);
+        }
+        html.dark-mode .ab-role__loc { color: rgba(255,255,240,0.6); }
+        .ab-role__dates {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--crimson-red-color);
+            white-space: nowrap;
+        }
+        html.dark-mode .ab-role__dates { color: var(--sand-yellow-color); }
+        .ab-role__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        html.dark-mode .ab-role__title { color: var(--light-body-color); }
+        .ab-role__desc {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        html.dark-mode .ab-role__desc { color: rgba(255,255,240,0.85); }
+        .ab-role__list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .ab-role__list li {
+            font-size: 0.98rem;
+            margin-bottom: 4px;
+        }
+
+        /* ---------- Two-column expertise list ---------- */
+        .ab-two-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0 32px;
+            margin-top: 28px;
+        }
+        @media (min-width: 768px) {
+            .ab-two-col { grid-template-columns: 1fr 1fr; }
+        }
+        .ab-two-col ul {
+            padding-left: 20px;
+            margin: 0 0 16px;
+        }
+        .ab-two-col li {
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        /* ---------- Client grid ---------- */
+        .ab-client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+        .ab-client-cat h4 {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--dark-brown-color);
+        }
+        html.dark-mode .ab-client-cat h4 {
+            color: var(--yellow-color);
+            border-bottom-color: var(--yellow-color);
+        }
+        .ab-client-cat ul {
+            padding-left: 0;
+            list-style: none;
+            margin: 0;
+        }
+        .ab-client-cat ul li {
+            font-size: 0.985rem;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+        html.dark-mode .ab-client-cat ul li { color: var(--light-body-color); }
+        .ab-client-cat ul li small {
+            font-size: 0.82rem;
+            color: var(--light-text-color);
+            font-style: italic;
+        }
+        html.dark-mode .ab-client-cat ul li small { color: rgba(255,255,240,0.55); }
+
+        /* ---------- Speaking table ---------- */
+        .ab-table-wrap { overflow-x: auto; margin-top: 32px; }
+        .ab-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'PT Sans', sans-serif;
+        }
+        .ab-table th, .ab-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.2);
+            vertical-align: top;
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }
+        html.dark-mode .ab-table th, html.dark-mode .ab-table td {
+            border-bottom-color: rgba(225, 212, 43, 0.18);
+        }
+        .ab-table thead th {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            border-bottom: 2px solid var(--dark-brown-color);
+            text-align: left;
+            padding-bottom: 12px;
+        }
+        html.dark-mode .ab-table thead th {
+            color: var(--yellow-color);
+            border-bottom-color: var(--yellow-color);
+        }
+        .ab-table tbody td:first-child {
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            white-space: nowrap;
+        }
+        html.dark-mode .ab-table tbody td:first-child { color: var(--sand-yellow-color); }
+        .ab-table tbody td:nth-child(2) {
+            white-space: nowrap;
+            color: var(--light-text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.88rem;
+        }
+        html.dark-mode .ab-table tbody td:nth-child(2) { color: rgba(255,255,240,0.65); }
+
+        /* ---------- Pull quote ---------- */
+        .ab-pullquote {
+            margin: 32px auto 0;
+            max-width: 820px;
+            padding: 0 32px;
+            border-left: 3px solid var(--crimson-red-color);
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        html.dark-mode .ab-pullquote {
+            border-left-color: var(--sand-yellow-color);
+            color: var(--light-body-color);
+        }
+
+        /* ---------- Presenter grid ---------- */
+        .ab-presenters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px 32px;
+            margin-top: 24px;
+        }
+        .ab-presenter {
+            font-size: 0.98rem;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.12);
+        }
+        html.dark-mode .ab-presenter { border-bottom-color: rgba(225, 212, 43, 0.12); }
+        .ab-presenter strong { color: var(--dark-brown-color); font-weight: 700; }
+        html.dark-mode .ab-presenter strong { color: var(--yellow-color); }
+        .ab-presenter span {
+            color: var(--light-text-color);
+            font-size: 0.92rem;
+        }
+        html.dark-mode .ab-presenter span { color: rgba(255,255,240,0.7); }
+
+        /* ---------- Publications list ---------- */
+        .ab-pub {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.12);
+        }
+        html.dark-mode .ab-pub { border-bottom-color: rgba(225, 212, 43, 0.12); }
+        .ab-pub:last-child { border-bottom: none; }
+        .ab-pub__title {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-brown-color);
+            margin-bottom: 4px;
+        }
+        html.dark-mode .ab-pub__title { color: var(--yellow-color); }
+        .ab-pub__src {
+            font-family: 'PT Sans', sans-serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--light-text-color);
+            margin-bottom: 6px;
+        }
+        html.dark-mode .ab-pub__src { color: rgba(255,255,240,0.6); }
+        .ab-pub__body {
+            font-size: 0.98rem;
+            color: var(--text-color);
+        }
+        html.dark-mode .ab-pub__body { color: var(--light-body-color); }
+
+        /* ---------- Stack groups ---------- */
+        .ab-stack-cluster {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 28px;
+            margin-top: 48px;
+        }
+        @media (min-width: 768px) { .ab-stack-cluster { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .ab-stack-cluster { grid-template-columns: repeat(3, 1fr); } }
+        .ab-stack-group {
+            padding: 24px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-left: 3px solid var(--dark-brown-color);
+        }
+        html.dark-mode .ab-stack-group {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left-color: var(--yellow-color);
+        }
+        .ab-stack-group h4 {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .ab-stack-group h4 { color: var(--yellow-color); }
+        .ab-stack-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+        }
+        .ab-stack-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+        html.dark-mode .ab-stack-item { color: var(--light-body-color); }
+        .ab-stack-item img { width: 18px; height: 18px; object-fit: contain; opacity: 0.85; }
+        html.dark-mode .ab-stack-item img {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+        }
+
+        /* ---------- Engagement / closing CTA ---------- */
+        .ab-closing {
+            background: linear-gradient(135deg, rgba(121, 82, 50, 0.05), rgba(76, 44, 75, 0.05));
+            padding: 60px 48px;
+            border: 1px solid rgba(121, 82, 50, 0.25);
+            margin-top: 48px;
+            text-align: center;
+        }
+        html.dark-mode .ab-closing {
+            background: linear-gradient(135deg, rgba(225, 212, 43, 0.04), rgba(225, 212, 43, 0.06));
+            border-color: rgba(225, 212, 43, 0.2);
+        }
+        .ab-closing h3 {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--text-color);
+            margin-bottom: 18px;
+            line-height: 1.2;
+        }
+        html.dark-mode .ab-closing h3 { color: var(--light-body-color); }
+        .ab-closing p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            max-width: 640px;
+            margin: 0 auto 22px;
+        }
+        html.dark-mode .ab-closing p { color: var(--light-body-color); }
+        .ab-closing__contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--crimson-red-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--crimson-red-color);
+            padding-bottom: 2px;
+            transition: all 0.2s ease;
+        }
+        html.dark-mode .ab-closing__contact {
+            color: var(--sand-yellow-color);
+            border-bottom-color: var(--sand-yellow-color);
+        }
+        .ab-closing__contact:hover {
+            color: var(--deep-orange-color);
+            border-bottom-color: var(--deep-orange-color);
+            gap: 12px;
+        }
+        html.dark-mode .ab-closing__contact:hover {
+            color: var(--yellow-color);
+            border-bottom-color: var(--yellow-color);
+        }
+
+        /* ---------- Prose helpers ---------- */
+        .ab-prose p { max-width: 720px; margin-bottom: 18px; }
+        .ab-prose p:last-child { margin-bottom: 0; }
+    </style>
+</head>
+
+<body class="ab-page">
+
+    <!-- Theme toggle -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div><div class="moon"></div>
+                    <div class="cloud cloud1"></div><div class="cloud cloud2"></div>
+                    <div class="star star1"></div><div class="star star2"></div>
+                    <div class="star star3"></div><div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+
+    <main class="main">
+
+        <!-- ===== HERO ===== -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            ABOUT &middot; KENNY HYDER
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            Senior marketing<br>operator who<br>ships code.
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1">
+                                    <a href="/" class="hero__link fw-light text-uppercase">Home</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="/capabilities" class="hero__link fw-light text-uppercase">Capabilities</a>
+                                </li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1">
+                                    <a href="#contact" class="hero__link fw-light text-uppercase">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INTRO ===== -->
+        <section class="ab-section ab-prose">
+            <div class="container">
+                <div class="section__block mx-auto ab-narrow">
+                    <p>Twenty years in digital marketing. Six years now also building the systems behind it.</p>
+                    <p>Two tracks running in parallel — senior search marketing strategist serving Fortune 500 portfolios, and full-stack engineer shipping custom dashboards, multi-platform data pipelines, AI-enabled tooling, and shipped SaaS products. The rarity is the combination.</p>
+                    <p>Most marketing leaders stop at strategy and templated dashboards. Most engineering hires stop at the requirements doc. I do both ends — write the strategy, build the system that runs it, and operate it once it's live. Each engagement is the proof.</p>
+                </div>
+
+                <blockquote class="ab-pullquote">
+                    The fastest way to be locked into your competitor's product roadmap is to build your stack out of other people's products. The fastest way to outflank them is to build your own.
+                </blockquote>
+            </div>
+        </section>
+
+        <!-- ===== AT-A-GLANCE STATS ===== -->
+        <section class="ab-section ab-section--tinted-brown" style="padding-top: 64px; padding-bottom: 64px;">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">At a glance</span>
+                    <h2 class="ab-h2">Twenty years, scaled both directions</h2>
+                    <p class="ab-lede">Marketing pedigree and engineering output, both in production today.</p>
+
+                    <div class="ab-stats">
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">20+</div>
+                            <div class="ab-stat__label">Years in<br>digital marketing</div>
+                        </div>
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">F5/F20</div>
+                            <div class="ab-stat__label">Fortune client<br>portfolio</div>
+                        </div>
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">6+</div>
+                            <div class="ab-stat__label">Live client<br>dashboards</div>
+                        </div>
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">4</div>
+                            <div class="ab-stat__label">SaaS products<br>shipped solo</div>
+                        </div>
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">9</div>
+                            <div class="ab-stat__label">Marketing APIs<br>in production</div>
+                        </div>
+                        <div class="ab-stat">
+                            <div class="ab-stat__num">$2.5M</div>
+                            <div class="ab-stat__label">First agency ARR<br>before acquisition</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TRACK RECORD: DUAL TRACK ===== -->
+        <section class="ab-section">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Track record</span>
+                    <h2 class="ab-h2">Marketer first. Engineer second. Operator always.</h2>
+                    <p class="ab-lede">The combination is the value. The breakdown:</p>
+
+                    <div class="ab-grid ab-grid--3">
+
+                        <div class="ab-card">
+                            <div class="ab-card__pillar-num">i.</div>
+                            <h3 class="ab-card__title">Marketing depth</h3>
+                            <p class="ab-card__sub">Where the credibility comes from.</p>
+                            <div class="ab-card__body">
+                                <ul>
+                                    <li>20+ years in SEO, paid search, content, and online reputation management</li>
+                                    <li>Direct work on Fortune 5, Fortune 20, Fortune 200 client portfolios</li>
+                                    <li>Founder of first agency at 22 — scaled to $2.5M ARR in under a year, acquired</li>
+                                    <li>Featured speaker: SMX, Pubcon (Las Vegas + Austin), Affiliate Summit West, BlogWorld, DMA</li>
+                                    <li>Top-rated session, Affiliate Summit West 2016</li>
+                                    <li>Search Engine Journal contributing author and cited industry expert</li>
+                                    <li>Judge, US Search Awards</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="ab-card">
+                            <div class="ab-card__pillar-num">ii.</div>
+                            <h3 class="ab-card__title">Engineering output</h3>
+                            <p class="ab-card__sub">What's actually running today.</p>
+                            <div class="ab-card__body">
+                                <ul>
+                                    <li>Six live client dashboards across affiliate networks, paid media, financial ops, fine art, law, and Usenet portfolios</li>
+                                    <li>Four shipped SaaS products (SportsBookish, AutomateDojo, MarkSearch.ai, SubredMonitor)</li>
+                                    <li>Nine marketing API integrations in production (Google Ads, Meta, TikTok, Microsoft, GA4, Search Console, Business Profile, BigQuery, Stripe)</li>
+                                    <li>Twenty-five plus ad accounts wired with OAuth, refresh, and conversion-action segmentation</li>
+                                    <li>AI tooling: Claude + GPT integrations with intent classification, RAG pipelines, vector search, content compliance scanning</li>
+                                    <li>Infra: Next.js 16, Supabase, Stripe, Vercel, Cloudflare, BigQuery, pgvector, Twilio</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="ab-card">
+                            <div class="ab-card__pillar-num">iii.</div>
+                            <h3 class="ab-card__title">Operator instinct</h3>
+                            <p class="ab-card__sub">Why both tracks matter together.</p>
+                            <div class="ab-card__body">
+                                <ul>
+                                    <li>Built investor-facing platforms used as fundraising material (GridScout, Token Opportunity Framework)</li>
+                                    <li>Custom HTML pitch decks shipped for institutional infrastructure capital and venture proposals</li>
+                                    <li>Capex business plan analysis across 150+ companies in the token economy framework</li>
+                                    <li>Supported a court-overseen restructuring with a financial dashboard used in court filings</li>
+                                    <li>Built marketing engineering layer that displaces $7K&ndash;$21K/year of off-the-shelf tooling per client</li>
+                                    <li>Expert witness retained for marketing-related litigation: rebuttal reports, exhibit production, PDF pipelines</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== AREAS OF EXPERTISE ===== -->
+        <section class="ab-section ab-section--tinted-cream">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Expertise</span>
+                    <h2 class="ab-h2">Where I operate</h2>
+                    <p class="ab-lede">Two columns — marketing strategy on the left, marketing engineering on the right. Most engagements draw on both.</p>
+
+                    <div class="ab-two-col">
+                        <ul>
+                            <li>Search engine optimization &mdash; technical, on-page, off-page, local, enterprise</li>
+                            <li>Paid search advertising strategy and management (Google Ads, Microsoft Ads, Meta, TikTok, LinkedIn)</li>
+                            <li>SERP analysis, algorithmic behavior, search intent classification</li>
+                            <li>Keyword research and competitive analysis (30,000+ keyword datasets)</li>
+                            <li>Content marketing strategy and viral content mechanics</li>
+                            <li>Online reputation management and brand/name confusion in search</li>
+                            <li>Conversion tracking, attribution modeling, ROI measurement</li>
+                            <li>Affiliate marketing, performance marketing, funnel optimization</li>
+                            <li>Domain strategy, DNS configuration, redirect analysis</li>
+                            <li>Digital advertising compliance and deceptive practices identification</li>
+                        </ul>
+                        <ul>
+                            <li>Full-stack web app development (Next.js, React, Flask, Tailwind)</li>
+                            <li>OAuth flows and token refresh across six marketing API providers</li>
+                            <li>Database design: Postgres, Supabase, pgvector, BigQuery, SQLite</li>
+                            <li>Multi-tenant SaaS architecture with auth, billing, RLS, tier-gated features</li>
+                            <li>Custom dashboard development with real-time API pulls and per-client branding</li>
+                            <li>AI integration: Claude, OpenAI, intent classification, RAG, embeddings, compliance scanning</li>
+                            <li>Stripe checkout, subscription management, webhook reconciliation</li>
+                            <li>Geospatial: PostGIS, Leaflet, Mapbox, custom Haversine queries</li>
+                            <li>Email + SMS dispatch: Resend, Twilio, ESP integration, deliverability monitoring</li>
+                            <li>Infrastructure: Vercel, Cloudflare, GitHub Actions, cron schedules, monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SELECT CLIENT EXPERIENCE ===== -->
+        <section class="ab-section">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Select client experience</span>
+                    <h2 class="ab-h2">Names on the wall</h2>
+                    <p class="ab-lede">Direct engagement and white-label senior consulting across two decades. Many engagements were under NDA via agency partnerships; the names below are representative.</p>
+
+                    <div class="ab-client-grid">
+                        <div class="ab-client-cat">
+                            <h4>Fortune Enterprise</h4>
+                            <ul>
+                                <li>HSBC <small>Fortune 20</small></li>
+                                <li>Staples <small>Fortune 100</small></li>
+                                <li>Gap Brands <small>Fortune 200</small></li>
+                                <li>Hallmark</li>
+                                <li>Yahoo!</li>
+                                <li>1-800-FLOWERS</li>
+                                <li>Yankee Candle</li>
+                            </ul>
+                        </div>
+                        <div class="ab-client-cat">
+                            <h4>Retail &amp; Consumer</h4>
+                            <ul>
+                                <li>Zales</li>
+                                <li>Ben Bridge Jewelers</li>
+                                <li>See's Candies</li>
+                                <li>Gold's Gym</li>
+                                <li>PetSmart</li>
+                                <li>Ebates / Rakuten</li>
+                            </ul>
+                        </div>
+                        <div class="ab-client-cat">
+                            <h4>Technology</h4>
+                            <ul>
+                                <li>Adobe <small>via Visible Factors</small></li>
+                                <li>Ticketmaster <small>via Visible Factors</small></li>
+                            </ul>
+                        </div>
+                        <div class="ab-client-cat">
+                            <h4>Other Sectors</h4>
+                            <ul>
+                                <li>Children's Hospital of Los Angeles</li>
+                                <li>ACE Cash Express</li>
+                                <li>NCAA</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 48px; font-style: italic; color: var(--light-text-color); max-width: 760px;">
+                        Active engagements today span European affiliate networks, multi-platform paid media operations, financial operations during court-overseen restructuring, fine-art galleries, personal injury law, and a nine-brand portfolio rollup &mdash; with custom systems built end-to-end for each.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CAREER TRAJECTORY ===== -->
+        <section class="ab-section ab-section--tinted-purple">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Trajectory</span>
+                    <h2 class="ab-h2">Roles, in order</h2>
+
+                    <div class="ab-timeline">
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Hyder Media</div>
+                                    <div class="ab-role__loc">Los Angeles, California</div>
+                                </div>
+                                <div class="ab-role__dates">2008 &mdash; Present</div>
+                            </div>
+                            <div class="ab-role__title">Founder &amp; Principal Consultant</div>
+                            <p class="ab-role__desc">Independent consultancy providing strategic SEO, paid search, content marketing, online reputation management, and now full-stack marketing engineering services. Serves as a white-label senior consultant for leading search marketing agencies, providing expert-level strategy and execution for their enterprise clients.</p>
+                            <ul class="ab-role__list">
+                                <li>Directs marketing strategy for Fortune 500, Fortune 20, and Fortune 5 clients across multiple verticals</li>
+                                <li>White-label partner to Inc. 500-ranked firms: The JAR Group (#475 Fastest-Growing Private Companies), Harmon Brothers (Squatty Potty, Purple Mattress &mdash; 1.4B+ video views, $350M+ client sales), ROI Works, Visible Factors (Adobe, Ticketmaster)</li>
+                                <li>Manages and audits paid search campaigns with annual budgets exceeding seven figures</li>
+                                <li>Builds custom analytics platforms, multi-tenant SaaS, and AI-enabled tooling end-to-end</li>
+                                <li>Conducts competitive intelligence analysis on portfolios of 30,000+ keywords across multiple brands</li>
+                                <li>Advises on online reputation management, brand protection, and name-confusion issues in search</li>
+                            </ul>
+                        </div>
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Equate Media</div>
+                                    <div class="ab-role__loc">Los Angeles, California</div>
+                                </div>
+                                <div class="ab-role__dates">2015 &mdash; 2021</div>
+                            </div>
+                            <div class="ab-role__title">VP of Marketing / Senior Advisor</div>
+                            <p class="ab-role__desc">Full-service lead generation and digital advertising company. Led digital content strategy and search visibility campaigns. Currently serves in advisory capacity on search marketing strategy and digital campaign architecture.</p>
+                        </div>
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Visible Factors</div>
+                                    <div class="ab-role__loc">Los Angeles, California</div>
+                                </div>
+                                <div class="ab-role__dates">2016 &mdash; 2020</div>
+                            </div>
+                            <div class="ab-role__title">Senior Consultant</div>
+                            <p class="ab-role__desc">Senior-level SEO and performance marketing consulting for enterprise clients including Adobe and Ticketmaster. Technical SEO audits, paid search strategy, and competitive analysis.</p>
+                        </div>
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Position Technologies</div>
+                                    <div class="ab-role__loc">Geneva, Illinois</div>
+                                </div>
+                                <div class="ab-role__dates">2008 &mdash; 2009</div>
+                            </div>
+                            <div class="ab-role__title">Senior Consultant</div>
+                            <p class="ab-role__desc">Enterprise local listing management and local SEO platform trusted by 70% of the largest e-tailers and S&amp;P 500 companies. Served as senior consultant following the acquisition of his agency, advising on local search strategy, search engine marketing, and platform development.</p>
+                        </div>
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Venture Media Group</div>
+                                    <div class="ab-role__loc">&nbsp;</div>
+                                </div>
+                                <div class="ab-role__dates">2007 &mdash; 2008</div>
+                            </div>
+                            <div class="ab-role__title">Director, Search Engine Marketing</div>
+                            <p class="ab-role__desc">Founded and directed the search engine marketing division. Grew the agency to over $2.5 million in annual recurring revenue in under one year. Agency subsequently acquired by Position Technologies in 2008.</p>
+                        </div>
+
+                        <div class="ab-role">
+                            <div class="ab-role__head">
+                                <div>
+                                    <div class="ab-role__co">Level 9 Innovation</div>
+                                    <div class="ab-role__loc">&nbsp;</div>
+                                </div>
+                                <div class="ab-role__dates">2005 &mdash; 2008</div>
+                            </div>
+                            <div class="ab-role__title">Chief Technology Officer</div>
+                            <p class="ab-role__desc">Directed all technology operations and search marketing strategy for a digital marketing agency. Oversaw technical SEO, web development, and search platform integrations &mdash; the early roots of the engineering track that compounded over the next twenty years.</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SPEAKING ===== -->
+        <section class="ab-section">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Speaking &amp; recognition</span>
+                    <h2 class="ab-h2">On the conference stage</h2>
+                    <p class="ab-lede">Featured speaker at major search marketing and digital advertising conferences. Topics ranged across SEO strategy, link building, content marketing, paid search optimization, local search, and online reputation management.</p>
+
+                    <div class="ab-table-wrap">
+                        <table class="ab-table">
+                            <thead>
+                                <tr>
+                                    <th>Conference</th>
+                                    <th>Year(s)</th>
+                                    <th>Session topics</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Pubcon Las Vegas</td>
+                                    <td>2011&ndash;2013</td>
+                                    <td>"Links With Maximum Juice and Minimum Risk" &middot; "Link Building by Hand: How to Capture Low Hanging Fruit" &middot; "Local Search Rankings" &middot; "Brand and Reputation Management"</td>
+                                </tr>
+                                <tr>
+                                    <td>Pubcon Austin (South)</td>
+                                    <td>2009, 2011</td>
+                                    <td>Search marketing strategy &middot; Brand and reputation management</td>
+                                </tr>
+                                <tr>
+                                    <td>SMX (Search Marketing Expo)</td>
+                                    <td>Multiple</td>
+                                    <td>Search engine marketing</td>
+                                </tr>
+                                <tr>
+                                    <td>Affiliate Summit West</td>
+                                    <td>2015, 2016</td>
+                                    <td>"Live SEO &amp; Monetization Site Reviews" &mdash; <strong>top-rated session by attendee ratings, ASW 2016</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>BlogWorld / New Media Expo</td>
+                                    <td>Multiple</td>
+                                    <td>Content marketing and digital strategy</td>
+                                </tr>
+                                <tr>
+                                    <td>Direct Marketing Association</td>
+                                    <td>Multiple</td>
+                                    <td>Digital marketing strategy</td>
+                                </tr>
+                                <tr>
+                                    <td>IM Spring Break</td>
+                                    <td>2009</td>
+                                    <td>"Creating Content for Social Media"</td>
+                                </tr>
+                                <tr>
+                                    <td>Search Developer Summit</td>
+                                    <td>2009</td>
+                                    <td>"Developer Summit: Open Source Stack"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="ab-h3" style="margin-top: 56px;">Notable co-presenters &amp; panelists</h3>
+                    <p style="font-size: 1rem; color: var(--light-text-color); max-width: 640px;">Presented alongside recognized leaders in the search marketing industry:</p>
+                    <div class="ab-presenters">
+                        <div class="ab-presenter"><strong>Loren Baker</strong> <span>&mdash; Founder, Search Engine Journal</span></div>
+                        <div class="ab-presenter"><strong>Greg Boser</strong> <span>&mdash; Founder, 3Dog Media; search marketing pioneer</span></div>
+                        <div class="ab-presenter"><strong>Arnie Kuenn</strong> <span>&mdash; CEO, Vertical Measures</span></div>
+                        <div class="ab-presenter"><strong>Jennifer Van Iderstyne</strong> <span>&mdash; SEO Director, Silver Arc Search Marketing</span></div>
+                        <div class="ab-presenter"><strong>David Wallace</strong> <span>&mdash; CEO, SearchRank</span></div>
+                        <div class="ab-presenter"><strong>Tony Wright</strong> <span>&mdash; CEO, WrightIMC</span></div>
+                        <div class="ab-presenter"><strong>Scott Polk</strong> <span>&mdash; Internet marketing veteran</span></div>
+                        <div class="ab-presenter"><strong>Adam Riemer</strong> <span>&mdash; Performance marketing expert</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PUBLICATIONS & RECOGNITION ===== -->
+        <section class="ab-section ab-section--tinted-cream">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Publications &amp; press</span>
+                    <h2 class="ab-h2">In print &amp; on record</h2>
+
+                    <div style="max-width: 820px; margin-top: 40px;">
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">"Step-By-Step Plan to Measure ROI"</div>
+                            <div class="ab-pub__src">Search Engine Journal &middot; August 2011</div>
+                            <p class="ab-pub__body">Comprehensive methodology for measuring return on investment from SEO campaigns. Published in the leading industry publication for SEO and search advertising professionals.</p>
+                        </div>
+
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">Search Engine Journal contributing author</div>
+                            <div class="ab-pub__src">Industry publication &middot; Ongoing</div>
+                            <p class="ab-pub__body">Recognized contributing author and cited search marketing expert on the leading industry publication for SEO and paid search professionals.</p>
+                        </div>
+
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">Pubcon link-building session recap</div>
+                            <div class="ab-pub__src">Search Engine Journal &middot; October 2013</div>
+                            <p class="ab-pub__body">Featured panelist coverage alongside Jennifer Van Iderstyne, Loren Baker, and Greg Boser at Pubcon Las Vegas.</p>
+                        </div>
+
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">VICE "Fakes, Frauds &amp; Scammers" Series</div>
+                            <div class="ab-pub__src">Documentary feature &middot; June 2021</div>
+                            <p class="ab-pub__body">Featured subject in the investigative segment "ABC News Ran My Made Up Story," demonstrating expert-level knowledge of content marketing mechanics, algorithmic content distribution, search engine behavior, and viral content engineering.</p>
+                        </div>
+
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">TAMAR Podcast &middot; DMNews</div>
+                            <div class="ab-pub__src">Interview &middot; Quoted industry expert</div>
+                            <p class="ab-pub__body">Featured interview on career trajectory and digital marketing industry expertise. Quoted across DMNews on changes in digital marketing and privacy practices.</p>
+                        </div>
+
+                        <div class="ab-pub">
+                            <div class="ab-pub__title">US Search Awards judge</div>
+                            <div class="ab-pub__src">Industry awards program &middot; Annual</div>
+                            <p class="ab-pub__body">Judge for the annual program recognizing excellence in search marketing, SEO, and paid search advertising.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== STACK / TECH ===== -->
+        <section class="ab-section">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">Working stack</span>
+                    <h2 class="ab-h2">What I work in, day to day</h2>
+                    <p class="ab-lede">Not a brochure list &mdash; these are the tools and APIs I'm running code against this week.</p>
+
+                    <div class="ab-stack-cluster">
+
+                        <div class="ab-stack-group">
+                            <h4>Languages</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/typescript/3178C6" alt=""> TypeScript</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/python/3776AB" alt=""> Python</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/javascript/F7DF1E" alt=""> JavaScript</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> SQL</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/html5/E34F26" alt=""> HTML/CSS</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/gnubash/4EAA25" alt=""> Bash</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Frameworks</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/nextdotjs/000000" alt=""> Next.js 16</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/react/61DAFB" alt=""> React</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/flask/000000" alt=""> Flask</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt=""> Tailwind v4</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/bootstrap/7952B3" alt=""> Bootstrap 5</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/shadcnui/000000" alt=""> shadcn/ui</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Databases &amp; data infra</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/supabase/3FCF8E" alt=""> Supabase Postgres</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/postgresql/4169E1" alt=""> pgvector</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/postgis/336791" alt=""> PostGIS</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/googlebigquery/669DF6" alt=""> BigQuery</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/sqlite/003B57" alt=""> SQLite</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/meilisearch/FF5CAA" alt=""> Meilisearch</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/qdrant/DC244C" alt=""> Qdrant</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Marketing &amp; ad APIs</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/googleads/4285F4" alt=""> Google Ads v23</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/meta/0467DF" alt=""> Meta Marketing API</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/tiktok/000000" alt=""> TikTok Marketing API</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/microsoft/737373" alt=""> Microsoft Ads (SOAP)</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/googleanalytics/E37400" alt=""> GA4</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/googlesearchconsole/458CF5" alt=""> Search Console</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/googlemybusiness/4285F4" alt=""> Business Profile</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>AI / ML</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/anthropic/D97757" alt=""> Claude (Opus + Haiku)</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/openai/412991" alt=""> OpenAI (GPT, embeddings)</span>
+                                <span class="ab-stack-item">Intent classification</span>
+                                <span class="ab-stack-item">Vector search</span>
+                                <span class="ab-stack-item">RAG pipelines</span>
+                                <span class="ab-stack-item">Compliance scanning</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Payments, auth &amp; messaging</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/stripe/635BFF" alt=""> Stripe v22</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/supabase/3FCF8E" alt=""> Supabase Auth</span>
+                                <span class="ab-stack-item">OAuth 2.0 (6+ providers)</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/twilio/F22F46" alt=""> Twilio</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/resend/000000" alt=""> Resend</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>CRM &amp; ops</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item">ActiveCampaign</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/airtable/18BFFF" alt=""> Airtable</span>
+                                <span class="ab-stack-item">Vonage VBC</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/zapier/FF4F00" alt=""> Zapier</span>
+                                <span class="ab-stack-item">DataGolf &middot; Kalshi</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Infrastructure</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/vercel/000000" alt=""> Vercel</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/cloudflare/F38020" alt=""> Cloudflare</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/githubactions/2088FF" alt=""> GitHub Actions</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/amazons3/569A31" alt=""> AWS S3</span>
+                                <span class="ab-stack-item">Cron schedules</span>
+                            </div>
+                        </div>
+
+                        <div class="ab-stack-group">
+                            <h4>Data viz &amp; docs</h4>
+                            <div class="ab-stack-items">
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/chartdotjs/FF6384" alt=""> Chart.js v4</span>
+                                <span class="ab-stack-item">Recharts</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/leaflet/199900" alt=""> Leaflet</span>
+                                <span class="ab-stack-item"><img src="https://cdn.simpleicons.org/mapbox/000000" alt=""> Mapbox</span>
+                                <span class="ab-stack-item">jsPDF &middot; html2canvas</span>
+                                <span class="ab-stack-item">Puppeteer (PDF)</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CLOSING / ENGAGEMENT ===== -->
+        <section class="ab-section ab-section--tinted-brown" id="contact">
+            <div class="container">
+                <div class="section__block mx-auto ab-wide">
+                    <span class="ab-mono ab-eyebrow">How working together works</span>
+                    <h2 class="ab-h2">Selective engagements, real conversations</h2>
+                    <p class="ab-lede">I take on a small number of engagements at any given time &mdash; through existing relationships, referrals, and direct outreach from companies I want to work with. Three structures: <strong>retainer</strong>, <strong>project</strong>, or <strong>advisor</strong>.</p>
+
+                    <p style="margin-top: 24px; font-size: 1.1rem; color: var(--text-color); max-width: 760px;">
+                        For executives considering a full-time hire instead of a consulting engagement: same starting point. A direct conversation about scope, structure, and fit.
+                    </p>
+
+                    <div class="ab-closing">
+                        <h3>Start the conversation.</h3>
+                        <p>If you're considering a marketing operator who also ships code &mdash; for a retainer, a project, or a full-time role &mdash; the path forward is the same: a direct call, no spec exercises, no sales funnel.</p>
+                        <a class="ab-closing__contact" href="mailto:kenny@hyder.me">kenny@hyder.me &rarr;</a>
+                        <p style="margin-top: 28px; font-size: 0.92rem; color: var(--light-text-color);">
+                            Los Angeles, California &middot; <a href="https://hyder.me" style="color: inherit; text-decoration: underline;">hyder.me</a> &middot; <a href="https://hyder.me/capabilities" style="color: inherit; text-decoration: underline;">/capabilities</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2026 <span itemprop="name">Hyder Media</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
