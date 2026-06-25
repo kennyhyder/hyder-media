@@ -961,7 +961,7 @@
         <ul>
             <li><strong>12-month minimum</strong>, auto-renewing quarterly</li>
             <li>30 days written notice for non-renewal after the initial term</li>
-            <li>Perpetual irrevocable license on the custom performance dashboard, surviving termination</li>
+            <li>Reporting dashboard access via private, password-protected URL on hyder.me, available 24/7 to the Falcon team for the duration of the engagement</li>
         </ul>
     </div>
 
@@ -981,7 +981,7 @@
             <li>Architect the data layer specification: what variables need to be available on what events, with what naming conventions</li>
             <li>Design server-side conversion infrastructure for Meta CAPI, LinkedIn server-side events, and Google enhanced conversions, including deduplication logic to prevent inflated counts when client-side and server-side fire together</li>
             <li>Document UTM convention and click-ID handling across all paid traffic</li>
-            <li>Build implementation runbook for Falcon engineering with example payloads, tag configurations, and edge-case handling</li>
+            <li>Package the above into a clear implementation spec that Falcon engineering can build directly from, with example event payloads and validation criteria</li>
             <li>Configure platform-side endpoints, conversion actions, custom conversions, and value attribution settings</li>
             <li>Set up Apollo.io integration for inbound lead attribution and CRM enrichment</li>
             <li>End-to-end validation of every conversion path before any paid campaign goes live</li>
@@ -1035,18 +1035,18 @@
         </ul>
 
         <h3>Cross-platform performance dashboard</h3>
-        <p>Custom-built software that consolidates everything into a single view, hosted at a Falcon-controlled subdomain.</p>
+        <p>Custom-built reporting dashboard that consolidates Google Ads, Meta Ads, and LinkedIn Ads performance into a single view, hosted on Hyder Media infrastructure. Falcon Labs gets a private password-protected URL with 24/7 access.</p>
         <ul>
-            <li>Architecture: data model, API integration points, hosting infrastructure</li>
-            <li>Real-time data pulls from Google Ads, Meta Ads, and LinkedIn Ads APIs</li>
+            <li>Architecture: data model, API integration points, hosting infrastructure on hyder.me</li>
+            <li>Real-time data pulls from Google Ads, Meta Ads, and LinkedIn Ads APIs via Hyder Media's existing platform API connections</li>
             <li>Aggregated cross-channel performance views with blended ROAS, CAC, and spend pacing</li>
             <li>Per-platform deep-dive views with campaign, ad group, ad, and audience-level metrics</li>
             <li>Attribution view with conversion source breakdown and journey visualization</li>
             <li>Spend pacing and budget forecast tools with projection rollups</li>
             <li>Custom UI/UX styled to Falcon Labs' brand</li>
-            <li>Hosting and deployment to a Falcon-controlled subdomain (e.g. dash.falconlabs.com) once requested</li>
-            <li>Perpetual irrevocable license to the dashboard software, surviving any future termination of the engagement</li>
+            <li>Private password-protected URL on hyder.me for Falcon Labs team access</li>
         </ul>
+        <p style="font-size: 0.92rem; color: var(--text-2); margin-top: 12px;">Hosting the dashboard on Hyder Media infrastructure (rather than provisioning it to a Falcon-controlled domain) uses Hyder Media's existing API credentials and deployment pipelines. This avoids the additional engineering work of standing up new API connections under Falcon's accounts, provisioning client-side hosting, and managing a separate deployment infrastructure, and contributes to the lower foundation fee.</p>
 
         <h3>Strategic planning, site optimization &amp; foundational thinking</h3>
         <p>The thinking work that happens before and around the technical work, which determines whether the technical work delivers results.</p>
@@ -1130,14 +1130,15 @@
         <ul>
             <li><strong>Email program removed</strong> from scope. Can be added back via a separate scope-of-work amendment at any time during the engagement.</li>
             <li><strong>Conversion tracking implementation ownership</strong> transferred to Falcon engineering, with Hyder Media owning the architecture spec, server-side platform configuration, and end-to-end validation.</li>
-            <li><strong>Foundation fee:</strong> $15,000 one-time, down from $30,000 in the original. Reflects the removal of email infrastructure work and the transfer of tracking implementation labor to Falcon engineering. Foundation work itself remains comprehensive across all three ad platforms.</li>
-            <li><strong>Monthly minimum:</strong> $5,000, down from $7,500 in the original. The lower minimum reflects the simpler engagement structure without the email program management retainer.</li>
-            <li><strong>Tiered percentage of ad spend</strong> structure adjusted to 10% / 8% / 6% across the three tiers (from 8% / 6% / 4% in the original), reflecting the reduced foundation fee.</li>
+            <li><strong>Foundation fee:</strong> $15,000 one-time, down from $30,000 in the original. Reflects the removal of email infrastructure work, the transfer of tracking implementation labor to Falcon engineering, and the consolidation of the dashboard onto Hyder Media infrastructure. Foundation work itself remains comprehensive across all three ad platforms.</li>
+            <li><strong>Tiered percentage of ad spend</strong> structure adjusted to 10% / 8% / 6% (from 8% / 6% / 4% in the original). The higher starting rate scales the ongoing fee with the actual size of ad spend as the engagement grows.</li>
+            <li><strong>Monthly minimum:</strong> $5,000, down from $7,500 in the original. Balanced by the tiered-percentage adjustment above.</li>
+            <li><strong>Reporting dashboard hosting</strong> on Hyder Media infrastructure (private, password-protected URL on hyder.me) instead of provisioning to a Falcon-controlled domain. No license transfer to Falcon Labs. Reporting access maintained throughout the engagement.</li>
             <li><strong>Performance bonus structure</strong> remains the accessible-tier structure introduced in the prior options doc.</li>
         </ul>
 
         <h3>What didn't change</h3>
-        <p>Account ownership, perpetual irrevocable software license, confidentiality, reporting transparency, invoicing terms (Net 15), early termination provisions, and creative scope (image and video assets remain outside Hyder Media's production scope) all carry forward from the original proposal Section 09 unchanged.</p>
+        <p>Account ownership of the Google Ads, Meta Ads, and LinkedIn Ads accounts themselves remains with Falcon Labs. Confidentiality, reporting transparency, invoicing terms (Net 15), early termination provisions, and creative scope (image and video assets remain outside Hyder Media's production scope) all carry forward from the original proposal Section 09 unchanged.</p>
     </div>
 
     <hr class="divider">
@@ -1176,7 +1177,7 @@
     </div>
 
     <div class="footnotes">
-        <p>This document presents Falcon Labs' revised paid-channel engagement following the June 23&ndash;25 conversation (defer email, $25K/month initial ad budget, conversion tracking implementation handled by Falcon engineering). Scope of work, technical approach, account ownership, confidentiality, and dashboard license treatment all inherit from the original proposal at <a href="https://hyder.me/falcon-proposal" style="color: var(--coral); text-decoration: none;">hyder.me/falcon-proposal</a> except where explicitly modified here. The $63K annual profit per merchant figure (50K monthly orders, $0.35 per order, 30% take rate) was provided by Falcon and serves as the LTV anchor. Specific Scale-phase CAC target is set at end of month 3 against trailing 60-day actual &times; 1.25 (a 25% conservative buffer). Document valid through August 31, 2026. All dollar amounts USD.</p>
+        <p>This document presents Falcon Labs' revised paid-channel engagement following the June 23&ndash;25 conversation (defer email, $25K/month initial ad budget, conversion tracking implementation handled by Falcon engineering, reporting dashboard hosted on Hyder Media infrastructure). Scope of work, technical approach, account ownership, and confidentiality all inherit from the original proposal at <a href="https://hyder.me/falcon-proposal" style="color: var(--coral); text-decoration: none;">hyder.me/falcon-proposal</a> except where explicitly modified here. The $63K annual profit per merchant figure (50K monthly orders, $0.35 per order, 30% take rate) was provided by Falcon and serves as the LTV anchor. Specific Scale-phase CAC target is set at end of month 3 against trailing 60-day actual &times; 1.25 (a 25% conservative buffer). Document valid through August 31, 2026. All dollar amounts USD.</p>
     </div>
 
 </div>
