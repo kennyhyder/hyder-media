@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "pdf:falcon": "node scripts/generate-falconlabs-proposal-pdf.mjs",
-    "pdf:falcon-options": "node scripts/generate-falconlabs-options-pdf.mjs"
+    "pdf:falcon-options": "node scripts/generate-falconlabs-options-pdf.mjs",
+    "pdf:falcon-revised": "node scripts/generate-falconlabs-revised-pdf.mjs"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^8.1.1",

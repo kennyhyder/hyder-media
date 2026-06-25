@@ -5,11 +5,14 @@
     { "source": "/falcon-proposal/", "destination": "/falcon-proposal", "statusCode": 301 },
     { "source": "/falcon-proposal.html", "destination": "/falcon-proposal", "statusCode": 301 },
     { "source": "/falcon-options/", "destination": "/falcon-options", "statusCode": 301 },
-    { "source": "/falcon-options.html", "destination": "/falcon-options", "statusCode": 301 }
+    { "source": "/falcon-options.html", "destination": "/falcon-options", "statusCode": 301 },
+    { "source": "/falcon-revised/", "destination": "/falcon-revised", "statusCode": 301 },
+    { "source": "/falcon-revised.html", "destination": "/falcon-revised", "statusCode": 301 }
   ],
   "rewrites": [
     { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal" },
-    { "source": "/falcon-options", "destination": "/clients/falconlabs/proposal-options" }
+    { "source": "/falcon-options", "destination": "/clients/falconlabs/proposal-options" },
+    { "source": "/falcon-revised", "destination": "/clients/falconlabs/proposal-revised" }
   ],
   "crons": [
     { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
