@@ -609,6 +609,13 @@
                 color: #475569 !important;
             }
 
+            /* Force all bold text dark for print contrast (overrides screen
+               `li strong { color: var(--text); }` which renders as
+               near-white on white in print mode). */
+            strong, b, li strong, p strong, ul li strong, ol li strong {
+                color: #0f172a !important;
+            }
+
             /* Dividers */
             .divider {
                 background: rgba(15, 23, 42, 0.12) !important;
