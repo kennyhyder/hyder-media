@@ -31,6 +31,21 @@ export default async function handler(req, res) {
   if (secret && (req.headers.authorization || '') !== `Bearer ${secret}`) return res.status(401).json({ error: 'unauthorized' });
   try {
     const key = loadKey();
+
+    // ?enable=1 — try to enable the Slides + Drive APIs on the SA's project
+    // (works only if the SA has serviceusage.services.enable permission).
+    if (req.query?.enable === '1') {
+      const tok = await getToken(key, ['https://www.googleapis.com/auth/cloud-platform']);
+      const proj = key.project_id;
+      const out = {};
+      for (const svc of ['slides.googleapis.com', 'drive.googleapis.com']) {
+        const r = await fetch(`https://serviceusage.googleapis.com/v1/projects/${proj}/services/${svc}:enable`, { method: 'POST', headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' }, body: '{}' });
+        const j = await r.json().catch(() => ({}));
+        out[svc] = r.ok ? 'enabled (or already)' : (j.error?.message || r.status);
+      }
+      return res.status(200).json({ ok: true, enable: out, project: proj });
+    }
+
     const token = await getToken(key, ['https://www.googleapis.com/auth/presentations', 'https://www.googleapis.com/auth/drive']);
     const H = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
