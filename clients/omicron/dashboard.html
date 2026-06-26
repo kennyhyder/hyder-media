@@ -6,6 +6,9 @@
     <title>Performance Dashboard | Omicron Google Ads</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- chartjs-plugin-datalabels — numeric totals on bar charts (sum-on-stack for
+         brand/non-brand, per-segment for SKU breakdowns, value-on-bar for grouped). -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <!-- ExcelJS — used by the Brand Defense XLSX export to write a styled workbook
          (cell colors, hyperlinks, frozen header). Loaded lazily by the export
          button if not yet ready. -->
@@ -1209,15 +1212,71 @@
             updateAccountDetails();
         }
 
+        // ── Bar-chart data labels (chartjs-plugin-datalabels) ───────────────
+        // One smart config drives every bar chart by shape:
+        //   • stacked, ≤2 datasets (brand/non-brand) → SUM on top of the stack
+        //   • stacked, >2 datasets (SKU/brand breakdown) → value on EACH segment
+        //   • not stacked (grouped CPA) → value on top of each bar
+        // Dollar/percent formatting is borrowed from each chart's own y-axis tick
+        // callback, so labels match the axis ($, %, or plain count).
+        function dlStacked(ctx) {
+            const s = ctx.chart.options.scales || {};
+            return !!((s.x && s.x.stacked) || (s.y && s.y.stacked));
+        }
+        function dlIsSku(ctx) { return dlStacked(ctx) && ctx.chart.data.datasets.length > 2; }
+        function dlAxisFmt(ctx, n) {
+            const r = Math.round(n);
+            const cb = ctx.chart.options.scales && ctx.chart.options.scales.y && ctx.chart.options.scales.y.ticks && ctx.chart.options.scales.y.ticks.callback;
+            if (typeof cb === 'function') { try { return cb(r); } catch (e) {} }
+            return r.toLocaleString();
+        }
+        const DATALABELS = {
+            clamp: true,
+            clip: false,
+            color: (ctx) => dlIsSku(ctx) ? '#ffffff' : '#e2e8f0',
+            font: (ctx) => dlIsSku(ctx) ? { weight: '700', size: 9 } : { weight: '600', size: 10 },
+            anchor: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
+            align: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
+            display: (ctx) => {
+                if (ctx.chart.config.type !== 'bar') return false;
+                const ds = ctx.chart.data.datasets;
+                if (dlStacked(ctx) && ds.length <= 2) return ctx.datasetIndex === ds.length - 1; // total once, on top
+                return true; // grouped value, or SKU per-segment
+            },
+            formatter: (value, ctx) => {
+                const ds = ctx.chart.data.datasets;
+                const i = ctx.dataIndex;
+                if (dlIsSku(ctx)) {
+                    const v = Number(value) || 0;
+                    const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
+                    if (!v || (total && v / total < 0.07)) return ''; // hide slivers
+                    return Math.round(v).toLocaleString();
+                }
+                if (dlStacked(ctx)) {
+                    const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
+                    return total ? dlAxisFmt(ctx, total) : '';
+                }
+                const v = Number(value) || 0;
+                return v ? dlAxisFmt(ctx, v) : '';
+            }
+        };
+
         // Initialize charts
         function initCharts() {
+            // Register once; default OFF so only charts that opt in show labels.
+            if (typeof ChartDataLabels !== 'undefined' && !window.__dlRegistered) {
+                try { Chart.register(ChartDataLabels); } catch (e) {}
+                Chart.defaults.set('plugins.datalabels', { display: false });
+                window.__dlRegistered = true;
+            }
             const chartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: false
-                    }
+                    },
+                    datalabels: DATALABELS
                 },
                 scales: {
                     x: {
@@ -1621,6 +1680,7 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
+                            datalabels: DATALABELS,
                             tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatNumber(c.raw)}` } }
                         },
                         scales: {
@@ -1648,6 +1708,7 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
+                            datalabels: DATALABELS,
                             tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.raw)}` } }
                         },
                         scales: {
@@ -1675,6 +1736,7 @@
                         maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
+                            datalabels: DATALABELS,
                             tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatCurrency(c.raw)}` } }
                         },
                         scales: {
@@ -1728,6 +1790,7 @@
                             position: 'bottom',
                             labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 10, padding: 6 }
                         },
+                        datalabels: DATALABELS,
                         tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${formatNumber(c.raw)}` } }
                     },
                     scales: {
@@ -1907,6 +1970,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
+                        datalabels: DATALABELS,
                         tooltip: {
                             callbacks: {
                                 label: (ctx) => `${ctx.dataset.label}: ${formatNumber(ctx.raw)}`
