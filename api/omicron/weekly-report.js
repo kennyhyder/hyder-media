@@ -60,7 +60,7 @@ function aggregateMonthly(accounts) {
   return out;
 }
 
-async function chartPng(config, width = 1000, height = 460) {
+async function chartPng(config, width = 900, height = 560) {
   const res = await fetch('https://quickchart.io/chart', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -153,12 +153,17 @@ export default async function handler(req, res) {
     const twoCharts = (title, sub, leftBuf, leftCap, rightBuf, rightCap) => {
       doc.addPage();
       slideHeader(title, sub);
-      const cw = (W - 80 - 20) / 2, cy = 110, ch = H - cy - 60;
+      // Charts are width-constrained (PNG is 900×560), so each renders cw wide ×
+      // cw*560/900 tall. Place captions DIRECTLY under the rendered chart — never
+      // near the bottom margin, where overflowing text makes pdfkit add a blank page.
+      const cw = (W - 80 - 20) / 2, cy = 104, ch = H - cy - 70;
       doc.image(leftBuf, 40, cy, { fit: [cw, ch] });
       doc.image(rightBuf, 40 + cw + 20, cy, { fit: [cw, ch] });
-      doc.fillColor(MUTED).font('Helvetica').fontSize(11);
-      doc.text(leftCap, 40, H - 44, { width: cw, align: 'center' });
-      doc.text(rightCap, 40 + cw + 20, H - 44, { width: cw, align: 'center' });
+      const chartH = Math.min(ch, Math.round(cw * 560 / 900));
+      const capY = cy + chartH + 14;
+      doc.fillColor(MUTED).font('Helvetica').fontSize(12);
+      doc.text(leftCap, 40, capY, { width: cw, align: 'center', lineBreak: false });
+      doc.text(rightCap, 40 + cw + 20, capY, { width: cw, align: 'center', lineBreak: false });
     };
 
     // Slide 1 — title
@@ -185,7 +190,7 @@ export default async function handler(req, res) {
       doc.fillColor(INK).font('Helvetica-Bold').fontSize(22).text(val, x, y + 32, { width: cwx, align: 'center' });
       doc.fillColor(MUTED).font('Helvetica').fontSize(11).text(label, x, y + 72, { width: cwx, align: 'center' });
     });
-    doc.fillColor(MUTED).fontSize(11).text('Blue = Non-Brand · Red = Brand. Owned-site slides exclude Sunny & Pure (deprecated from regular reporting).', 40, H - 60, { width: W - 80 });
+    doc.fillColor(MUTED).fontSize(11).text('Blue = Non-Brand · Red = Brand. Owned-site slides exclude Sunny & Pure (deprecated from regular reporting).', 40, H - 54, { width: W - 80, lineBreak: false });
 
     // Slides 3-5 — charts
     twoCharts('Portfolio Trend', 'All accounts', ovConv, 'Conversions (Brand vs Non-Brand)', ovCpa, 'CPA (Brand vs Non-Brand)');
