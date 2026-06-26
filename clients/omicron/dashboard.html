@@ -413,6 +413,8 @@
                 </div>
             </div>
 
+            <div id="overview-account-toggles"></div>
+
             <!-- All Conversions Chart -->
             <div class="card mb-6">
                 <div class="card-header">
@@ -518,6 +520,8 @@
                     </div>
                 </div>
             </div>
+
+            <div id="owned-account-toggles"></div>
 
             <div class="card mb-6">
                 <div class="card-header">
@@ -1153,12 +1157,87 @@
             }
         }
 
-        // Update dashboard with data
-        function updateDashboard() {
-            if (!apiData || !apiData.monthlyTotals) return;
+        // ── Owned-account selection for the Overview + Owned summaries ───────
+        // Sunny + Pure are deprecated from regular reporting: OFF by default but
+        // toggleable. Totals/graphs are re-aggregated CLIENT-SIDE from per-account
+        // data so excluding an account actually removes it from the numbers.
+        const DEPRECATED_ACCOUNTS = ['Sunny', 'Pure'];
+        let excludedAccounts = new Set(DEPRECATED_ACCOUNTS);
 
-            // Calculate totals from monthly data
-            const totals = apiData.monthlyTotals.reduce((acc, m) => {
+        function aggregateAccountsMonthly(accounts) {
+            const byMonth = new Map();
+            for (const acc of accounts) {
+                for (const m of (acc.monthly || [])) {
+                    let e = byMonth.get(m.month);
+                    if (!e) {
+                        e = { month: m.month, brand: { spend: 0, conversions: 0, clicks: 0, impressions: 0 }, nonBrand: { spend: 0, conversions: 0, clicks: 0, impressions: 0 } };
+                        byMonth.set(m.month, e);
+                    }
+                    for (const seg of ['brand', 'nonBrand']) {
+                        const s = m[seg] || {};
+                        e[seg].spend += s.spend || 0;
+                        e[seg].conversions += s.conversions || 0;
+                        e[seg].clicks += s.clicks || 0;
+                        e[seg].impressions += s.impressions || 0;
+                    }
+                }
+            }
+            const out = [...byMonth.values()].sort((a, b) => a.month < b.month ? -1 : 1);
+            for (const e of out) {
+                e.brand.cpa = e.brand.conversions ? e.brand.spend / e.brand.conversions : 0;
+                e.nonBrand.cpa = e.nonBrand.conversions ? e.nonBrand.spend / e.nonBrand.conversions : 0;
+                e.total = { spend: e.brand.spend + e.nonBrand.spend, conversions: e.brand.conversions + e.nonBrand.conversions, clicks: e.brand.clicks + e.nonBrand.clicks, impressions: e.brand.impressions + e.nonBrand.impressions };
+                e.total.cpa = e.total.conversions ? e.total.spend / e.total.conversions : 0;
+            }
+            return out;
+        }
+
+        // Selection-aware monthly series. group: 'all' | 'owned' | 'review'.
+        // Falls back to server aggregates if per-account monthly data is absent.
+        function effectiveMonthly(group) {
+            const accts = (apiData.accounts || []).filter(a => a.status === 'success' && !excludedAccounts.has(a.name) && (group === 'all' || a.group === group));
+            if (accts.length && accts.some(a => (a.monthly || []).length)) return aggregateAccountsMonthly(accts);
+            if (group === 'owned') return apiData.groupTotals?.owned || [];
+            if (group === 'review') return apiData.groupTotals?.review || [];
+            return apiData.monthlyTotals || [];
+        }
+
+        // Render the owned-account include/exclude toggles into the Overview + Owned tabs.
+        function renderAccountToggles() {
+            if (!apiData || !apiData.accounts) return;
+            const owned = apiData.accounts
+                .filter(a => a.status === 'success' && a.group === 'owned')
+                .sort((a, b) => accountOrderIndex(a.name) - accountOrderIndex(b.name));
+            if (!owned.length) return;
+            const chips = owned.map(a => {
+                const checked = excludedAccounts.has(a.name) ? '' : 'checked';
+                const dep = DEPRECATED_ACCOUNTS.includes(a.name) ? ' <span style="opacity:.55;">(deprecated)</span>' : '';
+                return `<label style="display:inline-flex;align-items:center;gap:5px;color:var(--text-primary);cursor:pointer;white-space:nowrap;">
+                    <input type="checkbox" data-account="${a.name}" ${checked} onchange="toggleAccount(this)" style="cursor:pointer;"> ${a.name}${dep}</label>`;
+            }).join('');
+            const wrap = `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:10px 14px;margin-bottom:16px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;font-size:0.8rem;">
+                <span style="color:var(--text-muted);font-weight:600;">Include accounts:</span>${chips}</div>`;
+            ['overview-account-toggles', 'owned-account-toggles'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = wrap;
+            });
+        }
+
+        // Toggle one account in/out of the Overview + Owned summaries, then refresh.
+        function toggleAccount(input) {
+            const name = input.dataset.account;
+            if (input.checked) excludedAccounts.delete(name);
+            else excludedAccounts.add(name);
+            renderAccountToggles();
+            // Refresh only the summary KPIs + overview/owned charts (not the heavy
+            // per-account detail charts) so toggling stays snappy.
+            updateSummaryStats();
+            updateCharts();
+        }
+
+        // Summary KPI cards (top stats + review/owned group stats), selection-aware.
+        function updateSummaryStats() {
+            const totals = effectiveMonthly('all').reduce((acc, m) => {
                 acc.spend += m.total?.spend || 0;
                 acc.conversions += m.total?.conversions || 0;
                 acc.clicks += m.total?.clicks || 0;
@@ -1169,7 +1248,6 @@
                 return acc;
             }, { spend: 0, conversions: 0, clicks: 0, brandSpend: 0, brandConv: 0, nonBrandSpend: 0, nonBrandConv: 0 });
 
-            // Update top stats
             document.getElementById('total-spend').textContent = formatCurrency(totals.spend);
             document.getElementById('total-conversions').textContent = formatNumber(totals.conversions);
             document.getElementById('avg-cpa').textContent = formatCurrency(totals.conversions > 0 ? totals.spend / totals.conversions : 0);
@@ -1177,28 +1255,23 @@
             document.getElementById('nonbrand-cpa').textContent = formatCurrency(totals.nonBrandConv > 0 ? totals.nonBrandSpend / totals.nonBrandConv : 0);
             document.getElementById('total-clicks').textContent = formatNumber(totals.clicks);
 
-            // Update group stats
-            if (apiData.groupTotals) {
-                const reviewTotals = apiData.groupTotals.review?.reduce((acc, m) => {
-                    acc.spend += m.total?.spend || 0;
-                    acc.conversions += m.total?.conversions || 0;
-                    return acc;
-                }, { spend: 0, conversions: 0 }) || { spend: 0, conversions: 0 };
+            const sumTot = (arr) => (arr || []).reduce((acc, m) => { acc.spend += m.total?.spend || 0; acc.conversions += m.total?.conversions || 0; return acc; }, { spend: 0, conversions: 0 });
+            const reviewTotals = sumTot(effectiveMonthly('review'));
+            const ownedTotals = sumTot(effectiveMonthly('owned'));
+            document.getElementById('review-spend').textContent = formatCurrency(reviewTotals.spend);
+            document.getElementById('review-conv').textContent = formatNumber(reviewTotals.conversions);
+            document.getElementById('review-cpa').textContent = formatCurrency(reviewTotals.conversions > 0 ? reviewTotals.spend / reviewTotals.conversions : 0);
+            document.getElementById('owned-spend').textContent = formatCurrency(ownedTotals.spend);
+            document.getElementById('owned-conv').textContent = formatNumber(ownedTotals.conversions);
+            document.getElementById('owned-cpa').textContent = formatCurrency(ownedTotals.conversions > 0 ? ownedTotals.spend / ownedTotals.conversions : 0);
+        }
 
-                const ownedTotals = apiData.groupTotals.owned?.reduce((acc, m) => {
-                    acc.spend += m.total?.spend || 0;
-                    acc.conversions += m.total?.conversions || 0;
-                    return acc;
-                }, { spend: 0, conversions: 0 }) || { spend: 0, conversions: 0 };
+        // Update dashboard with data
+        function updateDashboard() {
+            if (!apiData || !apiData.monthlyTotals) return;
 
-                document.getElementById('review-spend').textContent = formatCurrency(reviewTotals.spend);
-                document.getElementById('review-conv').textContent = formatNumber(reviewTotals.conversions);
-                document.getElementById('review-cpa').textContent = formatCurrency(reviewTotals.conversions > 0 ? reviewTotals.spend / reviewTotals.conversions : 0);
-
-                document.getElementById('owned-spend').textContent = formatCurrency(ownedTotals.spend);
-                document.getElementById('owned-conv').textContent = formatNumber(ownedTotals.conversions);
-                document.getElementById('owned-cpa').textContent = formatCurrency(ownedTotals.conversions > 0 ? ownedTotals.spend / ownedTotals.conversions : 0);
-            }
+            renderAccountToggles();
+            updateSummaryStats();
 
             // Update header subtitle with current granularity
             const subtitleEl = document.getElementById('dashboard-subtitle');
@@ -1430,7 +1503,7 @@
         function updateCharts() {
             if (!apiData) return;
 
-            const monthly = apiData.monthlyTotals || [];
+            const monthly = effectiveMonthly('all');
             const labels = monthly.map(m => formatMonth(m.month));
 
             // All Conversions Chart
@@ -1489,12 +1562,10 @@
             charts.costDist.update();
 
             // Update Review Sites Charts
-            const reviewMonthly = apiData.groupTotals?.review || [];
-            updateGroupCharts('review', reviewMonthly);
+            updateGroupCharts('review', effectiveMonthly('review'));
 
-            // Update Owned Sites Charts
-            const ownedMonthly = apiData.groupTotals?.owned || [];
-            updateGroupCharts('owned', ownedMonthly);
+            // Update Owned Sites Charts (selection-aware — excludes deselected accounts)
+            updateGroupCharts('owned', effectiveMonthly('owned'));
         }
 
         function updateGroupCharts(group, monthly) {
