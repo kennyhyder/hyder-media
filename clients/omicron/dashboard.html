@@ -1572,11 +1572,21 @@
         };
 
         // Update account details section
+        // Account Details display order (BUR, Top10, NH, Easynews, Eweka, Tweak,
+        // UsenetServer, Privado, then the deprecated Sunny/Pure at the end).
+        const ACCOUNT_DISPLAY_ORDER = ['BUR', 'Top10usenet', 'Newshosting', 'Easynews', 'Eweka', 'Tweak', 'UsenetServer', 'Privado', 'Sunny', 'Pure'];
+        function accountOrderIndex(name) {
+            const i = ACCOUNT_DISPLAY_ORDER.indexOf(name);
+            return i === -1 ? ACCOUNT_DISPLAY_ORDER.length : i;
+        }
+
         function updateAccountDetails() {
             if (!apiData || !apiData.accounts) return;
 
             const container = document.getElementById('account-details-container');
-            const successAccounts = apiData.accounts.filter(a => a.status === 'success');
+            const successAccounts = apiData.accounts
+                .filter(a => a.status === 'success')
+                .sort((a, b) => accountOrderIndex(a.name) - accountOrderIndex(b.name));
             const periodWord = apiData.granularity === 'day' ? 'Daily' : 'Monthly';
 
             destroyAccountCharts();
