@@ -269,7 +269,7 @@
       "maxDuration": 60
     },
     "api/omicron/**/*.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     }
   }
 }
