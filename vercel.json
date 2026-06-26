@@ -1,77 +1,275 @@
 {
   "cleanUrls": true,
   "redirects": [
-    { "source": "/clients/autoaddiction", "destination": "/clients/autoaddiction/", "statusCode": 301 },
-    { "source": "/falcon-proposal/", "destination": "/falcon-proposal", "statusCode": 301 },
-    { "source": "/falcon-proposal.html", "destination": "/falcon-proposal", "statusCode": 301 },
-    { "source": "/falcon-options/", "destination": "/falcon-options", "statusCode": 301 },
-    { "source": "/falcon-options.html", "destination": "/falcon-options", "statusCode": 301 },
-    { "source": "/falcon-revised/", "destination": "/falcon-revised", "statusCode": 301 },
-    { "source": "/falcon-revised.html", "destination": "/falcon-revised", "statusCode": 301 },
-    { "source": "/resume", "destination": "/about", "statusCode": 301 },
-    { "source": "/resume/", "destination": "/about", "statusCode": 301 },
-    { "source": "/resume.html", "destination": "/about", "statusCode": 301 },
-    { "source": "/cv", "destination": "/about", "statusCode": 301 }
+    {
+      "source": "/clients/autoaddiction",
+      "destination": "/clients/autoaddiction/",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-proposal/",
+      "destination": "/falcon-proposal",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-proposal.html",
+      "destination": "/falcon-proposal",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-options/",
+      "destination": "/falcon-options",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-options.html",
+      "destination": "/falcon-options",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-revised/",
+      "destination": "/falcon-revised",
+      "statusCode": 301
+    },
+    {
+      "source": "/falcon-revised.html",
+      "destination": "/falcon-revised",
+      "statusCode": 301
+    },
+    {
+      "source": "/resume",
+      "destination": "/about",
+      "statusCode": 301
+    },
+    {
+      "source": "/resume/",
+      "destination": "/about",
+      "statusCode": 301
+    },
+    {
+      "source": "/resume.html",
+      "destination": "/about",
+      "statusCode": 301
+    },
+    {
+      "source": "/cv",
+      "destination": "/about",
+      "statusCode": 301
+    }
   ],
   "rewrites": [
-    { "source": "/falcon-proposal", "destination": "/clients/falconlabs/proposal" },
-    { "source": "/falcon-options", "destination": "/clients/falconlabs/proposal-options" },
-    { "source": "/falcon-revised", "destination": "/clients/falconlabs/proposal-revised" }
+    {
+      "source": "/falcon-proposal",
+      "destination": "/clients/falconlabs/proposal"
+    },
+    {
+      "source": "/falcon-options",
+      "destination": "/clients/falconlabs/proposal-options"
+    },
+    {
+      "source": "/falcon-revised",
+      "destination": "/clients/falconlabs/proposal-revised"
+    }
   ],
   "crons": [
-    { "path": "/api/golfodds/cron-ingest-kalshi",   "schedule": "*/5 * * * *" },
-    { "path": "/api/golfodds/cron-ingest-datagolf", "schedule": "*/10 * * * *" },
-    { "path": "/api/golfodds/cron-ingest-matchup-books", "schedule": "*/10 * * * *" },
-    { "path": "/api/golfodds/cron-ingest-props",   "schedule": "*/10 * * * *" },
-    { "path": "/api/golfodds/cron-ingest-polymarket", "schedule": "*/15 * * * *" },
-    { "path": "/api/golfodds/cron-detect-alerts",   "schedule": "*/5 * * * *" },
-    { "path": "/api/sports/cron-ingest",            "schedule": "*/5 * * * *" },
-    { "path": "/api/sports/cron-ingest-props",      "schedule": "2,12,22,32,42,52 * * * *" },
-    { "path": "/api/sports/cron-ingest-books",      "schedule": "*/30 * * * *" },
-    { "path": "/api/sports/cron-ingest-books-futures", "schedule": "15,45 * * * *" },
-    { "path": "/api/sports/cron-ingest-polymarket", "schedule": "*/15 * * * *" },
-    { "path": "/api/sports/cron-detect-movements",  "schedule": "*/5 * * * *" },
-    { "path": "/api/sports/cron-social-digest",     "schedule": "15 14 * * *" },
-    { "path": "/api/sports/cron-social-alerts",     "schedule": "*/10 * * * *" },
-    { "path": "/api/sports/cron-email-drip",        "schedule": "30 14 * * *" },
-    { "path": "/api/sports/cron-capture-clv",       "schedule": "*/15 * * * *" },
-    { "path": "/api/sports/cron-ingest-public-splits", "schedule": "0 13 * * *" },
-    { "path": "/api/sports/cron-ingest-player-stats",  "schedule": "0 8 * * *" },
-    { "path": "/api/sports/cron-compute-projections",  "schedule": "0 9 * * *" },
-    { "path": "/api/sports/cron-twitter-watch",     "schedule": "*/15 * * * *" },
-    { "path": "/api/sports/cron-twitter-reply",     "schedule": "5,20,35,50 * * * *" },
-    { "path": "/api/sports/cron-retention",         "schedule": "30 9 * * *" },
-    { "path": "/api/sports/cron-archive-events",    "schedule": "0 * * * *" },
-    { "path": "/api/golfodds/cron-archive-tournaments", "schedule": "0 * * * *" },
-    { "path": "/api/data/sync-huggingface",         "schedule": "0 7 * * *" },
-    { "path": "/api/seo/cron-indexnow-sweep",       "schedule": "0 3 * * 0" },
-    { "path": "/api/seo/cron-sitemap-diff",         "schedule": "0 */6 * * *" },
-    { "path": "/api/seo/cron-route-canary",         "schedule": "*/15 * * * *" },
-    { "path": "/api/seo/cron-data-freshness",       "schedule": "*/15 * * * *" },
-    { "path": "/api/seo/cron-coverage-check",       "schedule": "0 * * * *" },
-    { "path": "/api/seo/cron-health-check",         "schedule": "0 12 * * *" },
-    { "path": "/api/seo/cron-keep-warm",            "schedule": "* * * * *" },
-    { "path": "/api/ag2020/autodial-cron",          "schedule": "*/15 * * * *" },
-    { "path": "/api/ag2020/cron-ad-spend-daily",    "schedule": "0 8 * * *" }
+    {
+      "path": "/api/golfodds/cron-ingest-kalshi",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-ingest-datagolf",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-ingest-matchup-books",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-ingest-props",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-ingest-polymarket",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-detect-alerts",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-props",
+      "schedule": "2,12,22,32,42,52 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-books",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-books-futures",
+      "schedule": "15,45 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-polymarket",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-detect-movements",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-social-digest",
+      "schedule": "15 14 * * *"
+    },
+    {
+      "path": "/api/sports/cron-social-alerts",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-email-drip",
+      "schedule": "30 14 * * *"
+    },
+    {
+      "path": "/api/sports/cron-capture-clv",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-public-splits",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/sports/cron-ingest-player-stats",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/sports/cron-compute-projections",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/sports/cron-twitter-watch",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-twitter-reply",
+      "schedule": "5,20,35,50 * * * *"
+    },
+    {
+      "path": "/api/sports/cron-retention",
+      "schedule": "30 9 * * *"
+    },
+    {
+      "path": "/api/sports/cron-archive-events",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/golfodds/cron-archive-tournaments",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/data/sync-huggingface",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/seo/cron-indexnow-sweep",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/seo/cron-sitemap-diff",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/seo/cron-route-canary",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/seo/cron-data-freshness",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/seo/cron-coverage-check",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/seo/cron-health-check",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/seo/cron-keep-warm",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/ag2020/autodial-cron",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/ag2020/cron-ad-spend-daily",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/omicron/weekly-report",
+      "schedule": "0 16,17 * * 2"
+    }
   ],
   "functions": {
-    "api/*.js": { "maxDuration": 10 },
-    "api/google-ads/**/*.js": { "maxDuration": 60 },
-    "api/solar/**/*.js": { "maxDuration": 60 },
-    "api/grid/**/*.js": { "maxDuration": 120 },
-    "api/bing-ads/**/*.js": { "maxDuration": 60 },
-    "api/affiliati/**/*.js": { "maxDuration": 60 },
-    "api/ag2020/**/*.js": { "maxDuration": 30 },
-    "api/digistore/**/*.js": { "maxDuration": 30 },
-    "api/meta-ads/**/*.js": { "maxDuration": 30 },
-    "api/serp/**/*.js": { "maxDuration": 60 },
-    "api/gbp/**/*.js": { "maxDuration": 30 },
-    "api/ga4/**/*.js": { "maxDuration": 60 },
-    "api/vita-brevis/**/*.js": { "maxDuration": 30 },
-    "api/tiktok-ads/**/*.js": { "maxDuration": 30 },
-    "api/golfodds/**/*.js": { "maxDuration": 300 },
-    "api/sports/**/*.js": { "maxDuration": 300 },
-    "api/data/**/*.js": { "maxDuration": 60 },
-    "api/seo/**/*.js": { "maxDuration": 60 }
+    "api/*.js": {
+      "maxDuration": 10
+    },
+    "api/google-ads/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/solar/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/grid/**/*.js": {
+      "maxDuration": 120
+    },
+    "api/bing-ads/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/affiliati/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/ag2020/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/digistore/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/meta-ads/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/serp/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/gbp/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/ga4/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/vita-brevis/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/tiktok-ads/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/golfodds/**/*.js": {
+      "maxDuration": 300
+    },
+    "api/sports/**/*.js": {
+      "maxDuration": 300
+    },
+    "api/data/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/seo/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/omicron/**/*.js": {
+      "maxDuration": 60
+    }
   }
 }
