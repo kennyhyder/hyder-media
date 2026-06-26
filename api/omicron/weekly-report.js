@@ -211,18 +211,22 @@ export default async function handler(req, res) {
       const n = items.length;
       const cols = n <= 3 ? n : 2;
       const rows = Math.ceil(n / cols);
-      const gap = 16, x0 = 40, y0 = 96, areaW = W - 80, areaH = H - y0 - 28;
+      const gap = 16, x0 = 40, y0 = 92;
+      const bottomSafe = H - 52;            // everything stays above this (within margin)
+      const areaW = W - 80, areaH = bottomSafe - y0;
       const cellW = (areaW - (cols - 1) * gap) / cols;
       const cellH = (areaH - (rows - 1) * gap) / rows;
-      const capH = 16;
+      const capH = 15;
       items.forEach((it, i) => {
         const col = i % cols, row = Math.floor(i / cols);
-        const cx = x0 + col * (cellW + gap), cy = y0 + row * (cellH + gap);
-        const maxChartH = cellH - capH;
-        const chH = Math.min(maxChartH, Math.round(cellW * 540 / 820));
-        const chY = cy + Math.max(0, (maxChartH - chH) / 2);
+        const cx = x0 + col * (cellW + gap), cyTop = y0 + row * (cellH + gap);
+        const chMaxH = cellH - capH;
+        const chH = Math.min(chMaxH, Math.round(cellW * 540 / 820));
+        const chY = cyTop + Math.max(0, (chMaxH - chH) / 2);
         if (it.buf) doc.image(it.buf, cx, chY, { fit: [cellW, chH] });
-        doc.fillColor(MUTED).font('Helvetica').fontSize(10).text(it.caption, cx, cy + maxChartH + 2, { width: cellW, align: 'center', lineBreak: false });
+        // caption DIRECTLY under the rendered chart — never at the cell bottom,
+        // which would hit the page margin and make pdfkit add a blank page.
+        doc.fillColor(MUTED).font('Helvetica').fontSize(10).text(it.caption, cx, chY + chH + 4, { width: cellW, align: 'center', lineBreak: false });
       });
     };
 
