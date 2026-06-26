@@ -196,6 +196,15 @@ export default async function handler(req, res) {
     await done;
     const pdf = Buffer.concat(chunks);
 
+    // Debug: return the PDF bytes directly (skip email) to inspect server output.
+    if (req.query?.pdf === '1') {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline; filename="omicron-weekly.pdf"');
+      res.end(pdf);
+      return;
+    }
+
     // 4) Email it.
     const to = (process.env.OMICRON_REPORT_TO || 'kenny@hyder.me').trim();
     const cc = (process.env.OMICRON_REPORT_CC || '').trim();
