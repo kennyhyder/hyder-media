@@ -73,7 +73,7 @@ export const METRICS: MetricDef[] = [
     subject: "state",
     unit: "average DC Readiness score",
     description:
-      "States ranked by the average MegaWatt Site DC Readiness score across all catalogued candidate sites — a blended screen of power, speed-to-power, fiber, water, and hazard.",
+      "States ranked by the average GridCensus DC Readiness score across all catalogued candidate sites — a blended screen of power, speed-to-power, fiber, water, and hazard.",
     compute: () => stateRows((a) => a.avgScore, fmtScore, "desc"),
   },
   {
@@ -82,7 +82,7 @@ export const METRICS: MetricDef[] = [
     subject: "state",
     unit: "catalogued candidate sites",
     description:
-      "States ranked by the raw count of scored datacenter candidate sites in the MegaWatt Site catalog.",
+      "States ranked by the raw count of scored datacenter candidate sites in the GridCensus catalog.",
     compute: () => stateRows((a) => a.count, fmtInt, "desc", 0),
   },
   {
@@ -174,7 +174,7 @@ export const METRICS: MetricDef[] = [
     subject: "site-type",
     unit: "average DC Readiness score",
     description:
-      "The nine MegaWatt Site site types ranked by their average DC Readiness score — which categories of land screen best for datacenter development.",
+      "The nine GridCensus site types ranked by their average DC Readiness score — which categories of land screen best for datacenter development.",
     compute: () => {
       const rows: RankedRow[] = [];
       for (const t of Object.values(SITE_TYPES)) {

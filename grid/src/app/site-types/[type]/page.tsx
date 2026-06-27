@@ -71,7 +71,7 @@ export default async function SiteTypePage({
     },
     {
       q: `How many ${t.label.toLowerCase()} datacenter sites are there?`,
-      a: `MegaWatt Site catalogs ${fmtInt(agg.count)} ${t.label.toLowerCase()} candidate sites nationwide, averaging ${fmtScore(agg.avgScore)}/100 DC Readiness.`,
+      a: `GridCensus catalogs ${fmtInt(agg.count)} ${t.label.toLowerCase()} candidate sites nationwide, averaging ${fmtScore(agg.avgScore)}/100 DC Readiness.`,
     },
     topState
       ? {

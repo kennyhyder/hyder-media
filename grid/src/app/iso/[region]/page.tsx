@@ -75,7 +75,7 @@ export default async function IsoRegionPage({
     },
     {
       q: `How many datacenter sites are in the ${iso.label} region?`,
-      a: `MegaWatt Site catalogs ${fmtInt(agg.count)} scored datacenter candidate sites in ${iso.label}, averaging ${fmtScore(agg.avgScore)}/100 DC Readiness.`,
+      a: `GridCensus catalogs ${fmtInt(agg.count)} scored datacenter candidate sites in ${iso.label}, averaging ${fmtScore(agg.avgScore)}/100 DC Readiness.`,
     },
     {
       q: `What is the average interconnection-queue wait in ${iso.label}?`,

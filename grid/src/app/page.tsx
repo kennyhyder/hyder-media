@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What is MegaWatt Site?",
+    q: "What is GridCensus?",
     a: `${SITE_NAME} is a datacenter site-selection screening tool. It scores ${fmtInt(
       national.count
     )} candidate locations across the United States on power, speed-to-power, fiber, water, and hazard, using public infrastructure data.`,

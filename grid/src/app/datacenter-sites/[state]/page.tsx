@@ -77,7 +77,7 @@ export default async function StatePage({
   const faq = [
     {
       q: `How many datacenter sites are in ${st.name}?`,
-      a: `MegaWatt Site catalogs ${fmtInt(agg.count)} scored datacenter candidate sites in ${st.name}, with an average DC Readiness score of ${fmtScore(agg.avgScore)}/100.`,
+      a: `GridCensus catalogs ${fmtInt(agg.count)} scored datacenter candidate sites in ${st.name}, with an average DC Readiness score of ${fmtScore(agg.avgScore)}/100.`,
     },
     {
       q: `What is the average interconnection-queue wait in ${st.name}?`,

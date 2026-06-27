@@ -136,7 +136,7 @@ export default async function RankingPage({
       <section className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="text-lg font-bold text-gray-900">Methodology</h2>
         <p className="mt-2 text-sm text-gray-700">
-          This ranking is computed directly from the MegaWatt Site dataset of
+          This ranking is computed directly from the GridCensus dataset of
           164,098 scored candidate sites. Values are screening estimates derived
           from public data sources — not site-specific assessments. Catalogued
           capacity is a theoretical aggregate, not deliverable power.{" "}

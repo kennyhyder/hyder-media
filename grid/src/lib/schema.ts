@@ -56,7 +56,7 @@ export function datasetSchema(opts: DatasetOpts): Json {
     dateModified: opts.dateModified ?? freshness(),
     isAccessibleForFree: true,
     creator: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-    license: "https://megawattsite.com/methodology",
+    license: "https://gridcensus.com/methodology",
     keywords: [
       "datacenter site selection",
       "speed to power",

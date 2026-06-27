@@ -28,7 +28,7 @@ export default function UpgradeCTA({
         </a>
         <a
           href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-            "MegaWatt Site — dataset / API inquiry"
+            "GridCensus — dataset / API inquiry"
           )}`}
           className="rounded-lg border border-purple-300 bg-white px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50"
         >

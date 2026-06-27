@@ -84,7 +84,7 @@ export default async function TypeStatePage({
   const faq = [
     {
       q: `How many ${r.t.label.toLowerCase()} datacenter sites are in ${r.st.name}?`,
-      a: `MegaWatt Site catalogs ${fmtInt(r.count)} ${r.t.label.toLowerCase()} datacenter candidate sites in ${r.st.name}.`,
+      a: `GridCensus catalogs ${fmtInt(r.count)} ${r.t.label.toLowerCase()} datacenter candidate sites in ${r.st.name}.`,
     },
     {
       q: `What is a ${r.t.label.toLowerCase()} datacenter site?`,
