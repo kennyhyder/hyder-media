@@ -1,0 +1,29 @@
+# MegaWatt Site
+
+> Datacenter site selection and speed-to-power intelligence. MegaWatt Site scores 164,098 candidate datacenter locations across all 50 US states (plus DC) on power availability, speed-to-power, fiber, water, and hazard — turning public infrastructure data into a site-selection screening tool. Dataset last updated March 2026.
+
+MegaWatt Site (megawattsite.com) is operated by Hyder Media. The DC Readiness model blends ten weighted factors (power 25%, speed-to-power 20%, fiber 15%, water 10%, hazard 10%, labor 5%, existing-datacenter 5%, land 5%, tax 3%, climate 2%) into a 0–100 screening score. Scores are estimates derived from public data sources, not site-specific engineering assessments. "Catalogued candidate capacity" is a theoretical aggregate of per-site available-capacity estimates, not deliverable power.
+
+## Key figures (national, updated 2026-03)
+- 164,098 scored candidate sites
+- Average DC Readiness score: 51.6 / 100
+- Average interconnection-queue wait: 3.1 years
+- 2,886 counties with five or more scored sites
+- 9 site types; 9 ISO/RTO regions
+
+## Key pages
+- [Home](https://megawattsite.com/): national overview, top-scored sites, methodology.
+- [Locations hub](https://megawattsite.com/datacenter-sites): all 51 states with counts and average scores.
+- [State pages](https://megawattsite.com/datacenter-sites/virginia): per-state breakdown by type, ISO, sub-score profile, top sites, top counties.
+- [County pages](https://megawattsite.com/datacenter-sites/virginia/loudoun-county): hazard rating, tax incentives, electricity rates, fiber, water stress, climate, land price, top sites.
+- [ISO/RTO regions](https://megawattsite.com/iso): PJM, WECC, MISO, SPP, SERC, ERCOT, CAISO, ISO-NE, NYISO — queue context + site breakdown.
+- [Site types](https://megawattsite.com/site-types): greenfield, industrial, substation-adjacent, former mine, federal excess, manufacturing, shovel-ready, brownfield, military BRAC.
+- [Rankings](https://megawattsite.com/rankings): states by readiness, capacity, shortest queue, fastest speed-to-power, lowest water stress; ISO regions by queue depth; site types by readiness.
+- [Methodology](https://megawattsite.com/methodology): the DC Readiness scoring model and data sources.
+- [Pricing](https://megawattsite.com/pricing): free public screen, Pro full dataset, Enterprise API.
+
+## Data & update cadence
+The aggregate dataset refreshes monthly. Each page carries a machine-readable "Dataset updated" timestamp and Dataset JSON-LD with dateModified.
+
+## Contact & licensing
+Contact: kenny@hyder.me. Content may be cited with attribution to "MegaWatt Site (megawattsite.com)". For bulk/API access see the Enterprise plan.

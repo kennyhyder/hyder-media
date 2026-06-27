@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NavBar from "../components/NavBar";
 import ErrorBoundary from "../components/ErrorBoundary";
-import DemoWrapper from "../components/DemoWrapper";
+import JsonLd from "../components/JsonLd";
+import { organizationSchema, webApplicationSchema } from "../lib/schema";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_TAGLINE } from "../lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,6 +17,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,18 +46,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <title>GridScout - Transmission Infrastructure Intelligence</title>
-        <meta name="description" content="Datacenter site selection intelligence: scored candidate sites, brownfield opportunities, and market analysis across the United States." />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
       >
+        <JsonLd data={[organizationSchema(), webApplicationSchema()]} />
         <NavBar />
         <main className="max-w-7xl mx-auto px-4 py-6">
           <ErrorBoundary>{children}</ErrorBoundary>
         </main>
-        <DemoWrapper />
       </body>
     </html>
   );

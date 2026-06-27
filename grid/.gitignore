@@ -1,28 +1,19 @@
 # Dependencies
 node_modules/
 
-# Next.js source (only built output is deployed)
-src/
-public/
-next.config.ts
-next-env.d.ts
-tailwind.config.ts
-tsconfig.json
-postcss.config.mjs
-eslint.config.mjs
-package.json
-package-lock.json
-
 # Build temp/cache directories
 out/
 .next/
+*.tsbuildinfo
 
 # Environment
+.env
 .env.local
 .env*.local
 
-# Data files (too large for git)
-data/
+# Raw data files (too large for git) — anchored to grid root so it does NOT
+# match src/data/ (the committed rollups.json the pages render from).
+/data/
 
 # Specs (documentation, not deployed)
 specs/
@@ -30,5 +21,6 @@ specs/
 # OS
 .DS_Store
 
-# Next.js build metadata
-*.txt
+# Demo screen recordings + screenshots (large, not part of the app)
+*.mov
+docs/

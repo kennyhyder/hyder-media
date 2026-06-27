@@ -2,38 +2,41 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { isDemoMode } from "@/lib/demoAccess";
 
-const NAV_LINKS = [
-  { href: "/grid/", label: "Dashboard", match: "/grid" },
-  { href: "/grid/map/", label: "Map", match: "/grid/map" },
-  { href: "/grid/sites/", label: "Greenfields", match: "/grid/sites" },
-  { href: "/grid/brownfields/", label: "Industrial", match: "/grid/brownfields" },
-  { href: "/grid/lines/", label: "Transmission", match: "/grid/lines" },
-  { href: "/grid/corridors/", label: "Corridors", match: "/grid/corridors" },
-  { href: "/grid/hyperscale/", label: "Hyperscale", match: "/grid/hyperscale" },
-  { href: "/grid/market/", label: "Market", match: "/grid/market" },
-  { href: "/grid/api-docs/", label: "API", match: "/grid/api-docs", fullOnly: true },
+const PUBLIC_LINKS = [
+  { href: "/datacenter-sites", label: "Locations", match: "/datacenter-sites" },
+  { href: "/site-types", label: "Site Types", match: "/site-types" },
+  { href: "/iso", label: "ISO Regions", match: "/iso" },
+  { href: "/rankings", label: "Rankings", match: "/rankings" },
+  { href: "/pricing", label: "Pricing", match: "/pricing" },
+];
+
+const TOOL_LINKS = [
+  { href: "/dashboard", label: "Explore Dashboard" },
+  { href: "/map", label: "Interactive Map" },
+  { href: "/sites", label: "Greenfield Sites" },
+  { href: "/brownfields", label: "Industrial Sites" },
+  { href: "/lines", label: "Transmission" },
+  { href: "/corridors", label: "Corridors" },
+  { href: "/hyperscale", label: "Hyperscale" },
+  { href: "/market", label: "Market" },
 ];
 
 export default function NavBar() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
   const [menuOpen, setMenuOpen] = useState(false);
-  const demo = isDemoMode();
+  const [toolsOpen, setToolsOpen] = useState(false);
 
-  const isActive = (match: string) => {
-    if (match === "/grid") return pathname === "/grid" || pathname === "/grid/";
-    return pathname.startsWith(match);
-  };
+  const isActive = (match: string) => pathname === match || pathname.startsWith(`${match}/`);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <a href="/grid/" className="flex items-center gap-2 text-lg font-bold text-purple-600">
+        <a href="/" className="flex items-center gap-2 text-lg font-bold text-purple-600">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          GridScout
+          MegaWatt Site
         </a>
 
         {/* Mobile hamburger button */}
@@ -52,8 +55,8 @@ export default function NavBar() {
         </button>
 
         {/* Desktop nav links */}
-        <div className="hidden md:flex gap-4 text-sm">
-          {NAV_LINKS.filter(link => !demo || !link.fullOnly).map((link) => (
+        <div className="hidden md:flex items-center gap-4 text-sm">
+          {PUBLIC_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -66,13 +69,37 @@ export default function NavBar() {
               {link.label}
             </a>
           ))}
+          <div className="relative">
+            <button
+              onClick={() => setToolsOpen((v) => !v)}
+              onBlur={() => setTimeout(() => setToolsOpen(false), 150)}
+              className="text-gray-600 hover:text-purple-600"
+              aria-haspopup="true"
+              aria-expanded={toolsOpen}
+            >
+              Tools ▾
+            </button>
+            {toolsOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-52 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                {TOOL_LINKS.map((t) => (
+                  <a
+                    key={t.href}
+                    href={t.href}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                  >
+                    {t.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Mobile nav links */}
       {menuOpen && (
         <div className="md:hidden mt-3 pt-3 border-t border-gray-200 flex flex-col gap-2 text-sm">
-          {NAV_LINKS.filter(link => !demo || !link.fullOnly).map((link) => (
+          {PUBLIC_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -86,6 +113,19 @@ export default function NavBar() {
               {link.label}
             </a>
           ))}
+          <div className="mt-1 pt-2 border-t border-gray-100">
+            <p className="py-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Tools</p>
+            {TOOL_LINKS.map((t) => (
+              <a
+                key={t.href}
+                href={t.href}
+                onClick={() => setMenuOpen(false)}
+                className="block py-1.5 text-gray-600 hover:text-purple-600"
+              >
+                {t.label}
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </nav>
