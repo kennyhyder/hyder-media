@@ -38,6 +38,8 @@ import SiteMiniMap from "@/components/map/SiteMiniMap";
 import type { MapSite } from "@/components/map/types";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import SaveButton from "@/components/account/SaveButton";
+import SuggestEditButton from "@/components/account/SuggestEditButton";
 
 // On-demand ISR: 164k sites must NOT prerender at build.
 export const revalidate = 86400;
@@ -374,6 +376,20 @@ export default async function SiteProfilePage({
           <div className="mt-0.5 text-xs font-medium text-gray-500">{scoreText} / 100</div>
         </div>
       </header>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SaveButton
+          entityType="site"
+          entityId={site.id}
+          label={name}
+          meta={{ name, state: site.state, score }}
+        />
+        <SuggestEditButton
+          entityType="site"
+          entityId={site.id}
+          fields={["name", "available_capacity_mw", "parcel_owner", "acreage", "former_use"]}
+        />
+      </div>
 
       <p className="mt-4 max-w-3xl text-gray-700">
         {name} is a {siteTypeLabel(site.site_type || "candidate").toLowerCase()} datacenter

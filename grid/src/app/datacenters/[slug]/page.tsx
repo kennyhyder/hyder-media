@@ -25,6 +25,10 @@ import JsonLd from "@/components/JsonLd";
 import { Row, Card } from "@/components/EntityProfile";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import { mergeEntity } from "@/lib/overrides";
+import SaveButton from "@/components/account/SaveButton";
+import ClaimButton from "@/components/account/ClaimButton";
+import SuggestEditButton from "@/components/account/SuggestEditButton";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -73,14 +77,28 @@ export default async function DatacenterProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const d = await resolve(slug);
-  if (!d) notFound();
+  const canonical = await resolve(slug);
+  if (!canonical) notFound();
+
+  // Overlay-merge: approved community edits (gc_entity_overrides) merged on top
+  // of canonical ingested data at render time. Graceful no-op if the table
+  // doesn't exist yet. This is the proof wiring of the overlay-merge read path.
+  const { merged: d, overridden } = await mergeEntity<Datacenter & Record<string, unknown>>(
+    "datacenter",
+    canonical.id,
+    canonical as Datacenter & Record<string, unknown>,
+  );
 
   const [sites, ixps, peers] = await Promise.all([
     nearbySitesByLatLng(d.latitude, d.longitude, 8),
     nearbyIxpsByLatLng(d.latitude, d.longitude, 5),
     nearbyDatacentersByLatLng(d.latitude, d.longitude, d.id, 5),
   ]);
+
+  // Domain for email-match claim auto-verify (from website, if present).
+  const entityDomain = d.website
+    ? (() => { try { return new URL(d.website!).hostname.replace(/^www\./, ""); } catch { return null; } })()
+    : null;
 
   const name = d.name || "Datacenter";
   const loc = [d.city, d.state].filter(Boolean).join(", ") || (d.state ? stateName(d.state) : "");
@@ -167,6 +185,32 @@ export default async function DatacenterProfilePage({
           </div>
         )}
       </header>
+
+      {/* Account actions: Save / Claim. Degrade to a sign-in redirect when
+          logged out; render nothing only if accounts are unconfigured. */}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SaveButton
+          entityType="datacenter"
+          entityId={canonical.id}
+          label={name}
+          meta={{ name, state: d.state, operator: d.operator }}
+        />
+        <ClaimButton
+          entityType="datacenter"
+          entityId={canonical.id}
+          entityDomain={entityDomain}
+        />
+      </div>
+
+      {overridden.length > 0 && (
+        <p className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs"
+           style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)", color: "var(--accent)" }}>
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          Community-verified edits applied ({overridden.map((o) => o.field).join(", ")})
+        </p>
+      )}
 
       <p className="mt-4 max-w-3xl text-gray-700">
         {name} is an operating datacenter facility{loc ? ` in ${loc}` : ""}
@@ -280,6 +324,15 @@ export default async function DatacenterProfilePage({
           </div>
         </section>
       )}
+
+      <section className="mt-8 max-w-2xl">
+        <h2 className="mb-2 text-sm font-bold text-gray-900">See something wrong or out of date?</h2>
+        <SuggestEditButton
+          entityType="datacenter"
+          entityId={canonical.id}
+          fields={["operator", "capacity_mw", "sqft", "status", "website", "year_built"]}
+        />
+      </section>
 
       <div className="mt-8">
         <Freshness />
