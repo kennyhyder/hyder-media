@@ -30,6 +30,66 @@ export function siteSlug(row: { id: string; name?: string | null }): string {
   return entitySlug(row, "site");
 }
 
+/** Substation slug: `${slugify(name)}-${shortId}`. */
+export function substationSlug(row: { id: string; name?: string | null }): string {
+  return entitySlug(row, "substation");
+}
+
+/** Brownfield slug. */
+export function brownfieldSlug(row: { id: string; name?: string | null }): string {
+  return entitySlug(row, "brownfield");
+}
+
+/** Internet exchange / IXP facility slug. */
+export function ixpSlug(row: { id: string; name?: string | null }): string {
+  return entitySlug(row, "internet-exchange");
+}
+
+/** Datacenter slug. */
+export function datacenterSlug(row: { id: string; name?: string | null }): string {
+  return entitySlug(row, "datacenter");
+}
+
+// ── Public profile-path builders ─────────────────────────────────────────────
+// Each returns null when the row lacks the segments needed to address it (such
+// rows are noindex anyway and get no inbound link).
+
+import { stateByCode as _stateByCode } from "@/lib/geo";
+
+/** `/substations/{state-slug}/{slug}` — needs a resolvable state code. */
+export function substationProfilePath(row: {
+  id: string;
+  name?: string | null;
+  state?: string | null;
+}): string | null {
+  if (!row.state) return null;
+  const st = _stateByCode(row.state);
+  if (!st) return null;
+  return `/substations/${st.slug}/${substationSlug(row)}`;
+}
+
+/** `/brownfield-sites/{state-slug}/{slug}`. */
+export function brownfieldProfilePath(row: {
+  id: string;
+  name?: string | null;
+  state?: string | null;
+}): string | null {
+  if (!row.state) return null;
+  const st = _stateByCode(row.state);
+  if (!st) return null;
+  return `/brownfield-sites/${st.slug}/${brownfieldSlug(row)}`;
+}
+
+/** `/internet-exchanges/{slug}` — flat (no state segment). */
+export function ixpProfilePath(row: { id: string; name?: string | null }): string {
+  return `/internet-exchanges/${ixpSlug(row)}`;
+}
+
+/** `/datacenters/{slug}` — flat (no state segment). */
+export function datacenterProfilePath(row: { id: string; name?: string | null }): string {
+  return `/datacenters/${datacenterSlug(row)}`;
+}
+
 /**
  * Pull the trailing short id out of a slug. Returns null if the slug has no
  * plausible 8-hex-char suffix (guards against malformed URLs → notFound()).

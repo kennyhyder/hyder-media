@@ -1,24 +1,47 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
-import { STATES, SITE_TYPES, ISO_REGIONS, countySlug } from "@/lib/geo";
+import { STATES, SITE_TYPES, ISO_REGIONS, stateByCode, countySlug } from "@/lib/geo";
 import { countiesForState, freshnessDate, countyRollup } from "@/lib/rollups";
 import { METRIC_KEYS } from "@/lib/rankings";
-import { allSitesForStateSitemap } from "@/lib/db";
-import { siteSlug } from "@/lib/entity-slug";
+import {
+  allSitesForStateSitemap,
+  allSubstationsForStateSitemap,
+  allBrownfieldsForSitemap,
+  allIxpsForSitemap,
+  allDatacentersForSitemap,
+} from "@/lib/db";
+import {
+  siteSlug,
+  substationSlug,
+  brownfieldSlug,
+  ixpSlug,
+  datacenterSlug,
+} from "@/lib/entity-slug";
 
 const LAST = freshnessDate();
 const N = STATES.length;
 
-// Shard layout:
-//   0            = static hubs + states + iso + types + rankings
+// Shard layout (keep sitemap-index.xml shard count in sync):
+//   0            = static hubs + states + iso + types + rankings + entity hubs
 //   1..N         = one per state — that state's county pages
 //   N+1..2N      = one per state — that state's individual site profile URLs
-//                  (≤ ~10k entries per state, under the 50k cap)
+//   2N+1..3N     = one per state — that state's substation profile URLs
+//   3N+1         = all brownfield-site profile URLs (~2k)
+//   3N+2         = all internet-exchange profile URLs (~1.4k)
+//   3N+3         = all datacenter profile URLs (~3.7k)
+const BROWNFIELD_SHARD = 3 * N + 1;
+const IXP_SHARD = 3 * N + 2;
+const DATACENTER_SHARD = 3 * N + 3;
+
 export async function generateSitemaps() {
   return [
     { id: 0 },
     ...STATES.map((_, i) => ({ id: i + 1 })),
     ...STATES.map((_, i) => ({ id: N + i + 1 })),
+    ...STATES.map((_, i) => ({ id: 2 * N + i + 1 })),
+    { id: BROWNFIELD_SHARD },
+    { id: IXP_SHARD },
+    { id: DATACENTER_SHARD },
   ];
 }
 
@@ -52,8 +75,18 @@ export default async function sitemap({
     out.push(entry("/site-types", "weekly", 0.8));
     out.push(entry("/iso", "weekly", 0.8));
     out.push(entry("/rankings", "weekly", 0.9));
+    out.push(entry("/substations", "weekly", 0.8));
+    out.push(entry("/internet-exchanges", "weekly", 0.8));
+    out.push(entry("/datacenters", "weekly", 0.8));
+    out.push(entry("/brownfield-sites", "weekly", 0.8));
     out.push(entry("/methodology", "monthly", 0.5));
     out.push(entry("/pricing", "monthly", 0.5));
+
+    // Per-state entity index pages (substations + brownfields by state)
+    for (const s of STATES) {
+      out.push(entry(`/substations/${s.slug}`, "weekly", 0.6));
+      out.push(entry(`/brownfield-sites/${s.slug}`, "weekly", 0.6));
+    }
 
     // States
     for (const s of STATES) {
@@ -91,22 +124,80 @@ export default async function sitemap({
   }
 
   // Site shards: id in N+1..2N → STATES[id-N-1], all that state's site profiles.
-  const state = STATES[id - N - 1];
-  if (!state) return [];
-  const rows = await allSitesForStateSitemap(state.code);
-  const out: MetadataRoute.Sitemap = [];
-  for (const row of rows) {
-    // Mirror the page-level noindex gate: skip rows missing score or fips.
-    if (row.dc_score == null || !row.fips_code) continue;
-    const countyName = countyRollup(row.fips_code)?.countyName;
-    if (!countyName) continue;
-    const path = `/datacenter-sites/${state.slug}/${countySlug(countyName)}/${siteSlug(row)}`;
-    out.push({
-      url: `${SITE_URL}${path}`,
-      lastModified: row.updated_at ? new Date(row.updated_at) : LAST,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    });
+  if (id >= N + 1 && id <= 2 * N) {
+    const state = STATES[id - N - 1];
+    if (!state) return [];
+    const rows = await allSitesForStateSitemap(state.code);
+    const out: MetadataRoute.Sitemap = [];
+    for (const row of rows) {
+      // Mirror the page-level noindex gate: skip rows missing score or fips.
+      if (row.dc_score == null || !row.fips_code) continue;
+      const countyName = countyRollup(row.fips_code)?.countyName;
+      if (!countyName) continue;
+      const path = `/datacenter-sites/${state.slug}/${countySlug(countyName)}/${siteSlug(row)}`;
+      out.push({
+        url: `${SITE_URL}${path}`,
+        lastModified: row.updated_at ? new Date(row.updated_at) : LAST,
+        changeFrequency: "monthly",
+        priority: 0.5,
+      });
+    }
+    return out;
   }
-  return out;
+
+  // Substation shards: id in 2N+1..3N → STATES[id-2N-1].
+  if (id >= 2 * N + 1 && id <= 3 * N) {
+    const state = STATES[id - 2 * N - 1];
+    if (!state) return [];
+    const rows = await allSubstationsForStateSitemap(state.code);
+    return rows
+      .filter((row) => !!row.name && !/^UNKNOWN/i.test(row.name))
+      .map((row) => ({
+        url: `${SITE_URL}/substations/${state.slug}/${substationSlug(row)}`,
+        lastModified: row.created_at ? new Date(row.created_at) : LAST,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+  }
+
+  // Brownfield shard (single).
+  if (id === BROWNFIELD_SHARD) {
+    const rows = await allBrownfieldsForSitemap();
+    return rows
+      .filter((row) => !!row.name && !!row.state && !!stateByCode(row.state))
+      .map((row) => ({
+        url: `${SITE_URL}/brownfield-sites/${stateByCode(row.state!)!.slug}/${brownfieldSlug(row)}`,
+        lastModified: row.created_at ? new Date(row.created_at) : LAST,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+  }
+
+  // Internet-exchange shard (single).
+  if (id === IXP_SHARD) {
+    const rows = await allIxpsForSitemap();
+    return rows
+      .filter((row) => !!row.name)
+      .map((row) => ({
+        url: `${SITE_URL}/internet-exchanges/${ixpSlug(row)}`,
+        lastModified: row.created_at ? new Date(row.created_at) : LAST,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+  }
+
+  // Datacenter shard (single).
+  if (id === DATACENTER_SHARD) {
+    const rows = await allDatacentersForSitemap();
+    return rows
+      .filter((row) => !!row.name && !!row.state)
+      .map((row) => ({
+        url: `${SITE_URL}/datacenters/${datacenterSlug(row)}`,
+        lastModified: row.created_at ? new Date(row.created_at) : LAST,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+  }
+
+  return [];
 }

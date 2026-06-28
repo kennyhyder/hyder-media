@@ -407,6 +407,445 @@ export async function nearbySites(site: FullDcSite, n = 8): Promise<DcSite[]> {
 }
 
 /**
+ * Nearby candidate sites by lat/lng bounding box (±`deg`). Ordered by dc_score
+ * desc. Generic — used by substation / brownfield / IXP / datacenter profiles
+ * which have no fips of their own but do have coordinates. `excludeId` skips a
+ * self row when the entity happens to live in grid_dc_sites too (it usually
+ * doesn't, so the default no-op exclusion is fine).
+ */
+export async function nearbySitesByLatLng(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  n = 6,
+  deg = 0.4
+): Promise<DcSite[]> {
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return [];
+  }
+  return restGet<DcSite>("grid_dc_sites", {
+    params: {
+      select: TOP_SITE_COLS,
+      order: "dc_score.desc.nullslast",
+      latitude: [`gte.${lat - deg}`, `lte.${lat + deg}`],
+      longitude: [`gte.${lng - deg}`, `lte.${lng + deg}`],
+      dc_score: "not.is.null",
+      limit: n,
+    },
+  });
+}
+
+// ── Substations (grid_substations) ───────────────────────────────────────────
+
+export interface Substation {
+  id: string;
+  name: string | null;
+  state: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  max_voltage_kv: number | null;
+  min_voltage_kv: number | null;
+  owners: string[] | null;
+  connected_line_count: number | null;
+  connected_line_ids: number[] | null;
+  created_at: string | null;
+}
+
+const SUBSTATION_COLS = [
+  "id", "name", "state", "latitude", "longitude", "max_voltage_kv", "min_voltage_kv",
+  "owners", "connected_line_count", "connected_line_ids", "created_at",
+].join(",");
+
+export async function getSubstationByShortId(
+  state: string,
+  shortId: string
+): Promise<Substation | null> {
+  if (!/^[0-9a-f]{8}$/i.test(shortId)) return null;
+  const { lo, hi } = uuidRangeFromShortId(shortId);
+  const rows = await restGet<Substation>("grid_substations", {
+    params: {
+      select: SUBSTATION_COLS,
+      state: `eq.${state}`,
+      id: [`gte.${lo}`, `lte.${hi}`],
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
+}
+
+/** Top substations in a state by max voltage (real-named only). */
+export async function topSubstationsByState(state: string, n = 60): Promise<Substation[]> {
+  return restGet<Substation>("grid_substations", {
+    params: {
+      select: SUBSTATION_COLS,
+      state: `eq.${state}`,
+      name: "not.like.UNKNOWN*",
+      order: "max_voltage_kv.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+export interface TransmissionLine {
+  hifld_id: number | null;
+  voltage_kv: number | null;
+  owner: string | null;
+  status: string | null;
+  length_miles: number | null;
+}
+
+/** Resolve the connected transmission lines for a substation by their hifld_ids. */
+export async function linesByHifldIds(ids: number[], n = 12): Promise<TransmissionLine[]> {
+  const clean = (ids || []).filter((x) => Number.isFinite(x)).slice(0, 40);
+  if (!clean.length) return [];
+  const rows = await restGet<TransmissionLine>("grid_transmission_lines", {
+    params: {
+      select: "hifld_id,voltage_kv,owner,status,length_miles",
+      hifld_id: `in.(${clean.join(",")})`,
+      order: "voltage_kv.desc.nullslast",
+      limit: n,
+    },
+  });
+  return rows;
+}
+
+// ── Brownfield sites (grid_brownfield_sites) ─────────────────────────────────
+
+export interface BrownfieldSite {
+  id: string;
+  name: string | null;
+  site_type: string | null;
+  former_use: string | null;
+  state: string | null;
+  county: string | null;
+  city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  acreage: number | null;
+  eia_plant_id: number | null;
+  existing_capacity_mw: number | null;
+  retirement_date: string | null;
+  grid_connection_voltage_kv: number | null;
+  epa_id: string | null;
+  cleanup_status: string | null;
+  contaminant_type: string | null;
+  nearest_substation_id: string | null;
+  nearest_substation_distance_km: number | null;
+  operator_name: string | null;
+  operator_address: string | null;
+  created_at: string | null;
+}
+
+const BROWNFIELD_COLS = [
+  "id", "name", "site_type", "former_use", "state", "county", "city", "latitude", "longitude",
+  "acreage", "eia_plant_id", "existing_capacity_mw", "retirement_date", "grid_connection_voltage_kv",
+  "epa_id", "cleanup_status", "contaminant_type", "nearest_substation_id",
+  "nearest_substation_distance_km", "operator_name", "operator_address", "created_at",
+].join(",");
+
+/** All brownfield sites in a state, by existing capacity (for the state index). */
+export async function brownfieldsByState(state: string, n = 200): Promise<BrownfieldSite[]> {
+  return restGet<BrownfieldSite>("grid_brownfield_sites", {
+    params: {
+      select: BROWNFIELD_COLS,
+      state: `eq.${state}`,
+      name: "not.is.null",
+      order: "existing_capacity_mw.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+export async function getBrownfieldByShortId(
+  state: string,
+  shortId: string
+): Promise<BrownfieldSite | null> {
+  if (!/^[0-9a-f]{8}$/i.test(shortId)) return null;
+  const { lo, hi } = uuidRangeFromShortId(shortId);
+  const rows = await restGet<BrownfieldSite>("grid_brownfield_sites", {
+    params: {
+      select: BROWNFIELD_COLS,
+      state: `eq.${state}`,
+      id: [`gte.${lo}`, `lte.${hi}`],
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
+}
+
+// ── Internet exchange facilities (grid_ixp_facilities) ───────────────────────
+
+export interface IxpFacility {
+  id: string;
+  name: string | null;
+  org_name: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  ix_count: number | null;
+  network_count: number | null;
+  website: string | null;
+  notes: string | null;
+  address: string | null;
+  zipcode: string | null;
+  created_at: string | null;
+}
+
+const IXP_COLS = [
+  "id", "name", "org_name", "city", "state", "country", "latitude", "longitude",
+  "ix_count", "network_count", "website", "notes", "address", "zipcode", "created_at",
+].join(",");
+
+export async function getIxpByShortId(shortId: string): Promise<IxpFacility | null> {
+  if (!/^[0-9a-f]{8}$/i.test(shortId)) return null;
+  const { lo, hi } = uuidRangeFromShortId(shortId);
+  const rows = await restGet<IxpFacility>("grid_ixp_facilities", {
+    params: {
+      select: IXP_COLS,
+      id: [`gte.${lo}`, `lte.${hi}`],
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
+}
+
+/** Top IXP facilities by connected-network count (for the hub list). */
+export async function topIxps(n = 120): Promise<IxpFacility[]> {
+  return restGet<IxpFacility>("grid_ixp_facilities", {
+    params: {
+      select: IXP_COLS,
+      name: "not.is.null",
+      order: "network_count.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+/** Other IXP facilities in the same metro (city+state), excluding self. */
+export async function nearbyIxps(ixp: IxpFacility, n = 6): Promise<IxpFacility[]> {
+  if (!ixp.city || !ixp.state) return [];
+  return restGet<IxpFacility>("grid_ixp_facilities", {
+    params: {
+      select: IXP_COLS,
+      city: `eq.${ixp.city}`,
+      state: `eq.${ixp.state}`,
+      id: `neq.${ixp.id}`,
+      order: "network_count.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+// ── Datacenters (grid_datacenters) ───────────────────────────────────────────
+
+export interface Datacenter {
+  id: string;
+  name: string | null;
+  operator: string | null;
+  city: string | null;
+  state: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  capacity_mw: number | null;
+  sqft: number | null;
+  dc_type: string | null;
+  year_built: number | null;
+  address: string | null;
+  zipcode: string | null;
+  website: string | null;
+  status: string | null;
+  created_at: string | null;
+}
+
+const DATACENTER_COLS = [
+  "id", "name", "operator", "city", "state", "latitude", "longitude", "capacity_mw",
+  "sqft", "dc_type", "year_built", "address", "zipcode", "website", "status", "created_at",
+].join(",");
+
+export async function getDatacenterByShortId(shortId: string): Promise<Datacenter | null> {
+  if (!/^[0-9a-f]{8}$/i.test(shortId)) return null;
+  const { lo, hi } = uuidRangeFromShortId(shortId);
+  const rows = await restGet<Datacenter>("grid_datacenters", {
+    params: {
+      select: DATACENTER_COLS,
+      id: [`gte.${lo}`, `lte.${hi}`],
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
+}
+
+/** Top datacenters by footprint (for the hub list). */
+export async function topDatacenters(n = 120): Promise<Datacenter[]> {
+  return restGet<Datacenter>("grid_datacenters", {
+    params: {
+      select: DATACENTER_COLS,
+      name: "not.is.null",
+      state: "not.is.null",
+      order: "sqft.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+/** Nearby IXP facilities by lat/lng bbox (for datacenter / site cross-links). */
+export async function nearbyIxpsByLatLng(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  n = 5,
+  deg = 0.6
+): Promise<IxpFacility[]> {
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return [];
+  return restGet<IxpFacility>("grid_ixp_facilities", {
+    params: {
+      select: IXP_COLS,
+      latitude: [`gte.${lat - deg}`, `lte.${lat + deg}`],
+      longitude: [`gte.${lng - deg}`, `lte.${lng + deg}`],
+      order: "network_count.desc.nullslast",
+      limit: n,
+    },
+  });
+}
+
+/** Nearby datacenters by lat/lng bbox. */
+export async function nearbyDatacentersByLatLng(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  excludeId: string | null,
+  n = 5,
+  deg = 0.5
+): Promise<Datacenter[]> {
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return [];
+  const params: Record<string, string | number | (string | number)[]> = {
+    select: DATACENTER_COLS,
+    latitude: [`gte.${lat - deg}`, `lte.${lat + deg}`],
+    longitude: [`gte.${lng - deg}`, `lte.${lng + deg}`],
+    order: "sqft.desc.nullslast",
+    limit: n,
+  };
+  if (excludeId) params.id = `neq.${excludeId}`;
+  return restGet<Datacenter>("grid_datacenters", { params });
+}
+
+// ── Sitemap enumerators for the new entities ─────────────────────────────────
+
+interface SitemapEntityRow {
+  id: string;
+  name: string | null;
+  state: string | null;
+  created_at: string | null;
+}
+
+/**
+ * Paginated full-state enumeration of substations for the sitemap. Only id /
+ * name / state / created_at. The sitemap applies the name+coords noindex gate.
+ */
+export async function allSubstationsForStateSitemap(
+  state: string
+): Promise<SitemapEntityRow[]> {
+  const PAGE = 1000;
+  const out: SitemapEntityRow[] = [];
+  for (let offset = 0; offset < 20000; offset += PAGE) {
+    const rows = await restGet<SitemapEntityRow>("grid_substations", {
+      params: {
+        select: "id,name,state,created_at",
+        state: `eq.${state}`,
+        // index gate mirror: only real-named subs get sitemap'd
+        name: "not.like.UNKNOWN*",
+        order: "id.asc",
+      },
+      headers: { Range: `${offset}-${offset + PAGE - 1}` },
+    });
+    if (!rows.length) break;
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
+/** All brownfield sites (id/name/state) for the sitemap — single shard (~2k). */
+export async function allBrownfieldsForSitemap(): Promise<SitemapEntityRow[]> {
+  const PAGE = 1000;
+  const out: SitemapEntityRow[] = [];
+  for (let offset = 0; offset < 5000; offset += PAGE) {
+    const rows = await restGet<SitemapEntityRow>("grid_brownfield_sites", {
+      params: {
+        select: "id,name,state,created_at",
+        name: "not.is.null",
+        state: "not.is.null",
+        order: "id.asc",
+      },
+      headers: { Range: `${offset}-${offset + PAGE - 1}` },
+    });
+    if (!rows.length) break;
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
+/** All IXP facilities (id/name/state) for the sitemap — single shard (~1.4k). */
+export async function allIxpsForSitemap(): Promise<SitemapEntityRow[]> {
+  const PAGE = 1000;
+  const out: SitemapEntityRow[] = [];
+  for (let offset = 0; offset < 5000; offset += PAGE) {
+    const rows = await restGet<SitemapEntityRow>("grid_ixp_facilities", {
+      params: {
+        select: "id,name,state,created_at",
+        name: "not.is.null",
+        order: "id.asc",
+      },
+      headers: { Range: `${offset}-${offset + PAGE - 1}` },
+    });
+    if (!rows.length) break;
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
+/** All datacenters (id/name/state) for the sitemap — single shard (~3.7k). */
+export async function allDatacentersForSitemap(): Promise<SitemapEntityRow[]> {
+  const PAGE = 1000;
+  const out: SitemapEntityRow[] = [];
+  for (let offset = 0; offset < 6000; offset += PAGE) {
+    const rows = await restGet<SitemapEntityRow>("grid_datacenters", {
+      params: {
+        select: "id,name,state,created_at",
+        name: "not.is.null",
+        state: "not.is.null",
+        order: "id.asc",
+      },
+      headers: { Range: `${offset}-${offset + PAGE - 1}` },
+    });
+    if (!rows.length) break;
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
+/** Distinct states present in a table (for hub-page state lists). Reads a
+ * bounded page and dedups client-side — fine for our row volumes. */
+export async function distinctStates(
+  table: string,
+  extraFilter?: Record<string, string>
+): Promise<string[]> {
+  const params: Record<string, string> = {
+    select: "state",
+    state: "not.is.null",
+    order: "state.asc",
+    ...(extraFilter ?? {}),
+  };
+  const rows = await restGet<{ state: string | null }>(table, {
+    params,
+    headers: { Range: "0-50000" },
+  });
+  return Array.from(new Set(rows.map((r) => r.state).filter((s): s is string => !!s)));
+}
+
+/**
  * Paginated full-state enumeration of sites for the sitemap (id/name/fips +
  * updated_at only). Skips nothing here; the sitemap applies the noindex gate.
  */

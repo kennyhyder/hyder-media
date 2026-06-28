@@ -11,6 +11,13 @@ const PUBLIC_LINKS = [
   { href: "/pricing", label: "Pricing", match: "/pricing" },
 ];
 
+const INFRA_LINKS = [
+  { href: "/substations", label: "Substations" },
+  { href: "/internet-exchanges", label: "Internet Exchanges" },
+  { href: "/datacenters", label: "Datacenters" },
+  { href: "/brownfield-sites", label: "Brownfield Sites" },
+];
+
 const TOOL_LINKS = [
   { href: "/dashboard", label: "Explore Dashboard" },
   { href: "/map", label: "Interactive Map" },
@@ -26,6 +33,7 @@ export default function NavBar() {
   const pathname = usePathname() || "/";
   const [menuOpen, setMenuOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [infraOpen, setInfraOpen] = useState(false);
 
   const isActive = (match: string) => pathname === match || pathname.startsWith(`${match}/`);
 
@@ -71,6 +79,30 @@ export default function NavBar() {
           ))}
           <div className="relative">
             <button
+              onClick={() => setInfraOpen((v) => !v)}
+              onBlur={() => setTimeout(() => setInfraOpen(false), 150)}
+              className="text-gray-600 hover:text-purple-600"
+              aria-haspopup="true"
+              aria-expanded={infraOpen}
+            >
+              Infrastructure ▾
+            </button>
+            {infraOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-52 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                {INFRA_LINKS.map((t) => (
+                  <a
+                    key={t.href}
+                    href={t.href}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                  >
+                    {t.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <button
               onClick={() => setToolsOpen((v) => !v)}
               onBlur={() => setTimeout(() => setToolsOpen(false), 150)}
               className="text-gray-600 hover:text-purple-600"
@@ -113,6 +145,19 @@ export default function NavBar() {
               {link.label}
             </a>
           ))}
+          <div className="mt-1 pt-2 border-t border-gray-100">
+            <p className="py-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Infrastructure</p>
+            {INFRA_LINKS.map((t) => (
+              <a
+                key={t.href}
+                href={t.href}
+                onClick={() => setMenuOpen(false)}
+                className="block py-1.5 text-gray-600 hover:text-purple-600"
+              >
+                {t.label}
+              </a>
+            ))}
+          </div>
           <div className="mt-1 pt-2 border-t border-gray-100">
             <p className="py-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Tools</p>
             {TOOL_LINKS.map((t) => (
