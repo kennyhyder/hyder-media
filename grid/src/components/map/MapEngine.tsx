@@ -8,6 +8,12 @@
 // and reports viewport stats + marker selection up to the React wrapper.
 
 import { useCallback, useEffect, useRef } from "react";
+// Leaflet + markercluster base stylesheets, npm-bundled into the page CSS by
+// Next (replaces the old body-level CDN <link> tags, which were invalid as
+// children of a <div> per W3C).
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { scoreColor, scoreGlow, TILES, readTheme } from "./theme";
 import { MapSite, MapDataResponse } from "./types";
 import { rollups } from "@/lib/rollups";

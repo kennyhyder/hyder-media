@@ -99,16 +99,8 @@ export default function ReadinessMap({
         isolation: "isolate",
       }}
     >
-      {/* Leaflet + markercluster stylesheets (CDN — matches app pattern) */}
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
-      />
-      <style>{CSS}</style>
-
+      {/* Leaflet base CSS is npm-bundled (see MapEngine import); the .leaflet-*
+          / .gcm-* overrides + keyframes live in globals.css. */}
       <MapEngine
         center={center}
         zoom={zoom}
@@ -242,36 +234,3 @@ export default function ReadinessMap({
     </div>
   );
 }
-
-const CSS = `
-.leaflet-container{background:var(--surface-2);font-family:var(--font-geist-sans),system-ui,sans-serif;}
-.leaflet-control-zoom a{
-  background:color-mix(in srgb, var(--surface) 85%, transparent)!important;color:var(--muted)!important;
-  border:1px solid var(--border)!important;backdrop-filter:blur(8px);
-}
-.leaflet-control-zoom a:hover{color:var(--accent)!important;border-color:color-mix(in srgb,var(--accent) 55%,transparent)!important;}
-.leaflet-control-attribution{
-  background:color-mix(in srgb, var(--surface) 65%, transparent)!important;color:var(--muted)!important;font-size:10px!important;
-  backdrop-filter:blur(6px);border-radius:6px 0 0 0;
-}
-.leaflet-control-attribution a{color:var(--accent)!important;}
-.leaflet-tooltip{
-  background:color-mix(in srgb, var(--surface) 94%, transparent)!important;color:var(--text)!important;
-  border:1px solid var(--border)!important;box-shadow:0 8px 24px -10px rgba(0,0,0,0.5)!important;
-  border-radius:8px!important;
-}
-.leaflet-tooltip:before{display:none!important;}
-.leaflet-popup-content-wrapper{
-  background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;
-  box-shadow:0 10px 30px -8px rgba(0,0,0,0.4);
-}
-.leaflet-popup-tip{background:var(--surface);}
-.gcm-site,.gcm-prime{transition:transform 120ms ease;cursor:pointer;}
-.gcm-site:hover,.gcm-prime:hover{transform:scale(1.45);}
-@keyframes gcm-pulse{0%{stroke-width:1;opacity:.95}50%{stroke-width:3.5;opacity:1}100%{stroke-width:1;opacity:.95}}
-.gcm-pulse{animation:gcm-pulse 2.2s ease-in-out infinite;}
-@keyframes gcm-boot{0%,100%{opacity:.5}50%{opacity:1}}
-.gcm-boot{animation:gcm-boot 1.4s ease-in-out infinite;}
-@keyframes gcm-live{0%,100%{opacity:1}50%{opacity:.45}}
-.gcm-live-dot{animation:gcm-live 1.6s ease-in-out infinite;}
-`;

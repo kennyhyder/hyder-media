@@ -66,15 +66,8 @@ export default function RegionMap({ sites, height = 420, label }: RegionMapProps
         isolation: "isolate",
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
-      />
-      <style>{REGION_CSS}</style>
-
+      {/* Leaflet base CSS is npm-bundled (see MapEngine import); the .leaflet-*
+          / .gcm-* overrides + keyframes live in globals.css. */}
       <MapEngine
         center={[plottable[0].latitude as number, plottable[0].longitude as number]}
         zoom={6}
@@ -138,22 +131,3 @@ export default function RegionMap({ sites, height = 420, label }: RegionMapProps
     </div>
   );
 }
-
-const REGION_CSS = `
-.leaflet-container{background:var(--surface-2);font-family:var(--font-geist-sans),system-ui,sans-serif;}
-.leaflet-control-zoom a{
-  background:color-mix(in srgb, var(--surface) 85%, transparent)!important;color:var(--muted)!important;
-  border:1px solid var(--border)!important;
-}
-.leaflet-control-zoom a:hover{color:var(--accent)!important;}
-.leaflet-control-attribution{
-  background:color-mix(in srgb, var(--surface) 65%, transparent)!important;color:var(--muted)!important;font-size:10px!important;
-}
-.leaflet-control-attribution a{color:var(--accent)!important;}
-.gcm-site,.gcm-prime{transition:transform 120ms ease;cursor:pointer;}
-.gcm-site:hover,.gcm-prime:hover{transform:scale(1.4);}
-@keyframes gcm-pulse{0%{stroke-width:1;opacity:.95}50%{stroke-width:3.5;opacity:1}100%{stroke-width:1;opacity:.95}}
-.gcm-pulse{animation:gcm-pulse 2.2s ease-in-out infinite;}
-@keyframes gcm-boot{0%,100%{opacity:.5}50%{opacity:1}}
-.gcm-boot{animation:gcm-boot 1.4s ease-in-out infinite;}
-`;
