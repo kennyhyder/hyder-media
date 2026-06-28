@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { SITE_TYPES, siteTypeBySlug, stateBySlug } from "@/lib/geo";
 import { stateAgg } from "@/lib/rollups";
 import { topSites } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import { fmtInt, fmtScore } from "@/lib/format";
 import StatBand from "@/components/StatBand";
 import SitesTable from "@/components/SitesTable";
@@ -148,6 +149,7 @@ export default async function TypeStatePage({
             sites={sites}
             showFormerUse={r.t.key === "brownfield"}
             caption={`Top ${r.t.label} sites in ${r.st.name}`}
+            linkBuilder={siteProfilePath}
           />
         </div>
       </section>

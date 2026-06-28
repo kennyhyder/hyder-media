@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { SITE_TYPES, siteTypeBySlug, stateByCode, stateName } from "@/lib/geo";
 import { siteTypeAgg } from "@/lib/rollups";
 import { topSites } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import { fmtInt, fmtScore, fmtMw, fmtYears } from "@/lib/format";
 import StatBand from "@/components/StatBand";
 import SubScoreProfile from "@/components/SubScoreProfile";
@@ -144,6 +145,7 @@ export default async function SiteTypePage({
             showState
             showFormerUse={isBrownfield}
             caption={`Top ${t.label} datacenter sites`}
+            linkBuilder={siteProfilePath}
           />
         </div>
       </section>

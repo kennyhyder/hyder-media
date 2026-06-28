@@ -10,12 +10,16 @@ export default function SitesTable({
   showCounty = true,
   showFormerUse = false,
   caption,
+  linkBuilder,
 }: {
   sites: DcSite[];
   showState?: boolean;
   showCounty?: boolean;
   showFormerUse?: boolean;
   caption?: string;
+  // When provided, the site-name cell links to the row's profile page.
+  // Returning null leaves that row as plain text (e.g. noindex sites).
+  linkBuilder?: (site: DcSite) => string | null;
 }) {
   if (!sites.length) {
     return (
@@ -43,10 +47,18 @@ export default function SitesTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {sites.map((s) => (
+          {sites.map((s) => {
+            const href = linkBuilder ? linkBuilder(s) : null;
+            return (
             <tr key={s.id} className="hover:bg-gray-50">
               <td className="px-3 py-2 font-medium text-gray-900">
-                {s.name || "Unnamed site"}
+                {href ? (
+                  <a href={href} className="text-purple-700 hover:underline">
+                    {s.name || "Unnamed site"}
+                  </a>
+                ) : (
+                  s.name || "Unnamed site"
+                )}
               </td>
               <td className="px-3 py-2 text-gray-600">
                 {siteTypeLabel(s.site_type || "")}
@@ -71,7 +83,8 @@ export default function SitesTable({
                 </span>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>

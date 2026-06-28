@@ -24,3 +24,4 @@ specs/
 # Demo screen recordings + screenshots (large, not part of the app)
 *.mov
 docs/
+.vercel

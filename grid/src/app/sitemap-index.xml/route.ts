@@ -12,8 +12,10 @@ import { freshnessDate } from "@/lib/rollups";
 export const revalidate = 86400;
 
 export async function GET() {
-  // Shard 0 = core hubs; shards 1..N = one per state (county pages).
-  const shardCount = 1 + STATES.length;
+  // Shard 0 = core hubs; shards 1..N = per-state county pages; shards N+1..2N =
+  // per-state individual site-profile URLs. Must stay in sync with
+  // generateSitemaps() in src/app/sitemap.ts.
+  const shardCount = 1 + STATES.length * 2;
   const lastmod = freshnessDate().toISOString();
 
   const entries = Array.from({ length: shardCount }, (_, i) =>

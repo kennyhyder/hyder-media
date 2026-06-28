@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { STATES, stateBySlug, countySlug, siteTypeLabel, SITE_TYPES } from "@/lib/geo";
 import { findCountyBySlug, indexableCounties, type CountyRollup } from "@/lib/rollups";
 import { topSites, countyDetail, type CountyDetail } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import {
   fmtInt,
   fmtScore,
@@ -228,6 +229,7 @@ export default async function CountyPage({
             sites={sites}
             showCounty={false}
             caption={`Top datacenter sites in ${r.county.countyName}`}
+            linkBuilder={siteProfilePath}
           />
         </div>
       </section>

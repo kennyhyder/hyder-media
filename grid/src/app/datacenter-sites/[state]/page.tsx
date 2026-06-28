@@ -4,6 +4,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { STATES, stateBySlug, countySlug, siteTypeLabel, SITE_TYPES, ISO_REGIONS, isoLabel } from "@/lib/geo";
 import { stateAgg, countiesForState } from "@/lib/rollups";
 import { topSites } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import { fmtInt, fmtScore, fmtMw, fmtYears } from "@/lib/format";
 import StatBand from "@/components/StatBand";
 import SubScoreProfile from "@/components/SubScoreProfile";
@@ -170,7 +171,7 @@ export default async function StatePage({
         </h2>
         <p className="mt-1 text-sm text-gray-600">Ranked by DC Readiness.</p>
         <div className="mt-3">
-          <SitesTable sites={sites} caption={`Top datacenter sites in ${st.name}`} />
+          <SitesTable sites={sites} caption={`Top datacenter sites in ${st.name}`} linkBuilder={siteProfilePath} />
         </div>
       </section>
 

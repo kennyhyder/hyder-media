@@ -7,6 +7,8 @@
 
 import "server-only";
 
+import { uuidRangeFromShortId } from "@/lib/entity-slug";
+
 const SUPABASE_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 
@@ -19,7 +21,9 @@ function authHeaders(extra?: Record<string, string>): HeadersInit {
 }
 
 export interface RestGetOptions {
-  params?: Record<string, string | number | undefined>;
+  // Array values emit repeated query params for the same column — required for
+  // range filters like id=gte.X & id=lte.Y on a single PostgREST column.
+  params?: Record<string, string | number | (string | number)[] | undefined>;
   headers?: Record<string, string>;
   // Next fetch revalidation (seconds). Defaults to 1 day.
   revalidate?: number;
@@ -30,7 +34,11 @@ function buildUrl(path: string, params?: RestGetOptions["params"]): string {
   if (params) {
     for (const [k, v] of Object.entries(params)) {
       if (v === undefined) continue;
-      url.searchParams.set(k, String(v));
+      if (Array.isArray(v)) {
+        for (const item of v) url.searchParams.append(k, String(item));
+      } else {
+        url.searchParams.set(k, String(v));
+      }
     }
   }
   return url.toString();
@@ -225,4 +233,203 @@ export async function countyDetail(
     params: { select: COUNTY_COLS, fips_code: `eq.${fips}`, limit: 1 },
   });
   return rows[0] ?? null;
+}
+
+/** Alias matching the requested entity-infra naming. */
+export async function getCountyByFips(fips: string): Promise<CountyDetail | null> {
+  return countyDetail(fips);
+}
+
+// ── Per-site profile (full row) ──────────────────────────────────────────────
+
+/**
+ * A site row with the rich column set used by the per-entity profile page.
+ * (All nullable — the profile renders defensively, omitting absent fields.)
+ */
+export interface FullDcSite {
+  id: string;
+  name: string | null;
+  site_type: string | null;
+  state: string | null;
+  county: string | null;
+  fips_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  dc_score: number | null;
+  // power & interconnection
+  substation_voltage_kv: number | null;
+  available_capacity_mw: number | null;
+  nearest_substation_name: string | null;
+  nearest_substation_distance_km: number | null;
+  lmp_zone: string | null;
+  lmp_wholesale_mwh: number | null;
+  iso_lmp_node: string | null;
+  iso_lmp_avg: number | null;
+  utility_name: string | null;
+  utility_rate_commercial: number | null;
+  energy_price_mwh: number | null;
+  // speed-to-power
+  iso_region: string | null;
+  queue_depth: number | null;
+  avg_queue_wait_years: number | null;
+  recent_queue_wait_years: number | null;
+  queue_completion_rate: number | null;
+  queue_withdrawal_rate: number | null;
+  // connectivity
+  nearest_ixp_name: string | null;
+  nearest_ixp_distance_km: number | null;
+  fcc_fiber_providers: number | null;
+  fcc_fiber_pct: number | null;
+  fcc_max_down_mbps: number | null;
+  nearest_cloud_provider: string | null;
+  nearest_cloud_region: string | null;
+  nearest_cloud_region_km: number | null;
+  nearest_cloud_distance_km: number | null;
+  // site characteristics
+  acreage: number | null;
+  parcel_owner: string | null;
+  parcel_apn: string | null;
+  land_owner_type: string | null;
+  land_manager: string | null;
+  buildability_score: number | null;
+  nlcd_class: string | null;
+  in_industrial_zone: boolean | null;
+  former_use: string | null;
+  existing_capacity_mw: number | null;
+  cleanup_status: string | null;
+  retirement_date: string | null;
+  // risk & environment
+  flood_zone: string | null;
+  flood_zone_sfha: boolean | null;
+  wri_water_stress: number | null;
+  wri_basin_name: string | null;
+  wetland_present: boolean | null;
+  wetland_type: string | null;
+  critical_habitat: boolean | null;
+  critical_habitat_species: string | null;
+  superfund_nearby: boolean | null;
+  superfund_site_name: string | null;
+  env_superfund_count: number | null;
+  construction_cost_index: number | null;
+  // location context / nearest-of
+  nearest_dc_name: string | null;
+  nearest_dc_distance_km: number | null;
+  nearest_rail_km: number | null;
+  nearest_gas_pipeline_km: number | null;
+  nearest_fiber_km: number | null;
+  // 13 sub-scores
+  score_power: number | null;
+  score_speed_to_power: number | null;
+  score_fiber: number | null;
+  score_water: number | null;
+  score_hazard: number | null;
+  score_labor: number | null;
+  score_land: number | null;
+  score_tax: number | null;
+  score_climate: number | null;
+  score_energy_cost: number | null;
+  score_gas_pipeline: number | null;
+  score_buildability: number | null;
+  score_construction_cost: number | null;
+  score_existing_dc: number | null;
+  updated_at: string | null;
+}
+
+const FULL_SITE_COLS = [
+  "id", "name", "site_type", "state", "county", "fips_code", "latitude", "longitude", "dc_score",
+  "substation_voltage_kv", "available_capacity_mw", "nearest_substation_name",
+  "nearest_substation_distance_km", "lmp_zone", "lmp_wholesale_mwh", "iso_lmp_node", "iso_lmp_avg",
+  "utility_name", "utility_rate_commercial", "energy_price_mwh",
+  "iso_region", "queue_depth", "avg_queue_wait_years", "recent_queue_wait_years",
+  "queue_completion_rate", "queue_withdrawal_rate",
+  "nearest_ixp_name", "nearest_ixp_distance_km", "fcc_fiber_providers", "fcc_fiber_pct",
+  "fcc_max_down_mbps", "nearest_cloud_provider", "nearest_cloud_region", "nearest_cloud_region_km",
+  "nearest_cloud_distance_km",
+  "acreage", "parcel_owner", "parcel_apn", "land_owner_type", "land_manager", "buildability_score",
+  "nlcd_class", "in_industrial_zone", "former_use", "existing_capacity_mw", "cleanup_status",
+  "retirement_date",
+  "flood_zone", "flood_zone_sfha", "wri_water_stress", "wri_basin_name", "wetland_present",
+  "wetland_type", "critical_habitat", "critical_habitat_species", "superfund_nearby",
+  "superfund_site_name", "env_superfund_count", "construction_cost_index",
+  "nearest_dc_name", "nearest_dc_distance_km", "nearest_rail_km", "nearest_gas_pipeline_km",
+  "nearest_fiber_km",
+  "score_power", "score_speed_to_power", "score_fiber", "score_water", "score_hazard", "score_labor",
+  "score_land", "score_tax", "score_climate", "score_energy_cost", "score_gas_pipeline",
+  "score_buildability", "score_construction_cost", "score_existing_dc",
+  "updated_at",
+].join(",");
+
+/**
+ * Resolve a single site by state code + the 8-char short id from its slug.
+ * Uses the uuid-range trick (PK-indexed) since the id column is a real uuid.
+ * `fipsOrCounty` is accepted for signature stability but not required for the
+ * lookup (state + short id is already unique in practice); when provided we use
+ * it only as a soft validation hint at the call site.
+ */
+export async function getSiteByShortId(
+  state: string,
+  _fipsOrCounty: string | undefined,
+  shortId: string
+): Promise<FullDcSite | null> {
+  if (!/^[0-9a-f]{8}$/i.test(shortId)) return null;
+  const { lo, hi } = uuidRangeFromShortId(shortId);
+  const rows = await restGet<FullDcSite>("grid_dc_sites", {
+    params: {
+      select: FULL_SITE_COLS,
+      state: `eq.${state}`,
+      id: [`gte.${lo}`, `lte.${hi}`],
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
+}
+
+/**
+ * Nearby comparable sites: same county (fips) when available, else a ±0.5°
+ * lat/long bounding box. Ordered by dc_score desc, excludes self.
+ */
+export async function nearbySites(site: FullDcSite, n = 8): Promise<DcSite[]> {
+  const params2: Record<string, string | number | (string | number)[]> = {
+    select: TOP_SITE_COLS,
+    order: "dc_score.desc.nullslast",
+    id: `neq.${site.id}`,
+    limit: n,
+  };
+  if (site.fips_code) {
+    params2.fips_code = `eq.${site.fips_code}`;
+  } else if (site.latitude != null && site.longitude != null) {
+    params2.latitude = [`gte.${site.latitude - 0.5}`, `lte.${site.latitude + 0.5}`];
+    params2.longitude = [`gte.${site.longitude - 0.5}`, `lte.${site.longitude + 0.5}`];
+  } else {
+    return [];
+  }
+  return restGet<DcSite>("grid_dc_sites", { params: params2 });
+}
+
+/**
+ * Paginated full-state enumeration of sites for the sitemap (id/name/fips +
+ * updated_at only). Skips nothing here; the sitemap applies the noindex gate.
+ */
+export async function allSitesForStateSitemap(
+  state: string
+): Promise<Array<{ id: string; name: string | null; fips_code: string | null; dc_score: number | null; updated_at: string | null }>> {
+  const PAGE = 1000;
+  const out: Array<{ id: string; name: string | null; fips_code: string | null; dc_score: number | null; updated_at: string | null }> = [];
+  for (let offset = 0; offset < 60000; offset += PAGE) {
+    const rows = await restGet<{ id: string; name: string | null; fips_code: string | null; dc_score: number | null; updated_at: string | null }>(
+      "grid_dc_sites",
+      {
+        params: {
+          select: "id,name,fips_code,dc_score,updated_at",
+          state: `eq.${state}`,
+          order: "id.asc",
+        },
+        headers: { Range: `${offset}-${offset + PAGE - 1}` },
+      }
+    );
+    if (!rows.length) break;
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
 }

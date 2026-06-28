@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { ISO_REGIONS, isoBySlug, siteTypeLabel, SITE_TYPES, stateByCode, stateName } from "@/lib/geo";
 import { isoAgg } from "@/lib/rollups";
 import { topSites } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import { fmtInt, fmtScore, fmtMw, fmtYears } from "@/lib/format";
 import StatBand from "@/components/StatBand";
 import SubScoreProfile from "@/components/SubScoreProfile";
@@ -147,7 +148,7 @@ export default async function IsoRegionPage({
           Top 25 datacenter sites in {iso.label}
         </h2>
         <div className="mt-3">
-          <SitesTable sites={sites} showState caption={`Top datacenter sites in ${iso.label}`} />
+          <SitesTable sites={sites} showState caption={`Top datacenter sites in ${iso.label}`} linkBuilder={siteProfilePath} />
         </div>
       </section>
 

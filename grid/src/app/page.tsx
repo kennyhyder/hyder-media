@@ -4,6 +4,7 @@ import { national } from "@/lib/rollups";
 import { STATES, SITE_TYPES, ISO_REGIONS } from "@/lib/geo";
 import { METRICS } from "@/lib/rankings";
 import { topSites } from "@/lib/db";
+import { siteProfilePath } from "@/lib/entity-slug";
 import { fmtInt, fmtScore, fmtMw, fmtYears } from "@/lib/format";
 import StatBand from "@/components/StatBand";
 import SitesTable from "@/components/SitesTable";
@@ -191,7 +192,7 @@ export default async function HomePage() {
           sites.
         </p>
         <div className="mt-3">
-          <SitesTable sites={top} showState showCounty caption="Top scored US datacenter sites" />
+          <SitesTable sites={top} showState showCounty caption="Top scored US datacenter sites" linkBuilder={siteProfilePath} />
         </div>
       </section>
 

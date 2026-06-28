@@ -1,16 +1,25 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { STATES, SITE_TYPES, ISO_REGIONS, countySlug } from "@/lib/geo";
-import { countiesForState, freshnessDate } from "@/lib/rollups";
+import { countiesForState, freshnessDate, countyRollup } from "@/lib/rollups";
 import { METRIC_KEYS } from "@/lib/rankings";
+import { allSitesForStateSitemap } from "@/lib/db";
+import { siteSlug } from "@/lib/entity-slug";
 
 const LAST = freshnessDate();
+const N = STATES.length;
 
-// Shard 0 = static hubs + states + iso + types + rankings.
-// Shards 1..N = one per state, that state's county pages.
+// Shard layout:
+//   0            = static hubs + states + iso + types + rankings
+//   1..N         = one per state — that state's county pages
+//   N+1..2N      = one per state — that state's individual site profile URLs
+//                  (≤ ~10k entries per state, under the 50k cap)
 export async function generateSitemaps() {
-  // 0 = core, then one shard per state for counties.
-  return [{ id: 0 }, ...STATES.map((_, i) => ({ id: i + 1 }))];
+  return [
+    { id: 0 },
+    ...STATES.map((_, i) => ({ id: i + 1 })),
+    ...STATES.map((_, i) => ({ id: N + i + 1 })),
+  ];
 }
 
 function entry(
@@ -65,17 +74,39 @@ export default async function sitemap({
     return out;
   }
 
-  // County shard for STATES[id-1]
-  const state = STATES[id - 1];
+  // County shards: id in 1..N → STATES[id-1]
+  if (id >= 1 && id <= N) {
+    const state = STATES[id - 1];
+    if (!state) return [];
+    const counties = countiesForState(state.code).filter(
+      (c) => c.count >= 5 && !!c.countyName
+    );
+    return counties.map((c) =>
+      entry(
+        `/datacenter-sites/${state.slug}/${countySlug(c.countyName)}`,
+        "weekly",
+        0.6
+      )
+    );
+  }
+
+  // Site shards: id in N+1..2N → STATES[id-N-1], all that state's site profiles.
+  const state = STATES[id - N - 1];
   if (!state) return [];
-  const counties = countiesForState(state.code).filter(
-    (c) => c.count >= 5 && !!c.countyName
-  );
-  return counties.map((c) =>
-    entry(
-      `/datacenter-sites/${state.slug}/${countySlug(c.countyName)}`,
-      "weekly",
-      0.6
-    )
-  );
+  const rows = await allSitesForStateSitemap(state.code);
+  const out: MetadataRoute.Sitemap = [];
+  for (const row of rows) {
+    // Mirror the page-level noindex gate: skip rows missing score or fips.
+    if (row.dc_score == null || !row.fips_code) continue;
+    const countyName = countyRollup(row.fips_code)?.countyName;
+    if (!countyName) continue;
+    const path = `/datacenter-sites/${state.slug}/${countySlug(countyName)}/${siteSlug(row)}`;
+    out.push({
+      url: `${SITE_URL}${path}`,
+      lastModified: row.updated_at ? new Date(row.updated_at) : LAST,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    });
+  }
+  return out;
 }
