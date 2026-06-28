@@ -18,6 +18,8 @@ import SitesTable from "@/components/SitesTable";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
+import RegionMap from "@/components/map/RegionMap";
+import type { MapSite } from "@/components/map/types";
 import {
   breadcrumbSchema,
   datasetSchema,
@@ -98,6 +100,20 @@ export default async function CountyPage({
   }));
 
   const d: CountyDetail | null = detail;
+
+  // Map points (top scored sites in the county) — client island, SSR untouched.
+  const mapSites: MapSite[] = sites
+    .filter((s) => s.latitude != null && s.longitude != null)
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      site_type: s.site_type,
+      state: s.state,
+      county: s.county,
+      latitude: s.latitude,
+      longitude: s.longitude,
+      dc_score: s.dc_score,
+    }));
 
   const faq = [
     {
@@ -182,6 +198,19 @@ export default async function CountyPage({
           ]}
         />
       </section>
+
+      {mapSites.length > 0 && (
+        <section
+          className="mt-8"
+          aria-label={`Map of top datacenter sites in ${r.county.countyName}`}
+        >
+          <RegionMap
+            sites={mapSites}
+            height={400}
+            label={`Top ${mapSites.length} in ${r.county.countyName}`}
+          />
+        </section>
+      )}
 
       {/* County context grid (live grid_county_data) */}
       {d && (

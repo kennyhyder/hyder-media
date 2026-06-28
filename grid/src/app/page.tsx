@@ -11,6 +11,7 @@ import SitesTable from "@/components/SitesTable";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
+import ReadinessMap from "@/components/map/ReadinessMap";
 import {
   webApplicationSchema,
   datasetSchema,
@@ -102,6 +103,47 @@ export default async function HomePage() {
             See the rankings
           </a>
         </div>
+      </section>
+
+      {/* Map-first hero — explorable readiness atlas. Pure client island
+          (Leaflet loads via dynamic ssr:false inside ReadinessMap); the SSR
+          content above + below is untouched and remains the SEO substance. */}
+      <section className="mt-8" aria-label="Interactive datacenter readiness map">
+        <ReadinessMap
+          height="70vh"
+          showChoropleth
+          showPoints
+          overlay={
+            <div
+              className="rounded-2xl px-5 py-4"
+              style={{
+                background: "color-mix(in srgb, var(--surface) 80%, transparent)",
+                border: "1px solid var(--border)",
+                backdropFilter: "blur(12px) saturate(140%)",
+                WebkitBackdropFilter: "blur(12px) saturate(140%)",
+                pointerEvents: "auto",
+              }}
+            >
+              <p
+                className="text-xs font-semibold uppercase tracking-wide"
+                style={{ color: "var(--accent)" }}
+              >
+                The readiness atlas
+              </p>
+              <p className="mt-1 max-w-sm text-sm" style={{ color: "var(--text)" }}>
+                Explore every state by average DC Readiness, then zoom in to{" "}
+                {fmtInt(national.count)} scored candidate sites. Click any site
+                for its full profile.
+              </p>
+              <a
+                href="/explore"
+                className="accent-fill mt-3 inline-block rounded-lg px-4 py-2 text-sm font-semibold"
+              >
+                Open full-screen explorer →
+              </a>
+            </div>
+          }
+        />
       </section>
 
       {/* National stat band */}

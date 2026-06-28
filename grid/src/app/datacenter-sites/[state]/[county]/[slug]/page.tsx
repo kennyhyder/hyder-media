@@ -34,6 +34,8 @@ import SitesTable from "@/components/SitesTable";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
+import SiteMiniMap from "@/components/map/SiteMiniMap";
+import type { MapSite } from "@/components/map/types";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 
@@ -265,6 +267,22 @@ export default async function SiteProfilePage({
       : "Unscored";
 
   const nearbyLink = (s: DcSite) => siteProfilePath(s);
+
+  // Map data (theme-aware client island; page text stays server-rendered).
+  const toMapSite = (s: FullDcSite | DcSite): MapSite => ({
+    id: s.id,
+    name: s.name,
+    site_type: s.site_type,
+    state: s.state,
+    county: s.county,
+    latitude: s.latitude,
+    longitude: s.longitude,
+    dc_score: s.dc_score,
+  });
+  const mapSite = toMapSite(site);
+  const mapNearby = nearby
+    .filter((s) => s.latitude != null && s.longitude != null)
+    .map(toMapSite);
 
   // JSON-LD: Place (with geo) + Dataset + BreadcrumbList.
   const placeLd: Record<string, unknown> = {
@@ -597,6 +615,14 @@ export default async function SiteProfilePage({
         <p className="mt-4 rounded-lg border border-purple-100 bg-purple-50 p-3 text-sm text-gray-700">
           <strong>Incentive detail:</strong> {d.dc_incentive_details}
         </p>
+      )}
+
+      {/* Location map — client island; profile data above stays server-rendered */}
+      {site.latitude != null && site.longitude != null && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-bold text-gray-900">Site location</h2>
+          <SiteMiniMap site={mapSite} nearby={mapNearby} height={380} />
+        </section>
       )}
 
       {/* Full sub-score breakdown */}

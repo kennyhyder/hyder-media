@@ -13,6 +13,8 @@ import SitesTable from "@/components/SitesTable";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
+import RegionMap from "@/components/map/RegionMap";
+import type { MapSite } from "@/components/map/types";
 import {
   breadcrumbSchema,
   datasetSchema,
@@ -74,6 +76,20 @@ export default async function StatePage({
 
   const topType = typeRows.slice().sort((a, b) => b.count - a.count)[0];
   const topIso = isoRows.slice().sort((a, b) => b.count - a.count)[0];
+
+  // Map points (top scored sites in the state) — client island, SSR untouched.
+  const mapSites: MapSite[] = sites
+    .filter((s) => s.latitude != null && s.longitude != null)
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      site_type: s.site_type,
+      state: s.state,
+      county: s.county,
+      latitude: s.latitude,
+      longitude: s.longitude,
+      dc_score: s.dc_score,
+    }));
 
   const faq = [
     {
@@ -142,6 +158,16 @@ export default async function StatePage({
           ]}
         />
       </section>
+
+      {mapSites.length > 0 && (
+        <section className="mt-8" aria-label={`Map of top datacenter sites in ${st.name}`}>
+          <RegionMap
+            sites={mapSites}
+            height={420}
+            label={`Top ${mapSites.length} in ${st.name}`}
+          />
+        </section>
+      )}
 
       <section className="mt-8 grid gap-8 lg:grid-cols-2">
         <div className="rounded-xl border border-gray-200 bg-white p-5">
