@@ -15,6 +15,7 @@ import {
   siteProfilePath,
   ixpProfilePath,
   datacenterProfilePath,
+  companyProfilePathFromOperator,
 } from "@/lib/entity-slug";
 import { fmtInt, fmtMwExact } from "@/lib/format";
 import SitesTable from "@/components/SitesTable";
@@ -86,6 +87,7 @@ export default async function DatacenterProfilePage({
   const profilePath = `/datacenters/${slug}`;
   const st = d.state ? stateByCode(d.state) : undefined;
   const nearbyLink = (s: DcSite) => siteProfilePath(s);
+  const companyPath = companyProfilePathFromOperator(d.operator);
 
   const placeLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -179,7 +181,20 @@ export default async function DatacenterProfilePage({
 
       <section className="mt-8 grid gap-5 lg:grid-cols-2">
         <Card title="Facility">
-          <Row label="Operator" value={d.operator} />
+          <Row
+            label="Operator"
+            value={
+              d.operator ? (
+                companyPath ? (
+                  <a href={companyPath} className="text-purple-700 hover:underline">
+                    {d.operator}
+                  </a>
+                ) : (
+                  d.operator
+                )
+              ) : null
+            }
+          />
           <Row label="Type" value={d.dc_type} />
           <Row label="Capacity" value={d.capacity_mw != null ? fmtMwExact(d.capacity_mw) : null} />
           <Row label="Footprint" value={d.sqft != null ? `${fmtInt(d.sqft)} sq ft` : null} />

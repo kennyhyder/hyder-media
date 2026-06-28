@@ -17,6 +17,7 @@ import {
   ixpSlug,
   datacenterSlug,
 } from "@/lib/entity-slug";
+import { getCompanies } from "@/lib/companies";
 
 const LAST = freshnessDate();
 const N = STATES.length;
@@ -29,9 +30,11 @@ const N = STATES.length;
 //   3N+1         = all brownfield-site profile URLs (~2k)
 //   3N+2         = all internet-exchange profile URLs (~1.4k)
 //   3N+3         = all datacenter profile URLs (~3.7k)
+//   3N+4         = all operating-company profile URLs (few hundred)
 const BROWNFIELD_SHARD = 3 * N + 1;
 const IXP_SHARD = 3 * N + 2;
 const DATACENTER_SHARD = 3 * N + 3;
+const COMPANY_SHARD = 3 * N + 4;
 
 export async function generateSitemaps() {
   return [
@@ -42,6 +45,7 @@ export async function generateSitemaps() {
     { id: BROWNFIELD_SHARD },
     { id: IXP_SHARD },
     { id: DATACENTER_SHARD },
+    { id: COMPANY_SHARD },
   ];
 }
 
@@ -78,6 +82,7 @@ export default async function sitemap({
     out.push(entry("/substations", "weekly", 0.8));
     out.push(entry("/internet-exchanges", "weekly", 0.8));
     out.push(entry("/datacenters", "weekly", 0.8));
+    out.push(entry("/companies", "weekly", 0.8));
     out.push(entry("/brownfield-sites", "weekly", 0.8));
     out.push(entry("/methodology", "monthly", 0.5));
     out.push(entry("/pricing", "monthly", 0.5));
@@ -196,6 +201,19 @@ export default async function sitemap({
         lastModified: row.created_at ? new Date(row.created_at) : LAST,
         changeFrequency: "monthly" as const,
         priority: 0.5,
+      }));
+  }
+
+  // Company shard (single). Skip noindex (empty/unnamed) companies.
+  if (id === COMPANY_SHARD) {
+    const companies = await getCompanies();
+    return companies
+      .filter((c) => c.name && c.facilityCount >= 1)
+      .map((c) => ({
+        url: `${SITE_URL}/companies/${c.slug}`,
+        lastModified: LAST,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
       }));
   }
 

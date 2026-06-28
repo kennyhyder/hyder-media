@@ -13,6 +13,7 @@
 
 import { slugify, stateByCode, countySlug } from "@/lib/geo";
 import { countyRollup } from "@/lib/rollups";
+import { normalizeCompanyName, companySlug } from "@/lib/company-normalize";
 
 export const SHORT_ID_LEN = 8;
 
@@ -88,6 +89,18 @@ export function ixpProfilePath(row: { id: string; name?: string | null }): strin
 /** `/datacenters/{slug}` — flat (no state segment). */
 export function datacenterProfilePath(row: { id: string; name?: string | null }): string {
   return `/datacenters/${datacenterSlug(row)}`;
+}
+
+/**
+ * `/companies/{slug}` for an operating company, given a RAW operator string.
+ * Normalizes the operator the same way the companies lib does so the link
+ * always resolves to the canonical company page. Returns null for empty input.
+ */
+export function companyProfilePathFromOperator(operator: string | null | undefined): string | null {
+  if (!operator) return null;
+  const name = normalizeCompanyName(operator);
+  if (!name) return null;
+  return `/companies/${companySlug(name)}`;
 }
 
 /**

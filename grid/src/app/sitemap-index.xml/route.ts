@@ -14,9 +14,10 @@ export const revalidate = 86400;
 export async function GET() {
   // Shard 0 = core hubs; shards 1..N = per-state county pages; shards N+1..2N =
   // per-state site-profile URLs; shards 2N+1..3N = per-state substation-profile
-  // URLs; then 3 single shards for brownfields, internet-exchanges, datacenters.
+  // URLs; then 4 single shards for brownfields, internet-exchanges, datacenters,
+  // and operating companies.
   // Must stay in sync with generateSitemaps() in src/app/sitemap.ts.
-  const shardCount = 1 + STATES.length * 3 + 3;
+  const shardCount = 1 + STATES.length * 3 + 4;
   const lastmod = freshnessDate().toISOString();
 
   const entries = Array.from({ length: shardCount }, (_, i) =>
