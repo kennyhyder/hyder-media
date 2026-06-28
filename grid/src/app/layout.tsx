@@ -59,6 +59,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1000] focus:rounded focus:px-4 focus:py-2"
+          style={{ background: "var(--accent)", color: "var(--tw-on-accent, #fff)" }}
+        >
+          Skip to content
+        </a>
         {/* Google Analytics 4 — site-wide (every page inherits the root layout) */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
@@ -79,7 +86,7 @@ gtag('config', '${GA_ID}');`}
         {/* Main content area. Offset by the 248px sidebar on lg+, full width
             below. Pages manage their own readable max-width (long-form text
             wraps; tables/maps/grids go full-bleed). */}
-        <main className="min-h-screen lg:pl-[248px]">
+        <main id="main" className="min-h-screen lg:pl-[248px]">
           <div className="px-4 py-6 sm:px-6 lg:px-8">
             <ErrorBoundary>{children}</ErrorBoundary>
           </div>
