@@ -17,6 +17,7 @@ import {
   type NavLink,
 } from "./nav-data";
 import ThemeToggle from "./ThemeToggle";
+import AccountNavLink from "./account/AccountNavLink";
 
 function Icon({ d }: { d: string }) {
   return (
@@ -106,6 +107,7 @@ export default function NavContent({ onNavigate }: { onNavigate?: () => void }) 
       <div className="mt-3 border-t px-2 pt-3" style={{ borderColor: "var(--border)" }}>
         <div className="flex flex-col gap-0.5">
           {FOOTER_LINKS.map(linkRow)}
+          <AccountNavLink onNavigate={onNavigate} />
         </div>
         <div className="mt-1">
           <ThemeToggle />
