@@ -33,10 +33,10 @@ export default function Breakdown({
                 r.label
               )}
             </span>
-            <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-2 flex-1 overflow-hidden rounded-full" style={{ background: "var(--surface-2)" }}>
               <div
-                className="h-full rounded-full bg-purple-400"
-                style={{ width: `${Math.max(2, (r.count / max) * 100)}%` }}
+                className="h-full rounded-full"
+                style={{ width: `${Math.max(2, (r.count / max) * 100)}%`, background: "var(--accent)" }}
               />
             </div>
             <span className="w-16 shrink-0 text-right text-sm tabular-nums text-gray-600">

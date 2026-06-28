@@ -8,7 +8,14 @@ export default function UpgradeCTA({
   context?: string;
 }) {
   return (
-    <section className="mt-12 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-6 md:p-8">
+    <section
+      className="mt-12 rounded-xl border p-6 md:p-8"
+      style={{
+        borderColor: "color-mix(in srgb, var(--accent) 35%, var(--border))",
+        background:
+          "linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--surface)) 0%, var(--surface) 60%)",
+      }}
+    >
       <h2 className="text-xl font-bold text-gray-900">
         Go deeper than the public screen
       </h2>
@@ -22,7 +29,7 @@ export default function UpgradeCTA({
       <div className="mt-5 flex flex-wrap gap-3">
         <a
           href="/pricing"
-          className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700"
+          className="accent-fill rounded-lg px-5 py-2.5 text-sm font-semibold"
         >
           See plans &amp; API access
         </a>
@@ -30,7 +37,8 @@ export default function UpgradeCTA({
           href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
             "GridCensus — dataset / API inquiry"
           )}`}
-          className="rounded-lg border border-purple-300 bg-white px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+          className="rounded-lg border px-5 py-2.5 text-sm font-semibold"
+          style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent)", background: "var(--surface)" }}
         >
           Talk to us
         </a>

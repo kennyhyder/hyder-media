@@ -17,7 +17,7 @@ export function Row({ label, value }: { label: string; value: ReactNode }) {
 
 export function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5">
+    <div className="surface-card rounded-xl p-5">
       <h2 className="mb-3 text-lg font-bold text-gray-900">{title}</h2>
       {children}
     </div>

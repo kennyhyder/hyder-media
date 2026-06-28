@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
-import NavBar from "../components/NavBar";
+import Sidebar from "../components/Sidebar";
+import MobileNav from "../components/MobileNav";
+import ThemeScript from "../components/ThemeScript";
 import ErrorBoundary from "../components/ErrorBoundary";
 import JsonLd from "../components/JsonLd";
 import { organizationSchema, webApplicationSchema } from "../lib/schema";
@@ -48,9 +50,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* No-flash theme bootstrap — must run before first paint. */}
+        <ThemeScript />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         {/* Google Analytics 4 — site-wide (every page inherits the root layout) */}
         <Script
@@ -64,9 +71,18 @@ gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
         </Script>
         <JsonLd data={[organizationSchema(), webApplicationSchema()]} />
-        <NavBar />
-        <main className="max-w-7xl mx-auto px-4 py-6">
-          <ErrorBoundary>{children}</ErrorBoundary>
+
+        {/* App shell: fixed sidebar (desktop) + mobile top-bar/drawer. */}
+        <Sidebar />
+        <MobileNav />
+
+        {/* Main content area. Offset by the 248px sidebar on lg+, full width
+            below. Pages manage their own readable max-width (long-form text
+            wraps; tables/maps/grids go full-bleed). */}
+        <main className="min-h-screen lg:pl-[248px]">
+          <div className="px-4 py-6 sm:px-6 lg:px-8">
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </div>
         </main>
       </body>
     </html>

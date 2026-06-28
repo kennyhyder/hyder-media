@@ -1,29 +1,294 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   GridCensus theme system — "Control Room" dark + clean light.
+
+   Strategy: the entire app (195k pages) was authored with hardcoded Tailwind
+   color utilities (bg-white / text-gray-900 / border-gray-200 / text-purple-600
+   etc). Rather than touch every page, we remap Tailwind's color SCALE tokens to
+   theme-aware CSS variables. Flipping `html.dark` re-points every one of those
+   utilities at once, so every page + shared component flips themes for free.
+
+   - `:root`            → light (clean) theme values
+   - `html.dark`        → dark (Control Room) values
+   - `@theme inline`    → binds Tailwind utility tokens to the vars above
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- Semantic app surface vars (consumed directly by the shell) ---- */
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --border: #e2e6ec;
+  --text: #0f1623;
+  --muted: #5a6678;
+  --accent: #0e7490;        /* darker cyan — AA contrast on light */
+  --accent-2: #4d7c0f;      /* olive/lime, darkened for light bg */
+
+  /* Score ramp (shared across both themes) */
+  --score-low: #f43f5e;
+  --score-mid: #fb923c;
+  --score-high: #fbbf24;
+  --score-top: #a3e635;
+
+  /* Back-compat aliases (some older code referenced these) */
+  --background: var(--bg);
+  --foreground: var(--text);
+
+  /* ---- Tailwind scale remaps (light) ----
+     Grays climb from page-bg → strong text. White = surface, black = text. */
+  --tw-white: var(--surface);
+  --tw-black: var(--text);
+
+  --tw-gray-50: var(--surface-2);
+  --tw-gray-100: #e9edf3;
+  --tw-gray-200: var(--border);
+  --tw-gray-300: #cfd6e0;
+  --tw-gray-400: #99a3b4;
+  --tw-gray-500: var(--muted);
+  --tw-gray-600: #44506180;   /* placeholder, overridden below */
+  --tw-gray-600: #455061;
+  --tw-gray-700: #313a49;
+  --tw-gray-800: #1d2533;
+  --tw-gray-900: var(--text);
+
+  /* Accent (purple/indigo in source) → brand accent cyan */
+  --tw-accent-50: #ecfeff;
+  --tw-accent-100: #cff5fb;
+  --tw-accent-200: #a5e8f2;
+  --tw-accent-300: #67d3e6;
+  --tw-accent-400: #2bb3cf;
+  --tw-accent-500: var(--accent);
+  --tw-accent-600: var(--accent);
+  --tw-accent-700: #0b5f76;
+  --tw-accent-800: #0a4f61;
+  --tw-accent-900: #093f4d;
+  --tw-on-accent: #ffffff;    /* text color that sits on a filled accent */
+
+  /* Status-tint surfaces (light): keep light tints */
+  --tw-tint-bg: 1;            /* multiplier hook (unused, doc only) */
 }
 
+html.dark {
+  /* ---- Control Room dark ---- */
+  --bg: #0a0e1a;
+  --surface: #121829;
+  --surface-2: #0f1422;
+  --border: #1f2a40;
+  --text: #e6edf7;
+  --muted: #8a97ad;
+  --accent: #22d3ee;
+  --accent-2: #a3e635;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+
+  /* ---- Tailwind scale remaps (dark) ----
+     Inverted ramp: gray-50/100 = elevated surfaces, gray-900 = brightest text. */
+  --tw-white: var(--surface);
+  --tw-black: var(--text);
+
+  --tw-gray-50: var(--surface-2);
+  --tw-gray-100: #1a2235;
+  --tw-gray-200: var(--border);
+  --tw-gray-300: #2a3852;
+  --tw-gray-400: #5e6c84;
+  --tw-gray-500: var(--muted);
+  --tw-gray-600: #a3afc2;
+  --tw-gray-700: #c2ccda;
+  --tw-gray-800: #d6deea;
+  --tw-gray-900: var(--text);
+
+  /* Accent → Control Room cyan */
+  --tw-accent-50: #0c2a33;
+  --tw-accent-100: #0f3a46;
+  --tw-accent-200: #115a6c;
+  --tw-accent-300: #1591ad;
+  --tw-accent-400: #1cbfe0;
+  --tw-accent-500: var(--accent);
+  --tw-accent-600: var(--accent);
+  --tw-accent-700: #67e3f6;
+  --tw-accent-800: #9aeefb;
+  --tw-accent-900: #c8f6ff;
+  --tw-on-accent: #04222a;    /* dark ink on bright cyan fill */
+}
+
+/* ----------------------------------------------------------------------------
+   Bind Tailwind utility color tokens to the remapped vars. Because these are
+   `var(...)` references resolved at use-time, theme switching is automatic.
+   Status colors (green/red/amber/yellow/orange/blue/lime) are intentionally
+   NOT remapped at full strength — they carry meaning. We only soften their
+   very-light tint backgrounds for dark mode further down via overrides.
+---------------------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-white: var(--tw-white);
+  --color-black: var(--tw-black);
+
+  --color-gray-50: var(--tw-gray-50);
+  --color-gray-100: var(--tw-gray-100);
+  --color-gray-200: var(--tw-gray-200);
+  --color-gray-300: var(--tw-gray-300);
+  --color-gray-400: var(--tw-gray-400);
+  --color-gray-500: var(--tw-gray-500);
+  --color-gray-600: var(--tw-gray-600);
+  --color-gray-700: var(--tw-gray-700);
+  --color-gray-800: var(--tw-gray-800);
+  --color-gray-900: var(--tw-gray-900);
+
+  /* purple + indigo (the old brand accent) → theme accent */
+  --color-purple-50: var(--tw-accent-50);
+  --color-purple-100: var(--tw-accent-100);
+  --color-purple-200: var(--tw-accent-200);
+  --color-purple-300: var(--tw-accent-300);
+  --color-purple-400: var(--tw-accent-400);
+  --color-purple-500: var(--tw-accent-500);
+  --color-purple-600: var(--tw-accent-600);
+  --color-purple-700: var(--tw-accent-700);
+  --color-purple-800: var(--tw-accent-800);
+  --color-purple-900: var(--tw-accent-900);
+
+  --color-indigo-50: var(--tw-accent-50);
+  --color-indigo-100: var(--tw-accent-100);
+  --color-indigo-200: var(--tw-accent-200);
+  --color-indigo-300: var(--tw-accent-300);
+  --color-indigo-400: var(--tw-accent-400);
+  --color-indigo-500: var(--tw-accent-500);
+  --color-indigo-600: var(--tw-accent-600);
+  --color-indigo-700: var(--tw-accent-700);
+  --color-indigo-800: var(--tw-accent-800);
+  --color-indigo-900: var(--tw-accent-900);
+}
+
+/* ----------------------------------------------------------------------------
+   Base document styling
+---------------------------------------------------------------------------- */
+html {
+  background: var(--bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans, system-ui, sans-serif);
 }
 
+/* Smooth (but quick) cross-fade when toggling themes. */
+html.theme-anim,
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease, fill 0.18s ease;
+}
+
+/* ----------------------------------------------------------------------------
+   Dark-mode legibility tweaks for the semantic STATUS tints we deliberately
+   left un-remapped. The light "-50 / -100" tint backgrounds are too bright on
+   a dark surface; pull them down to translucent washes that read on #0A0E1A.
+   These only apply under html.dark.
+---------------------------------------------------------------------------- */
+html.dark .bg-green-50  { background-color: color-mix(in srgb, #22c55e 14%, transparent); }
+html.dark .bg-green-100 { background-color: color-mix(in srgb, #22c55e 18%, transparent); }
+html.dark .bg-red-50    { background-color: color-mix(in srgb, #f43f5e 14%, transparent); }
+html.dark .bg-red-100   { background-color: color-mix(in srgb, #f43f5e 18%, transparent); }
+html.dark .bg-amber-50  { background-color: color-mix(in srgb, #fb923c 14%, transparent); }
+html.dark .bg-amber-100 { background-color: color-mix(in srgb, #fb923c 18%, transparent); }
+html.dark .bg-yellow-50 { background-color: color-mix(in srgb, #fbbf24 14%, transparent); }
+html.dark .bg-yellow-100{ background-color: color-mix(in srgb, #fbbf24 18%, transparent); }
+html.dark .bg-orange-50 { background-color: color-mix(in srgb, #fb923c 14%, transparent); }
+html.dark .bg-orange-100{ background-color: color-mix(in srgb, #fb923c 18%, transparent); }
+html.dark .bg-blue-50   { background-color: color-mix(in srgb, #3b82f6 14%, transparent); }
+html.dark .bg-blue-100  { background-color: color-mix(in srgb, #3b82f6 18%, transparent); }
+html.dark .bg-lime-50   { background-color: color-mix(in srgb, #a3e635 14%, transparent); }
+html.dark .bg-lime-100  { background-color: color-mix(in srgb, #a3e635 18%, transparent); }
+
+/* Brighten the dark-on-tint status TEXT so it reads on the translucent washes. */
+html.dark .text-green-700,
+html.dark .text-green-800 { color: #4ade80; }
+html.dark .text-red-700,
+html.dark .text-red-800   { color: #fb7185; }
+html.dark .text-amber-700,
+html.dark .text-amber-800,
+html.dark .text-amber-900 { color: #fdba74; }
+html.dark .text-yellow-700,
+html.dark .text-yellow-800,
+html.dark .text-yellow-900 { color: #fcd34d; }
+html.dark .text-orange-700,
+html.dark .text-orange-800 { color: #fdba74; }
+html.dark .text-blue-700,
+html.dark .text-blue-800,
+html.dark .text-blue-900  { color: #60a5fa; }
+html.dark .text-lime-700,
+html.dark .text-lime-800  { color: #bef264; }
+html.dark .text-green-600 { color: #4ade80; }
+html.dark .text-red-600,
+html.dark .text-red-500   { color: #fb7185; }
+html.dark .text-amber-600 { color: #fdba74; }
+html.dark .text-yellow-600{ color: #fcd34d; }
+html.dark .text-orange-600{ color: #fdba74; }
+html.dark .text-blue-600  { color: #60a5fa; }
+
+/* ----------------------------------------------------------------------------
+   App-shell utility classes (used by Sidebar / layout). These read the
+   semantic vars directly so they are independent of the Tailwind remap.
+---------------------------------------------------------------------------- */
+.app-surface   { background: var(--surface); }
+.app-surface-2 { background: var(--surface-2); }
+.app-border    { border-color: var(--border); }
+.app-text      { color: var(--text); }
+.app-muted     { color: var(--muted); }
+.app-accent    { color: var(--accent); }
+
+/* Filled accent button/pill that flips ink color per theme. */
+.accent-fill {
+  background: var(--accent);
+  color: var(--tw-on-accent);
+}
+.accent-fill:hover { filter: brightness(1.08); }
+
+/* Sidebar nav link states */
+.nav-link {
+  color: var(--muted);
+  border-radius: 0.5rem;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.nav-link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.nav-link[aria-current="page"] {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* Subtle glow on cards in dark mode; clean hairline in light. */
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+html.dark .surface-card {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Brand mark accent diamond */
+.brand-diamond { color: var(--accent); }
+
+/* ----------------------------------------------------------------------------
+   Print (unchanged behavior, force light)
+---------------------------------------------------------------------------- */
 @media print {
   nav { display: none !important; }
   .print\:hidden { display: none !important; }
   .print\:block { display: block !important; }
   .print\:flex { display: flex !important; }
-  body { background: white; }
+  body { background: white !important; color: #111 !important; }
   main { padding: 0 !important; max-width: none !important; }
   @page { margin: 0.75in; size: landscape; }
   table { page-break-inside: avoid; }

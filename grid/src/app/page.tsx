@@ -67,14 +67,21 @@ export default async function HomePage() {
       />
 
       {/* Hero */}
-      <section className="rounded-2xl bg-gradient-to-br from-purple-700 to-indigo-700 px-6 py-12 text-white md:px-10 md:py-16">
-        <p className="text-sm font-semibold uppercase tracking-wide text-purple-200">
+      <section
+        className="relative overflow-hidden rounded-2xl px-6 py-12 md:px-10 md:py-16"
+        style={{
+          background:
+            "radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 22%, var(--surface)) 0%, var(--surface) 55%), var(--surface)",
+          border: "1px solid color-mix(in srgb, var(--accent) 30%, var(--border))",
+        }}
+      >
+        <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
           Datacenter site intelligence
         </p>
-        <h1 className="mt-2 max-w-3xl text-3xl font-extrabold leading-tight md:text-5xl">
+        <h1 className="mt-2 max-w-3xl text-3xl font-extrabold leading-tight md:text-5xl" style={{ color: "var(--text)" }}>
           Find your next datacenter site — and how fast you can power it.
         </h1>
-        <p className="mt-4 max-w-2xl text-purple-100">
+        <p className="mt-4 max-w-2xl" style={{ color: "var(--muted)" }}>
           {SITE_NAME} scores {fmtInt(national.count)} candidate locations across
           the US on power availability, speed-to-power, fiber, water, and
           hazard. Screen states, counties, grid regions, and site types in
@@ -83,13 +90,14 @@ export default async function HomePage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <a
             href="/datacenter-sites"
-            className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+            className="accent-fill rounded-lg px-5 py-2.5 text-sm font-semibold"
           >
             Browse by location
           </a>
           <a
             href="/rankings"
-            className="rounded-lg border border-purple-300 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-600/40"
+            className="rounded-lg border px-5 py-2.5 text-sm font-semibold"
+            style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent)" }}
           >
             See the rankings
           </a>

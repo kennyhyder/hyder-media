@@ -23,14 +23,14 @@ export default function SitesTable({
 }) {
   if (!sites.length) {
     return (
-      <p className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-500">
+      <p className="surface-card rounded-lg p-4 text-sm text-gray-500">
         Live site list is temporarily unavailable. Aggregate figures on this
         page are unaffected.
       </p>
     );
   }
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+    <div className="surface-card overflow-x-auto rounded-lg">
       <table className="min-w-full divide-y divide-gray-200 text-sm">
         {caption && <caption className="sr-only">{caption}</caption>}
         <thead className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
