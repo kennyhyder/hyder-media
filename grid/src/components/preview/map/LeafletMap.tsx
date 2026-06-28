@@ -106,6 +106,14 @@ export default function LeafletMap({
       const params = new URLSearchParams();
       params.set("bounds", bounds);
       params.set("limit", "1000"); // cap markers in view → smooth
+      // Zoom-scaled readiness floor. A wide bbox with no score filter makes the
+      // API sort 164k rows by dc_score and hit the statement timeout (empty map).
+      // So at low zoom we request only the highest-readiness sites (small set →
+      // fast) and progressively reveal the long tail as the viewport shrinks
+      // (a small bbox stays fast even at score 0).
+      const z = map.getZoom();
+      const minScore = z <= 4 ? 78 : z <= 5 ? 70 : z <= 6 ? 60 : z <= 7 ? 48 : z <= 8 ? 32 : 0;
+      if (minScore > 0) params.set("min_score", String(minScore));
       if (lyr.substations) params.set("include_substations", "1");
       if (lyr.lines) params.set("include_lines", "1");
 
