@@ -16,6 +16,7 @@ import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
 import { Row, Card, km2mi } from "@/components/EntityProfile";
+import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 
@@ -212,7 +213,7 @@ export default async function BrownfieldProfilePage({
           <Row label="Cleanup status" value={bf.cleanup_status} />
           <Row label="Contaminant type" value={bf.contaminant_type} />
           <Row label="EPA ID" value={bf.epa_id} />
-          <Row label="Operator" value={bf.operator_name} />
+          <Row label="Operator" value={bf.operator_name ? <OrgLink owner={bf.operator_name} /> : null} />
           <Row label="Operator address" value={bf.operator_address} />
         </Card>
       </section>

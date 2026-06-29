@@ -10,7 +10,7 @@ const ContentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://unpkg.com",
   "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://www.google-analytics.com https://www.googletagmanager.com https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google-analytics.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org",
+  "connect-src 'self' https://www.google-analytics.com https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org https://hzaqzbtyqqixmibcfuwo.supabase.co wss://hzaqzbtyqqixmibcfuwo.supabase.co",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

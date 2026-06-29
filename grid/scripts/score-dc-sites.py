@@ -874,152 +874,85 @@ def main():
         print(f"\n[DRY RUN] Would update {len(patches)} sites with scores")
         return
 
-    # Bulk apply via psql temp table (much faster than REST API for 74K+ records)
-    import csv
-    import tempfile
-    import subprocess
+    # Apply via the Supabase Management API SQL endpoint (project-scoped by the
+    # SUPABASE_URL ref the rest of this script already reads — no hardcoded
+    # pooler host / password, so it can never write to the wrong project).
+    # Batched UPDATE ... FROM (VALUES ...) chunks. The previous psql-temp-table
+    # path was hardcoded to a DIFFERENT project's pooler and is removed.
+    import urllib.request as _u, urllib.error as _ue
 
-    PSQL_CMD = [
-        'psql',
-        '-h', 'aws-0-us-west-2.pooler.supabase.com',
-        '-p', '6543',
-        '-U', 'postgres.ilbovwnhrowvxjdkvrln',
-        '-d', 'postgres',
-    ]
-    PSQL_ENV = {**os.environ, 'PGPASSWORD': '#FsW7iqg%EYX&G3M'}
+    def _mgmt_ref():
+        # derive project ref from SUPABASE_URL (https://<ref>.supabase.co)
+        try:
+            return SUPABASE_URL.split('//', 1)[1].split('.', 1)[0]
+        except Exception:
+            return None
 
-    print(f"\n  Applying {len(patches)} score patches via psql bulk update...")
+    MGMT_TOKEN = os.environ.get('SUPABASE_MGMT_TOKEN')
+    if not MGMT_TOKEN:
+        for _p in ['/tmp/sbtok']:
+            try:
+                MGMT_TOKEN = open(_p).read().strip()
+                break
+            except FileNotFoundError:
+                pass
+    MGMT_REF = _mgmt_ref()
 
-    # Write patches to temp CSV
-    csv_columns = [
-        'id', 'dc_score',
-        'score_power', 'score_speed_to_power', 'score_fiber',
-        'score_energy_cost', 'score_water', 'score_hazard',
-        'score_buildability', 'score_labor', 'score_existing_dc',
-        'score_land', 'score_construction_cost', 'score_gas_pipeline',
-        'score_tax', 'score_climate',
-        'queue_depth', 'avg_queue_wait_years',
-        'nearest_ixp_id', 'nearest_ixp_name', 'nearest_ixp_distance_km',
-        'nearest_dc_id', 'nearest_dc_name', 'nearest_dc_distance_km',
-    ]
+    def _sql_lit(v):
+        if v is None:
+            return 'NULL'
+        if isinstance(v, bool):
+            return 'TRUE' if v else 'FALSE'
+        if isinstance(v, (int, float)):
+            return repr(v)
+        return "'" + str(v).replace("'", "''") + "'"
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=csv_columns, extrasaction='ignore')
-        writer.writeheader()
-        for p in patches:
-            # Replace None with empty string for CSV
-            row = {k: ('' if p.get(k) is None else p.get(k)) for k in csv_columns}
-            writer.writerow(row)
-        csv_path = f.name
+    NUM_COLS = ['dc_score', 'score_power', 'score_speed_to_power', 'score_fiber',
+                'score_energy_cost', 'score_water', 'score_hazard',
+                'score_buildability', 'score_labor', 'score_existing_dc',
+                'score_land', 'score_construction_cost', 'score_gas_pipeline',
+                'score_tax', 'score_climate']
 
-    # Build SQL: create temp table, COPY from CSV, UPDATE JOIN
-    sql = f"""
-    CREATE TEMP TABLE _score_import (
-        id UUID,
-        dc_score NUMERIC(5,1),
-        score_power NUMERIC(5,1),
-        score_speed_to_power NUMERIC(5,1),
-        score_fiber NUMERIC(5,1),
-        score_energy_cost NUMERIC(5,1),
-        score_water NUMERIC(5,1),
-        score_hazard NUMERIC(5,1),
-        score_buildability NUMERIC(5,1),
-        score_labor NUMERIC(5,1),
-        score_existing_dc NUMERIC(5,1),
-        score_land NUMERIC(5,1),
-        score_construction_cost NUMERIC(5,1),
-        score_gas_pipeline NUMERIC(5,1),
-        score_tax NUMERIC(5,1),
-        score_climate NUMERIC(5,1),
-        queue_depth INTEGER,
-        avg_queue_wait_years NUMERIC(4,1),
-        nearest_ixp_id TEXT,
-        nearest_ixp_name TEXT,
-        nearest_ixp_distance_km NUMERIC(8,2),
-        nearest_dc_id TEXT,
-        nearest_dc_name TEXT,
-        nearest_dc_distance_km NUMERIC(8,2)
-    );
+    def run_mgmt_sql(query):
+        body = json.dumps({'query': query}).encode()
+        req = _u.Request(
+            f'https://api.supabase.com/v1/projects/{MGMT_REF}/database/query',
+            data=body, method='POST',
+            headers={'Authorization': f'Bearer {MGMT_TOKEN}',
+                     'Content-Type': 'application/json',
+                     'User-Agent': 'gridcensus-score/1.0'})
+        with _u.urlopen(req, timeout=120) as r:
+            return r.read()
 
-    \\copy _score_import FROM '{csv_path}' WITH (FORMAT csv, HEADER true, NULL '');
+    if not MGMT_TOKEN or not MGMT_REF:
+        print("  ERROR: no SUPABASE_MGMT_TOKEN (or /tmp/sbtok) — cannot apply scores safely.")
+        print("  Refusing to fall back to a hardcoded pooler. Scores NOT written.")
+        return
 
-    UPDATE grid_dc_sites g SET
-        dc_score = s.dc_score,
-        score_power = s.score_power,
-        score_speed_to_power = s.score_speed_to_power,
-        score_fiber = s.score_fiber,
-        score_energy_cost = s.score_energy_cost,
-        score_water = s.score_water,
-        score_hazard = s.score_hazard,
-        score_buildability = s.score_buildability,
-        score_labor = s.score_labor,
-        score_existing_dc = s.score_existing_dc,
-        score_land = s.score_land,
-        score_construction_cost = s.score_construction_cost,
-        score_gas_pipeline = s.score_gas_pipeline,
-        score_tax = s.score_tax,
-        score_climate = s.score_climate,
-        queue_depth = COALESCE(s.queue_depth, g.queue_depth),
-        avg_queue_wait_years = COALESCE(s.avg_queue_wait_years, g.avg_queue_wait_years),
-        nearest_ixp_id = COALESCE(s.nearest_ixp_id::uuid, g.nearest_ixp_id),
-        nearest_ixp_name = COALESCE(s.nearest_ixp_name, g.nearest_ixp_name),
-        nearest_ixp_distance_km = COALESCE(s.nearest_ixp_distance_km, g.nearest_ixp_distance_km),
-        nearest_dc_id = COALESCE(s.nearest_dc_id::uuid, g.nearest_dc_id),
-        nearest_dc_name = COALESCE(s.nearest_dc_name, g.nearest_dc_name),
-        nearest_dc_distance_km = COALESCE(s.nearest_dc_distance_km, g.nearest_dc_distance_km)
-    FROM _score_import s
-    WHERE g.id = s.id;
-
-    DROP TABLE _score_import;
-    """
-
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.sql', delete=False) as f:
-        f.write(sql)
-        sql_path = f.name
-
-    try:
-        result = subprocess.run(
-            PSQL_CMD + ['-f', sql_path],
-            env=PSQL_ENV,
-            capture_output=True, text=True, timeout=300
-        )
-        if result.returncode == 0:
-            print(f"  Bulk update successful ({len(patches)} records)")
-        else:
-            print(f"  psql error: {result.stderr[:1000]}")
-            # Fallback to REST API if psql fails
-            print(f"  Falling back to REST API (20 workers)...")
-            patched_rest = 0
-            patch_errors_rest = 0
-
-            def apply_patch(patch):
-                site_id = patch.pop('id')
-                for attempt in range(3):
-                    try:
-                        supabase_request('PATCH', f'grid_dc_sites?id=eq.{site_id}', patch)
-                        return True
-                    except Exception:
-                        if attempt < 2:
-                            time.sleep(2 ** attempt)
-                            continue
-                        raise
-
-            with ThreadPoolExecutor(max_workers=20) as executor:
-                futures = {executor.submit(apply_patch, p): p for p in patches}
-                for i, future in enumerate(as_completed(futures)):
-                    try:
-                        future.result()
-                        patched_rest += 1
-                    except Exception as e:
-                        patch_errors_rest += 1
-                        if patch_errors_rest <= 10:
-                            print(f"  Patch error: {e}")
-                    if (i + 1) % 2000 == 0:
-                        print(f"  Patched {i + 1}/{len(patches)}...")
-            print(f"  REST API: {patched_rest} patched, {patch_errors_rest} errors")
-    finally:
-        os.unlink(csv_path)
-        os.unlink(sql_path)
+    print(f"\n  Applying {len(patches)} score patches via Management API "
+          f"(ref={MGMT_REF}) in batches...")
+    BATCH = 1000
+    applied = 0
+    for i in range(0, len(patches), BATCH):
+        chunk = patches[i:i + BATCH]
+        rows = []
+        for p in chunk:
+            vals = [f"'{p['id']}'::uuid"] + [_sql_lit(p.get(c)) for c in NUM_COLS]
+            rows.append('(' + ','.join(vals) + ')')
+        set_clause = ',\n'.join([f"{c}=v.{c}" for c in NUM_COLS])
+        cols_decl = 'id,' + ','.join(NUM_COLS)
+        sql = (f"UPDATE grid_dc_sites g SET\n{set_clause}\n"
+               f"FROM (VALUES\n" + ',\n'.join(rows) + f"\n) AS v({cols_decl})\n"
+               f"WHERE g.id = v.id;")
+        try:
+            run_mgmt_sql(sql)
+            applied += len(chunk)
+        except _ue.HTTPError as e:
+            print(f"  batch err @ {i}: {e.code} {e.read()[:300]}")
+            return
+        if applied % 10000 < BATCH:
+            print(f"  …applied ~{applied}/{len(patches)}")
+    print(f"  Management API update successful ({applied} records).")
 
     print(f"\n{'=' * 60}")
     print(f"DC Site Scoring Complete")

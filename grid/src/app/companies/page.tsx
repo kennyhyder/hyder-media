@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
-import { getCompanies } from "@/lib/companies";
-import { fmtInt, fmtMw } from "@/lib/format";
+import { topOrganizations, orgIndexMeta, ASSET_KEYS } from "@/lib/organizations";
+import { fmtInt } from "@/lib/format";
 import { stateName } from "@/lib/geo";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
@@ -11,16 +11,31 @@ import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Datacenter Operating Companies — Operators & Portfolios",
+  title: "Organizations — Infrastructure Owners & Operators",
   description:
-    "Browse datacenter operating companies across the United States — AWS, Equinix, Digital Realty, QTS, CoreSite, Lumen and hundreds more. Facility counts, total capacity, and state footprint for each operator, with every facility cross-linked.",
+    "Browse every organization in the datacenter-siting dataset — utilities like Duke Energy, Dominion and PacifiCorp, hyperscalers like AWS and Equinix, plus landowners, railroads and fiber carriers. Each profile aggregates ALL of an organization's assets — datacenters, candidate sites, substations, transmission, fiber and more — cross-linked across the dataset.",
   alternates: { canonical: `${SITE_URL}/companies` },
 };
 
-export default async function CompaniesHub() {
-  const all = await getCompanies();
-  // Only surface real, named companies with at least one facility.
-  const companies = all.filter((c) => c.name && c.facilityCount >= 1);
+// Cap the hub list — there are tens of thousands of orgs; show the densest.
+const HUB_LIMIT = 600;
+
+const ASSET_SHORT: Record<string, string> = {
+  datacenters: "DCs",
+  candidate_sites: "sites",
+  substations: "subs",
+  transmission_lines: "lines",
+  fiber_routes: "fiber",
+  rail_lines: "rail",
+  brownfields: "brownfields",
+  ixps: "IXPs",
+  parcels: "parcels",
+};
+
+export default async function OrganizationsHub() {
+  const ranked = topOrganizations();
+  const meta = orgIndexMeta();
+  const shown = ranked.slice(0, HUB_LIMIT);
 
   return (
     <div>
@@ -28,67 +43,73 @@ export default async function CompaniesHub() {
         data={[
           breadcrumbSchema([
             { name: "Home", url: "/" },
-            { name: "Companies", url: "/companies" },
+            { name: "Organizations", url: "/companies" },
           ]),
           datasetSchema({
-            name: `${SITE_NAME} — Datacenter operating companies`,
+            name: `${SITE_NAME} — Infrastructure organizations`,
             description:
-              "Datacenter and internet-exchange operating companies across the US, with facility counts, total capacity, and state footprint.",
+              "Organizations owning or operating datacenter-siting infrastructure across the US — utilities, hyperscalers, landowners, railroads and fiber carriers — each with full asset counts and state footprint.",
             url: `${SITE_URL}/companies`,
             spatialCoverage: "United States",
           }),
           itemListSchema(
-            companies
-              .slice(0, 25)
-              .map((c) => ({ name: c.name, url: `${SITE_URL}/companies/${c.slug}` }))
+            shown.slice(0, 25).map((c) => ({ name: c.name, url: `${SITE_URL}/companies/${c.slug}` }))
           ),
         ]}
       />
 
       <header>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Datacenter Operating Companies
-        </h1>
-        <p className="mt-2 max-w-2xl text-gray-600">
-          {fmtInt(companies.length)} operating companies run the datacenters and
-          internet-exchange facilities in the {SITE_NAME} catalog — from
-          hyperscalers like AWS, Google and Meta to wholesale and colocation
-          operators like Equinix, Digital Realty, QTS and CoreSite. Each profile
-          rolls up an operator&rsquo;s facility count, total catalogued capacity,
-          and state footprint, with every facility cross-linked.
+        <h1 className="text-3xl font-bold text-gray-900">Organizations</h1>
+        <p className="mt-2 max-w-3xl text-gray-600">
+          {fmtInt(meta.totalOrganizations)} organizations own or operate the{" "}
+          {fmtInt(meta.totalAssets)} catalogued infrastructure assets in the{" "}
+          {SITE_NAME} dataset — from utilities like Duke Energy, Dominion and
+          PacifiCorp to hyperscalers like AWS and Equinix, plus landowners,
+          railroads and fiber carriers. Each profile rolls up an
+          organization&rsquo;s <em>entire</em> footprint — datacenters, candidate
+          sites, substations, transmission, fiber, brownfields and exchanges —
+          with every asset cross-linked. Showing the {fmtInt(shown.length)}{" "}
+          densest organizations by total assets.
         </p>
       </header>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {companies.map((c) => (
-          <a
-            key={c.slug}
-            href={`/companies/${c.slug}`}
-            className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-purple-300 hover:shadow-sm"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="font-semibold text-gray-900 line-clamp-2">{c.name}</div>
-              <span className="shrink-0 rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-800">
-                {fmtInt(c.facilityCount)}
-              </span>
-            </div>
-            <div className="mt-1 text-xs text-gray-500">
-              {fmtInt(c.facilityCount)} {c.facilityCount === 1 ? "facility" : "facilities"}
-              {c.states.length > 0
-                ? ` · ${c.states.length} ${c.states.length === 1 ? "state" : "states"}`
-                : ""}
-            </div>
-            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-indigo-700">
-              {c.totalCapacityMw > 0 && <span>{fmtMw(c.totalCapacityMw)}</span>}
+        {shown.map((c) => {
+          const types = ASSET_KEYS.filter((k) => c.assets[k] > 0);
+          return (
+            <a
+              key={c.slug}
+              href={`/companies/${c.slug}`}
+              className="rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-purple-300 hover:shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-semibold text-gray-900 line-clamp-2">{c.name}</div>
+                <span className="shrink-0 rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-800">
+                  {fmtInt(c.totalAssets)}
+                </span>
+              </div>
+              <div className="mt-1 text-xs text-gray-500">
+                {fmtInt(c.totalAssets)} {c.totalAssets === 1 ? "asset" : "assets"}
+                {c.states.length > 0
+                  ? ` · ${c.states.length} ${c.states.length === 1 ? "state" : "states"}`
+                  : ""}
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-xs">
+                {types.slice(0, 4).map((k) => (
+                  <span key={k} className="font-medium text-indigo-700">
+                    {fmtInt(c.assets[k])} {ASSET_SHORT[k]}
+                  </span>
+                ))}
+              </div>
               {c.states.length > 0 && (
-                <span className="text-gray-500">
+                <div className="mt-1 text-xs text-gray-500">
                   {c.states.slice(0, 4).map((s) => stateName(s)).join(", ")}
                   {c.states.length > 4 ? ` +${c.states.length - 4}` : ""}
-                </span>
+                </div>
               )}
-            </div>
-          </a>
-        ))}
+            </a>
+          );
+        })}
       </div>
 
       <div className="mt-8">

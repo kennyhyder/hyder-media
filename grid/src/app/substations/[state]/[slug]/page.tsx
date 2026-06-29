@@ -17,6 +17,7 @@ import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
 import { Row, Card } from "@/components/EntityProfile";
+import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 
@@ -201,7 +202,9 @@ export default async function SubstationProfilePage({
 
         <Card title="Ownership & operation">
           {sub.owners && sub.owners.length > 0 ? (
-            sub.owners.map((o, i) => <Row key={i} label={i === 0 ? "Operator" : "Co-owner"} value={o} />)
+            sub.owners.map((o, i) => (
+              <Row key={i} label={i === 0 ? "Operator" : "Co-owner"} value={<OrgLink owner={o} />} />
+            ))
           ) : (
             <p className="text-sm text-gray-500">Operator not catalogued for this substation.</p>
           )}
@@ -236,7 +239,7 @@ export default async function SubstationProfilePage({
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="px-3 py-2 font-medium text-gray-900">#{l.hifld_id}</td>
                     <td className="px-3 py-2 text-gray-600">{fmtKv(l.voltage_kv)}</td>
-                    <td className="px-3 py-2 text-gray-600">{l.owner || "—"}</td>
+                    <td className="px-3 py-2 text-gray-600">{l.owner ? <OrgLink owner={l.owner} /> : "—"}</td>
                     <td className="px-3 py-2 text-gray-600">{l.status || "—"}</td>
                     <td className="px-3 py-2 text-gray-600">
                       {l.length_miles != null ? `${l.length_miles.toFixed(1)} mi` : "—"}

@@ -28,7 +28,7 @@ export const INFRA_GROUP: NavGroup = {
   links: [
     { href: "/substations", label: "Substations", match: "/substations" },
     { href: "/datacenters", label: "Datacenters", match: "/datacenters" },
-    { href: "/companies", label: "Companies", match: "/companies" },
+    { href: "/companies", label: "Organizations", match: "/companies" },
     { href: "/internet-exchanges", label: "Internet Exchanges", match: "/internet-exchanges" },
     { href: "/brownfield-sites", label: "Brownfields", match: "/brownfield-sites" },
   ],

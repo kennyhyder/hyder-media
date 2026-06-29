@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
  */
 export function sanitizeSearch(str?: string | null): string {
   if (!str) return "";
-  return str.replace(/[%_.*()]/g, (ch) => "\\" + ch);
+  return str.replace(/[%_.*(),]/g, (ch) => "\\" + ch);
 }
 
 /**

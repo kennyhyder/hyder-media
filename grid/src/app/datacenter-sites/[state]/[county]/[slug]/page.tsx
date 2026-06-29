@@ -31,6 +31,7 @@ import {
   scoreColor,
 } from "@/lib/format";
 import SitesTable from "@/components/SitesTable";
+import OrgLink from "@/components/OrgLink";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
@@ -518,7 +519,8 @@ export default async function SiteProfilePage({
             }
           />
           <Row label="Acreage" value={site.acreage != null ? `${fmtInt(site.acreage)} ac` : null} />
-          <Row label="Parcel owner" value={site.parcel_owner} />
+          <Row label="Parcel owner" value={site.parcel_owner ? <OrgLink owner={site.parcel_owner} /> : null} />
+          <Row label="Land contact" value={site.land_contact_name} />
           <Row label="Parcel APN" value={site.parcel_apn} />
           <Row label="Land owner type" value={site.land_owner_type} />
           <Row

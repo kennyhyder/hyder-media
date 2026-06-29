@@ -22,6 +22,7 @@ import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
 import { Row, Card } from "@/components/EntityProfile";
+import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 
@@ -181,7 +182,7 @@ export default async function IxpProfilePage({
             label="Internet exchanges (IX)"
             value={x.ix_count != null ? fmtInt(x.ix_count) : null}
           />
-          <Row label="Operator / org" value={x.org_name} />
+          <Row label="Operator / org" value={x.org_name ? <OrgLink owner={x.org_name} /> : null} />
           <Row
             label="Website"
             value={

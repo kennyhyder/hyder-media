@@ -17,10 +17,15 @@ import {
   ixpSlug,
   datacenterSlug,
 } from "@/lib/entity-slug";
-import { getCompanies } from "@/lib/companies";
+import { indexableOrgSlugs, orgSitemapShardCount } from "@/lib/organizations";
 
 const LAST = freshnessDate();
 const N = STATES.length;
+
+// Organization URLs can number in the tens of thousands, so they get their own
+// run of shards sized at ≤50k each.
+const ORG_PER_SHARD = 50000;
+const ORG_SHARD_COUNT = orgSitemapShardCount(ORG_PER_SHARD);
 
 // Shard layout (keep sitemap-index.xml shard count in sync):
 //   0            = static hubs + states + iso + types + rankings + entity hubs
@@ -30,11 +35,11 @@ const N = STATES.length;
 //   3N+1         = all brownfield-site profile URLs (~2k)
 //   3N+2         = all internet-exchange profile URLs (~1.4k)
 //   3N+3         = all datacenter profile URLs (~3.7k)
-//   3N+4         = all operating-company profile URLs (few hundred)
+//   3N+4 .. 3N+3+ORG_SHARD_COUNT = organization profile URLs (sharded ≤50k each)
 const BROWNFIELD_SHARD = 3 * N + 1;
 const IXP_SHARD = 3 * N + 2;
 const DATACENTER_SHARD = 3 * N + 3;
-const COMPANY_SHARD = 3 * N + 4;
+const ORG_SHARD_BASE = 3 * N + 4; // first org shard id
 
 export async function generateSitemaps() {
   return [
@@ -45,7 +50,7 @@ export async function generateSitemaps() {
     { id: BROWNFIELD_SHARD },
     { id: IXP_SHARD },
     { id: DATACENTER_SHARD },
-    { id: COMPANY_SHARD },
+    ...Array.from({ length: ORG_SHARD_COUNT }, (_, i) => ({ id: ORG_SHARD_BASE + i })),
   ];
 }
 
@@ -204,17 +209,19 @@ export default async function sitemap({
       }));
   }
 
-  // Company shard (single). Skip noindex (empty/unnamed) companies.
-  if (id === COMPANY_SHARD) {
-    const companies = await getCompanies();
-    return companies
-      .filter((c) => c.name && c.facilityCount >= 1)
-      .map((c) => ({
-        url: `${SITE_URL}/companies/${c.slug}`,
-        lastModified: LAST,
-        changeFrequency: "weekly" as const,
-        priority: 0.6,
-      }));
+  // Organization shards (one or more). Enumerate every indexable org slug,
+  // sliced into ≤50k-URL shards. /companies/{slug} is the canonical org URL.
+  if (id >= ORG_SHARD_BASE && id < ORG_SHARD_BASE + ORG_SHARD_COUNT) {
+    const shardIdx = id - ORG_SHARD_BASE;
+    const slugs = indexableOrgSlugs();
+    const start = shardIdx * ORG_PER_SHARD;
+    const slice = slugs.slice(start, start + ORG_PER_SHARD);
+    return slice.map((slug) => ({
+      url: `${SITE_URL}/companies/${slug}`,
+      lastModified: LAST,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
   }
 
   return [];

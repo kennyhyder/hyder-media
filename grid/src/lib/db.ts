@@ -290,6 +290,7 @@ export interface FullDcSite {
   parcel_owner: string | null;
   parcel_apn: string | null;
   land_owner_type: string | null;
+  land_contact_name: string | null;
   land_manager: string | null;
   buildability_score: number | null;
   nlcd_class: string | null;
@@ -345,7 +346,7 @@ const FULL_SITE_COLS = [
   "nearest_ixp_name", "nearest_ixp_distance_km", "fcc_fiber_providers", "fcc_fiber_pct",
   "fcc_max_down_mbps", "nearest_cloud_provider", "nearest_cloud_region", "nearest_cloud_region_km",
   "nearest_cloud_distance_km",
-  "acreage", "parcel_owner", "parcel_apn", "land_owner_type", "land_manager", "buildability_score",
+  "acreage", "parcel_owner", "parcel_apn", "land_owner_type", "land_contact_name", "land_manager", "buildability_score",
   "nlcd_class", "in_industrial_zone", "former_use", "existing_capacity_mw", "cleanup_status",
   "retirement_date",
   "flood_zone", "flood_zone_sfha", "wri_water_stress", "wri_basin_name", "wetland_present",
