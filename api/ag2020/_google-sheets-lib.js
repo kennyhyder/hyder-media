@@ -23,7 +23,15 @@ function getAuth() {
     try {
         creds = typeof raw === 'string' ? JSON.parse(raw.trim()) : raw;
     } catch (err) {
-        throw new Error(`AG2020_GOOGLE_SHEETS_KEY is not valid JSON: ${err.message}`);
+        throw new Error(`AG2020_GOOGLE_SHEETS_KEY is not valid JSON (length=${raw.length}, first 50 chars: ${raw.slice(0,50).replace(/\n/g,'\\n')}): ${err.message}`);
+    }
+    if (!creds.client_email) throw new Error(`Service account JSON missing client_email (keys present: ${Object.keys(creds).join(',')})`);
+    if (!creds.private_key) throw new Error(`Service account JSON missing private_key (keys present: ${Object.keys(creds).join(',')})`);
+    // Vercel sometimes strips literal newlines from env vars. Restore them.
+    // The private_key field MUST contain real newlines for crypto to work,
+    // even though the source JSON has \n escape sequences.
+    if (!creds.private_key.includes('\n')) {
+        creds.private_key = creds.private_key.replace(/\\n/g, '\n');
     }
     return new google.auth.JWT(
         creds.client_email,
