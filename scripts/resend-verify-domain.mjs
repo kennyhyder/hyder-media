@@ -19,6 +19,7 @@ const ENV_FILES = [
   `${ROOT}/grid/.env.local`,
 ];
 function env(key) {
+  if (process.env[key]) return process.env[key].trim(); // inline env wins — lets secrets stay off disk
   for (const file of ENV_FILES) {
     let txt;
     try { txt = readFileSync(file, "utf8"); } catch { continue; }
