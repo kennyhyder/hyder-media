@@ -30,6 +30,7 @@ import JsonLd from "@/components/JsonLd";
 import { Card } from "@/components/EntityProfile";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -53,11 +54,15 @@ export async function generateMetadata({
     rec.states.length > 0
       ? ` across ${rec.states.length} ${rec.states.length === 1 ? "state" : "states"}`
       : "";
-  return {
+  const base = {
     title: `${rec.name} — Infrastructure Portfolio & Assets`,
     description: `${rec.name} owns or operates ${fmtInt(
       rec.totalAssets
     )} catalogued infrastructure assets${stateBit} — datacenters, candidate sites, substations, transmission, fiber, and more. Explore ${rec.name}'s full footprint cross-linked across the ${SITE_NAME} dataset.`,
+  };
+  const override = await getPageOverride(`/companies/${slug}`);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}/companies/${slug}` },
     robots: orgShouldIndex(rec) ? undefined : { index: false, follow: true },
   };

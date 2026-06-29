@@ -19,6 +19,7 @@ import { Row, Card, km2mi } from "@/components/EntityProfile";
 import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -77,13 +78,17 @@ export async function generateMetadata({
     cap,
     bf.retirement_date ? `retired ${bf.retirement_date}` : null,
   ].filter(Boolean);
-  return {
+  const base = {
     title: `${name} — Brownfield Datacenter Site in ${loc}, ${r.stateNm}`,
     description: `${name}, a ${formerUseLabel(
       bf.former_use
     )} brownfield in ${loc}, ${r.stateNm}, evaluated for datacenter redevelopment. ${descParts.join(
       " · "
     )}. Existing grid hookup, retirement status, and nearby candidate sites.`,
+  };
+  const override = await getPageOverride(`/brownfield-sites/${r.stateSlug}/${slug}`);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}/brownfield-sites/${r.stateSlug}/${slug}` },
     robots: shouldIndex(bf) ? undefined : { index: false, follow: true },
   };

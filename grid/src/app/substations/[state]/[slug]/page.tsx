@@ -20,6 +20,7 @@ import { Row, Card } from "@/components/EntityProfile";
 import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 // On-demand ISR: 38k+ substations must NOT prerender at build.
 export const revalidate = 86400;
@@ -79,11 +80,15 @@ export async function generateMetadata({
     owner,
     sub.connected_line_count != null ? `${fmtInt(sub.connected_line_count)} connected transmission lines` : null,
   ].filter(Boolean);
-  return {
+  const base = {
     title: `${name} Substation — ${kv ? `${kv} · ` : ""}${r.stateNm}`,
     description: `${name}, a ${kv ? `${kv} ` : ""}electric transmission substation in ${r.stateNm}. ${descParts.join(
       " · "
     )}. Voltage class, operator, connected lines, and nearby datacenter candidate sites.`,
+  };
+  const override = await getPageOverride(`/substations/${r.stateSlug}/${slug}`);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}/substations/${r.stateSlug}/${slug}` },
     robots: shouldIndex(sub) ? undefined : { index: false, follow: true },
   };

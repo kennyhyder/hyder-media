@@ -26,6 +26,7 @@ import { Row, Card } from "@/components/EntityProfile";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 import { mergeEntity } from "@/lib/overrides";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 import SaveButton from "@/components/account/SaveButton";
 import ClaimButton from "@/components/account/ClaimButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
@@ -61,11 +62,15 @@ export async function generateMetadata({
     d.capacity_mw != null ? `${fmtMwExact(d.capacity_mw)} capacity` : null,
     d.sqft != null ? `${fmtInt(d.sqft)} sq ft` : null,
   ].filter(Boolean);
-  return {
+  const base = {
     title: `${name} — Datacenter${loc ? ` in ${loc}` : ""}${d.operator ? ` (${d.operator})` : ""}`,
     description: `${name}${loc ? ` in ${loc}` : ""}, an operating datacenter facility. ${descParts.join(
       " · "
     )}. Operator, location, nearby internet exchanges, and candidate sites for expansion.`,
+  };
+  const override = await getPageOverride(`/datacenters/${slug}`);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}/datacenters/${slug}` },
     robots: shouldIndex(d) ? undefined : { index: false, follow: true },
   };

@@ -42,6 +42,7 @@ import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 import SaveButton from "@/components/account/SaveButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 // On-demand ISR: 164k sites must NOT prerender at build.
 export const revalidate = 86400;
@@ -133,11 +134,15 @@ export async function generateMetadata({
   ].filter(Boolean);
   const path = siteProfilePath(site) ?? `/datacenter-sites/${r.stateSlug}/${county}/${slug}`;
   const typeLabel = siteTypeLabel(site.site_type || "").toLowerCase();
-  return {
+  const base = {
     title: `${name} — Datacenter Site in ${countyLabel}, ${r.stateNm} | DC Readiness ${score}/100`,
     description: `${name}, ${article(typeLabel)} ${typeLabel} datacenter candidate site in ${countyLabel}, ${
       r.stateNm
     }. ${descParts.join(" · ")}. Power, speed-to-power, fiber, water, and hazard screening from public infrastructure data.`,
+  };
+  const override = await getPageOverride(path);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}${path}` },
     robots: shouldIndex(site)
       ? undefined

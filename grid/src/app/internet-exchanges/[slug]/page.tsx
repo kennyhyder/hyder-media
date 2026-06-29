@@ -25,6 +25,7 @@ import { Row, Card } from "@/components/EntityProfile";
 import OrgLink from "@/components/OrgLink";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
+import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -57,11 +58,15 @@ export async function generateMetadata({
     x.ix_count != null && x.ix_count > 0 ? `${fmtInt(x.ix_count)} internet exchanges` : null,
     x.org_name,
   ].filter(Boolean);
-  return {
+  const base = {
     title: `${name} — Internet Exchange / Peering Facility${loc ? ` in ${loc}` : ""}`,
     description: `${name}${loc ? ` in ${loc}` : ""}, an internet exchange and peering facility. ${descParts.join(
       " · "
     )}. Carrier density, participant networks, and nearby datacenter candidate sites.`,
+  };
+  const override = await getPageOverride(`/internet-exchanges/${slug}`);
+  return {
+    ...applyOverride(base, override),
     alternates: { canonical: `${SITE_URL}/internet-exchanges/${slug}` },
     robots: shouldIndex(x) ? undefined : { index: false, follow: true },
   };
