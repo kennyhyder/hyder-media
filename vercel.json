@@ -211,6 +211,14 @@
     {
       "path": "/api/omicron/weekly-report",
       "schedule": "0 16,17 * * 2"
+    },
+    {
+      "path": "/api/ag2020/sync-google-sheets",
+      "schedule": "0 7,13,19 * * *"
+    },
+    {
+      "path": "/api/ag2020/bucket-allocate",
+      "schedule": "30 7 * * *"
     }
   ],
   "functions": {
