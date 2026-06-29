@@ -4,10 +4,15 @@
 //
 // Design notes
 // ------------
-// - Session: the browser client mirrors the access token into a first-party
-//   cookie (gc-access-token, see supabase-browser.ts). getCurrentUser() reads
-//   that cookie and validates it against Supabase Auth, then loads the gc_users
-//   row for role/capabilities.
+// - Session: the browser client (@supabase/ssr createBrowserClient) writes the
+//   session into chunked first-party cookies (sb-<ref>-auth-token[.N]).
+//   getServerSupabase() reads those cookies via @supabase/ssr's
+//   createServerClient and getCurrentUser() calls supabase.auth.getUser() to
+//   validate the session against Supabase Auth, then loads the gc_users row for
+//   role/capabilities.
+// - Token refresh happens in middleware (src/middleware.ts → updateSession),
+//   which re-issues the auth cookie on every request so sessions don't silently
+//   expire mid-session.
 // - Graceful degradation: gc_ tables may not exist yet (DDL is owner-applied).
 //   Every gc_ read is try/caught and returns a safe empty value, and
 //   accountsEnabled() lets pages skip account UI entirely when unconfigured.
@@ -15,7 +20,8 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { ACCESS_COOKIE } from "./supabase-browser";
+import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/$/, "");
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -133,40 +139,63 @@ export async function gcWrite<T = Record<string, unknown>>(
   }
 }
 
-// ── Current user ─────────────────────────────────────────────────────────────
-
-interface AuthUserResponse {
-  id: string;
-  email?: string;
-  user_metadata?: Record<string, unknown>;
-}
+// ── Server Supabase client (reads the @supabase/ssr auth cookies) ────────────
 
 /**
- * Validate the gc-access-token cookie against Supabase Auth and load the
- * gc_users row. Returns null when not signed in / unconfigured / any failure.
- * No-flash: this runs server-side, so the page renders the correct signed-in
- * state on first paint.
+ * Build a request-scoped Supabase server client that reads the auth session
+ * from the sb-<ref>-auth-token cookies the browser client wrote. In a Server
+ * Component (read-only cookie store) the setAll() is a no-op — token refresh is
+ * handled by middleware, not here. Returns null when unconfigured.
+ *
+ * Use this anywhere you need the authenticated user server-side (pages, route
+ * handlers). For mutations against gc_ tables we still use the service-key REST
+ * helpers (gcRead/gcWrite) below, gated behind getCurrentUser().
+ */
+export async function getServerSupabase(): Promise<SupabaseClient | null> {
+  if (!SUPABASE_URL || !ANON_KEY) return null;
+  const jar = await cookies();
+  return createServerClient(SUPABASE_URL, ANON_KEY, {
+    cookies: {
+      getAll() {
+        return jar.getAll();
+      },
+      setAll(cookiesToSet) {
+        // In Server Components the cookie store is read-only and will throw.
+        // Middleware (updateSession) owns refresh; swallow here so reads work.
+        try {
+          for (const { name, value, options } of cookiesToSet) {
+            jar.set(name, value, options);
+          }
+        } catch {
+          /* read-only cookie store (Server Component) — ignore */
+        }
+      },
+    },
+  });
+}
+
+// ── Current user ─────────────────────────────────────────────────────────────
+
+/**
+ * Validate the session cookie against Supabase Auth (supabase.auth.getUser())
+ * and load the gc_users row. Returns null when not signed in / unconfigured /
+ * any failure. No-flash: this runs server-side, so the page renders the correct
+ * signed-in state on first paint.
  */
 export async function getCurrentUser(): Promise<GcUser | null> {
   if (!accountsEnabled() || !SUPABASE_URL || !ANON_KEY) return null;
-  let token: string | undefined;
-  try {
-    const jar = await cookies();
-    token = jar.get(ACCESS_COOKIE)?.value;
-  } catch {
-    return null;
-  }
-  if (!token) return null;
 
-  // 1) Validate the JWT against Supabase Auth (GoTrue /user).
-  let authUser: AuthUserResponse | null = null;
+  const supabase = await getServerSupabase();
+  if (!supabase) return null;
+
+  // 1) Validate the session against Supabase Auth. getUser() re-checks the JWT
+  //    with GoTrue (not just decoding it locally), so a revoked/expired token
+  //    fails closed.
+  let authUser: { id: string; email?: string } | null = null;
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: ANON_KEY, Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    authUser = (await res.json()) as AuthUserResponse;
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) return null;
+    authUser = { id: data.user.id, email: data.user.email ?? undefined };
   } catch {
     return null;
   }

@@ -4,7 +4,7 @@
 // Every signup passes data: { product: 'gridcensus' } so the shared-project
 // auth.users trigger gate works (see supabase-browser.ts + migration 001).
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getBrowserSupabase,
   authConfigured,
@@ -23,9 +23,23 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  // Surface an error forwarded by the /auth/callback route (e.g. OAuth denied,
+  // expired confirmation code) on first paint.
+  useEffect(() => {
+    const err = new URLSearchParams(window.location.search).get("error");
+    if (err) setError(err);
+  }, []);
+
   const configured = authConfigured();
+  // Email-confirm, magic-link, and OAuth all come back as
+  // <origin>/auth/callback?code=… — the callback route exchanges the code for a
+  // session and then forwards to /account (or ?next=). Pointing these flows
+  // straight at /account would skip the code exchange and the session would
+  // never be set (the bounce-back bug).
   const redirectTo =
-    typeof window !== "undefined" ? `${window.location.origin}/account` : undefined;
+    typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : undefined;
 
   async function withClient<T>(fn: (sb: NonNullable<ReturnType<typeof getBrowserSupabase>>) => Promise<T>) {
     const sb = getBrowserSupabase();
@@ -64,7 +78,12 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       } else {
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        window.location.href = "/account";
+        // With @supabase/ssr the auth cookie is written synchronously by
+        // signInWithPassword, so a full reload to /account lands on a request
+        // the server can authenticate. Honor ?next= if present.
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get("next");
+        window.location.assign(next && next.startsWith("/") ? next : "/account");
       }
     });
   }

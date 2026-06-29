@@ -6,19 +6,12 @@
 
 import { useEffect, useState } from "react";
 import type { EntityType } from "@/lib/overrides";
-import { ACCESS_COOKIE, authConfigured } from "@/lib/supabase-browser";
+import { authConfigured, hasBrowserSession } from "@/lib/supabase-browser";
 
 const STATUS_LABEL: Record<string, string> = {
   email_verified: "Claim verified by email domain — pending owner edit access.",
   pending: "Claim submitted. We'll verify via website/DNS or manual review.",
 };
-
-function hasSessionCookie(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie
-    .split("; ")
-    .some((c) => c.startsWith(`${ACCESS_COOKIE}=`) && c.length > ACCESS_COOKIE.length + 1);
-}
 
 export default function ClaimButton({
   entityType,
@@ -37,7 +30,9 @@ export default function ClaimButton({
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    setSignedIn(hasSessionCookie());
+    let active = true;
+    hasBrowserSession().then((v) => { if (active) setSignedIn(v); });
+    return () => { active = false; };
   }, []);
 
   if (!authConfigured()) return null;

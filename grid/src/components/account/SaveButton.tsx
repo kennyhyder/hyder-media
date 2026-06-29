@@ -5,14 +5,7 @@
 
 import { useEffect, useState } from "react";
 import type { EntityType } from "@/lib/overrides";
-import { ACCESS_COOKIE, authConfigured } from "@/lib/supabase-browser";
-
-function hasSessionCookie(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie
-    .split("; ")
-    .some((c) => c.startsWith(`${ACCESS_COOKIE}=`) && c.length > ACCESS_COOKIE.length + 1);
-}
+import { authConfigured } from "@/lib/supabase-browser";
 
 export default function SaveButton({
   entityType,
@@ -30,11 +23,10 @@ export default function SaveButton({
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  // Resolve signed-in + saved state client-side so the entity page stays static
-  // (no per-request cookies/db on the server).
+  // Resolve signed-in + saved state via the API, which reads the @supabase/ssr
+  // session cookie server-side and returns { signedIn, saved }. The entity page
+  // stays static; only this fetch is per-user.
   useEffect(() => {
-    if (!hasSessionCookie()) return;
-    setSignedIn(true);
     fetch(
       `/api/account/save?entity_type=${encodeURIComponent(entityType)}&entity_id=${encodeURIComponent(entityId)}`,
     )

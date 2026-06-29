@@ -6,14 +6,7 @@
 
 import { useEffect, useState } from "react";
 import type { EntityType } from "@/lib/overrides";
-import { ACCESS_COOKIE, authConfigured } from "@/lib/supabase-browser";
-
-function hasSessionCookie(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie
-    .split("; ")
-    .some((c) => c.startsWith(`${ACCESS_COOKIE}=`) && c.length > ACCESS_COOKIE.length + 1);
-}
+import { authConfigured, hasBrowserSession } from "@/lib/supabase-browser";
 
 export default function SuggestEditButton({
   entityType,
@@ -36,7 +29,9 @@ export default function SuggestEditButton({
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    setSignedIn(hasSessionCookie());
+    let active = true;
+    hasBrowserSession().then((v) => { if (active) setSignedIn(v); });
+    return () => { active = false; };
   }, []);
 
   if (!authConfigured()) return null;

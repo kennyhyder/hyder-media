@@ -1,22 +1,31 @@
 "use client";
 
-// Sidebar account entry. Renders "Sign in" when logged out, "Account" when the
-// gc-access-token cookie is present. Client-only so it can read the cookie; the
-// link is a real <a> either way (works without JS — defaults to Sign in).
+// Sidebar account entry. Renders "Sign in" when logged out, "Account" when a
+// Supabase session is present. Client-only so it can read the session from the
+// browser client; the link is a real <a> either way (works without JS —
+// defaults to Sign in).
 
 import { useEffect, useState } from "react";
-import { ACCESS_COOKIE, authConfigured } from "@/lib/supabase-browser";
-
-function hasSession(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie.split("; ").some((c) => c.startsWith(`${ACCESS_COOKIE}=`) && c.length > ACCESS_COOKIE.length + 1);
-}
+import { getBrowserSupabase, authConfigured } from "@/lib/supabase-browser";
 
 export default function AccountNavLink({ onNavigate }: { onNavigate?: () => void }) {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    setSignedIn(hasSession());
+    const sb = getBrowserSupabase();
+    if (!sb) return;
+    let active = true;
+    sb.auth.getSession().then(({ data }) => {
+      if (active) setSignedIn(Boolean(data.session));
+    });
+    // Keep the label in sync if the user signs in/out in another tab.
+    const { data: sub } = sb.auth.onAuthStateChange((_e, session) => {
+      setSignedIn(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   // Hide entirely if accounts aren't configured in this environment.
