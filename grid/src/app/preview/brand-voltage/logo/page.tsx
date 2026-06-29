@@ -69,7 +69,7 @@ export default function LogoLab() {
               </h2>
               <span style={{ height: 1, flex: 1, background: V.border }} />
               <span style={{ fontFamily: "var(--vlt-mono), monospace", fontSize: 11, color: V.muted }}>
-                {letter === "G" ? "4×4 field · inner spur" : "3×3 field · also reads Census"}
+                {letter === "G" ? "3×3 field · energized center spur" : "3×3 field · also reads Census"}
               </span>
             </div>
 

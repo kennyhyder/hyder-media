@@ -44,31 +44,29 @@ const C_GLYPH: Glyph = {
   showField: true,
 };
 
+// G = the same 3×3 ring as C, but the energized node moves to the CENTER —
+// that center node is the G's inner spur (its tongue), with the mid-right node
+// left open. C and G differ only by where the spark sits.
 const G_GLYPH: Glyph = {
-  cols: 4,
-  rows: 4,
+  cols: 3,
+  rows: 3,
   lit: [
+    [0, 0],
     [1, 0],
-    [2, 0],
-    [3, 0], // top bar
-    [0, 1],
-    [0, 2], // left wall
-    [3, 2], // right wall (lower)
-    [2, 2], // inner spur tip (energized)
-    [1, 3],
-    [2, 3],
-    [3, 3], // bottom bar
-  ],
-  energized: [2, 2],
-  trace: [
-    [3, 0],
-    [1, 0],
-    [0, 1],
+    [2, 0], // top bar
+    [0, 1], // left wall
     [0, 2],
-    [1, 3],
-    [3, 3],
-    [3, 2],
+    [1, 2],
+    [2, 2], // bottom bar
+  ],
+  energized: [1, 1], // center spur — the only difference from C
+  trace: [
+    [2, 0],
+    [0, 0],
+    [0, 2],
     [2, 2],
+    [2, 1], // up the right side…
+    [1, 1], // …then turn inward to the spur
   ],
   showField: true,
 };
@@ -111,7 +109,7 @@ export function VoltageGlyph({
     for (let r = 0; r < g.rows; r++)
       for (let c = 0; c < g.cols; c++) {
         const k = `${c},${r}`;
-        if (!litSet.has(k)) fieldCells.push([c, r]);
+        if (!litSet.has(k) && k !== eKey) fieldCells.push([c, r]);
       }
   }
 
