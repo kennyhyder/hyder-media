@@ -7,7 +7,7 @@
  *  - "Monthly Bills"  → ag2020_bills  (template-level only; bucket may be edited in DB)
  *  - "Job Count"      → returned for inspection only (cross-reference with GlassBiller)
  *
- * Runs daily via cron (vercel.json `*/30 * * * *`) and is also safe to call
+ * Runs every 30 min via cron (see vercel.json) and is also safe to call
  * on-demand from a Refresh button on the dashboard.
  *
  * Authorization: cron header `Authorization: Bearer ${CRON_SECRET}` for scheduled
