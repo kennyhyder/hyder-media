@@ -79,7 +79,7 @@ export default async function AccountPage() {
               {user.role}
             </span>
             {user.reputation > 0 && (
-              <span className="ml-2 text-[11px]" style={{ color: "var(--accent)" }}>
+              <span className="ml-2 text-[11px]" style={{ color: "var(--accent-ink)" }}>
                 {user.reputation} rep
               </span>
             )}
@@ -130,7 +130,7 @@ export default async function AccountPage() {
                   <p className="text-sm font-medium" style={{ color: "var(--text)" }}>{l.name}</p>
                   {l.description && <p className="text-xs" style={{ color: "var(--muted)" }}>{l.description}</p>}
                 </div>
-                {l.is_public && <span className="text-[10px]" style={{ color: "var(--accent)" }}>public</span>}
+                {l.is_public && <span className="text-[10px]" style={{ color: "var(--accent-ink)" }}>public</span>}
               </li>
             ))}
           </ul>

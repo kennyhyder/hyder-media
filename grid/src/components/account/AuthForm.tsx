@@ -259,7 +259,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         </p>
       )}
       {notice && (
-        <p className="mt-4 rounded-lg px-3 py-2 text-xs" style={{ background: "color-mix(in srgb, var(--accent) 14%, transparent)", color: "var(--accent)" }}>
+        <p className="mt-4 rounded-lg px-3 py-2 text-xs" style={{ background: "color-mix(in srgb, var(--accent) 14%, transparent)", color: "var(--accent-ink)" }}>
           {notice}
         </p>
       )}

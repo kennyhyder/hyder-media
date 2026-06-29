@@ -209,7 +209,7 @@ export default async function DatacenterProfilePage({
 
       {overridden.length > 0 && (
         <p className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs"
-           style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)", color: "var(--accent)" }}>
+           style={{ background: "color-mix(in srgb, var(--accent) 12%, transparent)", color: "var(--accent-ink)" }}>
           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M9 12l2 2 4-4" />
           </svg>

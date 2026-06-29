@@ -73,7 +73,7 @@ export default function ClaimButton({
 
   if (result) {
     return (
-      <div className="rounded-lg border px-3 py-2 text-xs" style={{ borderColor: "var(--accent)", color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
+      <div className="rounded-lg border px-3 py-2 text-xs" style={{ borderColor: "var(--accent)", color: "var(--accent-ink)", background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
         {result}
       </div>
     );

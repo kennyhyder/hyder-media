@@ -222,7 +222,7 @@ export default function SitePanel({
                 background:
                   "color-mix(in srgb, var(--accent) 14%, transparent)",
                 border: "1px solid color-mix(in srgb, var(--accent) 45%, transparent)",
-                color: "var(--accent)",
+                color: "var(--accent-ink)",
                 fontWeight: 650,
                 fontSize: 13.5,
                 textDecoration: "none",

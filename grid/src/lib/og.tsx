@@ -1,9 +1,9 @@
 // Shared Open Graph image renderer (1200×630) used by every opengraph-image.tsx.
 //
-// The Control Room palette: dark navy (#0A0E1A) background, cyan (#22D3EE)
-// accent. Each card renders the entity name + a single headline stat so the
-// shared cards double as AI-citation bait. Next auto-wires opengraph-image into
-// BOTH og:image and twitter:image.
+// The Voltage palette: near-black (#0A0B0D) background, electric-lime
+// (#C4F000) accent used as a SIGNAL. Each card renders the entity name + a
+// single headline stat so the shared cards double as AI-citation bait. Next
+// auto-wires opengraph-image into BOTH og:image and twitter:image.
 //
 // Kept dependency-free (no remote fonts) so it renders fast under ISR and never
 // blocks on a network fetch.
@@ -13,12 +13,43 @@ import { ImageResponse } from "next/og";
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
-const BG = "#0A0E1A";
-const BG_2 = "#0F1629";
-const ACCENT = "#22D3EE";
-const TEXT = "#F8FAFC";
-const MUTED = "#94A3B8";
-const BORDER = "#1E293B";
+const BG = "#0A0B0D";
+const BG_2 = "#131519";
+const ACCENT = "#C4F000";
+const TEXT = "#ECEFF3";
+const MUTED = "#8B919B";
+const BORDER = "#232830";
+
+/** Voltage G monogram rendered for the OG brand row (3×3 grid, lime spur). */
+function OgGlyph({ size = 48 }: { size?: number }) {
+  const S = size;
+  const pad = S * 0.16;
+  const span = S - pad * 2;
+  const step = span / 2;
+  const lit = new Set(["0,0", "1,0", "2,0", "0,1", "0,2", "1,2", "2,2"]);
+  const energized = "1,1";
+  const n = S * 0.05;
+  const litR = S * 0.066;
+  const eR = S * 0.094;
+  const rects: { x: number; y: number; s: number; fill: string }[] = [];
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 3; c++) {
+      const k = `${c},${r}`;
+      const cx = pad + c * step;
+      const cy = pad + r * step;
+      if (k === energized) rects.push({ x: cx - eR, y: cy - eR, s: eR * 2, fill: ACCENT });
+      else if (lit.has(k)) rects.push({ x: cx - litR, y: cy - litR, s: litR * 2, fill: TEXT });
+      else rects.push({ x: cx - n, y: cy - n, s: n * 2, fill: "#4A4F58" });
+    }
+  }
+  return (
+    <svg width={S} height={S} viewBox={`0 0 ${S} ${S}`}>
+      {rects.map((r, i) => (
+        <rect key={i} x={r.x} y={r.y} width={r.s} height={r.s} fill={r.fill} />
+      ))}
+    </svg>
+  );
+}
 
 export interface OgStat {
   label: string;
@@ -59,24 +90,14 @@ export function ogCard(opts: OgCardOpts): ImageResponse {
       >
         {/* Brand row */}
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transform: "rotate(45deg)",
-              borderRadius: 8,
-              background: ACCENT,
-            }}
-          />
+          <OgGlyph size={48} />
           <div
             style={{
               fontSize: 30,
-              fontWeight: 800,
+              fontWeight: 700,
               color: TEXT,
-              letterSpacing: -0.5,
+              textTransform: "uppercase",
+              letterSpacing: 4,
             }}
           >
             GridCensus

@@ -38,7 +38,7 @@ export default function UpgradeCTA({
             "GridCensus — dataset / API inquiry"
           )}`}
           className="rounded-lg border px-5 py-2.5 text-sm font-semibold"
-          style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent)", background: "var(--surface)" }}
+          style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent-ink)", background: "var(--surface)" }}
         >
           Talk to us
         </a>

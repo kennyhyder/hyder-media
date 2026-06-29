@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   GridCensus theme system — "Control Room" dark + clean light.
+   GridCensus theme system — "Voltage" dark (native) + clean light.
 
    Strategy: the entire app (195k pages) was authored with hardcoded Tailwind
    color utilities (bg-white / text-gray-900 / border-gray-200 / text-purple-600
@@ -15,15 +15,20 @@
    ========================================================================== */
 
 :root {
-  /* ---- Semantic app surface vars (consumed directly by the shell) ---- */
+  /* ---- Semantic app surface vars (consumed directly by the shell) ----
+     Voltage LIGHT mode — clean, accessible. The lime is reserved as a SIGNAL
+     (fills / borders / the energized node). For accent-colored TEXT/links we
+     use --accent-ink (a darker olive) because lime #C4F000 FAILS WCAG on a
+     light ground. --accent-ink #4F6A00 = 5.82:1 on --bg (AA pass). */
   --bg: #f7f8fa;
   --surface: #ffffff;
   --surface-2: #f0f2f5;
-  --border: #e2e6ec;
-  --text: #0f1623;
-  --muted: #5a6678;
-  --accent: #0e7490;        /* darker cyan — AA contrast on light */
-  --accent-2: #4d7c0f;      /* olive/lime, darkened for light bg */
+  --border: #e2e6eb;
+  --text: #0a0b0d;
+  --muted: #586070;
+  --accent: #c4f000;        /* electric lime — SIGNAL only (fills/borders) */
+  --accent-ink: #4f6a00;    /* dark olive — accent TEXT/links (AA on light) */
+  --accent-2: #4f6a00;      /* legacy alias */
 
   /* Score ramp (shared across both themes) */
   --score-low: #f43f5e;
@@ -52,33 +57,42 @@
   --tw-gray-800: #1d2533;
   --tw-gray-900: var(--text);
 
-  /* Accent (purple/indigo in source) → brand accent cyan */
-  --tw-accent-50: #ecfeff;
-  --tw-accent-100: #cff5fb;
-  --tw-accent-200: #a5e8f2;
-  --tw-accent-300: #67d3e6;
-  --tw-accent-400: #2bb3cf;
-  --tw-accent-500: var(--accent);
-  --tw-accent-600: var(--accent);
-  --tw-accent-700: #0b5f76;
-  --tw-accent-800: #0a4f61;
-  --tw-accent-900: #093f4d;
-  --tw-on-accent: #ffffff;    /* text color that sits on a filled accent */
+  /* Accent (purple/indigo in source) → Voltage olive ramp for LIGHT.
+     KEY CONSTRAINT: the same -500/-600 step is used both as a FILL
+     (`bg-purple-600 text-white` buttons) AND as TEXT (`text-purple-600` links).
+     The bright lime can't do both (lime+white ≈ 1.2:1), so the mid ramp is the
+     dark olive #4F6A00 — white-on-it = 6.19:1, olive-on-white = 6.19:1, both AA.
+     The bright lime is reserved for the semantic --accent SIGNAL token only.
+     -50/100/200 stay pale lime tints for tint backgrounds. */
+  --tw-accent-50: #f4fbcc;
+  --tw-accent-100: #ecf7a3;
+  --tw-accent-200: #ddee6e;
+  --tw-accent-300: #8a9a2e;
+  --tw-accent-400: #6a7d12;
+  --tw-accent-500: var(--accent-ink);
+  --tw-accent-600: var(--accent-ink);
+  --tw-accent-700: #455c00;
+  --tw-accent-800: #3f5400;
+  --tw-accent-900: #364800;
+  --tw-on-accent: #ffffff;    /* white ink on the olive fill (AA: 6.19:1) */
 
   /* Status-tint surfaces (light): keep light tints */
   --tw-tint-bg: 1;            /* multiplier hook (unused, doc only) */
 }
 
 html.dark {
-  /* ---- Control Room dark ---- */
-  --bg: #0a0e1a;
-  --surface: #121829;
-  --surface-2: #0f1422;
-  --border: #1f2a40;
-  --text: #e6edf7;
-  --muted: #8a97ad;
-  --accent: #22d3ee;
-  --accent-2: #a3e635;
+  /* ---- Voltage DARK (the native mode) ----
+     Lime #C4F000 hits 14.8:1 on #0A0B0D, so in dark mode accent text is fine —
+     --accent-ink == --accent. */
+  --bg: #0a0b0d;
+  --surface: #131519;
+  --surface-2: #0f1115;
+  --border: #232830;
+  --text: #eceff3;
+  --muted: #8b919b;
+  --accent: #c4f000;        /* electric lime — signal */
+  --accent-ink: #c4f000;    /* in dark, accent text can be the lime itself */
+  --accent-2: #c4f000;
 
   --background: var(--bg);
   --foreground: var(--text);
@@ -99,18 +113,19 @@ html.dark {
   --tw-gray-800: #d6deea;
   --tw-gray-900: var(--text);
 
-  /* Accent → Control Room cyan */
-  --tw-accent-50: #0c2a33;
-  --tw-accent-100: #0f3a46;
-  --tw-accent-200: #115a6c;
-  --tw-accent-300: #1591ad;
-  --tw-accent-400: #1cbfe0;
+  /* Accent → Voltage lime. Inverted ramp: -50/100 = deep lime-tinted surfaces,
+     -700/800/900 = bright lime for accent TEXT on dark. */
+  --tw-accent-50: #1c2400;
+  --tw-accent-100: #283400;
+  --tw-accent-200: #3f5400;
+  --tw-accent-300: #6f9400;
+  --tw-accent-400: #9fd400;
   --tw-accent-500: var(--accent);
   --tw-accent-600: var(--accent);
-  --tw-accent-700: #67e3f6;
-  --tw-accent-800: #9aeefb;
-  --tw-accent-900: #c8f6ff;
-  --tw-on-accent: #04222a;    /* dark ink on bright cyan fill */
+  --tw-accent-700: #d4ff33;
+  --tw-accent-800: #e0ff66;
+  --tw-accent-900: #ecff99;
+  --tw-on-accent: #0a0b0d;    /* near-black ink on bright lime fill */
 }
 
 /* ----------------------------------------------------------------------------
@@ -175,6 +190,13 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+/* Voltage display type — Space Grotesk on headings (var set in layout.tsx).
+   Mono figures keep Geist Mono. Falls back cleanly if the var is absent. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--vlt-display), var(--font-sans, system-ui, sans-serif);
+  letter-spacing: -0.01em;
 }
 
 /* Smooth (but quick) cross-fade when toggling themes. */
@@ -242,14 +264,17 @@ html.dark .text-blue-600  { color: #60a5fa; }
 .app-border    { border-color: var(--border); }
 .app-text      { color: var(--text); }
 .app-muted     { color: var(--muted); }
-.app-accent    { color: var(--accent); }
+/* accent TEXT uses the AA-safe ink (== lime in dark, dark-olive in light). */
+.app-accent    { color: var(--accent-ink); }
 
-/* Filled accent button/pill that flips ink color per theme. */
+/* Filled accent button/pill — the lime SIGNAL CTA. Near-black ink on lime in
+   BOTH themes (white-on-lime fails; ink-on-lime ≈ 14:1). Independent of the
+   Tailwind --tw-on-accent (which serves the olive `bg-purple-600` fills). */
 .accent-fill {
   background: var(--accent);
-  color: var(--tw-on-accent);
+  color: #0a0b0d;
 }
-.accent-fill:hover { filter: brightness(1.08); }
+.accent-fill:hover { filter: brightness(1.06); }
 
 /* Sidebar nav link states */
 .nav-link {
@@ -277,8 +302,8 @@ html.dark .surface-card {
     0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-/* Brand mark accent diamond */
-.brand-diamond { color: var(--accent); }
+/* Brand mark accent diamond (legacy; Logo now uses the lime energized node). */
+.brand-diamond { color: var(--accent-ink); }
 
 /* ----------------------------------------------------------------------------
    Print (unchanged behavior, force light)
@@ -314,7 +339,7 @@ html.dark .surface-card {
   backdrop-filter: blur(8px);
 }
 .leaflet-control-zoom a:hover {
-  color: var(--accent) !important;
+  color: var(--accent-ink) !important;
   border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important;
 }
 .leaflet-control-attribution {
@@ -324,7 +349,7 @@ html.dark .surface-card {
   backdrop-filter: blur(6px);
   border-radius: 6px 0 0 0;
 }
-.leaflet-control-attribution a { color: var(--accent) !important; }
+.leaflet-control-attribution a { color: var(--accent-ink) !important; }
 .leaflet-tooltip {
   background: color-mix(in srgb, var(--surface) 94%, transparent) !important;
   color: var(--text) !important;

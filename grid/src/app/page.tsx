@@ -77,7 +77,7 @@ export default async function HomePage() {
           border: "1px solid color-mix(in srgb, var(--accent) 30%, var(--border))",
         }}
       >
-        <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
+        <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--accent-ink)" }}>
           Datacenter site intelligence
         </p>
         <h1 className="mt-2 max-w-3xl text-3xl font-extrabold leading-tight md:text-5xl" style={{ color: "var(--text)" }}>
@@ -99,7 +99,7 @@ export default async function HomePage() {
           <a
             href="/rankings"
             className="rounded-lg border px-5 py-2.5 text-sm font-semibold"
-            style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent)" }}
+            style={{ borderColor: "color-mix(in srgb, var(--accent) 40%, var(--border))", color: "var(--accent-ink)" }}
           >
             See the rankings
           </a>
@@ -127,7 +127,7 @@ export default async function HomePage() {
             >
               <p
                 className="text-xs font-semibold uppercase tracking-wide"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-ink)" }}
               >
                 The readiness atlas
               </p>

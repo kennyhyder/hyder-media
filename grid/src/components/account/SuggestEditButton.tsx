@@ -81,7 +81,7 @@ export default function SuggestEditButton({
 
   if (done) {
     return (
-      <div className="rounded-lg border px-3 py-2 text-xs" style={{ borderColor: "var(--accent)", color: "var(--accent)", background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
+      <div className="rounded-lg border px-3 py-2 text-xs" style={{ borderColor: "var(--accent)", color: "var(--accent-ink)", background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
         Thanks — your suggestion is in the moderation queue.
       </div>
     );

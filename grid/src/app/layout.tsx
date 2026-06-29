@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import Sidebar from "../components/Sidebar";
 import MobileNav from "../components/MobileNav";
 import ThemeScript from "../components/ThemeScript";
@@ -20,6 +20,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Voltage display face — Space Grotesk on headings + brand wordmark.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--vlt-display",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -56,13 +64,13 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased`}
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1000] focus:rounded focus:px-4 focus:py-2"
-          style={{ background: "var(--accent)", color: "var(--tw-on-accent, #fff)" }}
+          style={{ background: "var(--accent)", color: "var(--tw-on-accent, #0a0b0d)" }}
         >
           Skip to content
         </a>

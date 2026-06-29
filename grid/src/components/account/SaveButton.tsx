@@ -84,7 +84,7 @@ export default function SaveButton({
         className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition disabled:opacity-60"
         style={
           saved
-            ? { background: "color-mix(in srgb, var(--accent) 16%, transparent)", borderColor: "var(--accent)", color: "var(--accent)" }
+            ? { background: "color-mix(in srgb, var(--accent) 16%, transparent)", borderColor: "var(--accent)", color: "var(--accent-ink)" }
             : { borderColor: "var(--border)", color: "var(--text)" }
         }
       >
