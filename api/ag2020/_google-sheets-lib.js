@@ -16,25 +16,36 @@ import { google } from 'googleapis';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 
-function getAuth() {
+function parseCreds() {
     const raw = process.env.AG2020_GOOGLE_SHEETS_KEY;
     if (!raw) throw new Error('AG2020_GOOGLE_SHEETS_KEY env var is not set');
     let creds;
     try {
         creds = typeof raw === 'string' ? JSON.parse(raw.trim()) : raw;
     } catch (err) {
-        throw new Error(`AG2020_GOOGLE_SHEETS_KEY is not valid JSON: ${err.message}`);
+        throw new Error(`AG2020_GOOGLE_SHEETS_KEY is not valid JSON (length=${raw.length}): ${err.message}`);
     }
-    return new google.auth.JWT(
-        creds.client_email,
-        null,
-        creds.private_key,
-        SCOPES
-    );
+    if (!creds.client_email) throw new Error(`Service account JSON missing client_email (keys: ${Object.keys(creds).join(',')})`);
+    if (!creds.private_key) throw new Error(`Service account JSON missing private_key (keys: ${Object.keys(creds).join(',')})`);
+    // Vercel env var storage normalizes literal newlines. Restore them so
+    // OpenSSL can parse the PEM-encoded private key.
+    if (!creds.private_key.includes('\n')) {
+        creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+    }
+    return creds;
 }
 
-function getSheets() {
-    return google.sheets({ version: 'v4', auth: getAuth() });
+async function getSheets() {
+    const creds = parseCreds();
+    const auth = new google.auth.GoogleAuth({
+        credentials: {
+            client_email: creds.client_email,
+            private_key: creds.private_key,
+        },
+        scopes: SCOPES,
+    });
+    const client = await auth.getClient();
+    return google.sheets({ version: 'v4', auth: client });
 }
 
 function getSheetId() {
@@ -81,7 +92,7 @@ function parseDueDay(s) {
  * Skips rows that aren't a calendar date (header, blank, "Weekly Total Funding" subtotals).
  */
 export async function fetchDailyFunding() {
-    const sheets = getSheets();
+    const sheets = await getSheets();
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: getSheetId(),
         range: "'Daily funding'!A:G",
@@ -127,7 +138,7 @@ const CATEGORY_TO_BUCKET = {
 };
 
 export async function fetchMonthlyBills() {
-    const sheets = getSheets();
+    const sheets = await getSheets();
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: getSheetId(),
         range: "'Monthly Bills'!A:E",
@@ -167,7 +178,7 @@ export async function fetchMonthlyBills() {
  * Skips header and "Weekly Total Jobs" subtotal rows.
  */
 export async function fetchJobCount() {
-    const sheets = getSheets();
+    const sheets = await getSheets();
     const res = await sheets.spreadsheets.values.get({
         spreadsheetId: getSheetId(),
         range: "'Job Count'!A:E",
