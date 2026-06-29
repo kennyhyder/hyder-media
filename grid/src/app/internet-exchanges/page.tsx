@@ -11,7 +11,7 @@ import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Internet Exchanges & Peering Facilities — Carrier Density | GridCensus",
+  title: "Internet Exchanges & Peering Facilities — Carrier Density",
   description:
     "Browse 1,300+ internet exchange and peering facilities across the United States. Connected networks, carrier density, location, and nearby datacenter candidate sites for each exchange.",
   alternates: { canonical: `${SITE_URL}/internet-exchanges` },

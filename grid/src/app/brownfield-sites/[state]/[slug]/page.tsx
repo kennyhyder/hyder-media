@@ -78,7 +78,7 @@ export async function generateMetadata({
     bf.retirement_date ? `retired ${bf.retirement_date}` : null,
   ].filter(Boolean);
   return {
-    title: `${name} — Brownfield Datacenter Site in ${loc}, ${r.stateNm} | GridCensus`,
+    title: `${name} — Brownfield Datacenter Site in ${loc}, ${r.stateNm}`,
     description: `${name}, a ${formerUseLabel(
       bf.former_use
     )} brownfield in ${loc}, ${r.stateNm}, evaluated for datacenter redevelopment. ${descParts.join(

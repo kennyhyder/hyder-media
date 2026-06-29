@@ -62,6 +62,7 @@ export default async function HomePage() {
             description: SITE_DESCRIPTION,
             url: SITE_URL,
             spatialCoverage: "United States",
+            temporalCoverage: `2024/${new Date().getFullYear()}`,
           }),
           faqSchema(FAQ),
         ]}

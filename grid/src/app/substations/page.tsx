@@ -11,7 +11,7 @@ import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Electric Substations by State — Grid Infrastructure | GridCensus",
+  title: "Electric Substations by State — Grid Infrastructure",
   description:
     "Browse 38,000+ electric transmission substations across the United States by state. Voltage class, operator, connected transmission lines, and nearby datacenter candidate sites for each substation.",
   alternates: { canonical: `${SITE_URL}/substations` },

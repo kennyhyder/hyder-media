@@ -29,6 +29,7 @@ import {
   fmtCents,
   fmtUsd,
   scoreColor,
+  article,
 } from "@/lib/format";
 import SitesTable from "@/components/SitesTable";
 import OrgLink from "@/components/OrgLink";
@@ -131,11 +132,10 @@ export async function generateMetadata({
     wait,
   ].filter(Boolean);
   const path = siteProfilePath(site) ?? `/datacenter-sites/${r.stateSlug}/${county}/${slug}`;
+  const typeLabel = siteTypeLabel(site.site_type || "").toLowerCase();
   return {
     title: `${name} — Datacenter Site in ${countyLabel}, ${r.stateNm} | DC Readiness ${score}/100`,
-    description: `${name}, a ${siteTypeLabel(
-      site.site_type || ""
-    ).toLowerCase()} datacenter candidate site in ${countyLabel}, ${
+    description: `${name}, ${article(typeLabel)} ${typeLabel} datacenter candidate site in ${countyLabel}, ${
       r.stateNm
     }. ${descParts.join(" · ")}. Power, speed-to-power, fiber, water, and hazard screening from public infrastructure data.`,
     alternates: { canonical: `${SITE_URL}${path}` },
@@ -393,7 +393,8 @@ export default async function SiteProfilePage({
       </div>
 
       <p className="mt-4 max-w-3xl text-gray-700">
-        {name} is a {siteTypeLabel(site.site_type || "candidate").toLowerCase()} datacenter
+        {name} is {article(siteTypeLabel(site.site_type || "candidate").toLowerCase())}{" "}
+        {siteTypeLabel(site.site_type || "candidate").toLowerCase()} datacenter
         candidate site in {countyLabel}, {r.stateNm}
         {site.iso_region ? `, interconnecting through ${site.iso_region}` : ""}. It screens at{" "}
         {score != null ? `${fmtScore(score)}/100 DC Readiness` : "an unscored DC Readiness"}

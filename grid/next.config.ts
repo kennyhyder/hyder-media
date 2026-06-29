@@ -33,6 +33,27 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  // Legacy CSR pages (thin / duplicate-titled / superseded by the SSR redesign)
+  // 301 to their redesigned equivalents. Keeps the index clean and consolidates
+  // link equity. The dead /lines /corridor /site etc. all fold into /explore.
+  async redirects() {
+    return [
+      { source: "/sites", destination: "/datacenter-sites", permanent: true },
+      { source: "/site", destination: "/explore", permanent: true },
+      { source: "/lines", destination: "/explore", permanent: true },
+      { source: "/line", destination: "/explore", permanent: true },
+      { source: "/corridors", destination: "/explore", permanent: true },
+      { source: "/corridor", destination: "/explore", permanent: true },
+      { source: "/compare", destination: "/datacenter-sites", permanent: true },
+      { source: "/hyperscale", destination: "/datacenters", permanent: true },
+      { source: "/market", destination: "/rankings", permanent: true },
+      { source: "/search", destination: "/explore", permanent: true },
+      { source: "/dashboard", destination: "/explore", permanent: true },
+      { source: "/brownfield", destination: "/brownfield-sites", permanent: true },
+      { source: "/brownfields", destination: "/brownfield-sites", permanent: true },
+      { source: "/parcels", destination: "/datacenter-sites", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

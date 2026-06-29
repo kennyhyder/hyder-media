@@ -761,7 +761,7 @@ function BrownfieldDetailContent() {
                       {f.sales_email ? (
                         <a href={`mailto:${f.sales_email}`} className="text-purple-600 hover:underline block">{f.sales_email}</a>
                       ) : f.sales_phone ? (
-                        <a href={`tel:${f.sales_phone}`} className="text-gray-600 block">{f.sales_phone}</a>
+                        <a href={`tel:${String(f.sales_phone).replace(/\D/g, "")}`} className="text-gray-600 block">{f.sales_phone}</a>
                       ) : f.tech_email ? (
                         <a href={`mailto:${f.tech_email}`} className="text-purple-600 hover:underline block">{f.tech_email}</a>
                       ) : (

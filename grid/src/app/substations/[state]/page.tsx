@@ -25,7 +25,7 @@ export async function generateMetadata({
   const st = stateBySlug(state);
   if (!st) return { title: "State not found", robots: { index: false, follow: false } };
   return {
-    title: `Electric Substations in ${st.name} — Voltage, Operators & Lines | GridCensus`,
+    title: `Electric Substations in ${st.name} — Voltage, Operators & Lines`,
     description: `Electric transmission substations in ${st.name}, ranked by voltage. Operator, connected transmission lines, and nearby datacenter candidate sites for each substation.`,
     alternates: { canonical: `${SITE_URL}/substations/${st.slug}` },
   };

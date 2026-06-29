@@ -44,7 +44,23 @@ export interface DatasetOpts {
   url: string;
   dateModified?: string;
   spatialCoverage?: string;
+  /** ISO-8601 interval/year string, e.g. "2024/2026". Homepage Dataset uses it. */
+  temporalCoverage?: string;
 }
+
+// The scored DC Readiness factors — emitted as schema.org PropertyValue so AI
+// answer engines can enumerate exactly what the dataset measures.
+const SCORED_FACTORS = [
+  "power availability",
+  "speed to power",
+  "fiber connectivity",
+  "water risk",
+  "natural hazard",
+  "labor market",
+  "land cost",
+  "tax incentives",
+  "climate / cooling",
+];
 
 export function datasetSchema(opts: DatasetOpts): Json {
   const out: Json = {
@@ -64,9 +80,19 @@ export function datasetSchema(opts: DatasetOpts): Json {
       "power availability",
       "data center real estate",
     ],
+    variableMeasured: SCORED_FACTORS.map((f) => ({
+      "@type": "PropertyValue",
+      name: f,
+    })),
+    distribution: {
+      "@type": "DataDownload",
+      encodingFormat: "text/csv",
+      contentUrl: `${SITE_URL}/api/grid/dc-export`,
+    },
+    spatialCoverage: { "@type": "Place", name: opts.spatialCoverage ?? "United States" },
   };
-  if (opts.spatialCoverage) {
-    out.spatialCoverage = { "@type": "Place", name: opts.spatialCoverage };
+  if (opts.temporalCoverage) {
+    out.temporalCoverage = opts.temporalCoverage;
   }
   return out;
 }

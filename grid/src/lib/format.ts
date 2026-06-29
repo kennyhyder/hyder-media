@@ -49,3 +49,8 @@ export function scoreColor(score: number | null | undefined): string {
   if (score >= 40) return "bg-amber-100 text-amber-800";
   return "bg-red-100 text-red-700";
 }
+
+/** Pick the right indefinite article ("a" / "an") for the following word. */
+export function article(word: string | null | undefined): string {
+  return word && /^[aeiou]/i.test(word.trim()) ? "an" : "a";
+}

@@ -11,7 +11,7 @@ import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Brownfield & Retired Power Plant Sites for Datacenters | GridCensus",
+  title: "Brownfield & Retired Power Plant Sites for Datacenters",
   description:
     "Browse 2,000+ brownfield and retired power plant sites across the United States, evaluated for datacenter redevelopment. Existing grid hookup, former capacity, retirement status, and nearby candidate sites by state.",
   alternates: { canonical: `${SITE_URL}/brownfield-sites` },

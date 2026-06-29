@@ -58,7 +58,7 @@ export async function generateMetadata({
     x.org_name,
   ].filter(Boolean);
   return {
-    title: `${name} — Internet Exchange / Peering Facility${loc ? ` in ${loc}` : ""} | GridCensus`,
+    title: `${name} — Internet Exchange / Peering Facility${loc ? ` in ${loc}` : ""}`,
     description: `${name}${loc ? ` in ${loc}` : ""}, an internet exchange and peering facility. ${descParts.join(
       " · "
     )}. Carrier density, participant networks, and nearby datacenter candidate sites.`,

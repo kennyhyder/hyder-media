@@ -11,7 +11,7 @@ import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Operating Datacenters — Operators, Locations & Capacity | GridCensus",
+  title: "Operating Datacenters — Operators, Locations & Capacity",
   description:
     "Browse operating datacenter facilities across the United States. Operator, location, footprint, nearby internet exchanges, and candidate sites for expansion around each datacenter.",
   alternates: { canonical: `${SITE_URL}/datacenters` },

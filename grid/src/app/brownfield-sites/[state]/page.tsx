@@ -25,7 +25,7 @@ export async function generateMetadata({
   const st = stateBySlug(state);
   if (!st) return { title: "State not found", robots: { index: false, follow: false } };
   return {
-    title: `Brownfield & Retired Power Plant Sites in ${st.name} | GridCensus`,
+    title: `Brownfield & Retired Power Plant Sites in ${st.name}`,
     description: `Brownfield and retired generation sites in ${st.name} evaluated for datacenter redevelopment — former capacity, retirement status, and existing grid hookup.`,
     alternates: { canonical: `${SITE_URL}/brownfield-sites/${st.slug}` },
   };

@@ -145,10 +145,11 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         <form onSubmit={onPasswordSubmit} className="flex flex-col gap-3">
           {mode === "signup" && (
             <div>
-              <label className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>
+              <label htmlFor="auth-name" className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>
                 Name <span className="opacity-60">(optional)</span>
               </label>
               <input
+                id="auth-name"
                 className={inputCls}
                 style={inputStyle}
                 value={displayName}
@@ -158,8 +159,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
             </div>
           )}
           <div>
-            <label className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Email</label>
+            <label htmlFor="auth-email" className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Email</label>
             <input
+              id="auth-email"
               type="email"
               required
               className={inputCls}
@@ -170,8 +172,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Password</label>
+            <label htmlFor="auth-password" className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Password</label>
             <input
+              id="auth-password"
               type="password"
               required
               minLength={8}
@@ -193,8 +196,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       ) : (
         <form onSubmit={onMagicLink} className="flex flex-col gap-3">
           <div>
-            <label className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Email</label>
+            <label htmlFor="auth-magic-email" className="mb-1 block text-xs" style={{ color: "var(--muted)" }}>Email</label>
             <input
+              id="auth-magic-email"
               type="email"
               required
               className={inputCls}

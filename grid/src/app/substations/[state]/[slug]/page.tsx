@@ -80,7 +80,7 @@ export async function generateMetadata({
     sub.connected_line_count != null ? `${fmtInt(sub.connected_line_count)} connected transmission lines` : null,
   ].filter(Boolean);
   return {
-    title: `${name} Substation — ${kv ? `${kv} · ` : ""}${r.stateNm} | GridCensus`,
+    title: `${name} Substation — ${kv ? `${kv} · ` : ""}${r.stateNm}`,
     description: `${name}, a ${kv ? `${kv} ` : ""}electric transmission substation in ${r.stateNm}. ${descParts.join(
       " · "
     )}. Voltage class, operator, connected lines, and nearby datacenter candidate sites.`,

@@ -62,7 +62,7 @@ export async function generateMetadata({
     d.sqft != null ? `${fmtInt(d.sqft)} sq ft` : null,
   ].filter(Boolean);
   return {
-    title: `${name} — Datacenter${loc ? ` in ${loc}` : ""}${d.operator ? ` (${d.operator})` : ""} | GridCensus`,
+    title: `${name} — Datacenter${loc ? ` in ${loc}` : ""}${d.operator ? ` (${d.operator})` : ""}`,
     description: `${name}${loc ? ` in ${loc}` : ""}, an operating datacenter facility. ${descParts.join(
       " · "
     )}. Operator, location, nearby internet exchanges, and candidate sites for expansion.`,

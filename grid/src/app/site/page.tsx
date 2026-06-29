@@ -1160,7 +1160,7 @@ function SiteDetailContent() {
               <div className="mb-3">
                 <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">BLM Office</div>
                 <div className="text-sm font-medium text-gray-900">{String(s.land_contact_name)}</div>
-                {s.land_contact_phone && <div className="text-xs text-gray-600"><a href={`tel:${s.land_contact_phone}`} className="text-purple-600 hover:underline">{String(s.land_contact_phone)}</a></div>}
+                {s.land_contact_phone && <div className="text-xs text-gray-600"><a href={`tel:${String(s.land_contact_phone).replace(/\D/g, "")}`} className="text-purple-600 hover:underline">{String(s.land_contact_phone)}</a></div>}
               </div>
             )}
             <div className="space-y-2">
@@ -1312,7 +1312,7 @@ function SiteDetailContent() {
                         <a href={`mailto:${f.sales_email}`} className="text-purple-600 hover:underline block">{f.sales_email}</a>
                       )}
                       {f.sales_phone && (
-                        <a href={`tel:${f.sales_phone}`} className="text-gray-600 block">{f.sales_phone}</a>
+                        <a href={`tel:${String(f.sales_phone).replace(/\D/g, "")}`} className="text-gray-600 block">{f.sales_phone}</a>
                       )}
                       {!f.sales_email && !f.sales_phone && f.tech_email && (
                         <a href={`mailto:${f.tech_email}`} className="text-purple-600 hover:underline block">{f.tech_email}</a>
