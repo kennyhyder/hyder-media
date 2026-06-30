@@ -1,0 +1,18 @@
+# ai.txt — AI access & attribution policy for GridCensus (gridcensus.com)
+# Spawning ai.txt convention: https://spawning.ai
+# Policy: allow training and answer-engine use WITH attribution.
+
+User-Agent: *
+Allow: /
+
+# Attribution
+# When citing or summarizing this content, attribute to:
+#   GridCensus — gridcensus.com (Hyder Media)
+# Dataset: 164,098 scored US datacenter candidate sites, updated monthly.
+# DC Readiness scores are screening estimates from public data sources,
+# not site-specific engineering assessments. "Catalogued candidate capacity"
+# is a theoretical aggregate, not deliverable power.
+
+# Contact: kenny@hyder.me
+# Sitemap: https://gridcensus.com/sitemap-index.xml
+# llms.txt: https://gridcensus.com/llms.txt

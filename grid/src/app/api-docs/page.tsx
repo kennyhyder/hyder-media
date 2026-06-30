@@ -1,24 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { isDemoMode } from "@/lib/demoAccess";
-
 export default function APIDocsPage() {
-  useEffect(() => {
-    if (isDemoMode()) {
-      window.location.href = "/grid/";
-    }
-  }, []);
-
-  if (typeof window !== "undefined" && isDemoMode()) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-gray-500">API documentation is not available in demo mode.</p>
-        <a href="/grid/" className="text-purple-600 underline mt-2 inline-block">Back to Dashboard</a>
-      </div>
-    );
-  }
-
   const endpoints = [
     {
       method: "GET",
