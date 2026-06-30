@@ -1,0 +1,69 @@
+/* Editorial Light — scoped canvas + typography.
+   Applied only on the .root subtree. The global theme is untouched.
+   Fonts arrive via the --ed-serif / --ed-mono CSS variables set by next/font. */
+
+.root {
+  /* Break out of the root layout's <main class="max-w-7xl mx-auto px-4 py-6">
+     so the preview owns the full viewport width and paints its own canvas. */
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -1.5rem; /* cancel main's py-6 top */
+  margin-bottom: -1.5rem;
+  min-height: 100vh;
+
+  background: #fbfaf7;
+  color: #1a1a17;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.serif {
+  font-family: var(--ed-serif), Georgia, "Times New Roman", serif;
+}
+
+.mono {
+  font-family: var(--ed-mono), ui-monospace, "SFMono-Regular", monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Centered editorial column. */
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 720px) {
+  .shell {
+    padding: 0 1.25rem;
+  }
+}
+
+/* Links inside body copy: teal, underline on hover only. */
+.root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Leaflet popups restyled to the editorial palette (scoped to this subtree). */
+.root :global(.leaflet-container) {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: #fbfaf7;
+}
+.root :global(.leaflet-popup-content-wrapper) {
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e7e2d9;
+}
+.root :global(.leaflet-popup-tip) {
+  border: 1px solid #e7e2d9;
+}
+.root :global(.leaflet-bar a) {
+  border-radius: 0;
+  color: #1a1a17;
+}
