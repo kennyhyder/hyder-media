@@ -245,6 +245,11 @@ export default async function HomePage() {
         <div className="mt-3">
           <SitesTable sites={top} showState showCounty caption="Top scored US datacenter sites" linkBuilder={siteProfilePath} />
         </div>
+        <div className="mt-3">
+          <a href="/top-sites" className="text-sm font-medium text-purple-700 hover:underline">
+            View the full top 100 datacenter sites →
+          </a>
+        </div>
       </section>
 
       {/* Methodology blurb */}
