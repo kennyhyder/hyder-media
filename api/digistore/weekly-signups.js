@@ -285,6 +285,21 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+    // TEMP forensic log — identify runaway caller (June 24 BQ bill incident).
+    // Remove after caller is identified.
+    console.log('[weekly-signups] caller', JSON.stringify({
+        ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || null,
+        cf_ip: req.headers['cf-connecting-ip'] || null,
+        vercel_ip: req.headers['x-vercel-forwarded-for'] || null,
+        ua: req.headers['user-agent'] || null,
+        referer: req.headers['referer'] || null,
+        origin: req.headers['origin'] || null,
+        vercel_id: req.headers['x-vercel-id'] || null,
+        query: req.query,
+        method: req.method,
+        ts: new Date().toISOString(),
+    }));
+
     const reportEnd = (req.query.end && /^\d{4}-\d{2}-\d{2}$/.test(req.query.end)) ? req.query.end : todayISO();
     const reportStart = REPORT_START;
 
