@@ -191,7 +191,7 @@ export function getSupabase() {
 }
 
 export function checkAuth(req) {
-  if (!process.env.CRON_SECRET) return true;
+  if (!process.env.CRON_SECRET) return false; // fail closed if secret missing
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 

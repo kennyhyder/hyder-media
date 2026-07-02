@@ -249,11 +249,15 @@ async function pageAll(supabase, table, select, eqFilter = {}, notNull = null, g
     return out;
 }
 
+import { requireAuth } from './_auth.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+    if (!(await requireAuth(req, res))) return;
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const bucket = (req.query.bucket || 'week').toLowerCase();

@@ -135,7 +135,8 @@ export default async function handler(req, res) {
   const secret = (process.env.CRON_SECRET || '').trim();
   const auth = req.headers.authorization || '';
   const force = req.query?.force === '1';
-  if (secret && auth !== `Bearer ${secret}`) return res.status(401).json({ error: 'unauthorized' });
+  // Fail closed: reject when CRON_SECRET is missing or the header doesn't match.
+  if (!secret || auth !== `Bearer ${secret}`) return res.status(401).json({ error: 'unauthorized' });
   // Safe recipient check (no PDF build, no send) — confirm the configured list.
   if (req.query?.recipients === '1') {
     return res.status(200).json({ ok: true, configured_to: process.env.OMICRON_REPORT_TO || 'kenny@hyder.me (default)', cc: process.env.OMICRON_REPORT_CC || null });

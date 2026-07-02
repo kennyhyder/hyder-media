@@ -19,7 +19,8 @@ function getSupabase() {
 }
 
 function checkAuth(req) {
-  const expected = `Bearer ${process.env.CRON_SECRET || ""}`;
+  if (!process.env.CRON_SECRET) return false; // fail closed if secret missing
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
   return req.headers.authorization === expected || req.headers.Authorization === expected;
 }
 

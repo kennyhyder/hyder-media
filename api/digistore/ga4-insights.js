@@ -13,6 +13,9 @@
  */
 
 import { BigQuery } from '@google-cloud/bigquery';
+import { guard, getCached, setCached } from './_guard.js';
+
+const CACHE_TTL_MS = 15 * 60 * 1000;
 
 const PROJECT_ID = (process.env.GA4_BQ_PROJECT_ID || 'ds24-analytics-9338').trim();
 const HISTORY_TABLE = (process.env.GA4_BQ_HISTORY_TABLE || 'ds24_views.signup_history_apr2026').trim();
@@ -31,11 +34,19 @@ function getBigQueryClient() {
 }
 
 export default async function handler(req, res) {
+    if (!guard(req, res)) return;
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    const cachedResult = getCached(req);
+    if (cachedResult) {
+        res.setHeader('X-Cache', 'HIT');
+        return res.status(200).json(cachedResult);
+    }
 
     const result = { source: null, rows: [], totals: {}, errors: [], dataAge: null };
     let bq;
@@ -211,6 +222,8 @@ export default async function handler(req, res) {
         }, { vendor: 0, affiliate: 0, notSet: 0, total: 0, signups: 0 });
 
         result.status = 'success';
+        // Cache so repeated hits within the TTL don't re-run BigQuery.
+        setCached(req, result, CACHE_TTL_MS);
         return res.status(200).json(result);
 
     } catch (error) {

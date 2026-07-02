@@ -12,6 +12,17 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    // Guard: only allow calls with the cron secret, or same-site requests
+    // (Omicron dashboard's API-status check on clients/omicron/summary.html).
+    const authHeader = req.headers['authorization'] || '';
+    const referer = req.headers['referer'] || '';
+    const hasCronAuth = process.env.CRON_SECRET
+        && authHeader === `Bearer ${process.env.CRON_SECRET}`;
+    const isSameSite = referer.startsWith('https://hyder.me/');
+    if (!hasCronAuth && !isSameSite) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const results = {
         config: {},
         connection: null,

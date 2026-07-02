@@ -33,12 +33,11 @@ function todayISO(offsetDays = 0) {
 }
 
 export default async function handler(req, res) {
+    // Fail-closed: if CRON_SECRET is unset, reject rather than run open.
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret) {
-        const auth = req.headers.authorization || '';
-        if (auth !== `Bearer ${cronSecret}`) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
+    const cronAuth = req.headers.authorization || '';
+    if (!cronSecret || cronAuth !== `Bearer ${cronSecret}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 
     // Accept explicit start/end (YYYY-MM-DD) for historical backfills, else

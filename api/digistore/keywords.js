@@ -7,8 +7,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { guard } from './_guard.js';
 
 export default async function handler(req, res) {
+    if (!guard(req, res)) return;
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');

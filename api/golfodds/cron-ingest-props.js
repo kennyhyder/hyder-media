@@ -55,7 +55,7 @@ function getSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 function checkAuth(req) {
-  if (!process.env.CRON_SECRET) return true;
+  if (!process.env.CRON_SECRET) return false; // fail closed if secret missing
   return req.headers.authorization === `Bearer ${process.env.CRON_SECRET}`;
 }
 

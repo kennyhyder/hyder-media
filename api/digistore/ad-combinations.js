@@ -12,11 +12,13 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { guard } from './_guard.js';
 
 const CUSTOMER_ID = '2466246400';
 const LOGIN_CUSTOMER_ID = '2466246400';
 
 export default async function handler(req, res) {
+    if (!guard(req, res)) return;
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

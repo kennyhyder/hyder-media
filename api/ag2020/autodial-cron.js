@@ -15,12 +15,11 @@ import { isBusinessHours, placeCall } from './_autodial-lib.js';
 const BATCH = 25;
 
 export default async function handler(req, res) {
+    // Fail closed: reject when CRON_SECRET is missing or the header doesn't match.
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret) {
-        const auth = req.headers.authorization || '';
-        if (auth !== `Bearer ${cronSecret}`) {
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
+    const auth = req.headers.authorization || '';
+    if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 
     if (!isBusinessHours()) {

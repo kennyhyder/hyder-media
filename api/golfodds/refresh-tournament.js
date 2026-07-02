@@ -19,7 +19,7 @@ export const config = { maxDuration: 60 };
 
 function checkAuth(req) {
   const provided = req.query?.secret || (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  if (!process.env.CRON_SECRET) return true;
+  if (!process.env.CRON_SECRET) return false; // fail closed if secret missing
   return provided === process.env.CRON_SECRET;
 }
 

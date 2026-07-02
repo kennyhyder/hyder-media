@@ -21,6 +21,9 @@
 
 import { BigQuery } from '@google-cloud/bigquery';
 import { createClient } from '@supabase/supabase-js';
+import { guard, getCached, setCached } from './_guard.js';
+
+const CACHE_TTL_MS = 15 * 60 * 1000;
 
 const REPORT_START = '2026-04-10';
 const GA4_LAST_DATE = '2026-04-30';
@@ -279,11 +282,19 @@ async function fetchGoogleAdsDailySignups(start, end) {
 }
 
 export default async function handler(req, res) {
+    if (!guard(req, res)) return;
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+    res.setHeader('Cache-Control', 'private, max-age=300');
+    const cached = getCached(req);
+    if (cached) {
+        res.setHeader('X-Cache', 'HIT');
+        return res.status(200).json(cached);
+    }
 
     const reportEnd = (req.query.end && /^\d{4}-\d{2}-\d{2}$/.test(req.query.end)) ? req.query.end : todayISO();
     const reportStart = REPORT_START;
@@ -406,7 +417,7 @@ export default async function handler(req, res) {
     totals.vendorPct = totals.total > 0 ? Math.round((totals.vendor / totals.total) * 1000) / 10 : 0;
     totals.affiliatePct = totals.total > 0 ? Math.round((totals.affiliate / totals.total) * 1000) / 10 : 0;
 
-    return res.status(200).json({
+    const payload = {
         status: errors.length > 0 ? 'partial' : 'success',
         reportStart,
         reportEnd,
@@ -420,5 +431,9 @@ export default async function handler(req, res) {
         totals,
         errors,
         generatedAt: new Date().toISOString(),
-    });
+    };
+    // Cache success AND partial (both cost BigQuery/Google Ads calls to build)
+    // so repeated hits within the TTL never re-trigger upstream queries.
+    setCached(req, payload, CACHE_TTL_MS);
+    return res.status(200).json(payload);
 }

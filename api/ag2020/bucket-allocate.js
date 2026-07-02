@@ -12,11 +12,15 @@
 
 import { getSupabase, runAllocationCatchup, refreshBalanceSnapshots } from './_buckets-lib.js';
 
+import { requireAuth } from './_auth.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
+
+    if (!(await requireAuth(req, res))) return;
 
     const result = { started_at: new Date().toISOString() };
     try {
