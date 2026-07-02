@@ -3,6 +3,23 @@
 ## Project Overview
 This repository contains multiple interconnected projects for Kenny Hyder's digital marketing consultancy at hyder.me.
 
+**The full stack extends beyond this repo** — see `~/.claude/CLAUDE.md` (global stack registry, loaded every session) and Mission Control (mc.hyder.me, repo `kennyhyder/mission-control`). Notable external projects: **mission-control** (control center), **marksearch.ai** (`~/Desktop/USPTOsearch`), **tradebot** (DO droplet), **subredmonitor.com**, **automatedojo** (own repo, lives at `automatedojo/` here).
+
+## Monorepo top-level map
+| Dir | What | Live | Docs |
+|---|---|---|---|
+| `/` (root html) | hyder.me site + tools + /playbook + /about + /capabilities | hyder.me | this file |
+| `api/` | ~19 serverless namespaces, 39 crons (sports, golfodds, seo canaries, ag2020, digistore, omicron, vita-brevis, solar, grid-legacy, _platform shared libs) | hyder.me/api/* | per-dir CLAUDE.md |
+| `clients/` | Client dashboards (ag2020, digistore24, omicron, vita-brevis, falconlabs, dunham, autoaddiction, affiliati) | hyder.me/clients/* | `clients/*/CLAUDE.md` |
+| `sportsbookish/` | Odds-comparison SaaS — git-linked, own Vercel project | sportsbookish.com | `sportsbookish/CLAUDE.md` |
+| `grid/` | **GridCensus** (ex-GridScout) — standalone SaaS, own Supabase (`hzaqzbtyqqixmibcfuwo`), own Vercel project | gridcensus.com | `grid/CLAUDE.md` |
+| `golfodds/` | Golf odds frontend; data plane for sportsbookish (crons in `api/golfodds/`) | hyder.me/golfodds | `golfodds/CLAUDE.md` |
+| `automatedojo/` | AutomateDojo SaaS — **own git repo** nested here | automatedojo.com | `automatedojo/CLAUDE.md` |
+| `solar/` | SolarTrack DB (Blue Water Battery) | hyder.me/solar | `solar/CLAUDE.md` |
+| `tokens/` | Opportunity Framework (static, stable) | hyder.me/tokens | — |
+| `decks/` | Pitch decks: framework, auto-glass, gridscout, ag2020-investor, ai-strategy | hyder.me/decks/* | — |
+| `docs/`, `downloads/`, `scripts/`, `watch-faces/`, `cv/`, `moving-checklist/` | Docs, playbook bundle, data scripts, Garmin faces, expert-witness CV, misc | — | — |
+
 ## Directory Structure
 
 ### Root (`/`)

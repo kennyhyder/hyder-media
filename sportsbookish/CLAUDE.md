@@ -1,221 +1,218 @@
 # SportsBookish — Product Context for AI Agents
 
-**SportsBookish** is a SaaS that surfaces pricing edges between Kalshi (regulated event-contract exchange) and traditional sportsbooks across multiple sports. It's the productized evolution of the prototype at `hyder.me/golfodds`.
+**SportsBookish** is a production SaaS at **https://sportsbookish.com** that surfaces pricing edges between prediction markets (Kalshi, Polymarket) and traditional sportsbooks across team sports + golf. It grew out of the `hyder.me/golfodds` prototype and is now a full multi-sport odds-comparison platform with subscriptions, a public REST API, affiliate monetization, embeds, and programmatic SEO surfaces.
 
-**Product home**: https://sportsbookish.com (DNS in progress) · https://sportsbookish.vercel.app (always live)
-**Owner**: Kenny Hyder (kenny@hyder.me)
-**Started**: 2026-05-12 (this directory created same day as the golfodds prototype was built)
+**Owner**: Kenny Hyder (kenny@hyder.me) · **Started**: 2026-05-12 · **Status**: LIVE, paying customers, Stripe LIVE keys
 
 ## At a glance
 
 | | |
 |---|---|
-| Stack | Next.js 16 (Turbopack), TypeScript, shadcn/ui (base-ui-based), Tailwind v4, Supabase Auth + Postgres, Stripe v22, Lucide, Sonner |
+| Stack | Next.js 16 (Turbopack), TypeScript, shadcn/ui (base-ui-based), Tailwind v4, Supabase Auth + Postgres, Stripe v22, Lucide, Sonner, zod, react-query |
 | Hosting | Vercel project `sportsbookish` (proj_38DXJ93VFAvooocRjDIC6HHB3ohE), team `kennys-projects-93847471` |
-| Domain | `sportsbookish.com` (DNS via Cloudflare → Vercel A 76.76.21.21) |
-| Database | Supabase project `ilbovwnhrowvxjdkvrln` (shared with golfodds/solar/grid; tables prefixed `sb_*`) |
-| Payments | Stripe LIVE account (same one as reddit-keyword-monitor / subredmonitor); separate Products for SportsBookish |
-| Email | Resend (`golfodds@hyder.me` and `noreply@hyder.me` — verify hyder.me domain in Resend before launch) |
+| Domain | `sportsbookish.com` (Cloudflare DNS → Vercel) |
+| Database | Supabase project `ilbovwnhrowvxjdkvrln` (shared with golfodds/solar/grid/automatedojo; app tables prefixed `sb_*`) |
+| Payments | Stripe **LIVE** account — real charges. Test mode requires separate `sk_test_*` products + Preview-scope env vars |
+| Email | Resend (transactional + alerts) |
+| SMS | Twilio (Elite alerts) |
+| Data plane | `hyder.me/api/sports/*` + `hyder.me/api/golfodds/*` (cron ingest lives in the parent hyder-media repo) |
 
-## Pricing tiers
+## Tiers + monetization
 
-Source of truth: `lib/tiers.ts`. Schema mirror: `sb_subscription_tiers` (Supabase).
+### UI tiers — source of truth `lib/tiers.ts` (schema mirror: `sb_subscription_tiers`)
 
-| Tier | Name | Price | Stripe Price | Feature flags |
-|---|---|---|---|---|
-| `free` | First Line | $0 | (none — no Stripe entry) | `win_only: true` |
-| `pro` | Pro | $10/mo | `price_1TWUT0EI9W6dG0u9aXzidX4Z` | all markets, home_book, book_filter, props, matchups |
-| `elite` | Elite | $100/yr | `price_1TWUT0EI9W6dG0u9lmIAf8TZ` | all Pro + alerts (email + SMS), custom thresholds, sub-min updates, watchlist |
+| Tier | Name | Price | Notes |
+|---|---|---|---|
+| `free` | First Line | $0 | Win/H2H+spread+total headline markets, books median + 5 major books, watchlist, daily edge digest email |
+| `pro` | Pro | **$10/mo** | All markets + all 11+ books + golf depth + DataGolf model probs, home_book, book filtering, manual email alert rules |
+| `elite` | Elite | **$100/yr** | Everything in Pro + smart preset alerts, SMS delivery, custom thresholds per market type, watchlist push, sub-minute updates |
 
-Source of truth for pricing is `lib/tiers.ts` — `priceCents` + `interval`. Stripe Price IDs are LIVE-mode in the project Vercel env. Email templates + landing copy MUST match these numbers (last sync 2026-06-08 from $19/$39 → $10/$100 — drip emails were stale, fixed in same commit as the Polymarket affiliate wiring).
+**Repriced 2026-06-08** from $19/mo / $39/mo → $10/mo / $100/yr. If you see $19/$39 anywhere (emails, landing copy, docs), it's stale — fix it. `lib/tiers.ts` `priceCents` + `interval` is authoritative; Stripe Price IDs live in Vercel env (`STRIPE_PRICE_PRO`, `STRIPE_PRICE_ELITE`).
 
-Product IDs are LIVE-mode and stored in Stripe under names `SportsBookish Pro` / `SportsBookish Elite`. For TEST mode, re-run `scripts/setup-stripe-products.mjs` with a `sk_test_*` key.
+### API tiers — independent add-on (also in `lib/tiers.ts`)
 
-## File map (sportsbookish/)
+Developers subscribe to the REST API separately from the UI tier (two separate Stripe subscriptions can coexist). Gated by `sb_api_keys`, NOT `sb_subscriptions.tier`.
 
-```
-sportsbookish/
-├── app/
-│   ├── page.tsx                       # Marketing landing (hero, features, pricing teaser, footer)
-│   ├── pricing/page.tsx               # Public pricing page
-│   ├── signup/page.tsx                # Magic-link signup; optional ?tier= for direct-to-checkout
-│   ├── login/page.tsx                 # Magic-link login
-│   ├── auth/callback/route.ts         # Supabase code-exchange; honors ?tier= to bounce to checkout
-│   ├── dashboard/page.tsx             # Auth-required home; shows tier + golf link
-│   ├── api/
-│   │   ├── me/route.ts                # Returns current user + subscription + preferences
-│   │   ├── auth/signout/route.ts      # POST signout
-│   │   └── stripe/
-│   │       ├── checkout/route.ts            # POST: create checkout session (called from PricingCards)
-│   │       ├── checkout-redirect/route.ts   # GET: same, but 302s direct to Stripe (used post-signup)
-│   │       └── webhook/route.ts             # Stripe → us; updates sb_subscriptions + sb_billing_history
-│   └── golf/                          # Phase 2 — golf views ported from hyder.me/golfodds
-├── components/
-│   ├── ui/                            # shadcn/ui components (auto-generated)
-│   ├── nav/MarketingNav.tsx           # Public top nav
-│   └── marketing/PricingCards.tsx     # Pricing cards (calls /api/stripe/checkout)
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts                  # Browser-side client
-│   │   ├── server.ts                  # Server-side (cookies) + service-role client
-│   │   └── middleware.ts              # Session refresh + /dashboard gate
-│   ├── stripe.ts                      # Stripe SDK accessor
-│   ├── tiers.ts                       # Tier definitions (used by Stripe setup + UI + filtering)
-│   └── tier-guard.ts                  # (Phase 2) server-side tier resolution helper
-├── scripts/
-│   ├── schema.sql                     # Supabase migrations for sb_* tables
-│   ├── setup-stripe-products.mjs      # Idempotent: creates/finds Products + Prices, prints env vars
-│   └── setup-stripe-webhook.mjs       # Idempotent: creates/updates webhook endpoint, prints secret
-├── middleware.ts                      # Next.js middleware (proxy in v16) — calls supabase/middleware
-├── next.config.ts                     # turbopack.root set to silence multi-lockfile warning
-└── .env.local                         # See "Env vars" section below
-```
-
-## Environment variables
-
-All required for the app to run. Production values are in Vercel project `sportsbookish` env. Local dev: `.env.local`.
-
-| Var | Purpose | Scope |
+| Plan | Price | Quota |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Browser-safe Supabase URL | All envs |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe Supabase anon key (RLS-enforced) | All envs |
-| `SUPABASE_SERVICE_KEY` | Server-side privileged key (used by webhook) | All envs |
-| `STRIPE_SECRET_KEY` | `sk_live_*` in prod, `sk_test_*` in preview/staging | Per-env |
-| `STRIPE_PUBLISHABLE_KEY` | `pk_live_*` / `pk_test_*` | Per-env |
-| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (from Stripe dashboard or `setup-stripe-webhook.mjs`) | Per-env |
-| `STRIPE_PRICE_PRO` | $10/mo Price ID | Per-env (test/live differ) |
-| `STRIPE_PRICE_ELITE` | $100/yr Price ID | Per-env (test/live differ) |
-| `NEXT_PUBLIC_SITE_URL` | `https://sportsbookish.com` (prod) or staging URL | Per-env |
-| `RESEND_API_KEY` | Transactional email | All envs |
-| `VAULT_API_KEY` | Vault Network sub-affiliate API key (for /admin/affiliates dashboard) | All envs |
-| `AFFILIATE_POLYMARKET_URL` | Optional override of the Polymarket affiliate URL — defaults to the Routy SPORTSBOOKISH link | All envs |
+| Demo (free) | $0 | 1,000 req/mo shared public key (published in /api/docs — AI-friendly) |
+| `api_monthly` | $50/mo | 20,000 req/mo per key |
+| `api_annual` | $500/yr | 20,000 req/mo per key |
+| `enterprise` | contact | custom volume + WebSocket + historical archive |
 
-**Critical**: production uses `sk_live_*` keys — real charges. Staging should use `sk_test_*` keys.
+### Affiliate monetization (Vault Network)
 
-## Database schema
+Prediction-market + sportsbook brands are monetized through Vault Network (sub-affiliate — see `docs/Vault Sports - Sub-Affiliate Agreement_Rate Guide (SportsBookISH).pdf`).
 
-All tables prefixed `sb_` to coexist with `golfodds_*`, `solar_*`, `grid_*`, etc.
+- `lib/vault.ts` — POST-only API at `https://api.vaultnetwork.io`, auth via `apiKey` **in the JSON body** (not header). Endpoints: `POST /External/MyBrands`, `POST /External/DailyStats`. Proxied via `GET /api/admin/vault/{brands,stats}` (admin-only) and rendered at `/admin/affiliates` (7d/30d/90d windows, per-brand rollups, 10-min server cache).
+- `lib/affiliates.ts` — per-brand affiliate URLs (env-overridable: `AFFILIATE_POLYMARKET_URL`, `AFFILIATE_KALSHI_URL`, `AFFILIATE_DRAFTKINGS_URL`, etc.).
+- **Polymarket visual promo ads are iOS-only** per Vault terms — `<PolymarketPromo>` detects iOS via `lib/device.ts` and renders `null` elsewhere. The affiliate *URL* itself is universal. Ad creatives in `public/affiliate-ads/polymarket/`.
+- **Compliance language (MANDATORY)**: when a verb targets Kalshi or Polymarket, use *trade / predict / buy a position / combo* — never *bet / wager / stake / gamble / parlay*. Sportsbook-side language (FanDuel/DraftKings) is unrestricted. See `docs/Vault Affiliate Network.pdf` language sheet.
 
-### `sb_subscription_tiers`
-Plan catalog. Seeded with `free` / `pro` / `elite` rows + `feature_flags` JSONB.
+## App surfaces (app/)
 
-### `sb_subscriptions`
-One row per user. Tier + Stripe linkage. Auto-created at `free` tier on signup via `sb_handle_new_user()` trigger on `auth.users`.
+### Public odds + edges
+- `/sports` + `/sports/[league]` — league hubs (event, players/[slug], teams, [year] sub-routes)
+- `/sports/arbitrage`, `/sports/middles`, `/sports/movers`, `/sports/positive-ev` — scanner pages
+- `/odds/[sport]/[market]` — programmatic odds pages
+- `/golf` — golf hub with `/golf/[year]`, `/golf/players/[slug]`, `/golf/tournament/{ladder,matchups,player,props}`
 
-Columns: `user_id` (PK, FK auth.users), `tier`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, `status`, `current_period_start/end`, `cancel_at_period_end`, `canceled_at`, timestamps.
+### Comparison + review SEO surfaces
+- `/compare/[slug]` + `/compare/polymarket-vs-kalshi` — brand-vs-brand comparison pages driven by `lib/brand-profiles.ts`
+- `/sportsbooks` + `/sportsbooks/[slug]` — sportsbook/exchange review pages (same registry)
+- `/sportsbook-promos` — promo/affiliate offers page
+- `/research/*` — long-form research articles (3 as of 2026-07)
+- `/learn` + `/learn/[slug]` + `/learn/glossary` — educational content (glossary from `lib/glossary.ts`)
+- `/tools/{kelly-calculator,no-vig-calculator,odds-converter,parlay-calculator}` — free calculator tools
+- `/about`, `/press`, `/contact`, `/data`
 
-**Stripe v22 gotcha**: `current_period_start`/`end` now live on `subscription.items[0]`, not on `Subscription` directly. The webhook handler has `periodOf(sub)` helper to extract.
+### Authenticated user surfaces
+- `/dashboard` — tier-aware home
+- `/alerts` — alert rules (Pro: manual email rules; Elite: smart presets + SMS)
+- `/bets` — bet tracking (Elite) with `lib/bet-score.ts`
+- `/clv-leaderboard` — closing-line-value leaderboard
+- `/watchlist` (API at `/api/watchlist`) — bookmark teams/players
+- `/settings` + `/settings/api-keys` — account + API key management
+- `/redeem/[code]` — invite/promo code redemption (`lib/invites.ts`)
+- `/unsubscribe` — email prefs
 
-### `sb_user_preferences`
-Per-user settings for Pro+ features.
+### Embeds + public API
+- `/embed/*` — embeddable widgets (`biggest-edges`, `event`)
+- `/api/v1/{odds,edges,golf}` + `/api/v1/openapi.json` — public REST API, Bearer-key auth via `lib/api-auth.ts`, key CRUD at `/api/keys`
+- `/api/docs` — API documentation
 
-Columns: `user_id` (PK), `home_book` (e.g. `'draftkings'` — Pro+ users compare edge vs THIS book instead of book median), `excluded_books` (TEXT[] — books filtered OUT of consensus median), `alert_thresholds` (JSONB — Elite custom thresholds per market_type), `notification_channels` (TEXT[]), `sms_phone`.
+### Admin (`ADMIN_EMAILS` env gate, default kenny@hyder.me — `lib/admin.ts` `requireAdmin()`)
+- `/admin` — hub
+- `/admin/affiliates` — Vault Network revenue dashboard
+- `/admin/distribute` — content distribution
+- `/admin/invites` — invite code management
+- `/admin/sharp-engage` — sharp-user engagement
+- `/admin/users` — user management
 
-### `sb_billing_history`
-Invoice records from Stripe webhook (`invoice.payment_succeeded` / `payment_failed`). For user-facing receipts later.
+## Key libs (lib/)
 
-### RLS policies
-All `sb_*` tables have RLS enabled. Users can only read their own rows. The service-role client (used by webhook) bypasses RLS.
+| File | Role |
+|---|---|
+| `tiers.ts` | UI + API tier definitions, price-ID resolution (env-trimmed) |
+| `tier-guard.ts` | Server-side tier resolution — re-reads tier per request |
+| `brand-profiles.ts` | **Centralized brand registry** (9 slugs: kalshi, polymarket, draftkings, fanduel, betmgm, caesars, fanatics, betrivers, circa). Feeds /compare, /sportsbooks reviews, JSON-LD Organization markup for AI overviews. Facts have `asOf` dates — re-verify before compliance-sensitive copy |
+| `sports-data.ts`, `golf-data.ts`, `movements-data.ts`, `props-data.ts`, `matchup-data.ts`, `sportsbook-comparison-data.ts` | Server-side data access — fetch from the hyder.me data plane |
+| `redirects.ts` | Middleware redirect lookup (see below — the 504 fix) |
+| `vault.ts` | Vault Network affiliate API client |
+| `affiliates.ts` | Affiliate URLs + promo constants per brand |
+| `books.ts`, `kalshi.ts` | Book metadata + Kalshi helpers |
+| `alert-rules.ts`, `email-templates.ts` | Alerting + transactional email |
+| `api-auth.ts`, `admin.ts`, `invites.ts` | API-key auth, admin gate, invite codes |
+| `seo.tsx`, `slug.ts`, `indexnow.ts`, `glossary.ts` | SEO metadata/JSON-LD, slugs, IndexNow pings, glossary |
+| `analytics.ts`, `track-event.ts` | GA4 events — push to `window.dataLayer` directly, never `gtag()` (race-y) |
+| `stripe.ts` | Stripe SDK accessor (defensive `.trim()` on key) |
+| `supabase/` | Browser / server / middleware clients (`@supabase/ssr` — never share across contexts) |
+| `device.ts` | iOS detection for Polymarket promo gating |
 
-## Auth flow
+## Data plane (hyder-media parent repo)
 
-1. User clicks "Start free" or "Subscribe — Pro"
-2. → `/signup` (or `/signup?tier=pro`)
-3. Enters email → `signInWithOtp` sends magic link via Supabase Auth (which uses default SMTP — Supabase project dashboard configures the sender)
-4. Click link → `/auth/callback?code=X&tier=pro` → exchanges code → session set
-5. If `?tier=` present, redirect to `/api/stripe/checkout-redirect?tier=X` which 302s to Stripe Checkout
-6. Else redirect to `/dashboard`
-7. Stripe webhook (`checkout.session.completed`) updates `sb_subscriptions.tier`
-8. Dashboard reflects new tier on next page load
+This app is UI + auth + billing only. **All ingestion, cron jobs, and alert detection run on the `hyder.me` Vercel project** in the parent repo:
 
-**Login flow**: `/login` is the same magic-link pattern but `shouldCreateUser: false`.
+- `lib/golf-data.ts` + `lib/sports-data.ts` fetch from `https://hyder.me/api/golfodds/*` and `https://hyder.me/api/sports/*` (host overridable via `GOLFODDS_API_HOST` / `NEXT_PUBLIC_DATA_HOST`)
+- Ingest tables (`golfodds_*`, `sports_*`) live in the shared Supabase project but are written only by the parent repo's crons (Kalshi, Polymarket, DataGolf, The Odds API)
+- Shared odds math / name normalization lives at `hyder-media/api/_platform/` — don't duplicate it here
+- Three canaries (`cron-route-canary`, `cron-data-freshness`, `cron-coverage-check`) in the parent repo watch the data plane
+- App-owned tables are prefixed `sb_*` (subscriptions, preferences, billing, api_keys, alert rules, bets, watchlist, invites, redirects, etc. — schemas in `scripts/*.sql`)
 
-## Stripe webhook
+## Middleware + redirects — the June 18 504 lesson
 
-URL: `https://sportsbookish.vercel.app/api/stripe/webhook` (or `.com` once DNS lands)
-Endpoint ID: `we_1TWUaHEI9W6dG0u9FHBSrgvI`
-Events: `checkout.session.completed`, `customer.subscription.{created,updated,deleted}`, `invoice.payment_{succeeded,failed}`
+`middleware.ts` runs `checkRedirect()` (from `lib/redirects.ts`) FIRST, then the Supabase session refresh (`lib/supabase/middleware.ts`).
 
-For TEST mode, run `scripts/setup-stripe-webhook.mjs` with `sk_test_*` and a different URL (e.g. `https://sportsbookish-staging.vercel.app/api/stripe/webhook`). It creates a separate test-mode endpoint with its own secret.
+`checkRedirect` looks up `sb_url_redirects` (exact-match table) via Supabase REST on every page request. Hardening (commit `b9c362c1`, 2026-06-18):
 
-## Common tasks
+1. **1.2s hard timeout, fail OPEN** — a slow Supabase must never stall rendering. Previously this fetch had no timeout; a slow Supabase hung the middleware on EVERY request and the gateway 504'd site-wide before the page could render.
+2. **In-memory micro-cache per edge isolate** (60s TTL, 5s negative-cache on error, 4k-entry cap). The Next Data Cache does NOT apply to fetches inside middleware — without this cache every page load was a live Supabase round-trip. Negative caching matters most (most paths have no redirect row).
+3. **Pattern-based "smart" fallbacks are DISABLED and forbidden** (`smartFallback` returns null). An earlier version 301'd live `/sports/<league>/<year>/<slug>` etc. URLs to their parents — catastrophic for SEO/UX. Only the DB-backed exact-match table may redirect. See memory `route-health-rules.md`.
 
-### Add a new Stripe product/price
-1. Add entry to `PLANS` in `scripts/setup-stripe-products.mjs`
-2. `STRIPE_SECRET_KEY=sk_xxx node scripts/setup-stripe-products.mjs`
-3. Add resulting Price ID to Vercel env + `.env.local`
-4. Add tier to `lib/tiers.ts` + `sb_subscription_tiers` table
+**Next 16 deprecation**: Next prefers `proxy.ts` over `middleware.ts`. Functionally identical for now; rename eventually.
 
-### Add a new env var
-1. `vercel env add NAME production` (echo value via stdin)
-2. Add to `.env.local` for dev
-3. Document in this file
+## Deploy
 
-### Run schema migration
-1. Edit `scripts/schema.sql` (idempotent — uses `CREATE TABLE IF NOT EXISTS`)
-2. `PGPASSWORD='#FsW7iqg%EYX&G3M' psql -h aws-0-us-west-2.pooler.supabase.com -p 6543 -U postgres.ilbovwnhrowvxjdkvrln -d postgres -f scripts/schema.sql`
-
-### Deploy
+- **Git-linked to the hyder-media repo** (Vercel root directory: `sportsbookish/`). **Push to `main` → auto-deploys.** Do NOT run `vercel --prod` locally.
+- One push rebuilds both `hyder.me` (parent) and `sportsbookish.com` (this app).
 - Local dev: `npm run dev` (http://localhost:3000)
-- Manual deploy: `vercel --prod` (Pro plan, no CI yet)
-- Git push: triggers Vercel Preview on any branch; only `main` → production (configure in Vercel dashboard)
+- Schema migration: edit the relevant `scripts/*-schema.sql` (idempotent), apply via psql session-mode pooler (`aws-0-us-west-2.pooler.supabase.com` — port 5432 for DDL like `CREATE INDEX CONCURRENTLY`; 6543 transaction mode fails on those)
+- Stripe products/webhooks: `scripts/setup-stripe-products.mjs` + `scripts/setup-stripe-webhook.mjs` (idempotent; run with `sk_test_*` for test mode)
 
-## Affiliate monetisation (Vault Network)
+### Environment variables (Vercel project `sportsbookish` + `.env.local`)
 
-Polymarket and other prediction-market brands are monetised through Vault Network (sub-affiliate program — see `docs/Vault Sports - Sub-Affiliate Agreement_Rate Guide (SportsBookISH).pdf`). The Polymarket entry is wired in `lib/affiliates.ts` with the Routy tracking URL; constants `POLYMARKET_AFFILIATE_URL`, `POLYMARKET_PROMO_CODE`, `POLYMARKET_PROMO_HEADLINE` are exported for reuse.
+| Var | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-safe Supabase (RLS-enforced; also used by middleware redirect lookup) |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` | Server-side privileged (webhook, admin) |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | **`sk_live_*` in prod — real charges** |
+| `STRIPE_PRICE_PRO` / `STRIPE_PRICE_ELITE` | UI-tier Price IDs ($10/mo, $100/yr) |
+| `STRIPE_PRICE_API_MONTHLY` / `STRIPE_PRICE_API_ANNUAL` | API add-on Price IDs ($50/mo, $500/yr) |
+| `NEXT_PUBLIC_SITE_URL` | `https://sportsbookish.com` |
+| `RESEND_API_KEY` / `RESEND_FROM` | Transactional email |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_FROM_NUMBER` | Elite SMS alerts |
+| `VAULT_API_KEY` | Vault Network affiliate API |
+| `AFFILIATE_*_URL` | Per-brand affiliate URL overrides (POLYMARKET, KALSHI, DRAFTKINGS, FANDUEL, BETMGM, CAESARS, FANATICS, BETRIVERS) |
+| `ADMIN_EMAILS` | Comma-separated admin allowlist (default `kenny@hyder.me`) |
+| `CRON_SECRET` | Bearer auth for cron-invoked routes |
+| `GOLFODDS_API_HOST` / `NEXT_PUBLIC_DATA_HOST` | Data-plane host override (default `https://hyder.me`) |
+| `SPORTSBOOKISH_API_KEY` | Internal/shared API key |
+| `SB_SMART_404_FALLBACK` | Set `0` to disable smart fallback (currently a no-op anyway — see redirects) |
 
-- **Affiliate URL is universal** — every Polymarket label uses it on every device.
-- **Visual promo ads are iOS-only** — the $20-deposit / $50-trading-bonus offer is restricted to the Polymarket iOS app per Vault terms. `<PolymarketPromo>` (server component) detects iOS via `lib/device.ts` and renders `null` on non-iOS. Five ad sizes live under `public/affiliate-ads/polymarket/`.
-- **Compliance language** — when a verb targets Kalshi or Polymarket, use *trade / predict / buy a position / combo*, never *bet / wager / stake / gamble / parlay*. Sportsbook-side language is unrestricted (FanDuel/DraftKings can be "bet" against). See `docs/Vault Affiliate Network.pdf` Sales/DFS/Sweeps/Prediction-markets language sheet.
+**Adding env vars**: use `printf %s "value" | vercel env add NAME production` — `echo` bakes a trailing `\n` into the value, which corrupts Stripe/Vault auth headers ("connection error, retried 2 times" = local header corruption, not network). All `STRIPE_*`, `VAULT_API_KEY`, and price-ID reads are defensively `.trim()`'d; do the same for any new secret.
 
-### Vault API integration (`lib/vault.ts`)
+## Pre-deploy checklist (run before every push touching UI / routes / nav / data layer)
 
-POST-only API at `https://api.vaultnetwork.io`. Auth via `apiKey` in JSON body (not header). Two endpoints used:
+```bash
+# 1. TypeScript
+npx tsc --noEmit
 
-- `POST /External/MyBrands` → `[{ brand, states, cpa, notes }]` — offers we're allowed to promote with state availability + CPA (split applied).
-- `POST /External/DailyStats` → `[{ brand, link, region, date, registrations, ftds, qualifications, clicks, commission }]` for a date window.
+# 2. Build
+npm run build
 
-Surfaces in this app:
-- `GET /api/admin/vault/brands` — proxied to MyBrands. Admin-only.
-- `GET /api/admin/vault/stats?days=N&brands=...` — proxied to DailyStats + per-brand rollup. Admin-only.
-- `/admin/affiliates` — server-rendered dashboard. Window selector (7d/30d/90d). Renders top-line totals (clicks/regs/FTDs/qualified/commission), per-brand rollup with funnel rates + $/click, and an Active offers table from MyBrands. Server cache 10 min via `next.revalidate`.
+# 3. Security headers (post-deploy, against live URL)
+curl -sI https://sportsbookish.com | grep -iE "^(strict-transport|content-security|x-frame|x-content-type|referrer-policy|permissions-policy):"
 
-API key handling mirrors `lib/stripe.ts` defensive-trim pattern (`vercel env add` echoes append `\n`). When `VAULT_API_KEY` is missing the page renders a setup card with the `printf %s "key" | vercel env add ...` recipe instead of crashing.
+# 4. W3C validation (post-deploy)
+curl -s https://sportsbookish.com | curl -s --data-binary @- -H "Content-Type: text/html" "https://validator.w3.org/nu/?out=json" | python3 -c "import sys,json;r=json.load(sys.stdin);print(f'errors: {len([m for m in r[\"messages\"] if m[\"type\"]==\"error\"])}, warnings: {len([m for m in r[\"messages\"] if m.get(\"subType\")==\"warning\"])}')"
 
-## Connection to hyder-media monorepo
+# 5. WAVE accessibility (manual: https://wave.webaim.org/extension/ or https://wave.webaim.org/api/request)
 
-`sportsbookish/` lives inside the `hyder-media` Git repo but is its own Vercel project (root directory: `sportsbookish/`). Pushing to `main` rebuilds both:
-- `hyder.me` (the existing site, includes `/golfodds` legacy)
-- `sportsbookish.com` (this app)
+# 6. Smoke-test core flows in incognito + signed-in:
+#    - / (homepage)
+#    - /sports/mlb (or any in-season league)
+#    - /sports/mlb/event/<id> (any active game)
+#    - /golf (current tournament)
+#    - /alerts (Pro+ only)
+#    - /bets (Elite only)
+#    - /admin (admin only)
+#    - Pricing checkout (load /pricing, click Subscribe — do NOT complete payment: LIVE keys)
+```
 
-The existing `/golfodds` system (Kalshi/DataGolf ingest, cron jobs, alerts) on `hyder.me` is the **data source** for `sportsbookish.com` views (Phase 2). The cron jobs continue to run on the hyder.me project; sportsbookish fetches via the same `/api/golfodds/*` endpoints.
+Targets: security headers 100/100 (HSTS preload, full CSP, COOP/CORP), W3C 0 errors 0 warnings, WAVE 0 errors ≤2 alerts, clean build, no broken routes. Regressions → revert or patch BEFORE merging.
 
-## Phase roadmap
+**Route-health rules (MANDATORY)**: any middleware / redirect / route-shape change must pass live-URL smoke tests before AND after deploy. Pattern-based redirects matching live route shapes are forbidden — two catastrophic precedents (see Middleware section + memory `route-health-rules.md`).
 
-- **Phase 1 ✅** (this session): Auth + subscriptions + Stripe + landing/pricing/signup/login/dashboard scaffolding
-- **Phase 2** (next): Port `/golfodds` views into `sportsbookish/app/golf/*` with tier-aware data gating; `home_book` + `excluded_books` preferences UI; add `lib/tier-guard.ts`
-- **Phase 3**: NBA Playoffs ingest (same Kalshi pattern, no books for V1); Movement alerts (Kalshi prob moves ≥X% in N min); SMS via Twilio for Elite
-- **Phase 4**: Digital Ocean worker maintaining Kalshi WebSocket for sub-minute updates; Elite-tier custom alert thresholds UI
-- **Phase 5+**: Multi-sport selector at root, additional sports (MLB, NHL, tennis, soccer), historical line movement charts, public API access tier
+## Known issues + gotchas
 
-## Critical gotchas
+1. **Stripe key is LIVE** — real charges. Use `sk_test_*` + Preview-scope env for development.
+2. **Stripe v22 moved period dates** — `current_period_start/end` live on `subscription.items[0]`, not the Subscription. Webhook uses `periodOf()` helper.
+3. **shadcn/ui base-ui doesn't ship `asChild`** — use `buttonVariants()` class on `<Link>` instead of `<Button asChild>`. Older Next.js SaaS tutorial patterns will trip you here.
+4. **Tier check at request time** — the webhook updates `sb_subscriptions.tier` immediately; any data-gating API must re-read tier per request (`lib/tier-guard.ts`), never cache at session creation.
+5. **Cookies / SSR** — `@supabase/ssr` clients (browser/server/middleware) live in `lib/supabase/`; never share across contexts.
+6. **`middleware.ts` → `proxy.ts` deprecation** — Next 16 warns; rename pending.
+7. **Middleware fetches bypass the Next Data Cache** — hence the hand-rolled micro-cache in `lib/redirects.ts`. Don't remove it.
+8. **Magic links route through Supabase project SMTP** — auth email template must reference `https://sportsbookish.com`, not the default Supabase URL.
+9. **GA4 events**: push to `window.dataLayer` directly; `window.gtag` from useEffect races with `@next/third-parties/google`. Tier is passed in Stripe `success_url` so `purchase` value is correct before the webhook lands.
+10. **Env vars + trailing newlines** — see Deploy section; `printf %s`, never `echo`.
+11. **Futures data vendor gap** — The Odds API only exposes ~14 championship/winner futures keys; MVP/win-totals/awards/divisions aren't in the feed at any tier. Books DO publish them — never claim otherwise in user copy. `NoBooksDataNote` component renders tier-aware upsell/mailto instead.
+12. **Brand-profile facts drift** — funding/valuation/volume numbers in `lib/brand-profiles.ts` carry `asOf` dates; re-verify before using in compliance-sensitive copy.
+13. **Duplicate file artifact** — `lib/affiliates 2.ts` is an iCloud/macOS duplicate; the real module is `lib/affiliates.ts`. Safe to delete if it reappears.
 
-1. **Stripe key is LIVE** — `sk_live_*`. Real charges happen. Switch to test mode for development by creating `sk_test_*` products + setting Preview-scope Vercel env vars.
-2. **shadcn/ui base-ui doesn't ship asChild** — use `buttonVariants()` class on `<Link>` instead of `<Button asChild>`.
-3. **Stripe v22 moved period dates** — `current_period_start/end` are on `Subscription.items[0]`, not the subscription. See `periodOf()` in webhook.
-4. **Magic links route through Supabase project SMTP** — make sure the Supabase auth email template references `https://sportsbookish.com` (not the default Supabase URL).
-5. **Resend `from` domain** — `hyder.me` must be verified in Resend to send `golfodds@hyder.me`. Verify at https://resend.com/domains. Fallback to `onboarding@resend.dev` until verified.
-6. **Cookies / SSR** — using `@supabase/ssr`. The browser, server, and middleware clients are all in `lib/supabase/`. Never share clients across contexts.
-7. **Middleware deprecation warning** — Next.js 16 prefers `proxy.ts` over `middleware.ts`. Functionally identical for now but will need rename eventually.
-8. **`asChild` is gone** — see #2. If you copy patterns from older Next.js SaaS tutorials, this will trip you up.
-9. **Tier check at request time, not creation time** — webhook updates `sb_subscriptions.tier` immediately on Stripe events. Any API that gates data should re-read the user's tier on each request.
+## History
 
-## Where the prototype lives
-
-The original golf prototype is at:
-- UI: https://hyder.me/golfodds/ (password gate `BIRDIE`)
-- Data ingest: Vercel cron in the `hyder-media` project (every 5 min Kalshi + 10 min DataGolf)
-- DB tables: `golfodds_*` (separate from `sb_*`)
-- Alert detector: `/api/golfodds/cron-detect-alerts` (fires email via Resend)
-
-When Phase 2 ports views into `sportsbookish`, the data layer keeps using `golfodds_*` tables — only the auth, tier gating, and UI shell are new. Long-term we may rename tables to `sports_*` for multi-sport, but not yet.
+- **2026-05-12** — Phase 1: auth + Stripe + landing/pricing/signup/dashboard scaffold
+- **2026-05-22** — Golf views ported, tier gating, futures expansion, GA4 events, LastUpdated freshness, AI discoverability (llms.txt, OpenAPI, HF dataset, Wikidata Q139814938)
+- **2026-06-08** — Repriced $19/$39 → $10/mo / $100/yr; Polymarket affiliate wired (Vault Network)
+- **2026-06-18** — Site-wide 504 incident fixed (commit `b9c362c1`): middleware redirect lookup got timeout + fail-open + micro-cache
+- Since then: full production surface set (scanners, comparisons, reviews, tools, learn/research, embeds, public API v1, admin suite)
