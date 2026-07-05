@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bron × Hyder Media — Pre-call Intake</title>
+<style>
+  :root{ --bg:#0b0d10; --card:#14181d; --line:#242a31; --text:#e8eef4; --muted:#9aa7b4; --accent:#6ea8fe; --accent2:#8b5cf6; --ok:#34d399; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(1200px 600px at 70% -10%, #17202b 0%, var(--bg) 55%); color:var(--text); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .wrap{ max-width:760px; margin:0 auto; padding:40px 20px 80px; }
+  .brandline{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; letter-spacing:.3px; text-transform:uppercase; }
+  h1{ font-size:30px; margin:14px 0 6px; letter-spacing:-.5px; }
+  .sub{ color:var(--muted); margin:0 0 8px; }
+  .lead{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:22px 0 28px; color:var(--muted); }
+  .lead b{ color:var(--text); }
+  .q{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:14px 0; }
+  .q label.qlabel{ display:block; font-weight:600; margin-bottom:4px; }
+  .q .hint{ color:var(--muted); font-size:13.5px; margin-bottom:12px; }
+  input[type=text], textarea, select{ width:100%; background:#0e1216; border:1px solid var(--line); color:var(--text); border-radius:10px; padding:11px 12px; font:inherit; }
+  textarea{ min-height:96px; resize:vertical; }
+  input:focus, textarea:focus, select:focus{ outline:none; border-color:var(--accent); }
+  .opts{ display:flex; flex-wrap:wrap; gap:8px; }
+  .opt{ display:inline-flex; align-items:center; gap:8px; background:#0e1216; border:1px solid var(--line); border-radius:999px; padding:8px 13px; cursor:pointer; user-select:none; font-size:14.5px; }
+  .opt input{ accent-color:var(--accent); }
+  .opt.checked{ border-color:var(--accent); background:#132033; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media(max-width:560px){ .row2{ grid-template-columns:1fr; } }
+  .sec{ margin:34px 0 8px; color:var(--accent); font-size:13px; letter-spacing:1px; text-transform:uppercase; font-weight:700; }
+  button.submit{ width:100%; margin-top:26px; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#0b0d10; border:none; border-radius:12px; padding:15px; font-size:16px; font-weight:700; cursor:pointer; }
+  button.submit:disabled{ opacity:.6; cursor:default; }
+  .done{ text-align:center; padding:60px 20px; }
+  .done .check{ font-size:52px; }
+  .foot{ color:var(--muted); font-size:12.5px; text-align:center; margin-top:34px; }
+  .err{ color:#fca5a5; margin-top:12px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="form">
+    <div class="brandline"><span>Hyder Media</span> · <span>for Bron</span></div>
+    <h1>A few questions before we talk</h1>
+    <p class="sub">Mike / Tyler — thanks for making time. So the call is high-signal instead of discovery, a quick pre-read.</p>
+    <div class="lead">Answer whatever's easy (skip anything you'd rather cover live). Kenny is in Hawaii, so this lets him walk in already tuned to your reality — <b>paid channels that actually work for a crypto wallet, and a plan to produce marketing content fast.</b> ~5 minutes.</div>
+
+    <div class="row2">
+      <div class="q"><label class="qlabel">Your name</label><input type="text" id="respondent" placeholder="Mike / Tyler"></div>
+      <div class="q"><label class="qlabel">Your role</label><input type="text" id="role" placeholder="Co-founder / Marketing Director"></div>
+    </div>
+
+    <div class="sec">The channel-defining question</div>
+    <div class="q">
+      <label class="qlabel">Do you hold (or are you pursuing) a financial/crypto regulatory license?</label>
+      <div class="hint">This decides whether Google & Meta paid ads are even on the table (FinCEN MSB, FCA, MiCA/CASP, AUSTRAC…). Be as specific as you can.</div>
+      <select id="license"><option value="">Select…</option><option>None yet</option><option>Applied / in progress</option><option>We hold one (I'll name it below)</option></select>
+      <input type="text" id="license_detail" placeholder="Which license/registration, and in which jurisdiction? (if any)" style="margin-top:10px">
+    </div>
+
+    <div class="sec">Who & where</div>
+    <div class="q">
+      <label class="qlabel">Priority customer for the next 6–12 months</label>
+      <div class="hint">Pick as many as apply — determines the channel mix and messaging.</div>
+      <div class="opts" data-multi="priority_segment">
+        <label class="opt"><input type="checkbox" value="Retail individuals">Retail individuals</label>
+        <label class="opt"><input type="checkbox" value="Family offices">Family offices</label>
+        <label class="opt"><input type="checkbox" value="Professional-services firms">Professional-services firms</label>
+        <label class="opt"><input type="checkbox" value="Teams & treasuries">Teams & treasuries</label>
+        <label class="opt"><input type="checkbox" value="AI agents">AI agents</label>
+        <label class="opt"><input type="checkbox" value="Not sure yet">Not sure yet</label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qlabel">Priority geographies</label>
+      <div class="opts" data-multi="geos">
+        <label class="opt"><input type="checkbox" value="US">US</label>
+        <label class="opt"><input type="checkbox" value="UK">UK</label>
+        <label class="opt"><input type="checkbox" value="EU">EU</label>
+        <label class="opt"><input type="checkbox" value="Canada">Canada</label>
+        <label class="opt"><input type="checkbox" value="Asia">Asia</label>
+        <label class="opt"><input type="checkbox" value="LATAM">LATAM</label>
+        <label class="opt"><input type="checkbox" value="Global / no restriction">Global</label>
+      </div>
+    </div>
+
+    <div class="sec">What's running today</div>
+    <div class="q">
+      <label class="qlabel">Which marketing channels are live right now?</label>
+      <div class="opts" data-multi="channels_now">
+        <label class="opt"><input type="checkbox" value="X / Twitter ads">X / Twitter ads</label>
+        <label class="opt"><input type="checkbox" value="KOL / influencer">KOL / influencer</label>
+        <label class="opt"><input type="checkbox" value="PR / earned media">PR / earned media</label>
+        <label class="opt"><input type="checkbox" value="Content / SEO">Content / SEO</label>
+        <label class="opt"><input type="checkbox" value="Telegram community">Telegram community</label>
+        <label class="opt"><input type="checkbox" value="Discord">Discord</label>
+        <label class="opt"><input type="checkbox" value="Crypto ad networks">Crypto ad networks</label>
+        <label class="opt"><input type="checkbox" value="Referral / airdrop">Referral / airdrop</label>
+        <label class="opt"><input type="checkbox" value="Email">Email</label>
+        <label class="opt"><input type="checkbox" value="None yet">None yet</label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qlabel">What are you doing for marketing today — and what's worked / not worked?</label>
+      <div class="hint">A few sentences is perfect. Kenny will read between the lines.</div>
+      <textarea id="current_marketing" placeholder="e.g. mostly PR + partnerships so far; tried X but…"></textarea>
+    </div>
+
+    <div class="sec">Economics & assets</div>
+    <div class="row2">
+      <div class="q"><label class="qlabel">$BRON token status</label>
+        <select id="token_status"><option value="">Select…</option><option>Not live</option><option>Announced only</option><option>Live & listed</option></select></div>
+      <div class="q"><label class="qlabel">Rough monthly marketing budget</label>
+        <select id="budget_band"><option value="">Select…</option><option>Under $10k</option><option>$10–25k</option><option>$25–50k</option><option>$50–100k</option><option>$100k+</option><option>TBD</option></select></div>
+    </div>
+    <div class="q">
+      <label class="qlabel">What does a good customer acquisition cost / payback look like for you?</label>
+      <div class="hint">Even a rough number or "we don't know yet" is genuinely useful.</div>
+      <input type="text" id="target_cac" placeholder="e.g. sub-$50 CAC, payback under 6 months / not sure yet">
+    </div>
+    <div class="q"><label class="qlabel">Brand guidelines & creative assets — ready to use?</label>
+      <select id="has_brand_assets"><option value="">Select…</option><option>Yes, ready</option><option>Partial</option><option>No, need help</option></select></div>
+
+    <div class="sec">The open questions</div>
+    <div class="q"><label class="qlabel">Single biggest growth / marketing bottleneck right now?</label>
+      <textarea id="biggest_challenge" placeholder="The one thing that, if solved, would matter most."></textarea></div>
+    <div class="q"><label class="qlabel">Who produces your marketing content/creative today, how much, and what's the constraint?</label>
+      <textarea id="content_bottleneck" placeholder="e.g. Tyler + a freelancer; a few posts a week; can't produce enough variety to test paid."></textarea></div>
+    <div class="q"><label class="qlabel">What does success look like 6 months from now?</label>
+      <textarea id="success_6mo" placeholder="Users, subscribers, a specific milestone…"></textarea></div>
+    <div class="q"><label class="qlabel">Any hard "don'ts" or brand guardrails we must respect?</label>
+      <textarea id="brand_donts" placeholder="e.g. never shill-y KOL tactics; keep it institutional/credible."></textarea></div>
+    <div class="q"><label class="qlabel">Anything else you want Kenny to know before the call?</label>
+      <textarea id="anything_else" placeholder="Optional."></textarea></div>
+
+    <button class="submit" id="submitBtn" onclick="submitForm()">Send to Kenny</button>
+    <div class="err" id="err"></div>
+    <div class="foot">Private link · not indexed · your answers go straight to Kenny's prep for the call.</div>
+  </div>
+
+  <div id="thankyou" class="done" style="display:none">
+    <div class="check">✅</div>
+    <h1>Got it — thank you.</h1>
+    <p class="sub">Kenny will have read everything before you talk. See you on the call.</p>
+    <div class="foot">Hyder Media</div>
+  </div>
+</div>
+
+<script>
+  const TOKEN='bron-intake-9f3ax7';
+  document.querySelectorAll('.opt input').forEach(cb=>cb.addEventListener('change',()=>cb.closest('.opt').classList.toggle('checked',cb.checked)));
+  function multi(name){ return [...document.querySelectorAll(`[data-multi="${name}"] input:checked`)].map(i=>i.value); }
+  function val(id){ const el=document.getElementById(id); return el? (el.value||'').trim() : ''; }
+  async function submitForm(){
+    const btn=document.getElementById('submitBtn'); const err=document.getElementById('err');
+    err.textContent='';
+    const answers={
+      license: val('license'), license_detail: val('license_detail'),
+      priority_segment: multi('priority_segment'), geos: multi('geos'), channels_now: multi('channels_now'),
+      current_marketing: val('current_marketing'), token_status: val('token_status'), budget_band: val('budget_band'),
+      target_cac: val('target_cac'), has_brand_assets: val('has_brand_assets'),
+      biggest_challenge: val('biggest_challenge'), content_bottleneck: val('content_bottleneck'),
+      success_6mo: val('success_6mo'), brand_donts: val('brand_donts'), anything_else: val('anything_else')
+    };
+    const filled=Object.values(answers).some(v=> Array.isArray(v)? v.length : (v&&v.length));
+    if(!filled){ err.textContent='Please answer at least one question.'; return; }
+    btn.disabled=true; btn.textContent='Sending…';
+    try{
+      const res=await fetch('/api/bron/submit',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token:TOKEN, respondent:val('respondent'), role:val('role'), answers})});
+      const j=await res.json();
+      if(!res.ok||!j.ok) throw new Error(j.error||'failed');
+      document.getElementById('form').style.display='none';
+      document.getElementById('thankyou').style.display='block';
+      window.scrollTo(0,0);
+    }catch(e){ err.textContent='Something went wrong — try again, or just reply to Kenny directly.'; btn.disabled=false; btn.textContent='Send to Kenny'; }
+  }
+</script>
+</body>
+</html>

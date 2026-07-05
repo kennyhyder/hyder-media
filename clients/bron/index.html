@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bron — Call Dashboard · Hyder Media</title>
+<style>
+  :root{ --bg:#0b0d10; --card:#14181d; --card2:#0f1318; --line:#242a31; --text:#e8eef4; --muted:#9aa7b4; --accent:#6ea8fe; --accent2:#8b5cf6; --ok:#34d399; --red:#f87171; --amber:#fbbf24; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--text); font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .gate{ position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:50; }
+  .gate .box{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:28px; width:320px; text-align:center; }
+  .gate input{ width:100%; margin:14px 0; padding:11px; border-radius:9px; border:1px solid var(--line); background:#0e1216; color:var(--text); font:inherit; }
+  .gate button{ width:100%; padding:11px; border:none; border-radius:9px; background:var(--accent); color:#0b0d10; font-weight:700; cursor:pointer; }
+  header{ position:sticky; top:0; background:rgba(11,13,16,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); z-index:20; }
+  .hbar{ max-width:1000px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .hbar .t{ font-weight:800; letter-spacing:-.3px; }
+  .hbar .t span{ color:var(--muted); font-weight:500; }
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+  .tab{ padding:7px 13px; border-radius:999px; border:1px solid var(--line); color:var(--muted); cursor:pointer; font-size:13.5px; font-weight:600; }
+  .tab.active{ background:#132033; border-color:var(--accent); color:var(--text); }
+  .tab .dot{ display:none; width:7px; height:7px; background:var(--ok); border-radius:50%; margin-left:6px; }
+  .tab.has .dot{ display:inline-block; }
+  main{ max-width:1000px; margin:0 auto; padding:26px 20px 90px; }
+  section{ display:none; } section.active{ display:block; }
+  h2{ font-size:22px; margin:4px 0 16px; letter-spacing:-.3px; }
+  h3{ font-size:15px; text-transform:uppercase; letter-spacing:1px; color:var(--accent); margin:26px 0 10px; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:12px 0; }
+  .card.tight{ padding:14px 16px; }
+  .lead{ font-size:17px; }
+  ul{ margin:8px 0; padding-left:20px; } li{ margin:5px 0; }
+  .kv{ color:var(--muted); } .kv b{ color:var(--text); }
+  .pill{ display:inline-block; background:#132033; border:1px solid var(--line); border-radius:999px; padding:3px 10px; font-size:12.5px; margin:3px 4px 3px 0; color:var(--text); }
+  .warn{ border-left:3px solid var(--amber); background:#1a1710; }
+  .grn{ color:var(--ok); } .rd{ color:var(--red); } .am{ color:var(--amber); }
+  .muted{ color:var(--muted); }
+  a{ color:var(--accent); }
+  .copybar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn{ background:#132033; border:1px solid var(--line); color:var(--text); border-radius:9px; padding:9px 13px; cursor:pointer; font:inherit; font-size:13.5px; }
+  .btn.primary{ background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#0b0d10; border:none; font-weight:700; }
+  .answerbox{ background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:8px 0; }
+  .answerbox .q{ font-weight:600; } .answerbox .a{ margin:4px 0 6px; } .answerbox .i{ color:var(--accent); font-size:14px; }
+  .adj{ background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:8px 0; }
+  .adj .because{ color:var(--muted); font-size:13.5px; } .adj .do{ margin-top:4px; }
+  .spin{ text-align:center; color:var(--muted); padding:40px; }
+  code{ background:#0e1216; padding:2px 6px; border-radius:5px; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <div class="box">
+    <div style="font-weight:800">Bron Call Dashboard</div>
+    <div class="muted" style="font-size:13px;margin-top:4px">Hyder Media — private</div>
+    <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">Enter</button>
+    <div id="gerr" class="rd" style="font-size:13px;height:16px;margin-top:8px"></div>
+  </div>
+</div>
+
+<header>
+  <div class="hbar">
+    <div class="t">Bron <span>· call dashboard</span></div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-t="snap">Snapshot</div>
+      <div class="tab" data-t="mike">Mike</div>
+      <div class="tab" data-t="tyler">Tyler</div>
+      <div class="tab" data-t="ads">Ad Landscape</div>
+      <div class="tab" data-t="plan">Game Plan</div>
+      <div class="tab" data-t="answers" id="answersTab">Their Answers<span class="dot"></span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- SNAPSHOT -->
+  <section class="snap active" id="s-snap">
+    <h2>Snapshot</h2>
+    <div class="card lead"><b>Well-funded, elite-pedigree, essentially zero-traction</b> self-custodial MPC wallet. ~23 App Store ratings, ~470 downloads. The gap between pedigree and users <b>is the opportunity</b> — and being locked out of mainstream paid channels is exactly your lane.</div>
+    <div class="card">
+      <div class="kv"><b>Product:</b> MPC wallet — authority sharded across 3 parties, <b>seedless recovery via "Guardians."</b> m-of-n Policy Engine (approvals, time-locks, whitelists), DeFi permission revocation, cross-chain swaps, staking, fiat on/off-ramp (120+ currencies), 15+ chains.</div>
+      <div class="kv" style="margin-top:8px"><b>Founder:</b> Dmitry Tokarev (founder & ex-CEO of Copper Technologies; largest Copper shareholder).</div>
+      <div class="kv" style="margin-top:8px"><b>Funding:</b> ~$15M seed (2025), ~140 investors incl. <b>LocalGlobe, Fasanara, GSR.</b></div>
+      <div class="kv" style="margin-top:8px"><b>Structure:</b> HQ Cayman Islands · team London · app "Bron Foundation."</div>
+      <div class="kv" style="margin-top:8px"><b>Freshest hook:</b> Digital Inheritance (launched Mar 2, 2026) — Guardian-verified successors + 6-month delay + MPC co-signing. Best wedge into family offices / estate planning.</div>
+      <div class="kv" style="margin-top:8px"><b>Partnerships:</b> Noah (stablecoin ramp), P2P.org (staking), GSR.</div>
+    </div>
+    <h3>Their marketing footprint today</h3>
+    <div class="card">
+      <ul>
+        <li>GTM + Google Analytics live (<code>GTM-TPSR849Q</code>), Cookiebot, Cloudflare. <b>No Meta/TikTok/Reddit pixels</b> → analytics but no paid-social conversion infra.</li>
+        <li>Social: X (@bron_wallet) + Telegram (t.me/bronwallet). <b>Telegram is a primary crypto channel — grow/activate it.</b> No Discord.</li>
+        <li>Media kit + PR contact + dev portal. Credible testimonials (Digital Asset, Zama, ex-Deribit CEO).</li>
+      </ul>
+    </div>
+    <h3>Competitive map</h3>
+    <div class="card"><div class="muted">"No seed / no ID / institutional-grade / inheritance / Guardian recovery" is compelling but <b>not individually unique</b>:</div>
+      <div style="margin-top:8px"><span class="pill">Zengo (MPC)</span><span class="pill">Web3Auth</span><span class="pill">Argent / Safe</span><span class="pill">Coinbase Smart Wallet</span><span class="pill">Vault12 (inheritance)</span><span class="pill">Casa</span><span class="pill">MetaMask / Ledger / Trezor</span></div>
+      <div class="muted" style="margin-top:10px"><b>Where Bron wins:</b> the <i>combination</i> + institutional pedigree + the inheritance/family-office wedge. Market that, not "another wallet."</div>
+    </div>
+    <div class="muted" style="font-size:12.5px;margin-top:12px">Verify morning-of: current pricing tiers (sources conflict: $16–$1,666/yr vs $20/mo–$3,000) and $BRON token live status.</div>
+  </section>
+
+  <!-- MIKE -->
+  <section id="s-mike">
+    <h2>Mike Lobanov — co-founder</h2>
+    <div class="card lead"><b>Confirmed: the Target Global VC.</b> Mikhail "Mike" Lobanov, co-founder/GP of Target Global (~€3B). Director of Copper 2020 → resigned <b>Oct 28, 2025</b> (the day Bron hit Bloomberg). "Band getting back together" with Tokarev.</div>
+    <div class="card">
+      <div class="kv"><b>Brain:</b> LSE economist; Alfa Capital → co-founded Target Global 2012 (GP/COO, fintech). <b>Financial/VC mind, not an engineer.</b></div>
+      <div class="kv" style="margin-top:8px"><b>His portfolio IS the crypto-rails category:</b> Rapyd, Copper, Cryptofacilities (→Kraken), Mercuryo, Finom, 3Commas. <b>Knows crypto GTM cold — don't over-explain the space.</b></div>
+      <div class="kv" style="margin-top:8px"><b>GTM instinct:</b> B2B2C / partnership-led distribution + institutional trust — <b>NOT paid-consumer marketing</b>, so your paid-consumer expertise is genuinely complementary.</div>
+    </div>
+    <div class="card warn"><b class="am">Quiet awareness — do NOT raise:</b> Target Global Russia-links lawsuit + M360/Prime Meridian fund dispute (much is low-credibility kompromat; underlying disputes real). Explains the obsession with trust / self-custody / jurisdiction. Note: CCO is a <i>different</i> Mike (Mike Milner).</div>
+    <h3>How to win him</h3>
+    <div class="card"><ul>
+      <li>Speak <b>economics + distribution</b>: CAC / LTV / payback, efficient acquisition despite channel constraints.</li>
+      <li>Frame the AI content engine as <b>lower cost-per-creative / higher test velocity → lower CAC</b>, not "cool tech."</li>
+      <li>Position Bron as continuation of the Copper thesis: institutional custody → self-custody for everyone.</li>
+      <li>Treat him as a <b>peer principal with skin in the game</b>, not a passive investor. Don't BS a career VC.</li>
+    </ul></div>
+  </section>
+
+  <!-- TYLER -->
+  <section id="s-tyler">
+    <h2>Tyler Kenyon — Marketing Director</h2>
+    <div class="card lead">UK-based. <b>Tokarev insider</b> — ~2019–2024 at Copper (brand/PR/content: the "Unfair Advantage" TV spot on Bloomberg, CopperCasts podcast, State Street/Formula E launches). <b>A premium brand / narrative / PR marketer — NOT a performance marketer.</b></div>
+    <div class="card"><b>His gaps = your job:</b>
+      <ul>
+        <li>Hands-on paid acquisition at scale (he lists SEO/PPC but his visible work is all brand/PR).</li>
+        <li>Execution bandwidth (≈1-person marketing team).</li>
+        <li>Crypto ad-platform compliance/ops.</li>
+        <li>KOL + performance-creative production velocity.</li>
+      </ul>
+      <div class="muted">There's now a consumer subscription funnel that needs performance marketing — and he isn't a performance marketer. <b>That's your opening.</b></div>
+    </div>
+    <h3>How to work with him</h3>
+    <div class="card"><ul>
+      <li><b>Be his execution engine, not his replacement.</b> He invited himself to the call — he's checking if you make him look good.</li>
+      <li><b>Protect the premium/institutional brand</b> — no shill-y KOL spray-and-pray.</li>
+      <li>Speak his live campaign language: inheritance, guardian recovery, MPC/seedless, Noah/GSR partnerships.</li>
+      <li>Icebreaker: he studied <b>winemaking</b> (Plumpton College — "until the grapes ripen").</li>
+    </ul></div>
+  </section>
+
+  <!-- ADS -->
+  <section id="s-ads">
+    <h2>Advertising landscape — the crux</h2>
+    <div class="card"><b>Google Ads:</b> crypto exchanges/software wallets can only advertise in <b>Canada</b>, and only with <b>FINTRAC (CANAFE) MSB registration + Google certification</b> (July 2025 policy). Cayman entity → real geo/registration wall.</div>
+    <div class="card"><b>Meta:</b> Bron's swap/on-ramp/staking = "enhanced wallet" bucket → requires <b>written permission + a recognized regulator license</b> (FinCEN/FCA/AUSTRAC). Storage-only is exempt; Bron is not.</div>
+    <div class="card"><b>Net:</b> Google/Meta search largely a no-go today. The viable playbook:
+      <div style="margin-top:8px"><span class="pill">X Ads</span><span class="pill">Crypto ad networks (Coinzilla/Bitmedia/Brave)</span><span class="pill">KOL / influencer</span><span class="pill">Telegram community</span><span class="pill">Content / SEO + PR</span><span class="pill">Referral / airdrop ($BRON)</span><span class="pill">Podcasts / events</span></div>
+      <div class="muted" style="margin-top:10px">…plus the <b>compliance path to unlock</b> Google (Canada/FINTRAC) & Meta (regulator license) over time — knowing this maze is itself a differentiator.</div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section id="s-plan">
+    <h2>Game plan — running the room</h2>
+    <div class="card"><b>Two judges, two lenses.</b> Mike (VC) → economics + distribution. Tyler (marketing lead) → fit + brand-safety. Thread both with one story:</div>
+    <div class="card lead"><b>"Trust-first performance marketing."</b> Performance that <i>leverages + protects</i> Bron's trust narrative (inheritance / security / "the only money you truly own") — not generic growth-hacking.</div>
+    <h3>Your two pillars (the offer)</h3>
+    <div class="card">
+      <div><b>1 · Paid advertising, redirected to crypto-viable channels</b> — X Ads, crypto ad networks, the Google-Canada/Meta-license compliance path, + a measurement/attribution stack (they have none for paid).</div>
+      <div style="margin-top:10px"><b>2 · "Speed up content production for paid channels" = your AI edge, relocated to marketing</b> — an AI-accelerated creative/content pipeline (ad variants, LPs, X threads, video scripts, SEO/PR) at 5–10× velocity. To Mike this = lower CAC via more testing, not product dev.</div>
+    </div>
+    <h3>Say this</h3>
+    <div class="card muted"><i>"I run performance marketing on the channels that actually work for crypto — X, crypto ad networks, and the Google/Meta compliance path — and I've built AI-accelerated content-production systems that let a lean team produce and test creative at 5–10× velocity. That's the paid advertising and the content-production speed you flagged, from someone who knows the crypto ad-policy landmines cold."</i></div>
+    <h3>Don't</h3>
+    <div class="card"><ul><li>Pitch product/Claude-dev.</li><li>Over-explain crypto to Mike.</li><li>Raise Target Global / Russia / M360.</li><li>Pitch cheap KOL tactics.</li></ul></div>
+    <h3>Open with operator questions</h3>
+    <div class="card"><ul><li>Target CAC / payback?</li><li>Priority customer — retail, family office, or teams?</li><li>Regulator license (FinCEN/FCA/MiCA)?</li><li>What's marketing doing today + the bottleneck?</li></ul>
+      <div class="muted">(The intake form asks these — check the <b>Their Answers</b> tab in the morning.)</div>
+    </div>
+  </section>
+
+  <!-- ANSWERS -->
+  <section id="s-answers">
+    <h2>Their Answers <span class="muted" id="ansMeta" style="font-size:14px;font-weight:400"></span></h2>
+    <div class="card tight">
+      <div class="copybar">
+        <span class="muted">Send Bron this link:</span>
+        <code id="intakeUrl">…/clients/bron/intake.html</code>
+        <button class="btn primary" onclick="copyLink()">Copy link</button>
+        <button class="btn" onclick="loadAnswers()">Refresh</button>
+      </div>
+    </div>
+    <div id="answersBody"><div class="spin">Awaiting Bron's responses… this tab auto-refreshes. Send them the link above.</div></div>
+  </section>
+</main>
+
+<script>
+  // ---- gate ----
+  const PW='BRONPREP';
+  function unlock(){ const v=document.getElementById('pw').value; if(v===PW){ sessionStorage.setItem('bron_dash_auth','ok'); document.getElementById('gate').style.display='none'; init(); } else { document.getElementById('gerr').textContent='Nope.'; } }
+  if(sessionStorage.getItem('bron_dash_auth')==='ok'){ document.getElementById('gate').style.display='none'; }
+  // ---- tabs ----
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); document.getElementById('s-'+t.dataset.t).classList.add('active');
+    if(t.dataset.t==='answers') loadAnswers();
+  }));
+  // ---- answers feed ----
+  const DASH_TOKEN='bron-dash-7k2mq4';
+  const intakeURL=location.origin+'/clients/bron/intake.html';
+  function copyLink(){ navigator.clipboard.writeText(intakeURL).then(()=>{ const b=event.target; const o=b.textContent; b.textContent='Copied!'; setTimeout(()=>b.textContent=o,1200); }); }
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function flagClass(f){ if(/^GREEN:/i.test(f)) return 'grn'; if(/^RED:/i.test(f)) return 'rd'; return 'am'; }
+  const QLABELS={current_marketing:'Marketing today / what worked',biggest_challenge:'Biggest bottleneck',target_cac:'Target CAC / payback',success_6mo:'6-month success',content_bottleneck:'Content production constraint',brand_donts:"Brand don'ts",anything_else:'Anything else',license:'License status',license_detail:'License detail',priority_segment:'Priority segment',geos:'Geos',channels_now:'Channels live now',token_status:'$BRON token',budget_band:'Budget'};
+  function renderRaw(ans){ if(!ans) return ''; let h='<h3>Raw answers</h3><div class="card">'; for(const k of Object.keys(ans)){ const v=ans[k]; if(v==null||(Array.isArray(v)&&!v.length)||v==='') continue; const val=Array.isArray(v)? v.map(x=>`<span class="pill">${esc(x)}</span>`).join('') : esc(v); h+=`<div style="margin:7px 0"><span class="muted">${esc(QLABELS[k]||k)}:</span> ${val}</div>`; } return h+'</div>'; }
+  function renderAnalysis(a){ if(!a) return '<div class="card muted">Answers received — AI analysis didn\'t complete. Raw answers below.</div>'; let h='';
+    if(a.headline) h+=`<div class="card lead"><b>${esc(a.headline)}</b></div>`;
+    if(a.key_takeaways&&a.key_takeaways.length){ h+='<h3>Key takeaways</h3><div class="card"><ul>'+a.key_takeaways.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul></div>'; }
+    if(a.pitch_adjustments&&a.pitch_adjustments.length){ h+='<h3>Adjust your pitch</h3>'+a.pitch_adjustments.map(p=>`<div class="adj"><div class="because">Because: ${esc(p.because)}</div><div class="do">→ ${esc(p.do)}</div></div>`).join(''); }
+    if(a.channel_recommendation) h+=`<h3>Channel recommendation</h3><div class="card">${esc(a.channel_recommendation)}</div>`;
+    if(a.flags&&a.flags.length){ h+='<h3>Flags</h3><div class="card">'+a.flags.map(f=>`<div class="${flagClass(f)}" style="margin:5px 0">${esc(f)}</div>`).join('')+'</div>'; }
+    if(a.per_answer&&a.per_answer.length){ h+='<h3>Read on their open answers</h3>'+a.per_answer.map(p=>`<div class="answerbox"><div class="q">${esc(p.question)}</div><div class="a muted">"${esc(p.answer)}"</div><div class="i">→ ${esc(p.insight)}</div></div>`).join(''); }
+    return h;
+  }
+  let pollTimer=null;
+  async function loadAnswers(){
+    try{
+      const r=await fetch('/api/bron/data?k='+DASH_TOKEN,{cache:'no-store'});
+      const j=await r.json();
+      const body=document.getElementById('answersBody');
+      const subs=(j.submissions||[]);
+      if(!subs.length){ body.innerHTML='<div class="spin">Awaiting Bron\'s responses… this tab auto-refreshes every 30s. Send them the link above.</div>'; return; }
+      document.getElementById('answersTab').classList.add('has');
+      document.getElementById('ansMeta').textContent = `· ${subs.length} response${subs.length>1?'s':''}`;
+      body.innerHTML = subs.map(s=>{
+        const who=[s.respondent,s.role].filter(Boolean).join(' · ')||'Anonymous';
+        const when=new Date(s.submitted_at).toLocaleString();
+        return `<div style="margin:22px 0 6px"><span class="pill">${esc(who)}</span> <span class="muted" style="font-size:12.5px">${esc(when)} · ${esc(s.analysis_status)}</span></div>`
+          + renderAnalysis(s.analysis) + renderRaw(s.answers);
+      }).join('<hr style="border:none;border-top:1px solid var(--line);margin:30px 0">');
+    }catch(e){ /* keep last render */ }
+  }
+  function init(){
+    document.getElementById('intakeUrl').textContent = intakeURL;
+    loadAnswers();
+    if(!pollTimer) pollTimer=setInterval(loadAnswers, 30000);
+  }
+  if(sessionStorage.getItem('bron_dash_auth')==='ok') init();
+</script>
+</body>
+</html>

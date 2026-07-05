@@ -278,6 +278,9 @@
     },
     "api/omicron/**/*.js": {
       "maxDuration": 120
+    },
+    "api/bron/**/*.js": {
+      "maxDuration": 60
     }
   }
 }
