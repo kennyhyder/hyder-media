@@ -49,9 +49,9 @@ You are given Bron's own answers to a pre-call questionnaire. Turn them into a d
   "pitch_adjustments": [{"because": "the specific answer that triggers this", "do": "the concrete adjustment Kenny should make on the call"}],
   "channel_recommendation": "1-3 sentences: given their license status, priority segment, geos and budget, the recommended channel mix and the compliance move to unlock more",
   "flags": ["green flags (good fit signals) and red flags (risks/blockers), each prefixed 'GREEN:' or 'RED:'"],
-  "per_answer": [{"question": "the free-text question label", "answer": "their verbatim answer (trimmed)", "insight": "what it means for the pitch"}]
+  "per_answer": [{"question": "the free-text question label", "answer": "their verbatim answer (trimmed to <220 chars)", "insight": "what it means for the pitch, 1-2 sentences"}]
 }
-Be specific and tactical. If an answer is blank, skip it. Ground everything in what they actually said.`;
+Limits to keep the response complete: key_takeaways 4-6 bullets; pitch_adjustments up to 5; per_answer ONLY for the non-empty free-text answers, insight max 2 sentences. Be specific and tactical. Skip blank answers. Ground everything in what they actually said.`;
 
 async function analyze(answers) {
   const key = process.env.ANTHROPIC_API_KEY;
@@ -62,7 +62,7 @@ async function analyze(answers) {
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2000,
+      max_tokens: 4096,
       temperature: 0.3,
       system: ANALYSIS_SYSTEM,
       messages: [{ role: 'user', content: userMsg }],
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
       } catch (e) { console.error('bron update failed:', e.message); }
     }
 
-    return res.status(200).json({ ok: true, id, analyzed: status === 'done', debug: req.query.debug === '1' ? analysisError : undefined });
+    return res.status(200).json({ ok: true, id, analyzed: status === 'done' });
   } catch (error) {
     console.error('bron submit error:', error.message);
     return res.status(500).json({ error: 'submit_failed' });
