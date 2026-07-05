@@ -109,20 +109,24 @@ export default async function handler(req, res) {
     const id = row?.id;
 
     // 2) analyze (best-effort) and update
-    let analysis = null, status = 'failed';
+    let analysis = null, status = 'failed', analysisError = null;
     try {
       analysis = await analyze({ respondent, role, ...answers });
       status = 'done';
     } catch (e) {
+      analysisError = e.message;
       console.error('bron analyze failed:', e.message);
     }
     if (id) {
       try {
-        await sb(`bron_intake?id=eq.${id}`, 'PATCH', { analysis, analysis_status: status });
+        await sb(`bron_intake?id=eq.${id}`, 'PATCH', {
+          analysis, analysis_status: status,
+          meta: { ua: (req.headers['user-agent'] || '').slice(0, 200), analysisError },
+        });
       } catch (e) { console.error('bron update failed:', e.message); }
     }
 
-    return res.status(200).json({ ok: true, id, analyzed: status === 'done' });
+    return res.status(200).json({ ok: true, id, analyzed: status === 'done', debug: req.query.debug === '1' ? analysisError : undefined });
   } catch (error) {
     console.error('bron submit error:', error.message);
     return res.status(500).json({ error: 'submit_failed' });
