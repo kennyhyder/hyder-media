@@ -7,9 +7,24 @@
  * structured pitch implications, then update the row. If Claude fails the row
  * still holds the raw answers with analysis_status='failed'.
  */
+import nodemailer from 'nodemailer';
+
 const INTAKE_TOKEN = 'bron-intake-9f3ax7'; // anti-spam; baked into the form
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const NOTIFY_TO = process.env.ADMIN_EMAIL || 'kenny@hyder.me';
+const DASH_URL = 'https://hyder.me/clients/bron';
+
+// Human labels for the choice/free-text answers (so the email reads cleanly).
+const ANSWER_LABELS = {
+  license: 'License status', license_detail: 'License detail',
+  priority_segment: 'Priority segment', geos: 'Geos',
+  channels_now: 'Channels live now', current_marketing: 'Marketing today / what worked',
+  token_status: 'Token role in growth', budget_band: 'Monthly budget',
+  target_cac: 'Target CAC / payback', has_brand_assets: 'Has brand assets',
+  biggest_challenge: 'Biggest challenge', content_bottleneck: 'Content bottleneck',
+  success_6mo: '6-month success', brand_donts: "Brand don'ts", anything_else: 'Anything else',
+};
 
 // The free-text questions Claude should analyze (must match the form ids).
 const FREE_TEXT = {
@@ -82,6 +97,90 @@ async function analyze(answers) {
   return JSON.parse(text.slice(start, end + 1));
 }
 
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+}
+
+// Build the notification email HTML from the analysis + raw answers.
+function buildEmailHtml(respondent, role, answers, analysis, status) {
+  const a = analysis || {};
+  const brand = '#8b5cf6';
+  const P = [];
+  P.push(`<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;color:#1a1a2e">`);
+  P.push(`<div style="background:${brand};color:#fff;padding:18px 22px;border-radius:10px 10px 0 0">
+    <div style="font-size:13px;opacity:.85;letter-spacing:.04em;text-transform:uppercase">Bron intake — new response</div>
+    <div style="font-size:20px;font-weight:700;margin-top:4px">${esc(respondent || 'Someone at Bron')}${role ? ` · ${esc(role)}` : ''}</div>
+  </div>`);
+  P.push(`<div style="border:1px solid #e6e6ef;border-top:none;border-radius:0 0 10px 10px;padding:22px">`);
+
+  if (status !== 'done') {
+    P.push(`<div style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px">
+      AI analysis didn't run on this one — the raw answers are below, and it's on the dashboard. (analysis_status: ${esc(status)})</div>`);
+  }
+
+  if (a.headline) {
+    P.push(`<div style="font-size:16px;font-weight:700;line-height:1.4;margin:0 0 18px;padding:14px 16px;background:#f5f3ff;border-left:3px solid ${brand};border-radius:6px">${esc(a.headline)}</div>`);
+  }
+  if (Array.isArray(a.key_takeaways) && a.key_takeaways.length) {
+    P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:18px 0 8px">Key takeaways</h3><ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.55">`);
+    a.key_takeaways.forEach((t) => P.push(`<li>${esc(t)}</li>`));
+    P.push(`</ul>`);
+  }
+  if (Array.isArray(a.pitch_adjustments) && a.pitch_adjustments.length) {
+    P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:20px 0 8px">Pitch adjustments</h3>`);
+    a.pitch_adjustments.forEach((p) => P.push(`<div style="margin:0 0 12px;font-size:14px;line-height:1.5">
+      <div style="color:#6b7280"><b>Because:</b> ${esc(p.because)}</div>
+      <div style="margin-top:2px"><b style="color:${brand}">→ Do:</b> ${esc(p.do)}</div></div>`));
+  }
+  if (a.channel_recommendation) {
+    P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:20px 0 8px">Channel recommendation</h3>
+      <div style="font-size:14px;line-height:1.55">${esc(a.channel_recommendation)}</div>`);
+  }
+  if (Array.isArray(a.flags) && a.flags.length) {
+    P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:20px 0 8px">Flags</h3>`);
+    a.flags.forEach((f) => {
+      const green = /^GREEN/i.test(f);
+      P.push(`<div style="font-size:13.5px;line-height:1.5;margin:0 0 5px;color:${green ? '#166534' : '#991b1b'}">${esc(f)}</div>`);
+    });
+  }
+  if (Array.isArray(a.per_answer) && a.per_answer.length) {
+    P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:20px 0 8px">Per-answer read</h3>`);
+    a.per_answer.forEach((pa) => P.push(`<div style="margin:0 0 12px;font-size:13.5px;line-height:1.5">
+      <div style="color:#6b7280;font-weight:600">${esc(pa.question)}</div>
+      <div style="font-style:italic;color:#374151">“${esc(pa.answer)}”</div>
+      <div style="margin-top:2px"><b>Insight:</b> ${esc(pa.insight)}</div></div>`));
+  }
+
+  // Raw answers (all fields, so nothing is hidden)
+  P.push(`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:22px 0 8px">All answers</h3><table style="width:100%;border-collapse:collapse;font-size:13px">`);
+  Object.keys(ANSWER_LABELS).forEach((k) => {
+    let v = answers ? answers[k] : '';
+    if (Array.isArray(v)) v = v.join(', ');
+    if (v == null || v === '') return;
+    P.push(`<tr><td style="padding:6px 10px 6px 0;color:#6b7280;vertical-align:top;white-space:nowrap">${esc(ANSWER_LABELS[k])}</td><td style="padding:6px 0;border-bottom:1px solid #f0f0f5">${esc(v)}</td></tr>`);
+  });
+  P.push(`</table>`);
+
+  P.push(`<div style="margin-top:22px"><a href="${DASH_URL}" style="display:inline-block;background:${brand};color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:14px">Open the dashboard →</a></div>`);
+  P.push(`</div></div>`);
+  return P.join('');
+}
+
+async function notify(respondent, role, answers, analysis, status) {
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+  if (!user || !pass) throw new Error('no email creds (EMAIL_USER/EMAIL_PASS)');
+  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
+  const who = respondent || 'Someone at Bron';
+  const subject = status === 'done' && analysis && analysis.headline
+    ? `Bron intake · ${who}: ${String(analysis.headline).slice(0, 110)}`
+    : `Bron intake · ${who} responded${status === 'done' ? '' : ' (analysis pending)'}`;
+  await transporter.sendMail({
+    from: user, to: NOTIFY_TO, subject,
+    html: buildEmailHtml(who, role, answers, analysis, status),
+  });
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -126,7 +225,14 @@ export default async function handler(req, res) {
       } catch (e) { console.error('bron update failed:', e.message); }
     }
 
-    return res.status(200).json({ ok: true, id, analyzed: status === 'done' });
+    // 3) email Kenny the response + analysis (best-effort — never fail the request)
+    let emailed = false;
+    try {
+      await notify(respondent, role, answers, analysis, status);
+      emailed = true;
+    } catch (e) { console.error('bron notify failed:', e.message); }
+
+    return res.status(200).json({ ok: true, id, analyzed: status === 'done', emailed });
   } catch (error) {
     console.error('bron submit error:', error.message);
     return res.status(500).json({ error: 'submit_failed' });
