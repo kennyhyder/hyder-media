@@ -77,14 +77,39 @@ export default async function handler(req, res) {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const uploadBatch = crypto.randomUUID();
 
-    const ingestStats = await ingestRows(supabase, TENANT, rows, uploadBatch, filename);
-    const linkStats = await linkJobsToJourneys(supabase, TENANT);
+    // Step 1 — upsert the jobs. This is the critical, must-succeed part; the
+    // rows are the report's actual payload. Once this returns, the data is
+    // safely in ag2020_crm_jobs (idempotent on source_job_id) even if the
+    // downstream link/rollup has trouble.
+    let ingestStats;
+    try {
+        ingestStats = await ingestRows(supabase, TENANT, rows, uploadBatch, filename);
+    } catch (err) {
+        console.error('glassbiller ingest failed:', err);
+        return res.status(500).json({ error: 'ingest failed: ' + err.message, filename });
+    }
+
+    // Step 2 — link jobs to journeys + recompute rollups. This runs over the
+    // whole tenant (tens of thousands of journeys) and is the slow part that
+    // grows over time. Isolate it: if it throws or is slow, the jobs are still
+    // saved (step 1), so we report a partial success instead of a hard 500 that
+    // makes Zapier think nothing landed. A follow-up call / the nightly pass
+    // will reconcile links + rollups.
+    let linkStats = null;
+    let linkError = null;
+    try {
+        linkStats = await linkJobsToJourneys(supabase, TENANT);
+    } catch (err) {
+        console.error('glassbiller link/rollup failed (jobs still ingested):', err);
+        linkError = err.message;
+    }
 
     return res.status(200).json({
-        status: 'success',
+        status: linkError ? 'partial' : 'success',
         filename,
         upload_batch: uploadBatch,
         ingest: ingestStats,
         link: linkStats,
+        ...(linkError ? { link_error: linkError, note: 'Jobs were ingested; link/rollup failed and will reconcile on the next run.' } : {}),
     });
 }

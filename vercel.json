@@ -240,6 +240,9 @@
     "api/affiliati/**/*.js": {
       "maxDuration": 60
     },
+    "api/ag2020/glassbiller-email-ingest.js": {
+      "maxDuration": 300
+    },
     "api/ag2020/**/*.js": {
       "maxDuration": 30
     },
