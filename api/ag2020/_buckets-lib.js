@@ -249,6 +249,22 @@ export async function buildPaymentRecommendation(supabase, lookaheadDays = 7) {
         .from('ag2020_bills')
         .select('*')
         .eq('is_active', true);
+
+    // Payments already made toward recurring bills THIS calendar month → running
+    // tally. remaining = bill.amount − payments this month (mark-paid writes these
+    // as bucket 'out' rows with source='bill_payment' + reference_id=bill.id).
+    const monthStart = today.slice(0, 8) + '01';
+    const { data: billPays } = await supabase
+        .from('ag2020_bucket_transactions')
+        .select('reference_id, amount')
+        .eq('source', 'bill_payment')
+        .gte('txn_date', monthStart);
+    const paidByBill = {};
+    for (const p of billPays || []) {
+        if (!p.reference_id) continue;
+        paidByBill[p.reference_id] = (paidByBill[p.reference_id] || 0) + (Number(p.amount) || 0);
+    }
+
     const upcoming = [];
     for (const b of bills || []) {
         // Calculate next occurrence of b.due_day on or after today
@@ -257,11 +273,16 @@ export async function buildPaymentRecommendation(supabase, lookaheadDays = 7) {
             const checkDate = new Date(today + 'T00:00:00Z');
             checkDate.setUTCDate(checkDate.getUTCDate() + offset);
             if (checkDate.getUTCDate() === b.due_day) {
+                const paidThisPeriod = Math.round((paidByBill[b.id] || 0) * 100) / 100;
+                const remaining = Math.max(0, Math.round((Number(b.amount) - paidThisPeriod) * 100) / 100);
                 upcoming.push({
                     id: b.id,
                     name: b.name,
                     vendor: b.vendor,
-                    amount: Number(b.amount),
+                    amount: Number(b.amount),            // original bill amount (display)
+                    original_amount: Number(b.amount),
+                    paid_this_period: paidThisPeriod,
+                    remaining,                           // what's still owed this period
                     due_date: checkDate.toISOString().split('T')[0],
                     days_until: offset,
                     bucket: b.bucket,
@@ -287,6 +308,8 @@ export async function buildPaymentRecommendation(supabase, lookaheadDays = 7) {
         vendor: p.vendor,
         amount: Number(p.weekly_payment) > 0 ? Number(p.weekly_payment) : Number(p.amount_remaining),
         amount_remaining: Number(p.amount_remaining),
+        remaining: Number(p.amount_remaining),   // running tally (decremented by mark-paid)
+        weekly_payment: Number(p.weekly_payment) || 0,
         due_date: p.target_payoff_date,
         days_until: p.target_payoff_date ?
             Math.round((new Date(p.target_payoff_date) - new Date(today)) / 86400000) : null,
@@ -322,24 +345,40 @@ export async function buildPaymentRecommendation(supabase, lookaheadDays = 7) {
         }
     }
 
-    // 2. Recurring bills due in horizon, sorted by due_date
+    // 2. Recurring bills due in horizon, sorted by due_date. Gate on `remaining`
+    //    (bill amount minus what's already been paid this period) so partial
+    //    payments carry a running tally.
     for (const u of upcoming.sort((a, b) => a.due_date.localeCompare(b.due_date))) {
+        const dueLabel = `due ${u.days_until === 0 ? 'today' : 'in ' + u.days_until + ' days'}`;
+        const paidNote = u.paid_this_period > 0 ? ` · $${u.paid_this_period.toLocaleString()} paid this period` : '';
+        if (u.remaining <= 0.005) {
+            recommendations.push({ ...u, recommended_amount: 0, action: 'paid', reason: `paid in full this period` });
+            continue;
+        }
         const available = adjustedBalances[u.bucket] - (u.bucket === 'operating' ? operatingFloor : 0);
-        const canPay = Math.min(available, u.amount);
-        if (canPay >= u.amount) {
+        const canPay = Math.min(available, u.remaining);
+        if (canPay >= u.remaining) {
             recommendations.push({
                 ...u,
-                recommended_amount: u.amount,
+                recommended_amount: Math.round(u.remaining * 100) / 100,
                 action: u.autopay ? 'autopay_funded' : 'pay',
-                reason: `due ${u.days_until === 0 ? 'today' : 'in ' + u.days_until + ' days'}`,
+                reason: `${dueLabel}${paidNote}`,
             });
-            adjustedBalances[u.bucket] -= u.amount;
+            adjustedBalances[u.bucket] -= u.remaining;
+        } else if (canPay > 0) {
+            recommendations.push({
+                ...u,
+                recommended_amount: Math.round(canPay * 100) / 100,
+                action: 'partial',
+                reason: `partial — ${u.bucket} bucket short by $${Math.round((u.remaining - available) * 100) / 100}${paidNote}`,
+            });
+            adjustedBalances[u.bucket] -= canPay;
         } else {
             recommendations.push({
                 ...u,
                 recommended_amount: 0,
                 action: u.autopay ? 'autopay_underfunded' : 'defer',
-                reason: `${u.bucket} bucket short by $${Math.round((u.amount - available) * 100) / 100}`,
+                reason: `${u.bucket} bucket short by $${Math.round((u.remaining - available) * 100) / 100}${paidNote}`,
             });
         }
     }
