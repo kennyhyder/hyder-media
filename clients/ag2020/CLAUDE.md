@@ -228,6 +228,16 @@ The post-build script reads from `out/` and writes to the parent
 `clients/ag2020/` directory. Source `src/` is gitignored; only the build
 output ships.
 
+**Build gotcha — `npm run build` used to clobber this CLAUDE.md.** A stray
+claude-mem stub at `public/CLAUDE.md` gets copied into `out/` by Next, and the
+old `post-build.js` move loop overwrote the parent `CLAUDE.md` (this 274-line
+doc) with it on every build. Fixed in `scripts/post-build.js` via a `PRESERVE`
+set that skips `CLAUDE.md`. **`post-build.js` is gitignored, so this fix does
+NOT sync between machines** — apply the same `PRESERVE` guard on any machine
+where you build AG2020 (the laptop fix was applied 2026-07-08). If you ever see
+`git status` show this file deleted/gutted after a build, that machine's
+`post-build.js` is missing the guard.
+
 **Important env vars** (all in Vercel):
 `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `SUPABASE_ANON_KEY` (currently stale —
 regenerate from Supabase Settings → API),
