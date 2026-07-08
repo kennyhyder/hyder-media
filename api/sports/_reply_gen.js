@@ -20,7 +20,7 @@
 //     selling a service
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-opus-4-7";
+const MODEL = "claude-sonnet-5";
 
 // Forbidden patterns in the generated reply text — if any match, drop the
 // reply rather than post it. Belt-and-suspenders since the system prompt

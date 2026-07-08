@@ -488,7 +488,7 @@ export async function composeSharp(context, siteUrl) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-opus-4-7",
+        model: "claude-sonnet-5",
         max_tokens: 500,
         system: COMPOSER_SYSTEM,
         messages: [{ role: "user", content: JSON.stringify(payload, null, 2) }],
