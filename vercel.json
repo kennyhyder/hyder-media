@@ -2,6 +2,16 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/grid",
+      "destination": "https://gridcensus.com/",
+      "permanent": true
+    },
+    {
+      "source": "/grid/:path*",
+      "destination": "https://gridcensus.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/clients/autoaddiction",
       "destination": "/clients/autoaddiction/",
       "statusCode": 301
