@@ -42,3 +42,6 @@ specs/
 
 # Next.js build metadata
 *.txt
+
+# Python venv (laptop bootstrap 2026-07-08)
+.venv/

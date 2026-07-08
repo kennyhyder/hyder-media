@@ -3,3 +3,9 @@
 .env
 .env*.local
 .env.vercel
+
+# Dependencies (never commit — root node_modules alone is ~526MB)
+node_modules/
+
+# AutomateDojo is its own git repo (kennyhyder/automatedojo) nested here
+automatedojo/
