@@ -60,6 +60,25 @@ const FRESHNESS_TARGETS = [
     envUrl: "GRIDCENSUS_SUPABASE_URL", envKey: "GRIDCENSUS_SUPABASE_SERVICE_KEY" },
   // Sports alerts (movement detector)
   { table: "sports_alerts", column: "fired_at", label: "Sports movement alerts", cron_minutes: 5, stale_after_minutes: 60 /* alerts are episodic, not constant */ },
+  // ── Census Fleet (each property = own Supabase project; refreshed by droplet
+  // crons via /opt/census-fleet/ops/refresh-runner.sh, which also reports every
+  // run to Mission Control mc_ingest_runs). stale_after = 3× refresh cadence,
+  // except panel/well (annual/manual sources — ~400d per panelcensus README).
+  { table: "cc_stations", column: "fetched_at", label: "ChargeCensus AFDC stations", cron_minutes: 10080, stale_after_minutes: 30240,
+    envUrl: "CHARGECENSUS_SUPABASE_URL", envKey: "CHARGECENSUS_SUPABASE_SERVICE_KEY",
+    allowEmpty: true /* NREL AFDC outage — initial load hasn't landed; remove once cc_stations populates so emptiness alerts again */ },
+  { table: "tc_structures", column: "fetched_at", label: "TowerCensus FCC ASR structures", cron_minutes: 10080, stale_after_minutes: 30240,
+    envUrl: "TOWERCENSUS_SUPABASE_URL", envKey: "TOWERCENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "cr_carriers", column: "fetched_at", label: "CarrierCensus FMCSA carriers", cron_minutes: 43200, stale_after_minutes: 129600,
+    envUrl: "CARRIERCENSUS_SUPABASE_URL", envKey: "CARRIERCENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "ac_water_systems", column: "fetched_at", label: "AquaCensus EPA SDWA systems", cron_minutes: 129600, stale_after_minutes: 388800,
+    envUrl: "AQUACENSUS_SUPABASE_URL", envKey: "AQUACENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "bc_buildings", column: "fetched_at", label: "BuildingCensus benchmarking rows", cron_minutes: 43200, stale_after_minutes: 129600,
+    envUrl: "BUILDINGCENSUS_SUPABASE_URL", envKey: "BUILDINGCENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "pc_installations", column: "fetched_at", label: "PanelCensus LBNL TTS installs", cron_minutes: 525600, stale_after_minutes: 576000,
+    envUrl: "PANELCENSUS_SUPABASE_URL", envKey: "PANELCENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "wc_wells", column: "fetched_at", label: "WellCensus state well registries", cron_minutes: 525600, stale_after_minutes: 576000,
+    envUrl: "WELLCENSUS_SUPABASE_URL", envKey: "WELLCENSUS_SUPABASE_SERVICE_KEY" },
 ];
 
 function getSupabase() {
@@ -109,7 +128,12 @@ async function checkOne(supabase, target) {
     .limit(1);
   if (error) return { ...target, error: error.message };
   const latest = data?.[0]?.[target.column] || null;
-  if (!latest) return { ...target, latest: null, status: "no_data" };
+  if (!latest) {
+    // allowEmpty: table is known-empty (initial load pending) — report as skipped
+    // instead of no_data so it doesn't page every 15 min while the source is down.
+    if (target.allowEmpty) return { ...target, latest: null, status: "skipped", skip_reason: "table_empty_allowEmpty" };
+    return { ...target, latest: null, status: "no_data" };
+  }
   const ageMin = Math.round((Date.now() - new Date(latest).getTime()) / 60000);
   const status = ageMin > target.stale_after_minutes ? "stale" : "fresh";
   return { ...target, latest, age_minutes: ageMin, status };
