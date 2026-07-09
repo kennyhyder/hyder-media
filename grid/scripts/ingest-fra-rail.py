@@ -55,9 +55,9 @@ ARCGIS_PAGE_SIZE = 2000
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'fra_rail')
 
 # DB connection for psql bulk operations
-DB_HOST = 'aws-0-us-west-2.pooler.supabase.com'
+DB_HOST = 'aws-1-us-west-2.pooler.supabase.com'
 DB_PORT = '6543'
-DB_USER = 'postgres.ilbovwnhrowvxjdkvrln'
+DB_USER = 'postgres.hzaqzbtyqqixmibcfuwo'
 DB_NAME = 'postgres'
 DB_PASS = '#FsW7iqg%EYX&G3M'
 

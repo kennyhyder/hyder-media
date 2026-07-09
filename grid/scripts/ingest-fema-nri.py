@@ -354,7 +354,7 @@ def main():
         try:
             supabase_request(
                 'POST',
-                'grid_county_data',
+                'grid_county_data?on_conflict=fips_code',
                 batch,
                 {'Prefer': 'resolution=merge-duplicates,return=minimal'}
             )
@@ -364,7 +364,7 @@ def main():
                 try:
                     supabase_request(
                         'POST',
-                        'grid_county_data',
+                        'grid_county_data?on_conflict=fips_code',
                         [rec],
                         {'Prefer': 'resolution=merge-duplicates,return=minimal'}
                     )

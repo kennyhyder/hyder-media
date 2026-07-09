@@ -50,8 +50,8 @@ SCIENCEBASE_API_URL = f'https://www.sciencebase.gov/catalog/item/{SCIENCEBASE_IT
 BATCH_SIZE = 50
 
 PSQL_CMD = [
-    'psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-    '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres'
+    'psql', '-h', 'aws-1-us-west-2.pooler.supabase.com', '-p', '6543',
+    '-U', 'postgres.hzaqzbtyqqixmibcfuwo', '-d', 'postgres'
 ]
 PSQL_ENV_PASSWORD = '#FsW7iqg%EYX&G3M'
 

@@ -174,8 +174,8 @@ def main():
     """
     db_pass = os.environ.get('SUPABASE_DB_PASSWORD', '#FsW7iqg%EYX&G3M')
     result = subprocess.run(
-        ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-         '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
+        ['psql', '-h', 'aws-1-us-west-2.pooler.supabase.com', '-p', '6543',
+         '-U', 'postgres.hzaqzbtyqqixmibcfuwo', '-d', 'postgres',
          '-c', sql],
         env={**os.environ, 'PGPASSWORD': db_pass},
         capture_output=True, text=True, timeout=30

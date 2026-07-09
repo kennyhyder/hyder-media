@@ -35,9 +35,9 @@ LBNL_FILE = os.path.join(
 
 PSQL_CMD = [
     'psql',
-    '-h', 'aws-0-us-west-2.pooler.supabase.com',
+    '-h', 'aws-1-us-west-2.pooler.supabase.com',
     '-p', '6543',
-    '-U', 'postgres.ilbovwnhrowvxjdkvrln',
+    '-U', 'postgres.hzaqzbtyqqixmibcfuwo',
     '-d', 'postgres',
 ]
 PSQL_ENV = {**os.environ, 'PGPASSWORD': '#FsW7iqg%EYX&G3M'}

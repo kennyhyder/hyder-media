@@ -56,9 +56,9 @@ SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
 FCC_API_BASE = "https://broadbandmap.fcc.gov/api/public/map"
 
 # DB connection for psql bulk operations
-DB_HOST = 'aws-0-us-west-2.pooler.supabase.com'
+DB_HOST = 'aws-1-us-west-2.pooler.supabase.com'
 DB_PORT = '6543'
-DB_USER = 'postgres.ilbovwnhrowvxjdkvrln'
+DB_USER = 'postgres.hzaqzbtyqqixmibcfuwo'
 DB_NAME = 'postgres'
 DB_PASS = '#FsW7iqg%EYX&G3M'
 

@@ -46,9 +46,9 @@ CACHE_FILE = os.path.join(DATA_DIR, 'lmp_zone_prices.json')
 
 PSQL_CMD = [
     'psql',
-    '-h', 'aws-0-us-west-2.pooler.supabase.com',
+    '-h', 'aws-1-us-west-2.pooler.supabase.com',
     '-p', '6543',
-    '-U', 'postgres.ilbovwnhrowvxjdkvrln',
+    '-U', 'postgres.hzaqzbtyqqixmibcfuwo',
     '-d', 'postgres',
 ]
 PSQL_ENV = {**os.environ, 'PGPASSWORD': '#FsW7iqg%EYX&G3M'}

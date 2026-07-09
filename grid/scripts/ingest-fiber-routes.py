@@ -908,8 +908,8 @@ END $$;
     env = os.environ.copy()
     env['PGPASSWORD'] = os.environ.get('SUPABASE_DB_PASSWORD', '#FsW7iqg%EYX&G3M')
     result = subprocess.run(
-        ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-         '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
+        ['psql', '-h', 'aws-1-us-west-2.pooler.supabase.com', '-p', '6543',
+         '-U', 'postgres.hzaqzbtyqqixmibcfuwo', '-d', 'postgres',
          '-c', sql],
         capture_output=True, text=True, env=env, timeout=120
     )
@@ -1094,8 +1094,8 @@ def insert_routes(routes, dry_run=False):
         print(f"  Running chunk {ci + 1}/{len(chunk_files)} ({chunk_mb:.1f} MB)...")
 
         result = subprocess.run(
-            ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-             '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
+            ['psql', '-h', 'aws-1-us-west-2.pooler.supabase.com', '-p', '6543',
+             '-U', 'postgres.hzaqzbtyqqixmibcfuwo', '-d', 'postgres',
              '-f', chunk_file],
             capture_output=True, text=True, env=env, timeout=600
         )
@@ -1253,8 +1253,8 @@ def compute_fiber_proximity(routes, dry_run=False):
     env = os.environ.copy()
     env['PGPASSWORD'] = os.environ.get('SUPABASE_DB_PASSWORD', '#FsW7iqg%EYX&G3M')
     result = subprocess.run(
-        ['psql', '-h', 'aws-0-us-west-2.pooler.supabase.com', '-p', '6543',
-         '-U', 'postgres.ilbovwnhrowvxjdkvrln', '-d', 'postgres',
+        ['psql', '-h', 'aws-1-us-west-2.pooler.supabase.com', '-p', '6543',
+         '-U', 'postgres.hzaqzbtyqqixmibcfuwo', '-d', 'postgres',
          '-f', sql_file],
         capture_output=True, text=True, env=env, timeout=120
     )

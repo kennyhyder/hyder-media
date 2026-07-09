@@ -48,12 +48,12 @@ COUNTY_LAYER = f"{FCC_BDC_BASE}/1"
 
 PSQL_CMD = [
     'psql',
-    '-h', 'aws-0-us-west-2.pooler.supabase.com',
+    '-h', 'aws-1-us-west-2.pooler.supabase.com',
     '-p', '6543',
-    '-U', 'postgres.ilbovwnhrowvxjdkvrln',
+    '-U', 'postgres.hzaqzbtyqqixmibcfuwo',
     '-d', 'postgres',
 ]
-PSQL_ENV = dict(os.environ, PGPASSWORD='#FsW7iqg%EYX&G3M')
+PSQL_ENV = dict(os.environ, PGPASSWORD=os.environ.get('GRID_DB_PASSWORD', ''))
 
 # Top fiber providers by state (curated from FCC BDC provider filings, ISP market reports)
 # Used for fiber_provider_names enrichment since FCC ArcGIS only provides counts
