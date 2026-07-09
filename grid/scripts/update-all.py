@@ -25,7 +25,8 @@ GRID_DIR = os.path.dirname(SCRIPT_DIR)
 # Ingestion sources with update frequency (days)
 INGESTION_SOURCES = [
     # (name, script, frequency_days, description)
-    ("HIFLD Lines", "ingest-hifld.py", 90, "Transmission lines + substations"),
+    ("EIA Substations", "ingest-eia-substations.py", 90, "Substations (EIA Energy Atlas — HIFLD is dead)"),
+    ("EIA Transmission", "ingest-eia-transmission.py", 90, "Transmission lines (EIA Energy Atlas)"),
     ("FEMA NRI", "ingest-fema-nri.py", 365, "Hazard risk index by county"),
     ("BLS QCEW", "ingest-bls-qcew.py", 90, "Labor market data by county"),
     ("NOAA Climate", "ingest-noaa-climate.py", 365, "Climate normals"),
