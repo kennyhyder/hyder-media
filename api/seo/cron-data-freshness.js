@@ -52,6 +52,12 @@ const FRESHNESS_TARGETS = [
     stale_after_minutes: 60,
     skipUnless: hasActiveGolfTournament,
   },
+  // GridCensus (own Supabase project — envUrl/envKey point the check there).
+  // Cadences: sources refresh quarterly-ish (90d runbook); rescore rides refreshes.
+  { table: "grid_data_sources", column: "last_import", label: "GridCensus source refreshes", cron_minutes: 129600, stale_after_minutes: 136800,
+    envUrl: "GRIDCENSUS_SUPABASE_URL", envKey: "GRIDCENSUS_SUPABASE_SERVICE_KEY" },
+  { table: "grid_dc_sites", column: "updated_at", label: "GridCensus site rescore", cron_minutes: 129600, stale_after_minutes: 144000,
+    envUrl: "GRIDCENSUS_SUPABASE_URL", envKey: "GRIDCENSUS_SUPABASE_SERVICE_KEY" },
   // Sports alerts (movement detector)
   { table: "sports_alerts", column: "fired_at", label: "Sports movement alerts", cron_minutes: 5, stale_after_minutes: 60 /* alerts are episodic, not constant */ },
 ];
@@ -81,7 +87,17 @@ async function hasActiveGolfTournament(supabase) {
   return (data?.length || 0) > 0;
 }
 
+function clientFor(target) {
+  if (target.envUrl && process.env[target.envUrl] && process.env[target.envKey]) {
+    return createClient(process.env[target.envUrl].trim(), process.env[target.envKey].trim());
+  }
+  return null;
+}
+
 async function checkOne(supabase, target) {
+  const override = clientFor(target);
+  if (target.envUrl && !override) return { ...target, status: "skipped", skip_reason: "env_not_configured" };
+  if (override) supabase = override;
   if (typeof target.skipUnless === "function") {
     const ok = await target.skipUnless(supabase);
     if (!ok) return { ...target, status: "skipped", skip_reason: "no_work_expected" };
