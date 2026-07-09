@@ -246,9 +246,6 @@
     "api/solar/**/*.js": {
       "maxDuration": 60
     },
-    "api/grid/**/*.js": {
-      "maxDuration": 120
-    },
     "api/bing-ads/**/*.js": {
       "maxDuration": 60
     },
