@@ -74,6 +74,20 @@ def supabase_request(method, path, data=None, headers_extra=None):
             raise
 
 
+def solartrack_request(method, path):
+    """SolarTrack lives in the SHARED Supabase project — read from there
+    (SOLARTRACK_SUPABASE_URL/KEY env), while writes go to the own project."""
+    import os, json as _json, urllib.request as _rq
+    base = os.environ.get("SOLARTRACK_SUPABASE_URL", "").rstrip("/")
+    key = os.environ.get("SOLARTRACK_SUPABASE_KEY", "")
+    if not base or not key:
+        raise SystemExit("SOLARTRACK_SUPABASE_URL/KEY not set (shared-project read creds)")
+    req = _rq.Request(f"{base}/rest/v1/{path}", method=method,
+        headers={"apikey": key, "Authorization": f"Bearer {key}"})
+    with _rq.urlopen(req, timeout=120) as r:
+        return _json.loads(r.read().decode() or "null")
+
+
 def fetch_solar_queue_data():
     """Fetch ISO queue records from SolarTrack's solar_installations table."""
     records = []
@@ -81,7 +95,7 @@ def fetch_solar_queue_data():
     page_size = 1000
     # ISO queue records have source_record_id starting with iso_
     while True:
-        result = supabase_request('GET',
+        result = solartrack_request('GET',
             f'solar_installations?source_record_id=like.iso_*'
             f'&select=source_record_id,state,capacity_mw,site_type,install_date,operator_name'
             f'&limit={page_size}&offset={offset}')
