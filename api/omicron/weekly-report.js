@@ -5,11 +5,12 @@
 //   • Overview      — conversions, CPA, cost distribution (all accounts ex Sunny/Pure)
 //   • Review Sites  — conversions, CPA, cost (BUR + Top10usenet)
 //   • Owned Sites   — conversions, CPA, cost (ex Sunny/Pure)
-//   • Account Details — one slide per brand: conversions, CPA, spend, SKU/brand breakdown
+//   • Account Details — per brand: conversions, CPA, spend, SKU/brand breakdown
 //
 // Charts render chromium-free via QuickChart (Chart.js → PNG); pdfkit assembles
-// landscape slides. Scheduled Tuesday 12pm America/New_York (cron at 16:00 &
-// 17:00 UTC, gated on noon ET so exactly one fires across DST). ?force=1 sends
+// landscape slides — ONE chart per slide, full-width, for readability.
+// Scheduled Monday 9pm America/New_York (cron at 01:00 & 02:00 UTC Tuesday,
+// gated on 9pm ET Monday so exactly one fires across DST). ?force=1 sends
 // now; ?pdf=1 returns the PDF bytes instead of emailing (both need CRON_SECRET).
 // Recipient: OMICRON_REPORT_TO (defaults to kenny@hyder.me for the approval loop).
 
@@ -27,9 +28,9 @@ const BRAND_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#14b8a6', '#e
 const ORDER = ['BUR', 'Top10usenet', 'Newshosting', 'Easynews', 'Eweka', 'Tweak', 'UsenetServer', 'Privado', 'Sunny', 'Pure'];
 const DEPRECATED = ['Sunny', 'Pure'];
 
-function isNoonET(now = new Date()) {
+function isMon9pmET(now = new Date()) {
   const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', hour12: false }).formatToParts(now);
-  return parts.find(p => p.type === 'weekday').value === 'Tue' && Number(parts.find(p => p.type === 'hour').value) === 12;
+  return parts.find(p => p.type === 'weekday').value === 'Mon' && Number(parts.find(p => p.type === 'hour').value) === 21;
 }
 
 const fmtMonth = (m) => { const [y, mo] = String(m).split('-'); return new Date(Number(y), Number(mo) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }); };
@@ -141,7 +142,7 @@ export default async function handler(req, res) {
   if (req.query?.recipients === '1') {
     return res.status(200).json({ ok: true, configured_to: process.env.OMICRON_REPORT_TO || 'kenny@hyder.me (default)', cc: process.env.OMICRON_REPORT_CC || null });
   }
-  if (!force && !isNoonET()) return res.status(200).json({ ok: true, skipped: 'not noon ET Tuesday' });
+  if (!force && !isMon9pmET()) return res.status(200).json({ ok: true, skipped: 'not 9pm ET Monday' });
 
   try {
     // 1) Data — 6 months monthly + conversion-action breakdown.
@@ -208,31 +209,24 @@ export default async function handler(req, res) {
       if (sub) doc.fillColor(MUTED).font('Helvetica').fontSize(11).text(sub, 40, 60);
       doc.moveTo(40, 82).lineTo(W - 40, 82).strokeColor('#e2e8f0').stroke();
     };
-    // Lay N charts out in a grid (≤3 → one row; 4 → 2×2), each centered in its cell
-    // with the caption directly beneath — always inside the bottom margin.
-    const chartsGrid = (title, sub, items) => {
+    // ONE chart per slide — rendered as large as fits, centered, with the
+    // caption directly beneath. Bigger charts = readable in email/on phones.
+    const chartSlide = (title, sub, item) => {
       doc.addPage();
       slideHeader(title, sub);
-      const n = items.length;
-      const cols = n <= 3 ? n : 2;
-      const rows = Math.ceil(n / cols);
-      const gap = 16, x0 = 40, y0 = 92;
-      const bottomSafe = H - 52;            // everything stays above this (within margin)
-      const areaW = W - 80, areaH = bottomSafe - y0;
-      const cellW = (areaW - (cols - 1) * gap) / cols;
-      const cellH = (areaH - (rows - 1) * gap) / rows;
-      const capH = 15;
-      items.forEach((it, i) => {
-        const col = i % cols, row = Math.floor(i / cols);
-        const cx = x0 + col * (cellW + gap), cyTop = y0 + row * (cellH + gap);
-        const chMaxH = cellH - capH;
-        const chH = Math.min(chMaxH, Math.round(cellW * 540 / 820));
-        const chY = cyTop + Math.max(0, (chMaxH - chH) / 2);
-        if (it.buf) doc.image(it.buf, cx, chY, { fit: [cellW, chH] });
-        // caption DIRECTLY under the rendered chart — never at the cell bottom,
-        // which would hit the page margin and make pdfkit add a blank page.
-        doc.fillColor(MUTED).font('Helvetica').fontSize(10).text(it.caption, cx, chY + chH + 4, { width: cellW, align: 'center', lineBreak: false });
-      });
+      const top = 92;
+      const bottomSafe = H - 52;            // stay above the bottom margin
+      const areaW = W - 80, areaH = bottomSafe - top;
+      const capH = 22;
+      const chMaxH = areaH - capH;
+      // Preserve the charts' native 820:540 aspect; fit to whichever bound binds.
+      let chW = areaW, chH = Math.round(chW * 540 / 820);
+      if (chH > chMaxH) { chH = chMaxH; chW = Math.round(chH * 820 / 540); }
+      const cx = 40 + (areaW - chW) / 2;
+      const chY = top + Math.max(0, (chMaxH - chH) / 2);
+      if (item.buf) doc.image(item.buf, cx, chY, { fit: [chW, chH] });
+      doc.fillColor(MUTED).font('Helvetica').fontSize(13)
+        .text(item.caption, 40, chY + chH + 6, { width: W - 80, align: 'center', lineBreak: false });
     };
 
     // Title slide
@@ -262,7 +256,7 @@ export default async function handler(req, res) {
         });
         doc.fillColor(MUTED).fontSize(11).text('Blue = Non-Brand · Red = Brand. Owned & Overview exclude Sunny & Pure (deprecated from regular reporting).', 40, H - 54, { width: W - 80, lineBreak: false });
       } else {
-        chartsGrid(s.title, s.sub, s.items);
+        for (const it of s.items) chartSlide(s.title, s.sub, it);
       }
     }
 

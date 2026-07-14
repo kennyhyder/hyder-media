@@ -225,7 +225,7 @@
     },
     {
       "path": "/api/omicron/weekly-report",
-      "schedule": "0 16,17 * * 2"
+      "schedule": "0 1,2 * * 2"
     },
     {
       "path": "/api/ag2020/sync-google-sheets",
