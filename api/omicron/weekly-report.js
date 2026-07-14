@@ -33,6 +33,18 @@ function isMon9pmET(now = new Date()) {
   return parts.find(p => p.type === 'weekday').value === 'Mon' && Number(parts.find(p => p.type === 'hour').value) === 21;
 }
 
+// The summary reports ONE month: the current month, or the prior month when the
+// report runs before the 7th (early-month runs don't yet have a meaningful
+// current-month total). Returns a 'YYYY-MM' key computed in ET.
+function summaryMonthKey(now = new Date()) {
+  const p = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+  let y = Number(p.find(x => x.type === 'year').value);
+  let m = Number(p.find(x => x.type === 'month').value);
+  const d = Number(p.find(x => x.type === 'day').value);
+  if (d < 7) { m -= 1; if (m === 0) { m = 12; y -= 1; } }
+  return `${y}-${String(m).padStart(2, '0')}`;
+}
+
 const fmtMonth = (m) => { const [y, mo] = String(m).split('-'); return new Date(Number(y), Number(mo) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }); };
 const usd = (n) => '$' + Math.round(Number(n) || 0).toLocaleString();
 const num = (n) => Math.round(Number(n) || 0).toLocaleString();
@@ -77,6 +89,11 @@ async function mapLimit(items, limit, fn) {
   return out;
 }
 
+// Datalabels formatter (as a string — QuickChart evaluates it server-side;
+// JSON.stringify would drop a real function). Renders the STACK TOTAL once,
+// on the top-most dataset, above the bar. Blank on lower datasets.
+const STACK_TOTAL_FMT = "function(value, ctx){var ds=ctx.chart.data.datasets;if(ctx.datasetIndex!==ds.length-1)return '';var t=0;for(var j=0;j<ds.length;j++){t+=(Number(ds[j].data[ctx.dataIndex])||0);}return t?Math.round(t).toLocaleString():'';}";
+
 // brand/non-brand bar chart. kind: conv | cpa | cost | costpct
 function barConfig(monthly, kind) {
   const labels = monthly.map(m => fmtMonth(m.month));
@@ -95,12 +112,30 @@ function barConfig(monthly, kind) {
       { label: 'Brand', data: monthly.map(m => Math.round(pick(m, 'brand'))), backgroundColor: RED },
     ];
   }
+  // Labels: grouped CPA shows each value above its bar; percentage shows the
+  // segment share inside; stacked counts/spend show segment values inside PLUS
+  // the stack total above the bar.
+  const showTotalAbove = stacked && kind !== 'costpct';
+  let datalabels;
+  if (kind === 'cpa') {
+    datalabels = { color: INK, anchor: 'end', align: 'end', font: { size: 11, weight: 'bold' } };
+  } else if (kind === 'costpct') {
+    datalabels = { color: '#fff', anchor: 'center', align: 'center', font: { size: 10, weight: 'bold' } };
+  } else {
+    datalabels = {
+      labels: {
+        value: { color: '#fff', anchor: 'center', align: 'center', font: { size: 10, weight: 'bold' } },
+        total: { anchor: 'end', align: 'end', color: INK, font: { size: 12, weight: 'bold' }, clip: false, formatter: STACK_TOTAL_FMT },
+      },
+    };
+  }
   return {
     type: 'bar', data: { labels, datasets },
     options: {
+      layout: showTotalAbove ? { padding: { top: 26 } } : {},
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 11 } } },
-        datalabels: { color: stacked ? '#fff' : INK, anchor: stacked ? 'center' : 'end', align: stacked ? 'center' : 'end', font: { size: 10, weight: 'bold' } },
+        datalabels,
       },
       scales: { x: { stacked, ticks: { font: { size: 10 } } }, y: { stacked, ticks: { font: { size: 10 } }, ...(kind === 'costpct' ? { max: 100 } : {}) } },
     },
@@ -117,7 +152,11 @@ function skuConfig(convAccount, isReview) {
   return {
     type: 'bar', data: { labels, datasets },
     options: {
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 8 }, boxWidth: 8, padding: 4 } }, datalabels: { display: false } },
+      layout: { padding: { top: 26 } },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 8 }, boxWidth: 8, padding: 4 } },
+        datalabels: { anchor: 'end', align: 'end', color: INK, font: { size: 12, weight: 'bold' }, clip: false, formatter: STACK_TOTAL_FMT },
+      },
       scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { font: { size: 10 } } } },
     },
   };
@@ -145,10 +184,10 @@ export default async function handler(req, res) {
   if (!force && !isMon9pmET()) return res.status(200).json({ ok: true, skipped: 'not 9pm ET Monday' });
 
   try {
-    // 1) Data — 6 months monthly + conversion-action breakdown.
+    // 1) Data — 13 months monthly + conversion-action breakdown.
     const [data, conv] = await Promise.all([
-      (await fetch(`${HM}/api/google-ads/omicron-monthly?lookback=6mo`)).json(),
-      (await fetch(`${HM}/api/google-ads/omicron-conversions?lookback=6mo`)).json(),
+      (await fetch(`${HM}/api/google-ads/omicron-monthly?lookback=13mo`)).json(),
+      (await fetch(`${HM}/api/google-ads/omicron-conversions?lookback=13mo`)).json(),
     ]);
     const ok = (data.accounts || []).filter(a => a.status === 'success');
     const convByName = new Map((conv.accounts || []).filter(a => a.status === 'success').map(a => [a.name, a]));
@@ -161,9 +200,15 @@ export default async function handler(req, res) {
     const range = overview.length ? `${fmtMonth(overview[0].month)} – ${fmtMonth(overview[overview.length - 1].month)}` : '';
     const orderedAccounts = ok.slice().sort((a, b) => orderIdx(a.name) - orderIdx(b.name));
 
+    // Summary = one month: current month, or prior month if run before the 7th.
+    // Fall back to the latest month present if that month isn't in the data yet.
+    const sumKey = summaryMonthKey();
+    const sumEntry = overview.find(m => m.month === sumKey) || overview[overview.length - 1] || null;
+    const sumLabel = sumEntry ? new Date(Number(sumEntry.month.split('-')[0]), Number(sumEntry.month.split('-')[1]) - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '';
+
     // 2) Build slide specs (chart configs + captions).
     const slides = [];
-    slides.push({ type: 'kpi', range });
+    slides.push({ type: 'kpi', sumEntry, sumLabel });
     slides.push({ type: 'charts', title: 'Overview', sub: range + ' · all accounts (excl. Sunny & Pure)', items: [
       { config: barConfig(overview, 'conv'), caption: 'Conversions (Brand vs Non-Brand)' },
       { config: barConfig(overview, 'cpa'), caption: 'CPA (Brand vs Non-Brand)' },
@@ -239,8 +284,8 @@ export default async function handler(req, res) {
     for (const s of slides) {
       if (s.type === 'kpi') {
         doc.addPage();
-        slideHeader('Portfolio Summary', s.range + ' · all accounts (excl. Sunny & Pure)');
-        const k = kpis(overview);
+        slideHeader('Portfolio Summary', (s.sumLabel ? s.sumLabel + ' · ' : '') + 'all accounts (excl. Sunny & Pure)');
+        const k = kpis(s.sumEntry ? [s.sumEntry] : []);
         const cards = [
           ['Total Spend', usd(k.spend)], ['Conversions', num(k.conv)],
           ['Blended CPA', usd(k.conv ? k.spend / k.conv : 0)],
@@ -272,9 +317,11 @@ export default async function handler(req, res) {
       return;
     }
 
-    // 5) Email it.
-    const to = (process.env.OMICRON_REPORT_TO || 'kenny@hyder.me').trim();
-    const cc = (process.env.OMICRON_REPORT_CC || '').trim();
+    // 5) Email it. `?to=` overrides the configured list (preview/self-send);
+    // when overridden, CC is dropped so only the named recipient gets it.
+    const override = req.query?.to ? String(req.query.to).trim() : '';
+    const to = (override || process.env.OMICRON_REPORT_TO || 'kenny@hyder.me').trim();
+    const cc = override ? '' : (process.env.OMICRON_REPORT_CC || '').trim();
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS } });
     const stamp = new Date().toLocaleDateString('en-US', { dateStyle: 'long' });
     await transporter.sendMail({
