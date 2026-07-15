@@ -3,9 +3,12 @@
  * cashflow.html, 404.html). The Next.js index.html has its own gate via
  * src/components/auth/AuthGate.tsx.
  *
- * Verifies the user has a valid Supabase session. Does NOT enforce per-tab
- * permissions here — these standalone pages are accessible to any signed-in
- * AG2020 user.
+ * Verifies the user has a valid Supabase session AND an ag2020_users
+ * membership row. The Supabase project is shared across several products
+ * (Omicron, AutomateDojo, SportsBookISH...), so a session alone does NOT
+ * prove AG2020 access — non-members are signed out and denied. Does NOT
+ * enforce per-tab permissions here — these standalone pages are accessible
+ * to any AG2020 member.
  *
  * Include in <head> AFTER loading the Supabase JS SDK:
  *   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,9 +44,9 @@
         return file + window.location.search + window.location.hash;
     }
 
-    function redirectToLogin() {
+    function redirectToLogin(denied) {
         var next = encodeURIComponent(buildNextParam());
-        window.location.replace('login.html?next=' + next);
+        window.location.replace('login.html?next=' + next + (denied ? '&denied=1' : ''));
     }
 
     function reveal() {
@@ -56,6 +59,21 @@
         try {
             var s = await client.auth.getSession();
             if (!s.data || !s.data.session) { redirectToLogin(); return; }
+
+            // Tenant check: shared Supabase auth pool — the session must
+            // belong to an AG2020 member. RLS only exposes the user's own
+            // ag2020_users row, so non-members get zero rows back.
+            var m = await client
+                .from('ag2020_users')
+                .select('user_id')
+                .eq('user_id', s.data.session.user.id)
+                .maybeSingle();
+            if (m.error || !m.data) {
+                try { await client.auth.signOut(); } catch (_) {}
+                redirectToLogin(true);
+                return;
+            }
+
             reveal();
         } catch (err) {
             console.error('[ag2020 auth] check failed:', err);

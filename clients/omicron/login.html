@@ -378,8 +378,39 @@
             showStep('step-login');
         });
 
+        // -------- Tenant membership (shared Supabase project!) --------
+        // This auth pool is shared with AG2020 / AutomateDojo / SportsBookISH.
+        // A valid session does NOT imply Omicron access — every path into the
+        // dashboard must confirm an omicron_users row first. RLS restricts the
+        // select to the user's own row, so non-members simply get nothing back.
+        async function isOmicronMember() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return false;
+            const { data, error } = await sb
+                .from('omicron_users')
+                .select('user_id')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+            return !error && !!data;
+        }
+
+        async function denyNonMember() {
+            try { await sb.auth.signOut(); } catch (_) {}
+            showError('This account does not have access to the Omicron dashboard. If you were invited to a different dashboard, please use the sign-in page from that invitation.');
+            showStep('step-login');
+        }
+
         // -------- Initial state determination --------
         async function bootstrap() {
+            // Bounced here by auth-check.js after a non-member tenant check
+            if (_initialQS.get('denied')) {
+                showError('This account does not have access to the Omicron dashboard.');
+                showStep('step-login');
+                if (window.history?.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname);
+                }
+                return;
+            }
             // If Supabase redirected with an explicit error (expired token,
             // already-used OTP, etc.) tell the user up front instead of
             // silently dropping them on the login form.
@@ -428,6 +459,7 @@
             // Invited / password-reset users land here with no usable password.
             // Force them through the set-password step before MFA enrollment.
             if (_isInviteOrRecovery) {
+                if (!(await isOmicronMember())) { await denyNonMember(); return; }
                 needsPasswordSet = true;
                 showInfo('Welcome! Please set your password to continue.');
                 showStep('step-set-password');
@@ -439,6 +471,10 @@
 
         // Decide what to show after a successful password login (or page reload with session)
         async function routeAfterPasswordLogin() {
+            // Tenant check BEFORE any MFA challenge/enrollment — never enroll
+            // a factor for (or admit) a user from another product's dashboard.
+            if (!(await isOmicronMember())) { await denyNonMember(); return; }
+
             const { data: aalData, error: aalErr } =
                 await sb.auth.mfa.getAuthenticatorAssuranceLevel();
             if (aalErr) {
@@ -507,7 +543,10 @@
                 if (res.error) {
                     throw res.error;
                 }
-                // Session established. Treat this exactly like the link flow:
+                // Session established — but only continue if this account is
+                // actually an Omicron member (shared auth pool, see above).
+                if (!(await isOmicronMember())) { await denyNonMember(); return; }
+                // Treat this exactly like the link flow:
                 // force the user through "Set Your Password" before MFA setup.
                 needsPasswordSet = true;
                 showInfo('Welcome! Please set your password to continue.');

@@ -45,6 +45,10 @@ export default async function handler(req, res) {
     try {
         const { data, error } = await sb.auth.admin.inviteUserByEmail(email, {
             redirectTo: LOGIN_URL,
+            // Tag the account so the shared-project auth.users triggers
+            // (9dm_handle_new_user, sb_handle_new_user) skip it. The public
+            // magic-link path in login.html sets the same metadata.
+            data: { product: 'ag2020' },
         });
         if (error) throw error;
         user_id = data?.user?.id || null;

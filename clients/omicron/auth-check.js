@@ -1,7 +1,11 @@
 /**
  * Omicron dashboard auth gate.
  *
- * Verifies the user has an active Supabase session at AAL2 (MFA verified).
+ * Verifies the user has an active Supabase session at AAL2 (MFA verified)
+ * AND a membership row in omicron_users. The Supabase project is shared
+ * across several products (AG2020, AutomateDojo, SportsBookISH...), so a
+ * valid session alone proves nothing about Omicron access — a non-member
+ * with a session is signed out and denied.
  * Redirects to login.html with a `next` param if not. Hides the page body
  * until verification completes to prevent a flash of protected content.
  *
@@ -37,9 +41,9 @@
         return file + window.location.search + window.location.hash;
     }
 
-    function redirectToLogin() {
+    function redirectToLogin(denied) {
         const next = encodeURIComponent(buildNextParam());
-        window.location.replace('login.html?next=' + next);
+        window.location.replace('login.html?next=' + next + (denied ? '&denied=1' : ''));
     }
 
     function reveal() {
@@ -52,6 +56,21 @@
         try {
             const { data: { session } } = await client.auth.getSession();
             if (!session) { redirectToLogin(); return; }
+
+            // Tenant check: the session must belong to an Omicron member.
+            // RLS only lets a user read their own omicron_users row, so a
+            // non-member (e.g. an AG2020 user in the same auth pool) gets
+            // zero rows back — sign them out entirely and deny.
+            const { data: member, error: memberErr } = await client
+                .from('omicron_users')
+                .select('user_id')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+            if (memberErr || !member) {
+                try { await client.auth.signOut(); } catch (_) {}
+                redirectToLogin(true);
+                return;
+            }
 
             const { data: aalData, error: aalErr } =
                 await client.auth.mfa.getAuthenticatorAssuranceLevel();

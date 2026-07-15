@@ -264,6 +264,15 @@
 
         // -------- Bootstrap: handle invite/recovery landings + existing session --------
         (async function bootstrap() {
+            // Bounced here by auth-check.js after a failed tenant check
+            // (signed-in account with no ag2020_users membership row).
+            if (_initialQS.get('denied')) {
+                showError('This account does not have access to the Auto Glass 2020 dashboard. Ask Kenny or Cash to grant you access, then sign in again.');
+                if (window.history?.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname);
+                }
+                return;
+            }
             if (_authErrorCode) {
                 const friendly = _authErrorCode === 'otp_expired'
                     ? 'That sign-in link has expired or was already used. Common cause: an email client (Outlook Safe Links / Gmail preview / Resend click tracking) consumed the one-time token before you clicked. Ask Kenny to send a fresh invite, or use the password tab if you\'ve set one.'
