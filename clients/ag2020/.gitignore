@@ -15,5 +15,6 @@ tsconfig.json
 next-env.d.ts
 public/
 
-# Keep data files tracked (safe from iCloud eviction)
-!data/
+# data/ is NOT tracked (overridden root rule removed 2026-07-15): Vercel
+# serves every committed static file publicly, and data/ holds bank
+# statements + client financials. Keep local copies backed up outside git.
