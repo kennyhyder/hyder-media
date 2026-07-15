@@ -9,3 +9,7 @@ node_modules/
 
 # AutomateDojo is its own git repo (kennyhyder/automatedojo) nested here
 automatedojo/
+
+# AG2020 raw client data (bank statements, reports) — NEVER commit/deploy;
+# Vercel serves committed static files publicly
+clients/ag2020/data/
