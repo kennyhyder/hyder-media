@@ -51,10 +51,13 @@ ad-spend ingest, and an investor pitch deck. **Companion memory:**
 | Debt | Admin | Outstanding debts + schedule |
 | Bank Statements | Admin | Raw transaction history |
 | Bankruptcy | Admin | Chapter 11 analysis, creditor distributions |
-| Admin | Admin only | Invite / promote / delete users + per-tab visibility checkboxes |
-
-Admins see everything by default. Members see the team-safe set. Per-user
-`allowed_tabs` array overrides the role default when populated.
+~~Admin tab removed 2026-07-15~~ — no per-user accounts under the shared-password
+model; everyone sees every tab (single team identity, role=admin). The per-user
+gating machinery survives in `src/lib/auth.ts` if it's ever needed again.
+CEO tab additions 2026-07-15: "Payments to Google & Meta" card (daily API spend,
+auto-mirrored to operating outflows via `/api/ag2020/ad-payments`) and "Bank
+balances & manual entries" card (`/api/ag2020/manual-entry`: set actual bank
+balance + ad-hoc payments/income with log/undo).
 
 ## Attribution Platform (`ag2020_*` tables in Supabase)
 - `ag2020_lead_journey` — one row per unique customer (phone+email join key).
