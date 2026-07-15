@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — Maps Ops</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .container { max-width: 1240px; }
+        .section { margin-bottom: 52px; }
+        .section h2 {
+            font-size: 1.4rem; font-weight: 700;
+            padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 18px;
+        }
+        .section h2 .sec-note { font-size: 0.85rem; font-weight: 400; color: var(--text-secondary); margin-left: 10px; }
+        .section p { margin-bottom: 12px; }
+        .section p.muted { color: var(--text-secondary); font-size: 0.92rem; }
+
+        .conn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .conn-card {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px 20px;
+        }
+        .conn-card .conn-name { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .conn-card .conn-detail { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.45; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .dot-green { background: var(--success); }
+        .dot-red { background: var(--danger); }
+        .dot-yellow { background: var(--warning); }
+        .dot-gray { background: var(--text-secondary); }
+
+        .pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+        .pill-green  { background: rgba(34,197,94,0.15);  color: var(--success); }
+        .pill-yellow { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .pill-red    { background: rgba(239,68,68,0.15);  color: var(--danger); }
+        .pill-blue   { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .pill-gray   { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+
+        .data-table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 0.88rem; }
+        .data-table th { text-align: left; padding: 9px 10px; background: var(--bg-tertiary); font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; position: sticky; top: 0; }
+        .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .table-scroll { overflow-x: auto; max-height: 640px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+        .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+        .callout {
+            border-left: 4px solid var(--warning); background: rgba(245,158,11,0.08);
+            border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0; font-size: 0.92rem;
+        }
+        .callout.blue { border-left-color: var(--accent); background: rgba(59,130,246,0.08); }
+        .callout-title { font-weight: 700; display: block; margin-bottom: 4px; }
+
+        .stats-row { margin-bottom: 10px; }
+        .stat-sub { font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Kickoff plan */
+        .week {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px 22px; margin-bottom: 16px;
+        }
+        .week-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+        .week-num { background: var(--accent); color: #fff; font-weight: 700; font-size: 0.8rem; border-radius: 6px; padding: 3px 10px; white-space: nowrap; }
+        .week-title { font-weight: 700; font-size: 1.02rem; }
+        .week-progress { margin-left: auto; font-size: 0.8rem; color: var(--text-secondary); }
+        .task { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid rgba(71,85,105,0.35); font-size: 0.9rem; }
+        .task:last-child { border-bottom: none; }
+        .task input[type=checkbox] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+        .task.done .task-text { color: var(--text-secondary); text-decoration: line-through; }
+        .task .owner { font-size: 0.68rem; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-right: 6px; white-space: nowrap; vertical-align: middle; }
+        .owner-dunham { background: rgba(139,92,246,0.18); color: var(--purple); }
+        .owner-hyder  { background: rgba(59,130,246,0.18); color: var(--accent); }
+        .owner-both   { background: rgba(34,197,94,0.18); color: var(--success); }
+        .save-note { font-size: 0.78rem; color: var(--text-secondary); }
+
+        .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .toggle-link { font-size: 0.85rem; color: var(--accent); cursor: pointer; text-decoration: none; }
+        .toggle-link:hover { text-decoration: underline; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+        @media (max-width: 700px) { .week-progress { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham &amp; Jones — Maps Ops
+        </a>
+        <div class="nav-actions">
+            <a href="bail-bonds.html" class="btn btn-secondary">Strategy &amp; Plan</a>
+            <a href="dashboard.html" class="btn btn-secondary">Ad Report</a>
+            <button class="btn btn-primary" id="refresh-gbp-btn" onclick="refreshGbp()">Refresh GBP Audit</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Maps Domination — Operations</h1>
+            <p class="subtitle">Live connections, GBP office audit, keyword scoreboard &amp; kickoff plan</p>
+            <div class="report-meta">
+                <span>Track 1 — Texas Map Pack</span>
+                <span id="meta-updated">Loading…</span>
+            </div>
+        </div>
+
+        <!-- A. CONNECTIONS -->
+        <div class="section" id="connections">
+            <h2>Data Connections <span class="sec-note">what's wired vs. what needs a grant</span></h2>
+            <div class="conn-grid" id="conn-grid">
+                <div class="conn-card"><div class="conn-name"><span class="dot dot-gray"></span>Checking…</div></div>
+            </div>
+            <div id="conn-actions"></div>
+        </div>
+
+        <!-- B. GBP AUDIT -->
+        <div class="section" id="gbp-audit">
+            <h2>GBP Office Audit <span class="sec-note">all Dunham &amp; Jones profiles under managed access</span></h2>
+            <div class="stats-row" id="gbp-stats"></div>
+            <div id="gbp-alerts"></div>
+            <div class="table-scroll">
+                <table class="data-table" id="gbp-table">
+                    <thead><tr>
+                        <th>Office</th><th>Phone</th><th>Primary Category</th><th>Bail Category</th>
+                        <th>24/7</th><th>Reviews</th><th>Landing Page</th><th>Status</th>
+                    </tr></thead>
+                    <tbody><tr><td colspan="8">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- C. KEYWORD SCOREBOARD -->
+        <div class="section" id="keywords">
+            <h2>Bail Keyword Scoreboard <span class="sec-note">Feb 2026 SEMrush baseline vs live Search Console</span></h2>
+            <p class="muted" id="kw-status">Loading…</p>
+            <div class="btn-row">
+                <a class="toggle-link" id="kw-toggle" onclick="toggleKeywords()">Show all 243 tracked keywords</a>
+            </div>
+            <div class="table-scroll" style="max-height: 560px;">
+                <table class="data-table" id="kw-table">
+                    <thead><tr>
+                        <th>Keyword</th><th>Metro</th><th class="num">Volume</th><th>Local Pack</th>
+                        <th class="num">Baseline Pos</th><th class="num">Current Pos</th><th class="num">Δ</th>
+                    </tr></thead>
+                    <tbody><tr><td colspan="7">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- D. KICKOFF PLAN -->
+        <div class="section" id="kickoff">
+            <h2>Kickoff Plan — First 8 Weeks <span class="sec-note">checkboxes save automatically (shared)</span></h2>
+            <p class="muted">Owners: <span class="owner owner-dunham">DUNHAM</span> firm-side action &nbsp;·&nbsp; <span class="owner owner-hyder">HYDER</span> Hyder Media &nbsp;·&nbsp; <span class="owner owner-both">BOTH</span> joint. <span class="save-note" id="plan-save-note"></span></p>
+            <div id="plan-container">Loading…</div>
+        </div>
+
+        <div class="footer-note">
+            Operational companion to the <a href="bail-bonds.html" style="color: var(--accent); text-decoration: none;">Bail Bonds Search Domination</a> strategy · Prepared by Hyder Media
+        </div>
+    </div>
+
+    <script>
+        const API = {
+            connections: '/api/dunham/connections',
+            gbpAudit: '/api/dunham/gbp-audit',
+            keywords: '/api/dunham/bail-keywords',
+            state: '/api/gbp/locations',
+        };
+        const STATE_CLIENT = 'dunham-maps';
+        const PLAN_ROW = '_kickoff-plan';
+
+        // Offices listed on dunhamlaw.com — reconciled against live GBP profiles
+        const EXPECTED_CITIES = ['Abilene','Amarillo','Austin','Bryan','Corpus Christi','Dallas','Denton','El Paso','Fort Worth','Georgetown','Harker Heights','Houston','Lubbock','Midland','Plano','San Antonio','San Marcos','Waco'];
+
+        // ---------- Kickoff plan definition ----------
+        const PLAN = [
+            { week: 'Week 1', title: 'Access & Instrumentation', tasks: [
+                { id: 'w1-gsc', owner: 'DUNHAM', text: 'Grant Search Console access: dunhamlaw.com property → Settings → Users and permissions → Add kenny@hyder.me (Full). Repeat for dunhamjones.com.' },
+                { id: 'w1-ga4', owner: 'DUNHAM', text: 'GA4: confirm a property exists for dunhamlaw.com and add kenny@hyder.me as Viewer — or approve creating one (tag install via site template).' },
+                { id: 'w1-gmb-api', owner: 'HYDER', text: 'Enable "Google My Business API" in Google Cloud project 132234777258 so review counts/ratings flow into the audit below.' },
+                { id: 'w1-localfalcon', owner: 'HYDER', text: 'LocalFalcon account: 7×7 geo-grids on "bail bonds" + "bail bondsman" centered on the county jail in Houston, Dallas, San Antonio, Austin, Fort Worth, El Paso.' },
+                { id: 'w1-calls', owner: 'BOTH', text: 'Verify vanity-number routing and 24/7 answering: who picks up at 2am? Confirm call logs are exportable per line (needed for attribution baseline).' },
+                { id: 'w1-dallas', owner: 'BOTH', text: 'DALLAS HAS NO GBP PROFILE (top-2 market). Locate it under another Google account and transfer/grant, or create + verify it. Same check for Georgetown and San Marcos.' },
+                { id: 'w1-domains', owner: 'DUNHAM', text: 'Deliver the full premium-domain portfolio list → select the Track 2 directory vehicle.' },
+            ]},
+            { week: 'Week 2', title: 'Baseline & Compliance', tasks: [
+                { id: 'w2-grid', owner: 'HYDER', text: 'First geo-grid snapshots. Document the 3 map-pack winners per metro: business name, categories, review count/velocity, distance from jail, website.' },
+                { id: 'w2-cron', owner: 'HYDER', text: 'GSC rank-snapshot cron confirmed writing daily (auto-starts once Week-1 GSC grant lands); register table in the freshness canary.' },
+                { id: 'w2-compliance', owner: 'DUNHAM', text: 'Counsel review: attorney-bond marketing standards (§1704.163 representation-bound framing); approve rewrite of "FREE Bail Bonds" page titles to "Attorney Bond — No Bondsman Fee".' },
+                { id: 'w2-ftw', owner: 'BOTH', text: 'Fort Worth duplicate profile decision: criminal-defense profile (817-888-8888) vs personal-injury profile (800-528-4044) — separate practice areas are allowed, but names/categories must be distinct.' },
+                { id: 'w2-citations', owner: 'HYDER', text: 'NAP standardization sheet (one canonical name/address/phone per office) + citation audit on the major aggregators and legal directories.' },
+                { id: 'w2-boards', owner: 'DUNHAM', text: 'Pull current attorney-bond rules for the 6 priority county bail bond boards (Harris, Dallas, Bexar, Travis, Tarrant, El Paso) — flag any filing/disclosure requirements.' },
+            ]},
+            { week: 'Weeks 3–4', title: 'Category & Profile Rollout', tasks: [
+                { id: 'w3-cat-small', owner: 'HYDER', text: 'Add "Bail bonds service" secondary category to 3 low-risk offices first (Abilene, Waco, Corpus Christi) — 5 offices already carry it safely (Midland, Lubbock, El Paso, Amarillo, Bryan), so risk is validated. Watch 72h for re-verification.' },
+                { id: 'w3-cat-metro', owner: 'HYDER', text: 'Roll the category to the metros: Houston, San Antonio, Austin, Plano, Denton, Fort Worth (criminal profile) + Dallas once its profile exists. One office at a time, evidence pack ready (signage photo, bar license, office video).' },
+                { id: 'w3-services', owner: 'HYDER', text: 'Services & description pass on all 16+: add jail release / attorney bail bond service items, description naming county + 24/7 Jail Release Team, fresh signage photos.' },
+                { id: 'w3-landing', owner: 'HYDER', text: 'Landing strategy: keep criminal-attorney pages as GBP links but add an above-fold Jail Release / Attorney Bond module linking each office\'s county bail page. UTM-tag all GBP website links.' },
+                { id: 'w3-dj-domain', owner: 'BOTH', text: 'Waco, Harker Heights & Bryan GBPs point to dunhamjones.com — decide canonical domain and align (avoid splitting authority across two domains).' },
+            ]},
+            { week: 'Weeks 5–6', title: 'Review Engine & Landing Pages', tasks: [
+                { id: 'w5-reviews', owner: 'BOTH', text: 'Launch review workflow: post-resolution SMS/email with the office\'s direct review link (from audit Place IDs). Target ≥8 new Google reviews/office/month, steady velocity — never bursts.' },
+                { id: 'w5-respond', owner: 'DUNHAM', text: 'Review response protocol: office managers respond to 100% of reviews within 48h (templates provided; no case details — bar compliance).' },
+                { id: 'w5-pages', owner: 'HYDER', text: 'Upgrade 6 priority county pages: jail-name sections (Lew Sterrett, Harris JPC, Bexar ADC…), Spanish/fianzas versions, §1704.163 explainer, LocalBusiness/Attorney schema, embedded reviews.' },
+                { id: 'w5-gsc-report', owner: 'HYDER', text: 'First GSC-based movement report: bail-cluster clicks/impressions/positions vs Feb 2026 baseline (auto on this page once GSC connects).' },
+            ]},
+            { week: 'Weeks 7–8', title: 'Offense', tasks: [
+                { id: 'w7-spam', owner: 'HYDER', text: 'Spam patrol round 1: from geo-grid winners, document guideline violators per metro (keyword-stuffed names, fake addresses) → Business Redressal complaints with evidence. Track filings → removals.' },
+                { id: 'w7-bing', owner: 'HYDER', text: 'Bing Ads: chase Microsoft developer-token approval; launch bail campaigns on approval (only paid channel allowed in the vertical).' },
+                { id: 'w7-lsa', owner: 'HYDER', text: 'Local Services Ads signup under criminal-defense/DUI categories for all metros (law-firm side door — bondsmen can\'t run LSAs).' },
+                { id: 'w7-report', owner: 'HYDER', text: 'First monthly initiative report: grid movement, review velocity by office, keyword scoreboard deltas, call counts by vanity line, spam removals.' },
+            ]},
+        ];
+
+        // ---------- Connections ----------
+        async function loadConnections() {
+            const grid = document.getElementById('conn-grid');
+            const actions = document.getElementById('conn-actions');
+            try {
+                const c = await (await fetch(API.connections)).json();
+                const cards = [];
+                const card = (name, ok, detail, warn) => `
+                    <div class="conn-card">
+                        <div class="conn-name"><span class="dot ${ok ? 'dot-green' : (warn ? 'dot-yellow' : 'dot-red')}"></span>${name}
+                            <span class="pill ${ok ? 'pill-green' : (warn ? 'pill-yellow' : 'pill-red')}">${ok ? 'Connected' : (warn ? 'Partial' : 'Needs grant')}</span></div>
+                        <div class="conn-detail">${detail}</div>
+                    </div>`;
+                cards.push(card('Google Ads', true, 'Account 840-838-5870 via MCC — powering the Ad Report since 2016.'));
+                cards.push(card('Google Business Profile', c.gbp?.connected,
+                    c.gbp?.connected
+                        ? `${c.gbp.dunhamLocationCount} Dunham office profiles under managed access.`
+                        : (c.gbp?.grant || c.gbp?.error || 'Not connected.')));
+                cards.push(card('Search Console', c.gsc?.connected,
+                    c.gsc?.connected ? `Property: ${c.gsc.property} (${c.gsc.permission})`
+                        : 'No access to the dunhamlaw.com property yet — keyword tracking starts automatically when granted.'));
+                cards.push(card('Google Analytics 4', c.ga4?.connected,
+                    c.ga4?.connected ? `${c.ga4.displayName}` : 'No Dunham GA4 property visible yet.'));
+                grid.innerHTML = cards.join('');
+
+                const pending = [];
+                if (!c.gsc?.connected && c.gsc?.grant) pending.push(['Search Console', c.gsc.grant]);
+                if (!c.ga4?.connected && c.ga4?.grant) pending.push(['GA4', c.ga4.grant]);
+                if (!c.gbp?.connected && c.gbp?.grant) pending.push(['Business Profile', c.gbp.grant]);
+                actions.innerHTML = pending.length ? `
+                    <div class="callout"><span class="callout-title">Access grants needed (client-side, ~5 minutes)</span>
+                        ${pending.map(([n, g]) => `<div style="margin:6px 0;"><strong>${n}:</strong> ${g}</div>`).join('')}
+                    </div>` : `<div class="callout blue"><span class="callout-title">All grantable connections are live.</span></div>`;
+                document.getElementById('meta-updated').textContent = 'Connections checked: ' + new Date(c.checkedAt).toLocaleString();
+            } catch (e) {
+                grid.innerHTML = `<div class="conn-card"><div class="conn-name"><span class="dot dot-red"></span>Connection check failed</div><div class="conn-detail">${e.message}</div></div>`;
+            }
+        }
+
+        // ---------- GBP audit ----------
+        async function loadGbp(fromRefresh) {
+            const tbody = document.querySelector('#gbp-table tbody');
+            const stats = document.getElementById('gbp-stats');
+            const alerts = document.getElementById('gbp-alerts');
+            try {
+                const d = await (await fetch(API.gbpAudit + (fromRefresh ? '?refresh=1' : ''))).json();
+                const offices = d.offices || [];
+                if (!offices.length) {
+                    tbody.innerHTML = '<tr><td colspan="8">No stored audit yet — click "Refresh GBP Audit".</td></tr>';
+                    return;
+                }
+                offices.sort((a, b) => (a.city || '').localeCompare(b.city || ''));
+                const bailCount = offices.filter(o => o.audit.hasBailCategory).length;
+                const h24 = offices.filter(o => o.audit.is24x7).length;
+                const withReviews = offices.filter(o => o.reviews);
+                stats.innerHTML = `
+                    <div class="stat-card"><div class="stat-label">Profiles Managed</div><div class="stat-value">${offices.length}</div><div class="stat-sub">of ~18 expected offices</div></div>
+                    <div class="stat-card"><div class="stat-label">Bail Category Live</div><div class="stat-value">${bailCount}/${offices.length}</div><div class="stat-sub">"Bail bonds service" secondary</div></div>
+                    <div class="stat-card"><div class="stat-label">Open 24/7</div><div class="stat-value">${h24}/${offices.length}</div><div class="stat-sub">top-5 ranking factor</div></div>
+                    <div class="stat-card"><div class="stat-label">Review Data</div><div class="stat-value">${withReviews.length ? withReviews.length : '—'}</div><div class="stat-sub">${withReviews.length ? 'offices reporting' : 'needs GMB API enabled'}</div></div>`;
+
+                const gbpCities = new Set(offices.map(o => (o.city || '').toLowerCase()));
+                const missing = EXPECTED_CITIES.filter(c => !gbpCities.has(c.toLowerCase()));
+                alerts.innerHTML = missing.length ? `
+                    <div class="callout"><span class="callout-title">Offices with no managed GBP profile: ${missing.join(', ')}</span>
+                    These exist on dunhamlaw.com but no profile is visible under our access — either unclaimed, unverified, or owned by another Google account. Dallas is a top-2 Texas bail market; resolving it is a Week-1 task.</div>` : '';
+
+                tbody.innerHTML = offices.map(o => `
+                    <tr>
+                        <td><strong>${o.city || '?'}</strong><br><span style="font-size:0.75rem;color:var(--text-secondary)">${o.address || ''}</span></td>
+                        <td>${o.phone || '—'}</td>
+                        <td>${o.primaryCategory || '—'}${o.additionalCategories.length ? `<br><span style="font-size:0.75rem;color:var(--text-secondary)">+ ${o.additionalCategories.join(', ')}</span>` : ''}</td>
+                        <td>${o.audit.hasBailCategory ? '<span class="pill pill-green">Yes</span>' : '<span class="pill pill-red">Missing</span>'}</td>
+                        <td>${o.audit.is24x7 ? '<span class="pill pill-green">24/7</span>' : '<span class="pill pill-yellow">No</span>'}</td>
+                        <td class="num">${o.reviews ? `${o.reviews.total} (${o.reviews.averageRating ?? '—'}★)` : '—'}</td>
+                        <td style="max-width:220px; overflow-wrap:anywhere; font-size:0.8rem;">${o.website ? `<a href="${o.website}" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">${o.website.replace(/^https:\/\/(www\.)?/, '')}</a>` : '—'}</td>
+                        <td>${o.openStatus === 'OPEN' ? '<span class="pill pill-green">Open</span>' : `<span class="pill pill-yellow">${o.openStatus || '?'}</span>`}</td>
+                    </tr>`).join('');
+                if (d.refreshedAt || fromRefresh) {
+                    document.getElementById('meta-updated').textContent = 'GBP audit: ' + new Date(d.refreshedAt || Date.now()).toLocaleString();
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="8">Error: ${e.message}</td></tr>`;
+            }
+        }
+
+        async function refreshGbp() {
+            const btn = document.getElementById('refresh-gbp-btn');
+            btn.disabled = true; btn.textContent = 'Refreshing…';
+            await loadGbp(true);
+            btn.disabled = false; btn.textContent = 'Refresh GBP Audit';
+        }
+
+        // ---------- Keywords ----------
+        let showAllKeywords = false;
+        async function loadKeywords() {
+            const tbody = document.querySelector('#kw-table tbody');
+            const status = document.getElementById('kw-status');
+            try {
+                const d = await (await fetch(API.keywords + (showAllKeywords ? '' : '?priority=1'))).json();
+                const kws = d.keywords || [];
+                status.textContent = d.latestSnapshot
+                    ? `Baseline: ${d.baselineDate} (SEMrush) · Live positions: Search Console 7-day window ending ${d.latestSnapshot}.`
+                    : `Baseline: ${d.baselineDate} (SEMrush). Live positions appear automatically once Search Console access is granted (Week-1 task) — the daily snapshot cron is already running.`;
+                tbody.innerHTML = kws.map(k => {
+                    const cur = k.current?.position ?? null;
+                    const delta = (cur != null && k.baselinePosition != null) ? (k.baselinePosition - cur) : null;
+                    return `<tr>
+                        <td>${k.keyword}${k.isPriority ? ' <span class="pill pill-blue">P</span>' : ''}</td>
+                        <td>${k.metro || '—'}</td>
+                        <td class="num">${(k.volume || 0).toLocaleString()}</td>
+                        <td>${k.hasLocalPack ? '<span class="pill pill-yellow">Pack</span>' : '—'}</td>
+                        <td class="num">${k.baselinePosition ?? '—'}</td>
+                        <td class="num">${cur ?? '—'}</td>
+                        <td class="num">${delta == null ? '—' : (delta > 0 ? `<span style="color:var(--success)">▲ ${delta.toFixed(1)}</span>` : delta < 0 ? `<span style="color:var(--danger)">▼ ${Math.abs(delta).toFixed(1)}</span>` : '=')}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="7">No keywords.</td></tr>';
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7">Error: ${e.message}</td></tr>`;
+            }
+        }
+        function toggleKeywords() {
+            showAllKeywords = !showAllKeywords;
+            document.getElementById('kw-toggle').textContent = showAllKeywords ? 'Show priority keywords only' : 'Show all 243 tracked keywords';
+            loadKeywords();
+        }
+
+        // ---------- Kickoff plan (persisted checkboxes) ----------
+        let planRowId = null;
+        let planState = {};
+        async function loadPlan() {
+            try {
+                const d = await (await fetch(`${API.state}?client=${STATE_CLIENT}`)).json();
+                const row = (d.locations || []).find(l => l.location_name === PLAN_ROW);
+                if (row) { planRowId = row.id; planState = row.data || {}; }
+            } catch (_) { /* render unchecked */ }
+            renderPlan();
+        }
+        function renderPlan() {
+            const el = document.getElementById('plan-container');
+            el.innerHTML = PLAN.map(w => {
+                const done = w.tasks.filter(t => planState[t.id]?.done).length;
+                return `<div class="week">
+                    <div class="week-head">
+                        <span class="week-num">${w.week}</span>
+                        <span class="week-title">${w.title}</span>
+                        <span class="week-progress">${done}/${w.tasks.length} done</span>
+                    </div>
+                    ${w.tasks.map(t => `
+                        <div class="task ${planState[t.id]?.done ? 'done' : ''}" id="task-${t.id}">
+                            <input type="checkbox" ${planState[t.id]?.done ? 'checked' : ''} onchange="toggleTask('${t.id}', this.checked)">
+                            <div><span class="owner owner-${t.owner.toLowerCase()}">${t.owner}</span><span class="task-text">${t.text}</span></div>
+                        </div>`).join('')}
+                </div>`;
+            }).join('');
+        }
+        async function toggleTask(id, done) {
+            planState[id] = { done, at: new Date().toISOString() };
+            renderPlan();
+            const note = document.getElementById('plan-save-note');
+            note.textContent = 'Saving…';
+            try {
+                const body = { client_key: STATE_CLIENT, location_name: PLAN_ROW, data: planState };
+                if (planRowId) body.id = planRowId;
+                const resp = await (await fetch(API.state, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+                })).json();
+                if (resp.location?.id) planRowId = resp.location.id;
+                note.textContent = 'Saved ✓';
+                setTimeout(() => note.textContent = '', 2000);
+            } catch (e) {
+                note.textContent = 'Save failed — retry';
+            }
+        }
+
+        loadConnections();
+        loadGbp(false);
+        loadKeywords();
+        loadPlan();
+    </script>
+</body>
+</html>

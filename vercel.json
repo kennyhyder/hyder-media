@@ -234,6 +234,10 @@
     {
       "path": "/api/ag2020/bucket-allocate",
       "schedule": "30 7 * * *"
+    },
+    {
+      "path": "/api/dunham/bail-rank-snapshot",
+      "schedule": "10 13 * * *"
     }
   ],
   "functions": {
@@ -295,6 +299,9 @@
       "maxDuration": 120
     },
     "api/bron/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/dunham/**/*.js": {
       "maxDuration": 60
     }
   }
