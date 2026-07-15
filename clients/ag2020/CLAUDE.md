@@ -10,21 +10,31 @@ permissions. Added end-to-end attribution, halo-lift analysis, autodialer,
 ad-spend ingest, and an investor pitch deck. **Companion memory:**
 [[ag2020-platform-state]] and [[ag2020-pending-items]].
 
-## Authentication (Supabase email/password + magic link)
-- **Login page:** `/clients/ag2020/login.html` — both password sign-in AND magic-link tabs
-- **Auth check:** React `AuthGate` wraps the dashboard; static pages
-  (court-presentation, cashflow, 404) use `auth-check.js`
-- **Old `password.html`** now 302-redirects to `login.html` (preserves `?next=`)
-- **Supabase project:** `ilbovwnhrowvxjdkvrln` (shared with Omicron, AutomateDojo,
-  SportsBookISH, Vita Brevis, etc.)
-- **User table:** `ag2020_users` (user_id, email, role, allowed_tabs jsonb,
-  display_name). Schema in `/clients/ag2020/supabase/ag2020_users.sql`.
-- **Role helper:** `is_ag2020_admin(uuid)` SQL function (SECURITY DEFINER, used by RLS)
-- **Admins seeded:** `kenny@hyder.me` + `cash@autoglass2020.com`
-- **Sign-up flow** sets `raw_user_meta_data.product = 'ag2020'` so the
-  shared-project triggers `9dm_handle_new_user` + `sb_handle_new_user`
-  (AutomateDojo + SportsBookISH) skip — keeps users isolated per product.
-- **Legacy shared password** (pre-Supabase sessionStorage era): AG2020FLOW.
+## Authentication (single shared password — Supabase auth REMOVED 2026-07-15)
+- **Gate:** `/clients/ag2020/password.html` — shared password **AG2020FLOW**,
+  sets `sessionStorage['ag2020_dashboard_auth'] = 'authenticated'`. Preserves
+  deep links via `?next=` (and legacy `?redirect=`).
+- **Why removed:** 2026-07-14/15 cross-tenant incident — the shared Supabase
+  auth pool's magic-link invites fell back to the Omicron login (site_url +
+  allow-list misconfig) and Omicron had no membership gate; two AG2020
+  employees (Lacy, Taylor) were walked into the Omicron dashboard. Kenny
+  directive: AG2020 people must hold NO Supabase credentials, period. Their
+  auth accounts were deleted. Memory: [[shared-supabase-tenant-isolation]].
+- **Auth check:** React `AuthGate` (sessionStorage) wraps the dashboard;
+  static pages (court-presentation, cashflow, 404) use `auth-check.js`
+  (also sessionStorage). `login.html` now redirects to `password.html`.
+- **Everyone sees every tab** (single team identity, role=admin). The Admin
+  tab (per-user management) was removed. Per-user gating machinery
+  (`TAB_CATALOG`, `resolveAllowedTabs`) is kept in `src/lib/auth.ts` in case
+  it returns.
+- **API auth:** dashboard sends `Authorization: Bearer <AG2020_DASH_TOKEN>`
+  (static token in `src/lib/api.ts`, mechanism 'dash' in
+  `api/ag2020/_auth.js`, env-overridable for rotation). Grants exactly what
+  the shared password grants.
+- **Leftover Supabase artifacts** (unused, harmless): `ag2020_users` table,
+  `is_ag2020_admin()`, `supabase/*.sql`, `/api/ag2020/users/*` endpoints,
+  `public/auth-check.js`'s old exports. kenny@hyder.me keeps a Supabase
+  account (needed for Omicron admin), all @autoglass2020.com accounts deleted.
 
 ## Tab structure (per-user gating)
 | Tab | Default audience | Notes |

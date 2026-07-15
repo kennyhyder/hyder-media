@@ -3,25 +3,18 @@
  * cashflow.html, 404.html). The Next.js index.html has its own gate via
  * src/components/auth/AuthGate.tsx.
  *
- * Verifies the user has a valid Supabase session AND an ag2020_users
- * membership row. The Supabase project is shared across several products
- * (Omicron, AutomateDojo, SportsBookISH...), so a session alone does NOT
- * prove AG2020 access — non-members are signed out and denied. Does NOT
- * enforce per-tab permissions here — these standalone pages are accessible
- * to any AG2020 member.
+ * 2026-07-15: Supabase auth removed (cross-tenant magic-link incident —
+ * AG2020 people no longer have Supabase accounts at all). Access is the
+ * shared password gate at password.html, which sets
+ * sessionStorage['ag2020_dashboard_auth'] = 'authenticated'.
  *
- * Include in <head> AFTER loading the Supabase JS SDK:
- *   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ * Include in <head>:
  *   <script src="auth-check.js"></script>
+ * (The Supabase CDN script is no longer required; a leftover tag is harmless.)
  */
 (function () {
-    var SUPABASE_URL = 'https://ilbovwnhrowvxjdkvrln.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYm92d25ocm93dnhqZGt2cmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MjUzMTIsImV4cCI6MjA4NDEwMTMxMn0.FKtChreOxcemcTUZqbtnk-ZkjqLHYwQFKvx_Xy35FlM';
-
-    if (!window.supabase || !window.supabase.createClient) {
-        console.error('[ag2020 auth] Supabase JS SDK not loaded — auth check cannot run.');
-        return;
-    }
+    var AUTH_KEY = 'ag2020_dashboard_auth';
+    var AUTH_VALUE = 'authenticated';
 
     // Hide the page until auth is confirmed
     var hideStyle = document.createElement('style');
@@ -29,55 +22,27 @@
     hideStyle.textContent = 'html { visibility: hidden; }';
     document.head.appendChild(hideStyle);
 
-    var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
-    // Expose for sign-out buttons on the page
-    window.ag2020Supabase = client;
-    window.ag2020SignOut = async function () {
-        try { await client.auth.signOut(); } catch (_) {}
-        window.location.replace('login.html');
-    };
-
     function buildNextParam() {
         var file = window.location.pathname.split('/').filter(Boolean).pop() || '';
         return file + window.location.search + window.location.hash;
     }
 
-    function redirectToLogin(denied) {
+    function redirectToGate() {
         var next = encodeURIComponent(buildNextParam());
-        window.location.replace('login.html?next=' + next + (denied ? '&denied=1' : ''));
+        window.location.replace('password.html?next=' + next);
     }
 
-    function reveal() {
-        var el = document.getElementById('ag2020-auth-check-hide');
-        if (el) el.remove();
-        document.documentElement.style.visibility = 'visible';
-    }
+    // Kept for the sign-out buttons wired up when this was Supabase-based.
+    window.ag2020SignOut = function () {
+        try { sessionStorage.removeItem(AUTH_KEY); } catch (_) {}
+        window.location.replace('password.html');
+    };
 
-    (async function () {
-        try {
-            var s = await client.auth.getSession();
-            if (!s.data || !s.data.session) { redirectToLogin(); return; }
+    var ok = false;
+    try { ok = sessionStorage.getItem(AUTH_KEY) === AUTH_VALUE; } catch (_) {}
+    if (!ok) { redirectToGate(); return; }
 
-            // Tenant check: shared Supabase auth pool — the session must
-            // belong to an AG2020 member. RLS only exposes the user's own
-            // ag2020_users row, so non-members get zero rows back.
-            var m = await client
-                .from('ag2020_users')
-                .select('user_id')
-                .eq('user_id', s.data.session.user.id)
-                .maybeSingle();
-            if (m.error || !m.data) {
-                try { await client.auth.signOut(); } catch (_) {}
-                redirectToLogin(true);
-                return;
-            }
-
-            reveal();
-        } catch (err) {
-            console.error('[ag2020 auth] check failed:', err);
-            redirectToLogin();
-        }
-    })();
+    var el = document.getElementById('ag2020-auth-check-hide');
+    if (el) el.remove();
+    document.documentElement.style.visibility = 'visible';
 })();

@@ -1,12 +1,17 @@
 /**
  * Shared auth gate for /api/ag2020/* read/report endpoints.
  *
- * Dual-accept design (nothing breaks mid-transition):
+ * Accepted mechanisms:
  *   1. `Authorization: Bearer ${CRON_SECRET}`   — Vercel crons + internal calls.
- *   2. `Authorization: Bearer <supabase-jwt>`   — dashboard users. Verified by
- *      calling `${SUPABASE_URL}/auth/v1/user`; results cached in-memory ~60s
- *      keyed by token hash so we don't hammer GoTrue on every tab poll.
- *   3. TRANSITION fallback (GET/HEAD reads ONLY): no/invalid token, but the
+ *   2. `Authorization: Bearer ${AG2020_DASH_TOKEN}` — the dashboard. Since
+ *      2026-07-15 AG2020 uses a shared-password gate (Supabase auth removed
+ *      after the cross-tenant magic-link incident); the built app sends this
+ *      static token (src/lib/api.ts). It grants exactly what the shared
+ *      password grants — one team identity.
+ *   3. `Authorization: Bearer <supabase-jwt>`   — legacy; kept so nothing
+ *      breaks for stragglers with a live session. Verified against GoTrue,
+ *      results cached ~60s keyed by token hash.
+ *   4. TRANSITION fallback (GET/HEAD reads ONLY): no/invalid token, but the
  *      Referer starts with https://hyder.me/clients/ag2020 → allowed with a
  *      console.warn so we can measure remaining unauthenticated traffic
  *      before tightening. Writes (POST/PUT/PATCH/DELETE) never get this.
@@ -94,6 +99,13 @@ export async function requireAuth(req, res, { allow = ['cron', 'jwt', 'referer']
     const cronSecret = process.env.CRON_SECRET;
     if (allow.includes('cron') && token && cronSecret && timingSafeEqualStr(token, cronSecret)) {
         return { via: 'cron' };
+    }
+
+    // 1b. Dashboard token (shared-password model — see header comment).
+    // Env-overridable for rotation; default must match src/lib/api.ts.
+    const dashToken = (process.env.AG2020_DASH_TOKEN || 'ag2020-dash-4c7e1f9b2a8d3e5f6071829304a5b6c7').trim();
+    if (allow.includes('jwt') && token && timingSafeEqualStr(token, dashToken)) {
+        return { via: 'dash' };
     }
 
     // 2. Supabase user JWT
