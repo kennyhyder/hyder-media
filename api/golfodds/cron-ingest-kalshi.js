@@ -543,6 +543,18 @@ export default async function handler(req, res) {
     indexnowSummary = { error: e.message };
   }
 
+  // Heartbeat for the freshness canary: lets it distinguish "cron dead"
+  // (alert) from "cron healthy, zero open Kalshi markets between
+  // tournaments" (suppress). Best-effort — never fails the run.
+  try {
+    await supabase.from("golfodds_ingest_state").upsert({
+      source: "kalshi",
+      last_run_at: new Date().toISOString(),
+      last_quotes: totalQuotes,
+      last_errors: totalErrors,
+    });
+  } catch {}
+
   return res.status(200).json({
     started_at: startedAt,
     finished_at: new Date().toISOString(),

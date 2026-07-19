@@ -33,8 +33,13 @@ const FRESHNESS_TARGETS = [
   { table: "sports_book_quotes", column: "fetched_at", label: "Sports book quotes (h2h)", cron_minutes: 30, stale_after_minutes: 120 },
   // Sports — Polymarket
   { table: "sports_polymarket_quotes", column: "fetched_at", label: "Sports Polymarket quotes", cron_minutes: 15, stale_after_minutes: 60 },
-  // Golf — Kalshi
-  { table: "golfodds_kalshi_latest", column: "fetched_at", label: "Golf Kalshi quotes", cron_minutes: 5, stale_after_minutes: 20 },
+  // Golf — Kalshi. Heartbeat-gated: markets settle at tournament end and next
+  // week's may not list until Mon/Tue. The ingest cron writes
+  // golfodds_ingest_state after every run; when it's running clean with zero
+  // open markets, staleness here is expected — suppress. A dead cron writes no
+  // heartbeat, so the gate fails closed and the alert still fires.
+  { table: "golfodds_kalshi_latest", column: "fetched_at", label: "Golf Kalshi quotes", cron_minutes: 5, stale_after_minutes: 20,
+    skipUnless: kalshiExpectingData },
   // Golf — DataGolf model
   { table: "golfodds_dg_latest", column: "fetched_at", label: "Golf DataGolf model", cron_minutes: 10, stale_after_minutes: 40 },
   // Golf — sportsbooks (via DataGolf)
@@ -92,6 +97,21 @@ function checkAuth(req) {
 // Returns true when there's an open or imminent golf tournament where
 // Polymarket coverage is expected. "Imminent" = within 5 days; Polymarket
 // typically opens tournament markets ~3-5 days before play begins.
+// True when the Kalshi check should run. False only when the ingest cron's
+// heartbeat shows a recent clean run that found zero open markets (the
+// between-tournaments window). Missing/stale heartbeat or errors => true.
+async function kalshiExpectingData(supabase) {
+  const { data, error } = await supabase
+    .from("golfodds_ingest_state")
+    .select("last_run_at, last_quotes, last_errors")
+    .eq("source", "kalshi")
+    .maybeSingle();
+  if (error || !data) return true; // fail-closed: no heartbeat -> keep checking
+  const ageMin = (Date.now() - new Date(data.last_run_at).getTime()) / 60000;
+  const idleAndHealthy = ageMin <= 20 && data.last_quotes === 0 && data.last_errors === 0;
+  return !idleAndHealthy;
+}
+
 async function hasActiveGolfTournament(supabase) {
   const horizonIso = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const todayIso = new Date().toISOString().slice(0, 10);
