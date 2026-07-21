@@ -65,6 +65,8 @@ const FRESHNESS_TARGETS = [
     envUrl: "GRIDCENSUS_SUPABASE_URL", envKey: "GRIDCENSUS_SUPABASE_SERVICE_KEY" },
   // Sports alerts (movement detector)
   { table: "sports_alerts", column: "fired_at", label: "Sports movement alerts", cron_minutes: 5, stale_after_minutes: 60 /* alerts are episodic, not constant */ },
+  // Dunham bail-keyword GSC snapshots (daily cron 13:10 UTC; GSC access granted 2026-07)
+  { table: "dunham_bail_rank_history", column: "created_at", label: "Dunham bail rank snapshots", cron_minutes: 1440, stale_after_minutes: 4320 },
   // ── Census Fleet (each property = own Supabase project; refreshed by droplet
   // crons via /opt/census-fleet/ops/refresh-runner.sh, which also reports every
   // run to Mission Control mc_ingest_runs). stale_after = 3× refresh cadence,

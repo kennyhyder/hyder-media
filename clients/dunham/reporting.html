@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — Performance Reporting</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .container { max-width: 1240px; }
+        .section { margin-bottom: 52px; }
+        .section h2 { font-size: 1.4rem; font-weight: 700; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+        .section h2 .sec-note { font-size: 0.85rem; font-weight: 400; color: var(--text-secondary); margin-left: 10px; }
+        .section h3 { font-size: 1.05rem; font-weight: 600; margin: 22px 0 10px; }
+        .muted { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* Series colors — validated categorical palette (dark surface #1e293b).
+           Fixed entity→hue assignment; never reassigned by rank. */
+        .viz {
+            --s-crossnetwork: #3987e5;
+            --s-organic:      #199e70;
+            --s-direct:       #c98500;
+            --s-paidsearch:   #9085e9;
+            --s-paidsocial:   #e66767;
+            --s-referral:     #d55181;
+            --s-other:        #64748b;
+            --grid-line:      #334155;
+        }
+
+        /* Controls */
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 26px; }
+        .range-chip {
+            background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
+            border-radius: 999px; padding: 6px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+        .range-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .controls input[type=date], .controls select {
+            background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
+            border-radius: 8px; padding: 6px 10px; font-size: 0.85rem;
+        }
+        .controls .spacer { flex: 1; }
+
+        .stats-row { margin-bottom: 14px; }
+        .stat-sub { font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Channel bar list (doubles as the compliance table) */
+        .chan-row {
+            display: grid; grid-template-columns: 170px 1fr 90px 90px 70px;
+            gap: 12px; align-items: center; padding: 7px 0; font-size: 0.9rem;
+            border-bottom: 1px solid rgba(71,85,105,0.3);
+        }
+        .chan-row:last-child { border-bottom: none; }
+        .chan-row .chan-name { display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .chan-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .chan-track { display: block; background: var(--bg-tertiary); border-radius: 4px; height: 14px; overflow: hidden; }
+        .chan-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; }
+        .chan-row .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .chan-row .pct { font-weight: 700; }
+        .chan-head { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 2px solid var(--border); }
+
+        .data-table { width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 0.87rem; }
+        .data-table th { text-align: left; padding: 8px 10px; background: var(--bg-tertiary); font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        .data-table th.num, .data-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+        .data-table td { padding: 7px 10px; border-bottom: 1px solid rgba(71,85,105,0.3); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .table-scroll { overflow-x: auto; max-height: 520px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 18px; }
+        .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 12px; font-size: 0.8rem; color: var(--text-secondary); }
+        .legend .li { display: flex; align-items: center; gap: 6px; }
+
+        .chart-wrap { position: relative; }
+        .chart-wrap svg { display: block; width: 100%; height: auto; }
+        .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 800px) { .mini-grid { grid-template-columns: 1fr; } .chan-row { grid-template-columns: 130px 1fr 70px 60px; } .chan-row .users-col { display: none; } }
+
+        #viz-tooltip {
+            position: fixed; z-index: 50; pointer-events: none; display: none;
+            background: #0b1222; border: 1px solid var(--border); border-radius: 8px;
+            padding: 10px 12px; font-size: 0.8rem; line-height: 1.5; max-width: 260px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        #viz-tooltip .tt-title { font-weight: 700; margin-bottom: 4px; }
+        #viz-tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; }
+        #viz-tooltip .tt-row .sw { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 5px; }
+
+        .pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+        .pill-green { background: rgba(34,197,94,0.15); color: var(--success); }
+        .pill-yellow { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .pill-gray { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+
+        .needs-auth { text-align: center; padding: 30px 20px; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+
+        /* Compliance print view — prints ONLY the traffic section */
+        #print-header { display: none; }
+        @media print {
+            body { background: #fff; color: #111; }
+            .main-nav, .controls .range-chip, .controls input, .controls select, .controls button,
+            #ads-section, #meta-section, #bing-section, .no-print { display: none !important; }
+            #print-header { display: block; border-bottom: 2px solid #111; margin-bottom: 20px; padding-bottom: 12px; }
+            #print-header h1 { font-size: 1.4rem; color: #111; }
+            #print-header .ph-meta { font-size: 0.85rem; color: #333; margin-top: 6px; }
+            .card, .table-scroll { border-color: #ccc; background: #fff; max-height: none; overflow: visible; }
+            .section h2, .chan-row, .data-table td, .data-table th { color: #111 !important; border-color: #ddd !important; }
+            .data-table th { background: #f2f2f2; }
+            .chan-track { background: #eee; }
+            .report-header, .stats-row .stat-card { background: #fff; border-color: #ccc; }
+            .stat-value { color: #111 !important; }
+            .report-header h1 { background: none; -webkit-text-fill-color: initial; color: #111; }
+            .chan-fill, .chan-swatch, .legend .chan-swatch, svg rect { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            #viz-tooltip { display: none !important; }
+        }
+    </style>
+</head>
+<body class="viz">
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham &amp; Jones — Performance Reporting
+        </a>
+        <div class="nav-actions">
+            <a href="maps-ops.html" class="btn btn-secondary">Maps Ops</a>
+            <a href="bail-bonds.html" class="btn btn-secondary">Strategy</a>
+            <a href="dashboard.html" class="btn btn-secondary">Ad Copy Report</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="print-header">
+            <h1>Dunham &amp; Jones — Traffic Source Compliance Report</h1>
+            <div class="ph-meta" id="print-meta">—</div>
+            <div class="ph-meta">Methodology: Google Analytics 4 session attribution (default channel grouping). Percentages are share of total sessions for the stated property and date range. Prepared by Hyder Media.</div>
+        </div>
+
+        <div class="report-header">
+            <h1>Performance Reporting</h1>
+            <p class="subtitle">Live traffic mix &amp; ad platform performance — all sources, one view</p>
+            <div class="report-meta">
+                <span id="meta-range">—</span>
+                <span id="meta-generated">—</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="range-chip" data-days="7" onclick="setRange(7)">7 days</button>
+            <button class="range-chip active" data-days="28" onclick="setRange(28)">28 days</button>
+            <button class="range-chip" data-days="90" onclick="setRange(90)">90 days</button>
+            <input type="date" id="custom-start"> <span class="muted">to</span> <input type="date" id="custom-end">
+            <button class="btn btn-secondary btn-sm" onclick="applyCustom()">Apply</button>
+            <span class="spacer"></span>
+            <button class="btn btn-secondary btn-sm no-print" onclick="downloadCsv()">Download CSV</button>
+            <button class="btn btn-primary btn-sm no-print" onclick="window.print()">Print Compliance Report</button>
+        </div>
+
+        <!-- TRAFFIC MIX (compliance centerpiece) -->
+        <div class="section" id="traffic-section">
+            <h2>Traffic Mix — Where Visitors Come From
+                <span class="sec-note">Google Analytics 4 · session attribution</span>
+            </h2>
+            <div class="controls" style="margin-bottom: 14px;">
+                <label class="muted">Property:</label>
+                <select id="property-select" onchange="loadTraffic()"></select>
+            </div>
+            <div class="stats-row" id="traffic-stats"></div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Share of Sessions by Channel</h3>
+                <div id="channel-bars"><p class="muted">Loading…</p></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Daily Sessions by Channel</h3>
+                <div class="legend" id="daily-legend"></div>
+                <div class="chart-wrap" id="daily-chart"><p class="muted">Loading…</p></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Top Sources</h3>
+                <div class="table-scroll">
+                    <table class="data-table" id="source-table">
+                        <thead><tr><th>Source / Medium</th><th class="num">Sessions</th><th class="num">% of Total</th></tr></thead>
+                        <tbody><tr><td colspan="3">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- GOOGLE ADS -->
+        <div class="section" id="ads-section">
+            <h2>Google Ads Performance <span class="sec-note" id="ads-note">account 840-838-5870</span></h2>
+            <div class="stats-row" id="ads-stats"></div>
+            <div class="mini-grid">
+                <div class="card"><h3 style="margin-top:0;">Daily Spend</h3><div class="chart-wrap" id="ads-spend-chart"></div></div>
+                <div class="card"><h3 style="margin-top:0;">Daily Clicks</h3><div class="chart-wrap" id="ads-clicks-chart"></div></div>
+            </div>
+            <div class="card">
+                <h3 style="margin-top:0;">Campaigns</h3>
+                <div class="table-scroll">
+                    <table class="data-table" id="ads-table">
+                        <thead><tr><th>Campaign</th><th>Type</th><th>Status</th><th class="num">Spend</th><th class="num">Impr.</th><th class="num">Clicks</th><th class="num">CPC</th><th class="num">Conv.</th><th class="num">Cost/Conv.</th></tr></thead>
+                        <tbody><tr><td colspan="9">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- META -->
+        <div class="section" id="meta-section">
+            <h2>Meta Ads Performance <span class="sec-note">Facebook &amp; Instagram</span></h2>
+            <div id="meta-content"><p class="muted">Loading…</p></div>
+        </div>
+
+        <!-- BING -->
+        <div class="section" id="bing-section">
+            <h2>Microsoft Bing Ads <span class="sec-note">the only paid channel permitted for bail terms</span></h2>
+            <div class="card">
+                <span class="pill pill-yellow">Integration built — awaiting Microsoft approval</span>
+                <p class="muted" style="margin-top:10px;">The Bing Ads reporting integration (account X1592490) is complete and will activate automatically once Microsoft grants the developer-token Campaign Management approval. Bing permits bail bonds advertising that Google and Meta ban, making it a strategic channel for the Maps Initiative.</p>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Live data: GA4 (Dunham &amp; Jones Assets) · Google Ads API v23 · Meta Graph API — refreshed on load ·
+            <a href="bail-bonds.html" style="color: var(--accent); text-decoration:none;">Bail Bonds Initiative</a> · Prepared by Hyder Media
+        </div>
+    </div>
+
+    <div id="viz-tooltip"></div>
+
+    <script>
+        // Fixed entity→hue map (never reassigned by rank; unmapped fold to Other)
+        const CHANNEL_COLORS = {
+            'Cross-network':  'var(--s-crossnetwork)',
+            'Organic Search': 'var(--s-organic)',
+            'Direct':         'var(--s-direct)',
+            'Paid Search':    'var(--s-paidsearch)',
+            'Paid Social':    'var(--s-paidsocial)',
+            'Referral':       'var(--s-referral)',
+        };
+        const OTHER_COLOR = 'var(--s-other)';
+        const chanColor = c => CHANNEL_COLORS[c] || OTHER_COLOR;
+
+        let state = { days: 28, startDate: null, endDate: null, property: '253496127',
+                      channels: null, sources: null, daily: null, propertyName: '' };
+
+        const fmt = n => Number(n).toLocaleString();
+        const fmtMoney = (n, cur = 'USD') => Number(n).toLocaleString(undefined, { style: 'currency', currency: cur, maximumFractionDigits: 0 });
+        const pct = (n, d) => d ? (100 * n / d) : 0;
+        const rangeQS = () => state.startDate
+            ? `startDate=${state.startDate}&endDate=${state.endDate}`
+            : `days=${state.days}`;
+        const rangeLabel = () => state.startDate ? `${state.startDate} → ${state.endDate}` : `Last ${state.days} days`;
+
+        // ---------- Tooltip ----------
+        const tt = document.getElementById('viz-tooltip');
+        function showTip(html, ev) {
+            tt.innerHTML = html; tt.style.display = 'block';
+            const pad = 14, w = tt.offsetWidth, h = tt.offsetHeight;
+            let x = ev.clientX + pad, y = ev.clientY - h - pad;
+            if (x + w > innerWidth - 8) x = ev.clientX - w - pad;
+            if (y < 8) y = ev.clientY + pad;
+            tt.style.left = x + 'px'; tt.style.top = y + 'px';
+        }
+        function hideTip() { tt.style.display = 'none'; }
+
+        // ---------- Range controls ----------
+        function setRange(days) {
+            state.days = days; state.startDate = null; state.endDate = null;
+            document.querySelectorAll('.range-chip').forEach(c => c.classList.toggle('active', +c.dataset.days === days));
+            loadAll();
+        }
+        function applyCustom() {
+            const s = document.getElementById('custom-start').value, e = document.getElementById('custom-end').value;
+            if (!s || !e || s > e) return alert('Pick a valid start and end date.');
+            state.startDate = s; state.endDate = e;
+            document.querySelectorAll('.range-chip').forEach(c => c.classList.remove('active'));
+            loadAll();
+        }
+
+        // ---------- Traffic (GA4) ----------
+        async function loadProperties() {
+            try {
+                const d = await (await fetch('/api/dunham/ga4-traffic?breakdown=properties')).json();
+                const sel = document.getElementById('property-select');
+                sel.innerHTML = (d.properties || []).map(p =>
+                    `<option value="${p.property}" ${p.property === state.property ? 'selected' : ''}>${p.displayName}</option>`).join('');
+            } catch (_) {}
+        }
+
+        async function loadTraffic() {
+            state.property = document.getElementById('property-select').value || state.property;
+            const qs = `property=${state.property}&${rangeQS()}`;
+            const statsEl = document.getElementById('traffic-stats');
+            statsEl.innerHTML = '<div class="stat-card"><div class="stat-label">Loading…</div><div class="stat-value">—</div></div>';
+
+            const [chan, src, daily] = await Promise.all([
+                fetch(`/api/dunham/ga4-traffic?breakdown=channel&${qs}`).then(r => r.json()),
+                fetch(`/api/dunham/ga4-traffic?breakdown=source&${qs}`).then(r => r.json()),
+                fetch(`/api/dunham/ga4-traffic?breakdown=daily&${qs}`).then(r => r.json()),
+            ]);
+            if (chan.status !== 'success') {
+                statsEl.innerHTML = `<div class="stat-card"><div class="stat-label">GA4</div><div class="stat-value">—</div><div class="stat-sub">${chan.message || chan.error}</div></div>`;
+                return;
+            }
+            state.channels = chan; state.sources = src; state.daily = daily;
+            state.propertyName = chan.property.name;
+
+            const total = chan.totals.sessions;
+            const organic = chan.channels.filter(c => /^organic/i.test(c.channel)).reduce((s, c) => s + c.sessions, 0);
+            const paid = chan.channels.filter(c => /^paid|cross-network/i.test(c.channel)).reduce((s, c) => s + c.sessions, 0);
+            statsEl.innerHTML = `
+                <div class="stat-card"><div class="stat-label">Sessions</div><div class="stat-value">${fmt(total)}</div><div class="stat-sub">${rangeLabel()}</div></div>
+                <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value">${fmt(chan.totals.users)}</div><div class="stat-sub">${state.propertyName}</div></div>
+                <div class="stat-card"><div class="stat-label">Paid Traffic</div><div class="stat-value">${pct(paid, total).toFixed(1)}%</div><div class="stat-sub">Paid Search + Paid Social + Cross-network</div></div>
+                <div class="stat-card"><div class="stat-label">Organic Search</div><div class="stat-value">${pct(organic, total).toFixed(1)}%</div><div class="stat-sub">unpaid search traffic</div></div>`;
+
+            renderChannelBars(chan);
+            renderDailyChart(daily);
+            renderSourceTable(src);
+            document.getElementById('meta-range').textContent = rangeLabel();
+            document.getElementById('meta-generated').textContent = 'Generated: ' + new Date().toLocaleString();
+            document.getElementById('print-meta').textContent =
+                `Property: ${state.propertyName} · Period: ${rangeLabel()} · Generated: ${new Date().toLocaleString()}`;
+        }
+
+        function renderChannelBars(chan) {
+            const total = chan.totals.sessions || 1;
+            const max = Math.max(...chan.channels.map(c => c.sessions), 1);
+            document.getElementById('channel-bars').innerHTML = `
+                <div class="chan-row chan-head"><span>Channel</span><span></span><span class="num">Sessions</span><span class="num users-col">Users</span><span class="num">% Total</span></div>
+                ${chan.channels.map(c => `
+                    <div class="chan-row">
+                        <span class="chan-name"><span class="chan-swatch" style="background:${chanColor(c.channel)}"></span>${c.channel}</span>
+                        <span class="chan-track"><span class="chan-fill" style="width:${Math.max(1, 100 * c.sessions / max)}%; background:${chanColor(c.channel)}"></span></span>
+                        <span class="num">${fmt(c.sessions)}</span>
+                        <span class="num users-col">${fmt(c.users)}</span>
+                        <span class="num pct">${pct(c.sessions, total).toFixed(1)}%</span>
+                    </div>`).join('')}`;
+        }
+
+        function renderDailyChart(daily) {
+            const el = document.getElementById('daily-chart');
+            const rows = daily.daily || [];
+            if (!rows.length) { el.innerHTML = '<p class="muted">No daily data.</p>'; return; }
+
+            // Fold to fixed channels + Other; build per-date stacks in fixed order
+            const ORDER = ['Cross-network', 'Organic Search', 'Direct', 'Paid Search', 'Paid Social', 'Referral', 'Other'];
+            const byDate = new Map();
+            for (const r of rows) {
+                const key = ORDER.includes(r.channel) ? r.channel : 'Other';
+                if (!byDate.has(r.date)) byDate.set(r.date, {});
+                byDate.get(r.date)[key] = (byDate.get(r.date)[key] || 0) + r.sessions;
+            }
+            const dates = [...byDate.keys()].sort();
+            const present = ORDER.filter(ch => dates.some(d => byDate.get(d)[ch]));
+            const maxTotal = Math.max(...dates.map(d => Object.values(byDate.get(d)).reduce((s, v) => s + v, 0)));
+
+            document.getElementById('daily-legend').innerHTML = present.map(ch =>
+                `<span class="li"><span class="chan-swatch" style="background:${ch === 'Other' ? OTHER_COLOR : chanColor(ch)}"></span>${ch}</span>`).join('');
+
+            const W = 1000, H = 260, padL = 46, padB = 22, padT = 8;
+            const plotW = W - padL - 8, plotH = H - padT - padB;
+            const colW = plotW / dates.length;
+            const barW = Math.max(2, Math.min(26, colW - 2));
+            const yScale = v => v / maxTotal * plotH;
+            const gridVals = [0.25, 0.5, 0.75, 1].map(f => Math.round(maxTotal * f));
+
+            let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily sessions by channel">`;
+            for (const gv of gridVals) {
+                const y = padT + plotH - yScale(gv);
+                svg += `<line x1="${padL}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="var(--grid-line)" stroke-width="1"/>`;
+                svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" font-size="10" fill="var(--text-secondary)">${gv >= 1000 ? (gv / 1000).toFixed(gv >= 10000 ? 0 : 1) + 'K' : gv}</text>`;
+            }
+            const labelEvery = Math.ceil(dates.length / 9);
+            dates.forEach((d, i) => {
+                const x = padL + i * colW + (colW - barW) / 2;
+                let yCursor = padT + plotH;
+                const stack = byDate.get(d);
+                const dayTotal = Object.values(stack).reduce((s, v) => s + v, 0);
+                for (const ch of present) {
+                    const v = stack[ch] || 0;
+                    if (!v) continue;
+                    const h = Math.max(0, yScale(v) - 2);   // 2px surface gap between segments
+                    yCursor -= yScale(v);
+                    svg += `<rect x="${x}" y="${yCursor}" width="${barW}" height="${h}" rx="1.5"
+                        fill="${ch === 'Other' ? OTHER_COLOR : chanColor(ch)}"
+                        data-date="${d}" data-total="${dayTotal}" class="stack-seg"/>`;
+                }
+                if (i % labelEvery === 0) {
+                    svg += `<text x="${x + barW / 2}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--text-secondary)">${d.slice(4, 6)}/${d.slice(6, 8)}</text>`;
+                }
+            });
+            svg += '</svg>';
+            el.innerHTML = svg;
+
+            el.querySelectorAll('.stack-seg').forEach(seg => {
+                seg.addEventListener('mousemove', ev => {
+                    const d = seg.dataset.date, stack = byDate.get(d);
+                    const total = +seg.dataset.total;
+                    showTip(`<div class="tt-title">${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)} · ${fmt(total)} sessions</div>` +
+                        present.filter(ch => stack[ch]).map(ch =>
+                            `<div class="tt-row"><span><span class="sw" style="background:${ch === 'Other' ? OTHER_COLOR : chanColor(ch)}"></span>${ch}</span><span>${fmt(stack[ch])} · ${pct(stack[ch], total).toFixed(1)}%</span></div>`).join(''), ev);
+                });
+                seg.addEventListener('mouseleave', hideTip);
+            });
+        }
+
+        function renderSourceTable(src) {
+            const tbody = document.querySelector('#source-table tbody');
+            const total = src.totalSessions || 1;
+            tbody.innerHTML = (src.sources || []).map(s => `
+                <tr><td>${s.source} / ${s.medium}</td>
+                    <td class="num">${fmt(s.sessions)}</td>
+                    <td class="num"><strong>${pct(s.sessions, total).toFixed(1)}%</strong></td></tr>`).join('')
+                || '<tr><td colspan="3">No data.</td></tr>';
+        }
+
+        // ---------- Single-series mini column chart ----------
+        function miniChart(el, rows, key, color, fmtVal) {
+            if (!rows.length) { el.innerHTML = '<p class="muted">No data.</p>'; return; }
+            const W = 480, H = 150, padL = 44, padB = 18, padT = 6;
+            const plotW = W - padL - 6, plotH = H - padT - padB;
+            const max = Math.max(...rows.map(r => r[key]), 1);
+            const colW = plotW / rows.length;
+            const barW = Math.max(2, Math.min(18, colW - 2));
+            let svg = `<svg viewBox="0 0 ${W} ${H}">`;
+            [0.5, 1].forEach(f => {
+                const y = padT + plotH - f * plotH;
+                svg += `<line x1="${padL}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="var(--grid-line)" stroke-width="1"/>
+                        <text x="${padL - 5}" y="${y + 3}" text-anchor="end" font-size="9" fill="var(--text-secondary)">${fmtVal(max * f)}</text>`;
+            });
+            const labelEvery = Math.ceil(rows.length / 6);
+            rows.forEach((r, i) => {
+                const h = Math.max(1, r[key] / max * plotH);
+                const x = padL + i * colW + (colW - barW) / 2;
+                svg += `<rect x="${x}" y="${padT + plotH - h}" width="${barW}" height="${h}" rx="2" fill="${color}" data-i="${i}"/>`;
+                if (i % labelEvery === 0) svg += `<text x="${x + barW / 2}" y="${H - 4}" text-anchor="middle" font-size="9" fill="var(--text-secondary)">${r.date.slice(5)}</text>`;
+            });
+            svg += '</svg>';
+            el.innerHTML = svg;
+            el.querySelectorAll('rect').forEach(rect => {
+                rect.addEventListener('mousemove', ev => {
+                    const r = rows[+rect.dataset.i];
+                    showTip(`<div class="tt-title">${r.date}</div><div class="tt-row"><span>${key}</span><span>${fmtVal(r[key])}</span></div>`, ev);
+                });
+                rect.addEventListener('mouseleave', hideTip);
+            });
+        }
+
+        // ---------- Google Ads ----------
+        async function loadAds() {
+            const stats = document.getElementById('ads-stats');
+            const tbody = document.querySelector('#ads-table tbody');
+            stats.innerHTML = '<div class="stat-card"><div class="stat-label">Loading…</div><div class="stat-value">—</div></div>';
+            const d = await (await fetch(`/api/dunham/ads-performance?${rangeQS()}`)).json();
+            if (d.status !== 'success') {
+                stats.innerHTML = `<div class="stat-card"><div class="stat-label">Google Ads</div><div class="stat-value">—</div><div class="stat-sub">${d.error}</div></div>`;
+                return;
+            }
+            const t = d.totals, cur = d.currency;
+            document.getElementById('ads-note').textContent = `${d.accountName || ''} · ${d.account}`;
+            stats.innerHTML = `
+                <div class="stat-card"><div class="stat-label">Spend</div><div class="stat-value">${fmtMoney(t.cost, cur)}</div><div class="stat-sub">${rangeLabel()}</div></div>
+                <div class="stat-card"><div class="stat-label">Impressions</div><div class="stat-value">${fmt(t.impressions)}</div></div>
+                <div class="stat-card"><div class="stat-label">Clicks</div><div class="stat-value">${fmt(t.clicks)}</div><div class="stat-sub">CPC ${fmtMoney(t.clicks ? t.cost / t.clicks : 0, cur)}</div></div>
+                <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value">${fmt(Math.round(t.conversions))}</div><div class="stat-sub">Cost/conv ${fmtMoney(t.conversions ? t.cost / t.conversions : 0, cur)}</div></div>`;
+            miniChart(document.getElementById('ads-spend-chart'), d.daily, 'cost', 'var(--s-crossnetwork)', v => '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'K' : Math.round(v)));
+            miniChart(document.getElementById('ads-clicks-chart'), d.daily, 'clicks', 'var(--s-organic)', v => v >= 1000 ? (v / 1000).toFixed(1) + 'K' : Math.round(v));
+            tbody.innerHTML = d.campaigns.map(c => `
+                <tr><td style="max-width:280px; overflow-wrap:anywhere;">${c.name}</td>
+                    <td>${(c.channelType || '').replace('PERFORMANCE_MAX', 'PMax').replace('SEARCH', 'Search')}</td>
+                    <td>${c.status === 'ENABLED' ? '<span class="pill pill-green">Active</span>' : `<span class="pill pill-gray">${c.status}</span>`}</td>
+                    <td class="num">${fmtMoney(c.cost, cur)}</td>
+                    <td class="num">${fmt(c.impressions)}</td>
+                    <td class="num">${fmt(c.clicks)}</td>
+                    <td class="num">${fmtMoney(c.clicks ? c.cost / c.clicks : 0, cur)}</td>
+                    <td class="num">${c.conversions.toFixed(1)}</td>
+                    <td class="num">${c.conversions ? fmtMoney(c.cost / c.conversions, cur) : '—'}</td></tr>`).join('');
+        }
+
+        // ---------- Meta ----------
+        async function loadMeta() {
+            const el = document.getElementById('meta-content');
+            el.innerHTML = '<p class="muted">Loading…</p>';
+            const d = await (await fetch(`/api/dunham/meta-performance?${rangeQS()}`)).json();
+            if (d.status === 'needs_auth') {
+                el.innerHTML = `<div class="card needs-auth">
+                    <span class="pill pill-yellow">Re-authorization required</span>
+                    <p class="muted" style="margin:12px 0;">${d.error} Meta long-lived tokens expire every ~60 days.</p>
+                    <a class="btn btn-primary" href="/api/meta-ads/auth?returnUrl=/clients/dunham/reporting.html">Re-authorize Meta</a>
+                </div>`;
+                return;
+            }
+            if (d.status !== 'success') { el.innerHTML = `<div class="card"><p class="muted">Meta error: ${d.error}</p></div>`; return; }
+            const t = d.totals;
+            el.innerHTML = `
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-label">Spend</div><div class="stat-value">${fmtMoney(t.spend)}</div><div class="stat-sub">${rangeLabel()}</div></div>
+                    <div class="stat-card"><div class="stat-label">Impressions</div><div class="stat-value">${fmt(t.impressions)}</div></div>
+                    <div class="stat-card"><div class="stat-label">Clicks</div><div class="stat-value">${fmt(t.clicks)}</div><div class="stat-sub">CPC ${fmtMoney(t.clicks ? t.spend / t.clicks : 0)}</div></div>
+                    <div class="stat-card"><div class="stat-label">Lead Actions</div><div class="stat-value">${fmt(t.leadActions)}</div><div class="stat-sub">leads, calls, contacts</div></div>
+                </div>
+                <div class="mini-grid">
+                    <div class="card"><h3 style="margin-top:0;">Daily Spend</h3><div class="chart-wrap" id="meta-spend-chart"></div></div>
+                    <div class="card"><h3 style="margin-top:0;">Daily Clicks</h3><div class="chart-wrap" id="meta-clicks-chart"></div></div>
+                </div>
+                <div class="card"><h3 style="margin-top:0;">Campaigns</h3><div class="table-scroll">
+                    <table class="data-table"><thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">Impr.</th><th class="num">Clicks</th><th class="num">CPC</th><th class="num">Lead Actions</th></tr></thead>
+                    <tbody>${d.campaigns.map(c => `<tr><td style="max-width:300px; overflow-wrap:anywhere;">${c.name}</td>
+                        <td class="num">${fmtMoney(c.spend)}</td><td class="num">${fmt(c.impressions)}</td>
+                        <td class="num">${fmt(c.clicks)}</td><td class="num">${fmtMoney(c.cpc)}</td>
+                        <td class="num">${fmt(c.leadActions)}</td></tr>`).join('')}</tbody></table>
+                </div></div>`;
+            miniChart(document.getElementById('meta-spend-chart'), d.daily, 'spend', 'var(--s-paidsocial)', v => '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'K' : Math.round(v)));
+            miniChart(document.getElementById('meta-clicks-chart'), d.daily, 'clicks', 'var(--s-referral)', v => v >= 1000 ? (v / 1000).toFixed(1) + 'K' : Math.round(v));
+        }
+
+        // ---------- CSV export (compliance data) ----------
+        function downloadCsv() {
+            if (!state.channels) return alert('Traffic data still loading.');
+            const total = state.channels.totals.sessions || 1;
+            const srcTotal = state.sources?.totalSessions || 1;
+            const lines = [
+                `Dunham & Jones — Traffic Source Report`,
+                `Property,${state.propertyName}`,
+                `Period,${rangeLabel()}`,
+                `Generated,${new Date().toISOString()}`,
+                '',
+                'Channel,Sessions,Users,% of Sessions',
+                ...state.channels.channels.map(c => `"${c.channel}",${c.sessions},${c.users},${pct(c.sessions, total).toFixed(2)}%`),
+                '',
+                'Source / Medium,Sessions,% of Sessions',
+                ...(state.sources?.sources || []).map(s => `"${s.source} / ${s.medium}",${s.sessions},${pct(s.sessions, srcTotal).toFixed(2)}%`),
+            ];
+            const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `dunham-traffic-${(state.startDate || state.days + 'd')}-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+        }
+
+        function loadAll() { loadTraffic(); loadAds(); loadMeta(); }
+        loadProperties().then(loadAll);
+    </script>
+</body>
+</html>
