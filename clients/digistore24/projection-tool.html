@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPC Projection Tool | Digistore24</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -568,6 +569,125 @@
         .brand-switcher:hover { background: var(--border); }
         .brand-switcher option { background: var(--bg-secondary); color: var(--text-primary); }
 
+        /* ===== Vendor Activation ROAS Forecast ===== */
+        .data-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .data-badge.live { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .data-badge.demo { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .data-badge.loading { background: rgba(59, 130, 246, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+
+        .va-range-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+        .va-range-select option { background: var(--bg-secondary); }
+
+        .va-intro {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+        .va-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .va-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 1100px) {
+            .va-grid { grid-template-columns: 1fr; }
+        }
+
+        .va-inputs {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .va-chart-wrap {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 16px;
+            height: 400px;
+            position: relative;
+        }
+
+        .be-list {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-top: 16px;
+        }
+        .be-list-title {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .be-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            padding: 3px 0;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .be-row .be-val { color: var(--warning); font-weight: 600; }
+
+        .va-matrix { overflow-x: auto; margin-top: 24px; }
+        .va-matrix table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .va-matrix th, .va-matrix td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .va-matrix th {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .va-matrix th:first-child, .va-matrix td:first-child { text-align: left; }
+        .va-matrix td { font-family: 'SF Mono', Monaco, monospace; }
+        .va-matrix .roas-cell { border-radius: 6px; }
+        .va-matrix .roas-cell .roas-x { font-weight: 700; font-size: 0.95rem; display: block; }
+        .va-matrix .roas-cell .roas-rev { font-size: 0.7rem; color: var(--text-secondary); }
+        .roas-good { background: rgba(34, 197, 94, 0.14); }
+        .roas-good .roas-x { color: var(--success); }
+        .roas-near { background: rgba(245, 158, 11, 0.12); }
+        .roas-near .roas-x { color: var(--warning); }
+        .roas-bad { background: rgba(239, 68, 68, 0.10); }
+        .roas-bad .roas-x { color: var(--danger); }
+
     </style>
 </head>
 <body>
@@ -603,8 +723,106 @@
     <div class="container">
         <header>
             <h1>PPC Spend & Revenue Forecasting</h1>
-            <p class="subtitle">Forecast expected ad spend, conversions, and ROAS based on competitor click data and keyword CPCs</p>
+            <p class="subtitle">Live ROAS scenarios from real account data, plus keyword-based spend forecasts from competitor click data</p>
         </header>
+
+        <!-- ===== Vendor Activation ROAS Forecast (live account data) ===== -->
+        <div class="panel" style="margin-bottom: 24px;">
+            <div class="panel-header">
+                <h2>Vendor Activation ROAS Forecast <span style="font-weight: 400; color: var(--text-secondary); font-size: 0.8rem;">— live account data</span></h2>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="data-badge loading" id="va-badge">LOADING</span>
+                    <select class="va-range-select" id="va-range" onchange="loadVaData()">
+                        <option value="since-tracking" selected>Since vendor tracking began (May 1)</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="60">Last 60 days</option>
+                    </select>
+                    <button class="quick-btn" onclick="loadVaData()">Refresh</button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="va-intro">
+                    <strong>How to read this:</strong> The ad account's job is vendor signups, but Digistore24 only earns
+                    when a vendor <em>activates</em> — creates a product and starts selling. Neither the activation rate
+                    nor the margin take per activated vendor is known yet (the initial working assumption was
+                    <strong>$1,300 per activated vendor in a 30-day lookback</strong>). This tool takes <strong>real spend and
+                    real Vendor Sign-up conversions</strong> from the account and shows what ROAS looks like under each
+                    activation-rate × vendor-value scenario. <strong>Break-even = 1.0x ROAS</strong> (vendor revenue equals ad spend),
+                    marked as the red dashed line on the chart.
+                </div>
+
+                <!-- Live account data -->
+                <div class="va-stats">
+                    <div class="result-card">
+                        <div class="result-label">Ad Spend</div>
+                        <div class="result-value accent" id="va-stat-spend">—</div>
+                        <div class="result-subtext" id="va-stat-range">—</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Vendor Signups</div>
+                        <div class="result-value purple" id="va-stat-vendors">—</div>
+                        <div class="result-subtext">Vendor Sign-up conversions</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Affiliate Signups</div>
+                        <div class="result-value" id="va-stat-affiliates">—</div>
+                        <div class="result-subtext">not monetized directly</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label">Cost / Vendor Signup</div>
+                        <div class="result-value warning" id="va-stat-cpv">—</div>
+                        <div class="result-subtext">spend ÷ vendor signups</div>
+                    </div>
+                    <div class="result-card highlight">
+                        <div class="result-label">Break-even Activation @ $1,300</div>
+                        <div class="result-value success" id="va-stat-be">—</div>
+                        <div class="result-subtext">activation rate for 1.0x ROAS</div>
+                    </div>
+                </div>
+
+                <div class="va-grid">
+                    <!-- Scenario inputs -->
+                    <div class="va-inputs">
+                        <div class="section-title">Scenario Inputs</div>
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Auto-filled from the account for the selected date range. Edit to model a different spend level.">Ad Spend</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="va-spend" value="0" min="0" step="100">
+                                <span class="input-unit">USD</span>
+                            </div>
+                            <div class="input-hint">Auto-filled from live data — editable</div>
+                        </div>
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Vendor Sign-up conversions in the date range. Edit to model a different signup count.">Vendor Signups</label>
+                            <input type="number" id="va-vendors" value="0" min="0" step="1">
+                            <div class="input-hint">Auto-filled from live data — editable</div>
+                        </div>
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="% of vendor signups that create a product and start selling. Unknown today — enter the scenarios to compare.">Activation Rate Scenarios (%)</label>
+                            <input type="text" id="va-rates" value="5, 10, 15, 20, 30, 40, 50">
+                            <div class="input-hint">Comma-separated — each becomes a row + chart point</div>
+                        </div>
+                        <div class="input-group">
+                            <label class="tooltip-trigger" data-tooltip="Digistore24 margin take per activated vendor, 30-day lookback. $1,300 was the initial assumption.">Vendor Value Scenarios ($)</label>
+                            <input type="text" id="va-values" value="650, 1300, 1950">
+                            <div class="input-hint">Comma-separated — each becomes a line on the chart</div>
+                        </div>
+                        <div class="be-list" id="va-be-list">
+                            <div class="be-list-title">Break-even Activation Rate (1.0x ROAS)</div>
+                            <div id="va-be-rows"><div class="be-row"><span>—</span></div></div>
+                        </div>
+                    </div>
+
+                    <!-- ROAS chart -->
+                    <div class="va-chart-wrap">
+                        <canvas id="va-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Scenario matrix -->
+                <div class="va-matrix" id="va-matrix"></div>
+            </div>
+        </div>
 
         <div class="main-grid">
             <!-- Left Panel - Inputs -->
@@ -1222,6 +1440,256 @@
 
         // Initialize
         loadData();
+
+        // ===================================================================
+        // Vendor Activation ROAS Forecast — live account data
+        // ===================================================================
+        const VA_API = '/api/digistore/performance';
+        const VA_TRACKING_START = '2026-05-01'; // Vendor/Affiliate Sign-up conversion actions live from this date
+        const VA_LINE_COLORS = ['#3b82f6', '#22c55e', '#8b5cf6', '#f59e0b', '#14b8a6', '#ec4899'];
+
+        let vaLive = null;   // { spend, vendors, affiliates, rangeLabel, isLive }
+        let vaChart = null;
+
+        function vaSetBadge(state) {
+            const badge = document.getElementById('va-badge');
+            badge.className = 'data-badge ' + state;
+            badge.textContent = state === 'live' ? 'LIVE DATA' : state === 'demo' ? 'DEMO DATA' : 'LOADING';
+        }
+
+        function vaRange() {
+            const sel = document.getElementById('va-range').value;
+            const end = new Date().toISOString().split('T')[0];
+            let start;
+            if (sel === 'since-tracking') {
+                start = VA_TRACKING_START;
+            } else {
+                const d = new Date();
+                d.setDate(d.getDate() - parseInt(sel, 10));
+                start = d.toISOString().split('T')[0];
+                if (start < VA_TRACKING_START) start = VA_TRACKING_START;
+            }
+            return { start, end };
+        }
+
+        async function loadVaData() {
+            vaSetBadge('loading');
+            try {
+                const { start, end } = vaRange();
+                const bust = 't=' + Date.now();
+                const vaRes = await fetch(`${VA_API}?start=${start}&end=${end}&breakdown=vendor-affiliate&${bust}`).then(r => r.json());
+                const va = vaRes?.vendorAffiliate;
+                if (!va || va.error || !va.totals) throw new Error('vendor-affiliate unavailable');
+
+                // Use the effective (cutoff-clamped) range for spend so spend and
+                // vendor counts always cover the same window
+                const eff = va.effectiveRange || { start, end };
+                const sumRes = await fetch(`${VA_API}?start=${eff.start}&end=${eff.end}&breakdown=summary&${bust}`).then(r => r.json());
+                const summary = sumRes?.summary;
+                if (!summary || summary.error) throw new Error('summary unavailable');
+
+                vaLive = {
+                    spend: summary.spend,
+                    vendors: va.totals.vendor,
+                    affiliates: va.totals.affiliate,
+                    rangeLabel: `${eff.start} → ${eff.end}`,
+                    isLive: true,
+                };
+                vaSetBadge('live');
+            } catch (e) {
+                console.error('VA forecast: falling back to demo data:', e);
+                vaLive = { spend: 14800, vendors: 175, affiliates: 390, rangeLabel: 'demo data', isLive: false };
+                vaSetBadge('demo');
+            }
+
+            document.getElementById('va-spend').value = Math.round(vaLive.spend);
+            document.getElementById('va-vendors').value = Math.round(vaLive.vendors);
+            document.getElementById('va-stat-affiliates').textContent = formatNumber(Math.round(vaLive.affiliates));
+            calcVaForecast();
+        }
+
+        function vaParseList(id) {
+            const list = document.getElementById(id).value
+                .split(/[,\s]+/)
+                .map(parseFloat)
+                .filter(n => isFinite(n) && n > 0);
+            return [...new Set(list)].sort((a, b) => a - b);
+        }
+
+        function calcVaForecast() {
+            const spend = parseFloat(document.getElementById('va-spend').value) || 0;
+            const vendors = parseFloat(document.getElementById('va-vendors').value) || 0;
+            const rates = vaParseList('va-rates');
+            const values = vaParseList('va-values');
+
+            // Live stat cards
+            document.getElementById('va-stat-spend').textContent = '$' + formatNumber(spend);
+            document.getElementById('va-stat-range').textContent = vaLive ? vaLive.rangeLabel : '—';
+            document.getElementById('va-stat-vendors').textContent = formatNumber(Math.round(vendors));
+            document.getElementById('va-stat-cpv').textContent = vendors > 0 ? '$' + formatNumber(spend / vendors) : '—';
+
+            // Break-even activation rate at the original $1,300 assumption
+            const be1300 = (vendors > 0 && spend > 0) ? (spend / (vendors * 1300)) * 100 : null;
+            const beEl = document.getElementById('va-stat-be');
+            beEl.textContent = be1300 !== null ? be1300.toFixed(1) + '%' : '—';
+            beEl.className = 'result-value ' + (be1300 !== null && be1300 <= 20 ? 'success' : be1300 !== null && be1300 <= 40 ? 'warning' : 'danger');
+
+            // Break-even list per vendor value: rate where revenue = spend
+            const beRows = document.getElementById('va-be-rows');
+            if (vendors > 0 && spend > 0 && values.length) {
+                beRows.innerHTML = values.map(v => {
+                    const beRate = (spend / (vendors * v)) * 100;
+                    const beVendors = Math.ceil(spend / v);
+                    return `<div class="be-row"><span>$${formatNumber(v)} / vendor</span><span class="be-val">${beRate.toFixed(1)}% (${beVendors} activated)</span></div>`;
+                }).join('');
+            } else {
+                beRows.innerHTML = '<div class="be-row"><span>Needs spend, vendor signups & value scenarios</span></div>';
+            }
+
+            renderVaChart(spend, vendors, rates, values);
+            renderVaMatrix(spend, vendors, rates, values);
+        }
+
+        function renderVaChart(spend, vendors, rates, values) {
+            const canvas = document.getElementById('va-chart');
+            if (vaChart) { vaChart.destroy(); vaChart = null; }
+            if (!spend || !vendors || !rates.length || !values.length) return;
+
+            const maxX = Math.max(...rates) * 1.1;
+            const roasAt = (rate, value) => (vendors * (rate / 100) * value) / spend;
+
+            const datasets = values.map((v, i) => ({
+                label: `$${formatNumber(v)} / activated vendor`,
+                data: [0, ...rates, maxX].map(r => ({ x: r, y: roasAt(r, v) })),
+                borderColor: VA_LINE_COLORS[i % VA_LINE_COLORS.length],
+                backgroundColor: VA_LINE_COLORS[i % VA_LINE_COLORS.length],
+                pointRadius: (ctx) => rates.includes(ctx.parsed?.x) ? 4 : 0,
+                pointHoverRadius: 6,
+                tension: 0,
+                borderWidth: 2,
+            }));
+
+            // Break-even reference line at 1.0x ROAS
+            datasets.push({
+                label: 'Break-even (1.0x ROAS)',
+                data: [{ x: 0, y: 1 }, { x: maxX, y: 1 }],
+                borderColor: '#ef4444',
+                borderDash: [6, 6],
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+            });
+
+            // Break-even crossing markers on each value line
+            const crossings = values
+                .map(v => ({ x: (spend / (vendors * v)) * 100, y: 1 }))
+                .filter(p => p.x <= maxX);
+            if (crossings.length) {
+                datasets.push({
+                    label: 'Break-even crossing',
+                    data: crossings,
+                    type: 'scatter',
+                    pointStyle: 'rectRot',
+                    pointRadius: 7,
+                    pointHoverRadius: 9,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                    showLine: false,
+                });
+            }
+
+            vaChart = new Chart(canvas, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 } },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => `Activation rate: ${items[0].parsed.x.toFixed(1)}%`,
+                                label: (item) => {
+                                    if (item.dataset.label === 'Break-even (1.0x ROAS)') return 'Break-even: 1.00x';
+                                    if (item.dataset.label === 'Break-even crossing') return `Break-even at ${item.parsed.x.toFixed(1)}% activation`;
+                                    const activated = vendors * item.parsed.x / 100;
+                                    return `${item.dataset.label}: ${item.parsed.y.toFixed(2)}x ROAS (${Math.round(activated)} activated)`;
+                                },
+                            },
+                        },
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            max: maxX,
+                            title: { display: true, text: 'Vendor activation rate (%)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', callback: v => v + '%' },
+                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
+                        },
+                        y: {
+                            min: 0,
+                            title: { display: true, text: 'ROAS (vendor revenue ÷ ad spend)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8', callback: v => v.toFixed(1) + 'x' },
+                            grid: { color: 'rgba(71, 85, 105, 0.3)' },
+                        },
+                    },
+                },
+            });
+        }
+
+        function renderVaMatrix(spend, vendors, rates, values) {
+            const container = document.getElementById('va-matrix');
+            if (!spend || !vendors || !rates.length || !values.length) {
+                container.innerHTML = '<div class="loading">Enter spend, vendor signups, and at least one rate & value scenario</div>';
+                return;
+            }
+
+            const header = `
+                <tr>
+                    <th>Activation Rate</th>
+                    <th>Activated Vendors</th>
+                    <th>Cost / Activated</th>
+                    ${values.map(v => `<th>ROAS @ $${formatNumber(v)}</th>`).join('')}
+                </tr>`;
+
+            const rows = rates.map(r => {
+                const activated = vendors * r / 100;
+                const costPerActivated = activated > 0 ? spend / activated : 0;
+                const cells = values.map(v => {
+                    const revenue = activated * v;
+                    const roas = revenue / spend;
+                    const cls = roas >= 1 ? 'roas-good' : roas >= 0.75 ? 'roas-near' : 'roas-bad';
+                    return `<td class="roas-cell ${cls}"><span class="roas-x">${roas.toFixed(2)}x</span><span class="roas-rev">$${formatNumber(revenue)} rev</span></td>`;
+                }).join('');
+                return `
+                    <tr>
+                        <td>${r}%</td>
+                        <td>${activated < 10 ? activated.toFixed(1) : Math.round(activated).toLocaleString()}</td>
+                        <td>$${formatNumber(costPerActivated)}</td>
+                        ${cells}
+                    </tr>`;
+            }).join('');
+
+            container.innerHTML = `
+                <table>
+                    <thead>${header}</thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div class="input-hint" style="margin-top: 10px;">
+                    Green = at/above break-even (≥1.0x) · Amber = within reach (0.75–1.0x) · Red = below break-even.
+                    Revenue = vendor signups × activation rate × value per activated vendor (30-day lookback).
+                    ROAS excludes any revenue past the 30-day window — true LTV-based ROAS will be higher.
+                </div>`;
+        }
+
+        // Recalculate on any scenario input change
+        ['va-spend', 'va-vendors', 'va-rates', 'va-values'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcVaForecast);
+        });
+
+        loadVaData();
     </script>
 </body>
 </html>
