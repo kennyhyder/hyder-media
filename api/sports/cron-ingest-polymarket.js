@@ -205,6 +205,17 @@ export default async function handler(req, res) {
     summary.quotes_inserted += slice.length;
   }
 
+  // Heartbeat for the freshness canary: "healthy but nothing matched" is a
+  // legitimate idle state (Polymarket between covered events) — not an outage.
+  try {
+    await supabase.from("golfodds_ingest_state").upsert({
+      source: "sports_polymarket",
+      last_run_at: new Date().toISOString(),
+      last_quotes: summary.quotes_inserted || 0,
+      last_errors: summary.quote_error ? 1 : 0,
+    });
+  } catch {}
+
   return res.status(200).json({
     ok: true,
     duration_ms: Date.now() - startedAt,

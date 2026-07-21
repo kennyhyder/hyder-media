@@ -1,11 +1,117 @@
 {
-  "timestamp": "2026-06-27T15:22:45.215053",
+  "timestamp": "2026-07-08T23:47:15.454811",
   "results": {
-    "ingestion": [],
-    "enrichment": [],
-    "errors": 0
+    "ingestion": [
+      {
+        "name": "EIA Substations",
+        "success": false
+      },
+      {
+        "name": "EIA Transmission",
+        "success": false
+      },
+      {
+        "name": "FEMA NRI",
+        "success": true
+      },
+      {
+        "name": "BLS QCEW",
+        "success": true
+      },
+      {
+        "name": "NOAA Climate",
+        "success": true
+      },
+      {
+        "name": "WRI Water",
+        "success": true
+      },
+      {
+        "name": "FCC Fiber",
+        "success": true
+      },
+      {
+        "name": "PeeringDB",
+        "success": true
+      },
+      {
+        "name": "OSM Datacenters",
+        "success": true
+      },
+      {
+        "name": "EIA Brownfields",
+        "success": true
+      },
+      {
+        "name": "DC Tax Incentives",
+        "success": true
+      },
+      {
+        "name": "ISO Queues",
+        "success": false
+      },
+      {
+        "name": "USDA Land Values",
+        "success": true
+      }
+    ],
+    "enrichment": [
+      {
+        "name": "Generate DC Sites",
+        "success": true
+      },
+      {
+        "name": "Generate Greenfield",
+        "success": true
+      },
+      {
+        "name": "Crossref Brownfield",
+        "success": true
+      },
+      {
+        "name": "Crossref Corridors",
+        "success": true
+      },
+      {
+        "name": "Enrich Queue Wait",
+        "success": true
+      },
+      {
+        "name": "Enrich Tax Incentives",
+        "success": true
+      },
+      {
+        "name": "Enrich DLR Capacity",
+        "success": false
+      },
+      {
+        "name": "Enrich Land Contacts",
+        "success": false
+      },
+      {
+        "name": "Enrich Cloud Regions",
+        "success": true
+      },
+      {
+        "name": "Enrich FEMA Flood",
+        "success": false
+      },
+      {
+        "name": "Enrich WRI Water",
+        "success": false
+      },
+      {
+        "name": "Enrich FCC Fiber",
+        "success": true
+      },
+      {
+        "name": "Score DC Sites",
+        "success": true
+      }
+    ],
+    "errors": 7
   },
-  "total": 0,
-  "succeeded": 0,
-  "failed": 0
+  "total": 26,
+  "succeeded": 19,
+  "failed": 7
 }

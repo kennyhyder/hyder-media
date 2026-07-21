@@ -365,12 +365,5 @@ function updateOverview(tab) {
 Git is the source of truth: `git checkout HEAD -- clients/digistore24/data/keywords-combined.json` or `brctl download <file>`. Always deploy from GitHub, not local.
 
 <claude-mem-context>
-# Recent Activity
 
-### May 12, 2026
-
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #459 | 8:53 AM | 🔵 | GA4 rendering displays vendor/affiliate breakdown with ad group slug mapping | ~404 |
-| #458 | 8:52 AM | 🔵 | Frontend joins GA4 signup breakout with Google Ads campaign performance | ~350 |
 </claude-mem-context>

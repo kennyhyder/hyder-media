@@ -32,7 +32,8 @@ const FRESHNESS_TARGETS = [
   // Sports — sportsbooks (Odds API)
   { table: "sports_book_quotes", column: "fetched_at", label: "Sports book quotes (h2h)", cron_minutes: 30, stale_after_minutes: 120 },
   // Sports — Polymarket
-  { table: "sports_polymarket_quotes", column: "fetched_at", label: "Sports Polymarket quotes", cron_minutes: 15, stale_after_minutes: 60 },
+  { table: "sports_polymarket_quotes", column: "fetched_at", label: "Sports Polymarket quotes", cron_minutes: 15, stale_after_minutes: 60,
+    skipUnless: sportsPolymarketExpectingData },
   // Golf — Kalshi. Heartbeat-gated: markets settle at tournament end and next
   // week's may not list until Mon/Tue. The ingest cron writes
   // golfodds_ingest_state after every run; when it's running clean with zero
@@ -102,17 +103,21 @@ function checkAuth(req) {
 // True when the Kalshi check should run. False only when the ingest cron's
 // heartbeat shows a recent clean run that found zero open markets (the
 // between-tournaments window). Missing/stale heartbeat or errors => true.
-async function kalshiExpectingData(supabase) {
-  const { data, error } = await supabase
-    .from("golfodds_ingest_state")
-    .select("last_run_at, last_quotes, last_errors")
-    .eq("source", "kalshi")
-    .maybeSingle();
-  if (error || !data) return true; // fail-closed: no heartbeat -> keep checking
-  const ageMin = (Date.now() - new Date(data.last_run_at).getTime()) / 60000;
-  const idleAndHealthy = ageMin <= 20 && data.last_quotes === 0 && data.last_errors === 0;
-  return !idleAndHealthy;
+function heartbeatGate(source, maxAgeMin) {
+  return async function (supabase) {
+    const { data, error } = await supabase
+      .from("golfodds_ingest_state")
+      .select("last_run_at, last_quotes, last_errors")
+      .eq("source", source)
+      .maybeSingle();
+    if (error || !data) return true; // fail-closed: no heartbeat -> keep checking
+    const ageMin = (Date.now() - new Date(data.last_run_at).getTime()) / 60000;
+    const idleAndHealthy = ageMin <= maxAgeMin && data.last_quotes === 0 && data.last_errors === 0;
+    return !idleAndHealthy;
+  };
 }
+const kalshiExpectingData = heartbeatGate("kalshi", 20);
+const sportsPolymarketExpectingData = heartbeatGate("sports_polymarket", 60);
 
 async function hasActiveGolfTournament(supabase) {
   const horizonIso = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
