@@ -152,7 +152,8 @@ async function checkOne(supabase, target) {
   const { data, error } = await supabase
     .from(target.table)
     .select(target.column)
-    .order(target.column, { ascending: false, nullsFirst: false })
+    .not(target.column, "is", null)      // null rows must not mask real data;
+    .order(target.column, { ascending: false })  // plain desc stays index-friendly
     .limit(1);
   if (error) return { ...target, error: error.message };
   const latest = data?.[0]?.[target.column] || null;
