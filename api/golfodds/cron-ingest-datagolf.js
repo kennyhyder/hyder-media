@@ -72,14 +72,48 @@ async function ingestMarket(supabase, dgMarket, marketType) {
     const norm = normalizeName(name);
     if (!playerMap.has(norm)) playerMap.set(norm, { name, normalized_name: norm, dg_id: p.dg_id || null });
   }
+  // Reconcile players against BOTH unique keys (normalized_name, dg_id).
+  // A blind upsert on normalized_name explodes when DataGolf renders a name
+  // differently (row looks new by name, collides on dg_id) — 2026-07-21 outage.
   const playerIdByNorm = new Map();
   const rows = Array.from(playerMap.values());
-  for (let i = 0; i < rows.length; i += 500) {
-    const { data, error } = await supabase
-      .from("golfodds_players")
-      .upsert(rows.slice(i, i + 500), { onConflict: "normalized_name" })
-      .select("id, normalized_name");
-    if (error) throw new Error(`upsert players: ${error.message}`);
+  const dgIds = rows.map((r) => r.dg_id).filter(Boolean);
+  const norms = rows.map((r) => r.normalized_name);
+  const byDg = new Map(), byNorm = new Map();
+  for (let i = 0; i < dgIds.length; i += 150) {
+    const { data, error } = await supabase.from("golfodds_players")
+      .select("id, normalized_name, dg_id").in("dg_id", dgIds.slice(i, i + 150));
+    if (error) throw new Error(`load players by dg_id: ${error.message}`);
+    for (const r of data) byDg.set(r.dg_id, r);
+  }
+  for (let i = 0; i < norms.length; i += 150) {
+    const { data, error } = await supabase.from("golfodds_players")
+      .select("id, normalized_name, dg_id").in("normalized_name", norms.slice(i, i + 150));
+    if (error) throw new Error(`load players by name: ${error.message}`);
+    for (const r of data) byNorm.set(r.normalized_name, r);
+  }
+  const toInsert = [], toClaim = [];   // claim = existing name-row gains dg_id
+  for (const r of rows) {
+    const dgHit = r.dg_id ? byDg.get(r.dg_id) : null;
+    const nameHit = byNorm.get(r.normalized_name);
+    if (dgHit) {
+      // same player, possibly renamed by DG — keep existing row + its name
+      playerIdByNorm.set(r.normalized_name, dgHit.id);
+    } else if (nameHit) {
+      playerIdByNorm.set(r.normalized_name, nameHit.id);
+      if (r.dg_id && !nameHit.dg_id) toClaim.push({ id: nameHit.id, dg_id: r.dg_id });
+      // nameHit with a DIFFERENT dg_id = true collision; keep existing, skip claim
+    } else {
+      toInsert.push(r);
+    }
+  }
+  for (const c of toClaim) {
+    await supabase.from("golfodds_players").update({ dg_id: c.dg_id }).eq("id", c.id);
+  }
+  for (let i = 0; i < toInsert.length; i += 500) {
+    const { data, error } = await supabase.from("golfodds_players")
+      .insert(toInsert.slice(i, i + 500)).select("id, normalized_name");
+    if (error) throw new Error(`insert players: ${error.message}`);
     for (const p of data) playerIdByNorm.set(p.normalized_name, p.id);
   }
 

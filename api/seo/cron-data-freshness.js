@@ -18,7 +18,7 @@ import { createClient } from "@supabase/supabase-js";
 // GET /api/seo/cron-data-freshness
 //   Authorization: Bearer <CRON_SECRET>
 
-export const config = { maxDuration: 30 };
+export const config = { maxDuration: 60 };
 
 const SITE = "https://sportsbookish.com";
 const ALERT_TO = "kenny@hyder.me";
@@ -161,6 +161,56 @@ async function checkOne(supabase, target) {
   return { ...target, latest, age_minutes: ageMin, status };
 }
 
+// ---- Self-healing: table -> the ingest cron that refills it. On staleness the
+// canary re-fires the cron itself and re-checks before ever emailing.
+const REMEDIATION = {
+  sports_quotes: "/api/sports/cron-ingest",
+  sports_book_quotes: "/api/sports/cron-ingest-books",
+  sports_polymarket_quotes: "/api/sports/cron-ingest-polymarket",
+  golfodds_kalshi_latest: "/api/golfodds/cron-ingest-kalshi",
+  golfodds_dg_latest: "/api/golfodds/cron-ingest-datagolf",
+  golfodds_book_latest: "/api/golfodds/cron-ingest-datagolf",
+  golfodds_polymarket_latest: "/api/golfodds/cron-ingest-polymarket",
+};
+
+async function attemptRemediation(supabase, stales) {
+  const secret = (process.env.CRON_SECRET || "").trim();
+  if (!secret) return stales;
+  const urls = [...new Set(stales.map((s) => REMEDIATION[s.table]).filter(Boolean))];
+  if (!urls.length) return stales;
+  await Promise.all(urls.map((u) =>
+    fetch(`https://hyder.me${u}`, { headers: { Authorization: `Bearer ${secret}` } })
+      .catch(() => null)
+  ));
+  // re-check only the remediable targets; keep unfixable ones as-is
+  const out = [];
+  for (const s of stales) {
+    if (!REMEDIATION[s.table]) { out.push(s); continue; }
+    const target = FRESHNESS_TARGETS.find((t) => t.table === s.table);
+    const re = await checkOne(supabase, target);
+    if (re.status === "fresh") {
+      s.status = "auto_remediated";        // healed — no alert for this one
+    } else {
+      out.push({ ...re, remediation_attempted: true });
+    }
+  }
+  return out;
+}
+
+// ---- Alert throttle: this alert keeps recurring; cap at ~2 emails/day.
+const ALERT_THROTTLE_HOURS = 12;
+async function throttleOk(supabase) {
+  const { data } = await supabase.from("sb_alert_throttle")
+    .select("last_sent").eq("key", "data-freshness").maybeSingle();
+  if (!data?.last_sent) return true;
+  return Date.now() - new Date(data.last_sent).getTime() > ALERT_THROTTLE_HOURS * 3600 * 1000;
+}
+async function throttleStamp(supabase) {
+  await supabase.from("sb_alert_throttle")
+    .upsert({ key: "data-freshness", last_sent: new Date().toISOString() })
+    .then(() => null, () => null);
+}
+
 async function sendAlert(stales) {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) return { ok: false, error: "RESEND_API_KEY missing" };
@@ -172,7 +222,7 @@ async function sendAlert(stales) {
       from: "SportsBookISH Canary <alerts@sportsbookish.com>",
       to: [ALERT_TO],
       subject: `🚨 SportsBookISH: ${stales.length} ingest pipeline${stales.length > 1 ? "s" : ""} stuck`,
-      text: `Data has stopped flowing in:\n\n${lines}\n\nInvestigate immediately — ingest cron likely failing silently. Trigger manually: \nfor c in cron-ingest cron-ingest-books cron-ingest-polymarket cron-ingest-kalshi cron-ingest-datagolf cron-ingest-matchup-books; do\n  curl -H "Authorization: Bearer $CRON_SECRET" https://hyder.me/api/<path>/$c\ndone\n`,
+      text: `Data has stopped flowing in (auto-remediation was attempted and FAILED — this needs a code/source fix, not a re-trigger):\n\n${lines}\n\nNote: alerts for this are throttled to one per 12h. Trigger manually: \nfor c in cron-ingest cron-ingest-books cron-ingest-polymarket cron-ingest-kalshi cron-ingest-datagolf cron-ingest-matchup-books; do\n  curl -H "Authorization: Bearer $CRON_SECRET" https://hyder.me/api/<path>/$c\ndone\n`,
     }),
   });
   return r.ok ? { ok: true } : { ok: false, error: `${r.status}` };
@@ -206,10 +256,18 @@ export default async function handler(req, res) {
     const priorStales = new Set(
       ((prior?.detail || []).filter((d) => d.status === "stale" || d.status === "no_data" || d.error)).map((d) => d.table)
     );
-    const repeats = stales.filter((s) => priorStales.has(s.table));
+    let repeats = stales.filter((s) => priorStales.has(s.table));
     if (repeats.length > 0) {
-      const sent = await sendAlert(repeats);
-      alerted = sent.ok;
+      repeats = await attemptRemediation(supabase, repeats);
+    }
+    if (repeats.length > 0) {
+      if (await throttleOk(supabase)) {
+        const sent = await sendAlert(repeats);
+        alerted = sent.ok;
+        if (alerted) await throttleStamp(supabase);
+      } else {
+        alerted = "suppressed_throttle";
+      }
     }
   }
 
