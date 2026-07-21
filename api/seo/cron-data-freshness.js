@@ -116,8 +116,9 @@ function heartbeatGate(source, maxAgeMin) {
     return !idleAndHealthy;
   };
 }
-const kalshiExpectingData = heartbeatGate("kalshi", 20);
-const sportsPolymarketExpectingData = heartbeatGate("sports_polymarket", 60);
+// hoisted wrappers — FRESHNESS_TARGETS (defined above) references these by name
+function kalshiExpectingData(supabase) { return heartbeatGate("kalshi", 20)(supabase); }
+function sportsPolymarketExpectingData(supabase) { return heartbeatGate("sports_polymarket", 60)(supabase); }
 
 async function hasActiveGolfTournament(supabase) {
   const horizonIso = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
