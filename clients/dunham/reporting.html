@@ -179,6 +179,19 @@
             </div>
 
             <div class="card">
+                <h3 style="margin-top:0;">Traffic by Platform — Search Engines &amp; Social</h3>
+                <p class="muted" style="margin-bottom:10px;">Where sessions actually originate: Google, Bing, DuckDuckGo, Yahoo, Facebook, Instagram and more — with paid vs. unpaid split. Hover a row for the underlying GA4 sources. Platforms you've asked about are always listed, even at zero.</p>
+                <div id="platform-bars"><p class="muted">Loading…</p></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Website Comparison — Platform Mix by Property</h3>
+                <p class="muted" style="margin-bottom:10px;">The same platform breakdown for every Dunham &amp; Jones web property side by side (dunhamlaw.com, jailrelease.com, Warrant Check, …).</p>
+                <button class="btn btn-secondary btn-sm no-print" id="compare-btn" onclick="loadCompare()">Load website comparison</button>
+                <div id="compare-table" style="margin-top:10px;"></div>
+            </div>
+
+            <div class="card">
                 <h3 style="margin-top:0;">Daily Sessions by Channel</h3>
                 <div class="legend" id="daily-legend"></div>
                 <div class="chart-wrap" id="daily-chart"><p class="muted">Loading…</p></div>
@@ -251,11 +264,18 @@
         const chanColor = c => CHANNEL_COLORS[c] || OTHER_COLOR;
 
         let state = { days: 28, startDate: null, endDate: null, property: '253496127',
-                      channels: null, sources: null, daily: null, propertyName: '' };
+                      channels: null, sources: null, daily: null, platforms: null,
+                      compare: null, propertyName: '' };
 
         const fmt = n => Number(n).toLocaleString();
         const fmtMoney = (n, cur = 'USD') => Number(n).toLocaleString(undefined, { style: 'currency', currency: cur, maximumFractionDigits: 0 });
         const pct = (n, d) => d ? (100 * n / d) : 0;
+        const pctLabel = (n, d) => {
+            if (!n) return '0%';
+            const v = pct(n, d);
+            if (v < 0.01) return '<0.01%';
+            return v.toFixed(v < 0.1 ? 2 : 1) + '%';
+        };
         const rangeQS = () => state.startDate
             ? `startDate=${state.startDate}&endDate=${state.endDate}`
             : `days=${state.days}`;
@@ -303,16 +323,21 @@
             const statsEl = document.getElementById('traffic-stats');
             statsEl.innerHTML = '<div class="stat-card"><div class="stat-label">Loading…</div><div class="stat-value">—</div></div>';
 
-            const [chan, src, daily] = await Promise.all([
+            state.compare = null;   // range/property changed — invalidate the matrix
+            document.getElementById('compare-table').innerHTML = '';
+            document.getElementById('compare-btn').style.display = '';
+
+            const [chan, src, daily, plat] = await Promise.all([
                 fetch(`/api/dunham/ga4-traffic?breakdown=channel&${qs}`).then(r => r.json()),
                 fetch(`/api/dunham/ga4-traffic?breakdown=source&${qs}`).then(r => r.json()),
                 fetch(`/api/dunham/ga4-traffic?breakdown=daily&${qs}`).then(r => r.json()),
+                fetch(`/api/dunham/ga4-traffic?breakdown=platform&${qs}`).then(r => r.json()),
             ]);
             if (chan.status !== 'success') {
                 statsEl.innerHTML = `<div class="stat-card"><div class="stat-label">GA4</div><div class="stat-value">—</div><div class="stat-sub">${chan.message || chan.error}</div></div>`;
                 return;
             }
-            state.channels = chan; state.sources = src; state.daily = daily;
+            state.channels = chan; state.sources = src; state.daily = daily; state.platforms = plat;
             state.propertyName = chan.property.name;
 
             const total = chan.totals.sessions;
@@ -325,6 +350,7 @@
                 <div class="stat-card"><div class="stat-label">Organic Search</div><div class="stat-value">${pct(organic, total).toFixed(1)}%</div><div class="stat-sub">unpaid search traffic</div></div>`;
 
             renderChannelBars(chan);
+            renderPlatformBars(plat);
             renderDailyChart(daily);
             renderSourceTable(src);
             document.getElementById('meta-range').textContent = rangeLabel();
@@ -346,6 +372,63 @@
                         <span class="num users-col">${fmt(c.users)}</span>
                         <span class="num pct">${pct(c.sessions, total).toFixed(1)}%</span>
                     </div>`).join('')}`;
+        }
+
+        function renderPlatformBars(plat) {
+            const el = document.getElementById('platform-bars');
+            if (plat.status !== 'success') { el.innerHTML = `<p class="muted">${plat.error || 'No platform data.'}</p>`; return; }
+            const total = plat.totalSessions || 1;
+            const max = Math.max(...plat.platforms.map(p => p.sessions), 1);
+            el.innerHTML = `
+                <div class="chan-row chan-head" style="grid-template-columns: 170px 1fr 90px 90px 90px 70px;">
+                    <span>Platform</span><span></span><span class="num">Sessions</span><span class="num">Paid</span><span class="num">Unpaid</span><span class="num">% Total</span>
+                </div>
+                ${plat.platforms.map((p, i) => `
+                    <div class="chan-row platform-row" data-i="${i}" style="grid-template-columns: 170px 1fr 90px 90px 90px 70px;">
+                        <span class="chan-name">${p.platform}</span>
+                        <span class="chan-track"><span class="chan-fill" style="width:${Math.max(p.sessions ? 1 : 0, 100 * p.sessions / max)}%; background:var(--s-crossnetwork)"></span></span>
+                        <span class="num">${fmt(p.sessions)}</span>
+                        <span class="num muted">${p.paid ? fmt(p.paid) : '—'}</span>
+                        <span class="num muted">${p.unpaid ? fmt(p.unpaid) : '—'}</span>
+                        <span class="num pct">${pctLabel(p.sessions, total)}</span>
+                    </div>`).join('')}`;
+            el.querySelectorAll('.platform-row').forEach(row => {
+                row.addEventListener('mousemove', ev => {
+                    const p = plat.platforms[+row.dataset.i];
+                    if (!p.topSources.length) return;
+                    showTip(`<div class="tt-title">${p.platform} — underlying GA4 sources</div>` +
+                        p.topSources.map(t => `<div class="tt-row"><span>${t.sm}</span><span>${fmt(t.sessions)}</span></div>`).join(''), ev);
+                });
+                row.addEventListener('mouseleave', hideTip);
+            });
+        }
+
+        async function loadCompare() {
+            const btn = document.getElementById('compare-btn');
+            const el = document.getElementById('compare-table');
+            btn.disabled = true; btn.textContent = 'Loading all properties…';
+            try {
+                const d = await (await fetch(`/api/dunham/ga4-traffic?breakdown=compare&${rangeQS()}`)).json();
+                if (d.status !== 'success') throw new Error(d.error || 'compare failed');
+                state.compare = d;
+                const props = d.properties.filter(p => p.total > 0);
+                const platformNames = [...new Set(props.flatMap(p => Object.keys(p.platforms)))];
+                const grand = Object.fromEntries(platformNames.map(n => [n, props.reduce((s, p) => s + (p.platforms[n] || 0), 0)]));
+                const ALWAYS = ['Google', 'Bing (Microsoft)', 'DuckDuckGo', 'Yahoo', 'Facebook', 'Instagram'];
+                const rows = platformNames
+                    .filter(n => grand[n] > 0 || ALWAYS.includes(n))
+                    .sort((a, b) => grand[b] - grand[a]);
+                el.innerHTML = `<div class="table-scroll" style="max-height:none;"><table class="data-table">
+                    <thead><tr><th>Platform</th>${props.map(p => `<th class="num">${p.name.replace(' - GA4','').replace(' GA4','')}<br><span class="muted" style="font-weight:400">${fmt(p.total)} sessions</span></th>`).join('')}</tr></thead>
+                    <tbody>${rows.map(n => `<tr><td>${n}</td>${props.map(p => {
+                        const v = p.platforms[n] || 0;
+                        return `<td class="num">${v ? `${fmt(v)} <span class="muted">(${pctLabel(v, p.total)})</span>` : '—'}`;
+                    }).join('')}</tr>`).join('')}</tbody></table></div>`;
+                btn.style.display = 'none';
+            } catch (e) {
+                el.innerHTML = `<p class="muted">Comparison failed: ${e.message}</p>`;
+            }
+            btn.disabled = false; btn.textContent = 'Load website comparison';
         }
 
         function renderDailyChart(daily) {
@@ -542,6 +625,20 @@
                 'Source / Medium,Sessions,% of Sessions',
                 ...(state.sources?.sources || []).map(s => `"${s.source} / ${s.medium}",${s.sessions},${pct(s.sessions, srcTotal).toFixed(2)}%`),
             ];
+            if (state.platforms?.platforms) {
+                const pTotal = state.platforms.totalSessions || 1;
+                lines.push('', 'Platform,Sessions,Paid,Unpaid,% of Sessions',
+                    ...state.platforms.platforms.map(p =>
+                        `"${p.platform}",${p.sessions},${p.paid},${p.unpaid},${pct(p.sessions, pTotal).toFixed(2)}%`));
+            }
+            if (state.compare?.properties) {
+                const props = state.compare.properties.filter(p => p.total > 0);
+                const names = [...new Set(props.flatMap(p => Object.keys(p.platforms)))];
+                lines.push('', 'Platform,' + props.map(p => `"${p.name} (sessions)","${p.name} (%)"`).join(','));
+                for (const n of names.sort((a, b) => props.reduce((s, p) => s + (p.platforms[b] || 0), 0) - props.reduce((s, p) => s + (p.platforms[a] || 0), 0))) {
+                    lines.push(`"${n}",` + props.map(p => `${p.platforms[n] || 0},${pct(p.platforms[n] || 0, p.total).toFixed(2)}%`).join(','));
+                }
+            }
             const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
