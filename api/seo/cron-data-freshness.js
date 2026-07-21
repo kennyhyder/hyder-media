@@ -152,7 +152,7 @@ async function checkOne(supabase, target) {
   const { data, error } = await supabase
     .from(target.table)
     .select(target.column)
-    .order(target.column, { ascending: false })
+    .order(target.column, { ascending: false, nullsFirst: false })
     .limit(1);
   if (error) return { ...target, error: error.message };
   const latest = data?.[0]?.[target.column] || null;
