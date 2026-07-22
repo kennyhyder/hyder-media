@@ -1,0 +1,1780 @@
+[
+ {
+  "name": "Anderson",
+  "slug": "anderson",
+  "fips": "48001",
+  "population": 57736,
+  "has_bail_board": true
+ },
+ {
+  "name": "Andrews",
+  "slug": "andrews",
+  "fips": "48003",
+  "population": 18664,
+  "has_bail_board": false
+ },
+ {
+  "name": "Angelina",
+  "slug": "angelina",
+  "fips": "48005",
+  "population": 87319,
+  "has_bail_board": true
+ },
+ {
+  "name": "Aransas",
+  "slug": "aransas",
+  "fips": "48007",
+  "population": 25374,
+  "has_bail_board": false
+ },
+ {
+  "name": "Archer",
+  "slug": "archer",
+  "fips": "48009",
+  "population": 9029,
+  "has_bail_board": false
+ },
+ {
+  "name": "Armstrong",
+  "slug": "armstrong",
+  "fips": "48011",
+  "population": 1832,
+  "has_bail_board": false
+ },
+ {
+  "name": "Atascosa",
+  "slug": "atascosa",
+  "fips": "48013",
+  "population": 51784,
+  "has_bail_board": false
+ },
+ {
+  "name": "Austin",
+  "slug": "austin",
+  "fips": "48015",
+  "population": 31677,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bailey",
+  "slug": "bailey",
+  "fips": "48017",
+  "population": 6672,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bandera",
+  "slug": "bandera",
+  "fips": "48019",
+  "population": 22637,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bastrop",
+  "slug": "bastrop",
+  "fips": "48021",
+  "population": 110778,
+  "has_bail_board": false
+ },
+ {
+  "name": "Baylor",
+  "slug": "baylor",
+  "fips": "48023",
+  "population": 3463,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bee",
+  "slug": "bee",
+  "fips": "48025",
+  "population": 30850,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bell",
+  "slug": "bell",
+  "fips": "48027",
+  "population": 393193,
+  "has_bail_board": true
+ },
+ {
+  "name": "Bexar",
+  "slug": "bexar",
+  "fips": "48029",
+  "population": 2087679,
+  "has_bail_board": true
+ },
+ {
+  "name": "Blanco",
+  "slug": "blanco",
+  "fips": "48031",
+  "population": 13048,
+  "has_bail_board": false
+ },
+ {
+  "name": "Borden",
+  "slug": "borden",
+  "fips": "48033",
+  "population": 572,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bosque",
+  "slug": "bosque",
+  "fips": "48035",
+  "population": 18996,
+  "has_bail_board": false
+ },
+ {
+  "name": "Bowie",
+  "slug": "bowie",
+  "fips": "48037",
+  "population": 91687,
+  "has_bail_board": true
+ },
+ {
+  "name": "Brazoria",
+  "slug": "brazoria",
+  "fips": "48039",
+  "population": 398938,
+  "has_bail_board": true
+ },
+ {
+  "name": "Brazos",
+  "slug": "brazos",
+  "fips": "48041",
+  "population": 244703,
+  "has_bail_board": true
+ },
+ {
+  "name": "Brewster",
+  "slug": "brewster",
+  "fips": "48043",
+  "population": 9513,
+  "has_bail_board": false
+ },
+ {
+  "name": "Briscoe",
+  "slug": "briscoe",
+  "fips": "48045",
+  "population": 1445,
+  "has_bail_board": false
+ },
+ {
+  "name": "Brooks",
+  "slug": "brooks",
+  "fips": "48047",
+  "population": 6848,
+  "has_bail_board": false
+ },
+ {
+  "name": "Brown",
+  "slug": "brown",
+  "fips": "48049",
+  "population": 38709,
+  "has_bail_board": false
+ },
+ {
+  "name": "Burleson",
+  "slug": "burleson",
+  "fips": "48051",
+  "population": 19475,
+  "has_bail_board": false
+ },
+ {
+  "name": "Burnet",
+  "slug": "burnet",
+  "fips": "48053",
+  "population": 53991,
+  "has_bail_board": true
+ },
+ {
+  "name": "Caldwell",
+  "slug": "caldwell",
+  "fips": "48055",
+  "population": 49859,
+  "has_bail_board": false
+ },
+ {
+  "name": "Calhoun",
+  "slug": "calhoun",
+  "fips": "48057",
+  "population": 19696,
+  "has_bail_board": false
+ },
+ {
+  "name": "Callahan",
+  "slug": "callahan",
+  "fips": "48059",
+  "population": 14374,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cameron",
+  "slug": "cameron",
+  "fips": "48061",
+  "population": 426710,
+  "has_bail_board": true
+ },
+ {
+  "name": "Camp",
+  "slug": "camp",
+  "fips": "48063",
+  "population": 13000,
+  "has_bail_board": false
+ },
+ {
+  "name": "Carson",
+  "slug": "carson",
+  "fips": "48065",
+  "population": 5878,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cass",
+  "slug": "cass",
+  "fips": "48067",
+  "population": 28659,
+  "has_bail_board": false
+ },
+ {
+  "name": "Castro",
+  "slug": "castro",
+  "fips": "48069",
+  "population": 7227,
+  "has_bail_board": false
+ },
+ {
+  "name": "Chambers",
+  "slug": "chambers",
+  "fips": "48071",
+  "population": 53876,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cherokee",
+  "slug": "cherokee",
+  "fips": "48073",
+  "population": 52217,
+  "has_bail_board": false
+ },
+ {
+  "name": "Childress",
+  "slug": "childress",
+  "fips": "48075",
+  "population": 6788,
+  "has_bail_board": false
+ },
+ {
+  "name": "Clay",
+  "slug": "clay",
+  "fips": "48077",
+  "population": 10738,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cochran",
+  "slug": "cochran",
+  "fips": "48079",
+  "population": 2509,
+  "has_bail_board": false
+ },
+ {
+  "name": "Coke",
+  "slug": "coke",
+  "fips": "48081",
+  "population": 3352,
+  "has_bail_board": false
+ },
+ {
+  "name": "Coleman",
+  "slug": "coleman",
+  "fips": "48083",
+  "population": 7842,
+  "has_bail_board": false
+ },
+ {
+  "name": "Collin",
+  "slug": "collin",
+  "fips": "48085",
+  "population": 1195359,
+  "has_bail_board": true
+ },
+ {
+  "name": "Collingsworth",
+  "slug": "collingsworth",
+  "fips": "48087",
+  "population": 2563,
+  "has_bail_board": false
+ },
+ {
+  "name": "Colorado",
+  "slug": "colorado",
+  "fips": "48089",
+  "population": 21117,
+  "has_bail_board": false
+ },
+ {
+  "name": "Comal",
+  "slug": "comal",
+  "fips": "48091",
+  "population": 193928,
+  "has_bail_board": true
+ },
+ {
+  "name": "Comanche",
+  "slug": "comanche",
+  "fips": "48093",
+  "population": 14050,
+  "has_bail_board": false
+ },
+ {
+  "name": "Concho",
+  "slug": "concho",
+  "fips": "48095",
+  "population": 3297,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cooke",
+  "slug": "cooke",
+  "fips": "48097",
+  "population": 43782,
+  "has_bail_board": false
+ },
+ {
+  "name": "Coryell",
+  "slug": "coryell",
+  "fips": "48099",
+  "population": 84878,
+  "has_bail_board": false
+ },
+ {
+  "name": "Cottle",
+  "slug": "cottle",
+  "fips": "48101",
+  "population": 1294,
+  "has_bail_board": false
+ },
+ {
+  "name": "Crane",
+  "slug": "crane",
+  "fips": "48103",
+  "population": 4574,
+  "has_bail_board": false
+ },
+ {
+  "name": "Crockett",
+  "slug": "crockett",
+  "fips": "48105",
+  "population": 2858,
+  "has_bail_board": false
+ },
+ {
+  "name": "Crosby",
+  "slug": "crosby",
+  "fips": "48107",
+  "population": 4917,
+  "has_bail_board": false
+ },
+ {
+  "name": "Culberson",
+  "slug": "culberson",
+  "fips": "48109",
+  "population": 2196,
+  "has_bail_board": false
+ },
+ {
+  "name": "Dallam",
+  "slug": "dallam",
+  "fips": "48111",
+  "population": 7237,
+  "has_bail_board": false
+ },
+ {
+  "name": "Dallas",
+  "slug": "dallas",
+  "fips": "48113",
+  "population": 2606358,
+  "has_bail_board": true
+ },
+ {
+  "name": "Dawson",
+  "slug": "dawson",
+  "fips": "48115",
+  "population": 12004,
+  "has_bail_board": false
+ },
+ {
+  "name": "DeWitt",
+  "slug": "dewitt",
+  "fips": "48123",
+  "population": 19929,
+  "has_bail_board": false
+ },
+ {
+  "name": "Deaf Smith",
+  "slug": "deaf-smith",
+  "fips": "48117",
+  "population": 18347,
+  "has_bail_board": false
+ },
+ {
+  "name": "Delta",
+  "slug": "delta",
+  "fips": "48119",
+  "population": 5520,
+  "has_bail_board": false
+ },
+ {
+  "name": "Denton",
+  "slug": "denton",
+  "fips": "48121",
+  "population": 1007703,
+  "has_bail_board": true
+ },
+ {
+  "name": "Dickens",
+  "slug": "dickens",
+  "fips": "48125",
+  "population": 1711,
+  "has_bail_board": false
+ },
+ {
+  "name": "Dimmit",
+  "slug": "dimmit",
+  "fips": "48127",
+  "population": 8257,
+  "has_bail_board": false
+ },
+ {
+  "name": "Donley",
+  "slug": "donley",
+  "fips": "48129",
+  "population": 3214,
+  "has_bail_board": false
+ },
+ {
+  "name": "Duval",
+  "slug": "duval",
+  "fips": "48131",
+  "population": 9604,
+  "has_bail_board": false
+ },
+ {
+  "name": "Eastland",
+  "slug": "eastland",
+  "fips": "48133",
+  "population": 18037,
+  "has_bail_board": false
+ },
+ {
+  "name": "Ector",
+  "slug": "ector",
+  "fips": "48135",
+  "population": 164494,
+  "has_bail_board": true
+ },
+ {
+  "name": "Edwards",
+  "slug": "edwards",
+  "fips": "48137",
+  "population": 1393,
+  "has_bail_board": false
+ },
+ {
+  "name": "El Paso",
+  "slug": "el-paso",
+  "fips": "48141",
+  "population": 869880,
+  "has_bail_board": true
+ },
+ {
+  "name": "Ellis",
+  "slug": "ellis",
+  "fips": "48139",
+  "population": 222829,
+  "has_bail_board": true
+ },
+ {
+  "name": "Erath",
+  "slug": "erath",
+  "fips": "48143",
+  "population": 44195,
+  "has_bail_board": true
+ },
+ {
+  "name": "Falls",
+  "slug": "falls",
+  "fips": "48145",
+  "population": 17286,
+  "has_bail_board": false
+ },
+ {
+  "name": "Fannin",
+  "slug": "fannin",
+  "fips": "48147",
+  "population": 37571,
+  "has_bail_board": true
+ },
+ {
+  "name": "Fayette",
+  "slug": "fayette",
+  "fips": "48149",
+  "population": 25474,
+  "has_bail_board": false
+ },
+ {
+  "name": "Fisher",
+  "slug": "fisher",
+  "fips": "48151",
+  "population": 3612,
+  "has_bail_board": false
+ },
+ {
+  "name": "Floyd",
+  "slug": "floyd",
+  "fips": "48153",
+  "population": 5090,
+  "has_bail_board": false
+ },
+ {
+  "name": "Foard",
+  "slug": "foard",
+  "fips": "48155",
+  "population": 1079,
+  "has_bail_board": false
+ },
+ {
+  "name": "Fort Bend",
+  "slug": "fort-bend",
+  "fips": "48157",
+  "population": 916778,
+  "has_bail_board": true
+ },
+ {
+  "name": "Franklin",
+  "slug": "franklin",
+  "fips": "48159",
+  "population": 10735,
+  "has_bail_board": true
+ },
+ {
+  "name": "Freestone",
+  "slug": "freestone",
+  "fips": "48161",
+  "population": 20441,
+  "has_bail_board": false
+ },
+ {
+  "name": "Frio",
+  "slug": "frio",
+  "fips": "48163",
+  "population": 17987,
+  "has_bail_board": false
+ },
+ {
+  "name": "Gaines",
+  "slug": "gaines",
+  "fips": "48165",
+  "population": 22523,
+  "has_bail_board": false
+ },
+ {
+  "name": "Galveston",
+  "slug": "galveston",
+  "fips": "48167",
+  "population": 361744,
+  "has_bail_board": true
+ },
+ {
+  "name": "Garza",
+  "slug": "garza",
+  "fips": "48169",
+  "population": 4517,
+  "has_bail_board": false
+ },
+ {
+  "name": "Gillespie",
+  "slug": "gillespie",
+  "fips": "48171",
+  "population": 27733,
+  "has_bail_board": false
+ },
+ {
+  "name": "Glasscock",
+  "slug": "glasscock",
+  "fips": "48173",
+  "population": 1141,
+  "has_bail_board": false
+ },
+ {
+  "name": "Goliad",
+  "slug": "goliad",
+  "fips": "48175",
+  "population": 7144,
+  "has_bail_board": false
+ },
+ {
+  "name": "Gonzales",
+  "slug": "gonzales",
+  "fips": "48177",
+  "population": 19930,
+  "has_bail_board": false
+ },
+ {
+  "name": "Gray",
+  "slug": "gray",
+  "fips": "48179",
+  "population": 20916,
+  "has_bail_board": false
+ },
+ {
+  "name": "Grayson",
+  "slug": "grayson",
+  "fips": "48181",
+  "population": 146907,
+  "has_bail_board": true
+ },
+ {
+  "name": "Gregg",
+  "slug": "gregg",
+  "fips": "48183",
+  "population": 126243,
+  "has_bail_board": true
+ },
+ {
+  "name": "Grimes",
+  "slug": "grimes",
+  "fips": "48185",
+  "population": 32384,
+  "has_bail_board": true
+ },
+ {
+  "name": "Guadalupe",
+  "slug": "guadalupe",
+  "fips": "48187",
+  "population": 188454,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hale",
+  "slug": "hale",
+  "fips": "48189",
+  "population": 31761,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hall",
+  "slug": "hall",
+  "fips": "48191",
+  "population": 2818,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hamilton",
+  "slug": "hamilton",
+  "fips": "48193",
+  "population": 8619,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hansford",
+  "slug": "hansford",
+  "fips": "48195",
+  "population": 5071,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hardeman",
+  "slug": "hardeman",
+  "fips": "48197",
+  "population": 3490,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hardin",
+  "slug": "hardin",
+  "fips": "48199",
+  "population": 58261,
+  "has_bail_board": false
+ },
+ {
+  "name": "Harris",
+  "slug": "harris",
+  "fips": "48201",
+  "population": 4835125,
+  "has_bail_board": true
+ },
+ {
+  "name": "Harrison",
+  "slug": "harrison",
+  "fips": "48203",
+  "population": 70895,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hartley",
+  "slug": "hartley",
+  "fips": "48205",
+  "population": 5145,
+  "has_bail_board": false
+ },
+ {
+  "name": "Haskell",
+  "slug": "haskell",
+  "fips": "48207",
+  "population": 5385,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hays",
+  "slug": "hays",
+  "fips": "48209",
+  "population": 280486,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hemphill",
+  "slug": "hemphill",
+  "fips": "48211",
+  "population": 3189,
+  "has_bail_board": false
+ },
+ {
+  "name": "Henderson",
+  "slug": "henderson",
+  "fips": "48213",
+  "population": 86158,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hidalgo",
+  "slug": "hidalgo",
+  "fips": "48215",
+  "population": 898471,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hill",
+  "slug": "hill",
+  "fips": "48217",
+  "population": 38101,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hockley",
+  "slug": "hockley",
+  "fips": "48219",
+  "population": 21460,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hood",
+  "slug": "hood",
+  "fips": "48221",
+  "population": 67774,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hopkins",
+  "slug": "hopkins",
+  "fips": "48223",
+  "population": 38172,
+  "has_bail_board": true
+ },
+ {
+  "name": "Houston",
+  "slug": "houston",
+  "fips": "48225",
+  "population": 22066,
+  "has_bail_board": true
+ },
+ {
+  "name": "Howard",
+  "slug": "howard",
+  "fips": "48227",
+  "population": 30554,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hudspeth",
+  "slug": "hudspeth",
+  "fips": "48229",
+  "population": 3451,
+  "has_bail_board": false
+ },
+ {
+  "name": "Hunt",
+  "slug": "hunt",
+  "fips": "48231",
+  "population": 113347,
+  "has_bail_board": true
+ },
+ {
+  "name": "Hutchinson",
+  "slug": "hutchinson",
+  "fips": "48233",
+  "population": 20033,
+  "has_bail_board": false
+ },
+ {
+  "name": "Irion",
+  "slug": "irion",
+  "fips": "48235",
+  "population": 1549,
+  "has_bail_board": false
+ },
+ {
+  "name": "Jack",
+  "slug": "jack",
+  "fips": "48237",
+  "population": 8875,
+  "has_bail_board": false
+ },
+ {
+  "name": "Jackson",
+  "slug": "jackson",
+  "fips": "48239",
+  "population": 15221,
+  "has_bail_board": false
+ },
+ {
+  "name": "Jasper",
+  "slug": "jasper",
+  "fips": "48241",
+  "population": 32694,
+  "has_bail_board": true
+ },
+ {
+  "name": "Jeff Davis",
+  "slug": "jeff-davis",
+  "fips": "48243",
+  "population": 1856,
+  "has_bail_board": false
+ },
+ {
+  "name": "Jefferson",
+  "slug": "jefferson",
+  "fips": "48245",
+  "population": 251496,
+  "has_bail_board": true
+ },
+ {
+  "name": "Jim Hogg",
+  "slug": "jim-hogg",
+  "fips": "48247",
+  "population": 4720,
+  "has_bail_board": false
+ },
+ {
+  "name": "Jim Wells",
+  "slug": "jim-wells",
+  "fips": "48249",
+  "population": 38662,
+  "has_bail_board": true
+ },
+ {
+  "name": "Johnson",
+  "slug": "johnson",
+  "fips": "48251",
+  "population": 202906,
+  "has_bail_board": true
+ },
+ {
+  "name": "Jones",
+  "slug": "jones",
+  "fips": "48253",
+  "population": 20381,
+  "has_bail_board": false
+ },
+ {
+  "name": "Karnes",
+  "slug": "karnes",
+  "fips": "48255",
+  "population": 15018,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kaufman",
+  "slug": "kaufman",
+  "fips": "48257",
+  "population": 185690,
+  "has_bail_board": true
+ },
+ {
+  "name": "Kendall",
+  "slug": "kendall",
+  "fips": "48259",
+  "population": 50537,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kenedy",
+  "slug": "kenedy",
+  "fips": "48261",
+  "population": 343,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kent",
+  "slug": "kent",
+  "fips": "48263",
+  "population": 734,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kerr",
+  "slug": "kerr",
+  "fips": "48265",
+  "population": 53915,
+  "has_bail_board": true
+ },
+ {
+  "name": "Kimble",
+  "slug": "kimble",
+  "fips": "48267",
+  "population": 4442,
+  "has_bail_board": false
+ },
+ {
+  "name": "King",
+  "slug": "king",
+  "fips": "48269",
+  "population": 217,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kinney",
+  "slug": "kinney",
+  "fips": "48271",
+  "population": 3148,
+  "has_bail_board": false
+ },
+ {
+  "name": "Kleberg",
+  "slug": "kleberg",
+  "fips": "48273",
+  "population": 30069,
+  "has_bail_board": false
+ },
+ {
+  "name": "Knox",
+  "slug": "knox",
+  "fips": "48275",
+  "population": 3302,
+  "has_bail_board": false
+ },
+ {
+  "name": "La Salle",
+  "slug": "la-salle",
+  "fips": "48283",
+  "population": 6537,
+  "has_bail_board": false
+ },
+ {
+  "name": "Lamar",
+  "slug": "lamar",
+  "fips": "48277",
+  "population": 51127,
+  "has_bail_board": true
+ },
+ {
+  "name": "Lamb",
+  "slug": "lamb",
+  "fips": "48279",
+  "population": 12711,
+  "has_bail_board": true
+ },
+ {
+  "name": "Lampasas",
+  "slug": "lampasas",
+  "fips": "48281",
+  "population": 23262,
+  "has_bail_board": false
+ },
+ {
+  "name": "Lavaca",
+  "slug": "lavaca",
+  "fips": "48285",
+  "population": 20571,
+  "has_bail_board": false
+ },
+ {
+  "name": "Lee",
+  "slug": "lee",
+  "fips": "48287",
+  "population": 18240,
+  "has_bail_board": false
+ },
+ {
+  "name": "Leon",
+  "slug": "leon",
+  "fips": "48289",
+  "population": 16538,
+  "has_bail_board": true
+ },
+ {
+  "name": "Liberty",
+  "slug": "liberty",
+  "fips": "48291",
+  "population": 108272,
+  "has_bail_board": true
+ },
+ {
+  "name": "Limestone",
+  "slug": "limestone",
+  "fips": "48293",
+  "population": 22250,
+  "has_bail_board": true
+ },
+ {
+  "name": "Lipscomb",
+  "slug": "lipscomb",
+  "fips": "48295",
+  "population": 2906,
+  "has_bail_board": false
+ },
+ {
+  "name": "Live Oak",
+  "slug": "live-oak",
+  "fips": "48297",
+  "population": 11584,
+  "has_bail_board": false
+ },
+ {
+  "name": "Llano",
+  "slug": "llano",
+  "fips": "48299",
+  "population": 22875,
+  "has_bail_board": false
+ },
+ {
+  "name": "Loving",
+  "slug": "loving",
+  "fips": "48301",
+  "population": 43,
+  "has_bail_board": false
+ },
+ {
+  "name": "Lubbock",
+  "slug": "lubbock",
+  "fips": "48303",
+  "population": 320940,
+  "has_bail_board": true
+ },
+ {
+  "name": "Lynn",
+  "slug": "lynn",
+  "fips": "48305",
+  "population": 5761,
+  "has_bail_board": false
+ },
+ {
+  "name": "Madison",
+  "slug": "madison",
+  "fips": "48313",
+  "population": 13742,
+  "has_bail_board": false
+ },
+ {
+  "name": "Marion",
+  "slug": "marion",
+  "fips": "48315",
+  "population": 9571,
+  "has_bail_board": false
+ },
+ {
+  "name": "Martin",
+  "slug": "martin",
+  "fips": "48317",
+  "population": 5216,
+  "has_bail_board": false
+ },
+ {
+  "name": "Mason",
+  "slug": "mason",
+  "fips": "48319",
+  "population": 3931,
+  "has_bail_board": false
+ },
+ {
+  "name": "Matagorda",
+  "slug": "matagorda",
+  "fips": "48321",
+  "population": 36359,
+  "has_bail_board": true
+ },
+ {
+  "name": "Maverick",
+  "slug": "maverick",
+  "fips": "48323",
+  "population": 57762,
+  "has_bail_board": false
+ },
+ {
+  "name": "McCulloch",
+  "slug": "mcculloch",
+  "fips": "48307",
+  "population": 7452,
+  "has_bail_board": false
+ },
+ {
+  "name": "McLennan",
+  "slug": "mclennan",
+  "fips": "48309",
+  "population": 268583,
+  "has_bail_board": true
+ },
+ {
+  "name": "McMullen",
+  "slug": "mcmullen",
+  "fips": "48311",
+  "population": 568,
+  "has_bail_board": false
+ },
+ {
+  "name": "Medina",
+  "slug": "medina",
+  "fips": "48325",
+  "population": 54797,
+  "has_bail_board": false
+ },
+ {
+  "name": "Menard",
+  "slug": "menard",
+  "fips": "48327",
+  "population": 1958,
+  "has_bail_board": false
+ },
+ {
+  "name": "Midland",
+  "slug": "midland",
+  "fips": "48329",
+  "population": 177108,
+  "has_bail_board": true
+ },
+ {
+  "name": "Milam",
+  "slug": "milam",
+  "fips": "48331",
+  "population": 25951,
+  "has_bail_board": false
+ },
+ {
+  "name": "Mills",
+  "slug": "mills",
+  "fips": "48333",
+  "population": 4548,
+  "has_bail_board": false
+ },
+ {
+  "name": "Mitchell",
+  "slug": "mitchell",
+  "fips": "48335",
+  "population": 9075,
+  "has_bail_board": false
+ },
+ {
+  "name": "Montague",
+  "slug": "montague",
+  "fips": "48337",
+  "population": 21598,
+  "has_bail_board": false
+ },
+ {
+  "name": "Montgomery",
+  "slug": "montgomery",
+  "fips": "48339",
+  "population": 711354,
+  "has_bail_board": true
+ },
+ {
+  "name": "Moore",
+  "slug": "moore",
+  "fips": "48341",
+  "population": 21190,
+  "has_bail_board": false
+ },
+ {
+  "name": "Morris",
+  "slug": "morris",
+  "fips": "48343",
+  "population": 12066,
+  "has_bail_board": false
+ },
+ {
+  "name": "Motley",
+  "slug": "motley",
+  "fips": "48345",
+  "population": 1020,
+  "has_bail_board": false
+ },
+ {
+  "name": "Nacogdoches",
+  "slug": "nacogdoches",
+  "fips": "48347",
+  "population": 65375,
+  "has_bail_board": false
+ },
+ {
+  "name": "Navarro",
+  "slug": "navarro",
+  "fips": "48349",
+  "population": 55635,
+  "has_bail_board": true
+ },
+ {
+  "name": "Newton",
+  "slug": "newton",
+  "fips": "48351",
+  "population": 12039,
+  "has_bail_board": false
+ },
+ {
+  "name": "Nolan",
+  "slug": "nolan",
+  "fips": "48353",
+  "population": 14306,
+  "has_bail_board": false
+ },
+ {
+  "name": "Nueces",
+  "slug": "nueces",
+  "fips": "48355",
+  "population": 352289,
+  "has_bail_board": true
+ },
+ {
+  "name": "Ochiltree",
+  "slug": "ochiltree",
+  "fips": "48357",
+  "population": 9704,
+  "has_bail_board": false
+ },
+ {
+  "name": "Oldham",
+  "slug": "oldham",
+  "fips": "48359",
+  "population": 1783,
+  "has_bail_board": false
+ },
+ {
+  "name": "Orange",
+  "slug": "orange",
+  "fips": "48361",
+  "population": 85722,
+  "has_bail_board": true
+ },
+ {
+  "name": "Palo Pinto",
+  "slug": "palo-pinto",
+  "fips": "48363",
+  "population": 29747,
+  "has_bail_board": false
+ },
+ {
+  "name": "Panola",
+  "slug": "panola",
+  "fips": "48365",
+  "population": 22838,
+  "has_bail_board": false
+ },
+ {
+  "name": "Parker",
+  "slug": "parker",
+  "fips": "48367",
+  "population": 173494,
+  "has_bail_board": true
+ },
+ {
+  "name": "Parmer",
+  "slug": "parmer",
+  "fips": "48369",
+  "population": 9617,
+  "has_bail_board": false
+ },
+ {
+  "name": "Pecos",
+  "slug": "pecos",
+  "fips": "48371",
+  "population": 14623,
+  "has_bail_board": false
+ },
+ {
+  "name": "Polk",
+  "slug": "polk",
+  "fips": "48373",
+  "population": 54186,
+  "has_bail_board": true
+ },
+ {
+  "name": "Potter",
+  "slug": "potter",
+  "fips": "48375",
+  "population": 114647,
+  "has_bail_board": true
+ },
+ {
+  "name": "Presidio",
+  "slug": "presidio",
+  "fips": "48377",
+  "population": 5795,
+  "has_bail_board": false
+ },
+ {
+  "name": "Rains",
+  "slug": "rains",
+  "fips": "48379",
+  "population": 12986,
+  "has_bail_board": false
+ },
+ {
+  "name": "Randall",
+  "slug": "randall",
+  "fips": "48381",
+  "population": 148255,
+  "has_bail_board": true
+ },
+ {
+  "name": "Reagan",
+  "slug": "reagan",
+  "fips": "48383",
+  "population": 3141,
+  "has_bail_board": false
+ },
+ {
+  "name": "Real",
+  "slug": "real",
+  "fips": "48385",
+  "population": 2854,
+  "has_bail_board": false
+ },
+ {
+  "name": "Red River",
+  "slug": "red-river",
+  "fips": "48387",
+  "population": 11678,
+  "has_bail_board": true
+ },
+ {
+  "name": "Reeves",
+  "slug": "reeves",
+  "fips": "48389",
+  "population": 11770,
+  "has_bail_board": false
+ },
+ {
+  "name": "Refugio",
+  "slug": "refugio",
+  "fips": "48391",
+  "population": 6666,
+  "has_bail_board": false
+ },
+ {
+  "name": "Roberts",
+  "slug": "roberts",
+  "fips": "48393",
+  "population": 840,
+  "has_bail_board": false
+ },
+ {
+  "name": "Robertson",
+  "slug": "robertson",
+  "fips": "48395",
+  "population": 17267,
+  "has_bail_board": false
+ },
+ {
+  "name": "Rockwall",
+  "slug": "rockwall",
+  "fips": "48397",
+  "population": 131307,
+  "has_bail_board": true
+ },
+ {
+  "name": "Runnels",
+  "slug": "runnels",
+  "fips": "48399",
+  "population": 9868,
+  "has_bail_board": false
+ },
+ {
+  "name": "Rusk",
+  "slug": "rusk",
+  "fips": "48401",
+  "population": 53079,
+  "has_bail_board": false
+ },
+ {
+  "name": "Sabine",
+  "slug": "sabine",
+  "fips": "48403",
+  "population": 10106,
+  "has_bail_board": false
+ },
+ {
+  "name": "San Augustine",
+  "slug": "san-augustine",
+  "fips": "48405",
+  "population": 7833,
+  "has_bail_board": false
+ },
+ {
+  "name": "San Jacinto",
+  "slug": "san-jacinto",
+  "fips": "48407",
+  "population": 28936,
+  "has_bail_board": false
+ },
+ {
+  "name": "San Patricio",
+  "slug": "san-patricio",
+  "fips": "48409",
+  "population": 70660,
+  "has_bail_board": true
+ },
+ {
+  "name": "San Saba",
+  "slug": "san-saba",
+  "fips": "48411",
+  "population": 5845,
+  "has_bail_board": false
+ },
+ {
+  "name": "Schleicher",
+  "slug": "schleicher",
+  "fips": "48413",
+  "population": 2391,
+  "has_bail_board": false
+ },
+ {
+  "name": "Scurry",
+  "slug": "scurry",
+  "fips": "48415",
+  "population": 16212,
+  "has_bail_board": false
+ },
+ {
+  "name": "Shackelford",
+  "slug": "shackelford",
+  "fips": "48417",
+  "population": 3229,
+  "has_bail_board": false
+ },
+ {
+  "name": "Shelby",
+  "slug": "shelby",
+  "fips": "48419",
+  "population": 24179,
+  "has_bail_board": false
+ },
+ {
+  "name": "Sherman",
+  "slug": "sherman",
+  "fips": "48421",
+  "population": 2678,
+  "has_bail_board": false
+ },
+ {
+  "name": "Smith",
+  "slug": "smith",
+  "fips": "48423",
+  "population": 245209,
+  "has_bail_board": true
+ },
+ {
+  "name": "Somervell",
+  "slug": "somervell",
+  "fips": "48425",
+  "population": 9888,
+  "has_bail_board": false
+ },
+ {
+  "name": "Starr",
+  "slug": "starr",
+  "fips": "48427",
+  "population": 65934,
+  "has_bail_board": false
+ },
+ {
+  "name": "Stephens",
+  "slug": "stephens",
+  "fips": "48429",
+  "population": 9343,
+  "has_bail_board": false
+ },
+ {
+  "name": "Sterling",
+  "slug": "sterling",
+  "fips": "48431",
+  "population": 1397,
+  "has_bail_board": false
+ },
+ {
+  "name": "Stonewall",
+  "slug": "stonewall",
+  "fips": "48433",
+  "population": 1218,
+  "has_bail_board": false
+ },
+ {
+  "name": "Sutton",
+  "slug": "sutton",
+  "fips": "48435",
+  "population": 3221,
+  "has_bail_board": false
+ },
+ {
+  "name": "Swisher",
+  "slug": "swisher",
+  "fips": "48437",
+  "population": 6955,
+  "has_bail_board": false
+ },
+ {
+  "name": "Tarrant",
+  "slug": "tarrant",
+  "fips": "48439",
+  "population": 2182947,
+  "has_bail_board": true
+ },
+ {
+  "name": "Taylor",
+  "slug": "taylor",
+  "fips": "48441",
+  "population": 146836,
+  "has_bail_board": true
+ },
+ {
+  "name": "Terrell",
+  "slug": "terrell",
+  "fips": "48443",
+  "population": 687,
+  "has_bail_board": false
+ },
+ {
+  "name": "Terry",
+  "slug": "terry",
+  "fips": "48445",
+  "population": 11547,
+  "has_bail_board": false
+ },
+ {
+  "name": "Throckmorton",
+  "slug": "throckmorton",
+  "fips": "48447",
+  "population": 1526,
+  "has_bail_board": false
+ },
+ {
+  "name": "Titus",
+  "slug": "titus",
+  "fips": "48449",
+  "population": 31357,
+  "has_bail_board": true
+ },
+ {
+  "name": "Tom Green",
+  "slug": "tom-green",
+  "fips": "48451",
+  "population": 119057,
+  "has_bail_board": true
+ },
+ {
+  "name": "Travis",
+  "slug": "travis",
+  "fips": "48453",
+  "population": 1334961,
+  "has_bail_board": true
+ },
+ {
+  "name": "Trinity",
+  "slug": "trinity",
+  "fips": "48455",
+  "population": 14228,
+  "has_bail_board": false
+ },
+ {
+  "name": "Tyler",
+  "slug": "tyler",
+  "fips": "48457",
+  "population": 20382,
+  "has_bail_board": false
+ },
+ {
+  "name": "Upshur",
+  "slug": "upshur",
+  "fips": "48459",
+  "population": 43281,
+  "has_bail_board": false
+ },
+ {
+  "name": "Upton",
+  "slug": "upton",
+  "fips": "48461",
+  "population": 3109,
+  "has_bail_board": false
+ },
+ {
+  "name": "Uvalde",
+  "slug": "uvalde",
+  "fips": "48463",
+  "population": 24960,
+  "has_bail_board": false
+ },
+ {
+  "name": "Val Verde",
+  "slug": "val-verde",
+  "fips": "48465",
+  "population": 47720,
+  "has_bail_board": false
+ },
+ {
+  "name": "Van Zandt",
+  "slug": "van-zandt",
+  "fips": "48467",
+  "population": 64000,
+  "has_bail_board": false
+ },
+ {
+  "name": "Victoria",
+  "slug": "victoria",
+  "fips": "48469",
+  "population": 91664,
+  "has_bail_board": false
+ },
+ {
+  "name": "Walker",
+  "slug": "walker",
+  "fips": "48471",
+  "population": 81268,
+  "has_bail_board": true
+ },
+ {
+  "name": "Waller",
+  "slug": "waller",
+  "fips": "48473",
+  "population": 63553,
+  "has_bail_board": true
+ },
+ {
+  "name": "Ward",
+  "slug": "ward",
+  "fips": "48475",
+  "population": 10966,
+  "has_bail_board": false
+ },
+ {
+  "name": "Washington",
+  "slug": "washington",
+  "fips": "48477",
+  "population": 37007,
+  "has_bail_board": true
+ },
+ {
+  "name": "Webb",
+  "slug": "webb",
+  "fips": "48479",
+  "population": 269148,
+  "has_bail_board": true
+ },
+ {
+  "name": "Wharton",
+  "slug": "wharton",
+  "fips": "48481",
+  "population": 41739,
+  "has_bail_board": true
+ },
+ {
+  "name": "Wheeler",
+  "slug": "wheeler",
+  "fips": "48483",
+  "population": 4804,
+  "has_bail_board": false
+ },
+ {
+  "name": "Wichita",
+  "slug": "wichita",
+  "fips": "48485",
+  "population": 130180,
+  "has_bail_board": true
+ },
+ {
+  "name": "Wilbarger",
+  "slug": "wilbarger",
+  "fips": "48487",
+  "population": 12522,
+  "has_bail_board": false
+ },
+ {
+  "name": "Willacy",
+  "slug": "willacy",
+  "fips": "48489",
+  "population": 20037,
+  "has_bail_board": true
+ },
+ {
+  "name": "Williamson",
+  "slug": "williamson",
+  "fips": "48491",
+  "population": 697191,
+  "has_bail_board": true
+ },
+ {
+  "name": "Wilson",
+  "slug": "wilson",
+  "fips": "48493",
+  "population": 54183,
+  "has_bail_board": false
+ },
+ {
+  "name": "Winkler",
+  "slug": "winkler",
+  "fips": "48495",
+  "population": 7414,
+  "has_bail_board": false
+ },
+ {
+  "name": "Wise",
+  "slug": "wise",
+  "fips": "48497",
+  "population": 78097,
+  "has_bail_board": true
+ },
+ {
+  "name": "Wood",
+  "slug": "wood",
+  "fips": "48499",
+  "population": 47921,
+  "has_bail_board": false
+ },
+ {
+  "name": "Yoakum",
+  "slug": "yoakum",
+  "fips": "48501",
+  "population": 7468,
+  "has_bail_board": false
+ },
+ {
+  "name": "Young",
+  "slug": "young",
+  "fips": "48503",
+  "population": 18124,
+  "has_bail_board": false
+ },
+ {
+  "name": "Zapata",
+  "slug": "zapata",
+  "fips": "48505",
+  "population": 13736,
+  "has_bail_board": false
+ },
+ {
+  "name": "Zavala",
+  "slug": "zavala",
+  "fips": "48507",
+  "population": 9312,
+  "has_bail_board": false
+ }
+]
