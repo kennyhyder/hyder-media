@@ -64,3 +64,13 @@ pattern in any new canary.
 Env: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `CRON_SECRET`,
 `RESEND_API_KEY` (trim-read; alerts are best-effort if missing).
 Manual run: `curl -H "Authorization: Bearer $CRON_SECRET" https://hyder.me/api/seo/cron-coverage-check`.
+
+## Census Fleet additions (2026-07-22)
+
+| Handler | Schedule | What |
+|---|---|---|
+| `cron-gsc-fleet-watch` | 07:20 + 19:20 UTC | Per census domain: live robots.txt/sitemap-index health, GSC sitemap errors → auto-resubmit, homepage URL-inspection. Snapshots → `mc_gsc_watch` (MC project). Alerts throttled 12h (`sb_alert_throttle` key `gsc-fleet`) |
+| `cron-gsc-opportunities` | Mon+Thu 08:05 UTC | Self-feedback engine: 14d-vs-14d GSC risers + pos-8–30 opportunity queries + query-theme page suggestions + category momentum → `mc_seo_opportunities`; IndexNow-pings risers + their category hubs. No emails |
+| `fleet-trending` (not a cron) | public GET | Latest opportunity snapshot per domain, CORS *, 1h edge cache. Consumed by census-app `TrendingNow` widgets + censusfleet.com/admin |
+
+Fleet env on hyder-me-ecaw: `GSC_CLIENT_ID/SECRET`, `GSC_FLEET_REFRESH_TOKEN`, `MC_SUPABASE_URL/SERVICE_KEY`, per-property `*CENSUS_SUPABASE_URL/KEY` pairs.
