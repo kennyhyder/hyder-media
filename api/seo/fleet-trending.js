@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     const mc = createClient(process.env.MC_SUPABASE_URL.trim(), process.env.MC_SUPABASE_SERVICE_KEY.trim());
     let q = mc.from("mc_seo_opportunities")
-      .select("domain, created_at, risers, opportunities, categories, pinged")
+      .select("domain, created_at, risers, opportunities, categories, pinged, suggested_pages")
       .order("created_at", { ascending: false });
     if (domain) q = q.eq("domain", domain).limit(1);
     else q = q.limit(8);

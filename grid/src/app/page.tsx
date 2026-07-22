@@ -1,3 +1,4 @@
+import { TrendingNow } from "@/components/TrendingNow";
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL, SITE_TAGLINE, SITE_DESCRIPTION } from "@/lib/site";
 import { national } from "@/lib/rollups";
@@ -272,6 +273,7 @@ export default async function HomePage() {
       </div>
 
       <UpgradeCTA />
+      <TrendingNow domain="gridcensus.com" />
     </div>
   );
 }

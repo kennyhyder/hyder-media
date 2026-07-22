@@ -102,6 +102,27 @@ async function analyzeDomain(at, domain) {
     .sort((a, b) => b.impressions - a.impressions)
     .slice(0, 25);
 
+  // v2: recurring query THEMES -> suggested new pages. Strip geography +
+  // numbers to get a signature; >=3 distinct queries sharing one = a theme
+  // worth a dedicated page (surfaced on the dash, not auto-published yet).
+  const STATES = "alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming";
+  const geoRe = new RegExp(`\\b(${STATES})\\b`, "gi");
+  const themes = {};
+  for (const q of queriesCur) {
+    if (q.position < 8 || q.position > 40 || q.impressions < 5) continue;
+    const sig = q.keys[0].toLowerCase().replace(geoRe, "{state}").replace(/\d+/g, "{n}")
+      .replace(/\s+/g, " ").trim();
+    if (sig === q.keys[0].toLowerCase()) continue;      // no geo/number = not templatable
+    themes[sig] ??= { queries: [], impressions: 0 };
+    if (themes[sig].queries.length < 6) themes[sig].queries.push(q.keys[0]);
+    themes[sig].impressions += q.impressions;
+  }
+  const suggestedPages = Object.entries(themes)
+    .filter(([, v]) => v.queries.length >= 3)
+    .map(([sig, v]) => ({ theme: sig, impressions: v.impressions, examples: v.queries }))
+    .sort((a, b) => b.impressions - a.impressions)
+    .slice(0, 8);
+
   // category momentum
   const cats = {};
   for (const r of risers) {
@@ -113,7 +134,11 @@ async function analyzeDomain(at, domain) {
   // IndexNow-ping top risers (freshness/recrawl nudge)
   let pinged = 0;
   const key = INDEXNOW_KEYS[domain];
-  const urls = risers.slice(0, 20).map((r) => r.page).filter((u) => u.includes(domain));
+  const hubUrls = [...new Set(risers.slice(0, 20)
+    .map((r) => { try { const seg = new URL(r.page).pathname.split("/").filter(Boolean); return seg.length > 1 ? `https://${domain}/${seg[0]}` : null; } catch { return null; } })
+    .filter(Boolean))];
+  const urls = [...new Set([...risers.slice(0, 20).map((r) => r.page), ...hubUrls])]
+    .filter((u) => u.includes(domain));
   if (key && urls.length) {
     const r = await fetch("https://api.indexnow.org/indexnow", {
       method: "POST",
@@ -122,7 +147,7 @@ async function analyzeDomain(at, domain) {
     }).catch(() => null);
     pinged = r && r.ok ? urls.length : 0;
   }
-  return { domain, risers, opportunities: opps, categories: cats, pinged };
+  return { domain, risers, opportunities: opps, categories: cats, pinged, suggestedPages };
 }
 
 export default async function handler(req, res) {
@@ -137,7 +162,7 @@ export default async function handler(req, res) {
     const mc = createClient(process.env.MC_SUPABASE_URL.trim(), process.env.MC_SUPABASE_SERVICE_KEY.trim());
     await mc.from("mc_seo_opportunities").insert(results.map((r) => ({
       domain: r.domain, risers: r.risers, opportunities: r.opportunities,
-      categories: r.categories, pinged: r.pinged,
+      categories: r.categories, pinged: r.pinged, suggested_pages: r.suggestedPages,
     })));
     return res.status(200).json({
       analyzed: results.length,
