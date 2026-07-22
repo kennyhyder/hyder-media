@@ -28,6 +28,12 @@ if os.path.exists(jails_path):
     for j in json.load(open(jails_path)):
         jails[j['county']] = j
 
+boards = {}
+boards_path = os.path.join(DATA, 'boards.json')
+if os.path.exists(boards_path):
+    for b in json.load(open(boards_path)):
+        boards[b['county']] = b
+
 CSS = """
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -108,6 +114,17 @@ def page(title, body, depth=0):
 </body>
 </html>"""
 
+def board_links(c):
+    b = boards.get(c['name'])
+    if not b:
+        return ''
+    links = []
+    if b.get('board_url'):
+        links.append(f'<a href="{b["board_url"]}" rel="nofollow">{c["name"]} County Bail Bond Board</a>')
+    if b.get('roster_url'):
+        links.append(f'<a href="{b["roster_url"]}" rel="nofollow">Licensed bondsmen roster</a>')
+    return f'<p>Official resources: {" · ".join(links)}</p>' if links else ''
+
 def county_page(c):
     jail = jails.get(c['name'])
     board_badge = ('<span class="badge">County Bail Bond Board</span>' if c['has_bail_board']
@@ -143,6 +160,7 @@ def county_page(c):
 <div class="card">
   <h2>Bail Bond Licensing in {c['name']} County</h2>
   <p>{board_text}</p>
+  {board_links(c)}
 </div>
 {jail_block}
 {HOW_BAIL_WORKS}

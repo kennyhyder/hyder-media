@@ -1,0 +1,302 @@
+[
+ {
+  "county": "Harris",
+  "fips": "48201",
+  "facility": "Harris County Jail (Harris County Sheriff's Office)",
+  "address": "701 N. San Jacinto St.",
+  "city": "Houston",
+  "zip": "77002",
+  "phone": "(713) 755-5300",
+  "inmate_search_url": "https://www.harriscountyso.org/JailInfo/FindSomeoneInJail"
+ },
+ {
+  "county": "Dallas",
+  "fips": "48113",
+  "facility": "Lew Sterrett Justice Center (North Tower Detention Facility)",
+  "address": "111 W. Commerce St.",
+  "city": "Dallas",
+  "zip": "75202",
+  "phone": "(214) 761-9025",
+  "inmate_search_url": "https://www.dallascounty.org/jaillookup/"
+ },
+ {
+  "county": "Tarrant",
+  "fips": "48439",
+  "facility": "Tarrant County Corrections Center",
+  "address": "100 N. Lamar St.",
+  "city": "Fort Worth",
+  "zip": "76196",
+  "phone": "(817) 884-3116",
+  "inmate_search_url": "https://inmatesearch.tarrantcounty.com/"
+ },
+ {
+  "county": "Bexar",
+  "fips": "48029",
+  "facility": "Bexar County Adult Detention Center",
+  "address": "200 N. Comal St.",
+  "city": "San Antonio",
+  "zip": "78207",
+  "phone": "(210) 335-6315",
+  "inmate_search_url": "https://centralmagistrate.bexar.org/"
+ },
+ {
+  "county": "Travis",
+  "fips": "48453",
+  "facility": "Travis County Correctional Complex",
+  "address": "3614 Bill Price Rd.",
+  "city": "Del Valle",
+  "zip": "78617",
+  "phone": "(512) 854-4180",
+  "inmate_search_url": "https://www.tcsheriff.org/inmate-jail-info/inmate-info/find-an-inmate"
+ },
+ {
+  "county": "Collin",
+  "fips": "48085",
+  "facility": "Collin County Detention Facility",
+  "address": "4300 Community Ave.",
+  "city": "McKinney",
+  "zip": "75071",
+  "phone": "(972) 547-5200",
+  "inmate_search_url": "https://apps2.collincountytx.gov/judicialrecords/inmate"
+ },
+ {
+  "county": "Denton",
+  "fips": "48121",
+  "facility": "Denton County Jail (Denton County Sheriff's Office)",
+  "address": "127 N. Woodrow Ln.",
+  "city": "Denton",
+  "zip": "76205",
+  "phone": "(940) 349-1700",
+  "inmate_search_url": "https://justice1.dentoncounty.gov/PublicAccess/JailingSearch.aspx?ID=400"
+ },
+ {
+  "county": "Hidalgo",
+  "fips": "48215",
+  "facility": "Hidalgo County Adult Detention Center",
+  "address": "701 E. El Cibolo Rd.",
+  "city": "Edinburg",
+  "zip": "78541",
+  "phone": "(956) 381-7900",
+  "inmate_search_url": "https://pa.co.hidalgo.tx.us/default.aspx"
+ },
+ {
+  "county": "El Paso",
+  "fips": "48141",
+  "facility": "El Paso County Downtown Detention Facility",
+  "address": "601 E. Overland Ave.",
+  "city": "El Paso",
+  "zip": "79901",
+  "phone": "(915) 273-3770",
+  "inmate_search_url": "https://portal-txelpaso.tylertech.cloud/PublicAccess/default.aspx"
+ },
+ {
+  "county": "Fort Bend",
+  "fips": "48157",
+  "facility": "Fort Bend County Jail (Sheriff's Office Detention Division)",
+  "address": "1410 Richmond Parkway",
+  "city": "Richmond",
+  "zip": "77469",
+  "phone": "(281) 341-4735",
+  "inmate_search_url": "https://jailinq.fortbendcountytx.gov/"
+ },
+ {
+  "county": "Montgomery",
+  "fips": "48339",
+  "facility": "Montgomery County Jail",
+  "address": "1 Criminal Justice Dr",
+  "city": "Conroe",
+  "zip": "77301",
+  "phone": "(936) 760-5800",
+  "inmate_search_url": "https://jailroster.mctx.org/InmateLookup/login"
+ },
+ {
+  "county": "Williamson",
+  "fips": "48491",
+  "facility": "Williamson County Jail",
+  "address": "306 W 4th St",
+  "city": "Georgetown",
+  "zip": "78626",
+  "phone": "(512) 943-1365",
+  "inmate_search_url": "https://judicialrecords.wilco.org/PublicAccess/JailingSearch.aspx?ID=400"
+ },
+ {
+  "county": "Cameron",
+  "fips": "48061",
+  "facility": "Carrizales-Rucker Cameron County Detention Center",
+  "address": "7100 Old Alice Rd",
+  "city": "Olmito",
+  "zip": "78575",
+  "phone": "(956) 554-6701",
+  "inmate_search_url": "https://www.cameroncountytx.gov/incoming/inmates/site/"
+ },
+ {
+  "county": "Nueces",
+  "fips": "48355",
+  "facility": "Nueces County Jail",
+  "address": "901 Leopard St",
+  "city": "Corpus Christi",
+  "zip": "78401",
+  "phone": "(361) 887-2300",
+  "inmate_search_url": null
+ },
+ {
+  "county": "Brazoria",
+  "fips": "48039",
+  "facility": "Brazoria County Detention Center",
+  "address": "3602 County Road 45",
+  "city": "Angleton",
+  "zip": "77515",
+  "phone": "(979) 864-2336",
+  "inmate_search_url": "https://pubweb.brazoriacountytx.gov/PublicAccess/JailingSearch.aspx"
+ },
+ {
+  "county": "Bell",
+  "fips": "48027",
+  "facility": "Bell County Jail",
+  "address": "113 W Central Ave",
+  "city": "Belton",
+  "zip": "76513",
+  "phone": "(254) 933-5400",
+  "inmate_search_url": "https://nwweb.bellcounty.texas.gov/NewWorld.InmateInquiry/TX0140000"
+ },
+ {
+  "county": "Galveston",
+  "fips": "48167",
+  "facility": "Galveston County Jail",
+  "address": "5700 Avenue H",
+  "city": "Galveston",
+  "zip": "77551",
+  "phone": "(409) 766-2315",
+  "inmate_search_url": "https://p2c.galvestoncountytx.gov/jailinmates.aspx"
+ },
+ {
+  "county": "Lubbock",
+  "fips": "48303",
+  "facility": "Lubbock County Detention Center",
+  "address": "3502 N Holly Ave",
+  "city": "Lubbock",
+  "zip": "79403",
+  "phone": "(806) 775-7009",
+  "inmate_search_url": "https://publicrecords.lubbockcounty.gov/JailRoster/"
+ },
+ {
+  "county": "Webb",
+  "fips": "48479",
+  "facility": "Webb County Jail",
+  "address": "1001 Washington St",
+  "city": "Laredo",
+  "zip": "78040",
+  "phone": "(956) 523-4400",
+  "inmate_search_url": "https://webbcountytx.gov/Sheriff/BookingJailSearch/"
+ },
+ {
+  "county": "Jefferson",
+  "fips": "48245",
+  "facility": "Jefferson County Correctional Facility",
+  "address": "5030 Highway 69 S",
+  "city": "Beaumont",
+  "zip": "77705",
+  "phone": "(409) 835-8411",
+  "inmate_search_url": "https://sheriff.jeffersoncountytx.gov/inmateSearch"
+ },
+ {
+  "county": "McLennan",
+  "fips": "48309",
+  "facility": "McLennan County Jail (Highway 6)",
+  "address": "3201 E Highway 6",
+  "city": "Waco",
+  "zip": "76705",
+  "phone": "(254) 757-2555",
+  "inmate_search_url": "https://webapps.co.mclennan.tx.us/mugshots/"
+ },
+ {
+  "county": "Smith",
+  "fips": "48423",
+  "facility": "Smith County Jail",
+  "address": "206 E Elm St",
+  "city": "Tyler",
+  "zip": "75702",
+  "phone": "(903) 590-2800",
+  "inmate_search_url": "https://odysseypa.smith-county.com/PublicAccess/default.aspx"
+ },
+ {
+  "county": "Brazos",
+  "fips": "48041",
+  "facility": "Brazos County Detention Center",
+  "address": "1835 Sandy Point Rd",
+  "city": "Bryan",
+  "zip": "77807",
+  "phone": "(979) 361-4800",
+  "inmate_search_url": "https://portal-txbrazos.tylertech.cloud/BrazosPortal/"
+ },
+ {
+  "county": "Hays",
+  "fips": "48209",
+  "facility": "Hays County Jail",
+  "address": "1307 Uhland Rd",
+  "city": "San Marcos",
+  "zip": "78666",
+  "phone": "(512) 393-7800",
+  "inmate_search_url": null
+ },
+ {
+  "county": "Ellis",
+  "fips": "48139",
+  "facility": "Wayne McCollum Detention Center",
+  "address": "300 S Jackson St",
+  "city": "Waxahachie",
+  "zip": "75165",
+  "phone": "(972) 825-4931",
+  "inmate_search_url": "https://ecso.llhostings.com/"
+ },
+ {
+  "county": "Midland",
+  "fips": "48329",
+  "facility": "Midland County Jail (Central Detention Center)",
+  "address": "400 S Main St",
+  "city": "Midland",
+  "zip": "79701",
+  "phone": "(432) 688-4600",
+  "inmate_search_url": "https://www2.co.midland.tx.us/apps/inmates/search/"
+ },
+ {
+  "county": "Ector",
+  "fips": "48135",
+  "facility": "Ector County Detention Center",
+  "address": "2500 S US Highway 385",
+  "city": "Odessa",
+  "zip": "79766",
+  "phone": "(432) 335-3060",
+  "inmate_search_url": "https://portal-txector.tylertech.cloud/JailSearch/default.aspx"
+ },
+ {
+  "county": "Guadalupe",
+  "fips": "48187",
+  "facility": "Guadalupe County Adult Detention Center",
+  "address": "2615 N Guadalupe St",
+  "city": "Seguin",
+  "zip": "78155",
+  "phone": "(830) 303-6342",
+  "inmate_search_url": "https://portal-txguadalupe.tylertech.cloud/PublicAccess/default.aspx"
+ },
+ {
+  "county": "Comal",
+  "fips": "48091",
+  "facility": "Comal County Jail",
+  "address": "3000 IH 35 South",
+  "city": "New Braunfels",
+  "zip": "78130",
+  "phone": "(830) 620-3450",
+  "inmate_search_url": "http://public.co.comal.tx.us/default.aspx"
+ },
+ {
+  "county": "Potter",
+  "fips": "48375",
+  "facility": "Potter County Detention Center",
+  "address": "13100 NE 29th Ave",
+  "city": "Amarillo",
+  "zip": "79111",
+  "phone": "(806) 335-4100",
+  "inmate_search_url": "https://public.pottercountysheriff.org/pottersheriff/PrisonerAndTheirOffensesReport.pdf"
+ }
+]

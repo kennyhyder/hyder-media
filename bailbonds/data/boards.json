@@ -1,0 +1,52 @@
+[
+ {
+  "county": "Harris",
+  "board_url": "https://bailbond.harriscountytx.gov/",
+  "roster_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+ },
+ {
+  "county": "Dallas",
+  "board_url": "https://www.dallascounty.org/departments/bailbond/welcome.php",
+  "roster_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+ },
+ {
+  "county": "Tarrant",
+  "board_url": "https://www.tarrantcountytx.gov/en/commissioners-court/boards---commissions/bail-bond-board.html",
+  "roster_url": null
+ },
+ {
+  "county": "Bexar",
+  "board_url": "https://www.bexar.org/956/Bail-Bond-Board",
+  "roster_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+ },
+ {
+  "county": "Travis",
+  "board_url": "https://www.traviscountytx.gov/bail-bond-board",
+  "roster_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+ },
+ {
+  "county": "El Paso",
+  "board_url": "https://www.epcounty.com/919/Bail-Bond-Board",
+  "roster_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+ },
+ {
+  "county": "Collin",
+  "board_url": "https://www.collincountytx.gov/Government/Boards/Bail-Bond-Board",
+  "roster_url": null
+ },
+ {
+  "county": "Denton",
+  "board_url": "https://www.dentoncounty.gov/160/Bail-Bond-Board",
+  "roster_url": "https://www.dentoncounty.gov/161/Licensed-Bonding-Companies"
+ },
+ {
+  "county": "Montgomery",
+  "board_url": "https://www.mctx.org/departments/departments_a_-_c/bail_bond_board/index.php",
+  "roster_url": "https://www.mctx.org/departments/departments_a_-_c/bail_bond_board/rotation_lists.php"
+ },
+ {
+  "county": "Lubbock",
+  "board_url": "https://www.lubbockcounty.gov/egov/apps/document/center.egov?view=item&id=3307",
+  "roster_url": null
+ }
+]
