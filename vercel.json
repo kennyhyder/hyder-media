@@ -238,6 +238,10 @@
     {
       "path": "/api/dunham/bail-rank-snapshot",
       "schedule": "10 13 * * *"
+    },
+    {
+      "path": "/api/seo/cron-gsc-fleet-watch",
+      "schedule": "20 7,19 * * *"
     }
   ],
   "functions": {
@@ -303,6 +307,9 @@
     },
     "api/dunham/**/*.js": {
       "maxDuration": 60
+    },
+    "api/seo/cron-gsc-fleet-watch.js": {
+      "maxDuration": 120
     }
   }
 }
