@@ -242,6 +242,10 @@
     {
       "path": "/api/seo/cron-gsc-fleet-watch",
       "schedule": "20 7,19 * * *"
+    },
+    {
+      "path": "/api/seo/cron-gsc-opportunities",
+      "schedule": "5 8 * * 1,4"
     }
   ],
   "functions": {
