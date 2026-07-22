@@ -307,9 +307,6 @@
     },
     "api/dunham/**/*.js": {
       "maxDuration": 60
-    },
-    "api/seo/cron-gsc-fleet-watch.js": {
-      "maxDuration": 120
     }
   }
 }
