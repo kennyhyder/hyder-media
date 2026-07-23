@@ -246,6 +246,10 @@
     {
       "path": "/api/seo/cron-gsc-opportunities",
       "schedule": "5 8 * * 1,4"
+    },
+    {
+      "path": "/api/bailbonds/cron-places-enrich",
+      "schedule": "7 15 * * *"
     }
   ],
   "functions": {
@@ -311,6 +315,9 @@
     },
     "api/dunham/**/*.js": {
       "maxDuration": 60
+    },
+    "api/bailbonds/**/*.js": {
+      "maxDuration": 300
     }
   }
 }
