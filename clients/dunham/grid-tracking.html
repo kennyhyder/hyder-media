@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — Grid Tracking</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css">
+    <script src="/bailbonds/assets/leaflet/leaflet.js"></script>
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .container { max-width: 1240px; }
+        .muted { color: var(--text-secondary); font-size: 0.9rem; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 18px; }
+        .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 12px; }
+
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .controls select {
+            background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
+            border-radius: 8px; padding: 8px 12px; font-size: 0.9rem;
+        }
+        .kw-chip {
+            background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary);
+            border-radius: 999px; padding: 7px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+        .kw-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .controls .spacer { flex: 1; }
+
+        /* Business summary */
+        .biz-row { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+        .biz-info { flex: 1; min-width: 260px; }
+        .biz-name { font-size: 1.2rem; font-weight: 700; }
+        .biz-addr { color: var(--text-secondary); font-size: 0.9rem; margin: 2px 0 6px; }
+        .biz-rating { font-size: 0.9rem; }
+        .stars { color: #f59e0b; letter-spacing: 1px; }
+        .metric-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+        .mbadge {
+            border: 1px solid var(--border); border-radius: 10px; padding: 10px 18px;
+            text-align: center; min-width: 92px; background: var(--bg-tertiary);
+        }
+        .mbadge .k { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; color: var(--text-secondary); }
+        .mbadge .v { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .mbadge.good .v { color: var(--success); }
+        .mbadge.mid .v { color: var(--warning); }
+        .mbadge.bad .v { color: var(--danger); }
+        .grid-meta { color: var(--text-secondary); font-size: 0.83rem; margin-top: 10px; }
+
+        /* Map */
+        #grid-map { height: 560px; border-radius: 10px; }
+        .pin-ic {
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border-radius: 50%; color: #fff;
+            font-weight: 700; font-size: 12px; border: 2px solid rgba(255,255,255,0.85);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+        }
+        .leaflet-container { background: #1a2432; }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #0b1222; color: var(--text-primary); }
+        .leaflet-popup-content { font-size: 0.82rem; margin: 10px 12px; }
+
+        /* Insights */
+        .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+        .insight { border-left: 4px solid var(--accent); background: var(--bg-tertiary); border-radius: 0 10px 10px 0; padding: 14px 18px; }
+        .insight.green { border-left-color: var(--success); }
+        .insight.blue { border-left-color: var(--accent); }
+        .insight.red { border-left-color: var(--danger); }
+        .insight .t { font-weight: 700; font-size: 0.95rem; }
+        .insight .d { color: var(--text-secondary); font-size: 0.78rem; margin-bottom: 10px; }
+        .ins-vals { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.8rem; color: var(--text-secondary); }
+        .ins-vals .big { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); }
+        .ins-bar { background: var(--bg-primary); border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+        .ins-bar > div { height: 100%; border-radius: 4px; }
+
+        /* History sparkline */
+        .hist-wrap { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+        .hist-item { font-size: 0.82rem; color: var(--text-secondary); }
+        .hist-item b { color: var(--text-primary); }
+
+        /* Competitor table */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .data-table th { text-align: left; padding: 9px 10px; background: var(--bg-tertiary); font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; position: sticky; top: 0; }
+        .data-table td { padding: 10px; border-bottom: 1px solid rgba(71,85,105,0.35); vertical-align: top; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr.target { background: rgba(59,130,246,0.12); }
+        .table-scroll { overflow-x: auto; max-height: 720px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+        .rank-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 50%; background: var(--accent);
+            color: #fff; font-weight: 700; font-size: 0.78rem; flex-shrink: 0;
+        }
+        .comp-name { font-weight: 700; }
+        .comp-sub { color: var(--text-secondary); font-size: 0.8rem; }
+        .cat-tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+        .chip {
+            display: inline-block; min-width: 46px; text-align: center; padding: 3px 8px;
+            border-radius: 6px; font-weight: 700; font-size: 0.78rem; font-variant-numeric: tabular-nums;
+        }
+        .chip.g { background: rgba(34,197,94,0.2); color: var(--success); }
+        .chip.y { background: rgba(245,158,11,0.2); color: var(--warning); }
+        .chip.r { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .loading { text-align: center; color: var(--text-secondary); padding: 40px 0; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham &amp; Jones
+        </a>
+        <div class="nav-links"><a href="dashboard.html" class="nav-link">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link active">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link">GBP</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
+    </nav>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Map Rank Grid Tracking</h1>
+            <p class="subtitle">Where each office ranks in Google Maps, pin by pin, across its market</p>
+            <div class="report-meta">
+                <span>7×7 grid · 5 mi radius · jail-centered</span>
+                <span id="meta-updated">Loading…</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <label class="muted">Location:</label>
+            <select id="loc-select"></select>
+            <div id="kw-chips" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            <span class="spacer"></span>
+            <label class="muted">Scan:</label>
+            <select id="date-select"></select>
+        </div>
+
+        <div id="report-root"><div class="loading">Loading scan reports…</div></div>
+
+        <div class="footer-note">
+            Data: LocalFalcon geo-grid scans (Google Maps rankings), refreshed weekly (metros) /
+            monthly (smaller markets) · ARP = average rank across all pins where found · ATRP = average
+            of top ranks · SoLV = share of local voice (weighted top-3 visibility) · Prepared by Hyder Media
+        </div>
+    </div>
+
+    <script>
+        const API = '/api/dunham/grid-reports';
+        let allReports = [];
+        let state = { metro: null, keyword: null, reportKey: null };
+        let map = null;
+
+        const fmt1 = v => v == null ? '—' : Number(v).toFixed(2);
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        const starsHtml = r => {
+            if (r == null) return '';
+            const full = Math.round(r);
+            return `<span class="stars">${'★'.repeat(full)}${'☆'.repeat(5 - full)}</span>`;
+        };
+        const pinColor = rank =>
+            rank == null ? '#7f1d1d' : rank <= 3 ? '#16a34a' : rank <= 10 ? '#d97706' : '#dc2626';
+        const rankChip = (v, kind) => {
+            if (v == null) return '<span class="chip r">—</span>';
+            let cls;
+            if (kind === 'solv') cls = v >= 50 ? 'g' : v > 0 ? 'y' : 'r';
+            else cls = v <= 3 ? 'g' : v <= 10 ? 'y' : 'r';
+            return `<span class="chip ${cls}">${kind === 'solv' ? v.toFixed(2) : fmt1(v)}</span>`;
+        };
+        const badgeCls = (v, kind) => {
+            if (v == null) return 'bad';
+            if (kind === 'solv') return v >= 50 ? 'good' : v > 0 ? 'mid' : 'bad';
+            return v <= 3 ? 'good' : v <= 10 ? 'mid' : 'bad';
+        };
+
+        async function boot() {
+            const d = await (await fetch(API)).json();
+            if (d.status !== 'success') {
+                document.getElementById('report-root').innerHTML =
+                    `<div class="card">Failed to load reports: ${esc(d.error)}</div>`;
+                return;
+            }
+            allReports = d.reports;
+            const metros = [...new Set(allReports.map(r => r.metro))].sort();
+            const sel = document.getElementById('loc-select');
+            sel.innerHTML = metros.map(m => `<option>${esc(m)}</option>`).join('');
+            sel.onchange = () => { state.metro = sel.value; state.keyword = null; state.reportKey = null; syncControls(); };
+            state.metro = metros.includes('Houston') ? 'Houston' : metros[0];
+            sel.value = state.metro;
+            syncControls();
+        }
+
+        function syncControls() {
+            const inMetro = allReports.filter(r => r.metro === state.metro);
+            const kws = [...new Set(inMetro.map(r => r.keyword))];
+            if (!state.keyword || !kws.includes(state.keyword)) state.keyword = kws[0];
+            document.getElementById('kw-chips').innerHTML = kws.map(k =>
+                `<button class="kw-chip${k === state.keyword ? ' active' : ''}" onclick="setKw('${esc(k)}')">${esc(k)}</button>`).join('');
+
+            const scans = inMetro.filter(r => r.keyword === state.keyword);
+            if (!state.reportKey || !scans.some(s => s.reportKey === state.reportKey)) {
+                state.reportKey = scans[0]?.reportKey || null;
+            }
+            const ds = document.getElementById('date-select');
+            ds.innerHTML = scans.map(s =>
+                `<option value="${s.reportKey}"${s.reportKey === state.reportKey ? ' selected' : ''}>${esc(s.date)}</option>`).join('');
+            ds.onchange = () => { state.reportKey = ds.value; loadReport(); };
+            loadReport();
+        }
+        function setKw(k) { state.keyword = k; state.reportKey = null; syncControls(); }
+
+        async function loadReport() {
+            const root = document.getElementById('report-root');
+            if (!state.reportKey) { root.innerHTML = '<div class="card">No scans yet for this location/keyword.</div>'; return; }
+            root.innerHTML = '<div class="loading">Loading scan…</div>';
+            const d = await (await fetch(`${API}?key=${state.reportKey}`)).json();
+            if (d.status !== 'success') { root.innerHTML = `<div class="card">Error: ${esc(d.error)}</div>`; return; }
+            render(d);
+        }
+
+        function render(d) {
+            const s = d.summary, b = d.business;
+            const hist = allReports
+                .filter(r => r.metro === d.metro && r.keyword === d.keyword)
+                .sort((a, z) => new Date(a.date) - new Date(z.date));
+            const histHtml = hist.map(h =>
+                `<span class="hist-item">${esc((h.date || '').split(' ')[0])}<br>
+                 ARP <b>${fmt1(h.arp)}</b> · SoLV <b>${h.solv == null ? '—' : h.solv.toFixed(1)}%</b></span>`).join('');
+
+            const compRows = d.competitors.map((c, i) => `
+                <tr class="${c.isTarget ? 'target' : ''}">
+                    <td><span class="rank-num">${i + 1}</span></td>
+                    <td>
+                        <div class="comp-name">${esc(c.name)}${c.isTarget ? ' <span class="chip g">YOU</span>' : ''}</div>
+                        <div class="comp-sub">${esc(c.address || '')}</div>
+                        <div class="comp-sub">${c.rating != null ? `${c.rating.toFixed(1)} ${starsHtml(c.rating)} (${c.reviews ?? 0})` : ''}
+                            ${c.categories.length ? ` <span class="cat-tag">${esc(c.categories[0])}</span>` : ''}</div>
+                    </td>
+                    <td class="num">${c.dataPoints} pts<br><span class="comp-sub">${c.coveragePct}% of results</span></td>
+                    <td class="num">${rankChip(c.arp, 'arp')}</td>
+                    <td class="num">${rankChip(c.atrp, 'arp')}</td>
+                    <td class="num">${rankChip(c.solv, 'solv')}</td>
+                </tr>`).join('');
+
+            const ins = d.insights;
+            const osolvPct = ins.osolv ? Math.min(100, 100 * (ins.osolv.yours || 0) / (ins.osolv.top || 100)) : 0;
+            const distPct = ins.solvDistance && ins.solvDistance.average
+                ? Math.min(100, 100 * (ins.solvDistance.yours || 0) / ins.solvDistance.average) : 0;
+            const compPct = ins.competitors && ins.competitors.total
+                ? Math.min(100, 100 * (ins.competitors.active || 0) / ins.competitors.total) : 0;
+
+            document.getElementById('report-root').innerHTML = `
+                <div class="card">
+                    <div class="biz-row">
+                        <div class="biz-info">
+                            <div class="biz-name">${esc(b.name)}</div>
+                            <div class="biz-addr">${esc(b.address || '')}</div>
+                            <div class="biz-rating">${b.rating != null ? `${b.rating.toFixed(1)} ${starsHtml(b.rating)} (${b.reviews ?? 0} reviews)` : ''}
+                                ${b.categories.length ? `<span class="cat-tag"> · ${esc(b.categories[0])}</span>` : ''}</div>
+                            <div class="grid-meta">Searching <b style="color:var(--text-primary)">"${esc(d.keyword)}"</b> on Google Maps ·
+                                ${d.grid.size}×${d.grid.size} grid · ${d.grid.radius} ${esc(d.grid.measurement)} radius ·
+                                found in ${s.foundIn}/${s.totalPoints} pins (${s.foundPct}%) · ${esc(d.date)}</div>
+                        </div>
+                        <div class="metric-badges">
+                            <div class="mbadge ${badgeCls(s.arp, 'arp')}"><div class="k">ARP</div><div class="v">${fmt1(s.arp)}</div></div>
+                            <div class="mbadge ${badgeCls(s.atrp, 'arp')}"><div class="k">ATRP</div><div class="v">${fmt1(s.atrp)}</div></div>
+                            <div class="mbadge ${badgeCls(s.solv, 'solv')}"><div class="k">SoLV</div><div class="v">${s.solv == null ? '—' : s.solv.toFixed(2)}</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding:12px;"><div id="grid-map"></div></div>
+
+                <div class="card">
+                    <h2>Metric Insights</h2>
+                    <div class="insight-grid">
+                        <div class="insight green">
+                            <div class="t">OSoLV</div><div class="d">Potential for SoLV improvement</div>
+                            <div class="ins-vals"><span>Your SoLV<br><span class="big">${ins.osolv ? (ins.osolv.yours ?? 0).toFixed(2) : '—'}</span></span>
+                            <span style="text-align:right">Top SoLV<br><span class="big">${ins.osolv ? (ins.osolv.top ?? 0).toFixed(2) : '—'}</span></span></div>
+                            <div class="ins-bar"><div style="width:${osolvPct}%; background:var(--success);"></div></div>
+                        </div>
+                        <div class="insight blue">
+                            <div class="t">SoLV Distance</div><div class="d">Your distance visibility vs. market</div>
+                            <div class="ins-vals"><span>Your reach<br><span class="big">${ins.solvDistance ? (ins.solvDistance.yours ?? 0).toFixed(2) : '—'} mi</span></span>
+                            <span style="text-align:right">Market avg<br><span class="big">${ins.solvDistance ? (ins.solvDistance.average ?? 0).toFixed(2) : '—'} mi</span></span></div>
+                            <div class="ins-bar"><div style="width:${distPct}%; background:var(--accent);"></div></div>
+                        </div>
+                        <div class="insight red">
+                            <div class="t">Competitors</div><div class="d">Active competitors in market</div>
+                            <div class="ins-vals"><span>Total<br><span class="big">${ins.competitors ? ins.competitors.total : '—'}</span></span>
+                            <span style="text-align:right">With SoLV &gt; 0<br><span class="big">${ins.competitors ? ins.competitors.active : '—'}</span></span></div>
+                            <div class="ins-bar"><div style="width:${compPct}%; background:var(--danger);"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                ${hist.length > 1 ? `<div class="card"><h2>Trend — "${esc(d.keyword)}" in ${esc(d.metro)}</h2><div class="hist-wrap">${histHtml}</div></div>` : ''}
+
+                <div class="card">
+                    <h2>Market Ranking — ${d.competitors.length} businesses found in this grid</h2>
+                    <div class="table-scroll"><table class="data-table">
+                        <thead><tr><th>#</th><th>Business</th><th class="num">Found In</th>
+                        <th class="num">ARP</th><th class="num">ATRP</th><th class="num">SoLV</th></tr></thead>
+                        <tbody>${compRows}</tbody>
+                    </table></div>
+                </div>`;
+
+            document.getElementById('meta-updated').textContent = `Latest scan: ${d.date}`;
+            renderMap(d);
+        }
+
+        function renderMap(d) {
+            if (map) { map.remove(); map = null; }
+            map = L.map('grid-map', { scrollWheelZoom: false })
+                .setView([d.grid.centerLat, d.grid.centerLng], 11);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+            const pts = d.points.filter(p => p.lat && p.lng);
+            for (const p of pts) {
+                const label = p.rank == null ? '20+' : String(p.rank);
+                const icon = L.divIcon({
+                    className: '', iconSize: [34, 34], iconAnchor: [17, 17],
+                    html: `<div class="pin-ic" style="background:${pinColor(p.rank)}">${label}</div>`,
+                });
+                const top = p.top.map(t =>
+                    `<div>${t.rank}. ${esc(t.name)} <span style="color:#94a3b8">(${t.rating ?? '—'}★, ${t.reviews ?? 0})</span></div>`).join('');
+                L.marker([p.lat, p.lng], { icon }).addTo(map)
+                    .bindPopup(`<b>Your rank here: ${label}</b><div style="margin-top:6px">${top}</div>`);
+            }
+            if (pts.length > 1) {
+                map.fitBounds(pts.map(p => [p.lat, p.lng]), { padding: [24, 24] });
+            }
+        }
+
+        boot();
+    </script>
+</body>
+</html>

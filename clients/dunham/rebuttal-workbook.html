@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Rebuttal Workbook — Dunham & Jones</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #4a4a4a;
+            --accent: #2563eb;
+            --accent-light: #dbeafe;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --red-border: #fecaca;
+            --green: #16a34a;
+            --green-light: #f0fdf4;
+            --green-border: #bbf7d0;
+            --amber: #d97706;
+            --amber-light: #fffbeb;
+            --amber-border: #fde68a;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--primary);
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Header */
+        .page-header {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header .meta {
+            font-size: 14px;
+            color: var(--secondary);
+            margin-bottom: 16px;
+        }
+
+        .page-header .instructions {
+            background: var(--accent-light);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .page-header .instructions strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Case context */
+        .case-context {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .case-context h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+        }
+
+        .case-context .judgment-summary {
+            font-size: 14px;
+            color: var(--secondary);
+            line-height: 1.7;
+        }
+
+        .case-context .judgment-summary strong {
+            color: var(--primary);
+        }
+
+        .counties-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .county-tag {
+            background: var(--amber-light);
+            border: 1px solid var(--amber-border);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--amber);
+        }
+
+        /* Section cards */
+        .section-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: var(--red-light);
+            border-bottom: 1px solid var(--red-border);
+            padding: 16px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header:hover {
+            background: #fde8e8;
+        }
+
+        .section-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .section-header .section-ref {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--secondary);
+            background: var(--white);
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .section-body {
+            padding: 24px;
+        }
+
+        /* Claim summary */
+        .claim-summary {
+            background: var(--red-light);
+            border: 1px solid var(--red-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .claim-summary h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--red);
+            margin-bottom: 8px;
+        }
+
+        .claim-summary p, .claim-summary ul {
+            font-size: 14px;
+            color: var(--secondary);
+        }
+
+        .claim-summary ul {
+            padding-left: 20px;
+            margin-top: 6px;
+        }
+
+        .claim-summary li {
+            margin-bottom: 4px;
+        }
+
+        .claim-summary .claim-quote {
+            font-style: italic;
+            border-left: 3px solid var(--red-border);
+            padding-left: 12px;
+            margin: 8px 0;
+            color: var(--secondary);
+        }
+
+        /* Key assertions */
+        .assertions {
+            margin-bottom: 20px;
+        }
+
+        .assertions h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--amber);
+            margin-bottom: 8px;
+        }
+
+        .assertion-item {
+            display: flex;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .assertion-item:last-child {
+            border-bottom: none;
+        }
+
+        .assertion-num {
+            font-weight: 700;
+            color: var(--amber);
+            flex-shrink: 0;
+            width: 20px;
+        }
+
+        /* Rebuttal input */
+        .rebuttal-input {
+            background: var(--green-light);
+            border: 1px solid var(--green-border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .rebuttal-input h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--green);
+            margin-bottom: 8px;
+        }
+
+        .rebuttal-input textarea {
+            width: 100%;
+            min-height: 120px;
+            border: 1px solid var(--green-border);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--primary);
+            background: var(--white);
+            resize: vertical;
+        }
+
+        .rebuttal-input textarea:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .rebuttal-input textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        /* Export button */
+        .export-bar {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            text-align: center;
+        }
+
+        .export-bar p {
+            font-size: 14px;
+            color: var(--secondary);
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+            margin-left: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg);
+        }
+
+        /* Auto-save indicator */
+        .save-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--green);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .save-indicator.visible {
+            opacity: 1;
+        }
+
+        /* Status badges */
+        .status-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-weak {
+            background: var(--amber-light);
+            color: var(--amber);
+            border: 1px solid var(--amber-border);
+        }
+
+        .badge-speculative {
+            background: #f5f3ff;
+            color: #7c3aed;
+            border: 1px solid #ddd6fe;
+        }
+
+        .badge-no-evidence {
+            background: var(--red-light);
+            color: var(--red);
+            border: 1px solid var(--red-border);
+        }
+
+        .badge-overreach {
+            background: #fdf4ff;
+            color: #a21caf;
+            border: 1px solid #f0abfc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <h1>Expert Rebuttal Workbook</h1>
+            <div class="meta">
+                Caryn Brown, Digital Media Butterfly &mdash; Expert Report dated February 6, 2026<br>
+                <em>Dunnam & Dunnam LLP v. Dunham Law Firm, P.C., et al.</em> &mdash; Civil Action No. 6:21-cv-1041-ADA-DGT
+            </div>
+            <div class="instructions">
+                <strong>How to use this workbook:</strong>
+                Each section below summarizes Caryn Brown's claims with key assertions highlighted. Type your rebuttal notes in the green input areas. Your notes auto-save to your browser (localStorage). When finished, click "Export All Notes" at the bottom to generate a JSON file for analysis.
+            </div>
+        </div>
+
+        <!-- 1998 AGREED JUDGMENT CONTEXT -->
+        <div class="case-context">
+            <h2>1998 Agreed Judgment &mdash; Key Terms</h2>
+            <div class="judgment-summary">
+                <p><strong>Case:</strong> No. 98-1177-3, McLennan County, TX &mdash; 74th Judicial District, signed April 23, 1998.</p>
+                <p><strong>Parties:</strong> Dunnam & Dunnam LLP (Plaintiffs) v. The Dunham Law Firm, Attorneys at Law, P.C., Paul J. Dunham, Jeffrey R. Casey, Tony Faulkner, and Bobby Hawkins (Defendants).</p>
+                <p style="margin-top:8px"><strong>Core restriction:</strong> Defendants permanently enjoined from using, directly or indirectly, in the following counties:</p>
+                <div class="counties-list">
+                    <span class="county-tag">Bell</span>
+                    <span class="county-tag">McLennan</span>
+                    <span class="county-tag">Coryell</span>
+                    <span class="county-tag">Hill</span>
+                    <span class="county-tag">Bosque</span>
+                    <span class="county-tag">Johnson</span>
+                    <span class="county-tag">Brazos</span>
+                    <span class="county-tag">Hamilton</span>
+                    <span class="county-tag">Somervell</span>
+                    <span class="county-tag">Limestone</span>
+                    <span class="county-tag">Freestone</span>
+                    <span class="county-tag">Robertson</span>
+                    <span class="county-tag">Falls</span>
+                    <span class="county-tag">Madison</span>
+                    <span class="county-tag">Navarro</span>
+                    <span class="county-tag">Leon</span>
+                </div>
+                <p style="margin-top:10px"><strong>Prohibited names:</strong> "Dunham, Attorney at Law," "Dunhams, Attorney at Law," "Dunham Law Firm," "Dunham Firm," "Dunhams," "Dunham and Associates," and any variation using "Dunham" or "Dunnam" with the word "The" or "the," or with abbreviations (Inc., P.C., LLP), or names with the spelling "Dunnam" rather than "Dunham," or "Dunham" or "Dunnam" with a different given or surname.</p>
+                <p style="margin-top:10px"><strong>Advertising restriction:</strong> Defendants shall cancel all advertising or telephone listings using the specified names in the specified area, and shall not hereafter place any advertising or solicitation emphasizing "Dunham" or "Dunnam" in the specified area.</p>
+                <p style="margin-top:10px"><strong>Key limitation:</strong> The judgment restricts the use of specific <em>names</em> in specific <em>counties</em>. It does not restrict the defendants from practicing law or advertising their services in those counties under non-prohibited names (e.g., "Dunham & Jones").</p>
+            </div>
+        </div>
+
+        <!-- SECTION I: Summary of Opinions -->
+        <div class="section-card" id="section-1">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>I. Summary of Opinions</h3>
+                <span class="section-ref">Report pp. 1</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown claims that defendants' domains continue to show "ongoing exposure in restricted counties" and "continued algorithmic association with the Dunnam & Dunnam brand." She asserts the "net consumer-facing and algorithmic effect has not materially retreated" since August 2025, and that visibility has merely "shifted between DunhamLaw.com and DunhamJones.com" while the "aggregate footprint remains substantially similar."</p>
+                    <div class="status-row">
+                        <span class="badge badge-speculative">Speculative</span>
+                        <span class="badge badge-overreach">Overreach</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> "Ongoing exposure in restricted counties" &mdash; implies active targeting, but Brown admits she cannot verify geo-targeting settings without internal data.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> "Continued algorithmic association with the Dunnam & Dunnam brand" &mdash; conflates organic search engine behavior (which defendants don't control) with intentional conduct.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> "Aggregate footprint" theory &mdash; treats two separate legal entities/domains as a single actor to inflate the appearance of non-compliance.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> "Compliance assertions cannot be verified without defendants' internal documentation" &mdash; frames the absence of evidence as evidence of non-compliance.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-1" placeholder="Type your rebuttal notes for Section I here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION II: Assignment and Scope -->
+        <div class="section-card" id="section-2">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>II. Assignment and Scope</h3>
+                <span class="section-ref">Report pp. 1</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown was retained by Dunnam & Dunnam's counsel to assess compliance with the 1998 Agreed Judgment and 2011 Rule 11 Agreement. Her scope covers domain use, redirections, SEO practices, organic rankings, paid search, geographic targeting, consumer/algorithmic confusion, and "technical feasibility of compliance."</p>
+                    <p class="claim-quote">"Because several key facts can be confirmed only from defendants' internal systems... this report identifies those areas and refrains from assuming compliance absent documentary proof."</p>
+                    <div class="status-row">
+                        <span class="badge badge-overreach">Burden Shifting</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> Brown repeatedly "refrains from assuming compliance" &mdash; effectively presumes guilt and shifts the burden of proof to the defendants.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> Scope creep: the 1998 judgment predates modern search engines and addresses <em>naming</em> and <em>advertising</em>, not SEO practices, algorithmic behavior, or domain strategies.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-2" placeholder="Type your rebuttal notes for Section II here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION III: Sources, Methods, and Limitations -->
+        <div class="section-card" id="section-3">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>III. Sources, Methods, and Limitations</h3>
+                <span class="section-ref">Report pp. 2</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown lists her sources as "publicly observable website content," "third-party SEO visibility data," and "Wayback Machine snapshots." Her methods include domain/site architecture review, third-party keyword visibility review, and examination of "patterns characteristic of technical SEO deployment." She acknowledges she lacks access to negative keywords, geo-exclusions, metadata exports, redirect inventories, and Search Console data.</p>
+                    <div class="status-row">
+                        <span class="badge badge-weak">Methodologically Weak</span>
+                        <span class="badge badge-no-evidence">Tools Not Named</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> Brown does not name the specific third-party tools used (e.g., Ahrefs, SEMrush, SimilarWeb) &mdash; making her methodology non-reproducible.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> No crawl parameters disclosed: user-agent, crawl date, deduplication method, or scope. She only retroactively acknowledges this issue in Section XI (p. 12).</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> "The absence of internal proof should not be treated as evidence of compliance" &mdash; but the inverse is also true: the absence of internal proof is not evidence of non-compliance.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> Limited toolset (per her CV: only Ahrefs and Screaming Frog) compared to industry standard for this type of analysis.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-3" placeholder="Type your rebuttal notes for Section III here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION IV: Findings A - DunhamLaw.com -->
+        <div class="section-card" id="section-4">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>IV. Findings A &mdash; DunhamLaw.com</h3>
+                <span class="section-ref">Report pp. 3&ndash;4</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p><strong>A1 &mdash; Domain Use:</strong> DunhamLaw.com is active, "Dunham" appears in URLs/titles/headers/meta content, and the site "marketed services tied to restricted counties" with "Waco-related phrasing."</p>
+                    <p><strong>A2 &mdash; Brand-Adjacent Visibility:</strong> DunhamLaw.com ranked for "dunnam & dunnam," "dunnam and dunnam," and "dunnam and dunnam Waco" in third-party organic data. She concedes paid advertising "cannot be verified" without account exports.</p>
+                    <p><strong>A3 &mdash; Geographic Targeting:</strong> Site promoted services in McLennan County (Waco) and other restricted counties with "county mentions and Waco-specific phrasing at scale."</p>
+                    <p><strong>A4 &mdash; Keyword Counts (Aug 2025):</strong></p>
+                    <ul>
+                        <li>"Waco criminal attorney" &mdash; ~450 mentions</li>
+                        <li>"Bell County" &mdash; ~195</li>
+                        <li>"Brazos County" &mdash; ~70</li>
+                        <li>"Coryell County" &mdash; ~65</li>
+                        <li>"Hill County" &mdash; ~55</li>
+                        <li>"Bosque County" &mdash; ~60</li>
+                        <li>"Johnson County" &mdash; ~50</li>
+                        <li>Other restricted counties &mdash; ~20&ndash;45 each</li>
+                    </ul>
+                    <div class="status-row">
+                        <span class="badge badge-weak">Inflated Counts</span>
+                        <span class="badge badge-no-evidence">No Methodology for Counts</span>
+                        <span class="badge badge-overreach">Conflates Name with Prohibited Name</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> "Dunham" is the defendants' actual legal name &mdash; the 1998 judgment prohibits specific name formulations like "Dunham Law Firm" in specific counties, not the use of the surname "Dunham" generally. "DunhamLaw.com" vs. "Dunham Law Firm" is a critical distinction.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> Ranking for "dunnam & dunnam" queries is organic search engine behavior &mdash; defendants have no control over Google's algorithm choosing to surface DunhamLaw.com for "Dunnam" queries due to name similarity.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> Keyword counts (450 mentions of "Waco criminal attorney") are unverified &mdash; no crawl methodology, date, dedup method, or distinction between unique pages vs. templated/paginated content.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> County mentions may reflect legitimate practice areas &mdash; the judgment restricts the use of certain <em>names</em> in those counties, not the practice of law or all advertising there.</div>
+                    <div class="assertion-item"><span class="assertion-num">5.</span> Brown concedes she cannot verify paid search targeting but still implies violation through "brand-adjacent visibility" language.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-4" placeholder="Type your rebuttal notes for Section IV here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION V: Findings B - DunhamJones.com -->
+        <div class="section-card" id="section-5">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>V. Findings B &mdash; DunhamJones.com</h3>
+                <span class="section-ref">Report pp. 5</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p><strong>B1 &mdash; Domain Timeline:</strong> DunhamJones.com registered June 17, 2011; first Wayback capture February 20, 2023. Brown suggests "restricted-county content may now be hosted on DunhamJones.com rather than DunhamLaw.com."</p>
+                    <p><strong>B2 &mdash; Content Migration:</strong> Third-party data shows DunhamJones.com ranks for "Waco-specific and other restricted-county criminal defense queries." She calls this "content migration or re-optimization rather than removal."</p>
+                    <p><strong>B3 &mdash; Paid Search:</strong> No paid keyword activity detected for DunhamJones.com, but Brown argues this "does not establish compliance" because campaigns "can be paused/reactivated."</p>
+                    <div class="status-row">
+                        <span class="badge badge-speculative">Speculative</span>
+                        <span class="badge badge-overreach">"Aggregate Footprint" Theory</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> "Dunham & Jones" is NOT one of the prohibited names in the 1998 Agreed Judgment. The judgment lists specific names; "Dunham & Jones" is not among them.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> Brown's "aggregate footprint" theory has no legal basis &mdash; she is treating two distinct domains and entities as interchangeable to manufacture a violation.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> Ranking for "Waco criminal defense" queries is not itself a violation &mdash; the judgment restricts certain names, not the right to practice or advertise under non-prohibited names.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> Finding no paid activity but arguing it "doesn't establish compliance" is unfalsifiable reasoning &mdash; no evidence could ever satisfy this standard.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-5" placeholder="Type your rebuttal notes for Section V here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION VI: Developments Since August 2025 -->
+        <div class="section-card" id="section-6">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>VI. Developments Since August 2025</h3>
+                <span class="section-ref">Report pp. 6</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown asserts "no material retreat from restricted-area visibility or brand-adjacent search exposure at the aggregate level" between August 2025 and January 2026. She claims that any visibility shift between the two domains means the "net consumer-facing and algorithmic effect remains substantively similar."</p>
+                    <p class="claim-quote">"Claims of meaningful corrective action since August 2025 cannot be verified from public observation alone."</p>
+                    <div class="status-row">
+                        <span class="badge badge-no-evidence">No Comparative Data Shown</span>
+                        <span class="badge badge-weak">Qualitative Not Quantitative</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> Brown provides zero comparative data &mdash; she admits the Jan 2026 update is only a "qualitative comparison" (p. 12), yet draws quantitative conclusions about "no material retreat."</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> She again presumes non-compliance because she can't confirm compliance from public data alone.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> The "aggregate footprint" across domains is not a recognized legal or technical standard for measuring compliance.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-6" placeholder="Type your rebuttal notes for Section VI here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION VII: Intent, Ability, Post-Notice Conduct -->
+        <div class="section-card" id="section-7">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>VII. Intent, Ability to Comply, and Post-Notice Conduct</h3>
+                <span class="section-ref">Report pp. 7</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p><strong>A &mdash; Intent:</strong> Because defendants manage their sites, they have "technical capacity" to comply, and any non-compliance "is not attributable to technical impossibility" but rather "selective implementation choices."</p>
+                    <p><strong>B &mdash; Post-Notice:</strong> Defendants continued modifying their digital presence after being on notice, but "core elements... have not been conclusively cured." She calls this "relevant evidence because it shows compliance steps were feasible but not completed."</p>
+                    <p><strong>C &mdash; Algorithmic/AI Confusion:</strong> A chatbot on defendants' website "surfaced incorrect or conflicting contact information associated with Dunnam & Dunnam." Brown admits this "was not consistently reproducible" and is "not relied upon as a standalone finding."</p>
+                    <div class="status-row">
+                        <span class="badge badge-speculative">Imputes Intent</span>
+                        <span class="badge badge-overreach">Legal Conclusions</span>
+                        <span class="badge badge-no-evidence">Non-Reproducible AI Anecdote</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> Brown is offering legal conclusions about intent and willfulness &mdash; this exceeds the scope of a technical expert and invades the province of the fact-finder.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> "Selective implementation choices" implies intentional violation without any supporting evidence.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> The chatbot anecdote is self-admittedly non-reproducible and irrelevant &mdash; defendants don't control third-party AI chatbot behavior.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> "Algorithmic ambiguity" from overlapping names is an inherent consequence of two firms with similar surnames &mdash; not evidence of misconduct.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-7" placeholder="Type your rebuttal notes for Section VII here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION VIII: Technical Simplicity of Compliance -->
+        <div class="section-card" id="section-8">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>VIII. Technical Simplicity of Compliance</h3>
+                <span class="section-ref">Report pp. 8</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown asserts that compliance is "technically straightforward and comparatively inexpensive," listing: disabling DNS for "prohibited domains," deactivating/redirecting those domains, removing prohibited references from content/metadata/structured data, Search Console URL inspection and re-index requests, and negative keyword implementation with geo-exclusions in paid channels.</p>
+                    <div class="status-row">
+                        <span class="badge badge-overreach">Assumes Violations Exist</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> This section presumes non-compliance and then argues compliance would be easy &mdash; but never establishes what specific violations need remediation.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> "Disabling DNS for prohibited domains" &mdash; which domains does she consider "prohibited"? DunhamLaw.com uses the defendants' legal surname.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> Negative keyword implementation for "protected marks" &mdash; "Dunham" is not a protected mark; it is the defendants' actual name. The judgment restricts specific name formulations, not the surname itself.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> Brown's "compliance steps" would effectively require defendants to suppress their own legal name from search engines &mdash; going far beyond what the 1998 judgment orders.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-8" placeholder="Type your rebuttal notes for Section VIII here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION IX-X: Verification Matrix & Discovery -->
+        <div class="section-card" id="section-9">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>IX&ndash;X. Verification Matrix &amp; Recommended Discovery</h3>
+                <span class="section-ref">Report pp. 9&ndash;11</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown presents a "Verification/Proof Matrix" showing what she claims is and isn't publicly verifiable, and requests production of: full site backups, keyword/metadata audits, Google Ads exports, Analytics/Search Console data, SEO vendor communications, and full domain inventories.</p>
+                    <p class="claim-quote">"The absence of verification is not evidence of compliance. It reflects the limits of public observation and reinforces the need for documentary proof."</p>
+                    <div class="status-row">
+                        <span class="badge badge-overreach">Advocacy Not Analysis</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> An expert report that primarily serves as a discovery wishlist is advocacy, not independent analysis.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> The matrix frames everything as "proof required from defendants" &mdash; Brown could have conducted more thorough public analysis using industry-standard tools (SEMrush, SimilarWeb, Google Ads Transparency Center) but apparently did not.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> Several items Brown claims are "not publicly verifiable" (metadata, domain redirects, paid ad presence) are in fact partially or fully verifiable through public tools.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-9" placeholder="Type your rebuttal notes for Sections IX-X here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION XI: Quantitative Indicators -->
+        <div class="section-card" id="section-10">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>XI. Quantitative Indicators &amp; Methodological Transparency</h3>
+                <span class="section-ref">Report pp. 12</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown retroactively acknowledges that her August 2025 keyword counts were "approximate values" from "crawls and text analysis" and that the January 2026 update is only a "qualitative comparison." She admits that proper reproducibility would require documenting crawl scope, user-agent, date range, deduplication, dynamic content handling, and phrase matching logic &mdash; none of which she provided.</p>
+                    <div class="status-row">
+                        <span class="badge badge-weak">Self-Undermining</span>
+                        <span class="badge badge-no-evidence">Methodology Not Documented</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> Brown herself identifies all the methodological standards she failed to meet &mdash; this is a significant admission that her own counts are unreliable.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> "Approximate values" and "descriptive indicators" cannot support the definitive conclusions she draws elsewhere in the report (e.g., "no material retreat").</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> Without deduplication methodology, her counts likely include templated content (headers, footers, navigation) counted across hundreds of pages &mdash; massively inflating the numbers.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-10" placeholder="Type your rebuttal notes for Section XI here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION XIII: Corrective Advertising -->
+        <div class="section-card" id="section-11">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>XIII. Corrective Advertising</h3>
+                <span class="section-ref">Report pp. 13&ndash;14</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Claims</h4>
+                    <p>Brown proposes multi-year corrective advertising to "unwind historical associations," arguing that search engine associations "do not self-correct simply because conduct stops." She proposes annual costs of:</p>
+                    <ul>
+                        <li>Paid search corrective ads: $25,000&ndash;$50,000/year</li>
+                        <li>SEO corrective content &amp; signal repair: $20,000&ndash;$35,000/year</li>
+                        <li>Directory/platform remediation: $8,000&ndash;$15,000/year</li>
+                        <li>Ongoing monitoring &amp; enforcement: $12,000&ndash;$20,000/year</li>
+                        <li><strong>Total: $65,000&ndash;$120,000/year for multiple years</strong></li>
+                    </ul>
+                    <div class="status-row">
+                        <span class="badge badge-no-evidence">No Basis for Estimates</span>
+                        <span class="badge badge-overreach">Grossly Inflated</span>
+                        <span class="badge badge-speculative">Assumes Ongoing Violation</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Assertions to Rebut</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> No methodology, market data, or comparable cases cited to support the dollar figures. For a regional Waco market, these numbers are vastly inflated.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> Brown charges $125/hour but proposes $12,000&ndash;$20,000/year for "monitoring" &mdash; this appears designed to create an ongoing revenue stream for her own firm.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> "Associations do not self-correct" is misleading &mdash; search engine results change constantly, and historical SEO signals decay naturally over weeks/months, not the "multi-year" period she asserts.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> The entire corrective advertising section presumes proven violations and proven damages &mdash; neither has been established.</div>
+                    <div class="assertion-item"><span class="assertion-num">5.</span> "Paid search corrective ads" of $25K&ndash;$50K/year in a regional market like Waco is orders of magnitude beyond what would be needed for any legitimate clarification campaign.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-11" placeholder="Type your rebuttal notes for Section XIII here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION XIV: Expert Qualifications -->
+        <div class="section-card" id="section-12">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h3>XIV. Expert Qualifications &amp; Credibility</h3>
+                <span class="section-ref">Report pp. 15 + CV</span>
+            </div>
+            <div class="section-body">
+                <div class="claim-summary">
+                    <h4>Brown's Qualifications (per CV &amp; Filing)</h4>
+                    <ul>
+                        <li>Owner, Digital Media Butterfly (est. 2012, Waco, TX)</li>
+                        <li>Prior role: System Administrator at Brazos Higher Education (managing phone systems, 400 users, hardware rollouts)</li>
+                        <li>Education: "Formal coursework in web design and development (night program, 1998)"</li>
+                        <li>No prior expert testimony (stated in filing)</li>
+                        <li>No publications</li>
+                        <li>No named clients</li>
+                        <li>No industry conference speaking (only vague "professional, nonprofit, and business audiences")</li>
+                        <li>Rate: $125/hour</li>
+                        <li>Tools: Ahrefs, Screaming Frog, Wayback Machine, WHOIS</li>
+                    </ul>
+                    <div class="status-row">
+                        <span class="badge badge-weak">Limited Qualifications</span>
+                    </div>
+                </div>
+                <div class="assertions">
+                    <h4>Key Credibility Issues</h4>
+                    <div class="assertion-item"><span class="assertion-num">1.</span> No formal education in marketing, advertising, computer science, or related field &mdash; only a 1998 night course in web design.</div>
+                    <div class="assertion-item"><span class="assertion-num">2.</span> Prior professional experience was system administration (phone systems, hardware), not search marketing or advertising.</div>
+                    <div class="assertion-item"><span class="assertion-num">3.</span> No Fortune 500 or enterprise-level client experience &mdash; no named clients at all.</div>
+                    <div class="assertion-item"><span class="assertion-num">4.</span> Never testified as an expert before; no publications in the field.</div>
+                    <div class="assertion-item"><span class="assertion-num">5.</span> Located in Waco, TX &mdash; same city as plaintiff, raising potential bias/independence concerns.</div>
+                    <div class="assertion-item"><span class="assertion-num">6.</span> Report makes legal conclusions (intent, willfulness, compliance interpretation) beyond the scope of technical expertise.</div>
+                </div>
+                <div class="rebuttal-input">
+                    <h4>Your Rebuttal Notes</h4>
+                    <textarea id="notes-12" placeholder="Type your rebuttal notes on Brown's qualifications and credibility here..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPORT BAR -->
+        <div class="export-bar">
+            <p>When you've completed your notes, export them for analysis.</p>
+            <button class="btn btn-primary" onclick="exportNotes()">Export All Notes (JSON)</button>
+            <button class="btn btn-secondary" onclick="clearAll()">Clear All Notes</button>
+        </div>
+
+    </div>
+
+    <!-- Save indicator -->
+    <div class="save-indicator" id="saveIndicator">Saved</div>
+
+    <script>
+        const STORAGE_KEY = 'dunham_rebuttal_notes';
+        const SECTIONS = 12;
+
+        // Load saved notes
+        function loadNotes() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                for (let i = 1; i <= SECTIONS; i++) {
+                    const el = document.getElementById('notes-' + i);
+                    if (el && data['section_' + i]) {
+                        el.value = data['section_' + i];
+                    }
+                }
+            }
+        }
+
+        // Save all notes
+        function saveNotes() {
+            const data = {};
+            for (let i = 1; i <= SECTIONS; i++) {
+                const el = document.getElementById('notes-' + i);
+                if (el) data['section_' + i] = el.value;
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            showSaved();
+        }
+
+        // Show save indicator
+        function showSaved() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('visible');
+            setTimeout(() => indicator.classList.remove('visible'), 1500);
+        }
+
+        // Auto-save on input
+        document.querySelectorAll('textarea').forEach(ta => {
+            ta.addEventListener('input', debounce(saveNotes, 500));
+        });
+
+        function debounce(fn, ms) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), ms);
+            };
+        }
+
+        // Export notes as JSON
+        function exportNotes() {
+            const data = {};
+            const sectionTitles = {
+                1: 'I. Summary of Opinions',
+                2: 'II. Assignment and Scope',
+                3: 'III. Sources, Methods, and Limitations',
+                4: 'IV. Findings A — DunhamLaw.com',
+                5: 'V. Findings B — DunhamJones.com',
+                6: 'VI. Developments Since August 2025',
+                7: 'VII. Intent, Ability to Comply, and Post-Notice Conduct',
+                8: 'VIII. Technical Simplicity of Compliance',
+                9: 'IX–X. Verification Matrix & Recommended Discovery',
+                10: 'XI. Quantitative Indicators & Methodological Transparency',
+                11: 'XIII. Corrective Advertising',
+                12: 'XIV. Expert Qualifications & Credibility'
+            };
+            for (let i = 1; i <= SECTIONS; i++) {
+                const el = document.getElementById('notes-' + i);
+                if (el && el.value.trim()) {
+                    data[sectionTitles[i]] = el.value.trim();
+                }
+            }
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'rebuttal-notes-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Clear all
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all notes? This cannot be undone.')) {
+                for (let i = 1; i <= SECTIONS; i++) {
+                    const el = document.getElementById('notes-' + i);
+                    if (el) el.value = '';
+                }
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+        // Toggle section collapse (not used yet but wired up)
+        function toggleSection(header) {
+            // Currently all sections are open; can add collapse logic if needed
+        }
+
+        // Init
+        loadNotes();
+    </script>
+</body>
+</html>

@@ -13,3 +13,9 @@ automatedojo/
 # AG2020 raw client data (bank statements, reports) — NEVER commit/deploy;
 # Vercel serves committed static files publicly
 clients/ag2020/data/
+
+# Dunham litigation artifacts — local only, never push (>100MB PDFs)
+clients/dunham/rebuttal2/
+clients/dunham/*.pdf
+clients/dunham/*.docx
+clients/dunham/exports.zip

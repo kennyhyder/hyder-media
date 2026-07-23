@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expert Rebuttal Report V2 — Kenny Hyder</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        @page {
+            size: letter;
+            margin: 1in 1in;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in 1in;
+        }
+
+        @media print {
+            .container { padding: 0; }
+        }
+
+        /* Header */
+        .report-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1a1a1a;
+            margin-bottom: 28px;
+        }
+
+        .report-header img {
+            width: 56px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
+        .report-header h1 {
+            font-size: 16pt;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .report-header .subtitle {
+            font-size: 11pt;
+            color: #4a4a4a;
+            margin-bottom: 16px;
+        }
+
+        .report-meta {
+            font-size: 9.5pt;
+            color: #4a4a4a;
+            line-height: 1.8;
+        }
+
+        .report-meta strong {
+            color: #1a1a1a;
+        }
+
+        /* Sections */
+        h2 {
+            font-size: 13pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 4px;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 11.5pt;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        /* Bullet lists */
+        ul, ol {
+            padding-left: 22px;
+            margin-bottom: 12px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 8px;
+            line-height: 1.65;
+        }
+
+        ul li strong, ol li strong {
+            color: #1a1a1a;
+        }
+
+        /* Nested bullets */
+        ul ul, ol ul {
+            margin-top: 6px;
+            margin-bottom: 6px;
+        }
+
+        /* Block quotes for opposing expert claims */
+        .opposing-claim {
+            border-left: 3px solid #d1d5db;
+            padding-left: 14px;
+            margin: 10px 0;
+            color: #4a4a4a;
+            font-style: italic;
+            font-size: 10.5pt;
+        }
+
+        /* Evidence tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 10pt;
+        }
+
+        table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            text-align: left;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            font-size: 9.5pt;
+        }
+
+        table td {
+            padding: 5px 10px;
+            border: 1px solid #d1d5db;
+            vertical-align: top;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        /* Section page breaks */
+        .new-page {
+            page-break-before: always;
+        }
+
+        /* Exhibit reference */
+        .exhibit-ref {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 8px 14px;
+            margin: 12px 0;
+            font-size: 10pt;
+            border-radius: 3px;
+            page-break-inside: avoid;
+        }
+
+        .exhibit-ref strong {
+            color: #1a1a1a;
+        }
+
+        /* Signature block */
+        .signature {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #d1d5db;
+            page-break-inside: avoid;
+        }
+
+        .signature .sig-line {
+            border-bottom: 1px solid #1a1a1a;
+            width: 300px;
+            height: 40px;
+            margin-bottom: 4px;
+        }
+
+        .signature p {
+            margin-bottom: 2px;
+            font-size: 10.5pt;
+        }
+
+        /* Table of contents styling */
+        .toc {
+            margin: 16px 0 24px 0;
+        }
+
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 10.5pt;
+            border-bottom: 1px dotted #d1d5db;
+        }
+
+        .toc-item span:first-child {
+            font-weight: 500;
+        }
+
+        .toc-item span:last-child {
+            color: #4a4a4a;
+        }
+
+        /* Emphasis box for key findings */
+        .key-finding {
+            border: 2px solid #1a1a1a;
+            padding: 10px 14px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+
+        .key-finding p {
+            margin-bottom: 4px;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            background: #f3f4f6;
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="report-header">
+            <img src="../assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media">
+            <h1>Expert Rebuttal Report</h1>
+            <div class="subtitle">Response to Expert Report of Caryn Brown, Digital Media Butterfly</div>
+            <div class="report-meta">
+                <strong>Prepared for:</strong> Dunham &amp; Jones, Attorneys at Law, P.C.<br>
+                <strong>Prepared by:</strong> Kenny Hyder, Founder, Hyder Media<br>
+                <strong>Case:</strong> <em>Dunnam &amp; Dunnam LLP v. Dunham &amp; Jones, Attorneys at Law, P.C., et al.</em><br>
+                Civil Action No. 6:21-cv-1041-ADA-DGT, W.D. Texas, Waco Division<br>
+                <strong>Date:</strong> March 1, 2026
+            </div>
+        </div>
+
+        <!-- I. INTRODUCTION -->
+        <h2>I. Introduction and Qualifications</h2>
+
+        <p>I have been retained by counsel for Defendants to review and respond to the Expert Report of Caryn Brown ("Brown Report"), dated February 6, 2026, prepared on behalf of Plaintiff Dunnam &amp; Dunnam LLP. My analysis addresses the technical accuracy, methodological rigor, and factual basis of Brown's claims about Defendants' online properties and their alleged violation of the McLennan County, Texas, Agreed Judgment dated April 24, 1998 (the "1998 Agreed Judgment").</p>
+
+        <p>I am a digital marketing and search advertising consultant with over 20 years of hands-on experience in search engine optimization (SEO), paid search advertising (Google Ads/PPC), content marketing, online reputation management, and competitive analysis. I have directed search engine marketing strategy for multiple Fortune 500 companies, including Fortune 20 and Fortune 5 businesses. I am a recognized contributing author at Search Engine Journal, a veteran speaker at major industry conferences including Pubcon, SMX, Affiliate Summit, and the Direct Marketing Association, and I serve as a judge for the US Search Awards. My full curriculum vitae is attached.</p>
+
+        <p>My opinions are based on my professional experience, direct observation using industry-standard tools and methodologies, and review of the Brown Report, the 1998 Agreed Judgment, and the publicly observable online properties at issue. I am being compensated at a rate of $300 per hour for my work in this matter. My compensation is not contingent on the outcome of this case or the opinions expressed in this report.</p>
+
+        <p>Since my initial review of the Brown Report, I have conducted independent analysis using the following industry-standard tools, all of which generate verifiable, downloadable reports:</p>
+
+        <ul>
+            <li><strong>Screaming Frog SEO Spider</strong> &mdash; full site crawl of DunhamLaw.com (2,104 internal URLs, 1,548 HTML pages) with custom extraction configured to search for the keyword "dunnam" in HTML source, rendered page text, and content areas</li>
+            <li><strong>SimilarWeb</strong> &mdash; paid and organic keyword analysis for DunhamLaw.com, DunhamJones.com, and DunnamLaw.com (February 2025 through January 2026)</li>
+            <li><strong>SEMrush</strong> &mdash; organic position data for all three domains, plus backlink and anchor text analysis for DunhamLaw.com</li>
+            <li><strong>Google Ads Transparency Center</strong> &mdash; review of all paid advertisements associated with the DunhamLaw.com domain</li>
+        </ul>
+
+        <p>The raw exports from each of these tools are available upon request and form the evidentiary basis for the findings presented in this report.</p>
+
+        <!-- II. SUMMARY -->
+        <h2>II. Summary of Opinions</h2>
+
+        <p>My opinions are based on my professional experience, direct observation using industry-standard tools and methodologies, and review of the Brown Report, the 1998 Agreed Judgment, and the publicly observable online properties at issue.  Although my opinion is that the Brown Report fails to show any violations of the 1998 Agreed Judgment that was entered in McLennan County state court, I am not expressing any opinion on whether that is the correct legal standard governing this federal trademark infringement lawsuit. It is my opinion that:</p>
+
+        <ol>
+            <li><strong>The Brown Report fails to identify a single violation of the 1998 Agreed Judgment, and my independent analysis confirms no such violation exists.</strong> Despite being 15 pages long, the Brown Report does not contain a single screenshot, advertisement, search result, or online artifact showing that Defendants have used the restricted names in the restricted counties. If such evidence existed, it would be trivially easy to capture and present. A full-site crawl of DunhamLaw.com&mdash;2,104 URLs, 1,548 HTML pages&mdash;found zero instances of the word "dunnam" anywhere on the site. The Google Ads Transparency Center confirms all Defendants' advertisements run under the name "Dunham &amp; Jones Attorneys at Law, P.C."&mdash;not any restricted name. Third-party keyword data from SimilarWeb and SEMrush confirms Defendants have zero paid keywords targeting "Dunnam" and receive zero click traffic from organic "dunnam" queries.</li>
+
+            <li><strong>The Brown Report fundamentally mischaracterizes the scope of the 1998 Agreed Judgment.</strong> The 1998 Agreed Judgment restricts the use of specific name formulations (e.g., "Dunham Law Firm," "Dunham, Attorney at Law") in specific Texas counties to advertise Dunham &amp; Jones. It does not prohibit Defendants from using Paul Dunham's surname "Dunham," from operating the domain DunhamLaw.com or other domain names containing the word "dunham," from practicing law in those counties, or from advertising under non-restricted names such as "Dunham &amp; Jones."</li>
+
+            <li><strong>Brown's methodology is insufficient, undocumented, and non-reproducible.</strong> Brown does not identify which third-party tools she used, does not provide crawl parameters, does not document her methods, provides no downloadable reports as evidence, and admits her January 2026 analysis is only a "qualitative comparison." Her own report, however, does identify the methodological standards she failed to meet.</li>
+
+            <li><strong>Brown repeatedly conflates organic search engine behavior with intentional misconduct by the Defendants.</strong> That Google's algorithm may surface DunhamLaw.com in response to a "Dunnam" query is a function of Google's algorithmic name-similarity matching, not evidence that Defendants have targeted or used the word "Dunnam." Defendants receive zero clicks from "Dunnam"-intent searches. Moreover, even if Defendants were bidding on "Dunnam" as a paid keyword&mdash;which they are not&mdash;competitor brand bidding is a common and accepted practice explicitly permitted by Google, and would not itself violate the 1998 Agreed Judgment.</li>
+
+            <li><strong>Brown's corrective advertising expense estimates are unsupported, inflated, and premature.</strong> Brown does not state her methodology in making these estimates. She cites no market data or comparable cases. The figures are grossly disproportionate to the cost of advertising in a small, regional Texas market and presume violations that her report does not prove.</li>
+
+            <li><strong>Defendants have taken affirmative steps beyond what the state court 1998 Agreed Judgment requires.</strong> Defendants voluntarily redirect DunhamLaw.com to DunhamJones.com for users in restricted counties and for web pages referencing those counties or lawyers located in those counties. This is a significant, proactive measure that the 1998 Agreed Judgment does not require. Brown's report fails to recognize these measures or give them appropriate weight. A Screaming Frog crawl confirms that 66 of 71 restricted-county URLs on DunhamLaw.com redirect via 301 to DunhamJones.com&mdash;a systematic, proactive compliance measure that no court order compels.</li>
+
+            <li><strong>Brown's repeated demands for Defendants' internal documentation appear to be a fishing expedition.</strong> The items she claims require discovery&mdash;metadata, redirects, paid ad presence, county targeting&mdash;are all publicly verifiable through the same tools she claims to use. Her insistence on obtaining internal Google Ads account exports, SEO vendor communications, Search Console data, and full site backups goes well beyond what is necessary to assess compliance and would provide Plaintiff's team with valuable competitive intelligence about Defendants' marketing strategy.</li>
+        </ol>
+
+        <!-- III. EVIDENCE OVERVIEW -->
+        <h2 class="new-page">III. Independent Analysis: Tools, Methods, and Key Findings</h2>
+
+        <p>Unlike the Brown Report, which names no specific tools and provides no raw data, I have conducted independent analysis using named, industry-standard tools with full documentation. The following summarizes the methods and results.</p>
+
+        <h3>A. Screaming Frog SEO Spider &mdash; Full Site Crawl of DunhamLaw.com</h3>
+
+        <p><strong>Date:</strong> March 1, 2026 &nbsp;|&nbsp; <strong>Duration:</strong> 40 minutes &nbsp;|&nbsp; <strong>Scope:</strong> Full site crawl</p>
+
+        <p>Screaming Frog is a widely recognized website auditing tool used by SEO professionals to crawl websites and extract on-page data including page titles, meta descriptions, headings, body text, metadata, and custom search patterns. I configured the crawler to perform a <strong>custom search extraction</strong> specifically targeting the keyword "dunnam" across three content layers: raw HTML source code, rendered page text, and content area text.</p>
+
+        <div class="key-finding">
+            <p><strong>Finding:</strong> Across all 1,216 indexable HTML pages on DunhamLaw.com, the custom search extraction returned <strong>zero matches</strong> for the keyword "dunnam" in HTML, page text, and content areas. The word "dunnam" does not appear anywhere on the DunhamLaw.com website&mdash;not in page content, not in metadata, not in source code, not in headers, not in footers, not in navigation elements.</p>
+        </div>
+
+        <p>This finding directly contradicts Brown's claims of "continued algorithmic association with the Dunnam &amp; Dunnam brand" through Defendants' website. If Defendants were attempting to manipulate search rankings for the "Dunnam" brand&mdash;as Brown implies&mdash;they would need to include that term somewhere in their website content, metadata, or structure. The complete absence of this term, verified through a comprehensive automated crawl, demonstrates that no such manipulation exists.</p>
+
+        <p>The crawl also revealed the redirect structure for restricted-county content:</p>
+
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Total URLs</th>
+                <th>Live (200)</th>
+                <th>Redirect to DunhamJones.com (301)</th>
+            </tr>
+            <tr>
+                <td>Restricted county pages (all 16 counties)</td>
+                <td>71</td>
+                <td>5*</td>
+                <td>66</td>
+            </tr>
+            <tr>
+                <td>Waco law office page</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>Waco criminal attorneys page</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+        </table>
+
+        <p style="font-size: 9.5pt; color: #4a4a4a;">* Of the 5 live URLs: 3 are image files from a November 2025 "Not Guilty" verdict announcement, 1 is a case result page, and 1 is a Tennessee (not Texas) county page. No live, indexable service pages targeting restricted Texas counties remain on DunhamLaw.com.</p>
+
+        <p>Importantly, DunhamLaw.com contains warrant, bail bond, and injury lawyer pages for <strong>all 254 Texas counties</strong>&mdash;not just the 16 restricted counties. The restricted-county pages are part of a blanket statewide coverage strategy, and the vast majority have been redirected to DunhamJones.com as a compliance measure.</p>
+
+        <h3>B. Google Ads Transparency Center &mdash; Paid Ad Verification</h3>
+
+        <p>The Google Ads Transparency Center is a publicly accessible tool launched by Google that allows any user to view all advertisements run by any verified advertiser. I reviewed all advertisements associated with the domain DunhamLaw.com.</p>
+
+        <div class="key-finding">
+            <p><strong>Finding:</strong> Every advertisement displayed in the Google Ads Transparency Center for the DunhamLaw.com domain identifies the advertiser as <strong>"DUNHAM &amp; JONES ATTORNEYS AT LAW, P.C."</strong>&mdash;a verified advertiser. No advertisements use the name "Dunham Law Firm," "Dunham, Attorney at Law," "Dunhams," or any other restricted name formulation. No advertisements reference the "Dunnam" brand in any way.</p>
+        </div>
+
+        <p>Brown could have&mdash;and should have&mdash;consulted this tool before opining on Defendants' paid advertising. It is free, publicly accessible, and specifically designed to provide transparency into advertiser identity. Her failure to reference it is a significant methodological omission.</p>
+
+        <h3>C. SimilarWeb &mdash; Paid and Organic Keyword Analysis</h3>
+
+        <p>SimilarWeb is a leading competitive intelligence platform used to analyze website traffic, keyword rankings, and advertising activity. I analyzed paid and organic keyword data for DunhamLaw.com, DunhamJones.com, and DunnamLaw.com covering February 2025 through January 2026.</p>
+
+        <div class="key-finding">
+            <p><strong>Finding &mdash; Paid Keywords:</strong> Neither DunhamLaw.com nor DunhamJones.com targeted any paid keywords containing "dunnam" or any restricted name formulation during the 12-month period analyzed.</p>
+        </div>
+
+        <div class="key-finding">
+            <p><strong>Finding &mdash; Organic "Dunnam" Keywords:</strong> DunhamLaw.com appeared organically for 3 queries containing "dunnam"&mdash;all with <strong>zero clicks</strong>. DunhamJones.com appeared for 1 "dunnam" query&mdash;also with <strong>zero clicks</strong>. These incidental appearances generate no traffic and are the natural result of Google's fuzzy matching of similar names.</p>
+        </div>
+
+        <p>It is important to note that even if Defendants <em>were</em> bidding on "Dunnam &amp; Dunnam" as a paid keyword&mdash;which the data confirms they are not&mdash;this would still not constitute a violation of the 1998 Agreed Judgment. The Judgment prohibits using certain name formulations in advertising, not bidding on a competitor's brand name in a search advertising platform. Competitor brand bidding is a common and accepted practice in paid search advertising. Google explicitly permits advertisers to bid on competitors' brand names as keywords; it is a standard feature of the Google Ads platform used across virtually every industry. The fact that Defendants have not engaged in this entirely permissible practice further underscores the absence of any intent to trade on the Dunnam &amp; Dunnam brand.</p>
+
+        <p>If there were any evidence of Defendants attempting to conflate their brand with Dunnam &amp; Dunnam, the clearest and most direct proof would be paid search bids targeting the "Dunnam" brand&mdash;purchasing the right to appear in search results when users search for "Dunnam &amp; Dunnam." No such bids exist. This is not a gap in the evidence; it is affirmative proof that no such targeting has occurred.</p>
+
+        <h3 class="new-page">D. SEMrush &mdash; Organic Positions and Backlink Analysis</h3>
+
+        <p>SEMrush is one of the world's most widely used SEO research platforms, trusted by enterprises and agencies globally. I analyzed organic ranking positions for all three domains and performed a comprehensive backlink and anchor text analysis for DunhamLaw.com.</p>
+
+        <p><strong>Organic Rankings for "Dunnam" Keywords:</strong></p>
+
+        <table>
+            <tr>
+                <th>Domain</th>
+                <th>"Dunnam" Keywords</th>
+                <th>Positions</th>
+                <th>Traffic from "Dunnam" Keywords</th>
+            </tr>
+            <tr>
+                <td>dunhamlaw.com</td>
+                <td>3</td>
+                <td>19, 79</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>dunhamjones.com</td>
+                <td>12</td>
+                <td>21&ndash;73 (all page 3+)</td>
+                <td>0</td>
+            </tr>
+        </table>
+
+        <p>All "dunnam" keyword rankings for Defendants' domains fall on page 3 or deeper of Google search results (position 21+). These positions are functionally invisible to searchers&mdash;fewer than 1% of users click past page 2&mdash;and they generate zero measurable traffic. These are passive, incidental rankings caused by algorithmic name similarity, not targeted optimization.</p>
+
+        <div class="key-finding">
+            <p><strong>Finding &mdash; Backlink Anchors:</strong> Across <strong>28,279 total backlinks</strong> pointing to DunhamLaw.com (1,807 unique anchor texts), <strong>zero</strong> contain the word "dunnam" in any form. Not a single backlink uses "dunnam," "dunnam &amp; dunnam," "dunnam and dunnam," or any variation of the Dunnam brand as anchor text.</p>
+        </div>
+
+        <p>If Defendants were engaged in any link-building strategy to associate their domain with the "Dunnam" brand&mdash;a common SEO tactic for brand confusion&mdash;this would be plainly visible in the anchor text data. The complete absence of "dunnam" from 28,279 backlinks is definitive evidence that no such strategy exists or has ever existed.</p>
+
+        <p>All "Dunham"-containing anchor texts reference Defendants' legitimate brand names: "Dunham &amp; Jones," "Dunham &amp; Jones Attorneys at Law, P.C.," "Paul Dunham," and "DunhamLaw.com."</p>
+
+        <!-- IV. SCOPE MISCHARACTERIZATION -->
+        <h2 class="new-page">IV. The Brown Report Mischaracterizes the 1998 Agreed Judgment</h2>
+
+        <p>A proper analysis of whether the Defendants are violating the 1998 Agreed Judgment must begin with what it actually says. The Brown Report does not do so and therefore it consistently extends its reach beyond the text of that order.</p>
+
+        <h3>A. What the 1998 Agreed Judgment Prohibits</h3>
+
+        <p>The 1998 Agreed Judgment enjoins Defendants Dunham &amp; Jones, Paul Dunham, Jeffrey Casey and others from using, directly or indirectly, in 16 specified Texas counties, the following names: "Dunham, Attorney at Law," "Dunhams, Attorney at Law," "Dunham Law Firm," "Dunham Firm," "Dunhams," "Dunham and Associates with any variation of the use of a word or symbol for 'and,'" "Dunham and Dunham, with any variation of the use of a word or symbol for 'and,'" and any of the identified names with the word "The" or "the" preceding those names, with the words or abbreviations Inc., P.C., A Professional Corporation, L.L.P. or Limited Liability Partnership following or associated with those names, or with the spelling Dunnam rather than Dunham, or using the name Dunham or Dunnam without a different given name or a different surname associated that that name (the "Specified Names").  The 1998 Agreed Judgment also enjoins "the placing, making, purchasing or otherwise permitting any advertising or solicitation distributed or circulated in the specified area emphasizing the name 'Dunham' or 'Dunnam' as compared to any other given or proper name with may be contained in the name of the law firm, group or individual placing, making, purchasing or otherwise permitting said advertising."</p>
+
+        <h3>B. What the 1998 Agreed Judgment Does Not Prohibit</h3>
+
+        <ul>
+            <li><strong>The use of the surname "Dunham" itself.</strong> "Dunham" is Paul Dunham's surname and part of his law firm's name, Dunham &amp; Jones, Attorneys at Law, P.C. The Agreed Judgment restricts specific name formulations only. The Agreed Judgment does not restrict the use of domain names or prohibit the use of DunhamLaw.com or other domain names incorporating the name "Dunham."</li>
+
+            <li><strong>The practice of law in the specified counties.</strong> Defendants are free to practice law in all 16 counties; they are restricted only in the names under which they advertise their legal services.</li>
+
+            <li><strong>Advertising under non-restricted names.</strong> The name "Dunham &amp; Jones" is not a name restricted by the 1998 Agreed Judgment, so Defendants may advertise their legal services in the specified counties under this name. As confirmed by the Google Ads Transparency Center, all of Defendants' advertisements identify them as "Dunham &amp; Jones Attorneys at Law, P.C."</li>
+
+            <li><strong>Organic search engine rankings.</strong> The 1998 Agreed Judgment was entered years before modern search engines existed in their current form. It addresses naming practices and advertising of the Defendants. It does not address nor restrict how third-party algorithms index or display information about Defendants or Dunnam &amp; Dunnam.</li>
+
+            <li><strong>Mentioning geographic locations on their website.</strong> Dunham &amp; Jones operates offices and serves clients in the restricted counties. It is standard and necessary practice for a law firm to mention the locations where it operates on its website. The Judgment prohibits using certain <em>names</em> in those areas&mdash;not mentioning the areas themselves.</li>
+
+            <li><strong>The existence of SEO signals, metadata, or domain architecture.</strong> The 1998 Agreed Judgment does not require Defendants to do anything other than not advertise in the specified counties under the specified names. It does not require them to suppress their use of "Dunham &amp; Jones" or Dunham from search engine indexes or to implement negative keywords against Dunham or Dunnam or any variant of those names.</li>
+        </ul>
+
+        <h3>C. Brown's Overreach</h3>
+
+        <p>Brown's report effectively expands the 1998 Agreed Judgment to prohibit: the operation of the domain DunhamLaw.com, organic search visibility for the surname "Dunham" in restricted counties, any mention of restricted counties on Defendants' website, and any "algorithmic association" between Defendants and Plaintiff. None of these are requirements by the 1998 Agreed Judgment, and imposing them would effectively prohibit Defendants from operating a law practice under their own legal name.</p>
+
+        <p>Brown's keyword frequency counts&mdash;"450 mentions of 'Waco criminal attorney,' 195 mentions of 'Bell County'"&mdash;are presented as though they constitute violations. They do not. Having content about locations where Defendants practice law is not a violation of the Judgment and is not connected to the restricted naming practices. Dunham &amp; Jones is allowed to operate in those locations, and it is only logical that they would reference them on their website.</p>
+
+        <!-- V. EVIDENCE OF NON-VIOLATION -->
+        <h2 class="new-page">V. The Brown Report Includes No Evidence of Any Violation of the 1998 Agreed Judgment</h2>
+
+        <h3>A. No Prohibited Names Identified on Defendants' Websites</h3>
+
+        <p>The Screaming Frog crawl of DunhamLaw.com&mdash;2,104 internal URLs, 1,548 HTML pages, custom extraction for "dunnam" across HTML source, page text, and content areas&mdash;returned <strong>zero matches</strong>. The word "dunnam" does not appear anywhere on the site.</p>
+
+        <p>This is the definitive test. If Defendants were using restricted names on their website, were embedding "Dunnam" in metadata, or were targeting the "Dunnam &amp; Dunnam" brand through any on-page element, a comprehensive site crawl would detect it. This analysis was available to Brown using a tool she claims to use&mdash;Screaming Frog is listed on her CV&mdash;yet she either did not perform this crawl or chose not to report the results.</p>
+
+        <p>Brown claims that "Dunham" appears in URLs, page titles, headers, and meta content. This is unsurprising&mdash;"Dunham" is Paul Dunham's surname and the first name of the law firm Dunham &amp; Jones. However, Brown does not identify a single instance where a restricted name formulation ("Dunham Law Firm," "Dunham, Attorney at Law," "Dunhams," etc.) appears on Defendants' advertising in the restricted counties.</p>
+
+        <h3>B. The Report Includes No Offending Advertisements</h3>
+
+        <p>The Google Ads Transparency Center confirms that every paid advertisement associated with the DunhamLaw.com domain identifies the advertiser as "Dunham &amp; Jones Attorneys at Law, P.C."&mdash;a name that is not restricted by the 1998 Agreed Judgment. No advertisements use "Dunham Law Firm," "Dunham, Attorney at Law," "Dunhams," or any other restricted formulation. No advertisements reference "Dunnam" in any way.</p>
+
+        <p>SimilarWeb data further confirms that neither DunhamLaw.com nor DunhamJones.com targeted any paid keywords containing "dunnam" or any restricted name formulation during the 12-month period from February 2025 through January 2026.</p>
+
+        <p>Brown concedes she "cannot verify" paid advertising activity but still implies violation through "brand-adjacent visibility" language. If Defendants were running paid search ads using restricted names in restricted counties, this would be visible to anyone&mdash;including Brown herself&mdash;through a simple Google search from within those counties, through the Google Ads Transparency Center, or through any third-party competitive intelligence tool. The fact that no such evidence exists is not a gap in the record; it is evidence that no violation has occurred.</p>
+
+        <h3>C. No "Dunnam" Brand Targeting in SEO</h3>
+
+        <p>The SEMrush backlink analysis provides additional confirmation. Across 28,279 backlinks to DunhamLaw.com, zero use the word "dunnam" in anchor text. This is significant because anchor text manipulation&mdash;building links with competitor brand names as anchor text&mdash;is the primary SEO technique for creating brand association. The complete absence of "dunnam" from Defendants' entire backlink profile demonstrates that no such strategy has been employed.</p>
+
+        <p>All three lines of evidence&mdash;on-page content (Screaming Frog), paid advertising (Google Ads Transparency Center, SimilarWeb), and off-page SEO (SEMrush backlinks)&mdash;independently confirm the same conclusion: Defendants have not targeted, referenced, or attempted to associate with the "Dunnam" brand.</p>
+
+        <h3>D. The "If It's Visible to Google, It's Visible to You" Principle</h3>
+
+        <p>A basic principle of search engine optimization is that search engines only index and rank content that is publicly accessible. If Defendants were using restricted names on their website, embedding them in metadata, or targeting the "Dunnam &amp; Dunnam" brand through on-page content, this information would be visible to any person using a web browser, any search engine crawler, and any third-party SEO tool. The Brown Report does not contain a single instance of such a use&mdash;despite having access to the same public internet as everyone else.  The Brown Report therefore contains no proof of any violation of the 1998 Agreed Order.</p>
+
+        <!-- VI. METHODOLOGY CRITIQUE -->
+        <h2 class="new-page">VI. Brown's Methodology Is Insufficiently Described and Thus Non-Reproducible</h2>
+
+        <h3>A. Unnamed Tools and Undocumented Processes</h3>
+
+        <p>Brown references "third-party SEO visibility data" and "third-party keyword visibility" throughout her report. However, the Brown Report does not identify the specific tools Brown claims to have used. Industry-standard expert analysis requires naming the tools used (e.g., Ahrefs, SEMrush, SimilarWeb, Moz), specifying the exact date of data extraction, and providing the raw data and report outputs. All of these tools generate downloadable reports that serve as verifiable evidence. Brown provides none.</p>
+
+        <p>By contrast, every finding in this report identifies the specific tool used, the date of analysis, the scope of data collected, and the availability of raw exports for verification.</p>
+
+        <h3>B. Self-Identified Methodological Failures</h3>
+
+        <p>In Section XI of her report, Brown herself acknowledges that proper reproducibility of her methods and analysis would require her to document:</p>
+        <ul>
+            <li>Crawl scope and user-agent</li>
+            <li>Date range</li>
+            <li>Deduplication method for templated content</li>
+            <li>Handling of dynamic and paginated content</li>
+            <li>Phrase matching and variant handling logic</li>
+        </ul>
+
+        <p>Brown admits she did not provide any of these parameters. [cite to admission] This is a significant concession. Without a documented deduplication methodology, her keyword frequency counts (e.g., "450 mentions of 'Waco criminal attorney'") are almost certainly inflated by templated content&mdash;headers, footers, navigation menus, and sidebar elements that repeat across every page of a website. A single navigation element containing "Waco" that appears on 450 pages would be counted as "450 mentions" under an undeduplicated methodology, despite representing a single design choice.</p>
+
+        <p>In any case, there is nothing in the 1998 Agreed Judgment that prohibits Defendants from using the word "Waco" or other geographic terms.</p>
+
+        <h3>C. Qualitative Conclusions from Quantitative Claims</h3>
+
+        <p>Brown claims that her January 2026 update is a "qualitative comparison" to her August 2025 baseline.  She does not identify or produce her August 2025 baseline data, so there is no way to validate her comparison.  Brown draws the conclusion that there has been "no material retreat" in restricted-area visibility, but she does not define what she means by "restricted-area visibility."  The 1998 Agreed Judgment does not prohibit or restrict the "visibility" of Dunham &amp; Jones' website or advertising in the "restricted area" of the specified counties.  The restriction is on the use in advertisements of certain names and name variants.  Brown does not identify any offending uses of such names or name variants in the specified counties; she simply claims that unidentified and undefined "restricted-area visibility" has not changed since August 2025.</p>
+
+        <h3>D. Publicly Verifiable Items Treated as Requiring Discovery</h3>
+
+        <p>Brown's Verification/Proof Matrix (Attachment A) claims that certain items are "not publicly verifiable" and therefore her report is necessarily incomplete without further production from Defendants. In fact, many of these items are partially or fully verifiable through public tools:</p>
+
+        <ul>
+            <li><strong>Metadata cleanup:</strong> Fully verifiable through a Screaming Frog crawl&mdash;a tool Brown claims to use. I performed this crawl and found zero instances of "dunnam."</li>
+            <li><strong>Domain redirects:</strong> Verifiable through direct browser testing, HTTP header inspection, and redirect-checking tools. My crawl confirmed 66 of 71 restricted-county URLs redirect to DunhamJones.com.</li>
+            <li><strong>Paid ad presence:</strong> Verifiable through the Google Ads Transparency Center, which Brown apparently chose not to use, direct search observation in restricted counties, and third-party paid search intelligence tools. Since Brown is located in Waco, she can easily do direct search observation for offending advertisements.  Nonetheless, Brown fails to produce or identify a single offending advertisement or webpage.  My analysis of the Transparency Center confirmed all ads use "Dunham &amp; Jones Attorneys at Law, P.C."</li>
+            <li><strong>County targeting on-site:</strong> Verifiable through site crawling and content analysis. My Screaming Frog crawl captured every page and its content.</li>
+        </ul>
+
+        <p>That Brown claims these items require discovery from Defendants, rather than conducting the public analysis herself, raises serious questions about the thoroughness of her investigation. Either she lacks familiarity with the tools that would answer these questions, or it reflects her recognition that the publicly available evidence does not support her conclusions. In either case, her request for extensive internal documentation&mdash;including full site backups, SEO vendor communications, Google Analytics data, Search Console data, and complete Google Ads account exports&mdash;goes well beyond what is necessary to assess compliance with a naming restriction. Such production would effectively provide Plaintiff's team with a comprehensive roadmap of Defendants' marketing strategy and competitive intelligence, which has nothing to do with the 1998 Agreed Judgment's narrow prohibition on specific name formulations.</p>
+
+        <!-- VII. ORGANIC RANKINGS -->
+        <h2 class="new-page">VII. Organic Search Rankings Are No Evidence of Misconduct</h2>
+
+        <h3>A. How Search Engines Handle Similar Names</h3>
+
+        <p>Brown's finding that DunhamLaw.com ranked in organic search results on Google for queries like "dunnam &amp; dunnam" is presented as evidence of the Defendants' violation of the 1998 Agreed Judgment. It is not. Search engines, including Google, routinely produce organic results for approximate name matches, misspellings, and phonetically similar words. When a user searches for "dunnam," Google may show results that include the word "dunham" because Google's algorithm recognizes the names as similar. This is core algorithmic behavior that neither Defendants nor Plaintiff controls.</p>
+
+        <p>The closest Defendants could come to influencing organic search results and rankings for the "Dunnam &amp; Dunnam" brand would be to include that name in their website content, metadata, or link structure. As noted, if Defendants were doing this, it could easily be found. My Screaming Frog crawl found zero instances of "dunnam" in 1,548 HTML pages. My SEMrush analysis confirms zero instances of "dunnam" in 28,279 backlinks.</p>
+
+        <h3>B. Neither Party Controls Google's Algorithm</h3>
+
+        <p>No website operator controls how Google ranks their site for queries they have not specifically targeted by purchasing a keyword. Google's ranking algorithm considers hundreds of factors, including domain name similarity, geographic proximity, practice area overlap, and user behavior signals. It is entirely expected that that two law firms with similar sounding initial surnames, operating in overlapping geographic markets with overlapping practice areas, would appear in each other's organic search results. For instance, searching for "dunham austin lawyer" generates organic search results for Dunham LLP and Dunham &amp; Jones. Such results do not show any manipulation by either party.</p>
+
+        <h3>C. Brown's "Algorithmic Ambiguity" Argument Is Without Merit</h3>
+
+        <p>Brown introduces the concept of "algorithmic ambiguity" and describes a chatbot incident where "incorrect or conflicting contact information" was surfaced. She does not identify what chatbot she is referring to, does not describe or produce her chatbot session, nor does she identify what the purported faulty information was, so it is impossible to verify or replicate her claim.</p>
+
+        <p>In any case, Brown admits this was "not consistently reproducible" and is "not relied upon as a standalone finding." This admission effectively concedes her purported finding has no explanatory value. Defendants do not control third-party AI chatbot behavior, and isolated, non-reproducible algorithmic outputs are not evidence of a violation of the 1998 Agreed Judgment by Defendants, which is limited to restricting their use of certain names in advertisements, not the output of AI chatbots.</p>
+
+        <!-- VIII. PROACTIVE COMPLIANCE -->
+        <h2>VIII. Defendants Have Taken Proactive Steps Beyond the 1998 Agreed Judgment's Requirements</h2>
+
+        <p>Brown's report fails to acknowledge, identify, or give weight to the fact: <strong>Defendants voluntarily redirect their primary domain DunhamLaw.com to DunhamJones.com for users located in the restricted counties and for website content that advertises lawyers in the restricted counties or that refer to the restricted counties.</strong></p>
+
+        <p>My Screaming Frog crawl independently confirms the scope of this redirect program:</p>
+
+        <ul>
+            <li><strong>66 of 71 restricted-county URLs</strong> on DunhamLaw.com redirect via HTTP 301 to DunhamJones.com</li>
+            <li>Redirects cover all 16 restricted counties across three content categories: warrants, bail bonds, and injury lawyers</li>
+            <li>The Waco law office page (<code>/law-offices/waco-law-office/</code>) redirects to DunhamJones.com</li>
+            <li>The Waco criminal attorneys page (<code>/tx/waco-criminal-attorneys/</code>) redirects to DunhamJones.com</li>
+            <li>City-specific pages for Bryan, Harker Heights, Copperas Cove, Hillsboro, Cleburne, and Marlin all redirect to DunhamJones.com</li>
+        </ul>
+
+        <p>This is an extraordinary measure. Defendants operate a successful law practice with a 20+ year established domain. No provision of the 1998 Agreed Judgment requires them to redirect their primary domain for any geographic subset of users or content. That they have chosen to do so&mdash;at the cost of diminished brand consistency and potential user confusion&mdash;demonstrates a good-faith commitment to compliance that goes well beyond the Agreed Judgment's requirements. In no other context would a successful business voluntarily redirect its primary, long-established domain for a subset of its service areas.</p>
+
+        <p>In my professional experience managing enterprise-level web properties, geographic domain redirection is a technically sophisticated practice that requires ongoing maintenance and investment. It is the opposite of the "selective implementation choices" that Brown alleges but fails to describe or identify in her report.</p>
+
+        <!-- IX. CORRECTIVE ADVERTISING -->
+        <h2 class="new-page">IX. Brown's Corrective Advertising Estimates Are Unsupported and Inflated</h2>
+
+        <h3>A. No Methodology or Basis Provided</h3>
+
+        <p>Brown proposes annual corrective advertising costs of $65,000 to $120,000 per year for an unspecified multi-year period, without citing any methodology, market data, rate cards, comparable cases, or industry benchmarks. Her figures appear to be wholly arbitrary.</p>
+
+        <h3>B. Disproportionate to the Market</h3>
+
+        <p>Waco, Texas (McLennan County) is a regional market with a metropolitan population of approximately 270,000. Based on my 20+ year experience in purchasing online advertisements, the proposed "paid search corrective ads" budget of $25,000&ndash;$50,000 per year is orders of magnitude beyond what would be required for a legitimate search clarification campaign in a market of this size. For context, $50,000 in annual Google Ads spend in a regional legal market would purchase an extraordinarily dominant advertising presence&mdash;far beyond any reasonable "corrective" purpose.</p>
+
+        <h3>C. Self-Serving Monitoring Fees</h3>
+
+        <p>Brown proposes $12,000&ndash;$20,000 per year for "ongoing monitoring and enforcement." Given that Brown has identified no violations of the 1998 Agreed Judgment, she has identified no reason for "ongoing monitoring and enforcement." At her stated rate of $125 per hour, this would be 96 to 160 hours of annual monitoring&mdash;roughly 2 to 3 hours per week, every week, indefinitely. She does not identify what methods would be used to conduct this "monitoring," or why they could not be automated rather than done manually, week after week. This amount of time would be grossly disproportionate to the monitoring needs of a single regional matter. It appears designed to create a recurring revenue stream for Brown rather than address a genuine compliance need, given her failure to identify a single violation of the 1998 Agreed Judgment.</p>
+
+        <h3>D. Search Signals Do Not Require Multi-Year Correction</h3>
+
+        <p>Brown claims that search engine associations of words "do not self-correct simply because conduct stops" and that corrective efforts "must be sustained" over a "multi-year period." Again, her report fails to identify what "conduct" that Defendants are engaged in that she believes violates the 1998 Agreed Judgment that must "stop." Moreover, this claim is misleading. Search engine results and rankings are highly dynamic. Google recrawls and reindexes active websites on a continuous basis, typically on a frequency of days or weeks. Historical ranking signals naturally decay as content is updated, removed, or superseded. A multi-year corrective campaign is not needed, even if Brown had identified something that needs correcting, given how search engines actually function.</p>
+
+        <h3>E. Premature and Presumptive</h3>
+
+        <p>As noted, Brown's corrective advertising claim presumes that violations of the 1998 Agreed Judgment have been identified and proven and confusion has been established. Neither is the case. It is not possible to calculate corrective advertising costs without identifying the exact nature and scope of the misconduct, if any. Brown's failure to identify any offending conduct means her corrective advertising claim has no factual foundation.</p>
+
+        <!-- X. BROWN'S QUALIFICATIONS -->
+        <h2>X. Observations on the Opposing Expert's Qualifications</h2>
+
+        <p>To assist the Court's evaluation of the Brown Report and the reliability of the opinions contained in it, I note the following about Brown's qualifications:</p>
+
+        <ul>
+            <li>Brown's professional background before founding Digital Media Butterfly in 2012 was in <strong>system administration</strong>&mdash;managing phone systems, hardware rollouts, and providing technical support for approximately 400 users. This is information technology work, not search engine marketing or advertising expertise.</li>
+
+            <li>Brown's claimed formal technical education consists of <strong>coursework in a 1998 night program</strong> in web design and development, long before search engines existed in their current form. She holds no degree in marketing, advertising, computer science, or any related field.</li>
+
+            <li>Brown has <strong>never testified as an expert witness</strong> and <strong>identifies no publications</strong> in the field of search engine marketing, SEO, or digital advertising.</li>
+
+            <li>Brown <strong>names no clients</strong> in her CV&mdash;no enterprise, Fortune 500, or other engagements that would show experience with the multi-domain, multi-market analysis she attempts in this report.</li>
+
+            <li>Brown's report makes <strong>legal conclusions about intent, willfulness, and compliance</strong> that exceed the scope of technical expertise. She has no expertise to support an opinion on whether Defendants' "selective implementation choices" constitute intentional non-compliance, especially since she does not identify any violations of the 1998 Agreed Judgment nor identify what she is referring to when she says "selective implementation choices."</li>
+        </ul>
+
+        <!-- XI. CONCLUSION -->
+        <h2 class="new-page">XI. Conclusion</h2>
+
+        <p>The Brown Report consists of 15 pages of vague jargon, speculation, unsupported claims, and methodological shortcuts that attempts to create the appearance of non-compliance with the 1998 Agreed Judgment without showing a single actual violation. My independent analysis using industry-standard tools has produced verifiable evidence that directly contradicts Brown's central allegations:</p>
+
+        <ul>
+            <li><strong>No "Dunnam" content on Defendants' website.</strong> The Brown Report does not contain a single screenshot of a non-compliant advertisement, a single use of a restricted name in a restricted county, or any other concrete evidence of a violation. Her failure to produce such evidence speaks for itself. A Screaming Frog crawl of all 1,216 indexable pages found zero instances of "dunnam" in HTML, page text, or content areas.</li>
+
+            <li><strong>No restricted-name advertising.</strong> The Google Ads Transparency Center confirms all advertisements use "Dunham &amp; Jones Attorneys at Law, P.C."&mdash;a non-restricted name. SimilarWeb confirms no paid keywords targeting "dunnam" or any restricted name on either domain.</li>
+
+            <li><strong>No brand targeting through SEO.</strong> SEMrush analysis of 28,279 backlinks found zero anchor texts containing "dunnam." All link signals reference Defendants' legitimate brand names.</li>
+
+            <li><strong>Zero traffic from "Dunnam" searches.</strong> Both SimilarWeb and SEMrush confirm that Defendants' websites receive zero click traffic from "dunnam"-intent keywords. No paid keyword bids target the "Dunnam" brand&mdash;a practice that, even if it occurred, would be permitted by Google and would not violate the 1998 Agreed Judgment.</li>
+
+            <li><strong>Systematic compliance measures in place.</strong> 66 of 71 restricted-county URLs on DunhamLaw.com redirect to DunhamJones.com via HTTP 301&mdash;a significant, proactive compliance measure not required by the 1998 Agreed Judgment.</li>
+
+            <li><strong>Misreading of the 1998 Agreed Judgment.</strong> Brown appears to assume that the Judgment prohibits any use of the name "Dunham" online. It is not. The Judgment prohibits specific name formulations in specific counties&mdash;a far narrower restriction than Brown applies.</li>
+
+            <li><strong>Unfalsifiable reasoning.</strong> Brown's analytical framework is structured so that no evidence could ever demonstrate compliance: if she finds something, it's a violation (although she has not found any violation); since she finds nothing, she speculates that discovery is required to confirm compliance, even when she fails to use public tools available to do so. This is not rigorous analysis&mdash;it is advocacy.</li>
+
+            <li><strong>Inflated damages.</strong> Brown's corrective advertising estimates of $65,000&ndash;$120,000 per year are unsupported by any proof of any violation, by the description of any methodology for determining the purportedly needed corrective advertising, by any description of the type of corrective advertising or monitoring she believes is needed, and are wildly disproportionate to the regional market.</li>
+        </ul>
+
+        <p>In my professional opinion, Defendants' online properties do not demonstrate the violations alleged in the Brown Report. The evidence demonstrates the opposite: Defendants have systematically avoided using restricted names on their website, in their advertising, and in their SEO practices, and they have implemented voluntary compliance measures that go beyond the 1998 Agreed Judgment's requirements. The Brown Report should be given little weight due to its methodological deficiencies, unsupported conclusions, and fundamental mischaracterization of both the applicable legal standard and the technical realities of search engine behavior.</p>
+
+        <!-- SIGNATURE -->
+        <div class="signature">
+            <p>The opinions expressed in my report are based on my professional experience and analysis as of the date of this report. Raw tool exports supporting the findings in this report are available upon request. I reserve the right to supplement my report and opinions if I receive additional materials or discovery.</p>
+            <br>
+            <p>Signed on __________________, in Los Angeles, California.</p>
+            <br><br>
+            <div class="sig-line"></div>
+            <p><strong>Kenny Hyder</strong></p>
+            <p>Founder, Hyder Media</p>
+            <p>kenny@hyder.me | (619) 850-7217</p>
+            <p><a href="https://hyder.me">hyder.me</a></p>
+        </div>
+
+    </div>
+</body>
+</html>

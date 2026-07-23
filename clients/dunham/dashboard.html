@@ -19,18 +19,11 @@
     <nav class="main-nav">
         <a href="dashboard.html" class="nav-brand">
             <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
-            Dunham & Jones Ad Report
+            Dunham &amp; Jones
         </a>
-        <div class="nav-actions">
-            <a href="reporting.html" class="btn btn-secondary">Reporting</a>
-            <a href="bail-bonds.html" class="btn btn-secondary">Bail Bonds Initiative</a>
-            <a href="maps-ops.html" class="btn btn-secondary">Maps Ops</a>
-            <a href="gbp.html" class="btn btn-secondary">GBP Export</a>
-            <button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button>
-            <button class="btn btn-secondary" onclick="downloadAll()">Export All Years</button>
-            <button class="btn btn-primary" id="print-btn" onclick="printCurrentView()">Export PDF</button>
-        </div>
+        <div class="nav-links"><a href="dashboard.html" class="nav-link active">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link">GBP</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
     </nav>
+    <div class="page-toolbar"><button class="btn btn-secondary" onclick="loadData(undefined, true)">Refresh</button><button class="btn btn-secondary" onclick="downloadAll()">Export All Years</button><button class="btn btn-primary" id="print-btn" onclick="printCurrentView()">Export PDF</button></div>
 
     <div class="container">
         <div class="report-header">

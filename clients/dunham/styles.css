@@ -2182,3 +2182,17 @@ body {
         page-break-inside: avoid;
     }
 }
+
+/* Standardized navigation (2026-07-23) */
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.nav-link {
+    padding: 6px 12px; border-radius: 6px; color: var(--text-secondary);
+    text-decoration: none; font-size: 0.9rem; font-weight: 500; white-space: nowrap;
+}
+.nav-link:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.nav-link.active { background: var(--accent); color: #fff; }
+.page-toolbar {
+    display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
+    max-width: 1240px; margin: 14px auto -10px; padding: 0 20px;
+}
+@media print { .page-toolbar { display: none; } }

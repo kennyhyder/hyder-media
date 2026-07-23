@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenny Hyder | Expert CV</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #4a4a4a;
+            --accent: #2563eb;
+            --border: #d1d5db;
+            --bg: #ffffff;
+            --light-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: letter;
+            margin: 0.75in 0.85in;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: var(--primary);
+            background: var(--bg);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in 0.85in;
+        }
+
+        @media print {
+            .container {
+                padding: 0;
+            }
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .header-logo {
+            flex-shrink: 0;
+        }
+
+        .header-logo img {
+            width: 72px;
+            height: auto;
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h1 {
+            font-size: 28pt;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .header-text .subtitle {
+            font-size: 12pt;
+            font-weight: 500;
+            color: var(--secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .contact-info {
+            font-size: 9.5pt;
+            color: var(--secondary);
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+
+        .contact-info a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-info .separator {
+            margin: 0 8px;
+            color: var(--border);
+        }
+
+        /* Page indicator */
+        .page-indicator {
+            font-size: 8pt;
+            color: #999;
+            text-align: right;
+            margin-bottom: 4px;
+        }
+
+        /* Sections */
+        h2 {
+            font-size: 13pt;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 4px;
+            margin-top: 22px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 11pt;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 14px;
+            margin-bottom: 2px;
+            page-break-after: avoid;
+        }
+
+        h4 {
+            font-size: 10pt;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        p {
+            margin-bottom: 6px;
+            color: var(--secondary);
+        }
+
+        /* Job titles */
+        .role {
+            page-break-inside: avoid;
+            margin-bottom: 12px;
+        }
+
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .role-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .role-location {
+            font-style: italic;
+            color: var(--secondary);
+            font-size: 9.5pt;
+        }
+
+        .role-dates {
+            font-size: 9.5pt;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .role-desc {
+            margin-top: 4px;
+            color: var(--secondary);
+            font-size: 10pt;
+        }
+
+        /* Lists */
+        ul {
+            padding-left: 18px;
+            margin-bottom: 6px;
+        }
+
+        ul li {
+            margin-bottom: 3px;
+            color: var(--secondary);
+            font-size: 10pt;
+        }
+
+        ul li strong {
+            color: var(--primary);
+        }
+
+        /* Two-column expertise */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 24px;
+        }
+
+        .two-col ul {
+            margin-bottom: 0;
+        }
+
+        /* Client grid */
+        .client-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 32px;
+        }
+
+        .client-category {
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+        }
+
+        .client-category h4 {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .client-category ul {
+            margin-bottom: 0;
+        }
+
+        .client-category li {
+            font-size: 9.5pt;
+        }
+
+        /* Speaking table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 9.5pt;
+            page-break-inside: avoid;
+        }
+
+        thead th {
+            background: var(--primary);
+            color: white;
+            padding: 6px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody td {
+            padding: 6px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            color: var(--secondary);
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--light-bg);
+        }
+
+        tbody td:first-child {
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        tbody td:nth-child(2) {
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        /* Publications */
+        .pub-item {
+            margin-bottom: 8px;
+            page-break-inside: avoid;
+        }
+
+        .pub-item .pub-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .pub-item .pub-source {
+            font-style: italic;
+            color: var(--secondary);
+        }
+
+        .pub-item .pub-url {
+            font-size: 8.5pt;
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        /* Co-presenters */
+        .presenters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 24px;
+        }
+
+        .presenter {
+            font-size: 9.5pt;
+            padding: 2px 0;
+        }
+
+        .presenter strong {
+            color: var(--primary);
+        }
+
+        .presenter span {
+            color: var(--secondary);
+        }
+
+        /* Final sections */
+        .final-section {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            page-break-inside: avoid;
+        }
+
+        .final-section h2 {
+            margin-top: 0;
+        }
+
+        .final-section p {
+            font-size: 10pt;
+        }
+
+        /* Agency partnerships */
+        .agency {
+            margin-bottom: 6px;
+            padding-left: 18px;
+        }
+
+        .agency strong {
+            color: var(--primary);
+        }
+
+        .agency span {
+            font-size: 9.5pt;
+            color: var(--secondary);
+        }
+
+        /* Sub-heading labels */
+        .label {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        /* Print page breaks */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Section-level page break control */
+        .section-own-page {
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+
+        /* First section after header should NOT force a page break */
+        .section-own-page:first-of-type {
+            page-break-before: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-logo">
+                <a href="https://hyder.me"><img src="../assets/imgs/logos/hyder-media-logo.png" alt="Hyder Media"></a>
+            </div>
+            <div class="header-text">
+                <h1>KENNY HYDER</h1>
+                <div class="subtitle">Digital Marketing &amp; Search Advertising Expert</div>
+                <div class="contact-info">
+                    <a href="mailto:kenny@hyder.me">kenny@hyder.me</a>
+                    <span class="separator">|</span>
+                    (619) 850-7217
+                    <span class="separator">|</span>
+                    Los Angeles, California
+                    <span class="separator">|</span>
+                    <a href="https://hyder.me">hyder.me</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFESSIONAL SUMMARY -->
+        <h2>Professional Summary</h2>
+        <p>
+            Senior digital marketing and search advertising consultant with over 20 years of hands-on experience in search engine optimization (SEO), paid search advertising (SEM/PPC), content marketing, online reputation management, and consumer behavior analysis in digital environments. Founded first agency in 2007, scaling to over $2.5 million in annual recurring revenue within one year before acquisition in 2008. Has directed search marketing strategy for multiple Fortune 500 companies, including Fortune 20 and Fortune 5 businesses, generating measurable revenue increases in the hundreds of millions of dollars. Recognized as a search marketing expert by Search Engine Journal and other leading industry publications. Veteran featured speaker at major industry conferences including SMX (Search Marketing Expo), Pubcon, Affiliate Summit, BlogWorld/New Media Expo, and the Direct Marketing Association. Serves as a judge for the US Search Awards.
+        </p>
+
+        <!-- AREAS OF EXPERTISE -->
+        <h2>Areas of Expertise</h2>
+        <div class="two-col">
+            <ul>
+                <li>Search engine optimization (SEO): technical, on-page, off-page, local, and enterprise</li>
+                <li>Paid search advertising strategy and management (Google Ads, Microsoft Ads)</li>
+                <li>Search engine results page (SERP) analysis and algorithmic behavior</li>
+                <li>Keyword research, competitive analysis, and search intent classification</li>
+                <li>Content marketing strategy and viral content mechanics</li>
+                <li>Online reputation management (ORM) and brand/name confusion in search</li>
+                <li>Domain strategy, DNS configuration, and redirect analysis</li>
+                <li>Geographic targeting and location-based search visibility</li>
+            </ul>
+            <ul>
+                <li>Consumer confusion analysis in digital search environments</li>
+                <li>Website architecture, crawlability, and technical SEO auditing</li>
+                <li>Link building strategy, link equity analysis, and backlink auditing</li>
+                <li>Paid search campaign forensics: ad copy, keyword targeting, bid strategy</li>
+                <li>Conversion tracking, attribution modeling, and ROI measurement</li>
+                <li>Digital advertising compliance and deceptive practices identification</li>
+                <li>Affiliate marketing, performance marketing, and funnel optimization</li>
+                <li>Data analysis using industry-standard tools and proprietary methodologies</li>
+            </ul>
+        </div>
+
+        <!-- METHODOLOGIES & TOOLS -->
+        <div class="section-own-page">
+        <h2>Methodologies &amp; Tools</h2>
+
+        <div class="label">Methodologies</div>
+        <div class="two-col">
+            <ul>
+                <li>Comprehensive technical SEO auditing and site architecture analysis</li>
+                <li>Paid search campaign forensic analysis (keyword targeting, geographic settings, ad copy)</li>
+                <li>Organic and paid keyword visibility analysis across search engines</li>
+                <li>Cross-domain, domain migration, and redirect chain analysis</li>
+                <li>Longitudinal search visibility monitoring and change tracking</li>
+                <li>Competitive search landscape assessment and market share analysis</li>
+            </ul>
+            <ul>
+                <li>Brand confusion and trademark infringement analysis in search environments</li>
+                <li>Content authenticity and attribution analysis</li>
+                <li>Link graph analysis and link equity flow mapping</li>
+                <li>Consumer search behavior modeling and click-through analysis</li>
+                <li>ROI measurement and performance attribution for search campaigns</li>
+                <li>Large-scale keyword data analysis and classification (30,000+ keyword datasets)</li>
+            </ul>
+        </div>
+
+        <div class="label">Tools &amp; Data Sources</div>
+        <div class="two-col">
+            <ul>
+                <li>Google Ads: campaign management, Keyword Planner, auction insights</li>
+                <li>Google Search Console and Google Analytics</li>
+                <li>Google Ads Transparency Center</li>
+                <li>Ahrefs (organic search, backlink analysis, competitive research)</li>
+                <li>SEMrush (keyword research, competitive analysis, paid search intelligence)</li>
+                <li>Screaming Frog SEO Spider</li>
+                <li>Moz Pro (domain authority, link analysis)</li>
+            </ul>
+            <ul>
+                <li>SimilarWeb (traffic analysis, competitive intelligence, PPC keyword data)</li>
+                <li>Wayback Machine (Internet Archive) for historical site analysis</li>
+                <li>DNS and WHOIS public records</li>
+                <li>Direct search engine result observation and SERP analysis</li>
+                <li>Custom data analysis tools and API integrations (Google Ads API)</li>
+                <li>Microsoft Clarity and similar user behavior tools</li>
+                <li>Third-party website change monitoring tools</li>
+            </ul>
+        </div>
+        </div>
+
+        <!-- PROFESSIONAL EXPERIENCE -->
+        <h2>Professional Experience</h2>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Hyder Media <span style="font-weight:400; color: var(--secondary);">| Los Angeles, California</span></h3>
+                <span class="role-dates">2008 &ndash; Present</span>
+            </div>
+            <div class="role-title">Founder &amp; Principal Consultant</div>
+            <p class="role-desc">
+                Independent digital marketing consultancy providing strategic SEO, paid search, content marketing, and online reputation management services. Serves as a white-label senior consultant for leading search marketing agencies, providing expert-level strategy and execution for their enterprise clients.
+            </p>
+            <ul>
+                <li>Directs search marketing strategy for Fortune 500, Fortune 20, and Fortune 5 clients across multiple verticals</li>
+                <li>Provides white-label consulting services to top-tier agencies including Inc. 500-ranked firms</li>
+                <li>Manages and audits paid search campaigns with annual budgets exceeding seven figures</li>
+                <li>Conducts competitive intelligence analysis on keyword portfolios of 30,000+ keywords across multiple brands</li>
+                <li>Develops comprehensive SEO audit and remediation strategies for enterprise websites</li>
+                <li>Advises on online reputation management, brand protection, and name-confusion issues in search</li>
+                <li>Builds custom analytics platforms and data pipelines for search marketing intelligence</li>
+            </ul>
+
+            <div class="label" style="margin-top: 8px;">Select White-Label Agency Partnerships</div>
+            <div class="agency"><strong>The JAR Group</strong> <span>(Inc. 500 #475, Fastest-Growing Private Companies) &mdash; Global growth strategy and search marketing agency</span></div>
+            <div class="agency"><strong>Harmon Brothers</strong> <span>&mdash; Award-winning creative agency (Squatty Potty, Purple Mattress; 1.4B+ video views, $350M+ in client sales)</span></div>
+            <div class="agency"><strong>ROI Works</strong> <span>&mdash; Performance marketing agency; SEO and paid search consulting</span></div>
+            <div class="agency"><strong>Visible Factors</strong> <span>&mdash; Data-driven marketing agency (clients: Adobe, Ticketmaster); senior SEO and performance marketing</span></div>
+        </div>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Equate Media <span style="font-weight:400; color: var(--secondary);">| Los Angeles, California</span></h3>
+                <span class="role-dates">2015 &ndash; 2021</span>
+            </div>
+            <div class="role-title">VP of Marketing / Senior Advisor</div>
+            <p class="role-desc">Full-service lead generation and digital advertising company. Led digital content strategy and search visibility campaigns. Currently serves in advisory capacity on search marketing strategy and digital campaign architecture.</p>
+        </div>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Visible Factors <span style="font-weight:400; color: var(--secondary);">| Los Angeles, California</span></h3>
+                <span class="role-dates">2016 &ndash; 2020</span>
+            </div>
+            <div class="role-title">Senior Consultant</div>
+            <p class="role-desc">Senior-level SEO and performance marketing consulting for enterprise clients including major technology and e-commerce brands. Technical SEO audits, paid search strategy, and competitive analysis.</p>
+        </div>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Position Technologies (PositionTech) <span style="font-weight:400; color: var(--secondary);">| Geneva, Illinois</span></h3>
+                <span class="role-dates">2008 &ndash; 2009</span>
+            </div>
+            <div class="role-title">Senior Consultant</div>
+            <p class="role-desc">Enterprise local listing management and local SEO platform trusted by 70% of the largest e-tailers and S&amp;P 500 companies. Served as senior consultant following the acquisition of his agency, advising on local search strategy, search engine marketing, and platform development.</p>
+        </div>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Venture Media Group</h3>
+                <span class="role-dates">2007 &ndash; 2008</span>
+            </div>
+            <div class="role-title">Director, Search Engine Marketing</div>
+            <p class="role-desc">Founded and directed the search engine marketing division. Grew the agency to over $2.5 million in annual recurring revenue in under one year. Agency subsequently acquired by Position Technologies in 2008.</p>
+        </div>
+
+        <div class="role">
+            <div class="role-header">
+                <h3>Level 9 Innovation</h3>
+                <span class="role-dates">2005 &ndash; 2008</span>
+            </div>
+            <div class="role-title">Chief Technology Officer</div>
+            <p class="role-desc">Directed all technology operations and search marketing strategy for a digital marketing agency. Oversaw technical SEO, web development, and search platform integrations.</p>
+        </div>
+
+        <!-- SELECT CLIENT EXPERIENCE -->
+        <div class="section-own-page">
+        <h2>Select Client Experience</h2>
+        <p style="margin-bottom: 10px;">Search marketing strategy, SEO, paid search management, and/or digital marketing consulting for the following organizations (through direct engagement and agency partnerships):</p>
+
+        <div class="client-grid">
+            <div class="client-category">
+                <h4>Fortune 500 / Enterprise</h4>
+                <ul>
+                    <li>HSBC (Fortune 20; global banking)</li>
+                    <li>Staples (Fortune 100; office retail)</li>
+                    <li>Gap Brands (Fortune 200; global apparel)</li>
+                    <li>Hallmark (greeting cards and media)</li>
+                    <li>Yahoo! (technology and digital media)</li>
+                    <li>1-800-FLOWERS (e-commerce and gifting)</li>
+                    <li>Yankee Candle (consumer products)</li>
+                </ul>
+            </div>
+            <div class="client-category">
+                <h4>Retail &amp; Consumer</h4>
+                <ul>
+                    <li>Zales (jewelry retail)</li>
+                    <li>Ben Bridge Jewelers (luxury jewelry)</li>
+                    <li>See's Candies (confectionery retail)</li>
+                    <li>Gold's Gym (fitness franchise)</li>
+                    <li>PetSmart (pet retail)</li>
+                    <li>Ebates/Rakuten (e-commerce cashback)</li>
+                </ul>
+            </div>
+            <div class="client-category">
+                <h4>Healthcare &amp; Nonprofit</h4>
+                <ul>
+                    <li>Children's Hospital of Los Angeles</li>
+                </ul>
+            </div>
+            <div class="client-category">
+                <h4>Financial Services</h4>
+                <ul>
+                    <li>ACE Cash Express</li>
+                </ul>
+            </div>
+            <div class="client-category">
+                <h4>Sports &amp; Entertainment</h4>
+                <ul>
+                    <li>NCAA (National Collegiate Athletic Association)</li>
+                </ul>
+            </div>
+            <div class="client-category">
+                <h4>Technology (via Visible Factors)</h4>
+                <ul>
+                    <li>Adobe</li>
+                    <li>Ticketmaster</li>
+                </ul>
+            </div>
+        </div>
+        </div>
+
+        <!-- SPEAKING ENGAGEMENTS -->
+        <div class="section-own-page">
+        <h2>Relevant Speaking Engagements</h2>
+        <p style="margin-bottom: 10px;">Recognized and invited speaker at major search marketing and digital advertising industry conferences. Topics include SEO strategy, link building, content marketing, paid search optimization, local search, online reputation management, and ROI measurement.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Conference</th>
+                    <th>Year(s)</th>
+                    <th>Session Topics</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Pubcon Las Vegas</td>
+                    <td>2011&ndash;2013</td>
+                    <td>&ldquo;Links With Maximum Juice and Minimum Risk&rdquo;; &ldquo;Link Building by Hand: How to Capture Low Hanging Fruit&rdquo;; &ldquo;Local Search Rankings&rdquo;; &ldquo;Brand and Reputation Management&rdquo;</td>
+                </tr>
+                <tr>
+                    <td>Pubcon Austin (South)</td>
+                    <td>2009, 2011</td>
+                    <td>Search marketing strategy; Brand and reputation management</td>
+                </tr>
+                <tr>
+                    <td>SMX (Search Marketing Expo)</td>
+                    <td>Multiple</td>
+                    <td>Search engine marketing</td>
+                </tr>
+                <tr>
+                    <td>Affiliate Summit West</td>
+                    <td>2015, 2016</td>
+                    <td>&ldquo;Live SEO &amp; Monetization Site Reviews&rdquo; <strong>(Top-rated session by attendee ratings, ASW 2016)</strong></td>
+                </tr>
+                <tr>
+                    <td>BlogWorld / New Media Expo</td>
+                    <td>Multiple</td>
+                    <td>Content marketing and digital strategy</td>
+                </tr>
+                <tr>
+                    <td>Direct Marketing Association</td>
+                    <td>Multiple</td>
+                    <td>Digital marketing strategy</td>
+                </tr>
+                <tr>
+                    <td>IM Spring Break</td>
+                    <td>2009</td>
+                    <td>&ldquo;Creating Content for Social Media&rdquo;</td>
+                </tr>
+                <tr>
+                    <td>Search Developer Summit</td>
+                    <td>2009</td>
+                    <td>&ldquo;Developer Summit: Open Source Stack&rdquo;</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <!-- PUBLICATIONS & RECOGNITION -->
+        <div class="section-own-page">
+        <h2>Publications &amp; Industry Recognition</h2>
+
+        <div class="label">Published Articles</div>
+        <div class="pub-item">
+            <span class="pub-title">&ldquo;Step-By-Step Plan to Measure ROI&rdquo;</span> &mdash;
+            <span class="pub-source">Search Engine Journal</span> (August 2011).
+            Comprehensive methodology for measuring return on investment from SEO campaigns.<br>
+            <span class="pub-url">searchenginejournal.com/step-by-step-plan-to-measure-roi/32477/</span>
+        </div>
+
+        <div class="label">Contributing Author</div>
+        <div class="pub-item">
+            <span class="pub-title">Search Engine Journal</span> &mdash;
+            Recognized contributing author and cited search marketing expert on the leading industry publication for SEO and search advertising professionals.<br>
+            <span class="pub-url">searchenginejournal.com/author/kenny-hyder/</span>
+        </div>
+
+        <div class="label">Conference Session Coverage</div>
+        <div class="pub-item">
+            <span class="pub-title">&ldquo;Jennifer Van Iderstyne, Kenny Hyder, Loren Baker, Greg Boser on Linkbuilding: Pubcon Session Recap&rdquo;</span> &mdash;
+            <span class="pub-source">Search Engine Journal</span> (October 2013).
+            Featured session coverage of expert panel presentation.<br>
+            <span class="pub-url">searchenginejournal.com/jennifer-van-iderstyne-kenny-hyder-loren-baker-greg-boser-linkbuilding-pubcon-session-recap/74401/</span>
+        </div>
+
+        <div class="label">Media Appearances</div>
+        <div class="pub-item">
+            <span class="pub-title">VICE &ldquo;Fakes, Frauds &amp; Scammers&rdquo; Series</span> &mdash;
+            Featured subject in investigative segment &ldquo;ABC News Ran My Made Up Story&rdquo; (June 2021), demonstrating expert-level knowledge of content marketing mechanics, algorithmic content distribution, search engine behavior, and viral content engineering.
+        </div>
+        <div class="pub-item">
+            <span class="pub-title">TAMAR Podcast</span> &mdash;
+            Featured interview discussing career trajectory and digital marketing industry expertise.
+        </div>
+        <div class="pub-item">
+            <span class="pub-title">DMNews</span> &mdash;
+            Quoted as industry expert on changes in digital marketing and privacy practices.
+        </div>
+
+        <div class="label">Industry Awards Judging</div>
+        <div class="pub-item">
+            <span class="pub-title">US Search Awards</span> &mdash;
+            Judge for the annual awards program recognizing excellence in search marketing, SEO, and paid search advertising.
+        </div>
+        </div>
+
+        <!-- CO-PRESENTERS + FINAL SECTIONS — all on last page -->
+        <div class="section-own-page">
+        <h2>Notable Conference Co-Presenters &amp; Panelists</h2>
+        <p style="margin-bottom: 8px;">Presented alongside recognized leaders in the search marketing industry:</p>
+        <div class="presenters-grid">
+            <div class="presenter"><strong>Loren Baker</strong> <span>&mdash; Founder, Search Engine Journal</span></div>
+            <div class="presenter"><strong>Greg Boser</strong> <span>&mdash; Founder, 3Dog Media; search marketing pioneer</span></div>
+            <div class="presenter"><strong>Arnie Kuenn</strong> <span>&mdash; CEO, Vertical Measures</span></div>
+            <div class="presenter"><strong>Jennifer Van Iderstyne</strong> <span>&mdash; SEO Director, Silver Arc Search Marketing</span></div>
+            <div class="presenter"><strong>David Wallace</strong> <span>&mdash; CEO, SearchRank</span></div>
+            <div class="presenter"><strong>Tony Wright</strong> <span>&mdash; CEO, WrightIMC</span></div>
+            <div class="presenter"><strong>Scott Polk</strong> <span>&mdash; Internet marketing veteran</span></div>
+            <div class="presenter"><strong>Adam Riemer</strong> <span>&mdash; Performance marketing expert</span></div>
+        </div>
+
+        <div class="final-section">
+            <h2>Rate of Compensation</h2>
+            <p>$300 per hour.</p>
+        </div>
+
+        <div class="final-section">
+            <h2>Independence Statement</h2>
+            <p>I provide independent, objective analysis based on my 20+ years of professional experience in search engine optimization, paid search advertising, and digital marketing. My opinions are based on direct observation, industry-standard analytical methodologies, and the application of professional expertise developed through hands-on management of search campaigns for Fortune 500 companies and leading brands.</p>
+        </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -250,6 +250,10 @@
     {
       "path": "/api/bailbonds/cron-places-enrich",
       "schedule": "7 15 * * *"
+    },
+    {
+      "path": "/api/dunham/cron-grid-scans",
+      "schedule": "0 14 * * 1"
     }
   ],
   "functions": {
