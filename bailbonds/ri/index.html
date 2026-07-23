@@ -42,7 +42,8 @@ a { color:var(--accent); }
 .county-grid a:hover { border-color:var(--accent); }
 .county-grid .pop { color:var(--muted); font-size:.78rem; }
 .agent-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
-.agent { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; }
+.agent { display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; color:var(--ink); text-decoration:none; }
+.agent:hover { border-color:var(--accent); }
 .agent .an { font-weight:700; }
 .agent .ad, .agent .lic { color:var(--muted); font-size:.82rem; }
 .agent .ph { margin-top:4px; }
@@ -59,12 +60,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="brand" href="../index.html">Bail <span>Bonds</span> Directory</a>
+  <a class="brand" href="/bailbonds/">Bail <span>Bonds</span> Directory</a>
   <span class="tagline">Bail &amp; jail release information for every U.S. county</span>
 </div></header>
 <div class="wrap">
 
-<div class="crumb"><a href="../index.html">All states</a> › Rhode Island</div>
+<div class="crumb"><a href="/bailbonds/">All states</a> › Rhode Island</div>
 <h1>Bail Bonds in Rhode Island</h1>
 
 <div class="facts">
@@ -90,7 +91,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </div>
 
 <h2>All Rhode Island Counties</h2>
-<div class="county-grid"><a href="bristol/index.html">Bristol County<div class="pop">50,255 residents</div></a><a href="kent/index.html">Kent County<div class="pop">171,278 residents</div></a><a href="newport/index.html">Newport County<div class="pop">83,832 residents</div></a><a href="providence/index.html">Providence County<div class="pop">660,615 residents</div></a><a href="washington/index.html">Washington County<div class="pop">129,982 residents</div></a></div>
+<div class="county-grid"><a href="/bailbonds/ri/bristol/">Bristol County<div class="pop">50,255 residents</div></a><a href="/bailbonds/ri/kent/">Kent County<div class="pop">171,278 residents</div></a><a href="/bailbonds/ri/newport/">Newport County<div class="pop">83,832 residents</div></a><a href="/bailbonds/ri/providence/">Providence County<div class="pop">660,615 residents</div></a><a href="/bailbonds/ri/washington/">Washington County<div class="pop">129,982 residents</div></a></div>
 
 <footer>
   <p>Informational resource only — not legal advice. Bail amounts and procedures vary by state,

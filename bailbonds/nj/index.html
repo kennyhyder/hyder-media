@@ -42,7 +42,8 @@ a { color:var(--accent); }
 .county-grid a:hover { border-color:var(--accent); }
 .county-grid .pop { color:var(--muted); font-size:.78rem; }
 .agent-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
-.agent { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; }
+.agent { display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; color:var(--ink); text-decoration:none; }
+.agent:hover { border-color:var(--accent); }
 .agent .an { font-weight:700; }
 .agent .ad, .agent .lic { color:var(--muted); font-size:.82rem; }
 .agent .ph { margin-top:4px; }
@@ -59,12 +60,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="brand" href="../index.html">Bail <span>Bonds</span> Directory</a>
+  <a class="brand" href="/bailbonds/">Bail <span>Bonds</span> Directory</a>
   <span class="tagline">Bail &amp; jail release information for every U.S. county</span>
 </div></header>
 <div class="wrap">
 
-<div class="crumb"><a href="../index.html">All states</a> › New Jersey</div>
+<div class="crumb"><a href="/bailbonds/">All states</a> › New Jersey</div>
 <h1>Bail Bonds in New Jersey</h1>
 
 <div class="facts">
@@ -91,7 +92,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </div>
 
 <h2>All New Jersey Counties</h2>
-<div class="county-grid"><a href="atlantic/index.html">Atlantic County<div class="pop">275,213 residents</div></a><a href="bergen/index.html">Bergen County<div class="pop">957,736 residents</div></a><a href="burlington/index.html">Burlington County<div class="pop">469,167 residents</div></a><a href="camden/index.html">Camden County<div class="pop">527,196 residents</div></a><a href="cape-may/index.html">Cape May County<div class="pop">94,610 residents</div></a><a href="cumberland/index.html">Cumberland County<div class="pop">152,326 residents</div></a><a href="essex/index.html">Essex County<div class="pop">851,117 residents</div></a><a href="gloucester/index.html">Gloucester County<div class="pop">308,423 residents</div></a><a href="hudson/index.html">Hudson County<div class="pop">705,472 residents</div></a><a href="hunterdon/index.html">Hunterdon County<div class="pop">130,183 residents</div></a><a href="mercer/index.html">Mercer County<div class="pop">381,671 residents</div></a><a href="middlesex/index.html">Middlesex County<div class="pop">863,623 residents</div></a><a href="monmouth/index.html">Monmouth County<div class="pop">642,799 residents</div></a><a href="morris/index.html">Morris County<div class="pop">514,423 residents</div></a><a href="ocean/index.html">Ocean County<div class="pop">659,197 residents</div></a><a href="passaic/index.html">Passaic County<div class="pop">513,395 residents</div></a><a href="salem/index.html">Salem County<div class="pop">65,338 residents</div></a><a href="somerset/index.html">Somerset County<div class="pop">348,842 residents</div></a><a href="sussex/index.html">Sussex County<div class="pop">146,132 residents</div></a><a href="union/index.html">Union County<div class="pop">572,726 residents</div></a><a href="warren/index.html">Warren County<div class="pop">111,252 residents</div></a></div>
+<div class="county-grid"><a href="/bailbonds/nj/atlantic/">Atlantic County<div class="pop">275,213 residents</div></a><a href="/bailbonds/nj/bergen/">Bergen County<div class="pop">957,736 residents</div></a><a href="/bailbonds/nj/burlington/">Burlington County<div class="pop">469,167 residents</div></a><a href="/bailbonds/nj/camden/">Camden County<div class="pop">527,196 residents</div></a><a href="/bailbonds/nj/cape-may/">Cape May County<div class="pop">94,610 residents</div></a><a href="/bailbonds/nj/cumberland/">Cumberland County<div class="pop">152,326 residents</div></a><a href="/bailbonds/nj/essex/">Essex County<div class="pop">851,117 residents</div></a><a href="/bailbonds/nj/gloucester/">Gloucester County<div class="pop">308,423 residents</div></a><a href="/bailbonds/nj/hudson/">Hudson County<div class="pop">705,472 residents</div></a><a href="/bailbonds/nj/hunterdon/">Hunterdon County<div class="pop">130,183 residents</div></a><a href="/bailbonds/nj/mercer/">Mercer County<div class="pop">381,671 residents</div></a><a href="/bailbonds/nj/middlesex/">Middlesex County<div class="pop">863,623 residents</div></a><a href="/bailbonds/nj/monmouth/">Monmouth County<div class="pop">642,799 residents</div></a><a href="/bailbonds/nj/morris/">Morris County<div class="pop">514,423 residents</div></a><a href="/bailbonds/nj/ocean/">Ocean County<div class="pop">659,197 residents</div></a><a href="/bailbonds/nj/passaic/">Passaic County<div class="pop">513,395 residents</div></a><a href="/bailbonds/nj/salem/">Salem County<div class="pop">65,338 residents</div></a><a href="/bailbonds/nj/somerset/">Somerset County<div class="pop">348,842 residents</div></a><a href="/bailbonds/nj/sussex/">Sussex County<div class="pop">146,132 residents</div></a><a href="/bailbonds/nj/union/">Union County<div class="pop">572,726 residents</div></a><a href="/bailbonds/nj/warren/">Warren County<div class="pop">111,252 residents</div></a></div>
 
 <footer>
   <p>Informational resource only — not legal advice. Bail amounts and procedures vary by state,

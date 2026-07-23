@@ -42,7 +42,8 @@ a { color:var(--accent); }
 .county-grid a:hover { border-color:var(--accent); }
 .county-grid .pop { color:var(--muted); font-size:.78rem; }
 .agent-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
-.agent { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; }
+.agent { display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; color:var(--ink); text-decoration:none; }
+.agent:hover { border-color:var(--accent); }
 .agent .an { font-weight:700; }
 .agent .ad, .agent .lic { color:var(--muted); font-size:.82rem; }
 .agent .ph { margin-top:4px; }
@@ -59,12 +60,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="brand" href="../index.html">Bail <span>Bonds</span> Directory</a>
+  <a class="brand" href="/bailbonds/">Bail <span>Bonds</span> Directory</a>
   <span class="tagline">Bail &amp; jail release information for every U.S. county</span>
 </div></header>
 <div class="wrap">
 
-<div class="crumb"><a href="../index.html">All states</a> › Delaware</div>
+<div class="crumb"><a href="/bailbonds/">All states</a> › Delaware</div>
 <h1>Bail Bonds in Delaware</h1>
 
 <div class="facts">
@@ -90,7 +91,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 </div>
 
 <h2>All Delaware Counties</h2>
-<div class="county-grid"><a href="kent/index.html">Kent County<div class="pop">189,789 residents</div></a><a href="new-castle/index.html">New Castle County<div class="pop">578,592 residents</div></a><a href="sussex/index.html">Sussex County<div class="pop">263,509 residents</div></a></div>
+<div class="county-grid"><a href="/bailbonds/de/kent/">Kent County<div class="pop">189,789 residents</div></a><a href="/bailbonds/de/new-castle/">New Castle County<div class="pop">578,592 residents</div></a><a href="/bailbonds/de/sussex/">Sussex County<div class="pop">263,509 residents</div></a></div>
 
 <footer>
   <p>Informational resource only — not legal advice. Bail amounts and procedures vary by state,

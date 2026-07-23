@@ -1,6 +1,6 @@
 [
 {
-"name": "Action Bail Bonds (agent: Jerry Heflin)",
+"name": "Jerry Heflin",
 "address": "190 S. Collins, Suite #102",
 "city": "Sunnyvale",
 "zip": "75182",
@@ -8,10 +8,11 @@
 "license": "191",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Action Bail Bonds"
 },
 {
-"name": "Doc\u2019s Bail Bonds (agent: J. Wynn Dillard)",
+"name": "J. Wynn Dillard",
 "address": "163 Pittsburg St., Suite A2",
 "city": "Dallas",
 "zip": "75207",
@@ -19,10 +20,11 @@
 "license": "270",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Doc\u2019s Bail Bonds"
 },
 {
-"name": "Immediate Bail Bonds (agent: Marjorie A. Walstad)",
+"name": "Marjorie A. Walstad",
 "address": "224 W. Commerce St.",
 "city": "Dallas",
 "zip": "75208",
@@ -30,10 +32,11 @@
 "license": "147, 271",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Immediate Bail Bonds"
 },
 {
-"name": "AAA Professional Bail Bonds (agent: Jamal Qaddura)",
+"name": "Jamal Qaddura",
 "address": "4425 W. Airport Freeway, Suite 369",
 "city": "Irving",
 "zip": "75062",
@@ -41,10 +44,11 @@
 "license": "254",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "AAA Professional Bail Bonds"
 },
 {
-"name": "A EZ Out Bail Bonds (agent: Eddie Salazar)",
+"name": "Eddie Salazar",
 "address": "400 E. Irving Blvd.",
 "city": "Irving",
 "zip": "75060",
@@ -52,10 +56,11 @@
 "license": "236",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "A EZ Out Bail Bonds"
 },
 {
-"name": "DDD Dallas Bail Bonds (agent: Jeremias Guzman)",
+"name": "Jeremias Guzman",
 "address": "1114 N. Riverfront Blvd.",
 "city": "Dallas",
 "zip": "75207",
@@ -63,10 +68,11 @@
 "license": "246",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "DDD Dallas Bail Bonds"
 },
 {
-"name": "Texas Bail Bonds (agent: Humberto Herrera)",
+"name": "Humberto Herrera",
 "address": "1112 N. Zang Blvd., Suite 102",
 "city": "Dallas",
 "zip": "75203",
@@ -74,10 +80,11 @@
 "license": "276",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Texas Bail Bonds"
 },
 {
-"name": "2nd Chance Bail Bonds (agent: Herman Brown)",
+"name": "Herman Brown",
 "address": "3715 Fordham Rd., Suite 203",
 "city": "Dallas",
 "zip": "75201",
@@ -85,10 +92,11 @@
 "license": "280",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "2nd Chance Bail Bonds"
 },
 {
-"name": "AAA Atlas Bail Bonds (agent: Ethel Rangel)",
+"name": "Ethel Rangel",
 "address": "400 N. O'Conner Rd.",
 "city": "Irving",
 "zip": "75061",
@@ -96,10 +104,11 @@
 "license": "267",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "AAA Atlas Bail Bonds"
 },
 {
-"name": "Act Quick Bail Bonds (agent: John Rosa)",
+"name": "John Rosa",
 "address": "515 S. Riverfront Blvd.",
 "city": "Dallas",
 "zip": "75207",
@@ -107,10 +116,11 @@
 "license": "272, 284",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Act Quick Bail Bonds"
 },
 {
-"name": "Bring \u2018Em Home 24/7 Bail Bonds (agent: Lidio Ortiz Jr.)",
+"name": "Lidio Ortiz Jr.",
 "address": "161 Pittsburg Street",
 "city": "Dallas",
 "zip": "75207",
@@ -118,10 +128,11 @@
 "license": "274",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Bring \u2018Em Home 24/7 Bail Bonds"
 },
 {
-"name": "Cowboy Bail Bonds (agent: Buckley Von Chappell)",
+"name": "Buckley Von Chappell",
 "address": "311 S. Riverfront Blvd.",
 "city": "Dallas",
 "zip": "75207",
@@ -129,10 +140,11 @@
 "license": "218",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Cowboy Bail Bonds"
 },
 {
-"name": "Delta Bail Bonds (agent: Charles O. Monroe)",
+"name": "Charles O. Monroe",
 "address": "4140 Overton Road",
 "city": "Dallas",
 "zip": "75216",
@@ -140,10 +152,11 @@
 "license": "144, 263",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Delta Bail Bonds"
 },
 {
-"name": "Metroplex Bail Bonds (agent: Monnica S. Herndon)",
+"name": "Monnica S. Herndon",
 "address": "1601 W. Jefferson",
 "city": "Grand Prairie",
 "zip": "75051",
@@ -151,10 +164,11 @@
 "license": "206",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Metroplex Bail Bonds"
 },
 {
-"name": "No Limit Bail Bonds (agent: Corey C. Toney)",
+"name": "Corey C. Toney",
 "address": "909 South Corinth Street",
 "city": "Dallas",
 "zip": "75203",
@@ -162,10 +176,11 @@
 "license": "183, 187",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "No Limit Bail Bonds"
 },
 {
-"name": "Pat Kinnard Bail Bonds (agent: Patrick Kinnard)",
+"name": "Patrick Kinnard",
 "address": "109 N. McKinney Street, Suite A",
 "city": "Richardson",
 "zip": "75081",
@@ -173,10 +188,11 @@
 "license": "287",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Pat Kinnard Bail Bonds"
 },
 {
-"name": "Fast Action Bonding (agent: Edward J. Dees)",
+"name": "Edward J. Dees",
 "address": "526 N. Interuban St.",
 "city": "Richardson",
 "zip": "75081",
@@ -184,10 +200,11 @@
 "license": "71",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Fast Action Bonding"
 },
 {
-"name": "AA Best Bail Bonds (agent: Albert Saenz)",
+"name": "Albert Saenz",
 "address": "201 Continental Ave.",
 "city": "Dallas",
 "zip": "75207",
@@ -195,10 +212,11 @@
 "license": "275",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "AA Best Bail Bonds"
 },
 {
-"name": "Express Bail Bonds (agent: Jonathan Martinez)",
+"name": "Jonathan Martinez",
 "address": "331 S. Riverfront Blvd.",
 "city": "Dallas",
 "zip": "75207",
@@ -206,10 +224,11 @@
 "license": "264",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Express Bail Bonds"
 },
 {
-"name": "My Bail Bonds (agent: Mylinda Escobar)",
+"name": "Mylinda Escobar",
 "address": "7116 Lake June Rd., #100",
 "city": "Dallas",
 "zip": "75217",
@@ -217,10 +236,11 @@
 "license": "282",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "My Bail Bonds"
 },
 {
-"name": "Set\u2019em Free Bail Bonds (agent: Sharon McCleveland)",
+"name": "Sharon McCleveland",
 "address": "222 Continental Ave., #150",
 "city": "Dallas",
 "zip": "75207",
@@ -228,10 +248,11 @@
 "license": "227",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Set\u2019em Free Bail Bonds"
 },
 {
-"name": "Southern Bail Bonds (agent: Karen Dando)",
+"name": "Karen Dando",
 "address": "3936 S. Polk St., #110",
 "city": "Dallas",
 "zip": "75224",
@@ -239,10 +260,11 @@
 "license": "258",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Southern Bail Bonds"
 },
 {
-"name": "Providence Bail Bonds (agent: Andrew Wilkerson)",
+"name": "Andrew Wilkerson",
 "address": "4011 W. Camp Wisdom, Suite 233",
 "city": "Dallas",
 "zip": "75235",
@@ -250,10 +272,11 @@
 "license": "286",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Providence Bail Bonds"
 },
 {
-"name": "Bad Boy Bail Bonds (agent: Alvernon Jones)",
+"name": "Alvernon Jones",
 "address": "8438 Old Hickory Trail, #102",
 "city": "Dallas",
 "zip": "75237",
@@ -261,10 +284,11 @@
 "license": "252",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Bad Boy Bail Bonds"
 },
 {
-"name": "Ebony Bail Bonds (agent: Patricia J. Armstrong)",
+"name": "Patricia J. Armstrong",
 "address": "3030 Al Lipscomb Way",
 "city": "Dallas",
 "zip": "75215",
@@ -272,10 +296,11 @@
 "license": "277",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Ebony Bail Bonds"
 },
 {
-"name": "Mr. Bail Bonds (agent: Ruben Mata)",
+"name": "Ruben Mata",
 "address": "11629 Lake June Rd., Suite 101",
 "city": "Balch Springs",
 "zip": "75180",
@@ -283,10 +308,11 @@
 "license": "283",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Mr. Bail Bonds"
 },
 {
-"name": "Penny Bail Bonds (agent: Osiris Armendariz)",
+"name": "Osiris Armendariz",
 "address": "2605 Fort Worth Ave., Suite 200",
 "city": "Dallas",
 "zip": "75211",
@@ -294,10 +320,11 @@
 "license": "281",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Penny Bail Bonds"
 },
 {
-"name": "Ranger Bail Bonds (agent: Keith Pahcheka)",
+"name": "Keith Pahcheka",
 "address": "4021 W. Jefferson Blvd.",
 "city": "Dallas",
 "zip": "75211",
@@ -305,10 +332,11 @@
 "license": "235",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Ranger Bail Bonds"
 },
 {
-"name": "Rebel Bail Bonds (agent: Cory Lee)",
+"name": "Cory Lee",
 "address": "302 W. Commerce St., Suite 100",
 "city": "Dallas",
 "zip": "75208",
@@ -316,10 +344,11 @@
 "license": "268",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Rebel Bail Bonds"
 },
 {
-"name": "Bail Nation (agent: Jermell Sherman)",
+"name": "Jermell Sherman",
 "address": "3939 Beltline Rd, Suite 460-I",
 "city": "Addison",
 "zip": "75001",
@@ -327,10 +356,11 @@
 "license": "288",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "Bail Nation"
 },
 {
-"name": "A Affordable Bail Bonds (agent: Jose Villela)",
+"name": "Jose Villela",
 "address": "111 Continental, #500",
 "city": "Dallas",
 "zip": "75207",
@@ -338,10 +368,11 @@
 "license": "265",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "A Affordable Bail Bonds"
 },
 {
-"name": "A Way Out Bail Bonds 1 (agent: Jeanie Wade)",
+"name": "Jeanie Wade",
 "address": "3715 Waldorf",
 "city": "Dallas",
 "zip": "75229",
@@ -349,10 +380,11 @@
 "license": "285",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "A Way Out Bail Bonds 1"
 },
 {
-"name": "1st Call Bail Bonds (agent: Eric Khozindar)",
+"name": "Eric Khozindar",
 "address": "314 South Riverfront Blvd.",
 "city": "Dallas",
 "zip": "75207",
@@ -360,7 +392,8 @@
 "license": "267",
 "county": "Dallas",
 "state": "TX",
-"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php"
+"source_url": "https://www.dallascounty.org/departments/bailbond/companies.php",
+"agency": "1st Call Bail Bonds"
 },
 {
 "name": "DeLeon Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)",
@@ -368,10 +401,11 @@
 "city": "San Antonio",
 "zip": "78228",
 "phone": "(210) 435-5491",
-"license": "43, exp 06-30-2028",
+"license": "43",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2028"
 },
 {
 "name": "McRae Bail Bonds (licensee/agent: John McRae)",
@@ -379,10 +413,11 @@
 "city": "San Antonio",
 "zip": "78223",
 "phone": "(210) 533-5292",
-"license": "46, exp 08-31-2028",
+"license": "46",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "08-31-2028"
 },
 {
 "name": "Gabriel Bail Bond (licensee/agent: Inez Cindy Gabriel)",
@@ -390,10 +425,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 225-0300",
-"license": "88, exp 05-31-2028",
+"license": "88",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "05-31-2028"
 },
 {
 "name": "E-Z Out Bail Bonds (licensee/agent: J. L. McEntire)",
@@ -401,10 +437,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 225-1544",
-"license": "100, exp 08-31-2028",
+"license": "100",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "08-31-2028"
 },
 {
 "name": "Anytime Bail Bonds (licensee/agent: David Sawyer)",
@@ -412,10 +449,11 @@
 "city": "San Antonio",
 "zip": "78211",
 "phone": "(210) 213-2995",
-"license": "111, exp 10-31-2026",
+"license": "111",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2026"
 },
 {
 "name": "Y L & S Bail Bonds (licensee/agent: Herman Rover)",
@@ -423,10 +461,11 @@
 "city": "San Antonio",
 "zip": "78237",
 "phone": "(210) 431-9680",
-"license": "113, exp 08-31-2028",
+"license": "113",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "08-31-2028"
 },
 {
 "name": "Rangel\u00b4s Bonding Service (licensee/agent: Roland Rangel)",
@@ -434,10 +473,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 244-4000",
-"license": "116, exp 10-31-2028",
+"license": "116",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2028"
 },
 {
 "name": "Armstrong Bail Bonds (licensee/agent: Roscoe Armstrong)",
@@ -445,10 +485,11 @@
 "city": "San Antonio",
 "zip": "78210",
 "phone": "(210) 533-9600",
-"license": "125, exp 04-30-2028",
+"license": "125",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "04-30-2028"
 },
 {
 "name": "Texas Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)",
@@ -456,10 +497,11 @@
 "city": "San Antonio",
 "zip": "78228",
 "phone": "(210) 435-5491",
-"license": "129, exp 01-31-2029",
+"license": "129",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "01-31-2029"
 },
 {
 "name": "Alfaro Bail Bonds (licensee/agent: Lisa Marie Alfaro)",
@@ -467,10 +509,11 @@
 "city": "San Antonio",
 "zip": "78212",
 "phone": "(210) 227-1117",
-"license": "146, exp 10-31-2027",
+"license": "146",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2027"
 },
 {
 "name": "AA-Best Bail Bonds (licensee/agent: Albert Saenz)",
@@ -478,10 +521,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 228-9999",
-"license": "149, exp 06-30-2029",
+"license": "149",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2029"
 },
 {
 "name": "Eagle Bail Bonds (licensee/agent: Manuel A. Rodriguez)",
@@ -489,10 +533,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 436-2133",
-"license": "150, exp 07-31-2029",
+"license": "150",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "07-31-2029"
 },
 {
 "name": "Available Bail Bonds (licensee/agent: Fernando Rover)",
@@ -500,10 +545,11 @@
 "city": "San Antonio",
 "zip": "78220",
 "phone": "(210) 299-4178",
-"license": "153, exp 06-30-2027",
+"license": "153",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2027"
 },
 {
 "name": "Cowboy Bail Bonds (licensee/agent: Christopher E. Embrey)",
@@ -511,10 +557,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 212-6337",
-"license": "159, exp 12-31-2027",
+"license": "159",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "12-31-2027"
 },
 {
 "name": "Eagle-1 Bail Bonds (licensee/agent: Manuel Rodriguez)",
@@ -522,10 +569,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 436-2133",
-"license": "165, exp 04-30-2029",
+"license": "165",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "04-30-2029"
 },
 {
 "name": "Mr. Jones Bail Bonds (licensee/agent: Herman Rover)",
@@ -533,10 +581,11 @@
 "city": "San Antonio",
 "zip": "78202",
 "phone": "(210) 271-2244",
-"license": "173, exp 02-28-2028",
+"license": "173",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "02-28-2028"
 },
 {
 "name": "AAA Spurs Bail Bonds (licensee/agent: Christopher Embrey)",
@@ -544,10 +593,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 212-6300",
-"license": "174, exp 04-30-2029",
+"license": "174",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "04-30-2029"
 },
 {
 "name": "Mitchell Bail Bonds (licensee/agent: Shanette Mitchell)",
@@ -555,10 +605,11 @@
 "city": "San Antonio",
 "zip": "78220",
 "phone": "(210) 472-2245",
-"license": "176, exp 09-30-2027",
+"license": "176",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "09-30-2027"
 },
 {
 "name": "A-Bad Boy Bail Bonds (licensee/agent: Roscoe Armstrong Jr.)",
@@ -566,10 +617,11 @@
 "city": "San Antonio",
 "zip": "78210",
 "phone": "(210) 533-9600",
-"license": "181, exp 09-30-2028",
+"license": "181",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "09-30-2028"
 },
 {
 "name": "River City Bail Bonds (licensee/agent: Clay Embrey)",
@@ -577,10 +629,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 271-7700",
-"license": "182, exp 03-31-2029",
+"license": "182",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "03-31-2029"
 },
 {
 "name": "AA-Ritz Bail Bonds (licensee/agent: Daniel Ritz III)",
@@ -588,10 +641,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 226-6363",
-"license": "184, exp 05-31-2026",
+"license": "184",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "05-31-2026"
 },
 {
 "name": "2nd Chance Bail Bonds (licensee/agent: Elton R. Green, Jr.)",
@@ -599,10 +653,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 785-9700",
-"license": "190, exp 01-31-2028",
+"license": "190",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "01-31-2028"
 },
 {
 "name": "Lucky Eagle 1 Bail Bonds (licensee/agent: Manuel A. Rodriguez)",
@@ -610,10 +665,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 228-0090",
-"license": "192, exp 11-30-2028",
+"license": "192",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "11-30-2028"
 },
 {
 "name": "AAA Garcia Bail Bonds (licensee/agent: Luis J. Garcia)",
@@ -621,10 +677,11 @@
 "city": "San Antonio",
 "zip": "78238",
 "phone": "(210) 888-2245",
-"license": "195, exp 06-30-2027",
+"license": "195",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2027"
 },
 {
 "name": "Triple A Bail Bonds (licensee/agent: Daniel Ritz III)",
@@ -632,10 +689,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 226-6969",
-"license": "201, exp 10-31-2028",
+"license": "201",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2028"
 },
 {
 "name": "Aladdin Bail Bonds (licensee/agent: Susan Monsalvo Smith)",
@@ -643,10 +701,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 224-4222",
-"license": "202, exp 12-31-2028",
+"license": "202",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "12-31-2028"
 },
 {
 "name": "Fernando\u2019s Bail Bond (licensee/agent: Fernando C. Rover)",
@@ -654,10 +713,11 @@
 "city": "San Antonio",
 "zip": "78203",
 "phone": "(210) 222-2330",
-"license": "204, exp 04-30-2029",
+"license": "204",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "04-30-2029"
 },
 {
 "name": "AAA Garcia Bail Bonds #2 (licensee/agent: Stefanie M. Garcia)",
@@ -665,10 +725,11 @@
 "city": "San Antonio",
 "zip": "78238",
 "phone": "(210) 465-7777",
-"license": "206, exp 08-31-2029",
+"license": "206",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "08-31-2029"
 },
 {
 "name": "Alamo City Bail Bonds II (licensee/agent: Dane Embrey)",
@@ -676,10 +737,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 229-1988",
-"license": "209, exp 10-31-2027",
+"license": "209",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2027"
 },
 {
 "name": "A-Action Bail Bonds #2 (licensee/agent: Dane Embrey)",
@@ -687,10 +749,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 226-5487",
-"license": "210, exp 10-31-2027",
+"license": "210",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "10-31-2027"
 },
 {
 "name": "McRae Bail Bonds #3 (licensee/agent: John McRae)",
@@ -698,10 +761,11 @@
 "city": "San Antonio",
 "zip": "78223",
 "phone": "(210) 533-5292",
-"license": "211, exp 12-31-2027",
+"license": "211",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "12-31-2027"
 },
 {
 "name": "AA Best Bail Bonds #2 (licensee/agent: Albert Saenz)",
@@ -709,10 +773,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 228-9999",
-"license": "212, exp 07-31-2026",
+"license": "212",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "07-31-2026"
 },
 {
 "name": "Mitchell Bail Bond Services No.2 (licensee/agent: Shanette Mitchell)",
@@ -720,10 +785,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 354-2245",
-"license": "214, exp 12-31-2026",
+"license": "214",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "12-31-2026"
 },
 {
 "name": "Around The Clock Bail Bonds (licensee/agent: Nicholas Kerr)",
@@ -731,10 +797,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 405-6000",
-"license": "215, exp 01-31-2027",
+"license": "215",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "01-31-2027"
 },
 {
 "name": "YL & S Bail Bond #2 (licensee/agent: Herman Rover)",
@@ -742,10 +809,11 @@
 "city": "San Antonio",
 "zip": "78237",
 "phone": "(210) 431-9680",
-"license": "216, exp 06-30-2027",
+"license": "216",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2027"
 },
 {
 "name": "San Antonio Bail Bonds 2 (licensee/agent: Alfonso Perez)",
@@ -753,10 +821,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 231-6444",
-"license": "217, exp 11-30-2027",
+"license": "217",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "11-30-2027"
 },
 {
 "name": "COPA 3 Bail Bonds (licensee/agent: Alfonso Perez)",
@@ -764,10 +833,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 231-0202",
-"license": "218, exp 01-31-2028",
+"license": "218",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "01-31-2028"
 },
 {
 "name": "Bexar Bail Bonds (licensee/agent: Clay Embrey)",
@@ -775,10 +845,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 224-9915",
-"license": "219, exp 03-31-2028",
+"license": "219",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "03-31-2028"
 },
 {
 "name": "Jailbusters Bail Bonds #2 (licensee/agent: Ishelle Fernandez)",
@@ -786,10 +857,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 223-3733",
-"license": "220, exp 05-31-2026",
+"license": "220",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "05-31-2026"
 },
 {
 "name": "LRJ Bail Bonds (licensee/agent: Leticia Rodriguez)",
@@ -797,10 +869,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 620-0180",
-"license": "221, exp 06-30-2028",
+"license": "221",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2028"
 },
 {
 "name": "Free Me Bail Bonds (licensee/agent: Nicole Guerra)",
@@ -808,10 +881,11 @@
 "city": "Converse",
 "zip": "78109",
 "phone": "(210) 874-7333",
-"license": "222, exp 09-30-2026",
+"license": "222",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "09-30-2026"
 },
 {
 "name": "A-Action Bail Bonds #3 (licensee/agent: Dane Embrey)",
@@ -819,10 +893,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 226-5487",
-"license": "223, exp 06-30-2027",
+"license": "223",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "06-30-2027"
 },
 {
 "name": "Amigo San Antonio Bail Bonds (licensee/agent: Alfonso Perez)",
@@ -830,10 +905,11 @@
 "city": "San Antonio",
 "zip": "78207",
 "phone": "(210) 231-6444",
-"license": "224, exp 04-30-2028",
+"license": "224",
 "county": "Bexar",
 "state": "TX",
-"source_url": "https://www.bexar.org/962/Bail-Bond-Companies"
+"source_url": "https://www.bexar.org/962/Bail-Bond-Companies",
+"expiration": "04-30-2028"
 },
 {
 "name": "20-Minute Bail Bonds (agent/owner: Cason Clayton Cagle)",
@@ -841,10 +917,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-387-1212",
-"license": "04-01-04, exp 04/22/2027",
+"license": "04-01-04",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "04/22/2027"
 },
 {
 "name": "A EZ Out Bail Bonds (agent/owner: Eddie Salazar)",
@@ -852,10 +929,11 @@
 "city": "Denton",
 "zip": "76205",
 "phone": "940-320-6600",
-"license": "2019-23-05A, exp 05/23/2027",
+"license": "2019-23-05A",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "05/23/2027"
 },
 {
 "name": "AAA Atlas Bail Bonds II (agent/owner: Julianna Acosta)",
@@ -863,10 +941,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "972-620-4503",
-"license": "17-09-28, exp 09/28/2027",
+"license": "17-09-28",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "09/28/2027"
 },
 {
 "name": "AA-Best Bail Bonds #2 (agent/owner: Albert Saenz)",
@@ -874,10 +953,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-565-1121",
-"license": "2018-27-09, exp 10/02/2026",
+"license": "2018-27-09",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "10/02/2026"
 },
 {
 "name": "Act Rapid Bail Bonds (agent/owner: Elvin John Rosa)",
@@ -885,10 +965,11 @@
 "city": "Denton",
 "zip": "76205",
 "phone": "214-562-9565",
-"license": "2022-24-03, exp 03/24/2028",
+"license": "2022-24-03",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "03/24/2028"
 },
 {
 "name": "Alley Katz Bail Bonds (agent/owner: Melinda Webb)",
@@ -896,10 +977,11 @@
 "city": "Denton",
 "zip": "76202",
 "phone": "940-591-9937",
-"license": "02-01-09, exp 09/26/2025",
+"license": "02-01-09",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "09/26/2025"
 },
 {
 "name": "Alley Katz Credit Bail Bonds (agent/owner: Melinda Webb)",
@@ -907,10 +989,11 @@
 "city": "Denton",
 "zip": "76205",
 "phone": "940-591-9937",
-"license": "2026-25-06, exp 06/25/2028",
+"license": "2026-25-06",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "06/25/2028"
 },
 {
 "name": "Bad Boy Bail Bonds (agent/owner: Thomas Snoddy)",
@@ -918,10 +1001,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-228-0700",
-"license": "23-26-01, exp 02/10/2027",
+"license": "23-26-01",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "02/10/2027"
 },
 {
 "name": "Bail Bond Headquarters (agent/owner: Carrie Sanders)",
@@ -929,10 +1013,11 @@
 "city": "Aubrey",
 "zip": "76227",
 "phone": "940-387-1133",
-"license": "20-25-06, exp 07/29/2028",
+"license": "20-25-06",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "07/29/2028"
 },
 {
 "name": "Better Call Paul Bail Bonds (agent/owner: Paul Michael Smith)",
@@ -940,10 +1025,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "972-741-5828",
-"license": "2026-26-02, exp 02/26/2028",
+"license": "2026-26-02",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "02/26/2028"
 },
 {
 "name": "Big Bubba\u2019s Bail Bonds (agent/owner: Eric Khozindar)",
@@ -951,10 +1037,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-380-1981",
-"license": "19-25-07, exp 07/25/2027",
+"license": "19-25-07",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "07/25/2027"
 },
 {
 "name": "Bilingual + Bail Bonds (agent/owner: Edith Burgess)",
@@ -962,10 +1049,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-380-0120",
-"license": "2025-26-06, exp 06/26/2027",
+"license": "2025-26-06",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "06/26/2027"
 },
 {
 "name": "Bilingual Bail Bonds (agent/owner: Edith Burgess)",
@@ -973,10 +1061,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-380-1111",
-"license": "19-9-26A, exp 09/26/2025",
+"license": "19-9-26A",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "09/26/2025"
 },
 {
 "name": "Bond Father Bail Bonds (agent/owner: Arthur L. Flores)",
@@ -984,10 +1073,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-218-6660",
-"license": "21-25-02, exp 02/25/2027",
+"license": "21-25-02",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "02/25/2027"
 },
 {
 "name": "Burgess Bail Bonds (agent/owner: Edith Burgess)",
@@ -995,10 +1085,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-380-1111",
-"license": "199202-10, exp 02/11/2029",
+"license": "199202-10",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "02/11/2029"
 },
 {
 "name": "Central Bail Bonds 2 (agent/owner: Angela Knowles Burgher)",
@@ -1006,10 +1097,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-484-9200",
-"license": "21-28-01A, exp 01/28/2027",
+"license": "21-28-01A",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "01/28/2027"
 },
 {
 "name": "City Hall Bail Bonds (agent/owner: Shawn Cagle)",
@@ -1017,10 +1109,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-381-0338",
-"license": "01-04-12, exp 12/20/2027",
+"license": "01-04-12",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "12/20/2027"
 },
 {
 "name": "Doc\u2019s Bail Bonds (agent/owner: Jerry Wynn Dillard, Jr)",
@@ -1028,10 +1121,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-383-4600",
-"license": "21-28-01B, exp 01/28/2027",
+"license": "21-28-01B",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "01/28/2027"
 },
 {
 "name": "Doc's Bail Bonds #2 (agent/owner: Jerry Wynn Dillard III)",
@@ -1039,10 +1133,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "479-306-8896",
-"license": "2022-23-06, exp 06/15/2028",
+"license": "2022-23-06",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "06/15/2028"
 },
 {
 "name": "Express Bail Bonds (agent/owner: Jonathan Martinez)",
@@ -1050,10 +1145,11 @@
 "city": "Denton",
 "zip": "76205",
 "phone": "940-310-2244",
-"license": "2024-04-25, exp 04/25/2028",
+"license": "2024-04-25",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "04/25/2028"
 },
 {
 "name": "First Call Bail Bonds (agent/owner: Paul Michael Smith)",
@@ -1061,10 +1157,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "972-741-5828",
-"license": "2022-28-07, exp 09/30/2026",
+"license": "2022-28-07",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "09/30/2026"
 },
 {
 "name": "Marisol's Bail Bonds (agent/owner: Marisol Rodriguez)",
@@ -1072,10 +1169,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-999-8127",
-"license": "23-07-27, exp 07/27/2027",
+"license": "23-07-27",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "07/27/2027"
 },
 {
 "name": "Not Guilty Bail Bonds (agent/owner: John Baumgartner)",
@@ -1083,10 +1181,11 @@
 "city": "Lewisville",
 "zip": "75057",
 "phone": "214-516-0096",
-"license": "2024-24-10, exp 10/24/2026",
+"license": "2024-24-10",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "10/24/2026"
 },
 {
 "name": "Pay Less Bail Bonds (agent/owner: Amanda Marie Cagle)",
@@ -1094,10 +1193,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-243-9977",
-"license": "11-26-04, exp 03/26/2025",
+"license": "11-26-04",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "03/26/2025"
 },
 {
 "name": "Webb\u2019s County Wide Bail Bonds (agent/owner: Randy Webb)",
@@ -1105,10 +1205,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-483-0005",
-"license": "13-28-02, exp 02/28/2029",
+"license": "13-28-02",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "02/28/2029"
 },
 {
 "name": "Webb\u2019s Statewide Bail Bonds (agent/owner: Melinda Webb)",
@@ -1116,10 +1217,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-381-9937",
-"license": "03-01-06, exp 06/26/2029",
+"license": "03-01-06",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "06/26/2029"
 },
 {
 "name": "You Walk Bail Bonds (agent/owner: Carrie Sanders)",
@@ -1127,10 +1229,11 @@
 "city": "Denton",
 "zip": "76209",
 "phone": "940-391-3983",
-"license": "16-2801-04, exp 05/22/2027",
+"license": "16-2801-04",
 "county": "Denton",
 "state": "TX",
-"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/"
+"source_url": "https://apps.dentoncounty.com/website/bailbondlisting/",
+"expiration": "05/22/2027"
 },
 {
 "name": "Set 'Em Free Bail Bonds (licensee/agent: McCleveland, Sharon (Agent - Financial Casualty & Surety))",
@@ -1507,1082 +1610,1357 @@
 "source_url": "https://www.mctx.org/departments/departments_a_-_c/bail_bond_board/rotation_lists.php"
 },
 {
-"name": "24/7 Bail Bonds (agent: Jonathan Abel; surety: Financial Casualty & Surety, Inc)",
+"name": "Jonathan Abel",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-247-9090",
-"license": "74636, exp 04/18/28",
+"license": "74636",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "24/7 Bail Bonds",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "04/18/28"
 },
 {
-"name": "Legacy Bail Bonds (agent: Shaun Burns; surety: First Community Ins. Co.)",
+"name": "Shaun Burns",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-529-9907",
-"license": "74529, exp 09/23/28",
+"license": "74529",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Legacy Bail Bonds",
+"surety": "First Community Ins. Co",
+"expiration": "09/23/28"
 },
 {
-"name": "Abacus II Bail Bonds (agent: Christopher Libby; surety: First Community Ins. Co.)",
+"name": "Christopher Libby",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-750-9250",
-"license": "74572, exp 09/23/26",
+"license": "74572",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Abacus II Bail Bonds",
+"surety": "First Community Ins. Co",
+"expiration": "09/23/26"
 },
 {
-"name": "24/7 Bail Bonds #2 (agent: Jonathan W. Abel; surety: First Community Ins. Co.)",
+"name": "Jonathan W. Abel",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-247-9093",
-"license": "74594, exp 11/23/26",
+"license": "74594",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "24/7 Bail Bonds #2",
+"surety": "First Community Ins. Co",
+"expiration": "11/23/26"
 },
 {
-"name": "Cox Bail Bonds (agent: Michael W Cox; surety: First Community Ins. Co.)",
+"name": "Michael W Cox",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-222-7934",
-"license": "74624, exp 10/22/26",
+"license": "74624",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Cox Bail Bonds",
+"surety": "First Community Ins. Co",
+"expiration": "10/22/26"
 },
 {
-"name": "Burns Bail Bonds (licensee: Christopher Daniel Freyer)",
+"name": "Christopher Daniel Freyer",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-227-3400",
-"license": "74346, exp 11/03/26",
+"license": "74346",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Burns Bail Bonds",
+"expiration": "11/03/26"
 },
 {
-"name": "Access Bonding Service (agent: Judy Grandmaison-Warren; surety: International Fidelity Ins. Co.)",
+"name": "Judy Grandmaison-Warren",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-3101",
-"license": "74322, exp 02/20/28",
+"license": "74322",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Access Bonding Service",
+"surety": "International Fidelity Ins. Co",
+"expiration": "02/20/28"
 },
 {
-"name": "A&G Bail Bonds (agent: Jason Anderson; surety: Lexington Nat. Ins. Corp)",
+"name": "Jason Anderson",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "832-539-6699",
-"license": "74634, exp 11/24/27",
+"license": "74634",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A&G Bail Bonds",
+"surety": "Lexington Nat. Ins. Corp",
+"expiration": "11/24/27"
 },
 {
-"name": "A.S.A.P. Bail Bonds (agent: Derrick Dixon; surety: Lexington Nat. Ins. Corp.)",
+"name": "Derrick Dixon",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-225-2727",
-"license": "74507, exp 12/21/26",
+"license": "74507",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A.S.A.P. Bail Bonds",
+"surety": "Lexington Nat. Ins. Corp",
+"expiration": "12/21/26"
 },
 {
-"name": "Pastor Bail Bonds 2 (agent: William Pastor; surety: Lexington Nat. Ins. Corp.)",
+"name": "William Pastor",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-869-9954",
-"license": "74573, exp 10/25/26",
+"license": "74573",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Pastor Bail Bonds 2",
+"surety": "Lexington Nat. Ins. Corp",
+"expiration": "10/25/26"
 },
 {
-"name": "A Mobile Bail Bonds Service IV (agent: Dane Webb Embrey; surety: Lexington Nat. Ins. Corp.)",
+"name": "Dane Webb Embrey",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-463-7774",
-"license": "74622, exp 07/10/28",
+"license": "74622",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A Mobile Bail Bonds Service IV",
+"surety": "Lexington Nat. Ins. Corp",
+"expiration": "07/10/28"
 },
 {
-"name": "Bada Bing Bail Bonds (licensee: Tina Lyles)",
+"name": "Tina Lyles",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-864-2464",
-"license": "74183, exp 04/21/27",
+"license": "74183",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Bada Bing Bail Bonds",
+"expiration": "04/21/27"
 },
 {
-"name": "Americas Bail Bonds (licensee: Carlos Manzano)",
+"name": "Carlos Manzano",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-227-2663",
-"license": "74551, exp 11/22/27",
+"license": "74551",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Americas Bail Bonds",
+"expiration": "11/22/27"
 },
 {
-"name": "Action Bail Bonds (licensee: John Edmond McCluskey)",
+"name": "John Edmond McCluskey",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-4600",
-"license": "74320, exp 12/19/27",
+"license": "74320",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Action Bail Bonds",
+"expiration": "12/19/27"
 },
 {
-"name": "H Town Bail Bonds (licensee: Troy McLehany)",
+"name": "Troy McLehany",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-224-7500",
-"license": "74462, exp 12/24/27",
+"license": "74462",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "H Town Bail Bonds",
+"expiration": "12/24/27"
 },
 {
-"name": "Advance Bay Area Bail Bonds (agent: Tessa May-Mohwinkel; surety: North River Ins. Co.)",
+"name": "Tessa May-Mohwinkel",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-204-8280",
-"license": "74583, exp 04/21/27",
+"license": "74583",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Advance Bay Area Bail Bonds",
+"surety": "North River Ins. Co",
+"expiration": "04/21/27"
 },
 {
-"name": "Godfather\u2019s Bail Bonds (agent: Steven Elliott Sondag; surety: North River Ins. Co.)",
+"name": "Steven Elliott Sondag",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-224-3600",
-"license": "74603, exp 12/21/27",
+"license": "74603",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Godfather\u2019s Bail Bonds",
+"surety": "North River Ins. Co",
+"expiration": "12/21/27"
 },
 {
-"name": "Guardian Eagle Bail Bonds (agent: Brandy Sanchez; surety: Palmetto Surety Corp.)",
+"name": "Brandy Sanchez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "832-785-4745",
-"license": "74638, exp 07/01/28",
+"license": "74638",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Guardian Eagle Bail Bonds",
+"surety": "Palmetto Surety Corp",
+"expiration": "07/01/28"
 },
 {
-"name": "Metro Bail Bonds (licensee: Shannon Burns Pena)",
+"name": "Shannon Burns Pena",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-224-5636",
-"license": "74501, exp 01/27/29",
+"license": "74501",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Metro Bail Bonds",
+"expiration": "01/27/29"
 },
 {
-"name": "Another Chance Bail Bonds (agent: McStimey L. Bowie; surety: Roche Surety & Casualty Co.)",
+"name": "McStimey L. Bowie",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-405-0060",
-"license": "74569, exp 12/23/28",
+"license": "74569",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Another Chance Bail Bonds",
+"surety": "Roche Surety & Casualty Co",
+"expiration": "12/23/28"
 },
 {
-"name": "Santana Bonding (licensee: Israel Santana)",
+"name": "Israel Santana",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-923-2244",
-"license": "74476, exp 11/24/26",
+"license": "74476",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Santana Bonding",
+"expiration": "11/24/26"
 },
 {
-"name": "ABC Bonding Company (licensee: David G. Schmidt)",
+"name": "David G. Schmidt",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-222-6222",
-"license": "74357, exp 02/18/27",
+"license": "74357",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "ABC Bonding Company",
+"expiration": "02/18/27"
 },
 {
-"name": "Bayou City Bail Bonding (agent: Troy McLehany; surety: United States Fire Ins. Co.)",
+"name": "Troy McLehany",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-228-4064",
-"license": "74498, exp 08/22/28",
+"license": "74498",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Bayou City Bail Bonding",
+"surety": "United States Fire Ins. Co",
+"expiration": "08/22/28"
 },
 {
-"name": "Abacus Bail Bonds (agent: Christopher Libby; surety: United States Fire Ins. Co.)",
+"name": "Christopher Libby",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-534-1100",
-"license": "74600, exp 08/28/27",
+"license": "74600",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Abacus Bail Bonds",
+"surety": "United States Fire Ins. Co",
+"expiration": "08/28/27"
 },
 {
-"name": "Aaron Bonding Agency (licensee: Rodney Don Vannerson)",
+"name": "Rodney Don Vannerson",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-2667",
-"license": "74465, exp 12/24/27",
+"license": "74465",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Aaron Bonding Agency",
+"expiration": "12/24/27"
 },
 {
-"name": "Blackwood Bail Bonds (agent: Edd Blackwood, Jr.; surety: Allegheny Casualty Co.)",
+"name": "Edd Blackwood, Jr.",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-222-2245",
-"license": "74432, exp 04/24/27",
+"license": "74432",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Blackwood Bail Bonds",
+"surety": "Allegheny Casualty Co",
+"expiration": "04/24/27"
 },
 {
-"name": "A Friendly Bonding Company (agent: Judy Grandmaison-Warren; surety: Allegheny Casualty Co.)",
+"name": "Judy Grandmaison-Warren",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-227-1777",
-"license": "74452, exp 05/28/29",
+"license": "74452",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A Friendly Bonding Company",
+"surety": "Allegheny Casualty Co",
+"expiration": "05/28/29"
 },
 {
-"name": "North Main Bail Bond Company (agent: Thomas Stith II; surety: Allegheny Casualty Co.)",
+"name": "Thomas Stith II",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-844-8000",
-"license": "74494, exp 05/23/28",
+"license": "74494",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "North Main Bail Bond Company",
+"surety": "Allegheny Casualty Co",
+"expiration": "05/23/28"
 },
 {
-"name": "A-Better Bail Bond DT (agent: Kelvin Hampton Sr.; surety: Allegheny Casualty Co.)",
+"name": "Kelvin Hampton Sr.",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-224-8400",
-"license": "74504, exp 03/25/29",
+"license": "74504",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A-Better Bail Bond DT",
+"surety": "Allegheny Casualty Co",
+"expiration": "03/25/29"
 },
 {
-"name": "Allout Bail Bonds (agent: Ricky Thomas Smith; surety: Allegheny Casualty Co.)",
+"name": "Ricky Thomas Smith",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-861-6882",
-"license": "74514, exp 08/27/27",
+"license": "74514",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Allout Bail Bonds",
+"surety": "Allegheny Casualty Co",
+"expiration": "08/27/27"
 },
 {
-"name": "All About Bail Bonds (agent: Sunya Chambers; surety: Allegheny Casualty Co.)",
+"name": "Sunya Chambers",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-676-2227",
-"license": "74517, exp 01/05/28",
+"license": "74517",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "All About Bail Bonds",
+"surety": "Allegheny Casualty Co",
+"expiration": "01/05/28"
 },
 {
-"name": "2 Be Free Bonding Company 2 (agent: Tina Lyles; surety: Allegheny Casualty Co.)",
+"name": "Tina Lyles",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-3734",
-"license": "74610, exp 01/26/27",
+"license": "74610",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "2 Be Free Bonding Company 2",
+"surety": "Allegheny Casualty Co",
+"expiration": "01/26/27"
 },
 {
-"name": "Greenspoint Bail Bond II (agent: Cedric Claiborne; surety: Allegheny Casualty Co.)",
+"name": "Cedric Claiborne",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-445-6345",
-"license": "74613, exp 01/25/27",
+"license": "74613",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Greenspoint Bail Bond II",
+"surety": "Allegheny Casualty Co",
+"expiration": "01/25/27"
 },
 {
-"name": "A-Action Bail Bonds II (agent: John McCluskey; surety: Allegheny Casualty Co.)",
+"name": "John McCluskey",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-4623",
-"license": "74612, exp 01/19/27",
+"license": "74612",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A-Action Bail Bonds II",
+"surety": "Allegheny Casualty Co",
+"expiration": "01/19/27"
 },
 {
-"name": "Better Now Than Later Bail Bonds II (agent: Marc Metze; surety: Allegheny Casualty Co.)",
+"name": "Marc Metze",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-226-8700",
-"license": "74615, exp 05/11/27",
+"license": "74615",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Better Now Than Later Bail Bonds II",
+"surety": "Allegheny Casualty Co",
+"expiration": "05/11/27"
 },
 {
-"name": "A-1 Bonding Company II (agent: Christopher Strickland; surety: Allegheny Casualty Co.)",
+"name": "Christopher Strickland",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-759-0000",
-"license": "74620, exp 03/19/28",
+"license": "74620",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A-1 Bonding Company II",
+"surety": "Allegheny Casualty Co",
+"expiration": "03/19/28"
 },
 {
-"name": "Elite Bonding Company (agent: Antonia Sierra; surety: Allegheny Casualty Co.)",
+"name": "Antonia Sierra",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-281-8100",
-"license": "74630, exp 01/27/27",
+"license": "74630",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Elite Bonding Company",
+"surety": "Allegheny Casualty Co",
+"expiration": "01/27/27"
 },
 {
-"name": "3-Amigo\u2019s Bonding II (agent: Joseph Villarreal; surety: Allegheny Casualty Co.)",
+"name": "Joseph Villarreal",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-928-5011",
-"license": "74631, exp 03/10/27",
+"license": "74631",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "3-Amigo\u2019s Bonding II",
+"surety": "Allegheny Casualty Co",
+"expiration": "03/10/27"
 },
 {
-"name": "Country Bonding II (agent: Michael Yokem; surety: Allegheny Casualty Co.)",
+"name": "Michael Yokem",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-575-9548",
-"license": "74633, exp 09/20/27",
+"license": "74633",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Country Bonding II",
+"surety": "Allegheny Casualty Co",
+"expiration": "09/20/27"
 },
 {
-"name": "A Southside Bail Bond (agent: Mark Harris; surety: American Surety Co.)",
+"name": "Mark Harris",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-738-6969",
-"license": "74540, exp 08/27/29",
+"license": "74540",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "A Southside Bail Bond",
+"surety": "American Surety Co",
+"expiration": "08/27/29"
 },
 {
-"name": "Allied Bonding Agency (agent: Carl R. Pruett; surety: American Surety Co.)",
+"name": "Carl R. Pruett",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-225-1761",
-"license": "74574, exp 11/18/26",
+"license": "74574",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Allied Bonding Agency",
+"surety": "American Surety Co",
+"expiration": "11/18/26"
 },
 {
-"name": "JCB Bail Bonds (agent: Juan Carlos Bernabe Jr; surety: American Surety Co.)",
+"name": "Juan Carlos Bernabe Jr",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "832-409-6067",
-"license": "74606, exp 08/25/28",
+"license": "74606",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "JCB Bail Bonds",
+"surety": "American Surety Co",
+"expiration": "08/25/28"
 },
 {
-"name": "Houston Harris County Bail Bonds II (agent: Rosemary Dominguez; surety: American Surety Co.)",
+"name": "Rosemary Dominguez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-222-2262",
-"license": "74607, exp 09/21/26",
+"license": "74607",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Houston Harris County Bail Bonds II",
+"surety": "American Surety Co",
+"expiration": "09/21/26"
 },
 {
-"name": "ABC Bonding Company of TX (agent: David G. Schmidt; surety: American Surety Co.)",
+"name": "David G. Schmidt",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-228-6011",
-"license": "74608, exp 09/21/26",
+"license": "74608",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "ABC Bonding Company of TX",
+"surety": "American Surety Co",
+"expiration": "09/21/26"
 },
 {
-"name": "Lockwood Bail Bond Company by Sandra (agent: Sandra Sanchez; surety: American Surety Co.)",
+"name": "Sandra Sanchez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-672-5625",
-"license": "74609, exp 10/24/26",
+"license": "74609",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Lockwood Bail Bond Company by Sandra",
+"surety": "American Surety Co",
+"expiration": "10/24/26"
 },
 {
-"name": "Espinoza Affordable Bail Bonds (agent: Jose Espinoza; surety: American Surety Co.)",
+"name": "Jose Espinoza",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-472-6400",
-"license": "74625, exp 06/29/27",
+"license": "74625",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Espinoza Affordable Bail Bonds",
+"surety": "American Surety Co",
+"expiration": "06/29/27"
 },
 {
-"name": "KYD Bailbonds (agent: Kenia Bernabe; surety: American Surety Co.)",
+"name": "Kenia Bernabe",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "832-850-5100",
-"license": "74628, exp 11/08/27",
+"license": "74628",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "KYD Bailbonds",
+"surety": "American Surety Co",
+"expiration": "11/08/27"
 },
 {
-"name": "1-Way Out Bail Bonds (agent: Jason Ayala; surety: American Surety Co.)",
+"name": "Jason Ayala",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-672-2663",
-"license": "74635, exp 04/18/28",
+"license": "74635",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "1-Way Out Bail Bonds",
+"surety": "American Surety Co",
+"expiration": "04/18/28"
 },
 {
-"name": "Baytown Bonding Company (licensee: Don Baker)",
+"name": "Don Baker",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-422-8297",
-"license": "74106, exp 01/19/27",
+"license": "74106",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Baytown Bonding Company",
+"expiration": "01/19/27"
 },
 {
-"name": "Outlaw Bail Bonds (licensee: Johnny Dale Ballard)",
+"name": "Johnny Dale Ballard",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-455-0680",
-"license": "74435, exp 05/19/27",
+"license": "74435",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Outlaw Bail Bonds",
+"expiration": "05/19/27"
 },
 {
-"name": "Better Now Than Later Bail Bonds (agent: Marc Adam Metze; surety: Bankers Insurance Co.)",
+"name": "Marc Adam Metze",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-521-2004",
-"license": "74441, exp 12/22/27",
+"license": "74441",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Better Now Than Later Bail Bonds",
+"surety": "Bankers Insurance Co",
+"expiration": "12/22/27"
 },
 {
-"name": "1st Advantage Bail Bonds (agent: Mario Garza; surety: Bankers Insurance Co.)",
+"name": "Mario Garza",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-847-9902",
-"license": "74485, exp 12/21/27",
+"license": "74485",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "1st Advantage Bail Bonds",
+"surety": "Bankers Insurance Co",
+"expiration": "12/21/27"
 },
 {
-"name": "X-It Bail Bonds Services (agent: Maria L. Sanchez; surety: Bankers Insurance Co.)",
+"name": "Maria L. Sanchez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-222-8880",
-"license": "74557, exp 05/23/28",
+"license": "74557",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "X-It Bail Bonds Services",
+"surety": "Bankers Insurance Co",
+"expiration": "05/23/28"
 },
 {
-"name": "Bowen\u2019s Bonding Svc (licensee: Tameka Anese Bowen)",
+"name": "Tameka Anese Bowen",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-426-5577",
-"license": "74490, exp 04/28/28",
+"license": "74490",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Bowen\u2019s Bonding Svc",
+"expiration": "04/28/28"
 },
 {
-"name": "Atlas Bail Bonds (licensee: Cynthia Bravo)",
+"name": "Cynthia Bravo",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-522-7777",
-"license": "74548, exp 10/18/27",
+"license": "74548",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Atlas Bail Bonds",
+"expiration": "10/18/27"
 },
 {
-"name": "All About Bail Bonds #2 (licensee: Sunya Rachell Chambers)",
+"name": "Sunya Rachell Chambers",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-784-2474",
-"license": "74589, exp 05/18/29",
+"license": "74589",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "All About Bail Bonds #2",
+"expiration": "05/18/29"
 },
 {
-"name": "Houston Harris County Bail Bonds (licensee: Rosemary Dominguez)",
+"name": "Rosemary Dominguez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-237-1975",
-"license": "74250, exp 10/24/26",
+"license": "74250",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Houston Harris County Bail Bonds",
+"expiration": "10/24/26"
 },
 {
-"name": "Set\u2019Em Free Bail Bonds (agent: Sharon McCleveland; surety: Financial Casualty & Surety, Inc)",
+"name": "Sharon McCleveland",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-864-2245",
-"license": "74487, exp 02/22/28",
+"license": "74487",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Set\u2019Em Free Bail Bonds",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "02/22/28"
 },
 {
-"name": "Aaron Bail Bonds (agent: Rodney Don Vannerson; surety: Financial Casualty & Surety, Inc)",
+"name": "Rodney Don Vannerson",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-223-2663",
-"license": "74497, exp 07/18/28",
+"license": "74497",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Aaron Bail Bonds",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "07/18/28"
 },
 {
-"name": "American Bonding Agency (agent: Roberto Trevino; surety: Financial Casualty & Surety, Inc)",
+"name": "Roberto Trevino",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-898-6731",
-"license": "74519, exp 01/21/28",
+"license": "74519",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "American Bonding Agency",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "01/21/28"
 },
 {
-"name": "Clutch City Bail Bonds (agent: Toddrick Holmes; surety: Financial Casualty & Surety, Inc)",
+"name": "Toddrick Holmes",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-568-6060",
-"license": "74591, exp 05/18/29",
+"license": "74591",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Clutch City Bail Bonds",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "05/18/29"
 },
 {
-"name": "Fearless Bail Bonds II (agent: Marcos Antonio; surety: Financial Casualty & Surety, Inc)",
+"name": "Marcos Antonio",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-862-8888",
-"license": "74617, exp 09/18/27",
+"license": "74617",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Fearless Bail Bonds II",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "09/18/27"
 },
 {
-"name": "X-It Bail Bonds II (agent: Maria Sanchez; surety: Financial Casualty & Surety, Inc)",
+"name": "Maria Sanchez",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "281-947-6070",
-"license": "74621, exp 06/18/28",
+"license": "74621",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "X-It Bail Bonds II",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "06/18/28"
 },
 {
-"name": "Lone Star Bonding Co. 2 (agent: Steve Cruz; surety: Financial Casualty & Surety, Inc)",
+"name": "Steve Cruz",
 "address": "",
 "city": "",
 "zip": "",
 "phone": "713-228-8800",
-"license": "74629, exp 11/23/26",
+"license": "74629",
 "county": "Harris",
 "state": "TX",
-"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf"
+"source_url": "https://bailbond.harriscountytx.gov/Portals/bailbond/documents/long%20list%20071326.pdf",
+"agency": "Lone Star Bonding Co. 2",
+"surety": "Financial Casualty & Surety, Inc",
+"expiration": "11/23/26"
 },
 {
-"name": "Ashley's Bail Bonds (agent: Ashley Cantu; licensee: Universal Fire & Casualty Insurance Company)",
+"name": "Ashley Cantu",
 "address": "2012 E. 7th Street Unit 5",
 "city": "Austin",
 "zip": "78702",
 "phone": "(512) 243-7474",
-"license": "202504, exp 04/07/27",
+"license": "202504",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "04/07/27",
+"agency": "Ashley's Bail Bonds",
+"surety": "licensee: Universal Fire & Casualty Insurance Company"
 },
 {
-"name": "Freedom Bail Bonding (agent: Troy McLehany; licensee: Financial Casualty & Surety)",
+"name": "Troy McLehany",
 "address": "107 W. 10th Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 481-0000",
-"license": "042025, exp 05/08/27",
+"license": "042025",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "05/08/27",
+"agency": "Freedom Bail Bonding",
+"surety": "licensee: Financial Casualty & Surety"
 },
 {
-"name": "Around The Clock Bail Bonds (agent: John A. Zavala; licensee: Bankers Insurance Company)",
+"name": "John A. Zavala",
 "address": "909 Nueces Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 476-2409",
-"license": "203253, exp 05/06/28",
+"license": "203253",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "05/06/28",
+"agency": "Around The Clock Bail Bonds",
+"surety": "licensee: Bankers Insurance Company"
 },
 {
-"name": "Bulldog Bail Bonds (agent: Jessica Zak; licensee: Allegheny Casualty Company)",
+"name": "Jessica Zak",
 "address": "600 W. 13th Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 988-9898",
-"license": "012015, exp 09/29/26",
+"license": "012015",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "09/29/26",
+"agency": "Bulldog Bail Bonds",
+"surety": "licensee: Allegheny Casualty Company"
 },
 {
-"name": "Lone Star Bail Service (agent: Billy Engle; licensee: First Community Insurance Company)",
+"name": "Billy Engle",
 "address": "600 W. 13th Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 994-9669",
-"license": "281423, exp 11/10/28",
+"license": "281423",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "11/10/28",
+"agency": "Lone Star Bail Service",
+"surety": "licensee: First Community Insurance Company"
 },
 {
-"name": "Bail Bonds Express (licensee: Jennifer Moreno-Williams)",
+"name": "Jennifer Moreno-Williams",
 "address": "600 W. 28th St, Suite 106-B",
 "city": "Austin",
 "zip": "78705",
 "phone": "(512) 320-0928",
-"license": "226450, exp 03/13/29",
+"license": "226450",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"agency": "Bail Bonds Express",
+"expiration": "03/13/29"
 },
 {
-"name": "Kwik Out Bail Bonds (agent: Troy McLehany; licensee: United States Fire Insurance Company)",
+"name": "Troy McLehany",
 "address": "2236 Webberville Rd",
 "city": "Austin",
 "zip": "78702",
 "phone": "(512) 472-5945",
-"license": "012017, exp 05/05/28",
+"license": "012017",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "05/05/28",
+"agency": "Kwik Out Bail Bonds",
+"surety": "licensee: United States Fire Insurance Company"
 },
 {
-"name": "Austin Texas Bail Bonds (agent: Jessica Zak; licensee: Financial Casualty & Surety)",
+"name": "Jessica Zak",
 "address": "600 W. 13th Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 320-0800",
-"license": "234577, exp 12/13/27",
+"license": "234577",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "12/13/27",
+"agency": "Austin Texas Bail Bonds",
+"surety": "licensee: Financial Casualty & Surety"
 },
 {
-"name": "ATX Bail Bonds 2 (agent: Daniel Brenza; licensee: Allegheny Casualty Company)",
+"name": "Daniel Brenza",
 "address": "600 W. 28th Street, Suite 201",
 "city": "Austin",
 "zip": "78705",
 "phone": "(512) 834-2245",
-"license": "052021, exp 05/04/27",
+"license": "052021",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "05/04/27",
+"agency": "ATX Bail Bonds 2",
+"surety": "licensee: Allegheny Casualty Company"
 },
 {
-"name": "24-7 Bail Bonds (licensee: Daniel Williams)",
+"name": "Daniel Williams",
 "address": "600 W. 28th St, Suite 106-B",
 "city": "Austin",
 "zip": "78705",
 "phone": "(512) 291-5500",
-"license": "012018, exp 01/18/27",
+"license": "012018",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"agency": "24-7 Bail Bonds",
+"expiration": "01/18/27"
 },
 {
-"name": "Bring'Em Home 24/7 Bail Bonds (agent: Lidio Ortiz, Jr.; licensee: Bankers Insurance Company)",
+"name": "Lidio Ortiz, Jr.",
 "address": "2306 E. Cesar Chavez, Suite B",
 "city": "Austin",
 "zip": "78702",
 "phone": "(737) 255-9899",
-"license": "072024, exp 07/26/28",
+"license": "072024",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "07/26/28",
+"agency": "Bring'Em Home 24/7 Bail Bonds",
+"surety": "licensee: Bankers Insurance Company"
 },
 {
-"name": "Travis County Bail Bonds (agent: Jessica Zak; licensee: Lexington National Insurance Corporation)",
+"name": "Jessica Zak",
 "address": "600 W. 13th Street",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 320-0800",
-"license": "202407, exp 07/26/28",
+"license": "202407",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "07/26/28",
+"agency": "Travis County Bail Bonds",
+"surety": "licensee: Lexington National Insurance Corporation"
 },
 {
-"name": "ASAP Bail Bonds ATX (agent: Derrick Dixon; licensee: Lexington National Insurance Corporation)",
+"name": "Derrick Dixon",
 "address": "1609 Shoal Creek, Suite 100, Room 6",
 "city": "Austin",
 "zip": "78701",
 "phone": "(512) 520-5264",
-"license": "112024, exp 11/15/26",
+"license": "112024",
 "county": "Travis",
 "state": "TX",
-"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf"
+"source_url": "https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf",
+"expiration": "11/15/26",
+"agency": "ASAP Bail Bonds ATX",
+"surety": "licensee: Lexington National Insurance Corporation"
 },
 {
-"name": "Lachica (agent: Alberto J. De Lachica; International Fidelity Ins.)",
+"name": "Alberto J. De Lachica",
 "address": "200 S. Stanton, Suite D",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-1900",
-"license": "009, exp July 25, 2027",
+"license": "009",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "July 25, 2027",
+"agency": "Lachica",
+"surety": "International Fidelity Ins"
 },
 {
-"name": "Borderland (agent: Antonio Munoz; American Surety Co.)",
+"name": "Antonio Munoz",
 "address": "425 Myrtle",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-542-1911",
-"license": "093, exp February 26, 2027",
+"license": "093",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "February 26, 2027",
+"agency": "Borderland",
+"surety": "American Surety Co"
 },
 {
-"name": "Freedom (agent: Pasqual Olibas)",
+"name": "Pasqual Olibas",
 "address": "1707 Wyoming",
 "city": "El Paso",
 "zip": "79902",
 "phone": "915-877-9293",
-"license": "100, exp November 12, 2026",
+"license": "100",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"agency": "Freedom",
+"expiration": "November 12, 2026"
 },
 {
-"name": "E-Z IV (agent: Jose Castaneda; Lexington Insurance)",
+"name": "Jose Castaneda",
 "address": "700 E. Overland",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-532-6333",
-"license": "105, exp November 27, 2028",
+"license": "105",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "November 27, 2028",
+"agency": "E-Z IV",
+"surety": "Lexington Insurance"
 },
 {
-"name": "Lachica III (agent: Alberto J. De Lachica; Financial Casualty & Surety)",
+"name": "Alberto J. De Lachica",
 "address": "425 E. Paisano Dr., Suite D",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-2997",
-"license": "107, exp November 12, 2026",
+"license": "107",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "November 12, 2026",
+"agency": "Lachica III",
+"surety": "Financial Casualty & Surety"
 },
 {
-"name": "1 Stop (agent: Jesus \"Jessie\" Samaniego; U.S. Fire Insurance Co.)",
+"name": "Jesus \"Jessie\" Samaniego",
 "address": "801 Myrtle Ave, #105",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-7867",
-"license": "116, exp November 12, 2028",
+"license": "116",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "November 12, 2028",
+"agency": "1 Stop",
+"surety": "U.S. Fire Insurance Co"
 },
 {
-"name": "A-Quick IV (agent: Guadalupe Antonio Quintanilla; International Fidelity Insurance Co.)",
+"name": "Guadalupe Antonio Quintanilla",
 "address": "717 E. San Antonio, Ste A",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-533-1414",
-"license": "118, exp May 26, 2026",
+"license": "118",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "May 26, 2026",
+"agency": "A-Quick IV",
+"surety": "International Fidelity Insurance Co"
 },
 {
-"name": "1 Call (agent: Oscar Gonzalez; The North River Insurance Co.)",
+"name": "Oscar Gonzalez",
 "address": "801 Myrtle Ave, #105",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-533-2255",
-"license": "120, exp February 23, 2027",
+"license": "120",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "February 23, 2027",
+"agency": "1 Call",
+"surety": "The North River Insurance Co"
 },
 {
-"name": "AAA (agent: C. Tejeda; American Bankers Ins.)",
+"name": "C. Tejeda",
 "address": "700 E. Overland, Ste E",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-2224",
-"license": "127, exp June 17, 2028",
+"license": "127",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "June 17, 2028",
+"agency": "AAA",
+"surety": "American Bankers Ins"
 },
 {
-"name": "9 One 5 (agent: Fernando Serrano; Bankers Ins.)",
+"name": "Fernando Serrano",
 "address": "830 E. San Antonio",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-313-4111",
-"license": "130, exp February 26, 2028",
+"license": "130",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "February 26, 2028",
+"agency": "9 One 5",
+"surety": "Bankers Ins"
 },
 {
-"name": "Amigo V (agent: James Rey)",
+"name": "James Rey",
 "address": "501 N. Kansas",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-532-3500",
-"license": "132, exp May 23, 2027",
+"license": "132",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"agency": "Amigo V",
+"expiration": "May 23, 2027"
 },
 {
-"name": "24 Hr. VI (agent: Antonio Munoz; American Surety)",
+"name": "Antonio Munoz",
 "address": "425 Myrtle",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-533-9800",
-"license": "133, exp January 30, 2029",
+"license": "133",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "January 30, 2029",
+"agency": "24 Hr. VI",
+"surety": "American Surety"
 },
 {
-"name": "Speedy (agent: Oscar Bustamante; Bankers Insurance)",
+"name": "Oscar Bustamante",
 "address": "206 S. Florence",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-566-8104",
-"license": "134, exp April 29, 2027",
+"license": "134",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "April 29, 2027",
+"agency": "Speedy",
+"surety": "Bankers Insurance"
 },
 {
-"name": "Apodaca-Lachica (agent: Alberto J. de Lachica; Allegheny Casualty Company)",
+"name": "Alberto J. de Lachica",
 "address": "211 S. Kansas",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-1900",
-"license": "135, exp August 27, 2027",
+"license": "135",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "August 27, 2027",
+"agency": "Apodaca-Lachica",
+"surety": "Allegheny Casualty Company"
 },
 {
-"name": "Affordable II (agent: Hector Quintanilla; United States Fire Insurance)",
+"name": "Hector Quintanilla",
 "address": "101 N. Ochoa",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-351-7002",
-"license": "136, exp October 29, 2027",
+"license": "136",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "October 29, 2027",
+"agency": "Affordable II",
+"surety": "United States Fire Insurance"
 },
 {
-"name": "Amigo VI (agent: James Rey; Allegheny Casualty Company)",
+"name": "James Rey",
 "address": "501 N. Kansas",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-532-3500",
-"license": "137, exp February 25, 2028",
+"license": "137",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "February 25, 2028",
+"agency": "Amigo VI",
+"surety": "Allegheny Casualty Company"
 },
 {
-"name": "Lone Star (agent: Antonio Munoz; Universal Fire & Casualty)",
+"name": "Antonio Munoz",
 "address": "425 Myrtle",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-542-1911",
-"license": "139, exp April 27, 2027",
+"license": "139",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "April 27, 2027",
+"agency": "Lone Star",
+"surety": "Universal Fire & Casualty"
 },
 {
-"name": "EZ V (agent: Jose Castaneda; Allegheny Casualty Company)",
+"name": "Jose Castaneda",
 "address": "700 E. Overland",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-532-6329",
-"license": "140, exp July 26, 2026",
+"license": "140",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "July 26, 2026",
+"agency": "EZ V",
+"surety": "Allegheny Casualty Company"
 },
 {
-"name": "Dollar (agent: Claudia Rubio; Financial Casualty & Surety)",
+"name": "Claudia Rubio",
 "address": "700 E. Overland",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-544-2224",
-"license": "141, exp September 26, 2027",
+"license": "141",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "September 26, 2027",
+"agency": "Dollar",
+"surety": "Financial Casualty & Surety"
 },
 {
-"name": "EPT (agent: Fernando Serrano; Financial Casualty & Surety)",
+"name": "Fernando Serrano",
 "address": "830 E. San Antonio, Suite C",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-313-4117",
-"license": "142, exp June 24, 2027",
+"license": "142",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "June 24, 2027",
+"agency": "EPT",
+"surety": "Financial Casualty & Surety"
 },
 {
-"name": "Payless Bail Bonds III (agent: Luis Quintanilla; Allegheny Casualty Company)",
+"name": "Luis Quintanilla",
 "address": "416 N. Staton Ste. 120-G",
 "city": "El Paso",
 "zip": "79901",
 "phone": "915-222-0832",
-"license": "143, exp February 24, 2028",
+"license": "143",
 "county": "El Paso",
 "state": "TX",
-"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF"
+"source_url": "https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF",
+"expiration": "February 24, 2028",
+"agency": "Payless Bail Bonds III",
+"surety": "Allegheny Casualty Company"
 },
 {
 "name": "Bond Doctor Bail Bonds",
@@ -2794,7 +3172,7 @@
 "source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
 },
 {
-"name": "Chapman's Bail Bonds (agent: Chase Chapman)",
+"name": "Chase Chapman",
 "address": "700 E. Waco Dr.",
 "city": "Waco",
 "zip": "76704",
@@ -2802,7 +3180,8 @@
 "license": "",
 "county": "McLennan",
 "state": "TX",
-"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
+"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF",
+"agency": "Chapman's Bail Bonds"
 },
 {
 "name": "Gonzales Bail Bonds (Roy Gonzales)",
@@ -2838,7 +3217,7 @@
 "source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
 },
 {
-"name": "Kocian Bail Bonds (agent: Cody Kocian)",
+"name": "Cody Kocian",
 "address": "3300 W. Waco Dr.",
 "city": "Waco",
 "zip": "76710",
@@ -2846,7 +3225,8 @@
 "license": "",
 "county": "McLennan",
 "state": "TX",
-"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
+"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF",
+"agency": "Kocian Bail Bonds"
 },
 {
 "name": "Larry Johnson's Lone Star Bail (Larry Johnson)",
@@ -2860,7 +3240,7 @@
 "source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
 },
 {
-"name": "Legacy Bail Bonds (agent: Charlie Pickens III)",
+"name": "Charlie Pickens III",
 "address": "705 Kane St.",
 "city": "Waco",
 "zip": "76705",
@@ -2868,7 +3248,8 @@
 "license": "",
 "county": "McLennan",
 "state": "TX",
-"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
+"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF",
+"agency": "Legacy Bail Bonds"
 },
 {
 "name": "Mabry Bail Bonds (John Mabry)",
@@ -2882,7 +3263,7 @@
 "source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
 },
 {
-"name": "Player Bail Bonds (agent: Christy Player-Greenwood)",
+"name": "Christy Player-Greenwood",
 "address": "1515 W. Waco Dr.",
 "city": "Waco",
 "zip": "76707",
@@ -2890,7 +3271,8 @@
 "license": "",
 "county": "McLennan",
 "state": "TX",
-"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF"
+"source_url": "https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF",
+"agency": "Player Bail Bonds"
 },
 {
 "name": "Waco Bail Bonds (Cindy Mabry)",

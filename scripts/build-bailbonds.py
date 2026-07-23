@@ -36,6 +36,7 @@ ROOT = os.path.join(os.path.dirname(__file__), '..', 'bailbonds')
 DATA = os.path.join(ROOT, 'data')
 
 DOMAIN = 'https://hyder.me/bailbonds'   # swap at domain-transfer time
+BASE = '/bailbonds'                      # URL prefix; set to '' after domain transfer
 INDEXABLE = False                        # flip to True at transfer time
 
 counties = json.load(open(os.path.join(DATA, 'counties.json')))
@@ -60,6 +61,22 @@ def norm_county(name):
             n = n[: -len(suffix)]
     return n
 
+def display_name(n):
+    n = str(n or '').strip()
+    return n.title() if n.isupper() else n
+
+def agent_slug(a, taken):
+    import re as _re, unicodedata as _ud
+    base = _ud.normalize('NFKD', str(a['name'])).encode('ascii', 'ignore').decode()
+    base = _re.sub(r'[^a-z0-9]+', '-', base.lower()).strip('-')[:60] or 'agent'
+    lic = _re.sub(r'[^a-z0-9]+', '-', str(a.get('license') or '').lower()).strip('-')
+    slug = f"{base}-{lic}" if lic else base
+    n, s2 = 2, slug
+    while s2 in taken:
+        s2 = f"{slug}-{n}"; n += 1
+    taken.add(s2)
+    return s2
+
 agents_by_state = {}
 agents_by_county = {}
 for path in sorted(glob.glob(os.path.join(DATA, 'agents', '*.json'))):
@@ -70,6 +87,11 @@ for path in sorted(glob.glob(os.path.join(DATA, 'agents', '*.json'))):
         agents_by_state.setdefault(st, []).append(a)
         if a.get('county'):
             agents_by_county.setdefault((st, norm_county(a['county'])), []).append(a)
+
+for _st, _rows in agents_by_state.items():
+    _taken = set()
+    for _a in _rows:
+        _a['slug'] = agent_slug(_a, _taken)
 
 def esc(s):
     return html_mod.escape(str(s), quote=False) if s else ''
@@ -106,7 +128,8 @@ a { color:var(--accent); }
 .county-grid a:hover { border-color:var(--accent); }
 .county-grid .pop { color:var(--muted); font-size:.78rem; }
 .agent-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
-.agent { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; }
+.agent { display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; color:var(--ink); text-decoration:none; }
+.agent:hover { border-color:var(--accent); }
 .agent .an { font-weight:700; }
 .agent .ad, .agent .lic { color:var(--muted); font-size:.82rem; }
 .agent .ph { margin-top:4px; }
@@ -129,7 +152,6 @@ def status_badge(st):
     }[st['status']]
 
 def page(title, description, body, depth=0, jsonld=None, canonical_path=''):
-    root = '../' * depth
     robots = '' if INDEXABLE else '<meta name="robots" content="noindex, nofollow">\n'
     canonical = f'<link rel="canonical" href="{DOMAIN}{canonical_path}">\n' if INDEXABLE else ''
     ld = ''
@@ -149,7 +171,7 @@ def page(title, description, body, depth=0, jsonld=None, canonical_path=''):
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="brand" href="{root}index.html">Bail <span>Bonds</span> Directory</a>
+  <a class="brand" href="{BASE}/">Bail <span>Bonds</span> Directory</a>
   <span class="tagline">Bail &amp; jail release information for every U.S. county</span>
 </div></header>
 <div class="wrap">
@@ -291,20 +313,23 @@ def how_bail_works(st):
   </ul>
 </div>"""
 
-def agent_cards(agent_list, limit=None):
+def agent_cards(agent_list, limit=None, more_href=None):
     shown = agent_list[:limit] if limit else agent_list
     cards = []
     for a in shown:
+        url = f"{BASE}/{a['state'].lower()}/agent/{a['slug']}/"
         addr = ', '.join(filter(None, [a.get('address'), a.get('city'), a.get('zip')]))
         lic = f"<div class='lic'>License: {esc(a['license'])}</div>" if a.get('license') else ''
-        agency = f"<div class='ad'>{esc(a['agency'])}</div>" if a.get('agency') and a.get('agency') != a.get('name') else ''
-        cards.append(f"""<div class="agent">
-  <div class="an">{esc(a['name'])}</div>{agency}
+        agency = f"<div class='ad'>{esc(display_name(a['agency']))}</div>" if a.get('agency') and a.get('agency') != a.get('name') else ''
+        cards.append(f"""<a class="agent" href="{url}">
+  <div class="an">{esc(display_name(a['name']))}</div>{agency}
   <div class="ad">{esc(addr)}</div>
   {f"<div class='ph'>{esc(a['phone'])}</div>" if a.get('phone') else ''}
   {lic}
-</div>""")
-    more = f"<p class='sub'>+ {len(agent_list) - len(shown)} more licensed agents on record.</p>" if limit and len(agent_list) > limit else ''
+</a>""")
+    more = (f"<p class='sub'><a href='{more_href}'>View all {len(agent_list)} licensed agents →</a></p>"
+            if limit and len(agent_list) > limit and more_href else
+            (f"<p class='sub'>+ {len(agent_list) - len(shown)} more licensed agents on record.</p>" if limit and len(agent_list) > limit else ''))
     srcs = sorted({a.get('source_url') for a in shown if a.get('source_url')})
     src_note = f"<p class='src'>Source: official license roster{'s' if len(srcs) > 1 else ''} — " + \
                ' · '.join(f"<a href='{s}' rel='nofollow'>{s.split('/')[2]}</a>" for s in srcs[:3]) + '</p>' if srcs else ''
@@ -328,14 +353,15 @@ def related_links(c, st, st_counties):
     idx = next(i for i, x in enumerate(st_counties) if x['slug'] == c['slug'])
     neighbors = [st_counties[i] for i in (idx - 1, idx + 1) if 0 <= i < len(st_counties) and st_counties[i]['slug'] != c['slug']]
     seen, links = {c['slug']}, []
+    sb = f"{BASE}/{st['abbr'].lower()}"
     for x in top + neighbors:
         if x['slug'] not in seen:
             seen.add(x['slug'])
-            links.append(f'<a href="../{x["slug"]}/index.html">{esc(x["display"])}</a>')
+            links.append(f'<a href="{sb}/{x["slug"]}/">{esc(x["display"])}</a>')
     return f"""
 <div class="card">
   <h2>Bail Bonds Elsewhere in {st['name']}</h2>
-  <div class="linkrow">{''.join(links)} <a href="../index.html">All {st['name']} counties →</a></div>
+  <div class="linkrow">{''.join(links)} <a href="{sb}/">All {st['name']} counties →</a></div>
 </div>"""
 
 # ---------- Pages ----------
@@ -410,8 +436,8 @@ def county_page(c, st, st_counties):
             agents_card = f"""
 <div class="card">
   <h2>Licensed Bail Agents in {display}</h2>
-  <p class="sub">County-level roster integration in progress — see the
-  <a href="../index.html">{st['name']} state page</a> for statewide licensed agents.</p>
+  <p class="sub">County-level roster integration in progress — see
+  <a href="{BASE}/{st['abbr'].lower()}/agents/">all licensed agents in {st['name']}</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>"""
 
@@ -422,7 +448,7 @@ def county_page(c, st, st_counties):
     ])
 
     body = f"""
-<div class="crumb"><a href="../../index.html">All states</a> › <a href="../index.html">{st['name']}</a> › {display}</div>
+<div class="crumb"><a href="{BASE}/">All states</a> › <a href="{BASE}/{st['abbr'].lower()}/">{st['name']}</a> › {display}</div>
 <h1>Bail Bonds in {display}, {st['name']}</h1>
 <p class="sub">Jail release information, the bail process, and licensed bail agents for {display}.</p>
 <div class="facts">
@@ -451,7 +477,7 @@ def county_page(c, st, st_counties):
 
 def state_page(st, st_counties):
     tiles = ''.join(
-        f'<a href="{c["slug"]}/index.html">{esc(c["display"])}'
+        f'<a href="{BASE}/{st["abbr"].lower()}/{c["slug"]}/">{esc(c["display"])}'
         f'<div class="pop">{c["population"]:,} residents</div></a>'
         for c in st_counties)
     n = len(st_counties)
@@ -459,11 +485,13 @@ def state_page(st, st_counties):
     st_agents = agents_by_state.get(st['abbr'], [])
     agents_card = ''
     if st_agents and st['status'] in ('legal', 'impaired'):
+        agents_url = f"{BASE}/{st['abbr'].lower()}/agents/"
         agents_card = f"""
 <div class="card">
   <h2>Licensed Bail Agents in {st['name']}</h2>
-  <p class="sub">{len(st_agents)} licensed agents/agencies on official rosters.</p>
-  {agent_cards(sorted(st_agents, key=lambda a: (a.get('city') or '', a['name'])), limit=60)}
+  <p class="sub">{len(st_agents)} licensed agents/agencies on official rosters —
+  <a href="{agents_url}">view the complete {st['name']} roster</a>.</p>
+  {agent_cards(sorted(st_agents, key=lambda a: (a.get('city') or '', a['name'])), limit=24, more_href=agents_url)}
 </div>"""
     facts = f"""
 <div class="facts">
@@ -473,7 +501,7 @@ def state_page(st, st_counties):
   <div class="fact"><div class="k">Regulator</div><div class="v small">{esc(st.get('regulator') or 'Court system')}</div></div>
 </div>"""
     body = f"""
-<div class="crumb"><a href="../index.html">All states</a> › {st['name']}</div>
+<div class="crumb"><a href="{BASE}/">All states</a> › {st['name']}</div>
 <h1>Bail Bonds in {st['name']}</h1>
 {facts}
 {how_bail_works(st)}
@@ -494,7 +522,7 @@ def national_index(by_state):
     total_agents = sum(len(v) for v in agents_by_state.values())
     agents_line = f" Includes {total_agents:,} licensed bail agents from official state and county rosters." if total_agents else ''
     tiles = ''.join(
-        f'<a href="{s["abbr"].lower()}/index.html">{s["name"]}'
+        f'<a href="{BASE}/{s["abbr"].lower()}/">{s["name"]}'
         f'<div class="pop">{len(by_state.get(s["abbr"], []))} counties · '
         f'{ {"legal": "commercial bail", "impaired": "limited market", "none": "no commercial bail"}[s["status"]] }</div></a>'
         for s in sorted(states.values(), key=lambda x: x['name']))
@@ -510,6 +538,89 @@ systems — each state page explains exactly how release works there.{agents_lin
                 "How bail works in every U.S. state and county: premiums, licensing, jail lookups, "
                 "and licensed bail agents from official rosters.", body, depth=0,
                 canonical_path='/')
+
+def state_agents_page(st, st_agents):
+    sb = f"{BASE}/{st['abbr'].lower()}"
+    groups = {}
+    for a in st_agents:
+        groups.setdefault(a.get('county') or 'Statewide / county not specified', []).append(a)
+    sections = []
+    for county in sorted(groups, key=lambda c: (c.startswith('Statewide'), c)):
+        rows = sorted(groups[county], key=lambda a: str(a['name']))
+        sections.append(f"<h2 id=\"{norm_county(county).replace(' ', '-')}\">{esc(county)} ({len(rows)})</h2>" + agent_cards(rows))
+    body = f"""
+<div class="crumb"><a href="{BASE}/">All states</a> › <a href="{sb}/">{st['name']}</a> › All licensed agents</div>
+<h1>Every Licensed Bail Agent in {st['name']}</h1>
+<p class="sub">{len(st_agents)} licensed bail agents and agencies from official state and county
+rosters, grouped by county. Click any listing for the full profile.</p>
+{''.join(sections)}
+"""
+    return page(f"All {len(st_agents)} Licensed Bail Agents in {st['name']} — Complete Roster",
+                f"The complete roster of {len(st_agents)} licensed bail bond agents in {st['name']}, "
+                f"from official license records, grouped by county.", body, depth=1,
+                jsonld=[breadcrumb_jsonld([('All states', '/'), (st['name'], f"/{st['abbr'].lower()}/"),
+                                          ('All licensed agents', f"/{st['abbr'].lower()}/agents/")])],
+                canonical_path=f"/{st['abbr'].lower()}/agents/")
+
+def agent_page(a, st):
+    sb = f"{BASE}/{st['abbr'].lower()}"
+    name = display_name(a['name'])
+    agency = display_name(a.get('agency')) if a.get('agency') and a.get('agency') != a.get('name') else None
+    county = a.get('county')
+    county_row = None
+    if county:
+        target = norm_county(county)
+        county_row = next((c for c in counties if c['state'] == st['abbr'] and norm_county(c['name']) == target), None)
+    county_link = (f'<a href="{sb}/{county_row["slug"]}/">{esc(county_row["display"])}, {st["abbr"]}</a>'
+                   if county_row else (esc(county) if county else f"{st['name']} (statewide)"))
+    addr = ', '.join(filter(None, [a.get('address'), a.get('city'), a.get('zip')]))
+    src = a.get('source_url') or ''
+    src_host = src.split('/')[2] if src.startswith('http') else src
+    lic_disp = esc(a.get('license'))
+    if a.get('expiration'):
+        lic_disp = f"{lic_disp} (expires {esc(a['expiration'])})" if lic_disp else f"expires {esc(a['expiration'])}"
+    facts = ''.join(f'<li><strong>{k}:</strong> {v}</li>' for k, v in [
+        ('Agency', esc(agency) if agency else None),
+        ('Address', esc(addr) if addr else None),
+        ('Phone', esc(a.get('phone'))),
+        ('License', lic_disp),
+        ('Surety', esc(a.get('surety'))),
+        ('Serves', county_link),
+    ] if v)
+    ld = {
+        '@context': 'https://schema.org', '@type': 'LocalBusiness',
+        'name': name, 'url': f"{DOMAIN}/{st['abbr'].lower()}/agent/{a['slug']}/",
+        'additionalType': 'https://en.wikipedia.org/wiki/Bail_bondsman',
+    }
+    if a.get('phone'): ld['telephone'] = a['phone']
+    if addr: ld['address'] = {'@type': 'PostalAddress', 'streetAddress': a.get('address') or '',
+                              'addressLocality': a.get('city') or '', 'postalCode': a.get('zip') or '',
+                              'addressRegion': st['abbr']}
+    body = f"""
+<div class="crumb"><a href="{BASE}/">All states</a> › <a href="{sb}/">{st['name']}</a> › <a href="{sb}/agents/">Agents</a> › {esc(name)}</div>
+<h1>{esc(name)}</h1>
+<p class="sub">Licensed bail bond {'agency' if agency is None and a.get('agency') else 'agent'} in {st['name']} — from the official license roster.</p>
+<div class="card">
+  <h2>Profile</h2>
+  <ul>{facts}</ul>
+  <p class="src">Source: official roster — <a href="{src}" rel="nofollow">{esc(src_host)}</a>.
+  License status can change; verify with the licensing authority before doing business.</p>
+</div>
+{how_bail_works(st)}
+<div class="card">
+  <h2>More in {st['name']}</h2>
+  <div class="linkrow">
+    <a href="{sb}/agents/">All licensed {st['name']} agents</a>
+    {f'<a href="{sb}/{county_row["slug"]}/">Bail bonds in {esc(county_row["display"])}</a>' if county_row else ''}
+    <a href="{sb}/">{st['name']} counties</a>
+  </div>
+</div>
+"""
+    loc = f" in {county_row['display']}" if county_row else f" in {st['name']}"
+    return page(f"{name} — Licensed Bail Bond Agent{loc}",
+                f"{name}: licensed bail bond agent{loc}. Contact details, license number, and "
+                f"official-roster verification.", body, depth=3, jsonld=[ld],
+                canonical_path=f"/{st['abbr'].lower()}/agent/{a['slug']}/")
 
 # ---------- Build ----------
 
@@ -531,6 +642,17 @@ for abbr, st_counties in by_state.items():
     os.makedirs(sdir, exist_ok=True)
     open(os.path.join(sdir, 'index.html'), 'w').write(state_page(st, st_counties))
     urls.append(f'/{abbr.lower()}/')
+    st_agents = agents_by_state.get(abbr, [])
+    if st_agents and st['status'] in ('legal', 'impaired'):
+        adir = os.path.join(sdir, 'agents')
+        os.makedirs(adir, exist_ok=True)
+        open(os.path.join(adir, 'index.html'), 'w').write(state_agents_page(st, st_agents))
+        urls.append(f'/{abbr.lower()}/agents/')
+        for a in st_agents:
+            pdir = os.path.join(sdir, 'agent', a['slug'])
+            os.makedirs(pdir, exist_ok=True)
+            open(os.path.join(pdir, 'index.html'), 'w').write(agent_page(a, st))
+            urls.append(f'/{abbr.lower()}/agent/{a["slug"]}/')
     for c in st_counties:
         d = os.path.join(sdir, c['slug'])
         os.makedirs(d, exist_ok=True)
