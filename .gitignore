@@ -27,3 +27,5 @@ clients/dunham/*.pdf
 clients/dunham/*.docx
 clients/dunham/*.zip
 clients/dunham/rebuttal-notes-*.json
+clients/dunham/expert-rebuttal-report*.html
+clients/dunham/rebuttal-workbook.html
