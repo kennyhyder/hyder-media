@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Bail Bonds Directory — Every County in America</title>
+<title>Bail Bonds Directory — Costs, Laws &amp; Licensed Agents in Every U.S. County</title>
+<meta name="description" content="How bail works in every U.S. state and county: premiums, licensing, jail lookups, and licensed bail agents from official rosters.">
+<meta property="og:title" content="Bail Bonds Directory — Costs, Laws &amp; Licensed Agents in Every U.S. County">
+<meta property="og:description" content="How bail works in every U.S. state and county: premiums, licensing, jail lookups, and licensed bail agents from official rosters.">
+<meta property="og:type" content="website">
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -17,6 +21,7 @@ header.site .wrap { padding:18px 20px; display:flex; align-items:baseline; gap:1
 .tagline { color:var(--muted); font-size:.85rem; }
 h1 { font-size:1.7rem; margin:18px 0 6px; }
 h2 { font-size:1.2rem; margin:28px 0 10px; }
+h3 { font-size:1rem; margin:16px 0 6px; }
 p { margin-bottom:12px; }
 .sub { color:var(--muted); }
 .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px 24px; margin:16px 0; }
@@ -24,6 +29,7 @@ p { margin-bottom:12px; }
 .fact { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
 .fact .k { font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
 .fact .v { font-size:1.2rem; font-weight:700; margin-top:2px; }
+.fact .v.small { font-size:.92rem; }
 .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; background:#e8f0fd; color:var(--accent); }
 .badge.warn { background:#fdf0e8; color:#b45816; }
 .badge.off { background:#f2e8ee; color:#9c2f5f; }
@@ -34,7 +40,18 @@ a { color:var(--accent); }
 .county-grid a { display:block; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 14px; text-decoration:none; color:var(--ink); font-size:.92rem; }
 .county-grid a:hover { border-color:var(--accent); }
 .county-grid .pop { color:var(--muted); font-size:.78rem; }
+.agent-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; margin-top:14px; }
+.agent { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px 14px; font-size:.88rem; }
+.agent .an { font-weight:700; }
+.agent .ad, .agent .lic { color:var(--muted); font-size:.82rem; }
+.agent .ph { margin-top:4px; }
+.faq details { border-bottom:1px solid var(--line); padding:10px 0; }
+.faq details:last-child { border-bottom:none; }
+.faq summary { font-weight:600; cursor:pointer; }
+.faq details p { margin:8px 0 2px; color:var(--muted); }
+.linkrow { display:flex; flex-wrap:wrap; gap:8px 16px; font-size:.88rem; margin-top:8px; }
 .notice { background:#fff8e8; border:1px solid #eeddb0; border-radius:8px; padding:10px 14px; font-size:.85rem; color:#6b5b1e; margin:14px 0; }
+.src { font-size:.78rem; color:var(--muted); margin-top:10px; }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
@@ -47,16 +64,18 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <div class="wrap">
 
 <h1>Bail Bonds in Every U.S. County</h1>
-<p class="sub">Bail process, jail information, and licensed bail agents for all 3,100+ U.S. counties.
-Commercial bail operates in 40 states; the rest use court-deposit or recognizance systems —
-each state page explains how release works there.</p>
+<p class="sub">Bail process, costs, jail information, and licensed bail agents for all 3,100+ U.S.
+counties. Commercial bail operates in 40 states; the rest use court-deposit or recognizance
+systems — each state page explains exactly how release works there.</p>
 <h2>Choose a State</h2>
 <div class="county-grid"><a href="al/index.html">Alabama<div class="pop">67 counties · commercial bail</div></a><a href="ak/index.html">Alaska<div class="pop">30 counties · commercial bail</div></a><a href="az/index.html">Arizona<div class="pop">15 counties · commercial bail</div></a><a href="ar/index.html">Arkansas<div class="pop">75 counties · commercial bail</div></a><a href="ca/index.html">California<div class="pop">58 counties · commercial bail</div></a><a href="co/index.html">Colorado<div class="pop">64 counties · commercial bail</div></a><a href="ct/index.html">Connecticut<div class="pop">9 counties · commercial bail</div></a><a href="de/index.html">Delaware<div class="pop">3 counties · commercial bail</div></a><a href="dc/index.html">District of Columbia<div class="pop">1 counties · no commercial bail</div></a><a href="fl/index.html">Florida<div class="pop">67 counties · commercial bail</div></a><a href="ga/index.html">Georgia<div class="pop">159 counties · commercial bail</div></a><a href="hi/index.html">Hawaii<div class="pop">5 counties · commercial bail</div></a><a href="id/index.html">Idaho<div class="pop">44 counties · commercial bail</div></a><a href="il/index.html">Illinois<div class="pop">102 counties · no commercial bail</div></a><a href="in/index.html">Indiana<div class="pop">92 counties · commercial bail</div></a><a href="ia/index.html">Iowa<div class="pop">99 counties · commercial bail</div></a><a href="ks/index.html">Kansas<div class="pop">105 counties · commercial bail</div></a><a href="ky/index.html">Kentucky<div class="pop">120 counties · no commercial bail</div></a><a href="la/index.html">Louisiana<div class="pop">64 counties · commercial bail</div></a><a href="me/index.html">Maine<div class="pop">16 counties · no commercial bail</div></a><a href="md/index.html">Maryland<div class="pop">24 counties · commercial bail</div></a><a href="ma/index.html">Massachusetts<div class="pop">14 counties · no commercial bail</div></a><a href="mi/index.html">Michigan<div class="pop">83 counties · commercial bail</div></a><a href="mn/index.html">Minnesota<div class="pop">87 counties · commercial bail</div></a><a href="ms/index.html">Mississippi<div class="pop">82 counties · commercial bail</div></a><a href="mo/index.html">Missouri<div class="pop">115 counties · commercial bail</div></a><a href="mt/index.html">Montana<div class="pop">56 counties · commercial bail</div></a><a href="ne/index.html">Nebraska<div class="pop">93 counties · no commercial bail</div></a><a href="nv/index.html">Nevada<div class="pop">17 counties · commercial bail</div></a><a href="nh/index.html">New Hampshire<div class="pop">10 counties · commercial bail</div></a><a href="nj/index.html">New Jersey<div class="pop">21 counties · no commercial bail</div></a><a href="nm/index.html">New Mexico<div class="pop">33 counties · limited market</div></a><a href="ny/index.html">New York<div class="pop">62 counties · limited market</div></a><a href="nc/index.html">North Carolina<div class="pop">100 counties · commercial bail</div></a><a href="nd/index.html">North Dakota<div class="pop">53 counties · commercial bail</div></a><a href="oh/index.html">Ohio<div class="pop">88 counties · commercial bail</div></a><a href="ok/index.html">Oklahoma<div class="pop">77 counties · commercial bail</div></a><a href="or/index.html">Oregon<div class="pop">36 counties · no commercial bail</div></a><a href="pa/index.html">Pennsylvania<div class="pop">67 counties · commercial bail</div></a><a href="ri/index.html">Rhode Island<div class="pop">5 counties · commercial bail</div></a><a href="sc/index.html">South Carolina<div class="pop">46 counties · commercial bail</div></a><a href="sd/index.html">South Dakota<div class="pop">66 counties · commercial bail</div></a><a href="tn/index.html">Tennessee<div class="pop">95 counties · commercial bail</div></a><a href="tx/index.html">Texas<div class="pop">254 counties · commercial bail</div></a><a href="ut/index.html">Utah<div class="pop">29 counties · commercial bail</div></a><a href="vt/index.html">Vermont<div class="pop">14 counties · commercial bail</div></a><a href="va/index.html">Virginia<div class="pop">133 counties · commercial bail</div></a><a href="wa/index.html">Washington<div class="pop">39 counties · commercial bail</div></a><a href="wv/index.html">West Virginia<div class="pop">55 counties · commercial bail</div></a><a href="wi/index.html">Wisconsin<div class="pop">72 counties · no commercial bail</div></a><a href="wy/index.html">Wyoming<div class="pop">23 counties · commercial bail</div></a></div>
 
 <footer>
   <p>Informational resource only — not legal advice. Bail amounts and procedures vary by state,
-  county, and case. Data sources: U.S. Census Bureau (2023 population estimates), state statutes
-  and insurance regulators, county records.</p>
+  county, and case. Data sources: U.S. Census Bureau (2023 population estimates), state statutes,
+  state insurance regulators and licensing boards, county bail bond boards and sheriff records.</p>
+  <p>Agent listings come from official state and county license rosters — verify current license
+  status with the licensing authority before doing business.</p>
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
