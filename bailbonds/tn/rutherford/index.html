@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tn/agents/">all licensed agents in Tennessee</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Rutherford County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Jail Busters Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(18 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">107 W Lytle St, Murfreesboro, TN 37130, USA</div>
+  <div class='ph'>☎ (615) 410-3230</div>
+  <div class='ad'><a href='https://jailbusterstn.com/' rel='nofollow noopener'>jailbusterstn.com</a></div>
+</div><div class="agent">
+  <div class="an">A Around the Clock Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(18 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">2095 Old Fort Pkwy, Murfreesboro, TN 37129, USA</div>
+  <div class='ph'>☎ (615) 728-3236</div>
+  <div class='ad'><a href='https://a-aroundtheclock.com/' rel='nofollow noopener'>a-aroundtheclock.com</a></div>
+</div><div class="agent">
+  <div class="an">Smiley Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">201 W Main St #304, Murfreesboro, TN 37130, USA</div>
+  <div class='ph'>☎ (615) 900-3296</div>
+  <div class='ad'><a href='https://smileybonding.com/?utm_source=google-local&amp;utm_medium=organic&amp;utm_campaign=4022' rel='nofollow noopener'>smileybonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Norton Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">316 W Lytle St #108, Murfreesboro, TN 37130, USA</div>
+  <div class='ph'>☎ (615) 904-2122</div>
+  <div class='ad'><a href='https://www.nortonbailbonding.com/' rel='nofollow noopener'>nortonbailbonding.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Rutherford County?</summary><p>Bail bond premiums in Tennessee typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Rutherford County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Rutherford County?</summary><p>Contact the Rutherford County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.84337, -86.41721], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.848002199999996,"lng":-86.3916545,"label":"<strong>Jail Busters Bail Bonds</strong><br>\u2605 5 (18 reviews)<br>\u260e (615) 410-3230"},{"lat":35.8461699,"lng":-86.42963669999999,"label":"<strong>A Around the Clock Bonding</strong><br>\u2605 5 (18 reviews)<br>\u260e (615) 728-3236"},{"lat":35.848681899999995,"lng":-86.39442249999999,"label":"<strong>Norton Bonding</strong><br>\u2605 5 (3 reviews)<br>\u260e (615) 904-2122"},{"lat":35.8459649,"lng":-86.3929577,"label":"<strong>Smiley Bail Bonds</strong><br>\u2605 5 (4 reviews)<br>\u260e (615) 900-3296"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

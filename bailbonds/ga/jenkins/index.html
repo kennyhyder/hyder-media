@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ga/agents/">all licensed agents in Georgia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Jenkins County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Donaldson Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(74 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">665 Martin Luther King Jr Dr, Statesboro, GA 30458, USA</div>
+  <div class='ph'>☎ (912) 764-9270</div>
+  
+</div><div class="agent">
+  <div class="an">Akins &amp; Saseen Bonding Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(22 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">17254 HWY, 301 Northside Dr E, Statesboro, GA 30458, USA</div>
+  <div class='ph'>☎ (912) 764-6666</div>
+  <div class='ad'><a href='http://www.akinssaseenbonding.com/' rel='nofollow noopener'>akinssaseenbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Wright Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4285 US-25 south, Waynesboro, GA 30830, USA</div>
+  <div class='ph'>☎ (706) 871-9253</div>
+  
+</div><div class="agent">
+  <div class="an">Nunnally's Bail Bonding</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">511 Cotton Ave, Millen, GA 30442, USA</div>
+  
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Jenkins County?</summary><p>Bail bond premiums in Georgia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Jenkins County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Jenkins County?</summary><p>Contact the Jenkins County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.79456, -81.97152], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":32.9631087,"lng":-81.9756171,"label":"<strong>Wright Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (706) 871-9253"},{"lat":32.454262299999996,"lng":-81.7894369,"label":"<strong>Donaldson Bonding</strong><br>\u2605 4.9 (74 reviews)<br>\u260e (912) 764-9270"},{"lat":32.4646464,"lng":-81.76609200000001,"label":"<strong>Akins &amp; Saseen Bonding Co</strong><br>\u2605 4.4 (22 reviews)<br>\u260e (912) 764-6666"},{"lat":32.8023318,"lng":-81.94071459999999,"label":"<strong>Nunnally's Bail Bonding</strong>"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

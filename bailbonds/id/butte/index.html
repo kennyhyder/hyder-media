@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/id/agents/">all licensed agents in Idaho</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Butte County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Aladdin Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(584 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1940 Feather River Blvd G, Oroville, CA 95965, USA</div>
+  <div class='ph'>☎ (530) 671-7722</div>
+  <div class='ad'><a href='https://locations.aladdinbailbonds.com/ca/oroville/bail-bonds-oroville-ca-85117.html?utm_source=gmb&amp;utm_medium=organic&amp;utm_campaign=Oroville' rel='nofollow noopener'>locations.aladdinbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Double Trouble Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(368 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">930 N Cole Rd a, Boise, ID 83704, USA</div>
+  <div class='ph'>☎ (208) 629-2517</div>
+  <div class='ad'><a href='https://doubletroublebailbonds.com/' rel='nofollow noopener'>doubletroublebailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Chico Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">40 Bellarmine Ct, Chico, CA 95928, USA</div>
+  <div class='ph'>☎ (530) 342-6288</div>
+  <div class='ad'><a href='http://www.chicobailbonds.com/' rel='nofollow noopener'>chicobailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Greg Padilla Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">Chico, CA 95928, USA</div>
+  <div class='ph'>☎ (530) 343-7363</div>
+  <div class='ad'><a href='https://www.padillabailbonds.com/' rel='nofollow noopener'>padillabailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Butte County?</summary><p>Bail bond premiums in Idaho typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Butte County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Butte County?</summary><p>Contact the Butte County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([43.6851, -113.17763], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.71459,"lng":-121.819775,"label":"<strong>Chico Bail Bonds</strong><br>\u2605 4.2 (6 reviews)<br>\u260e (530) 342-6288"},{"lat":43.6131764,"lng":-116.27383309999998,"label":"<strong>Double Trouble Bail Bonds</strong><br>\u2605 4.9 (368 reviews)<br>\u260e (208) 629-2517"},{"lat":39.728494399999995,"lng":-121.8374777,"label":"<strong>Greg Padilla Bail Bonds</strong><br>\u2605 3 (2 reviews)<br>\u260e (530) 343-7363"},{"lat":39.5030426,"lng":-121.5717796,"label":"<strong>Aladdin Bail Bonds</strong><br>\u2605 4.8 (584 reviews)<br>\u260e (530) 671-7722"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

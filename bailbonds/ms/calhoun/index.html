@@ -105,6 +105,51 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ms/agents/">all licensed agents in Mississippi</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Calhoun County</h2>
+  <p class="sub">6 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">John Forsythe Professional Bondsman/Recovery Specialist</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(7 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">290 W Oxford St, Pontotoc, MS 38863, USA</div>
+  <div class='ph'>☎ (662) 296-4000</div>
+  
+</div><div class="agent">
+  <div class="an">A Absolute Bail Bonds Dan Walls</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">391 B W Oxford St, Pontotoc, MS 38863, USA</div>
+  <div class='ph'>☎ (662) 488-5903</div>
+  
+</div><div class="agent">
+  <div class="an">Corbett Bonding Office</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">Pittsboro, MS 38951, USA</div>
+  <div class='ph'>☎ (800) 671-7972</div>
+  
+</div><div class="agent">
+  <div class="an">Cook A &amp; A Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">721 W Vine St, Aberdeen, MS 39730, USA</div>
+  <div class='ph'>☎ (662) 369-9911</div>
+  
+</div><div class="agent">
+  <div class="an">Gary Campbell Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">PO Box 309, Bruce, MS 38915, USA</div>
+  <div class='ph'>☎ (662) 983-4296</div>
+  
+</div><div class="agent">
+  <div class="an">All Pro Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">Pontotoc, MS 38863, USA</div>
+  <div class='ph'>☎ (662) 489-6556</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Calhoun County?</summary><p>Bail bond premiums in Mississippi typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Calhoun County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Calhoun County?</summary><p>Contact the Calhoun County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.93663, -89.33711], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":33.930186,"lng":-89.32640099999999,"label":"<strong>Corbett Bonding Office</strong><br>\u2605 3 (2 reviews)<br>\u260e (800) 671-7972"},{"lat":34.2491793,"lng":-89.0244287,"label":"<strong>A Absolute Bail Bonds Dan Walls</strong><br>\u2605 3.7 (6 reviews)<br>\u260e (662) 488-5903"},{"lat":34.2531639,"lng":-89.01695869999999,"label":"<strong>John Forsythe Professional Bondsman/Recovery Specialist</strong><br>\u2605 4.4 (7 reviews)<br>\u260e (662) 296-4000"},{"lat":33.829047599999996,"lng":-88.5552577,"label":"<strong>Cook A &amp; A Bail Bonding</strong><br>\u2605 5 (1 reviews)<br>\u260e (662) 369-9911"},{"lat":33.9921253,"lng":-89.34893910000001,"label":"<strong>Gary Campbell Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (662) 983-4296"},{"lat":34.247883099999996,"lng":-88.998673,"label":"<strong>All Pro Bonding</strong><br>\u2605 5 (1 reviews)<br>\u260e (662) 489-6556"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

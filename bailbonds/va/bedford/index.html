@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/va/agents/">all licensed agents in Virginia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Bedford County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Stoney's Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(258 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1101 Lawson White Dr, Columbia, TN 38401, USA</div>
+  <div class='ph'>☎ (931) 490-1900</div>
+  <div class='ad'><a href='https://www.stoneysbailbonding.com/' rel='nofollow noopener'>stoneysbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Scott &amp; Bond Insurance</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">415 E Main St, Bedford, VA 24523, USA</div>
+  <div class='ph'>☎ (540) 586-3131</div>
+  <div class='ad'><a href='http://www.scottandbond.com/' rel='nofollow noopener'>scottandbond.com</a></div>
+</div><div class="agent">
+  <div class="an">A-1Affordable Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">E Court St, Rocky Mount, VA 24151, USA</div>
+  
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Bedford County?</summary><p>Bail bond premiums in Virginia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Bedford County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Bedford County?</summary><p>Contact the Bedford County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.31226, -79.52722], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.6440386,"lng":-87.0672676,"label":"<strong>Stoney's Bail Bonding</strong><br>\u2605 4.9 (258 reviews)<br>\u260e (931) 490-1900"},{"lat":36.9956129,"lng":-79.8890198,"label":"<strong>A-1Affordable Bail Bonds</strong>"},{"lat":37.3335976,"lng":-79.5196158,"label":"<strong>Scott &amp; Bond Insurance</strong><br>\u2605 5 (2 reviews)<br>\u260e (540) 586-3131"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

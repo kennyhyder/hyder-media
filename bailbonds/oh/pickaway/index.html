@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/oh/agents/">all licensed agents in Ohio</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Pickaway County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Fountain Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(18 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">50 W Main St Ste 275, Chillicothe, OH 45601, USA</div>
+  <div class='ph'>☎ (380) 288-3411</div>
+  <div class='ad'><a href='https://www.fountainbonding.com/' rel='nofollow noopener'>fountainbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Family First Bail Bonds of Pickaway County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(16 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">113 S Court St, Circleville, OH 43113, USA</div>
+  <div class='ph'>☎ (740) 207-2272</div>
+  
+</div><div class="agent">
+  <div class="an">Freedom Now Bail Bonds of Circleville</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(15 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">113 S Court St Ste 210, Circleville, OH 43113, USA</div>
+  <div class='ph'>☎ (740) 231-9043</div>
+  <div class='ad'><a href='http://www.freedomnowbailbonds.com/' rel='nofollow noopener'>freedomnowbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Freedom Now Bail Bonds of Ross &amp; Pike Counties</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(13 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">41 1/2 S Paint St Ste 2, Chillicothe, OH 45601, USA</div>
+  <div class='ph'>☎ (740) 231-9043</div>
+  <div class='ad'><a href='http://www.freedomnowbailbonds.com/' rel='nofollow noopener'>freedomnowbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Choice Bonding</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">617 Brookhill Ln Ste 104, Circleville, OH 43113, USA</div>
+  <div class='ph'>☎ (380) 268-9220</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Pickaway County?</summary><p>Bail bond premiums in Ohio typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Pickaway County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Pickaway County?</summary><p>Contact the Pickaway County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.64895, -83.05283], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.332117499999995,"lng":-82.98165399999999,"label":"<strong>Freedom Now Bail Bonds of Ross &amp; Pike Counties</strong><br>\u2605 5 (13 reviews)<br>\u260e (740) 231-9043"},{"lat":39.6014705,"lng":-82.9456081,"label":"<strong>Family First Bail Bonds of Pickaway County</strong><br>\u2605 5 (16 reviews)<br>\u260e (740) 207-2272"},{"lat":39.6014705,"lng":-82.9456081,"label":"<strong>Freedom Now Bail Bonds of Circleville</strong><br>\u2605 5 (15 reviews)<br>\u260e (740) 231-9043"},{"lat":39.6039493,"lng":-82.91853689999999,"label":"<strong>Choice Bonding</strong><br>\u260e (380) 268-9220"},{"lat":39.332692,"lng":-82.9837786,"label":"<strong>Fountain Bonding</strong><br>\u2605 4.7 (18 reviews)<br>\u260e (380) 288-3411"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

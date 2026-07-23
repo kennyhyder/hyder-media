@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nh/agents/">all licensed agents in New Hampshire</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Sullivan County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">BailCo Bail Bonds Manchester</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(248 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">405 Center St, Manchester, CT 06040, USA</div>
+  <div class='ph'>☎ (800) 422-4526</div>
+  <div class='ad'><a href='https://www.bailcobailbonds.com/?utm_source=localsearch&amp;utm_medium=organic&amp;utm_campaign=googlemybusiness' rel='nofollow noopener'>bailcobailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">A Angel Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">806 3rd St, Elizabethton, TN 37643, USA</div>
+  <div class='ph'>☎ (423) 575-2245</div>
+  <div class='ad'><a href='https://www.aangelbonding.com/' rel='nofollow noopener'>aangelbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Sullivan County Sheriff's Office</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">14 Main St, Newport, NH 03773, USA</div>
+  <div class='ph'>☎ (603) 863-4200</div>
+  <div class='ad'><a href='http://www.sullivancountynh.gov/' rel='nofollow noopener'>sullivancountynh.gov</a></div>
+</div><div class="agent">
+  <div class="an">Sullivan County Jail-House</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">103 County Farm Rd, Claremont, NH 03743, USA</div>
+  <div class='ph'>☎ (603) 542-8717</div>
+  <div class='ad'><a href='http://www.sullivancountynh.gov/' rel='nofollow noopener'>sullivancountynh.gov</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Sullivan County?</summary><p>Bail bond premiums in New Hampshire typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Sullivan County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Sullivan County?</summary><p>Contact the Sullivan County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([43.36119, -72.22208], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":43.3647073,"lng":-72.17289749999999,"label":"<strong>Sullivan County Sheriff's Office</strong><br>\u260e (603) 863-4200"},{"lat":41.7728932,"lng":-72.5374041,"label":"<strong>BailCo Bail Bonds Manchester</strong><br>\u2605 4.8 (248 reviews)<br>\u260e (800) 422-4526"},{"lat":36.347482,"lng":-82.2097021,"label":"<strong>A Angel Bonding</strong><br>\u2605 5 (8 reviews)<br>\u260e (423) 575-2245"},{"lat":43.3098804,"lng":-72.31181930000001,"label":"<strong>Sullivan County Jail-House</strong><br>\u260e (603) 542-8717"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

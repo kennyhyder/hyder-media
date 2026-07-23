@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ks/agents/">all licensed agents in Kansas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Stanton County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Greenfeather Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(390 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">302 S Clairborne Rd C, Olathe, KS 66062, USA</div>
+  <div class='ph'>☎ (913) 850-1855</div>
+  <div class='ad'><a href='https://www.greenfeatherkc.com/' rel='nofollow noopener'>greenfeatherkc.com</a></div>
+</div><div class="agent">
+  <div class="an">Shane's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.1</span> <span class='sub'>(270 reviews)</span></div>
+  <div class="ad">405 E Santa Fe St, Olathe, KS 66061, USA</div>
+  <div class='ph'>☎ (913) 228-0459</div>
+  <div class='ad'><a href='http://shanesbailbonds.com/' rel='nofollow noopener'>shanesbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Heartland Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.9</span> <span class='sub'>(122 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">101 S Kansas Ave Ste B, Olathe, KS 66061, USA</div>
+  <div class='ph'>☎ (913) 327-9033</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Stanton County?</summary><p>Bail bond premiums in Kansas typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Stanton County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Stanton County?</summary><p>Contact the Stanton County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.56593, -101.78938], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.881772000000005,"lng":-94.8209191,"label":"<strong>Heartland Bail Bonds</strong><br>\u2605 3.9 (122 reviews)<br>\u260e (913) 327-9033"},{"lat":38.8832693,"lng":-94.816226,"label":"<strong>Shane's Bail Bonds</strong><br>\u2605 4.1 (270 reviews)<br>\u260e (913) 228-0459"},{"lat":38.8796065,"lng":-94.7886885,"label":"<strong>Greenfeather Bail Bonds</strong><br>\u2605 4.9 (390 reviews)<br>\u260e (913) 850-1855"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

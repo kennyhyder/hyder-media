@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/la/agents/">all licensed agents in Louisiana</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Cameron Parish</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Paris Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(56 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">5349 Broad St, Lake Charles, LA 70615, USA</div>
+  
+  <div class='ad'><a href='http://parisbailbonds.info/' rel='nofollow noopener'>parisbailbonds.info</a></div>
+</div><div class="agent">
+  <div class="an">Court Gabriel Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(20 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">505 Shady Ln, Sulphur, LA 70663, USA</div>
+  <div class='ph'>☎ (337) 533-2225</div>
+  <div class='ad'><a href='http://www.bailbondslakecharles.net/' rel='nofollow noopener'>bailbondslakecharles.net</a></div>
+</div><div class="agent">
+  <div class="an">A Right Choice Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">916 W McNeese St Apt a, Lake Charles, LA 70605, USA</div>
+  <div class='ph'>☎ (337) 429-2996</div>
+  <div class='ad'><a href='https://arightchoicebail.com/?utm_source=gbp' rel='nofollow noopener'>arightchoicebail.com</a></div>
+</div><div class="agent">
+  <div class="an">Richard Fuselier Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4225 Broad St, Lake Charles, LA 70615, USA</div>
+  <div class='ph'>☎ (337) 564-1975</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Cameron Parish?</summary><p>Bail bond premiums in Louisiana typically run 12% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,200 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Cameron Parish?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Cameron Parish?</summary><p>Contact the Cameron Parish sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.87181, -93.16495], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":30.176455899999997,"lng":-93.2349169,"label":"<strong>A Right Choice Bail Bonds</strong><br>\u2605 4.7 (14 reviews)<br>\u260e (337) 429-2996"},{"lat":30.228154099999998,"lng":-93.1561303,"label":"<strong>Richard Fuselier Bail Bonds</strong><br>\u2605 5 (9 reviews)<br>\u260e (337) 564-1975"},{"lat":30.227934800000003,"lng":-93.14034520000001,"label":"<strong>Paris Bail Bonds</strong><br>\u2605 4.8 (56 reviews)"},{"lat":30.226202100000002,"lng":-93.3349181,"label":"<strong>Court Gabriel Bail Bonds</strong><br>\u2605 4.7 (20 reviews)<br>\u260e (337) 533-2225"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

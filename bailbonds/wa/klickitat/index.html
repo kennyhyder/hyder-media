@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/wa/agents/">all licensed agents in Washington</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Klickitat County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Schroeder Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.1</span> <span class='sub'>(40 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">119 S Okanogan Ave B3, Wenatchee, WA 98801, USA</div>
+  <div class='ph'>☎ (509) 665-6666</div>
+  <div class='ad'><a href='http://www.schroederbailbonds.com/' rel='nofollow noopener'>schroederbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">All City Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(29 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3212 Old Hwy 99 South Rd, Mount Vernon, WA 98273, USA</div>
+  <div class='ph'>☎ (360) 428-4900</div>
+  <div class='ad'><a href='https://www.allcitybailbonds.com/locations/mt-vernon/' rel='nofollow noopener'>allcitybailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">A Plus Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">114 E Walnut St, Yakima, WA 98901, USA</div>
+  <div class='ph'>☎ (509) 575-5759</div>
+  <div class='ad'><a href='https://aplus-bailbonds.com/' rel='nofollow noopener'>aplus-bailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">A Plus Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">225 W Pine St, Okanogan, WA 98840, USA</div>
+  <div class='ph'>☎ (509) 422-3900</div>
+  <div class='ad'><a href='https://aplus-bailbonds.com/okanagan-county/' rel='nofollow noopener'>aplus-bailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Klickitat County?</summary><p>Bail bond premiums in Washington typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Klickitat County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Klickitat County?</summary><p>Contact the Klickitat County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([45.87045, -120.7793], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":48.3952211,"lng":-122.3353899,"label":"<strong>All City Bail Bonds</strong><br>\u2605 4 (29 reviews)<br>\u260e (360) 428-4900"},{"lat":46.599656599999996,"lng":-120.5036674,"label":"<strong>A Plus Bail Bonds</strong><br>\u2605 4.7 (9 reviews)<br>\u260e (509) 575-5759"},{"lat":48.3640381,"lng":-119.5814254,"label":"<strong>A Plus Bail Bonds</strong><br>\u2605 5 (3 reviews)<br>\u260e (509) 422-3900"},{"lat":47.421225199999995,"lng":-120.31375750000001,"label":"<strong>Schroeder Bail Bonds</strong><br>\u2605 4.1 (40 reviews)<br>\u260e (509) 665-6666"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

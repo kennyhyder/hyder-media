@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nm/agents/">all licensed agents in New Mexico</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — San Miguel County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Freedom Libertad Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(531 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1104 N Chadbourne St, San Angelo, TX 76903, USA</div>
+  <div class='ph'>☎ (325) 659-2663</div>
+  <div class='ad'><a href='https://www.sanangelobonds.com/' rel='nofollow noopener'>sanangelobonds.com</a></div>
+</div><div class="agent">
+  <div class="an">El Amigo Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(96 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">104 Gregory Dr, Del Rio, TX 78840, USA</div>
+  <div class='ph'>☎ (830) 352-1922</div>
+  <div class='ad'><a href='https://elamigobailbonds.com/' rel='nofollow noopener'>elamigobailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Judy's Bail Bonds Service</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(80 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">614 FM 2523, Del Rio, TX 78840, USA</div>
+  <div class='ph'>☎ (830) 774-4748</div>
+  <div class='ad'><a href='http://www.judysbailbonds.com/' rel='nofollow noopener'>judysbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Ashley's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(18 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">284 Hamilton Ln, Del Rio, TX 78840, USA</div>
+  <div class='ph'>☎ (830) 703-0304</div>
+  <div class='ad'><a href='http://www.ashleysbailbonds.com/' rel='nofollow noopener'>ashleysbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Bob's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(17 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">112 E W 3rd St, Dalhart, TX 79022, USA</div>
+  <div class='ph'>☎ (806) 249-0188</div>
+  <div class='ad'><a href='https://bobsbailbonds2.godaddysites.com/' rel='nofollow noopener'>bobsbailbonds2.godaddysites.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in San Miguel County?</summary><p>Bail bond premiums in New Mexico typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in San Miguel County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in San Miguel County?</summary><p>Contact the San Miguel County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.47686, -104.80352], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":31.472929399999998,"lng":-100.4433261,"label":"<strong>Freedom Libertad Bail Bonds</strong><br>\u2605 4.8 (531 reviews)<br>\u260e (325) 659-2663"},{"lat":29.373007,"lng":-100.84587429999999,"label":"<strong>El Amigo Bail Bonds</strong><br>\u2605 4.6 (96 reviews)<br>\u260e (830) 352-1922"},{"lat":36.063210999999995,"lng":-102.5228307,"label":"<strong>Bob's Bail Bonds</strong><br>\u2605 4.9 (17 reviews)<br>\u260e (806) 249-0188"},{"lat":29.373340700000004,"lng":-100.845598,"label":"<strong>Ashley's Bail Bonds</strong><br>\u2605 4.6 (18 reviews)<br>\u260e (830) 703-0304"},{"lat":29.3747089,"lng":-100.84135189999999,"label":"<strong>Judy's Bail Bonds Service</strong><br>\u2605 4.9 (80 reviews)<br>\u260e (830) 774-4748"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

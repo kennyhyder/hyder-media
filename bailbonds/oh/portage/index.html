@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/oh/agents/">all licensed agents in Ohio</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Portage County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Craven Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(38 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">200 W Main St Unit 16, Ravenna, OH 44266, USA</div>
+  <div class='ph'>☎ (330) 552-6203</div>
+  <div class='ad'><a href='https://www.cravenbailbondsohio.com/bail-bond-services-by-city/find-a-bail-bondsman-in-ohio-cities/bail-bond-service-in-ravenna/?utm_source=google&amp;utm_medium=organic&amp;utm_campaign=seolocale' rel='nofollow noopener'>cravenbailbondsohio.com</a></div>
+</div><div class="agent">
+  <div class="an">Stark County Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(10 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1728 29th St NW, Canton, OH 44709, USA</div>
+  <div class='ph'>☎ (330) 621-4898</div>
+  
+</div><div class="agent">
+  <div class="an">Allstate Bail Bonds - Ravenna and Portage County Office</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">101 E Main St, Ravenna, OH 44266, USA</div>
+  <div class='ph'>☎ (330) 313-1771</div>
+  <div class='ad'><a href='https://allstatebail.org/ravenna-ohio-portage-county-bail-bondsman/' rel='nofollow noopener'>allstatebail.org</a></div>
+</div><div class="agent">
+  <div class="an">Clyde Reed's Bail Bonding Services</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">26150 Forbes Rd, Bedford, OH 44146, USA</div>
+  <div class='ph'>☎ (216) 932-0066</div>
+  
+</div><div class="agent">
+  <div class="an">3rd Degree Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">713 7th St NE, North Canton, OH 44720, USA</div>
+  <div class='ph'>☎ (330) 353-2667</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Portage County?</summary><p>Bail bond premiums in Ohio typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Portage County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Portage County?</summary><p>Contact the Portage County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.16897, -81.19696], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.372891300000006,"lng":-81.4934521,"label":"<strong>Clyde Reed's Bail Bonding Services</strong><br>\u2605 5 (2 reviews)<br>\u260e (216) 932-0066"},{"lat":40.88306,"lng":-81.39350519999999,"label":"<strong>3rd Degree Bail Bonds</strong><br>\u2605 3.5 (2 reviews)<br>\u260e (330) 353-2667"},{"lat":41.1578589,"lng":-81.2429757,"label":"<strong>Allstate Bail Bonds - Ravenna and Portage County Office</strong><br>\u2605 3.7 (3 reviews)<br>\u260e (330) 313-1771"},{"lat":41.15809,"lng":-81.243403,"label":"<strong>Craven Bail Bonds</strong><br>\u2605 4.8 (38 reviews)<br>\u260e (330) 552-6203"},{"lat":40.8312232,"lng":-81.391083,"label":"<strong>Stark County Bail Bonds</strong><br>\u2605 5 (10 reviews)<br>\u260e (330) 621-4898"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

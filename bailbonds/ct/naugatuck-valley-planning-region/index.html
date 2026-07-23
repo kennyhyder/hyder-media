@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ct/agents/">all licensed agents in Connecticut</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Naugatuck Valley Planning Region</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">A+ Nancy Connole Bail Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(36 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">234 E Main St Fl 2, Waterbury, CT 06702, USA</div>
+  <div class='ph'>☎ (203) 509-2090</div>
+  
+</div><div class="agent">
+  <div class="an">Waterbury, CT – Aces Bail Bonds (24/7 Service)</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(17 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">185 Bunker Hill Ave, Waterbury, CT 06708, USA</div>
+  <div class='ph'>☎ (203) 777-2663</div>
+  <div class='ad'><a href='https://acesbailbondsct.com/bail-bonds-waterbury-ct/' rel='nofollow noopener'>acesbailbondsct.com</a></div>
+</div><div class="agent">
+  <div class="an">Griffith Bailbonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(7 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">41 Holmes Ave #1, Waterbury, CT 06710, USA</div>
+  <div class='ph'>☎ (203) 212-8988</div>
+  <div class='ad'><a href='https://www.247waterburybailbondsct.com/' rel='nofollow noopener'>247waterburybailbondsct.com</a></div>
+</div><div class="agent">
+  <div class="an">Bobby Bail Bonds - Seymour CT</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">2 Klarides Village Dr #119, Seymour, CT 06483, USA</div>
+  <div class='ph'>☎ (203) 427-8095</div>
+  <div class='ad'><a href='https://www.bobbybailbonds.net/Bail-Bonds-CT/seymour.html' rel='nofollow noopener'>bobbybailbonds.net</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Naugatuck Valley Planning Region?</summary><p>Bail bond premiums in Connecticut typically run 10% of first $5,000, 7% above of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Naugatuck Valley Planning Region?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Naugatuck Valley Planning Region?</summary><p>Contact the Naugatuck Valley Planning Region sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.51893, -73.08791], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.397030799999996,"lng":-73.0843867,"label":"<strong>Bobby Bail Bonds - Seymour CT</strong><br>\u2605 3.7 (3 reviews)<br>\u260e (203) 427-8095"},{"lat":41.5586566,"lng":-73.0449388,"label":"<strong>Griffith Bailbonds LLC</strong><br>\u2605 5 (7 reviews)<br>\u260e (203) 212-8988"},{"lat":41.5544029,"lng":-73.03660769999999,"label":"<strong>A+ Nancy Connole Bail Bonds LLC</strong><br>\u2605 5 (36 reviews)<br>\u260e (203) 509-2090"},{"lat":41.5679091,"lng":-73.0634709,"label":"<strong>Waterbury, CT \u2013 Aces Bail Bonds (24/7 Service)</strong><br>\u2605 5 (17 reviews)<br>\u260e (203) 777-2663"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

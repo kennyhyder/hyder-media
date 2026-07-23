@@ -117,6 +117,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Caldwell County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Around the Clock Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(462 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">909 Nueces St, Austin, TX 78701, USA</div>
+  <div class='ph'>☎ (512) 476-5245</div>
+  <div class='ad'><a href='https://bailaustin.net/?utm_source=gmb&amp;utm_medium=local&amp;utm_campaign=website' rel='nofollow noopener'>bailaustin.net</a></div>
+</div><div class="agent">
+  <div class="an">Bail Bond Hotline of Caldwell County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(208 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">631 S Colorado St Ste 100, Lockhart, TX 78644, USA</div>
+  <div class='ph'>☎ (512) 398-9111</div>
+  <div class='ad'><a href='https://freemeasap.com/' rel='nofollow noopener'>freemeasap.com</a></div>
+</div><div class="agent">
+  <div class="an">A-A-A Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(30 reviews)</span></div>
+  <div class="ad">1327 S Colorado St, Lockhart, TX 78644, USA</div>
+  <div class='ph'>☎ (512) 398-7700</div>
+  <div class='ad'><a href='https://www.aaabailseguin.com/' rel='nofollow noopener'>aaabailseguin.com</a></div>
+</div><div class="agent">
+  <div class="an">Pronto Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(9 reviews)</span></div>
+  <div class="ad">205 S Blanco St B, Lockhart, TX 78644, USA</div>
+  <div class='ph'>☎ (512) 398-2600</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Caldwell County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Caldwell County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Caldwell County?</summary><p>Contact the Caldwell County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.8324, -97.62814], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":29.8831189,"lng":-97.67439639999999,"label":"<strong>Pronto Bail Bonds</strong><br>\u2605 4.6 (9 reviews)<br>\u260e (512) 398-2600"},{"lat":29.8783728,"lng":-97.66928709999999,"label":"<strong>Bail Bond Hotline of Caldwell County</strong><br>\u2605 4.9 (208 reviews)<br>\u260e (512) 398-9111"},{"lat":29.8690909,"lng":-97.6689904,"label":"<strong>A-A-A Bail Bonds</strong><br>\u2605 5 (30 reviews)<br>\u260e (512) 398-7700"},{"lat":30.273052099999997,"lng":-97.7470204,"label":"<strong>Around the Clock Bail Bonds</strong><br>\u2605 4.8 (462 reviews)<br>\u260e (512) 476-5245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

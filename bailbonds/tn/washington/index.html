@@ -105,6 +105,27 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tn/agents/">all licensed agents in Tennessee</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Washington County</h2>
+  <p class="sub">2 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">AAA Bail Bonding Co. | Kingsport and Sullivan County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(23 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">843 E Center St, Kingsport, TN 37660, USA</div>
+  <div class='ph'>☎ (423) 247-2245</div>
+  <div class='ad'><a href='https://aaabailbonding.net/' rel='nofollow noopener'>aaabailbonding.net</a></div>
+</div><div class="agent">
+  <div class="an">Aces Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.6</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">239 Blountville Bypass, Blountville, TN 37617, USA</div>
+  <div class='ph'>☎ (423) 406-1185</div>
+  <div class='ad'><a href='http://acesbail.com/' rel='nofollow noopener'>acesbail.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Washington County?</summary><p>Bail bond premiums in Tennessee typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Washington County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Washington County?</summary><p>Contact the Washington County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +150,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.29566, -82.49504], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":36.534674599999995,"lng":-82.3251758,"label":"<strong>Aces Bail Bonds</strong><br>\u2605 3.6 (14 reviews)<br>\u260e (423) 406-1185"},{"lat":36.543461799999996,"lng":-82.5517002,"label":"<strong>AAA Bail Bonding Co. | Kingsport and Sullivan County</strong><br>\u2605 4.8 (23 reviews)<br>\u260e (423) 247-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Johnston County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Absolute Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(98 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">225 Tryon Rd Ste 204, Raleigh, NC 27603, USA</div>
+  <div class='ph'>☎ (919) 510-0920</div>
+  <div class='ad'><a href='https://absolutebailbonding.com/' rel='nofollow noopener'>absolutebailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Bond Boys</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(25 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">101 S 4th St Suite D, Smithfield, NC 27577, USA</div>
+  <div class='ph'>☎ (984) 285-5702</div>
+  <div class='ad'><a href='https://bondboysnc.com/' rel='nofollow noopener'>bondboysnc.com</a></div>
+</div><div class="agent">
+  <div class="an">Alicia Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(7 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1027 US-70 Ste 205, Garner, NC 27529, USA</div>
+  <div class='ph'>☎ (919) 348-8853</div>
+  <div class='ad'><a href='https://aliciabailbond.com/areas-we-serve/wake-county/' rel='nofollow noopener'>aliciabailbond.com</a></div>
+</div><div class="agent">
+  <div class="an">DJ'S Bail Bonds Smithfield</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">134 S 3rd St, Smithfield, NC 27577, USA</div>
+  <div class='ph'>☎ (919) 937-2245</div>
+  <div class='ad'><a href='https://www.djsbailbonds.com/smithfield-nc-bail-bonds/' rel='nofollow noopener'>djsbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Johnston County Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">207 N 3rd St, Smithfield, NC 27577, USA</div>
+  <div class='ph'>☎ (919) 989-9062</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Johnston County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Johnston County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Johnston County?</summary><p>Contact the Johnston County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.51342, -78.36735], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.7312941,"lng":-78.6466646,"label":"<strong>Absolute Bail Bonds</strong><br>\u2605 4.9 (98 reviews)<br>\u260e (919) 510-0920"},{"lat":35.5103963,"lng":-78.3468201,"label":"<strong>DJ'S Bail Bonds Smithfield</strong><br>\u2605 5 (6 reviews)<br>\u260e (919) 937-2245"},{"lat":35.5130501,"lng":-78.345146,"label":"<strong>Johnston County Bail Bonds</strong><br>\u2605 5 (2 reviews)<br>\u260e (919) 989-9062"},{"lat":35.5105858,"lng":-78.3445473,"label":"<strong>Bond Boys</strong><br>\u2605 5 (25 reviews)<br>\u260e (984) 285-5702"},{"lat":35.7158511,"lng":-78.6338684,"label":"<strong>Alicia Bail Bonds</strong><br>\u2605 5 (7 reviews)<br>\u260e (919) 348-8853"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

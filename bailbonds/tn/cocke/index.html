@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tn/agents/">all licensed agents in Tennessee</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Cocke County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Sanford &amp; Sons Bail Bonds, Inc.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(16 reviews)</span></div>
+  <div class="ad">140 Snake Rd, Mosheim, TN 37818, USA</div>
+  <div class='ph'>☎ (423) 638-2245</div>
+  <div class='ad'><a href='http://sanfordandsonsbailbonds.com/' rel='nofollow noopener'>sanfordandsonsbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">In Jail Better Call Sol, LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">511 N Haun Dr, Morristown, TN 37814, USA</div>
+  
+  
+</div><div class="agent">
+  <div class="an">AAA Bail Bonding Co | Dandridge and Jefferson County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">870 TN-92, Dandridge, TN 37725, USA</div>
+  <div class='ph'>☎ (423) 393-2676</div>
+  <div class='ad'><a href='https://aaabailbonding.net/' rel='nofollow noopener'>aaabailbonding.net</a></div>
+</div><div class="agent">
+  <div class="an">AAA Bail Bonding</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">128 S Main St Ste 323, Greeneville, TN 37743, USA</div>
+  <div class='ph'>☎ (423) 638-2663</div>
+  <div class='ad'><a href='https://aaabailbonding.net/' rel='nofollow noopener'>aaabailbonding.net</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Cocke County?</summary><p>Bail bond premiums in Tennessee typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Cocke County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Cocke County?</summary><p>Contact the Cocke County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.9162, -83.11922], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":36.025135899999995,"lng":-83.4271601,"label":"<strong>AAA Bail Bonding Co | Dandridge and Jefferson County</strong><br>\u2605 5 (2 reviews)<br>\u260e (423) 393-2676"},{"lat":36.2267134,"lng":-83.2669657,"label":"<strong>In Jail Better Call Sol, LLC</strong><br>\u2605 5 (4 reviews)"},{"lat":36.162437499999996,"lng":-82.83161609999999,"label":"<strong>AAA Bail Bonding</strong><br>\u260e (423) 638-2663"},{"lat":36.192060999999995,"lng":-82.93238,"label":"<strong>Sanford &amp; Sons Bail Bonds, Inc.</strong><br>\u2605 4.6 (16 reviews)<br>\u260e (423) 638-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

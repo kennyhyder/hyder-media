@@ -105,6 +105,27 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/mn/agents/">all licensed agents in Minnesota</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Traverse County</h2>
+  <p class="sub">2 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Midwest Bail Bonds - St Paul</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(185 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">278 E 7th St, St Paul, MN 55101, USA</div>
+  <div class='ph'>☎ (651) 448-2323</div>
+  <div class='ad'><a href='https://midwestbailbonding.com/saint-paul-bail-bonds/' rel='nofollow noopener'>midwestbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">AnyTime Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(127 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">181 Pullman Ave, St Paul Park, MN 55071, USA</div>
+  <div class='ph'>☎ (651) 769-2245</div>
+  <div class='ad'><a href='http://anytimebailbondsmn.com/' rel='nofollow noopener'>anytimebailbondsmn.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Traverse County?</summary><p>Bail bond premiums in Minnesota typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Traverse County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Traverse County?</summary><p>Contact the Traverse County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +150,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([45.76993, -96.47483], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":44.951141899999996,"lng":-93.0873563,"label":"<strong>Midwest Bail Bonds - St Paul</strong><br>\u2605 5 (185 reviews)<br>\u260e (651) 448-2323"},{"lat":44.8368648,"lng":-92.99965,"label":"<strong>AnyTime Bail Bonds</strong><br>\u2605 5 (127 reviews)<br>\u260e (651) 769-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

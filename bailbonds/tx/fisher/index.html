@@ -117,6 +117,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Fisher County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">M.R. Gault Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(45 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">501 W 6th St, Georgetown, TX 78626, USA</div>
+  <div class='ph'>☎ (512) 686-4632</div>
+  <div class='ad'><a href='https://www.georgetownbailbond.net/' rel='nofollow noopener'>georgetownbailbond.net</a></div>
+</div><div class="agent">
+  <div class="an">Texas Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(3 reviews)</span></div>
+  <div class="ad">1503 James St, Sweetwater, TX 79556, USA</div>
+  <div class='ph'>☎ (325) 236-5991</div>
+  
+</div><div class="agent">
+  <div class="an">Catch &amp; Release Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">201 N Wells St, Edna, TX 77957, USA</div>
+  <div class='ph'>☎ (361) 308-6010</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Fisher County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Fisher County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Fisher County?</summary><p>Contact the Fisher County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.74047, -100.40312], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":30.638431999999998,"lng":-97.68117099999999,"label":"<strong>M.R. Gault Bail Bonds</strong><br>\u2605 4.8 (45 reviews)<br>\u260e (512) 686-4632"},{"lat":32.4781267,"lng":-100.39292429999999,"label":"<strong>Texas Bail Bonds</strong><br>\u2605 4.7 (3 reviews)<br>\u260e (325) 236-5991"},{"lat":28.978789700000004,"lng":-96.64687939999999,"label":"<strong>Catch &amp; Release Bonds LLC</strong><br>\u2605 5 (2 reviews)<br>\u260e (361) 308-6010"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

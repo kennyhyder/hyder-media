@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/al/agents/">all licensed agents in Alabama</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Chilton County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Family First Bail Bonds - Clanton and Chilton County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(392 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">804 7th St N Ste B, Clanton, AL 35045, USA</div>
+  <div class='ph'>☎ (205) 294-1417</div>
+  <div class='ad'><a href='https://www.familyfirstbonding.com/locations/chilton-county-alabama' rel='nofollow noopener'>familyfirstbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Family First Bail Bonds - Wetumpka &amp; Elmore County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(51 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4035 US-231 suite B, Wetumpka, AL 36093, USA</div>
+  <div class='ph'>☎ (205) 294-1417</div>
+  <div class='ad'><a href='https://www.familyfirstbonding.com/locations/elmore-county-wetumpka-alabama' rel='nofollow noopener'>familyfirstbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">R&amp;R Bail Bonds of Shelby County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(13 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">741 Vine St, Montevallo, AL 35115, USA</div>
+  <div class='ph'>☎ (205) 476-8261</div>
+  <div class='ad'><a href='http://rrbailbonds.net/?utm_source=gmb&amp;utm_medium=referral' rel='nofollow noopener'>rrbailbonds.net</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Chilton County?</summary><p>Bail bond premiums in Alabama typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Chilton County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Chilton County?</summary><p>Contact the Chilton County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.85405, -86.72661], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":33.1008198,"lng":-86.86370389999999,"label":"<strong>R&amp;R Bail Bonds of Shelby County</strong><br>\u2605 5 (13 reviews)<br>\u260e (205) 476-8261"},{"lat":32.50208,"lng":-86.21627029999999,"label":"<strong>Family First Bail Bonds - Wetumpka &amp; Elmore County</strong><br>\u2605 4.9 (51 reviews)<br>\u260e (205) 294-1417"},{"lat":32.84579840000001,"lng":-86.63323969999999,"label":"<strong>Family First Bail Bonds - Clanton and Chilton County</strong><br>\u2605 5 (392 reviews)<br>\u260e (205) 294-1417"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

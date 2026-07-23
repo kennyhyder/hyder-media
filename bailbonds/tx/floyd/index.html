@@ -117,6 +117,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Floyd County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">James Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(408 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">307 N Center St, Longview, TX 75601, USA</div>
+  <div class='ph'>☎ (903) 553-0155</div>
+  <div class='ad'><a href='http://www.jamesbailbonds.com/' rel='nofollow noopener'>jamesbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Texas Outlaws Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(106 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1801 S Broadway Ave, Tyler, TX 75701, USA</div>
+  <div class='ph'>☎ (903) 630-5937</div>
+  <div class='ad'><a href='https://texasoutlawbailbonds.com/' rel='nofollow noopener'>texasoutlawbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Terry Larey Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(22 reviews)</span></div>
+  <div class="ad">112 W Broad St, Texarkana, TX 75501, USA</div>
+  <div class='ph'>☎ (903) 793-2400</div>
+  
+</div><div class="agent">
+  <div class="an">BondFather Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">225 West Side Dr #100, Decatur, TX 76234, USA</div>
+  <div class='ph'>☎ (940) 393-0643</div>
+  <div class='ad'><a href='http://bondfatherbailbonds.com/' rel='nofollow noopener'>bondfatherbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Ace Bond Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">321 W 6th, Plainview, TX 79072, USA</div>
+  <div class='ph'>☎ (806) 293-8551</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Floyd County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Floyd County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Floyd County?</summary><p>Contact the Floyd County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +180,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.07373, -101.30327], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":32.329898299999996,"lng":-95.30089219999999,"label":"<strong>Texas Outlaws Bail Bonds</strong><br>\u2605 4.7 (106 reviews)<br>\u260e (903) 630-5937"},{"lat":33.421251700000006,"lng":-94.043612,"label":"<strong>Terry Larey Bail Bonds</strong><br>\u2605 4 (22 reviews)<br>\u260e (903) 793-2400"},{"lat":32.4970686,"lng":-94.7396363,"label":"<strong>James Bail Bonds</strong><br>\u2605 4.9 (408 reviews)<br>\u260e (903) 553-0155"},{"lat":33.2296151,"lng":-97.6100769,"label":"<strong>BondFather Bail Bonds</strong><br>\u2605 3.7 (9 reviews)<br>\u260e (940) 393-0643"},{"lat":34.1853475,"lng":-101.7065124,"label":"<strong>Ace Bond Co</strong><br>\u2605 4.2 (6 reviews)<br>\u260e (806) 293-8551"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

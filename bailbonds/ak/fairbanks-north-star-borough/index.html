@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ak/agents/">all licensed agents in Alaska</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Fairbanks North Star Borough</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Bail Hotline Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.1</span> <span class='sub'>(104 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">707 Jefferson St, Fairfield, CA 94533, USA</div>
+  <div class='ph'>☎ (707) 744-4419</div>
+  <div class='ad'><a href='http://www.mybailhotline.com/ca/office/fairfield-bail-bonds' rel='nofollow noopener'>mybailhotline.com</a></div>
+</div><div class="agent">
+  <div class="an">Beacon Investigative Solutions</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 2.3</span> <span class='sub'>(3 reviews)</span></div>
+  <div class="ad">600 3rd St #202, Fairbanks, AK 99701, USA</div>
+  <div class='ph'>☎ (800) 535-2136</div>
+  <div class='ad'><a href='http://beaconintlgroup.com/' rel='nofollow noopener'>beaconintlgroup.com</a></div>
+</div><div class="agent">
+  <div class="an">Custody Investigator's Office</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">101 Lacey St #101, Fairbanks, AK 99701, USA</div>
+  <div class='ph'>☎ (907) 452-9360</div>
+  <div class='ad'><a href='http://courts.alaska.gov/shc/family/glossary.htm#investigator' rel='nofollow noopener'>courts.alaska.gov</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Fairbanks North Star Borough?</summary><p>Bail bond premiums in Alaska typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Fairbanks North Star Borough?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Fairbanks North Star Borough?</summary><p>Contact the Fairbanks North Star Borough sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([64.67045, -146.49606], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.249533899999996,"lng":-122.0420632,"label":"<strong>Bail Hotline Bail Bonds</strong><br>\u2605 4.1 (104 reviews)<br>\u260e (707) 744-4419"},{"lat":64.84509469999999,"lng":-147.6943176,"label":"<strong>Beacon Investigative Solutions</strong><br>\u2605 2.3 (3 reviews)<br>\u260e (800) 535-2136"},{"lat":64.84456159999999,"lng":-147.7168608,"label":"<strong>Custody Investigator's Office</strong><br>\u2605 5 (1 reviews)<br>\u260e (907) 452-9360"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

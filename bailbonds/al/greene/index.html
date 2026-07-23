@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/al/agents/">all licensed agents in Alabama</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Greene County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Free U Bail Bonds | Alabama Bonding Company</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(46 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">16 1st St NE Ste B, La Fayette, AL 36862, USA</div>
+  <div class='ph'>☎ (334) 719-2266</div>
+  <div class='ad'><a href='https://freeubailbonds.com/' rel='nofollow noopener'>freeubailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Guaranteed Bail Bonding LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(44 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">400 E Commerce St, Greenville, AL 36037, USA</div>
+  <div class='ph'>☎ (334) 371-2663</div>
+  <div class='ad'><a href='https://www.guaranteedbailbonding.com/' rel='nofollow noopener'>guaranteedbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Bulldog Bail Bonding LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(33 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">909 E Commerce St, Greenville, AL 36037, USA</div>
+  <div class='ph'>☎ (334) 304-2181</div>
+  <div class='ad'><a href='http://www.bondinganytime.com/' rel='nofollow noopener'>bondinganytime.com</a></div>
+</div><div class="agent">
+  <div class="an">AKA BAIL BONDS OF ALABAMA LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(25 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">400 6th St S, Oneonta, AL 35121, USA</div>
+  <div class='ph'>☎ (205) 237-9183</div>
+  <div class='ad'><a href='http://www.akabailbondsal.com/' rel='nofollow noopener'>akabailbondsal.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Greene County?</summary><p>Bail bond premiums in Alabama typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Greene County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Greene County?</summary><p>Contact the Greene County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.8445, -87.9642], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":33.943058,"lng":-86.4636937,"label":"<strong>AKA BAIL BONDS OF ALABAMA LLC</strong><br>\u2605 5 (25 reviews)<br>\u260e (205) 237-9183"},{"lat":32.9001009,"lng":-85.3999717,"label":"<strong>Free U Bail Bonds | Alabama Bonding Company</strong><br>\u2605 5 (46 reviews)<br>\u260e (334) 719-2266"},{"lat":31.8299126,"lng":-86.6151292,"label":"<strong>Bulldog Bail Bonding LLC</strong><br>\u2605 5 (33 reviews)<br>\u260e (334) 304-2181"},{"lat":31.8294588,"lng":-86.6204556,"label":"<strong>Guaranteed Bail Bonding LLC</strong><br>\u2605 5 (44 reviews)<br>\u260e (334) 371-2663"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/al/agents/">all licensed agents in Alabama</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Wilcox County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Free At Last Bail Bonding of Alabama</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(218 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">623 S Seminary St Ste 128, Florence, AL 35630, USA</div>
+  <div class='ph'>☎ (256) 633-0630</div>
+  <div class='ad'><a href='http://www.facebook.com/freeatlastbailbondingofalabama' rel='nofollow noopener'>facebook.com</a></div>
+</div><div class="agent">
+  <div class="an">Baldwin County Bonding Co., Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(92 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">134 E 3rd St, Bay Minette, AL 36507, USA</div>
+  <div class='ph'>☎ (251) 937-4357</div>
+  <div class='ad'><a href='http://www.baldwincountybonding.com/' rel='nofollow noopener'>baldwincountybonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Cherokee Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">158 Granade Ave, Chatom, AL 36518, USA</div>
+  <div class='ph'>☎ (251) 847-2827</div>
+  
+</div><div class="agent">
+  <div class="an">Alabama Georgia Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">129 Main St, Grove Hill, AL 36451, USA</div>
+  <div class='ph'>☎ (251) 275-2663</div>
+  
+</div><div class="agent">
+  <div class="an">Taylor Bail Bonds</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">5171 Co Rd 45, Fort Deposit, AL 36032, USA</div>
+  <div class='ph'>☎ (334) 452-1365</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Wilcox County?</summary><p>Bail bond premiums in Alabama typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Wilcox County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Wilcox County?</summary><p>Contact the Wilcox County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.99008, -87.30494], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":31.4665908,"lng":-88.25685999999999,"label":"<strong>Cherokee Bail Bonds</strong><br>\u2605 3 (4 reviews)<br>\u260e (251) 847-2827"},{"lat":32.0581169,"lng":-86.6929822,"label":"<strong>Taylor Bail Bonds</strong><br>\u260e (334) 452-1365"},{"lat":31.709043,"lng":-87.77758949999999,"label":"<strong>Alabama Georgia Bonding</strong><br>\u2605 5 (1 reviews)<br>\u260e (251) 275-2663"},{"lat":30.8843944,"lng":-87.77429200000002,"label":"<strong>Baldwin County Bonding Co., Inc</strong><br>\u2605 4.9 (92 reviews)<br>\u260e (251) 937-4357"},{"lat":34.7957678,"lng":-87.6710969,"label":"<strong>Free At Last Bail Bonding of Alabama</strong><br>\u2605 4.9 (218 reviews)<br>\u260e (256) 633-0630"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

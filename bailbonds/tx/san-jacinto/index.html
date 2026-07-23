@@ -117,6 +117,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — San Jacinto County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(596 reviews)</span></div>
+  <div class="ad">400 San Jacinto St, Houston, TX 77002, USA</div>
+  <div class='ph'>☎ (713) 588-9727</div>
+  <div class='ad'><a href='https://www.abc-bailbonds.com/?utm_source=gmb%2C+gbp&amp;utm_medium=organic&amp;utm_campaign=houston&amp;utm_content=website' rel='nofollow noopener'>abc-bailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Action Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(97 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1404 Congress St, Houston, TX 77002, USA</div>
+  <div class='ph'>☎ (832) 699-2273</div>
+  <div class='ad'><a href='http://www.actionbailbondshouston.com/' rel='nofollow noopener'>actionbailbondshouston.com</a></div>
+</div><div class="agent">
+  <div class="an">A1 Ellisor Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(38 reviews)</span></div>
+  <div class="ad">90 Live Oak St, Coldspring, TX 77331, USA</div>
+  <div class='ph'>☎ (936) 653-4165</div>
+  
+</div><div class="agent">
+  <div class="an">A-1 Boney Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(22 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1700 N Washington Ave, Livingston, TX 77351, USA</div>
+  <div class='ph'>☎ (936) 327-3338</div>
+  
+</div><div class="agent">
+  <div class="an">Alexis Bail Bonds Polk County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(5 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">901 N Washington Ave, Livingston, TX 77351, USA</div>
+  <div class='ph'>☎ (936) 788-8228</div>
+  <div class='ad'><a href='https://www.alexisbailbonds.com/' rel='nofollow noopener'>alexisbailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in San Jacinto County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in San Jacinto County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in San Jacinto County?</summary><p>Contact the San Jacinto County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +180,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.57439, -95.16314], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":29.7604395,"lng":-95.3598214,"label":"<strong>ABC Bail Bonds</strong><br>\u2605 4.2 (596 reviews)<br>\u260e (713) 588-9727"},{"lat":30.7152432,"lng":-94.9333521,"label":"<strong>Alexis Bail Bonds Polk County</strong><br>\u2605 5 (5 reviews)<br>\u260e (936) 788-8228"},{"lat":30.5915617,"lng":-95.13046609999999,"label":"<strong>A1 Ellisor Bail Bonds</strong><br>\u2605 4.7 (38 reviews)<br>\u260e (936) 653-4165"},{"lat":30.7224069,"lng":-94.9327259,"label":"<strong>A-1 Boney Bail Bonds</strong><br>\u2605 4.4 (22 reviews)<br>\u260e (936) 327-3338"},{"lat":29.7598855,"lng":-95.3572382,"label":"<strong>Action Bail Bonds</strong><br>\u2605 4.6 (97 reviews)<br>\u260e (832) 699-2273"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

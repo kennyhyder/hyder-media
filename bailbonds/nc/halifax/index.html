@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Halifax County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">1st Priority Group Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.1</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3208 Sunset Ave Ste a, Rocky Mount, NC 27804, USA</div>
+  <div class='ph'>☎ (252) 452-5175</div>
+  
+</div><div class="agent">
+  <div class="an">Fuller's Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">105 Green St E #B, Wilson, NC 27893, USA</div>
+  <div class='ph'>☎ (252) 991-7579</div>
+  
+</div><div class="agent">
+  <div class="an">Battle Bail Bondsman</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">319 W Washington St, Nashville, NC 27856, USA</div>
+  <div class='ph'>☎ (252) 903-4085</div>
+  
+</div><div class="agent">
+  <div class="an">Woods Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">105 Green St E, Wilson, NC 27893, USA</div>
+  <div class='ph'>☎ (252) 292-4378</div>
+  
+</div><div class="agent">
+  <div class="an">Reed's Bailbonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">301 S Church St Suite 253, Rocky Mount, NC 27804, USA</div>
+  <div class='ph'>☎ (252) 266-2306</div>
+  <div class='ad'><a href='https://www.doublerbailbonds.net/' rel='nofollow noopener'>doublerbailbonds.net</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Halifax County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Halifax County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Halifax County?</summary><p>Contact the Halifax County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.25144, -77.64484], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.9763491,"lng":-77.97084439999999,"label":"<strong>Battle Bail Bondsman</strong><br>\u2605 3.5 (8 reviews)<br>\u260e (252) 903-4085"},{"lat":35.9395889,"lng":-77.7970655,"label":"<strong>Reed's Bailbonding</strong><br>\u2605 5 (4 reviews)<br>\u260e (252) 266-2306"},{"lat":35.726486099999995,"lng":-77.90926879999999,"label":"<strong>Woods Bail Bonding</strong><br>\u2605 4.7 (6 reviews)<br>\u260e (252) 292-4378"},{"lat":35.7264674,"lng":-77.9093122,"label":"<strong>Fuller's Bail Bonding</strong><br>\u2605 3 (9 reviews)<br>\u260e (252) 991-7579"},{"lat":35.9636282,"lng":-77.8425943,"label":"<strong>1st Priority Group Bail Bonds</strong><br>\u2605 4.1 (14 reviews)<br>\u260e (252) 452-5175"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

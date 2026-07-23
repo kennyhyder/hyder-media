@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ny/agents/">all licensed agents in New York</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Delaware County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(207 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">21 W 3rd St, Media, PA 19063, USA</div>
+  <div class='ph'>☎ (610) 892-7551</div>
+  <div class='ad'><a href='https://www.abcbail.com/media-bail-bonds/' rel='nofollow noopener'>abcbail.com</a></div>
+</div><div class="agent">
+  <div class="an">ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(76 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">139 W Market St Unit a, West Chester, PA 19382, USA</div>
+  <div class='ph'>☎ (610) 793-9500</div>
+  <div class='ad'><a href='https://www.abcbail.com/west-chester-bail-bonds/' rel='nofollow noopener'>abcbail.com</a></div>
+</div><div class="agent">
+  <div class="an">Delco Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(71 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">214 W Front St Ste 101, Media, PA 19063, USA</div>
+  <div class='ph'>☎ (484) 443-3648</div>
+  <div class='ad'><a href='https://www.delcobailbonds.com/' rel='nofollow noopener'>delcobailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">County Bail Bonds - Bucks, Chester &amp; Delaware Counties, PA</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(22 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">29 S Darlington St 2nd Floor, West Chester, PA 19382, USA</div>
+  <div class='ph'>☎ (610) 571-5185</div>
+  <div class='ad'><a href='https://countybailbonds247.com/bail-bonds-near-me-open-24-7/' rel='nofollow noopener'>countybailbonds247.com</a></div>
+</div><div class="agent">
+  <div class="an">George Garmon Bailbonds &amp; Process</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(7 reviews)</span></div>
+  <div class="ad">540 Broadway, Monticello, NY 12701, USA</div>
+  <div class='ph'>☎ (845) 791-7115</div>
+  <div class='ad'><a href='http://www.bailbondsmonticello.com/' rel='nofollow noopener'>bailbondsmonticello.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Delaware County?</summary><p>Bail bond premiums in New York typically run 6-10% (statutory sliding scale) of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $600 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Delaware County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Delaware County?</summary><p>Contact the Delaware County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.19399, -74.96673], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.9586981,"lng":-75.6069921,"label":"<strong>ABC Bail Bonds</strong><br>\u2605 4.8 (76 reviews)<br>\u260e (610) 793-9500"},{"lat":39.9580766,"lng":-75.6066063,"label":"<strong>County Bail Bonds - Bucks, Chester &amp; Delaware Counties, PA</strong><br>\u2605 4.8 (22 reviews)<br>\u260e (610) 571-5185"},{"lat":39.9208922,"lng":-75.38956619999999,"label":"<strong>ABC Bail Bonds</strong><br>\u2605 4.7 (207 reviews)<br>\u260e (610) 892-7551"},{"lat":41.6570076,"lng":-74.6940845,"label":"<strong>George Garmon Bailbonds &amp; Process</strong><br>\u2605 4 (7 reviews)<br>\u260e (845) 791-7115"},{"lat":39.9191077,"lng":-75.3924885,"label":"<strong>Delco Bail Bonds</strong><br>\u2605 4.6 (71 reviews)<br>\u260e (484) 443-3648"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

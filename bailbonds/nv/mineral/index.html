@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nv/agents/">all licensed agents in Nevada</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Mineral County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Nevada County Bail House Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(19 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">220 Main St #2b, Nevada City, CA 95959, USA</div>
+  <div class='ph'>☎ (530) 265-0535</div>
+  <div class='ad'><a href='https://www.nevadacitybail.com/' rel='nofollow noopener'>nevadacitybail.com</a></div>
+</div><div class="agent">
+  <div class="an">Cheap Bail Bonds Henderson</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(13 reviews)</span></div>
+  <div class="ad">170 S Green Valley Pkwy #410, Henderson, NV 89012, USA</div>
+  <div class='ph'>☎ (702) 887-1106</div>
+  <div class='ad'><a href='http://cheapbailbondshenderson.com/' rel='nofollow noopener'>cheapbailbondshenderson.com</a></div>
+</div><div class="agent">
+  <div class="an">A Allies Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.8</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">76 N Maine St, Fallon, NV 89406, USA</div>
+  <div class='ph'>☎ (775) 885-1000</div>
+  
+</div><div class="agent">
+  <div class="an">Big Daddy's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(3 reviews)</span></div>
+  <div class="ad">Carson City, NV 89701, USA</div>
+  <div class='ph'>☎ (775) 883-2335</div>
+  
+</div><div class="agent">
+  <div class="an">Fallon Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">78 N Maine St, Fallon, NV 89406, USA</div>
+  
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Mineral County?</summary><p>Bail bond premiums in Nevada typically run 15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,500 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Mineral County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Mineral County?</summary><p>Contact the Mineral County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.51665, -118.41628], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.129728199999995,"lng":-119.67309390000001,"label":"<strong>Big Daddy's Bail Bonds</strong><br>\u2605 3.7 (3 reviews)<br>\u260e (775) 883-2335"},{"lat":39.475562599999996,"lng":-118.77680089999998,"label":"<strong>A Allies Bail Bonds</strong><br>\u2605 3.8 (6 reviews)<br>\u260e (775) 885-1000"},{"lat":36.022028899999995,"lng":-115.0825085,"label":"<strong>Cheap Bail Bonds Henderson</strong><br>\u2605 5 (13 reviews)<br>\u260e (702) 887-1106"},{"lat":39.4756431,"lng":-118.7768111,"label":"<strong>Fallon Bail Bonds</strong>"},{"lat":39.263523,"lng":-121.01737000000001,"label":"<strong>Nevada County Bail House Bail Bonds</strong><br>\u2605 4.9 (19 reviews)<br>\u260e (530) 265-0535"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

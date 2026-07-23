@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tn/agents/">all licensed agents in Tennessee</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Robertson County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">All Knight Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(53 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1103 Matthews St, Springfield, TN 37172, USA</div>
+  <div class='ph'>☎ (615) 456-4343</div>
+  <div class='ad'><a href='https://www.nashville-bailbonds.com/' rel='nofollow noopener'>nashville-bailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Martin Bonding Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(23 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">310 5th Ave E, Springfield, TN 37172, USA</div>
+  <div class='ph'>☎ (615) 384-5380</div>
+  
+</div><div class="agent">
+  <div class="an">Free Bird Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">400 5th Ave E, Springfield, TN 37172, USA</div>
+  <div class='ph'>☎ (615) 384-7994</div>
+  <div class='ad'><a href='https://www.freebirdbails.com/' rel='nofollow noopener'>freebirdbails.com</a></div>
+</div><div class="agent">
+  <div class="an">Brookes Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">813 Memorial Blvd, Springfield, TN 37172, USA</div>
+  <div class='ph'>☎ (615) 667-1200</div>
+  <div class='ad'><a href='https://brookesbailbonding.com/' rel='nofollow noopener'>brookesbailbonding.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Robertson County?</summary><p>Bail bond premiums in Tennessee typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Robertson County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Robertson County?</summary><p>Contact the Robertson County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.52439, -86.87259], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":36.5091123,"lng":-86.880462,"label":"<strong>Free Bird Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (615) 384-7994"},{"lat":36.509207200000006,"lng":-86.8808847,"label":"<strong>Martin Bonding Co</strong><br>\u2605 4.9 (23 reviews)<br>\u260e (615) 384-5380"},{"lat":36.505159,"lng":-86.882153,"label":"<strong>Brookes Bail Bonding</strong><br>\u2605 5 (1 reviews)<br>\u260e (615) 667-1200"},{"lat":36.5025428,"lng":-86.8833806,"label":"<strong>All Knight Bonding</strong><br>\u2605 5 (53 reviews)<br>\u260e (615) 456-4343"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

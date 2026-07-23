@@ -105,6 +105,57 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/md/agents/">all licensed agents in Maryland</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Montgomery County</h2>
+  <p class="sub">7 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(91 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">8 W Main St, Norristown, PA 19401, USA</div>
+  <div class='ph'>☎ (610) 292-9900</div>
+  <div class='ad'><a href='https://www.abcbail.com/norristown-bail-bonds/' rel='nofollow noopener'>abcbail.com</a></div>
+</div><div class="agent">
+  <div class="an">A+ Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">618 Swede St, Norristown, PA 19401, USA</div>
+  <div class='ph'>☎ (610) 396-0577</div>
+  <div class='ad'><a href='http://www.aplusbailbondspa.com/montgomery-bail-bonds/' rel='nofollow noopener'>aplusbailbondspa.com</a></div>
+</div><div class="agent">
+  <div class="an">Rockville Area Bail Bondsman</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">451 Hungerford Dr #171, Rockville, MD 20850, USA</div>
+  <div class='ph'>☎ (240) 813-3695</div>
+  
+</div><div class="agent">
+  <div class="an">Big Louie Bail Bonds</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1021 University Blvd E #102, Silver Spring, MD 20903, USA</div>
+  <div class='ph'>☎ (301) 408-4580</div>
+  
+</div><div class="agent">
+  <div class="an">2nd Chance Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">6015 Montrose Rd, Rockville, MD 20852, USA</div>
+  <div class='ph'>☎ (301) 468-2663</div>
+  
+</div><div class="agent">
+  <div class="an">4 Brothers Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">490 Fleet St, Rockville, MD 20850, USA</div>
+  <div class='ph'>☎ (301) 610-2004</div>
+  
+</div><div class="agent">
+  <div class="an">My Brother's 24 Hour Bail Bnds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">77 S Washington St, Rockville, MD 20850, USA</div>
+  <div class='ph'>☎ (301) 309-2333</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Montgomery County?</summary><p>Bail bond premiums in Maryland typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Montgomery County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Montgomery County?</summary><p>Contact the Montgomery County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +180,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.13738, -77.20306], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":40.1178904,"lng":-75.3422977,"label":"<strong>A+ Bail Bonds</strong><br>\u2605 5 (2 reviews)<br>\u260e (610) 396-0577"},{"lat":39.0895766,"lng":-77.15110059999999,"label":"<strong>Rockville Area Bail Bondsman</strong><br>\u260e (240) 813-3695"},{"lat":38.9908374,"lng":-76.9901905,"label":"<strong>Big Louie Bail Bonds</strong><br>\u260e (301) 408-4580"},{"lat":39.0533666,"lng":-77.1218408,"label":"<strong>2nd Chance Bail Bonds</strong><br>\u260e (301) 468-2663"},{"lat":39.080559,"lng":-77.14658310000002,"label":"<strong>4 Brothers Bail Bonds</strong><br>\u260e (301) 610-2004"},{"lat":40.114455,"lng":-75.3450385,"label":"<strong>ABC Bail Bonds</strong><br>\u2605 4.8 (91 reviews)<br>\u260e (610) 292-9900"},{"lat":39.083608,"lng":-77.15310199999999,"label":"<strong>My Brother's 24 Hour Bail Bnds</strong><br>\u260e (301) 309-2333"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -108,8 +108,24 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">1954 Yarrow Dr., Mapleton, 84664</div>
   <div class='ph'>☎ (801) 491-5025</div>
   
+  <div style='margin-top:4px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(334 reviews)</span> · <span class=badge>Open 24/7</span></div>
   <div class='lic'>License: 483843</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://insurance.utah.gov/licensees/bail-bond/agencies/' rel='nofollow'>insurance.utah.gov</a></p>
+</div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Utah County</h2>
+  <p class="sub">1 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Bail City Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">75 W 300 N, Spanish Fork, UT 84660, USA</div>
+  <div class='ph'>☎ (385) 200-9103</div>
+  <div class='ad'><a href='https://bailcitybailbonds.com/utah/utah-county/spanish-fork/' rel='nofollow noopener'>bailcitybailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
 </div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Utah County?</summary><p>Bail bond premiums in Utah typically run 10-20% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Utah County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Utah County?</summary><p>Contact the Utah County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
@@ -135,7 +151,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.12042, -111.66856], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [{"lat":40.12016,"lng":-111.6021,"label":"<strong><a href='/bailbonds/ut/agent/breaking-bad-bail-bonds-483843/'>Breaking Bad Bail Bonds</a></strong><br>\u260e (801) 491-5025"}];
+  var pts = [{"lat":40.113461699999995,"lng":-111.65595929999999,"label":"<strong>Bail City Bail Bonds</strong><br>\u2605 5 (3 reviews)<br>\u260e (385) 200-9103"},{"lat":40.12016,"lng":-111.6021,"label":"<strong><a href='/bailbonds/ut/agent/breaking-bad-bail-bonds-483843/'>Breaking Bad Bail Bonds</a></strong><br>\u260e (801) 491-5025"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

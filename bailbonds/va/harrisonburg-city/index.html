@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/va/agents/">all licensed agents in Virginia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Harrisonburg city</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Doctor Bond</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">50 Liberty St, Harrisonburg, VA 22801, USA</div>
+  <div class='ph'>☎ (540) 432-1843</div>
+  
+</div><div class="agent">
+  <div class="an">Doug Dunkle Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(5 reviews)</span></div>
+  <div class="ad">50 Liberty St, Harrisonburg, VA 22801, USA</div>
+  <div class='ph'>☎ (540) 434-4978</div>
+  
+</div><div class="agent">
+  <div class="an">1-800 For Bail</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">50 Liberty St, Harrisonburg, VA 22801, USA</div>
+  <div class='ph'>☎ (540) 434-4978</div>
+  
+</div><div class="agent">
+  <div class="an">A Regional Bonding Co</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">Harrisonburg, VA 22801, USA</div>
+  <div class='ph'>☎ (540) 564-2500</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Harrisonburg city?</summary><p>Bail bond premiums in Virginia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Harrisonburg city?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Harrisonburg city?</summary><p>Contact the Harrisonburg city sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.43626, -78.8733], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.4491412,"lng":-78.8704607,"label":"<strong>1-800 For Bail</strong><br>\u2605 1 (1 reviews)<br>\u260e (540) 434-4978"},{"lat":38.4491454,"lng":-78.87042819999999,"label":"<strong>Doctor Bond</strong><br>\u2605 3 (6 reviews)<br>\u260e (540) 432-1843"},{"lat":38.4495818,"lng":-78.8689199,"label":"<strong>A Regional Bonding Co</strong><br>\u260e (540) 564-2500"},{"lat":38.449200100000006,"lng":-78.87056749999999,"label":"<strong>Doug Dunkle Bail Bonds</strong><br>\u2605 3 (5 reviews)<br>\u260e (540) 434-4978"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

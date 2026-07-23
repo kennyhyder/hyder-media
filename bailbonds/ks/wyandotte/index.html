@@ -105,6 +105,51 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ks/agents/">all licensed agents in Kansas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Wyandotte County</h2>
+  <p class="sub">6 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Metro Bail Bonds - Bonding KC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(20 reviews)</span></div>
+  <div class="ad">735 Kansas Ave, Kansas City, KS 66105, USA</div>
+  <div class='ph'>☎ (913) 342-0909</div>
+  <div class='ad'><a href='http://bondingkc.com/' rel='nofollow noopener'>bondingkc.com</a></div>
+</div><div class="agent">
+  <div class="an">Freedom Bonding LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.4</span> <span class='sub'>(8 reviews)</span></div>
+  <div class="ad">901 N 10th St, Kansas City, KS 66101, USA</div>
+  <div class='ph'>☎ (913) 371-8175</div>
+  
+</div><div class="agent">
+  <div class="an">Dwight Herrin Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">1015 E 8th St, Kansas City, MO 64106, USA</div>
+  <div class='ph'>☎ (816) 221-1549</div>
+  
+</div><div class="agent">
+  <div class="an">D P Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">E 26th St, Kansas City, MO 64127, USA</div>
+  <div class='ph'>☎ (816) 241-2264</div>
+  
+</div><div class="agent">
+  <div class="an">Alpha One Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">PO Box 47102, Kansas City, MO 64188, USA</div>
+  <div class='ph'>☎ (816) 532-2000</div>
+  
+</div><div class="agent">
+  <div class="an">A Aero Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">Kansas City, KS 66112, USA</div>
+  <div class='ph'>☎ (913) 381-2010</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Wyandotte County?</summary><p>Bail bond premiums in Kansas typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Wyandotte County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Wyandotte County?</summary><p>Contact the Wyandotte County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.11538, -94.76309], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.087363499999995,"lng":-94.62800159999999,"label":"<strong>Metro Bail Bonds - Bonding KC</strong><br>\u2605 3.7 (20 reviews)<br>\u260e (913) 342-0909"},{"lat":39.2239447,"lng":-94.58545079999999,"label":"<strong>Alpha One Bail Bonds</strong><br>\u260e (816) 532-2000"},{"lat":39.114061199999995,"lng":-94.7743064,"label":"<strong>A Aero Bail Bonds</strong><br>\u260e (913) 381-2010"},{"lat":39.104003999999996,"lng":-94.5701995,"label":"<strong>Dwight Herrin Bail Bonds</strong><br>\u2605 1 (1 reviews)<br>\u260e (816) 221-1549"},{"lat":39.077833399999996,"lng":-94.5458072,"label":"<strong>D P Bail Bonding</strong><br>\u2605 4 (1 reviews)<br>\u260e (816) 241-2264"},{"lat":39.114847,"lng":-94.634652,"label":"<strong>Freedom Bonding LLC</strong><br>\u2605 3.4 (8 reviews)<br>\u260e (913) 371-8175"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

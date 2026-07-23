@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ga/agents/">all licensed agents in Georgia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Haralson County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Bond James Bond, Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.3</span> <span class='sub'>(15 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">646 Goodyear Ave, Rockmart, GA 30153, USA</div>
+  <div class='ph'>☎ (770) 684-9111</div>
+  <div class='ad'><a href='https://bondjamesbondinc.com/' rel='nofollow noopener'>bondjamesbondinc.com</a></div>
+</div><div class="agent">
+  <div class="an">Bond James Bond, Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(13 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1978 Rockmart Hwy, Cedartown, GA 30125, USA</div>
+  <div class='ph'>☎ (770) 748-1911</div>
+  <div class='ad'><a href='https://bondjamesbondinc.com/' rel='nofollow noopener'>bondjamesbondinc.com</a></div>
+</div><div class="agent">
+  <div class="an">Bad Boyz Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">6 N Main St, Cedartown, GA 30125, USA</div>
+  <div class='ph'>☎ (678) 901-0582</div>
+  
+</div><div class="agent">
+  <div class="an">Miller Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.3</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">123 Jeffers St, Buchanan, GA 30113, USA</div>
+  <div class='ph'>☎ (770) 646-5604</div>
+  
+</div><div class="agent">
+  <div class="an">A National Bond Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">301 S Marble St, Rockmart, GA 30153, USA</div>
+  <div class='ph'>☎ (770) 748-1911</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Haralson County?</summary><p>Bail bond premiums in Georgia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Haralson County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Haralson County?</summary><p>Contact the Haralson County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.79516, -85.22006], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":34.0136734,"lng":-85.25437629999999,"label":"<strong>Bad Boyz Bail Bonds</strong><br>\u2605 4 (9 reviews)<br>\u260e (678) 901-0582"},{"lat":34.018471,"lng":-85.2080387,"label":"<strong>Bond James Bond, Inc</strong><br>\u2605 4 (13 reviews)<br>\u260e (770) 748-1911"},{"lat":33.9959706,"lng":-85.0530923,"label":"<strong>A National Bond Co</strong><br>\u2605 4 (2 reviews)<br>\u260e (770) 748-1911"},{"lat":34.0030923,"lng":-85.0401509,"label":"<strong>Bond James Bond, Inc</strong><br>\u2605 4.3 (15 reviews)<br>\u260e (770) 684-9111"},{"lat":33.7949226,"lng":-85.1896879,"label":"<strong>Miller Bonding</strong><br>\u2605 3.3 (4 reviews)<br>\u260e (770) 646-5604"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

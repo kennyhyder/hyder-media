@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ak/agents/">all licensed agents in Alaska</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Ketchikan Gateway Borough</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Ketchikan Gateway Borough Transit System</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.1</span> <span class='sub'>(16 reviews)</span></div>
+  <div class="ad">1175 Copper Ridge Ln, Ketchikan, AK 99901, USA</div>
+  <div class='ph'>☎ (907) 225-8726</div>
+  
+</div><div class="agent">
+  <div class="an">BailBonds.com</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(11 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">428 S Congress Ave, West Palm Beach, FL 33406, USA</div>
+  <div class='ph'>☎ (561) 440-2245</div>
+  <div class='ad'><a href='https://bailbonds.com/service-areas/florida/palm-beach/' rel='nofollow noopener'>bailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Ketchikan Correctional Center</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">1201 Schoenbar Rd, Ketchikan, AK 99901, USA</div>
+  <div class='ph'>☎ (907) 228-7350</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Ketchikan Gateway Borough?</summary><p>Bail bond premiums in Alaska typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Ketchikan Gateway Borough?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Ketchikan Gateway Borough?</summary><p>Contact the Ketchikan Gateway Borough sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([55.44994, -131.10668], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":55.348199099999995,"lng":-131.6499571,"label":"<strong>Ketchikan Correctional Center</strong><br>\u260e (907) 228-7350"},{"lat":55.350310699999994,"lng":-131.6522392,"label":"<strong>Ketchikan Gateway Borough Transit System</strong><br>\u2605 3.1 (16 reviews)<br>\u260e (907) 225-8726"},{"lat":26.6703469,"lng":-80.08738509999999,"label":"<strong>BailBonds.com</strong><br>\u2605 4.9 (11 reviews)<br>\u260e (561) 440-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ny/agents/">all licensed agents in New York</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Erie County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">World Wide Bonding Agency</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(103 reviews)</span></div>
+  <div class="ad">2846 William St, Buffalo, NY 14227, USA</div>
+  <div class='ph'>☎ (888) 681-7685</div>
+  <div class='ad'><a href='http://www.wwbagency.com/' rel='nofollow noopener'>wwbagency.com</a></div>
+</div><div class="agent">
+  <div class="an">Schaffer Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">3949 California Rd, Orchard Park, NY 14127, USA</div>
+  <div class='ph'>☎ (716) 578-0446</div>
+  
+</div><div class="agent">
+  <div class="an">Bonfante Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">Buffalo, NY 14216, USA</div>
+  <div class='ph'>☎ (716) 861-7108</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Erie County?</summary><p>Bail bond premiums in New York typically run 6-10% (statutory sliding scale) of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $600 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Erie County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Erie County?</summary><p>Contact the Erie County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.75276, -78.77819], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":42.8842454,"lng":-78.7651672,"label":"<strong>World Wide Bonding Agency</strong><br>\u2605 5 (103 reviews)<br>\u260e (888) 681-7685"},{"lat":42.9474429,"lng":-78.8637505,"label":"<strong>Bonfante Bail Bonds</strong><br>\u260e (716) 861-7108"},{"lat":42.776468900000005,"lng":-78.77818909999999,"label":"<strong>Schaffer Bail Bonds</strong><br>\u2605 1 (1 reviews)<br>\u260e (716) 578-0446"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

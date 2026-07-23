@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nd/agents/">all licensed agents in North Dakota</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Billings County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Western Pawn &amp; Bail Bond</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(58 reviews)</span></div>
+  <div class="ad">2817 Montana Ave, Billings, MT 59101, USA</div>
+  <div class='ph'>☎ (406) 245-2334</div>
+  <div class='ad'><a href='https://westernpawnandbail.com/' rel='nofollow noopener'>westernpawnandbail.com</a></div>
+</div><div class="agent">
+  <div class="an">Absolute Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(56 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">387 Hayes Dr, Hastings, MN 55033, USA</div>
+  <div class='ph'>☎ (651) 480-8889</div>
+  <div class='ad'><a href='http://absolutebailbond.com/' rel='nofollow noopener'>absolutebailbond.com</a></div>
+</div><div class="agent">
+  <div class="an">Midwest Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(25 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">Lower Level, 522 Beltrami Ave NW Ste 8, Bemidji, MN 56601, USA</div>
+  <div class='ph'>☎ (218) 230-2266</div>
+  <div class='ad'><a href='https://midwestbonding.net/' rel='nofollow noopener'>midwestbonding.net</a></div>
+</div><div class="agent">
+  <div class="an">Lipstick Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(3 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1301 Division St D, Billings, MT 59101, USA</div>
+  <div class='ph'>☎ (406) 534-7777</div>
+  <div class='ad'><a href='https://lipstickbailbonds.net/bail-bonds-in-billings/' rel='nofollow noopener'>lipstickbailbonds.net</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Billings County?</summary><p>Bail bond premiums in North Dakota typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Billings County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Billings County?</summary><p>Contact the Billings County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([47.00704, -103.36402], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":47.473501899999995,"lng":-94.8807401,"label":"<strong>Midwest Bonding</strong><br>\u2605 5 (25 reviews)<br>\u260e (218) 230-2266"},{"lat":44.7125067,"lng":-92.8559849,"label":"<strong>Absolute Bail Bonds</strong><br>\u2605 4.7 (56 reviews)<br>\u260e (651) 480-8889"},{"lat":45.783168499999995,"lng":-108.5151267,"label":"<strong>Lipstick Bail Bonds</strong><br>\u2605 1 (3 reviews)<br>\u260e (406) 534-7777"},{"lat":45.780943,"lng":-108.50586299999999,"label":"<strong>Western Pawn &amp; Bail Bond</strong><br>\u2605 3.5 (58 reviews)<br>\u260e (406) 245-2334"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

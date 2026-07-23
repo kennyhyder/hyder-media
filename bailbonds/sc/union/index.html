@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/sc/agents/">all licensed agents in South Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Union County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Aladdin Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(353 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">744 E Stone Ave, Greenville, SC 29609, USA</div>
+  <div class='ph'>☎ (864) 509-6960</div>
+  <div class='ad'><a href='https://locations.aladdinbailbonds.com/sc/greenville/bail-bonds-greenville-sc-40001.html?utm_source=gmb&amp;utm_medium=organic&amp;utm_campaign=Greenville' rel='nofollow noopener'>locations.aladdinbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">A-D Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(59 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">103 N Tugaloo St, Walhalla, SC 29691, USA</div>
+  <div class='ph'>☎ (864) 638-8994</div>
+  
+</div><div class="agent">
+  <div class="an">Pro Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(16 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">2661 W Roosevelt Blvd Ste 109, Monroe, NC 28110, USA</div>
+  <div class='ph'>☎ (704) 882-7227</div>
+  <div class='ad'><a href='https://probailbonding.com/' rel='nofollow noopener'>probailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Over-N-Out Bail Bonding LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.9</span> <span class='sub'>(7 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">32 Magnolia St, York, SC 29745, USA</div>
+  <div class='ph'>☎ (803) 280-8190</div>
+  <div class='ad'><a href='http://overnoutbailbond.com/' rel='nofollow noopener'>overnoutbailbond.com</a></div>
+</div><div class="agent">
+  <div class="an">Cohen Agency LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(7 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">2242 SC-72, Whitmire, SC 29178, USA</div>
+  <div class='ph'>☎ (839) 214-9858</div>
+  <div class='ad'><a href='https://www.cohenagencyllc.com/' rel='nofollow noopener'>cohenagencyllc.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Union County?</summary><p>Bail bond premiums in South Carolina typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Union County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Union County?</summary><p>Contact the Union County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.6904, -81.6159], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.001214399999995,"lng":-81.2447114,"label":"<strong>Over-N-Out Bail Bonding LLC</strong><br>\u2605 3.9 (7 reviews)<br>\u260e (803) 280-8190"},{"lat":34.8571248,"lng":-82.38553069999999,"label":"<strong>Aladdin Bail Bonds</strong><br>\u2605 4.8 (353 reviews)<br>\u260e (864) 509-6960"},{"lat":34.765689699999996,"lng":-83.0673075,"label":"<strong>A-D Bail Bonding</strong><br>\u2605 4.4 (59 reviews)<br>\u260e (864) 638-8994"},{"lat":35.0175348,"lng":-80.5754008,"label":"<strong>Pro Bail Bonds</strong><br>\u2605 5 (16 reviews)<br>\u260e (704) 882-7227"},{"lat":34.508217099999996,"lng":-81.63388169999999,"label":"<strong>Cohen Agency LLC</strong><br>\u2605 5 (7 reviews)<br>\u260e (839) 214-9858"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

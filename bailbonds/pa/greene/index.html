@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/pa/agents/">all licensed agents in Pennsylvania</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Greene County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Mitch's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(21 reviews)</span></div>
+  <div class="ad">62 W Wheeling St, Washington, PA 15301, USA</div>
+  <div class='ph'>☎ (724) 225-2245</div>
+  <div class='ad'><a href='http://www.mitchsbailbonds.com/' rel='nofollow noopener'>mitchsbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Geno's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(18 reviews)</span></div>
+  <div class="ad">144 E Main St, Uniontown, PA 15401, USA</div>
+  <div class='ph'>☎ (724) 430-0340</div>
+  <div class='ad'><a href='http://www.genosbail.com/' rel='nofollow noopener'>genosbail.com</a></div>
+</div><div class="agent">
+  <div class="an">Liberty Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(16 reviews)</span></div>
+  <div class="ad">20 W Cherry Ave, Washington, PA 15301, USA</div>
+  <div class='ph'>☎ (724) 228-7750</div>
+  <div class='ad'><a href='https://libertybailbondspa.com/regional-service-areas/washington-county/' rel='nofollow noopener'>libertybailbondspa.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Greene County?</summary><p>Bail bond premiums in Pennsylvania typically run 5-10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $500 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Greene County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Greene County?</summary><p>Contact the Greene County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.84771, -80.22566], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":40.169928999999996,"lng":-80.245904,"label":"<strong>Liberty Bail Bonds</strong><br>\u2605 4.4 (16 reviews)<br>\u260e (724) 228-7750"},{"lat":39.9000797,"lng":-79.72032440000001,"label":"<strong>Geno's Bail Bonds</strong><br>\u2605 4.7 (18 reviews)<br>\u260e (724) 430-0340"},{"lat":40.168988,"lng":-80.246534,"label":"<strong>Mitch's Bail Bonds</strong><br>\u2605 4.2 (21 reviews)<br>\u260e (724) 225-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

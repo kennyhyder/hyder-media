@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/mo/agents/">all licensed agents in Missouri</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Lafayette County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Richard Ratty Bail Bond</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">Blue Springs, MO 64015, USA</div>
+  <div class='ph'>☎ (816) 229-5700</div>
+  
+</div><div class="agent">
+  <div class="an">Ky Bailbonds - Blue Springs</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">500 SE Williamsburg Dr, Blue Springs, MO 64014, USA</div>
+  <div class='ph'>☎ (816) 228-6655</div>
+  <div class='ad'><a href='http://www.bailbondsbluespringsmo.com/' rel='nofollow noopener'>bailbondsbluespringsmo.com</a></div>
+</div><div class="agent">
+  <div class="an">A Sharp Bail Bonding Agency</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">Warrensburg, MO 64093, USA</div>
+  <div class='ph'>☎ (660) 441-3616</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Lafayette County?</summary><p>Bail bond premiums in Missouri typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Lafayette County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Lafayette County?</summary><p>Contact the Lafayette County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.06871, -93.80264], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.9816548,"lng":-94.2613654,"label":"<strong>Ky Bailbonds - Blue Springs</strong><br>\u2605 3.5 (2 reviews)<br>\u260e (816) 228-6655"},{"lat":38.7627893,"lng":-93.73604979999999,"label":"<strong>A Sharp Bail Bonding Agency</strong><br>\u2605 4.5 (2 reviews)<br>\u260e (660) 441-3616"},{"lat":39.022981,"lng":-94.305082,"label":"<strong>Richard Ratty Bail Bond</strong><br>\u2605 5 (6 reviews)<br>\u260e (816) 229-5700"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

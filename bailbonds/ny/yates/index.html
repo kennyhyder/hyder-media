@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ny/agents/">all licensed agents in New York</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Yates County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">AA Bail Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(206 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">345 Pierce St First Floor, Kingston, PA 18704, USA</div>
+  <div class='ph'>☎ (570) 820-6200</div>
+  <div class='ad'><a href='http://www.aabailbondsllc.com/' rel='nofollow noopener'>aabailbondsllc.com</a></div>
+</div><div class="agent">
+  <div class="an">Empire Bail Bonds - Nassau</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.6</span> <span class='sub'>(41 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">next to Dunkin’ Donuts, 100 Main St, Hempstead, NY 11550, USA</div>
+  <div class='ph'>☎ (516) 292-2222</div>
+  <div class='ad'><a href='https://www.bailempire.com/' rel='nofollow noopener'>bailempire.com</a></div>
+</div><div class="agent">
+  <div class="an">Binder Bail</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(16 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">155 N Main St, Liberty, NY 12754, USA</div>
+  <div class='ph'>☎ (845) 434-4663</div>
+  
+</div><div class="agent">
+  <div class="an">Yates County Sheriff's Office</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">227 Main St, Penn Yan, NY 14527, USA</div>
+  <div class='ph'>☎ (315) 536-4438</div>
+  <div class='ad'><a href='https://www.yatescountysheriff.gov/' rel='nofollow noopener'>yatescountysheriff.gov</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Yates County?</summary><p>Bail bond premiums in New York typically run 6-10% (statutory sliding scale) of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $600 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Yates County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Yates County?</summary><p>Contact the Yates County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.63824, -77.10432], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.8019725,"lng":-74.7468246,"label":"<strong>Binder Bail</strong><br>\u2605 5 (16 reviews)<br>\u260e (845) 434-4663"},{"lat":41.2611559,"lng":-75.88719379999999,"label":"<strong>AA Bail Bonds LLC</strong><br>\u2605 4.9 (206 reviews)<br>\u260e (570) 820-6200"},{"lat":40.7098407,"lng":-73.62506859999999,"label":"<strong>Empire Bail Bonds - Nassau</strong><br>\u2605 3.6 (41 reviews)<br>\u260e (516) 292-2222"},{"lat":42.6658511,"lng":-77.05533799999999,"label":"<strong>Yates County Sheriff's Office</strong><br>\u260e (315) 536-4438"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

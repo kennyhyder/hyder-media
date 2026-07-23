@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Bertie County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">U.S. Bonding Co.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(69 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3307 US-74 Unit B, Monroe, NC 28112, USA</div>
+  <div class='ph'>☎ (704) 233-4899</div>
+  <div class='ad'><a href='https://www.usbonding.net/' rel='nofollow noopener'>usbonding.net</a></div>
+</div><div class="agent">
+  <div class="an">Crosby Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(66 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">804 S Garnett St Suite E, Henderson, NC 27536, USA</div>
+  <div class='ph'>☎ (919) 603-8705</div>
+  <div class='ad'><a href='http://www.crosbybonding.com/' rel='nofollow noopener'>crosbybonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Bail Lady Bonding and Recovery</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(48 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">246 Church St NE, Concord, NC 28025, USA</div>
+  <div class='ph'>☎ (704) 713-1296</div>
+  <div class='ad'><a href='https://thebaillady.com/' rel='nofollow noopener'>thebaillady.com</a></div>
+</div><div class="agent">
+  <div class="an">Andre Day's Bail Bonding Services</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">600 E 8th St, Scotland Neck, NC 27874, USA</div>
+  <div class='ph'>☎ (252) 826-0413</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Bertie County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Bertie County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Bertie County?</summary><p>Contact the Bertie County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.05904, -76.96236], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":36.124425599999995,"lng":-77.4152757,"label":"<strong>Andre Day's Bail Bonding Services</strong><br>\u2605 5 (2 reviews)<br>\u260e (252) 826-0413"},{"lat":34.9815724,"lng":-80.47045539999999,"label":"<strong>U.S. Bonding Co.</strong><br>\u2605 5 (69 reviews)<br>\u260e (704) 233-4899"},{"lat":36.3229708,"lng":-78.40946799999999,"label":"<strong>Crosby Bail Bonding</strong><br>\u2605 4.9 (66 reviews)<br>\u260e (919) 603-8705"},{"lat":35.417679899999996,"lng":-80.5871337,"label":"<strong>Bail Lady Bonding and Recovery</strong><br>\u2605 5 (48 reviews)<br>\u260e (704) 713-1296"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

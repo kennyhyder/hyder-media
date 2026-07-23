@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ok/agents/">all licensed agents in Oklahoma</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Caddo County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Andrew's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">511 SW C Ave Ste 3, Lawton, OK 73501, USA</div>
+  <div class='ph'>☎ (910) 494-7919</div>
+  <div class='ad'><a href='https://www.lawtonbailbonds.com/' rel='nofollow noopener'>lawtonbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Chase Pletcher Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">309 E Rogers St, El Reno, OK 73036, USA</div>
+  <div class='ph'>☎ (405) 982-3888</div>
+  <div class='ad'><a href='http://pletcherbailbondspurcell.com/' rel='nofollow noopener'>pletcherbailbondspurcell.com</a></div>
+</div><div class="agent">
+  <div class="an">Doc's Bail Bonds of Oklahoma</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3909 SE 29th St, Del City, OK 73115, USA</div>
+  <div class='ph'>☎ (405) 474-4213</div>
+  <div class='ad'><a href='https://docsbailbondsofok.com/' rel='nofollow noopener'>docsbailbondsofok.com</a></div>
+</div><div class="agent">
+  <div class="an">Roy's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(7 reviews)</span></div>
+  <div class="ad">117 N Bickford Ave, El Reno, OK 73036, USA</div>
+  
+  
+</div><div class="agent">
+  <div class="an">Free At Last Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.3</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4309, 607 SW C Ave Suite 2, Lawton, OK 73501, USA</div>
+  <div class='ph'>☎ (580) 699-2663</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Caddo County?</summary><p>Bail bond premiums in Oklahoma typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Caddo County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Caddo County?</summary><p>Contact the Caddo County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.16792, -98.38105], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":34.6054789,"lng":-98.3959371,"label":"<strong>Andrew's Bail Bonds</strong><br>\u2605 5 (14 reviews)<br>\u260e (910) 494-7919"},{"lat":35.533784100000005,"lng":-97.9539248,"label":"<strong>Roy's Bail Bonds</strong><br>\u2605 4.4 (7 reviews)"},{"lat":34.6054702,"lng":-98.3973075,"label":"<strong>Free At Last Bail Bonds</strong><br>\u2605 4.3 (6 reviews)<br>\u260e (580) 699-2663"},{"lat":35.4358654,"lng":-97.4476945,"label":"<strong>Doc's Bail Bonds of Oklahoma</strong><br>\u2605 5 (8 reviews)<br>\u260e (405) 474-4213"},{"lat":35.535179899999996,"lng":-97.9512362,"label":"<strong>Chase Pletcher Bail Bonds</strong><br>\u2605 4.9 (14 reviews)<br>\u260e (405) 982-3888"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

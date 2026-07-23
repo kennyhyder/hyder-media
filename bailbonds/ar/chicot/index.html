@@ -105,6 +105,51 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ar/agents/">all licensed agents in Arkansas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Chicot County</h2>
+  <p class="sub">6 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Bryce's Bail Bonding, Inc. &amp; JE Bonding, Inc.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1005 S 9th St, Heber Springs, AR 72543, USA</div>
+  <div class='ph'>☎ (501) 362-8134</div>
+  <div class='ad'><a href='http://www.bailbondshebersprings.com/' rel='nofollow noopener'>bailbondshebersprings.com</a></div>
+</div><div class="agent">
+  <div class="an">Norris Bonding Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">1813 E Alexander St, Greenville, MS 38703, USA</div>
+  <div class='ph'>☎ (662) 334-1119</div>
+  
+</div><div class="agent">
+  <div class="an">Summitt Benny</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">170 Farmer Dr, Hamburg, AR 71646, USA</div>
+  <div class='ph'>☎ (870) 853-8698</div>
+  
+</div><div class="agent">
+  <div class="an">B &amp; B Bail Bonds Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(3 reviews)</span></div>
+  <div class="ad">853 Percy St, Greenville, MS 38701, USA</div>
+  <div class='ph'>☎ (662) 334-1222</div>
+  
+</div><div class="agent">
+  <div class="an">C M Davis Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">605 Washington Ave, Greenville, MS 38701, USA</div>
+  <div class='ph'>☎ (662) 335-9500</div>
+  
+</div><div class="agent">
+  <div class="an">Exit Bail Bond Co Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">Nashville, AR 71852, USA</div>
+  <div class='ph'>☎ (870) 845-5000</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Chicot County?</summary><p>Bail bond premiums in Arkansas typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Chicot County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Chicot County?</summary><p>Contact the Chicot County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.26714, -91.29716], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":33.4031142,"lng":-91.0578389,"label":"<strong>B &amp; B Bail Bonds Inc</strong><br>\u2605 3.7 (3 reviews)<br>\u260e (662) 334-1222"},{"lat":33.208467,"lng":-91.82807,"label":"<strong>Summitt Benny</strong><br>\u2605 3.5 (4 reviews)<br>\u260e (870) 853-8698"},{"lat":33.406149899999996,"lng":-91.029692,"label":"<strong>Norris Bonding Co</strong><br>\u2605 3.5 (6 reviews)<br>\u260e (662) 334-1119"},{"lat":33.409897199999996,"lng":-91.05865089999999,"label":"<strong>C M Davis Bail Bonding</strong><br>\u2605 4 (2 reviews)<br>\u260e (662) 335-9500"},{"lat":35.482651,"lng":-92.0393739,"label":"<strong>Bryce's Bail Bonding, Inc. &amp; JE Bonding, Inc.</strong><br>\u2605 4.5 (8 reviews)<br>\u260e (501) 362-8134"},{"lat":33.9456692,"lng":-93.847129,"label":"<strong>Exit Bail Bond Co Inc</strong><br>\u2605 5 (1 reviews)<br>\u260e (870) 845-5000"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

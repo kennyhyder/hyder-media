@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ia/agents/">all licensed agents in Iowa</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Osceola County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Bail 2 GO Kissimmee - Osceola County Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(370 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">120 Simpson Rd Ste A, Kissimmee, FL 34744, USA</div>
+  <div class='ph'>☎ (407) 483-7983</div>
+  <div class='ad'><a href='https://bail2go.com/locations/kissimmee-bail-bonds/' rel='nofollow noopener'>bail2go.com</a></div>
+</div><div class="agent">
+  <div class="an">Custom Solution Investigations and Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(33 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">212 N Howard St, Indianola, IA 50125, USA</div>
+  <div class='ph'>☎ (515) 961-0033</div>
+  <div class='ad'><a href='http://www.csi-ia.com/' rel='nofollow noopener'>csi-ia.com</a></div>
+</div><div class="agent">
+  <div class="an">AAAA Freebird</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">517 E Clay St, Osceola, IA 50213, USA</div>
+  <div class='ph'>☎ (641) 342-8888</div>
+  
+</div><div class="agent">
+  <div class="an">AAA Freedom Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">302 N Grant St, Everly, IA 51338, USA</div>
+  <div class='ph'>☎ (712) 834-2978</div>
+  
+</div><div class="agent">
+  <div class="an">Federman Bonding Co</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">955 2nd Ave W, Sibley, IA 51249, USA</div>
+  <div class='ph'>☎ (712) 754-2211</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Osceola County?</summary><p>Bail bond premiums in Iowa typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Osceola County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Osceola County?</summary><p>Contact the Osceola County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([43.37854, -95.63379], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.361788999999995,"lng":-93.560729,"label":"<strong>Custom Solution Investigations and Bail Bonds</strong><br>\u2605 4.4 (33 reviews)<br>\u260e (515) 961-0033"},{"lat":41.037934299999996,"lng":-93.75720749999999,"label":"<strong>AAAA Freebird</strong><br>\u2605 5 (1 reviews)<br>\u260e (641) 342-8888"},{"lat":28.288041699999997,"lng":-81.3547451,"label":"<strong>Bail 2 GO Kissimmee - Osceola County Bail Bonds</strong><br>\u2605 4.7 (370 reviews)<br>\u260e (407) 483-7983"},{"lat":43.398816,"lng":-95.75232319999999,"label":"<strong>Federman Bonding Co</strong><br>\u260e (712) 754-2211"},{"lat":43.1607731,"lng":-95.3315039,"label":"<strong>AAA Freedom Bail Bonds</strong><br>\u2605 1 (1 reviews)<br>\u260e (712) 834-2978"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

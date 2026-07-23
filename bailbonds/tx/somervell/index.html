@@ -117,6 +117,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Somervell County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Vaughn’s Erath Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(44 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1029 Glen Rose Rd, Stephenville, TX 76401, USA</div>
+  <div class='ph'>☎ (254) 227-5552</div>
+  <div class='ad'><a href='https://www.vaughnsbailbonds.com/erath' rel='nofollow noopener'>vaughnsbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">E-Z Out Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(24 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">201 S Morgan St, Granbury, TX 76048, USA</div>
+  <div class='ph'>☎ (817) 573-3353</div>
+  <div class='ad'><a href='https://hoodcounty.texas.gov/business_detail_T15_R44.php' rel='nofollow noopener'>hoodcounty.texas.gov</a></div>
+</div><div class="agent">
+  <div class="an">Aces Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(21 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1514 Crossland Rd, Granbury, TX 76048, USA</div>
+  <div class='ph'>☎ (817) 573-0228</div>
+  
+</div><div class="agent">
+  <div class="an">Hood County Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(17 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1105 W Pearl St, Granbury, TX 76048, USA</div>
+  <div class='ph'>☎ (817) 243-0341</div>
+  <div class='ad'><a href='https://hoodcountybailbonds.com/' rel='nofollow noopener'>hoodcountybailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">All American Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">Glen Rose, TX 76043, USA</div>
+  <div class='ph'>☎ (254) 897-7272</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Somervell County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Somervell County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Somervell County?</summary><p>Contact the Somervell County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +180,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.21807, -97.76922], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":32.2346356,"lng":-97.7552753,"label":"<strong>All American Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (254) 897-7272"},{"lat":32.4412525,"lng":-97.79403710000001,"label":"<strong>E-Z Out Bail Bonds</strong><br>\u2605 4.7 (24 reviews)<br>\u260e (817) 573-3353"},{"lat":32.445440399999995,"lng":-97.8057201,"label":"<strong>Aces Bail Bonds</strong><br>\u2605 4.7 (21 reviews)<br>\u260e (817) 573-0228"},{"lat":32.442138199999995,"lng":-97.79947609999999,"label":"<strong>Hood County Bail Bonds</strong><br>\u2605 4.9 (17 reviews)<br>\u260e (817) 243-0341"},{"lat":32.2120958,"lng":-98.1891995,"label":"<strong>Vaughn\u2019s Erath Bail Bonds</strong><br>\u2605 5 (44 reviews)<br>\u260e (254) 227-5552"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -117,6 +117,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — San Patricio County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">A-1 Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">100 E Main St, Sinton, TX 78387, USA</div>
+  <div class='ph'>☎ (361) 364-2264</div>
+  
+</div><div class="agent">
+  <div class="an">Eddie's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">208 N Rachal Ave, Sinton, TX 78387, USA</div>
+  <div class='ph'>☎ (361) 364-5595</div>
+  
+</div><div class="agent">
+  <div class="an">A&amp;A Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">123 N Vineyard Ave, Sinton, TX 78387, USA</div>
+  <div class='ph'>☎ (361) 364-2663</div>
+  <div class='ad'><a href='https://www.aabailbonds.net/' rel='nofollow noopener'>aabailbonds.net</a></div>
+</div><div class="agent">
+  <div class="an">Sinton Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 2</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">512 Short St, Sinton, TX 78387, USA</div>
+  <div class='ph'>☎ (361) 364-5554</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in San Patricio County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in San Patricio County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in San Patricio County?</summary><p>Contact the San Patricio County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([28.01179, -97.51716], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":28.038217999999997,"lng":-97.51030850000001,"label":"<strong>Eddie's Bail Bonds</strong><br>\u2605 4 (2 reviews)<br>\u260e (361) 364-5595"},{"lat":28.037591799999998,"lng":-97.5094877,"label":"<strong>A&amp;A Bail Bonds</strong><br>\u2605 5 (2 reviews)<br>\u260e (361) 364-2663"},{"lat":28.0402286,"lng":-97.51021890000001,"label":"<strong>A-1 Bail Bonds</strong><br>\u2605 5 (6 reviews)<br>\u260e (361) 364-2264"},{"lat":28.031703,"lng":-97.5159089,"label":"<strong>Sinton Bail Bonds</strong><br>\u2605 2 (1 reviews)<br>\u260e (361) 364-5554"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

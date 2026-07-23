@@ -105,6 +105,51 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/pa/agents/">all licensed agents in Pennsylvania</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Westmoreland County</h2>
+  <p class="sub">6 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Smittle Bail Bond</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.6</span> <span class='sub'>(10 reviews)</span></div>
+  <div class="ad">731 Church St, New Kensington, PA 15068, USA</div>
+  <div class='ph'>☎ (724) 335-0706</div>
+  
+</div><div class="agent">
+  <div class="an">Mirolli Nicholas</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.5</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">Greensburg, PA 15601, USA</div>
+  <div class='ph'>☎ (724) 837-9736</div>
+  
+</div><div class="agent">
+  <div class="an">Bruce Null Bail Bond Agency</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">Greensburg, PA 15601, USA</div>
+  <div class='ph'>☎ (724) 836-6404</div>
+  
+</div><div class="agent">
+  <div class="an">All City Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">116 E Pittsburgh St, Greensburg, PA 15601, USA</div>
+  <div class='ph'>☎ (724) 216-5583</div>
+  <div class='ad'><a href='http://quicksigners.net/' rel='nofollow noopener'>quicksigners.net</a></div>
+</div><div class="agent">
+  <div class="an">Cutting Edge Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">5461 Lincoln Hwy, Jeannette, PA 15644, USA</div>
+  <div class='ph'>☎ (724) 296-8077</div>
+  
+</div><div class="agent">
+  <div class="an">Mike Villi Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">418 Tremont Ave, Greensburg, PA 15601, USA</div>
+  <div class='ph'>☎ (724) 838-1173</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Westmoreland County?</summary><p>Bail bond premiums in Pennsylvania typically run 5-10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $500 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Westmoreland County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Westmoreland County?</summary><p>Contact the Westmoreland County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.31107, -79.46669], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":40.302743,"lng":-79.54159589999999,"label":"<strong>All City Bail Bonds</strong><br>\u2605 1 (1 reviews)<br>\u260e (724) 216-5583"},{"lat":40.3014581,"lng":-79.5389289,"label":"<strong>Mirolli Nicholas</strong><br>\u2605 3.5 (4 reviews)<br>\u260e (724) 837-9736"},{"lat":40.298505299999995,"lng":-79.5373145,"label":"<strong>Mike Villi Bail Bonds</strong><br>\u260e (724) 838-1173"},{"lat":40.3014581,"lng":-79.5389289,"label":"<strong>Bruce Null Bail Bond Agency</strong><br>\u2605 4 (4 reviews)<br>\u260e (724) 836-6404"},{"lat":40.5542732,"lng":-79.75940899999999,"label":"<strong>Smittle Bail Bond</strong><br>\u2605 3.6 (10 reviews)<br>\u260e (724) 335-0706"},{"lat":40.3105909,"lng":-79.613334,"label":"<strong>Cutting Edge Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (724) 296-8077"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

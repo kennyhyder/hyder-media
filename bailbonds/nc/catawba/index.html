@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Catawba County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Any Second Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(84 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">125 E Plaza Dr Ste 118, Mooresville, NC 28115, USA</div>
+  <div class='ph'>☎ (704) 657-8800</div>
+  <div class='ad'><a href='https://www.anysecondbailbondingmooresville.com/' rel='nofollow noopener'>anysecondbailbondingmooresville.com</a></div>
+</div><div class="agent">
+  <div class="an">Champion Bail Bonding Solutions</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(63 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">6047 Tyvola Glen Cir Ste 214 B, Charlotte, NC 28217, USA</div>
+  <div class='ph'>☎ (980) 384-6630</div>
+  <div class='ad'><a href='http://www.championbailbonding.com/' rel='nofollow noopener'>championbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Doc Bail Bonding LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(54 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">248 N Center St, Statesville, NC 28677, USA</div>
+  <div class='ph'>☎ (704) 902-1152</div>
+  <div class='ad'><a href='http://www.docbailbonding.com/' rel='nofollow noopener'>docbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Steve's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(34 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">108 S Gaston St, Dallas, NC 28034, USA</div>
+  <div class='ph'>☎ (704) 864-8600</div>
+  <div class='ad'><a href='http://www.stevesbailbonds.com/' rel='nofollow noopener'>stevesbailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Catawba County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Catawba County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Catawba County?</summary><p>Contact the Catawba County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.66188, -81.21491], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.1641683,"lng":-80.8922108,"label":"<strong>Champion Bail Bonding Solutions</strong><br>\u2605 4.9 (63 reviews)<br>\u260e (980) 384-6630"},{"lat":35.58985,"lng":-80.8358339,"label":"<strong>Any Second Bail Bonding</strong><br>\u2605 5 (84 reviews)<br>\u260e (704) 657-8800"},{"lat":35.7877124,"lng":-80.889577,"label":"<strong>Doc Bail Bonding LLC</strong><br>\u2605 4.4 (54 reviews)<br>\u260e (704) 902-1152"},{"lat":35.3149754,"lng":-81.17577829999999,"label":"<strong>Steve's Bail Bonds</strong><br>\u2605 4.8 (34 reviews)<br>\u260e (704) 864-8600"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

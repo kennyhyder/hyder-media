@@ -105,6 +105,51 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/md/agents/">all licensed agents in Maryland</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Allegany County</h2>
+  <p class="sub">6 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Honest John's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">70 Pershing St, Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 729-1001</div>
+  
+</div><div class="agent">
+  <div class="an">2nd Chance Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 2</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">203 Baltimore St, Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 777-3733</div>
+  
+</div><div class="agent">
+  <div class="an">A Regional Bonding Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 722-0515</div>
+  <div class='ad'><a href='https://regionalbonding.com/' rel='nofollow noopener'>regionalbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">A Aarc Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">14726 Watson St SW, Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 729-3939</div>
+  
+</div><div class="agent">
+  <div class="an">District Court Commissioner</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">123 S Liberty St #2, Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 723-3150</div>
+  <div class='ad'><a href='http://www.courts.state.md.us/' rel='nofollow noopener'>courts.state.md.us</a></div>
+</div><div class="agent">
+  <div class="an">Jim Frank Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">24 N Centre St, Cumberland, MD 21502, USA</div>
+  <div class='ph'>☎ (301) 777-5080</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Allegany County?</summary><p>Bail bond premiums in Maryland typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Allegany County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Allegany County?</summary><p>Contact the Allegany County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +174,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.61231, -78.7031], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":39.6528622,"lng":-78.76251400000001,"label":"<strong>A Regional Bonding Co</strong><br>\u2605 5 (1 reviews)<br>\u260e (301) 722-0515"},{"lat":39.5930123,"lng":-78.8421836,"label":"<strong>A Aarc Bail Bonds</strong><br>\u260e (301) 729-3939"},{"lat":39.650891099999996,"lng":-78.76170189999999,"label":"<strong>Honest John's Bail Bonds</strong><br>\u2605 3 (4 reviews)<br>\u260e (301) 729-1001"},{"lat":39.6503259,"lng":-78.7615228,"label":"<strong>District Court Commissioner</strong><br>\u260e (301) 723-3150"},{"lat":39.652144899999996,"lng":-78.7616741,"label":"<strong>Jim Frank Bail Bonds</strong><br>\u260e (301) 777-5080"},{"lat":39.6521766,"lng":-78.75828469999999,"label":"<strong>2nd Chance Bail Bonds</strong><br>\u2605 2 (2 reviews)<br>\u260e (301) 777-3733"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

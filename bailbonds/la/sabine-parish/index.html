@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/la/agents/">all licensed agents in Louisiana</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Sabine Parish</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Nikki Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(31 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">345 TX-63, Jasper, TX 75951, USA</div>
+  <div class='ph'>☎ (409) 384-1136</div>
+  
+</div><div class="agent">
+  <div class="an">Bee Quick Bail Bondsman</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(6 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">940 San Antonio Ave, Many, LA 71449, USA</div>
+  <div class='ph'>☎ (318) 609-3882</div>
+  <div class='ad'><a href='https://www.facebook.com/Bee-Quick-Bail-Bonds-109165340701660/' rel='nofollow noopener'>facebook.com</a></div>
+</div><div class="agent">
+  <div class="an">Easy 1 Bail Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(4 reviews)</span></div>
+  <div class="ad">78 Lovelady Dr, Many, LA 71449, USA</div>
+  <div class='ph'>☎ (318) 590-2140</div>
+  
+</div><div class="agent">
+  <div class="an">Park Chop's Bail Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">316 Yokum Dr, Many, LA 71449, USA</div>
+  <div class='ph'>☎ (318) 256-5757</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Sabine Parish?</summary><p>Bail bond premiums in Louisiana typically run 12% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,200 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Sabine Parish?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Sabine Parish?</summary><p>Contact the Sabine Parish sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.5604, -93.55958], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":31.6181101,"lng":-93.4704065,"label":"<strong>Park Chop's Bail Bonds LLC</strong><br>\u2605 1 (1 reviews)<br>\u260e (318) 256-5757"},{"lat":31.5681595,"lng":-93.4823715,"label":"<strong>Bee Quick Bail Bondsman</strong><br>\u2605 4 (6 reviews)<br>\u260e (318) 609-3882"},{"lat":31.4964123,"lng":-93.6693495,"label":"<strong>Easy 1 Bail Bonds LLC</strong><br>\u2605 3 (4 reviews)<br>\u260e (318) 590-2140"},{"lat":30.904224600000003,"lng":-94.02338320000001,"label":"<strong>Nikki Bail Bonds</strong><br>\u2605 4.5 (31 reviews)<br>\u260e (409) 384-1136"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

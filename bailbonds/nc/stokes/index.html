@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Stokes County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Free U Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(58 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">421 Eugene Ct, Greensboro, NC 27401, USA</div>
+  <div class='ph'>☎ (336) 333-0088</div>
+  <div class='ad'><a href='http://www.freeubailbondsnc.com/' rel='nofollow noopener'>freeubailbondsnc.com</a></div>
+</div><div class="agent">
+  <div class="an">North Carolina Bail Agents Association</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(42 reviews)</span></div>
+  <div class="ad">1220 Eastchester Dr #104, High Point, NC 27265, USA</div>
+  <div class='ph'>☎ (919) 832-0867</div>
+  <div class='ad'><a href='https://www.ncbaa.com/' rel='nofollow noopener'>ncbaa.com</a></div>
+</div><div class="agent">
+  <div class="an">Around The Clock Bail Bonds Winston-Salem</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(37 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4623 Ogburn Ave, Winston-Salem, NC 27105, USA</div>
+  <div class='ph'>☎ (336) 924-7055</div>
+  <div class='ad'><a href='https://aroundtheclockbailbond.com/service-area/bail-bonds-winston-salem-nc/' rel='nofollow noopener'>aroundtheclockbailbond.com</a></div>
+</div><div class="agent">
+  <div class="an">Smith &amp; Son Bailbonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(19 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">705 E Sprague St, Winston-Salem, NC 27107, USA</div>
+  <div class='ph'>☎ (336) 712-6618</div>
+  <div class='ad'><a href='http://www.winstonsalembailbondsnc.com/' rel='nofollow noopener'>winstonsalembailbondsnc.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Stokes County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Stokes County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Stokes County?</summary><p>Contact the Stokes County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.3938, -80.26992], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":36.069221,"lng":-80.24945629999999,"label":"<strong>Smith &amp; Son Bailbonds</strong><br>\u2605 4.8 (19 reviews)<br>\u260e (336) 712-6618"},{"lat":35.9950562,"lng":-79.994641,"label":"<strong>North Carolina Bail Agents Association</strong><br>\u2605 4.9 (42 reviews)<br>\u260e (919) 832-0867"},{"lat":36.0682402,"lng":-79.7940717,"label":"<strong>Free U Bail Bonds</strong><br>\u2605 4.7 (58 reviews)<br>\u260e (336) 333-0088"},{"lat":36.1593715,"lng":-80.2360542,"label":"<strong>Around The Clock Bail Bonds Winston-Salem</strong><br>\u2605 4.6 (37 reviews)<br>\u260e (336) 924-7055"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Camden County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Off the Hook Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.8</span> <span class='sub'>(58 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">106 N Water St #103, Wilmington, NC 28401, USA</div>
+  <div class='ph'>☎ (910) 232-3401</div>
+  <div class='ad'><a href='http://offthehookbail.com/' rel='nofollow noopener'>offthehookbail.com</a></div>
+</div><div class="agent">
+  <div class="an">All American Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(23 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">709 Princess St, Wilmington, NC 28401, USA</div>
+  <div class='ph'>☎ (910) 675-2828</div>
+  <div class='ad'><a href='http://www.wilmingtonbailbonds.com/' rel='nofollow noopener'>wilmingtonbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Powell Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.7</span> <span class='sub'>(19 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3804 Juvenile Center Rd, Castle Hayne, NC 28429, USA</div>
+  <div class='ph'>☎ (910) 762-4114</div>
+  <div class='ad'><a href='https://www.powellbailbonding.com/' rel='nofollow noopener'>powellbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Beacon Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(19 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3972 Old Ocean Hwy Ste I, Bolivia, NC 28422, USA</div>
+  <div class='ph'>☎ (910) 547-8474</div>
+  <div class='ad'><a href='http://beaconbailbonding.com/' rel='nofollow noopener'>beaconbailbonding.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Camden County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Camden County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Camden County?</summary><p>Contact the Camden County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.34234, -76.16249], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":34.3194957,"lng":-77.8909206,"label":"<strong>Powell Bail Bonding</strong><br>\u2605 4.7 (19 reviews)<br>\u260e (910) 762-4114"},{"lat":34.236469299999996,"lng":-77.9464764,"label":"<strong>All American Bail Bonding</strong><br>\u2605 4.7 (23 reviews)<br>\u260e (910) 675-2828"},{"lat":34.2371529,"lng":-77.9499925,"label":"<strong>Off the Hook Bail Bonds</strong><br>\u2605 4.8 (58 reviews)<br>\u260e (910) 232-3401"},{"lat":34.0691002,"lng":-78.14657580000001,"label":"<strong>Beacon Bail Bonding</strong><br>\u2605 4.4 (19 reviews)<br>\u260e (910) 547-8474"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

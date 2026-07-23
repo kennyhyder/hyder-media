@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/oh/agents/">all licensed agents in Ohio</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Geauga County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Zero Down Bailbonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(263 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1200 W 3rd St, Cleveland, OH 44113, USA</div>
+  <div class='ph'>☎ (216) 385-8278</div>
+  
+</div><div class="agent">
+  <div class="an">Family First Bail Bonds - Portage County Ohio</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(62 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">110 N Chestnut St Suite U-2, Ravenna, OH 44266, USA</div>
+  <div class='ph'>☎ (234) 703-1045</div>
+  <div class='ad'><a href='https://www.familyfirstbonding.com/locations/portage-county-ravenna-ohio' rel='nofollow noopener'>familyfirstbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Zero Down Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(59 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">9805 Denison Ave, Cleveland, OH 44102, USA</div>
+  <div class='ph'>☎ (216) 393-7911</div>
+  <div class='ad'><a href='http://www.23down.com/' rel='nofollow noopener'>23down.com</a></div>
+</div><div class="agent">
+  <div class="an">Cleveland Bail Bonds LLC</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(42 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">815 Superior Ave Ste 610, Cleveland, OH 44114, USA</div>
+  <div class='ph'>☎ (216) 424-2663</div>
+  <div class='ad'><a href='https://www.clevelandohbailbonds.com/' rel='nofollow noopener'>clevelandohbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Sly Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">2490 Lee Blvd #211, Cleveland Heights, OH 44118, USA</div>
+  <div class='ph'>☎ (216) 348-0200</div>
+  <div class='ad'><a href='https://www.slybailbonds.com/ohio-bail-bonds-office-locations/cleveland-bail-bonds/' rel='nofollow noopener'>slybailbonds.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Geauga County?</summary><p>Bail bond premiums in Ohio typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Geauga County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Geauga County?</summary><p>Contact the Geauga County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.49932, -81.17351], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.1580352,"lng":-81.2430328,"label":"<strong>Family First Bail Bonds - Portage County Ohio</strong><br>\u2605 4.9 (62 reviews)<br>\u260e (234) 703-1045"},{"lat":41.5023438,"lng":-81.68946729999999,"label":"<strong>Cleveland Bail Bonds LLC</strong><br>\u2605 5 (42 reviews)<br>\u260e (216) 424-2663"},{"lat":41.5161465,"lng":-81.5697193,"label":"<strong>Sly Bail Bonds</strong><br>\u2605 4 (4 reviews)<br>\u260e (216) 348-0200"},{"lat":41.501563399999995,"lng":-81.6985706,"label":"<strong>Zero Down Bailbonds</strong><br>\u2605 5 (263 reviews)<br>\u260e (216) 385-8278"},{"lat":41.4657123,"lng":-81.75133579999999,"label":"<strong>Zero Down Bail Bonds</strong><br>\u2605 4.2 (59 reviews)<br>\u260e (216) 393-7911"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Greene County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">1st &amp; 10 Bail Bonding LLC - Greenville</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(435 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">209 Evans St C, Greenville, NC 27858, USA</div>
+  <div class='ph'>☎ (252) 378-0384</div>
+  <div class='ad'><a href='https://jrbailbonding.com/?y_source=1_MjMwMDM3MjQtNzE1LWxvY2F0aW9uLndlYnNpdGU%3D' rel='nofollow noopener'>jrbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Ready and Willing Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(82 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">416 S Eugene Ct Ste B, Greensboro, NC 27401, USA</div>
+  <div class='ph'>☎ (336) 601-6850</div>
+  <div class='ad'><a href='https://readyandwillingbailbonding.com/' rel='nofollow noopener'>readyandwillingbailbonding.com</a></div>
+</div><div class="agent">
+  <div class="an">Integrity Bail Bonding Company, Inc.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(19 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">803C E Main St, Havelock, NC 28532, USA</div>
+  <div class='ph'>☎ (252) 444-6226</div>
+  <div class='ad'><a href='http://www.integritybail.com/' rel='nofollow noopener'>integritybail.com</a></div>
+</div><div class="agent">
+  <div class="an">iBail Bonding Company</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(5 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3005 S Memorial Dr, Greenville, NC 27834, USA</div>
+  <div class='ph'>☎ (252) 916-4977</div>
+  
+</div><div class="agent">
+  <div class="an">Jb's Bail Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">Snow Hill, NC 28580, USA</div>
+  
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Greene County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Greene County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Greene County?</summary><p>Contact the Greene County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.48196, -77.68169], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.4551729,"lng":-77.6704546,"label":"<strong>Jb's Bail Bonding</strong><br>\u2605 5 (1 reviews)"},{"lat":34.866594,"lng":-76.898935,"label":"<strong>Integrity Bail Bonding Company, Inc.</strong><br>\u2605 4.5 (19 reviews)<br>\u260e (252) 444-6226"},{"lat":36.0683156,"lng":-79.79455589999999,"label":"<strong>Ready and Willing Bail Bonding</strong><br>\u2605 4.9 (82 reviews)<br>\u260e (336) 601-6850"},{"lat":35.5807439,"lng":-77.3964465,"label":"<strong>iBail Bonding Company</strong><br>\u2605 4.2 (5 reviews)<br>\u260e (252) 916-4977"},{"lat":35.613819,"lng":-77.3721906,"label":"<strong>1st &amp; 10 Bail Bonding LLC - Greenville</strong><br>\u2605 5 (435 reviews)<br>\u260e (252) 378-0384"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

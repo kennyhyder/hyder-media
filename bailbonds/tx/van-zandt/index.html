@@ -117,6 +117,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Van Zandt County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Angry Bird Bail Bonds-Van</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1.7</span> <span class='sub'>(3 reviews)</span></div>
+  <div class="ad">Edgewood, TX 75117, USA</div>
+  <div class='ph'>☎ (903) 896-2500</div>
+  
+</div><div class="agent">
+  <div class="an">Taylor Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">Canton, TX 75103, USA</div>
+  <div class='ph'>☎ (903) 567-1599</div>
+  
+</div><div class="agent">
+  <div class="an">Aa-Adair Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">390 W Dallas St, Canton, TX 75103, USA</div>
+  <div class='ph'>☎ (903) 677-1800</div>
+  
+</div><div class="agent">
+  <div class="an">ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">195 Athens St, Canton, TX 75103, USA</div>
+  <div class='ph'>☎ (903) 567-0570</div>
+  <div class='ad'><a href='https://www.abcbail.com/' rel='nofollow noopener'>abcbail.com</a></div>
+</div><div class="agent">
+  <div class="an">Aaaaggie Bail Bond</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">195 Athens St, Canton, TX 75103, USA</div>
+  <div class='ph'>☎ (903) 567-0875</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Van Zandt County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Van Zandt County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Van Zandt County?</summary><p>Contact the Van Zandt County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +180,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.55879, -95.83691], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":32.5569977,"lng":-95.8651646,"label":"<strong>Aa-Adair Bail Bonds</strong><br>\u2605 3 (1 reviews)<br>\u260e (903) 677-1800"},{"lat":32.6982122,"lng":-95.885154,"label":"<strong>Angry Bird Bail Bonds-Van</strong><br>\u2605 1.7 (3 reviews)<br>\u260e (903) 896-2500"},{"lat":32.556283,"lng":-95.8649583,"label":"<strong>Aaaaggie Bail Bond</strong><br>\u260e (903) 567-0875"},{"lat":32.556283,"lng":-95.8649583,"label":"<strong>ABC Bail Bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (903) 567-0570"},{"lat":32.5565244,"lng":-95.86329959999999,"label":"<strong>Taylor Bail Bonds</strong><br>\u2605 5 (2 reviews)<br>\u260e (903) 567-1599"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

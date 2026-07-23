@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/la/agents/">all licensed agents in Louisiana</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Vermilion Parish</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Set U Free Bail Bonds Inc.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(25 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">Chase Tower, 600 Jefferson St Ste 515, Lafayette, LA 70501, USA</div>
+  <div class='ph'>☎ (337) 706-7657</div>
+  
+</div><div class="agent">
+  <div class="an">Cut Rate Bail Bonds Lafayette</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(11 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">303 W Main St, Lafayette, LA 70501, USA</div>
+  <div class='ph'>☎ (337) 233-9696</div>
+  <div class='ad'><a href='http://cutratebailbonds.net/' rel='nofollow noopener'>cutratebailbonds.net</a></div>
+</div><div class="agent">
+  <div class="an">Jr's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1103 Lee Ave, Lafayette, LA 70501, USA</div>
+  <div class='ph'>☎ (337) 962-2035</div>
+  
+</div><div class="agent">
+  <div class="an">Cut Rate Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(2 reviews)</span></div>
+  <div class="ad">Abbeville, LA 70510, USA</div>
+  <div class='ph'>☎ (337) 893-5313</div>
+  
+</div><div class="agent">
+  <div class="an">Gaspard Bail Bonding Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">3148 Pine St, Abbeville, LA 70510, USA</div>
+  <div class='ph'>☎ (337) 898-8679</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Vermilion Parish?</summary><p>Bail bond premiums in Louisiana typically run 12% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,200 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Vermilion Parish?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Vermilion Parish?</summary><p>Contact the Vermilion Parish sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.80664, -92.32139], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":30.222799900000002,"lng":-92.0209606,"label":"<strong>Cut Rate Bail Bonds Lafayette</strong><br>\u2605 4.6 (11 reviews)<br>\u260e (337) 233-9696"},{"lat":30.2202094,"lng":-92.019021,"label":"<strong>Jr's Bail Bonds</strong><br>\u2605 5 (2 reviews)<br>\u260e (337) 962-2035"},{"lat":29.9680838,"lng":-92.0906543,"label":"<strong>Gaspard Bail Bonding Inc</strong><br>\u2605 5 (1 reviews)<br>\u260e (337) 898-8679"},{"lat":30.223386200000004,"lng":-92.0191084,"label":"<strong>Set U Free Bail Bonds Inc.</strong><br>\u2605 4.2 (25 reviews)<br>\u260e (337) 706-7657"},{"lat":29.9746502,"lng":-92.13429210000001,"label":"<strong>Cut Rate Bail Bonds</strong><br>\u2605 1 (2 reviews)<br>\u260e (337) 893-5313"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/pa/agents/">all licensed agents in Pennsylvania</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Lackawanna County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Smith Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.8</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">35 Water St Near Prison, Closest Bondsman to Prison, Wilkes-Barre, PA 18702, USA</div>
+  <div class='ph'>☎ (570) 823-3113</div>
+  
+</div><div class="agent">
+  <div class="an">10 Minute Bail</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.3</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">405 N River St Ste 1, Wilkes-Barre, PA 18702, USA</div>
+  <div class='ph'>☎ (570) 466-2565</div>
+  
+</div><div class="agent">
+  <div class="an">Quick and easy Bail bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">619 E Drinker St, Dunmore, PA 18512, USA</div>
+  <div class='ph'>☎ (570) 770-1508</div>
+  <div class='ad'><a href='https://quickbales.com/' rel='nofollow noopener'>quickbales.com</a></div>
+</div><div class="agent">
+  <div class="an">Diane's 24-7 Bail Bonds</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">Scranton, PA 18510, USA</div>
+  <div class='ph'>☎ (570) 963-7100</div>
+  
+</div><div class="agent">
+  <div class="an">Lackawanna County</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">201 Lackawanna Ave #311d, Scranton, PA 18503, USA</div>
+  <div class='ph'>☎ (570) 878-1021</div>
+  <div class='ad'><a href='http://www.libertybailbondspa.com/' rel='nofollow noopener'>libertybailbondspa.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Lackawanna County?</summary><p>Bail bond premiums in Pennsylvania typically run 5-10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $500 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Lackawanna County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Lackawanna County?</summary><p>Contact the Lackawanna County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.43664, -75.60877], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":41.4089229,"lng":-75.6411735,"label":"<strong>Diane's 24-7 Bail Bonds</strong><br>\u260e (570) 963-7100"},{"lat":41.419589599999995,"lng":-75.6201495,"label":"<strong>Quick and easy Bail bonds</strong><br>\u2605 5 (1 reviews)<br>\u260e (570) 770-1508"},{"lat":41.2547843,"lng":-75.8714952,"label":"<strong>10 Minute Bail</strong><br>\u2605 4.3 (4 reviews)<br>\u260e (570) 466-2565"},{"lat":41.4090667,"lng":-75.6681741,"label":"<strong>Lackawanna County</strong><br>\u260e (570) 878-1021"},{"lat":41.2531829,"lng":-75.87742,"label":"<strong>Smith Bail Bonds</strong><br>\u2605 3.8 (8 reviews)<br>\u260e (570) 823-3113"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

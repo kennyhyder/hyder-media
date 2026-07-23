@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nc/agents/">all licensed agents in North Carolina</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Cabarrus County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Access To Freedom Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(38 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4037 E Independence Blvd #502, Charlotte, NC 28205, USA</div>
+  <div class='ph'>☎ (980) 808-7949</div>
+  <div class='ad'><a href='https://accesstofreedombailbondsnc.com/' rel='nofollow noopener'>accesstofreedombailbondsnc.com</a></div>
+</div><div class="agent">
+  <div class="an">Hunter's Affordable Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3</span> <span class='sub'>(27 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">428 E 4th St #400, Charlotte, NC 28202, USA</div>
+  <div class='ph'>☎ (704) 377-3733</div>
+  <div class='ad'><a href='http://bailbondcharlottenc.com/' rel='nofollow noopener'>bailbondcharlottenc.com</a></div>
+</div><div class="agent">
+  <div class="an">A. Gray Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.8</span> <span class='sub'>(8 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">715 E 5th St #212, Charlotte, NC 28202, USA</div>
+  <div class='ph'>☎ (704) 347-2545</div>
+  <div class='ad'><a href='https://www.graybail.com/' rel='nofollow noopener'>graybail.com</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Cabarrus County?</summary><p>Bail bond premiums in North Carolina typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Cabarrus County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Cabarrus County?</summary><p>Contact the Cabarrus County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.38835, -80.55273], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":35.2007911,"lng":-80.7722183,"label":"<strong>Access To Freedom Bail Bonds</strong><br>\u2605 5 (38 reviews)<br>\u260e (980) 808-7949"},{"lat":35.2225691,"lng":-80.8351899,"label":"<strong>A. Gray Bail Bonds</strong><br>\u2605 3.8 (8 reviews)<br>\u260e (704) 347-2545"},{"lat":35.2230086,"lng":-80.84065489999999,"label":"<strong>Hunter's Affordable Bonding</strong><br>\u2605 3 (27 reviews)<br>\u260e (704) 377-3733"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ga/agents/">all licensed agents in Georgia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Webster County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">24 Bail Bonding Inc.</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(125 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">85 Zena Dr SE, Cartersville, GA 30121, USA</div>
+  <div class='ph'>☎ (770) 382-2424</div>
+  
+</div><div class="agent">
+  <div class="an">Hawk's Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(30 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">13 St Andrews Ct, Brunswick, GA 31520, USA</div>
+  <div class='ph'>☎ (912) 580-1133</div>
+  <div class='ad'><a href='http://hawksbailbonds.com/' rel='nofollow noopener'>hawksbailbonds.com</a></div>
+</div><div class="agent">
+  <div class="an">Liberty Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.8</span> <span class='sub'>(29 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">502 Gloucester St Ste 203, Brunswick, GA 31520, USA</div>
+  <div class='ph'>☎ (912) 261-8568</div>
+  <div class='ad'><a href='https://glynncountysheriff.org/resourcedirectory' rel='nofollow noopener'>glynncountysheriff.org</a></div>
+</div><div class="agent">
+  <div class="an">A Fast Bonding Co Inc</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(7 reviews)</span></div>
+  <div class="ad">299 Mc Math Mill Rd, Americus, GA 31719, USA</div>
+  <div class='ph'>☎ (229) 931-9112</div>
+  
+</div><div class="agent">
+  <div class="an">A Way Bonding Company LLC</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">958 Wall St, Richland, GA 31825, USA</div>
+  <div class='ph'>☎ (229) 321-0671</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Webster County?</summary><p>Bail bond premiums in Georgia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Webster County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Webster County?</summary><p>Contact the Webster County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.04669, -84.55383], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":34.190186,"lng":-84.782062,"label":"<strong>24 Bail Bonding Inc.</strong><br>\u2605 4.5 (125 reviews)<br>\u260e (770) 382-2424"},{"lat":32.086149999999996,"lng":-84.66716,"label":"<strong>A Way Bonding Company LLC</strong><br>\u260e (229) 321-0671"},{"lat":31.150590200000003,"lng":-81.4980686,"label":"<strong>Hawk's Bail Bonds</strong><br>\u2605 4.5 (30 reviews)<br>\u260e (912) 580-1133"},{"lat":32.0707036,"lng":-84.2724317,"label":"<strong>A Fast Bonding Co Inc</strong><br>\u2605 4.9 (7 reviews)<br>\u260e (229) 931-9112"},{"lat":31.149123000000003,"lng":-81.494552,"label":"<strong>Liberty Bail Bonds</strong><br>\u2605 3.8 (29 reviews)<br>\u260e (912) 261-8568"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

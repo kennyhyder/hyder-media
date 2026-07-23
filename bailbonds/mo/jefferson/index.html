@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/mo/agents/">all licensed agents in Missouri</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Jefferson County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Alena Malone Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(14 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">20 S Central Ave #200, Clayton, MO 63105, USA</div>
+  <div class='ph'>☎ (314) 322-0202</div>
+  
+</div><div class="agent">
+  <div class="an">Davis Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.3</span> <span class='sub'>(7 reviews)</span></div>
+  <div class="ad">8008 Carondelet Ave, St. Louis, MO 63105, USA</div>
+  <div class='ph'>☎ (314) 638-7034</div>
+  
+</div><div class="agent">
+  <div class="an">We Bail Bond</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(2 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">16024 Manchester Rd #200, Ellisville, MO 63011, USA</div>
+  <div class='ph'>☎ (636) 422-3292</div>
+  
+</div><div class="agent">
+  <div class="an">Chuck Telle Bondsman</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 5</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">630 1st Street, Hillsboro, MO 63050, USA</div>
+  <div class='ph'>☎ (636) 797-3522</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Jefferson County?</summary><p>Bail bond premiums in Missouri typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Jefferson County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Jefferson County?</summary><p>Contact the Jefferson County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.25763, -90.54368], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.2312333,"lng":-90.5664364,"label":"<strong>Chuck Telle Bondsman</strong><br>\u2605 5 (1 reviews)<br>\u260e (636) 797-3522"},{"lat":38.648927,"lng":-90.34045950000001,"label":"<strong>Davis Bail Bonds</strong><br>\u2605 3.3 (7 reviews)<br>\u260e (314) 638-7034"},{"lat":38.5907385,"lng":-90.59263609999999,"label":"<strong>We Bail Bond</strong><br>\u2605 5 (2 reviews)<br>\u260e (636) 422-3292"},{"lat":38.649659,"lng":-90.33814699999999,"label":"<strong>Alena Malone Bail Bonds</strong><br>\u2605 4.4 (14 reviews)<br>\u260e (314) 322-0202"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

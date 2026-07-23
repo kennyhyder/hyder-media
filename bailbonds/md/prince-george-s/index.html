@@ -105,6 +105,45 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/md/agents/">all licensed agents in Maryland</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Prince George's County</h2>
+  <p class="sub">5 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">A ABC Bail Bonds</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 1</span> <span class='sub'>(1 reviews)</span></div>
+  <div class="ad">14744 Main St, Upper Marlboro, MD 20772, USA</div>
+  <div class='ph'>☎ (240) 949-7794</div>
+  
+</div><div class="agent">
+  <div class="an">Indian Head Bail Bond</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">5210 Silver Hill Rd, District Heights, MD 20747, USA</div>
+  <div class='ph'>☎ (301) 686-1300</div>
+  
+</div><div class="agent">
+  <div class="an">T&amp;T Bail Bond LLC</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">5210 Silver Hill Rd, District Heights, MD 20747, USA</div>
+  <div class='ph'>☎ (443) 799-5411</div>
+  
+</div><div class="agent">
+  <div class="an">Prince George's Bail Bond Comm</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">14735 Main St #2407, Upper Marlboro, MD 20772, USA</div>
+  <div class='ph'>☎ (301) 952-3422</div>
+  <div class='ad'><a href='http://abcbailbonds.net/bail-bonds-prince-georges-county.html' rel='nofollow noopener'>abcbailbonds.net</a></div>
+</div><div class="agent">
+  <div class="an">Baldwin Bail Bonds</div>
+  <div style='margin-top:2px;'> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">4344 Farragut St, Hyattsville, MD 20781, USA</div>
+  <div class='ph'>☎ (301) 277-2245</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Prince George's County?</summary><p>Bail bond premiums in Maryland typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Prince George's County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Prince George's County?</summary><p>Contact the Prince George's County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.82928, -76.84819], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":38.852480199999995,"lng":-76.9166736,"label":"<strong>Indian Head Bail Bond</strong><br>\u260e (301) 686-1300"},{"lat":38.8169671,"lng":-76.75007599999999,"label":"<strong>A ABC Bail Bonds</strong><br>\u2605 1 (1 reviews)<br>\u260e (240) 949-7794"},{"lat":38.8524207,"lng":-76.91665309999999,"label":"<strong>T&amp;T Bail Bond LLC</strong><br>\u260e (443) 799-5411"},{"lat":38.8163105,"lng":-76.7499811,"label":"<strong>Prince George's Bail Bond Comm</strong><br>\u260e (301) 952-3422"},{"lat":38.9517594,"lng":-76.94096750000001,"label":"<strong>Baldwin Bail Bonds</strong><br>\u260e (301) 277-2245"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

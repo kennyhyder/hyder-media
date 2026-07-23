@@ -117,6 +117,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/tx/agents/">all licensed agents in Texas</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Calhoun County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">ABC Bonding Company-Calhoun County</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.8</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">206 S Ann St, Port Lavaca, TX 77979, USA</div>
+  <div class='ph'>☎ (361) 553-7000</div>
+  
+</div><div class="agent">
+  <div class="an">American Bail Bond Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 3.7</span> <span class='sub'>(6 reviews)</span></div>
+  <div class="ad">124 S Virginia St, Port Lavaca, TX 77979, USA</div>
+  <div class='ph'>☎ (361) 552-6732</div>
+  
+</div><div class="agent">
+  <div class="an">Port Lavaca Bail Bond Co</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.5</span> <span class='sub'>(4 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">1303 Algee Dr, Port Lavaca, TX 77979, USA</div>
+  <div class='ph'>☎ (361) 552-0020</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Calhoun County?</summary><p>Bail bond premiums in Texas typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Calhoun County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Calhoun County?</summary><p>Contact the Calhoun County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details><details><summary>What is an attorney bond in Texas?</summary><p>Under Texas Occupations Code §1704.163, a licensed Texas attorney can post bail for a client they represent in the criminal case — in any Texas county — without being a licensed bondsman. One retainer can cover both the jail release and the criminal defense.</p></details></div>
 
 <div class="card">
@@ -141,7 +168,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([28.44172, -96.57957], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":28.6132109,"lng":-96.62559,"label":"<strong>ABC Bonding Company-Calhoun County</strong><br>\u2605 3.8 (9 reviews)<br>\u260e (361) 553-7000"},{"lat":28.614377100000002,"lng":-96.6253401,"label":"<strong>American Bail Bond Co</strong><br>\u2605 3.7 (6 reviews)<br>\u260e (361) 552-6732"},{"lat":28.604235,"lng":-96.630291,"label":"<strong>Port Lavaca Bail Bond Co</strong><br>\u2605 4.5 (4 reviews)<br>\u260e (361) 552-0020"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

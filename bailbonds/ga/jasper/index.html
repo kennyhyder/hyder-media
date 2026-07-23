@@ -105,6 +105,39 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/ga/agents/">all licensed agents in Georgia</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Jasper County</h2>
+  <p class="sub">4 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">A &amp; A Bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 2.3</span> <span class='sub'>(50 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">760 Martin Rd, Jasper, GA 30143, USA</div>
+  <div class='ph'>☎ (770) 894-7575</div>
+  <div class='ad'><a href='http://www.aandabonding.com/' rel='nofollow noopener'>aandabonding.com</a></div>
+</div><div class="agent">
+  <div class="an">ABC BONDING</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.2</span> <span class='sub'>(35 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">3020 Camp Rd, Jasper, GA 30143, USA</div>
+  <div class='ph'>☎ (770) 735-6100</div>
+  
+</div><div class="agent">
+  <div class="an">LUCKY DAWG BAIL BOND</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.9</span> <span class='sub'>(16 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">660 E Church St, Jasper, GA 30143, USA</div>
+  <div class='ph'>☎ (770) 894-2343</div>
+  
+</div><div class="agent">
+  <div class="an">Ozburn bail bonding</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.4</span> <span class='sub'>(9 reviews)</span> · <span class=badge>Open 24/7</span></div>
+  <div class="ad">338 Forsyth St, Monticello, GA 31064, USA</div>
+  <div class='ph'>☎ (706) 476-0220</div>
+  
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Jasper County?</summary><p>Bail bond premiums in Georgia typically run 10-15% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Jasper County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Jasper County?</summary><p>Contact the Jasper County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +162,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.31698, -83.68915], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":34.4386674,"lng":-84.437021,"label":"<strong>A &amp; A Bonding</strong><br>\u2605 2.3 (50 reviews)<br>\u260e (770) 894-7575"},{"lat":34.4649338,"lng":-84.4196753,"label":"<strong>LUCKY DAWG BAIL BOND</strong><br>\u2605 4.9 (16 reviews)<br>\u260e (770) 894-2343"},{"lat":33.3039513,"lng":-83.6850511,"label":"<strong>Ozburn bail bonding</strong><br>\u2605 4.4 (9 reviews)<br>\u260e (706) 476-0220"},{"lat":34.455439399999996,"lng":-84.4474188,"label":"<strong>ABC BONDING</strong><br>\u2605 4.2 (35 reviews)<br>\u260e (770) 735-6100"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);

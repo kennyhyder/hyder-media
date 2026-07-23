@@ -105,6 +105,33 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <a href="/bailbonds/nm/agents/">all licensed agents in New Mexico</a>.</p>
   <p class="notice">Featured placement — reserved.</p>
 </div>
+
+<div class="card">
+  <h2>Bail Bond Businesses on Google — Luna County</h2>
+  <p class="sub">3 business profiles found on Google Maps for this area that we have not
+  yet matched to a license-roster record. Verify licensing with the state or county authority
+  before doing business.</p>
+  <div class="agent-list"><div class="agent">
+  <div class="an">Luna County Abstract &amp; Title</div>
+  <div style='margin-top:2px;'><span style='color:#b45816;font-weight:700;'>★ 4.6</span> <span class='sub'>(36 reviews)</span></div>
+  <div class="ad">521 S Gold Ave, Deming, NM 88030, USA</div>
+  <div class='ph'>☎ (575) 546-2739</div>
+  <div class='ad'><a href='https://lcat.net/luna-county-office/' rel='nofollow noopener'>lcat.net</a></div>
+</div><div class="agent">
+  <div class="an">Luna County Detention Center</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">1700 4th St NE, Deming, NM 88030, USA</div>
+  <div class='ph'>☎ (575) 544-0191</div>
+  <div class='ad'><a href='https://www.lunacountynm.us/departments/detention_center/index.php' rel='nofollow noopener'>lunacountynm.us</a></div>
+</div><div class="agent">
+  <div class="an">Luna County Sheriff's Office</div>
+  <div style='margin-top:2px;'></div>
+  <div class="ad">2462 J St SE, Deming, NM 88030, USA</div>
+  <div class='ph'>☎ (575) 546-2655</div>
+  <div class='ad'><a href='https://www.lunacountynm.us/departments/sheriff_s_department/index.php' rel='nofollow noopener'>lunacountynm.us</a></div>
+</div></div>
+  <p class="src">Business data via Google Places. Ratings and review counts as of the last refresh.</p>
+</div>
 <div class="card faq"><h2>Frequently Asked Questions</h2><details><summary>How much does a bail bond cost in Luna County?</summary><p>Bail bond premiums in New Mexico typically run 10% of the total bail amount — the fee a licensed bail agent charges to post the full bond. It is not refundable. On a $10,000 bond, expect roughly $1,000 or more depending on the rate.</p></details><details><summary>How long does it take to get released from jail in Luna County?</summary><p>Once a bond is posted, release typically takes 2–12 hours depending on the facility's booking volume. Bail must first be set by a judge or bail schedule, which usually happens within 24–48 hours of arrest.</p></details><details><summary>What if I can't afford the bail bond premium?</summary><p>Many bail agents offer payment plans, and some accept collateral (property, vehicles) in place of full cash payment. Courts may also lower bail at a hearing — a defense attorney can request it.</p></details><details><summary>How do I find out if someone is in jail in Luna County?</summary><p>Contact the Luna County sheriff's office or check its online inmate roster if one is published. You'll need the person's full legal name and, ideally, date of birth.</p></details></div>
 
 <div class="card">
@@ -129,7 +156,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.18452, -107.74719], 9);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
-  var pts = [];
+  var pts = [{"lat":32.276834199999996,"lng":-107.7371859,"label":"<strong>Luna County Detention Center</strong><br>\u260e (575) 544-0191"},{"lat":32.2637715,"lng":-107.7577556,"label":"<strong>Luna County Abstract &amp; Title</strong><br>\u2605 4.6 (36 reviews)<br>\u260e (575) 546-2739"},{"lat":32.244504,"lng":-107.7331253,"label":"<strong>Luna County Sheriff's Office</strong><br>\u260e (575) 546-2655"}];
   pts.forEach(function(p) {
     var mk = L.marker([p.lat, p.lng]).addTo(m);
     if (p.label) mk.bindPopup(p.label);
