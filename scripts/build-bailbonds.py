@@ -157,7 +157,7 @@ def how_bail_works(st):
     # legal / impaired
     reg = f"<li><strong>Licensing:</strong> bail agents are regulated by the {st['regulator']}.</li>" if st.get('regulator') else ''
     prem = st.get('premium') or '10%'
-    impaired_note = f"<p><strong>{st['note']}</strong></p>" if st['status'] == 'impaired' and st.get('note') else ''
+    impaired_note = f"<p><strong>{st['note']}</strong></p>" if st.get('note') else ''
     return f"""
 <div class="card">
   <h2>How Bail Works in {st['name']}</h2>

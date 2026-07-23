@@ -4,62 +4,62 @@
   "name": "Alaska",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Alaska Division of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "AL",
   "name": "Alabama",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Alabama bail bondsmen are now licensed by the state's dedicated Professional Bail Bonding Board rather than the Department of Insurance.",
+  "regulator": "Alabama Professional Bail Bonding Board",
+  "premium": "10-15%"
  },
  {
   "abbr": "AR",
   "name": "Arkansas",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Arkansas sets the bail bond premium by statute at exactly 10% of the bond, with a $50 minimum.",
+  "regulator": "Arkansas Professional Bail Bondsman Licensing Board (Department of Labor and Licensing)",
+  "premium": "10%"
  },
  {
   "abbr": "AZ",
   "name": "Arizona",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Arizona Department of Insurance and Financial Institutions",
+  "premium": "10%"
  },
  {
   "abbr": "CA",
   "name": "California",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "California caps bail premiums at 10%, and many agents offer filed discount rates of 7-8% for clients with an attorney or union membership.",
+  "regulator": "California Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "CO",
   "name": "Colorado",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Colorado Division of Insurance",
+  "premium": "10-15%"
  },
  {
   "abbr": "CT",
   "name": "Connecticut",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Connecticut bail premiums are fixed by state law on a sliding scale \u2014 10% of the first $5,000 of bond and 7% of everything above \u2014 and agents may not discount them.",
+  "regulator": "Connecticut Insurance Department",
+  "premium": "10% of first $5,000, 7% above"
  },
  {
   "abbr": "DC",
   "name": "District of Columbia",
   "status": "none",
-  "note": "Washington, D.C. has operated without money bail since 1992 \u2014 release decisions are risk-based.",
+  "note": "Washington, DC effectively eliminated money bail in 1992 \u2014 more than 90% of defendants are released on non-financial conditions through the Pretrial Services Agency, and commercial bondsmen do not operate.",
   "regulator": null,
   "premium": null
  },
@@ -68,54 +68,54 @@
   "name": "Delaware",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Delaware Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "FL",
   "name": "Florida",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Florida sets the bail premium at a flat 10% for state charges and 15% for federal bonds, uniform across all licensed agents.",
+  "regulator": "Florida Department of Financial Services",
+  "premium": "10% (15% federal)"
  },
  {
   "abbr": "GA",
   "name": "Georgia",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Georgia caps bail premiums at 15% and requires bondsmen to be approved by the sheriff of each county where they write bonds.",
+  "regulator": "County sheriffs (bonding approval); surety agents licensed by the Georgia Office of the Commissioner of Insurance and Safety Fire",
+  "premium": "10-15%"
  },
  {
   "abbr": "HI",
   "name": "Hawaii",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Hawaii Insurance Division (Department of Commerce and Consumer Affairs)",
+  "premium": "10%"
  },
  {
   "abbr": "IA",
   "name": "Iowa",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Iowa Insurance Division",
+  "premium": "10%"
  },
  {
   "abbr": "ID",
   "name": "Idaho",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Idaho Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "IL",
   "name": "Illinois",
   "status": "none",
-  "note": "Illinois abolished cash bail entirely in September 2023 under the Pretrial Fairness Act \u2014 release is determined by a judge without money bond, and commercial bondsmen have been banned since 1963.",
+  "note": "Illinois abolished cash bail entirely in September 2023 under the Pretrial Fairness Act \u2014 release is determined by a judge without money bond.",
   "regulator": null,
   "premium": null
  },
@@ -124,22 +124,22 @@
   "name": "Indiana",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Indiana Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "KS",
   "name": "Kansas",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Kansas Insurance Department",
+  "premium": "10%"
  },
  {
   "abbr": "KY",
   "name": "Kentucky",
   "status": "none",
-  "note": "Kentucky banned commercial bail bondsmen in 1976 \u2014 courts use a 10% deposit system paid directly to the court.",
+  "note": "Kentucky became the first state to ban commercial bail bonding in 1976 \u2014 defendants post bail deposits directly with the court.",
   "regulator": null,
   "premium": null
  },
@@ -147,15 +147,15 @@
   "abbr": "LA",
   "name": "Louisiana",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Louisiana's bail premium is set by the legislature at 12% of the bond (minimum $120), higher than the 10% common elsewhere.",
+  "regulator": "Louisiana Department of Insurance",
+  "premium": "12%"
  },
  {
   "abbr": "MA",
   "name": "Massachusetts",
   "status": "none",
-  "note": "Commercial bail effectively ended in Massachusetts in 2014 \u2014 release runs through bail commissioners and cash paid to the court.",
+  "note": "Massachusetts has no commercial bail bond industry \u2014 cash bail is paid directly to the court or a bail commissioner rather than through a bondsman.",
   "regulator": null,
   "premium": null
  },
@@ -163,15 +163,15 @@
   "abbr": "MD",
   "name": "Maryland",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "A 2017 Maryland court rule directs judges to prefer non-financial release conditions, which has reduced \u2014 but not eliminated \u2014 the use of cash bail and bondsmen.",
+  "regulator": "Maryland Insurance Administration",
+  "premium": "10%"
  },
  {
   "abbr": "ME",
   "name": "Maine",
   "status": "none",
-  "note": "Maine has no commercial bail industry \u2014 release is by recognizance, supervised release, or cash deposit to the court.",
+  "note": "Maine has no commercial bail bond industry \u2014 release is handled by bail commissioners, and any cash bail is paid directly to the court.",
   "regulator": null,
   "premium": null
  },
@@ -180,62 +180,62 @@
   "name": "Michigan",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Michigan Department of Insurance and Financial Services",
+  "premium": "10%"
  },
  {
   "abbr": "MN",
   "name": "Minnesota",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Minnesota Department of Commerce",
+  "premium": "10%"
  },
  {
   "abbr": "MO",
   "name": "Missouri",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Missouri Department of Commerce and Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "MS",
   "name": "Mississippi",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Mississippi Insurance Department",
+  "premium": "10%"
  },
  {
   "abbr": "MT",
   "name": "Montana",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Montana Commissioner of Securities and Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "NC",
   "name": "North Carolina",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "North Carolina law caps bail bond premiums at 15% of the bond amount, enforced statewide by the Department of Insurance.",
+  "regulator": "North Carolina Department of Insurance",
+  "premium": "10-15%"
  },
  {
   "abbr": "ND",
   "name": "North Dakota",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "North Dakota Insurance Department",
+  "premium": "10%"
  },
  {
   "abbr": "NE",
   "name": "Nebraska",
   "status": "none",
-  "note": "Nebraska does not permit commercial bondsmen \u2014 a 10% cash deposit is paid directly to the court.",
+  "note": "Nebraska prohibits commercial bail bondsmen \u2014 defendants post a 10% cash deposit directly with the court instead.",
   "regulator": null,
   "premium": null
  },
@@ -244,14 +244,14 @@
   "name": "New Hampshire",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "New Hampshire Insurance Department",
+  "premium": "10%"
  },
  {
   "abbr": "NJ",
   "name": "New Jersey",
   "status": "none",
-  "note": "New Jersey's 2017 Criminal Justice Reform Act replaced cash bail with a risk-based system \u2014 commercial bail was effectively eliminated.",
+  "note": "New Jersey's 2017 Criminal Justice Reform Act replaced cash bail with risk-based release, effectively eliminating the commercial bail industry in the state.",
   "regulator": null,
   "premium": null
  },
@@ -259,47 +259,47 @@
   "abbr": "NM",
   "name": "New Mexico",
   "status": "impaired",
-  "note": "New Mexico's 2016 constitutional amendment ended fixed money-bond schedules \u2014 money bail is rare and the commercial market is minimal.",
-  "regulator": null,
-  "premium": null
+  "note": "New Mexico's 2016 constitutional amendment largely replaced money bail with risk-based release and detention, leaving only a small remaining bail bond market.",
+  "regulator": "New Mexico Office of Superintendent of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "NV",
   "name": "Nevada",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Nevada law sets the bail premium at exactly 15% of the bond (or $50, whichever is greater) \u2014 agents cannot legally discount it.",
+  "regulator": "Nevada Division of Insurance",
+  "premium": "15%"
  },
  {
   "abbr": "NY",
   "name": "New York",
   "status": "impaired",
-  "note": "New York's 2019 bail reform eliminated cash bail for most misdemeanors and non-violent felonies \u2014 bondsmen operate mainly on felony cases.",
-  "regulator": null,
-  "premium": null
+  "note": "New York's 2020 bail reform eliminated cash bail for most misdemeanors and nonviolent felonies, so licensed bondsmen operate only in the narrower set of bail-eligible cases.",
+  "regulator": "New York State Department of Financial Services",
+  "premium": "6-10% (statutory sliding scale)"
  },
  {
   "abbr": "OH",
   "name": "Ohio",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Ohio Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "OK",
   "name": "Oklahoma",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Oklahoma Insurance Department",
+  "premium": "10%"
  },
  {
   "abbr": "OR",
   "name": "Oregon",
   "status": "none",
-  "note": "Oregon banned commercial bail in 1974 \u2014 defendants post a 10% security deposit with the court, most of it refundable.",
+  "note": "Oregon abolished commercial bail in 1974 \u2014 defendants post a 10% security deposit directly with the court instead of using a bondsman.",
   "regulator": null,
   "premium": null
  },
@@ -307,48 +307,48 @@
   "abbr": "PA",
   "name": "Pennsylvania",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Philadelphia courts release most defendants on a 10% deposit paid directly to the court, so commercial bondsmen operate mainly elsewhere in Pennsylvania.",
+  "regulator": "Pennsylvania Insurance Department",
+  "premium": "5-10%"
  },
  {
   "abbr": "RI",
   "name": "Rhode Island",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Rhode Island Department of Business Regulation (Insurance Division)",
+  "premium": "10%"
  },
  {
   "abbr": "SC",
   "name": "South Carolina",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "South Carolina Department of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "SD",
   "name": "South Dakota",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "South Dakota Division of Insurance",
+  "premium": "10%"
  },
  {
   "abbr": "TN",
   "name": "Tennessee",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "As of 2026 Tennessee bondsmen must hold a license from the new state Board of Professional Bondsmen in addition to approval by the local courts where they operate.",
+  "regulator": "Tennessee Board of Professional Bondsmen (Department of Commerce & Insurance), plus local court approval",
+  "premium": "10%"
  },
  {
   "abbr": "TX",
   "name": "Texas",
   "status": "legal",
-  "note": null,
-  "regulator": "county bail bond boards (Tex. Occ. Code ch. 1704)",
+  "note": "Texas regulates bail bonds county-by-county through local bail bond boards, so licensing rules and typical rates can vary between counties.",
+  "regulator": "County bail bond boards (Texas Occupations Code ch. 1704)",
   "premium": "10-15%"
  },
  {
@@ -356,38 +356,38 @@
   "name": "Utah",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Utah Insurance Department",
+  "premium": "10-20%"
  },
  {
   "abbr": "VA",
   "name": "Virginia",
   "status": "legal",
-  "note": null,
-  "regulator": null,
-  "premium": null
+  "note": "Virginia is unusual in licensing bondsmen through its Department of Criminal Justice Services, with premiums fixed by law between 10% and 15%.",
+  "regulator": "Virginia Department of Criminal Justice Services",
+  "premium": "10-15%"
  },
  {
   "abbr": "VT",
   "name": "Vermont",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Vermont Department of Financial Regulation",
+  "premium": "10%"
  },
  {
   "abbr": "WA",
   "name": "Washington",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Washington State Department of Licensing",
+  "premium": "10%"
  },
  {
   "abbr": "WI",
   "name": "Wisconsin",
   "status": "none",
-  "note": "Wisconsin has banned commercial bail bonding since 1979 \u2014 bail is posted directly with the court.",
+  "note": "Wisconsin abolished commercial bail bonding in 1979 \u2014 bail is posted in cash directly with the court, though a friend or family member may act as surety.",
   "regulator": null,
   "premium": null
  },
@@ -396,15 +396,15 @@
   "name": "West Virginia",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "West Virginia Offices of the Insurance Commissioner",
+  "premium": "10%"
  },
  {
   "abbr": "WY",
   "name": "Wyoming",
   "status": "legal",
   "note": null,
-  "regulator": null,
-  "premium": null
+  "regulator": "Wyoming Department of Insurance",
+  "premium": "10%"
  }
 ]
