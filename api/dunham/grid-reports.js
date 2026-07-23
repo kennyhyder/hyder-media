@@ -24,6 +24,12 @@ const PLACE_TO_METRO = {
     'ChIJSUlIfLoT_oYRGGIjN9DF9tU': 'Lubbock',
     'ChIJn4Fc4H1PAYcRXCg2fBAF1jg': 'Amarillo',
     'ChIJ2alzKVmBRoYRtksX2EK0-dA': 'Bryan',
+    'ChIJkwnwiTaNVoYRKOwYks3a1-s': 'Abilene',
+    'ChIJXbFFdeCDT4YRY03SEa83fGw': 'Waco',
+    'ChIJaWJDyaRJRYYRNT9soTv6pLE': 'Harker Heights',
+    'ChIJ9W27gONfaIYRJPL6ubakDfQ': 'Corpus Christi',
+    'ChIJiz2HdarLTYYRBJPfKtKa4O4': 'Denton',
+    'ChIJ30Fdd4AZTIYR83clEzrjSYs': 'Plano',
 };
 
 export default async function handler(req, res) {

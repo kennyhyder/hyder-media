@@ -3,9 +3,9 @@
  * GET /api/dunham/cron-grid-scans     (Mondays 14:00 UTC)
  *
  * Cadence (fits the 7,500-credit/month LocalFalcon package):
- *   - 6 priority metros × 3 keywords, every week          (882 credits/week)
- *   - 4 small markets  × 3 keywords, first Monday of month (588 credits/month)
- *   ≈ 4,400 credits/month total, ~3,000 headroom for ad-hoc scans.
+ *   - 6 priority metros × 3 keywords, every week           (882 credits/week)
+ *   - 10 small markets × 3 keywords, first Monday of month (1,470 credits/month)
+ *   ≈ 5,290 credits/month total, ~2,200 headroom for ad-hoc scans.
  *
  * Each scan: 7×7 grid, 5 mi radius, jail-centered, eager (fire and return —
  * reports are pulled by the dashboard via /api/dunham/grid-reports).
@@ -33,6 +33,12 @@ const SMALL_MARKETS = [
     ['lubbock', 'ChIJSUlIfLoT_oYRGGIjN9DF9tU', '33.6290', '-101.8220'],
     ['amarillo', 'ChIJn4Fc4H1PAYcRXCg2fBAF1jg', '35.2220', '-101.8310'],
     ['bryan', 'ChIJ2alzKVmBRoYRtksX2EK0-dA', '30.6850', '-96.4050'],
+    ['abilene', 'ChIJkwnwiTaNVoYRKOwYks3a1-s', '32.4158', '-99.7340'],
+    ['waco', 'ChIJXbFFdeCDT4YRY03SEa83fGw', '31.5493', '-97.1467'],
+    ['harker-heights', 'ChIJaWJDyaRJRYYRNT9soTv6pLE', '31.0567', '-97.4646'],
+    ['corpus-christi', 'ChIJ9W27gONfaIYRJPL6ubakDfQ', '27.7963', '-97.3997'],
+    ['denton', 'ChIJiz2HdarLTYYRBJPfKtKa4O4', '33.2153', '-97.1120'],
+    ['plano', 'ChIJ30Fdd4AZTIYR83clEzrjSYs', '33.2468', '-96.6361'],
 ];
 const PLACE_TO_METRO = Object.fromEntries(
     [...METROS, ...SMALL_MARKETS].map(([slug, pid]) => [pid, slug]));
