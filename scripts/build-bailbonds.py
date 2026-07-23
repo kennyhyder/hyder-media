@@ -1,38 +1,48 @@
 #!/usr/bin/env python3
 """
-Texas bail-bonds directory — static site generator (Track 2 staging build).
+National bail-bonds directory — static site generator (Track 2 staging build).
 
-Reads bailbonds/data/*.json and generates:
-  bailbonds/index.html               — county index
-  bailbonds/tx/<county-slug>/index.html  — one page per county (254)
+Structure:
+  bailbonds/index.html                    — national index (51 states/DC)
+  bailbonds/<state>/index.html            — state page (e.g. /bailbonds/tx/)
+  bailbonds/<state>/<county>/index.html   — county page (~3,144 total)
 
-STAGING: every page carries <meta name="robots" content="noindex, nofollow">
-until the property moves to its permanent premium domain. The design is
-deliberately neutral/unbranded and fully self-contained (inline CSS, no
-external assets) so the whole tree can be lifted onto any domain unchanged.
+Content is STATE-AWARE:
+  - "legal"    — commercial bail operates: bond types, regulator, agents slot
+  - "impaired" — legal but reform-restricted (NY, NM)
+  - "none"     — no commercial bail (IL, KY, WI, OR, NE, MA, ME, NJ, DC):
+                 pages describe court-deposit / PR release, no agents card
+  - Texas keeps its richer template: county bail-bond boards, verified jail
+    data, and the §1704.163 attorney-bond card (attorney bonds are TX law —
+    never rendered for other states).
 
-Run: python3 scripts/build-bailbonds.py
+STAGING: every page carries noindex until the property moves to its permanent
+domain. Neutral brand, fully self-contained pages, portable by design.
+
+Run: python3 scripts/build-bailbonds.py   (reads bailbonds/data/*.json)
 """
 
 import json
 import os
+import re
 import shutil
+import unicodedata
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'bailbonds')
 DATA = os.path.join(ROOT, 'data')
 
 counties = json.load(open(os.path.join(DATA, 'counties.json')))
-jails = {}
-jails_path = os.path.join(DATA, 'jails.json')
-if os.path.exists(jails_path):
-    for j in json.load(open(jails_path)):
-        jails[j['county']] = j
+states = {s['abbr']: s for s in json.load(open(os.path.join(DATA, 'states.json')))}
 
-boards = {}
-boards_path = os.path.join(DATA, 'boards.json')
-if os.path.exists(boards_path):
-    for b in json.load(open(boards_path)):
-        boards[b['county']] = b
+def load_keyed(fname):
+    path = os.path.join(DATA, fname)
+    if not os.path.exists(path):
+        return {}
+    return {j['county']: j for j in json.load(open(path))}
+
+# Verified detail data — currently Texas-only; applied only when state == TX
+tx_jails = load_keyed('jails.json')
+tx_boards = load_keyed('boards.json')
 
 CSS = """
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
@@ -54,6 +64,8 @@ p { margin-bottom:12px; }
 .fact .k { font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
 .fact .v { font-size:1.2rem; font-weight:700; margin-top:2px; }
 .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; background:#e8f0fd; color:var(--accent); }
+.badge.warn { background:#fdf0e8; color:#b45816; }
+.badge.off { background:#f2e8ee; color:#9c2f5f; }
 ul { margin:0 0 12px 22px; }
 li { margin-bottom:6px; }
 a { color:var(--accent); }
@@ -66,25 +78,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 .crumb { font-size:.85rem; margin-top:14px; }
 """
 
-HOW_BAIL_WORKS = """
-<div class="card">
-  <h2>How Bail Works in Texas</h2>
-  <p>After an arrest in Texas, a magistrate must set bail promptly — the law requires a
-  magistrate hearing within 48 hours (Tex. Code Crim. Proc. art. 15.17). Once bail is set,
-  there are four ways to secure release:</p>
-  <ul>
-    <li><strong>Surety bond</strong> — a licensed bail bond company posts the full bond for a
-    non-refundable premium, typically 10&ndash;15% of the bail amount.</li>
-    <li><strong>Cash bond</strong> — the full bail amount is paid directly to the county,
-    refundable when the case concludes and all appearances are made.</li>
-    <li><strong>Personal recognizance (PR) bond</strong> — release without payment, at the
-    court's discretion. Texas law (SB 6, 2021; SB 9, 2025) restricts PR bonds for many offenses.</li>
-    <li><strong>Attorney bond</strong> — under Tex. Occ. Code &sect;1704.163, a licensed Texas
-    attorney may post bail for a client they represent in the criminal case, in any Texas county.
-    One retainer can cover both the release and the defense.</li>
-  </ul>
-</div>
-"""
+def status_badge(st):
+    return {
+        'legal': '<span class="badge">Commercial bail operates</span>',
+        'impaired': '<span class="badge warn">Limited bail market</span>',
+        'none': '<span class="badge off">No commercial bail</span>',
+    }[st['status']]
 
 def page(title, body, depth=0):
     root = '../' * depth
@@ -99,110 +98,237 @@ def page(title, body, depth=0):
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="brand" href="{root}index.html">Texas <span>Bail Bonds</span> Directory</a>
-  <span class="tagline">County-by-county bail &amp; jail release information</span>
+  <a class="brand" href="{root}index.html">Bail <span>Bonds</span> Directory</a>
+  <span class="tagline">Bail &amp; jail release information for every U.S. county</span>
 </div></header>
 <div class="wrap">
 {body}
 <footer>
-  <p>Informational resource only — not legal advice. Bail amounts and procedures vary by county
-  and case. Data sources: U.S. Census Bureau (2023 population estimates), Texas Occupations Code
-  Ch. 1704, county bail bond boards.</p>
+  <p>Informational resource only — not legal advice. Bail amounts and procedures vary by state,
+  county, and case. Data sources: U.S. Census Bureau (2023 population estimates), state statutes
+  and insurance regulators, county records.</p>
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
 </body>
 </html>"""
 
-def board_links(c):
-    b = boards.get(c['name'])
+# ---------- Shared content blocks ----------
+
+def how_bail_works(st):
+    """State-aware release-process card."""
+    if st['abbr'] == 'TX':
+        return """
+<div class="card">
+  <h2>How Bail Works in Texas</h2>
+  <p>After an arrest in Texas, a magistrate must set bail promptly — the law requires a magistrate
+  hearing within 48 hours of arrest (Tex. Code Crim. Proc. art. 15.17). Once bail is set, there are
+  four ways to secure release:</p>
+  <ul>
+    <li><strong>Surety bond</strong> — a licensed bail bond company posts the full bond for a
+    non-refundable premium, typically 10&ndash;15% of the bail amount.</li>
+    <li><strong>Cash bond</strong> — the full bail amount is paid directly to the county,
+    refundable when the case concludes and all appearances are made.</li>
+    <li><strong>Personal recognizance (PR) bond</strong> — release without payment, at the
+    court's discretion. Texas law (SB 6, 2021; SB 9, 2025) restricts PR bonds for many offenses.</li>
+    <li><strong>Attorney bond</strong> — under Tex. Occ. Code &sect;1704.163, a licensed Texas
+    attorney may post bail for a client they represent in the criminal case, in any Texas county.
+    One retainer can cover both the release and the defense.</li>
+  </ul>
+</div>"""
+    if st['status'] == 'none':
+        note = f"<p><strong>{st['note']}</strong></p>" if st.get('note') else ''
+        return f"""
+<div class="card">
+  <h2>How Release Works in {st['name']}</h2>
+  {note}
+  <p>{st['name']} does not permit commercial bail bondsmen. Release from custody after an arrest
+  typically happens one of these ways:</p>
+  <ul>
+    <li><strong>Release on recognizance</strong> — a written promise to appear, no payment required.</li>
+    <li><strong>Deposit or cash bond to the court</strong> — where money bond exists, it is paid
+    directly to the court (often a 10% deposit), and is refundable at case disposition.</li>
+    <li><strong>Supervised or conditional release</strong> — pretrial services supervision,
+    check-ins, or other non-monetary conditions.</li>
+  </ul>
+  <p class="sub">Because no bail bond companies operate here, be wary of anyone offering paid
+  bail services in {st['name']}.</p>
+</div>"""
+    # legal / impaired
+    reg = f"<li><strong>Licensing:</strong> bail agents are regulated by the {st['regulator']}.</li>" if st.get('regulator') else ''
+    prem = st.get('premium') or '10%'
+    impaired_note = f"<p><strong>{st['note']}</strong></p>" if st['status'] == 'impaired' and st.get('note') else ''
+    return f"""
+<div class="card">
+  <h2>How Bail Works in {st['name']}</h2>
+  {impaired_note}
+  <p>After bail is set by a judge or bail schedule, there are three common ways to secure release:</p>
+  <ul>
+    <li><strong>Surety bond</strong> — a licensed bail bond agent posts the full bond for a
+    non-refundable premium, typically {prem} of the bail amount.</li>
+    <li><strong>Cash bond</strong> — the full bail amount paid directly to the court, refundable
+    when the case concludes and all appearances are made.</li>
+    <li><strong>Release on recognizance</strong> — release without payment at the court's
+    discretion, sometimes with pretrial supervision.</li>
+    {reg}
+  </ul>
+</div>"""
+
+def tx_board_links(county_name):
+    b = tx_boards.get(county_name)
     if not b:
         return ''
     links = []
     if b.get('board_url'):
-        links.append(f'<a href="{b["board_url"]}" rel="nofollow">{c["name"]} County Bail Bond Board</a>')
+        links.append(f'<a href="{b["board_url"]}" rel="nofollow">{county_name} County Bail Bond Board</a>')
     if b.get('roster_url'):
         links.append(f'<a href="{b["roster_url"]}" rel="nofollow">Licensed bondsmen roster</a>')
     return f'<p>Official resources: {" · ".join(links)}</p>' if links else ''
 
-def county_page(c):
-    jail = jails.get(c['name'])
-    board_badge = ('<span class="badge">County Bail Bond Board</span>' if c['has_bail_board']
-                   else '<span class="badge" style="background:#eef1f5;color:var(--muted)">Sheriff-regulated county</span>')
-    board_text = (
-        f"{c['name']} County has a bail bond board under Texas Occupations Code Chapter 1704 — "
-        "bail bond companies must hold a license issued by the county board, which publishes the "
-        "roster of approved sureties."
-        if c['has_bail_board'] else
-        f"{c['name']} County does not operate a bail bond board (required only above 110,000 "
-        "population). Bondsmen here operate with the approval of the county sheriff."
-    )
-    jail_block = ''
-    if jail and jail.get('facility'):
-        rows = ''.join(f"<li><strong>{k}:</strong> {v}</li>" for k, v in [
-            ('Facility', jail.get('facility')),
-            ('Address', ', '.join(filter(None, [jail.get('address'), jail.get('city'), jail.get('zip')]))),
-            ('Phone', jail.get('phone')),
-        ] if v)
-        link = (f'<p><a href="{jail["inmate_search_url"]}" rel="nofollow">Inmate search / jail roster</a></p>'
-                if jail.get('inmate_search_url') else '')
-        jail_block = f'<div class="card"><h2>{c["name"]} County Jail</h2><ul>{rows}</ul>{link}</div>'
+# ---------- Pages ----------
 
-    body = f"""
-<div class="crumb"><a href="../../index.html">All Texas counties</a> › {c['name']} County</div>
-<h1>Bail Bonds in {c['name']} County, Texas</h1>
-<p class="sub">Jail release information, bail process, and licensed bail agents for {c['name']} County.</p>
-<div class="facts">
-  <div class="fact"><div class="k">Population (2023)</div><div class="v">{c['population']:,}</div></div>
-  <div class="fact"><div class="k">Regulation</div><div class="v" style="font-size:.95rem;">{board_badge}</div></div>
-  <div class="fact"><div class="k">County FIPS</div><div class="v">{c['fips']}</div></div>
-</div>
+def county_page(c, st):
+    display = c['display']           # e.g. "Harris County", "Orleans Parish", "Richmond city"
+    short = c['name']                # e.g. "Harris", "Orleans Parish"
+    is_tx = st['abbr'] == 'TX'
+
+    # Regulation card
+    if is_tx:
+        if c.get('has_bail_board'):
+            reg_badge = '<span class="badge">County Bail Bond Board</span>'
+            reg_text = (f"{display} has a bail bond board under Texas Occupations Code Chapter 1704 — "
+                        "bail bond companies must hold a license issued by the county board, which "
+                        "publishes the roster of approved sureties.")
+        else:
+            reg_badge = '<span class="badge" style="background:#eef1f5;color:var(--muted)">Sheriff-regulated county</span>'
+            reg_text = (f"{display} does not operate a bail bond board (required only above 110,000 "
+                        "population). Bondsmen here operate with the approval of the county sheriff.")
+        reg_card = f"""
 <div class="card">
-  <h2>Bail Bond Licensing in {c['name']} County</h2>
-  <p>{board_text}</p>
-  {board_links(c)}
-</div>
-{jail_block}
-{HOW_BAIL_WORKS}
+  <h2>Bail Bond Licensing in {display}</h2>
+  <p>{reg_text}</p>
+  {tx_board_links(short)}
+</div>"""
+    elif st['status'] == 'none':
+        reg_badge = status_badge(st)
+        reg_card = ''
+    else:
+        reg_badge = status_badge(st)
+        reg_card = (f"""
+<div class="card">
+  <h2>Bail Bond Licensing</h2>
+  <p>Bail bond agents serving {display} are licensed statewide by the {st['regulator']}.</p>
+</div>""" if st.get('regulator') else '')
+
+    # Jail card (verified TX data only, for now)
+    jail_card = ''
+    if is_tx:
+        jail = tx_jails.get(short)
+        if jail and jail.get('facility'):
+            rows = ''.join(f"<li><strong>{k}:</strong> {v}</li>" for k, v in [
+                ('Facility', jail.get('facility')),
+                ('Address', ', '.join(filter(None, [jail.get('address'), jail.get('city'), jail.get('zip')]))),
+                ('Phone', jail.get('phone')),
+            ] if v)
+            link = (f'<p><a href="{jail["inmate_search_url"]}" rel="nofollow">Inmate search / jail roster</a></p>'
+                    if jail.get('inmate_search_url') else '')
+            jail_card = f'<div class="card"><h2>{display} Jail</h2><ul>{rows}</ul>{link}</div>'
+
+    # Attorney-bond card — Texas law only
+    attorney_card = f"""
 <div class="card">
   <h2>Attorney Bonds — An Alternative to a Bondsman</h2>
   <p>Texas is one of the few states where a licensed attorney can post bail directly for a client
-  they represent (Tex. Occ. Code &sect;1704.163) — in {c['name']} County and every other Texas
-  county. Instead of paying a bondsman a non-refundable 10&ndash;15% premium <em>and</em> separately
-  hiring a defense lawyer, one call can handle both the jail release and the defense.</p>
+  they represent (Tex. Occ. Code &sect;1704.163) — in {display} and every other Texas county.
+  Instead of paying a bondsman a non-refundable 10&ndash;15% premium <em>and</em> separately hiring
+  a defense lawyer, one call can handle both the jail release and the defense.</p>
   <p class="notice">Featured attorney-bond placement — reserved.</p>
-</div>
-<div class="card">
-  <h2>Licensed Bail Agents in {c['name']} County</h2>
-  <p class="sub">Agent directory launching soon.</p>
-</div>
-"""
-    return page(f"Bail Bonds in {c['name']} County, TX — Jail Release & Bail Agents", body, depth=2)
+</div>""" if is_tx else ''
 
-def index_page():
-    biggest = sorted(counties, key=lambda x: -x['population'])[:12]
-    tiles = ''.join(
-        f'<a href="tx/{c["slug"]}/index.html">{c["name"]} County'
-        f'<div class="pop">{c["population"]:,} residents</div></a>'
-        for c in counties)
+    # Agents card — only where commercial bail exists
+    agents_card = f"""
+<div class="card">
+  <h2>Licensed Bail Agents in {display}</h2>
+  <p class="sub">Agent directory launching soon.</p>
+  <p class="notice">Featured placement — reserved.</p>
+</div>""" if st['status'] in ('legal', 'impaired') else ''
+
     body = f"""
-<h1>Texas Bail Bonds — Every County</h1>
-<p class="sub">Bail process, jail information, and licensed bail agents for all 254 Texas counties.
-{sum(1 for c in counties if c['has_bail_board'])} counties operate bail bond boards; the rest are
-sheriff-regulated.</p>
-{HOW_BAIL_WORKS}
-<h2>All 254 Counties</h2>
+<div class="crumb"><a href="../../index.html">All states</a> › <a href="../index.html">{st['name']}</a> › {display}</div>
+<h1>Bail Bonds in {display}, {st['name']}</h1>
+<p class="sub">Jail release information and the bail process for {display}.</p>
+<div class="facts">
+  <div class="fact"><div class="k">Population (2023)</div><div class="v">{c['population']:,}</div></div>
+  <div class="fact"><div class="k">Bail Framework</div><div class="v" style="font-size:.95rem;">{reg_badge}</div></div>
+  <div class="fact"><div class="k">FIPS</div><div class="v">{c['fips']}</div></div>
+</div>
+{reg_card}
+{jail_card}
+{how_bail_works(st)}
+{attorney_card}
+{agents_card}
+"""
+    title_kw = 'Bail Bonds' if st['status'] != 'none' else 'Jail Release'
+    return page(f"{title_kw} in {display}, {st['abbr']} — Bail & Jail Release Info", body, depth=2)
+
+def state_page(st, st_counties):
+    tiles = ''.join(
+        f'<a href="{c["slug"]}/index.html">{c["display"]}'
+        f'<div class="pop">{c["population"]:,} residents</div></a>'
+        for c in st_counties)
+    n = len(st_counties)
+    unit = {'LA': 'parishes', 'AK': 'boroughs & census areas'}.get(st['abbr'], 'counties')
+    body = f"""
+<div class="crumb"><a href="../index.html">All states</a> › {st['name']}</div>
+<h1>Bail Bonds in {st['name']}</h1>
+<p class="sub">{status_badge(st)} &nbsp; {n} {unit}</p>
+{how_bail_works(st)}
+<h2>All {st['name']} {unit.title()}</h2>
 <div class="county-grid">{tiles}</div>
 """
-    return page("Texas Bail Bonds Directory — All 254 Counties", body, depth=0)
+    return page(f"Bail Bonds in {st['name']} — Every County", body, depth=1)
 
-# ---- build ----
-tx_dir = os.path.join(ROOT, 'tx')
-if os.path.exists(tx_dir):
-    shutil.rmtree(tx_dir)
+def national_index(by_state):
+    legal_n = sum(1 for s in states.values() if s['status'] == 'legal')
+    tiles = ''.join(
+        f'<a href="{s["abbr"].lower()}/index.html">{s["name"]}'
+        f'<div class="pop">{len(by_state.get(s["abbr"], []))} counties · '
+        f'{ {"legal": "commercial bail", "impaired": "limited market", "none": "no commercial bail"}[s["status"]] }</div></a>'
+        for s in sorted(states.values(), key=lambda x: x['name']))
+    body = f"""
+<h1>Bail Bonds in Every U.S. County</h1>
+<p class="sub">Bail process, jail information, and licensed bail agents for all 3,100+ U.S. counties.
+Commercial bail operates in {legal_n} states; the rest use court-deposit or recognizance systems —
+each state page explains how release works there.</p>
+<h2>Choose a State</h2>
+<div class="county-grid">{tiles}</div>
+"""
+    return page("Bail Bonds Directory — Every County in America", body, depth=0)
+
+# ---------- Build ----------
+
+by_state = {}
 for c in counties:
-    d = os.path.join(tx_dir, c['slug'])
-    os.makedirs(d, exist_ok=True)
-    open(os.path.join(d, 'index.html'), 'w').write(county_page(c))
-open(os.path.join(ROOT, 'index.html'), 'w').write(index_page())
-print(f"built {len(counties)} county pages + index (jail data for {len(jails)} counties)")
+    by_state.setdefault(c['state'], []).append(c)
+
+# wipe generated state dirs (keep data/)
+for entry in os.listdir(ROOT):
+    p = os.path.join(ROOT, entry)
+    if os.path.isdir(p) and entry != 'data':
+        shutil.rmtree(p)
+
+total = 0
+for abbr, st_counties in by_state.items():
+    st = states[abbr]
+    st_counties.sort(key=lambda c: c['name'])
+    sdir = os.path.join(ROOT, abbr.lower())
+    os.makedirs(sdir, exist_ok=True)
+    open(os.path.join(sdir, 'index.html'), 'w').write(state_page(st, st_counties))
+    for c in st_counties:
+        d = os.path.join(sdir, c['slug'])
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, 'index.html'), 'w').write(county_page(c, st))
+        total += 1
+open(os.path.join(ROOT, 'index.html'), 'w').write(national_index(by_state))
+print(f"built {total} county pages across {len(by_state)} states + national index "
+      f"(TX jail data: {len(tx_jails)}, TX boards: {len(tx_boards)})")

@@ -1,0 +1,410 @@
+[
+ {
+  "abbr": "AK",
+  "name": "Alaska",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "AL",
+  "name": "Alabama",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "AR",
+  "name": "Arkansas",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "AZ",
+  "name": "Arizona",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "CA",
+  "name": "California",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "CO",
+  "name": "Colorado",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "CT",
+  "name": "Connecticut",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "DC",
+  "name": "District of Columbia",
+  "status": "none",
+  "note": "Washington, D.C. has operated without money bail since 1992 \u2014 release decisions are risk-based.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "DE",
+  "name": "Delaware",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "FL",
+  "name": "Florida",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "GA",
+  "name": "Georgia",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "HI",
+  "name": "Hawaii",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "IA",
+  "name": "Iowa",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "ID",
+  "name": "Idaho",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "IL",
+  "name": "Illinois",
+  "status": "none",
+  "note": "Illinois abolished cash bail entirely in September 2023 under the Pretrial Fairness Act \u2014 release is determined by a judge without money bond, and commercial bondsmen have been banned since 1963.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "IN",
+  "name": "Indiana",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "KS",
+  "name": "Kansas",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "KY",
+  "name": "Kentucky",
+  "status": "none",
+  "note": "Kentucky banned commercial bail bondsmen in 1976 \u2014 courts use a 10% deposit system paid directly to the court.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "LA",
+  "name": "Louisiana",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MA",
+  "name": "Massachusetts",
+  "status": "none",
+  "note": "Commercial bail effectively ended in Massachusetts in 2014 \u2014 release runs through bail commissioners and cash paid to the court.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MD",
+  "name": "Maryland",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "ME",
+  "name": "Maine",
+  "status": "none",
+  "note": "Maine has no commercial bail industry \u2014 release is by recognizance, supervised release, or cash deposit to the court.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MI",
+  "name": "Michigan",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MN",
+  "name": "Minnesota",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MO",
+  "name": "Missouri",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MS",
+  "name": "Mississippi",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "MT",
+  "name": "Montana",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NC",
+  "name": "North Carolina",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "ND",
+  "name": "North Dakota",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NE",
+  "name": "Nebraska",
+  "status": "none",
+  "note": "Nebraska does not permit commercial bondsmen \u2014 a 10% cash deposit is paid directly to the court.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NH",
+  "name": "New Hampshire",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NJ",
+  "name": "New Jersey",
+  "status": "none",
+  "note": "New Jersey's 2017 Criminal Justice Reform Act replaced cash bail with a risk-based system \u2014 commercial bail was effectively eliminated.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NM",
+  "name": "New Mexico",
+  "status": "impaired",
+  "note": "New Mexico's 2016 constitutional amendment ended fixed money-bond schedules \u2014 money bail is rare and the commercial market is minimal.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NV",
+  "name": "Nevada",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "NY",
+  "name": "New York",
+  "status": "impaired",
+  "note": "New York's 2019 bail reform eliminated cash bail for most misdemeanors and non-violent felonies \u2014 bondsmen operate mainly on felony cases.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "OH",
+  "name": "Ohio",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "OK",
+  "name": "Oklahoma",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "OR",
+  "name": "Oregon",
+  "status": "none",
+  "note": "Oregon banned commercial bail in 1974 \u2014 defendants post a 10% security deposit with the court, most of it refundable.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "PA",
+  "name": "Pennsylvania",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "RI",
+  "name": "Rhode Island",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "SC",
+  "name": "South Carolina",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "SD",
+  "name": "South Dakota",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "TN",
+  "name": "Tennessee",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "TX",
+  "name": "Texas",
+  "status": "legal",
+  "note": null,
+  "regulator": "county bail bond boards (Tex. Occ. Code ch. 1704)",
+  "premium": "10-15%"
+ },
+ {
+  "abbr": "UT",
+  "name": "Utah",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "VA",
+  "name": "Virginia",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "VT",
+  "name": "Vermont",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "WA",
+  "name": "Washington",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "WI",
+  "name": "Wisconsin",
+  "status": "none",
+  "note": "Wisconsin has banned commercial bail bonding since 1979 \u2014 bail is posted directly with the court.",
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "WV",
+  "name": "West Virginia",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ },
+ {
+  "abbr": "WY",
+  "name": "Wyoming",
+  "status": "legal",
+  "note": null,
+  "regulator": null,
+  "premium": null
+ }
+]
