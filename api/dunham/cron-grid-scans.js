@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export const config = { maxDuration: 300 };
 
-const KEYWORDS = ['bail bonds', 'bail bondsman', 'jail release'];
+const KEYWORDS = ['bail bonds', 'fianzas', 'jail release'];   // 'bail bondsman' dropped 2026-07-23: 83-95% result overlap w/ 'bail bonds'; fianzas = 35% overlap (distinct Spanish market)
 const METROS = [
     ['houston', 'ChIJFbCscprBQIYRM53MaGUqvkI', '29.7687', '-95.3576'],
     ['dallas', 'ChIJOe9WbTuZToYRdjnk3g4hdlc', '32.7770', '-96.8090'],

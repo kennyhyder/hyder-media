@@ -220,7 +220,7 @@
             syncControls();
         }
 
-        const KW_ORDER = ['bail bonds', 'bail bondsman', 'jail release'];
+        const KW_ORDER = ['bail bonds', 'fianzas', 'jail release', 'bail bondsman'];
         function syncControls() {
             const inMetro = allReports.filter(r => r.metro === state.metro);
             const kws = [...new Set(inMetro.map(r => r.keyword))]
