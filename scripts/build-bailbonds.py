@@ -51,6 +51,15 @@ tx_jails = load_keyed('jails.json')
 tx_boards = load_keyed('boards.json')
 
 # ---- Licensed-agent rosters: data/agents/*.json → indexed by state / (state, county)
+def norm_county(name):
+    """'Orleans Parish' / 'Orleans' / 'orleans county' → 'orleans' so roster
+    county names match county-page names regardless of suffix style."""
+    n = str(name).lower().strip()
+    for suffix in (' county', ' parish', ' borough', ' census area', ' municipality', ' city and borough'):
+        if n.endswith(suffix):
+            n = n[: -len(suffix)]
+    return n
+
 agents_by_state = {}
 agents_by_county = {}
 for path in sorted(glob.glob(os.path.join(DATA, 'agents', '*.json'))):
@@ -60,7 +69,7 @@ for path in sorted(glob.glob(os.path.join(DATA, 'agents', '*.json'))):
             continue
         agents_by_state.setdefault(st, []).append(a)
         if a.get('county'):
-            agents_by_county.setdefault((st, a['county']), []).append(a)
+            agents_by_county.setdefault((st, norm_county(a['county'])), []).append(a)
 
 def esc(s):
     return html_mod.escape(str(s), quote=False) if s else ''
@@ -388,7 +397,7 @@ def county_page(c, st, st_counties):
 
     agents_card = ''
     if st['status'] in ('legal', 'impaired'):
-        county_agents = agents_by_county.get((st['abbr'], short), [])
+        county_agents = agents_by_county.get((st['abbr'], norm_county(short)), [])
         if county_agents:
             agents_card = f"""
 <div class="card">
