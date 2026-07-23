@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selling in Europe: The Complete Guide for US Digital Sellers | Digistore24</title>
+    <meta name="description" content="Everything US sellers need to know about selling digital products in Europe — EU VAT, GDPR, payment methods, consumer law, DAC7 and fulfillment — and how Digistore24's reseller model handles it all for you.">
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Live experience.digistore24.com funnel design tokens */
+            --blue: #2463EB;
+            --blue-dark: #1a4fcc;
+            --cyan: #6EE3FF;
+            --ink: #0D1117;
+            --panel: #F4F6F9;
+            --panel-blue: #EEF3FD;
+            --chip-blue: #DBEAFE;
+            --amber: #F59E0B;
+            --gray: #828990;
+            --border: #E5E5E5;
+            --white: #FFFFFF;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: var(--ink);
+            background: var(--white);
+            line-height: 1.65;
+        }
+        h1, h2, .serif { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; line-height: 1.15; }
+
+        /* ===== internal tool nav (not part of the mock design) ===== */
+        .tool-nav {
+            background: #0f172a; padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .tool-nav a { color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+        .tool-nav .mock-tag {
+            color: #f59e0b; font-size: 0.75rem; font-weight: 700; letter-spacing: 1.2px;
+            border: 1px solid #f59e0b; border-radius: 4px; padding: 2px 10px;
+        }
+
+        /* ===== announcement bar ===== */
+        .announce {
+            background: var(--ink); color: #fff; text-align: center;
+            padding: 9px 16px; font-size: 0.85rem;
+        }
+        .announce a { color: var(--cyan); text-decoration: none; font-weight: 600; }
+
+        /* ===== header ===== */
+        .site-header {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1120px; margin: 0 auto; padding: 18px 24px;
+        }
+        .wordmark { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); text-decoration: none; }
+        .wordmark span { color: var(--blue); }
+
+        .btn {
+            display: inline-block; text-decoration: none; font-weight: 600;
+            border-radius: 8px; transition: background 0.15s ease, transform 0.15s ease;
+        }
+        .btn-primary { background: var(--blue); color: #fff; padding: 12px 26px; }
+        .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+        .btn-large { padding: 16px 34px; font-size: 1.05rem; }
+        .btn-ghost { color: var(--blue); padding: 12px 20px; }
+        .btn-ghost:hover { text-decoration: underline; }
+
+        /* ===== hero ===== */
+        .hero { background: linear-gradient(180deg, var(--panel-blue) 0%, var(--white) 100%); padding: 64px 24px 48px; }
+        .hero-inner { max-width: 880px; margin: 0 auto; text-align: center; }
+        .hero-badge {
+            display: inline-block; background: var(--chip-blue); color: var(--blue-dark);
+            font-size: 0.82rem; font-weight: 600; border-radius: 999px; padding: 6px 18px; margin-bottom: 22px;
+        }
+        .hero h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin-bottom: 20px; }
+        .hero h1 em { font-style: normal; color: var(--blue); }
+        .hero .sub { font-size: 1.15rem; color: #3c4652; max-width: 720px; margin: 0 auto 28px; }
+        .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+        .trust-row { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; color: var(--gray); font-size: 0.9rem; }
+        .trust-row span::before { content: "✓ "; color: var(--blue); font-weight: 700; }
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px; max-width: 860px; margin: 40px auto 0;
+        }
+        .stat { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px 12px; text-align: center; }
+        .stat .num { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.9rem; color: var(--blue); }
+        .stat .lbl { font-size: 0.82rem; color: var(--gray); }
+
+        /* ===== guide TOC ===== */
+        .toc { max-width: 1120px; margin: 0 auto; padding: 34px 24px 10px; text-align: center; }
+        .toc .kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 14px; }
+        .toc-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .toc-chips a {
+            background: var(--panel); border: 1px solid var(--border); color: var(--ink);
+            border-radius: 999px; padding: 8px 18px; font-size: 0.88rem; text-decoration: none; font-weight: 500;
+        }
+        .toc-chips a:hover { background: var(--chip-blue); border-color: var(--blue); color: var(--blue-dark); }
+
+        /* ===== guide sections ===== */
+        section.guide { padding: 56px 24px; }
+        section.guide.alt { background: var(--panel); }
+        .g-inner { max-width: 880px; margin: 0 auto; }
+        .g-kicker { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+        section.guide h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); margin-bottom: 18px; }
+        section.guide p { color: #3c4652; margin-bottom: 14px; }
+        section.guide ul.facts { margin: 4px 0 18px 22px; color: #3c4652; }
+        section.guide ul.facts li { margin-bottom: 8px; }
+        .ds-answer {
+            background: var(--panel-blue); border-left: 4px solid var(--blue); border-radius: 0 12px 12px 0;
+            padding: 20px 24px; margin-top: 22px;
+        }
+        .ds-answer .tag { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blue-dark); margin-bottom: 8px; }
+        .ds-answer p { color: var(--ink); margin-bottom: 8px; }
+        .ds-answer p:last-child { margin-bottom: 0; }
+
+        .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0 4px; }
+        .method-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+        section.guide.alt .method-card { background: #fff; }
+        .method-card h3 { font-size: 1.02rem; margin-bottom: 6px; }
+        .method-card .where { font-size: 0.78rem; color: var(--blue); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .method-card p { font-size: 0.9rem; color: #3c4652; margin: 0; }
+
+        /* ===== comparison table (live-LP style) ===== */
+        .compare-wrap { overflow-x: auto; margin-top: 22px; }
+        table.compare { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        table.compare th, table.compare td { padding: 14px 18px; text-align: left; font-size: 0.94rem; border-bottom: 1px solid var(--border); }
+        table.compare th { background: var(--ink); color: #fff; font-weight: 600; }
+        table.compare th:nth-child(2) { color: var(--cyan); }
+        table.compare td:nth-child(2) { color: var(--blue-dark); font-weight: 600; }
+        table.compare td:nth-child(3) { color: var(--gray); }
+        table.compare tr:last-child td { border-bottom: none; }
+
+        /* ===== steps ===== */
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
+        .step { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px; }
+        .step .n {
+            width: 42px; height: 42px; border-radius: 50%; background: var(--blue); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'DM Serif Display', Georgia, serif; font-size: 1.3rem; margin-bottom: 14px;
+        }
+        .step h3 { font-size: 1.1rem; margin-bottom: 8px; }
+        .step p { font-size: 0.92rem; color: #3c4652; margin: 0; }
+
+        /* ===== testimonial ===== */
+        .quote-card { max-width: 760px; margin: 0 auto; text-align: center; }
+        .quote-card .stars { color: var(--amber); font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 14px; }
+        .quote-card blockquote { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.35rem; line-height: 1.45; margin-bottom: 16px; }
+        .quote-card .who { color: var(--gray); font-size: 0.92rem; }
+
+        /* ===== FAQ ===== */
+        .faq-list { max-width: 880px; margin: 26px auto 0; }
+        details.faq { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+        details.faq summary {
+            cursor: pointer; list-style: none; padding: 18px 22px; font-weight: 600; font-size: 1rem;
+            display: flex; justify-content: space-between; align-items: center; gap: 14px;
+        }
+        details.faq summary::-webkit-details-marker { display: none; }
+        details.faq summary::after { content: "+"; color: var(--blue); font-size: 1.4rem; font-weight: 400; }
+        details.faq[open] summary::after { content: "–"; }
+        details.faq .a { padding: 0 22px 18px; color: #3c4652; font-size: 0.95rem; }
+
+        /* ===== final CTA ===== */
+        .final-cta { background: var(--ink); color: #fff; text-align: center; padding: 70px 24px; }
+        .final-cta h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); margin-bottom: 16px; }
+        .final-cta h2 em { font-style: normal; color: var(--cyan); }
+        .final-cta p { color: #b8c0c9; max-width: 640px; margin: 0 auto 26px; }
+        .final-cta .trust-row { margin-top: 18px; }
+        .final-cta .trust-row span { color: #b8c0c9; }
+        .final-cta .trust-row span::before { color: var(--cyan); }
+
+        /* ===== footer ===== */
+        .site-footer { background: #fff; border-top: 1px solid var(--border); padding: 26px 24px; }
+        .foot-inner { max-width: 1120px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; color: var(--gray); font-size: 0.82rem; }
+        .foot-inner a { color: var(--gray); text-decoration: none; margin-left: 16px; }
+        .foot-inner a:hover { color: var(--ink); }
+
+        @media (max-width: 640px) {
+            .site-header { padding: 14px 16px; }
+            .hero { padding: 44px 16px 36px; }
+            section.guide { padding: 42px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Internal: CI-suite nav — remove before client handoff -->
+    <nav class="tool-nav">
+        <a href="eu-expansion-analysis.html">← Back to EU Expansion Analysis</a>
+        <span class="mock-tag">DESIGN MOCK — NOT LIVE</span>
+    </nav>
+
+    <!-- ===== Mock page starts here ===== -->
+    <div class="announce">
+        Already doing $250K+/year? Get white glove onboarding. <a href="#">Book a Call →</a>
+    </div>
+
+    <header class="site-header">
+        <a href="#" class="wordmark">digistore<span>24</span></a>
+        <a href="#start" class="btn btn-primary">Start Selling for Free →</a>
+    </header>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge">🇪🇺 The complete guide for US sellers — updated for 2026</span>
+            <h1>Sell in Europe.<br>Skip the <em>Compliance Headache.</em></h1>
+            <p class="sub">450 million consumers are waiting on the other side of EU VAT, GDPR, and a maze of payment and consumer rules. This guide explains every requirement in plain English — and how Digistore24's reseller model handles all of it for you, automatically.</p>
+            <div class="hero-ctas">
+                <a href="#start" class="btn btn-primary btn-large">Start Selling for Free →</a>
+                <a href="#vat" class="btn btn-ghost btn-large">Read the Guide ↓</a>
+            </div>
+            <div class="trust-row">
+                <span>No credit card required</span>
+                <span>No setup fees</span>
+                <span>Cancel anytime</span>
+            </div>
+            <div class="stats-row">
+                <div class="stat"><div class="num">450M+</div><div class="lbl">EU Consumers</div></div>
+                <div class="stat"><div class="num">180+</div><div class="lbl">Countries Supported</div></div>
+                <div class="stat"><div class="num">$4B+</div><div class="lbl">Sales Processed</div></div>
+                <div class="stat"><div class="num">20K+</div><div class="lbl">Vetted Affiliates</div></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="toc">
+        <div class="kicker">What's in this guide</div>
+        <div class="toc-chips">
+            <a href="#vat">EU VAT &amp; OSS</a>
+            <a href="#taxes">Taxes &amp; DAC7</a>
+            <a href="#payments">Payment Methods</a>
+            <a href="#gdpr">GDPR</a>
+            <a href="#consumer-rights">Consumer Rights</a>
+            <a href="#fulfillment">Fulfillment &amp; Shipping</a>
+            <a href="#merchant-of-record">Merchant of Record</a>
+            <a href="#faq">FAQ</a>
+        </div>
+    </div>
+
+    <section class="guide" id="vat">
+        <div class="g-inner">
+            <div class="g-kicker">EU VAT · OSS · IOSS</div>
+            <h2>Do US sellers have to charge EU VAT on digital products?</h2>
+            <p><strong>Yes — from your very first sale.</strong> Unlike US sales tax, there is no minimum threshold for non-EU businesses selling digital products or services to EU consumers. The moment a customer in Berlin buys your $49 course, you technically owe German VAT on that sale.</p>
+            <ul class="facts">
+                <li><strong>VAT rates range from 17% to 27%</strong> depending on the customer's country — and you must charge the rate where your <em>customer</em> lives, not where you're based.</li>
+                <li><strong>You'd need to register</strong> — either in individual member states or through the EU's non-Union <strong>One Stop Shop (OSS)</strong> scheme, which lets you file one quarterly return covering all 27 countries. Physical goods imported under €150 use the separate <strong>Import One Stop Shop (IOSS)</strong>.</li>
+                <li><strong>Every sale needs a VAT-compliant invoice</strong>, and B2B sales to VAT-registered European businesses are handled differently (reverse charge) than B2C sales.</li>
+                <li>Getting it wrong isn't theoretical — EU tax authorities can and do pursue foreign sellers, and marketplaces now report seller revenue directly to them (see DAC7 below).</li>
+            </ul>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p>Digistore24 operates as a <strong>reseller (merchant of record)</strong>: technically, Digistore24 is the seller in every customer transaction. That means <strong>Digistore24 calculates, collects, and remits VAT in every EU country — and issues the compliant invoices</strong> — automatically, on every sale.</p>
+                <p>You never register for VAT anywhere in Europe. You never file an OSS return. You receive your payout; the tax layer is simply not your problem.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide alt" id="taxes">
+        <div class="g-inner">
+            <div class="g-kicker">Taxes · Filing · DAC7</div>
+            <h2>Sales tax vs. VAT — and what a US seller actually files</h2>
+            <p>US sales tax is charged once, at the final sale, and only where you have nexus. <strong>VAT is different</strong>: it's charged on every transaction in the chain, at much higher rates (17–27% vs. the 6–10% US sellers are used to), and it's owed to a foreign tax authority in a foreign filing system.</p>
+            <ul class="facts">
+                <li><strong>Selling direct means foreign tax exposure:</strong> VAT returns (quarterly under OSS), potential fiscal representatives, and currency conversion on every remittance.</li>
+                <li><strong>DAC7</strong> requires digital platforms to report sellers' revenues to EU tax authorities annually — EU tax offices increasingly see cross-border digital income by default.</li>
+                <li>Selling digital products into the EU generally does <em>not</em> create an EU "permanent establishment" for US income-tax purposes on its own — but direct-selling setups (local entities, warehouses, dependent agents) can change that. Most US sellers want to stay far away from that line.</li>
+            </ul>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p>In the reseller model, <strong>your counterparty is Digistore24 — not thousands of European consumers.</strong> Digistore24 handles European transaction taxes as the seller of record, and your accounting stays what it already is: revenue from one platform, reported like the rest of your US income. No EU filings, no fiscal representatives, no foreign tax accounts.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide" id="payments">
+        <div class="g-inner">
+            <div class="g-kicker">Payments · Currencies · PSD2</div>
+            <h2>What payment methods do European customers actually use?</h2>
+            <p>Here's what surprises most US sellers: <strong>in much of Europe, credit cards are not the default.</strong> If your checkout only takes Visa and Mastercard in USD, you're silently losing a large share of European buyers at the last step.</p>
+            <div class="method-grid">
+                <div class="method-card"><div class="where">Netherlands</div><h3>iDEAL</h3><p>The dominant Dutch payment method — direct bank transfer used for the majority of online purchases in the Netherlands.</p></div>
+                <div class="method-card"><div class="where">Germany · Austria · Nordics</div><h3>Klarna / Sofort</h3><p>Pay-later and direct bank transfer. German buyers in particular expect invoice and installment options at checkout.</p></div>
+                <div class="method-card"><div class="where">Belgium</div><h3>Bancontact</h3><p>Belgium's standard online payment scheme — the expected option for Belgian consumers.</p></div>
+                <div class="method-card"><div class="where">Eurozone-wide</div><h3>SEPA Direct Debit</h3><p>Bank-to-bank payments across the euro area — widely used for subscriptions and installment plans.</p></div>
+                <div class="method-card"><div class="where">EU-wide requirement</div><h3>PSD2 / 3-D Secure</h3><p>European law requires Strong Customer Authentication on most online card payments. Checkouts without proper 3DS flows see failed transactions.</p></div>
+                <div class="method-card"><div class="where">Everywhere</div><h3>Local currency &amp; language</h3><p>Buyers convert better when they pay in euros (or their home currency) with a checkout in their own language.</p></div>
+            </div>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p><strong>All of these are built into the Digistore24 checkout.</strong> Local payment methods, local currencies, localized checkout language, and PSD2-compliant authentication — with multiple banks and processors behind the scenes for higher approval rates and fewer declines. You list your product once; European customers see the checkout they expect.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide alt" id="gdpr">
+        <div class="g-inner">
+            <div class="g-kicker">GDPR · Privacy · Cookies</div>
+            <h2>Does GDPR apply to a US business selling to Europe?</h2>
+            <p><strong>Yes.</strong> GDPR applies to any business — anywhere in the world — that offers goods or services to people in the EU or monitors their behavior. Selling to European customers puts you in scope, regardless of where your LLC is registered.</p>
+            <ul class="facts">
+                <li><strong>Consent rules:</strong> valid cookie consent, opt-in (not pre-checked) marketing consent, and the right for users to access or delete their data.</li>
+                <li><strong>Documentation:</strong> a GDPR-grade privacy policy, data processing agreements with your vendors, and records of processing activities.</li>
+                <li><strong>Enforcement is real:</strong> fines can reach 4% of global revenue, and EU regulators have pursued non-EU companies.</li>
+                <li>Handling European payment data yourself multiplies your exposure — cardholder data plus personal data across 27 jurisdictions.</li>
+            </ul>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p><strong>The highest-risk data never touches your systems.</strong> As the seller of record, Digistore24 processes customer payment and order data on GDPR-compliant, EU-operated infrastructure — checkout, invoicing, and buyer records included. Your GDPR footprint shrinks to what you actually control (your own website and email list) instead of every transaction record in Europe.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide" id="consumer-rights">
+        <div class="g-inner">
+            <div class="g-kicker">Consumer Law · Refunds · Invoicing</div>
+            <h2>The 14-day rule: EU consumer rights on digital purchases</h2>
+            <p>EU consumer law gives buyers a <strong>14-day right of withdrawal</strong> on online purchases — a legally mandated cooling-off period, not a courtesy refund policy. For digital products there's a critical nuance:</p>
+            <ul class="facts">
+                <li>The withdrawal right for digital content can be waived — but only if the buyer <strong>expressly consents to immediate delivery and acknowledges losing the withdrawal right</strong>, captured the right way at checkout, before delivery.</li>
+                <li>Your terms, refund policy, and pre-contract information must meet EU distance-selling disclosure requirements — US-style "all sales final" language is unenforceable against EU consumers.</li>
+                <li>EU customers (and their accountants) expect <strong>compliant invoices</strong> — with VAT identification and country-correct formatting.</li>
+                <li>The EU's geo-blocking rules also restrict unjustified discrimination between EU customers based on their country.</li>
+            </ul>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p>The Digistore24 checkout implements the digital-content consent flow, generates compliant invoices, and manages refunds and chargebacks under its buyer-facing policies — <strong>consumer-law mechanics are built into the order flow itself.</strong> You set your refund terms within the platform's framework; the legal plumbing is already there.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide alt" id="fulfillment">
+        <div class="g-inner">
+            <div class="g-kicker">Fulfillment · 3PL · Shipping</div>
+            <h2>What about physical products — shipping, customs, and 3PL?</h2>
+            <p>Selling <strong>digital</strong> products to Europe requires no logistics at all — delivery is instant and borderless, which is exactly why digital is the fastest way to go international. If your funnel includes physical components (books, supplements, merch), three things matter:</p>
+            <ul class="facts">
+                <li><strong>EORI number:</strong> importing commercial goods into the EU requires an Economic Operators Registration and Identification number for customs.</li>
+                <li><strong>Customs, duties &amp; import VAT:</strong> shipments face import VAT (IOSS simplifies orders under €150) and possible duties — surprise fees at the door kill repeat purchases.</li>
+                <li><strong>European 3PL:</strong> at volume, US sellers typically move inventory to a European fulfillment center (Germany and the Netherlands are the common hubs) so delivery takes days, not weeks, and customs is handled once per bulk shipment instead of per order.</li>
+            </ul>
+            <div class="ds-answer">
+                <div class="tag">How Digistore24 handles it</div>
+                <p><strong>Digital delivery, checkout, and payment are fully handled</strong> — for digital products you can sell into all of Europe today with zero logistics. For physical offers, Digistore24's order and payment layer connects with fulfillment integrations, while you (or your 3PL partner) handle the shipping side. Start with your digital line — it's live in Europe the moment you list it.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide" id="merchant-of-record">
+        <div class="g-inner">
+            <div class="g-kicker">The Model That Makes It Simple</div>
+            <h2>What is a merchant of record — and why it changes everything</h2>
+            <p>A <strong>merchant of record (MoR)</strong> is the legal entity that sells to the end customer — and therefore carries the tax, compliance, and payment obligations of the sale. This is the fundamental difference between platforms:</p>
+            <p>A <strong>payment processor</strong> (Stripe, PayPal) moves money for you — but <em>you</em> remain the seller, with every obligation on this page still yours. A <strong>merchant of record</strong> becomes the seller — and every obligation on this page becomes theirs.</p>
+            <div class="compare-wrap">
+                <table class="compare">
+                    <thead>
+                        <tr><th>Obligation</th><th>With Digistore24 (Reseller)</th><th>DIY with a Payment Processor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>EU VAT registration &amp; filing</td><td>Handled — Digistore24 is the seller</td><td>You register (OSS) &amp; file quarterly</td></tr>
+                        <tr><td>VAT calculation on every sale</td><td>Automatic, all 27 countries</td><td>You configure &amp; maintain rates</td></tr>
+                        <tr><td>Compliant EU invoicing</td><td>Generated automatically</td><td>Your responsibility</td></tr>
+                        <tr><td>Local payment methods</td><td>Built in (iDEAL, Klarna, SEPA…)</td><td>Per-method integration work</td></tr>
+                        <tr><td>PSD2 / Strong Customer Auth</td><td>Built into checkout</td><td>You implement &amp; test 3DS flows</td></tr>
+                        <tr><td>GDPR on transaction data</td><td>Digistore24's compliant infrastructure</td><td>Your systems, your exposure</td></tr>
+                        <tr><td>14-day withdrawal mechanics</td><td>Built into order flow</td><td>You build the consent flow</td></tr>
+                        <tr><td>Refunds &amp; chargebacks</td><td>Managed for you</td><td>You fight them, per country</td></tr>
+                        <tr><td>DAC7 / platform reporting</td><td>Platform-level, handled</td><td>Your reporting exposure</td></tr>
+                        <tr><td>Upfront cost</td><td>$0 — pay only when you sell</td><td>Compliance stack + advisors</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="guide alt" id="start">
+        <div class="g-inner" style="text-align: center;">
+            <div class="g-kicker">Get Started</div>
+            <h2>Start selling in Europe in 3 simple steps</h2>
+            <div class="steps-grid" style="text-align: left;">
+                <div class="step"><div class="n">1</div><h3>Create Your Free Account</h3><p>Sign up in minutes. No credit card required, no upfront fees, no contracts. You only pay when you make a sale.</p></div>
+                <div class="step"><div class="n">2</div><h3>List Your Product</h3><p>Upload your product, set your price, and configure your checkout. European currencies, languages, and payment methods are already built in.</p></div>
+                <div class="step"><div class="n">3</div><h3>Sell Across Europe</h3><p>Drive your own traffic or tap 20,000+ vetted affiliates — while Digistore24 handles VAT, invoicing, payments, and compliance on every European sale.</p></div>
+            </div>
+            <a href="#" class="btn btn-primary btn-large" style="margin-top: 32px;">Start Selling for Free →</a>
+        </div>
+    </section>
+
+    <section class="guide">
+        <div class="quote-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>"Digistore24 offers me a range of conversion boosters, such as optimized and super easy-to-set-up order forms, through which I achieved a conversion rate of around 30%!"</blockquote>
+            <div class="who">Alon Colman Lerner — CEO, Omos Media GmbH</div>
+        </div>
+    </section>
+
+    <section class="guide alt" id="faq">
+        <div class="g-inner">
+            <div class="g-kicker">FAQ</div>
+            <h2>Selling in Europe: frequently asked questions</h2>
+            <div class="faq-list">
+                <details class="faq" open>
+                    <summary>Do I need to register for EU VAT if I sell through Digistore24?</summary>
+                    <div class="a">No. Digistore24 operates as a reseller (merchant of record), which makes Digistore24 the seller in each customer transaction. Digistore24 calculates, collects, and remits VAT across the EU — you never register, file, or remit European VAT for sales made through the platform.</div>
+                </details>
+                <details class="faq">
+                    <summary>Do US companies have to charge EU VAT on digital products?</summary>
+                    <div class="a">If you sell directly to EU consumers — yes, from the first sale. There is no minimum threshold for non-EU sellers of digital products. Selling through a merchant of record moves that obligation to the platform instead.</div>
+                </details>
+                <details class="faq">
+                    <summary>What's the difference between OSS and IOSS?</summary>
+                    <div class="a">The One Stop Shop (OSS) is the EU's single quarterly VAT filing scheme covering digital products and services sold across all member states. The Import One Stop Shop (IOSS) is the equivalent for physical goods imported into the EU in shipments valued under €150. Both exist so sellers don't have to register in every individual country — and neither is needed at all when a merchant of record is the seller.</div>
+                </details>
+                <details class="faq">
+                    <summary>Does GDPR apply to my US business?</summary>
+                    <div class="a">Yes — GDPR applies to any business offering goods or services to people in the EU, regardless of where the business is located. Selling through Digistore24 keeps customer transaction data on the platform's GDPR-compliant infrastructure, which significantly reduces (but doesn't eliminate) your own compliance footprint — your website and marketing lists remain your responsibility.</div>
+                </details>
+                <details class="faq">
+                    <summary>What payment methods do European customers expect?</summary>
+                    <div class="a">It varies by country: iDEAL in the Netherlands, Klarna/Sofort in Germany and Austria, Bancontact in Belgium, SEPA Direct Debit across the eurozone, plus cards with PSD2-compliant 3-D Secure authentication everywhere. The Digistore24 checkout presents each customer with the local methods, currency, and language they expect.</div>
+                </details>
+                <details class="faq">
+                    <summary>Can EU customers demand refunds on digital products?</summary>
+                    <div class="a">EU law provides a 14-day right of withdrawal on online purchases. For digital content, that right can be waived when the buyer expressly consents to immediate delivery and acknowledges the waiver at checkout — a flow that's built into the Digistore24 order process.</div>
+                </details>
+                <details class="faq">
+                    <summary>What is DAC7 and does it affect me?</summary>
+                    <div class="a">DAC7 is an EU directive requiring digital platforms to report sellers' revenues to European tax authorities annually. It's handled at the platform level — one more reporting regime that isn't your problem when you sell through a compliant platform rather than running your own EU storefront.</div>
+                </details>
+                <details class="faq">
+                    <summary>Do I need an EORI number or a European 3PL?</summary>
+                    <div class="a">Only for physical goods. Digital products need no customs, shipping, or logistics of any kind. If you sell physical products into the EU at volume, you'll want an EORI number for customs and, eventually, a European fulfillment partner — Germany and the Netherlands are the common hubs.</div>
+                </details>
+                <details class="faq">
+                    <summary>What does it cost to start selling in Europe with Digistore24?</summary>
+                    <div class="a">Nothing upfront — no setup fees and no monthly fees. Digistore24 earns a commission only when you make a sale, so the entire European compliance layer costs you $0 until it's actually generating revenue.</div>
+                </details>
+                <details class="faq">
+                    <summary>How fast can I be live in European markets?</summary>
+                    <div class="a">The same day. Because VAT, payments, invoicing, and consumer-law mechanics are already built into the platform, listing your digital product makes it available to European buyers immediately — there's no registration process standing between you and the market.</div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <h2>450 million customers.<br><em>Zero compliance homework.</em></h2>
+        <p>Every requirement on this page is already handled inside Digistore24. List your product once and it's ready to sell across Europe — VAT, payments, invoices, and consumer law included. Free to start, no credit card required.</p>
+        <a href="#" class="btn btn-primary btn-large">Start Selling for Free →</a>
+        <div class="trust-row">
+            <span>No monthly fees</span>
+            <span>Payouts up to 3× per week</span>
+            <span>Cancel anytime</span>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="foot-inner">
+            <div>© 2026 Digistore24. All rights reserved.</div>
+            <div>
+                <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Imprint</a><a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "Do US companies have to charge EU VAT on digital products?", "acceptedAnswer": {"@type": "Answer", "text": "If selling directly to EU consumers, yes — from the first sale, with no minimum threshold for non-EU sellers. Selling through a merchant of record such as Digistore24 moves that obligation to the platform."}},
+        {"@type": "Question", "name": "What is the difference between OSS and IOSS?", "acceptedAnswer": {"@type": "Answer", "text": "OSS is the EU's single quarterly VAT filing scheme for digital products and services; IOSS is the equivalent for physical goods imported in shipments under €150. Neither is needed when a merchant of record is the seller."}},
+        {"@type": "Question", "name": "Does GDPR apply to US businesses?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — GDPR applies to any business offering goods or services to people in the EU, regardless of location."}},
+        {"@type": "Question", "name": "What payment methods do European customers use?", "acceptedAnswer": {"@type": "Answer", "text": "iDEAL in the Netherlands, Klarna and Sofort in Germany and Austria, Bancontact in Belgium, SEPA Direct Debit across the eurozone, and cards with PSD2-compliant 3-D Secure authentication."}},
+        {"@type": "Question", "name": "Can EU customers demand refunds on digital products?", "acceptedAnswer": {"@type": "Answer", "text": "EU law provides a 14-day right of withdrawal, which for digital content can be waived when the buyer expressly consents to immediate delivery and acknowledges the waiver at checkout."}},
+        {"@type": "Question", "name": "What is DAC7?", "acceptedAnswer": {"@type": "Answer", "text": "An EU directive requiring digital platforms to report sellers' revenues to European tax authorities annually. It is handled at the platform level."}}
+      ]
+    }
+    </script>
+</body>
+</html>
