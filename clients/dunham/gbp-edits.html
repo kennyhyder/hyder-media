@@ -84,8 +84,10 @@
 
         <div class="intro">
             <b>What this is — and what it isn't</b>
-            These are <i>safe, non-category</i> profile edits: business descriptions, added service listings,
-            and website-link updates. No categories are touched (that rollout stays on hold until the
+            These are <i>safe, non-category</i> profile edits: business descriptions, added service
+            listings, tracking tags on the existing website link (the link itself does not move — current
+            law-office rankings are untouched), and a <i>second</i> link for 24/7 jail release added
+            alongside the main one. No categories are touched (that rollout stays on hold until the
             verification plan is ready). All bail language is representation-bound per Tex. Occ. Code
             §1704.163 — "for clients we represent" — with no fee claims. Approve each item, or mark it
             Hold with a note and we'll revise. Once an office's items are approved, Hyder Media applies
@@ -137,7 +139,7 @@
             return `https://www.dunhamlaw.com/tx/bail-bonds/${countySlug}/?utm_source=gbp&utm_medium=organic&utm_campaign=maps-initiative-${city.toLowerCase().replace(/\s+/g, '-')}`;
         }
 
-        const DJ_NOTE = 'This profile currently points at dunhamjones.com — the proposal also standardizes it onto dunhamlaw.com (the primary domain). If you prefer keeping dunhamjones.com, mark Hold and note it.';
+        const DJ_NOTE = 'This profile\u2019s main link points at dunhamjones.com (secondary domain). The proposals below leave it unchanged — domain consolidation is a separate decision flagged in the audit above.';
         const OFFICES = [
             // Priority group — already carry the "Bail bonds service" category
             { id: 'midland', city: 'Midland', county: 'Midland', countySlug: 'midland-county', phone: '(432) 888-8888', priority: true },
@@ -161,7 +163,8 @@
         const EDIT_TYPES = [
             ['description', 'Business description', 'Adds the jail-release + attorney-bond story to a profile that currently only mentions criminal defense. Description text is not a ranking factor, but it converts profile viewers into callers.'],
             ['services', 'Add 4 service listings', 'Service listings appear on the profile and help Google understand what the business offers. These are additions — existing services are untouched.'],
-            ['website', 'Website link → county bail page (with tracking)', 'Points the profile at the county bail-bonds page (currently the criminal-attorneys page) and adds UTM tags so GBP traffic shows up attributed in the Reporting dashboard.'],
+            ['website', 'Website link — add tracking only (same page)', 'The main website link stays exactly where it is — the law-office page that supports current criminal-defense rankings. We only append UTM tags so GBP traffic becomes attributable in Reporting. The landing page itself does not change.'],
+            ['bail-link', 'Add second link: 24/7 Jail Release (appointment link)', 'Google Business Profiles support an additional appointment/booking link alongside the main website. This adds one pointing at the county bail/jail-release page — new bail-intent doorway, zero change to the main link or the law-office relevance signals.'],
         ];
 
         let approvals = {};
@@ -232,10 +235,18 @@
                         current = '(existing services remain unchanged)';
                         proposed = '<ul class="svc">' + SERVICES.map(([n, d]) =>
                             `<li><b>${esc(n)}</b> — ${esc(d)}</li>`).join('') + '</ul>';
-                    } else {
+                    } else if (type === 'website') {
                         current = cur.website ? `<a href="${esc(cur.website)}" target="_blank" rel="noopener">${esc(cur.website)}</a>` : '(none)';
+                        const tagged = (cur.website || '').split('?')[0] +
+                            `?utm_source=gbp&utm_medium=organic&utm_campaign=maps-initiative-${o.city.toLowerCase().replace(/\s+/g, '-')}`;
+                        proposed = cur.website
+                            ? `<a href="${esc((cur.website || '').split('?')[0])}" target="_blank" rel="noopener">${esc(tagged)}</a><div style="margin-top:6px;" class="muted">Same page — only tracking parameters added.</div>`
+                            : '(no current website link — nothing proposed)';
+                    } else {
+                        current = '(no appointment link set)';
                         const u = bailUrl(o.countySlug, o.city);
-                        proposed = `<a href="${esc(u.split('?')[0])}" target="_blank" rel="noopener">${esc(u)}</a>`;
+                        proposed = `<b>“24/7 Jail Release”</b> appointment link →<br><a href="${esc(u.split('?')[0])}" target="_blank" rel="noopener">${esc(u)}</a>` +
+                            `<div style="margin-top:6px;" class="muted">Added via Google's Place Actions API — shows as an extra action link on the profile. Main website link untouched.</div>`;
                     }
                     return `
                     <div class="edit-block">
@@ -259,9 +270,9 @@
                 const officeStatuses = EDIT_TYPES.map(([t]) => (approvals[`${o.id}:${t}`] || {}).status);
                 const done = officeStatuses.filter(s => s === 'approved').length;
                 const held = officeStatuses.filter(s => s === 'hold').length;
-                const statusPill = done === 3 ? '<span class="pill pill-green">All approved</span>'
+                const statusPill = done === EDIT_TYPES.length ? '<span class="pill pill-green">All approved</span>'
                     : held ? `<span class="pill pill-yellow">${held} on hold</span>`
-                    : `<span class="pill pill-gray">${done}/3 approved</span>`;
+                    : `<span class="pill pill-gray">${done}/${EDIT_TYPES.length} approved</span>`;
                 return `
                 <div class="card" id="office-${o.id}">
                     <div class="office-head">
