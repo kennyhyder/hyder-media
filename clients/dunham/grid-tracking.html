@@ -193,9 +193,12 @@
             syncControls();
         }
 
+        const KW_ORDER = ['bail bonds', 'bail bondsman', 'jail release'];
         function syncControls() {
             const inMetro = allReports.filter(r => r.metro === state.metro);
-            const kws = [...new Set(inMetro.map(r => r.keyword))];
+            const kws = [...new Set(inMetro.map(r => r.keyword))]
+                .sort((a, b) => (KW_ORDER.indexOf(a) + 99 * (KW_ORDER.indexOf(a) < 0)) -
+                                (KW_ORDER.indexOf(b) + 99 * (KW_ORDER.indexOf(b) < 0)));
             if (!state.keyword || !kws.includes(state.keyword)) state.keyword = kws[0];
             document.getElementById('kw-chips').innerHTML = kws.map(k =>
                 `<button class="kw-chip${k === state.keyword ? ' active' : ''}" onclick="setKw('${esc(k)}')">${esc(k)}</button>`).join('');
@@ -218,6 +221,24 @@
             root.innerHTML = '<div class="loading">Loading scan…</div>';
             const d = await (await fetch(`${API}?key=${state.reportKey}`)).json();
             if (d.status !== 'success') { root.innerHTML = `<div class="card">Error: ${esc(d.error)}</div>`; return; }
+
+            // Movement: diff against the previous scan of the same location+keyword
+            d.movement = null;
+            const series = allReports
+                .filter(r => r.metro === state.metro && r.keyword === state.keyword)
+                .sort((a, z) => new Date(z.date) - new Date(a.date));
+            const idx = series.findIndex(r => r.reportKey === state.reportKey);
+            const prev = idx >= 0 ? series[idx + 1] : null;
+            if (prev) {
+                try {
+                    const p = await (await fetch(`${API}?key=${prev.reportKey}`)).json();
+                    if (p.status === 'success') {
+                        const prevPos = {};
+                        p.competitors.forEach((c, i) => prevPos[c.placeId] = { pos: i + 1, arp: c.arp, solv: c.solv });
+                        d.movement = { date: prev.date, prevPos };
+                    }
+                } catch (_) {}
+            }
             render(d);
         }
 
@@ -230,6 +251,16 @@
                 `<span class="hist-item">${esc((h.date || '').split(' ')[0])}<br>
                  ARP <b>${fmt1(h.arp)}</b> · SoLV <b>${h.solv == null ? '—' : h.solv.toFixed(1)}%</b></span>`).join('');
 
+            const moveCell = (c, i) => {
+                if (!d.movement) return '<td class="num muted">—</td>';
+                const prev = d.movement.prevPos[c.placeId];
+                if (!prev) return '<td class="num"><span class="chip y">NEW</span></td>';
+                const delta = prev.pos - (i + 1);
+                if (delta === 0) return '<td class="num muted">=</td>';
+                return delta > 0
+                    ? `<td class="num"><span style="color:var(--success);font-weight:700">▲ ${delta}</span></td>`
+                    : `<td class="num"><span style="color:var(--danger);font-weight:700">▼ ${-delta}</span></td>`;
+            };
             const compRows = d.competitors.map((c, i) => `
                 <tr class="${c.isTarget ? 'target' : ''}">
                     <td><span class="rank-num">${i + 1}</span></td>
@@ -239,6 +270,7 @@
                         <div class="comp-sub">${c.rating != null ? `${c.rating.toFixed(1)} ${starsHtml(c.rating)} (${c.reviews ?? 0})` : ''}
                             ${c.categories.length ? ` <span class="cat-tag">${esc(c.categories[0])}</span>` : ''}</div>
                     </td>
+                    ${moveCell(c, i)}
                     <td class="num">${c.dataPoints} pts<br><span class="comp-sub">${c.coveragePct}% of results</span></td>
                     <td class="num">${rankChip(c.arp, 'arp')}</td>
                     <td class="num">${rankChip(c.atrp, 'arp')}</td>
@@ -301,9 +333,13 @@
                 ${hist.length > 1 ? `<div class="card"><h2>Trend — "${esc(d.keyword)}" in ${esc(d.metro)}</h2><div class="hist-wrap">${histHtml}</div></div>` : ''}
 
                 <div class="card">
-                    <h2>Market Ranking — ${d.competitors.length} businesses found in this grid</h2>
+                    <h2>Market Ranking — ${d.competitors.length} businesses found for "${esc(d.keyword)}" in ${esc(d.metro)}</h2>
+                    <p class="muted" style="margin-bottom:10px;">${d.movement
+                        ? `Change column compares against the previous scan (${esc(d.movement.date)}).`
+                        : 'Change tracking starts with the next scan of this keyword.'}
+                        ${d.competitors.length < 6 ? ' Few businesses rank for this keyword in this market — a visibility opportunity.' : ''}</p>
                     <div class="table-scroll"><table class="data-table">
-                        <thead><tr><th>#</th><th>Business</th><th class="num">Found In</th>
+                        <thead><tr><th>#</th><th>Business</th><th class="num">Change</th><th class="num">Found In</th>
                         <th class="num">ARP</th><th class="num">ATRP</th><th class="num">SoLV</th></tr></thead>
                         <tbody>${compRows}</tbody>
                     </table></div>
