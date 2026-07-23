@@ -19,3 +19,11 @@ clients/dunham/rebuttal2/
 clients/dunham/*.pdf
 clients/dunham/*.docx
 clients/dunham/exports.zip
+
+# Dunham litigation + client data exports — local only, never deploy
+clients/dunham/rebuttal2/
+clients/dunham/exports/
+clients/dunham/*.pdf
+clients/dunham/*.docx
+clients/dunham/*.zip
+clients/dunham/rebuttal-notes-*.json
