@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,26 +107,31 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">A-Aaa Harrison Bail Bonds</div>
   <div class="ad">3049 CRAWFORDVILLE HWY, CRAWFORDVIILE,, 32327</div>
   
+  <div class='ad'>✉ MH2JR@AOL.COM</div>
   <div class='lic'>License: B000593</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dawson-kimberly-simone-w711741/">
   <div class="an">Dawson, Kimberly Simone</div>
   <div class="ad">JOHNSON BAIL BONDS 3038 CRAWFORDVILLE HWY STE A, CRAWFORDVILLE, 32327</div>
   
+  <div class='ad'>✉ KIMBERLYDAWSON37@GMAIL.COM</div>
   <div class='lic'>License: W711741</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gavin-jamel-rashun-w091763/">
   <div class="an">Gavin, Jamel Rashun</div>
   <div class="ad">N/A, CRAWFORDVILLE, 32327</div>
   
+  <div class='ad'>✉ JAMELGAVIN@ROCKETMAIL.COM</div>
   <div class='lic'>License: W091763</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harrison-michael-hugh-jr-a112406/">
   <div class="an">Harrison, Michael Hugh Jr</div>
   <div class="ad">A AAA HARRISON BAIL BONDS 2698-A CRAWFORDVILLE HWY, CRAWFORDVILLE, 32327</div>
   
+  <div class='ad'>✉ MH2JR@AOL.COM</div>
   <div class='lic'>License: A112406</div>
 </a><a class="agent" href="/bailbonds/fl/agent/krause-robert-l-a145749/">
   <div class="an">Krause, Robert L</div>
   <div class="ad">3039 CRAWFORDVILLE HWY, CRAWFORDVILLE, 32327</div>
   
+  <div class='ad'>✉ ROBKRAUSE63@GMAIL.COM</div>
   <div class='lic'>License: A145749</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.09134, -84.35911], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.17612,"lng":-84.37497,"label":"<strong><a href='/bailbonds/fl/agent/a-aaa-harrison-bail-bonds-b000593/'>A-Aaa Harrison Bail Bonds</a></strong>"},{"lat":30.17681,"lng":-84.3751,"label":"<strong><a href='/bailbonds/fl/agent/dawson-kimberly-simone-w711741/'>Dawson, Kimberly Simone</a></strong>"},{"lat":30.19016,"lng":-84.37284,"label":"<strong><a href='/bailbonds/fl/agent/harrison-michael-hugh-jr-a112406/'>Harrison, Michael Hugh Jr</a></strong>"},{"lat":30.17643,"lng":-84.37497,"label":"<strong><a href='/bailbonds/fl/agent/krause-robert-l-a145749/'>Krause, Robert L</a></strong>"},{"lat":30.19955,"lng":-84.3634,"label":"<strong>1 agent in CRAWFORDVILLE</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/gavin-jamel-rashun-w091763/'>Gavin, Jamel Rashun</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

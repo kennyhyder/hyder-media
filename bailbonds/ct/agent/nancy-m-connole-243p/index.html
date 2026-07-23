@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Nancy M Connole</h1>
 <p class="sub">Licensed bail bond agent in Connecticut — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Address:</strong> Mooreland Road, Winsted, 06098</li><li><strong>Phone:</strong> 203-597-0906</li><li><strong>License:</strong> 243P</li><li><strong>Serves:</strong> Litchfield</li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Address:</strong> Mooreland Road, Winsted, 06098</li><li><strong>Phone:</strong> <a href="tel:203-597-0906">203-597-0906</a></li><li><strong>License:</strong> 243P</li><li><strong>Serves:</strong> Litchfield</li></ul>
   <p class="src">Source: official roster — <a href="https://portal.ct.gov/despp/-/media/despp/slfu/bondsman/bondsman-2020_20200417.pdf" rel="nofollow">portal.ct.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Connecticut</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.92585, -73.06754], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":41.92585,"lng":-73.06754,"label":"<strong>Nancy M Connole</strong> <em>(approximate \u2014 city center)</em>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

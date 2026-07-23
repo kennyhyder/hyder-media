@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,176 +107,211 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">A Aaa Dan'S Bail Bonds</div>
   <div class="ad">2417 WEST PENSACOLA STREET, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ GLWILSON79@YAHOO.COM</div>
   <div class='lic'>License: B000484</div>
 </a><a class="agent" href="/bailbonds/fl/agent/austin-alrick-sherrod-d080605/">
   <div class="an">Austin, Alrick Sherrod</div>
   <div class="ad">AUSTIN BAIL BOND AGENCY 1241 W THARPE ST STE 14, TALLAHASSEE, 33303</div>
   
+  <div class='ad'>✉ RATTLERBOY.AA@GMAIL.COM</div>
   <div class='lic'>License: D080605</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bailey-andrea-danielle-g321763/">
   <div class="an">Bailey, Andrea Danielle</div>
   <div class="ad">1382 WESTHEAVEN DRIVE, TALLAHASSEE, 32310</div>
   
+  <div class='ad'>✉ ANDY060@AOL.COM</div>
   <div class='lic'>License: G321763</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bj-fletcher-llc-b000562/">
   <div class="an">Bj Fletcher Llc</div>
   <div class="ad">524 APPLEYARD DRIVE B, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ DRBJFLETCHER@GMAIL.COM</div>
   <div class='lic'>License: B000562</div>
 </a><a class="agent" href="/bailbonds/fl/agent/boatwright-bail-bonds-inc-b000638/">
   <div class="an">Boatwright Bail Bonds, Inc.</div>
   <div class="ad">1114 THOMASVILLE ROAD, SUITE E4, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ BOATWRIGHTL@HOTMAIL.COM</div>
   <div class='lic'>License: B000638</div>
 </a><a class="agent" href="/bailbonds/fl/agent/boatwright-larmond-jhmeid-e105794/">
   <div class="an">Boatwright, Larmond Jhmeid</div>
   <div class="ad">BOATWRIGHT BAIL BONDS INC 1114 THOMASVILLE ROAD SUITE #E4, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ BOATWRIGHTL@HOTMAIL.COM</div>
   <div class='lic'>License: E105794</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cannon-willard-a039699/">
   <div class="an">Cannon, Willard</div>
   <div class="ad">DANZY BONDING 541 E TENNESSEE ST STE 104, TALLAHASSEE, 32308</div>
   
+  <div class='ad'>✉ WCANNON1972@YAHOO.COM</div>
   <div class='lic'>License: A039699</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cleveland-stacey-ellen-a049173/">
   <div class="an">Cleveland, Stacey Ellen</div>
   <div class="ad">649 WEST 4TH AVE, TALLAHASSEE, 32301</div>
   
+  <div class='ad'>✉ BROWNCHICK61@GMAIL.COM</div>
   <div class='lic'>License: A049173</div>
 </a><a class="agent" href="/bailbonds/fl/agent/danzy-bail-bonds-b000058/">
   <div class="an">Danzy Bail Bonds</div>
   <div class="ad">541 E. TENNESSEE STREET 104, TALLAHASSEE, 32308</div>
   
+  <div class='ad'>✉ DERRICKDANZY@GMAIL.COM</div>
   <div class='lic'>License: B000058</div>
 </a><a class="agent" href="/bailbonds/fl/agent/danzy-derrick-dwayne-a061458/">
   <div class="an">Danzy, Derrick Dwayne</div>
   <div class="ad">DANZY BAIL BONDS 541 E. TENNESSEE STREET (104), TALLAHASSEE, 32308</div>
   
+  <div class='ad'>✉ DERRICKDANZY@GMAIL.COM</div>
   <div class='lic'>License: A061458</div>
 </a><a class="agent" href="/bailbonds/fl/agent/e-parker-bail-bonds-b000625/">
   <div class="an">E Parker Bail Bonds</div>
   <div class="ad">1560-2 CAPITAL CIRCLE NW, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ ERICP@EPARKERBAILBONDS.COM</div>
   <div class='lic'>License: B000625</div>
 </a><a class="agent" href="/bailbonds/fl/agent/emmanuel-s-bail-bonds-llc-b000482/">
   <div class="an">Emmanuel'S Bail Bonds, Llc</div>
   <div class="ad">2431 WEST PENSACOLA STREET, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ GUERR507@GMAIL.COM</div>
   <div class='lic'>License: B000482</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fletcher-bonding-agency-b000424/">
   <div class="an">Fletcher Bonding Agency</div>
   <div class="ad">524 APPLEYARD DRIVE, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ ALOIFLETCHER@GMAIL.COM</div>
   <div class='lic'>License: B000424</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fletcher-william-h-jr-w078462/">
   <div class="an">Fletcher, William H Jr</div>
   <div class="ad">ALOI-WILLIAMS BONDING 524 APPLEYARD DRIVE #A, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ ALOIFLETCHER@GMAIL.COM</div>
   <div class='lic'>License: W078462</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fletcher-william-henderson-a086027/">
   <div class="an">Fletcher, William Henderson</div>
   <div class="ad">ALOIANDFLETCHER 524 APPLEYARD DR, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ ALOIFLETCHER@GMAIL.COM</div>
   <div class='lic'>License: A086027</div>
 </a><a class="agent" href="/bailbonds/fl/agent/geathers-jakaydria-monique-g107138/">
   <div class="an">Geathers, Jakaydria Monique</div>
   <div class="ad">1211 W THARPE ST., TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ JGEATHERS88@GMAIL.COM</div>
   <div class='lic'>License: G107138</div>
 </a><a class="agent" href="/bailbonds/fl/agent/guerrier-emmanuel-e161190/">
   <div class="an">Guerrier, Emmanuel</div>
   <div class="ad">EMMANUEL'S BAIL BONDS LLC 2431 W PENSACOLA STREET, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ GUERR507@GMAIL.COM</div>
   <div class='lic'>License: E161190</div>
 </a><a class="agent" href="/bailbonds/fl/agent/h-a-bail-bond-agency-inc-b000585/">
   <div class="an">H&amp;A Bail Bond Agency Inc.</div>
   <div class="ad">2401 W. PENSACOLA ST, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ OMARK.HERRING@GMAIL.COM</div>
   <div class='lic'>License: B000585</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harrison-erica-jewel-w796917/">
   <div class="an">Harrison, Erica Jewel</div>
   <div class="ad">2814 HARRISON HILL WAY, TALLAHASSEE, 32311</div>
   
+  <div class='ad'>✉ ERICAHARRISON273@GMAIL.COM</div>
   <div class='lic'>License: W796917</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herring-kiara-simone-w247511/">
   <div class="an">Herring, Kiara Simone'</div>
   <div class="ad">2401 W. PENSACOLA STREET UNIT G, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ KIARA6_5@HOTMAIL.COM</div>
   <div class='lic'>License: W247511</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herring-omar-kareem-a117750/">
   <div class="an">Herring, Omar Kareem</div>
   <div class="ad">H&amp;A BAIL BOND AGENCY 2401 W PENSACOLA ST STE G, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ OMARK.HERRING@GMAIL.COM</div>
   <div class='lic'>License: A117750</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hightower-jacqueline-d-w400232/">
   <div class="an">Hightower, Jacqueline D</div>
   <div class="ad">COMMUNITY BAIL BONDS, LLC 642 W. BREVARD. STREET, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ JDHFAMU@GMAIL.COM</div>
   <div class='lic'>License: W400232</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hodges-susan-e-g033171/">
   <div class="an">Hodges, Susan E</div>
   <div class="ad">8036 RED EAGLE DR, TALLAHASSEE, 32312</div>
   
+  <div class='ad'>✉ SHODGES8391@HOTMAIL.COM</div>
   <div class='lic'>License: G033171</div>
 </a><a class="agent" href="/bailbonds/fl/agent/holmes-melanie-p000137/">
   <div class="an">Holmes, Melanie</div>
   <div class="ad">HOLMES BAIL BONDS LLC 2110 S ADAMS ST STE E3, TALLAHASSEE, 32301</div>
   
+  <div class='ad'>✉ HOLMESBAIL@GMAIL.COM</div>
   <div class='lic'>License: P000137</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kady-james-j-d035783/">
   <div class="an">Kady, James J</div>
   <div class="ad">KD PROCESS 2957 CAPITAL PARK DRIVE, SUITE 7, TALLAHASSEE, 32301</div>
   
+  <div class='ad'>✉ JAMES@KDPROCESS.NET</div>
   <div class='lic'>License: D035783</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lyles-kendrick-l-sr-p198800/">
   <div class="an">Lyles, Kendrick L Sr</div>
   <div class="ad">1805 BRIDGEMONT TRAIL, TALLAHASSEE, 32312</div>
   
+  <div class='ad'>✉ LUV850@GMAIL.COM</div>
   <div class='lic'>License: P198800</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parker-eric-gregory-a200391/">
   <div class="an">Parker, Eric Gregory</div>
   <div class="ad">E PARKER BAIL BONDS 1560 CAPITAL CIRCLE NW STE. 2, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ EPARKERBAILBONDS@OUTLOOK.COM</div>
   <div class='lic'>License: A200391</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perk-s-bonding-agency-academy-llc-b000465/">
   <div class="an">Perk'S Bonding Agency &amp; Academy Llc</div>
   <div class="ad">1211 W THARPE STREET UNIT B, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ PERKSBONDING1@YAHOO.COM</div>
   <div class='lic'>License: B000465</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ramsook-teresa-alexandra-p166186/">
   <div class="an">Ramsook, Teresa Alexandra</div>
   <div class="ad">524 APPLEYARD DR, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ YOUAREERASED@AOL.COM</div>
   <div class='lic'>License: P166186</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sun-shyne-bail-bonds-inc-b000486/">
   <div class="an">Sun Shyne Bail Bonds Inc</div>
   <div class="ad">820 REDDICK LANE, TALLAHASSEE, 32317</div>
   
+  <div class='ad'>✉ REDDICKAN@GMAIL.COM</div>
   <div class='lic'>License: B000486</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thomas-jimmy-rogers-a263715/">
   <div class="an">Thomas, Jimmy Rogers</div>
   <div class="ad">2431 W PENSACOLA STREET, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ JT162248@GMAIL.COM</div>
   <div class='lic'>License: A263715</div>
 </a><a class="agent" href="/bailbonds/fl/agent/turner-scott-kyle-w348667/">
   <div class="an">Turner, Scott Kyle</div>
   <div class="ad">A-AAA HARRISON BAIL BONDS 2121 W PENSACOLA ST STE C, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ TURNER5028@YAHOO.COM</div>
   <div class='lic'>License: W348667</div>
 </a><a class="agent" href="/bailbonds/fl/agent/whitfield-shaun-david-w561974/">
   <div class="an">Whitfield, Shaun David</div>
   <div class="ad">PERK'S BONDING AGENCY 649 W. 4TH AVE, TALLAHASSEE, 32303</div>
   
+  <div class='ad'>✉ SHAUND_24@YAHOO.COM</div>
   <div class='lic'>License: W561974</div>
 </a><a class="agent" href="/bailbonds/fl/agent/williams-jeremy-w596482/">
   <div class="an">Williams, Jeremy</div>
   <div class="ad">933 MILLARD STREET, TALLAHASSEE, 32301</div>
   
+  <div class='ad'>✉ J.WILLIAMS08@YAHOO.COM</div>
   <div class='lic'>License: W596482</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wilson-gregory-lemont-e136011/">
   <div class="an">Wilson, Gregory Lemont</div>
   <div class="ad">A AAA DAN'S BAIL BONDS 2417 W PENSACOLA, TALLAHASSEE, 32304</div>
   
+  <div class='ad'>✉ GLWILSON79@YAHOO.COM</div>
   <div class='lic'>License: E136011</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -294,5 +331,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.45931, -84.2778], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.44097,"lng":-84.3263,"label":"<strong><a href='/bailbonds/fl/agent/a-aaa-dan-s-bail-bonds-b000484/'>A Aaa Dan'S Bail Bonds</a></strong>"},{"lat":30.46349,"lng":-84.30364,"label":"<strong><a href='/bailbonds/fl/agent/austin-alrick-sherrod-d080605/'>Austin, Alrick Sherrod</a></strong>"},{"lat":30.42667,"lng":-84.36904,"label":"<strong><a href='/bailbonds/fl/agent/bailey-andrea-danielle-g321763/'>Bailey, Andrea Danielle</a></strong>"},{"lat":30.45085,"lng":-84.33799,"label":"<strong><a href='/bailbonds/fl/agent/bj-fletcher-llc-b000562/'>Bj Fletcher Llc</a></strong>"},{"lat":30.45419,"lng":-84.27843,"label":"<strong><a href='/bailbonds/fl/agent/boatwright-bail-bonds-inc-b000638/'>Boatwright Bail Bonds, Inc.</a></strong>"},{"lat":30.45419,"lng":-84.27843,"label":"<strong><a href='/bailbonds/fl/agent/boatwright-larmond-jhmeid-e105794/'>Boatwright, Larmond Jhmeid</a></strong>"},{"lat":30.44464,"lng":-84.2761,"label":"<strong><a href='/bailbonds/fl/agent/cannon-willard-a039699/'>Cannon, Willard</a></strong>"},{"lat":30.45358,"lng":-84.29225,"label":"<strong><a href='/bailbonds/fl/agent/cleveland-stacey-ellen-a049173/'>Cleveland, Stacey Ellen</a></strong>"},{"lat":30.44464,"lng":-84.2761,"label":"<strong><a href='/bailbonds/fl/agent/danzy-bail-bonds-b000058/'>Danzy Bail Bonds</a></strong>"},{"lat":30.44464,"lng":-84.2761,"label":"<strong><a href='/bailbonds/fl/agent/danzy-derrick-dwayne-a061458/'>Danzy, Derrick Dwayne</a></strong>"},{"lat":30.47189,"lng":-84.36172,"label":"<strong><a href='/bailbonds/fl/agent/e-parker-bail-bonds-b000625/'>E Parker Bail Bonds</a></strong>"},{"lat":30.44098,"lng":-84.32654,"label":"<strong><a href='/bailbonds/fl/agent/emmanuel-s-bail-bonds-llc-b000482/'>Emmanuel'S Bail Bonds, Llc</a></strong>"},{"lat":30.45085,"lng":-84.33799,"label":"<strong><a href='/bailbonds/fl/agent/fletcher-bonding-agency-b000424/'>Fletcher Bonding Agency</a></strong>"},{"lat":30.45085,"lng":-84.33799,"label":"<strong><a href='/bailbonds/fl/agent/fletcher-william-h-jr-w078462/'>Fletcher, William H Jr</a></strong>"},{"lat":30.45085,"lng":-84.33799,"label":"<strong><a href='/bailbonds/fl/agent/fletcher-william-henderson-a086027/'>Fletcher, William Henderson</a></strong>"},{"lat":30.46355,"lng":-84.30163,"label":"<strong><a href='/bailbonds/fl/agent/geathers-jakaydria-monique-g107138/'>Geathers, Jakaydria Monique</a></strong>"},{"lat":30.44098,"lng":-84.32654,"label":"<strong><a href='/bailbonds/fl/agent/guerrier-emmanuel-e161190/'>Guerrier, Emmanuel</a></strong>"},{"lat":30.44096,"lng":-84.32603,"label":"<strong><a href='/bailbonds/fl/agent/h-a-bail-bond-agency-inc-b000585/'>H&amp;A Bail Bond Agency Inc.</a></strong>"},{"lat":30.42102,"lng":-84.17477,"label":"<strong><a href='/bailbonds/fl/agent/harrison-erica-jewel-w796917/'>Harrison, Erica Jewel</a></strong>"},{"lat":30.44096,"lng":-84.32603,"label":"<strong><a href='/bailbonds/fl/agent/herring-kiara-simone-w247511/'>Herring, Kiara Simone'</a></strong>"},{"lat":30.44096,"lng":-84.32603,"label":"<strong><a href='/bailbonds/fl/agent/herring-omar-kareem-a117750/'>Herring, Omar Kareem</a></strong>"},{"lat":30.44911,"lng":-84.29211,"label":"<strong><a href='/bailbonds/fl/agent/hightower-jacqueline-d-w400232/'>Hightower, Jacqueline D</a></strong>"},{"lat":30.59077,"lng":-84.26798,"label":"<strong><a href='/bailbonds/fl/agent/hodges-susan-e-g033171/'>Hodges, Susan E</a></strong>"},{"lat":30.42068,"lng":-84.28211,"label":"<strong><a href='/bailbonds/fl/agent/holmes-melanie-p000137/'>Holmes, Melanie</a></strong>"},{"lat":30.44273,"lng":-84.22805,"label":"<strong><a href='/bailbonds/fl/agent/kady-james-j-d035783/'>Kady, James J</a></strong>"},{"lat":30.58978,"lng":-84.24627,"label":"<strong><a href='/bailbonds/fl/agent/lyles-kendrick-l-sr-p198800/'>Lyles, Kendrick L Sr</a></strong>"},{"lat":30.47189,"lng":-84.36172,"label":"<strong><a href='/bailbonds/fl/agent/parker-eric-gregory-a200391/'>Parker, Eric Gregory</a></strong>"},{"lat":30.46355,"lng":-84.30163,"label":"<strong><a href='/bailbonds/fl/agent/perk-s-bonding-agency-academy-llc-b000465/'>Perk'S Bonding Agency &amp; Academy Llc</a></strong>"},{"lat":30.45085,"lng":-84.33799,"label":"<strong><a href='/bailbonds/fl/agent/ramsook-teresa-alexandra-p166186/'>Ramsook, Teresa Alexandra</a></strong>"},{"lat":30.44098,"lng":-84.32654,"label":"<strong><a href='/bailbonds/fl/agent/thomas-jimmy-rogers-a263715/'>Thomas, Jimmy Rogers</a></strong>"},{"lat":30.44067,"lng":-84.32009,"label":"<strong><a href='/bailbonds/fl/agent/turner-scott-kyle-w348667/'>Turner, Scott Kyle</a></strong>"},{"lat":30.45358,"lng":-84.29225,"label":"<strong><a href='/bailbonds/fl/agent/whitfield-shaun-david-w561974/'>Whitfield, Shaun David</a></strong>"},{"lat":30.40875,"lng":-84.26805,"label":"<strong><a href='/bailbonds/fl/agent/williams-jeremy-w596482/'>Williams, Jeremy</a></strong>"},{"lat":30.44097,"lng":-84.3263,"label":"<strong><a href='/bailbonds/fl/agent/wilson-gregory-lemont-e136011/'>Wilson, Gregory Lemont</a></strong>"},{"lat":30.45353,"lng":-84.25227,"label":"<strong>1 agent in TALLAHASSEE</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/sun-shyne-bail-bonds-inc-b000486/'>Sun Shyne Bail Bonds Inc</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

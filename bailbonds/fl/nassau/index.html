@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,71 +107,85 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Daniel Bail Bonds Inc</div>
   <div class="ad">850913 HIGHWAY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ DANIELBONDS2010@HOTMAIL.COM</div>
   <div class='lic'>License: B000670</div>
 </a><a class="agent" href="/bailbonds/fl/agent/daniel-sherry-r-d018708/">
   <div class="an">Daniel, Sherry R</div>
   <div class="ad">DANIEL BAIL BONDS 850913 HIGHWAY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ DANIELBONDS2013@HOTMAIL.COM</div>
   <div class='lic'>License: D018708</div>
 </a><a class="agent" href="/bailbonds/fl/agent/duffy-tawn-christopher-p185185/">
   <div class="an">Duffy, Tawn Christopher</div>
   <div class="ad">ABSOLUTE BAIL BONDS 463473 SR 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ DUFF243@YAHOO.COM</div>
   <div class='lic'>License: P185185</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dye-shaun-michael-p062485/">
   <div class="an">Dye, Shaun Michael</div>
   <div class="ad">850785 US HWY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ NIKEBOY1247@AOL.COM</div>
   <div class='lic'>License: P062485</div>
 </a><a class="agent" href="/bailbonds/fl/agent/grillaert-michael-joseph-i-w076821/">
   <div class="an">Grillaert, Michael Joseph I</div>
   <div class="ad">ABSOLUTE BAIL BONDS 463473 SR 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ MJG6655@YAHOO.COM</div>
   <div class='lic'>License: W076821</div>
 </a><a class="agent" href="/bailbonds/fl/agent/henley-willie-jr-g127062/">
   <div class="an">Henley, Willie Jr</div>
   <div class="ad">86283 CALLAWAY DR, YULEE, 32097</div>
   
+  <div class='ad'>✉ PREACHERMAN2315@GMAIL.COM</div>
   <div class='lic'>License: G127062</div>
 </a><a class="agent" href="/bailbonds/fl/agent/liberty-bail-bonds-nassau-llc-b000106/">
   <div class="an">Liberty Bail Bonds Nassau Llc</div>
   <div class="ad">850785 U S HIGHWAY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ LIBERTYNASSAU@GMAIL.COM</div>
   <div class='lic'>License: B000106</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nelson-kendra-l-p025285/">
   <div class="an">Nelson, Kendra L</div>
   <div class="ad">ABSOLUTE BAIL BONDS 463473 SR 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ KENDRANELSON04@GMAIL.COM</div>
   <div class='lic'>License: P025285</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parrish-janet-b-d024459/">
   <div class="an">Parrish, Janet B</div>
   <div class="ad">A1 JOE PARRISH BAIL BONDS INC 463475 STATE ROAD 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ JANBPARRISH@GMAIL.COM</div>
   <div class='lic'>License: D024459</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parrish-joseph-brian-a200908/">
   <div class="an">Parrish, Joseph Brian</div>
   <div class="ad">850785 US HWY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ JOEFBPARRISH@GMAIL.COM</div>
   <div class='lic'>License: A200908</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sullivan-alesha-w388985/">
   <div class="an">Sullivan, Alesha</div>
   <div class="ad">ABSOLUTE BAIL BONDS 463473 STATE ROAD 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ ALESHA365@GMAIL.COM</div>
   <div class='lic'>License: W388985</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tebo-melissa-w272417/">
   <div class="an">Tebo, Melissa</div>
   <div class="ad">850785 US HIGHWAY 17, YULEE, 32097</div>
   
+  <div class='ad'>✉ MTEBO423@GMAIL.COM</div>
   <div class='lic'>License: W272417</div>
 </a><a class="agent" href="/bailbonds/fl/agent/watters-gary-arthur-a318522/">
   <div class="an">Watters, Gary Arthur</div>
   <div class="ad">463473 SR 200, YULEE, 32097</div>
   
+  <div class='ad'>✉ GARYWATTERS.ABSOLUTE@GMAIL.COM</div>
   <div class='lic'>License: A318522</div>
 </a><a class="agent" href="/bailbonds/fl/agent/werder-jeffrey-james-edward-g050916/">
   <div class="an">Werder, Jeffrey James Edward</div>
   <div class="ad">96232 NASSAU LAKES CIR, FERNANDINA BEACH, 32034</div>
   
+  <div class='ad'>✉ JWERDER6@YAHOO.COM</div>
   <div class='lic'>License: G050916</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -189,5 +205,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.60596, -81.76509], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.63565,"lng":-81.60548,"label":"<strong><a href='/bailbonds/fl/agent/daniel-bail-bonds-inc-b000670/'>Daniel Bail Bonds Inc</a></strong>"},{"lat":30.63565,"lng":-81.60548,"label":"<strong><a href='/bailbonds/fl/agent/daniel-sherry-r-d018708/'>Daniel, Sherry R</a></strong>"},{"lat":30.63016,"lng":-81.57586,"label":"<strong><a href='/bailbonds/fl/agent/duffy-tawn-christopher-p185185/'>Duffy, Tawn Christopher</a></strong>"},{"lat":30.63101,"lng":-81.60077,"label":"<strong><a href='/bailbonds/fl/agent/dye-shaun-michael-p062485/'>Dye, Shaun Michael</a></strong>"},{"lat":30.63016,"lng":-81.57586,"label":"<strong><a href='/bailbonds/fl/agent/grillaert-michael-joseph-i-w076821/'>Grillaert, Michael Joseph I</a></strong>"},{"lat":30.60975,"lng":-81.593,"label":"<strong><a href='/bailbonds/fl/agent/henley-willie-jr-g127062/'>Henley, Willie Jr</a></strong>"},{"lat":30.63101,"lng":-81.60077,"label":"<strong><a href='/bailbonds/fl/agent/liberty-bail-bonds-nassau-llc-b000106/'>Liberty Bail Bonds Nassau Llc</a></strong>"},{"lat":30.63016,"lng":-81.57586,"label":"<strong><a href='/bailbonds/fl/agent/nelson-kendra-l-p025285/'>Nelson, Kendra L</a></strong>"},{"lat":30.63016,"lng":-81.57582,"label":"<strong><a href='/bailbonds/fl/agent/parrish-janet-b-d024459/'>Parrish, Janet B</a></strong>"},{"lat":30.63101,"lng":-81.60077,"label":"<strong><a href='/bailbonds/fl/agent/parrish-joseph-brian-a200908/'>Parrish, Joseph Brian</a></strong>"},{"lat":30.63016,"lng":-81.57586,"label":"<strong><a href='/bailbonds/fl/agent/sullivan-alesha-w388985/'>Sullivan, Alesha</a></strong>"},{"lat":30.63101,"lng":-81.60077,"label":"<strong><a href='/bailbonds/fl/agent/tebo-melissa-w272417/'>Tebo, Melissa</a></strong>"},{"lat":30.63016,"lng":-81.57586,"label":"<strong><a href='/bailbonds/fl/agent/watters-gary-arthur-a318522/'>Watters, Gary Arthur</a></strong>"},{"lat":30.61423,"lng":-81.52256,"label":"<strong><a href='/bailbonds/fl/agent/werder-jeffrey-james-edward-g050916/'>Werder, Jeffrey James Edward</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

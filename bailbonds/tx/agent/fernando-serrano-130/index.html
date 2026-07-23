@@ -9,7 +9,7 @@
 <meta property="og:title" content="Fernando Serrano — Licensed Bail Bond Agent in El Paso County">
 <meta property="og:description" content="Fernando Serrano: licensed bail bond agent in El Paso County. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Fernando Serrano","url":"https://hyder.me/bailbonds/tx/agent/fernando-serrano-130/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"915-313-4111","address":{"@type":"PostalAddress","streetAddress":"830 E. San Antonio","addressLocality":"El Paso","postalCode":"79901","addressRegion":"TX"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Fernando Serrano","url":"https://hyder.me/bailbonds/tx/agent/fernando-serrano-130/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"915-313-4111","address":{"@type":"PostalAddress","streetAddress":"830 E. San Antonio","addressLocality":"El Paso","postalCode":"79901","addressRegion":"TX"},"geo":{"@type":"GeoCoordinates","latitude":31.75957,"longitude":-106.48113}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Fernando Serrano</h1>
 <p class="sub">Licensed bail bond agent in Texas — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Agency:</strong> 9 One 5</li><li><strong>Address:</strong> 830 E. San Antonio, El Paso, 79901</li><li><strong>Phone:</strong> 915-313-4111</li><li><strong>License:</strong> 130 (expires February 26, 2028)</li><li><strong>Surety:</strong> Bankers Ins</li><li><strong>Serves:</strong> <a href="/bailbonds/tx/el-paso/">El Paso County, TX</a></li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Agency:</strong> 9 One 5</li><li><strong>Address:</strong> 830 E. San Antonio, El Paso, 79901</li><li><strong>Phone:</strong> <a href="tel:915-313-4111">915-313-4111</a></li><li><strong>License:</strong> 130 (expires February 26, 2028)</li><li><strong>Surety:</strong> Bankers Ins</li><li><strong>Serves:</strong> <a href="/bailbonds/tx/el-paso/">El Paso County, TX</a></li></ul>
   <p class="src">Source: official roster — <a href="https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF" rel="nofollow">www.epcounty.com</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Texas</h2>
@@ -110,5 +112,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.75957, -106.48113], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":31.75957,"lng":-106.48113,"label":"<strong>Fernando Serrano</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

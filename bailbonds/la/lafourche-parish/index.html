@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,37 +106,44 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/scott-weiner-brandt-260866/">
   <div class="an">Scott Weiner Brandt</div>
   <div class="ad">1431 Tiger Drive, Thibodaux, 70301</div>
-  <div class='ph'>(985) 446-9007</div>
+  <div class='ph'>☎ (985) 446-9007</div>
+  
   <div class='lic'>License: 260866</div>
 </a><a class="agent" href="/bailbonds/la/agent/robert-joseph-stoufflet-323474/">
   <div class="an">Robert Joseph Stoufflet</div>
   <div class="ad">1431 Tiger Drive, Thibodaux, 70301</div>
-  <div class='ph'>(985) 446-9007</div>
+  <div class='ph'>☎ (985) 446-9007</div>
+  
   <div class='lic'>License: 323474</div>
 </a><a class="agent" href="/bailbonds/la/agent/angela-b-nora-719615/">
   <div class="an">Angela B Nora</div>
   <div class="ad">1400 Ridgefield Ave, Thibodaux, 70301</div>
-  <div class='ph'>(208) 732-3776</div>
+  <div class='ph'>☎ (208) 732-3776</div>
+  
   <div class='lic'>License: 719615</div>
 </a><a class="agent" href="/bailbonds/la/agent/a-1-bail-bonds-of-louisiana-llc-512077/">
   <div class="an">A-1 Bail Bonds of Louisiana, LLC</div>
   <div class="ad">1431 Tiger Drive, Thibodaux, 70301</div>
-  <div class='ph'>(985) 446-9007</div>
+  <div class='ph'>☎ (985) 446-9007</div>
+  
   <div class='lic'>License: 512077</div>
 </a><a class="agent" href="/bailbonds/la/agent/toby-vincent-gambarella-772748/">
   <div class="an">Toby Vincent Gambarella</div>
   <div class="ad">1431 Tiger Drive, Thibodaux, 70301</div>
-  <div class='ph'>(985) 446-9007</div>
+  <div class='ph'>☎ (985) 446-9007</div>
+  
   <div class='lic'>License: 772748</div>
 </a><a class="agent" href="/bailbonds/la/agent/varick-charles-taylor-sr-333282/">
   <div class="an">Varick Charles Taylor Sr</div>
   <div class="ad">1128 Louise Street, Thibodaux, 70301</div>
-  <div class='ph'>(985) 446-2214</div>
+  <div class='ph'>☎ (985) 446-2214</div>
+  
   <div class='lic'>License: 333282</div>
 </a><a class="agent" href="/bailbonds/la/agent/rayne-marie-pierre-1019789/">
   <div class="an">Rayne Marie Pierre</div>
   <div class="ad">167 Ainsley Dr, Thibodaux, 70301</div>
-  <div class='ph'>(225) 461-5390</div>
+  <div class='ph'>☎ (225) 461-5390</div>
+  
   <div class='lic'>License: 1019789</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.49199, -90.39485], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.77698,"lng":-90.84057,"label":"<strong><a href='/bailbonds/la/agent/scott-weiner-brandt-260866/'>Scott Weiner Brandt</a></strong><br>\u260e (985) 446-9007"},{"lat":29.77698,"lng":-90.84057,"label":"<strong><a href='/bailbonds/la/agent/robert-joseph-stoufflet-323474/'>Robert Joseph Stoufflet</a></strong><br>\u260e (985) 446-9007"},{"lat":29.78548,"lng":-90.82378,"label":"<strong><a href='/bailbonds/la/agent/angela-b-nora-719615/'>Angela B Nora</a></strong><br>\u260e (208) 732-3776"},{"lat":29.77698,"lng":-90.84057,"label":"<strong><a href='/bailbonds/la/agent/a-1-bail-bonds-of-louisiana-llc-512077/'>A-1 Bail Bonds of Louisiana, LLC</a></strong><br>\u260e (985) 446-9007"},{"lat":29.77698,"lng":-90.84057,"label":"<strong><a href='/bailbonds/la/agent/toby-vincent-gambarella-772748/'>Toby Vincent Gambarella</a></strong><br>\u260e (985) 446-9007"},{"lat":29.78618,"lng":-90.83488,"label":"<strong><a href='/bailbonds/la/agent/varick-charles-taylor-sr-333282/'>Varick Charles Taylor Sr</a></strong><br>\u260e (985) 446-2214"},{"lat":29.78851,"lng":-90.86489,"label":"<strong><a href='/bailbonds/la/agent/rayne-marie-pierre-1019789/'>Rayne Marie Pierre</a></strong><br>\u260e (225) 461-5390"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

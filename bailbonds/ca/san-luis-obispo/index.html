@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,80 +107,96 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Downey, Eric</div>
   <div class="ad">102 SANTA ROSA ST., San Luis Obispo, 93405</div>
   
+  
   <div class='lic'>License: 1843444</div>
 </a><a class="agent" href="/bailbonds/ca/agent/erpenbach-kenneth-1846671/">
   <div class="an">Erpenbach, Kenneth</div>
   <div class="ad">7630 EL CAMINO REAL # B, Atascadero, 93422</div>
+  
   
   <div class='lic'>License: 1846671</div>
 </a><a class="agent" href="/bailbonds/ca/agent/flores-jeffrey-1n13349/">
   <div class="an">Flores, Jeffrey</div>
   <div class="ad">102 SANTA ROSA ST, San Luis Obispo, 93405</div>
   
+  
   <div class='lic'>License: 1N13349</div>
 </a><a class="agent" href="/bailbonds/ca/agent/houser-kerry-1845664/">
   <div class="an">Houser, Kerry</div>
   <div class="ad">102 SANTA ROSA ST., San Luis Obispo, 93405</div>
+  
   
   <div class='lic'>License: 1845664</div>
 </a><a class="agent" href="/bailbonds/ca/agent/langley-larissa-1843466/">
   <div class="an">Langley, Larissa</div>
   <div class="ad">297 SANTA ROSA ST. #A, San Luis Obispo, 93405</div>
   
+  
   <div class='lic'>License: 1843466</div>
 </a><a class="agent" href="/bailbonds/ca/agent/langley-collins-amanda-1l57310/">
   <div class="an">Langley Collins, Amanda</div>
   <div class="ad">422 KODIAK ST, Morro Bay, 93442</div>
+  
   
   <div class='lic'>License: 1L57310</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-keikiuiokalani-4476778/">
   <div class="an">Lopez, Keikiuiokalani</div>
   <div class="ad">102 SANTA ROSA ST., San Luis Obispo, 93405</div>
   
+  
   <div class='lic'>License: 4476778</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lyons-jefferson-1n13018/">
   <div class="an">Lyons, Jefferson</div>
   <div class="ad">102 SANTA ROSA ST, San Luis Obispo, 93405</div>
+  
   
   <div class='lic'>License: 1N13018</div>
 </a><a class="agent" href="/bailbonds/ca/agent/madrigal-miguel-4425225/">
   <div class="an">Madrigal, Miguel</div>
   <div class="ad">948 SANTA ROSA ST, San Luis Obispo, 93401</div>
   
+  
   <div class='lic'>License: 4425225</div>
 </a><a class="agent" href="/bailbonds/ca/agent/porter-gregory-4418272/">
   <div class="an">Porter, Gregory</div>
   <div class="ad">875 TEN OAKS WAY, Nipomo, 93444</div>
+  
   
   <div class='lic'>License: 4418272</div>
 </a><a class="agent" href="/bailbonds/ca/agent/romero-joseph-1546822/">
   <div class="an">Romero, Joseph</div>
   <div class="ad">1735 LINCOLN AVE, Arroyo Grande, 93420</div>
   
+  
   <div class='lic'>License: 1546822</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stephenson-lisa-1846307/">
   <div class="an">Stephenson, Lisa</div>
   <div class="ad">151 N 7TH STREET, Grover Beach, 93433</div>
+  
   
   <div class='lic'>License: 1846307</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stireman-aaron-4446207/">
   <div class="an">Stireman, Aaron</div>
   <div class="ad">1111 FERNWOOD DRIVE, San Luis Obispo, 93401</div>
   
+  
   <div class='lic'>License: 4446207</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sullivan-gregory-1674186/">
   <div class="an">Sullivan, Gregory</div>
   <div class="ad">948 SANTA ROSA ST., San Luis Obispo, 93401</div>
+  
   
   <div class='lic'>License: 1674186</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tuggle-daniel-1841325/">
   <div class="an">Tuggle, Daniel</div>
   <div class="ad">948 SANTA ROSA ST., San Luis Obispo, 93401</div>
   
+  
   <div class='lic'>License: 1841325</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wetzel-david-1845149/">
   <div class="an">Wetzel, David</div>
   <div class="ad">2150 CREEK RD, Oceano, 93445</div>
+  
   
   <div class='lic'>License: 1845149</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -199,5 +217,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.38819, -120.4489], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":35.29063,"lng":-120.66671,"label":"<strong><a href='/bailbonds/ca/agent/downey-eric-1843444/'>Downey, Eric</a></strong>"},{"lat":35.48019,"lng":-120.65811,"label":"<strong><a href='/bailbonds/ca/agent/erpenbach-kenneth-1846671/'>Erpenbach, Kenneth</a></strong>"},{"lat":35.29063,"lng":-120.66671,"label":"<strong><a href='/bailbonds/ca/agent/flores-jeffrey-1n13349/'>Flores, Jeffrey</a></strong>"},{"lat":35.29063,"lng":-120.66671,"label":"<strong><a href='/bailbonds/ca/agent/houser-kerry-1845664/'>Houser, Kerry</a></strong>"},{"lat":35.40046,"lng":-120.86122,"label":"<strong><a href='/bailbonds/ca/agent/langley-collins-amanda-1l57310/'>Langley Collins, Amanda</a></strong>"},{"lat":35.29063,"lng":-120.66671,"label":"<strong><a href='/bailbonds/ca/agent/lopez-keikiuiokalani-4476778/'>Lopez, Keikiuiokalani</a></strong>"},{"lat":35.29063,"lng":-120.66671,"label":"<strong><a href='/bailbonds/ca/agent/lyons-jefferson-1n13018/'>Lyons, Jefferson</a></strong>"},{"lat":35.28325,"lng":-120.66039,"label":"<strong><a href='/bailbonds/ca/agent/madrigal-miguel-4425225/'>Madrigal, Miguel</a></strong>"},{"lat":35.04009,"lng":-120.51129,"label":"<strong><a href='/bailbonds/ca/agent/porter-gregory-4418272/'>Porter, Gregory</a></strong>"},{"lat":35.07717,"lng":-120.54086,"label":"<strong><a href='/bailbonds/ca/agent/romero-joseph-1546822/'>Romero, Joseph</a></strong>"},{"lat":35.12216,"lng":-120.62274,"label":"<strong><a href='/bailbonds/ca/agent/stephenson-lisa-1846307/'>Stephenson, Lisa</a></strong>"},{"lat":35.26156,"lng":-120.64011,"label":"<strong><a href='/bailbonds/ca/agent/stireman-aaron-4446207/'>Stireman, Aaron</a></strong>"},{"lat":35.28325,"lng":-120.66039,"label":"<strong><a href='/bailbonds/ca/agent/sullivan-gregory-1674186/'>Sullivan, Gregory</a></strong>"},{"lat":35.28325,"lng":-120.66039,"label":"<strong><a href='/bailbonds/ca/agent/tuggle-daniel-1841325/'>Tuggle, Daniel</a></strong>"},{"lat":35.09693,"lng":-120.61424,"label":"<strong><a href='/bailbonds/ca/agent/wetzel-david-1845149/'>Wetzel, David</a></strong>"},{"lat":35.2662,"lng":-120.66844,"label":"<strong>1 agent in San Luis Obispo</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/langley-larissa-1843466/'>Langley, Larissa</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

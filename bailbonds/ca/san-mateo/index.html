@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,85 +107,102 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Aguilar Gonzalez, Nathalie</div>
   <div class="ad">710 WINSLOW ST., Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 4487094</div>
 </a><a class="agent" href="/bailbonds/ca/agent/betonio-anthony-1842744/">
   <div class="an">Betonio, Anthony</div>
   <div class="ad">208 MARSHALL ST. , SUITE 101, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 1842744</div>
 </a><a class="agent" href="/bailbonds/ca/agent/campana-erich-1842872/">
   <div class="an">Campana, Erich</div>
   <div class="ad">1583 EL CAMINO REAL, Millbrae, 94030</div>
   
+  
   <div class='lic'>License: 1842872</div>
 </a><a class="agent" href="/bailbonds/ca/agent/campana-geraldine-1659114/">
   <div class="an">Campana, Geraldine</div>
   <div class="ad">1583 EL CAMINO REAL, Millbrae, 94030</div>
+  
   
   <div class='lic'>License: 1659114</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-maria-1846566/">
   <div class="an">Garcia, Maria</div>
   <div class="ad">208 MARSHALL ST, Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 1846566</div>
 </a><a class="agent" href="/bailbonds/ca/agent/iaggi-jason-1842885/">
   <div class="an">Iaggi, Jason</div>
   <div class="ad">208 MARSHALL STREET, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 1842885</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lee-ronald-1841697/">
   <div class="an">Lee, Ronald</div>
   <div class="ad">1583 EL CAMINO REAL, Millbrae, 94030</div>
   
+  
   <div class='lic'>License: 1841697</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-alden-4389757/">
   <div class="an">Lopez, Alden</div>
   <div class="ad">710 WINSLOW STREET, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 4389757</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-steve-1n13199/">
   <div class="an">Lopez, Steve</div>
   <div class="ad">710 WINSLOW ST, Redwood City, 94403</div>
   
+  
   <div class='lic'>License: 1N13199</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-ivonne-1846206/">
   <div class="an">Martinez, Ivonne</div>
   <div class="ad">208 MARSHALL ST, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 1846206</div>
 </a><a class="agent" href="/bailbonds/ca/agent/murphy-soloven-1840321/">
   <div class="an">Murphy, Soloven</div>
   <div class="ad">208 MARSHALL ST., Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 1840321</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-luis-1k16747/">
   <div class="an">Ramirez, Luis</div>
   <div class="ad">208 MARSHALL STREET, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 1K16747</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-madrigal-dulce-4447081/">
   <div class="an">Reyes Madrigal, Dulce</div>
   <div class="ad">710 WINSLOW ST., Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 4447081</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tirado-castillo-cesar-1n13079/">
   <div class="an">Tirado Castillo, Cesar</div>
   <div class="ad">208 MARSHALL ST, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 1N13079</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valderrama-steven-1846476/">
   <div class="an">Valderrama, Steven</div>
   <div class="ad">208 MARSHALL STREET, Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 1846476</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vera-alejandra-1844434/">
   <div class="an">Vera, Alejandra</div>
   <div class="ad">208 MARSHALL ST., Redwood City, 94063</div>
   
+  
   <div class='lic'>License: 1844434</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wong-tercel-4430588/">
   <div class="an">Wong, Tercel</div>
   <div class="ad">710 WINSLOW STREET, Redwood City, 94063</div>
+  
   
   <div class='lic'>License: 4430588</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -204,5 +223,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.41467, -122.37155], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.48728,"lng":-122.2312,"label":"<strong><a href='/bailbonds/ca/agent/aguilar-gonzalez-nathalie-4487094/'>Aguilar Gonzalez, Nathalie</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/betonio-anthony-1842744/'>Betonio, Anthony</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/garcia-maria-1846566/'>Garcia, Maria</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/iaggi-jason-1842885/'>Iaggi, Jason</a></strong>"},{"lat":37.48728,"lng":-122.2312,"label":"<strong><a href='/bailbonds/ca/agent/lopez-alden-4389757/'>Lopez, Alden</a></strong>"},{"lat":37.48728,"lng":-122.2312,"label":"<strong><a href='/bailbonds/ca/agent/lopez-steve-1n13199/'>Lopez, Steve</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/martinez-ivonne-1846206/'>Martinez, Ivonne</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/murphy-soloven-1840321/'>Murphy, Soloven</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-luis-1k16747/'>Ramirez, Luis</a></strong>"},{"lat":37.48728,"lng":-122.2312,"label":"<strong><a href='/bailbonds/ca/agent/reyes-madrigal-dulce-4447081/'>Reyes Madrigal, Dulce</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/tirado-castillo-cesar-1n13079/'>Tirado Castillo, Cesar</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/valderrama-steven-1846476/'>Valderrama, Steven</a></strong>"},{"lat":37.48672,"lng":-122.23212,"label":"<strong><a href='/bailbonds/ca/agent/vera-alejandra-1844434/'>Vera, Alejandra</a></strong>"},{"lat":37.48728,"lng":-122.2312,"label":"<strong><a href='/bailbonds/ca/agent/wong-tercel-4430588/'>Wong, Tercel</a></strong>"},{"lat":37.59897,"lng":-122.40199,"label":"<strong>3 agents in Millbrae</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/campana-erich-1842872/'>Campana, Erich</a></strong><br><strong><a href='/bailbonds/ca/agent/campana-geraldine-1659114/'>Campana, Geraldine</a></strong><br><strong><a href='/bailbonds/ca/agent/lee-ronald-1841697/'>Lee, Ronald</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

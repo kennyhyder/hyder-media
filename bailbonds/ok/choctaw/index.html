@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,22 +106,26 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ok/agent/wanda-fredalene-holder/">
   <div class="an">Wanda Fredalene Holder</div>
   <div class="ad">Hugo</div>
-  <div class='ph'>(580) 317-3009</div>
+  <div class='ph'>☎ (580) 317-3009</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/clark-holder/">
   <div class="an">Clark Holder</div><div class='ad'>Holder Bail Bond</div>
   <div class="ad">401 E. Duke</div>
-  <div class='ph'>(580) 317-5009</div>
+  <div class='ph'>☎ (580) 317-5009</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/jericho-holder/">
   <div class="an">Jericho Holder</div><div class='ad'>JHolder Bail Bonds</div>
   <div class="ad">Soper</div>
-  <div class='ph'>(580) 271-1063</div>
+  <div class='ph'>☎ (580) 271-1063</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/brandy-mcknight/">
   <div class="an">Brandy Mcknight</div><div class='ad'>Mcknight Bail Bonds</div>
   <div class="ad">Sawyer</div>
-  <div class='ph'>(580) 317-7781</div>
+  <div class='ph'>☎ (580) 317-7781</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://choctawcosheriff.com/bondsmen' rel='nofollow'>choctawcosheriff.com</a> · <a href='https://howbailbondswork.com/oklahoma/Oklahoma_Bail_Bonds_Agents_List.pdf' rel='nofollow'>howbailbondswork.com</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.0277, -95.55408], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.01158,"lng":-95.51218,"label":"<strong>1 agent in Hugo</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/wanda-fredalene-holder/'>Wanda Fredalene Holder</a></strong><br>\u260e (580) 317-3009"},{"lat":34.03207,"lng":-95.6966,"label":"<strong>1 agent in Soper</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/jericho-holder/'>Jericho Holder</a></strong><br>\u260e (580) 271-1063"},{"lat":34.01871,"lng":-95.37847,"label":"<strong>1 agent in Sawyer</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/brandy-mcknight/'>Brandy Mcknight</a></strong><br>\u260e (580) 317-7781"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

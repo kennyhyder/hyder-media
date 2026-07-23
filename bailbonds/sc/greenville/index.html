@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,52 +106,62 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/atchison-christopher-l-prb-6445357-npn-6445357/">
   <div class="an">Atchison, Christopher L</div>
   <div class="ad">Greenville, 29601</div>
-  <div class='ph'>(864) 271-0222</div>
+  <div class='ph'>☎ (864) 271-0222</div>
+  
   <div class='lic'>License: PRB 6445357 (NPN 6445357)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/curlee-jack-d-prb-6427911-npn-6427911/">
   <div class="an">Curlee, Jack D</div><div class='ad'>A-1 Bail Bonding</div>
   <div class="ad">Greenville, 29601</div>
-  <div class='ph'>(864) 232-0646</div>
+  <div class='ph'>☎ (864) 232-0646</div>
+  
   <div class='lic'>License: PRB 6427911 (NPN 6427911)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/downs-yvonne-j-prb-17533637-npn-17533637/">
   <div class="an">Downs, Yvonne J</div>
   <div class="ad">Greenville, 29605</div>
-  <div class='ph'>(864) 509-0684</div>
+  <div class='ph'>☎ (864) 509-0684</div>
+  
   <div class='lic'>License: PRB 17533637 (NPN 17533637)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/kellett-michael-t-prb-8557878-npn-8557878/">
   <div class="an">Kellett, Michael T</div>
   <div class="ad">Simpsonville, 29680</div>
-  <div class='ph'>(864) 233-0041</div>
+  <div class='ph'>☎ (864) 233-0041</div>
+  
   <div class='lic'>License: PRB 8557878 (NPN 8557878)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/mccrary-joel-wesley-prb-8435538-npn-8435538/">
   <div class="an">Mccrary, Joel Wesley</div>
   <div class="ad">Taylors, 29687</div>
-  <div class='ph'>(864) 848-3833</div>
+  <div class='ph'>☎ (864) 848-3833</div>
+  
   <div class='lic'>License: PRB 8435538 (NPN 8435538)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/mcgee-lindsay-prb-20888383-npn-20888383/">
   <div class="an">Mcgee, Lindsay</div>
   <div class="ad">Mauldin, 29662</div>
-  <div class='ph'>(864) 918-9405</div>
+  <div class='ph'>☎ (864) 918-9405</div>
+  
   <div class='lic'>License: PRB 20888383 (NPN 20888383)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/thompson-lamal-j-prb-8425348-npn-8425348/">
   <div class="an">Thompson, Lamal J</div>
   <div class="ad">Greer, 29650</div>
-  <div class='ph'>(864) 233-5225</div>
+  <div class='ph'>☎ (864) 233-5225</div>
+  
   <div class='lic'>License: PRB 8425348 (NPN 8425348)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/trotter-milton-iii-prb-6435405-npn-6435405/">
   <div class="an">Trotter, Milton Iii</div><div class='ad'>Trotter Bonding Company</div>
   <div class="ad">Greenville, 29601</div>
-  <div class='ph'>(864) 233-3076</div>
+  <div class='ph'>☎ (864) 233-3076</div>
+  
   <div class='lic'>License: PRB 6435405 (NPN 6435405)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/tucker-kenyatta-olando-prb-22090012-npn-22090012/">
   <div class="an">Tucker, Kenyatta Olando</div>
   <div class="ad">Greenville, 29607</div>
-  <div class='ph'>(864) 399-5375</div>
+  <div class='ph'>☎ (864) 399-5375</div>
+  
   <div class='lic'>License: PRB 22090012 (NPN 22090012)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/anastos-stephen-a-rbm-18393237-npn-18393237/">
   <div class="an">Anastos, Stephen A</div>
   <div class="ad">Easley, 29642</div>
-  <div class='ph'>(864) 979-2230</div>
+  <div class='ph'>☎ (864) 979-2230</div>
+  
   <div class='lic'>License: RBM 18393237 (NPN 18393237)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Greenville' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Greenville' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -169,5 +181,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.89265, -82.37208], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.8369,"lng":-82.363,"label":"<strong>5 agents in Greenville</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/atchison-christopher-l-prb-6445357-npn-6445357/'>Atchison, Christopher L</a></strong><br>\u260e (864) 271-0222<br><strong><a href='/bailbonds/sc/agent/curlee-jack-d-prb-6427911-npn-6427911/'>Curlee, Jack D</a></strong><br>\u260e (864) 232-0646<br><strong><a href='/bailbonds/sc/agent/downs-yvonne-j-prb-17533637-npn-17533637/'>Downs, Yvonne J</a></strong><br>\u260e (864) 509-0684<br><strong><a href='/bailbonds/sc/agent/trotter-milton-iii-prb-6435405-npn-6435405/'>Trotter, Milton Iii</a></strong><br>\u260e (864) 233-3076<br><strong><a href='/bailbonds/sc/agent/tucker-kenyatta-olando-prb-22090012-npn-22090012/'>Tucker, Kenyatta Olando</a></strong><br>\u260e (864) 399-5375"},{"lat":34.72903,"lng":-82.25752,"label":"<strong>1 agent in Simpsonville</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/kellett-michael-t-prb-8557878-npn-8557878/'>Kellett, Michael T</a></strong><br>\u260e (864) 233-0041"},{"lat":34.91431,"lng":-82.31391,"label":"<strong>1 agent in Taylors</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/mccrary-joel-wesley-prb-8435538-npn-8435538/'>Mccrary, Joel Wesley</a></strong><br>\u260e (864) 848-3833"},{"lat":34.78102,"lng":-82.30423,"label":"<strong>1 agent in Mauldin</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/mcgee-lindsay-prb-20888383-npn-20888383/'>Mcgee, Lindsay</a></strong><br>\u260e (864) 918-9405"},{"lat":34.93329,"lng":-82.2308,"label":"<strong>1 agent in Greer</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/thompson-lamal-j-prb-8425348-npn-8425348/'>Thompson, Lamal J</a></strong><br>\u260e (864) 233-5225"},{"lat":34.81981,"lng":-82.58216,"label":"<strong>1 agent in Easley</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/anastos-stephen-a-rbm-18393237-npn-18393237/'>Anastos, Stephen A</a></strong><br>\u260e (864) 979-2230"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

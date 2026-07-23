@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,32 +106,38 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mi/agent/lafran-hill-bell/">
   <div class="an">LaFran Hill-Bell</div><div class='ad'>#1 4 Bail</div>
   <div class="ad">P.O. Box 457, Birmingham, 48012</div>
-  <div class='ph'>313-585-1729</div>
+  <div class='ph'>☎ 313-585-1729</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/isrrael-cruz/">
   <div class="an">Isrrael Cruz</div><div class='ad'>A-1 Bail Bond Agency, Inc.</div>
   <div class="ad">1419 S. Milford Rd., Highland, 48357</div>
-  <div class='ph'>888-777-9511</div>
+  <div class='ph'>☎ 888-777-9511</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/matthew-maddock/">
   <div class="an">Matthew Maddock</div><div class='ad'>A-1 Bail Bond Agency, Inc.</div>
   <div class="ad">1419 S. Milford Rd., Highland, 48357</div>
-  <div class='ph'>888-777-9511</div>
+  <div class='ph'>☎ 888-777-9511</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/andrew-hoover/">
   <div class="an">Andrew Hoover</div><div class='ad'>Andrew's Quick Bail, LLC</div>
   <div class="ad">2525 Pontiac Lake Road, Waterford, 48328</div>
-  <div class='ph'>313-434-9846</div>
+  <div class='ph'>☎ 313-434-9846</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/michael-hoover/">
   <div class="an">Michael Hoover</div><div class='ad'>Andrew's Quick Bail, LLC</div>
   <div class="ad">2525 Pontiac Lake Road, Waterford, 48328</div>
-  <div class='ph'>313-434-9846</div>
+  <div class='ph'>☎ 313-434-9846</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/jeremy-stradley/">
   <div class="an">Jeremy Stradley</div><div class='ad'>Freedom Bail Bonds II</div>
   <div class="ad">331 E. 9 Mile Road, Hazel Park, 48030</div>
-  <div class='ph'>248-399-9475</div>
+  <div class='ph'>☎ 248-399-9475</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://files.7thcircuitcourt.com/Documents/Quick%20Links/Approved%20Bail%20Bond%20Companies/Approved%20Bond%20list.pdf' rel='nofollow'>files.7thcircuitcourt.com</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.66045, -83.38421], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":42.62723,"lng":-83.61632,"label":"<strong><a href='/bailbonds/mi/agent/isrrael-cruz/'>Isrrael Cruz</a></strong><br>\u260e 888-777-9511"},{"lat":42.62723,"lng":-83.61632,"label":"<strong><a href='/bailbonds/mi/agent/matthew-maddock/'>Matthew Maddock</a></strong><br>\u260e 888-777-9511"},{"lat":42.65424,"lng":-83.33756,"label":"<strong><a href='/bailbonds/mi/agent/andrew-hoover/'>Andrew Hoover</a></strong><br>\u260e 313-434-9846"},{"lat":42.65424,"lng":-83.33756,"label":"<strong><a href='/bailbonds/mi/agent/michael-hoover/'>Michael Hoover</a></strong><br>\u260e 313-434-9846"},{"lat":42.46149,"lng":-83.10251,"label":"<strong><a href='/bailbonds/mi/agent/jeremy-stradley/'>Jeremy Stradley</a></strong><br>\u260e 248-399-9475"},{"lat":42.5448,"lng":-83.21658,"label":"<strong>1 agent in Birmingham</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mi/agent/lafran-hill-bell/'>LaFran Hill-Bell</a></strong><br>\u260e 313-585-1729"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

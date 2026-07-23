@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,12 +106,14 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/hamilton-peter-lamark-rbm-21466931-npn-21466931/">
   <div class="an">Hamilton, Peter Lamark</div>
   <div class="ad">Hollywood, 29449</div>
-  <div class='ph'>(843) 459-5739</div>
+  <div class='ph'>☎ (843) 459-5739</div>
+  
   <div class='lic'>License: RBM 21466931 (NPN 21466931)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/archield-iris-sbb-17751695-npn-17751695/">
   <div class="an">Archield, Iris</div>
   <div class="ad">North Charleston, 29418</div>
-  <div class='ph'>(843) 303-5139</div>
+  <div class='ph'>☎ (843) 303-5139</div>
+  
   <div class='lic'>License: SBB 17751695 (NPN 17751695)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Charleston' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Charleston' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -129,5 +133,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.80046, -79.94248], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.75125,"lng":-80.20193,"label":"<strong>1 agent in Hollywood</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/hamilton-peter-lamark-rbm-21466931-npn-21466931/'>Hamilton, Peter Lamark</a></strong><br>\u260e (843) 459-5739"},{"lat":32.91788,"lng":-80.065,"label":"<strong>1 agent in North Charleston</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/archield-iris-sbb-17751695-npn-17751695/'>Archield, Iris</a></strong><br>\u260e (843) 303-5139"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

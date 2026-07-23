@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,80 +107,96 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Barbree, James</div>
   <div class="ad">40 BELLARMINE CT, Chico, 95928</div>
   
+  
   <div class='lic'>License: 1N06978</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bennett-billie-1n12974/">
   <div class="an">Bennett, Billie</div>
   <div class="ad">2131 4TH ST, Oroville, 95965</div>
+  
   
   <div class='lic'>License: 1N12974</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coito-david-4547163/">
   <div class="an">Coito, David</div>
   <div class="ad">1940 FEATHER RIVER BLVD., SUITEG, Oroville, 95965</div>
   
+  
   <div class='lic'>License: 4547163</div>
 </a><a class="agent" href="/bailbonds/ca/agent/davis-matthew-1832867/">
   <div class="an">Davis, Matthew</div>
   <div class="ad">40 BELLARMINE CT, Chico, 95928</div>
+  
   
   <div class='lic'>License: 1832867</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dawson-brian-1m10167/">
   <div class="an">Dawson, Brian</div>
   <div class="ad">2920 CLARK RD 19A, Oroville, 95965</div>
   
+  
   <div class='lic'>License: 1M10167</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dixon-logan-4463029/">
   <div class="an">Dixon, Logan</div>
   <div class="ad">40 BELLARMINE COURT, Chico, 95928</div>
+  
   
   <div class='lic'>License: 4463029</div>
 </a><a class="agent" href="/bailbonds/ca/agent/fowler-bradley-1844697/">
   <div class="an">Fowler, Bradley</div>
   <div class="ad">30 MANON LN, Oroville, 95966</div>
   
+  
   <div class='lic'>License: 1844697</div>
 </a><a class="agent" href="/bailbonds/ca/agent/maguire-sharon-4441948/">
   <div class="an">Maguire, Sharon</div>
   <div class="ad">1940 FEATHER RIVER BLVD., SUITE G., Oroville, 95965</div>
+  
   
   <div class='lic'>License: 4441948</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcmains-nikki-1443843/">
   <div class="an">Mcmains, Nikki</div>
   <div class="ad">30 MANON LANE, Oroville, 95966</div>
   
+  
   <div class='lic'>License: 1443843</div>
 </a><a class="agent" href="/bailbonds/ca/agent/moore-nathan-1n12949/">
   <div class="an">Moore, Nathan</div>
   <div class="ad">30 Manon Lane, Oroville, 95966</div>
+  
   
   <div class='lic'>License: 1N12949</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortiz-munguia-yobani-1n13256/">
   <div class="an">Ortiz Munguia, Yobani</div>
   <div class="ad">1940 FEATHER RIVER BLVD SUITE G, Oroville, 95966</div>
   
+  
   <div class='lic'>License: 1N13256</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-rice-norberto-1m85583/">
   <div class="an">Ramirez-Rice, Norberto</div>
   <div class="ad">1940 FEATHER RIVER BLVD STE G, Oroville, 95965</div>
+  
   
   <div class='lic'>License: 1M85583</div>
 </a><a class="agent" href="/bailbonds/ca/agent/singh-sandeep-1m71704/">
   <div class="an">Singh, Sandeep</div>
   <div class="ad">1940 FEATHER RIVER BLVD STE G, Oroville, 95965</div>
   
+  
   <div class='lic'>License: 1M71704</div>
 </a><a class="agent" href="/bailbonds/ca/agent/skoog-steven-1841058/">
   <div class="an">Skoog, Steven</div>
   <div class="ad">30 MANON LANE, Oroville, 95966</div>
+  
   
   <div class='lic'>License: 1841058</div>
 </a><a class="agent" href="/bailbonds/ca/agent/spyres-autumn-1n13305/">
   <div class="an">Spyres, Autumn</div>
   <div class="ad">1940 FEATHER RIVER BLVD SUITE G, Oroville, 95965</div>
   
+  
   <div class='lic'>License: 1N13305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wood-curtis-4422464/">
   <div class="an">Wood, Curtis</div>
   <div class="ad">1940 FEATHER RIVER BLVD STE G, Oroville, 95965</div>
+  
   
   <div class='lic'>License: 4422464</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -199,5 +217,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.66534, -121.60321], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.71326,"lng":-121.8203,"label":"<strong><a href='/bailbonds/ca/agent/barbree-james-1n06978/'>Barbree, James</a></strong>"},{"lat":39.52256,"lng":-121.57405,"label":"<strong><a href='/bailbonds/ca/agent/bennett-billie-1n12974/'>Bennett, Billie</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/coito-david-4547163/'>Coito, David</a></strong>"},{"lat":39.71326,"lng":-121.8203,"label":"<strong><a href='/bailbonds/ca/agent/davis-matthew-1832867/'>Davis, Matthew</a></strong>"},{"lat":39.66084,"lng":-121.62937,"label":"<strong><a href='/bailbonds/ca/agent/dawson-brian-1m10167/'>Dawson, Brian</a></strong>"},{"lat":39.71326,"lng":-121.8203,"label":"<strong><a href='/bailbonds/ca/agent/dixon-logan-4463029/'>Dixon, Logan</a></strong>"},{"lat":39.50882,"lng":-121.45202,"label":"<strong><a href='/bailbonds/ca/agent/fowler-bradley-1844697/'>Fowler, Bradley</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/maguire-sharon-4441948/'>Maguire, Sharon</a></strong>"},{"lat":39.50882,"lng":-121.45202,"label":"<strong><a href='/bailbonds/ca/agent/mcmains-nikki-1443843/'>Mcmains, Nikki</a></strong>"},{"lat":39.50882,"lng":-121.45202,"label":"<strong><a href='/bailbonds/ca/agent/moore-nathan-1n12949/'>Moore, Nathan</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/ortiz-munguia-yobani-1n13256/'>Ortiz Munguia, Yobani</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-rice-norberto-1m85583/'>Ramirez-Rice, Norberto</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/singh-sandeep-1m71704/'>Singh, Sandeep</a></strong>"},{"lat":39.50882,"lng":-121.45202,"label":"<strong><a href='/bailbonds/ca/agent/skoog-steven-1841058/'>Skoog, Steven</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/spyres-autumn-1n13305/'>Spyres, Autumn</a></strong>"},{"lat":39.50127,"lng":-121.57129,"label":"<strong><a href='/bailbonds/ca/agent/wood-curtis-4422464/'>Wood, Curtis</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

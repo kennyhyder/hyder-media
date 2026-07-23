@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,25 +107,30 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Brown, Robert</div>
   <div class="ad">435 N MAIN ST, Lakeport, 95453</div>
   
+  
   <div class='lic'>License: 1783498</div>
 </a><a class="agent" href="/bailbonds/ca/agent/catalina-anthony-1842081/">
   <div class="an">Catalina, Anthony</div>
   <div class="ad">1054 N. MAIN ST., Lakeport, 95453</div>
+  
   
   <div class='lic'>License: 1842081</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cruz-ronnie-1g57098/">
   <div class="an">Cruz, Ronnie</div>
   <div class="ad">434 AVENUE B, Lakeport, 95453</div>
   
+  
   <div class='lic'>License: 1G57098</div>
 </a><a class="agent" href="/bailbonds/ca/agent/jackson-teresa-1840617/">
   <div class="an">Jackson, Teresa</div>
   <div class="ad">211 WRIGHT LANE, Lakeport, 95453</div>
   
+  
   <div class='lic'>License: 1840617</div>
 </a><a class="agent" href="/bailbonds/ca/agent/morris-marcia-1842275/">
   <div class="an">Morris, Marcia</div>
   <div class="ad">6199 5TH AVE, Lucerne, 95458</div>
+  
   
   <div class='lic'>License: 1842275</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.10801, -122.74522], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.0449,"lng":-122.9152,"label":"<strong><a href='/bailbonds/ca/agent/brown-robert-1783498/'>Brown, Robert</a></strong>"},{"lat":39.04859,"lng":-122.91502,"label":"<strong><a href='/bailbonds/ca/agent/catalina-anthony-1842081/'>Catalina, Anthony</a></strong>"},{"lat":39.11026,"lng":-122.89804,"label":"<strong><a href='/bailbonds/ca/agent/cruz-ronnie-1g57098/'>Cruz, Ronnie</a></strong>"},{"lat":39.07229,"lng":-122.91562,"label":"<strong><a href='/bailbonds/ca/agent/jackson-teresa-1840617/'>Jackson, Teresa</a></strong>"},{"lat":39.09296,"lng":-122.79686,"label":"<strong><a href='/bailbonds/ca/agent/morris-marcia-1842275/'>Morris, Marcia</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

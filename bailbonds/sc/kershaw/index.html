@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,12 +106,14 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/williams-marion-brock-prb-18393654-npn-18393654/">
   <div class="an">Williams, Marion Brock</div><div class='ad'>Williams' Bail Bonds Company</div>
   <div class="ad">Camden, 29020</div>
-  <div class='ph'>(803) 425-8860</div>
+  <div class='ph'>☎ (803) 425-8860</div>
+  
   <div class='lic'>License: PRB 18393654 (NPN 18393654)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/minich-marshall-m-rbm-18393431-npn-18393431/">
   <div class="an">Minich, Marshall M</div><div class='ad'>Davis Bail Bonding Co.</div>
   <div class="ad">Camden, 29020</div>
-  <div class='ph'>(803) 600-7351</div>
+  <div class='ph'>☎ (803) 600-7351</div>
+  
   <div class='lic'>License: RBM 18393431 (NPN 18393431)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Kershaw' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Kershaw' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -129,5 +133,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.33836, -80.59089], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.25893,"lng":-80.6092,"label":"<strong>2 agents in Camden</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/williams-marion-brock-prb-18393654-npn-18393654/'>Williams, Marion Brock</a></strong><br>\u260e (803) 425-8860<br><strong><a href='/bailbonds/sc/agent/minich-marshall-m-rbm-18393431-npn-18393431/'>Minich, Marshall M</a></strong><br>\u260e (803) 600-7351"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

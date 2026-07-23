@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,217 +106,260 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/sheral-ann-lavergne-66977/">
   <div class="an">Sheral Ann Lavergne</div>
   <div class="ad">2910 Todd Jude Road, Lake Charles, 70607</div>
-  <div class='ph'>(337) 274-8936</div>
+  <div class='ph'>☎ (337) 274-8936</div>
+  
   <div class='lic'>License: 66977</div>
 </a><a class="agent" href="/bailbonds/la/agent/iram-patrick-fuselier-69958/">
   <div class="an">Iram Patrick Fuselier</div>
   <div class="ad">5419 East Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 433-3767</div>
+  <div class='ph'>☎ (337) 433-3767</div>
+  
   <div class='lic'>License: 69958</div>
 </a><a class="agent" href="/bailbonds/la/agent/richard-lynn-fuselier-158058/">
   <div class="an">Richard Lynn Fuselier</div>
   <div class="ad">5419 E Broad, Lake Charles, 70615</div>
-  <div class='ph'>(337) 433-3767</div>
+  <div class='ph'>☎ (337) 433-3767</div>
+  
   <div class='lic'>License: 158058</div>
 </a><a class="agent" href="/bailbonds/la/agent/mary-linda-fonda-103382/">
   <div class="an">Mary Linda Fonda</div>
   <div class="ad">678 S. Tillie, Lake Charles, 70611</div>
-  <div class='ph'>(337) 855-2681</div>
+  <div class='ph'>☎ (337) 855-2681</div>
+  
   <div class='lic'>License: 103382</div>
 </a><a class="agent" href="/bailbonds/la/agent/thomas-cecil-paris-168474/">
   <div class="an">Thomas Cecil Paris</div>
   <div class="ad">5349 Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 437-3755</div>
+  <div class='ph'>☎ (337) 437-3755</div>
+  
   <div class='lic'>License: 168474</div>
 </a><a class="agent" href="/bailbonds/la/agent/murphy-shaune-fuselier-173024/">
   <div class="an">Murphy Shaune Fuselier</div>
   <div class="ad">A Fuselier Bonding Service 5419 E Broad St., Lake Charles, 70615</div>
-  <div class='ph'>(337) 936-1920</div>
+  <div class='ph'>☎ (337) 936-1920</div>
+  
   <div class='lic'>License: 173024</div>
 </a><a class="agent" href="/bailbonds/la/agent/iva-marie-hernandez-196444/">
   <div class="an">Iva Marie Hernandez</div>
   <div class="ad">5349 E Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 439-1808</div>
+  <div class='ph'>☎ (337) 439-1808</div>
+  
   <div class='lic'>License: 196444</div>
 </a><a class="agent" href="/bailbonds/la/agent/michael-todd-smith-174019/">
   <div class="an">Michael Todd Smith</div>
   <div class="ad">1638 Broad Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 912-1267</div>
+  <div class='ph'>☎ (337) 912-1267</div>
+  
   <div class='lic'>License: 174019</div>
 </a><a class="agent" href="/bailbonds/la/agent/angelica-antoinette-floyd-205173/">
   <div class="an">Angelica Antoinette Floyd</div>
   <div class="ad">4445 Gordon Woods Drive, Lake Charles, 70615</div>
-  <div class='ph'>(337) 764-2247</div>
+  <div class='ph'>☎ (337) 764-2247</div>
+  
   <div class='lic'>License: 205173</div>
 </a><a class="agent" href="/bailbonds/la/agent/wilford-dan-carter-ii-227092/">
   <div class="an">Wilford Dan Carter II</div>
   <div class="ad">5415 B East Broad St., Lake Charles, 70615</div>
-  <div class='ph'>(337) 249-0768</div>
+  <div class='ph'>☎ (337) 249-0768</div>
+  
   <div class='lic'>License: 227092</div>
 </a><a class="agent" href="/bailbonds/la/agent/cathy-bailey-gauthier-249630/">
   <div class="an">Cathy Bailey Gauthier</div>
   <div class="ad">5607 Jade Drive, Lake Charles, 70615</div>
-  <div class='ph'>(337) 497-1756</div>
+  <div class='ph'>☎ (337) 497-1756</div>
+  
   <div class='lic'>License: 249630</div>
 </a><a class="agent" href="/bailbonds/la/agent/fuselier-bonding-service-ltd-188105/">
   <div class="an">Fuselier Bonding Service Ltd</div>
   <div class="ad">5419 EAST BROAD, LAKE CHARLES, 70615</div>
-  <div class='ph'>(337) 433-3767</div>
+  <div class='ph'>☎ (337) 433-3767</div>
+  
   <div class='lic'>License: 188105</div>
 </a><a class="agent" href="/bailbonds/la/agent/julie-ann-landry-280182/">
   <div class="an">Julie Ann Landry</div>
   <div class="ad">5419 E Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 491-9600</div>
+  <div class='ph'>☎ (337) 491-9600</div>
+  
   <div class='lic'>License: 280182</div>
 </a><a class="agent" href="/bailbonds/la/agent/cookie-s-bail-bonds-ins-agcy-289128/">
   <div class="an">Cookie's Bail Bonds &amp; Ins Agcy</div>
   <div class="ad">2910 Todd Jude Road, Lake Charles, 70607</div>
-  <div class='ph'>(337) 274-8936</div>
+  <div class='ph'>☎ (337) 274-8936</div>
+  
   <div class='lic'>License: 289128</div>
 </a><a class="agent" href="/bailbonds/la/agent/a-all-day-night-bonding-inc-285445/">
   <div class="an">A-All Day &amp; Night Bonding Inc</div>
   <div class="ad">5419 E Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 491-9600</div>
+  <div class='ph'>☎ (337) 491-9600</div>
+  
   <div class='lic'>License: 285445</div>
 </a><a class="agent" href="/bailbonds/la/agent/cathy-s-bail-bonding-inc-325854/">
   <div class="an">Cathy's Bail Bonding Inc</div>
   <div class="ad">5607 Jade Drive, Lake Charles, 70615</div>
-  <div class='ph'>(337) 496-6219</div>
+  <div class='ph'>☎ (337) 496-6219</div>
+  
   <div class='lic'>License: 325854</div>
 </a><a class="agent" href="/bailbonds/la/agent/daniel-george-vamvoras-485759/">
   <div class="an">Daniel George Vamvoras</div>
   <div class="ad">1111 Ryan St, LAKE CHARLES, 70601</div>
-  <div class='ph'>(337) 532-1233</div>
+  <div class='ph'>☎ (337) 532-1233</div>
+  
   <div class='lic'>License: 485759</div>
 </a><a class="agent" href="/bailbonds/la/agent/william-ezekial-guillory-566503/">
   <div class="an">William Ezekial Guillory</div>
   <div class="ad">4225 Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 348-1377</div>
+  <div class='ph'>☎ (337) 348-1377</div>
+  
   <div class='lic'>License: 566503</div>
 </a><a class="agent" href="/bailbonds/la/agent/dawn-rae-farris-625880/">
   <div class="an">Dawn Rae Farris</div>
   <div class="ad">800 Hummingbird Cv, Lake Charles, 70611</div>
-  <div class='ph'>(337) 853-2178</div>
+  <div class='ph'>☎ (337) 853-2178</div>
+  
   <div class='lic'>License: 625880</div>
 </a><a class="agent" href="/bailbonds/la/agent/john-anthony-rogers-478595/">
   <div class="an">John Anthony Rogers</div>
   <div class="ad">5859 Tom Hebert Rd # 39, Lake Charles, 70607</div>
-  <div class='ph'>(337) 249-8337</div>
+  <div class='ph'>☎ (337) 249-8337</div>
+  
   <div class='lic'>License: 478595</div>
 </a><a class="agent" href="/bailbonds/la/agent/monique-irene-tolbert-723068/">
   <div class="an">Monique Irene Tolbert</div>
   <div class="ad">2807 5Th Ave, Lake Charles, 70601</div>
-  <div class='ph'>(337) 274-1124</div>
+  <div class='ph'>☎ (337) 274-1124</div>
+  
   <div class='lic'>License: 723068</div>
 </a><a class="agent" href="/bailbonds/la/agent/will-guillory-s-bail-bonds-llc-723572/">
   <div class="an">Will Guillory's Bail Bonds, LLC</div>
   <div class="ad">4225 Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 433-5550</div>
+  <div class='ph'>☎ (337) 433-5550</div>
+  
   <div class='lic'>License: 723572</div>
 </a><a class="agent" href="/bailbonds/la/agent/monica-vidrine-722904/">
   <div class="an">Monica Vidrine</div>
   <div class="ad">5419 E Broad St  5419 E. Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 433-3767</div>
+  <div class='ph'>☎ (337) 433-3767</div>
+  
   <div class='lic'>License: 722904</div>
 </a><a class="agent" href="/bailbonds/la/agent/priscilla-sam-733023/">
   <div class="an">Priscilla Sam</div>
   <div class="ad">400 North Lyons Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 249-9595</div>
+  <div class='ph'>☎ (337) 249-9595</div>
+  
   <div class='lic'>License: 733023</div>
 </a><a class="agent" href="/bailbonds/la/agent/hunter-ray-robin-800017/">
   <div class="an">Hunter Ray Robin</div>
   <div class="ad">5345 Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 433-5550</div>
+  <div class='ph'>☎ (337) 433-5550</div>
+  
   <div class='lic'>License: 800017</div>
 </a><a class="agent" href="/bailbonds/la/agent/tomika-nicole-duhon-bilbo-542478/">
   <div class="an">Tomika Nicole Duhon-Bilbo</div>
   <div class="ad">2433 18th Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 842-7232</div>
+  <div class='ph'>☎ (337) 842-7232</div>
+  
   <div class='lic'>License: 542478</div>
 </a><a class="agent" href="/bailbonds/la/agent/katrell-a-guillory-1139923/">
   <div class="an">Katrell A Guillory</div>
   <div class="ad">1025 Mill Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 429-5620</div>
+  <div class='ph'>☎ (337) 429-5620</div>
+  
   <div class='lic'>License: 1139923</div>
 </a><a class="agent" href="/bailbonds/la/agent/jayden-enterprises-617969/">
   <div class="an">Jayden Enterprises</div>
   <div class="ad">1111 Ryan St, Lake Charles, 70601</div>
-  <div class='ph'>(337) 433-6486</div>
+  <div class='ph'>☎ (337) 433-6486</div>
+  
   <div class='lic'>License: 617969</div>
 </a><a class="agent" href="/bailbonds/la/agent/lydia-l-larce-764080/">
   <div class="an">Lydia L Larce</div>
   <div class="ad">1716 Wendell Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 515-1832</div>
+  <div class='ph'>☎ (337) 515-1832</div>
+  
   <div class='lic'>License: 764080</div>
 </a><a class="agent" href="/bailbonds/la/agent/leighton-charles-eloi-637599/">
   <div class="an">Leighton Charles Eloi</div>
   <div class="ad">5419 E Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 965-0909</div>
+  <div class='ph'>☎ (337) 965-0909</div>
+  
   <div class='lic'>License: 637599</div>
 </a><a class="agent" href="/bailbonds/la/agent/michael-earl-lehr-1227160/">
   <div class="an">Michael Earl Lehr</div>
   <div class="ad">5345 Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 348-1377</div>
+  <div class='ph'>☎ (337) 348-1377</div>
+  
   <div class='lic'>License: 1227160</div>
 </a><a class="agent" href="/bailbonds/la/agent/mario-glynn-hernandez-503348/">
   <div class="an">Mario Glynn Hernandez</div>
   <div class="ad">5345 E Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 496-7427</div>
+  <div class='ph'>☎ (337) 496-7427</div>
+  
   <div class='lic'>License: 503348</div>
 </a><a class="agent" href="/bailbonds/la/agent/carter-bail-bonds-llc-846215/">
   <div class="an">Carter Bail Bonds Llc</div>
   <div class="ad">1025 Mill St, Lake Charles, 70601</div>
-  <div class='ph'>(337) 249-0768</div>
+  <div class='ph'>☎ (337) 249-0768</div>
+  
   <div class='lic'>License: 846215</div>
 </a><a class="agent" href="/bailbonds/la/agent/rochelle-williams-bradley-862918/">
   <div class="an">Rochelle Williams Bradley</div>
   <div class="ad">2018 Moeling St, Lake Charles, 70601</div>
-  <div class='ph'>(337) 419-9587</div>
+  <div class='ph'>☎ (337) 419-9587</div>
+  
   <div class='lic'>License: 862918</div>
 </a><a class="agent" href="/bailbonds/la/agent/tessie-renee-reed-853056/">
   <div class="an">Tessie Renee Reed</div>
   <div class="ad">1111 Ryan Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 436-3292</div>
+  <div class='ph'>☎ (337) 436-3292</div>
+  
   <div class='lic'>License: 853056</div>
 </a><a class="agent" href="/bailbonds/la/agent/dustina-fulks-fulks-950973/">
   <div class="an">Dustina Fulks Fulks</div>
   <div class="ad">5439 E. Broad Street, Lake Charles, 70615</div>
-  <div class='ph'>(337) 437-3755</div>
+  <div class='ph'>☎ (337) 437-3755</div>
+  
   <div class='lic'>License: 950973</div>
 </a><a class="agent" href="/bailbonds/la/agent/megan-shay-gabriel-984935/">
   <div class="an">Megan Shay Gabriel</div>
   <div class="ad">5415 Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 476-0925</div>
+  <div class='ph'>☎ (337) 476-0925</div>
+  
   <div class='lic'>License: 984935</div>
 </a><a class="agent" href="/bailbonds/la/agent/out-by-dawn-bail-bonds-llc-866064/">
   <div class="an">Out By Dawn Bail Bonds Llc</div>
   <div class="ad">700 Arsene LeBleu Rd, Lake Charles, 70607</div>
-  <div class='ph'>(337) 853-2178</div>
+  <div class='ph'>☎ (337) 853-2178</div>
+  
   <div class='lic'>License: 866064</div>
 </a><a class="agent" href="/bailbonds/la/agent/surety-first-llc-1148632/">
   <div class="an">Surety First Llc</div>
   <div class="ad">1025 Mill Street, Lake Charles, 70601</div>
-  <div class='ph'>(337) 429-5620</div>
+  <div class='ph'>☎ (337) 429-5620</div>
+  
   <div class='lic'>License: 1148632</div>
 </a><a class="agent" href="/bailbonds/la/agent/cresenthia-m-bushnell-1233878/">
   <div class="an">Cresenthia M Bushnell</div>
   <div class="ad">601 BILBO STREET Unit N, Lake Charles, 70601</div>
-  <div class='ph'>(337) 990-5181</div>
+  <div class='ph'>☎ (337) 990-5181</div>
+  
   <div class='lic'>License: 1233878</div>
 </a><a class="agent" href="/bailbonds/la/agent/bradley-s-bail-bonds-more-llc-954745/">
   <div class="an">Bradley'S Bail Bonds &amp; More Llc</div>
   <div class="ad">2018 Moeling St, Lake Charles, 70601</div>
-  <div class='ph'>(337) 419-9587</div>
+  <div class='ph'>☎ (337) 419-9587</div>
+  
   <div class='lic'>License: 954745</div>
 </a><a class="agent" href="/bailbonds/la/agent/fulks-investments-llc-1138922/">
   <div class="an">Fulks Investments, Llc</div>
   <div class="ad">5349 Broad St, Lake Charles, 70615</div>
-  <div class='ph'>(337) 437-3755</div>
+  <div class='ph'>☎ (337) 437-3755</div>
+  
   <div class='lic'>License: 1138922</div>
 </a><a class="agent" href="/bailbonds/la/agent/dayatra-rose-guy-1202602/">
   <div class="an">Dayatra Rose Guy</div>
   <div class="ad">2807 5Th Ave, Lake Charles, 70601</div>
-  <div class='ph'>(901) 206-9700</div>
+  <div class='ph'>☎ (901) 206-9700</div>
+  
   <div class='lic'>License: 1202602</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -334,5 +379,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.22956, -93.35801], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.15046,"lng":-93.17338,"label":"<strong><a href='/bailbonds/la/agent/sheral-ann-lavergne-66977/'>Sheral Ann Lavergne</a></strong><br>\u260e (337) 274-8936"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/iram-patrick-fuselier-69958/'>Iram Patrick Fuselier</a></strong><br>\u260e (337) 433-3767"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/richard-lynn-fuselier-158058/'>Richard Lynn Fuselier</a></strong><br>\u260e (337) 433-3767"},{"lat":30.31321,"lng":-93.18591,"label":"<strong><a href='/bailbonds/la/agent/mary-linda-fonda-103382/'>Mary Linda Fonda</a></strong><br>\u260e (337) 855-2681"},{"lat":30.22774,"lng":-93.1408,"label":"<strong><a href='/bailbonds/la/agent/thomas-cecil-paris-168474/'>Thomas Cecil Paris</a></strong><br>\u260e (337) 437-3755"},{"lat":30.22774,"lng":-93.1408,"label":"<strong><a href='/bailbonds/la/agent/iva-marie-hernandez-196444/'>Iva Marie Hernandez</a></strong><br>\u260e (337) 439-1808"},{"lat":30.22747,"lng":-93.19814,"label":"<strong><a href='/bailbonds/la/agent/michael-todd-smith-174019/'>Michael Todd Smith</a></strong><br>\u260e (337) 912-1267"},{"lat":30.24834,"lng":-93.149,"label":"<strong><a href='/bailbonds/la/agent/angelica-antoinette-floyd-205173/'>Angelica Antoinette Floyd</a></strong><br>\u260e (337) 764-2247"},{"lat":30.22773,"lng":-93.13853,"label":"<strong><a href='/bailbonds/la/agent/wilford-dan-carter-ii-227092/'>Wilford Dan Carter II</a></strong><br>\u260e (337) 249-0768"},{"lat":30.27402,"lng":-93.11734,"label":"<strong><a href='/bailbonds/la/agent/cathy-bailey-gauthier-249630/'>Cathy Bailey Gauthier</a></strong><br>\u260e (337) 497-1756"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/fuselier-bonding-service-ltd-188105/'>Fuselier Bonding Service Ltd</a></strong><br>\u260e (337) 433-3767"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/julie-ann-landry-280182/'>Julie Ann Landry</a></strong><br>\u260e (337) 491-9600"},{"lat":30.15046,"lng":-93.17338,"label":"<strong><a href='/bailbonds/la/agent/cookie-s-bail-bonds-ins-agcy-289128/'>Cookie's Bail Bonds &amp; Ins Agcy</a></strong><br>\u260e (337) 274-8936"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/a-all-day-night-bonding-inc-285445/'>A-All Day &amp; Night Bonding Inc</a></strong><br>\u260e (337) 491-9600"},{"lat":30.27402,"lng":-93.11734,"label":"<strong><a href='/bailbonds/la/agent/cathy-s-bail-bonding-inc-325854/'>Cathy's Bail Bonding Inc</a></strong><br>\u260e (337) 496-6219"},{"lat":30.22496,"lng":-93.21794,"label":"<strong><a href='/bailbonds/la/agent/daniel-george-vamvoras-485759/'>Daniel George Vamvoras</a></strong><br>\u260e (337) 532-1233"},{"lat":30.22768,"lng":-93.15718,"label":"<strong><a href='/bailbonds/la/agent/william-ezekial-guillory-566503/'>William Ezekial Guillory</a></strong><br>\u260e (337) 348-1377"},{"lat":30.15525,"lng":-93.17971,"label":"<strong><a href='/bailbonds/la/agent/john-anthony-rogers-478595/'>John Anthony Rogers</a></strong><br>\u260e (337) 249-8337"},{"lat":30.20448,"lng":-93.18917,"label":"<strong><a href='/bailbonds/la/agent/monique-irene-tolbert-723068/'>Monique Irene Tolbert</a></strong><br>\u260e (337) 274-1124"},{"lat":30.22768,"lng":-93.15718,"label":"<strong><a href='/bailbonds/la/agent/will-guillory-s-bail-bonds-llc-723572/'>Will Guillory's Bail Bonds, LLC</a></strong><br>\u260e (337) 433-5550"},{"lat":30.24226,"lng":-93.20003,"label":"<strong><a href='/bailbonds/la/agent/priscilla-sam-733023/'>Priscilla Sam</a></strong><br>\u260e (337) 249-9595"},{"lat":30.22774,"lng":-93.1413,"label":"<strong><a href='/bailbonds/la/agent/hunter-ray-robin-800017/'>Hunter Ray Robin</a></strong><br>\u260e (337) 433-5550"},{"lat":30.20579,"lng":-93.18446,"label":"<strong><a href='/bailbonds/la/agent/tomika-nicole-duhon-bilbo-542478/'>Tomika Nicole Duhon-Bilbo</a></strong><br>\u260e (337) 842-7232"},{"lat":30.23181,"lng":-93.20666,"label":"<strong><a href='/bailbonds/la/agent/katrell-a-guillory-1139923/'>Katrell A Guillory</a></strong><br>\u260e (337) 429-5620"},{"lat":30.22496,"lng":-93.21794,"label":"<strong><a href='/bailbonds/la/agent/jayden-enterprises-617969/'>Jayden Enterprises</a></strong><br>\u260e (337) 433-6486"},{"lat":30.25949,"lng":-93.18154,"label":"<strong><a href='/bailbonds/la/agent/lydia-l-larce-764080/'>Lydia L Larce</a></strong><br>\u260e (337) 515-1832"},{"lat":30.22773,"lng":-93.13843,"label":"<strong><a href='/bailbonds/la/agent/leighton-charles-eloi-637599/'>Leighton Charles Eloi</a></strong><br>\u260e (337) 965-0909"},{"lat":30.22774,"lng":-93.1413,"label":"<strong><a href='/bailbonds/la/agent/michael-earl-lehr-1227160/'>Michael Earl Lehr</a></strong><br>\u260e (337) 348-1377"},{"lat":30.22774,"lng":-93.1413,"label":"<strong><a href='/bailbonds/la/agent/mario-glynn-hernandez-503348/'>Mario Glynn Hernandez</a></strong><br>\u260e (337) 496-7427"},{"lat":30.23181,"lng":-93.20666,"label":"<strong><a href='/bailbonds/la/agent/carter-bail-bonds-llc-846215/'>Carter Bail Bonds Llc</a></strong><br>\u260e (337) 249-0768"},{"lat":30.24953,"lng":-93.19271,"label":"<strong><a href='/bailbonds/la/agent/rochelle-williams-bradley-862918/'>Rochelle Williams Bradley</a></strong><br>\u260e (337) 419-9587"},{"lat":30.22496,"lng":-93.21794,"label":"<strong><a href='/bailbonds/la/agent/tessie-renee-reed-853056/'>Tessie Renee Reed</a></strong><br>\u260e (337) 436-3292"},{"lat":30.22776,"lng":-93.13797,"label":"<strong><a href='/bailbonds/la/agent/dustina-fulks-fulks-950973/'>Dustina Fulks Fulks</a></strong><br>\u260e (337) 437-3755"},{"lat":30.22773,"lng":-93.13853,"label":"<strong><a href='/bailbonds/la/agent/megan-shay-gabriel-984935/'>Megan Shay Gabriel</a></strong><br>\u260e (337) 476-0925"},{"lat":30.0665,"lng":-93.22171,"label":"<strong><a href='/bailbonds/la/agent/out-by-dawn-bail-bonds-llc-866064/'>Out By Dawn Bail Bonds Llc</a></strong><br>\u260e (337) 853-2178"},{"lat":30.23181,"lng":-93.20666,"label":"<strong><a href='/bailbonds/la/agent/surety-first-llc-1148632/'>Surety First Llc</a></strong><br>\u260e (337) 429-5620"},{"lat":30.23164,"lng":-93.21537,"label":"<strong><a href='/bailbonds/la/agent/cresenthia-m-bushnell-1233878/'>Cresenthia M Bushnell</a></strong><br>\u260e (337) 990-5181"},{"lat":30.24953,"lng":-93.19271,"label":"<strong><a href='/bailbonds/la/agent/bradley-s-bail-bonds-more-llc-954745/'>Bradley'S Bail Bonds &amp; More Llc</a></strong><br>\u260e (337) 419-9587"},{"lat":30.22774,"lng":-93.1408,"label":"<strong><a href='/bailbonds/la/agent/fulks-investments-llc-1138922/'>Fulks Investments, Llc</a></strong><br>\u260e (337) 437-3755"},{"lat":30.20448,"lng":-93.18917,"label":"<strong><a href='/bailbonds/la/agent/dayatra-rose-guy-1202602/'>Dayatra Rose Guy</a></strong><br>\u260e (901) 206-9700"},{"lat":30.19902,"lng":-93.21084,"label":"<strong>3 agents in Lake Charles</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/la/agent/murphy-shaune-fuselier-173024/'>Murphy Shaune Fuselier</a></strong><br>\u260e (337) 936-1920<br><strong><a href='/bailbonds/la/agent/dawn-rae-farris-625880/'>Dawn Rae Farris</a></strong><br>\u260e (337) 853-2178<br><strong><a href='/bailbonds/la/agent/monica-vidrine-722904/'>Monica Vidrine</a></strong><br>\u260e (337) 433-3767"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

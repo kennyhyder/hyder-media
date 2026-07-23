@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,11 +107,13 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bail Bonds By Brian Schultz</div>
   <div class="ad">2574 HWY 81 N, PONCE DE LEON, 32455</div>
   
+  <div class='ad'>✉ WCSO24@YAHOO.COM</div>
   <div class='lic'>License: B000078</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lewis-kathryn-reasa-a069601/">
   <div class="an">Lewis, Kathryn Reasa</div>
   <div class="ad">1719 S WAUKESHA ST, BONIFAY, 32425</div>
   
+  <div class='ad'>✉ BAIL547@LIVE.COM</div>
   <div class='lic'>License: A069601</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -129,5 +133,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.86201, -85.81594], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.76099,"lng":-85.95899,"label":"<strong><a href='/bailbonds/fl/agent/bail-bonds-by-brian-schultz-b000078/'>Bail Bonds By Brian Schultz</a></strong>"},{"lat":30.77595,"lng":-85.6821,"label":"<strong><a href='/bailbonds/fl/agent/lewis-kathryn-reasa-a069601/'>Lewis, Kathryn Reasa</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

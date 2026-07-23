@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,17 +106,20 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/wa/agent/bad-boys-bail-bonds-inc/">
   <div class="an">Bad Boys Bail Bonds, Inc.</div>
   <div class="ad">4830 Pacific Ave., Suite A, Tacoma, 98408</div>
-  <div class='ph'>(253) 671-2245</div>
+  <div class='ph'>☎ (253) 671-2245</div>
+  
   
 </a><a class="agent" href="/bailbonds/wa/agent/two-jinn-inc-dba-aladdin-bail-bonds/">
   <div class="an">Two Jinn, Inc. dba Aladdin Bail Bonds</div><div class='ad'>Two Jinn, Inc.</div>
   <div class="ad">755 Tacoma Ave. S., Suite 1, Tacoma, 98402</div>
-  <div class='ph'>(206) 287-9999</div>
+  <div class='ph'>☎ (206) 287-9999</div>
+  
   
 </a><a class="agent" href="/bailbonds/wa/agent/all-city-bail-bond-co-dba-cj-johnson-bail-bonds/">
   <div class="an">All City Bail Bond Co. dba CJ Johnson Bail Bonds</div><div class='ad'>All City Bail Bond Co.</div>
   <div class="ad">620 S. 11th St., Suite A, Tacoma, 98405</div>
-  <div class='ph'>(206) 624-7777</div>
+  <div class='ph'>☎ (206) 624-7777</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://cdn.kingcounty.gov/-/media/king-county/depts/dajd/documents/send-money-pay-bond/approved-bail-bond-companies-april18-2026-final.pdf' rel='nofollow'>cdn.kingcounty.gov</a></p>
 </div>
@@ -134,5 +139,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([47.05141, -122.15324], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":47.21329,"lng":-122.43408,"label":"<strong><a href='/bailbonds/wa/agent/bad-boys-bail-bonds-inc/'>Bad Boys Bail Bonds, Inc.</a></strong><br>\u260e (253) 671-2245"},{"lat":47.25578,"lng":-122.44504,"label":"<strong><a href='/bailbonds/wa/agent/two-jinn-inc-dba-aladdin-bail-bonds/'>Two Jinn, Inc. dba Aladdin Bail Bonds</a></strong><br>\u260e (206) 287-9999"},{"lat":47.25261,"lng":-122.44537,"label":"<strong><a href='/bailbonds/wa/agent/all-city-bail-bond-co-dba-cj-johnson-bail-bonds/'>All City Bail Bond Co. dba CJ Johnson Bail Bonds</a></strong><br>\u260e (206) 624-7777"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

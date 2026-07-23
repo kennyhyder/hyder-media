@@ -51,6 +51,25 @@ def load_keyed(fname):
 tx_jails = load_keyed('jails.json')
 tx_boards = load_keyed('boards.json')
 
+def load_geo(fname):
+    path = os.path.join(DATA, 'geo', fname)
+    return json.load(open(path)) if os.path.exists(path) else {}
+
+county_centroids = load_geo('county-centroids.json')   # FIPS -> [lat,lng]
+city_centroids = load_geo('city-centroids.json')       # "ST:city" -> [lat,lng]
+agent_geo = load_geo('agents-geo.json')                # "ST:idx" -> [lat,lng]
+jail_coords = load_geo('jail-coords.json')             # TX county -> [lat,lng]
+
+def agent_coords(a):
+    g = agent_geo.get(a.get('geo_id') or '')
+    if g:
+        return g, 'exact'
+    if a.get('city'):
+        c = city_centroids.get(f"{a['state']}:{str(a['city']).lower().strip()}")
+        if c:
+            return c, 'city'
+    return None, None
+
 # ---- Licensed-agent rosters: data/agents/*.json → indexed by state / (state, county)
 def norm_county(name):
     """'Orleans Parish' / 'Orleans' / 'orleans county' → 'orleans' so roster
@@ -80,7 +99,9 @@ def agent_slug(a, taken):
 agents_by_state = {}
 agents_by_county = {}
 for path in sorted(glob.glob(os.path.join(DATA, 'agents', '*.json'))):
-    for a in json.load(open(path)):
+    _fstate = os.path.basename(path)[:-5].upper()
+    for _i, a in enumerate(json.load(open(path))):
+        a['geo_id'] = f'{_fstate}:{_i}'
         st = a.get('state')
         if not st or not a.get('name'):
             continue
@@ -151,7 +172,7 @@ def status_badge(st):
         'none': '<span class="badge off">No commercial bail</span>',
     }[st['status']]
 
-def page(title, description, body, depth=0, jsonld=None, canonical_path=''):
+def page(title, description, body, depth=0, jsonld=None, canonical_path='', leaflet=False, tail_script=''):
     robots = '' if INDEXABLE else '<meta name="robots" content="noindex, nofollow">\n'
     canonical = f'<link rel="canonical" href="{DOMAIN}{canonical_path}">\n' if INDEXABLE else ''
     ld = ''
@@ -168,6 +189,7 @@ def page(title, description, body, depth=0, jsonld=None, canonical_path=''):
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">
 {ld}<style>{CSS}</style>
+{f'<link rel="stylesheet" href="{BASE}/assets/leaflet/leaflet.css"><script src="{BASE}/assets/leaflet/leaflet.js"></script>' if leaflet else ''}
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -185,8 +207,33 @@ def page(title, description, body, depth=0, jsonld=None, canonical_path=''):
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+{tail_script}
 </body>
 </html>"""
+
+# ---------- Maps ----------
+
+def map_block(center, zoom, markers, height=380):
+    """markers: [{lat, lng, label(html), kind('agent'|'jail'|'office')}]"""
+    return (f'<div class="card"><h2>Map</h2><div id="bbmap" style="height:{height}px;border-radius:8px;"></div>'
+            f'<p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>'), f"""
+<script>
+(function() {{
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '{BASE}/assets/leaflet/images/';
+  var m = L.map('bbmap', {{scrollWheelZoom: false}}).setView([{center[0]}, {center[1]}], {zoom});
+  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',
+    {{attribution: '© OpenStreetMap contributors', maxZoom: 19}}).addTo(m);
+  var pts = {json.dumps(markers, separators=(',', ':'))};
+  pts.forEach(function(p) {{
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  }});
+  if (pts.length > 1) {{
+    m.fitBounds(pts.map(function(p) {{ return [p.lat, p.lng]; }}), {{padding: [30, 30], maxZoom: 13}});
+  }}
+}})();
+</script>"""
 
 # ---------- FAQ (visible block + JSON-LD pairs) ----------
 
@@ -324,7 +371,8 @@ def agent_cards(agent_list, limit=None, more_href=None):
         cards.append(f"""<a class="agent" href="{url}">
   <div class="an">{esc(display_name(a['name']))}</div>{agency}
   <div class="ad">{esc(addr)}</div>
-  {f"<div class='ph'>{esc(a['phone'])}</div>" if a.get('phone') else ''}
+  {f"<div class='ph'>☎ {esc(a['phone'])}</div>" if a.get('phone') else ''}
+  {f"<div class='ad'>✉ {esc(a['email'])}</div>" if a.get('email') else ''}
   {lic}
 </a>""")
     more = (f"<p class='sub'><a href='{more_href}'>View all {len(agent_list)} licensed agents →</a></p>"
@@ -441,6 +489,33 @@ def county_page(c, st, st_counties):
   <p class="notice">Featured placement — reserved.</p>
 </div>"""
 
+    # Map: county centroid center; exact agent pins; city-grouped approximate pins; jail pin
+    map_html, map_js = '', ''
+    center = county_centroids.get(c['fips'])
+    if center:
+        markers = []
+        county_agents_all = agents_by_county.get((st['abbr'], norm_county(short)), [])
+        city_groups = {}
+        for a in county_agents_all:
+            coords, kind = agent_coords(a)
+            if not coords:
+                continue
+            label = (f"<strong><a href='{BASE}/{a['state'].lower()}/agent/{a['slug']}/'>{esc(display_name(a['name']))}</a></strong>"
+                     + (f"<br>☎ {esc(a['phone'])}" if a.get('phone') else ''))
+            if kind == 'exact':
+                markers.append({'lat': coords[0], 'lng': coords[1], 'label': label})
+            else:
+                city_groups.setdefault((coords[0], coords[1], a.get('city')), []).append(label)
+        for (la, ln, cityname), labels in city_groups.items():
+            head = f"<strong>{len(labels)} agent{'s' if len(labels) != 1 else ''} in {esc(cityname)}</strong> <em>(approximate)</em><br>"
+            markers.append({'lat': la, 'lng': ln, 'label': head + '<br>'.join(labels[:8])})
+        if is_tx and jail_coords.get(short):
+            jc = jail_coords[short]
+            jl = tx_jails.get(short, {})
+            markers.append({'lat': jc[0], 'lng': jc[1],
+                            'label': f"<strong>{esc(jl.get('facility', short + ' County Jail'))}</strong><br>County jail"})
+        map_html, map_js = map_block(center, 9, markers)
+
     faqs = county_faqs(c, st)
     crumb_ld = breadcrumb_jsonld([
         ('All states', '/index.html'), (st['name'], f'/{st["abbr"].lower()}/index.html'),
@@ -456,6 +531,7 @@ def county_page(c, st, st_counties):
   <div class="fact"><div class="k">Bail Framework</div><div class="v small">{reg_badge}</div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">{esc(st.get('premium') or ('—' if st['status'] == 'none' else '10%'))}</div></div>
 </div>
+{map_html}
 {reg_card}
 {jail_card}
 {how_bail_works(st)}
@@ -473,6 +549,7 @@ def county_page(c, st, st_counties):
         desc, body, depth=2,
         jsonld=[crumb_ld, faq_jsonld(faqs)],
         canonical_path=f'/{st["abbr"].lower()}/{c["slug"]}/',
+        leaflet=bool(map_html), tail_script=map_js,
     )
 
 def state_page(st, st_counties):
@@ -553,14 +630,43 @@ def state_agents_page(st, st_agents):
 <h1>Every Licensed Bail Agent in {st['name']}</h1>
 <p class="sub">{len(st_agents)} licensed bail agents and agencies from official state and county
 rosters, grouped by county. Click any listing for the full profile.</p>
+<div class="card" style="position:sticky;top:0;z-index:5;">
+  <input type="search" id="agent-filter" placeholder="Search {len(st_agents)} agents by name, agency, or city…"
+    style="width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:.95rem;">
+</div>
 {''.join(sections)}
 """
+    search_js = """
+<script>
+(function() {
+  var input = document.getElementById('agent-filter');
+  if (!input) return;
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.agent'));
+  var heads = Array.prototype.slice.call(document.querySelectorAll('h2[id]'));
+  input.addEventListener('input', function() {
+    var q = input.value.toLowerCase().trim();
+    cards.forEach(function(c) {
+      c.style.display = (!q || c.textContent.toLowerCase().indexOf(q) !== -1) ? '' : 'none';
+    });
+    heads.forEach(function(h) {
+      var el = h.nextElementSibling, any = false;
+      while (el && el.tagName !== 'H2') {
+        Array.prototype.forEach.call(el.querySelectorAll ? el.querySelectorAll('.agent') : [], function(c) {
+          if (c.style.display !== 'none') any = true;
+        });
+        el = el.nextElementSibling;
+      }
+      h.style.display = (!q || any) ? '' : 'none';
+    });
+  });
+})();
+</script>"""
     return page(f"All {len(st_agents)} Licensed Bail Agents in {st['name']} — Complete Roster",
                 f"The complete roster of {len(st_agents)} licensed bail bond agents in {st['name']}, "
                 f"from official license records, grouped by county.", body, depth=1,
                 jsonld=[breadcrumb_jsonld([('All states', '/'), (st['name'], f"/{st['abbr'].lower()}/"),
                                           ('All licensed agents', f"/{st['abbr'].lower()}/agents/")])],
-                canonical_path=f"/{st['abbr'].lower()}/agents/")
+                canonical_path=f"/{st['abbr'].lower()}/agents/", tail_script=search_js)
 
 def agent_page(a, st):
     sb = f"{BASE}/{st['abbr'].lower()}"
@@ -579,14 +685,25 @@ def agent_page(a, st):
     lic_disp = esc(a.get('license'))
     if a.get('expiration'):
         lic_disp = f"{lic_disp} (expires {esc(a['expiration'])})" if lic_disp else f"expires {esc(a['expiration'])}"
+    phone_html = (f'<a href="tel:{esc(str(a["phone"]).strip())}">{esc(a["phone"])}</a>'
+                  if a.get('phone') else None)
+    email_html = (f'<a href="mailto:{esc(a["email"])}">{esc(a["email"])}</a>'
+                  if a.get('email') else None)
     facts = ''.join(f'<li><strong>{k}:</strong> {v}</li>' for k, v in [
         ('Agency', esc(agency) if agency else None),
         ('Address', esc(addr) if addr else None),
-        ('Phone', esc(a.get('phone'))),
+        ('Phone', phone_html),
+        ('Email', email_html),
         ('License', lic_disp),
         ('Surety', esc(a.get('surety'))),
         ('Serves', county_link),
     ] if v)
+    coords, coord_kind = agent_coords(a)
+    map_html, map_js = '', ''
+    if coords:
+        approx = ' <em>(approximate — city center)</em>' if coord_kind == 'city' else ''
+        map_html, map_js = map_block(coords, 13, [{'lat': coords[0], 'lng': coords[1],
+            'label': f'<strong>{esc(name)}</strong>{approx}'}], height=300)
     ld = {
         '@context': 'https://schema.org', '@type': 'LocalBusiness',
         'name': name, 'url': f"{DOMAIN}/{st['abbr'].lower()}/agent/{a['slug']}/",
@@ -601,11 +718,12 @@ def agent_page(a, st):
 <h1>{esc(name)}</h1>
 <p class="sub">Licensed bail bond {'agency' if agency is None and a.get('agency') else 'agent'} in {st['name']} — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
+  <h2>Contact & License</h2>
   <ul>{facts}</ul>
   <p class="src">Source: official roster — <a href="{src}" rel="nofollow">{esc(src_host)}</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+{map_html}
 {how_bail_works(st)}
 <div class="card">
   <h2>More in {st['name']}</h2>
@@ -616,11 +734,14 @@ def agent_page(a, st):
   </div>
 </div>
 """
+    if coords and coord_kind == 'exact':
+        ld['geo'] = {'@type': 'GeoCoordinates', 'latitude': coords[0], 'longitude': coords[1]}
     loc = f" in {county_row['display']}" if county_row else f" in {st['name']}"
     return page(f"{name} — Licensed Bail Bond Agent{loc}",
                 f"{name}: licensed bail bond agent{loc}. Contact details, license number, and "
                 f"official-roster verification.", body, depth=3, jsonld=[ld],
-                canonical_path=f"/{st['abbr'].lower()}/agent/{a['slug']}/")
+                canonical_path=f"/{st['abbr'].lower()}/agent/{a['slug']}/",
+                leaflet=bool(map_html), tail_script=map_js)
 
 # ---------- Build ----------
 
@@ -630,7 +751,7 @@ for c in counties:
 
 for entry in os.listdir(ROOT):
     p = os.path.join(ROOT, entry)
-    if os.path.isdir(p) and entry != 'data':
+    if os.path.isdir(p) and entry not in ('data', 'assets'):
         shutil.rmtree(p)
 
 urls = ['/']

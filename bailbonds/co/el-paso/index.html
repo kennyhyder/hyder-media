@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">502 S Nevada Ave, Colorado Springs, 80903</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/lincoln-anthony-berridge/">
   <div class="an">Lincoln Anthony Berridge</div><div class='ad'>The Bail Guy LLC</div>
   <div class="ad">3472 Research Pkwy Ste 104 PMB 9031, Colorado Springs, 80920</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/dennis-carl-blackwell/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">2960 E Las Vegas St, Colorado Springs, 80906</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/dawn-christine-propernick/">
   <div class="an">Dawn Christine Propernick</div><div class='ad'>Dawn C Propernick Bail Bonds</div>
   <div class="ad">4790 Jet Wing Cir W, Colorado Springs, 80916</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/james-anthony-pesavento/">
@@ -126,14 +132,17 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">802 S Nevada Ave, Colorado Springs, 80903</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/timothy-james-mcdowell/">
   <div class="an">Timothy James Mcdowell</div><div class='ad'>Blue Force Bail Bonds, LLC</div>
   <div class="ad">2860 South Circle Drive Suite G30E, Colorado Springs, 80906</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/heather-renee-herr/">
   <div class="an">Heather Renee Herr</div><div class='ad'>Angels &amp; Outlaws Bail Bonds, LLC</div>
   <div class="ad">3595 E Fountain Blvd Ste 235, Colorado Springs, 80910</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 19941131222)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20081079988)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20141083424)' rel='nofollow'>data.colorado.gov</a></p>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.82738, -104.52747], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.82674,"lng":-104.82226,"label":"<strong><a href='/bailbonds/co/agent/robert-joseph-brown/'>Robert Joseph Brown</a></strong>"},{"lat":38.95697,"lng":-104.76636,"label":"<strong><a href='/bailbonds/co/agent/lincoln-anthony-berridge/'>Lincoln Anthony Berridge</a></strong>"},{"lat":38.78014,"lng":-104.77294,"label":"<strong><a href='/bailbonds/co/agent/dennis-carl-blackwell/'>Dennis Carl Blackwell</a></strong>"},{"lat":38.81238,"lng":-104.73992,"label":"<strong><a href='/bailbonds/co/agent/dawn-christine-propernick/'>Dawn Christine Propernick</a></strong>"},{"lat":38.82298,"lng":-104.82244,"label":"<strong><a href='/bailbonds/co/agent/james-anthony-pesavento/'>James Anthony Pesavento</a></strong>"},{"lat":38.79625,"lng":-104.79393,"label":"<strong><a href='/bailbonds/co/agent/timothy-james-mcdowell/'>Timothy James Mcdowell</a></strong>"},{"lat":38.81434,"lng":-104.76059,"label":"<strong><a href='/bailbonds/co/agent/heather-renee-herr/'>Heather Renee Herr</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

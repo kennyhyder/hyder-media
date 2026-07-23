@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,37 +106,44 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mi/agent/amber-green/">
   <div class="an">Amber Green</div><div class='ad'>AMG Bail Bonds</div>
   <div class="ad">P.O. Box 90781, Burton, 48509</div>
-  <div class='ph'>810-293-6189</div>
+  <div class='ph'>☎ 810-293-6189</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/kimberly-bowen/">
   <div class="an">Kimberly Bowen</div><div class='ad'>Back to the Bricks Bail Bonds</div>
   <div class="ad">P.O. Box 190233, Burton, 48519</div>
-  <div class='ph'>810-423-0832</div>
+  <div class='ph'>☎ 810-423-0832</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/eugene-butler-jr/">
   <div class="an">Eugene Butler, Jr.</div><div class='ad'>Bail My Tail Bail Bond Agency</div>
   <div class="ad">1027 Church St, Flint, 48502</div>
-  <div class='ph'>810-234-5776</div>
+  <div class='ph'>☎ 810-234-5776</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/mark-zilinski/">
   <div class="an">Mark Zilinski</div><div class='ad'>Bail My Tail Bail Bond Agency</div>
   <div class="ad">1027 Church St, Flint, 48502</div>
-  <div class='ph'>810-234-5776</div>
+  <div class='ph'>☎ 810-234-5776</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/melissa-snider/">
   <div class="an">Melissa Snider</div><div class='ad'>Flint Bonding Service</div>
   <div class="ad">1034 S. Grand Traverse, Flint, 48502</div>
-  <div class='ph'>810-238-6143</div>
+  <div class='ph'>☎ 810-238-6143</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/kevin-wilson/">
   <div class="an">Kevin Wilson</div><div class='ad'>K W Bail Bond</div>
   <div class="ad">2046 Corunna Road, Flint, 48503</div>
-  <div class='ph'>810-308-8799</div>
+  <div class='ph'>☎ 810-308-8799</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/carl-harrison/">
   <div class="an">Carl Harrison</div><div class='ad'>No Judgement Bail Bonds</div>
   <div class="ad">1000 Beach St., Flint, 48502</div>
-  <div class='ph'>810-820-6147</div>
+  <div class='ph'>☎ 810-820-6147</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://files.7thcircuitcourt.com/Documents/Quick%20Links/Approved%20Bail%20Bond%20Companies/Approved%20Bond%20list.pdf' rel='nofollow'>files.7thcircuitcourt.com</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([43.02108, -83.70637], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":43.00998,"lng":-83.68899,"label":"<strong><a href='/bailbonds/mi/agent/eugene-butler-jr/'>Eugene Butler, Jr.</a></strong><br>\u260e 810-234-5776"},{"lat":43.00998,"lng":-83.68899,"label":"<strong><a href='/bailbonds/mi/agent/mark-zilinski/'>Mark Zilinski</a></strong><br>\u260e 810-234-5776"},{"lat":43.00858,"lng":-83.68985,"label":"<strong><a href='/bailbonds/mi/agent/melissa-snider/'>Melissa Snider</a></strong><br>\u260e 810-238-6143"},{"lat":43.00569,"lng":-83.71312,"label":"<strong><a href='/bailbonds/mi/agent/kevin-wilson/'>Kevin Wilson</a></strong><br>\u260e 810-308-8799"},{"lat":43.01078,"lng":-83.68815,"label":"<strong><a href='/bailbonds/mi/agent/carl-harrison/'>Carl Harrison</a></strong><br>\u260e 810-820-6147"},{"lat":43.00075,"lng":-83.61815,"label":"<strong>2 agents in Burton</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mi/agent/amber-green/'>Amber Green</a></strong><br>\u260e 810-293-6189<br><strong><a href='/bailbonds/mi/agent/kimberly-bowen/'>Kimberly Bowen</a></strong><br>\u260e 810-423-0832"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

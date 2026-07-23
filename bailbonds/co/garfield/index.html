@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">748 E Vista Dr, Silt, 81652</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/myrna-mclemee-raymer/">
   <div class="an">Myrna Mclemee-Raymer</div><div class='ad'>'Action Bail Bonds LLC</div>
   <div class="ad">789 W. 24th 789 W. 24th, Rifle, 81650</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/myrna-mclemee-raymer-2/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">789 W. 24th, Rifle, 81650</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/donna-r-hughes-2/">
   <div class="an">Donna R Hughes</div><div class='ad'>Boyds Bail Bonds, Llc</div>
   <div class="ad">748 E Vista Dr, Silt, 81652</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/ross-bail-bonds-company/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">210 7th Street, Glenwood Springs, 81601</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/donna-r-hughes-3/">
   <div class="an">Donna R Hughes</div><div class='ad'>Boyd'S Bail Bonds, Inc.</div>
   <div class="ad">748 E Vista Dr, Silt, 81652</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 19991163753)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20021309651)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20051160491)' rel='nofollow'>data.colorado.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.59935, -107.90978], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.55581,"lng":-107.64664,"label":"<strong><a href='/bailbonds/co/agent/donna-r-hughes/'>Donna R Hughes</a></strong>"},{"lat":39.55169,"lng":-107.78696,"label":"<strong><a href='/bailbonds/co/agent/myrna-mclemee-raymer-2/'>Myrna Mclemee-Raymer</a></strong>"},{"lat":39.55581,"lng":-107.64664,"label":"<strong><a href='/bailbonds/co/agent/donna-r-hughes-2/'>Donna R Hughes</a></strong>"},{"lat":39.54776,"lng":-107.32322,"label":"<strong><a href='/bailbonds/co/agent/ross-bail-bonds-company/'>Ross Bail Bonds Company</a></strong>"},{"lat":39.55581,"lng":-107.64664,"label":"<strong><a href='/bailbonds/co/agent/donna-r-hughes-3/'>Donna R Hughes</a></strong>"},{"lat":39.53757,"lng":-107.77034,"label":"<strong>1 agent in Rifle</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/co/agent/myrna-mclemee-raymer/'>Myrna Mclemee-Raymer</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

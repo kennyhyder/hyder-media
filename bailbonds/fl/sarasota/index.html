@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,186 +107,223 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">1 Way Bail Bonds Llc</div>
   <div class="ad">677 N WASHINGTON BLVD, SUITE 17, SARASOTA, 34236</div>
   
+  <div class='ad'>✉ DONNYLOBB1@GMAIL.COM</div>
   <div class='lic'>License: B000241</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a-heaven-sent-bail-bond-b000644/">
   <div class="an">A Heaven Sent Bail Bond</div>
   <div class="ad">1864 DR MLK, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ VETTE@AHEAVENSENTBAILBONDS.COM</div>
   <div class='lic'>License: B000644</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a-way-out-bail-bonds-sarasota-b000071/">
   <div class="an">A Way Out Bail Bonds Sarasota</div>
   <div class="ad">12 S LIME AVENUE, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ BUSTINOUTBB@GMAIL.COM</div>
   <div class='lic'>License: B000071</div>
 </a><a class="agent" href="/bailbonds/fl/agent/above-and-beyond-bail-bonds-inc-b000655/">
   <div class="an">Above And Beyond Bail Bonds Inc</div>
   <div class="ad">430 E. VENICE AVE, VENICE, 34285</div>
   
+  <div class='ad'>✉ ABOVEANDBEYONDBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000655</div>
 </a><a class="agent" href="/bailbonds/fl/agent/after-hours-bail-bonds-b000602/">
   <div class="an">After Hours Bail Bonds</div>
   <div class="ad">1902 S TAMIAMI TRAIL, VENICE, 34293</div>
   
+  <div class='ad'>✉ AFTERHOURSBAILBONDS@COMCAST.NET</div>
   <div class='lic'>License: B000602</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ainscoe-alfred-brian-w039476/">
   <div class="an">Ainscoe, Alfred Brian</div>
   <div class="ad">BIG JOHNSON BAIL BONDS 2 2051 MAIN ST STE 100, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ TWOROTTEN4U@MSN.COM</div>
   <div class='lic'>License: W039476</div>
 </a><a class="agent" href="/bailbonds/fl/agent/aitken-randall-william-w290558/">
   <div class="an">Aitken, Randall William</div>
   <div class="ad">AFTER HOURS BAIL BONDS 1902 SOUTH TAMIAMI TRAIL, VENICE, 34293</div>
   
+  <div class='ad'>✉ RWAJ1@AOL.COM</div>
   <div class='lic'>License: W290558</div>
 </a><a class="agent" href="/bailbonds/fl/agent/all-day-surety-support-b000603/">
   <div class="an">All Day Surety Support</div>
   <div class="ad">891 CYPRESS RD, VENICE, 34293</div>
   
+  <div class='ad'>✉ ALLDAYSURETYSUPPORT@COMCAST.NET</div>
   <div class='lic'>License: B000603</div>
 </a><a class="agent" href="/bailbonds/fl/agent/beaus-bail-bonds-b000406/">
   <div class="an">Beaus Bail Bonds</div>
   <div class="ad">2075 MAIN ST SUITE 2, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ BEAUSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000406</div>
 </a><a class="agent" href="/bailbonds/fl/agent/big-boys-bail-bonds-llc-b000658/">
   <div class="an">Big Boys Bail Bonds Llc</div>
   <div class="ad">430 E. VENICE AVE, VENICE, 34285</div>
   
+  <div class='ad'>✉ BIGBOYSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000658</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bud-s-bail-bonds-b000110/">
   <div class="an">Bud'S Bail Bonds</div>
   <div class="ad">2245 RINGLING BOULEVARD, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ PATTI@BUDSBAILBONDS.COM</div>
   <div class='lic'>License: B000110</div>
 </a><a class="agent" href="/bailbonds/fl/agent/call-willette-bail-bonds-b000614/">
   <div class="an">Call Willette Bail Bonds</div>
   <div class="ad">1903 NORTH GATE BLVD 101, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ CALLWILLETTEBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000614</div>
 </a><a class="agent" href="/bailbonds/fl/agent/claridy-willette-denise-e128626/">
   <div class="an">Claridy, Willette Denise</div>
   <div class="ad">1903 NORTHGATE BLVD. STE.105, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ WILLETTESBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: E128626</div>
 </a><a class="agent" href="/bailbonds/fl/agent/day-kayla-marie-w294363/">
   <div class="an">Day, Kayla Marie</div>
   <div class="ad">AFTER HOURS BAIL BONDS 1902 S TAMIAMI TRAIL, VENICE, 34293</div>
   
+  <div class='ad'>✉ AFTERHOURSBAILBONDS@COMCAST.NET</div>
   <div class='lic'>License: W294363</div>
 </a><a class="agent" href="/bailbonds/fl/agent/exum-david-j-g100182/">
   <div class="an">Exum, David J</div>
   <div class="ad">521 MOUNT VERNON DR, VENICE, 34293</div>
   
+  <div class='ad'>✉ DEXUM51@GMAIL.COM</div>
   <div class='lic'>License: G100182</div>
 </a><a class="agent" href="/bailbonds/fl/agent/graham-jayston-ronald-e147544/">
   <div class="an">Graham, Jayston Ronald</div>
   <div class="ad">BAD BOY BAIL BONDS 2062 RINGLING BLVD, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ BADBOYBONDS@YAHOO.COM</div>
   <div class='lic'>License: E147544</div>
 </a><a class="agent" href="/bailbonds/fl/agent/grasty-moyel-w624109/">
   <div class="an">Grasty, Moyel</div>
   <div class="ad">M.B. BAIL BONDS 3575 WEBBER ST. SUITE 109, SARASOTA, 34239</div>
   
+  <div class='ad'>✉ 1MB.BAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W624109</div>
 </a><a class="agent" href="/bailbonds/fl/agent/klein-benjamin-wyatt-g045428/">
   <div class="an">Klein, Benjamin Wyatt</div>
   <div class="ad">2562 MARBLEHEAD DR, SARASOTA, 34231</div>
   
+  <div class='ad'>✉ BENWKLEIN@OUTLOOK.COM</div>
   <div class='lic'>License: G045428</div>
 </a><a class="agent" href="/bailbonds/fl/agent/klein-brent-wallace-a142645/">
   <div class="an">Klein, Brent Wallace</div>
   <div class="ad">AFFORDABLE BAIL BONDS 2127 RINGLING BLVD. SUITE 101 A, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ KLEINBAIL@VERIZON.NET</div>
   <div class='lic'>License: A142645</div>
 </a><a class="agent" href="/bailbonds/fl/agent/klein-wallace-herman-a142770/">
   <div class="an">Klein, Wallace Herman</div>
   <div class="ad">A-A ABACUS BAIL BONDS 2127 RINGLING BLVD SUITE 101 A, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ KLEINBAIL@VERIZON.NET</div>
   <div class='lic'>License: A142770</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kovalsky-ronald-robert-e036463/">
   <div class="an">Kovalsky, Ronald Robert</div>
   <div class="ad">BIG BOYS BAIL BONDS 430 E. VENICE AVE, VENICE, 34285</div>
   
+  <div class='ad'>✉ BIGBOYSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: E036463</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kovalsky-ronald-robert-iii-w243640/">
   <div class="an">Kovalsky, Ronald Robert Iii</div>
   <div class="ad">430 E. VENICE AVE, VENICE, 34285</div>
   
+  <div class='ad'>✉ RONNIEKOVALSKY@GMAIL.COM</div>
   <div class='lic'>License: W243640</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kovalsky-sandie-lee-w036461/">
   <div class="an">Kovalsky, Sandie Lee</div>
   <div class="ad">430 E. VENICE AVE, VENICE, 34285</div>
   
+  <div class='ad'>✉ ABOVEANDBEYONDBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: W036461</div>
 </a><a class="agent" href="/bailbonds/fl/agent/leonard-jake-donald-w667117/">
   <div class="an">Leonard, Jake Donald</div>
   <div class="ad">BUD'S BAIL BONDS 2245 RINGLING BLVD, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ JAKE.LEONARD98@GMAIL.COM</div>
   <div class='lic'>License: W667117</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ludwigson-patricia-may-w385810/">
   <div class="an">Ludwigson, Patricia May</div>
   <div class="ad">2245 RINGLING BLVD, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ PATTI@BUDSBAILBONDS.COM</div>
   <div class='lic'>License: W385810</div>
 </a><a class="agent" href="/bailbonds/fl/agent/m-b-bailbonds-b000404/">
   <div class="an">M.B. Bailbonds</div>
   <div class="ad">3575 WEBBER ST. SUITE109, SARASOTA, 34239</div>
   
+  <div class='ad'>✉ 1MB.BAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000404</div>
 </a><a class="agent" href="/bailbonds/fl/agent/merucci-anthony-paul-w346005/">
   <div class="an">Merucci, Anthony Paul</div>
   <div class="ad">AUTOMATIC BAIL BONDS LLC 2075 MAIN ST SUITE 39, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ AMERUCCI@GMAIL.COM</div>
   <div class='lic'>License: W346005</div>
 </a><a class="agent" href="/bailbonds/fl/agent/platt-theresa-w774528/">
   <div class="an">Platt, Theresa</div>
   <div class="ad">2080 ELLERY ST, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ THERESAPLATT32@GMAIL.COM</div>
   <div class='lic'>License: W774528</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rainey-dominique-angel-p221052/">
   <div class="an">Rainey, Dominique Angel</div>
   <div class="ad">2898 ROHRER ST, NORTH PORT, FL, 34286</div>
   
+  <div class='ad'>✉ MS.DOMINIQUERAINEY@GMAIL.COM</div>
   <div class='lic'>License: P221052</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sarasota-bail-bonds-b000704/">
   <div class="an">Sarasota Bail Bonds</div>
   <div class="ad">2071 MAIN STREET, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ JAMESBONDSMEN007@GMAIL.COM</div>
   <div class='lic'>License: B000704</div>
 </a><a class="agent" href="/bailbonds/fl/agent/spires-destiny-g306697/">
   <div class="an">Spires, Destiny</div>
   <div class="ad">1903 N. GATE BLVD, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ SPIRESDESTINY@YAHOO.COM</div>
   <div class='lic'>License: G306697</div>
 </a><a class="agent" href="/bailbonds/fl/agent/steiding-shane-keith-d021604/">
   <div class="an">Steiding, Shane Keith</div>
   <div class="ad">28 N LIME AVE, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ SHANE@IBONDUOUT.COM</div>
   <div class='lic'>License: D021604</div>
 </a><a class="agent" href="/bailbonds/fl/agent/troutman-ranae-w133869/">
   <div class="an">Troutman, Ranae</div>
   <div class="ad">2075 MAIN ST SARASOTA FL SUITE 2, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ RANAE.TROUTMAN@YAHOO.COM</div>
   <div class='lic'>License: W133869</div>
 </a><a class="agent" href="/bailbonds/fl/agent/weaver-dennis-eugene-p220575/">
   <div class="an">Weaver, Dennis Eugene</div>
   <div class="ad">AFTER HOURS BAIL BONDS 1902 S TAMIAMI TRAIL, VENICE, 34293</div>
   
+  <div class='ad'>✉ AFTERHOURSBAILBONDS@COMCAST.NET</div>
   <div class='lic'>License: P220575</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wheeler-lori-w125009/">
   <div class="an">Wheeler, Lori</div>
   <div class="ad">1445 21ST STREET, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ LDANDSTYLES@GMAIL.COM</div>
   <div class='lic'>License: W125009</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wilson-connie-w118881/">
   <div class="an">Wilson, Connie</div>
   <div class="ad">1511 NAPOLI DRIVE EAST, SARSOTA, 34232</div>
   
+  <div class='ad'>✉ VALENTINOCONYEA@GMAIL.COM</div>
   <div class='lic'>License: W118881</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bud-s-bail-bonds/">
   <div class="an">Bud's Bail Bonds</div>
   <div class="ad">2245 Ringling Blvd, Sarasota, 34237</div>
-  <div class='ph'>904-923-2663</div>
+  <div class='ph'>☎ 904-923-2663</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://flbaa.com/ (Florida Bail Agents Association member directory)' rel='nofollow'>flbaa.com</a> · <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -304,5 +343,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([27.22533, -82.42371], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":27.34189,"lng":-82.53105,"label":"<strong><a href='/bailbonds/fl/agent/1-way-bail-bonds-llc-b000241/'>1 Way Bail Bonds Llc</a></strong>"},{"lat":27.35958,"lng":-82.53354,"label":"<strong><a href='/bailbonds/fl/agent/a-heaven-sent-bail-bond-b000644/'>A Heaven Sent Bail Bond</a></strong>"},{"lat":27.33637,"lng":-82.52426,"label":"<strong><a href='/bailbonds/fl/agent/a-way-out-bail-bonds-sarasota-b000071/'>A Way Out Bail Bonds Sarasota</a></strong>"},{"lat":27.09966,"lng":-82.43838,"label":"<strong><a href='/bailbonds/fl/agent/above-and-beyond-bail-bonds-inc-b000655/'>Above And Beyond Bail Bonds Inc</a></strong>"},{"lat":27.06187,"lng":-82.41639,"label":"<strong><a href='/bailbonds/fl/agent/after-hours-bail-bonds-b000602/'>After Hours Bail Bonds</a></strong>"},{"lat":27.33652,"lng":-82.52922,"label":"<strong><a href='/bailbonds/fl/agent/ainscoe-alfred-brian-w039476/'>Ainscoe, Alfred Brian</a></strong>"},{"lat":27.06187,"lng":-82.41639,"label":"<strong><a href='/bailbonds/fl/agent/aitken-randall-william-w290558/'>Aitken, Randall William</a></strong>"},{"lat":27.03798,"lng":-82.41206,"label":"<strong><a href='/bailbonds/fl/agent/all-day-surety-support-b000603/'>All Day Surety Support</a></strong>"},{"lat":27.33652,"lng":-82.52872,"label":"<strong><a href='/bailbonds/fl/agent/beaus-bail-bonds-b000406/'>Beaus Bail Bonds</a></strong>"},{"lat":27.09966,"lng":-82.43838,"label":"<strong><a href='/bailbonds/fl/agent/big-boys-bail-bonds-llc-b000658/'>Big Boys Bail Bonds Llc</a></strong>"},{"lat":27.33565,"lng":-82.52535,"label":"<strong><a href='/bailbonds/fl/agent/bud-s-bail-bonds-b000110/'>Bud'S Bail Bonds</a></strong>"},{"lat":27.37217,"lng":-82.53285,"label":"<strong><a href='/bailbonds/fl/agent/call-willette-bail-bonds-b000614/'>Call Willette Bail Bonds</a></strong>"},{"lat":27.37217,"lng":-82.53285,"label":"<strong><a href='/bailbonds/fl/agent/claridy-willette-denise-e128626/'>Claridy, Willette Denise</a></strong>"},{"lat":27.06187,"lng":-82.41639,"label":"<strong><a href='/bailbonds/fl/agent/day-kayla-marie-w294363/'>Day, Kayla Marie</a></strong>"},{"lat":27.07768,"lng":-82.40721,"label":"<strong><a href='/bailbonds/fl/agent/exum-david-j-g100182/'>Exum, David J</a></strong>"},{"lat":27.33554,"lng":-82.52924,"label":"<strong><a href='/bailbonds/fl/agent/graham-jayston-ronald-e147544/'>Graham, Jayston Ronald</a></strong>"},{"lat":27.30835,"lng":-82.49798,"label":"<strong><a href='/bailbonds/fl/agent/grasty-moyel-w624109/'>Grasty, Moyel</a></strong>"},{"lat":27.27851,"lng":-82.51847,"label":"<strong><a href='/bailbonds/fl/agent/klein-benjamin-wyatt-g045428/'>Klein, Benjamin Wyatt</a></strong>"},{"lat":27.33565,"lng":-82.52771,"label":"<strong><a href='/bailbonds/fl/agent/klein-brent-wallace-a142645/'>Klein, Brent Wallace</a></strong>"},{"lat":27.33565,"lng":-82.52771,"label":"<strong><a href='/bailbonds/fl/agent/klein-wallace-herman-a142770/'>Klein, Wallace Herman</a></strong>"},{"lat":27.09966,"lng":-82.43838,"label":"<strong><a href='/bailbonds/fl/agent/kovalsky-ronald-robert-e036463/'>Kovalsky, Ronald Robert</a></strong>"},{"lat":27.09966,"lng":-82.43838,"label":"<strong><a href='/bailbonds/fl/agent/kovalsky-ronald-robert-iii-w243640/'>Kovalsky, Ronald Robert Iii</a></strong>"},{"lat":27.09966,"lng":-82.43838,"label":"<strong><a href='/bailbonds/fl/agent/kovalsky-sandie-lee-w036461/'>Kovalsky, Sandie Lee</a></strong>"},{"lat":27.33565,"lng":-82.52535,"label":"<strong><a href='/bailbonds/fl/agent/leonard-jake-donald-w667117/'>Leonard, Jake Donald</a></strong>"},{"lat":27.33565,"lng":-82.52535,"label":"<strong><a href='/bailbonds/fl/agent/ludwigson-patricia-may-w385810/'>Ludwigson, Patricia May</a></strong>"},{"lat":27.30835,"lng":-82.49798,"label":"<strong><a href='/bailbonds/fl/agent/m-b-bailbonds-b000404/'>M.B. Bailbonds</a></strong>"},{"lat":27.33652,"lng":-82.52872,"label":"<strong><a href='/bailbonds/fl/agent/merucci-anthony-paul-w346005/'>Merucci, Anthony Paul</a></strong>"},{"lat":27.00142,"lng":-82.12111,"label":"<strong><a href='/bailbonds/fl/agent/platt-theresa-w774528/'>Platt, Theresa</a></strong>"},{"lat":27.08294,"lng":-82.19098,"label":"<strong><a href='/bailbonds/fl/agent/rainey-dominique-angel-p221052/'>Rainey, Dominique Angel</a></strong>"},{"lat":27.33652,"lng":-82.52879,"label":"<strong><a href='/bailbonds/fl/agent/sarasota-bail-bonds-b000704/'>Sarasota Bail Bonds</a></strong>"},{"lat":27.37217,"lng":-82.53285,"label":"<strong><a href='/bailbonds/fl/agent/spires-destiny-g306697/'>Spires, Destiny</a></strong>"},{"lat":27.33678,"lng":-82.52413,"label":"<strong><a href='/bailbonds/fl/agent/steiding-shane-keith-d021604/'>Steiding, Shane Keith</a></strong>"},{"lat":27.33652,"lng":-82.52872,"label":"<strong><a href='/bailbonds/fl/agent/troutman-ranae-w133869/'>Troutman, Ranae</a></strong>"},{"lat":27.06187,"lng":-82.41639,"label":"<strong><a href='/bailbonds/fl/agent/weaver-dennis-eugene-p220575/'>Weaver, Dennis Eugene</a></strong>"},{"lat":27.35573,"lng":-82.54195,"label":"<strong><a href='/bailbonds/fl/agent/wheeler-lori-w125009/'>Wheeler, Lori</a></strong>"},{"lat":27.35001,"lng":-82.44788,"label":"<strong><a href='/bailbonds/fl/agent/wilson-connie-w118881/'>Wilson, Connie</a></strong>"},{"lat":27.33565,"lng":-82.52535,"label":"<strong><a href='/bailbonds/fl/agent/bud-s-bail-bonds/'>Bud's Bail Bonds</a></strong><br>\u260e 904-923-2663"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

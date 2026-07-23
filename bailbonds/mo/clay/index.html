@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,26 +106,31 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mo/agent/sean-w-bratten-324936/">
   <div class="an">Sean W. Bratten</div><div class='ad'>Bratten Bail Bonds</div>
   <div class="ad">PO Box 671, Liberty, 64069</div>
-  <div class='ph'>816-415-4448</div>
+  <div class='ph'>☎ 816-415-4448</div>
+  
   <div class='lic'>License: 324936</div>
 </a><a class="agent" href="/bailbonds/mo/agent/john-w-garrett-305064/">
   <div class="an">John W. Garrett</div><div class='ad'>1st ASAP Bail Bonds, Inc. (Roche Surety and Casualty Co.)</div>
   <div class="ad">PO Box 914, Liberty, 64069</div>
-  <div class='ph'>816-842-1717</div>
+  <div class='ph'>☎ 816-842-1717</div>
+  
   <div class='lic'>License: 305064</div>
 </a><a class="agent" href="/bailbonds/mo/agent/stephene-l-garrett-8231387/">
   <div class="an">Stephene L. Garrett</div><div class='ad'>Anytime Bail Bonds, Inc. (Sun Surety Insurance Co.)</div>
   <div class="ad">118 N. Conistor Ln, Ste B #337, Liberty, 64068</div>
-  <div class='ph'>816-781-3100</div>
+  <div class='ph'>☎ 816-781-3100</div>
+  
   <div class='lic'>License: 8231387</div>
 </a><a class="agent" href="/bailbonds/mo/agent/airen-c-heldenbrand-351690/">
   <div class="an">Airen C. Heldenbrand</div><div class='ad'>Heldenbrand Bail Bonds</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 351690</div>
 </a><a class="agent" href="/bailbonds/mo/agent/jonathan-j-rose-306119/">
   <div class="an">Jonathan J. Rose</div><div class='ad'>Rose Bail Bonding, LLC</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 306119</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://www.16thcircuit.org/Data/Sites/1/media/Surety/qualified-lists/07-july-2026-qualified-bail-bondsmen-list.pdf' rel='nofollow'>www.16thcircuit.org</a> · <a href='https://www.circuit7.net/bailbond/ApprovedBailBonds' rel='nofollow'>www.circuit7.net</a></p>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.31555, -94.4215], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.24563,"lng":-94.45109,"label":"<strong><a href='/bailbonds/mo/agent/stephene-l-garrett-8231387/'>Stephene L. Garrett</a></strong><br>\u260e 816-781-3100"},{"lat":39.24127,"lng":-94.41944,"label":"<strong>2 agents in Liberty</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mo/agent/sean-w-bratten-324936/'>Sean W. Bratten</a></strong><br>\u260e 816-415-4448<br><strong><a href='/bailbonds/mo/agent/john-w-garrett-305064/'>John W. Garrett</a></strong><br>\u260e 816-842-1717"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

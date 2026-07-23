@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,102 +106,122 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/william-anthony-byrd-150291/">
   <div class="an">William Anthony Byrd</div>
   <div class="ad">203 Burt Blvd, Benton, 71006</div>
-  <div class='ph'>(318) 965-5300</div>
+  <div class='ph'>☎ (318) 965-5300</div>
+  
   <div class='lic'>License: 150291</div>
 </a><a class="agent" href="/bailbonds/la/agent/james-ralph-bookout-181890/">
   <div class="an">James Ralph Bookout</div>
   <div class="ad">1635 Old Benton Rd., Bossier City, 71111</div>
-  <div class='ph'>(318) 525-1818</div>
+  <div class='ph'>☎ (318) 525-1818</div>
+  
   <div class='lic'>License: 181890</div>
 </a><a class="agent" href="/bailbonds/la/agent/billy-byrd-bail-bonds-llc-197473/">
   <div class="an">Billy Byrd Bail Bonds LLC</div>
   <div class="ad">203 Burt Blvd, Benton, 71006</div>
-  <div class='ph'>(318) 965-5300</div>
+  <div class='ph'>☎ (318) 965-5300</div>
+  
   <div class='lic'>License: 197473</div>
 </a><a class="agent" href="/bailbonds/la/agent/patrick-dewayne-smith-sr-334490/">
   <div class="an">Patrick Dewayne Smith Sr</div>
   <div class="ad">2307 Middle Creek Blvd, Bossier City, 71111</div>
-  <div class='ph'>(318) 773-9653</div>
+  <div class='ph'>☎ (318) 773-9653</div>
+  
   <div class='lic'>License: 334490</div>
 </a><a class="agent" href="/bailbonds/la/agent/tangular-uvonne-anderson-462979/">
   <div class="an">Tangular Uvonne Anderson</div>
   <div class="ad">4638 Voss Drive, Bossier City, 71111</div>
-  <div class='ph'>(318) 200-1241</div>
+  <div class='ph'>☎ (318) 200-1241</div>
+  
   <div class='lic'>License: 462979</div>
 </a><a class="agent" href="/bailbonds/la/agent/vicki-marie-cooper-538350/">
   <div class="an">Vicki Marie Cooper</div>
   <div class="ad">2524 Hoyer Street, Bossier City, 71101</div>
-  <div class='ph'>(318) 840-8786</div>
+  <div class='ph'>☎ (318) 840-8786</div>
+  
   <div class='lic'>License: 538350</div>
 </a><a class="agent" href="/bailbonds/la/agent/brittney-lorraine-butcher-499046/">
   <div class="an">Brittney Lorraine Butcher</div>
   <div class="ad">3011 Donald Drive, Bossier City, 71112</div>
-  <div class='ph'>(318) 222-9803</div>
+  <div class='ph'>☎ (318) 222-9803</div>
+  
   <div class='lic'>License: 499046</div>
 </a><a class="agent" href="/bailbonds/la/agent/fast-af-bail-bonds-llc-893554/">
   <div class="an">Fast Af Bail Bonds Llc</div>
   <div class="ad">1120 Airline Dr., #200, Bossier City, 71112</div>
-  <div class='ph'>(318) 525-5424</div>
+  <div class='ph'>☎ (318) 525-5424</div>
+  
   <div class='lic'>License: 893554</div>
 </a><a class="agent" href="/bailbonds/la/agent/clifford-lafayette-watkins-iii-908507/">
   <div class="an">Clifford Lafayette Watkins III</div>
   <div class="ad">1120 Airline Dr., #200, Bossier City, 71112</div>
-  <div class='ph'>(318) 525-5424</div>
+  <div class='ph'>☎ (318) 525-5424</div>
+  
   <div class='lic'>License: 908507</div>
 </a><a class="agent" href="/bailbonds/la/agent/no-sleep-gang-bail-bonds-llc-757767/">
   <div class="an">No Sleep Gang Bail Bonds Llc</div>
   <div class="ad">1007 Gould Drive  Building 2 Suite 3, Bossier City, 71111</div>
-  <div class='ph'>(318) 754-6964</div>
+  <div class='ph'>☎ (318) 754-6964</div>
+  
   <div class='lic'>License: 757767</div>
 </a><a class="agent" href="/bailbonds/la/agent/alisa-lynn-turner-756194/">
   <div class="an">Alisa Lynn Turner</div>
   <div class="ad">4820 San Antone Drive, Bossier City, 71111</div>
-  <div class='ph'>(318) 754-6964</div>
+  <div class='ph'>☎ (318) 754-6964</div>
+  
   <div class='lic'>License: 756194</div>
 </a><a class="agent" href="/bailbonds/la/agent/cooper-bail-bonds-llc-620842/">
   <div class="an">Cooper Bail Bonds, LLC</div>
   <div class="ad">2524 Hoyer Street, Bossier City, 71112</div>
-  <div class='ph'>(318) 840-8786</div>
+  <div class='ph'>☎ (318) 840-8786</div>
+  
   <div class='lic'>License: 620842</div>
 </a><a class="agent" href="/bailbonds/la/agent/cotie-anne-klenk-948430/">
   <div class="an">Cotie Anne Klenk</div>
   <div class="ad">1120 Airline Drive #200, Bossier City, 71112</div>
-  <div class='ph'>(318) 560-3149</div>
+  <div class='ph'>☎ (318) 560-3149</div>
+  
   <div class='lic'>License: 948430</div>
 </a><a class="agent" href="/bailbonds/la/agent/claude-henry-scott-1057544/">
   <div class="an">Claude Henry Scott</div>
   <div class="ad">2285 Benton Rd Ste D202-A, Bossier City, 71111</div>
-  <div class='ph'>(318) 540-4333</div>
+  <div class='ph'>☎ (318) 540-4333</div>
+  
   <div class='lic'>License: 1057544</div>
 </a><a class="agent" href="/bailbonds/la/agent/bailmakers-bail-bonds-llc-1071338/">
   <div class="an">Bailmakers Bail Bonds LLC</div>
   <div class="ad">2285 Benton Rd., Ste D202-A, Bossier City, 71111</div>
-  <div class='ph'>(318) 540-4333</div>
+  <div class='ph'>☎ (318) 540-4333</div>
+  
   <div class='lic'>License: 1071338</div>
 </a><a class="agent" href="/bailbonds/la/agent/percy-holladay-johnson-1150512/">
   <div class="an">Percy Holladay Johnson</div>
   <div class="ad">4609 Donnie Ave, Bossier City, 71111</div>
-  <div class='ph'>(318) 605-6899</div>
+  <div class='ph'>☎ (318) 605-6899</div>
+  
   <div class='lic'>License: 1150512</div>
 </a><a class="agent" href="/bailbonds/la/agent/valerie-palmere-scott-1057546/">
   <div class="an">Valerie Palmere Scott</div>
   <div class="ad">2285 Benton Road Suite D202-A, Bossier City, 71111</div>
-  <div class='ph'>(318) 426-3095</div>
+  <div class='ph'>☎ (318) 426-3095</div>
+  
   <div class='lic'>License: 1057546</div>
 </a><a class="agent" href="/bailbonds/la/agent/paul-leon-eckholdt-1226266/">
   <div class="an">Paul Leon Eckholdt</div>
   <div class="ad">1120 Airline Drive Suite 200, Bossier City, 71112</div>
-  <div class='ph'>(318) 525-5424</div>
+  <div class='ph'>☎ (318) 525-5424</div>
+  
   <div class='lic'>License: 1226266</div>
 </a><a class="agent" href="/bailbonds/la/agent/laura-kathryn-campbell-1237728/">
   <div class="an">Laura Kathryn Campbell</div>
   <div class="ad">1120 Airline Dr, Bossier City, 71112</div>
-  <div class='ph'>(318) 525-5424</div>
+  <div class='ph'>☎ (318) 525-5424</div>
+  
   <div class='lic'>License: 1237728</div>
 </a><a class="agent" href="/bailbonds/la/agent/althea-l-adams-1196792/">
   <div class="an">Althea L Adams</div>
   <div class="ad">Fast Af Bail Bonds Llc  1120 Airline Drive  Suite 200, Bossier City, 71112</div>
-  <div class='ph'>(318) 525-5424</div>
+  <div class='ph'>☎ (318) 525-5424</div>
+  
   <div class='lic'>License: 1196792</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -219,5 +241,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.69848, -93.62656], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.67918,"lng":-93.73964,"label":"<strong><a href='/bailbonds/la/agent/william-anthony-byrd-150291/'>William Anthony Byrd</a></strong><br>\u260e (318) 965-5300"},{"lat":32.52793,"lng":-93.72993,"label":"<strong><a href='/bailbonds/la/agent/james-ralph-bookout-181890/'>James Ralph Bookout</a></strong><br>\u260e (318) 525-1818"},{"lat":32.67918,"lng":-93.73964,"label":"<strong><a href='/bailbonds/la/agent/billy-byrd-bail-bonds-llc-197473/'>Billy Byrd Bail Bonds LLC</a></strong><br>\u260e (318) 965-5300"},{"lat":32.56838,"lng":-93.63966,"label":"<strong><a href='/bailbonds/la/agent/patrick-dewayne-smith-sr-334490/'>Patrick Dewayne Smith Sr</a></strong><br>\u260e (318) 773-9653"},{"lat":32.54108,"lng":-93.67634,"label":"<strong><a href='/bailbonds/la/agent/tangular-uvonne-anderson-462979/'>Tangular Uvonne Anderson</a></strong><br>\u260e (318) 200-1241"},{"lat":32.50296,"lng":-93.69968,"label":"<strong><a href='/bailbonds/la/agent/vicki-marie-cooper-538350/'>Vicki Marie Cooper</a></strong><br>\u260e (318) 840-8786"},{"lat":32.51591,"lng":-93.69444,"label":"<strong><a href='/bailbonds/la/agent/brittney-lorraine-butcher-499046/'>Brittney Lorraine Butcher</a></strong><br>\u260e (318) 222-9803"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/fast-af-bail-bonds-llc-893554/'>Fast Af Bail Bonds Llc</a></strong><br>\u260e (318) 525-5424"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/clifford-lafayette-watkins-iii-908507/'>Clifford Lafayette Watkins III</a></strong><br>\u260e (318) 525-5424"},{"lat":32.51775,"lng":-93.71097,"label":"<strong><a href='/bailbonds/la/agent/no-sleep-gang-bail-bonds-llc-757767/'>No Sleep Gang Bail Bonds Llc</a></strong><br>\u260e (318) 754-6964"},{"lat":32.5424,"lng":-93.66914,"label":"<strong><a href='/bailbonds/la/agent/alisa-lynn-turner-756194/'>Alisa Lynn Turner</a></strong><br>\u260e (318) 754-6964"},{"lat":32.50296,"lng":-93.69968,"label":"<strong><a href='/bailbonds/la/agent/cooper-bail-bonds-llc-620842/'>Cooper Bail Bonds, LLC</a></strong><br>\u260e (318) 840-8786"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/cotie-anne-klenk-948430/'>Cotie Anne Klenk</a></strong><br>\u260e (318) 560-3149"},{"lat":32.54261,"lng":-93.7224,"label":"<strong><a href='/bailbonds/la/agent/claude-henry-scott-1057544/'>Claude Henry Scott</a></strong><br>\u260e (318) 540-4333"},{"lat":32.54261,"lng":-93.7224,"label":"<strong><a href='/bailbonds/la/agent/bailmakers-bail-bonds-llc-1071338/'>Bailmakers Bail Bonds LLC</a></strong><br>\u260e (318) 540-4333"},{"lat":32.54164,"lng":-93.67353,"label":"<strong><a href='/bailbonds/la/agent/percy-holladay-johnson-1150512/'>Percy Holladay Johnson</a></strong><br>\u260e (318) 605-6899"},{"lat":32.54261,"lng":-93.7224,"label":"<strong><a href='/bailbonds/la/agent/valerie-palmere-scott-1057546/'>Valerie Palmere Scott</a></strong><br>\u260e (318) 426-3095"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/paul-leon-eckholdt-1226266/'>Paul Leon Eckholdt</a></strong><br>\u260e (318) 525-5424"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/laura-kathryn-campbell-1237728/'>Laura Kathryn Campbell</a></strong><br>\u260e (318) 525-5424"},{"lat":32.50556,"lng":-93.6972,"label":"<strong><a href='/bailbonds/la/agent/althea-l-adams-1196792/'>Althea L Adams</a></strong><br>\u260e (318) 525-5424"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

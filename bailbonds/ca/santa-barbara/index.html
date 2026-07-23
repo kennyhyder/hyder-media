@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,65 +107,78 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Alvarado, Jeffery</div>
   <div class="ad">5395 PASEO CAMEO, Santa Barbara, 93111</div>
   
+  
   <div class='lic'>License: 1846232</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bohl-chuck-1844418/">
   <div class="an">Bohl, Chuck</div>
   <div class="ad">1301 EAST OCEAN AVE., Lompoc, 93436</div>
+  
   
   <div class='lic'>License: 1844418</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bracamontes-oscar-1k22339/">
   <div class="an">Bracamontes, Oscar</div>
   <div class="ad">4390 CALLE REAL STE B, Santa Barbara, 93101</div>
   
+  
   <div class='lic'>License: 1K22339</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brattain-jae-1838881/">
   <div class="an">Brattain, Jae</div>
   <div class="ad">3461 STATE ST, Santa Barbara, 93105</div>
+  
   
   <div class='lic'>License: 1838881</div>
 </a><a class="agent" href="/bailbonds/ca/agent/burns-william-1845231/">
   <div class="an">Burns, William</div>
   <div class="ad">1187 COAST VILLAGE RD. # 487, Santa Barbara, 93108</div>
   
+  
   <div class='lic'>License: 1845231</div>
 </a><a class="agent" href="/bailbonds/ca/agent/carrasco-ramirez-jasmin-4452481/">
   <div class="an">Carrasco-Ramirez, Jasmin</div>
   <div class="ad">505 S. MCCLELLAND ST. SUITE B, Santa Maria, 93455</div>
+  
   
   <div class='lic'>License: 4452481</div>
 </a><a class="agent" href="/bailbonds/ca/agent/corlatan-ilie-1833675/">
   <div class="an">Corlatan, Ilie</div>
   <div class="ad">465 MOUNTAIN DR, Santa Barbara, 93103</div>
   
+  
   <div class='lic'>License: 1833675</div>
 </a><a class="agent" href="/bailbonds/ca/agent/estevez-lino-4339229/">
   <div class="an">Estevez, Lino</div>
   <div class="ad">505 S. MCCLELLAND STREET, SUITE B, Santa Maria, 93455</div>
+  
   
   <div class='lic'>License: 4339229</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mejia-francisco-1843092/">
   <div class="an">Mejia, Francisco</div>
   <div class="ad">23 N SALINAS ST, Santa Barbara, 93103</div>
   
+  
   <div class='lic'>License: 1843092</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendez-roman-1l12945/">
   <div class="an">Mendez, Roman</div>
   <div class="ad">4390 CALLE REAL STE B, Santa Barbara, 93110</div>
+  
   
   <div class='lic'>License: 1L12945</div>
 </a><a class="agent" href="/bailbonds/ca/agent/razo-jennifer-1k68719/">
   <div class="an">Razo, Jennifer</div>
   <div class="ad">4390 CALLE REAL, SUITE - B, Santa Barbara, 93110</div>
   
+  
   <div class='lic'>License: 1K68719</div>
 </a><a class="agent" href="/bailbonds/ca/agent/romero-timothy-1840894/">
   <div class="an">Romero, Timothy</div>
   <div class="ad">5017 MICHAEL ST., Santa Maria, 93455</div>
   
+  
   <div class='lic'>License: 1840894</div>
 </a><a class="agent" href="/bailbonds/ca/agent/trujillo-perez-maribel-1n13223/">
   <div class="an">Trujillo Perez, Maribel</div>
   <div class="ad">4390 CALLE REAL SUITE B, Santa Barbara, 93101</div>
+  
   
   <div class='lic'>License: 1N13223</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -184,5 +199,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.53668, -120.03836], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.45369,"lng":-119.81143,"label":"<strong><a href='/bailbonds/ca/agent/alvarado-jeffery-1846232/'>Alvarado, Jeffery</a></strong>"},{"lat":34.63894,"lng":-120.44278,"label":"<strong><a href='/bailbonds/ca/agent/bohl-chuck-1844418/'>Bohl, Chuck</a></strong>"},{"lat":34.44147,"lng":-119.76884,"label":"<strong><a href='/bailbonds/ca/agent/bracamontes-oscar-1k22339/'>Bracamontes, Oscar</a></strong>"},{"lat":34.44035,"lng":-119.73844,"label":"<strong><a href='/bailbonds/ca/agent/brattain-jae-1838881/'>Brattain, Jae</a></strong>"},{"lat":34.42103,"lng":-119.64516,"label":"<strong><a href='/bailbonds/ca/agent/burns-william-1845231/'>Burns, William</a></strong>"},{"lat":34.9484,"lng":-120.43441,"label":"<strong><a href='/bailbonds/ca/agent/carrasco-ramirez-jasmin-4452481/'>Carrasco-Ramirez, Jasmin</a></strong>"},{"lat":34.45331,"lng":-119.66027,"label":"<strong><a href='/bailbonds/ca/agent/corlatan-ilie-1833675/'>Corlatan, Ilie</a></strong>"},{"lat":34.9484,"lng":-120.43441,"label":"<strong><a href='/bailbonds/ca/agent/estevez-lino-4339229/'>Estevez, Lino</a></strong>"},{"lat":34.4272,"lng":-119.67392,"label":"<strong><a href='/bailbonds/ca/agent/mejia-francisco-1843092/'>Mejia, Francisco</a></strong>"},{"lat":34.44147,"lng":-119.76884,"label":"<strong><a href='/bailbonds/ca/agent/mendez-roman-1l12945/'>Mendez, Roman</a></strong>"},{"lat":34.44147,"lng":-119.76884,"label":"<strong><a href='/bailbonds/ca/agent/razo-jennifer-1k68719/'>Razo, Jennifer</a></strong>"},{"lat":34.86456,"lng":-120.41054,"label":"<strong><a href='/bailbonds/ca/agent/romero-timothy-1840894/'>Romero, Timothy</a></strong>"},{"lat":34.44147,"lng":-119.76884,"label":"<strong><a href='/bailbonds/ca/agent/trujillo-perez-maribel-1n13223/'>Trujillo Perez, Maribel</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

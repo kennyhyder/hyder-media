@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,155 +107,186 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bickel, Melissa</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 4483412</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castillo-garcia-litzy-4423122/">
   <div class="an">Castillo Garcia, Litzy</div>
   <div class="ad">1259 PLEASANT GROVE BLVD., SUITE 160, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 4423122</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castro-lena-1k77829/">
   <div class="an">Castro, Lena</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1K77829</div>
 </a><a class="agent" href="/bailbonds/ca/agent/darby-emily-4344591/">
   <div class="an">Darby, Emily</div>
   <div class="ad">410 VERNON ST, Roseville, 95747</div>
+  
   
   <div class='lic'>License: 4344591</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dick-robert-1n05276/">
   <div class="an">Dick, Robert</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1N05276</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dimiceli-terri-4420795/">
   <div class="an">Dimiceli, Terri</div>
   <div class="ad">1031 JUNCTION BLVD., 801, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 4420795</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dillard-corey-1845997/">
   <div class="an">Dillard, Corey</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1845997</div>
 </a><a class="agent" href="/bailbonds/ca/agent/fabrizio-nicholas-1k42830/">
   <div class="an">Fabrizio, Nicholas</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 1K42830</div>
 </a><a class="agent" href="/bailbonds/ca/agent/fales-gregory-1694854/">
   <div class="an">Fales, Gregory</div>
   <div class="ad">1259 PLEASANT GROVE BLVD STE 160, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1694854</div>
 </a><a class="agent" href="/bailbonds/ca/agent/herrada-adrian-1845573/">
   <div class="an">Herrada, Adrian</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 1845573</div>
 </a><a class="agent" href="/bailbonds/ca/agent/holloway-ashley-devin-1846579/">
   <div class="an">Holloway, Ashley- Devin</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1846579</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hubbard-glen-1582103/">
   <div class="an">Hubbard, Glen</div>
   <div class="ad">4209 VISTA DR, Loomis, 95650</div>
+  
   
   <div class='lic'>License: 1582103</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lee-mark-1k22709/">
   <div class="an">Lee, Mark</div>
   <div class="ad">2460 HIDDEN OAKS LANE, Auburn, 95603</div>
   
+  
   <div class='lic'>License: 1K22709</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lemon-evan-4469823/">
   <div class="an">Lemon, Evan</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 4469823</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lemon-shauntay-1m04574/">
   <div class="an">Lemon, Shauntay</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1M04574</div>
 </a><a class="agent" href="/bailbonds/ca/agent/macdiarmid-sierra-1k80700/">
   <div class="an">Macdiarmid, Sierra</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 1K80700</div>
 </a><a class="agent" href="/bailbonds/ca/agent/maxey-richard-1843849/">
   <div class="an">Maxey, Richard</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1843849</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mccallum-scotland-4452767/">
   <div class="an">Mccallum, Scotland</div>
   <div class="ad">11410 ATWOOD RD., Auburn, 95603</div>
+  
   
   <div class='lic'>License: 4452767</div>
 </a><a class="agent" href="/bailbonds/ca/agent/o-kane-timothy-1840363/">
   <div class="an">O'Kane, Timothy</div>
   <div class="ad">1031 JUNCTION BLVD, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1840363</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ochoa-jenise-4377018/">
   <div class="an">Ochoa, Jenise</div>
   <div class="ad">410 VERNON STREET, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 4377018</div>
 </a><a class="agent" href="/bailbonds/ca/agent/powers-donald-1k05494/">
   <div class="an">Powers, Donald</div>
   <div class="ad">2280 GRASS VALLEY HWY #340, Auburn, 95603</div>
   
+  
   <div class='lic'>License: 1K05494</div>
 </a><a class="agent" href="/bailbonds/ca/agent/purewal-sabrina-1n06936/">
   <div class="an">Purewal, Sabrina</div>
   <div class="ad">1259 PLEASANT GROVE BLVD STE 160, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 1N06936</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rocha-joel-1n13381/">
   <div class="an">Rocha, Joel</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1N13381</div>
 </a><a class="agent" href="/bailbonds/ca/agent/saechao-marina-4349446/">
   <div class="an">Saechao, Marina</div>
   <div class="ad">1259 PLEASANT GROVE BLVD. #160, Rocklin, 95765</div>
+  
   
   <div class='lic'>License: 4349446</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandoval-diana-1846720/">
   <div class="an">Sandoval, Diana</div>
   <div class="ad">915 HIGHLAND POINTE DRIVE, SUITE 250, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1846720</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandoval-jason-1845632/">
   <div class="an">Sandoval, Jason</div>
   <div class="ad">2840 LINCOLN AIRPARK DR, Lincoln, 95648</div>
+  
   
   <div class='lic'>License: 1845632</div>
 </a><a class="agent" href="/bailbonds/ca/agent/schulz-juan-1m13785/">
   <div class="an">Schulz, Juan</div>
   <div class="ad">11750 ATWOOD ROAD, Auburn, 95603</div>
   
+  
   <div class='lic'>License: 1M13785</div>
 </a><a class="agent" href="/bailbonds/ca/agent/varozza-joshua-1845284/">
   <div class="an">Varozza, Joshua</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
+  
   
   <div class='lic'>License: 1845284</div>
 </a><a class="agent" href="/bailbonds/ca/agent/waxham-joshua-1843126/">
   <div class="an">Waxham, Joshua</div>
   <div class="ad">410 VERNON ST, Roseville, 95678</div>
   
+  
   <div class='lic'>License: 1843126</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-christina-1l56788/">
   <div class="an">Williams, Christina</div>
   <div class="ad">4209 VISTA DR, Loomis, 95650</div>
   
+  
   <div class='lic'>License: 1L56788</div>
 </a><a class="agent" href="/bailbonds/ca/agent/zimmerman-melissa-1738147/">
   <div class="an">Zimmerman, Melissa</div>
   <div class="ad">11410 ATWOOD ROAD, Auburn, 95603</div>
+  
   
   <div class='lic'>License: 1738147</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -274,5 +307,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.06203, -120.72272], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/bickel-melissa-4483412/'>Bickel, Melissa</a></strong>"},{"lat":38.77248,"lng":-121.31279,"label":"<strong><a href='/bailbonds/ca/agent/castillo-garcia-litzy-4423122/'>Castillo Garcia, Litzy</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/castro-lena-1k77829/'>Castro, Lena</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/darby-emily-4344591/'>Darby, Emily</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/dick-robert-1n05276/'>Dick, Robert</a></strong>"},{"lat":38.76023,"lng":-121.29557,"label":"<strong><a href='/bailbonds/ca/agent/dimiceli-terri-4420795/'>Dimiceli, Terri</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/dillard-corey-1845997/'>Dillard, Corey</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/fabrizio-nicholas-1k42830/'>Fabrizio, Nicholas</a></strong>"},{"lat":38.77248,"lng":-121.31279,"label":"<strong><a href='/bailbonds/ca/agent/fales-gregory-1694854/'>Fales, Gregory</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/herrada-adrian-1845573/'>Herrada, Adrian</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/holloway-ashley-devin-1846579/'>Holloway, Ashley- Devin</a></strong>"},{"lat":38.92176,"lng":-121.1059,"label":"<strong><a href='/bailbonds/ca/agent/lee-mark-1k22709/'>Lee, Mark</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/lemon-evan-4469823/'>Lemon, Evan</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/lemon-shauntay-1m04574/'>Lemon, Shauntay</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/macdiarmid-sierra-1k80700/'>Macdiarmid, Sierra</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/maxey-richard-1843849/'>Maxey, Richard</a></strong>"},{"lat":38.9347,"lng":-121.10527,"label":"<strong><a href='/bailbonds/ca/agent/mccallum-scotland-4452767/'>Mccallum, Scotland</a></strong>"},{"lat":38.76023,"lng":-121.29557,"label":"<strong><a href='/bailbonds/ca/agent/o-kane-timothy-1840363/'>O'Kane, Timothy</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/ochoa-jenise-4377018/'>Ochoa, Jenise</a></strong>"},{"lat":38.93486,"lng":-121.09294,"label":"<strong><a href='/bailbonds/ca/agent/powers-donald-1k05494/'>Powers, Donald</a></strong>"},{"lat":38.77248,"lng":-121.31279,"label":"<strong><a href='/bailbonds/ca/agent/purewal-sabrina-1n06936/'>Purewal, Sabrina</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/rocha-joel-1n13381/'>Rocha, Joel</a></strong>"},{"lat":38.78317,"lng":-121.28495,"label":"<strong><a href='/bailbonds/ca/agent/sandoval-diana-1846720/'>Sandoval, Diana</a></strong>"},{"lat":38.90981,"lng":-121.32973,"label":"<strong><a href='/bailbonds/ca/agent/sandoval-jason-1845632/'>Sandoval, Jason</a></strong>"},{"lat":38.93483,"lng":-121.09679,"label":"<strong><a href='/bailbonds/ca/agent/schulz-juan-1m13785/'>Schulz, Juan</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/varozza-joshua-1845284/'>Varozza, Joshua</a></strong>"},{"lat":38.74799,"lng":-121.28541,"label":"<strong><a href='/bailbonds/ca/agent/waxham-joshua-1843126/'>Waxham, Joshua</a></strong>"},{"lat":38.9347,"lng":-121.10527,"label":"<strong><a href='/bailbonds/ca/agent/zimmerman-melissa-1738147/'>Zimmerman, Melissa</a></strong>"},{"lat":38.80937,"lng":-121.19547,"label":"<strong>2 agents in Loomis</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/hubbard-glen-1582103/'>Hubbard, Glen</a></strong><br><strong><a href='/bailbonds/ca/agent/williams-christina-1l56788/'>Williams, Christina</a></strong>"},{"lat":38.80687,"lng":-121.2497,"label":"<strong>1 agent in Rocklin</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/saechao-marina-4349446/'>Saechao, Marina</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

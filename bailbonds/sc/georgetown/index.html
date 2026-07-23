@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,22 +106,26 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/daniels-james-c-prb-18393714-npn-18393714/">
   <div class="an">Daniels, James C</div><div class='ad'>C &amp; J Bonding Company</div>
   <div class="ad">Georgetown, 29440</div>
-  <div class='ph'>(843) 527-1224</div>
+  <div class='ph'>☎ (843) 527-1224</div>
+  
   <div class='lic'>License: PRB 18393714 (NPN 18393714)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/johnson-raymond-e-prb-6418183-npn-6418183/">
   <div class="an">Johnson, Raymond E</div>
   <div class="ad">Georgetown, 29440</div>
-  <div class='ph'>(843) 520-2770</div>
+  <div class='ph'>☎ (843) 520-2770</div>
+  
   <div class='lic'>License: PRB 6418183 (NPN 6418183)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/daniels-melanie-p-rbm-18393252-npn-18393252/">
   <div class="an">Daniels, Melanie P</div>
   <div class="ad">Georgetown, 29442</div>
-  <div class='ph'>(843) 527-1224</div>
+  <div class='ph'>☎ (843) 527-1224</div>
+  
   <div class='lic'>License: RBM 18393252 (NPN 18393252)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/andrews-mary-e-sbb-16770205-npn-16770205/">
   <div class="an">Andrews, Mary E</div>
   <div class="ad">Georgetown, 29440</div>
-  <div class='ph'>(843) 235-2663</div>
+  <div class='ph'>☎ (843) 235-2663</div>
+  
   <div class='lic'>License: SBB 16770205 (NPN 16770205)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Georgetown' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Georgetown' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Georgetown' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.41753, -79.29633], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.37243,"lng":-79.28079,"label":"<strong>4 agents in Georgetown</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/daniels-james-c-prb-18393714-npn-18393714/'>Daniels, James C</a></strong><br>\u260e (843) 527-1224<br><strong><a href='/bailbonds/sc/agent/johnson-raymond-e-prb-6418183-npn-6418183/'>Johnson, Raymond E</a></strong><br>\u260e (843) 520-2770<br><strong><a href='/bailbonds/sc/agent/daniels-melanie-p-rbm-18393252-npn-18393252/'>Daniels, Melanie P</a></strong><br>\u260e (843) 527-1224<br><strong><a href='/bailbonds/sc/agent/andrews-mary-e-sbb-16770205-npn-16770205/'>Andrews, Mary E</a></strong><br>\u260e (843) 235-2663"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in El Paso County</h2>
@@ -116,107 +118,128 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/alberto-j-de-lachica-009/">
   <div class="an">Alberto J. De Lachica</div><div class='ad'>Lachica</div>
   <div class="ad">200 S. Stanton, Suite D, El Paso, 79901</div>
-  <div class='ph'>915-544-1900</div>
+  <div class='ph'>☎ 915-544-1900</div>
+  
   <div class='lic'>License: 009</div>
 </a><a class="agent" href="/bailbonds/tx/agent/antonio-munoz-093/">
   <div class="an">Antonio Munoz</div><div class='ad'>Borderland</div>
   <div class="ad">425 Myrtle, El Paso, 79901</div>
-  <div class='ph'>915-542-1911</div>
+  <div class='ph'>☎ 915-542-1911</div>
+  
   <div class='lic'>License: 093</div>
 </a><a class="agent" href="/bailbonds/tx/agent/pasqual-olibas-100/">
   <div class="an">Pasqual Olibas</div><div class='ad'>Freedom</div>
   <div class="ad">1707 Wyoming, El Paso, 79902</div>
-  <div class='ph'>915-877-9293</div>
+  <div class='ph'>☎ 915-877-9293</div>
+  
   <div class='lic'>License: 100</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jose-castaneda-105/">
   <div class="an">Jose Castaneda</div><div class='ad'>E-Z Iv</div>
   <div class="ad">700 E. Overland, El Paso, 79901</div>
-  <div class='ph'>915-532-6333</div>
+  <div class='ph'>☎ 915-532-6333</div>
+  
   <div class='lic'>License: 105</div>
 </a><a class="agent" href="/bailbonds/tx/agent/alberto-j-de-lachica-107/">
   <div class="an">Alberto J. De Lachica</div><div class='ad'>Lachica III</div>
   <div class="ad">425 E. Paisano Dr., Suite D, El Paso, 79901</div>
-  <div class='ph'>915-544-2997</div>
+  <div class='ph'>☎ 915-544-2997</div>
+  
   <div class='lic'>License: 107</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jesus-jessie-samaniego-116/">
   <div class="an">Jesus "Jessie" Samaniego</div><div class='ad'>1 Stop</div>
   <div class="ad">801 Myrtle Ave, #105, El Paso, 79901</div>
-  <div class='ph'>915-544-7867</div>
+  <div class='ph'>☎ 915-544-7867</div>
+  
   <div class='lic'>License: 116</div>
 </a><a class="agent" href="/bailbonds/tx/agent/guadalupe-antonio-quintanilla-118/">
   <div class="an">Guadalupe Antonio Quintanilla</div><div class='ad'>A-Quick IV</div>
   <div class="ad">717 E. San Antonio, Ste A, El Paso, 79901</div>
-  <div class='ph'>915-533-1414</div>
+  <div class='ph'>☎ 915-533-1414</div>
+  
   <div class='lic'>License: 118</div>
 </a><a class="agent" href="/bailbonds/tx/agent/oscar-gonzalez-120/">
   <div class="an">Oscar Gonzalez</div><div class='ad'>1 Call</div>
   <div class="ad">801 Myrtle Ave, #105, El Paso, 79901</div>
-  <div class='ph'>915-533-2255</div>
+  <div class='ph'>☎ 915-533-2255</div>
+  
   <div class='lic'>License: 120</div>
 </a><a class="agent" href="/bailbonds/tx/agent/c-tejeda-127/">
   <div class="an">C. Tejeda</div><div class='ad'>Aaa</div>
   <div class="ad">700 E. Overland, Ste E, El Paso, 79901</div>
-  <div class='ph'>915-544-2224</div>
+  <div class='ph'>☎ 915-544-2224</div>
+  
   <div class='lic'>License: 127</div>
 </a><a class="agent" href="/bailbonds/tx/agent/fernando-serrano-130/">
   <div class="an">Fernando Serrano</div><div class='ad'>9 One 5</div>
   <div class="ad">830 E. San Antonio, El Paso, 79901</div>
-  <div class='ph'>915-313-4111</div>
+  <div class='ph'>☎ 915-313-4111</div>
+  
   <div class='lic'>License: 130</div>
 </a><a class="agent" href="/bailbonds/tx/agent/james-rey-132/">
   <div class="an">James Rey</div><div class='ad'>Amigo V</div>
   <div class="ad">501 N. Kansas, El Paso, 79901</div>
-  <div class='ph'>915-532-3500</div>
+  <div class='ph'>☎ 915-532-3500</div>
+  
   <div class='lic'>License: 132</div>
 </a><a class="agent" href="/bailbonds/tx/agent/antonio-munoz-133/">
   <div class="an">Antonio Munoz</div><div class='ad'>24 Hr. VI</div>
   <div class="ad">425 Myrtle, El Paso, 79901</div>
-  <div class='ph'>915-533-9800</div>
+  <div class='ph'>☎ 915-533-9800</div>
+  
   <div class='lic'>License: 133</div>
 </a><a class="agent" href="/bailbonds/tx/agent/oscar-bustamante-134/">
   <div class="an">Oscar Bustamante</div><div class='ad'>Speedy</div>
   <div class="ad">206 S. Florence, El Paso, 79901</div>
-  <div class='ph'>915-566-8104</div>
+  <div class='ph'>☎ 915-566-8104</div>
+  
   <div class='lic'>License: 134</div>
 </a><a class="agent" href="/bailbonds/tx/agent/alberto-j-de-lachica-135/">
   <div class="an">Alberto J. de Lachica</div><div class='ad'>Apodaca-Lachica</div>
   <div class="ad">211 S. Kansas, El Paso, 79901</div>
-  <div class='ph'>915-544-1900</div>
+  <div class='ph'>☎ 915-544-1900</div>
+  
   <div class='lic'>License: 135</div>
 </a><a class="agent" href="/bailbonds/tx/agent/hector-quintanilla-136/">
   <div class="an">Hector Quintanilla</div><div class='ad'>Affordable II</div>
   <div class="ad">101 N. Ochoa, El Paso, 79901</div>
-  <div class='ph'>915-351-7002</div>
+  <div class='ph'>☎ 915-351-7002</div>
+  
   <div class='lic'>License: 136</div>
 </a><a class="agent" href="/bailbonds/tx/agent/james-rey-137/">
   <div class="an">James Rey</div><div class='ad'>Amigo VI</div>
   <div class="ad">501 N. Kansas, El Paso, 79901</div>
-  <div class='ph'>915-532-3500</div>
+  <div class='ph'>☎ 915-532-3500</div>
+  
   <div class='lic'>License: 137</div>
 </a><a class="agent" href="/bailbonds/tx/agent/antonio-munoz-139/">
   <div class="an">Antonio Munoz</div><div class='ad'>Lone Star</div>
   <div class="ad">425 Myrtle, El Paso, 79901</div>
-  <div class='ph'>915-542-1911</div>
+  <div class='ph'>☎ 915-542-1911</div>
+  
   <div class='lic'>License: 139</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jose-castaneda-140/">
   <div class="an">Jose Castaneda</div><div class='ad'>Ez V</div>
   <div class="ad">700 E. Overland, El Paso, 79901</div>
-  <div class='ph'>915-532-6329</div>
+  <div class='ph'>☎ 915-532-6329</div>
+  
   <div class='lic'>License: 140</div>
 </a><a class="agent" href="/bailbonds/tx/agent/claudia-rubio-141/">
   <div class="an">Claudia Rubio</div><div class='ad'>Dollar</div>
   <div class="ad">700 E. Overland, El Paso, 79901</div>
-  <div class='ph'>915-544-2224</div>
+  <div class='ph'>☎ 915-544-2224</div>
+  
   <div class='lic'>License: 141</div>
 </a><a class="agent" href="/bailbonds/tx/agent/fernando-serrano-142/">
   <div class="an">Fernando Serrano</div><div class='ad'>Ept</div>
   <div class="ad">830 E. San Antonio, Suite C, El Paso, 79901</div>
-  <div class='ph'>915-313-4117</div>
+  <div class='ph'>☎ 915-313-4117</div>
+  
   <div class='lic'>License: 142</div>
 </a><a class="agent" href="/bailbonds/tx/agent/luis-quintanilla-143/">
   <div class="an">Luis Quintanilla</div><div class='ad'>Payless Bail Bonds III</div>
   <div class="ad">416 N. Staton Ste. 120-G, El Paso, 79901</div>
-  <div class='ph'>915-222-0832</div>
+  <div class='ph'>☎ 915-222-0832</div>
+  
   <div class='lic'>License: 143</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.epcounty.com/DocumentCenter/View/1296/Bail-Bond-Directory-PDF' rel='nofollow'>www.epcounty.com</a></p>
 </div>
@@ -236,5 +259,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.76646, -106.24152], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":31.75757,"lng":-106.48554,"label":"<strong><a href='/bailbonds/tx/agent/alberto-j-de-lachica-009/'>Alberto J. De Lachica</a></strong><br>\u260e 915-544-1900"},{"lat":31.75943,"lng":-106.4846,"label":"<strong><a href='/bailbonds/tx/agent/antonio-munoz-093/'>Antonio Munoz</a></strong><br>\u260e 915-542-1911"},{"lat":31.77239,"lng":-106.47504,"label":"<strong><a href='/bailbonds/tx/agent/pasqual-olibas-100/'>Pasqual Olibas</a></strong><br>\u260e 915-877-9293"},{"lat":31.75832,"lng":-106.48247,"label":"<strong><a href='/bailbonds/tx/agent/jose-castaneda-105/'>Jose Castaneda</a></strong><br>\u260e 915-532-6333"},{"lat":31.75609,"lng":-106.48446,"label":"<strong><a href='/bailbonds/tx/agent/alberto-j-de-lachica-107/'>Alberto J. De Lachica</a></strong><br>\u260e 915-544-2997"},{"lat":31.76147,"lng":-106.48142,"label":"<strong><a href='/bailbonds/tx/agent/jesus-jessie-samaniego-116/'>Jesus \"Jessie\" Samaniego</a></strong><br>\u260e 915-544-7867"},{"lat":31.75946,"lng":-106.48213,"label":"<strong><a href='/bailbonds/tx/agent/guadalupe-antonio-quintanilla-118/'>Guadalupe Antonio Quintanilla</a></strong><br>\u260e 915-533-1414"},{"lat":31.76147,"lng":-106.48142,"label":"<strong><a href='/bailbonds/tx/agent/oscar-gonzalez-120/'>Oscar Gonzalez</a></strong><br>\u260e 915-533-2255"},{"lat":31.75832,"lng":-106.48247,"label":"<strong><a href='/bailbonds/tx/agent/c-tejeda-127/'>C. Tejeda</a></strong><br>\u260e 915-544-2224"},{"lat":31.75957,"lng":-106.48113,"label":"<strong><a href='/bailbonds/tx/agent/fernando-serrano-130/'>Fernando Serrano</a></strong><br>\u260e 915-313-4111"},{"lat":31.76211,"lng":-106.48749,"label":"<strong><a href='/bailbonds/tx/agent/james-rey-132/'>James Rey</a></strong><br>\u260e 915-532-3500"},{"lat":31.75943,"lng":-106.4846,"label":"<strong><a href='/bailbonds/tx/agent/antonio-munoz-133/'>Antonio Munoz</a></strong><br>\u260e 915-533-9800"},{"lat":31.75827,"lng":-106.48246,"label":"<strong><a href='/bailbonds/tx/agent/oscar-bustamante-134/'>Oscar Bustamante</a></strong><br>\u260e 915-566-8104"},{"lat":31.7577,"lng":-106.48462,"label":"<strong><a href='/bailbonds/tx/agent/alberto-j-de-lachica-135/'>Alberto J. de Lachica</a></strong><br>\u260e 915-544-1900"},{"lat":31.75963,"lng":-106.4813,"label":"<strong><a href='/bailbonds/tx/agent/hector-quintanilla-136/'>Hector Quintanilla</a></strong><br>\u260e 915-351-7002"},{"lat":31.76211,"lng":-106.48749,"label":"<strong><a href='/bailbonds/tx/agent/james-rey-137/'>James Rey</a></strong><br>\u260e 915-532-3500"},{"lat":31.75943,"lng":-106.4846,"label":"<strong><a href='/bailbonds/tx/agent/antonio-munoz-139/'>Antonio Munoz</a></strong><br>\u260e 915-542-1911"},{"lat":31.75832,"lng":-106.48247,"label":"<strong><a href='/bailbonds/tx/agent/jose-castaneda-140/'>Jose Castaneda</a></strong><br>\u260e 915-532-6329"},{"lat":31.75832,"lng":-106.48247,"label":"<strong><a href='/bailbonds/tx/agent/claudia-rubio-141/'>Claudia Rubio</a></strong><br>\u260e 915-544-2224"},{"lat":31.75957,"lng":-106.48113,"label":"<strong><a href='/bailbonds/tx/agent/fernando-serrano-142/'>Fernando Serrano</a></strong><br>\u260e 915-313-4117"},{"lat":31.76139,"lng":-106.48801,"label":"<strong><a href='/bailbonds/tx/agent/luis-quintanilla-143/'>Luis Quintanilla</a></strong><br>\u260e 915-222-0832"},{"lat":31.75817,"lng":-106.48353,"label":"<strong>El Paso County Downtown Detention Facility</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

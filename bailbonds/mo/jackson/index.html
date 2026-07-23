@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,47 +106,56 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mo/agent/curtis-d-eaton-304436/">
   <div class="an">Curtis D. Eaton</div><div class='ad'>Eaton Bail Bonds / Bruno Bail Bonds, LLC</div>
   <div class="ad">615 W. 39th Street, Kansas City, 64111</div>
-  <div class='ph'>816-221-7161</div>
+  <div class='ph'>☎ 816-221-7161</div>
+  
   <div class='lic'>License: 304436</div>
 </a><a class="agent" href="/bailbonds/mo/agent/anthony-ferrara-jr-315975/">
   <div class="an">Anthony Ferrara Jr.</div><div class='ad'>Ferrara Bail Bonds</div>
   <div class="ad">PO Box 9464, Raytown, 64133</div>
-  <div class='ph'>816-436-2245</div>
+  <div class='ph'>☎ 816-436-2245</div>
+  
   <div class='lic'>License: 315975</div>
 </a><a class="agent" href="/bailbonds/mo/agent/tamika-m-hanks-8325392/">
   <div class="an">Tamika M. Hanks</div><div class='ad'>Mika Hanks Bail Bonds</div>
   <div class="ad">4741 Central Street, Ste 516, Kansas City, 64112</div>
-  <div class='ph'>816-921-5500</div>
+  <div class='ph'>☎ 816-921-5500</div>
+  
   <div class='lic'>License: 8325392</div>
 </a><a class="agent" href="/bailbonds/mo/agent/rodney-k-jarrett-434727/">
   <div class="an">Rodney K. Jarrett</div><div class='ad'>Jay Jarrett Bail Bonds</div>
   <div class="ad">4741 Central Street, Ste 464, Kansas City, 64112</div>
-  <div class='ph'>816-606-5000</div>
+  <div class='ph'>☎ 816-606-5000</div>
+  
   <div class='lic'>License: 434727</div>
 </a><a class="agent" href="/bailbonds/mo/agent/coleman-o-keys-306318/">
   <div class="an">Coleman O. Keys</div><div class='ad'>Keys Bonding Co.</div>
   <div class="ad">7949 Blue Ridge Blvd., Raytown, 64138</div>
-  <div class='ph'>816-254-9999</div>
+  <div class='ph'>☎ 816-254-9999</div>
+  
   <div class='lic'>License: 306318</div>
 </a><a class="agent" href="/bailbonds/mo/agent/michael-j-palmer-305842/">
   <div class="an">Michael J. Palmer</div>
   <div class="ad">1919 Buchanan, Kansas City, 64116</div>
-  <div class='ph'>816-781-9977</div>
+  <div class='ph'>☎ 816-781-9977</div>
+  
   <div class='lic'>License: 305842</div>
 </a><a class="agent" href="/bailbonds/mo/agent/josephina-m-soria-391367/">
   <div class="an">Josephina M. Soria</div><div class='ad'>Jo Jo's Bail Bonds</div>
   <div class="ad">PO Box 1579, Independence, 64055</div>
-  <div class='ph'>816-446-4874</div>
+  <div class='ph'>☎ 816-446-4874</div>
+  
   <div class='lic'>License: 391367</div>
 </a><a class="agent" href="/bailbonds/mo/agent/kevin-w-young-305389/">
   <div class="an">Kevin W. Young</div><div class='ad'>KY Bail Bonds</div>
   <div class="ad">PO Box 321, Lone Jack, 64070</div>
-  <div class='ph'>816-921-6900</div>
+  <div class='ph'>☎ 816-921-6900</div>
+  
   <div class='lic'>License: 305389</div>
 </a><a class="agent" href="/bailbonds/mo/agent/nicholas-e-noble-418401/">
   <div class="an">Nicholas E. Noble</div><div class='ad'>Bruno Bonding, LLC (Bankers Insurance Co.)</div>
   <div class="ad">615 W. 39th Street, Kansas City, 64111</div>
-  <div class='ph'>816-221-7108</div>
+  <div class='ph'>☎ 816-221-7108</div>
+  
   <div class='lic'>License: 418401</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.16thcircuit.org/Data/Sites/1/media/Surety/qualified-lists/07-july-2026-qualified-bail-bondsmen-list.pdf' rel='nofollow'>www.16thcircuit.org</a></p>
 </div>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.00536, -94.34321], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.05677,"lng":-94.5933,"label":"<strong><a href='/bailbonds/mo/agent/curtis-d-eaton-304436/'>Curtis D. Eaton</a></strong><br>\u260e 816-221-7161"},{"lat":39.04123,"lng":-94.5903,"label":"<strong><a href='/bailbonds/mo/agent/tamika-m-hanks-8325392/'>Tamika M. Hanks</a></strong><br>\u260e 816-921-5500"},{"lat":39.04123,"lng":-94.5903,"label":"<strong><a href='/bailbonds/mo/agent/rodney-k-jarrett-434727/'>Rodney K. Jarrett</a></strong><br>\u260e 816-606-5000"},{"lat":38.9795,"lng":-94.48727,"label":"<strong><a href='/bailbonds/mo/agent/coleman-o-keys-306318/'>Coleman O. Keys</a></strong><br>\u260e 816-254-9999"},{"lat":39.14181,"lng":-94.5796,"label":"<strong><a href='/bailbonds/mo/agent/michael-j-palmer-305842/'>Michael J. Palmer</a></strong><br>\u260e 816-781-9977"},{"lat":39.05677,"lng":-94.5933,"label":"<strong><a href='/bailbonds/mo/agent/nicholas-e-noble-418401/'>Nicholas E. Noble</a></strong><br>\u260e 816-221-7108"},{"lat":38.99427,"lng":-94.46151,"label":"<strong>1 agent in Raytown</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mo/agent/anthony-ferrara-jr-315975/'>Anthony Ferrara Jr.</a></strong><br>\u260e 816-436-2245"},{"lat":39.08547,"lng":-94.35208,"label":"<strong>1 agent in Independence</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mo/agent/josephina-m-soria-391367/'>Josephina M. Soria</a></strong><br>\u260e 816-446-4874"},{"lat":38.8709,"lng":-94.18559,"label":"<strong>1 agent in Lone Jack</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mo/agent/kevin-w-young-305389/'>Kevin W. Young</a></strong><br>\u260e 816-921-6900"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

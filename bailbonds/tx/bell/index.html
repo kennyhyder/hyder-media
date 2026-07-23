@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in Bell County</h2>
@@ -116,67 +118,80 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/a-budget-military-civilian-bail-bond-linda-aaron-74/">
   <div class="an">A Budget Military &amp; Civilian Bail Bond (Linda Aaron)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 526-5445</div>
+  <div class='ph'>☎ (254) 526-5445</div>
+  
   <div class='lic'>License: 74</div>
 </a><a class="agent" href="/bailbonds/tx/agent/a-budget-military-civilian-bail-bond-2-linda-aaron-allegheny-112/">
   <div class="an">A Budget Military + Civilian Bail Bond #2 (Linda Aaron; Allegheny Casualty Co.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 526-5445</div>
+  <div class='ph'>☎ (254) 526-5445</div>
+  
   <div class='lic'>License: 112</div>
 </a><a class="agent" href="/bailbonds/tx/agent/bosslady-bail-bonds-christine-bennett-allegheny-casualty-co-117/">
   <div class="an">Bosslady Bail Bonds (Christine Bennett; Allegheny Casualty Co.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 534-0299</div>
+  <div class='ph'>☎ (254) 534-0299</div>
+  
   <div class='lic'>License: 117</div>
 </a><a class="agent" href="/bailbonds/tx/agent/ez-bail-bonds-debbie-crocker-allegheny-casualty-co-111/">
   <div class="an">EZ Bail Bonds (Debbie Crocker; Allegheny Casualty Co.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 290-0985</div>
+  <div class='ph'>☎ (254) 290-0985</div>
+  
   <div class='lic'>License: 111</div>
 </a><a class="agent" href="/bailbonds/tx/agent/amigo-vasquez-bail-bonds-nora-o-neill-allegheny-casualty-co-97/">
   <div class="an">Amigo Vasquez Bail Bonds (Nora O'Neill; Allegheny Casualty Co.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 939-9343</div>
+  <div class='ph'>☎ (254) 939-9343</div>
+  
   <div class='lic'>License: 97</div>
 </a><a class="agent" href="/bailbonds/tx/agent/free-man-bail-bonds-erendira-diaz-bankers-insurance-company-95/">
   <div class="an">Free-Man Bail Bonds (Erendira Diaz; Bankers Insurance Company)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 228-6008</div>
+  <div class='ph'>☎ (254) 228-6008</div>
+  
   <div class='lic'>License: 95</div>
 </a><a class="agent" href="/bailbonds/tx/agent/smoking-gun-bail-bonds-michael-edwards-115/">
   <div class="an">Smoking Gun Bail Bonds (Michael Edwards)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 933-0600</div>
+  <div class='ph'>☎ (254) 933-0600</div>
+  
   <div class='lic'>License: 115</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aa-best-bail-bonds-albert-saenz-financial-casualty-surety-in-116/">
   <div class="an">AA Best Bail Bonds (Albert Saenz; Financial Casualty &amp; Surety Inc.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 233-1100</div>
+  <div class='ph'>☎ (254) 233-1100</div>
+  
   <div class='lic'>License: 116</div>
 </a><a class="agent" href="/bailbonds/tx/agent/quik-release-bail-bonds-robert-gaines-26/">
   <div class="an">Quik Release Bail Bonds (Robert Gaines)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 939-9448</div>
+  <div class='ph'>☎ (254) 939-9448</div>
+  
   <div class='lic'>License: 26</div>
 </a><a class="agent" href="/bailbonds/tx/agent/discount-bail-bond-latesia-ganos-lexington-national-insuranc-109/">
   <div class="an">Discount Bail Bond (Latesia Ganos; Lexington National Insurance Corp.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 526-6832</div>
+  <div class='ph'>☎ (254) 526-6832</div>
+  
   <div class='lic'>License: 109</div>
 </a><a class="agent" href="/bailbonds/tx/agent/bad-boy-bail-bonds-cory-lee-lexington-national-insurance-cor-98/">
   <div class="an">Bad Boy Bail Bonds (Cory Lee; Lexington National Insurance Corp.)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 634-2245</div>
+  <div class='ph'>☎ (254) 634-2245</div>
+  
   <div class='lic'>License: 98</div>
 </a><a class="agent" href="/bailbonds/tx/agent/central-texas-bail-bonds-lilia-cortes-united-states-fire-ins-114/">
   <div class="an">Central Texas Bail Bonds (Lilia Cortes; United States Fire Insurance Company)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 366-2431</div>
+  <div class='ph'>☎ (254) 366-2431</div>
+  
   <div class='lic'>License: 114</div>
 </a><a class="agent" href="/bailbonds/tx/agent/first-call-bail-bonds-kyle-e-willett-united-states-fire-insu-110/">
   <div class="an">First Call Bail Bonds (Kyle E. Willett; United States Fire Insurance Company)</div>
   <div class="ad"></div>
-  <div class='ph'>(254) 933-8669</div>
+  <div class='ph'>☎ (254) 933-8669</div>
+  
   <div class='lic'>License: 110</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.bellcountytx.com/services/county_links/bell_county_bailbond_board_new/docs/260213bailbondcolist.pdf' rel='nofollow'>www.bellcountytx.com</a></p>
 </div>
@@ -196,5 +211,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.04275, -97.48127], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":31.05665,"lng":-97.46465,"label":"<strong>Bell County Jail</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

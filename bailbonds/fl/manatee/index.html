@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,131 +107,157 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">!!A.S.A.P!! Bail Bonds, Llc</div>
   <div class="ad">3912 US-301 N, ELLENTON, 34222</div>
   
+  <div class='ad'>✉ ASAPBAILBONDS941@GMAIL.COM</div>
   <div class='lic'>License: B000642</div>
 </a><a class="agent" href="/bailbonds/fl/agent/automatic-bail-bonds-llc-b000016/">
   <div class="an">Automatic Bail Bonds Llc</div>
   <div class="ad">317 7TH ST E UNIT A, BRADENTON, 34208</div>
   
+  <div class='ad'>✉ AUTOMATICBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000016</div>
 </a><a class="agent" href="/bailbonds/fl/agent/big-johnson-bail-bonds-b000569/">
   <div class="an">Big Johnson Bail Bonds</div>
   <div class="ad">520 12TH ST W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ GJOHNSONFL@YAHOO.COM</div>
   <div class='lic'>License: B000569</div>
 </a><a class="agent" href="/bailbonds/fl/agent/branch-evette-michelle-p241486/">
   <div class="an">Branch, Evette Michelle</div>
   <div class="ad">A HEAVEN SENT BAIL BOND 1864 DR MLK WAY, SARASOTA, 34234</div>
   
+  <div class='ad'>✉ VETTE@AHEAVENSENTBAILBONDS.COM</div>
   <div class='lic'>License: P241486</div>
 </a><a class="agent" href="/bailbonds/fl/agent/buckingham-whitney-w552214/">
   <div class="an">Buckingham, Whitney</div>
   <div class="ad">3912 US 301 N 3912 US 301 N, BRADENTON, 34222</div>
   
+  <div class='ad'>✉ WBOWERS46@YAHOO.COM</div>
   <div class='lic'>License: W552214</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cici-s-bail-bonds-llc-b000172/">
   <div class="an">Cici'S Bail Bonds Llc</div>
   <div class="ad">433 8TH AVE W SUITE #104, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ CICISBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000172</div>
 </a><a class="agent" href="/bailbonds/fl/agent/delgado-conchita-w066290/">
   <div class="an">Delgado, Conchita</div>
   <div class="ad">433 8TH AVE W, SUITE #104, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ CICISBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W066290</div>
 </a><a class="agent" href="/bailbonds/fl/agent/evans-leah-w543959/">
   <div class="an">Evans, Leah</div>
   <div class="ad">BAD BOY BAIL BONDS 2062 RINGLING BLVD, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ LEKRAUSE1@GMAIL.COM</div>
   <div class='lic'>License: W543959</div>
 </a><a class="agent" href="/bailbonds/fl/agent/evans-tommy-w170095/">
   <div class="an">Evans, Tommy</div>
   <div class="ad">BAD BOY BAIL BONDS 1101 9TH AVE W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ TOMMYEVANS22@GMAIL.COM</div>
   <div class='lic'>License: W170095</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gill-james-f-iv-w320770/">
   <div class="an">Gill, James F Iv</div>
   <div class="ad">548 12 ST W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ JFGILL@HOTMAIL.COM</div>
   <div class='lic'>License: W320770</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-bond-bail-bond-llc-b000175/">
   <div class="an">James Bond Bail Bond Llc,</div>
   <div class="ad">1101 9TH AVE W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ TOMMYEVANS22@GMAIL.COM</div>
   <div class='lic'>License: B000175</div>
 </a><a class="agent" href="/bailbonds/fl/agent/johnson-gary-walter-jr-a294901/">
   <div class="an">Johnson, Gary Walter Jr</div>
   <div class="ad">BIG JOHNSON BAILBONDS 520 12TH ST W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ GJOHNSONFL@YAHOO.COM</div>
   <div class='lic'>License: A294901</div>
 </a><a class="agent" href="/bailbonds/fl/agent/johnson-heather-renee-w321315/">
   <div class="an">Johnson, Heather Renee</div>
   <div class="ad">BIG JOHNSON BAIL BONDS 520 12TH STREET W, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ LUCKYTOE2@YAHOO.COM</div>
   <div class='lic'>License: W321315</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kielmann-aaron-david-p090075/">
   <div class="an">Kielmann, Aaron David</div>
   <div class="ad">921 41ST. ST. WEST, BRADENTON, 34205</div>
   
+  <div class='ad'>✉ AKCUSTOMSERVICES@GMAIL.COM</div>
   <div class='lic'>License: P090075</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lima-eddy-r-a155709/">
   <div class="an">Lima, Eddy R</div>
   <div class="ad">AADVANTAGE Y AAMIGO 1039 EAST AVE N, SARASOTA, 34237</div>
   
+  <div class='ad'>✉ AADVANTAGE2@GMAIL.COM</div>
   <div class='lic'>License: A155709</div>
 </a><a class="agent" href="/bailbonds/fl/agent/panagiotakis-maria-g164162/">
   <div class="an">Panagiotakis, Maria</div>
   <div class="ad">6832 71ST ST E, BRADENTON, 34203</div>
   
+  <div class='ad'>✉ PANAGIOTAKIS.MARIA@GMAIL.COM</div>
   <div class='lic'>License: G164162</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pierre-dawn-delores-w724419/">
   <div class="an">Pierre, Dawn Delores</div>
   <div class="ad">AA MR P POLLARD BAIL BOND 2005 3RD AVENUE EAST, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ 1COLLINMOMMA@GMAIL.COM</div>
   <div class='lic'>License: W724419</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pollard-frazier-lee-e122020/">
   <div class="an">Pollard, Frazier Lee</div>
   <div class="ad">2005 3RD AVE EAST, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ ISEARCH52@YAHOO.COM</div>
   <div class='lic'>License: E122020</div>
 </a><a class="agent" href="/bailbonds/fl/agent/shelly-autumn-nicole-w125261/">
   <div class="an">Shelly, Autumn Nicole</div>
   <div class="ad">AUTOMATIC BAIL BONDS LLC 317 7TH ST E SUITE A, BRADENTON, 34208</div>
   
+  <div class='ad'>✉ AUTOMATICBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W125261</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-harold-l-sr-p069667/">
   <div class="an">Smith, Harold L Sr</div>
   <div class="ad">SMITTY BAIL BONDS 1707 2ND AVE E, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ SMITHH456@AOL.COM</div>
   <div class='lic'>License: P069667</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-monica-latrice-p134014/">
   <div class="an">Smith, Monica Latrice</div>
   <div class="ad">SMITTY'S BAIL BOND 1707 2ND AVE EAST, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ MONICATOSMOOTHSMITH@GMAIL.COM</div>
   <div class='lic'>License: P134014</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-rosa-b-e089823/">
   <div class="an">Smith, Rosa B</div>
   <div class="ad">SMITTY'S BAIL BOND 1707 2ND AVE E, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ MONICATOSMOOTHSMITH@GMAIL.COM</div>
   <div class='lic'>License: E089823</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smitty-bail-bond-of-palmetto-b000552/">
   <div class="an">Smitty Bail Bond Of Palmetto</div>
   <div class="ad">1707 2ND AVE WEST, PALMETTO, 34221</div>
   
+  <div class='ad'>✉ SMITHH456@AOL.COM</div>
   <div class='lic'>License: B000552</div>
 </a><a class="agent" href="/bailbonds/fl/agent/titen-jay-michael-g277670/">
   <div class="an">Titen, Jay Michael</div>
   <div class="ad">7322 MANATEE AVE W #105, BRADENTON, 34209</div>
   
+  <div class='ad'>✉ SHOCKWAVEINVESTIGATIONS@GMAIL.COM</div>
   <div class='lic'>License: G277670</div>
 </a><a class="agent" href="/bailbonds/fl/agent/torres-anthony-w788060/">
   <div class="an">Torres, Anthony</div>
   <div class="ad">AUTOMATIC BAIL BONDS LLC 317 7TH STREET EAST STE A, BRADENTON, 34208</div>
   
+  <div class='ad'>✉ TORRESANTHONYMHS24@GMAIL.COM</div>
   <div class='lic'>License: W788060</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bad-boy-bail-bonds/">
   <div class="an">Bad Boy Bail Bonds</div>
   <div class="ad">1109 9th Ave West, Bradenton, 34205</div>
-  <div class='ph'>941-799-3278</div>
+  <div class='ph'>☎ 941-799-3278</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://flbaa.com/ (Florida Bail Agents Association member directory)' rel='nofollow'>flbaa.com</a> · <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -249,5 +277,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([27.47556, -82.39314], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":27.52191,"lng":-82.5244,"label":"<strong><a href='/bailbonds/fl/agent/a-s-a-p-bail-bonds-llc-b000642/'>!!A.S.A.P!! Bail Bonds, Llc</a></strong>"},{"lat":27.49656,"lng":-82.55667,"label":"<strong><a href='/bailbonds/fl/agent/automatic-bail-bonds-llc-b000016/'>Automatic Bail Bonds Llc</a></strong>"},{"lat":27.49515,"lng":-82.57353,"label":"<strong><a href='/bailbonds/fl/agent/big-johnson-bail-bonds-b000569/'>Big Johnson Bail Bonds</a></strong>"},{"lat":27.35958,"lng":-82.53354,"label":"<strong><a href='/bailbonds/fl/agent/branch-evette-michelle-p241486/'>Branch, Evette Michelle</a></strong>"},{"lat":27.51436,"lng":-82.57303,"label":"<strong><a href='/bailbonds/fl/agent/cici-s-bail-bonds-llc-b000172/'>Cici'S Bail Bonds Llc</a></strong>"},{"lat":27.51436,"lng":-82.57303,"label":"<strong><a href='/bailbonds/fl/agent/delgado-conchita-w066290/'>Delgado, Conchita</a></strong>"},{"lat":27.33554,"lng":-82.52924,"label":"<strong><a href='/bailbonds/fl/agent/evans-leah-w543959/'>Evans, Leah</a></strong>"},{"lat":27.49178,"lng":-82.57277,"label":"<strong><a href='/bailbonds/fl/agent/evans-tommy-w170095/'>Evans, Tommy</a></strong>"},{"lat":27.49482,"lng":-82.57354,"label":"<strong><a href='/bailbonds/fl/agent/gill-james-f-iv-w320770/'>Gill, James F Iv</a></strong>"},{"lat":27.49178,"lng":-82.57277,"label":"<strong><a href='/bailbonds/fl/agent/james-bond-bail-bond-llc-b000175/'>James Bond Bail Bond Llc,</a></strong>"},{"lat":27.49515,"lng":-82.57353,"label":"<strong><a href='/bailbonds/fl/agent/johnson-gary-walter-jr-a294901/'>Johnson, Gary Walter Jr</a></strong>"},{"lat":27.49515,"lng":-82.57353,"label":"<strong><a href='/bailbonds/fl/agent/johnson-heather-renee-w321315/'>Johnson, Heather Renee</a></strong>"},{"lat":27.49183,"lng":-82.60143,"label":"<strong><a href='/bailbonds/fl/agent/kielmann-aaron-david-p090075/'>Kielmann, Aaron David</a></strong>"},{"lat":27.34569,"lng":-82.52833,"label":"<strong><a href='/bailbonds/fl/agent/lima-eddy-r-a155709/'>Lima, Eddy R</a></strong>"},{"lat":27.41923,"lng":-82.46756,"label":"<strong><a href='/bailbonds/fl/agent/panagiotakis-maria-g164162/'>Panagiotakis, Maria</a></strong>"},{"lat":27.53135,"lng":-82.56164,"label":"<strong><a href='/bailbonds/fl/agent/pierre-dawn-delores-w724419/'>Pierre, Dawn Delores</a></strong>"},{"lat":27.53135,"lng":-82.56164,"label":"<strong><a href='/bailbonds/fl/agent/pollard-frazier-lee-e122020/'>Pollard, Frazier Lee</a></strong>"},{"lat":27.49656,"lng":-82.55667,"label":"<strong><a href='/bailbonds/fl/agent/shelly-autumn-nicole-w125261/'>Shelly, Autumn Nicole</a></strong>"},{"lat":27.5286,"lng":-82.56265,"label":"<strong><a href='/bailbonds/fl/agent/smith-harold-l-sr-p069667/'>Smith, Harold L Sr</a></strong>"},{"lat":27.5286,"lng":-82.56265,"label":"<strong><a href='/bailbonds/fl/agent/smith-monica-latrice-p134014/'>Smith, Monica Latrice</a></strong>"},{"lat":27.5286,"lng":-82.56265,"label":"<strong><a href='/bailbonds/fl/agent/smith-rosa-b-e089823/'>Smith, Rosa B</a></strong>"},{"lat":27.52861,"lng":-82.56472,"label":"<strong><a href='/bailbonds/fl/agent/smitty-bail-bond-of-palmetto-b000552/'>Smitty Bail Bond Of Palmetto</a></strong>"},{"lat":27.49619,"lng":-82.63429,"label":"<strong><a href='/bailbonds/fl/agent/titen-jay-michael-g277670/'>Titen, Jay Michael</a></strong>"},{"lat":27.49656,"lng":-82.55667,"label":"<strong><a href='/bailbonds/fl/agent/torres-anthony-w788060/'>Torres, Anthony</a></strong>"},{"lat":27.49178,"lng":-82.5728,"label":"<strong><a href='/bailbonds/fl/agent/bad-boy-bail-bonds/'>Bad Boy Bail Bonds</a></strong><br>\u260e 941-799-3278"},{"lat":27.4898,"lng":-82.5768,"label":"<strong>1 agent in BRADENTON</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/buckingham-whitney-w552214/'>Buckingham, Whitney</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,11 +107,13 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Barfield, Lena Catherine</div>
   <div class="ad">383 LENA'S LANE, WEWAHITCHKA, 32465</div>
   
+  <div class='ad'>✉ JOLENFARM@HOTMAIL.COM</div>
   <div class='lic'>License: P164662</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brake-stacy-elizabeth-g256016/">
   <div class="an">Brake, Stacy Elizabeth</div>
   <div class="ad">534 S. DIANNA ST., WEWAHITCHKA, 32465</div>
   
+  <div class='ad'>✉ SWARREN65354@GMAIL.COM</div>
   <div class='lic'>License: G256016</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -129,5 +133,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.85924, -85.27201], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.99266,"lng":-85.12993,"label":"<strong><a href='/bailbonds/fl/agent/barfield-lena-catherine-p164662/'>Barfield, Lena Catherine</a></strong>"},{"lat":30.15201,"lng":-85.23033,"label":"<strong><a href='/bailbonds/fl/agent/brake-stacy-elizabeth-g256016/'>Brake, Stacy Elizabeth</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

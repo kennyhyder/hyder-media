@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">5-10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,72 +106,86 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/pa/agent/jason-j-rawls/">
   <div class="an">Jason J. Rawls</div><div class='ad'>Aaccion Bail Bonds</div>
   <div class="ad">6290 Harvest Field Lane, Harrisburg, 17111</div>
-  <div class='ph'>(717) 773-5333</div>
+  <div class='ph'>☎ (717) 773-5333</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/steven-r-blackman/">
   <div class="an">Steven R. Blackman</div><div class='ad'>Blackman Bail Bonds</div>
   <div class="ad">6670 Linglestown Road, Harrisburg, 17112</div>
-  <div class='ph'>(717) 919-2015</div>
+  <div class='ph'>☎ (717) 919-2015</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/michael-r-gibson/">
   <div class="an">Michael R. Gibson</div><div class='ad'>000 Aarons Bail Bonds</div>
   <div class="ad">2080 Linglestown Road Ste. 107, Harrisburg, 17110</div>
-  <div class='ph'>(717) 919-1895</div>
+  <div class='ph'>☎ (717) 919-1895</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/linette-manzano/">
   <div class="an">Linette Manzano</div><div class='ad'>A Boss Lady Bail Bonds, LLC</div>
   <div class="ad">15 N 6th Street, Reading, 19601</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/hart-bottorf/">
   <div class="an">Hart Bottorf</div><div class='ad'>A Plus Bail Bonds</div>
   <div class="ad">535 Court Street, Reading, 19601</div>
-  <div class='ph'>(717) 409-6333</div>
+  <div class='ph'>☎ (717) 409-6333</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/marcel-centeno/">
   <div class="an">Marcel Centeno</div><div class='ad'>A Plus Bail Bonds</div>
   <div class="ad">535 Court Street, Reading, 19601</div>
-  <div class='ph'>(717) 409-6333</div>
+  <div class='ph'>☎ (717) 409-6333</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/adam-vaughn-groff/">
   <div class="an">Adam Vaughn Groff</div><div class='ad'>A Plus Bail Bonds</div>
   <div class="ad">535 Court Street, Reading, 19601</div>
-  <div class='ph'>(717) 409-6333</div>
+  <div class='ph'>☎ (717) 409-6333</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/david-r-morgan/">
   <div class="an">David R. Morgan</div><div class='ad'>A Plus Bail Bonds</div>
   <div class="ad">535 Court Street, Reading, 19601</div>
-  <div class='ph'>(717) 409-6333</div>
+  <div class='ph'>☎ (717) 409-6333</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/brent-m-jones/">
   <div class="an">Brent M. Jones</div>
   <div class="ad">703 Glen Street, Harrisburg, 17112</div>
-  <div class='ph'>(717) 557-6946</div>
+  <div class='ph'>☎ (717) 557-6946</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/scott-e-churchill/">
   <div class="an">Scott E. Churchill</div><div class='ad'>Eastern Bail Bonds</div>
   <div class="ad">120 Grand Avenue Ste. 798, Hackettstown, 07840</div>
-  <div class='ph'>(800) 540-2245</div>
+  <div class='ph'>☎ (800) 540-2245</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/william-theodore-ritsick-jr/">
   <div class="an">William Theodore Ritsick Jr.</div><div class='ad'>Always Available Bail Bonds</div>
   <div class="ad">216 N. River Street Ste. 250, Wilkes Barre, 18702-2528</div>
-  <div class='ph'>(570) 472-1403</div>
+  <div class='ph'>☎ (570) 472-1403</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/adam-naim-szar/">
   <div class="an">Adam Naim Szar</div>
   <div class="ad">6327 Pine Street, Harrisburg, 17112</div>
-  <div class='ph'>(717) 503-1721</div>
+  <div class='ph'>☎ (717) 503-1721</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/dimitri-a-zozos/">
   <div class="an">Dimitri A. Zozos</div>
   <div class="ad">2215 Forest Hills Drive Ste. 37, Harrisburg, 17112</div>
-  <div class='ph'>(717) 648-6720</div>
+  <div class='ph'>☎ (717) 648-6720</div>
+  
   
 </a><a class="agent" href="/bailbonds/pa/agent/james-patrick-fabie/">
   <div class="an">James Patrick Fabie</div><div class='ad'>Tri-County Bail Bonding</div>
   <div class="ad">17 N Duke Street, Lancaster, 17602-2808</div>
-  <div class='ph'>(717) 650-8733</div>
+  <div class='ph'>☎ (717) 650-8733</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.dauphincounty.gov/docs/default-source/clerk-of-courts/bailbond-list.pdf?sfvrsn=b1d33135_1' rel='nofollow'>www.dauphincounty.gov</a></p>
 </div>
@@ -189,5 +205,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.41257, -76.79263], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.27894,"lng":-76.77483,"label":"<strong><a href='/bailbonds/pa/agent/jason-j-rawls/'>Jason J. Rawls</a></strong><br>\u260e (717) 773-5333"},{"lat":40.34918,"lng":-76.7729,"label":"<strong><a href='/bailbonds/pa/agent/steven-r-blackman/'>Steven R. Blackman</a></strong><br>\u260e (717) 919-2015"},{"lat":40.32862,"lng":-76.86578,"label":"<strong><a href='/bailbonds/pa/agent/michael-r-gibson/'>Michael R. Gibson</a></strong><br>\u260e (717) 919-1895"},{"lat":40.33591,"lng":-75.92581,"label":"<strong><a href='/bailbonds/pa/agent/linette-manzano/'>Linette Manzano</a></strong>"},{"lat":40.33629,"lng":-75.92648,"label":"<strong><a href='/bailbonds/pa/agent/hart-bottorf/'>Hart Bottorf</a></strong><br>\u260e (717) 409-6333"},{"lat":40.33629,"lng":-75.92648,"label":"<strong><a href='/bailbonds/pa/agent/marcel-centeno/'>Marcel Centeno</a></strong><br>\u260e (717) 409-6333"},{"lat":40.33629,"lng":-75.92648,"label":"<strong><a href='/bailbonds/pa/agent/adam-vaughn-groff/'>Adam Vaughn Groff</a></strong><br>\u260e (717) 409-6333"},{"lat":40.33629,"lng":-75.92648,"label":"<strong><a href='/bailbonds/pa/agent/david-r-morgan/'>David R. Morgan</a></strong><br>\u260e (717) 409-6333"},{"lat":40.33328,"lng":-76.7927,"label":"<strong><a href='/bailbonds/pa/agent/brent-m-jones/'>Brent M. Jones</a></strong><br>\u260e (717) 557-6946"},{"lat":40.85374,"lng":-74.8298,"label":"<strong><a href='/bailbonds/pa/agent/scott-e-churchill/'>Scott E. Churchill</a></strong><br>\u260e (800) 540-2245"},{"lat":41.25175,"lng":-75.87776,"label":"<strong><a href='/bailbonds/pa/agent/william-theodore-ritsick-jr/'>William Theodore Ritsick Jr.</a></strong><br>\u260e (570) 472-1403"},{"lat":40.33518,"lng":-76.78226,"label":"<strong><a href='/bailbonds/pa/agent/adam-naim-szar/'>Adam Naim Szar</a></strong><br>\u260e (717) 503-1721"},{"lat":40.33664,"lng":-76.83367,"label":"<strong><a href='/bailbonds/pa/agent/dimitri-a-zozos/'>Dimitri A. Zozos</a></strong><br>\u260e (717) 648-6720"},{"lat":40.0387,"lng":-76.30364,"label":"<strong><a href='/bailbonds/pa/agent/james-patrick-fabie/'>James Patrick Fabie</a></strong><br>\u260e (717) 650-8733"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">12835 E Arapahoe Rd Ste 2-250, Centennial, 80112</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/michael-david-vaughn/">
   <div class="an">Michael David Vaughn</div><div class='ad'>Bail House Bail Bonds LLC</div>
   <div class="ad">709 W Littleton Blvd Ste 203, Littleton, 80120</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/tracy-trynetta-mays-kelly/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">6312 N Dunkirk Ct, Aurora, 80019</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/edith-p-ortega/">
   <div class="an">Edith P Ortega</div><div class='ad'>Bond Girl Bail Llc</div>
   <div class="ad">14261 E 4th Ave Ste 230, Aurora, 80011</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/jessica-danell-jamison/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">2323 S. Troy 4-180, Aurora, 80012</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/ressie-marie-releford/">
   <div class="an">Ressie Marie Releford</div><div class='ad'>Colorado'S Finest Bail Bonds, Llc</div>
   <div class="ad">12835 E Arapahoe Rd Ste 2-250, Centennial, 80112</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/brittany-monique-scott/">
@@ -136,9 +144,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">12895 E Arapahoe Rd Suite 250, Centennial, 80112</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/brian-thomas-worrell/">
   <div class="an">Brian Thomas Worrell</div><div class='ad'>Bounty County Bail Bonds LLC</div>
   <div class="ad">3294 Scranton St, Aurora, 80011</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/katherine-louise-pearson/">
@@ -146,9 +156,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">6595 S. Dayton Street Suite 1550, Greenwood Village, 80111</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/sean-stupski/">
   <div class="an">Sean Stupski</div><div class='ad'>Still Gonna Bail, LLC</div>
   <div class="ad">6263 E Phillips Pl, Centennial, 80112</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/jessica-danell-jamison-2/">
@@ -156,14 +168,17 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">16890 E. Alameda Ave #470237, Aurora, 80014</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/she-s-got-bail-bailbonds-llc/">
   <div class="an">She's got bail bailbonds LLC</div>
   <div class="ad">9641 E Geddes Ave Unit 449, Englewood, 80112</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/david-arnez-nubine/">
   <div class="an">David Arnez Nubine</div><div class='ad'>Fast &amp; Easy Bail Bonds, Inc.</div>
   <div class="ad">3124 S. Parker Rd #A2-256, Aurora, 80014</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20081442041)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20091331165)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20091587582)' rel='nofollow'>data.colorado.gov</a></p>
@@ -184,5 +199,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.64455, -104.33171], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.59511,"lng":-104.84011,"label":"<strong><a href='/bailbonds/co/agent/1st-stop-bail-bonds-llc/'>1st Stop Bail Bonds,LLC</a></strong>"},{"lat":39.61324,"lng":-104.99646,"label":"<strong><a href='/bailbonds/co/agent/michael-david-vaughn/'>Michael David Vaughn</a></strong>"},{"lat":39.81133,"lng":-104.76183,"label":"<strong><a href='/bailbonds/co/agent/tracy-trynetta-mays-kelly/'>Tracy Trynetta Mays-Kelly</a></strong>"},{"lat":39.72206,"lng":-104.82291,"label":"<strong><a href='/bailbonds/co/agent/edith-p-ortega/'>Edith P Ortega</a></strong>"},{"lat":39.59511,"lng":-104.84011,"label":"<strong><a href='/bailbonds/co/agent/ressie-marie-releford/'>Ressie Marie Releford</a></strong>"},{"lat":39.5951,"lng":-104.83967,"label":"<strong><a href='/bailbonds/co/agent/brittany-monique-scott/'>Brittany Monique Scott</a></strong>"},{"lat":39.7634,"lng":-104.83826,"label":"<strong><a href='/bailbonds/co/agent/brian-thomas-worrell/'>Brian Thomas Worrell</a></strong>"},{"lat":39.59748,"lng":-104.87625,"label":"<strong><a href='/bailbonds/co/agent/katherine-louise-pearson/'>Katherine Louise Pearson</a></strong>"},{"lat":39.56811,"lng":-104.91681,"label":"<strong><a href='/bailbonds/co/agent/sean-stupski/'>Sean Stupski</a></strong>"},{"lat":39.58421,"lng":-104.87734,"label":"<strong><a href='/bailbonds/co/agent/she-s-got-bail-bailbonds-llc/'>She's got bail bailbonds LLC</a></strong>"},{"lat":39.6597,"lng":-104.85136,"label":"<strong><a href='/bailbonds/co/agent/david-arnez-nubine/'>David Arnez Nubine</a></strong>"},{"lat":39.70363,"lng":-104.72009,"label":"<strong>2 agents in Aurora</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/co/agent/jessica-danell-jamison/'>Jessica Danell Jamison</a></strong><br><strong><a href='/bailbonds/co/agent/jessica-danell-jamison-2/'>Jessica Danell Jamison</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

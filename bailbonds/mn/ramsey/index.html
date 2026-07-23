@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,42 +106,50 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mn/agent/aanestad-timothy-jay/">
   <div class="an">Aanestad, Timothy Jay</div><div class='ad'>Aanestad Bail Bonds</div>
   <div class="ad">525 E. 7th Street, Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8080</div>
+  <div class='ph'>☎ 651-227-8080</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/aanestad-timothy-jay-2/">
   <div class="an">Aanestad, Timothy Jay</div><div class='ad'>Griffin Bail Bonds</div>
   <div class="ad">525 E. 7th St Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8100</div>
+  <div class='ph'>☎ 651-227-8100</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/aanestad-timothy-jay-3/">
   <div class="an">Aanestad, Timothy Jay</div><div class='ad'>Liberty Bonding Agency, Inc.</div>
   <div class="ad">615 Hawthorne Avenue East, St. Paul, 55130</div>
-  <div class='ph'>651-444-9206</div>
+  <div class='ph'>☎ 651-444-9206</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/ahlberg-jennifer-mae/">
   <div class="an">Ahlberg, Jennifer Mae</div><div class='ad'>Liberty Bonding Agency, Inc.</div>
   <div class="ad">615 Hawthorne Avenue East, St. Paul, 55130</div>
-  <div class='ph'>651-444-9206</div>
+  <div class='ph'>☎ 651-444-9206</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/anderson-joseph-leroy/">
   <div class="an">Anderson, Joseph Leroy</div><div class='ad'>Aanestad Bail Bonds</div>
   <div class="ad">525 E. 7th Street, Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8080</div>
+  <div class='ph'>☎ 651-227-8080</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/contreras-gloria-victoria/">
   <div class="an">Contreras, Gloria Victoria</div><div class='ad'>Aanestad Bail Bonds</div>
   <div class="ad">525 E. 7th Street, Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8080</div>
+  <div class='ph'>☎ 651-227-8080</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cuffe-connie-marie/">
   <div class="an">Cuffe, Connie Marie</div><div class='ad'>Aanestad Bail Bonds</div>
   <div class="ad">525 E. 7th Street, Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8080</div>
+  <div class='ph'>☎ 651-227-8080</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/edmond-kellum-deshandra/">
   <div class="an">Edmond Kellum, Deshandra</div><div class='ad'>Aanestad Bail Bonds</div>
   <div class="ad">525 E. 7th Street, Suite A, St. Paul, 55101</div>
-  <div class='ph'>651-227-8080</div>
+  <div class='ph'>☎ 651-227-8080</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf' rel='nofollow'>mncourtsdocs.courts.state.mn.us</a></p>
 </div>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([45.0152, -93.09996], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/aanestad-timothy-jay/'>Aanestad, Timothy Jay</a></strong><br>\u260e 651-227-8080"},{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/aanestad-timothy-jay-2/'>Aanestad, Timothy Jay</a></strong><br>\u260e 651-227-8100"},{"lat":44.97838,"lng":-93.07401,"label":"<strong><a href='/bailbonds/mn/agent/aanestad-timothy-jay-3/'>Aanestad, Timothy Jay</a></strong><br>\u260e 651-444-9206"},{"lat":44.97838,"lng":-93.07401,"label":"<strong><a href='/bailbonds/mn/agent/ahlberg-jennifer-mae/'>Ahlberg, Jennifer Mae</a></strong><br>\u260e 651-444-9206"},{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/anderson-joseph-leroy/'>Anderson, Joseph Leroy</a></strong><br>\u260e 651-227-8080"},{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/contreras-gloria-victoria/'>Contreras, Gloria Victoria</a></strong><br>\u260e 651-227-8080"},{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/cuffe-connie-marie/'>Cuffe, Connie Marie</a></strong><br>\u260e 651-227-8080"},{"lat":44.95494,"lng":-93.08046,"label":"<strong><a href='/bailbonds/mn/agent/edmond-kellum-deshandra/'>Edmond Kellum, Deshandra</a></strong><br>\u260e 651-227-8080"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

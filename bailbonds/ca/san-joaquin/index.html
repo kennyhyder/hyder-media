@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,85 +107,102 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Beamon, Ingrid</div>
   <div class="ad">124 N WILSON WAY, Stockton, 95205</div>
   
+  
   <div class='lic'>License: 1783482</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cortes-jose-1845079/">
   <div class="an">Cortes, Jose</div>
   <div class="ad">11 W. MATHEWS RD, French Camp, 95231</div>
+  
   
   <div class='lic'>License: 1845079</div>
 </a><a class="agent" href="/bailbonds/ca/agent/floyd-leza-1840767/">
   <div class="an">Floyd, Leza</div>
   <div class="ad">11 WEST MATTHEWS RD., French Camp, 95231</div>
   
+  
   <div class='lic'>License: 1840767</div>
 </a><a class="agent" href="/bailbonds/ca/agent/johnston-matthew-4499325/">
   <div class="an">Johnston, Matthew</div>
   <div class="ad">1403 ELKHORN DRIVE, Stockton, 95209</div>
+  
   
   <div class='lic'>License: 4499325</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-robert-1k45288/">
   <div class="an">Lopez, Robert</div>
   <div class="ad">3401 SURREY DR, Tracy, 95376</div>
   
+  
   <div class='lic'>License: 1K45288</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-sheena-4374477/">
   <div class="an">Martinez, Sheena</div>
   <div class="ad">1954 NORFOLK DRIVE, Lodi, 95242</div>
+  
   
   <div class='lic'>License: 4374477</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mozqueda-christy-4450715/">
   <div class="an">Mozqueda, Christy</div>
   <div class="ad">10046 RIVER OAKS DRIVE, Stockton, 95209</div>
   
+  
   <div class='lic'>License: 4450715</div>
 </a><a class="agent" href="/bailbonds/ca/agent/peters-david-1842281/">
   <div class="an">Peters, David</div>
   <div class="ad">1660 W. WALNUT, Stockton, 95203</div>
+  
   
   <div class='lic'>License: 1842281</div>
 </a><a class="agent" href="/bailbonds/ca/agent/peters-william-1833690/">
   <div class="an">Peters, William</div>
   <div class="ad">1660 W WALNUT ST, Stockton, 95203</div>
   
+  
   <div class='lic'>License: 1833690</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-cynthia-4382084/">
   <div class="an">Ramirez, Cynthia</div>
   <div class="ad">11 WEST MATHEWS RD., French Camp, 95231</div>
+  
   
   <div class='lic'>License: 4382084</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-martha-1841203/">
   <div class="an">Ramirez, Martha</div>
   <div class="ad">8900 THORNTON RD, #11, Stockton, 95209</div>
   
+  
   <div class='lic'>License: 1841203</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ruiz-salas-gustavo-1846102/">
   <div class="an">Ruiz Salas, Gustavo</div>
   <div class="ad">141 E WEBER AVE, Stockton, 95202</div>
+  
   
   <div class='lic'>License: 1846102</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandoval-ysidro-1841199/">
   <div class="an">Sandoval, Ysidro</div>
   <div class="ad">1852 WEST 11TH STREET, Tracy, 95376</div>
   
+  
   <div class='lic'>License: 1841199</div>
 </a><a class="agent" href="/bailbonds/ca/agent/schuerman-jacob-1846492/">
   <div class="an">Schuerman, Jacob</div>
   <div class="ad">141 E WEBER AVE, Stockton, 95202</div>
+  
   
   <div class='lic'>License: 1846492</div>
 </a><a class="agent" href="/bailbonds/ca/agent/souza-dustin-1844448/">
   <div class="an">Souza, Dustin</div>
   <div class="ad">11 WEST MATHEWS RD., French Camp, 95231</div>
   
+  
   <div class='lic'>License: 1844448</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ward-jordan-1k67295/">
   <div class="an">Ward, Jordan</div>
   <div class="ad">11 W MATHEWS ROAD, French Camp, 95231</div>
   
+  
   <div class='lic'>License: 1K67295</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-janaya-1345981/">
   <div class="an">Williams, Janaya</div>
   <div class="ad">4719 QUAIL LAKES DR, STE G #1307, Stockton, 95207</div>
+  
   
   <div class='lic'>License: 1345981</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -204,5 +223,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.93498, -121.27224], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.95709,"lng":-121.27183,"label":"<strong><a href='/bailbonds/ca/agent/beamon-ingrid-1783482/'>Beamon, Ingrid</a></strong>"},{"lat":37.88191,"lng":-121.27646,"label":"<strong><a href='/bailbonds/ca/agent/cortes-jose-1845079/'>Cortes, Jose</a></strong>"},{"lat":37.88191,"lng":-121.27646,"label":"<strong><a href='/bailbonds/ca/agent/floyd-leza-1840767/'>Floyd, Leza</a></strong>"},{"lat":38.05204,"lng":-121.32887,"label":"<strong><a href='/bailbonds/ca/agent/johnston-matthew-4499325/'>Johnston, Matthew</a></strong>"},{"lat":37.76164,"lng":-121.42215,"label":"<strong><a href='/bailbonds/ca/agent/lopez-robert-1k45288/'>Lopez, Robert</a></strong>"},{"lat":38.10706,"lng":-121.29629,"label":"<strong><a href='/bailbonds/ca/agent/martinez-sheena-4374477/'>Martinez, Sheena</a></strong>"},{"lat":38.04513,"lng":-121.34612,"label":"<strong><a href='/bailbonds/ca/agent/mozqueda-christy-4450715/'>Mozqueda, Christy</a></strong>"},{"lat":37.96422,"lng":-121.31802,"label":"<strong><a href='/bailbonds/ca/agent/peters-david-1842281/'>Peters, David</a></strong>"},{"lat":37.96422,"lng":-121.31802,"label":"<strong><a href='/bailbonds/ca/agent/peters-william-1833690/'>Peters, William</a></strong>"},{"lat":37.88191,"lng":-121.27646,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-cynthia-4382084/'>Ramirez, Cynthia</a></strong>"},{"lat":38.03096,"lng":-121.33443,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-martha-1841203/'>Ramirez, Martha</a></strong>"},{"lat":37.95395,"lng":-121.28919,"label":"<strong><a href='/bailbonds/ca/agent/ruiz-salas-gustavo-1846102/'>Ruiz Salas, Gustavo</a></strong>"},{"lat":37.7392,"lng":-121.44938,"label":"<strong><a href='/bailbonds/ca/agent/sandoval-ysidro-1841199/'>Sandoval, Ysidro</a></strong>"},{"lat":37.95395,"lng":-121.28919,"label":"<strong><a href='/bailbonds/ca/agent/schuerman-jacob-1846492/'>Schuerman, Jacob</a></strong>"},{"lat":37.88191,"lng":-121.27646,"label":"<strong><a href='/bailbonds/ca/agent/souza-dustin-1844448/'>Souza, Dustin</a></strong>"},{"lat":37.88191,"lng":-121.27646,"label":"<strong><a href='/bailbonds/ca/agent/ward-jordan-1k67295/'>Ward, Jordan</a></strong>"},{"lat":37.98669,"lng":-121.34016,"label":"<strong><a href='/bailbonds/ca/agent/williams-janaya-1345981/'>Williams, Janaya</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

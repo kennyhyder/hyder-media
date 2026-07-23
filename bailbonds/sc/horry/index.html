@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,17 +106,20 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/evans-joseph-z-prb-6421057-npn-6421057/">
   <div class="an">Evans, Joseph Z</div><div class='ad'>Evans Bail Bonding</div>
   <div class="ad">Myrtle Beach, 29577</div>
-  <div class='ph'>(843) 946-9498</div>
+  <div class='ph'>☎ (843) 946-9498</div>
+  
   <div class='lic'>License: PRB 6421057 (NPN 6421057)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/uhler-lisa-w-prb-18393706-npn-18393706/">
   <div class="an">Uhler, Lisa W</div>
   <div class="ad">Loris, 29569</div>
-  <div class='ph'>(843) 489-7196</div>
+  <div class='ph'>☎ (843) 489-7196</div>
+  
   <div class='lic'>License: PRB 18393706 (NPN 18393706)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/browder-anthony-scott-rbm-19153434-npn-19153434/">
   <div class="an">Browder, Anthony Scott</div>
   <div class="ad">Myrtle Beach, 29588</div>
-  <div class='ph'>(843) 318-9368</div>
+  <div class='ph'>☎ (843) 318-9368</div>
+  
   <div class='lic'>License: RBM 19153434 (NPN 19153434)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Horry' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Horry' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -134,5 +139,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.90927, -78.97668], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.71039,"lng":-78.88602,"label":"<strong>2 agents in Myrtle Beach</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/evans-joseph-z-prb-6421057-npn-6421057/'>Evans, Joseph Z</a></strong><br>\u260e (843) 946-9498<br><strong><a href='/bailbonds/sc/agent/browder-anthony-scott-rbm-19153434-npn-19153434/'>Browder, Anthony Scott</a></strong><br>\u260e (843) 318-9368"},{"lat":34.05748,"lng":-78.88842,"label":"<strong>1 agent in Loris</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/uhler-lisa-w-prb-18393706-npn-18393706/'>Uhler, Lisa W</a></strong><br>\u260e (843) 489-7196"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

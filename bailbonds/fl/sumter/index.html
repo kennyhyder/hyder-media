@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,51 +107,61 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Alexson, Barbara Lynn</div>
   <div class="ad">4384 S US 301, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ BOBS24HOURBAILBOND@YAHOO.COM</div>
   <div class='lic'>License: W081434</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alexson-robert-charles-p228528/">
   <div class="an">Alexson, Robert Charles</div>
   <div class="ad">BOB'S 24 HOUR BAIL BOND 4384 US 301, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ BOBS24HOURBAILBOND@YAHOO.COM</div>
   <div class='lic'>License: P228528</div>
 </a><a class="agent" href="/bailbonds/fl/agent/barnes-dawn-m-a013972/">
   <div class="an">Barnes, Dawn M</div>
   <div class="ad">JARRETT PARISH BAIL BONDS 1452 W CR 48, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ KELBRE440@YAHOO.COM</div>
   <div class='lic'>License: A013972</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bob-s-24-hour-bail-bond-b000029/">
   <div class="an">Bob'S 24 Hour Bail Bond</div>
   <div class="ad">4384 US 301, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ BOBS24HOURBAILBOND@YAHOO.COM</div>
   <div class='lic'>License: B000029</div>
 </a><a class="agent" href="/bailbonds/fl/agent/furca-kathleen-theresa-w052293/">
   <div class="an">Furca, Kathleen Theresa</div>
   <div class="ad">2424 COUNTY ROAD 615, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ WTFRU2@GMAIL.COM</div>
   <div class='lic'>License: W052293</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ownby-valerie-justina-w536031/">
   <div class="an">Ownby, Valerie Justina</div>
   <div class="ad">9907 LAND O LAKES BLVD, LAND O LAKES, 33513</div>
   
+  <div class='ad'>✉ TUNNELL65@GMAIL.COM</div>
   <div class='lic'>License: W536031</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parish-cyril-elmo-jr-a200175/">
   <div class="an">Parish, Cyril Elmo Jr</div>
   <div class="ad">C E PARISH GENERAL AGENCY INC 1452 W CR 48, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ CEP@SUM.NET</div>
   <div class='lic'>License: A200175</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parish-jarrett-patrick-a200186/">
   <div class="an">Parish, Jarrett Patrick</div>
   <div class="ad">JARRETT PARISH BAIL BONDS 1452 WEST HIGHWAY 48, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ JARRETTPARISH@GMAIL.COM</div>
   <div class='lic'>License: A200186</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parish-burns-patricia-carol-a200176/">
   <div class="an">Parish-Burns, Patricia Carol</div>
   <div class="ad">2322 W CR 476, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ BONDS@SUM.NET</div>
   <div class='lic'>License: A200176</div>
 </a><a class="agent" href="/bailbonds/fl/agent/renner-shannon-elyse-g044109/">
   <div class="an">Renner, Shannon Elyse</div>
   <div class="ad">12786 SW 49TH TER, WEBSTER, 33579</div>
   
+  <div class='ad'>✉ SHAN4801@ICLOUD.COM</div>
   <div class='lic'>License: G044109</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -169,5 +181,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([28.71398, -82.06968], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":28.69233,"lng":-82.10432,"label":"<strong><a href='/bailbonds/fl/agent/alexson-barbara-lynn-w081434/'>Alexson, Barbara Lynn</a></strong>"},{"lat":28.69233,"lng":-82.10432,"label":"<strong><a href='/bailbonds/fl/agent/alexson-robert-charles-p228528/'>Alexson, Robert Charles</a></strong>"},{"lat":28.69233,"lng":-82.10432,"label":"<strong><a href='/bailbonds/fl/agent/bob-s-24-hour-bail-bond-b000029/'>Bob'S 24 Hour Bail Bond</a></strong>"},{"lat":28.65234,"lng":-82.14469,"label":"<strong><a href='/bailbonds/fl/agent/furca-kathleen-theresa-w052293/'>Furca, Kathleen Theresa</a></strong>"},{"lat":28.30063,"lng":-82.49587,"label":"<strong><a href='/bailbonds/fl/agent/ownby-valerie-justina-w536031/'>Ownby, Valerie Justina</a></strong>"},{"lat":28.57005,"lng":-82.18662,"label":"<strong><a href='/bailbonds/fl/agent/renner-shannon-elyse-g044109/'>Renner, Shannon Elyse</a></strong>"},{"lat":28.68695,"lng":-82.11441,"label":"<strong>4 agents in BUSHNELL</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/barnes-dawn-m-a013972/'>Barnes, Dawn M</a></strong><br><strong><a href='/bailbonds/fl/agent/parish-cyril-elmo-jr-a200175/'>Parish, Cyril Elmo Jr</a></strong><br><strong><a href='/bailbonds/fl/agent/parish-jarrett-patrick-a200186/'>Parish, Jarrett Patrick</a></strong><br><strong><a href='/bailbonds/fl/agent/parish-burns-patricia-carol-a200176/'>Parish-Burns, Patricia Carol</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

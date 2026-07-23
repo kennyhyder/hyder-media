@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,227 +106,272 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/darlene-alice-garrison-141842/">
   <div class="an">Darlene Alice Garrison</div>
   <div class="ad">1000 Lafayette Street 200, Lafayette, 70501</div>
-  <div class='ph'>(337) 478-9220</div>
+  <div class='ph'>☎ (337) 478-9220</div>
+  
   <div class='lic'>License: 141842</div>
 </a><a class="agent" href="/bailbonds/la/agent/craig-edward-prejean-161778/">
   <div class="an">Craig Edward Prejean</div>
   <div class="ad">103 STEWART, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-7108</div>
+  <div class='ph'>☎ (337) 264-7108</div>
+  
   <div class='lic'>License: 161778</div>
 </a><a class="agent" href="/bailbonds/la/agent/james-andrew-lewis-199939/">
   <div class="an">James Andrew Lewis</div>
   <div class="ad">1000 Lafayette St., Ste 200, Lafayette, 70502</div>
-  <div class='ph'>(337) 269-8979</div>
+  <div class='ph'>☎ (337) 269-8979</div>
+  
   <div class='lic'>License: 199939</div>
 </a><a class="agent" href="/bailbonds/la/agent/aaron-paul-degeytair-sr-263217/">
   <div class="an">Aaron Paul Degeytair Sr.</div>
   <div class="ad">907 Lafayette Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 291-2444</div>
+  <div class='ph'>☎ (337) 291-2444</div>
+  
   <div class='lic'>License: 263217</div>
 </a><a class="agent" href="/bailbonds/la/agent/mark-anthony-fontenot-258840/">
   <div class="an">Mark Anthony Fontenot</div>
   <div class="ad">1000 Lafayette St., Suite 200, Lafayette, 70501</div>
-  <div class='ph'>(337) 288-4800</div>
+  <div class='ph'>☎ (337) 288-4800</div>
+  
   <div class='lic'>License: 258840</div>
 </a><a class="agent" href="/bailbonds/la/agent/april-degeytair-porter-271132/">
   <div class="an">April Degeytair Porter</div>
   <div class="ad">708 S. Washington Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 233-2872</div>
+  <div class='ph'>☎ (337) 233-2872</div>
+  
   <div class='lic'>License: 271132</div>
 </a><a class="agent" href="/bailbonds/la/agent/jerry-phillip-manuel-255250/">
   <div class="an">Jerry Phillip Manuel</div>
   <div class="ad">123 le violon road  lot#d, Lafayette, 70506</div>
-  <div class='ph'>(337) 277-2071</div>
+  <div class='ph'>☎ (337) 277-2071</div>
+  
   <div class='lic'>License: 255250</div>
 </a><a class="agent" href="/bailbonds/la/agent/christopher-shawn-trahan-307859/">
   <div class="an">Christopher Shawn Trahan</div>
   <div class="ad">708 S. Washington Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 291-2444</div>
+  <div class='ph'>☎ (337) 291-2444</div>
+  
   <div class='lic'>License: 307859</div>
 </a><a class="agent" href="/bailbonds/la/agent/vaughn-michael-swilley-280155/">
   <div class="an">Vaughn Michael Swilley</div>
   <div class="ad">305 W Main, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 280155</div>
 </a><a class="agent" href="/bailbonds/la/agent/m-guedry-ltd-inc-314891/">
   <div class="an">M Guedry Ltd Inc</div>
   <div class="ad">708 S. Washington Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 233-2872</div>
+  <div class='ph'>☎ (337) 233-2872</div>
+  
   <div class='lic'>License: 314891</div>
 </a><a class="agent" href="/bailbonds/la/agent/rachael-lynn-adams-462207/">
   <div class="an">Rachael Lynn Adams</div>
   <div class="ad">PO Box 3706, Lafayette, 70502</div>
-  <div class='ph'>(337) 233-2872</div>
+  <div class='ph'>☎ (337) 233-2872</div>
+  
   <div class='lic'>License: 462207</div>
 </a><a class="agent" href="/bailbonds/la/agent/hunter-james-chaisson-278185/">
   <div class="an">Hunter James Chaisson</div>
   <div class="ad">104 Aristotle Drive, Lafayette, 70508</div>
-  <div class='ph'>(985) 397-1705</div>
+  <div class='ph'>☎ (985) 397-1705</div>
+  
   <div class='lic'>License: 278185</div>
 </a><a class="agent" href="/bailbonds/la/agent/john-heinrich-jr-557558/">
   <div class="an">John Heinrich Jr.</div>
   <div class="ad">207 Monterey Dr., Lafayette, 70506</div>
-  <div class='ph'>(337) 781-9320</div>
+  <div class='ph'>☎ (337) 781-9320</div>
+  
   <div class='lic'>License: 557558</div>
 </a><a class="agent" href="/bailbonds/la/agent/shawn-anthony-williams-450056/">
   <div class="an">Shawn Anthony Williams</div>
   <div class="ad">211 1/2 West Vermillion St., Lafayette, 70501</div>
-  <div class='ph'>(337) 780-9309</div>
+  <div class='ph'>☎ (337) 780-9309</div>
+  
   <div class='lic'>License: 450056</div>
 </a><a class="agent" href="/bailbonds/la/agent/braxton-swilley-681310/">
   <div class="an">Braxton Swilley</div>
   <div class="ad">305 W Main st, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 681310</div>
 </a><a class="agent" href="/bailbonds/la/agent/david-comeaux-726113/">
   <div class="an">David Comeaux</div>
   <div class="ad">101 S Lakepoint Drive, Lafayette, 70506</div>
-  <div class='ph'>(337) 216-0774</div>
+  <div class='ph'>☎ (337) 216-0774</div>
+  
   <div class='lic'>License: 726113</div>
 </a><a class="agent" href="/bailbonds/la/agent/mud-bug-bail-bonds-inc-739468/">
   <div class="an">Mud Bug Bail Bonds Inc</div>
   <div class="ad">705-A S. Washington Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 466-3533</div>
+  <div class='ph'>☎ (337) 466-3533</div>
+  
   <div class='lic'>License: 739468</div>
 </a><a class="agent" href="/bailbonds/la/agent/kelly-sue-horsley-763211/">
   <div class="an">Kelly Sue Horsley</div>
   <div class="ad">705a S Washington St, Lafayette, 70501</div>
-  <div class='ph'>(337) 466-3533</div>
+  <div class='ph'>☎ (337) 466-3533</div>
+  
   <div class='lic'>License: 763211</div>
 </a><a class="agent" href="/bailbonds/la/agent/a-able-bonding-inc-768922/">
   <div class="an">A-Able Bonding, Inc.</div>
   <div class="ad">305 W Main Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 768922</div>
 </a><a class="agent" href="/bailbonds/la/agent/sheila-courville-bienvenu-915657/">
   <div class="an">Sheila Courville Bienvenu</div>
   <div class="ad">305 West Main, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 915657</div>
 </a><a class="agent" href="/bailbonds/la/agent/corey-p-harrington-861365/">
   <div class="an">Corey P Harrington</div>
   <div class="ad">PO Box 3706, Lafayette, 70502</div>
-  <div class='ph'>(337) 233-2872</div>
+  <div class='ph'>☎ (337) 233-2872</div>
+  
   <div class='lic'>License: 861365</div>
 </a><a class="agent" href="/bailbonds/la/agent/earline-marie-dupuy-914175/">
   <div class="an">Earline Marie Dupuy</div>
   <div class="ad">305 W Main, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 914175</div>
 </a><a class="agent" href="/bailbonds/la/agent/john-tyler-o-gwynn-1057215/">
   <div class="an">John Tyler O'gwynn</div>
   <div class="ad">106 Zoie Dr, Lafayette, 70507</div>
-  <div class='ph'>(337) 346-4600</div>
+  <div class='ph'>☎ (337) 346-4600</div>
+  
   <div class='lic'>License: 1057215</div>
 </a><a class="agent" href="/bailbonds/la/agent/levi-a-trahan-1113086/">
   <div class="an">Levi A Trahan</div>
   <div class="ad">3603 w congress st Apt 117A, Lafayette, 70506</div>
-  <div class='ph'>(337) 277-8869</div>
+  <div class='ph'>☎ (337) 277-8869</div>
+  
   <div class='lic'>License: 1113086</div>
 </a><a class="agent" href="/bailbonds/la/agent/natasha-rochelle-meche-615494/">
   <div class="an">Natasha Rochelle Meche</div>
   <div class="ad">708 S. Washington St., Lafayette, 70501</div>
-  <div class='ph'>(337) 501-2281</div>
+  <div class='ph'>☎ (337) 501-2281</div>
+  
   <div class='lic'>License: 615494</div>
 </a><a class="agent" href="/bailbonds/la/agent/holly-waters-archibald-623789/">
   <div class="an">Holly Waters Archibald</div>
   <div class="ad">708 S Washington St, Lafayette, 70501</div>
-  <div class='ph'>(337) 322-9000</div>
+  <div class='ph'>☎ (337) 322-9000</div>
+  
   <div class='lic'>License: 623789</div>
 </a><a class="agent" href="/bailbonds/la/agent/elaine-martin-679533/">
   <div class="an">Elaine Martin</div>
   <div class="ad">705-A S.Washington St, Lafayette, 70501</div>
-  <div class='ph'>(337) 466-3533</div>
+  <div class='ph'>☎ (337) 466-3533</div>
+  
   <div class='lic'>License: 679533</div>
 </a><a class="agent" href="/bailbonds/la/agent/isaac-jones-iii-763720/">
   <div class="an">Isaac Jones III</div>
   <div class="ad">305 West Main St, Lafayette, 70501</div>
-  <div class='ph'>13372649111</div>
+  <div class='ph'>☎ 13372649111</div>
+  
   <div class='lic'>License: 763720</div>
 </a><a class="agent" href="/bailbonds/la/agent/alvin-louis-harvey-645566/">
   <div class="an">Alvin Louis Harvey</div>
   <div class="ad">111 Coulee Dr Apt A, Lafayette, 70508</div>
-  <div class='ph'>(337) 349-5306</div>
+  <div class='ph'>☎ (337) 349-5306</div>
+  
   <div class='lic'>License: 645566</div>
 </a><a class="agent" href="/bailbonds/la/agent/brian-paul-fonseca-1172474/">
   <div class="an">Brian Paul Fonseca</div>
   <div class="ad">305 West Main St, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 1172474</div>
 </a><a class="agent" href="/bailbonds/la/agent/megan-guedry-fontenot-766596/">
   <div class="an">Megan Guedry Fontenot</div>
   <div class="ad">907 Lafayette Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 291-2444</div>
+  <div class='ph'>☎ (337) 291-2444</div>
+  
   <div class='lic'>License: 766596</div>
 </a><a class="agent" href="/bailbonds/la/agent/logan-jean-leroy-810708/">
   <div class="an">Logan Jean Leroy</div>
   <div class="ad">PO Box 3706, Lafayette, 70502</div>
-  <div class='ph'>(337) 354-7126</div>
+  <div class='ph'>☎ (337) 354-7126</div>
+  
   <div class='lic'>License: 810708</div>
 </a><a class="agent" href="/bailbonds/la/agent/racquel-angelique-babino-1234720/">
   <div class="an">Racquel Angelique Babino</div>
   <div class="ad">705 S Washington Street, Lafayette, 70501</div>
-  <div class='ph'>(337) 466-3533</div>
+  <div class='ph'>☎ (337) 466-3533</div>
+  
   <div class='lic'>License: 1234720</div>
 </a><a class="agent" href="/bailbonds/la/agent/the-watchmen-la-fugitive-apprehension-task-force-1070172/">
   <div class="an">The Watchmen: La Fugitive Apprehension Task Force</div>
   <div class="ad">1000 Lafayette St., Lafayette, 70501</div>
-  <div class='ph'>(337) 346-4600</div>
+  <div class='ph'>☎ (337) 346-4600</div>
+  
   <div class='lic'>License: 1070172</div>
 </a><a class="agent" href="/bailbonds/la/agent/bail-louisiana-1132600/">
   <div class="an">Bail Louisiana</div>
   <div class="ad">157 Lloyd Road, Lafayette, 70506</div>
-  <div class='ph'>(337) 789-2245</div>
+  <div class='ph'>☎ (337) 789-2245</div>
+  
   <div class='lic'>License: 1132600</div>
 </a><a class="agent" href="/bailbonds/la/agent/3e-s-bailbonds-llc-1182410/">
   <div class="an">3E'S Bailbonds, Llc</div>
   <div class="ad">1103 Lee Avenue, Lafayette, 70501</div>
-  <div class='ph'>(318) 729-7772</div>
+  <div class='ph'>☎ (318) 729-7772</div>
+  
   <div class='lic'>License: 1182410</div>
 </a><a class="agent" href="/bailbonds/la/agent/brian-k-frost-1182480/">
   <div class="an">Brian K Frost</div>
   <div class="ad">1103 Lee Avenue, Lafayette, 70501</div>
-  <div class='ph'>(318) 229-6122</div>
+  <div class='ph'>☎ (318) 229-6122</div>
+  
   <div class='lic'>License: 1182480</div>
 </a><a class="agent" href="/bailbonds/la/agent/kenneth-wayne-whiteman-1225208/">
   <div class="an">Kenneth Wayne Whiteman</div>
   <div class="ad">4400 Ambassador Caffery Pkwy  Suite A # 338, Lafayette, 70508</div>
-  <div class='ph'>(337) 303-3538</div>
+  <div class='ph'>☎ (337) 303-3538</div>
+  
   <div class='lic'>License: 1225208</div>
 </a><a class="agent" href="/bailbonds/la/agent/feel-free-bail-bonds-llc-1039802/">
   <div class="an">Feel Free Bail Bonds LLC</div>
   <div class="ad">115 W Main St. #3, Lafayette, 70501</div>
-  <div class='ph'>(337) 780-9309</div>
+  <div class='ph'>☎ (337) 780-9309</div>
+  
   <div class='lic'>License: 1039802</div>
 </a><a class="agent" href="/bailbonds/la/agent/kingdom-defense-bail-llc-1227923/">
   <div class="an">Kingdom Defense Bail, Llc</div>
   <div class="ad">4400 Ambassador Caffery Pkwy  Suite A # 338, Lafayette, 70508</div>
-  <div class='ph'>(337) 303-3538</div>
+  <div class='ph'>☎ (337) 303-3538</div>
+  
   <div class='lic'>License: 1227923</div>
 </a><a class="agent" href="/bailbonds/la/agent/surety-management-inc-1083803/">
   <div class="an">Surety Management Inc</div>
   <div class="ad">1000 Lafayette St Ste 200, Lafayette, 70501</div>
-  <div class='ph'>(337) 234-0011</div>
+  <div class='ph'>☎ (337) 234-0011</div>
+  
   <div class='lic'>License: 1083803</div>
 </a><a class="agent" href="/bailbonds/la/agent/andrena-elizabeth-cluse-891177/">
   <div class="an">Andrena Elizabeth Cluse</div>
   <div class="ad">305 W. Main St, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 891177</div>
 </a><a class="agent" href="/bailbonds/la/agent/charles-l-woodard-1042438/">
   <div class="an">Charles L Woodard</div>
   <div class="ad">305 west main st, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 1042438</div>
 </a><a class="agent" href="/bailbonds/la/agent/misty-norwood-lennie-1044525/">
   <div class="an">Misty Norwood Lennie</div>
   <div class="ad">305 West Main St, Lafayette, 70501</div>
-  <div class='ph'>(337) 264-9111</div>
+  <div class='ph'>☎ (337) 264-9111</div>
+  
   <div class='lic'>License: 1044525</div>
 </a><a class="agent" href="/bailbonds/la/agent/e-and-e-bonding-llc-1208161/">
   <div class="an">E And E Bonding, Llc</div>
   <div class="ad">112 Calypso Lane  Apt D, Lafayette, 70508</div>
-  <div class='ph'>(337) 967-7800</div>
+  <div class='ph'>☎ (337) 967-7800</div>
+  
   <div class='lic'>License: 1208161</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -344,5 +391,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.20651, -92.06417], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.22224,"lng":-92.01773,"label":"<strong><a href='/bailbonds/la/agent/craig-edward-prejean-161778/'>Craig Edward Prejean</a></strong><br>\u260e (337) 264-7108"},{"lat":30.22397,"lng":-92.02071,"label":"<strong><a href='/bailbonds/la/agent/aaron-paul-degeytair-sr-263217/'>Aaron Paul Degeytair Sr.</a></strong><br>\u260e (337) 291-2444"},{"lat":30.22681,"lng":-92.02189,"label":"<strong><a href='/bailbonds/la/agent/april-degeytair-porter-271132/'>April Degeytair Porter</a></strong><br>\u260e (337) 233-2872"},{"lat":30.20012,"lng":-92.10831,"label":"<strong><a href='/bailbonds/la/agent/jerry-phillip-manuel-255250/'>Jerry Phillip Manuel</a></strong><br>\u260e (337) 277-2071"},{"lat":30.22681,"lng":-92.02189,"label":"<strong><a href='/bailbonds/la/agent/christopher-shawn-trahan-307859/'>Christopher Shawn Trahan</a></strong><br>\u260e (337) 291-2444"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/vaughn-michael-swilley-280155/'>Vaughn Michael Swilley</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22681,"lng":-92.02189,"label":"<strong><a href='/bailbonds/la/agent/m-guedry-ltd-inc-314891/'>M Guedry Ltd Inc</a></strong><br>\u260e (337) 233-2872"},{"lat":30.1494,"lng":-91.98998,"label":"<strong><a href='/bailbonds/la/agent/hunter-james-chaisson-278185/'>Hunter James Chaisson</a></strong><br>\u260e (985) 397-1705"},{"lat":30.16461,"lng":-92.09792,"label":"<strong><a href='/bailbonds/la/agent/john-heinrich-jr-557558/'>John Heinrich Jr.</a></strong><br>\u260e (337) 781-9320"},{"lat":30.22402,"lng":-92.01995,"label":"<strong><a href='/bailbonds/la/agent/shawn-anthony-williams-450056/'>Shawn Anthony Williams</a></strong><br>\u260e (337) 780-9309"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/braxton-swilley-681310/'>Braxton Swilley</a></strong><br>\u260e (337) 264-9111"},{"lat":30.18729,"lng":-92.09655,"label":"<strong><a href='/bailbonds/la/agent/david-comeaux-726113/'>David Comeaux</a></strong><br>\u260e (337) 216-0774"},{"lat":30.22685,"lng":-92.02175,"label":"<strong><a href='/bailbonds/la/agent/mud-bug-bail-bonds-inc-739468/'>Mud Bug Bail Bonds Inc</a></strong><br>\u260e (337) 466-3533"},{"lat":30.22685,"lng":-92.02175,"label":"<strong><a href='/bailbonds/la/agent/kelly-sue-horsley-763211/'>Kelly Sue Horsley</a></strong><br>\u260e (337) 466-3533"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/a-able-bonding-inc-768922/'>A-Able Bonding, Inc.</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/sheila-courville-bienvenu-915657/'>Sheila Courville Bienvenu</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/earline-marie-dupuy-914175/'>Earline Marie Dupuy</a></strong><br>\u260e (337) 264-9111"},{"lat":30.27591,"lng":-92.07203,"label":"<strong><a href='/bailbonds/la/agent/john-tyler-o-gwynn-1057215/'>John Tyler O'gwynn</a></strong><br>\u260e (337) 346-4600"},{"lat":30.20338,"lng":-92.06233,"label":"<strong><a href='/bailbonds/la/agent/levi-a-trahan-1113086/'>Levi A Trahan</a></strong><br>\u260e (337) 277-8869"},{"lat":30.22681,"lng":-92.02189,"label":"<strong><a href='/bailbonds/la/agent/natasha-rochelle-meche-615494/'>Natasha Rochelle Meche</a></strong><br>\u260e (337) 501-2281"},{"lat":30.22681,"lng":-92.02189,"label":"<strong><a href='/bailbonds/la/agent/holly-waters-archibald-623789/'>Holly Waters Archibald</a></strong><br>\u260e (337) 322-9000"},{"lat":30.22685,"lng":-92.02175,"label":"<strong><a href='/bailbonds/la/agent/elaine-martin-679533/'>Elaine Martin</a></strong><br>\u260e (337) 466-3533"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/isaac-jones-iii-763720/'>Isaac Jones III</a></strong><br>\u260e 13372649111"},{"lat":30.17251,"lng":-92.00613,"label":"<strong><a href='/bailbonds/la/agent/alvin-louis-harvey-645566/'>Alvin Louis Harvey</a></strong><br>\u260e (337) 349-5306"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/brian-paul-fonseca-1172474/'>Brian Paul Fonseca</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22397,"lng":-92.02071,"label":"<strong><a href='/bailbonds/la/agent/megan-guedry-fontenot-766596/'>Megan Guedry Fontenot</a></strong><br>\u260e (337) 291-2444"},{"lat":30.22685,"lng":-92.02175,"label":"<strong><a href='/bailbonds/la/agent/racquel-angelique-babino-1234720/'>Racquel Angelique Babino</a></strong><br>\u260e (337) 466-3533"},{"lat":30.21383,"lng":-92.09602,"label":"<strong><a href='/bailbonds/la/agent/bail-louisiana-1132600/'>Bail Louisiana</a></strong><br>\u260e (337) 789-2245"},{"lat":30.22043,"lng":-92.01925,"label":"<strong><a href='/bailbonds/la/agent/3e-s-bailbonds-llc-1182410/'>3E'S Bailbonds, Llc</a></strong><br>\u260e (318) 729-7772"},{"lat":30.22043,"lng":-92.01925,"label":"<strong><a href='/bailbonds/la/agent/brian-k-frost-1182480/'>Brian K Frost</a></strong><br>\u260e (318) 229-6122"},{"lat":30.15826,"lng":-92.05059,"label":"<strong><a href='/bailbonds/la/agent/kenneth-wayne-whiteman-1225208/'>Kenneth Wayne Whiteman</a></strong><br>\u260e (337) 303-3538"},{"lat":30.22284,"lng":-92.01897,"label":"<strong><a href='/bailbonds/la/agent/feel-free-bail-bonds-llc-1039802/'>Feel Free Bail Bonds LLC</a></strong><br>\u260e (337) 780-9309"},{"lat":30.15826,"lng":-92.05059,"label":"<strong><a href='/bailbonds/la/agent/kingdom-defense-bail-llc-1227923/'>Kingdom Defense Bail, Llc</a></strong><br>\u260e (337) 303-3538"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/andrena-elizabeth-cluse-891177/'>Andrena Elizabeth Cluse</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/charles-l-woodard-1042438/'>Charles L Woodard</a></strong><br>\u260e (337) 264-9111"},{"lat":30.22285,"lng":-92.02089,"label":"<strong><a href='/bailbonds/la/agent/misty-norwood-lennie-1044525/'>Misty Norwood Lennie</a></strong><br>\u260e (337) 264-9111"},{"lat":30.1484,"lng":-91.98697,"label":"<strong><a href='/bailbonds/la/agent/e-and-e-bonding-llc-1208161/'>E And E Bonding, Llc</a></strong><br>\u260e (337) 967-7800"},{"lat":30.2056,"lng":-92.02806,"label":"<strong>8 agents in Lafayette</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/la/agent/darlene-alice-garrison-141842/'>Darlene Alice Garrison</a></strong><br>\u260e (337) 478-9220<br><strong><a href='/bailbonds/la/agent/james-andrew-lewis-199939/'>James Andrew Lewis</a></strong><br>\u260e (337) 269-8979<br><strong><a href='/bailbonds/la/agent/mark-anthony-fontenot-258840/'>Mark Anthony Fontenot</a></strong><br>\u260e (337) 288-4800<br><strong><a href='/bailbonds/la/agent/rachael-lynn-adams-462207/'>Rachael Lynn Adams</a></strong><br>\u260e (337) 233-2872<br><strong><a href='/bailbonds/la/agent/corey-p-harrington-861365/'>Corey P Harrington</a></strong><br>\u260e (337) 233-2872<br><strong><a href='/bailbonds/la/agent/logan-jean-leroy-810708/'>Logan Jean Leroy</a></strong><br>\u260e (337) 354-7126<br><strong><a href='/bailbonds/la/agent/the-watchmen-la-fugitive-apprehension-task-force-1070172/'>The Watchmen: La Fugitive Apprehension Task Force</a></strong><br>\u260e (337) 346-4600<br><strong><a href='/bailbonds/la/agent/surety-management-inc-1083803/'>Surety Management Inc</a></strong><br>\u260e (337) 234-0011"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

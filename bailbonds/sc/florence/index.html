@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,42 +106,50 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/altman-jason-c-prb-6438712-npn-6438712/">
   <div class="an">Altman, Jason C</div><div class='ad'>Home Quick Bail Bonds Assoc. #102</div>
   <div class="ad">Effingham, 29541</div>
-  <div class='ph'>(843) 629-8227</div>
+  <div class='ph'>☎ (843) 629-8227</div>
+  
   <div class='lic'>License: PRB 6438712 (NPN 6438712)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/bradley-adrian-d-prb-17182650-npn-17182650/">
   <div class="an">Bradley, Adrian D</div>
   <div class="ad">Quinby, 29506</div>
-  <div class='ph'>(843) 409-9524</div>
+  <div class='ph'>☎ (843) 409-9524</div>
+  
   <div class='lic'>License: PRB 17182650 (NPN 17182650)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/cooper-trey-z-prb-8435545-npn-8435545/">
   <div class="an">Cooper, Trey Z</div>
   <div class="ad">Effingham, 29501</div>
-  <div class='ph'>(843) 615-1578</div>
+  <div class='ph'>☎ (843) 615-1578</div>
+  
   <div class='lic'>License: PRB 8435545 (NPN 8435545)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/harris-randy-byron-prb-18393732-npn-18393732/">
   <div class="an">Harris, Randy Byron</div>
   <div class="ad">Florence, 29501</div>
-  <div class='ph'>(843) 610-4874</div>
+  <div class='ph'>☎ (843) 610-4874</div>
+  
   <div class='lic'>License: PRB 18393732 (NPN 18393732)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/hawkins-kevin-r-prb-18393724-npn-18393724/">
   <div class="an">Hawkins, Kevin R</div>
   <div class="ad">Florence, 29501</div>
-  <div class='ph'>(843) 245-6250</div>
+  <div class='ph'>☎ (843) 245-6250</div>
+  
   <div class='lic'>License: PRB 18393724 (NPN 18393724)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/tindal-steven-prb-18393542-npn-18393542/">
   <div class="an">Tindal, Steven</div>
   <div class="ad">Florence, 29501</div>
-  <div class='ph'>(843) 346-9595</div>
+  <div class='ph'>☎ (843) 346-9595</div>
+  
   <div class='lic'>License: PRB 18393542 (NPN 18393542)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/tindal-theresa-s-prb-7491470-npn-7491470/">
   <div class="an">Tindal, Theresa S</div><div class='ad'>Blackcat Bonding Agency</div>
   <div class="ad">Florence, 29505</div>
-  <div class='ph'>(843) 679-5510</div>
+  <div class='ph'>☎ (843) 679-5510</div>
+  
   <div class='lic'>License: PRB 7491470 (NPN 7491470)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/brown-onika-taiwann-rbm-21493021-npn-21493021/">
   <div class="an">Brown, Onika Taiwann</div>
   <div class="ad">Florence, 29505</div>
-  <div class='ph'>(843) 799-1833</div>
+  <div class='ph'>☎ (843) 799-1833</div>
+  
   <div class='lic'>License: RBM 21493021 (NPN 21493021)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Florence' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Florence' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.02853, -79.71023], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.22803,"lng":-79.73569,"label":"<strong>1 agent in Quinby</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/bradley-adrian-d-prb-17182650-npn-17182650/'>Bradley, Adrian D</a></strong><br>\u260e (843) 409-9524"},{"lat":34.17892,"lng":-79.79222,"label":"<strong>5 agents in Florence</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/harris-randy-byron-prb-18393732-npn-18393732/'>Harris, Randy Byron</a></strong><br>\u260e (843) 610-4874<br><strong><a href='/bailbonds/sc/agent/hawkins-kevin-r-prb-18393724-npn-18393724/'>Hawkins, Kevin R</a></strong><br>\u260e (843) 245-6250<br><strong><a href='/bailbonds/sc/agent/tindal-steven-prb-18393542-npn-18393542/'>Tindal, Steven</a></strong><br>\u260e (843) 346-9595<br><strong><a href='/bailbonds/sc/agent/tindal-theresa-s-prb-7491470-npn-7491470/'>Tindal, Theresa S</a></strong><br>\u260e (843) 679-5510<br><strong><a href='/bailbonds/sc/agent/brown-onika-taiwann-rbm-21493021-npn-21493021/'>Brown, Onika Taiwann</a></strong><br>\u260e (843) 799-1833"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

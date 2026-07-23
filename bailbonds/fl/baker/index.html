@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,66 +107,79 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Atkins, Theodore Jr</div>
   <div class="ad">AAA HELP BAIL BONDS INC 11 W MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ TONINGBYTEDDY@GMAIL.COM</div>
   <div class='lic'>License: E166532</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cook-charles-avery-w401628/">
   <div class="an">Cook, Charles Avery</div>
   <div class="ad">A CALL TO FREEDOM 88 N 6TH ST, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ MRMARINE2017@YAHOO.COM</div>
   <div class='lic'>License: W401628</div>
 </a><a class="agent" href="/bailbonds/fl/agent/d-annunzio-kevin-w807590/">
   <div class="an">D'Annunzio, Kevin</div>
   <div class="ad">AAA HELP BAIL BOND INC 11 W MACCLENNY AVENUE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ BOOGIEBOOGCASPER@YAHOO.COM</div>
   <div class='lic'>License: W807590</div>
 </a><a class="agent" href="/bailbonds/fl/agent/folston-ernest-jr-w083228/">
   <div class="an">Folston, Ernest Jr</div>
   <div class="ad">AAA HELP BAIL BONDS INC 11 W MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ EFOLSTONJR@EFOLSTONCONSULTING.COM</div>
   <div class='lic'>License: W083228</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hadley-rashodd-w237250/">
   <div class="an">Hadley, Rashodd</div>
   <div class="ad">AAA HELP BAIL BONDS 11 WEST MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ RASHODD.HADLEY@WARNER.EDU</div>
   <div class='lic'>License: W237250</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-anthony-lorenzo-jr-w217279/">
   <div class="an">James, Anthony Lorenzo Jr.</div>
   <div class="ad">11 W MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ SOLIDPRESSURE@GMAIL.COM</div>
   <div class='lic'>License: W217279</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-keyarha-amani-g219344/">
   <div class="an">James, Keyarha Amani</div>
   <div class="ad">11 W MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ KEYARAHJAMES@YAHOO.COM</div>
   <div class='lic'>License: G219344</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-linda-l-w032509/">
   <div class="an">James, Linda L</div>
   <div class="ad">AAA HELP BAIL BOND INC. 11 WEST MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ LINLOUJAMES2@YAHOO.COM</div>
   <div class='lic'>License: W032509</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcduffie-jo-anne-w100561/">
   <div class="an">Mcduffie, Jo Anne</div>
   <div class="ad">206 E MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ VINCEMCDUFFIE@ICLOUD.COM</div>
   <div class='lic'>License: W100561</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcduffie-richard-vincent-a172050/">
   <div class="an">Mcduffie, Richard Vincent</div>
   <div class="ad">RENEE'S BAIL BONDS 206 E MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ VINCEMCDUFFIE@ICLOUD.COM</div>
   <div class='lic'>License: A172050</div>
 </a><a class="agent" href="/bailbonds/fl/agent/renee-s-bail-bonds-b000571/">
   <div class="an">Renee'S Bail Bonds</div>
   <div class="ad">206 E MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ VINCEMCDUFFIE@YAHOO.COM</div>
   <div class='lic'>License: B000571</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-edwin-scott-p194692/">
   <div class="an">Smith, Edwin Scott</div>
   <div class="ad">RENEE'S BAIL BONDS 206 EAST MACCLENNY AVENUE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ RETTCOWW@YAHOO.COM</div>
   <div class='lic'>License: P194692</div>
 </a><a class="agent" href="/bailbonds/fl/agent/turk-marilyn-crews-e014539/">
   <div class="an">Turk, Marilyn Crews</div>
   <div class="ad">AAA HELP BAIL BONDS INC 11 W MACCLENNY AVE, MACCLENNY, 32063</div>
   
+  <div class='ad'>✉ AAAHELPBAIL.MT@GMAIL.COM</div>
   <div class='lic'>License: E014539</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -184,5 +199,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.32444, -82.30228], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/atkins-theodore-jr-e166532/'>Atkins, Theodore Jr</a></strong>"},{"lat":30.28342,"lng":-82.12405,"label":"<strong><a href='/bailbonds/fl/agent/cook-charles-avery-w401628/'>Cook, Charles Avery</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/d-annunzio-kevin-w807590/'>D'Annunzio, Kevin</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/folston-ernest-jr-w083228/'>Folston, Ernest Jr</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/hadley-rashodd-w237250/'>Hadley, Rashodd</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/james-anthony-lorenzo-jr-w217279/'>James, Anthony Lorenzo Jr.</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/james-keyarha-amani-g219344/'>James, Keyarha Amani</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/james-linda-l-w032509/'>James, Linda L</a></strong>"},{"lat":30.28265,"lng":-82.12026,"label":"<strong><a href='/bailbonds/fl/agent/mcduffie-jo-anne-w100561/'>Mcduffie, Jo Anne</a></strong>"},{"lat":30.28265,"lng":-82.12026,"label":"<strong><a href='/bailbonds/fl/agent/mcduffie-richard-vincent-a172050/'>Mcduffie, Richard Vincent</a></strong>"},{"lat":30.28265,"lng":-82.12026,"label":"<strong><a href='/bailbonds/fl/agent/renee-s-bail-bonds-b000571/'>Renee'S Bail Bonds</a></strong>"},{"lat":30.28265,"lng":-82.12026,"label":"<strong><a href='/bailbonds/fl/agent/smith-edwin-scott-p194692/'>Smith, Edwin Scott</a></strong>"},{"lat":30.28241,"lng":-82.12248,"label":"<strong><a href='/bailbonds/fl/agent/turk-marilyn-crews-e014539/'>Turk, Marilyn Crews</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

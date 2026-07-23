@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,130 +107,156 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Alvarez Ramirez, Noel</div>
   <div class="ad">836 MAIN STREET, Martinez, 94806</div>
   
+  
   <div class='lic'>License: 4487399</div>
 </a><a class="agent" href="/bailbonds/ca/agent/boyd-robin-1k39762/">
   <div class="an">Boyd, Robin</div>
   <div class="ad">4816 STERLING HILL DR., Antioch, 94531</div>
+  
   
   <div class='lic'>License: 1K39762</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brocks-michael-1841507/">
   <div class="an">Brocks, Michael</div>
   <div class="ad">2201 SYCAMORE DRIVE, APT 296, Antioch, 94509</div>
   
+  
   <div class='lic'>License: 1841507</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brown-shantel-1k26662/">
   <div class="an">Brown, Shantel</div>
   <div class="ad">836 MAIN ST, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 1K26662</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bulloch-curt-1e80348/">
   <div class="an">Bulloch, Curt</div>
   <div class="ad">1555 BOTELHO DRIVE, SUITE 408, Walnut Creek, 94596</div>
   
+  
   <div class='lic'>License: 1E80348</div>
 </a><a class="agent" href="/bailbonds/ca/agent/davis-frank-1846235/">
   <div class="an">Davis, Frank</div>
   <div class="ad">719 PROMONTORY TERR, San Ramon, 94583</div>
+  
   
   <div class='lic'>License: 1846235</div>
 </a><a class="agent" href="/bailbonds/ca/agent/delisle-amanda-1844789/">
   <div class="an">Delisle, Amanda</div>
   <div class="ad">836 MAIN ST, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1844789</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-eduardo-1843268/">
   <div class="an">Garcia, Eduardo</div>
   <div class="ad">836 MAIN ST, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 1843268</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-eridberto-1c95196/">
   <div class="an">Garcia, Eridberto</div>
   <div class="ad">836 MAIN ST, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1C95196</div>
 </a><a class="agent" href="/bailbonds/ca/agent/guerra-thelma-1840209/">
   <div class="an">Guerra, Thelma</div>
   <div class="ad">P.O.BOX 631, Concord, 94522</div>
+  
   
   <div class='lic'>License: 1840209</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-margarita-4301047/">
   <div class="an">Hernandez, Margarita</div>
   <div class="ad">836 MAIN STREET, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 4301047</div>
 </a><a class="agent" href="/bailbonds/ca/agent/keeton-markeasha-1m19834/">
   <div class="an">Keeton, Markeasha</div>
   <div class="ad">836 MAIN STREET, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 1M19834</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcelroy-lovell-0n15761/">
   <div class="an">Mcelroy, Lovell</div>
   <div class="ad">106 SAN PABLO TOWNE CTR, #334, San Pablo, 94806</div>
   
+  
   <div class='lic'>License: 0N15761</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcinroy-reed-1842767/">
   <div class="an">Mcinroy, Reed</div>
   <div class="ad">4816 STERLING HILL DRIVE, Antioch, 94531</div>
+  
   
   <div class='lic'>License: 1842767</div>
 </a><a class="agent" href="/bailbonds/ca/agent/olson-joshua-1842846/">
   <div class="an">Olson, Joshua</div>
   <div class="ad">4700 SUNNY PL APT A, Concord, 94521</div>
   
+  
   <div class='lic'>License: 1842846</div>
 </a><a class="agent" href="/bailbonds/ca/agent/olson-kelly-1845075/">
   <div class="an">Olson, Kelly</div>
   <div class="ad">924 COURT ST, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 1845075</div>
 </a><a class="agent" href="/bailbonds/ca/agent/phills-jordan-1n13414/">
   <div class="an">Phills, Jordan</div>
   <div class="ad">836 MAIN STREET, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1N13414</div>
 </a><a class="agent" href="/bailbonds/ca/agent/raman-nadav-4474835/">
   <div class="an">Raman, Nadav</div>
   <div class="ad">836 MAIN STREET, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 4474835</div>
 </a><a class="agent" href="/bailbonds/ca/agent/richardson-david-1846339/">
   <div class="an">Richardson, David</div>
   <div class="ad">4464 LONETREE WAY, 513, Antioch, 94531</div>
   
+  
   <div class='lic'>License: 1846339</div>
 </a><a class="agent" href="/bailbonds/ca/agent/richardson-jessica-1m78653/">
   <div class="an">Richardson, Jessica</div>
   <div class="ad">4464 LONETREE WAY #513, Antioch, 94531</div>
+  
   
   <div class='lic'>License: 1M78653</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rosas-angelica-1h55252/">
   <div class="an">Rosas, Angelica</div>
   <div class="ad">836 MAIN ST, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1H55252</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stock-lezlie-4494413/">
   <div class="an">Stock, Lezlie</div>
   <div class="ad">910 MAIN STREET, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 4494413</div>
 </a><a class="agent" href="/bailbonds/ca/agent/suarez-dimas-karla-1n12894/">
   <div class="an">Suarez Dimas, Karla</div>
   <div class="ad">912 COURT ST., Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1N12894</div>
 </a><a class="agent" href="/bailbonds/ca/agent/truso-thomas-1833627/">
   <div class="an">Truso, Thomas</div>
   <div class="ad">1901 RAILROAD AVE., SUITE D, Pittsburg, 94565</div>
+  
   
   <div class='lic'>License: 1833627</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valdueza-christopher-1k09364/">
   <div class="an">Valdueza, Christopher</div>
   <div class="ad">910 MAIN ST, Martinez, 94553</div>
   
+  
   <div class='lic'>License: 1K09364</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vargas-christopher-1846773/">
   <div class="an">Vargas, Christopher</div>
   <div class="ad">910 MAIN ST, Martinez, 94553</div>
+  
   
   <div class='lic'>License: 1846773</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -249,5 +277,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.91948, -121.95154], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/alvarez-ramirez-noel-4487399/'>Alvarez Ramirez, Noel</a></strong>"},{"lat":37.96967,"lng":-121.76378,"label":"<strong><a href='/bailbonds/ca/agent/boyd-robin-1k39762/'>Boyd, Robin</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/brown-shantel-1k26662/'>Brown, Shantel</a></strong>"},{"lat":37.89464,"lng":-122.06142,"label":"<strong><a href='/bailbonds/ca/agent/bulloch-curt-1e80348/'>Bulloch, Curt</a></strong>"},{"lat":37.77687,"lng":-121.98608,"label":"<strong><a href='/bailbonds/ca/agent/davis-frank-1846235/'>Davis, Frank</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/delisle-amanda-1844789/'>Delisle, Amanda</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/garcia-eduardo-1843268/'>Garcia, Eduardo</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/garcia-eridberto-1c95196/'>Garcia, Eridberto</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-margarita-4301047/'>Hernandez, Margarita</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/keeton-markeasha-1m19834/'>Keeton, Markeasha</a></strong>"},{"lat":37.96967,"lng":-121.76378,"label":"<strong><a href='/bailbonds/ca/agent/mcinroy-reed-1842767/'>Mcinroy, Reed</a></strong>"},{"lat":37.96389,"lng":-121.97927,"label":"<strong><a href='/bailbonds/ca/agent/olson-joshua-1842846/'>Olson, Joshua</a></strong>"},{"lat":38.01719,"lng":-122.13319,"label":"<strong><a href='/bailbonds/ca/agent/olson-kelly-1845075/'>Olson, Kelly</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/phills-jordan-1n13414/'>Phills, Jordan</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/raman-nadav-4474835/'>Raman, Nadav</a></strong>"},{"lat":37.9666,"lng":-121.78224,"label":"<strong><a href='/bailbonds/ca/agent/richardson-david-1846339/'>Richardson, David</a></strong>"},{"lat":37.9666,"lng":-121.78224,"label":"<strong><a href='/bailbonds/ca/agent/richardson-jessica-1m78653/'>Richardson, Jessica</a></strong>"},{"lat":38.01783,"lng":-122.13538,"label":"<strong><a href='/bailbonds/ca/agent/rosas-angelica-1h55252/'>Rosas, Angelica</a></strong>"},{"lat":38.01813,"lng":-122.1348,"label":"<strong><a href='/bailbonds/ca/agent/stock-lezlie-4494413/'>Stock, Lezlie</a></strong>"},{"lat":38.01723,"lng":-122.13323,"label":"<strong><a href='/bailbonds/ca/agent/suarez-dimas-karla-1n12894/'>Suarez Dimas, Karla</a></strong>"},{"lat":38.01813,"lng":-122.1348,"label":"<strong><a href='/bailbonds/ca/agent/valdueza-christopher-1k09364/'>Valdueza, Christopher</a></strong>"},{"lat":38.01813,"lng":-122.1348,"label":"<strong><a href='/bailbonds/ca/agent/vargas-christopher-1846773/'>Vargas, Christopher</a></strong>"},{"lat":37.97834,"lng":-121.79606,"label":"<strong>1 agent in Antioch</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/brocks-michael-1841507/'>Brocks, Michael</a></strong>"},{"lat":37.97218,"lng":-122.00159,"label":"<strong>1 agent in Concord</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/guerra-thelma-1840209/'>Guerra, Thelma</a></strong>"},{"lat":37.96286,"lng":-122.34258,"label":"<strong>1 agent in San Pablo</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/mcelroy-lovell-0n15761/'>Mcelroy, Lovell</a></strong>"},{"lat":38.01677,"lng":-121.89695,"label":"<strong>1 agent in Pittsburg</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/truso-thomas-1833627/'>Truso, Thomas</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

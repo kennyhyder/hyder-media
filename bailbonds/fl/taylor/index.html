@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,26 +107,31 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Anderson, Michael</div>
   <div class="ad">SWANN BAIL BONDS 105 1/2 N. JEFFERSON STREET, PERRY, 32347</div>
   
+  <div class='ad'>✉ ANDERMD@MAIL.COM</div>
   <div class='lic'>License: W254101</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jay-armanda-w384489/">
   <div class="an">Jay, Armanda</div>
   <div class="ad">427 E MAURICE LINTON RD, PERRY, 32347</div>
   
+  <div class='ad'>✉ ARMANDAJAY@GMAIL.COM</div>
   <div class='lic'>License: W384489</div>
 </a><a class="agent" href="/bailbonds/fl/agent/swann-bail-bonds-and-monitoring-services-llc-b000133/">
   <div class="an">Swann Bail Bonds And Monitoring Services Llc</div>
   <div class="ad">105 1/2 N JEFFERSON ST, PERRY, 32347</div>
   
+  <div class='ad'>✉ SWANNINSURANCE@FAIRPOINT.NET</div>
   <div class='lic'>License: B000133</div>
 </a><a class="agent" href="/bailbonds/fl/agent/swann-lopatic-leslie-a313647/">
   <div class="an">Swann Lopatic, Leslie</div>
   <div class="ad">SWANN INSURANCE AGENCY 105 1/2 N JEFFERSON ST, PERRY, 32347</div>
   
+  <div class='ad'>✉ LESLIESWANNPERDUE@GMAIL.COM</div>
   <div class='lic'>License: A313647</div>
 </a><a class="agent" href="/bailbonds/fl/agent/swann-elbert-earl-a258871/">
   <div class="an">Swann, Elbert Earl</div>
   <div class="ad">SWANN INSURANCE AGENCY 105 1/2 N JEFFERSON ST, PERRY, 32347</div>
   
+  <div class='ad'>✉ EARLSWANN@YAHOO.COM</div>
   <div class='lic'>License: A258871</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.96715, -83.63957], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.11725,"lng":-83.58214,"label":"<strong><a href='/bailbonds/fl/agent/anderson-michael-w254101/'>Anderson, Michael</a></strong>"},{"lat":30.11221,"lng":-83.57908,"label":"<strong><a href='/bailbonds/fl/agent/jay-armanda-w384489/'>Jay, Armanda</a></strong>"},{"lat":30.11725,"lng":-83.58214,"label":"<strong><a href='/bailbonds/fl/agent/swann-bail-bonds-and-monitoring-services-llc-b000133/'>Swann Bail Bonds And Monitoring Services Llc</a></strong>"},{"lat":30.11725,"lng":-83.58214,"label":"<strong><a href='/bailbonds/fl/agent/swann-lopatic-leslie-a313647/'>Swann Lopatic, Leslie</a></strong>"},{"lat":30.11725,"lng":-83.58214,"label":"<strong><a href='/bailbonds/fl/agent/swann-elbert-earl-a258871/'>Swann, Elbert Earl</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

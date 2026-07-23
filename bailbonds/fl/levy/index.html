@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,36 +107,43 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Cornwell, Cindy Lee</div>
   <div class="ad">MS JUDY'S BAIL BONDS 1113 NW 19THAVE AVE, CHIEFLAND, 33619</div>
   
+  <div class='ad'>✉ BAILBONDWM@AOL.COM</div>
   <div class='lic'>License: A055163</div>
 </a><a class="agent" href="/bailbonds/fl/agent/holland-paul-graham-jr-w183308/">
   <div class="an">Holland, Paul Graham Jr</div>
   <div class="ad">1005 NW 19TH AVE, CHIEFLAND, 32626</div>
   
+  <div class='ad'>✉ PAULBBAT21@AOL.COM</div>
   <div class='lic'>License: W183308</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-charlene-s-w099291/">
   <div class="an">James, Charlene S</div>
   <div class="ad">CJ'S BAIL BONDS 806 E. NOBLE AVE, WILLISTON, 32696</div>
   
+  <div class='ad'>✉ CJAMES8614@AOL.COM</div>
   <div class='lic'>License: W099291</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ms-judy-s-bail-bonds-llc-b000333/">
   <div class="an">Ms Judy'S Bail Bonds Llc</div>
   <div class="ad">1113 NW 19TH AVE, CHIEFLAND, 32626</div>
   
+  <div class='ad'>✉ MSJUDYSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000333</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stines-judith-kaye-a255024/">
   <div class="an">Stines, Judith Kaye</div>
   <div class="ad">1113 N W 19TH AVE, CHIEFLAND, 32626</div>
   
+  <div class='ad'>✉ MSJUDYSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: A255024</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stone-david-granville-a296739/">
   <div class="an">Stone, David Granville</div>
   <div class="ad">DAVID STONE BAIL BONDS 9151 NE 80TH AVE, BRONSON, 32621</div>
   
+  <div class='ad'>✉ ETPSTONE@GMAIL.COM</div>
   <div class='lic'>License: A296739</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stone-david-granville-sr-e021259/">
   <div class="an">Stone, David Granville Sr.</div>
   <div class="ad">DAVID STONE BAIL BONDS 9151 NE 80TH AVE, BRONSON, 32621</div>
   
+  <div class='ad'>✉ DAVIDSTONEBAILBO@BELLSOUTH.NET</div>
   <div class='lic'>License: E021259</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.27185, -82.83123], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.49651,"lng":-82.86863,"label":"<strong><a href='/bailbonds/fl/agent/holland-paul-graham-jr-w183308/'>Holland, Paul Graham Jr</a></strong>"},{"lat":29.38868,"lng":-82.43717,"label":"<strong><a href='/bailbonds/fl/agent/james-charlene-s-w099291/'>James, Charlene S</a></strong>"},{"lat":29.4965,"lng":-82.86962,"label":"<strong><a href='/bailbonds/fl/agent/ms-judy-s-bail-bonds-llc-b000333/'>Ms Judy'S Bail Bonds Llc</a></strong>"},{"lat":29.4965,"lng":-82.86962,"label":"<strong><a href='/bailbonds/fl/agent/stines-judith-kaye-a255024/'>Stines, Judith Kaye</a></strong>"},{"lat":29.46514,"lng":-82.63956,"label":"<strong><a href='/bailbonds/fl/agent/stone-david-granville-a296739/'>Stone, David Granville</a></strong>"},{"lat":29.46514,"lng":-82.63956,"label":"<strong><a href='/bailbonds/fl/agent/stone-david-granville-sr-e021259/'>Stone, David Granville Sr.</a></strong>"},{"lat":29.49225,"lng":-82.86633,"label":"<strong>1 agent in CHIEFLAND</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/cornwell-cindy-lee-a055163/'>Cornwell, Cindy Lee</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

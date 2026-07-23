@@ -9,7 +9,7 @@
 <meta property="og:title" content="Never Fold Bail Bond Llc. — Licensed Bail Bond Agent in Louisiana">
 <meta property="og:description" content="Never Fold Bail Bond Llc.: licensed bail bond agent in Louisiana. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Never Fold Bail Bond Llc.","url":"https://hyder.me/bailbonds/la/agent/never-fold-bail-bond-llc-770076/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"(318) 446-7265","address":{"@type":"PostalAddress","streetAddress":"1117 Main St.","addressLocality":"Colfax","postalCode":"71417","addressRegion":"LA"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Never Fold Bail Bond Llc.","url":"https://hyder.me/bailbonds/la/agent/never-fold-bail-bond-llc-770076/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"(318) 446-7265","address":{"@type":"PostalAddress","streetAddress":"1117 Main St.","addressLocality":"Colfax","postalCode":"71417","addressRegion":"LA"},"geo":{"@type":"GeoCoordinates","latitude":31.52174,"longitude":-92.70048}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Never Fold Bail Bond Llc.</h1>
 <p class="sub">Licensed bail bond agent in Louisiana — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Address:</strong> 1117 Main St., Colfax, 71417</li><li><strong>Phone:</strong> (318) 446-7265</li><li><strong>License:</strong> 770076</li><li><strong>Serves:</strong> Louisiana (statewide)</li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Address:</strong> 1117 Main St., Colfax, 71417</li><li><strong>Phone:</strong> <a href="tel:(318) 446-7265">(318) 446-7265</a></li><li><strong>License:</strong> 770076</li><li><strong>Serves:</strong> Louisiana (statewide)</li></ul>
   <p class="src">Source: official roster — <a href="https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls" rel="nofollow">www.ldi.la.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Louisiana</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.52174, -92.70048], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":31.52174,"lng":-92.70048,"label":"<strong>Never Fold Bail Bond Llc.</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

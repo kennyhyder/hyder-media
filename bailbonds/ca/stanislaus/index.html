@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,250 +107,300 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Americano Sanchez, Juan</div>
   <div class="ad">822 9TH ST STE 8, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1J03649</div>
 </a><a class="agent" href="/bailbonds/ca/agent/basilio-santos-michelle-1n13257/">
   <div class="an">Basilio-Santos, Michelle</div>
   <div class="ad">822 9TH ST STE 8, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1N13257</div>
 </a><a class="agent" href="/bailbonds/ca/agent/carbajal-corey-16967439/">
   <div class="an">Carbajal, Corey</div>
   <div class="ad">910 11TH ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 16967439</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cesario-angelina-1846802/">
   <div class="an">Cesario, Angelina</div>
   <div class="ad">1200 H STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1846802</div>
 </a><a class="agent" href="/bailbonds/ca/agent/contreras-erika-1l62201/">
   <div class="an">Contreras, Erika</div>
   <div class="ad">900 G ST, 100, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1L62201</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dietz-matthew-4386528/">
   <div class="an">Dietz, Matthew</div>
   <div class="ad">4713 GREENLEAF CT, STE B, Modesto, 95356</div>
+  
   
   <div class='lic'>License: 4386528</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dubberly-elsa-1n13399/">
   <div class="an">Dubberly, Elsa</div>
   <div class="ad">1327 YOSEMITE BLVD STE B, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1N13399</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-cristina-1n13126/">
   <div class="an">Espinoza, Cristina</div>
   <div class="ad">414 S 3RD AVE APT B, Oakdale, 95361</div>
+  
   
   <div class='lic'>License: 1N13126</div>
 </a><a class="agent" href="/bailbonds/ca/agent/flores-andraes-1844927/">
   <div class="an">Flores, Andraes</div>
   <div class="ad">1300 H ST., 400, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1844927</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-angela-1840943/">
   <div class="an">Garcia, Angela</div>
   <div class="ad">900 G ST, 100, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1840943</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-anthony-1847480/">
   <div class="an">Garcia, Anthony</div>
   <div class="ad">900 G ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1847480</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-diana-1841872/">
   <div class="an">Garcia, Diana</div>
   <div class="ad">910 11TH STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1841872</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-mark-1840462/">
   <div class="an">Garcia, Mark</div>
   <div class="ad">900 G ST, 100, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1840462</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzales-veronica-1846106/">
   <div class="an">Gonzales, Veronica</div>
   <div class="ad">1327 YOSEMITE BLVD STE B, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1846106</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-martinez-jovany-1m23941/">
   <div class="an">Gutierrez Martinez, Jovany</div>
   <div class="ad">910 11th STREET, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1M23941</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-benjamin-4319187/">
   <div class="an">Hernandez, Benjamin</div>
   <div class="ad">1325 YOSEMITE BLVD, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 4319187</div>
 </a><a class="agent" href="/bailbonds/ca/agent/iniguez-lorena-1825026/">
   <div class="an">Iniguez, Lorena</div>
   <div class="ad">1327 YOSEMITE BLVD STE B, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1825026</div>
 </a><a class="agent" href="/bailbonds/ca/agent/jasso-adriana-1k07511/">
   <div class="an">Jasso, Adriana</div>
   <div class="ad">822 9TH ST STE 8, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1K07511</div>
 </a><a class="agent" href="/bailbonds/ca/agent/keene-kara-1845913/">
   <div class="an">Keene, Kara</div>
   <div class="ad">3520 MARSALA WAY, Modesto, 95356</div>
   
+  
   <div class='lic'>License: 1845913</div>
 </a><a class="agent" href="/bailbonds/ca/agent/kuikahi-myles-1843085/">
   <div class="an">Kuikahi, Myles</div>
   <div class="ad">822 9TH ST STE 8, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1843085</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-aleo-1n13373/">
   <div class="an">Lopez, Aleo</div>
   <div class="ad">1325 YOSEMITE BLVD, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1N13373</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-elizabeth-4384526/">
   <div class="an">Lopez, Elizabeth</div>
   <div class="ad">910 11TH STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 4384526</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-maria-1843824/">
   <div class="an">Lopez, Maria</div>
   <div class="ad">1202 H ST STE E, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1843824</div>
 </a><a class="agent" href="/bailbonds/ca/agent/loveless-tyrus-1844883/">
   <div class="an">Loveless, Tyrus</div>
   <div class="ad">2724 KAY, Modesto, 95307</div>
+  
   
   <div class='lic'>License: 1844883</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lubbers-haley-4320271/">
   <div class="an">Lubbers, Haley</div>
   <div class="ad">1327 YOSEMITE BLVD SUITE B, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 4320271</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marshall-justin-4445119/">
   <div class="an">Marshall, Justin</div>
   <div class="ad">1202 H ST, STE E, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 4445119</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-adrian-1k62264/">
   <div class="an">Martinez, Adrian</div>
   <div class="ad">1220 H ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1K62264</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-adrian-4507270/">
   <div class="an">Martinez, Adrian</div>
   <div class="ad">1220 H STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 4507270</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-daniel-1892569/">
   <div class="an">Martinez, Daniel</div>
   <div class="ad">1220 H ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1892569</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-john-1720994/">
   <div class="an">Martinez, John</div>
   <div class="ad">1220 H STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1720994</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-kimberly-4472201/">
   <div class="an">Martinez, Kimberly</div>
   <div class="ad">910 11TH STREET, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 4472201</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcgill-jeanine-1l60045/">
   <div class="an">Mcgill, Jeanine</div>
   <div class="ad">115 PARK AVENUE, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1L60045</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortiz-melisa-1834710/">
   <div class="an">Ortiz, Melisa</div>
   <div class="ad">1202 H STREET SUITE E, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1834710</div>
 </a><a class="agent" href="/bailbonds/ca/agent/padilla-alfonso-1846379/">
   <div class="an">Padilla, Alfonso</div>
   <div class="ad">1220 I ST, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1846379</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pappas-theo-1783419/">
   <div class="an">Pappas, Theo</div>
   <div class="ad">822 9TH ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1783419</div>
 </a><a class="agent" href="/bailbonds/ca/agent/perez-erika-4406900/">
   <div class="an">Perez, Erika</div>
   <div class="ad">910 11TH STREET, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 4406900</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pontillo-aleo-1840285/">
   <div class="an">Pontillo, Aleo</div>
   <div class="ad">1501 COFFEE RD STE T, Modesto, 95355</div>
   
+  
   <div class='lic'>License: 1840285</div>
 </a><a class="agent" href="/bailbonds/ca/agent/quinonez-pedro-1k88371/">
   <div class="an">Quinonez, Pedro</div>
   <div class="ad">1901 SUNNY VISTA AVE, Modesto, 95350</div>
+  
   
   <div class='lic'>License: 1K88371</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-ana-4546935/">
   <div class="an">Ramirez, Ana</div>
   <div class="ad">12 H STREET, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 4546935</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-gilbert-1a37660/">
   <div class="an">Ramirez, Gilbert</div>
   <div class="ad">4120 DALE RD J-8 #115, Modesto, 95356</div>
+  
   
   <div class='lic'>License: 1A37660</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramos-mike-4222901/">
   <div class="an">Ramos, Mike</div>
   <div class="ad">4623 REFLECTION AVE, Turlock, 95382</div>
   
+  
   <div class='lic'>License: 4222901</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramos-patricia-1844201/">
   <div class="an">Ramos, Patricia</div>
   <div class="ad">4623 REFLECTION AVE, Turlock, 95382</div>
+  
   
   <div class='lic'>License: 1844201</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rincon-cesar-4348019/">
   <div class="an">Rincon, Cesar</div>
   <div class="ad">345 WEST F STREET, Oakdale, 95361</div>
   
+  
   <div class='lic'>License: 4348019</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rincon-cesar-1846264/">
   <div class="an">Rincon, Cesar</div>
   <div class="ad">1220 EAST F ST, Oakdale, 95361</div>
+  
   
   <div class='lic'>License: 1846264</div>
 </a><a class="agent" href="/bailbonds/ca/agent/santana-mariela-1846466/">
   <div class="an">Santana, Mariela</div>
   <div class="ad">822 9TH ST STE 8, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1846466</div>
 </a><a class="agent" href="/bailbonds/ca/agent/self-diana-4308335/">
   <div class="an">Self, Diana</div>
   <div class="ad">913 EDISON AVE, Modesto, 95350</div>
+  
   
   <div class='lic'>License: 4308335</div>
 </a><a class="agent" href="/bailbonds/ca/agent/smith-joanna-1833629/">
   <div class="an">Smith, Joanna</div>
   <div class="ad">1202 H STREET STE E, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1833629</div>
 </a><a class="agent" href="/bailbonds/ca/agent/soto-juan-1l71201/">
   <div class="an">Soto, Juan</div>
   <div class="ad">910 11TH ST, Modesto, 95354</div>
+  
   
   <div class='lic'>License: 1L71201</div>
 </a><a class="agent" href="/bailbonds/ca/agent/suarez-shela-1n13398/">
   <div class="an">Suarez, Shela</div>
   <div class="ad">1220 H ST, Modesto, 95354</div>
   
+  
   <div class='lic'>License: 1N13398</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-shannon-1k52647/">
   <div class="an">Williams, Shannon</div>
   <div class="ad">920 RIVER BLUFF DR, Oakdale, 95361</div>
+  
   
   <div class='lic'>License: 1K52647</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -369,5 +421,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.56232, -121.00283], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/americano-sanchez-juan-1j03649/'>Americano Sanchez, Juan</a></strong>"},{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/basilio-santos-michelle-1n13257/'>Basilio-Santos, Michelle</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/carbajal-corey-16967439/'>Carbajal, Corey</a></strong>"},{"lat":37.64001,"lng":-120.99594,"label":"<strong><a href='/bailbonds/ca/agent/cesario-angelina-1846802/'>Cesario, Angelina</a></strong>"},{"lat":37.6369,"lng":-120.99771,"label":"<strong><a href='/bailbonds/ca/agent/contreras-erika-1l62201/'>Contreras, Erika</a></strong>"},{"lat":37.70254,"lng":-121.07246,"label":"<strong><a href='/bailbonds/ca/agent/dietz-matthew-4386528/'>Dietz, Matthew</a></strong>"},{"lat":37.63826,"lng":-120.97396,"label":"<strong><a href='/bailbonds/ca/agent/dubberly-elsa-1n13399/'>Dubberly, Elsa</a></strong>"},{"lat":37.76255,"lng":-120.84547,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-cristina-1n13126/'>Espinoza, Cristina</a></strong>"},{"lat":37.64072,"lng":-120.995,"label":"<strong><a href='/bailbonds/ca/agent/flores-andraes-1844927/'>Flores, Andraes</a></strong>"},{"lat":37.6369,"lng":-120.99771,"label":"<strong><a href='/bailbonds/ca/agent/garcia-angela-1840943/'>Garcia, Angela</a></strong>"},{"lat":37.6369,"lng":-120.99771,"label":"<strong><a href='/bailbonds/ca/agent/garcia-anthony-1847480/'>Garcia, Anthony</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/garcia-diana-1841872/'>Garcia, Diana</a></strong>"},{"lat":37.6369,"lng":-120.99771,"label":"<strong><a href='/bailbonds/ca/agent/garcia-mark-1840462/'>Garcia, Mark</a></strong>"},{"lat":37.63826,"lng":-120.97396,"label":"<strong><a href='/bailbonds/ca/agent/gonzales-veronica-1846106/'>Gonzales, Veronica</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-martinez-jovany-1m23941/'>Gutierrez Martinez, Jovany</a></strong>"},{"lat":37.63826,"lng":-120.97399,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-benjamin-4319187/'>Hernandez, Benjamin</a></strong>"},{"lat":37.63826,"lng":-120.97396,"label":"<strong><a href='/bailbonds/ca/agent/iniguez-lorena-1825026/'>Iniguez, Lorena</a></strong>"},{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/jasso-adriana-1k07511/'>Jasso, Adriana</a></strong>"},{"lat":37.69081,"lng":-121.04125,"label":"<strong><a href='/bailbonds/ca/agent/keene-kara-1845913/'>Keene, Kara</a></strong>"},{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/kuikahi-myles-1843085/'>Kuikahi, Myles</a></strong>"},{"lat":37.63826,"lng":-120.97399,"label":"<strong><a href='/bailbonds/ca/agent/lopez-aleo-1n13373/'>Lopez, Aleo</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/lopez-elizabeth-4384526/'>Lopez, Elizabeth</a></strong>"},{"lat":37.64002,"lng":-120.99593,"label":"<strong><a href='/bailbonds/ca/agent/lopez-maria-1843824/'>Lopez, Maria</a></strong>"},{"lat":37.593,"lng":-120.94661,"label":"<strong><a href='/bailbonds/ca/agent/loveless-tyrus-1844883/'>Loveless, Tyrus</a></strong>"},{"lat":37.63826,"lng":-120.97396,"label":"<strong><a href='/bailbonds/ca/agent/lubbers-haley-4320271/'>Lubbers, Haley</a></strong>"},{"lat":37.64002,"lng":-120.99593,"label":"<strong><a href='/bailbonds/ca/agent/marshall-justin-4445119/'>Marshall, Justin</a></strong>"},{"lat":37.64014,"lng":-120.99577,"label":"<strong><a href='/bailbonds/ca/agent/martinez-adrian-1k62264/'>Martinez, Adrian</a></strong>"},{"lat":37.64014,"lng":-120.99577,"label":"<strong><a href='/bailbonds/ca/agent/martinez-adrian-4507270/'>Martinez, Adrian</a></strong>"},{"lat":37.64014,"lng":-120.99577,"label":"<strong><a href='/bailbonds/ca/agent/martinez-daniel-1892569/'>Martinez, Daniel</a></strong>"},{"lat":37.64014,"lng":-120.99577,"label":"<strong><a href='/bailbonds/ca/agent/martinez-john-1720994/'>Martinez, John</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/martinez-kimberly-4472201/'>Martinez, Kimberly</a></strong>"},{"lat":37.646,"lng":-120.99897,"label":"<strong><a href='/bailbonds/ca/agent/mcgill-jeanine-1l60045/'>Mcgill, Jeanine</a></strong>"},{"lat":37.64002,"lng":-120.99593,"label":"<strong><a href='/bailbonds/ca/agent/ortiz-melisa-1834710/'>Ortiz, Melisa</a></strong>"},{"lat":37.64111,"lng":-120.99696,"label":"<strong><a href='/bailbonds/ca/agent/padilla-alfonso-1846379/'>Padilla, Alfonso</a></strong>"},{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/pappas-theo-1783419/'>Pappas, Theo</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/perez-erika-4406900/'>Perez, Erika</a></strong>"},{"lat":37.66539,"lng":-120.97579,"label":"<strong><a href='/bailbonds/ca/agent/pontillo-aleo-1840285/'>Pontillo, Aleo</a></strong>"},{"lat":37.67111,"lng":-120.97954,"label":"<strong><a href='/bailbonds/ca/agent/quinonez-pedro-1k88371/'>Quinonez, Pedro</a></strong>"},{"lat":37.69882,"lng":-121.04996,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-gilbert-1a37660/'>Ramirez, Gilbert</a></strong>"},{"lat":37.53521,"lng":-120.8428,"label":"<strong><a href='/bailbonds/ca/agent/ramos-mike-4222901/'>Ramos, Mike</a></strong>"},{"lat":37.53521,"lng":-120.8428,"label":"<strong><a href='/bailbonds/ca/agent/ramos-patricia-1844201/'>Ramos, Patricia</a></strong>"},{"lat":37.76445,"lng":-120.85209,"label":"<strong><a href='/bailbonds/ca/agent/rincon-cesar-4348019/'>Rincon, Cesar</a></strong>"},{"lat":37.77011,"lng":-120.83778,"label":"<strong><a href='/bailbonds/ca/agent/rincon-cesar-1846264/'>Rincon, Cesar</a></strong>"},{"lat":37.63815,"lng":-120.9992,"label":"<strong><a href='/bailbonds/ca/agent/santana-mariela-1846466/'>Santana, Mariela</a></strong>"},{"lat":37.6582,"lng":-120.98186,"label":"<strong><a href='/bailbonds/ca/agent/self-diana-4308335/'>Self, Diana</a></strong>"},{"lat":37.64002,"lng":-120.99593,"label":"<strong><a href='/bailbonds/ca/agent/smith-joanna-1833629/'>Smith, Joanna</a></strong>"},{"lat":37.64043,"lng":-120.9983,"label":"<strong><a href='/bailbonds/ca/agent/soto-juan-1l71201/'>Soto, Juan</a></strong>"},{"lat":37.64014,"lng":-120.99577,"label":"<strong><a href='/bailbonds/ca/agent/suarez-shela-1n13398/'>Suarez, Shela</a></strong>"},{"lat":37.77848,"lng":-120.84681,"label":"<strong><a href='/bailbonds/ca/agent/williams-shannon-1k52647/'>Williams, Shannon</a></strong>"},{"lat":37.63753,"lng":-121.00305,"label":"<strong>1 agent in Modesto</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/ramirez-ana-4546935/'>Ramirez, Ana</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

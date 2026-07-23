@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,20 +107,24 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Aldridge, Anne</div>
   <div class="ad">P.O.BOX 10261, Napa, 94559</div>
   
+  
   <div class='lic'>License: 1841490</div>
 </a><a class="agent" href="/bailbonds/ca/agent/aldridge-joseph-1840836/">
   <div class="an">Aldridge, Joseph</div>
   <div class="ad">150 SILVERADO TRAIL, #7, Napa, 94559</div>
+  
   
   <div class='lic'>License: 1840836</div>
 </a><a class="agent" href="/bailbonds/ca/agent/carpenter-ashley-4414623/">
   <div class="an">Carpenter, Ashley</div>
   <div class="ad">812 3RD STREET, Napa, 94559</div>
   
+  
   <div class='lic'>License: 4414623</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pascu-kimberly-1845917/">
   <div class="an">Pascu, Kimberly</div>
   <div class="ad">812 3RD STREET, Napa, 94558</div>
+  
   
   <div class='lic'>License: 1845917</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.5071, -122.3259], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.2891,"lng":-122.27494,"label":"<strong><a href='/bailbonds/ca/agent/aldridge-joseph-1840836/'>Aldridge, Joseph</a></strong>"},{"lat":38.29869,"lng":-122.28163,"label":"<strong><a href='/bailbonds/ca/agent/carpenter-ashley-4414623/'>Carpenter, Ashley</a></strong>"},{"lat":38.29869,"lng":-122.28163,"label":"<strong><a href='/bailbonds/ca/agent/pascu-kimberly-1845917/'>Pascu, Kimberly</a></strong>"},{"lat":38.29787,"lng":-122.30074,"label":"<strong>1 agent in Napa</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/aldridge-anne-1841490/'>Aldridge, Anne</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

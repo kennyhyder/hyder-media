@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,37 +106,44 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ok/agent/ronal-dean-eden/">
   <div class="an">Ronal Dean Eden</div>
   <div class="ad">Oklahoma City</div>
-  <div class='ph'>(405) 239-2221</div>
+  <div class='ph'>☎ (405) 239-2221</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/margaret-louise-knight/">
   <div class="an">Margaret Louise Knight</div>
   <div class="ad">Wheatland</div>
-  <div class='ph'>(405) 236-3434</div>
+  <div class='ph'>☎ (405) 236-3434</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/shawn-mcclanahan/">
   <div class="an">Shawn McClanahan</div>
   <div class="ad">Oklahoma City</div>
-  <div class='ph'>(405) 232-5644</div>
+  <div class='ph'>☎ (405) 232-5644</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/deborah-deanne-pipher/">
   <div class="an">Deborah Deanne Pipher</div>
   <div class="ad">Oklahoma City</div>
-  <div class='ph'>(405) 236-4603</div>
+  <div class='ph'>☎ (405) 236-4603</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/dustin-clint-pletcher/">
   <div class="an">Dustin Clint Pletcher</div>
   <div class="ad">Shawnee</div>
-  <div class='ph'>(405) 273-5555</div>
+  <div class='ph'>☎ (405) 273-5555</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/teresa-wanda-worley/">
   <div class="an">Teresa Wanda Worley</div>
   <div class="ad">Oklahoma City</div>
-  <div class='ph'>(405) 232-7373</div>
+  <div class='ph'>☎ (405) 232-7373</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/vernie-eugene-ziegler/">
   <div class="an">Vernie Eugene Ziegler</div>
   <div class="ad">Oklahoma City</div>
-  <div class='ph'>(405) 232-2058</div>
+  <div class='ph'>☎ (405) 232-2058</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://howbailbondswork.com/oklahoma/Oklahoma_Bail_Bonds_Agents_List.pdf' rel='nofollow'>howbailbondswork.com</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.55461, -97.4094], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":35.46708,"lng":-97.51366,"label":"<strong>5 agents in Oklahoma City</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/ronal-dean-eden/'>Ronal Dean Eden</a></strong><br>\u260e (405) 239-2221<br><strong><a href='/bailbonds/ok/agent/shawn-mcclanahan/'>Shawn McClanahan</a></strong><br>\u260e (405) 232-5644<br><strong><a href='/bailbonds/ok/agent/deborah-deanne-pipher/'>Deborah Deanne Pipher</a></strong><br>\u260e (405) 236-4603<br><strong><a href='/bailbonds/ok/agent/teresa-wanda-worley/'>Teresa Wanda Worley</a></strong><br>\u260e (405) 232-7373<br><strong><a href='/bailbonds/ok/agent/vernie-eugene-ziegler/'>Vernie Eugene Ziegler</a></strong><br>\u260e (405) 232-2058"},{"lat":35.36941,"lng":-96.95641,"label":"<strong>1 agent in Shawnee</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/dustin-clint-pletcher/'>Dustin Clint Pletcher</a></strong><br>\u260e (405) 273-5555"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

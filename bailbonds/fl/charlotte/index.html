@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,146 +107,175 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">1St Exit Bail Bonds</div>
   <div class="ad">207 WOOD ST., PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ JIMMY@1STEXITBAILBONDS.COM</div>
   <div class='lic'>License: B000064</div>
 </a><a class="agent" href="/bailbonds/fl/agent/aaa-bundy-s-bail-bonds-llc-b000164/">
   <div class="an">Aaa Bundy'S Bail Bonds Llc</div>
   <div class="ad">4549 TAMIAMI TRAIL UNIT A, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ AAABUNDYSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000164</div>
 </a><a class="agent" href="/bailbonds/fl/agent/absolute-lee-bail-bonds-llc-b000647/">
   <div class="an">Absolute'Lee Bail Bonds Llc</div>
   <div class="ad">4055 S TAMIAMI TRAIL SUITE #1, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ ABSOLUTELEEBAILBONDSLLC@GMAIL.COM</div>
   <div class='lic'>License: B000647</div>
 </a><a class="agent" href="/bailbonds/fl/agent/all-american-bail-bonds-b000213/">
   <div class="an">All American Bail Bonds</div>
   <div class="ad">5300 ROOSEVELT BLVD, CLEARWATER, 33760</div>
   
+  <div class='ad'>✉ JIMMY@1STEXITBAILBONDS.COM</div>
   <div class='lic'>License: B000213</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blanding-bail-bonds-of-sofl-b000067/">
   <div class="an">Blanding Bail Bonds Of Sofl</div>
   <div class="ad">4456 TAMIAMI TRAIL A1, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ NAILGUN456@GMAIL.COM</div>
   <div class='lic'>License: B000067</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blanding-gloria-jean-d011145/">
   <div class="an">Blanding, Gloria Jean</div>
   <div class="ad">GLORIA BAIL BONDS 4055 TAMIAMI TRAIL STE#34, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ GLORIASHADAE@YAHOO.COM</div>
   <div class='lic'>License: D011145</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blanding-latoscha-g054575/">
   <div class="an">Blanding, Latoscha</div>
   <div class="ad">2369 STARLITE LN, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ CUDJOLATOSCHA@GMAIL.COM</div>
   <div class='lic'>License: G054575</div>
 </a><a class="agent" href="/bailbonds/fl/agent/burlew-ryan-p210357/">
   <div class="an">Burlew, Ryan</div>
   <div class="ad">AAA BUNDY'S BAILBONDS 4549-C TAMIAMI TRAIL, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ RYAN.INFINITYCONSTRUCTION@GMAIL.COM</div>
   <div class='lic'>License: P210357</div>
 </a><a class="agent" href="/bailbonds/fl/agent/carrozza-christopher-anthony-p110531/">
   <div class="an">Carrozza, Christopher Anthony</div>
   <div class="ad">3495 LAKE VIEW DR, PORT CHARLOTTE, 33948</div>
   
+  <div class='ad'>✉ CARROZZABAIL@GMAIL.COM</div>
   <div class='lic'>License: P110531</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chermansky-jennifer-theresa-w365868/">
   <div class="an">Chermansky, Jennifer Theresa</div>
   <div class="ad">BLANDING BAIL BONDS OF SO FL 3596 TAMIAMI TRL 209, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ JVITIELLO26@GMAIL.COM</div>
   <div class='lic'>License: W365868</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cooper-bail-bonds-b000062/">
   <div class="an">Cooper Bail Bonds</div>
   <div class="ad">265E MARION AVE STE 116, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ COOPERBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000062</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cooper-reggie-darrell-sr-p014704/">
   <div class="an">Cooper, Reggie Darrell Sr</div>
   <div class="ad">COOPER BAIL BONDS 265 E MARION AVE #116, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ AAABONDSMAN@GMAIL.COM</div>
   <div class='lic'>License: P014704</div>
 </a><a class="agent" href="/bailbonds/fl/agent/crenshaw-debra-a-d060498/">
   <div class="an">Crenshaw, Debra A</div>
   <div class="ad">CRENSHAW BAIL BOND INC. 251 B E OLYMPIA AVENUE, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ MINISTERCRENSHAW@YAHOO.COM</div>
   <div class='lic'>License: D060498</div>
 </a><a class="agent" href="/bailbonds/fl/agent/geer-richard-carl-w624968/">
   <div class="an">Geer, Richard Carl</div>
   <div class="ad">1 CALL BAIL BONDS LLC 4549 TAMIAMI TRL STE A1, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ VALYKIS_NOCTURNAL@YAHOO.COM</div>
   <div class='lic'>License: W624968</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gloria-bail-bond-b000340/">
   <div class="an">Gloria Bail Bond</div>
   <div class="ad">4055 TAMIAMI TRAIL, PORT CHARLOTTEWE, 33952</div>
   
+  <div class='ad'>✉ GLORIABAILBOND@GMAIL.COM</div>
   <div class='lic'>License: B000340</div>
 </a><a class="agent" href="/bailbonds/fl/agent/green-felesia-w071382/">
   <div class="an">Green, Felesia</div>
   <div class="ad">750 S. ORANGE BLOSSOM TRAIL, ORLANDO, 32805</div>
   
+  <div class='ad'>✉ YUMMY61@YAHOO.COM</div>
   <div class='lic'>License: W071382</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-matthew-timo-p067009/">
   <div class="an">Jones, Matthew Timo</div>
   <div class="ad">312 MARY STREET, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ MATT@AWAYOUTBAILBONDS.ORG</div>
   <div class='lic'>License: P067009</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lee-larissa-diane-w257481/">
   <div class="an">Lee, Larissa Diane</div>
   <div class="ad">4055 S TAMIAMI TRAIL SUITE 7, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ LARISSABLANCO77@GMAIL.COM</div>
   <div class='lic'>License: W257481</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lobb-donald-richard-jr-w407297/">
   <div class="an">Lobb, Donald Richard Jr.</div>
   <div class="ad">1 WAY BAIL BONDS, LLC 677 N WASHINGTON BLVD, SUITE 17, SARASOTA, 34236</div>
   
+  <div class='ad'>✉ DONNYLOBB1@GMAIL.COM</div>
   <div class='lic'>License: W407297</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcginnis-bail-bonds-b000104/">
   <div class="an">Mcginnis Bail Bonds</div>
   <div class="ad">1205 ELIZABETH ST SUITE A, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ MCGINNISBB@YAHOO.COM</div>
   <div class='lic'>License: B000104</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcginnis-jaime-lee-e049604/">
   <div class="an">Mcginnis, Jaime Lee</div>
   <div class="ad">1205 ELIZABETH ST UNIT A, PORT CHARLOTTE, 33950</div>
   
+  <div class='ad'>✉ CATLINJL@GMAIL.COM</div>
   <div class='lic'>License: E049604</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcginnis-patrick-d-a315678/">
   <div class="an">Mcginnis, Patrick D</div>
   <div class="ad">MCGINNIS BAIL BONDS 1205 ELIZABETH ST UNIT A, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ MCGINNISBB@YAHOO.COM</div>
   <div class='lic'>License: A315678</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pugh-james-davis-e051793/">
   <div class="an">Pugh, James Davis</div>
   <div class="ad">GLORIA'S BAIL BONDS 256 E. OLYMPIA AVENUE, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ TAP3892@GMAIL.COM</div>
   <div class='lic'>License: E051793</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rios-jimmy-p196464/">
   <div class="an">Rios, Jimmy</div>
   <div class="ad">1ST EXIT BAIL BONDS 207 WOOD ST., PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ JIMMY@1STEXITBAILBONDS.COM</div>
   <div class='lic'>License: P196464</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rios-lona-t-w918879/">
   <div class="an">Rios, Lona T</div>
   <div class="ad">1ST EXIT BAIL BONDS 207 WOOD STREET, PUNTA GORDA, 33950</div>
   
+  <div class='ad'>✉ LONA@1STEXITBAILBONDS.COM</div>
   <div class='lic'>License: W918879</div>
 </a><a class="agent" href="/bailbonds/fl/agent/santiago-loretta-w783431/">
   <div class="an">Santiago, Loretta</div>
   <div class="ad">4456 TAMIAMI TRAIL A1, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ NAILGUN456@GMAIL.COM</div>
   <div class='lic'>License: W783431</div>
 </a><a class="agent" href="/bailbonds/fl/agent/santiago-nicholas-p164878/">
   <div class="an">Santiago, Nicholas</div>
   <div class="ad">4456 TAMIAMI TRAIL A1, PORT CHARLOTTE, 33980</div>
   
+  <div class='ad'>✉ NAILGUN456@GMAIL.COM</div>
   <div class='lic'>License: P164878</div>
 </a><a class="agent" href="/bailbonds/fl/agent/saunders-delshierra-nychelle-w262959/">
   <div class="an">Saunders, Delshierra Nychelle</div>
   <div class="ad">1406 SHEEHAN BLVD, PORT CHARLOTTE, 33952</div>
   
+  <div class='ad'>✉ SHAESAUNDERS@YAHOO.COM</div>
   <div class='lic'>License: W262959</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wertenbach-brittany-g200851/">
   <div class="an">Wertenbach, Brittany</div>
   <div class="ad">166 STRASBURG DRIVE, PORT CHARLOTTE, 33954</div>
   
+  <div class='ad'>✉ LILBRITT0130@GMAIL.COM</div>
   <div class='lic'>License: G200851</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -264,5 +295,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([26.9064, -82.00366], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":26.93764,"lng":-82.04707,"label":"<strong><a href='/bailbonds/fl/agent/1st-exit-bail-bonds-b000064/'>1St Exit Bail Bonds</a></strong>"},{"lat":26.9626,"lng":-82.07202,"label":"<strong><a href='/bailbonds/fl/agent/aaa-bundy-s-bail-bonds-llc-b000164/'>Aaa Bundy'S Bail Bonds Llc</a></strong>"},{"lat":26.97163,"lng":-82.08533,"label":"<strong><a href='/bailbonds/fl/agent/absolute-lee-bail-bonds-llc-b000647/'>Absolute'Lee Bail Bonds Llc</a></strong>"},{"lat":27.91635,"lng":-82.71306,"label":"<strong><a href='/bailbonds/fl/agent/all-american-bail-bonds-b000213/'>All American Bail Bonds</a></strong>"},{"lat":26.96452,"lng":-82.07415,"label":"<strong><a href='/bailbonds/fl/agent/blanding-bail-bonds-of-sofl-b000067/'>Blanding Bail Bonds Of Sofl</a></strong>"},{"lat":26.97163,"lng":-82.08533,"label":"<strong><a href='/bailbonds/fl/agent/blanding-gloria-jean-d011145/'>Blanding, Gloria Jean</a></strong>"},{"lat":26.99366,"lng":-82.08258,"label":"<strong><a href='/bailbonds/fl/agent/blanding-latoscha-g054575/'>Blanding, Latoscha</a></strong>"},{"lat":26.9626,"lng":-82.07202,"label":"<strong><a href='/bailbonds/fl/agent/burlew-ryan-p210357/'>Burlew, Ryan</a></strong>"},{"lat":26.97595,"lng":-82.12357,"label":"<strong><a href='/bailbonds/fl/agent/carrozza-christopher-anthony-p110531/'>Carrozza, Christopher Anthony</a></strong>"},{"lat":26.97963,"lng":-82.09514,"label":"<strong><a href='/bailbonds/fl/agent/chermansky-jennifer-theresa-w365868/'>Chermansky, Jennifer Theresa</a></strong>"},{"lat":26.93751,"lng":-82.04747,"label":"<strong><a href='/bailbonds/fl/agent/cooper-bail-bonds-b000062/'>Cooper Bail Bonds</a></strong>"},{"lat":26.93751,"lng":-82.04747,"label":"<strong><a href='/bailbonds/fl/agent/cooper-reggie-darrell-sr-p014704/'>Cooper, Reggie Darrell Sr</a></strong>"},{"lat":26.93641,"lng":-82.04659,"label":"<strong><a href='/bailbonds/fl/agent/crenshaw-debra-a-d060498/'>Crenshaw, Debra A</a></strong>"},{"lat":26.9626,"lng":-82.07202,"label":"<strong><a href='/bailbonds/fl/agent/geer-richard-carl-w624968/'>Geer, Richard Carl</a></strong>"},{"lat":26.97163,"lng":-82.08533,"label":"<strong><a href='/bailbonds/fl/agent/gloria-bail-bond-b000340/'>Gloria Bail Bond</a></strong>"},{"lat":28.53387,"lng":-81.39723,"label":"<strong><a href='/bailbonds/fl/agent/green-felesia-w071382/'>Green, Felesia</a></strong>"},{"lat":26.93858,"lng":-82.04232,"label":"<strong><a href='/bailbonds/fl/agent/jones-matthew-timo-p067009/'>Jones, Matthew Timo</a></strong>"},{"lat":26.97163,"lng":-82.08533,"label":"<strong><a href='/bailbonds/fl/agent/lee-larissa-diane-w257481/'>Lee, Larissa Diane</a></strong>"},{"lat":27.34189,"lng":-82.53105,"label":"<strong><a href='/bailbonds/fl/agent/lobb-donald-richard-jr-w407297/'>Lobb, Donald Richard Jr.</a></strong>"},{"lat":26.92812,"lng":-82.04426,"label":"<strong><a href='/bailbonds/fl/agent/mcginnis-bail-bonds-b000104/'>Mcginnis Bail Bonds</a></strong>"},{"lat":26.92812,"lng":-82.04426,"label":"<strong><a href='/bailbonds/fl/agent/mcginnis-jaime-lee-e049604/'>Mcginnis, Jaime Lee</a></strong>"},{"lat":26.92812,"lng":-82.04426,"label":"<strong><a href='/bailbonds/fl/agent/mcginnis-patrick-d-a315678/'>Mcginnis, Patrick D</a></strong>"},{"lat":26.93653,"lng":-82.04663,"label":"<strong><a href='/bailbonds/fl/agent/pugh-james-davis-e051793/'>Pugh, James Davis</a></strong>"},{"lat":26.93764,"lng":-82.04707,"label":"<strong><a href='/bailbonds/fl/agent/rios-jimmy-p196464/'>Rios, Jimmy</a></strong>"},{"lat":26.93764,"lng":-82.04707,"label":"<strong><a href='/bailbonds/fl/agent/rios-lona-t-w918879/'>Rios, Lona T</a></strong>"},{"lat":26.96452,"lng":-82.07415,"label":"<strong><a href='/bailbonds/fl/agent/santiago-loretta-w783431/'>Santiago, Loretta</a></strong>"},{"lat":26.96452,"lng":-82.07415,"label":"<strong><a href='/bailbonds/fl/agent/santiago-nicholas-p164878/'>Santiago, Nicholas</a></strong>"},{"lat":27.00669,"lng":-82.0858,"label":"<strong><a href='/bailbonds/fl/agent/saunders-delshierra-nychelle-w262959/'>Saunders, Delshierra Nychelle</a></strong>"},{"lat":27.02728,"lng":-82.08191,"label":"<strong><a href='/bailbonds/fl/agent/wertenbach-brittany-g200851/'>Wertenbach, Brittany</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

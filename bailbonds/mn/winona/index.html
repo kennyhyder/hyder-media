@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,47 +106,56 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mn/agent/benner-cornelius-w/">
   <div class="an">Benner, Cornelius W</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/brekke-haley-ann/">
   <div class="an">Brekke, Haley Ann</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/brown-troy-dayne/">
   <div class="an">Brown, Troy Dayne</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cisewski-hannah-rae/">
   <div class="an">Cisewski, Hannah Rae</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cisewski-jason-luke/">
   <div class="an">Cisewski, Jason Luke</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/denny-alan-dale/">
   <div class="an">Denny, Alan Dale</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/elkin-brian-james/">
   <div class="an">Elkin, Brian James</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/ernest-aiden/">
   <div class="an">Ernest, Aiden</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/ernest-glen-matthew/">
   <div class="an">Ernest, Glen Matthew</div><div class='ad'>Midwest Bonding, LLC</div>
   <div class="ad">PO Box 125, 525 Junction Street, Winona, 55987</div>
-  <div class='ph'>507-454-0600</div>
+  <div class='ph'>☎ 507-454-0600</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf' rel='nofollow'>mncourtsdocs.courts.state.mn.us</a></p>
 </div>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([43.98135, -91.77704], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":44.05127,"lng":-91.66808,"label":"<strong>9 agents in Winona</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mn/agent/benner-cornelius-w/'>Benner, Cornelius W</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/brekke-haley-ann/'>Brekke, Haley Ann</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/brown-troy-dayne/'>Brown, Troy Dayne</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/cisewski-hannah-rae/'>Cisewski, Hannah Rae</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/cisewski-jason-luke/'>Cisewski, Jason Luke</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/denny-alan-dale/'>Denny, Alan Dale</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/elkin-brian-james/'>Elkin, Brian James</a></strong><br>\u260e 507-454-0600<br><strong><a href='/bailbonds/mn/agent/ernest-aiden/'>Ernest, Aiden</a></strong><br>\u260e 507-454-0600"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

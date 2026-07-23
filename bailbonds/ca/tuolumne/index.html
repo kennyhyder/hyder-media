@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,30 +107,36 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bell, Kelsey</div>
   <div class="ad">21114 SHAWS FLAT, Sonora, 95370</div>
   
+  
   <div class='lic'>License: 4475246</div>
 </a><a class="agent" href="/bailbonds/ca/agent/canepa-joshua-4470055/">
   <div class="an">Canepa, Joshua</div>
   <div class="ad">21114 SHAWS FLAT RD, Sonora, 95370</div>
+  
   
   <div class='lic'>License: 4470055</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cotti-anthony-1n13253/">
   <div class="an">Cotti, Anthony</div>
   <div class="ad">11912 HWY 49, Sonora, 95370</div>
   
+  
   <div class='lic'>License: 1N13253</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-hope-1n13342/">
   <div class="an">Martinez, Hope</div>
   <div class="ad">11912 HWY 49, Sonora, 95370</div>
+  
   
   <div class='lic'>License: 1N13342</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-oscar-1846216/">
   <div class="an">Martinez, Oscar</div>
   <div class="ad">85 N. WASHINGTON ST., Sonora, 95370</div>
   
+  
   <div class='lic'>License: 1846216</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-ryan-4397833/">
   <div class="an">Williams, Ryan</div>
   <div class="ad">24245 BLACK OAK CT #1694, Twain Harte, 95383</div>
+  
   
   <div class='lic'>License: 4397833</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.02143, -119.96473], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.00536,"lng":-120.40311,"label":"<strong><a href='/bailbonds/ca/agent/bell-kelsey-4475246/'>Bell, Kelsey</a></strong>"},{"lat":38.00536,"lng":-120.40311,"label":"<strong><a href='/bailbonds/ca/agent/canepa-joshua-4470055/'>Canepa, Joshua</a></strong>"},{"lat":37.99989,"lng":-120.38346,"label":"<strong><a href='/bailbonds/ca/agent/cotti-anthony-1n13253/'>Cotti, Anthony</a></strong>"},{"lat":37.99989,"lng":-120.38346,"label":"<strong><a href='/bailbonds/ca/agent/martinez-hope-1n13342/'>Martinez, Hope</a></strong>"},{"lat":37.98624,"lng":-120.38392,"label":"<strong><a href='/bailbonds/ca/agent/martinez-oscar-1846216/'>Martinez, Oscar</a></strong>"},{"lat":38.06144,"lng":-120.19399,"label":"<strong><a href='/bailbonds/ca/agent/williams-ryan-4397833/'>Williams, Ryan</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

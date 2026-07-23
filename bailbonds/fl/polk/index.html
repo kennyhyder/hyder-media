@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,461 +107,553 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">98 South Bail Bonds</div>
   <div class="ad">5715 US HWY 98 SOUTH, LAKELAND, 33812</div>
   
+  <div class='ad'>✉ 98SOUTHBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000276</div>
 </a><a class="agent" href="/bailbonds/fl/agent/abailable-bonddiva-b000609/">
   <div class="an">Abailable Bonddiva</div>
   <div class="ad">610 N INGRAHAM AVE, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ ABAILABLEBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000609</div>
 </a><a class="agent" href="/bailbonds/fl/agent/acosta-jonhny-w832731/">
   <div class="an">Acosta, Jonhny</div>
   <div class="ad">24/7 HD BAIL BONDS INC 2025 FLAMINGO DRIVE, SUITE E, BARTOW, 33830</div>
   
+  <div class='ad'>✉ ACOSTAJOHNY14@GMAIL.COM</div>
   <div class='lic'>License: W832731</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alliance-1st-bail-bonds-llc-b000695/">
   <div class="an">Alliance 1St Bail Bonds Llc</div>
   <div class="ad">414 WEST MEMORIAL BLVD, LAKELAND, 33815</div>
   
+  <div class='ad'>✉ ABB616@MSN.COM</div>
   <div class='lic'>License: B000695</div>
 </a><a class="agent" href="/bailbonds/fl/agent/anderson-faatima-p171893/">
   <div class="an">Anderson, Faatima</div>
   <div class="ad">1192 POLK ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ FAATIMA40@YAHOO.COM</div>
   <div class='lic'>License: P171893</div>
 </a><a class="agent" href="/bailbonds/fl/agent/assured-bail-bonds-b000162/">
   <div class="an">Assured Bail Bonds</div>
   <div class="ad">5236 US 98 N, LAKELAND, 33809</div>
   
+  <div class='ad'>✉ ASSUREDBB@GMAIL.COM</div>
   <div class='lic'>License: B000162</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bail-advantage-b000177/">
   <div class="an">Bail Advantage</div>
   <div class="ad">385 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ ADAM.MATHIS.BADV@OUTLOOK.COM</div>
   <div class='lic'>License: B000177</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bail-america-inc-b000167/">
   <div class="an">Bail America Inc</div>
   <div class="ad">505 E. MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ GOTBAIL@BAILAMERICAINC.COM</div>
   <div class='lic'>License: B000167</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bouwkamp-lisa-gail-w490194/">
   <div class="an">Bouwkamp, Lisa Gail</div>
   <div class="ad">6014 WOODHAVEN DR, LAKELAND, 33811</div>
   
+  <div class='ad'>✉ TLCTLC1108@GMAIL.COM</div>
   <div class='lic'>License: W490194</div>
 </a><a class="agent" href="/bailbonds/fl/agent/broome-justin-lee-g131938/">
   <div class="an">Broome, Justin Lee</div>
   <div class="ad">1720 MEADOWBROOK AVE, LAKELAND, 33803</div>
   
+  <div class='ad'>✉ JBROOME124@GMAIL.COM</div>
   <div class='lic'>License: G131938</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brown-dale-j-w082790/">
   <div class="an">Brown, Dale J</div>
   <div class="ad">415 EAST MAIN STREET SUITE 213, BARTOW, 33830</div>
   
+  <div class='ad'>✉ 1STBREAKBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W082790</div>
 </a><a class="agent" href="/bailbonds/fl/agent/burger-pauler-levett-w959809/">
   <div class="an">Burger, Pauler Levett</div>
   <div class="ad">KENNY VELASQUEZ BAIL BONDS 415 E MAIN ST SUITE 201, BARTOW, 33830</div>
   
+  <div class='ad'>✉ PAULABRGR14@GMAIL.COM</div>
   <div class='lic'>License: W959809</div>
 </a><a class="agent" href="/bailbonds/fl/agent/burgess-ricky-james-sr-w760354/">
   <div class="an">Burgess, Ricky James Sr.</div>
   <div class="ad">BAIL AMERICA BAIL BONDS 505 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ RICKY_BURGESS@YAHOO.COM</div>
   <div class='lic'>License: W760354</div>
 </a><a class="agent" href="/bailbonds/fl/agent/carter-lynodra-marchelle-g313216/">
   <div class="an">Carter, Lynodra Marchelle</div>
   <div class="ad">190 CHAMPIONS VUE LOOP UNIT 302, DAVENPORT, 33897</div>
   
+  <div class='ad'>✉ LYNODRAC@YAHOO.COM</div>
   <div class='lic'>License: G313216</div>
 </a><a class="agent" href="/bailbonds/fl/agent/coffey-jessica-lynn-w937405/">
   <div class="an">Coffey, Jessica Lynn</div>
   <div class="ad">825 W MCLEOD ST NONE, BARTOW, 33830</div>
   
+  <div class='ad'>✉ JESSICACOFFEY98@GMAIL.COM</div>
   <div class='lic'>License: W937405</div>
 </a><a class="agent" href="/bailbonds/fl/agent/coffey-stacy-michelle-p162692/">
   <div class="an">Coffey, Stacy Michelle</div>
   <div class="ad">825 W. MCLEOD STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ SCOFFEYBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: P162692</div>
 </a><a class="agent" href="/bailbonds/fl/agent/collins-glenethel-faye-a051680/">
   <div class="an">Collins, Glenethel Faye</div>
   <div class="ad">GLENETHEL COLLINS BAIL BONDS 1192 POLK STREET, BARTOW, 33831</div>
   
+  <div class='ad'>✉ SIERRBRIAA@AOL.COM</div>
   <div class='lic'>License: A051680</div>
 </a><a class="agent" href="/bailbonds/fl/agent/conley-bail-bonds-b000324/">
   <div class="an">Conley Bail Bonds</div>
   <div class="ad">1245 E MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BULLDOGS723@AOL.COM</div>
   <div class='lic'>License: B000324</div>
 </a><a class="agent" href="/bailbonds/fl/agent/conley-dwayne-o-d016397/">
   <div class="an">Conley, Dwayne O</div>
   <div class="ad">CONLEY BAIL BONDS 1245 EAST MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BULLDOGS723@AOL.COM</div>
   <div class='lic'>License: D016397</div>
 </a><a class="agent" href="/bailbonds/fl/agent/conley-hunter-alan-w118778/">
   <div class="an">Conley, Hunter Alan</div>
   <div class="ad">1245 E MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ HCONLEY198@GMAIL.COM</div>
   <div class='lic'>License: W118778</div>
 </a><a class="agent" href="/bailbonds/fl/agent/crosby-kaitlyn-g116805/">
   <div class="an">Crosby, Kaitlyn</div>
   <div class="ad">415 EAST MAIN, BARTOW, 33830</div>
   
+  <div class='ad'>✉ KATE9111991.KC@GMAIL.COM</div>
   <div class='lic'>License: G116805</div>
 </a><a class="agent" href="/bailbonds/fl/agent/davenport-calvin-w474964/">
   <div class="an">Davenport, Calvin</div>
   <div class="ad">M &amp; M BAIL BOND COMPANY 128 PALMETTO AVE NW, WINTER HAVEN, 33881</div>
   
+  <div class='ad'>✉ CALVINDAVENPORT650@YAHOO.COM</div>
   <div class='lic'>License: W474964</div>
 </a><a class="agent" href="/bailbonds/fl/agent/davila-john-manuel-w496442/">
   <div class="an">Davila, John Manuel</div>
   <div class="ad">GEICO 3535 W PIPKIN RD, LAKELAND, 33811</div>
   
+  <div class='ad'>✉ JOHNDAVILA@GEICO.COM</div>
   <div class='lic'>License: W496442</div>
 </a><a class="agent" href="/bailbonds/fl/agent/davis-daniel-jerome-sr-w375924/">
   <div class="an">Davis, Daniel Jerome Sr</div>
   <div class="ad">GLENETHEL COLLINS BAIL BONDS 113 EAST MAIN STREET STE 6, BARTOW, 33830</div>
   
+  <div class='ad'>✉ DANNYBOY5401@GMAIL.COM</div>
   <div class='lic'>License: W375924</div>
 </a><a class="agent" href="/bailbonds/fl/agent/delatorre-bianca-michelle-w289879/">
   <div class="an">Delatorre, Bianca Michelle</div>
   <div class="ad">GEICO ATTN LICENSING 3535 WEST PIPKIN ROAD, LAKELAND, 33811</div>
   
+  <div class='ad'>✉ BDELATORRE@GEICO.COM</div>
   <div class='lic'>License: W289879</div>
 </a><a class="agent" href="/bailbonds/fl/agent/delgado-rivera-brenda-lee-g307156/">
   <div class="an">Delgado-Rivera, Brenda Lee</div>
   <div class="ad">367 SUNFISH DR, WINTER HAVEN, 33881</div>
   
+  <div class='ad'>✉ BRENLEE.THE.BOUTIQUE@GMAIL.COM</div>
   <div class='lic'>License: G307156</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dobson-rebekah-louise-a069607/">
   <div class="an">Dobson, Rebekah Louise</div>
   <div class="ad">TOMMYS BAIL BONDS 1022 SOUTH COMBEE ROAD, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ SONGBIRD2124@GMAIL.COM</div>
   <div class='lic'>License: A069607</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dobson-thomas-haley-a069612/">
   <div class="an">Dobson, Thomas Haley</div>
   <div class="ad">TOMMY'S BAIL BONDS 1022 SOUTH COMBEE RD, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ SONGBIRD2124@GMAIL.COM</div>
   <div class='lic'>License: A069612</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ellis-merriam-khan-a077070/">
   <div class="an">Ellis, Merriam Khan</div>
   <div class="ad">MERRIAM ELLIS BAIL BONDS 155 E CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ MELLISBAILBONDS@AOL.COM</div>
   <div class='lic'>License: A077070</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ellis-renard-devereaux-p211754/">
   <div class="an">Ellis, Renard Devereaux</div>
   <div class="ad">155 E CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ ELLISRD40@AOL.COM</div>
   <div class='lic'>License: P211754</div>
 </a><a class="agent" href="/bailbonds/fl/agent/etienne-frantz-ii-g090514/">
   <div class="an">Etienne, Frantz Ii</div>
   <div class="ad">5192 SPANISH OAKS LN, LAKELAND, 33805</div>
   
+  <div class='ad'>✉ FETIENNE74@GMAIL.COM</div>
   <div class='lic'>License: G090514</div>
 </a><a class="agent" href="/bailbonds/fl/agent/etienne-frantz-j-p156029/">
   <div class="an">Etienne, Frantz J.</div>
   <div class="ad">414 W MEMORIAL BLVD, LAKELAND, 33815</div>
   
+  <div class='ad'>✉ ABB616@MSN.COM</div>
   <div class='lic'>License: P156029</div>
 </a><a class="agent" href="/bailbonds/fl/agent/etienne-jacqueline-w009510/">
   <div class="an">Etienne, Jacqueline</div>
   <div class="ad">ALLIANCE 1ST BAIL BONDS LLC 414 WEST MEMORIAL BLVD, LAKELAND, 33815</div>
   
+  <div class='ad'>✉ ABB615@MSN.COM</div>
   <div class='lic'>License: W009510</div>
 </a><a class="agent" href="/bailbonds/fl/agent/franco-graciela-g285783/">
   <div class="an">Franco, Graciela</div>
   <div class="ad">505 E MAINT ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ GRACIE@BAILAMERICAINC.COM</div>
   <div class='lic'>License: G285783</div>
 </a><a class="agent" href="/bailbonds/fl/agent/geistlinger-heather-jean-e060705/">
   <div class="an">Geistlinger, Heather Jean</div>
   <div class="ad">385 E. MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ HEATHERBAILAGENT@GMAIL.COM</div>
   <div class='lic'>License: E060705</div>
 </a><a class="agent" href="/bailbonds/fl/agent/green-byron-w727061/">
   <div class="an">Green, Byron</div>
   <div class="ad">KENNY VELASQUEZ BAIL 415-A EAST MAIN ST STE 201, BARTOW, 33830</div>
   
+  <div class='ad'>✉ CENTRALFLORIDABAIL@YAHOO.COM</div>
   <div class='lic'>License: W727061</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hardee-emanuel-d010145/">
   <div class="an">Hardee, Emanuel</div>
   <div class="ad">MERRIAM ELLIS BAIL BONDS 155 E CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ HARDEESENTERPRISES@GMAIL.COM</div>
   <div class='lic'>License: D010145</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hart-ramon-andra-d067060/">
   <div class="an">Hart, Ramon Andra</div>
   <div class="ad">RICO REED BAIL BONDS 240 N BROADWAY AVE, BARTOW, 33830</div>
   
+  <div class='ad'>✉ HK_ALPHA1@YAHOO.COM</div>
   <div class='lic'>License: D067060</div>
 </a><a class="agent" href="/bailbonds/fl/agent/henry-kenton-merrell-e157953/">
   <div class="an">Henry, Kenton Merrell</div>
   <div class="ad">PREMIUM BAIL BONDS 113 E MAIN ST #4, BARTOW, 33830</div>
   
+  <div class='ad'>✉ KENT33815@GMAIL.COM</div>
   <div class='lic'>License: E157953</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hernandez-eugene-w026897/">
   <div class="an">Hernandez, Eugene</div>
   <div class="ad">355 W. DAVIDSON ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ EUGENE33401@GMAIL.COM</div>
   <div class='lic'>License: W026897</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hill-benny-jr-p162079/">
   <div class="an">Hill, Benny Jr</div>
   <div class="ad">950 W TEE CIR, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BENNY.HILL0708@GMAIL.COM</div>
   <div class='lic'>License: P162079</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jackson-woods-felicia-lashae-w863757/">
   <div class="an">Jackson-Woods, Felicia Lashae</div>
   <div class="ad">GLENETHEL COLLINS BAIL BONDS 113 E MAIN STREET STE 6, BARTOW, 33830</div>
   
+  <div class='ad'>✉ FELASTR@AOL.COM</div>
   <div class='lic'>License: W863757</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-kerry-t-p134986/">
   <div class="an">Jones, Kerry T</div>
   <div class="ad">1504 RECKER HWY, WINTER HAVEN, 33880</div>
   
+  <div class='ad'>✉ KERRY@LIONSGROUPREALTY.COM</div>
   <div class='lic'>License: P134986</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kenny-velasquez-bail-b000500/">
   <div class="an">Kenny Velasquez Bail</div>
   <div class="ad">415 E MAIN ST SUITE 201, BARTOW, 33830</div>
   
+  <div class='ad'>✉ 8636170080CELL@GMAIL.COM</div>
   <div class='lic'>License: B000500</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kerry-kboy-jones-bailbonds-inc-b000033/">
   <div class="an">Kerry Kboy Jones Bailbonds Inc</div>
   <div class="ad">1504 RECKER HWY, WINTER HAVEN, 33880</div>
   
+  <div class='ad'>✉ KERRY@LIONSGROUPREALTY.COM</div>
   <div class='lic'>License: B000033</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kidwell-william-l-e187360/">
   <div class="an">Kidwell, William L</div>
   <div class="ad">500 BERKLEY ROAD, AUBURNDALE, 33823</div>
   
+  <div class='ad'>✉ WILLIAMKIDWELLBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: E187360</div>
 </a><a class="agent" href="/bailbonds/fl/agent/laster-lillie-mae-p229210/">
   <div class="an">Laster, Lillie Mae</div>
   <div class="ad">809 MEMORIAL BLVD, LAKELAND, 33815</div>
   
+  <div class='ad'>✉ LILLIELASTER1@GMAIL.COM</div>
   <div class='lic'>License: P229210</div>
 </a><a class="agent" href="/bailbonds/fl/agent/legacy-bailbonds-2-b000623/">
   <div class="an">Legacy Bailbonds 2</div>
   <div class="ad">1862 S CRYSTAL LAKE DR, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ SABANAWINDOWS@YAHOO.COM</div>
   <div class='lic'>License: B000623</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lewis-calvin-m-g300028/">
   <div class="an">Lewis, Calvin M</div>
   <div class="ad">5626 MOON VALLEY DRIVE, LAKELAND, 33812</div>
   
+  <div class='ad'>✉ CLEWELLZ813@GMAIL.COM</div>
   <div class='lic'>License: G300028</div>
 </a><a class="agent" href="/bailbonds/fl/agent/long-angela-kim-a157819/">
   <div class="an">Long, Angela Kim</div>
   <div class="ad">395 W CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ AKLONG19@YAHOO.COM</div>
   <div class='lic'>License: A157819</div>
 </a><a class="agent" href="/bailbonds/fl/agent/loyd-angela-w243691/">
   <div class="an">Loyd, Angela</div>
   <div class="ad">3535 W PIPKIN RD, LAKELAND, 33811</div>
   
+  <div class='ad'>✉ ANGELALOYD@YMAIL.COM</div>
   <div class='lic'>License: W243691</div>
 </a><a class="agent" href="/bailbonds/fl/agent/loydd-james-cleve-w875660/">
   <div class="an">Loydd, James Cleve</div>
   <div class="ad">159 BROOKSHIRE DR, LAKE WALES, 33898</div>
   
+  <div class='ad'>✉ JAMES.LOYDD@YAHOO.COM</div>
   <div class='lic'>License: W875660</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lozada-bryan-v-w135727/">
   <div class="an">Lozada, Bryan V</div>
   <div class="ad">ZONA LONG BAIL BONDS 395 W. CHRUCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BLOZADA000@GMAIL.COM</div>
   <div class='lic'>License: W135727</div>
 </a><a class="agent" href="/bailbonds/fl/agent/m-m-bail-bonds-company-b000097/">
   <div class="an">M&amp;M Bail Bonds Company</div>
   <div class="ad">403 3RD STREET SW, WINTER HAVEN, 33880</div>
   
+  <div class='ad'>✉ INFO@MILLERTAXINC.COM</div>
   <div class='lic'>License: B000097</div>
 </a><a class="agent" href="/bailbonds/fl/agent/marines-janet-g102256/">
   <div class="an">Marines, Janet</div>
   <div class="ad">415 E. MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ JANETMARINES21@GMAIL.COM</div>
   <div class='lic'>License: G102256</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mathis-adam-shane-w477827/">
   <div class="an">Mathis, Adam Shane</div>
   <div class="ad">BAIL ADVANTAGE 385 E MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ ADAM.MATHIS.BADV@OUTLOOK.COM</div>
   <div class='lic'>License: W477827</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mathis-noel-shawn-d029796/">
   <div class="an">Mathis, Noel Shawn</div>
   <div class="ad">BAIL ADVANTAGE 385 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BAILADVANTAGE@GMAIL.COM</div>
   <div class='lic'>License: D029796</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mathis-thomas-scott-p165935/">
   <div class="an">Mathis, Thomas Scott</div>
   <div class="ad">385 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BAILADVANTAGE@GMAIL.COM</div>
   <div class='lic'>License: P165935</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mccarthy-juanita-lynn-w580760/">
   <div class="an">Mccarthy, Juanita Lynn</div>
   <div class="ad">500 BERKLEY ROAD, AUBURNDALE, 33823</div>
   
+  <div class='ad'>✉ JFORCEFAN01@YAHOO.COM</div>
   <div class='lic'>License: W580760</div>
 </a><a class="agent" href="/bailbonds/fl/agent/merriam-ellis-bail-bonds-b000018/">
   <div class="an">Merriam Ellis Bail Bonds</div>
   <div class="ad">155 EAST CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ MELLISBAILBONDS@AOL.COM</div>
   <div class='lic'>License: B000018</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miller-michael-gerard-w098290/">
   <div class="an">Miller, Michael Gerard</div>
   <div class="ad">403 3RD ST S.W., WINTER HAVEN, 33880</div>
   
+  <div class='ad'>✉ INFO@MILLERTAXINC.COM</div>
   <div class='lic'>License: W098290</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miller-robert-melvin-jr-g157672/">
   <div class="an">Miller, Robert Melvin Jr.</div>
   <div class="ad">1622 YORKSHIRE TRAIL, LAKELAND, 33809</div>
   
+  <div class='ad'>✉ BOBMILLERHOME@GMAIL.COM</div>
   <div class='lic'>License: G157672</div>
 </a><a class="agent" href="/bailbonds/fl/agent/moore-diana-j-d075354/">
   <div class="an">Moore, Diana J</div>
   <div class="ad">505 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ DODIAKS@HOTMAIL.COM</div>
   <div class='lic'>License: D075354</div>
 </a><a class="agent" href="/bailbonds/fl/agent/moore-douglas-s-a309205/">
   <div class="an">Moore, Douglas S</div>
   <div class="ad">505 EAST MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BAILAMERICAINC@HOTMAIL.COM</div>
   <div class='lic'>License: A309205</div>
 </a><a class="agent" href="/bailbonds/fl/agent/morel-miguel-angel-jr-w938596/">
   <div class="an">Morel, Miguel Angel Jr</div>
   <div class="ad">24/7 HD BAIL BONDS INC 415 E MAIN ST , SUITE 218, BARTOW, 33830</div>
   
+  <div class='ad'>✉ MORELMIGUEL2487@GMAIL.COM</div>
   <div class='lic'>License: W938596</div>
 </a><a class="agent" href="/bailbonds/fl/agent/morgan-deborah-lynn-w965531/">
   <div class="an">Morgan, Deborah Lynn</div>
   <div class="ad">505 E MAIN STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ DEBIMORGAN2022@GMAIL.COM</div>
   <div class='lic'>License: W965531</div>
 </a><a class="agent" href="/bailbonds/fl/agent/musselwhite-yvonne-eve-w327409/">
   <div class="an">Musselwhite, Yvonne Eve</div>
   <div class="ad">ZONA LONG BAIL BONDS 395 WEST CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ YVONNEMUSSELWHITE@YAHOO.COM</div>
   <div class='lic'>License: W327409</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nation-bail-bonds-inc-b000185/">
   <div class="an">Nation Bail Bonds Inc</div>
   <div class="ad">170 N. FLORIDA AVE, BARTOW, 33830</div>
   
+  <div class='ad'>✉ EDINC57@YAHOO.COM</div>
   <div class='lic'>License: B000185</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pagan-chaleah-rose-w090735/">
   <div class="an">Pagan, Chaleah Rose</div>
   <div class="ad">113 EAST MAIN STREET UNIT 3, BARTOW, 33830</div>
   
+  <div class='ad'>✉ CHALEAHPAGAN@GMAIL.COM</div>
   <div class='lic'>License: W090735</div>
 </a><a class="agent" href="/bailbonds/fl/agent/premium-bail-bonds-b000413/">
   <div class="an">Premium Bail Bonds</div>
   <div class="ad">113 E MAIN ST #4, BARTOW, 33830</div>
   
+  <div class='ad'>✉ KENT33815@GMAIL.COM</div>
   <div class='lic'>License: B000413</div>
 </a><a class="agent" href="/bailbonds/fl/agent/prioleau-kevin-jr-g332267/">
   <div class="an">Prioleau, Kevin Jr</div>
   <div class="ad">200 EMERALD AVE APT. 26, LAKE WALES, 33853</div>
   
+  <div class='ad'>✉ PRIOLEAUENTERPRISESLLC@GMAIL.COM</div>
   <div class='lic'>License: G332267</div>
 </a><a class="agent" href="/bailbonds/fl/agent/puskar-trevor-d-g044091/">
   <div class="an">Puskar, Trevor D</div>
   <div class="ad">113 E MAIN ST STE. 4, BARTOW, 33830</div>
   
+  <div class='ad'>✉ TREVOR@PREMIUMBAIL.COM</div>
   <div class='lic'>License: G044091</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rashad-erik-tyrone-p141956/">
   <div class="an">Rashad, Erik Tyrone</div>
   <div class="ad">1819 VILLAGE CT, MULBERRY, 33860</div>
   
+  <div class='ad'>✉ 1800MEDIATION@GMAIL.COM</div>
   <div class='lic'>License: P141956</div>
 </a><a class="agent" href="/bailbonds/fl/agent/reed-charrico-reche-w073577/">
   <div class="an">Reed, Charrico Reche</div>
   <div class="ad">6155 SOUTH FLORIDA AVE, LAKELAND, 33813</div>
   
+  <div class='ad'>✉ CHARRICOREED@YAHOO.COM</div>
   <div class='lic'>License: W073577</div>
 </a><a class="agent" href="/bailbonds/fl/agent/reed-gail-k-p134033/">
   <div class="an">Reed, Gail K</div>
   <div class="ad">240 NORTH BROADWAY AVE, BARTOW, 33830</div>
   
+  <div class='ad'>✉ GALKREED2@YAHOO.COM</div>
   <div class='lic'>License: P134033</div>
 </a><a class="agent" href="/bailbonds/fl/agent/reed-tametress-erica-e028684/">
   <div class="an">Reed, Tametress Erica</div>
   <div class="ad">RICO REED BAILBONDS INC 6155 S FLORIDA AVE #5, LAKELAND, 33813</div>
   
+  <div class='ad'>✉ RRBBCN240@YAHOO.COM</div>
   <div class='lic'>License: E028684</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rico-reed-bail-bonds-inc-b000310/">
   <div class="an">Rico Reed Bail Bonds Inc.</div>
   <div class="ad">6155 S FLORIDA AVENUE SUITE #3, LAKELAND, 33813</div>
   
+  <div class='ad'>✉ RRBBCN240@YAHOO.COM</div>
   <div class='lic'>License: B000310</div>
 </a><a class="agent" href="/bailbonds/fl/agent/roop-kayla-w939441/">
   <div class="an">Roop, Kayla</div>
   <div class="ad">825 W. MCLEOD ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ SEGER0514@GMAIL.COM</div>
   <div class='lic'>License: W939441</div>
 </a><a class="agent" href="/bailbonds/fl/agent/schwartz-william-dean-iv-w633043/">
   <div class="an">Schwartz, William Dean Iv</div>
   <div class="ad">5715 US HWY 98 SOUTH, LAKELAND, 33812</div>
   
+  <div class='ad'>✉ SCHWARTZDEAN0@GMAIL.COM</div>
   <div class='lic'>License: W633043</div>
 </a><a class="agent" href="/bailbonds/fl/agent/shaw-christina-lou-p222662/">
   <div class="an">Shaw, Christina Lou</div>
   <div class="ad">OPTIMAL BAIL BONDS 10941 COUNTRY HAVEN DR, LAKELAND, 33809</div>
   
+  <div class='ad'>✉ CSHAW0724@GMAIL.COM</div>
   <div class='lic'>License: P222662</div>
 </a><a class="agent" href="/bailbonds/fl/agent/southern-finest-bail-bonds-b000042/">
   <div class="an">Southern Finest Bail Bonds</div>
   <div class="ad">355 W DAVIDSON ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ SOUTHERNFINESTBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000042</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thompson-william-glen-w513649/">
   <div class="an">Thompson, William Glen</div>
   <div class="ad">TOMMY'S BAIL BONDS INC 1022 S. COMBEE RD, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ GLENT37@YAHOO.COM</div>
   <div class='lic'>License: W513649</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tommy-s-bail-bonds-inc-b000459/">
   <div class="an">Tommy'S Bail Bonds, Inc.</div>
   <div class="ad">1022 S. COMBEE ROAD, LAKELAND, 33801</div>
   
+  <div class='ad'>✉ TOMMY@LAKELANDBAILBONDS.COM</div>
   <div class='lic'>License: B000459</div>
 </a><a class="agent" href="/bailbonds/fl/agent/velasquez-kenny-jayro-w149285/">
   <div class="an">Velasquez, Kenny Jayro</div>
   <div class="ad">415 EAST MAIN ST STE 201 &amp; A, BARTOW, 33844</div>
   
+  <div class='ad'>✉ 8636170080CELL@GMAIL.COM</div>
   <div class='lic'>License: W149285</div>
 </a><a class="agent" href="/bailbonds/fl/agent/velazquez-melina-g187596/">
   <div class="an">Velazquez, Melina</div>
   <div class="ad">3655 GIORGIO DRIVE, WINTER HAVEN, 33884</div>
   
+  <div class='ad'>✉ MELINAXNAOMI@AOL.COM</div>
   <div class='lic'>License: G187596</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wells-chase-taylor-w002153/">
   <div class="an">Wells, Chase Taylor</div>
   <div class="ad">GEICO ATTN LICENSING 3535 W. PIPKIN ROAD, LAKELAND, 33811</div>
   
+  <div class='ad'>✉ CHAWELLS@GEICO.COM</div>
   <div class='lic'>License: W002153</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wells-terry-l-d050330/">
   <div class="an">Wells, Terry L</div>
   <div class="ad">BAIL ADVANTAGE 385 E MAIN ST, BARTOW, 33830</div>
   
+  <div class='ad'>✉ BAILPROOF@GMAIL.COM</div>
   <div class='lic'>License: D050330</div>
 </a><a class="agent" href="/bailbonds/fl/agent/white-eddie-jr-d004129/">
   <div class="an">White, Eddie Jr</div>
   <div class="ad">NATION BAIL BONDS INC 170 N FLORIDA AVE STE 2, BARTOW, 33830</div>
   
+  <div class='ad'>✉ EDINC57@MSN.COM</div>
   <div class='lic'>License: D004129</div>
 </a><a class="agent" href="/bailbonds/fl/agent/william-kidwell-bail-bonds-b000550/">
   <div class="an">William Kidwell Bail Bonds</div>
   <div class="ad">500 BERKLEY ROAD, AUBURNDALE, 33823</div>
   
+  <div class='ad'>✉ WILLIAMKIDWELLBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000550</div>
 </a><a class="agent" href="/bailbonds/fl/agent/zavolas-michael-andreas-e117347/">
   <div class="an">Zavolas, Michael Andreas</div>
   <div class="ad">6799 TREYMONT DRIVE, LAKELAND, 33813</div>
   
+  <div class='ad'>✉ MICHAEL.ZAVOLAS@YAHOO.COM</div>
   <div class='lic'>License: E117347</div>
 </a><a class="agent" href="/bailbonds/fl/agent/zona-long-bail-bonds-b000296/">
   <div class="an">Zona Long Bail Bonds</div>
   <div class="ad">395 WEST CHURCH STREET, BARTOW, 33830</div>
   
+  <div class='ad'>✉ AKLONG19@YAHOO.COM</div>
   <div class='lic'>License: B000296</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bail-america/">
   <div class="an">Bail America</div>
   <div class="ad">505 E Main St., Bartow, 33803</div>
-  <div class='ph'>863-533-2245</div>
+  <div class='ph'>☎ 863-533-2245</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://flbaa.com/ (Florida Bail Agents Association member directory)' rel='nofollow'>flbaa.com</a> · <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -579,5 +673,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([27.95369, -81.69349], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":27.96119,"lng":-81.87545,"label":"<strong><a href='/bailbonds/fl/agent/98-south-bail-bonds-b000276/'>98 South Bail Bonds</a></strong>"},{"lat":28.04973,"lng":-81.945,"label":"<strong><a href='/bailbonds/fl/agent/abailable-bonddiva-b000609/'>Abailable Bonddiva</a></strong>"},{"lat":27.89819,"lng":-81.82374,"label":"<strong><a href='/bailbonds/fl/agent/acosta-jonhny-w832731/'>Acosta, Jonhny</a></strong>"},{"lat":28.05488,"lng":-81.96078,"label":"<strong><a href='/bailbonds/fl/agent/alliance-1st-bail-bonds-llc-b000695/'>Alliance 1St Bail Bonds Llc</a></strong>"},{"lat":27.90046,"lng":-81.85547,"label":"<strong><a href='/bailbonds/fl/agent/anderson-faatima-p171893/'>Anderson, Faatima</a></strong>"},{"lat":28.10958,"lng":-81.97385,"label":"<strong><a href='/bailbonds/fl/agent/assured-bail-bonds-b000162/'>Assured Bail Bonds</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/bail-advantage-b000177/'>Bail Advantage</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/bail-america-inc-b000167/'>Bail America Inc</a></strong>"},{"lat":27.95573,"lng":-82.02351,"label":"<strong><a href='/bailbonds/fl/agent/bouwkamp-lisa-gail-w490194/'>Bouwkamp, Lisa Gail</a></strong>"},{"lat":28.02159,"lng":-81.92787,"label":"<strong><a href='/bailbonds/fl/agent/broome-justin-lee-g131938/'>Broome, Justin Lee</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/brown-dale-j-w082790/'>Brown, Dale J</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/burger-pauler-levett-w959809/'>Burger, Pauler Levett</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/burgess-ricky-james-sr-w760354/'>Burgess, Ricky James Sr.</a></strong>"},{"lat":27.88445,"lng":-81.84976,"label":"<strong><a href='/bailbonds/fl/agent/coffey-jessica-lynn-w937405/'>Coffey, Jessica Lynn</a></strong>"},{"lat":27.88445,"lng":-81.84976,"label":"<strong><a href='/bailbonds/fl/agent/coffey-stacy-michelle-p162692/'>Coffey, Stacy Michelle</a></strong>"},{"lat":27.90046,"lng":-81.85547,"label":"<strong><a href='/bailbonds/fl/agent/collins-glenethel-faye-a051680/'>Collins, Glenethel Faye</a></strong>"},{"lat":27.8968,"lng":-81.8307,"label":"<strong><a href='/bailbonds/fl/agent/conley-bail-bonds-b000324/'>Conley Bail Bonds</a></strong>"},{"lat":27.8968,"lng":-81.8307,"label":"<strong><a href='/bailbonds/fl/agent/conley-dwayne-o-d016397/'>Conley, Dwayne O</a></strong>"},{"lat":27.8968,"lng":-81.8307,"label":"<strong><a href='/bailbonds/fl/agent/conley-hunter-alan-w118778/'>Conley, Hunter Alan</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/crosby-kaitlyn-g116805/'>Crosby, Kaitlyn</a></strong>"},{"lat":28.03849,"lng":-81.72716,"label":"<strong><a href='/bailbonds/fl/agent/davenport-calvin-w474964/'>Davenport, Calvin</a></strong>"},{"lat":27.9748,"lng":-82.01429,"label":"<strong><a href='/bailbonds/fl/agent/davila-john-manuel-w496442/'>Davila, John Manuel</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/davis-daniel-jerome-sr-w375924/'>Davis, Daniel Jerome Sr</a></strong>"},{"lat":27.9748,"lng":-82.01429,"label":"<strong><a href='/bailbonds/fl/agent/delatorre-bianca-michelle-w289879/'>Delatorre, Bianca Michelle</a></strong>"},{"lat":28.08539,"lng":-81.67819,"label":"<strong><a href='/bailbonds/fl/agent/delgado-rivera-brenda-lee-g307156/'>Delgado-Rivera, Brenda Lee</a></strong>"},{"lat":28.03188,"lng":-81.9078,"label":"<strong><a href='/bailbonds/fl/agent/dobson-rebekah-louise-a069607/'>Dobson, Rebekah Louise</a></strong>"},{"lat":28.03188,"lng":-81.9078,"label":"<strong><a href='/bailbonds/fl/agent/dobson-thomas-haley-a069612/'>Dobson, Thomas Haley</a></strong>"},{"lat":27.89792,"lng":-81.84218,"label":"<strong><a href='/bailbonds/fl/agent/ellis-merriam-khan-a077070/'>Ellis, Merriam Khan</a></strong>"},{"lat":27.89792,"lng":-81.84218,"label":"<strong><a href='/bailbonds/fl/agent/ellis-renard-devereaux-p211754/'>Ellis, Renard Devereaux</a></strong>"},{"lat":28.10829,"lng":-81.92508,"label":"<strong><a href='/bailbonds/fl/agent/etienne-frantz-ii-g090514/'>Etienne, Frantz Ii</a></strong>"},{"lat":28.05488,"lng":-81.96078,"label":"<strong><a href='/bailbonds/fl/agent/etienne-frantz-j-p156029/'>Etienne, Frantz J.</a></strong>"},{"lat":28.05488,"lng":-81.96078,"label":"<strong><a href='/bailbonds/fl/agent/etienne-jacqueline-w009510/'>Etienne, Jacqueline</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/geistlinger-heather-jean-e060705/'>Geistlinger, Heather Jean</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/green-byron-w727061/'>Green, Byron</a></strong>"},{"lat":27.89792,"lng":-81.84218,"label":"<strong><a href='/bailbonds/fl/agent/hardee-emanuel-d010145/'>Hardee, Emanuel</a></strong>"},{"lat":27.89753,"lng":-81.84324,"label":"<strong><a href='/bailbonds/fl/agent/hart-ramon-andra-d067060/'>Hart, Ramon Andra</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/henry-kenton-merrell-e157953/'>Henry, Kenton Merrell</a></strong>"},{"lat":27.89712,"lng":-81.84637,"label":"<strong><a href='/bailbonds/fl/agent/hernandez-eugene-w026897/'>Hernandez, Eugene</a></strong>"},{"lat":27.88848,"lng":-81.81997,"label":"<strong><a href='/bailbonds/fl/agent/hill-benny-jr-p162079/'>Hill, Benny Jr</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/jackson-woods-felicia-lashae-w863757/'>Jackson-Woods, Felicia Lashae</a></strong>"},{"lat":28.00732,"lng":-81.7513,"label":"<strong><a href='/bailbonds/fl/agent/jones-kerry-t-p134986/'>Jones, Kerry T</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/kenny-velasquez-bail-b000500/'>Kenny Velasquez Bail</a></strong>"},{"lat":28.00732,"lng":-81.7513,"label":"<strong><a href='/bailbonds/fl/agent/kerry-kboy-jones-bailbonds-inc-b000033/'>Kerry Kboy Jones Bailbonds Inc</a></strong>"},{"lat":28.06202,"lng":-81.81743,"label":"<strong><a href='/bailbonds/fl/agent/kidwell-william-l-e187360/'>Kidwell, William L</a></strong>"},{"lat":28.05499,"lng":-81.96576,"label":"<strong><a href='/bailbonds/fl/agent/laster-lillie-mae-p229210/'>Laster, Lillie Mae</a></strong>"},{"lat":28.0241,"lng":-81.92436,"label":"<strong><a href='/bailbonds/fl/agent/legacy-bailbonds-2-b000623/'>Legacy Bailbonds 2</a></strong>"},{"lat":27.96215,"lng":-81.90562,"label":"<strong><a href='/bailbonds/fl/agent/lewis-calvin-m-g300028/'>Lewis, Calvin M</a></strong>"},{"lat":27.89792,"lng":-81.84661,"label":"<strong><a href='/bailbonds/fl/agent/long-angela-kim-a157819/'>Long, Angela Kim</a></strong>"},{"lat":27.9748,"lng":-82.01429,"label":"<strong><a href='/bailbonds/fl/agent/loyd-angela-w243691/'>Loyd, Angela</a></strong>"},{"lat":27.96689,"lng":-81.59105,"label":"<strong><a href='/bailbonds/fl/agent/loydd-james-cleve-w875660/'>Loydd, James Cleve</a></strong>"},{"lat":27.89792,"lng":-81.84661,"label":"<strong><a href='/bailbonds/fl/agent/lozada-bryan-v-w135727/'>Lozada, Bryan V</a></strong>"},{"lat":28.01765,"lng":-81.73076,"label":"<strong><a href='/bailbonds/fl/agent/m-m-bail-bonds-company-b000097/'>M&amp;M Bail Bonds Company</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/marines-janet-g102256/'>Marines, Janet</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/mathis-adam-shane-w477827/'>Mathis, Adam Shane</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/mathis-noel-shawn-d029796/'>Mathis, Noel Shawn</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/mathis-thomas-scott-p165935/'>Mathis, Thomas Scott</a></strong>"},{"lat":28.06202,"lng":-81.81743,"label":"<strong><a href='/bailbonds/fl/agent/mccarthy-juanita-lynn-w580760/'>Mccarthy, Juanita Lynn</a></strong>"},{"lat":27.89792,"lng":-81.84218,"label":"<strong><a href='/bailbonds/fl/agent/merriam-ellis-bail-bonds-b000018/'>Merriam Ellis Bail Bonds</a></strong>"},{"lat":28.01765,"lng":-81.73076,"label":"<strong><a href='/bailbonds/fl/agent/miller-michael-gerard-w098290/'>Miller, Michael Gerard</a></strong>"},{"lat":28.14527,"lng":-81.92378,"label":"<strong><a href='/bailbonds/fl/agent/miller-robert-melvin-jr-g157672/'>Miller, Robert Melvin Jr.</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/moore-diana-j-d075354/'>Moore, Diana J</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/moore-douglas-s-a309205/'>Moore, Douglas S</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/morel-miguel-angel-jr-w938596/'>Morel, Miguel Angel Jr</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/morgan-deborah-lynn-w965531/'>Morgan, Deborah Lynn</a></strong>"},{"lat":27.89792,"lng":-81.84661,"label":"<strong><a href='/bailbonds/fl/agent/musselwhite-yvonne-eve-w327409/'>Musselwhite, Yvonne Eve</a></strong>"},{"lat":27.89696,"lng":-81.84062,"label":"<strong><a href='/bailbonds/fl/agent/nation-bail-bonds-inc-b000185/'>Nation Bail Bonds Inc</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/pagan-chaleah-rose-w090735/'>Pagan, Chaleah Rose</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/premium-bail-bonds-b000413/'>Premium Bail Bonds</a></strong>"},{"lat":27.89214,"lng":-81.58746,"label":"<strong><a href='/bailbonds/fl/agent/prioleau-kevin-jr-g332267/'>Prioleau, Kevin Jr</a></strong>"},{"lat":27.89637,"lng":-81.84313,"label":"<strong><a href='/bailbonds/fl/agent/puskar-trevor-d-g044091/'>Puskar, Trevor D</a></strong>"},{"lat":27.93497,"lng":-81.99043,"label":"<strong><a href='/bailbonds/fl/agent/rashad-erik-tyrone-p141956/'>Rashad, Erik Tyrone</a></strong>"},{"lat":27.95411,"lng":-81.96894,"label":"<strong><a href='/bailbonds/fl/agent/reed-charrico-reche-w073577/'>Reed, Charrico Reche</a></strong>"},{"lat":27.89753,"lng":-81.84324,"label":"<strong><a href='/bailbonds/fl/agent/reed-gail-k-p134033/'>Reed, Gail K</a></strong>"},{"lat":27.95411,"lng":-81.96894,"label":"<strong><a href='/bailbonds/fl/agent/reed-tametress-erica-e028684/'>Reed, Tametress Erica</a></strong>"},{"lat":27.95411,"lng":-81.96894,"label":"<strong><a href='/bailbonds/fl/agent/rico-reed-bail-bonds-inc-b000310/'>Rico Reed Bail Bonds Inc.</a></strong>"},{"lat":27.88445,"lng":-81.84976,"label":"<strong><a href='/bailbonds/fl/agent/roop-kayla-w939441/'>Roop, Kayla</a></strong>"},{"lat":27.96119,"lng":-81.87545,"label":"<strong><a href='/bailbonds/fl/agent/schwartz-william-dean-iv-w633043/'>Schwartz, William Dean Iv</a></strong>"},{"lat":28.19922,"lng":-81.98398,"label":"<strong><a href='/bailbonds/fl/agent/shaw-christina-lou-p222662/'>Shaw, Christina Lou</a></strong>"},{"lat":27.89712,"lng":-81.84637,"label":"<strong><a href='/bailbonds/fl/agent/southern-finest-bail-bonds-b000042/'>Southern Finest Bail Bonds</a></strong>"},{"lat":28.03188,"lng":-81.9078,"label":"<strong><a href='/bailbonds/fl/agent/thompson-william-glen-w513649/'>Thompson, William Glen</a></strong>"},{"lat":28.03188,"lng":-81.9078,"label":"<strong><a href='/bailbonds/fl/agent/tommy-s-bail-bonds-inc-b000459/'>Tommy'S Bail Bonds, Inc.</a></strong>"},{"lat":27.89639,"lng":-81.84051,"label":"<strong><a href='/bailbonds/fl/agent/velasquez-kenny-jayro-w149285/'>Velasquez, Kenny Jayro</a></strong>"},{"lat":27.95153,"lng":-81.6931,"label":"<strong><a href='/bailbonds/fl/agent/velazquez-melina-g187596/'>Velazquez, Melina</a></strong>"},{"lat":27.9748,"lng":-82.01429,"label":"<strong><a href='/bailbonds/fl/agent/wells-chase-taylor-w002153/'>Wells, Chase Taylor</a></strong>"},{"lat":27.89639,"lng":-81.84085,"label":"<strong><a href='/bailbonds/fl/agent/wells-terry-l-d050330/'>Wells, Terry L</a></strong>"},{"lat":27.89696,"lng":-81.84062,"label":"<strong><a href='/bailbonds/fl/agent/white-eddie-jr-d004129/'>White, Eddie Jr</a></strong>"},{"lat":28.06202,"lng":-81.81743,"label":"<strong><a href='/bailbonds/fl/agent/william-kidwell-bail-bonds-b000550/'>William Kidwell Bail Bonds</a></strong>"},{"lat":27.94107,"lng":-81.90681,"label":"<strong><a href='/bailbonds/fl/agent/zavolas-michael-andreas-e117347/'>Zavolas, Michael Andreas</a></strong>"},{"lat":27.89792,"lng":-81.84661,"label":"<strong><a href='/bailbonds/fl/agent/zona-long-bail-bonds-b000296/'>Zona Long Bail Bonds</a></strong>"},{"lat":27.89639,"lng":-81.83977,"label":"<strong><a href='/bailbonds/fl/agent/bail-america/'>Bail America</a></strong><br>\u260e 863-533-2245"},{"lat":28.16119,"lng":-81.61084,"label":"<strong>1 agent in DAVENPORT</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/carter-lynodra-marchelle-g313216/'>Carter, Lynodra Marchelle</a></strong>"},{"lat":27.8868,"lng":-81.82176,"label":"<strong>1 agent in BARTOW</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/franco-graciela-g285783/'>Franco, Graciela</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

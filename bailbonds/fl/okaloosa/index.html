@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,51 +107,61 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">A Mr Clem Bail Bonds, Llc</div>
   <div class="ad">3516 HORNE HOLLOW RD., CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ CLEMCLEMMIE@GMAIL.COM</div>
   <div class='lic'>License: B000702</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blocker-bail-bonds-inc-b000632/">
   <div class="an">Blocker Bail Bonds, Inc.</div>
   <div class="ad">698E JAMES LEE BLVD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ BLOCKERBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000632</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blocker-amanda-w468764/">
   <div class="an">Blocker, Amanda</div>
   <div class="ad">698 E. JAMES LEE BLVD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ BLOCKERBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W468764</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blocker-darrel-glen-a023901/">
   <div class="an">Blocker, Darrel Glen</div>
   <div class="ad">BLOCKER BAIL BOND 698 E JAMES LEE BLVD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ JGBLOCKER@GMAIL.COM</div>
   <div class='lic'>License: A023901</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blocker-derrick-lee-e042665/">
   <div class="an">Blocker, Derrick Lee</div>
   <div class="ad">BLOCKER BAIL BONDS 698 E JAMES LEE BLVD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ DERRICKCRESTVIEW@AOL.COM</div>
   <div class='lic'>License: E042665</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blocker-joshua-glen-e108101/">
   <div class="an">Blocker, Joshua Glen</div>
   <div class="ad">BLOCKER BAIL BONDS 698 JAMES LEE BLVD EAST, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ JGBLOCKER@GMAIL.COM</div>
   <div class='lic'>License: E108101</div>
 </a><a class="agent" href="/bailbonds/fl/agent/flenaugh-clem-e037308/">
   <div class="an">Flenaugh, Clem</div>
   <div class="ad">A MR CLEM'S BAIL BONDING AGENCY LLC 200 APLIN ROAD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ CLEMCLEMMIE@GMAIL.COM</div>
   <div class='lic'>License: E037308</div>
 </a><a class="agent" href="/bailbonds/fl/agent/flenaugh-delphine-p166058/">
   <div class="an">Flenaugh, Delphine</div>
   <div class="ad">200 APLIN ROAD, CRESTVIEW, 32539</div>
   
+  <div class='ad'>✉ CLEMDEFLEN@COX.NET</div>
   <div class='lic'>License: P166058</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mark-harris-bail-bonds-b000490/">
   <div class="an">Mark Harris Bail Bonds</div>
   <div class="ad">327 NW RACETRACK RD UNIT C, FORT WALTON BEACH, 32547</div>
   
+  <div class='ad'>✉ GRANTHARRISBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000490</div>
 </a><a class="agent" href="/bailbonds/fl/agent/norman-william-christopher-a193184/">
   <div class="an">Norman, William Christopher</div>
   <div class="ad">AAA BULLDOG BAIL BONDS AGENCY INC 491 S FERDON BLVD, CRESTVIEW, 32536</div>
   
+  <div class='ad'>✉ GENERA@EARTHLINK.NET</div>
   <div class='lic'>License: A193184</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -169,5 +181,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.61433, -86.59108], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.81587,"lng":-86.49843,"label":"<strong><a href='/bailbonds/fl/agent/a-mr-clem-bail-bonds-llc-b000702/'>A Mr Clem Bail Bonds, Llc</a></strong>"},{"lat":30.76288,"lng":-86.56376,"label":"<strong><a href='/bailbonds/fl/agent/blocker-bail-bonds-inc-b000632/'>Blocker Bail Bonds, Inc.</a></strong>"},{"lat":30.76288,"lng":-86.56376,"label":"<strong><a href='/bailbonds/fl/agent/blocker-amanda-w468764/'>Blocker, Amanda</a></strong>"},{"lat":30.76288,"lng":-86.56376,"label":"<strong><a href='/bailbonds/fl/agent/blocker-darrel-glen-a023901/'>Blocker, Darrel Glen</a></strong>"},{"lat":30.76288,"lng":-86.56376,"label":"<strong><a href='/bailbonds/fl/agent/blocker-derrick-lee-e042665/'>Blocker, Derrick Lee</a></strong>"},{"lat":30.76288,"lng":-86.56376,"label":"<strong><a href='/bailbonds/fl/agent/blocker-joshua-glen-e108101/'>Blocker, Joshua Glen</a></strong>"},{"lat":30.74414,"lng":-86.56201,"label":"<strong><a href='/bailbonds/fl/agent/flenaugh-clem-e037308/'>Flenaugh, Clem</a></strong>"},{"lat":30.74414,"lng":-86.56201,"label":"<strong><a href='/bailbonds/fl/agent/flenaugh-delphine-p166058/'>Flenaugh, Delphine</a></strong>"},{"lat":30.44932,"lng":-86.62913,"label":"<strong><a href='/bailbonds/fl/agent/mark-harris-bail-bonds-b000490/'>Mark Harris Bail Bonds</a></strong>"},{"lat":30.7552,"lng":-86.56534,"label":"<strong><a href='/bailbonds/fl/agent/norman-william-christopher-a193184/'>Norman, William Christopher</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

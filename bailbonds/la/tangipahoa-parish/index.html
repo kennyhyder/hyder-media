@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,42 +106,50 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/george-edward-perkins-jr-145182/">
   <div class="an">George Edward Perkins Jr</div>
   <div class="ad">512 J. W. Davis Drive, Ste B, Hammond, 70403</div>
-  <div class='ph'>(985) 981-2141</div>
+  <div class='ph'>☎ (985) 981-2141</div>
+  
   <div class='lic'>License: 145182</div>
 </a><a class="agent" href="/bailbonds/la/agent/george-perkins-bail-bonding-inc-609909/">
   <div class="an">George Perkins Bail Bonding Inc</div>
   <div class="ad">512 J.W. Davis Drive   Suite B, Hammond, 70403</div>
-  <div class='ph'>(985) 981-2141</div>
+  <div class='ph'>☎ (985) 981-2141</div>
+  
   <div class='lic'>License: 609909</div>
 </a><a class="agent" href="/bailbonds/la/agent/oscar-c-dantzler-jr-617172/">
   <div class="an">Oscar C Dantzler Jr</div>
   <div class="ad">1203 Apple St., Hammond, 70402</div>
-  <div class='ph'>(985) 215-1508</div>
+  <div class='ph'>☎ (985) 215-1508</div>
+  
   <div class='lic'>License: 617172</div>
 </a><a class="agent" href="/bailbonds/la/agent/latoya-showers-franklin-716074/">
   <div class="an">Latoya Showers Franklin</div>
   <div class="ad">12061 Northwood Dr, Hammond, 70401</div>
-  <div class='ph'>(985) 981-8211</div>
+  <div class='ph'>☎ (985) 981-8211</div>
+  
   <div class='lic'>License: 716074</div>
 </a><a class="agent" href="/bailbonds/la/agent/angela-denise-bezue-905422/">
   <div class="an">Angela Denise Bezue</div>
   <div class="ad">44162 Hood Road, Hammond, 70403</div>
-  <div class='ph'>(985) 215-9433</div>
+  <div class='ph'>☎ (985) 215-9433</div>
+  
   <div class='lic'>License: 905422</div>
 </a><a class="agent" href="/bailbonds/la/agent/dantzler-s-affordable-bail-bonds-llc-863706/">
   <div class="an">Dantzler's Affordable Bail Bonds LLC</div>
   <div class="ad">1203 Apple Street, Hammond, 70402</div>
-  <div class='ph'>(985) 269-3138</div>
+  <div class='ph'>☎ (985) 269-3138</div>
+  
   <div class='lic'>License: 863706</div>
 </a><a class="agent" href="/bailbonds/la/agent/ivan-manuel-918309/">
   <div class="an">Ivan Manuel</div>
   <div class="ad">106 Marley Drive, Hammond, 70401</div>
-  <div class='ph'>(225) 683-1111</div>
+  <div class='ph'>☎ (225) 683-1111</div>
+  
   <div class='lic'>License: 918309</div>
 </a><a class="agent" href="/bailbonds/la/agent/d-ravion-jacori-johnson-1172943/">
   <div class="an">D Ravion Jacori Johnson</div>
   <div class="ad">1000 N Morrison Blvd Unit 10, Hammond, 70401</div>
-  <div class='ph'>(318) 990-2454</div>
+  <div class='ph'>☎ (318) 990-2454</div>
+  
   <div class='lic'>License: 1172943</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.62135, -90.40649], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.49447,"lng":-90.47003,"label":"<strong><a href='/bailbonds/la/agent/george-edward-perkins-jr-145182/'>George Edward Perkins Jr</a></strong><br>\u260e (985) 981-2141"},{"lat":30.49447,"lng":-90.47003,"label":"<strong><a href='/bailbonds/la/agent/george-perkins-bail-bonding-inc-609909/'>George Perkins Bail Bonding Inc</a></strong><br>\u260e (985) 981-2141"},{"lat":30.51658,"lng":-90.4508,"label":"<strong><a href='/bailbonds/la/agent/oscar-c-dantzler-jr-617172/'>Oscar C Dantzler Jr</a></strong><br>\u260e (985) 215-1508"},{"lat":30.5373,"lng":-90.52631,"label":"<strong><a href='/bailbonds/la/agent/latoya-showers-franklin-716074/'>Latoya Showers Franklin</a></strong><br>\u260e (985) 981-8211"},{"lat":30.49065,"lng":-90.52479,"label":"<strong><a href='/bailbonds/la/agent/angela-denise-bezue-905422/'>Angela Denise Bezue</a></strong><br>\u260e (985) 215-9433"},{"lat":30.51658,"lng":-90.4508,"label":"<strong><a href='/bailbonds/la/agent/dantzler-s-affordable-bail-bonds-llc-863706/'>Dantzler's Affordable Bail Bonds LLC</a></strong><br>\u260e (985) 269-3138"},{"lat":30.50676,"lng":-90.4749,"label":"<strong><a href='/bailbonds/la/agent/ivan-manuel-918309/'>Ivan Manuel</a></strong><br>\u260e (225) 683-1111"},{"lat":30.5102,"lng":-90.48253,"label":"<strong><a href='/bailbonds/la/agent/d-ravion-jacori-johnson-1172943/'>D Ravion Jacori Johnson</a></strong><br>\u260e (318) 990-2454"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

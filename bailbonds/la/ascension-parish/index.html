@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,41 +107,49 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Ronald Thomas</div>
   <div class="ad">43067 Cypress Bend Dr, Gonzales, 70737</div>
   
+  
   <div class='lic'>License: 517694</div>
 </a><a class="agent" href="/bailbonds/la/agent/charles-lee-sanders-464643/">
   <div class="an">Charles Lee Sanders</div>
   <div class="ad">PO Box 2160, Gonzales, 70707</div>
-  <div class='ph'>(225) 303-8406</div>
+  <div class='ph'>☎ (225) 303-8406</div>
+  
   <div class='lic'>License: 464643</div>
 </a><a class="agent" href="/bailbonds/la/agent/cora-june-760384/">
   <div class="an">Cora June</div>
   <div class="ad">40448 Crossgate Place, Gonzales, 70737</div>
-  <div class='ph'>(225) 317-4606</div>
+  <div class='ph'>☎ (225) 317-4606</div>
+  
   <div class='lic'>License: 760384</div>
 </a><a class="agent" href="/bailbonds/la/agent/cynthia-m-boss-672807/">
   <div class="an">Cynthia M Boss</div>
   <div class="ad">1803 W. Orice Roth Road, Gonzales, 70737</div>
-  <div class='ph'>(225) 402-1947</div>
+  <div class='ph'>☎ (225) 402-1947</div>
+  
   <div class='lic'>License: 672807</div>
 </a><a class="agent" href="/bailbonds/la/agent/big-c-bail-bondsman-llc-514181/">
   <div class="an">Big C Bail Bondsman, LLC</div>
   <div class="ad">PO Box 2160, Gonzales, 70707</div>
-  <div class='ph'>(225) 303-8406</div>
+  <div class='ph'>☎ (225) 303-8406</div>
+  
   <div class='lic'>License: 514181</div>
 </a><a class="agent" href="/bailbonds/la/agent/shayla-monique-washington-1235086/">
   <div class="an">Shayla Monique Washington</div>
   <div class="ad">221 North Brown Ave, Gonzales, 70737</div>
-  <div class='ph'>(225) 220-1638</div>
+  <div class='ph'>☎ (225) 220-1638</div>
+  
   <div class='lic'>License: 1235086</div>
 </a><a class="agent" href="/bailbonds/la/agent/mckinley-depaul-bailey-956824/">
   <div class="an">Mckinley Depaul Bailey</div>
   <div class="ad">42082 Jr Estates Drive, Gonzales, 70737</div>
-  <div class='ph'>(225) 390-5743</div>
+  <div class='ph'>☎ (225) 390-5743</div>
+  
   <div class='lic'>License: 956824</div>
 </a><a class="agent" href="/bailbonds/la/agent/bailey-bail-bond-recovery-llc-1041682/">
   <div class="an">Bailey Bail Bond &amp; Recovery Llc</div>
   <div class="ad">42082 Jr Estates Dr, Gonzales, 70737</div>
-  <div class='ph'>(225) 390-5743</div>
+  <div class='ph'>☎ (225) 390-5743</div>
+  
   <div class='lic'>License: 1041682</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.20644, -90.9125], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.23958,"lng":-90.88438,"label":"<strong><a href='/bailbonds/la/agent/ronald-thomas-517694/'>Ronald Thomas</a></strong>"},{"lat":30.28604,"lng":-90.92473,"label":"<strong><a href='/bailbonds/la/agent/cora-june-760384/'>Cora June</a></strong><br>\u260e (225) 317-4606"},{"lat":30.21819,"lng":-90.93947,"label":"<strong><a href='/bailbonds/la/agent/cynthia-m-boss-672807/'>Cynthia M Boss</a></strong><br>\u260e (225) 402-1947"},{"lat":30.23362,"lng":-90.92817,"label":"<strong><a href='/bailbonds/la/agent/shayla-monique-washington-1235086/'>Shayla Monique Washington</a></strong><br>\u260e (225) 220-1638"},{"lat":30.20433,"lng":-90.90331,"label":"<strong><a href='/bailbonds/la/agent/mckinley-depaul-bailey-956824/'>Mckinley Depaul Bailey</a></strong><br>\u260e (225) 390-5743"},{"lat":30.20433,"lng":-90.90331,"label":"<strong><a href='/bailbonds/la/agent/bailey-bail-bond-recovery-llc-1041682/'>Bailey Bail Bond &amp; Recovery Llc</a></strong><br>\u260e (225) 390-5743"},{"lat":30.21274,"lng":-90.9224,"label":"<strong>2 agents in Gonzales</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/la/agent/charles-lee-sanders-464643/'>Charles Lee Sanders</a></strong><br>\u260e (225) 303-8406<br><strong><a href='/bailbonds/la/agent/big-c-bail-bondsman-llc-514181/'>Big C Bail Bondsman, LLC</a></strong><br>\u260e (225) 303-8406"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

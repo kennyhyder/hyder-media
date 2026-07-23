@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,70 +107,84 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Anderson, Shane</div>
   <div class="ad">1723 PLACER ST., Redding, 96001</div>
   
+  
   <div class='lic'>License: 4319526</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arceneaux-kayla-1n12904/">
   <div class="an">Arceneaux, Kayla</div>
   <div class="ad">1737 PLACER ST, Redding, 96001</div>
+  
   
   <div class='lic'>License: 1N12904</div>
 </a><a class="agent" href="/bailbonds/ca/agent/baker-curtis-1n13036/">
   <div class="an">Baker, Curtis</div>
   <div class="ad">1737 PLACER ST, Redding, 96001</div>
   
+  
   <div class='lic'>License: 1N13036</div>
 </a><a class="agent" href="/bailbonds/ca/agent/baker-galen-1n13168/">
   <div class="an">Baker, Galen</div>
   <div class="ad">1723 PLACER ST, Redding, 96001</div>
+  
   
   <div class='lic'>License: 1N13168</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brasher-ina-4526430/">
   <div class="an">Brasher, Ina</div>
   <div class="ad">1737 PLACER STREET, Redding, 96001</div>
   
+  
   <div class='lic'>License: 4526430</div>
 </a><a class="agent" href="/bailbonds/ca/agent/byrne-jessica-1n12956/">
   <div class="an">Byrne, Jessica</div>
   <div class="ad">1737 PLACER ST, Redding, 96001</div>
+  
   
   <div class='lic'>License: 1N12956</div>
 </a><a class="agent" href="/bailbonds/ca/agent/collins-nicholas-4561595/">
   <div class="an">Collins, Nicholas</div>
   <div class="ad">1723 PLACER ST, Redding, 96001</div>
   
+  
   <div class='lic'>License: 4561595</div>
 </a><a class="agent" href="/bailbonds/ca/agent/d-angelo-sheri-1841381/">
   <div class="an">D'Angelo, Sheri</div>
   <div class="ad">1708 PLACER ST, Redding, 96001</div>
+  
   
   <div class='lic'>License: 1841381</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hallaway-john-4457915/">
   <div class="an">Hallaway, John</div>
   <div class="ad">1737 PLACER STREET, Redding, 96001</div>
   
+  
   <div class='lic'>License: 4457915</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hoekstra-holly-1830773/">
   <div class="an">Hoekstra, Holly</div>
   <div class="ad">1737 PLACER STREET, Redding, 96001</div>
+  
   
   <div class='lic'>License: 1830773</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lichnerowicz-hannah-4489434/">
   <div class="an">Lichnerowicz, Hannah</div>
   <div class="ad">1737 PLACER STREET, Redding, 96001</div>
   
+  
   <div class='lic'>License: 4489434</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pineda-calderon-eduardo-2094427/">
   <div class="an">Pineda-Calderon, Eduardo</div>
   <div class="ad">1723 PLACER STREET, Redding, 96001</div>
+  
   
   <div class='lic'>License: 2094427</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sedillo-chenoa-4409939/">
   <div class="an">Sedillo, Chenoa</div>
   <div class="ad">1737 PLACER ST, Redding, 96001</div>
   
+  
   <div class='lic'>License: 4409939</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wolf-anthony-4452784/">
   <div class="an">Wolf, Anthony</div>
   <div class="ad">1723 PLACE STREET, Redding, 96001</div>
+  
   
   <div class='lic'>License: 4452784</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -189,5 +205,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.76051, -122.04356], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.5813,"lng":-122.39384,"label":"<strong><a href='/bailbonds/ca/agent/anderson-shane-4319526/'>Anderson, Shane</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/arceneaux-kayla-1n12904/'>Arceneaux, Kayla</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/baker-curtis-1n13036/'>Baker, Curtis</a></strong>"},{"lat":40.5813,"lng":-122.39384,"label":"<strong><a href='/bailbonds/ca/agent/baker-galen-1n13168/'>Baker, Galen</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/brasher-ina-4526430/'>Brasher, Ina</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/byrne-jessica-1n12956/'>Byrne, Jessica</a></strong>"},{"lat":40.5813,"lng":-122.39384,"label":"<strong><a href='/bailbonds/ca/agent/collins-nicholas-4561595/'>Collins, Nicholas</a></strong>"},{"lat":40.58153,"lng":-122.39375,"label":"<strong><a href='/bailbonds/ca/agent/d-angelo-sheri-1841381/'>D'Angelo, Sheri</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/hallaway-john-4457915/'>Hallaway, John</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/hoekstra-holly-1830773/'>Hoekstra, Holly</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/lichnerowicz-hannah-4489434/'>Lichnerowicz, Hannah</a></strong>"},{"lat":40.5813,"lng":-122.39384,"label":"<strong><a href='/bailbonds/ca/agent/pineda-calderon-eduardo-2094427/'>Pineda-Calderon, Eduardo</a></strong>"},{"lat":40.58126,"lng":-122.39399,"label":"<strong><a href='/bailbonds/ca/agent/sedillo-chenoa-4409939/'>Sedillo, Chenoa</a></strong>"},{"lat":40.5813,"lng":-122.39384,"label":"<strong><a href='/bailbonds/ca/agent/wolf-anthony-4452784/'>Wolf, Anthony</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

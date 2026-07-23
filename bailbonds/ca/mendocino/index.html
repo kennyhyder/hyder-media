@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,55 +107,66 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Craft, Emerald</div>
   <div class="ad">118 S. STATE ST, Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 4482946</div>
 </a><a class="agent" href="/bailbonds/ca/agent/davis-mark-1503427/">
   <div class="an">Davis, Mark</div>
   <div class="ad">601 KINGS CT, Ukiah, 95482</div>
+  
   
   <div class='lic'>License: 1503427</div>
 </a><a class="agent" href="/bailbonds/ca/agent/fichtelberg-hila-4341903/">
   <div class="an">Fichtelberg, Hila</div>
   <div class="ad">280 NORTH OAK STREET, Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 4341903</div>
 </a><a class="agent" href="/bailbonds/ca/agent/flores-jason-1n06971/">
   <div class="an">Flores, Jason</div>
   <div class="ad">118 S STATE ST, Ukiah, 95482</div>
+  
   
   <div class='lic'>License: 1N06971</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hercher-jacob-1m44078/">
   <div class="an">Hercher, Jacob</div>
   <div class="ad">118 S STATE ST, Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 1M44078</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcasey-robert-1745251/">
   <div class="an">Mcasey, Robert</div>
   <div class="ad">601 KINGS CT, Ukiah, 95482</div>
+  
   
   <div class='lic'>License: 1745251</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pena-valdez-fran-1n13405/">
   <div class="an">Pena-Valdez, Fran</div>
   <div class="ad">118 STATE ST., Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 1N13405</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reynoso-mario-4303806/">
   <div class="an">Reynoso, Mario</div>
   <div class="ad">118 S STATE ST, Ukiah, 95482</div>
+  
   
   <div class='lic'>License: 4303806</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sellers-noble-4373624/">
   <div class="an">Sellers, Noble</div>
   <div class="ad">118 S. STATE STREET, Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 4373624</div>
 </a><a class="agent" href="/bailbonds/ca/agent/velazquez-aldo-1842929/">
   <div class="an">Velazquez, Aldo</div>
   <div class="ad">210 N STATE STREET, Ukiah, 95482</div>
   
+  
   <div class='lic'>License: 1842929</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vargas-alvarez-erika-4537086/">
   <div class="an">Vargas Alvarez, Erika</div>
   <div class="ad">118 S STATE ST, Ukiah, 95482</div>
+  
   
   <div class='lic'>License: 4537086</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -174,5 +187,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.43239, -123.44288], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/craft-emerald-4482946/'>Craft, Emerald</a></strong>"},{"lat":39.14796,"lng":-123.19876,"label":"<strong><a href='/bailbonds/ca/agent/davis-mark-1503427/'>Davis, Mark</a></strong>"},{"lat":39.15078,"lng":-123.20986,"label":"<strong><a href='/bailbonds/ca/agent/fichtelberg-hila-4341903/'>Fichtelberg, Hila</a></strong>"},{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/flores-jason-1n06971/'>Flores, Jason</a></strong>"},{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/hercher-jacob-1m44078/'>Hercher, Jacob</a></strong>"},{"lat":39.14796,"lng":-123.19876,"label":"<strong><a href='/bailbonds/ca/agent/mcasey-robert-1745251/'>Mcasey, Robert</a></strong>"},{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/reynoso-mario-4303806/'>Reynoso, Mario</a></strong>"},{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/sellers-noble-4373624/'>Sellers, Noble</a></strong>"},{"lat":39.15068,"lng":-123.20793,"label":"<strong><a href='/bailbonds/ca/agent/velazquez-aldo-1842929/'>Velazquez, Aldo</a></strong>"},{"lat":39.14984,"lng":-123.20771,"label":"<strong><a href='/bailbonds/ca/agent/vargas-alvarez-erika-4537086/'>Vargas Alvarez, Erika</a></strong>"},{"lat":39.14661,"lng":-123.21033,"label":"<strong>1 agent in Ukiah</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/pena-valdez-fran-1n13405/'>Pena-Valdez, Fran</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

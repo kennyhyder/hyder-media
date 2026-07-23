@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,36 +107,43 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Byrd, Herbert Lee Jr</div>
   <div class="ad">514 E SUGARLAND HWY 27, CLEWISTON, 33440</div>
   
+  <div class='ad'>✉ HERBERTBYRD84@GMAIL.COM</div>
   <div class='lic'>License: W919609</div>
 </a><a class="agent" href="/bailbonds/fl/agent/coach-ford-bail-bonds-llc-b000176/">
   <div class="an">Coach Ford Bail Bonds Llc</div>
   <div class="ad">514 E SUGARLAND HWY 27, CLEWISTON, 33440</div>
   
+  <div class='ad'>✉ MR.TFORD@YMAIL.COM</div>
   <div class='lic'>License: B000176</div>
 </a><a class="agent" href="/bailbonds/fl/agent/express-bail-bonds-inc-b000537/">
   <div class="an">Express Bail Bonds, Inc</div>
   <div class="ad">216 S MAIN ST STE 2B, LABELLE, 33935</div>
   
+  <div class='ad'>✉ AKEXPRESSBB2019@GMAIL.COM</div>
   <div class='lic'>License: B000537</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ford-terrance-w128284/">
   <div class="an">Ford, Terrance</div>
   <div class="ad">514 E SUGARLAND HWY 27, CLEWISTON, 33440</div>
   
+  <div class='ad'>✉ MR.TFORD@YMAIL.COM</div>
   <div class='lic'>License: W128284</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hendry-county-bail-bonds-b000168/">
   <div class="an">Hendry County Bail Bonds</div>
   <div class="ad">216 S MAIN STREET STE 2, LABELLE, 33935</div>
   
+  <div class='ad'>✉ HENCOBAIL3@GMAIL.COM</div>
   <div class='lic'>License: B000168</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kelly-allondra-w460057/">
   <div class="an">Kelly, Allondra</div>
   <div class="ad">HENDRY COUNTY BAIL BONDS 216 S MAIN STREET UNIT 2, LABELLE, 33935</div>
   
+  <div class='ad'>✉ LONDRE95@GMAIL.COM</div>
   <div class='lic'>License: W460057</div>
 </a><a class="agent" href="/bailbonds/fl/agent/louis-linda-d-w658090/">
   <div class="an">Louis, Linda D</div>
   <div class="ad">514 E SUGARLAND HWY 27, CLEWISTON, 33440</div>
   
+  <div class='ad'>✉ ZOGURLBAILBONDS1804@HOTMAIL.COM</div>
   <div class='lic'>License: W658090</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([26.53997, -81.15211], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":26.7542,"lng":-80.92781,"label":"<strong><a href='/bailbonds/fl/agent/byrd-herbert-lee-jr-w919609/'>Byrd, Herbert Lee Jr</a></strong>"},{"lat":26.7542,"lng":-80.92781,"label":"<strong><a href='/bailbonds/fl/agent/coach-ford-bail-bonds-llc-b000176/'>Coach Ford Bail Bonds Llc</a></strong>"},{"lat":26.75508,"lng":-81.43829,"label":"<strong><a href='/bailbonds/fl/agent/express-bail-bonds-inc-b000537/'>Express Bail Bonds, Inc</a></strong>"},{"lat":26.7542,"lng":-80.92781,"label":"<strong><a href='/bailbonds/fl/agent/ford-terrance-w128284/'>Ford, Terrance</a></strong>"},{"lat":26.75508,"lng":-81.43829,"label":"<strong><a href='/bailbonds/fl/agent/hendry-county-bail-bonds-b000168/'>Hendry County Bail Bonds</a></strong>"},{"lat":26.75508,"lng":-81.43829,"label":"<strong><a href='/bailbonds/fl/agent/kelly-allondra-w460057/'>Kelly, Allondra</a></strong>"},{"lat":26.7542,"lng":-80.92781,"label":"<strong><a href='/bailbonds/fl/agent/louis-linda-d-w658090/'>Louis, Linda D</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

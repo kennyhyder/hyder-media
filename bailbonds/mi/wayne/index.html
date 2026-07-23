@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,22 +106,26 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mi/agent/derek-bennett-jr/">
   <div class="an">Derek Bennett, Jr.</div><div class='ad'>Detroit Bail Bonds &amp; Surety</div>
   <div class="ad">269 Walker Street, Suite 539, Detroit, 48207</div>
-  <div class='ph'>313-244-0669</div>
+  <div class='ph'>☎ 313-244-0669</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/dionna-johnson/">
   <div class="an">Dionna Johnson</div><div class='ad'>Detroit Bail Bonds &amp; Surety</div>
   <div class="ad">269 Walker Street, Suite 539, Detroit, 48207</div>
-  <div class='ph'>313-244-0669</div>
+  <div class='ph'>☎ 313-244-0669</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/yangja-dantzler/">
   <div class="an">Yangja Dantzler</div><div class='ad'>Wayne County Bail Bonds</div>
   <div class="ad">5518 Allen Rd., Allen Park, 48101</div>
-  <div class='ph'>734-789-3000</div>
+  <div class='ph'>☎ 734-789-3000</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/glen-gay/">
   <div class="an">Glen Gay</div><div class='ad'>Wayne County Bail Bonds</div>
   <div class="ad">5518 Allen Rd., Allen Park, 48101</div>
-  <div class='ph'>734-789-3000</div>
+  <div class='ph'>☎ 734-789-3000</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://files.7thcircuitcourt.com/Documents/Quick%20Links/Approved%20Bail%20Bond%20Companies/Approved%20Bond%20list.pdf' rel='nofollow'>files.7thcircuitcourt.com</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.28466, -83.26195], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":42.34067,"lng":-83.0161,"label":"<strong><a href='/bailbonds/mi/agent/derek-bennett-jr/'>Derek Bennett, Jr.</a></strong><br>\u260e 313-244-0669"},{"lat":42.34067,"lng":-83.0161,"label":"<strong><a href='/bailbonds/mi/agent/dionna-johnson/'>Dionna Johnson</a></strong><br>\u260e 313-244-0669"},{"lat":42.26304,"lng":-83.20286,"label":"<strong><a href='/bailbonds/mi/agent/yangja-dantzler/'>Yangja Dantzler</a></strong><br>\u260e 734-789-3000"},{"lat":42.26304,"lng":-83.20286,"label":"<strong><a href='/bailbonds/mi/agent/glen-gay/'>Glen Gay</a></strong><br>\u260e 734-789-3000"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

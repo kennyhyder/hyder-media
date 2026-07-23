@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,17 +106,20 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/az/agent/lucille-carter/">
   <div class="an">Lucille Carter</div><div class='ad'>AC Bail Bonds</div>
   <div class="ad">3860 Sunshine Drive, Ste B, Kingman, 86409</div>
-  <div class='ph'>(928) 757-3106</div>
+  <div class='ph'>☎ (928) 757-3106</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/robert-g-lambert/">
   <div class="an">Robert G Lambert</div><div class='ad'>Bert's Bail Bonds</div>
   <div class="ad">1285 Hancock Rd, Suite A, Bullhead City, 86442</div>
-  <div class='ph'>(928) 754-3733</div>
+  <div class='ph'>☎ (928) 754-3733</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/maria-l-shivone/">
   <div class="an">Maria L Shivone</div><div class='ad'>Bail Out Bail Bonds</div>
   <div class="ad">PO Box 2456, Lake Havasu City, 86405</div>
-  <div class='ph'>(928) 453-9180</div>
+  <div class='ph'>☎ (928) 453-9180</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.mohavecourts.com/sites/default/files/Mohave%20Courts/Court%20Departments/Clerk%20of%20Court/Docs/LP/Publishing%20Bail%20Bondsmen.pdf' rel='nofollow'>www.mohavecourts.com</a></p>
 </div>
@@ -134,5 +139,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.71771, -113.74969], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":35.23599,"lng":-113.99532,"label":"<strong><a href='/bailbonds/az/agent/lucille-carter/'>Lucille Carter</a></strong><br>\u260e (928) 757-3106"},{"lat":35.10805,"lng":-114.60269,"label":"<strong><a href='/bailbonds/az/agent/robert-g-lambert/'>Robert G Lambert</a></strong><br>\u260e (928) 754-3733"},{"lat":34.49981,"lng":-114.31094,"label":"<strong>1 agent in Lake Havasu City</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/az/agent/maria-l-shivone/'>Maria L Shivone</a></strong><br>\u260e (928) 453-9180"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

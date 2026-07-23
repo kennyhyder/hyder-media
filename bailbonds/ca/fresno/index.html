@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,290 +107,348 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Altamirano, Joe</div>
   <div class="ad">1342 VAN NESS, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1843568</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arellano-jose-4481191/">
   <div class="an">Arellano, Jose</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 4481191</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castle-michael-1m23238/">
   <div class="an">Castle, Michael</div>
   <div class="ad">1243 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1M23238</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cervantes-medina-isaura-1n13367/">
   <div class="an">Cervantes Medina, Isaura</div>
   <div class="ad">195 W ELM AVE, Coalinga, 93210</div>
+  
   
   <div class='lic'>License: 1N13367</div>
 </a><a class="agent" href="/bailbonds/ca/agent/chance-gerald-1767458/">
   <div class="an">Chance, Gerald</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1767458</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dawar-rama-1l27093/">
   <div class="an">Dawar, Rama</div>
   <div class="ad">2926 N. WEST AVENUE, Fresno, 93705</div>
+  
   
   <div class='lic'>License: 1L27093</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-de-galvan-dioselina-1844914/">
   <div class="an">Diaz-De Galvan, Dioselina</div>
   <div class="ad">534 PARK BLVD, Orange Cove, 93646</div>
   
+  
   <div class='lic'>License: 1844914</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dowling-mark-1817399/">
   <div class="an">Dowling, Mark</div>
   <div class="ad">5789 N RUMI AVE, Fresno, 93723</div>
+  
   
   <div class='lic'>License: 1817399</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-grace-1840393/">
   <div class="an">Espinoza, Grace</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1840393</div>
 </a><a class="agent" href="/bailbonds/ca/agent/galvan-ramon-1843652/">
   <div class="an">Galvan, Ramon</div>
   <div class="ad">534 PARK BLVD, Orange Cove, 93646</div>
+  
   
   <div class='lic'>License: 1843652</div>
 </a><a class="agent" href="/bailbonds/ca/agent/galvan-raymond-4510113/">
   <div class="an">Galvan, Raymond</div>
   <div class="ad">534 PARK BLVD, Orange Cove, 93646</div>
   
+  
   <div class='lic'>License: 4510113</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garza-mitchell-4339167/">
   <div class="an">Garza, Mitchell</div>
   <div class="ad">1237 VAN NESS, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 4339167</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-alexandra-1m04131/">
   <div class="an">Gutierrez, Alexandra</div>
   <div class="ad">195 W ELM AVE, Coalinga, 93210</div>
   
+  
   <div class='lic'>License: 1M04131</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-rito-1n13335/">
   <div class="an">Gutierrez, Rito</div>
   <div class="ad">195 W ELM AVE, Coalinga, 93210</div>
+  
   
   <div class='lic'>License: 1N13335</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-mary-1546895/">
   <div class="an">Hernandez, Mary</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1546895</div>
 </a><a class="agent" href="/bailbonds/ca/agent/koehler-brett-1n12928/">
   <div class="an">Koehler, Brett</div>
   <div class="ad">2117 MERCED ST, Fresno, 93701</div>
+  
   
   <div class='lic'>License: 1N12928</div>
 </a><a class="agent" href="/bailbonds/ca/agent/krdikashyan-gegham-1846497/">
   <div class="an">Krdikashyan, Gegham</div>
   <div class="ad">6083 N FIGARDEN DR, #217, Fresno, 93722</div>
   
+  
   <div class='lic'>License: 1846497</div>
 </a><a class="agent" href="/bailbonds/ca/agent/krdikashyan-hovik-1n13068/">
   <div class="an">Krdikashyan, Hovik</div>
   <div class="ad">6083 N. FIGARDEN DR, Fresno, 93722</div>
+  
   
   <div class='lic'>License: 1N13068</div>
 </a><a class="agent" href="/bailbonds/ca/agent/leon-emanuel-4044089/">
   <div class="an">Leon, Emanuel</div>
   <div class="ad">4262 W. FIGARDEN DR., APT. 121, Fresno, 93722</div>
   
+  
   <div class='lic'>License: 4044089</div>
 </a><a class="agent" href="/bailbonds/ca/agent/machado-scott-1844560/">
   <div class="an">Machado, Scott</div>
   <div class="ad">1243 VAN NESS AVENUE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1844560</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marcus-george-1528478/">
   <div class="an">Marcus, George</div>
   <div class="ad">852 E.CALIFORNIA AVE, Fresno, 93706</div>
   
+  
   <div class='lic'>License: 1528478</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martines-maurice-1842023/">
   <div class="an">Martines, Maurice</div>
   <div class="ad">2141 TUOMNE ST., SUITE L, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1842023</div>
 </a><a class="agent" href="/bailbonds/ca/agent/masters-nicholas-4372586/">
   <div class="an">Masters, Nicholas</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 4372586</div>
 </a><a class="agent" href="/bailbonds/ca/agent/medina-manuel-1844521/">
   <div class="an">Medina, Manuel</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1844521</div>
 </a><a class="agent" href="/bailbonds/ca/agent/medina-stephani-4526297/">
   <div class="an">Medina, Stephani</div>
   <div class="ad">464 E CALIMYRNA APT104, Fresno, 93710</div>
   
+  
   <div class='lic'>License: 4526297</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mejia-anthony-1844778/">
   <div class="an">Mejia, Anthony</div>
   <div class="ad">2117 MERCED AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1844778</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mejia-juan-1846704/">
   <div class="an">Mejia, Juan</div>
   <div class="ad">2117 MERCED ST, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1846704</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendoza-maria-4503278/">
   <div class="an">Mendoza, Maria</div>
   <div class="ad">2117 MERCED STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 4503278</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mercado-alejandro-1844166/">
   <div class="an">Mercado, Alejandro</div>
   <div class="ad">1243 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1844166</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mercado-robert-1842254/">
   <div class="an">Mercado, Robert</div>
   <div class="ad">1243 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1842254</div>
 </a><a class="agent" href="/bailbonds/ca/agent/miller-teddy-1841365/">
   <div class="an">Miller, Teddy</div>
   <div class="ad">1243 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1841365</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mohamed-kaled-1f55960/">
   <div class="an">Mohamed, Kaled</div>
   <div class="ad">2350 W. SHAW SUITE 140, Fresno, 93711</div>
+  
   
   <div class='lic'>License: 1F55960</div>
 </a><a class="agent" href="/bailbonds/ca/agent/morales-teresa-1844651/">
   <div class="an">Morales, Teresa</div>
   <div class="ad">2117 MERCED STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1844651</div>
 </a><a class="agent" href="/bailbonds/ca/agent/oliver-arlinza-1840523/">
   <div class="an">Oliver, Arlinza</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1840523</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pearlstein-barry-1591579/">
   <div class="an">Pearlstein, Barry</div>
   <div class="ad">1243 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1591579</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pimental-matthew-1n13265/">
   <div class="an">Pimental, Matthew</div>
   <div class="ad">2117 MERCED ST, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1N13265</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-patricia-1485763/">
   <div class="an">Ramirez, Patricia</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1485763</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-peter-1844530/">
   <div class="an">Ramirez, Peter</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1844530</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-urroz-eustolia-1842308/">
   <div class="an">Ramirez-Urroz, Eustolia</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1842308</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reynoso-saraia-4513656/">
   <div class="an">Reynoso, Saraia</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 4513656</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rivera-hernandez-bria-1845099/">
   <div class="an">Rivera Hernandez, Bria</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1845099</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rodriguez-benny-1846426/">
   <div class="an">Rodriguez, Benny</div>
   <div class="ad">2117 MERCED AVENUE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1846426</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rodriguez-jessica-4530398/">
   <div class="an">Rodriguez, Jessica</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 4530398</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rosales-armando-1842463/">
   <div class="an">Rosales, Armando</div>
   <div class="ad">1342 VAN NESS AVE., Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1842463</div>
 </a><a class="agent" href="/bailbonds/ca/agent/salazar-antonio-1k78041/">
   <div class="an">Salazar, Antonio</div>
   <div class="ad">2117 MERCED STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1K78041</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sepulveda-robert-1843715/">
   <div class="an">Sepulveda, Robert</div>
   <div class="ad">1237 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1843715</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sharp-tenishia-1747925/">
   <div class="an">Sharp, Tenishia</div>
   <div class="ad">4918 N SEQUOIA DR APT 101, Fresno, 93705</div>
   
+  
   <div class='lic'>License: 1747925</div>
 </a><a class="agent" href="/bailbonds/ca/agent/soval-lopez-itzel-4454327/">
   <div class="an">Soval Lopez, Itzel</div>
   <div class="ad">1342 VAN NESS AVE, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 4454327</div>
 </a><a class="agent" href="/bailbonds/ca/agent/thatcher-timothy-4431053/">
   <div class="an">Thatcher, Timothy</div>
   <div class="ad">2981 RICHMOND AVE, Clovis, 93619</div>
   
+  
   <div class='lic'>License: 4431053</div>
 </a><a class="agent" href="/bailbonds/ca/agent/torres-daniel-1843014/">
   <div class="an">Torres, Daniel</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1843014</div>
 </a><a class="agent" href="/bailbonds/ca/agent/urroz-jonah-4438460/">
   <div class="an">Urroz, Jonah</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 4438460</div>
 </a><a class="agent" href="/bailbonds/ca/agent/urroz-martin-1842309/">
   <div class="an">Urroz, Martin</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1842309</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vang-chue-1800162/">
   <div class="an">Vang, Chue</div>
   <div class="ad">4903 EAST KINGS CANYON RD, SUITE 104, Fresno, 93727</div>
   
+  
   <div class='lic'>License: 1800162</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vang-gertshaj-1l77305/">
   <div class="an">Vang, Gertshaj</div>
   <div class="ad">4903 E KINGS CANYON RD STE 104, Fresno, 93727</div>
+  
   
   <div class='lic'>License: 1L77305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vang-jettshaj-1l50411/">
   <div class="an">Vang, Jettshaj</div>
   <div class="ad">4903 E KINGS CANYON RD APT. 104, APT. 104, Fresno, 93727</div>
   
+  
   <div class='lic'>License: 1L50411</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vang-maisee-1c41201/">
   <div class="an">Vang, Maisee</div>
   <div class="ad">4903 E. KINGS CANYON RD., 104, Fresno, 93727</div>
+  
   
   <div class='lic'>License: 1C41201</div>
 </a><a class="agent" href="/bailbonds/ca/agent/weyer-christopher-1843633/">
   <div class="an">Weyer, Christopher</div>
   <div class="ad">1342 VAN NESS, Fresno, 93721</div>
   
+  
   <div class='lic'>License: 1843633</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ybarra-aida-1845280/">
   <div class="an">Ybarra, Aida</div>
   <div class="ad">1230 M STREET, Fresno, 93721</div>
+  
   
   <div class='lic'>License: 1845280</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -409,5 +469,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.76101, -119.65502], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/altamirano-joe-1843568/'>Altamirano, Joe</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/arellano-jose-4481191/'>Arellano, Jose</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/castle-michael-1m23238/'>Castle, Michael</a></strong>"},{"lat":36.13873,"lng":-120.36115,"label":"<strong><a href='/bailbonds/ca/agent/cervantes-medina-isaura-1n13367/'>Cervantes Medina, Isaura</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/chance-gerald-1767458/'>Chance, Gerald</a></strong>"},{"lat":36.7768,"lng":-119.82651,"label":"<strong><a href='/bailbonds/ca/agent/dawar-rama-1l27093/'>Dawar, Rama</a></strong>"},{"lat":36.62456,"lng":-119.31151,"label":"<strong><a href='/bailbonds/ca/agent/diaz-de-galvan-dioselina-1844914/'>Diaz-De Galvan, Dioselina</a></strong>"},{"lat":36.81957,"lng":-119.90934,"label":"<strong><a href='/bailbonds/ca/agent/dowling-mark-1817399/'>Dowling, Mark</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-grace-1840393/'>Espinoza, Grace</a></strong>"},{"lat":36.62456,"lng":-119.31151,"label":"<strong><a href='/bailbonds/ca/agent/galvan-ramon-1843652/'>Galvan, Ramon</a></strong>"},{"lat":36.62456,"lng":-119.31151,"label":"<strong><a href='/bailbonds/ca/agent/galvan-raymond-4510113/'>Galvan, Raymond</a></strong>"},{"lat":36.73696,"lng":-119.79176,"label":"<strong><a href='/bailbonds/ca/agent/garza-mitchell-4339167/'>Garza, Mitchell</a></strong>"},{"lat":36.13873,"lng":-120.36115,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-alexandra-1m04131/'>Gutierrez, Alexandra</a></strong>"},{"lat":36.13873,"lng":-120.36115,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-rito-1n13335/'>Gutierrez, Rito</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-mary-1546895/'>Hernandez, Mary</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/koehler-brett-1n12928/'>Koehler, Brett</a></strong>"},{"lat":36.82414,"lng":-119.87055,"label":"<strong><a href='/bailbonds/ca/agent/krdikashyan-gegham-1846497/'>Krdikashyan, Gegham</a></strong>"},{"lat":36.82414,"lng":-119.87055,"label":"<strong><a href='/bailbonds/ca/agent/krdikashyan-hovik-1n13068/'>Krdikashyan, Hovik</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/machado-scott-1844560/'>Machado, Scott</a></strong>"},{"lat":36.72134,"lng":-119.80038,"label":"<strong><a href='/bailbonds/ca/agent/marcus-george-1528478/'>Marcus, George</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/masters-nicholas-4372586/'>Masters, Nicholas</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/medina-manuel-1844521/'>Medina, Manuel</a></strong>"},{"lat":36.82442,"lng":-119.78062,"label":"<strong><a href='/bailbonds/ca/agent/medina-stephani-4526297/'>Medina, Stephani</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/mejia-anthony-1844778/'>Mejia, Anthony</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/mejia-juan-1846704/'>Mejia, Juan</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/mendoza-maria-4503278/'>Mendoza, Maria</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/mercado-alejandro-1844166/'>Mercado, Alejandro</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/mercado-robert-1842254/'>Mercado, Robert</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/miller-teddy-1841365/'>Miller, Teddy</a></strong>"},{"lat":36.80835,"lng":-119.83403,"label":"<strong><a href='/bailbonds/ca/agent/mohamed-kaled-1f55960/'>Mohamed, Kaled</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/morales-teresa-1844651/'>Morales, Teresa</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/oliver-arlinza-1840523/'>Oliver, Arlinza</a></strong>"},{"lat":36.73702,"lng":-119.79182,"label":"<strong><a href='/bailbonds/ca/agent/pearlstein-barry-1591579/'>Pearlstein, Barry</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/pimental-matthew-1n13265/'>Pimental, Matthew</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-patricia-1485763/'>Ramirez, Patricia</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-peter-1844530/'>Ramirez, Peter</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-urroz-eustolia-1842308/'>Ramirez-Urroz, Eustolia</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/reynoso-saraia-4513656/'>Reynoso, Saraia</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/rivera-hernandez-bria-1845099/'>Rivera Hernandez, Bria</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/rodriguez-benny-1846426/'>Rodriguez, Benny</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/rodriguez-jessica-4530398/'>Rodriguez, Jessica</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/rosales-armando-1842463/'>Rosales, Armando</a></strong>"},{"lat":36.73809,"lng":-119.79185,"label":"<strong><a href='/bailbonds/ca/agent/salazar-antonio-1k78041/'>Salazar, Antonio</a></strong>"},{"lat":36.73696,"lng":-119.79176,"label":"<strong><a href='/bailbonds/ca/agent/sepulveda-robert-1843715/'>Sepulveda, Robert</a></strong>"},{"lat":36.80669,"lng":-119.83257,"label":"<strong><a href='/bailbonds/ca/agent/sharp-tenishia-1747925/'>Sharp, Tenishia</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/soval-lopez-itzel-4454327/'>Soval Lopez, Itzel</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/torres-daniel-1843014/'>Torres, Daniel</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/urroz-jonah-4438460/'>Urroz, Jonah</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/urroz-martin-1842309/'>Urroz, Martin</a></strong>"},{"lat":36.73598,"lng":-119.73174,"label":"<strong><a href='/bailbonds/ca/agent/vang-chue-1800162/'>Vang, Chue</a></strong>"},{"lat":36.73598,"lng":-119.73174,"label":"<strong><a href='/bailbonds/ca/agent/vang-gertshaj-1l77305/'>Vang, Gertshaj</a></strong>"},{"lat":36.73598,"lng":-119.73174,"label":"<strong><a href='/bailbonds/ca/agent/vang-jettshaj-1l50411/'>Vang, Jettshaj</a></strong>"},{"lat":36.73598,"lng":-119.73174,"label":"<strong><a href='/bailbonds/ca/agent/vang-maisee-1c41201/'>Vang, Maisee</a></strong>"},{"lat":36.73809,"lng":-119.79282,"label":"<strong><a href='/bailbonds/ca/agent/weyer-christopher-1843633/'>Weyer, Christopher</a></strong>"},{"lat":36.73844,"lng":-119.78953,"label":"<strong><a href='/bailbonds/ca/agent/ybarra-aida-1845280/'>Ybarra, Aida</a></strong>"},{"lat":36.78268,"lng":-119.79336,"label":"<strong>2 agents in Fresno</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/leon-emanuel-4044089/'>Leon, Emanuel</a></strong><br><strong><a href='/bailbonds/ca/agent/martines-maurice-1842023/'>Martines, Maurice</a></strong>"},{"lat":36.82897,"lng":-119.68492,"label":"<strong>1 agent in Clovis</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/thatcher-timothy-4431053/'>Thatcher, Timothy</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">201 E. 4th Street Ste. #46, Loveland, 80537</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/shaun-paul-greylock/">
   <div class="an">Shaun Paul Greylock</div><div class='ad'>Northern Colorado Bail Bonds LLC</div>
   <div class="ad">1000 Meadowbrook Dr, Fort Collins, 80521</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/crystal-dawn-krall/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">452 Tahoe Dr, Loveland, 80538</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/chelsea-raydon-gonzales/">
   <div class="an">Chelsea Raydon Gonzales</div><div class='ad'>Greenlite Bail Bonds, Inc.</div>
   <div class="ad">2003 Prairie Hill Dr, Fort Collins, 80528</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20031131124)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20091167731)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20181220757)' rel='nofollow'>data.colorado.gov</a></p>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.65809, -105.48676], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.39552,"lng":-105.07446,"label":"<strong><a href='/bailbonds/co/agent/jon-thomas-bradley/'>Jon Thomas Bradley</a></strong>"},{"lat":40.57455,"lng":-105.11389,"label":"<strong><a href='/bailbonds/co/agent/shaun-paul-greylock/'>Shaun Paul Greylock</a></strong>"},{"lat":40.45353,"lng":-105.08287,"label":"<strong><a href='/bailbonds/co/agent/crystal-dawn-krall/'>Crystal Dawn Krall</a></strong>"},{"lat":40.49996,"lng":-105.04133,"label":"<strong><a href='/bailbonds/co/agent/chelsea-raydon-gonzales/'>Chelsea Raydon Gonzales</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

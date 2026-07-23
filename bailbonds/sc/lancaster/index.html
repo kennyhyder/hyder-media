@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,32 +106,38 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/blackmon-brace-linda-g-prb-2987070-npn-2987070/">
   <div class="an">Blackmon-Brace, Linda G</div><div class='ad'>Blackmon-Brace'S Bondsman</div>
   <div class="ad">Lancaster, 29720</div>
-  <div class='ph'>(803) 287-7364</div>
+  <div class='ph'>☎ (803) 287-7364</div>
+  
   <div class='lic'>License: PRB 2987070 (NPN 2987070)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/green-mace-jr-prb-15838688-npn-15838688/">
   <div class="an">Green, Mace Jr</div>
   <div class="ad">Lancaster, 29720</div>
-  <div class='ph'>(803) 289-7102</div>
+  <div class='ph'>☎ (803) 289-7102</div>
+  
   <div class='lic'>License: PRB 15838688 (NPN 15838688)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/mungo-brown-porsha-tonik-prb-22174551-npn-22174551/">
   <div class="an">Mungo-Brown, Porsha Tonik</div>
   <div class="ad">Lancaster, 29720</div>
-  <div class='ph'>(803) 982-0338</div>
+  <div class='ph'>☎ (803) 982-0338</div>
+  
   <div class='lic'>License: PRB 22174551 (NPN 22174551)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/rucker-daffney-c-prb-17926043-npn-17926043/">
   <div class="an">Rucker, Daffney C</div>
   <div class="ad">Lancaster, 29720</div>
-  <div class='ph'>(803) 289-9700</div>
+  <div class='ph'>☎ (803) 289-9700</div>
+  
   <div class='lic'>License: PRB 17926043 (NPN 17926043)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/simpson-erica-g-prb-6441064-npn-6441064/">
   <div class="an">Simpson, Erica G</div><div class='ad'>Apex Bail Bonding</div>
   <div class="ad">Lancaster, 29720</div>
-  <div class='ph'>(803) 712-4171</div>
+  <div class='ph'>☎ (803) 712-4171</div>
+  
   <div class='lic'>License: PRB 6441064 (NPN 6441064)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/clendenin-dakota-rbm-21386185-npn-21386185/">
   <div class="an">Clendenin, Dakota</div>
   <div class="ad">Fort Mill, 29715</div>
-  <div class='ph'>(803) 288-4802</div>
+  <div class='ph'>☎ (803) 288-4802</div>
+  
   <div class='lic'>License: RBM 21386185 (NPN 21386185)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Lancaster' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Lancaster' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.68682, -80.70369], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.72613,"lng":-80.77896,"label":"<strong>5 agents in Lancaster</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/blackmon-brace-linda-g-prb-2987070-npn-2987070/'>Blackmon-Brace, Linda G</a></strong><br>\u260e (803) 287-7364<br><strong><a href='/bailbonds/sc/agent/green-mace-jr-prb-15838688-npn-15838688/'>Green, Mace Jr</a></strong><br>\u260e (803) 289-7102<br><strong><a href='/bailbonds/sc/agent/mungo-brown-porsha-tonik-prb-22174551-npn-22174551/'>Mungo-Brown, Porsha Tonik</a></strong><br>\u260e (803) 982-0338<br><strong><a href='/bailbonds/sc/agent/rucker-daffney-c-prb-17926043-npn-17926043/'>Rucker, Daffney C</a></strong><br>\u260e (803) 289-9700<br><strong><a href='/bailbonds/sc/agent/simpson-erica-g-prb-6441064-npn-6441064/'>Simpson, Erica G</a></strong><br>\u260e (803) 712-4171"},{"lat":35.006,"lng":-80.94,"label":"<strong>1 agent in Fort Mill</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/clendenin-dakota-rbm-21386185-npn-21386185/'>Clendenin, Dakota</a></strong><br>\u260e (803) 288-4802"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

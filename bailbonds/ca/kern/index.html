@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,195 +107,234 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Aguilar, Rogelio</div>
   <div class="ad">1308 CHESTER AVE, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1843385</div>
 </a><a class="agent" href="/bailbonds/ca/agent/avalos-victoria-1842315/">
   <div class="an">Avalos, Victoria</div>
   <div class="ad">12104 MARLA AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1842315</div>
 </a><a class="agent" href="/bailbonds/ca/agent/butler-champaign-1l48643/">
   <div class="an">Butler, Champaign</div>
   <div class="ad">1222 CALIFORNIA AVE., Bakersfield, 93304</div>
   
+  
   <div class='lic'>License: 1L48643</div>
 </a><a class="agent" href="/bailbonds/ca/agent/calderon-sara-1843759/">
   <div class="an">Calderon, Sara</div>
   <div class="ad">301 S. CHINA LAKE BLVD, SUITE B, Ridgecrest, 93555</div>
+  
   
   <div class='lic'>License: 1843759</div>
 </a><a class="agent" href="/bailbonds/ca/agent/clemente-arnold-luis-4504687/">
   <div class="an">Clemente, Arnold Luis</div>
   <div class="ad">9530 HAGEMAN RD B193, Bakersfield, 93312</div>
   
+  
   <div class='lic'>License: 4504687</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-aziel-4524816/">
   <div class="an">Diaz, Aziel</div>
   <div class="ad">1121 CHESTER AVENUE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 4524816</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dodgin-susan-1492997/">
   <div class="an">Dodgin, Susan</div>
   <div class="ad">1710 BLANCHE ST, Bakersfield, 93304</div>
   
+  
   <div class='lic'>License: 1492997</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dunn-william-1817377/">
   <div class="an">Dunn, William</div>
   <div class="ad">1440 CHESTER AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1817377</div>
 </a><a class="agent" href="/bailbonds/ca/agent/epps-laura-1844048/">
   <div class="an">Epps, Laura</div>
   <div class="ad">1710 BLANCHE STREET, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1844048</div>
 </a><a class="agent" href="/bailbonds/ca/agent/epps-steven-1841598/">
   <div class="an">Epps, Steven</div>
   <div class="ad">1710 BLANCHE STREET, Bakersfield, 93304</div>
+  
   
   <div class='lic'>License: 1841598</div>
 </a><a class="agent" href="/bailbonds/ca/agent/esposito-amanda-1845322/">
   <div class="an">Esposito, Amanda</div>
   <div class="ad">1330 L STREET, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1845322</div>
 </a><a class="agent" href="/bailbonds/ca/agent/esquivel-griselda-4222575/">
   <div class="an">Esquivel, Griselda</div>
   <div class="ad">1308 CHESTER AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 4222575</div>
 </a><a class="agent" href="/bailbonds/ca/agent/etheridge-marcus-1844727/">
   <div class="an">Etheridge, Marcus</div>
   <div class="ad">1431 K ST, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1844727</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gabler-randall-4497259/">
   <div class="an">Gabler, Randall</div>
   <div class="ad">9530 HAGEMAN RD, STE B193, Bakersfield, 93312</div>
+  
   
   <div class='lic'>License: 4497259</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-olga-1845387/">
   <div class="an">Garcia, Olga</div>
   <div class="ad">1328 K ST, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1845387</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-francisco-1n12962/">
   <div class="an">Gonzalez, Francisco</div>
   <div class="ad">1121 CHESTER AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1N12962</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-jaritza-4450455/">
   <div class="an">Gonzalez, Jaritza</div>
   <div class="ad">11 W. MATTHEW RD., Stockton, 93303</div>
   
+  
   <div class='lic'>License: 4450455</div>
 </a><a class="agent" href="/bailbonds/ca/agent/harris-jason-1e40624/">
   <div class="an">Harris, Jason</div>
   <div class="ad">9530 HAGEMAN RD., STE B193, Bakersfield, 93312</div>
+  
   
   <div class='lic'>License: 1E40624</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-cristal-1k95122/">
   <div class="an">Hernandez, Cristal</div>
   <div class="ad">1308 CHESTER AVE, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1K95122</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-oscar-1846299/">
   <div class="an">Hernandez, Oscar</div>
   <div class="ad">1308 CHESTER AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1846299</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lebsock-rachel-1n12997/">
   <div class="an">Lebsock, Rachel</div>
   <div class="ad">301 S. CHINA LAKE BLVD STE B, Ridgecrest, 93555</div>
   
+  
   <div class='lic'>License: 1N12997</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lee-anna-1842005/">
   <div class="an">Lee, Anna</div>
   <div class="ad">15554 RUBICON AVE, Bakersfield, 93314</div>
+  
   
   <div class='lic'>License: 1842005</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lee-timothy-1840939/">
   <div class="an">Lee, Timothy</div>
   <div class="ad">518 CHESTER AVE, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1840939</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-ramon-1g84550/">
   <div class="an">Lopez, Ramon</div>
   <div class="ad">428 TRUXTUN AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1G84550</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ochoa-guadalupe-pina-1l55788/">
   <div class="an">Ochoa, Guadalupe Pina</div>
   <div class="ad">1431 K ST, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1L55788</div>
 </a><a class="agent" href="/bailbonds/ca/agent/odeh-yusef-1842901/">
   <div class="an">Odeh, Yusef</div>
   <div class="ad">301 S. CHINA LAKE, B, Ridgecrest, 93555</div>
+  
   
   <div class='lic'>License: 1842901</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortega-manuel-1845712/">
   <div class="an">Ortega, Manuel</div>
   <div class="ad">9530 HAGEMAN RD, B193, Bakersfield, 93312</div>
   
+  
   <div class='lic'>License: 1845712</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortega-oliver-1846398/">
   <div class="an">Ortega, Oliver</div>
   <div class="ad">1308 CHESTER AVENUE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1846398</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortiz-garcia-eduardo-1n12905/">
   <div class="an">Ortiz Garcia, Eduardo</div>
   <div class="ad">1308 CHESTER AVE, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1N12905</div>
 </a><a class="agent" href="/bailbonds/ca/agent/payne-brian-1n13366/">
   <div class="an">Payne, Brian</div>
   <div class="ad">1710 BLANCHE ST, Bakersfield, 93304</div>
+  
   
   <div class='lic'>License: 1N13366</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pierce-a-1843703/">
   <div class="an">Pierce, A</div>
   <div class="ad">1222 CALIFORNIA AVE, Bakersfield, 93304</div>
   
+  
   <div class='lic'>License: 1843703</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pierce-myesha-1843532/">
   <div class="an">Pierce, Myesha</div>
   <div class="ad">1222 CALIFORNIA AVE, Bakersfield, 93304</div>
+  
   
   <div class='lic'>License: 1843532</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pierce-taylor-1n13023/">
   <div class="an">Pierce, Taylor</div>
   <div class="ad">1222 CALIFORNIA AVE, Bakersfield, 93304</div>
   
+  
   <div class='lic'>License: 1N13023</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-paula-4455466/">
   <div class="an">Ramirez, Paula</div>
   <div class="ad">1308 CHESTERAVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 4455466</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rojas-christopher-1l56682/">
   <div class="an">Rojas, Christopher</div>
   <div class="ad">1121 CHESTER AVE, Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1L56682</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rojas-nathan-1k27689/">
   <div class="an">Rojas, Nathan</div>
   <div class="ad">1121 CHESTER AVE, Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 1K27689</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tuthill-payton-1n13320/">
   <div class="an">Tuthill, Payton</div>
   <div class="ad">301 S CHINA LAKE BLVD STE B, Ridgecrest, 93555</div>
   
+  
   <div class='lic'>License: 1N13320</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valdez-tony-1846810/">
   <div class="an">Valdez, Tony</div>
   <div class="ad">1308 CHESTER AVE., Bakersfield, 93301</div>
   
+  
   <div class='lic'>License: 1846810</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valencia-yssamari-4324319/">
   <div class="an">Valencia, Yssamari</div>
   <div class="ad">1308 CHESTER AVE., Bakersfield, 93301</div>
+  
   
   <div class='lic'>License: 4324319</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -314,5 +355,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.34663, -118.72951], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/aguilar-rogelio-1843385/'>Aguilar, Rogelio</a></strong>"},{"lat":35.41833,"lng":-119.13672,"label":"<strong><a href='/bailbonds/ca/agent/avalos-victoria-1842315/'>Avalos, Victoria</a></strong>"},{"lat":35.36853,"lng":-119.01559,"label":"<strong><a href='/bailbonds/ca/agent/butler-champaign-1l48643/'>Butler, Champaign</a></strong>"},{"lat":35.61883,"lng":-117.67014,"label":"<strong><a href='/bailbonds/ca/agent/calderon-sara-1843759/'>Calderon, Sara</a></strong>"},{"lat":35.39812,"lng":-119.10839,"label":"<strong><a href='/bailbonds/ca/agent/clemente-arnold-luis-4504687/'>Clemente, Arnold Luis</a></strong>"},{"lat":35.36771,"lng":-119.01891,"label":"<strong><a href='/bailbonds/ca/agent/diaz-aziel-4524816/'>Diaz, Aziel</a></strong>"},{"lat":35.36765,"lng":-119.02139,"label":"<strong><a href='/bailbonds/ca/agent/dodgin-susan-1492997/'>Dodgin, Susan</a></strong>"},{"lat":35.37067,"lng":-119.01875,"label":"<strong><a href='/bailbonds/ca/agent/dunn-william-1817377/'>Dunn, William</a></strong>"},{"lat":35.36765,"lng":-119.02139,"label":"<strong><a href='/bailbonds/ca/agent/epps-laura-1844048/'>Epps, Laura</a></strong>"},{"lat":35.36765,"lng":-119.02139,"label":"<strong><a href='/bailbonds/ca/agent/epps-steven-1841598/'>Epps, Steven</a></strong>"},{"lat":35.36984,"lng":-119.01638,"label":"<strong><a href='/bailbonds/ca/agent/esposito-amanda-1845322/'>Esposito, Amanda</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/esquivel-griselda-4222575/'>Esquivel, Griselda</a></strong>"},{"lat":35.37071,"lng":-119.01769,"label":"<strong><a href='/bailbonds/ca/agent/etheridge-marcus-1844727/'>Etheridge, Marcus</a></strong>"},{"lat":35.39812,"lng":-119.10839,"label":"<strong><a href='/bailbonds/ca/agent/gabler-randall-4497259/'>Gabler, Randall</a></strong>"},{"lat":35.36983,"lng":-119.01754,"label":"<strong><a href='/bailbonds/ca/agent/garcia-olga-1845387/'>Garcia, Olga</a></strong>"},{"lat":35.36771,"lng":-119.01891,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-francisco-1n12962/'>Gonzalez, Francisco</a></strong>"},{"lat":35.39812,"lng":-119.10839,"label":"<strong><a href='/bailbonds/ca/agent/harris-jason-1e40624/'>Harris, Jason</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-cristal-1k95122/'>Hernandez, Cristal</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-oscar-1846299/'>Hernandez, Oscar</a></strong>"},{"lat":35.61883,"lng":-117.67014,"label":"<strong><a href='/bailbonds/ca/agent/lebsock-rachel-1n12997/'>Lebsock, Rachel</a></strong>"},{"lat":35.36726,"lng":-119.17538,"label":"<strong><a href='/bailbonds/ca/agent/lee-anna-1842005/'>Lee, Anna</a></strong>"},{"lat":35.36195,"lng":-119.01881,"label":"<strong><a href='/bailbonds/ca/agent/lee-timothy-1840939/'>Lee, Timothy</a></strong>"},{"lat":35.37335,"lng":-119.00696,"label":"<strong><a href='/bailbonds/ca/agent/lopez-ramon-1g84550/'>Lopez, Ramon</a></strong>"},{"lat":35.37071,"lng":-119.01769,"label":"<strong><a href='/bailbonds/ca/agent/ochoa-guadalupe-pina-1l55788/'>Ochoa, Guadalupe Pina</a></strong>"},{"lat":35.61883,"lng":-117.67014,"label":"<strong><a href='/bailbonds/ca/agent/odeh-yusef-1842901/'>Odeh, Yusef</a></strong>"},{"lat":35.39812,"lng":-119.10839,"label":"<strong><a href='/bailbonds/ca/agent/ortega-manuel-1845712/'>Ortega, Manuel</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/ortega-oliver-1846398/'>Ortega, Oliver</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/ortiz-garcia-eduardo-1n12905/'>Ortiz Garcia, Eduardo</a></strong>"},{"lat":35.36765,"lng":-119.02139,"label":"<strong><a href='/bailbonds/ca/agent/payne-brian-1n13366/'>Payne, Brian</a></strong>"},{"lat":35.36853,"lng":-119.01559,"label":"<strong><a href='/bailbonds/ca/agent/pierce-a-1843703/'>Pierce, A</a></strong>"},{"lat":35.36853,"lng":-119.01559,"label":"<strong><a href='/bailbonds/ca/agent/pierce-myesha-1843532/'>Pierce, Myesha</a></strong>"},{"lat":35.36853,"lng":-119.01559,"label":"<strong><a href='/bailbonds/ca/agent/pierce-taylor-1n13023/'>Pierce, Taylor</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-paula-4455466/'>Ramirez, Paula</a></strong>"},{"lat":35.36771,"lng":-119.01891,"label":"<strong><a href='/bailbonds/ca/agent/rojas-christopher-1l56682/'>Rojas, Christopher</a></strong>"},{"lat":35.36771,"lng":-119.01891,"label":"<strong><a href='/bailbonds/ca/agent/rojas-nathan-1k27689/'>Rojas, Nathan</a></strong>"},{"lat":35.61883,"lng":-117.67014,"label":"<strong><a href='/bailbonds/ca/agent/tuthill-payton-1n13320/'>Tuthill, Payton</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/valdez-tony-1846810/'>Valdez, Tony</a></strong>"},{"lat":35.3696,"lng":-119.01876,"label":"<strong><a href='/bailbonds/ca/agent/valencia-yssamari-4324319/'>Valencia, Yssamari</a></strong>"},{"lat":37.97724,"lng":-121.30886,"label":"<strong>1 agent in Stockton</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/gonzalez-jaritza-4450455/'>Gonzalez, Jaritza</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <meta property="og:title" content="Espinoza, Edith — Licensed Bail Bond Agent in Sacramento County">
 <meta property="og:description" content="Espinoza, Edith: licensed bail bond agent in Sacramento County. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Espinoza, Edith","url":"https://hyder.me/bailbonds/ca/agent/espinoza-edith-4507116/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","address":{"@type":"PostalAddress","streetAddress":"917 7TH STREET","addressLocality":"Sacramento","postalCode":"95814","addressRegion":"CA"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Espinoza, Edith","url":"https://hyder.me/bailbonds/ca/agent/espinoza-edith-4507116/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","address":{"@type":"PostalAddress","streetAddress":"917 7TH STREET","addressLocality":"Sacramento","postalCode":"95814","addressRegion":"CA"},"geo":{"@type":"GeoCoordinates","latitude":38.58232,"longitude":-121.49697}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Espinoza, Edith</h1>
 <p class="sub">Licensed bail bond agent in California — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
+  <h2>Contact & License</h2>
   <ul><li><strong>Address:</strong> 917 7TH STREET, Sacramento, 95814</li><li><strong>License:</strong> 4507116</li><li><strong>Serves:</strong> <a href="/bailbonds/ca/sacramento/">Sacramento County, CA</a></li></ul>
   <p class="src">Source: official roster — <a href="https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)" rel="nofollow">cdicloud.insurance.ca.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in California</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.58232, -121.49697], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.58232,"lng":-121.49697,"label":"<strong>Espinoza, Edith</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

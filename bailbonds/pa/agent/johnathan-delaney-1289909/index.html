@@ -9,7 +9,7 @@
 <meta property="og:title" content="Johnathan Delaney — Licensed Bail Bond Agent in Adams County">
 <meta property="og:description" content="Johnathan Delaney: licensed bail bond agent in Adams County. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Johnathan Delaney","url":"https://hyder.me/bailbonds/pa/agent/johnathan-delaney-1289909/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"410-392-0808","address":{"@type":"PostalAddress","streetAddress":"115 Landing Lane","addressLocality":"Elkton","postalCode":"21921","addressRegion":"PA"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Johnathan Delaney","url":"https://hyder.me/bailbonds/pa/agent/johnathan-delaney-1289909/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"410-392-0808","address":{"@type":"PostalAddress","streetAddress":"115 Landing Lane","addressLocality":"Elkton","postalCode":"21921","addressRegion":"PA"},"geo":{"@type":"GeoCoordinates","latitude":39.60557,"longitude":-75.83931}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Johnathan Delaney</h1>
 <p class="sub">Licensed bail bond agent in Pennsylvania — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Agency:</strong> Back on Your Block Bail Bonds</li><li><strong>Address:</strong> 115 Landing Lane, Elkton, 21921</li><li><strong>Phone:</strong> 410-392-0808</li><li><strong>License:</strong> 1289909</li><li><strong>Serves:</strong> <a href="/bailbonds/pa/adams/">Adams County, PA</a></li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Agency:</strong> Back on Your Block Bail Bonds</li><li><strong>Address:</strong> 115 Landing Lane, Elkton, 21921</li><li><strong>Phone:</strong> <a href="tel:410-392-0808">410-392-0808</a></li><li><strong>License:</strong> 1289909</li><li><strong>Serves:</strong> <a href="/bailbonds/pa/adams/">Adams County, PA</a></li></ul>
   <p class="src">Source: official roster — <a href="https://www.adamscountypa.gov/departments/clerkofcourt/bondsman-list" rel="nofollow">www.adamscountypa.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Pennsylvania</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.60557, -75.83931], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.60557,"lng":-75.83931,"label":"<strong>Johnathan Delaney</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

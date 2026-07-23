@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,151 +107,181 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">01 Hippie Chick Bail Bonds Inc</div>
   <div class="ad">501 N PALMETTO AVENUE STE B, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ HIPPIECHICKBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000103</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alward-troy-wayne-a005134/">
   <div class="an">Alward, Troy Wayne</div>
   <div class="ad">914 N. ORANGE AVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ TWA941@GMAIL.COM</div>
   <div class='lic'>License: A005134</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blye-nichi-antionette-g089708/">
   <div class="an">Blye, Nichi Antionette</div>
   <div class="ad">3888 FALCON CREST DRIVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ CLARKNICHI@GMAIL.COM</div>
   <div class='lic'>License: G089708</div>
 </a><a class="agent" href="/bailbonds/fl/agent/branning-james-allen-w036450/">
   <div class="an">Branning, James Allen</div>
   <div class="ad">CALL JAMES BAIL BONDS 501 N PALMETTO AVE STE A, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ JAMESB237@HOTMAIL.COM</div>
   <div class='lic'>License: W036450</div>
 </a><a class="agent" href="/bailbonds/fl/agent/branning-kimberly-a-w603655/">
   <div class="an">Branning, Kimberly A</div>
   <div class="ad">HIPPIE CHICK BAIL BONDS 501 N PALMETTO AVE STE B, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ KBRANNING47@YAHOO.COM</div>
   <div class='lic'>License: W603655</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brown-brittney-raven-sakiva-w645004/">
   <div class="an">Brown, Brittney Raven Sakiva</div>
   <div class="ad">KOUNTRY BOYZ BAIL BONDS 710 N ORANGE AVE SUITE #A, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ BRITTNEYMACKEY2009@GMAIL.COM</div>
   <div class='lic'>License: W645004</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brown-graylon-dennis-e111550/">
   <div class="an">Brown, Graylon Dennis</div>
   <div class="ad">1391 COOPERS HAWK WAY, MIDDLEBURG, 32068</div>
   
+  <div class='ad'>✉ NAPBROWN47@HOTMAIL.COM</div>
   <div class='lic'>License: E111550</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brown-steven-w587501/">
   <div class="an">Brown, Steven</div>
   <div class="ad">KOUNTRY BOYZ BAIL BONDS 710 N ORANGE AVE SUITE #A, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ KOUNTRYBOYZBAILBONDS850@GMAIL.COM</div>
   <div class='lic'>License: W587501</div>
 </a><a class="agent" href="/bailbonds/fl/agent/burroughs-pauldwina-p240076/">
   <div class="an">Burroughs, Pauldwina</div>
   <div class="ad">IN AND OUT BAIL BONDS EXPRESS 1730 KINGSLEY AVE SUITE D, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ BDWINA@YAHOO.COM</div>
   <div class='lic'>License: P240076</div>
 </a><a class="agent" href="/bailbonds/fl/agent/call-james-bail-bonds-b000567/">
   <div class="an">Call James Bail Bonds</div>
   <div class="ad">501 N PALMETTO AVENUE SUITE A, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ JAMESB237@HOTMAIL.COM</div>
   <div class='lic'>License: B000567</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dowston-rodwick-j-iii-w573984/">
   <div class="an">Dowston, Rodwick J Iii</div>
   <div class="ad">829 PALMETTO AVENUE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ BUDDA904@GMAIL.COM</div>
   <div class='lic'>License: W573984</div>
 </a><a class="agent" href="/bailbonds/fl/agent/duval-bailbonds-b000443/">
   <div class="an">Duval Bailbonds</div>
   <div class="ad">2233 PARK AVE SUITE 201 BLDG C, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ DUVALBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000443</div>
 </a><a class="agent" href="/bailbonds/fl/agent/full-throttle-bail-bonds-b000551/">
   <div class="an">Full Throttle Bail Bonds</div>
   <div class="ad">1734 KINGSLEY AVENUE SUITE 8, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ FULLTHROTTLEBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000551</div>
 </a><a class="agent" href="/bailbonds/fl/agent/green-cove-springs-bail-bonds-b000676/">
   <div class="an">Green Cove Springs Bail Bonds</div>
   <div class="ad">914 N. ORANGE AVE., GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ GCSBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000676</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hempseed-kaitlin-nicole-w485973/">
   <div class="an">Hempseed, Kaitlin Nicole</div>
   <div class="ad">FULL THROTTLE BAIL BONDS 2592 INDIGO AVENUE SUITE 1, MIDDLEBURG, 32068</div>
   
+  <div class='ad'>✉ KAITLYNNNICOLE904@YAHOO.COM</div>
   <div class='lic'>License: W485973</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hill-staci-lynn-w708481/">
   <div class="an">Hill, Staci Lynn</div>
   <div class="ad">829 N. PALMETTO AVE., GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ 904GATORGIRL@GMAIL.COM</div>
   <div class='lic'>License: W708481</div>
 </a><a class="agent" href="/bailbonds/fl/agent/in-and-out-bail-bonds-express-b000612/">
   <div class="an">In And Out Bail Bonds Express</div>
   <div class="ad">1730 KINGSLEY AVE SUITE D, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ BDWINA@YAHOO.COM</div>
   <div class='lic'>License: B000612</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kountry-boyz-bail-bonds-b000183/">
   <div class="an">Kountry Boyz Bail Bonds</div>
   <div class="ad">710 N ORANGE AVE SUITE #A, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ KOUNTRYBOYZBAILBONDS850@GMAIL.COM</div>
   <div class='lic'>License: B000183</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mackey-jeh-iah-w946789/">
   <div class="an">Mackey, Jeh'Iah</div>
   <div class="ad">KOUNTRY BOYZ BAIL BONDS 1627 IDLEWILD AVE, SR-16 W, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ JKMACKEY12@GMAIL.COM</div>
   <div class='lic'>License: W946789</div>
 </a><a class="agent" href="/bailbonds/fl/agent/patrick-monique-j-w774531/">
   <div class="an">Patrick, Monique J</div>
   <div class="ad">KOUNTRY BOYZ BAIL BONDS 710 N. ORANGE AVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ MPBAILBONDSFL@GMAIL.COM</div>
   <div class='lic'>License: W774531</div>
 </a><a class="agent" href="/bailbonds/fl/agent/quimby-dreama-l-p040122/">
   <div class="an">Quimby, Dreama L</div>
   <div class="ad">ABSOLUTE BAIL BONDS 614 ORANGE AVE N, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ DREAMAQ2@YAHOO.COM</div>
   <div class='lic'>License: P040122</div>
 </a><a class="agent" href="/bailbonds/fl/agent/robinson-charles-w587527/">
   <div class="an">Robinson, Charles</div>
   <div class="ad">ROBINSON AND ROBINSON BAIL BONDS 1120 PARK AVE E, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ CJROBINSON0776@AOL.COM</div>
   <div class='lic'>License: W587527</div>
 </a><a class="agent" href="/bailbonds/fl/agent/scruggs-bail-bonds-llc-b000139/">
   <div class="an">Scruggs Bail Bonds, Llc</div>
   <div class="ad">2233 PARK AVE. BUILDING 300 SUITE.302, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ SCRUGGSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000139</div>
 </a><a class="agent" href="/bailbonds/fl/agent/scruggs-lamar-w587023/">
   <div class="an">Scruggs, Lamar</div>
   <div class="ad">SCRUGGS BAIL BONDS, LLC 2233 PARK AVE. BUILDING 300 SUITE.302, ORANGE PARK, 32073</div>
   
+  <div class='ad'>✉ LAMARSCRUGGS11@GMAIL.COM</div>
   <div class='lic'>License: W587023</div>
 </a><a class="agent" href="/bailbonds/fl/agent/seabridge-daryl-w493880/">
   <div class="an">Seabridge, Daryl</div>
   <div class="ad">203 S ORANGE AVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ DABRIDGE43S@GMAIL.COM</div>
   <div class='lic'>License: W493880</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sechrest-larry-k-a237560/">
   <div class="an">Sechrest, Larry K</div>
   <div class="ad">GREEN COVE SPRINGS BAIL BONDS INC 914 N ORANGE AVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ GCSBONDS@GMAIL.COM</div>
   <div class='lic'>License: A237560</div>
 </a><a class="agent" href="/bailbonds/fl/agent/symonds-bail-bonds-inc-b000378/">
   <div class="an">Symonds Bail Bonds, Inc.</div>
   <div class="ad">3049 HWY 17 NORTH, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ SYMONDS3049@YAHOO.COM</div>
   <div class='lic'>License: B000378</div>
 </a><a class="agent" href="/bailbonds/fl/agent/symonds-raymond-william-p046985/">
   <div class="an">Symonds, Raymond William</div>
   <div class="ad">SYMONDS BAIL BONDS INC 3049 HIGHWAY 17, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ SYMONDS3049@YAHOO.COM</div>
   <div class='lic'>License: P046985</div>
 </a><a class="agent" href="/bailbonds/fl/agent/symonds-stanley-gerard-a300531/">
   <div class="an">Symonds, Stanley Gerard</div>
   <div class="ad">SYMONDS BAIL BONDS 3049 US HWY 17 S, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ SYMONDS3049@YAHOO.COM</div>
   <div class='lic'>License: A300531</div>
 </a><a class="agent" href="/bailbonds/fl/agent/walker-mitchell-w531147/">
   <div class="an">Walker, Mitchell</div>
   <div class="ad">1 ANSWER AWAY CLAY BAIL BONDS 829 PALMETTO AVE, GREEN COVE SPRINGS, 32043</div>
   
+  <div class='ad'>✉ MITCHELL.WALKER81@YAHOO.COM</div>
   <div class='lic'>License: W531147</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -269,5 +301,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.98658, -81.86504], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.99783,"lng":-81.68273,"label":"<strong><a href='/bailbonds/fl/agent/01-hippie-chick-bail-bonds-inc-b000103/'>01 Hippie Chick Bail Bonds Inc</a></strong>"},{"lat":30.00463,"lng":-81.68739,"label":"<strong><a href='/bailbonds/fl/agent/alward-troy-wayne-a005134/'>Alward, Troy Wayne</a></strong>"},{"lat":30.00333,"lng":-81.72666,"label":"<strong><a href='/bailbonds/fl/agent/blye-nichi-antionette-g089708/'>Blye, Nichi Antionette</a></strong>"},{"lat":29.99783,"lng":-81.68273,"label":"<strong><a href='/bailbonds/fl/agent/branning-james-allen-w036450/'>Branning, James Allen</a></strong>"},{"lat":29.99783,"lng":-81.68273,"label":"<strong><a href='/bailbonds/fl/agent/branning-kimberly-a-w603655/'>Branning, Kimberly A</a></strong>"},{"lat":30.00077,"lng":-81.68376,"label":"<strong><a href='/bailbonds/fl/agent/brown-brittney-raven-sakiva-w645004/'>Brown, Brittney Raven Sakiva</a></strong>"},{"lat":30.13646,"lng":-81.85873,"label":"<strong><a href='/bailbonds/fl/agent/brown-graylon-dennis-e111550/'>Brown, Graylon Dennis</a></strong>"},{"lat":30.00077,"lng":-81.68376,"label":"<strong><a href='/bailbonds/fl/agent/brown-steven-w587501/'>Brown, Steven</a></strong>"},{"lat":30.16488,"lng":-81.73192,"label":"<strong><a href='/bailbonds/fl/agent/burroughs-pauldwina-p240076/'>Burroughs, Pauldwina</a></strong>"},{"lat":29.99783,"lng":-81.68273,"label":"<strong><a href='/bailbonds/fl/agent/call-james-bail-bonds-b000567/'>Call James Bail Bonds</a></strong>"},{"lat":30.00419,"lng":-81.688,"label":"<strong><a href='/bailbonds/fl/agent/dowston-rodwick-j-iii-w573984/'>Dowston, Rodwick J Iii</a></strong>"},{"lat":30.16164,"lng":-81.70076,"label":"<strong><a href='/bailbonds/fl/agent/duval-bailbonds-b000443/'>Duval Bailbonds</a></strong>"},{"lat":30.16488,"lng":-81.73198,"label":"<strong><a href='/bailbonds/fl/agent/full-throttle-bail-bonds-b000551/'>Full Throttle Bail Bonds</a></strong>"},{"lat":30.00463,"lng":-81.68739,"label":"<strong><a href='/bailbonds/fl/agent/green-cove-springs-bail-bonds-b000676/'>Green Cove Springs Bail Bonds</a></strong>"},{"lat":30.04392,"lng":-81.91404,"label":"<strong><a href='/bailbonds/fl/agent/hempseed-kaitlin-nicole-w485973/'>Hempseed, Kaitlin Nicole</a></strong>"},{"lat":30.00419,"lng":-81.688,"label":"<strong><a href='/bailbonds/fl/agent/hill-staci-lynn-w708481/'>Hill, Staci Lynn</a></strong>"},{"lat":30.16488,"lng":-81.73192,"label":"<strong><a href='/bailbonds/fl/agent/in-and-out-bail-bonds-express-b000612/'>In And Out Bail Bonds Express</a></strong>"},{"lat":30.00077,"lng":-81.68376,"label":"<strong><a href='/bailbonds/fl/agent/kountry-boyz-bail-bonds-b000183/'>Kountry Boyz Bail Bonds</a></strong>"},{"lat":29.98578,"lng":-81.69663,"label":"<strong><a href='/bailbonds/fl/agent/mackey-jeh-iah-w946789/'>Mackey, Jeh'Iah</a></strong>"},{"lat":30.00077,"lng":-81.68376,"label":"<strong><a href='/bailbonds/fl/agent/patrick-monique-j-w774531/'>Patrick, Monique J</a></strong>"},{"lat":29.99935,"lng":-81.68258,"label":"<strong><a href='/bailbonds/fl/agent/quimby-dreama-l-p040122/'>Quimby, Dreama L</a></strong>"},{"lat":30.17612,"lng":-81.70165,"label":"<strong><a href='/bailbonds/fl/agent/robinson-charles-w587527/'>Robinson, Charles</a></strong>"},{"lat":30.16164,"lng":-81.70076,"label":"<strong><a href='/bailbonds/fl/agent/scruggs-bail-bonds-llc-b000139/'>Scruggs Bail Bonds, Llc</a></strong>"},{"lat":30.16164,"lng":-81.70076,"label":"<strong><a href='/bailbonds/fl/agent/scruggs-lamar-w587023/'>Scruggs, Lamar</a></strong>"},{"lat":29.99192,"lng":-81.67897,"label":"<strong><a href='/bailbonds/fl/agent/seabridge-daryl-w493880/'>Seabridge, Daryl</a></strong>"},{"lat":30.00463,"lng":-81.68739,"label":"<strong><a href='/bailbonds/fl/agent/sechrest-larry-k-a237560/'>Sechrest, Larry K</a></strong>"},{"lat":30.03376,"lng":-81.70885,"label":"<strong><a href='/bailbonds/fl/agent/symonds-bail-bonds-inc-b000378/'>Symonds Bail Bonds, Inc.</a></strong>"},{"lat":30.03376,"lng":-81.70885,"label":"<strong><a href='/bailbonds/fl/agent/symonds-raymond-william-p046985/'>Symonds, Raymond William</a></strong>"},{"lat":30.03376,"lng":-81.70885,"label":"<strong><a href='/bailbonds/fl/agent/symonds-stanley-gerard-a300531/'>Symonds, Stanley Gerard</a></strong>"},{"lat":29.98531,"lng":-81.68098,"label":"<strong>1 agent in GREEN COVE SPRINGS</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/walker-mitchell-w531147/'>Walker, Mitchell</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

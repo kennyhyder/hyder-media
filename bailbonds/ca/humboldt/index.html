@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,45 +107,54 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Blasingame, Charles</div>
   <div class="ad">732 5TH ST STE H, Eureka, 95501</div>
   
+  
   <div class='lic'>License: 1K15411</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brown-austin-1n13198/">
   <div class="an">Brown, Austin</div>
   <div class="ad">503 H ST, Eureka, 95501</div>
+  
   
   <div class='lic'>License: 1N13198</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brown-kristin-511916/">
   <div class="an">Brown, Kristin</div>
   <div class="ad">503 H. STREET, Eureka, 95501</div>
   
+  
   <div class='lic'>License: 511916</div>
 </a><a class="agent" href="/bailbonds/ca/agent/edwards-bradley-4494585/">
   <div class="an">Edwards, Bradley</div>
   <div class="ad">503 H. STREET, Eureka, 95501</div>
+  
   
   <div class='lic'>License: 4494585</div>
 </a><a class="agent" href="/bailbonds/ca/agent/orozco-cesar-4514262/">
   <div class="an">Orozco, Cesar</div>
   <div class="ad">503 H ST, Eureka, 95501</div>
   
+  
   <div class='lic'>License: 4514262</div>
 </a><a class="agent" href="/bailbonds/ca/agent/payton-elouise-1844580/">
   <div class="an">Payton, Elouise</div>
   <div class="ad">732 5TH ST STE H, Eureka, 95501</div>
+  
   
   <div class='lic'>License: 1844580</div>
 </a><a class="agent" href="/bailbonds/ca/agent/payton-steven-1846305/">
   <div class="an">Payton, Steven</div>
   <div class="ad">732 5TH ST STE H, Eureka, 95501</div>
   
+  
   <div class='lic'>License: 1846305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ries-ana-1l47958/">
   <div class="an">Ries, Ana</div>
   <div class="ad">503 H STREET, Eureka, 95501</div>
   
+  
   <div class='lic'>License: 1L47958</div>
 </a><a class="agent" href="/bailbonds/ca/agent/velazquez-christian-1842821/">
   <div class="an">Velazquez, Christian</div>
   <div class="ad">805 7TH ST, 202, Eureka, 95501</div>
+  
   
   <div class='lic'>License: 1842821</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.70665, -123.92618], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.8022,"lng":-124.16337,"label":"<strong><a href='/bailbonds/ca/agent/blasingame-charles-1k15411/'>Blasingame, Charles</a></strong>"},{"lat":40.80208,"lng":-124.16367,"label":"<strong><a href='/bailbonds/ca/agent/brown-austin-1n13198/'>Brown, Austin</a></strong>"},{"lat":40.80208,"lng":-124.16367,"label":"<strong><a href='/bailbonds/ca/agent/brown-kristin-511916/'>Brown, Kristin</a></strong>"},{"lat":40.80208,"lng":-124.16367,"label":"<strong><a href='/bailbonds/ca/agent/edwards-bradley-4494585/'>Edwards, Bradley</a></strong>"},{"lat":40.80208,"lng":-124.16367,"label":"<strong><a href='/bailbonds/ca/agent/orozco-cesar-4514262/'>Orozco, Cesar</a></strong>"},{"lat":40.8022,"lng":-124.16337,"label":"<strong><a href='/bailbonds/ca/agent/payton-elouise-1844580/'>Payton, Elouise</a></strong>"},{"lat":40.8022,"lng":-124.16337,"label":"<strong><a href='/bailbonds/ca/agent/payton-steven-1846305/'>Payton, Steven</a></strong>"},{"lat":40.80208,"lng":-124.16367,"label":"<strong><a href='/bailbonds/ca/agent/ries-ana-1l47958/'>Ries, Ana</a></strong>"},{"lat":40.8008,"lng":-124.16217,"label":"<strong><a href='/bailbonds/ca/agent/velazquez-christian-1842821/'>Velazquez, Christian</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

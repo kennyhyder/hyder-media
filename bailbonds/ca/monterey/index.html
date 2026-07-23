@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,120 +107,144 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Anguiano, Edward</div>
   <div class="ad">217 N. MAIN ST., Salinas, 93901</div>
   
+  
   <div class='lic'>License: 4335995</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castaneda-alejandro-1767446/">
   <div class="an">Castaneda, Alejandro</div>
   <div class="ad">102 LINCOLN AVE, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1767446</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castillo-daniel-1845375/">
   <div class="an">Castillo, Daniel</div>
   <div class="ad">1184 MONROE ST, #2, Salinas, 93906</div>
   
+  
   <div class='lic'>License: 1845375</div>
 </a><a class="agent" href="/bailbonds/ca/agent/daniel-allyssa-1m47469/">
   <div class="an">Daniel, Allyssa</div>
   <div class="ad">336 N. MAIN ST, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1M47469</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-anthony-1674119/">
   <div class="an">Diaz, Anthony</div>
   <div class="ad">217 N. MAIN ST, Salinas, 93902</div>
   
+  
   <div class='lic'>License: 1674119</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-damon-1n12996/">
   <div class="an">Diaz, Damon</div>
   <div class="ad">217 N MAIN ST, Salinas, 93907</div>
+  
   
   <div class='lic'>License: 1N12996</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-derek-1783434/">
   <div class="an">Diaz, Derek</div>
   <div class="ad">217 N. MAIN ST, Salinas, 93901</div>
   
+  
   <div class='lic'>License: 1783434</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-dresden-1n12982/">
   <div class="an">Diaz, Dresden</div>
   <div class="ad">217 N MAIN ST, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1N12982</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-mark-1840877/">
   <div class="an">Diaz, Mark</div>
   <div class="ad">217 N. MAIN, Salinas, 93901</div>
   
+  
   <div class='lic'>License: 1840877</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzales-adam-1840911/">
   <div class="an">Gonzales, Adam</div>
   <div class="ad">214 NORTH MAIN ST., Salinas, 93902</div>
+  
   
   <div class='lic'>License: 1840911</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-jose-1615730/">
   <div class="an">Gonzalez, Jose</div>
   <div class="ad">102 LINCOLN AVE, Salinas, 93901</div>
   
+  
   <div class='lic'>License: 1615730</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-rosa-1843020/">
   <div class="an">Gonzalez, Rosa</div>
   <div class="ad">102 LINCOLN AVE, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1843020</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mejia-garcia-mayan-1n13048/">
   <div class="an">Mejia-Garcia, Mayan</div>
   <div class="ad">336 N. MAIN ST, Salinas, 93901</div>
   
+  
   <div class='lic'>License: 1N13048</div>
 </a><a class="agent" href="/bailbonds/ca/agent/moreno-nancy-1d32199/">
   <div class="an">Moreno, Nancy</div>
   <div class="ad">7 N. HEBBRON AVE., Salinas, 93905</div>
+  
   
   <div class='lic'>License: 1D32199</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pantoja-lorena-1c79552/">
   <div class="an">Pantoja, Lorena</div>
   <div class="ad">7 N. HEBBRON, Salinas, 93905</div>
   
+  
   <div class='lic'>License: 1C79552</div>
 </a><a class="agent" href="/bailbonds/ca/agent/perez-nicolas-1j09643/">
   <div class="an">Perez, Nicolas</div>
   <div class="ad">336 N MAIN STREET, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1J09643</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-zavala-christian-1872785/">
   <div class="an">Ramirez-Zavala, Christian</div>
   <div class="ad">811 GARDEN WAY, Salinas, 93908</div>
   
+  
   <div class='lic'>License: 1872785</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rivera-jorge-1821167/">
   <div class="an">Rivera, Jorge</div>
   <div class="ad">224 NAVAJO DR, Salinas, 93906</div>
+  
   
   <div class='lic'>License: 1821167</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sanchez-elliana-1845802/">
   <div class="an">Sanchez, Elliana</div>
   <div class="ad">7 N. HEBRON AVE., Salinas, 93905</div>
   
+  
   <div class='lic'>License: 1845802</div>
 </a><a class="agent" href="/bailbonds/ca/agent/santana-francisco-4482247/">
   <div class="an">Santana, Francisco</div>
   <div class="ad">1580 SANBORN RD, Salinas, 93905</div>
+  
   
   <div class='lic'>License: 4482247</div>
 </a><a class="agent" href="/bailbonds/ca/agent/silva-ernie-1842576/">
   <div class="an">Silva, Ernie</div>
   <div class="ad">214 AROMAS RD, Aromas, 95004</div>
   
+  
   <div class='lic'>License: 1842576</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valenzuela-armida-1844815/">
   <div class="an">Valenzuela, Armida</div>
   <div class="ad">217 N MAIN ST, Salinas, 93901</div>
+  
   
   <div class='lic'>License: 1844815</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vazquez-ivan-1k60742/">
   <div class="an">Vazquez, Ivan</div>
   <div class="ad">336 N MAIN ST, Salinas, 93901</div>
   
+  
   <div class='lic'>License: 1K60742</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williamson-inkyung-1845967/">
   <div class="an">Williamson, Inkyung</div>
   <div class="ad">490 CALLE PRINCIPAL, Monterey, 93940</div>
+  
   
   <div class='lic'>License: 1845967</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -239,5 +265,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.2401, -121.31558], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/anguiano-edward-4335995/'>Anguiano, Edward</a></strong>"},{"lat":36.67654,"lng":-121.65762,"label":"<strong><a href='/bailbonds/ca/agent/castaneda-alejandro-1767446/'>Castaneda, Alejandro</a></strong>"},{"lat":36.69777,"lng":-121.66134,"label":"<strong><a href='/bailbonds/ca/agent/castillo-daniel-1845375/'>Castillo, Daniel</a></strong>"},{"lat":36.6828,"lng":-121.65331,"label":"<strong><a href='/bailbonds/ca/agent/daniel-allyssa-1m47469/'>Daniel, Allyssa</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/diaz-anthony-1674119/'>Diaz, Anthony</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/diaz-damon-1n12996/'>Diaz, Damon</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/diaz-derek-1783434/'>Diaz, Derek</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/diaz-dresden-1n12982/'>Diaz, Dresden</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/diaz-mark-1840877/'>Diaz, Mark</a></strong>"},{"lat":36.68121,"lng":-121.65391,"label":"<strong><a href='/bailbonds/ca/agent/gonzales-adam-1840911/'>Gonzales, Adam</a></strong>"},{"lat":36.67654,"lng":-121.65762,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-jose-1615730/'>Gonzalez, Jose</a></strong>"},{"lat":36.67654,"lng":-121.65762,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-rosa-1843020/'>Gonzalez, Rosa</a></strong>"},{"lat":36.6828,"lng":-121.65331,"label":"<strong><a href='/bailbonds/ca/agent/mejia-garcia-mayan-1n13048/'>Mejia-Garcia, Mayan</a></strong>"},{"lat":36.67367,"lng":-121.63228,"label":"<strong><a href='/bailbonds/ca/agent/moreno-nancy-1d32199/'>Moreno, Nancy</a></strong>"},{"lat":36.67252,"lng":-121.63109,"label":"<strong><a href='/bailbonds/ca/agent/pantoja-lorena-1c79552/'>Pantoja, Lorena</a></strong>"},{"lat":36.6828,"lng":-121.65331,"label":"<strong><a href='/bailbonds/ca/agent/perez-nicolas-1j09643/'>Perez, Nicolas</a></strong>"},{"lat":36.67176,"lng":-121.63024,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-zavala-christian-1872785/'>Ramirez-Zavala, Christian</a></strong>"},{"lat":36.70527,"lng":-121.65648,"label":"<strong><a href='/bailbonds/ca/agent/rivera-jorge-1821167/'>Rivera, Jorge</a></strong>"},{"lat":36.67367,"lng":-121.63228,"label":"<strong><a href='/bailbonds/ca/agent/sanchez-elliana-1845802/'>Sanchez, Elliana</a></strong>"},{"lat":36.69462,"lng":-121.59631,"label":"<strong><a href='/bailbonds/ca/agent/santana-francisco-4482247/'>Santana, Francisco</a></strong>"},{"lat":36.88235,"lng":-121.66074,"label":"<strong><a href='/bailbonds/ca/agent/silva-ernie-1842576/'>Silva, Ernie</a></strong>"},{"lat":36.68126,"lng":-121.65404,"label":"<strong><a href='/bailbonds/ca/agent/valenzuela-armida-1844815/'>Valenzuela, Armida</a></strong>"},{"lat":36.6828,"lng":-121.65331,"label":"<strong><a href='/bailbonds/ca/agent/vazquez-ivan-1k60742/'>Vazquez, Ivan</a></strong>"},{"lat":36.59841,"lng":-121.89591,"label":"<strong><a href='/bailbonds/ca/agent/williamson-inkyung-1845967/'>Williamson, Inkyung</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

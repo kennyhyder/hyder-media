@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,27 +106,32 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mn/agent/angerman-brittany-nicole/">
   <div class="an">Angerman, Brittany Nicole</div><div class='ad'>Minnesota Bail Bonds</div>
   <div class="ad">808 W 36th St, Hastings, 55033</div>
-  <div class='ph'>651-808-0823</div>
+  <div class='ph'>☎ 651-808-0823</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/bohlman-evan-alexander/">
   <div class="an">Bohlman, Evan Alexander</div><div class='ad'>Associated Bonding Company DBA The DWI Guys</div>
   <div class="ad">20711 Holt Avenue South, #247, Lakeville, 55044</div>
-  <div class='ph'>952-426-1620</div>
+  <div class='ph'>☎ 952-426-1620</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/bohlman-timothy-lee/">
   <div class="an">Bohlman, Timothy Lee</div><div class='ad'>Associated Bonding Company DBA The DWI Guys</div>
   <div class="ad">20711 Holt Avenue South, #247, Lakeville, 55044</div>
-  <div class='ph'>952-426-1620</div>
+  <div class='ph'>☎ 952-426-1620</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/bohlman-timothy-lee-2/">
   <div class="an">Bohlman, Timothy Lee</div><div class='ad'>On-Call 24/7 Services LLC</div>
   <div class="ad">20711 Holt Ave S Unit 247, Lakeville, 55044</div>
-  <div class='ph'>612-562-4300</div>
+  <div class='ph'>☎ 612-562-4300</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/devito-richard-samuel/">
   <div class="an">DeVito, Richard Samuel</div><div class='ad'>Bad Boys Bail Bonds Inc.</div>
   <div class="ad">1185 Concord Street N #433, South St. Paul, 55075</div>
-  <div class='ph'>651-769-5501</div>
+  <div class='ph'>☎ 651-769-5501</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf' rel='nofollow'>mncourtsdocs.courts.state.mn.us</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([44.67089, -93.06248], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":44.71041,"lng":-92.86335,"label":"<strong><a href='/bailbonds/mn/agent/angerman-brittany-nicole/'>Angerman, Brittany Nicole</a></strong><br>\u260e 651-808-0823"},{"lat":44.64949,"lng":-93.24156,"label":"<strong><a href='/bailbonds/mn/agent/bohlman-evan-alexander/'>Bohlman, Evan Alexander</a></strong><br>\u260e 952-426-1620"},{"lat":44.64949,"lng":-93.24156,"label":"<strong><a href='/bailbonds/mn/agent/bohlman-timothy-lee/'>Bohlman, Timothy Lee</a></strong><br>\u260e 952-426-1620"},{"lat":44.64949,"lng":-93.24156,"label":"<strong><a href='/bailbonds/mn/agent/bohlman-timothy-lee-2/'>Bohlman, Timothy Lee</a></strong><br>\u260e 612-562-4300"},{"lat":44.91047,"lng":-93.0516,"label":"<strong><a href='/bailbonds/mn/agent/devito-richard-samuel/'>DeVito, Richard Samuel</a></strong><br>\u260e 651-769-5501"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

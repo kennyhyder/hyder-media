@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,32 +106,38 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mn/agent/buffington-adam-m/">
   <div class="an">Buffington, Adam M.</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cumler-james-christopher/">
   <div class="an">Cumler, James Christopher</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cumler-robert-brandon/">
   <div class="an">Cumler, Robert Brandon</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/erickson-michael-scott/">
   <div class="an">Erickson, Michael Scott</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/gebhard-joleen-marie/">
   <div class="an">Gebhard, Joleen Marie</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/gebhard-steven-august/">
   <div class="an">Gebhard, Steven August</div><div class='ad'>A-Affordable Bail Bonds</div>
   <div class="ad">219 South 4th Street, Brainerd, 56401</div>
-  <div class='ph'>218-829-2464</div>
+  <div class='ph'>☎ 218-829-2464</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf' rel='nofollow'>mncourtsdocs.courts.state.mn.us</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([46.49165, -94.07072], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/buffington-adam-m/'>Buffington, Adam M.</a></strong><br>\u260e 218-829-2464"},{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/cumler-james-christopher/'>Cumler, James Christopher</a></strong><br>\u260e 218-829-2464"},{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/cumler-robert-brandon/'>Cumler, Robert Brandon</a></strong><br>\u260e 218-829-2464"},{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/erickson-michael-scott/'>Erickson, Michael Scott</a></strong><br>\u260e 218-829-2464"},{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/gebhard-joleen-marie/'>Gebhard, Joleen Marie</a></strong><br>\u260e 218-829-2464"},{"lat":46.3566,"lng":-94.2036,"label":"<strong><a href='/bailbonds/mn/agent/gebhard-steven-august/'>Gebhard, Steven August</a></strong><br>\u260e 218-829-2464"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

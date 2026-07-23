@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,20 +107,24 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bowman, Billy</div>
   <div class="ad">835 BRYANT STREET, San Francisco, 94103</div>
   
+  
   <div class='lic'>License: 1843267</div>
 </a><a class="agent" href="/bailbonds/ca/agent/castaneda-cecilia-1e97943/">
   <div class="an">Castaneda, Cecilia</div>
   <div class="ad">855 BRYANT ST., San Francisco, 94103</div>
+  
   
   <div class='lic'>License: 1E97943</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-eliza-1843234/">
   <div class="an">Gonzalez, Eliza</div>
   <div class="ad">869 BRYANT ST, San Francisco, 94103</div>
   
+  
   <div class='lic'>License: 1843234</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hasan-kamal-1k18582/">
   <div class="an">Hasan, Kamal</div>
   <div class="ad">869 BRYANT ST, San Francisco, 94103</div>
+  
   
   <div class='lic'>License: 1K18582</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.72724, -123.03223], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.77535,"lng":-122.40329,"label":"<strong><a href='/bailbonds/ca/agent/bowman-billy-1843267/'>Bowman, Billy</a></strong>"},{"lat":37.77508,"lng":-122.40364,"label":"<strong><a href='/bailbonds/ca/agent/castaneda-cecilia-1e97943/'>Castaneda, Cecilia</a></strong>"},{"lat":37.77489,"lng":-122.40387,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-eliza-1843234/'>Gonzalez, Eliza</a></strong>"},{"lat":37.77489,"lng":-122.40387,"label":"<strong><a href='/bailbonds/ca/agent/hasan-kamal-1k18582/'>Hasan, Kamal</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

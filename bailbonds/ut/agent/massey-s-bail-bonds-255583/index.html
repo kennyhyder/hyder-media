@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Massey's Bail Bonds</h1>
 <p class="sub">Licensed bail bond agency in Utah — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Address:</strong> PO Box 497, Riverton, 84065</li><li><strong>Phone:</strong> (801) 381-9470</li><li><strong>License:</strong> 255583</li><li><strong>Serves:</strong> <a href="/bailbonds/ut/salt-lake/">Salt Lake County, UT</a></li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Address:</strong> PO Box 497, Riverton, 84065</li><li><strong>Phone:</strong> <a href="tel:(801) 381-9470">(801) 381-9470</a></li><li><strong>License:</strong> 255583</li><li><strong>Serves:</strong> <a href="/bailbonds/ut/salt-lake/">Salt Lake County, UT</a></li></ul>
   <p class="src">Source: official roster — <a href="https://insurance.utah.gov/licensees/bail-bond/agencies/" rel="nofollow">insurance.utah.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Utah</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.51763, -111.96352], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.51763,"lng":-111.96352,"label":"<strong>Massey's Bail Bonds</strong> <em>(approximate \u2014 city center)</em>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

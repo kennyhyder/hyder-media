@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,192 +106,230 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mn/agent/aaron-jannsen/">
   <div class="an">Aaron, Jannsen</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/alvin-jon-richard/">
   <div class="an">Alvin, Jon Richard</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/amos-aparea-antoinette/">
   <div class="an">Amos, Aparea Antoinette</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/anderson-jami/">
   <div class="an">Anderson, Jami</div><div class='ad'>Metro Bail Bonds, LLC</div>
   <div class="ad">310 South 4th Ave Suite 1050, Minneapolis, 55415</div>
-  <div class='ph'>651-324-8006</div>
+  <div class='ph'>☎ 651-324-8006</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/anderson-karl-elroy/">
   <div class="an">Anderson, Karl Elroy</div><div class='ad'>Bad Girl Bail Bonds LLC</div>
   <div class="ad">100 North Sixth Street Suite 227B, Minneapolis, 55403</div>
-  <div class='ph'>612-597-3600</div>
+  <div class='ph'>☎ 612-597-3600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/andolshek-jay-arthur/">
   <div class="an">Andolshek, Jay Arthur</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/armstrong-nancy/">
   <div class="an">Armstrong, Nancy</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/banks-joseph-curtis-2/">
   <div class="an">Banks, Joseph Curtis</div><div class='ad'>Flex Bail Bonds LLC</div>
   <div class="ad">7124 78th Ave N, Brooklyn Park, 55445</div>
-  <div class='ph'>763-221-4724</div>
+  <div class='ph'>☎ 763-221-4724</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/banks-nancy-marie/">
   <div class="an">Banks, Nancy Marie</div><div class='ad'>Flex Bail Bonds LLC</div>
   <div class="ad">7124 78th Ave N, Brooklyn Park, 55445</div>
-  <div class='ph'>763-221-4724</div>
+  <div class='ph'>☎ 763-221-4724</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/benzing-blaine-lynell/">
   <div class="an">Benzing, Blaine Lynell</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/benzing-blaire-loren/">
   <div class="an">Benzing, Blaire Loren</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/beseman-paul-merlin/">
   <div class="an">Beseman, Paul Merlin</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/buersken-amber-gabriel/">
   <div class="an">Buersken, Amber Gabriel</div><div class='ad'>Bad Girl Bail Bonds LLC</div>
   <div class="ad">100 North Sixth Street Suite 227B, Minneapolis, 55403</div>
-  <div class='ph'>612-597-3600</div>
+  <div class='ph'>☎ 612-597-3600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/byman-marilee-jeanette/">
   <div class="an">Byman, Marilee Jeanette</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/campbell-justin-james/">
   <div class="an">Campbell, Justin James</div><div class='ad'>Metro Bail Bonds, LLC</div>
   <div class="ad">310 South 4th Ave Suite 1050, Minneapolis, 55415</div>
-  <div class='ph'>651-324-8006</div>
+  <div class='ph'>☎ 651-324-8006</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cates-donald-robert/">
   <div class="an">Cates, Donald Robert</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cedillo-kari-marie/">
   <div class="an">Cedillo, Kari Marie</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cole-austin-david/">
   <div class="an">Cole, Austin David</div><div class='ad'>Metro Bail Bonds, LLC</div>
   <div class="ad">310 South 4th Ave Suite 1050, Minneapolis, 55415</div>
-  <div class='ph'>651-324-8006</div>
+  <div class='ph'>☎ 651-324-8006</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cote-angie/">
   <div class="an">Cote, Angie</div><div class='ad'>Osseo Enterprises LLC DBA Express Bail Bonds</div>
   <div class="ad">7012 E. Fish Lake Road, Maple Grove, 55311</div>
-  <div class='ph'>763-634-0000</div>
+  <div class='ph'>☎ 763-634-0000</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/cox-shannon-lynn/">
   <div class="an">Cox, Shannon Lynn</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/daher-beth-suzanne/">
   <div class="an">Daher, Beth Suzanne</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/doyen-david-john/">
   <div class="an">Doyen, David John</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/doyen-david-joseph/">
   <div class="an">Doyen, David Joseph</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/duncan-vanessa-marie/">
   <div class="an">Duncan, Vanessa Marie</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/eason-michelle-lynn/">
   <div class="an">Eason, Michelle Lynn</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/ellingson-tracy-ann/">
   <div class="an">Ellingson, Tracy Ann</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/enright-darlene-mae/">
   <div class="an">Enright, Darlene Mae</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/enright-james-donald/">
   <div class="an">Enright, James Donald</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/ericksen-nicole-elizabeth/">
   <div class="an">Ericksen, Nicole Elizabeth</div><div class='ad'>Bad Girl Bail Bonds LLC</div>
   <div class="ad">100 North Sixth Street Suite 227B, Minneapolis, 55403</div>
-  <div class='ph'>612-597-3600</div>
+  <div class='ph'>☎ 612-597-3600</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/evans-charles-e/">
   <div class="an">Evans, Charles E.</div><div class='ad'>Twin City Bail Bonds LLC</div>
   <div class="ad">331 2nd Ave South Suite 432, Minneapolis, 55401</div>
-  <div class='ph'>651-206-7530</div>
+  <div class='ph'>☎ 651-206-7530</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/fedde-shelby-lee/">
   <div class="an">Fedde, Shelby Lee</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/fleury-shane-michael/">
   <div class="an">Fleury, Shane Michael</div><div class='ad'>Osseo Enterprises LLC DBA Express Bail Bonds</div>
   <div class="ad">7012 E. Fish Lake Road, Maple Grove, 55311</div>
-  <div class='ph'>763-634-0000</div>
+  <div class='ph'>☎ 763-634-0000</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/galer-dustan-bradley/">
   <div class="an">Galer, Dustan Bradley</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/galer-tyann-jo/">
   <div class="an">Galer, Tyann Jo</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/gaytan-eduardo/">
   <div class="an">Gaytan, Eduardo</div><div class='ad'>Bail Boys Bail Bonds LLC</div>
   <div class="ad">331 2nd Ave. S. Suite #407, Minneapolis, 55401</div>
-  <div class='ph'>763-358-5111</div>
+  <div class='ph'>☎ 763-358-5111</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/glasser-blaine-eugene/">
   <div class="an">Glasser, Blaine Eugene</div><div class='ad'>Absolute Bail Bonds, Inc.</div>
   <div class="ad">322 South 3rd Street, Minneapolis, 55415</div>
-  <div class='ph'>612-333-3030</div>
+  <div class='ph'>☎ 612-333-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/goff-thomas-dale/">
   <div class="an">Goff, Thomas Dale</div><div class='ad'>Bail Bonds Doctor, Inc.</div>
   <div class="ad">415 South 5th Street, Minneapolis, 55415</div>
-  <div class='ph'>612-332-3030</div>
+  <div class='ph'>☎ 612-332-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/mn/agent/goldberg-patti-g/">
   <div class="an">Goldberg, Patti G.</div><div class='ad'>Goldberg Bonding Co.</div>
   <div class="ad">400 South 4th Street, #107M, Minneapolis, 55415</div>
-  <div class='ph'>612-333-8111</div>
+  <div class='ph'>☎ 612-333-8111</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf' rel='nofollow'>mncourtsdocs.courts.state.mn.us</a></p>
 </div>
@@ -309,5 +349,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([45.00612, -93.47523], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/aaron-jannsen/'>Aaron, Jannsen</a></strong><br>\u260e 612-332-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/alvin-jon-richard/'>Alvin, Jon Richard</a></strong><br>\u260e 612-333-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/amos-aparea-antoinette/'>Amos, Aparea Antoinette</a></strong><br>\u260e 612-333-3030"},{"lat":44.97832,"lng":-93.26371,"label":"<strong><a href='/bailbonds/mn/agent/anderson-jami/'>Anderson, Jami</a></strong><br>\u260e 651-324-8006"},{"lat":44.97971,"lng":-93.27486,"label":"<strong><a href='/bailbonds/mn/agent/anderson-karl-elroy/'>Anderson, Karl Elroy</a></strong><br>\u260e 612-597-3600"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/andolshek-jay-arthur/'>Andolshek, Jay Arthur</a></strong><br>\u260e 612-333-8111"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/armstrong-nancy/'>Armstrong, Nancy</a></strong><br>\u260e 612-333-3030"},{"lat":45.09769,"lng":-93.37267,"label":"<strong><a href='/bailbonds/mn/agent/banks-joseph-curtis-2/'>Banks, Joseph Curtis</a></strong><br>\u260e 763-221-4724"},{"lat":45.09769,"lng":-93.37267,"label":"<strong><a href='/bailbonds/mn/agent/banks-nancy-marie/'>Banks, Nancy Marie</a></strong><br>\u260e 763-221-4724"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/benzing-blaine-lynell/'>Benzing, Blaine Lynell</a></strong><br>\u260e 612-333-8111"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/benzing-blaire-loren/'>Benzing, Blaire Loren</a></strong><br>\u260e 612-333-8111"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/beseman-paul-merlin/'>Beseman, Paul Merlin</a></strong><br>\u260e 612-333-3030"},{"lat":44.97971,"lng":-93.27486,"label":"<strong><a href='/bailbonds/mn/agent/buersken-amber-gabriel/'>Buersken, Amber Gabriel</a></strong><br>\u260e 612-597-3600"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/byman-marilee-jeanette/'>Byman, Marilee Jeanette</a></strong><br>\u260e 612-333-8111"},{"lat":44.97832,"lng":-93.26371,"label":"<strong><a href='/bailbonds/mn/agent/campbell-justin-james/'>Campbell, Justin James</a></strong><br>\u260e 651-324-8006"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/cates-donald-robert/'>Cates, Donald Robert</a></strong><br>\u260e 612-332-3030"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/cedillo-kari-marie/'>Cedillo, Kari Marie</a></strong><br>\u260e 612-332-3030"},{"lat":44.97832,"lng":-93.26371,"label":"<strong><a href='/bailbonds/mn/agent/cole-austin-david/'>Cole, Austin David</a></strong><br>\u260e 651-324-8006"},{"lat":45.08307,"lng":-93.44907,"label":"<strong><a href='/bailbonds/mn/agent/cote-angie/'>Cote, Angie</a></strong><br>\u260e 763-634-0000"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/cox-shannon-lynn/'>Cox, Shannon Lynn</a></strong><br>\u260e 612-333-3030"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/daher-beth-suzanne/'>Daher, Beth Suzanne</a></strong><br>\u260e 612-332-3030"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/doyen-david-john/'>Doyen, David John</a></strong><br>\u260e 612-332-3030"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/doyen-david-joseph/'>Doyen, David Joseph</a></strong><br>\u260e 612-332-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/duncan-vanessa-marie/'>Duncan, Vanessa Marie</a></strong><br>\u260e 612-333-3030"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/eason-michelle-lynn/'>Eason, Michelle Lynn</a></strong><br>\u260e 612-333-8111"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/ellingson-tracy-ann/'>Ellingson, Tracy Ann</a></strong><br>\u260e 612-332-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/enright-darlene-mae/'>Enright, Darlene Mae</a></strong><br>\u260e 612-333-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/enright-james-donald/'>Enright, James Donald</a></strong><br>\u260e 612-333-3030"},{"lat":44.97971,"lng":-93.27486,"label":"<strong><a href='/bailbonds/mn/agent/ericksen-nicole-elizabeth/'>Ericksen, Nicole Elizabeth</a></strong><br>\u260e 612-597-3600"},{"lat":44.97925,"lng":-93.26646,"label":"<strong><a href='/bailbonds/mn/agent/evans-charles-e/'>Evans, Charles E.</a></strong><br>\u260e 651-206-7530"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/fedde-shelby-lee/'>Fedde, Shelby Lee</a></strong><br>\u260e 612-333-3030"},{"lat":45.08307,"lng":-93.44907,"label":"<strong><a href='/bailbonds/mn/agent/fleury-shane-michael/'>Fleury, Shane Michael</a></strong><br>\u260e 763-634-0000"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/galer-dustan-bradley/'>Galer, Dustan Bradley</a></strong><br>\u260e 612-333-3030"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/galer-tyann-jo/'>Galer, Tyann Jo</a></strong><br>\u260e 612-333-3030"},{"lat":44.97925,"lng":-93.26646,"label":"<strong><a href='/bailbonds/mn/agent/gaytan-eduardo/'>Gaytan, Eduardo</a></strong><br>\u260e 763-358-5111"},{"lat":44.97891,"lng":-93.26451,"label":"<strong><a href='/bailbonds/mn/agent/glasser-blaine-eugene/'>Glasser, Blaine Eugene</a></strong><br>\u260e 612-333-3030"},{"lat":44.97635,"lng":-93.26496,"label":"<strong><a href='/bailbonds/mn/agent/goff-thomas-dale/'>Goff, Thomas Dale</a></strong><br>\u260e 612-332-3030"},{"lat":44.97748,"lng":-93.26422,"label":"<strong><a href='/bailbonds/mn/agent/goldberg-patti-g/'>Goldberg, Patti G.</a></strong><br>\u260e 612-333-8111"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,30 +107,36 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bedford, Renee</div>
   <div class="ad">52 MAIN ST., San Andreas, 95249</div>
   
+  
   <div class='lic'>License: 4380124</div>
 </a><a class="agent" href="/bailbonds/ca/agent/faulkner-jeannene-4391856/">
   <div class="an">Faulkner, Jeannene</div>
   <div class="ad">52 MAIN STREET, San Andreas, 95249</div>
+  
   
   <div class='lic'>License: 4391856</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-margeurite-1l01305/">
   <div class="an">Gutierrez, Margeurite</div>
   <div class="ad">3121 ARROWHEAD ST, Copperopolis, 95228</div>
   
+  
   <div class='lic'>License: 1L01305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/holliday-darren-4391862/">
   <div class="an">Holliday, Darren</div>
   <div class="ad">52 MAIN STREET, San Andreas, 95249</div>
+  
   
   <div class='lic'>License: 4391862</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-diego-1k29566/">
   <div class="an">Martinez, Diego</div>
   <div class="ad">103 ST. CHARLES ST, San Andreas, 95249</div>
   
+  
   <div class='lic'>License: 1K29566</div>
 </a><a class="agent" href="/bailbonds/ca/agent/miranda-daniel-1n13239/">
   <div class="an">Miranda, Daniel</div>
   <div class="ad">52 MAIN ST, San Andreas, 95249</div>
+  
   
   <div class='lic'>License: 1N13239</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.19107, -120.55411], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.91971,"lng":-120.62293,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-margeurite-1l01305/'>Gutierrez, Margeurite</a></strong>"},{"lat":38.19269,"lng":-120.67318,"label":"<strong>5 agents in San Andreas</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/bedford-renee-4380124/'>Bedford, Renee</a></strong><br><strong><a href='/bailbonds/ca/agent/faulkner-jeannene-4391856/'>Faulkner, Jeannene</a></strong><br><strong><a href='/bailbonds/ca/agent/holliday-darren-4391862/'>Holliday, Darren</a></strong><br><strong><a href='/bailbonds/ca/agent/martinez-diego-1k29566/'>Martinez, Diego</a></strong><br><strong><a href='/bailbonds/ca/agent/miranda-daniel-1n13239/'>Miranda, Daniel</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

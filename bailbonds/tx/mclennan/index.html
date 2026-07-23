@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in McLennan County</h2>
@@ -116,62 +118,74 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/ash-bail-bonds-joe-ash/">
   <div class="an">Ash Bail Bonds (Joe Ash)</div>
   <div class="ad">5701 Lake Haven, Waco, 76710</div>
-  <div class='ph'>254-399-0707</div>
+  <div class='ph'>☎ 254-399-0707</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/break-em-out-bail-bonds-chase-chapman/">
   <div class="an">Break 'Em Out Bail Bonds (Chase Chapman)</div>
   <div class="ad">700 E. Waco Dr, Ste. D, Waco, 76704</div>
-  <div class='ph'>254-400-2663</div>
+  <div class='ph'>☎ 254-400-2663</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/chase-chapman/">
   <div class="an">Chase Chapman</div><div class='ad'>Chapman's Bail Bonds</div>
   <div class="ad">700 E. Waco Dr., Waco, 76704</div>
-  <div class='ph'>254-855-9885</div>
+  <div class='ph'>☎ 254-855-9885</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/gonzales-bail-bonds-roy-gonzales/">
   <div class="an">Gonzales Bail Bonds (Roy Gonzales)</div>
   <div class="ad">3800 W. Waco Dr., Waco, 76710</div>
-  <div class='ph'>254-772-8866</div>
+  <div class='ph'>☎ 254-772-8866</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/gonzales-flores-bail-bonds-sonya-d-flores/">
   <div class="an">Gonzales-Flores Bail Bonds (Sonya D. Flores)</div>
   <div class="ad">3800 W. Waco Dr., Waco, 76710</div>
-  <div class='ph'>254-744-1317</div>
+  <div class='ph'>☎ 254-744-1317</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/james-r-pena-bail-bonding-svc-james-r-pena/">
   <div class="an">James R. Pena Bail Bonding Svc (James R. Pena)</div>
   <div class="ad">903-B N. Valley Mills Dr., Waco, 76710</div>
-  <div class='ph'>254-776-9400</div>
+  <div class='ph'>☎ 254-776-9400</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/cody-kocian/">
   <div class="an">Cody Kocian</div><div class='ad'>Kocian Bail Bonds</div>
   <div class="ad">3300 W. Waco Dr., Waco, 76710</div>
-  <div class='ph'>254-756-2992</div>
+  <div class='ph'>☎ 254-756-2992</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/larry-johnson-s-lone-star-bail-larry-johnson/">
   <div class="an">Larry Johnson's Lone Star Bail (Larry Johnson)</div>
   <div class="ad">416 Sapphire Blvd., Hewitt, 76643</div>
-  <div class='ph'>254-715-6999</div>
+  <div class='ph'>☎ 254-715-6999</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/charlie-pickens-iii/">
   <div class="an">Charlie Pickens III</div><div class='ad'>Legacy Bail Bonds</div>
   <div class="ad">705 Kane St., Waco, 76705</div>
-  <div class='ph'>254-755-7589</div>
+  <div class='ph'>☎ 254-755-7589</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/mabry-bail-bonds-john-mabry/">
   <div class="an">Mabry Bail Bonds (John Mabry)</div>
   <div class="ad">2708 Merrimac Circle, Waco, 76710</div>
-  <div class='ph'>254-744-3050</div>
+  <div class='ph'>☎ 254-744-3050</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/christy-player-greenwood/">
   <div class="an">Christy Player-Greenwood</div><div class='ad'>Player Bail Bonds</div>
   <div class="ad">1515 W. Waco Dr., Waco, 76707</div>
-  <div class='ph'>254-732-3693</div>
+  <div class='ph'>☎ 254-732-3693</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/waco-bail-bonds-cindy-mabry/">
   <div class="an">Waco Bail Bonds (Cindy Mabry)</div>
   <div class="ad">2708 Merrimac Circle, Waco, 76710</div>
-  <div class='ph'>254-744-3050</div>
+  <div class='ph'>☎ 254-744-3050</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.mclennan.gov/DocumentCenter/View/17145/Active-McLennan-County-Bail-Bonding-Agencies-PDF' rel='nofollow'>www.mclennan.gov</a></p>
 </div>
@@ -191,5 +205,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([31.5496, -97.20151], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":31.53537,"lng":-97.19775,"label":"<strong><a href='/bailbonds/tx/agent/ash-bail-bonds-joe-ash/'>Ash Bail Bonds (Joe Ash)</a></strong><br>\u260e 254-399-0707"},{"lat":31.57066,"lng":-97.12877,"label":"<strong><a href='/bailbonds/tx/agent/break-em-out-bail-bonds-chase-chapman/'>Break 'Em Out Bail Bonds (Chase Chapman)</a></strong><br>\u260e 254-400-2663"},{"lat":31.57066,"lng":-97.12877,"label":"<strong><a href='/bailbonds/tx/agent/chase-chapman/'>Chase Chapman</a></strong><br>\u260e 254-855-9885"},{"lat":31.53268,"lng":-97.16574,"label":"<strong><a href='/bailbonds/tx/agent/gonzales-bail-bonds-roy-gonzales/'>Gonzales Bail Bonds (Roy Gonzales)</a></strong><br>\u260e 254-772-8866"},{"lat":31.53268,"lng":-97.16574,"label":"<strong><a href='/bailbonds/tx/agent/gonzales-flores-bail-bonds-sonya-d-flores/'>Gonzales-Flores Bail Bonds (Sonya D. Flores)</a></strong><br>\u260e 254-744-1317"},{"lat":31.53014,"lng":-97.18243,"label":"<strong><a href='/bailbonds/tx/agent/james-r-pena-bail-bonding-svc-james-r-pena/'>James R. Pena Bail Bonding Svc (James R. Pena)</a></strong><br>\u260e 254-776-9400"},{"lat":31.53674,"lng":-97.16084,"label":"<strong><a href='/bailbonds/tx/agent/cody-kocian/'>Cody Kocian</a></strong><br>\u260e 254-756-2992"},{"lat":31.46621,"lng":-97.19419,"label":"<strong><a href='/bailbonds/tx/agent/larry-johnson-s-lone-star-bail-larry-johnson/'>Larry Johnson's Lone Star Bail (Larry Johnson)</a></strong><br>\u260e 254-715-6999"},{"lat":31.58876,"lng":-97.09993,"label":"<strong><a href='/bailbonds/tx/agent/charlie-pickens-iii/'>Charlie Pickens III</a></strong><br>\u260e 254-755-7589"},{"lat":31.53419,"lng":-97.21702,"label":"<strong><a href='/bailbonds/tx/agent/mabry-bail-bonds-john-mabry/'>Mabry Bail Bonds (John Mabry)</a></strong><br>\u260e 254-744-3050"},{"lat":31.55155,"lng":-97.14461,"label":"<strong><a href='/bailbonds/tx/agent/christy-player-greenwood/'>Christy Player-Greenwood</a></strong><br>\u260e 254-732-3693"},{"lat":31.53419,"lng":-97.21702,"label":"<strong><a href='/bailbonds/tx/agent/waco-bail-bonds-cindy-mabry/'>Waco Bail Bonds (Cindy Mabry)</a></strong><br>\u260e 254-744-3050"},{"lat":31.53136,"lng":-97.23817,"label":"<strong>McLennan County Jail (Highway 6)</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

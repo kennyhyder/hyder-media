@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,21 +107,25 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Holifield Bail Bonds</div>
   <div class="ad">489 NE 326 AVE, CROSS CITY, 32628</div>
   
+  <div class='ad'>✉ JHOLIFIELD1@GMAIL.COM</div>
   <div class='lic'>License: B000503</div>
 </a><a class="agent" href="/bailbonds/fl/agent/holifield-evan-franklin-g032178/">
   <div class="an">Holifield, Evan Franklin</div>
   <div class="ad">489 NE 326 AVE, CROSS CITY, 32628</div>
   
+  <div class='ad'>✉ EVANHOLIFIELD@ICLOUD.COM</div>
   <div class='lic'>License: G032178</div>
 </a><a class="agent" href="/bailbonds/fl/agent/holifield-jason-gary-e034562/">
   <div class="an">Holifield, Jason Gary</div>
   <div class="ad">489 NE 326 AVE, CROSS CITY, 32628</div>
   
+  <div class='ad'>✉ JHOLIFIELD1@GMAIL.COM</div>
   <div class='lic'>License: E034562</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lamenta-keen-sylvia-g-w114105/">
   <div class="an">Lamenta-Keen, Sylvia G.</div>
   <div class="ad">ALL-OUT BAIL BONDS INC 300 NE 255TH ST, CROSS CITY, 32628</div>
   
+  <div class='ad'>✉ ZUCHINY@AOL.COM</div>
   <div class='lic'>License: W114105</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.55268, -83.23623], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.66543,"lng":-83.09227,"label":"<strong><a href='/bailbonds/fl/agent/holifield-bail-bonds-b000503/'>Holifield Bail Bonds</a></strong>"},{"lat":29.66543,"lng":-83.09227,"label":"<strong><a href='/bailbonds/fl/agent/holifield-evan-franklin-g032178/'>Holifield, Evan Franklin</a></strong>"},{"lat":29.66543,"lng":-83.09227,"label":"<strong><a href='/bailbonds/fl/agent/holifield-jason-gary-e034562/'>Holifield, Jason Gary</a></strong>"},{"lat":29.6386,"lng":-83.12484,"label":"<strong>1 agent in CROSS CITY</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/lamenta-keen-sylvia-g-w114105/'>Lamenta-Keen, Sylvia G.</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

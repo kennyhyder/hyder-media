@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">4299 E 130th circle, Thornton, 80241</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/anya-irina-pulai/">
   <div class="an">Anya Irina Pulai</div><div class='ad'>Urban Bail Bonds LLC</div>
   <div class="ad">1801 E. 121st Ave POB 33515, Northglenn, 80241</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/almighty-bail-bonds-llc/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">13489 Clayton St, Thornton, 80241</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/julie-tupreem-deluna/">
   <div class="an">Julie Tupreem Deluna</div><div class='ad'>Prodical Bail Bonds LLC</div>
   <div class="ad">10580 Quintero St, Commerce City, 80022</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/savanna-mercedes-rabon-2/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">12550 Eastlake Dr, Thornton, 80241</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/sherri-b-pollack/">
   <div class="an">Sherri B Pollack</div><div class='ad'>Sherri's Bail Bonds LLC</div>
   <div class="ad">5209 Silver Maple St, Brighton, 80601</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20031026728)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20111448040)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20201617397)' rel='nofollow'>data.colorado.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.87432, -104.33187], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.93266,"lng":-104.93586,"label":"<strong><a href='/bailbonds/co/agent/ronald-douglas-solano/'>Ronald Douglas Solano</a></strong>"},{"lat":39.93872,"lng":-104.95231,"label":"<strong><a href='/bailbonds/co/agent/almighty-bail-bonds-llc/'>Almighty Bail Bonds LLC</a></strong>"},{"lat":39.8886,"lng":-104.78696,"label":"<strong><a href='/bailbonds/co/agent/julie-tupreem-deluna/'>Julie Tupreem Deluna</a></strong>"},{"lat":39.92647,"lng":-104.96156,"label":"<strong><a href='/bailbonds/co/agent/savanna-mercedes-rabon-2/'>Savanna Mercedes Rabon</a></strong>"},{"lat":39.99928,"lng":-104.749,"label":"<strong><a href='/bailbonds/co/agent/sherri-b-pollack/'>Sherri B Pollack</a></strong>"},{"lat":39.91163,"lng":-104.98214,"label":"<strong>1 agent in Northglenn</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/co/agent/anya-irina-pulai/'>Anya Irina Pulai</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,100 +107,120 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Baker, James, R</div><div class='ad'>North River Insurance Company | United States Fire Insurance Company | Us Specialty Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0010008171</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baker-maya-e-0021314036/">
   <div class="an">Baker, Maya, E</div><div class='ad'>1St Atlantic Surety Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0021314036</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baker-trenessa-m-0016751636/">
   <div class="an">Baker, Trenessa, M</div><div class='ad'>Allegheny Casualty Company | International Fidelity Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0016751636</div>
 </a><a class="agent" href="/bailbonds/nc/agent/ballance-robert-c-0008392469/">
   <div class="an">Ballance, Robert, C</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0008392469</div>
 </a><a class="agent" href="/bailbonds/nc/agent/ballard-angela-f-0019323446/">
   <div class="an">Ballard, Angela, F</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0019323446</div>
 </a><a class="agent" href="/bailbonds/nc/agent/ballard-marcia-d-0020508895/">
   <div class="an">Ballard, Marcia, D</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0020508895</div>
 </a><a class="agent" href="/bailbonds/nc/agent/ballard-ronnie-e-0014398320/">
   <div class="an">Ballard, Ronnie, E</div><div class='ad'>American Surety Company | Blanks, Jesse, L | Financial Casualty &amp; Surety Inc</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0014398320</div>
 </a><a class="agent" href="/bailbonds/nc/agent/banks-quanesha-0020302016/">
   <div class="an">Banks, Quanesha</div><div class='ad'>Bankers Insurance Company | Financial Casualty &amp; Surety Inc | Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0020302016</div>
 </a><a class="agent" href="/bailbonds/nc/agent/banks-jones-elbretia-m-0021767441/">
   <div class="an">Banks-Jones, Elbretia, M</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0021767441</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baptiste-messiah-0021595902/">
   <div class="an">Baptiste, Messiah</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0021595902</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barber-ashley-0022164208/">
   <div class="an">Barber, Ashley</div><div class='ad'>First Community Insurance Company | Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0022164208</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barber-douglas-w-0010004580/">
   <div class="an">Barber, Douglas, W</div><div class='ad'>1St Atlantic Surety Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0010004580</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barefoot-justin-0021091266/">
   <div class="an">Barefoot, Justin</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0021091266</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barker-andrew-0020418032/">
   <div class="an">Barker, Andrew</div><div class='ad'>Allegheny Casualty Company | Financial Casualty &amp; Surety Inc | International Fidelity Insurance Company | North River Insurance Company | Palmetto Surety Corporation | United States Fire Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0020418032</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-anthony-e-0010004606/">
   <div class="an">Barnes, Anthony, E</div><div class='ad'>Crum &amp; Forster Indemnity Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0010004606</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-ashley-e-0018588434/">
   <div class="an">Barnes, Ashley, E</div><div class='ad'>Barnes, Ashley, E | First Community Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0018588434</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-brice-m-0018851374/">
   <div class="an">Barnes, Brice, M</div><div class='ad'>Bankers Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0018851374</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-candice-i-0016724951/">
   <div class="an">Barnes, Candice, I</div><div class='ad'>Accredited Surety And Casualty Company Inc | First Community Insurance Company | Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0016724951</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-david-0019021250/">
   <div class="an">Barnes, David</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0019021250</div>
 </a><a class="agent" href="/bailbonds/nc/agent/barnes-debbie-s-0017186725/">
   <div class="an">Barnes, Debbie, S</div><div class='ad'>Allegheny Casualty Company | Bankers Insurance Company | International Fidelity Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0017186725</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://s3.amazonaws.com/nccourts-01-civil-and-criminal-calendars/bonds/Active-Bond-Report-Buncombe-County.pdf' rel='nofollow'>s3.amazonaws.com</a></p>
@@ -219,5 +241,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([35.60937, -82.53042], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,26 +107,31 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Big Dawg Bail Bonds</div>
   <div class="ad">133 W. CALL ST., STARKE, 32091</div>
   
+  <div class='ad'>✉ BIGDAWGBAILBOND@GMAIL.COM</div>
   <div class='lic'>License: B000401</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hinds-dustin-johnson-p094680/">
   <div class="an">Hinds, Dustin Johnson</div>
   <div class="ad">AAA BAIL BONDING AGENCY 954 NORTH TEMPLE AVE., STARKE, 32091</div>
   
+  <div class='ad'>✉ BAILBONDS987@AOL.COM</div>
   <div class='lic'>License: P094680</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hinds-patricia-johnson-a193295/">
   <div class="an">Hinds, Patricia Johnson</div>
   <div class="ad">AAA BAIL BONDING AGENCY 1013 N. TEMPLE AVE, STARKE, 32091</div>
   
+  <div class='ad'>✉ BONDSLADY@EMBARQMAIL.COM</div>
   <div class='lic'>License: A193295</div>
 </a><a class="agent" href="/bailbonds/fl/agent/morgan-kyle-w-g019094/">
   <div class="an">Morgan, Kyle W</div>
   <div class="ad">133 W. CALL ST, STARKE, 32091</div>
   
+  <div class='ad'>✉ KYLEMORGAN313@GMAIL.COM</div>
   <div class='lic'>License: G019094</div>
 </a><a class="agent" href="/bailbonds/fl/agent/russell-kevan-p-w414856/">
   <div class="an">Russell, Kevan P</div>
   <div class="ad">133 W, CALL ST., STARKE, 32091</div>
   
+  <div class='ad'>✉ LONEWOLF4006@GMAIL.COM</div>
   <div class='lic'>License: W414856</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.95239, -82.1667], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.94428,"lng":-82.11016,"label":"<strong><a href='/bailbonds/fl/agent/big-dawg-bail-bonds-b000401/'>Big Dawg Bail Bonds</a></strong>"},{"lat":29.95431,"lng":-82.10783,"label":"<strong><a href='/bailbonds/fl/agent/hinds-dustin-johnson-p094680/'>Hinds, Dustin Johnson</a></strong>"},{"lat":29.95523,"lng":-82.10765,"label":"<strong><a href='/bailbonds/fl/agent/hinds-patricia-johnson-a193295/'>Hinds, Patricia Johnson</a></strong>"},{"lat":29.94428,"lng":-82.11016,"label":"<strong><a href='/bailbonds/fl/agent/morgan-kyle-w-g019094/'>Morgan, Kyle W</a></strong>"},{"lat":29.94428,"lng":-82.11016,"label":"<strong><a href='/bailbonds/fl/agent/russell-kevan-p-w414856/'>Russell, Kevan P</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

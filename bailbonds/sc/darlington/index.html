@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,32 +106,38 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/easterling-james-m-prb-20764206-npn-20764206/">
   <div class="an">Easterling, James M</div><div class='ad'>Backwoods Bonding Co Llc</div>
   <div class="ad">Hartsville, 29550</div>
-  <div class='ph'>(843) 309-9494</div>
+  <div class='ph'>☎ (843) 309-9494</div>
+  
   <div class='lic'>License: PRB 20764206 (NPN 20764206)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/galloway-sidney-t-prb-8984269-npn-8984269/">
   <div class="an">Galloway, Sidney T</div>
   <div class="ad">Lamar, 29069</div>
-  <div class='ph'>(843) 495-6280</div>
+  <div class='ph'>☎ (843) 495-6280</div>
+  
   <div class='lic'>License: PRB 8984269 (NPN 8984269)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/lambert-harris-b-iii-prb-6412511-npn-6412511/">
   <div class="an">Lambert, Harris B Iii</div>
   <div class="ad">Hartsville, 29550</div>
-  <div class='ph'>(843) 230-3982</div>
+  <div class='ph'>☎ (843) 230-3982</div>
+  
   <div class='lic'>License: PRB 6412511 (NPN 6412511)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/wilhelm-fred-l-sr-prb-6430978-npn-6430978/">
   <div class="an">Wilhelm, Fred L Sr</div><div class='ad'>Avl Bonding</div>
   <div class="ad">Hartsville, 29550</div>
-  <div class='ph'>(843) 861-1794</div>
+  <div class='ph'>☎ (843) 861-1794</div>
+  
   <div class='lic'>License: PRB 6430978 (NPN 6430978)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/easterling-ann-howle-ms-rbm-21554641-npn-21554641/">
   <div class="an">Easterling, Ann Howle Ms.</div>
   <div class="ad">Hartsville, 29550</div>
-  <div class='ph'>(843) 309-9494</div>
+  <div class='ph'>☎ (843) 309-9494</div>
+  
   <div class='lic'>License: RBM 21554641 (NPN 21554641)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/chapman-shawn-d-sbb-6421971-npn-6421971/">
   <div class="an">Chapman, Shawn D</div>
   <div class="ad">Darlington, 29532</div>
-  <div class='ph'>(843) 395-0630</div>
+  <div class='ph'>☎ (843) 395-0630</div>
+  
   <div class='lic'>License: SBB 6421971 (NPN 6421971)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Darlington' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Darlington' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Darlington' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.33219, -79.96211], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.366,"lng":-80.08326,"label":"<strong>4 agents in Hartsville</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/easterling-james-m-prb-20764206-npn-20764206/'>Easterling, James M</a></strong><br>\u260e (843) 309-9494<br><strong><a href='/bailbonds/sc/agent/lambert-harris-b-iii-prb-6412511-npn-6412511/'>Lambert, Harris B Iii</a></strong><br>\u260e (843) 230-3982<br><strong><a href='/bailbonds/sc/agent/wilhelm-fred-l-sr-prb-6430978-npn-6430978/'>Wilhelm, Fred L Sr</a></strong><br>\u260e (843) 861-1794<br><strong><a href='/bailbonds/sc/agent/easterling-ann-howle-ms-rbm-21554641-npn-21554641/'>Easterling, Ann Howle Ms.</a></strong><br>\u260e (843) 309-9494"},{"lat":34.16947,"lng":-80.06507,"label":"<strong>1 agent in Lamar</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/galloway-sidney-t-prb-8984269-npn-8984269/'>Galloway, Sidney T</a></strong><br>\u260e (843) 495-6280"},{"lat":34.30138,"lng":-79.86717,"label":"<strong>1 agent in Darlington</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/chapman-shawn-d-sbb-6421971-npn-6421971/'>Chapman, Shawn D</a></strong><br>\u260e (843) 395-0630"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

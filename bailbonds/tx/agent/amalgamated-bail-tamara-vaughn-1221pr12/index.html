@@ -9,7 +9,7 @@
 <meta property="og:title" content="Amalgamated Bail (Tamara Vaughn) — Licensed Bail Bond Agent in Parker County">
 <meta property="og:description" content="Amalgamated Bail (Tamara Vaughn): licensed bail bond agent in Parker County. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Amalgamated Bail (Tamara Vaughn)","url":"https://hyder.me/bailbonds/tx/agent/amalgamated-bail-tamara-vaughn-1221pr12/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"817-599-4949","address":{"@type":"PostalAddress","streetAddress":"801 Fort Worth Hwy","addressLocality":"Weatherford","postalCode":"76086","addressRegion":"TX"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Amalgamated Bail (Tamara Vaughn)","url":"https://hyder.me/bailbonds/tx/agent/amalgamated-bail-tamara-vaughn-1221pr12/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"817-599-4949","address":{"@type":"PostalAddress","streetAddress":"801 Fort Worth Hwy","addressLocality":"Weatherford","postalCode":"76086","addressRegion":"TX"},"geo":{"@type":"GeoCoordinates","latitude":32.75881,"longitude":-97.786}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Amalgamated Bail (Tamara Vaughn)</h1>
 <p class="sub">Licensed bail bond agent in Texas — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Address:</strong> 801 Fort Worth Hwy, Weatherford, 76086</li><li><strong>Phone:</strong> 817-599-4949</li><li><strong>License:</strong> 1221PR12</li><li><strong>Serves:</strong> <a href="/bailbonds/tx/parker/">Parker County, TX</a></li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Address:</strong> 801 Fort Worth Hwy, Weatherford, 76086</li><li><strong>Phone:</strong> <a href="tel:817-599-4949">817-599-4949</a></li><li><strong>License:</strong> 1221PR12</li><li><strong>Serves:</strong> <a href="/bailbonds/tx/parker/">Parker County, TX</a></li></ul>
   <p class="src">Source: official roster — <a href="https://www.parkercountytx.gov/DocumentCenter/View/8814/Approved-Bonding-Companies" rel="nofollow">www.parkercountytx.gov</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Texas</h2>
@@ -110,5 +112,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.75881, -97.786], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.75881,"lng":-97.786,"label":"<strong>Amalgamated Bail (Tamara Vaughn)</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

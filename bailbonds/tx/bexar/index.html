@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in Bexar County</h2>
@@ -116,217 +118,260 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/deleon-bail-bonds-licensee-agent-nabor-a-deleon-jr-43/">
   <div class="an">DeLeon Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)</div>
   <div class="ad">3459 W. Woodlawn #3, San Antonio, 78228</div>
-  <div class='ph'>(210) 435-5491</div>
+  <div class='ph'>☎ (210) 435-5491</div>
+  
   <div class='lic'>License: 43</div>
 </a><a class="agent" href="/bailbonds/tx/agent/mcrae-bail-bonds-licensee-agent-john-mcrae-46/">
   <div class="an">McRae Bail Bonds (licensee/agent: John McRae)</div>
   <div class="ad">4023 S. Presa, San Antonio, 78223</div>
-  <div class='ph'>(210) 533-5292</div>
+  <div class='ph'>☎ (210) 533-5292</div>
+  
   <div class='lic'>License: 46</div>
 </a><a class="agent" href="/bailbonds/tx/agent/gabriel-bail-bond-licensee-agent-inez-cindy-gabriel-88/">
   <div class="an">Gabriel Bail Bond (licensee/agent: Inez Cindy Gabriel)</div>
   <div class="ad">1502 W. Martin St., San Antonio, 78207</div>
-  <div class='ph'>(210) 225-0300</div>
+  <div class='ph'>☎ (210) 225-0300</div>
+  
   <div class='lic'>License: 88</div>
 </a><a class="agent" href="/bailbonds/tx/agent/e-z-out-bail-bonds-licensee-agent-j-l-mcentire-100/">
   <div class="an">E-Z Out Bail Bonds (licensee/agent: J. L. McEntire)</div>
   <div class="ad">115 S. Comal St., San Antonio, 78207</div>
-  <div class='ph'>(210) 225-1544</div>
+  <div class='ph'>☎ (210) 225-1544</div>
+  
   <div class='lic'>License: 100</div>
 </a><a class="agent" href="/bailbonds/tx/agent/anytime-bail-bonds-licensee-agent-david-sawyer-111/">
   <div class="an">Anytime Bail Bonds (licensee/agent: David Sawyer)</div>
   <div class="ad">1111 Quintana Rd., San Antonio, 78211</div>
-  <div class='ph'>(210) 213-2995</div>
+  <div class='ph'>☎ (210) 213-2995</div>
+  
   <div class='lic'>License: 111</div>
 </a><a class="agent" href="/bailbonds/tx/agent/y-l-s-bail-bonds-licensee-agent-herman-rover-113/">
   <div class="an">Y L &amp; S Bail Bonds (licensee/agent: Herman Rover)</div>
   <div class="ad">802 Enrique Barrera Pkwy, San Antonio, 78237</div>
-  <div class='ph'>(210) 431-9680</div>
+  <div class='ph'>☎ (210) 431-9680</div>
+  
   <div class='lic'>License: 113</div>
 </a><a class="agent" href="/bailbonds/tx/agent/rangel-s-bonding-service-licensee-agent-roland-rangel-116/">
   <div class="an">Rangel´s Bonding Service (licensee/agent: Roland Rangel)</div>
   <div class="ad">1323 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 244-4000</div>
+  <div class='ph'>☎ (210) 244-4000</div>
+  
   <div class='lic'>License: 116</div>
 </a><a class="agent" href="/bailbonds/tx/agent/armstrong-bail-bonds-licensee-agent-roscoe-armstrong-125/">
   <div class="an">Armstrong Bail Bonds (licensee/agent: Roscoe Armstrong)</div>
   <div class="ad">930 S. Hackberry, San Antonio, 78210</div>
-  <div class='ph'>(210) 533-9600</div>
+  <div class='ph'>☎ (210) 533-9600</div>
+  
   <div class='lic'>License: 125</div>
 </a><a class="agent" href="/bailbonds/tx/agent/texas-bail-bonds-licensee-agent-nabor-a-deleon-jr-129/">
   <div class="an">Texas Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)</div>
   <div class="ad">3459 W. Woodlawn #3, San Antonio, 78228</div>
-  <div class='ph'>(210) 435-5491</div>
+  <div class='ph'>☎ (210) 435-5491</div>
+  
   <div class='lic'>License: 129</div>
 </a><a class="agent" href="/bailbonds/tx/agent/alfaro-bail-bonds-licensee-agent-lisa-marie-alfaro-146/">
   <div class="an">Alfaro Bail Bonds (licensee/agent: Lisa Marie Alfaro)</div>
   <div class="ad">1138 N. Flores, San Antonio, 78212</div>
-  <div class='ph'>(210) 227-1117</div>
+  <div class='ph'>☎ (210) 227-1117</div>
+  
   <div class='lic'>License: 146</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aa-best-bail-bonds-licensee-agent-albert-saenz-149/">
   <div class="an">AA-Best Bail Bonds (licensee/agent: Albert Saenz)</div>
   <div class="ad">103 S. Comal, San Antonio, 78207</div>
-  <div class='ph'>(210) 228-9999</div>
+  <div class='ph'>☎ (210) 228-9999</div>
+  
   <div class='lic'>License: 149</div>
 </a><a class="agent" href="/bailbonds/tx/agent/eagle-bail-bonds-licensee-agent-manuel-a-rodriguez-150/">
   <div class="an">Eagle Bail Bonds (licensee/agent: Manuel A. Rodriguez)</div>
   <div class="ad">2515 W. Commerce #1, San Antonio, 78207</div>
-  <div class='ph'>(210) 436-2133</div>
+  <div class='ph'>☎ (210) 436-2133</div>
+  
   <div class='lic'>License: 150</div>
 </a><a class="agent" href="/bailbonds/tx/agent/available-bail-bonds-licensee-agent-fernando-rover-153/">
   <div class="an">Available Bail Bonds (licensee/agent: Fernando Rover)</div>
   <div class="ad">3119 Martin Luther King, San Antonio, 78220</div>
-  <div class='ph'>(210) 299-4178</div>
+  <div class='ph'>☎ (210) 299-4178</div>
+  
   <div class='lic'>License: 153</div>
 </a><a class="agent" href="/bailbonds/tx/agent/cowboy-bail-bonds-licensee-agent-christopher-e-embrey-159/">
   <div class="an">Cowboy Bail Bonds (licensee/agent: Christopher E. Embrey)</div>
   <div class="ad">1122 W. Commerce, San Antonio, 78207</div>
-  <div class='ph'>(210) 212-6337</div>
+  <div class='ph'>☎ (210) 212-6337</div>
+  
   <div class='lic'>License: 159</div>
 </a><a class="agent" href="/bailbonds/tx/agent/eagle-1-bail-bonds-licensee-agent-manuel-rodriguez-165/">
   <div class="an">Eagle-1 Bail Bonds (licensee/agent: Manuel Rodriguez)</div>
   <div class="ad">2515 W. Commerce #1, San Antonio, 78207</div>
-  <div class='ph'>(210) 436-2133</div>
+  <div class='ph'>☎ (210) 436-2133</div>
+  
   <div class='lic'>License: 165</div>
 </a><a class="agent" href="/bailbonds/tx/agent/mr-jones-bail-bonds-licensee-agent-herman-rover-173/">
   <div class="an">Mr. Jones Bail Bonds (licensee/agent: Herman Rover)</div>
   <div class="ad">225 N. New Braunfels, San Antonio, 78202</div>
-  <div class='ph'>(210) 271-2244</div>
+  <div class='ph'>☎ (210) 271-2244</div>
+  
   <div class='lic'>License: 173</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aaa-spurs-bail-bonds-licensee-agent-christopher-embrey-174/">
   <div class="an">AAA Spurs Bail Bonds (licensee/agent: Christopher Embrey)</div>
   <div class="ad">1122 W. Commerce, San Antonio, 78207</div>
-  <div class='ph'>(210) 212-6300</div>
+  <div class='ph'>☎ (210) 212-6300</div>
+  
   <div class='lic'>License: 174</div>
 </a><a class="agent" href="/bailbonds/tx/agent/mitchell-bail-bonds-licensee-agent-shanette-mitchell-176/">
   <div class="an">Mitchell Bail Bonds (licensee/agent: Shanette Mitchell)</div>
   <div class="ad">3003 Martin Luther King #1, San Antonio, 78220</div>
-  <div class='ph'>(210) 472-2245</div>
+  <div class='ph'>☎ (210) 472-2245</div>
+  
   <div class='lic'>License: 176</div>
 </a><a class="agent" href="/bailbonds/tx/agent/a-bad-boy-bail-bonds-licensee-agent-roscoe-armstrong-jr-181/">
   <div class="an">A-Bad Boy Bail Bonds (licensee/agent: Roscoe Armstrong Jr.)</div>
   <div class="ad">930 S. Hackberry, San Antonio, 78210</div>
-  <div class='ph'>(210) 533-9600</div>
+  <div class='ph'>☎ (210) 533-9600</div>
+  
   <div class='lic'>License: 181</div>
 </a><a class="agent" href="/bailbonds/tx/agent/river-city-bail-bonds-licensee-agent-clay-embrey-182/">
   <div class="an">River City Bail Bonds (licensee/agent: Clay Embrey)</div>
   <div class="ad">102 S. Comal St., San Antonio, 78207</div>
-  <div class='ph'>(210) 271-7700</div>
+  <div class='ph'>☎ (210) 271-7700</div>
+  
   <div class='lic'>License: 182</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aa-ritz-bail-bonds-licensee-agent-daniel-ritz-iii-184/">
   <div class="an">AA-Ritz Bail Bonds (licensee/agent: Daniel Ritz III)</div>
   <div class="ad">1503 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 226-6363</div>
+  <div class='ph'>☎ (210) 226-6363</div>
+  
   <div class='lic'>License: 184</div>
 </a><a class="agent" href="/bailbonds/tx/agent/2nd-chance-bail-bonds-licensee-agent-elton-r-green-jr-190/">
   <div class="an">2nd Chance Bail Bonds (licensee/agent: Elton R. Green, Jr.)</div>
   <div class="ad">1621 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 785-9700</div>
+  <div class='ph'>☎ (210) 785-9700</div>
+  
   <div class='lic'>License: 190</div>
 </a><a class="agent" href="/bailbonds/tx/agent/lucky-eagle-1-bail-bonds-licensee-agent-manuel-a-rodriguez-192/">
   <div class="an">Lucky Eagle 1 Bail Bonds (licensee/agent: Manuel A. Rodriguez)</div>
   <div class="ad">2515 W. Commerce #1, San Antonio, 78207</div>
-  <div class='ph'>(210) 228-0090</div>
+  <div class='ph'>☎ (210) 228-0090</div>
+  
   <div class='lic'>License: 192</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aaa-garcia-bail-bonds-licensee-agent-luis-j-garcia-195/">
   <div class="an">AAA Garcia Bail Bonds (licensee/agent: Luis J. Garcia)</div>
   <div class="ad">5714 NW Loop 410 #500, San Antonio, 78238</div>
-  <div class='ph'>(210) 888-2245</div>
+  <div class='ph'>☎ (210) 888-2245</div>
+  
   <div class='lic'>License: 195</div>
 </a><a class="agent" href="/bailbonds/tx/agent/triple-a-bail-bonds-licensee-agent-daniel-ritz-iii-201/">
   <div class="an">Triple A Bail Bonds (licensee/agent: Daniel Ritz III)</div>
   <div class="ad">1503 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 226-6969</div>
+  <div class='ph'>☎ (210) 226-6969</div>
+  
   <div class='lic'>License: 201</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aladdin-bail-bonds-licensee-agent-susan-monsalvo-smith-202/">
   <div class="an">Aladdin Bail Bonds (licensee/agent: Susan Monsalvo Smith)</div>
   <div class="ad">1303 W. Houston St., San Antonio, 78207</div>
-  <div class='ph'>(210) 224-4222</div>
+  <div class='ph'>☎ (210) 224-4222</div>
+  
   <div class='lic'>License: 202</div>
 </a><a class="agent" href="/bailbonds/tx/agent/fernandos-bail-bond-licensee-agent-fernando-c-rover-204/">
   <div class="an">Fernando’s Bail Bond (licensee/agent: Fernando C. Rover)</div>
   <div class="ad">2222 E. Commerce St., San Antonio, 78203</div>
-  <div class='ph'>(210) 222-2330</div>
+  <div class='ph'>☎ (210) 222-2330</div>
+  
   <div class='lic'>License: 204</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aaa-garcia-bail-bonds-2-licensee-agent-stefanie-m-garcia-206/">
   <div class="an">AAA Garcia Bail Bonds #2 (licensee/agent: Stefanie M. Garcia)</div>
   <div class="ad">5714 NW Loop 410, #500, San Antonio, 78238</div>
-  <div class='ph'>(210) 465-7777</div>
+  <div class='ph'>☎ (210) 465-7777</div>
+  
   <div class='lic'>License: 206</div>
 </a><a class="agent" href="/bailbonds/tx/agent/alamo-city-bail-bonds-ii-licensee-agent-dane-embrey-209/">
   <div class="an">Alamo City Bail Bonds II (licensee/agent: Dane Embrey)</div>
   <div class="ad">1126 W. Commerce, San Antonio, 78207</div>
-  <div class='ph'>(210) 229-1988</div>
+  <div class='ph'>☎ (210) 229-1988</div>
+  
   <div class='lic'>License: 209</div>
 </a><a class="agent" href="/bailbonds/tx/agent/a-action-bail-bonds-2-licensee-agent-dane-embrey-210/">
   <div class="an">A-Action Bail Bonds #2 (licensee/agent: Dane Embrey)</div>
   <div class="ad">1126 W. Commerce, San Antonio, 78207</div>
-  <div class='ph'>(210) 226-5487</div>
+  <div class='ph'>☎ (210) 226-5487</div>
+  
   <div class='lic'>License: 210</div>
 </a><a class="agent" href="/bailbonds/tx/agent/mcrae-bail-bonds-3-licensee-agent-john-mcrae-211/">
   <div class="an">McRae Bail Bonds #3 (licensee/agent: John McRae)</div>
   <div class="ad">4023 S. Presa, San Antonio, 78223</div>
-  <div class='ph'>(210) 533-5292</div>
+  <div class='ph'>☎ (210) 533-5292</div>
+  
   <div class='lic'>License: 211</div>
 </a><a class="agent" href="/bailbonds/tx/agent/aa-best-bail-bonds-2-licensee-agent-albert-saenz-212/">
   <div class="an">AA Best Bail Bonds #2 (licensee/agent: Albert Saenz)</div>
   <div class="ad">103 S. Comal, San Antonio, 78207</div>
-  <div class='ph'>(210) 228-9999</div>
+  <div class='ph'>☎ (210) 228-9999</div>
+  
   <div class='lic'>License: 212</div>
 </a><a class="agent" href="/bailbonds/tx/agent/mitchell-bail-bond-services-no-2-licensee-agent-shanette-mit-214/">
   <div class="an">Mitchell Bail Bond Services No.2 (licensee/agent: Shanette Mitchell)</div>
   <div class="ad">1303 W. Travis, San Antonio, 78207</div>
-  <div class='ph'>(210) 354-2245</div>
+  <div class='ph'>☎ (210) 354-2245</div>
+  
   <div class='lic'>License: 214</div>
 </a><a class="agent" href="/bailbonds/tx/agent/around-the-clock-bail-bonds-licensee-agent-nicholas-kerr-215/">
   <div class="an">Around The Clock Bail Bonds (licensee/agent: Nicholas Kerr)</div>
   <div class="ad">2704 W. Commerce St., San Antonio, 78207</div>
-  <div class='ph'>(210) 405-6000</div>
+  <div class='ph'>☎ (210) 405-6000</div>
+  
   <div class='lic'>License: 215</div>
 </a><a class="agent" href="/bailbonds/tx/agent/yl-s-bail-bond-2-licensee-agent-herman-rover-216/">
   <div class="an">YL &amp; S Bail Bond #2 (licensee/agent: Herman Rover)</div>
   <div class="ad">802 Enrique Barrera Pkwy, San Antonio, 78237</div>
-  <div class='ph'>(210) 431-9680</div>
+  <div class='ph'>☎ (210) 431-9680</div>
+  
   <div class='lic'>License: 216</div>
 </a><a class="agent" href="/bailbonds/tx/agent/san-antonio-bail-bonds-2-licensee-agent-alfonso-perez-217/">
   <div class="an">San Antonio Bail Bonds 2 (licensee/agent: Alfonso Perez)</div>
   <div class="ad">1511 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 231-6444</div>
+  <div class='ph'>☎ (210) 231-6444</div>
+  
   <div class='lic'>License: 217</div>
 </a><a class="agent" href="/bailbonds/tx/agent/copa-3-bail-bonds-licensee-agent-alfonso-perez-218/">
   <div class="an">COPA 3 Bail Bonds (licensee/agent: Alfonso Perez)</div>
   <div class="ad">1511 W. Martin St., San Antonio, 78207</div>
-  <div class='ph'>(210) 231-0202</div>
+  <div class='ph'>☎ (210) 231-0202</div>
+  
   <div class='lic'>License: 218</div>
 </a><a class="agent" href="/bailbonds/tx/agent/bexar-bail-bonds-licensee-agent-clay-embrey-219/">
   <div class="an">Bexar Bail Bonds (licensee/agent: Clay Embrey)</div>
   <div class="ad">102 S. Comal St., San Antonio, 78207</div>
-  <div class='ph'>(210) 224-9915</div>
+  <div class='ph'>☎ (210) 224-9915</div>
+  
   <div class='lic'>License: 219</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jailbusters-bail-bonds-2-licensee-agent-ishelle-fernandez-220/">
   <div class="an">Jailbusters Bail Bonds #2 (licensee/agent: Ishelle Fernandez)</div>
   <div class="ad">1300 W. Travis St., San Antonio, 78207</div>
-  <div class='ph'>(210) 223-3733</div>
+  <div class='ph'>☎ (210) 223-3733</div>
+  
   <div class='lic'>License: 220</div>
 </a><a class="agent" href="/bailbonds/tx/agent/lrj-bail-bonds-licensee-agent-leticia-rodriguez-221/">
   <div class="an">LRJ Bail Bonds (licensee/agent: Leticia Rodriguez)</div>
   <div class="ad">2515 W. Commerce Ste 1, San Antonio, 78207</div>
-  <div class='ph'>(210) 620-0180</div>
+  <div class='ph'>☎ (210) 620-0180</div>
+  
   <div class='lic'>License: 221</div>
 </a><a class="agent" href="/bailbonds/tx/agent/free-me-bail-bonds-licensee-agent-nicole-guerra-222/">
   <div class="an">Free Me Bail Bonds (licensee/agent: Nicole Guerra)</div>
   <div class="ad">14322 IH 10 E., Ste 105, Converse, 78109</div>
-  <div class='ph'>(210) 874-7333</div>
+  <div class='ph'>☎ (210) 874-7333</div>
+  
   <div class='lic'>License: 222</div>
 </a><a class="agent" href="/bailbonds/tx/agent/a-action-bail-bonds-3-licensee-agent-dane-embrey-223/">
   <div class="an">A-Action Bail Bonds #3 (licensee/agent: Dane Embrey)</div>
   <div class="ad">1126 W. Commerce, San Antonio, 78207</div>
-  <div class='ph'>(210) 226-5487</div>
+  <div class='ph'>☎ (210) 226-5487</div>
+  
   <div class='lic'>License: 223</div>
 </a><a class="agent" href="/bailbonds/tx/agent/amigo-san-antonio-bail-bonds-licensee-agent-alfonso-perez-224/">
   <div class="an">Amigo San Antonio Bail Bonds (licensee/agent: Alfonso Perez)</div>
   <div class="ad">1511 W. Martin, San Antonio, 78207</div>
-  <div class='ph'>(210) 231-6444</div>
+  <div class='ph'>☎ (210) 231-6444</div>
+  
   <div class='lic'>License: 224</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.bexar.org/962/Bail-Bond-Companies' rel='nofollow'>www.bexar.org</a></p>
 </div>
@@ -346,5 +391,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.44867, -98.52015], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.45802,"lng":-98.56727,"label":"<strong><a href='/bailbonds/tx/agent/deleon-bail-bonds-licensee-agent-nabor-a-deleon-jr-43/'>DeLeon Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)</a></strong><br>\u260e (210) 435-5491"},{"lat":29.38387,"lng":-98.47834,"label":"<strong><a href='/bailbonds/tx/agent/mcrae-bail-bonds-licensee-agent-john-mcrae-46/'>McRae Bail Bonds (licensee/agent: John McRae)</a></strong><br>\u260e (210) 533-5292"},{"lat":29.43034,"lng":-98.50837,"label":"<strong><a href='/bailbonds/tx/agent/gabriel-bail-bond-licensee-agent-inez-cindy-gabriel-88/'>Gabriel Bail Bond (licensee/agent: Inez Cindy Gabriel)</a></strong><br>\u260e (210) 225-0300"},{"lat":29.42626,"lng":-98.5076,"label":"<strong><a href='/bailbonds/tx/agent/e-z-out-bail-bonds-licensee-agent-j-l-mcentire-100/'>E-Z Out Bail Bonds (licensee/agent: J. L. McEntire)</a></strong><br>\u260e (210) 225-1544"},{"lat":29.37775,"lng":-98.55217,"label":"<strong><a href='/bailbonds/tx/agent/anytime-bail-bonds-licensee-agent-david-sawyer-111/'>Anytime Bail Bonds (licensee/agent: David Sawyer)</a></strong><br>\u260e (210) 213-2995"},{"lat":29.43026,"lng":-98.50615,"label":"<strong><a href='/bailbonds/tx/agent/rangel-s-bonding-service-licensee-agent-roland-rangel-116/'>Rangel\u00b4s Bonding Service (licensee/agent: Roland Rangel)</a></strong><br>\u260e (210) 244-4000"},{"lat":29.40983,"lng":-98.47319,"label":"<strong><a href='/bailbonds/tx/agent/armstrong-bail-bonds-licensee-agent-roscoe-armstrong-125/'>Armstrong Bail Bonds (licensee/agent: Roscoe Armstrong)</a></strong><br>\u260e (210) 533-9600"},{"lat":29.45802,"lng":-98.56727,"label":"<strong><a href='/bailbonds/tx/agent/texas-bail-bonds-licensee-agent-nabor-a-deleon-jr-129/'>Texas Bail Bonds (licensee/agent: Nabor A. DeLeon Jr.)</a></strong><br>\u260e (210) 435-5491"},{"lat":29.43653,"lng":-98.5017,"label":"<strong><a href='/bailbonds/tx/agent/alfaro-bail-bonds-licensee-agent-lisa-marie-alfaro-146/'>Alfaro Bail Bonds (licensee/agent: Lisa Marie Alfaro)</a></strong><br>\u260e (210) 227-1117"},{"lat":29.42638,"lng":-98.50759,"label":"<strong><a href='/bailbonds/tx/agent/aa-best-bail-bonds-licensee-agent-albert-saenz-149/'>AA-Best Bail Bonds (licensee/agent: Albert Saenz)</a></strong><br>\u260e (210) 228-9999"},{"lat":29.42781,"lng":-98.52257,"label":"<strong><a href='/bailbonds/tx/agent/eagle-bail-bonds-licensee-agent-manuel-a-rodriguez-150/'>Eagle Bail Bonds (licensee/agent: Manuel A. Rodriguez)</a></strong><br>\u260e (210) 436-2133"},{"lat":29.41349,"lng":-98.43331,"label":"<strong><a href='/bailbonds/tx/agent/available-bail-bonds-licensee-agent-fernando-rover-153/'>Available Bail Bonds (licensee/agent: Fernando Rover)</a></strong><br>\u260e (210) 299-4178"},{"lat":29.42632,"lng":-98.50671,"label":"<strong><a href='/bailbonds/tx/agent/cowboy-bail-bonds-licensee-agent-christopher-e-embrey-159/'>Cowboy Bail Bonds (licensee/agent: Christopher E. Embrey)</a></strong><br>\u260e (210) 212-6337"},{"lat":29.42781,"lng":-98.52257,"label":"<strong><a href='/bailbonds/tx/agent/eagle-1-bail-bonds-licensee-agent-manuel-rodriguez-165/'>Eagle-1 Bail Bonds (licensee/agent: Manuel Rodriguez)</a></strong><br>\u260e (210) 436-2133"},{"lat":29.42182,"lng":-98.46132,"label":"<strong><a href='/bailbonds/tx/agent/mr-jones-bail-bonds-licensee-agent-herman-rover-173/'>Mr. Jones Bail Bonds (licensee/agent: Herman Rover)</a></strong><br>\u260e (210) 271-2244"},{"lat":29.42632,"lng":-98.50671,"label":"<strong><a href='/bailbonds/tx/agent/aaa-spurs-bail-bonds-licensee-agent-christopher-embrey-174/'>AAA Spurs Bail Bonds (licensee/agent: Christopher Embrey)</a></strong><br>\u260e (210) 212-6300"},{"lat":29.41349,"lng":-98.43662,"label":"<strong><a href='/bailbonds/tx/agent/mitchell-bail-bonds-licensee-agent-shanette-mitchell-176/'>Mitchell Bail Bonds (licensee/agent: Shanette Mitchell)</a></strong><br>\u260e (210) 472-2245"},{"lat":29.40983,"lng":-98.47319,"label":"<strong><a href='/bailbonds/tx/agent/a-bad-boy-bail-bonds-licensee-agent-roscoe-armstrong-jr-181/'>A-Bad Boy Bail Bonds (licensee/agent: Roscoe Armstrong Jr.)</a></strong><br>\u260e (210) 533-9600"},{"lat":29.42637,"lng":-98.50746,"label":"<strong><a href='/bailbonds/tx/agent/river-city-bail-bonds-licensee-agent-clay-embrey-182/'>River City Bail Bonds (licensee/agent: Clay Embrey)</a></strong><br>\u260e (210) 271-7700"},{"lat":29.43046,"lng":-98.50836,"label":"<strong><a href='/bailbonds/tx/agent/aa-ritz-bail-bonds-licensee-agent-daniel-ritz-iii-184/'>AA-Ritz Bail Bonds (licensee/agent: Daniel Ritz III)</a></strong><br>\u260e (210) 226-6363"},{"lat":29.43058,"lng":-98.50967,"label":"<strong><a href='/bailbonds/tx/agent/2nd-chance-bail-bonds-licensee-agent-elton-r-green-jr-190/'>2nd Chance Bail Bonds (licensee/agent: Elton R. Green, Jr.)</a></strong><br>\u260e (210) 785-9700"},{"lat":29.42781,"lng":-98.52257,"label":"<strong><a href='/bailbonds/tx/agent/lucky-eagle-1-bail-bonds-licensee-agent-manuel-a-rodriguez-192/'>Lucky Eagle 1 Bail Bonds (licensee/agent: Manuel A. Rodriguez)</a></strong><br>\u260e (210) 228-0090"},{"lat":29.48197,"lng":-98.60114,"label":"<strong><a href='/bailbonds/tx/agent/aaa-garcia-bail-bonds-licensee-agent-luis-j-garcia-195/'>AAA Garcia Bail Bonds (licensee/agent: Luis J. Garcia)</a></strong><br>\u260e (210) 888-2245"},{"lat":29.43046,"lng":-98.50836,"label":"<strong><a href='/bailbonds/tx/agent/triple-a-bail-bonds-licensee-agent-daniel-ritz-iii-201/'>Triple A Bail Bonds (licensee/agent: Daniel Ritz III)</a></strong><br>\u260e (210) 226-6969"},{"lat":29.42741,"lng":-98.50871,"label":"<strong><a href='/bailbonds/tx/agent/aladdin-bail-bonds-licensee-agent-susan-monsalvo-smith-202/'>Aladdin Bail Bonds (licensee/agent: Susan Monsalvo Smith)</a></strong><br>\u260e (210) 224-4222"},{"lat":29.41939,"lng":-98.46071,"label":"<strong><a href='/bailbonds/tx/agent/fernandos-bail-bond-licensee-agent-fernando-c-rover-204/'>Fernando\u2019s Bail Bond (licensee/agent: Fernando C. Rover)</a></strong><br>\u260e (210) 222-2330"},{"lat":29.48197,"lng":-98.60114,"label":"<strong><a href='/bailbonds/tx/agent/aaa-garcia-bail-bonds-2-licensee-agent-stefanie-m-garcia-206/'>AAA Garcia Bail Bonds #2 (licensee/agent: Stefanie M. Garcia)</a></strong><br>\u260e (210) 465-7777"},{"lat":29.42632,"lng":-98.50675,"label":"<strong><a href='/bailbonds/tx/agent/alamo-city-bail-bonds-ii-licensee-agent-dane-embrey-209/'>Alamo City Bail Bonds II (licensee/agent: Dane Embrey)</a></strong><br>\u260e (210) 229-1988"},{"lat":29.42632,"lng":-98.50675,"label":"<strong><a href='/bailbonds/tx/agent/a-action-bail-bonds-2-licensee-agent-dane-embrey-210/'>A-Action Bail Bonds #2 (licensee/agent: Dane Embrey)</a></strong><br>\u260e (210) 226-5487"},{"lat":29.38387,"lng":-98.47834,"label":"<strong><a href='/bailbonds/tx/agent/mcrae-bail-bonds-3-licensee-agent-john-mcrae-211/'>McRae Bail Bonds #3 (licensee/agent: John McRae)</a></strong><br>\u260e (210) 533-5292"},{"lat":29.42638,"lng":-98.50759,"label":"<strong><a href='/bailbonds/tx/agent/aa-best-bail-bonds-2-licensee-agent-albert-saenz-212/'>AA Best Bail Bonds #2 (licensee/agent: Albert Saenz)</a></strong><br>\u260e (210) 228-9999"},{"lat":29.4283,"lng":-98.50861,"label":"<strong><a href='/bailbonds/tx/agent/mitchell-bail-bond-services-no-2-licensee-agent-shanette-mit-214/'>Mitchell Bail Bond Services No.2 (licensee/agent: Shanette Mitchell)</a></strong><br>\u260e (210) 354-2245"},{"lat":29.42788,"lng":-98.52469,"label":"<strong><a href='/bailbonds/tx/agent/around-the-clock-bail-bonds-licensee-agent-nicholas-kerr-215/'>Around The Clock Bail Bonds (licensee/agent: Nicholas Kerr)</a></strong><br>\u260e (210) 405-6000"},{"lat":29.43046,"lng":-98.50844,"label":"<strong><a href='/bailbonds/tx/agent/san-antonio-bail-bonds-2-licensee-agent-alfonso-perez-217/'>San Antonio Bail Bonds 2 (licensee/agent: Alfonso Perez)</a></strong><br>\u260e (210) 231-6444"},{"lat":29.43046,"lng":-98.50844,"label":"<strong><a href='/bailbonds/tx/agent/copa-3-bail-bonds-licensee-agent-alfonso-perez-218/'>COPA 3 Bail Bonds (licensee/agent: Alfonso Perez)</a></strong><br>\u260e (210) 231-0202"},{"lat":29.42637,"lng":-98.50746,"label":"<strong><a href='/bailbonds/tx/agent/bexar-bail-bonds-licensee-agent-clay-embrey-219/'>Bexar Bail Bonds (licensee/agent: Clay Embrey)</a></strong><br>\u260e (210) 224-9915"},{"lat":29.42818,"lng":-98.5086,"label":"<strong><a href='/bailbonds/tx/agent/jailbusters-bail-bonds-2-licensee-agent-ishelle-fernandez-220/'>Jailbusters Bail Bonds #2 (licensee/agent: Ishelle Fernandez)</a></strong><br>\u260e (210) 223-3733"},{"lat":29.42781,"lng":-98.52257,"label":"<strong><a href='/bailbonds/tx/agent/lrj-bail-bonds-licensee-agent-leticia-rodriguez-221/'>LRJ Bail Bonds (licensee/agent: Leticia Rodriguez)</a></strong><br>\u260e (210) 620-0180"},{"lat":29.42632,"lng":-98.50675,"label":"<strong><a href='/bailbonds/tx/agent/a-action-bail-bonds-3-licensee-agent-dane-embrey-223/'>A-Action Bail Bonds #3 (licensee/agent: Dane Embrey)</a></strong><br>\u260e (210) 226-5487"},{"lat":29.43046,"lng":-98.50844,"label":"<strong><a href='/bailbonds/tx/agent/amigo-san-antonio-bail-bonds-licensee-agent-alfonso-perez-224/'>Amigo San Antonio Bail Bonds (licensee/agent: Alfonso Perez)</a></strong><br>\u260e (210) 231-6444"},{"lat":29.46281,"lng":-98.52464,"label":"<strong>2 agents in San Antonio</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/tx/agent/y-l-s-bail-bonds-licensee-agent-herman-rover-113/'>Y L &amp; S Bail Bonds (licensee/agent: Herman Rover)</a></strong><br>\u260e (210) 431-9680<br><strong><a href='/bailbonds/tx/agent/yl-s-bail-bond-2-licensee-agent-herman-rover-216/'>YL &amp; S Bail Bond #2 (licensee/agent: Herman Rover)</a></strong><br>\u260e (210) 431-9680"},{"lat":29.51249,"lng":-98.30463,"label":"<strong>1 agent in Converse</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/tx/agent/free-me-bail-bonds-licensee-agent-nicole-guerra-222/'>Free Me Bail Bonds (licensee/agent: Nicole Guerra)</a></strong><br>\u260e (210) 874-7333"},{"lat":29.42907,"lng":-98.50727,"label":"<strong>Bexar County Adult Detention Center</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

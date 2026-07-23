@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,75 +107,90 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Baez, Guarionex, Y</div><div class='ad'>1St Atlantic Surety Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0016899878</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-aaron-i-0018516157/">
   <div class="an">Bailey, Aaron, I</div><div class='ad'>Cannon Surety Llc In Rehabilitation | Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0018516157</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-chaz-j-0020723636/">
   <div class="an">Bailey, Chaz, J</div><div class='ad'>Bankers Insurance Company | First Community Insurance Company | Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0020723636</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-glenn-e-0017455428/">
   <div class="an">Bailey, Glenn, E</div><div class='ad'>Allegheny Casualty Company | International Fidelity Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0017455428</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-jessica-0022050100/">
   <div class="an">Bailey, Jessica</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0022050100</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-john-h-0017466677/">
   <div class="an">Bailey, John, H</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0017466677</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-kimberly-a-0017031267/">
   <div class="an">Bailey, Kimberly, A</div><div class='ad'>Accredited Surety And Casualty Company Inc | Allegheny Casualty Company | International Fidelity Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0017031267</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-melvin-a-0017504908/">
   <div class="an">Bailey, Melvin, A</div><div class='ad'>Financial Casualty &amp; Surety Inc</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0017504908</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-michelle-f-0007979776/">
   <div class="an">Bailey, Michelle, F</div><div class='ad'>Palmetto Surety Corporation | Seneca Insurance Company Inc | Universal Fire &amp; Casualty Insurance Company | Us Specialty Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0007979776</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-sabrina-m-0008060235/">
   <div class="an">Bailey, Sabrina, M</div><div class='ad'>Palmetto Surety Corporation</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0008060235</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-susan-m-0016099093/">
   <div class="an">Bailey, Susan, M</div><div class='ad'>Accredited Surety And Casualty Company Inc | Crum &amp; Forster Indemnity Company | Palmetto Surety Corporation</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0016099093</div>
 </a><a class="agent" href="/bailbonds/nc/agent/bailey-veanee-d-0021263105/">
   <div class="an">Bailey, Veanee, D</div><div class='ad'>Bankers Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0021263105</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baker-charles-e-0008393835/">
   <div class="an">Baker, Charles, E</div><div class='ad'>1St Atlantic Surety Company | Allegheny Casualty Company | International Fidelity Insurance Company | Lexington National Insurance Corporation | Lexon Insurance Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0008393835</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baker-eric-l-0021096279/">
   <div class="an">Baker, Eric, L</div><div class='ad'>Crum &amp; Forster Indemnity Company</div>
   <div class="ad"></div>
   
+  
   <div class='lic'>License: 0021096279</div>
 </a><a class="agent" href="/bailbonds/nc/agent/baker-jahzeer-r-0020745803/">
   <div class="an">Baker, Jahzeer, R</div><div class='ad'>United States Fire Insurance Company</div>
   <div class="ad"></div>
+  
   
   <div class='lic'>License: 0020745803</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://s3.amazonaws.com/nccourts-01-civil-and-criminal-calendars/bonds/Active-Bond-Report-Durham-County.pdf' rel='nofollow'>s3.amazonaws.com</a></p>
@@ -194,5 +211,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.03383, -78.87812], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

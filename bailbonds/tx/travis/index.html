@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in Travis County</h2>
@@ -116,67 +118,80 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/ashley-cantu-202504/">
   <div class="an">Ashley Cantu</div><div class='ad'>Ashley's Bail Bonds</div>
   <div class="ad">2012 E. 7th Street Unit 5, Austin, 78702</div>
-  <div class='ph'>(512) 243-7474</div>
+  <div class='ph'>☎ (512) 243-7474</div>
+  
   <div class='lic'>License: 202504</div>
 </a><a class="agent" href="/bailbonds/tx/agent/troy-mclehany-042025/">
   <div class="an">Troy McLehany</div><div class='ad'>Freedom Bail Bonding</div>
   <div class="ad">107 W. 10th Street, Austin, 78701</div>
-  <div class='ph'>(512) 481-0000</div>
+  <div class='ph'>☎ (512) 481-0000</div>
+  
   <div class='lic'>License: 042025</div>
 </a><a class="agent" href="/bailbonds/tx/agent/john-a-zavala-203253/">
   <div class="an">John A. Zavala</div><div class='ad'>Around The Clock Bail Bonds</div>
   <div class="ad">909 Nueces Street, Austin, 78701</div>
-  <div class='ph'>(512) 476-2409</div>
+  <div class='ph'>☎ (512) 476-2409</div>
+  
   <div class='lic'>License: 203253</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jessica-zak-012015/">
   <div class="an">Jessica Zak</div><div class='ad'>Bulldog Bail Bonds</div>
   <div class="ad">600 W. 13th Street, Austin, 78701</div>
-  <div class='ph'>(512) 988-9898</div>
+  <div class='ph'>☎ (512) 988-9898</div>
+  
   <div class='lic'>License: 012015</div>
 </a><a class="agent" href="/bailbonds/tx/agent/billy-engle-281423/">
   <div class="an">Billy Engle</div><div class='ad'>Lone Star Bail Service</div>
   <div class="ad">600 W. 13th Street, Austin, 78701</div>
-  <div class='ph'>(512) 994-9669</div>
+  <div class='ph'>☎ (512) 994-9669</div>
+  
   <div class='lic'>License: 281423</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jennifer-moreno-williams-226450/">
   <div class="an">Jennifer Moreno-Williams</div><div class='ad'>Bail Bonds Express</div>
   <div class="ad">600 W. 28th St, Suite 106-B, Austin, 78705</div>
-  <div class='ph'>(512) 320-0928</div>
+  <div class='ph'>☎ (512) 320-0928</div>
+  
   <div class='lic'>License: 226450</div>
 </a><a class="agent" href="/bailbonds/tx/agent/troy-mclehany-012017/">
   <div class="an">Troy McLehany</div><div class='ad'>Kwik Out Bail Bonds</div>
   <div class="ad">2236 Webberville Rd, Austin, 78702</div>
-  <div class='ph'>(512) 472-5945</div>
+  <div class='ph'>☎ (512) 472-5945</div>
+  
   <div class='lic'>License: 012017</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jessica-zak-234577/">
   <div class="an">Jessica Zak</div><div class='ad'>Austin Texas Bail Bonds</div>
   <div class="ad">600 W. 13th Street, Austin, 78701</div>
-  <div class='ph'>(512) 320-0800</div>
+  <div class='ph'>☎ (512) 320-0800</div>
+  
   <div class='lic'>License: 234577</div>
 </a><a class="agent" href="/bailbonds/tx/agent/daniel-brenza-052021/">
   <div class="an">Daniel Brenza</div><div class='ad'>ATX Bail Bonds 2</div>
   <div class="ad">600 W. 28th Street, Suite 201, Austin, 78705</div>
-  <div class='ph'>(512) 834-2245</div>
+  <div class='ph'>☎ (512) 834-2245</div>
+  
   <div class='lic'>License: 052021</div>
 </a><a class="agent" href="/bailbonds/tx/agent/daniel-williams-012018/">
   <div class="an">Daniel Williams</div><div class='ad'>24-7 Bail Bonds</div>
   <div class="ad">600 W. 28th St, Suite 106-B, Austin, 78705</div>
-  <div class='ph'>(512) 291-5500</div>
+  <div class='ph'>☎ (512) 291-5500</div>
+  
   <div class='lic'>License: 012018</div>
 </a><a class="agent" href="/bailbonds/tx/agent/lidio-ortiz-jr-072024/">
   <div class="an">Lidio Ortiz, Jr.</div><div class='ad'>Bring'Em Home 24/7 Bail Bonds</div>
   <div class="ad">2306 E. Cesar Chavez, Suite B, Austin, 78702</div>
-  <div class='ph'>(737) 255-9899</div>
+  <div class='ph'>☎ (737) 255-9899</div>
+  
   <div class='lic'>License: 072024</div>
 </a><a class="agent" href="/bailbonds/tx/agent/jessica-zak-202407/">
   <div class="an">Jessica Zak</div><div class='ad'>Travis County Bail Bonds</div>
   <div class="ad">600 W. 13th Street, Austin, 78701</div>
-  <div class='ph'>(512) 320-0800</div>
+  <div class='ph'>☎ (512) 320-0800</div>
+  
   <div class='lic'>License: 202407</div>
 </a><a class="agent" href="/bailbonds/tx/agent/derrick-dixon-112024/">
   <div class="an">Derrick Dixon</div><div class='ad'>ASAP Bail Bonds ATX</div>
   <div class="ad">1609 Shoal Creek, Suite 100, Room 6, Austin, 78701</div>
-  <div class='ph'>(512) 520-5264</div>
+  <div class='ph'>☎ (512) 520-5264</div>
+  
   <div class='lic'>License: 112024</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.traviscountytx.gov/images/bail_bond_board/Doc/Approved-Bail-Bond-Licensees.pdf' rel='nofollow'>www.traviscountytx.gov</a></p>
 </div>
@@ -196,5 +211,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.23951, -97.69127], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.26216,"lng":-97.7202,"label":"<strong><a href='/bailbonds/tx/agent/ashley-cantu-202504/'>Ashley Cantu</a></strong><br>\u260e (512) 243-7474"},{"lat":30.27179,"lng":-97.7416,"label":"<strong><a href='/bailbonds/tx/agent/troy-mclehany-042025/'>Troy McLehany</a></strong><br>\u260e (512) 481-0000"},{"lat":30.27255,"lng":-97.74729,"label":"<strong><a href='/bailbonds/tx/agent/john-a-zavala-203253/'>John A. Zavala</a></strong><br>\u260e (512) 476-2409"},{"lat":30.27665,"lng":-97.74589,"label":"<strong><a href='/bailbonds/tx/agent/jessica-zak-012015/'>Jessica Zak</a></strong><br>\u260e (512) 988-9898"},{"lat":30.27665,"lng":-97.74589,"label":"<strong><a href='/bailbonds/tx/agent/billy-engle-281423/'>Billy Engle</a></strong><br>\u260e (512) 994-9669"},{"lat":30.29343,"lng":-97.74269,"label":"<strong><a href='/bailbonds/tx/agent/jennifer-moreno-williams-226450/'>Jennifer Moreno-Williams</a></strong><br>\u260e (512) 320-0928"},{"lat":30.26198,"lng":-97.71655,"label":"<strong><a href='/bailbonds/tx/agent/troy-mclehany-012017/'>Troy McLehany</a></strong><br>\u260e (512) 472-5945"},{"lat":30.27665,"lng":-97.74589,"label":"<strong><a href='/bailbonds/tx/agent/jessica-zak-234577/'>Jessica Zak</a></strong><br>\u260e (512) 320-0800"},{"lat":30.29343,"lng":-97.74269,"label":"<strong><a href='/bailbonds/tx/agent/daniel-brenza-052021/'>Daniel Brenza</a></strong><br>\u260e (512) 834-2245"},{"lat":30.29343,"lng":-97.74269,"label":"<strong><a href='/bailbonds/tx/agent/daniel-williams-012018/'>Daniel Williams</a></strong><br>\u260e (512) 291-5500"},{"lat":30.25528,"lng":-97.71917,"label":"<strong><a href='/bailbonds/tx/agent/lidio-ortiz-jr-072024/'>Lidio Ortiz, Jr.</a></strong><br>\u260e (737) 255-9899"},{"lat":30.27665,"lng":-97.74589,"label":"<strong><a href='/bailbonds/tx/agent/jessica-zak-202407/'>Jessica Zak</a></strong><br>\u260e (512) 320-0800"},{"lat":30.28205,"lng":-97.75032,"label":"<strong><a href='/bailbonds/tx/agent/derrick-dixon-112024/'>Derrick Dixon</a></strong><br>\u260e (512) 520-5264"},{"lat":30.19604,"lng":-97.64548,"label":"<strong>Travis County Correctional Complex</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

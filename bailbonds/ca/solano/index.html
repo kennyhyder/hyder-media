@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,110 +107,132 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Anderson, Pamela</div>
   <div class="ad">460 UNION AVE., SUITE A, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1659170</div>
 </a><a class="agent" href="/bailbonds/ca/agent/anthony-artrese-4492111/">
   <div class="an">Anthony, Artrese</div>
   <div class="ad">325 MERGANSER DR., #1211, Suisun City, 94585</div>
+  
   
   <div class='lic'>License: 4492111</div>
 </a><a class="agent" href="/bailbonds/ca/agent/barron-ronald-1846556/">
   <div class="an">Barron, Ronald</div>
   <div class="ad">325 TEXAS ST, Fairfield, 95687</div>
   
+  
   <div class='lic'>License: 1846556</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cassidy-james-1842607/">
   <div class="an">Cassidy, James</div>
   <div class="ad">325 TEXAS STREET, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 1842607</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hudgins-bryan-1k70909/">
   <div class="an">Hudgins, Bryan</div>
   <div class="ad">117 DEANS CT, Vallejo, 94591</div>
   
+  
   <div class='lic'>License: 1K70909</div>
 </a><a class="agent" href="/bailbonds/ca/agent/kudsk-susan-1841995/">
   <div class="an">Kudsk, Susan</div>
   <div class="ad">3185 SERRA WAY, Fairfield, 94534</div>
+  
   
   <div class='lic'>License: 1841995</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcalister-aaron-1830726/">
   <div class="an">Mcalister, Aaron</div>
   <div class="ad">460 UNION AVE., SUITE A, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1830726</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mckee-edward-1833622/">
   <div class="an">Mckee, Edward</div>
   <div class="ad">2134 VISTA HERMOSA, Fairfield, 94534</div>
+  
   
   <div class='lic'>License: 1833622</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mcpherson-jason-1m37924/">
   <div class="an">Mcpherson, Jason</div>
   <div class="ad">325 TEXAS ST, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1M37924</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendez-allison-1n13325/">
   <div class="an">Mendez, Allison</div>
   <div class="ad">325 TEXAS ST, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 1N13325</div>
 </a><a class="agent" href="/bailbonds/ca/agent/porquez-george-1844616/">
   <div class="an">Porquez, George</div>
   <div class="ad">325 TEXAS ST., Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1844616</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stofle-amy-4454827/">
   <div class="an">Stofle, Amy</div>
   <div class="ad">519 MADISON STREET, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 4454827</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stofle-joseph-1k37242/">
   <div class="an">Stofle, Joseph</div>
   <div class="ad">519 MADISON ST, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1K37242</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tellez-munoz-ramiro-4408900/">
   <div class="an">Tellez Munoz, Ramiro</div>
   <div class="ad">323 TEXAS ST, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 4408900</div>
 </a><a class="agent" href="/bailbonds/ca/agent/torres-andreanna-1l28093/">
   <div class="an">Torres, Andreanna</div>
   <div class="ad">323 TEXAS ST, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1L28093</div>
 </a><a class="agent" href="/bailbonds/ca/agent/turner-charles-1830732/">
   <div class="an">Turner, Charles</div>
   <div class="ad">700 EMPIRE STREET, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 1830732</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vargas-luis-1l72800/">
   <div class="an">Vargas, Luis</div>
   <div class="ad">325 TEXAS ST, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1L72800</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wade-donald-1844965/">
   <div class="an">Wade, Donald</div>
   <div class="ad">700 EMPIRE ST., Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 1844965</div>
 </a><a class="agent" href="/bailbonds/ca/agent/walton-miranda-4533772/">
   <div class="an">Walton, Miranda</div>
   <div class="ad">325 TEXAS ST, Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 4533772</div>
 </a><a class="agent" href="/bailbonds/ca/agent/welch-kevin-4344113/">
   <div class="an">Welch, Kevin</div>
   <div class="ad">459 ASTER ST, Vacaville, 95688</div>
+  
   
   <div class='lic'>License: 4344113</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-michelle-1079323/">
   <div class="an">Williams, Michelle</div>
   <div class="ad">325 TEXAS ST., Fairfield, 94533</div>
   
+  
   <div class='lic'>License: 1079323</div>
 </a><a class="agent" href="/bailbonds/ca/agent/wilson-keyonta-1n13410/">
   <div class="an">Wilson, Keyonta</div>
   <div class="ad">325 TEXAS ST, Fairfield, 94533</div>
+  
   
   <div class='lic'>License: 1N13410</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -229,5 +253,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.26723, -121.93959], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.24671,"lng":-122.04047,"label":"<strong><a href='/bailbonds/ca/agent/anderson-pamela-1659170/'>Anderson, Pamela</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/barron-ronald-1846556/'>Barron, Ronald</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/cassidy-james-1842607/'>Cassidy, James</a></strong>"},{"lat":38.09831,"lng":-122.19325,"label":"<strong><a href='/bailbonds/ca/agent/hudgins-bryan-1k70909/'>Hudgins, Bryan</a></strong>"},{"lat":38.26152,"lng":-122.07052,"label":"<strong><a href='/bailbonds/ca/agent/kudsk-susan-1841995/'>Kudsk, Susan</a></strong>"},{"lat":38.24671,"lng":-122.04047,"label":"<strong><a href='/bailbonds/ca/agent/mcalister-aaron-1830726/'>Mcalister, Aaron</a></strong>"},{"lat":38.27144,"lng":-122.05852,"label":"<strong><a href='/bailbonds/ca/agent/mckee-edward-1833622/'>Mckee, Edward</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/mcpherson-jason-1m37924/'>Mcpherson, Jason</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/mendez-allison-1n13325/'>Mendez, Allison</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/porquez-george-1844616/'>Porquez, George</a></strong>"},{"lat":38.24742,"lng":-122.04598,"label":"<strong><a href='/bailbonds/ca/agent/stofle-amy-4454827/'>Stofle, Amy</a></strong>"},{"lat":38.24742,"lng":-122.04598,"label":"<strong><a href='/bailbonds/ca/agent/stofle-joseph-1k37242/'>Stofle, Joseph</a></strong>"},{"lat":38.24915,"lng":-122.03678,"label":"<strong><a href='/bailbonds/ca/agent/tellez-munoz-ramiro-4408900/'>Tellez Munoz, Ramiro</a></strong>"},{"lat":38.24915,"lng":-122.03678,"label":"<strong><a href='/bailbonds/ca/agent/torres-andreanna-1l28093/'>Torres, Andreanna</a></strong>"},{"lat":38.25039,"lng":-122.04197,"label":"<strong><a href='/bailbonds/ca/agent/turner-charles-1830732/'>Turner, Charles</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/vargas-luis-1l72800/'>Vargas, Luis</a></strong>"},{"lat":38.25039,"lng":-122.04197,"label":"<strong><a href='/bailbonds/ca/agent/wade-donald-1844965/'>Wade, Donald</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/walton-miranda-4533772/'>Walton, Miranda</a></strong>"},{"lat":38.40497,"lng":-121.94609,"label":"<strong><a href='/bailbonds/ca/agent/welch-kevin-4344113/'>Welch, Kevin</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/williams-michelle-1079323/'>Williams, Michelle</a></strong>"},{"lat":38.24915,"lng":-122.0368,"label":"<strong><a href='/bailbonds/ca/agent/wilson-keyonta-1n13410/'>Wilson, Keyonta</a></strong>"},{"lat":38.24833,"lng":-122.01007,"label":"<strong>1 agent in Suisun City</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/anthony-artrese-4492111/'>Anthony, Artrese</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

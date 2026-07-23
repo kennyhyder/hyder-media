@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">601 16th St. C-456, Golden, 80401</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/kelly-marie-franklin/">
   <div class="an">Kelly Marie Franklin</div><div class='ad'>Bail Bonds by Kelly LLC</div>
   <div class="ad">8623 W 64th Way, Arvada, 80004</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/steven-matthew-rickett/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">7610 W 5th Ave Ste 100, Lakewood, 80226</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/anya-irina-pulai-2/">
   <div class="an">Anya Irina Pulai</div><div class='ad'>Urban Bail Bonds Lakewood LLC</div>
   <div class="ad">2235 Iris St. # B POB 33515, Lakewood, 80215</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/co/agent/michael-anthony-tayler/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">7220 W Jefferson Ave Ste 200, Lakewood, 80235</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/michael-louis-venables-2/">
   <div class="an">Michael Louis Venables</div><div class='ad'>Patriot Bail Bonding LLC</div>
   <div class="ad">601 16th Street STE C-456, Golden, 80401</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20051413817)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20111638056)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20191885184)' rel='nofollow'>data.colorado.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.57951, -105.24546], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.75325,"lng":-105.21616,"label":"<strong><a href='/bailbonds/co/agent/michael-louis-venables/'>Michael Louis Venables</a></strong>"},{"lat":39.81425,"lng":-105.09356,"label":"<strong><a href='/bailbonds/co/agent/kelly-marie-franklin/'>Kelly Marie Franklin</a></strong>"},{"lat":39.72385,"lng":-105.08173,"label":"<strong><a href='/bailbonds/co/agent/steven-matthew-rickett/'>Steven Matthew Rickett</a></strong>"},{"lat":39.75016,"lng":-105.1066,"label":"<strong><a href='/bailbonds/co/agent/anya-irina-pulai-2/'>Anya Irina Pulai</a></strong>"},{"lat":39.64986,"lng":-105.07728,"label":"<strong><a href='/bailbonds/co/agent/michael-anthony-tayler/'>Michael Anthony Tayler</a></strong>"},{"lat":39.75325,"lng":-105.21616,"label":"<strong><a href='/bailbonds/co/agent/michael-louis-venables-2/'>Michael Louis Venables</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

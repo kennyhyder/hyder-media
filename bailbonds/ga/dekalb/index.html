@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,42 +106,50 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ga/agent/24-fast-bail-bonds-of-dekalb-llc/">
   <div class="an">24 Fast Bail Bonds of DeKalb, LLC</div>
   <div class="ad">191 Northern Avenue, Avondale Estates, 30032</div>
-  <div class='ph'>404-299-6000</div>
+  <div class='ph'>☎ 404-299-6000</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/a-action-bail-bonds-llc/">
   <div class="an">A-Action Bail Bonds, LLC</div>
   <div class="ad">4288 Memorial Drive Suite C, Decatur, 30032</div>
-  <div class='ph'>404-294-5568</div>
+  <div class='ph'>☎ 404-294-5568</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/a-2nd-chance-bail-bonds/">
   <div class="an">A 2nd Chance Bail Bonds</div>
   <div class="ad">4286 Memorial Drive Suite C, Decatur, 30032</div>
-  <div class='ph'>404-298-9722</div>
+  <div class='ph'>☎ 404-298-9722</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/atlanta-dekalb-bail-bonding-agency-inc/">
   <div class="an">Atlanta DeKalb Bail Bonding Agency, Inc.</div>
   <div class="ad">3978 E. Ponce de Leon Avenue, Clarkston, 30021</div>
-  <div class='ph'>404-292-0640</div>
+  <div class='ph'>☎ 404-292-0640</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/bbh-bonding-co/">
   <div class="an">BBH Bonding Co.</div>
   <div class="ad">4630 Memorial Drive, Decatur, 30032</div>
-  <div class='ph'>404-294-0805</div>
+  <div class='ph'>☎ 404-294-0805</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/delta-jet-bonding-company-inc/">
   <div class="an">Delta Jet Bonding Company, Inc.</div>
   <div class="ad">4712 Memorial Drive Suite H, Decatur, 30032</div>
-  <div class='ph'>404-296-2304</div>
+  <div class='ph'>☎ 404-296-2304</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/free-at-last-bail-bonds-inc/">
   <div class="an">Free At Last Bail Bonds, Inc.</div>
   <div class="ad">4717 Memorial Drive, Decatur, 30034</div>
-  <div class='ph'>404-294-1366</div>
+  <div class='ph'>☎ 404-294-1366</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/hosea-s-bonding-company/">
   <div class="an">Hosea's Bonding Company</div>
   <div class="ad">3500 Kensington Road, Decatur, 30032</div>
-  <div class='ph'>404-222-9999</div>
+  <div class='ph'>☎ 404-222-9999</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.dekalbsheriff.org/bonding-inmate-services/' rel='nofollow'>www.dekalbsheriff.org</a></p>
 </div>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.77066, -84.22634], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.78068,"lng":-84.24516,"label":"<strong><a href='/bailbonds/ga/agent/24-fast-bail-bonds-of-dekalb-llc/'>24 Fast Bail Bonds of DeKalb, LLC</a></strong><br>\u260e 404-299-6000"},{"lat":33.77349,"lng":-84.24867,"label":"<strong><a href='/bailbonds/ga/agent/a-action-bail-bonds-llc/'>A-Action Bail Bonds, LLC</a></strong><br>\u260e 404-294-5568"},{"lat":33.77346,"lng":-84.24869,"label":"<strong><a href='/bailbonds/ga/agent/a-2nd-chance-bail-bonds/'>A 2nd Chance Bail Bonds</a></strong><br>\u260e 404-298-9722"},{"lat":33.8043,"lng":-84.24478,"label":"<strong><a href='/bailbonds/ga/agent/atlanta-dekalb-bail-bonding-agency-inc/'>Atlanta DeKalb Bail Bonding Agency, Inc.</a></strong><br>\u260e 404-292-0640"},{"lat":33.78088,"lng":-84.23837,"label":"<strong><a href='/bailbonds/ga/agent/bbh-bonding-co/'>BBH Bonding Co.</a></strong><br>\u260e 404-294-0805"},{"lat":33.78334,"lng":-84.23666,"label":"<strong><a href='/bailbonds/ga/agent/delta-jet-bonding-company-inc/'>Delta Jet Bonding Company, Inc.</a></strong><br>\u260e 404-296-2304"},{"lat":33.78359,"lng":-84.23606,"label":"<strong><a href='/bailbonds/ga/agent/free-at-last-bail-bonds-inc/'>Free At Last Bail Bonds, Inc.</a></strong><br>\u260e 404-294-1366"},{"lat":33.77228,"lng":-84.24825,"label":"<strong><a href='/bailbonds/ga/agent/hosea-s-bonding-company/'>Hosea's Bonding Company</a></strong><br>\u260e 404-222-9999"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,40 +107,48 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Dragoo, Nicholas</div>
   <div class="ad">1540 JEFFERSON BLVD, West Sacramento, 95691</div>
   
+  
   <div class='lic'>License: 4300248</div>
 </a><a class="agent" href="/bailbonds/ca/agent/meza-cristina-1n13042/">
   <div class="an">Meza, Cristina</div>
   <div class="ad">1540 JEFFERSON BLVD, West Sacramento, 95691</div>
+  
   
   <div class='lic'>License: 1N13042</div>
 </a><a class="agent" href="/bailbonds/ca/agent/meza-isai-4506844/">
   <div class="an">Meza, Isai</div>
   <div class="ad">1540 JEFFERSON BLVD., West Sacramento, 95691</div>
   
+  
   <div class='lic'>License: 4506844</div>
 </a><a class="agent" href="/bailbonds/ca/agent/morris-robert-1846040/">
   <div class="an">Morris, Robert</div>
   <div class="ad">1540 JEFFERSON BLD, West Sacramento, 95691</div>
+  
   
   <div class='lic'>License: 1846040</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-norma-4390091/">
   <div class="an">Ramirez, Norma</div>
   <div class="ad">1540 JEFFERSON BLVD, West Sacramento, 95691</div>
   
+  
   <div class='lic'>License: 4390091</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stults-joseph-4450280/">
   <div class="an">Stults, Joseph</div>
   <div class="ad">331 J ST., APT 2, Davis, 95616</div>
+  
   
   <div class='lic'>License: 4450280</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valencia-fausto-1844773/">
   <div class="an">Valencia, Fausto</div>
   <div class="ad">1540 JEFFERSON BLVD., West Sacramento, 95691</div>
   
+  
   <div class='lic'>License: 1844773</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valencia-micaela-1d72455/">
   <div class="an">Valencia, Micaela</div>
   <div class="ad">1540 JEFFERSON BLVD., West Sacramento, 95691</div>
+  
   
   <div class='lic'>License: 1D72455</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.67961, -121.90275], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/dragoo-nicholas-4300248/'>Dragoo, Nicholas</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/meza-cristina-1n13042/'>Meza, Cristina</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/meza-isai-4506844/'>Meza, Isai</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/morris-robert-1846040/'>Morris, Robert</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-norma-4390091/'>Ramirez, Norma</a></strong>"},{"lat":38.54591,"lng":-121.73607,"label":"<strong><a href='/bailbonds/ca/agent/stults-joseph-4450280/'>Stults, Joseph</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/valencia-fausto-1844773/'>Valencia, Fausto</a></strong>"},{"lat":38.56801,"lng":-121.52531,"label":"<strong><a href='/bailbonds/ca/agent/valencia-micaela-1d72455/'>Valencia, Micaela</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

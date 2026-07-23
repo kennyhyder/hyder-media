@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">250 East 5th Street, Cincinnati, 45202</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/oh/agent/bob-shropshire-sons/">
   <div class="an">Bob Shropshire Sons</div>
   <div class="ad">806 Main St, Cincinnati, 45202</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/oh/agent/hb-bail-bonds-llc/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">175 S 3rd Street Suite 200, Columbus, 43215</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/oh/agent/harper-brothers-bail-bonds-llc/">
   <div class="an">Harper Brothers Bail Bonds LLC</div>
   <div class="ad">7126 Nightshade Dr, Westerville, 43082</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/oh/agent/butler-franklin-bail-bond/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">29 N D St, Hamilton, 45013</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/oh/agent/john-e-young-bailbonds/">
   <div class="an">John E. Young Bailbonds</div>
   <div class="ad">756 Impala, Hamilton, 45013</div>
+  
   
   
 </a></div><p class='src'>Source: official license roster — <a href='https://clerkofcourts.bcohio.gov/legal_division/bond_information.php' rel='nofollow'>clerkofcourts.bcohio.gov</a></p>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([39.43975, -84.56573], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.10182,"lng":-84.50895,"label":"<strong><a href='/bailbonds/oh/agent/senitas-bail-bonds/'>Senitas Bail Bonds</a></strong>"},{"lat":39.10505,"lng":-84.51054,"label":"<strong><a href='/bailbonds/oh/agent/bob-shropshire-sons/'>Bob Shropshire Sons</a></strong>"},{"lat":39.95813,"lng":-82.99719,"label":"<strong><a href='/bailbonds/oh/agent/hb-bail-bonds-llc/'>HB Bail Bonds LLC</a></strong>"},{"lat":40.16473,"lng":-82.90646,"label":"<strong><a href='/bailbonds/oh/agent/harper-brothers-bail-bonds-llc/'>Harper Brothers Bail Bonds LLC</a></strong>"},{"lat":39.40419,"lng":-84.56887,"label":"<strong><a href='/bailbonds/oh/agent/butler-franklin-bail-bond/'>Butler Franklin Bail Bond</a></strong>"},{"lat":39.39077,"lng":-84.58719,"label":"<strong><a href='/bailbonds/oh/agent/john-e-young-bailbonds/'>John E. Young Bailbonds</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

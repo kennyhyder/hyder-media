@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">5-10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,9 +108,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">447 S. Prince St., Lancaster, 17603</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/jedd-andrew-cross/">
   <div class="an">Jedd Andrew Cross</div><div class='ad'>American Surety Company</div>
   <div class="ad">325 S. 7th St., Reading, 19602</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/pa/agent/samuel-paul-cross/">
@@ -116,9 +120,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">1801 Eckert Ave, Reading, 19602</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/michelle-smucker/">
   <div class="an">Michelle Smucker</div><div class='ad'>A + Plus Bail Bonds (Bankers Insurance Company)</div>
   <div class="ad">535 Court St., Reading, 19601</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/pa/agent/jeffrey-s-hibbs/">
@@ -126,9 +132,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">215 W. Bridge St., Morrisville, 19067</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/david-j-mayka/">
   <div class="an">David J. Mayka</div><div class='ad'>Lexington National Insurance Company</div>
   <div class="ad">215 W. Bridge St., Morrisville, 19067</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/pa/agent/john-david-rusak/">
@@ -136,9 +144,11 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">215 W. Bridge St., Morrisville, 19067</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/thaddeus-smith/">
   <div class="an">Thaddeus Smith</div><div class='ad'>Lexington National Insurance Company</div>
   <div class="ad">1055 Scott St., Kulpmont, 17834</div>
+  
   
   
 </a><a class="agent" href="/bailbonds/pa/agent/brittany-woodruff/">
@@ -146,14 +156,17 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">431 Main St. Apt. 2, Royersford, 19468</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/michael-vance/">
   <div class="an">Michael Vance</div><div class='ad'>Sun Surety Insurance Company</div>
   <div class="ad">53 N. Duke St., Ste. 402, Lancaster, 17602-2839</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/pa/agent/louis-a-denome/">
   <div class="an">Louis A. Denome</div><div class='ad'>United States Fire Insurance Company</div>
   <div class="ad">181 Tanglewood Dr., Quarryville, 17566</div>
+  
   
   
 </a></div><p class='src'>Source: official license roster — <a href='https://co.lancaster.pa.us/DocumentCenter/View/16777/Bail-Bondsmen' rel='nofollow'>co.lancaster.pa.us</a></p>
@@ -174,5 +187,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.04199, -76.2502], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":40.03051,"lng":-76.30628,"label":"<strong><a href='/bailbonds/pa/agent/sylvester-jones/'>Sylvester Jones</a></strong>"},{"lat":40.32973,"lng":-75.92405,"label":"<strong><a href='/bailbonds/pa/agent/jedd-andrew-cross/'>Jedd Andrew Cross</a></strong>"},{"lat":40.33214,"lng":-75.90235,"label":"<strong><a href='/bailbonds/pa/agent/samuel-paul-cross/'>Samuel Paul Cross</a></strong>"},{"lat":40.33629,"lng":-75.92648,"label":"<strong><a href='/bailbonds/pa/agent/michelle-smucker/'>Michelle Smucker</a></strong>"},{"lat":40.20644,"lng":-74.77855,"label":"<strong><a href='/bailbonds/pa/agent/jeffrey-s-hibbs/'>Jeffrey S. Hibbs</a></strong>"},{"lat":40.20644,"lng":-74.77855,"label":"<strong><a href='/bailbonds/pa/agent/david-j-mayka/'>David J. Mayka</a></strong>"},{"lat":40.20644,"lng":-74.77855,"label":"<strong><a href='/bailbonds/pa/agent/john-david-rusak/'>John David Rusak</a></strong>"},{"lat":40.79234,"lng":-76.47575,"label":"<strong><a href='/bailbonds/pa/agent/thaddeus-smith/'>Thaddeus Smith</a></strong>"},{"lat":40.18571,"lng":-75.53864,"label":"<strong><a href='/bailbonds/pa/agent/brittany-woodruff/'>Brittany Woodruff</a></strong>"},{"lat":40.03928,"lng":-76.30376,"label":"<strong><a href='/bailbonds/pa/agent/michael-vance/'>Michael Vance</a></strong>"},{"lat":39.85697,"lng":-76.20837,"label":"<strong><a href='/bailbonds/pa/agent/louis-a-denome/'>Louis A. Denome</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

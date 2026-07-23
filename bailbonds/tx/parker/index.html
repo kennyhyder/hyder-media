@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in Parker County</h2>
@@ -116,42 +118,50 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/brazos-bonding-company-michael-o-connor-0798pr4/">
   <div class="an">Brazos Bonding Company (Michael O'Connor)</div>
   <div class="ad">126 A Hogle Street, Weatherford, 76086</div>
-  <div class='ph'>817-599-5311</div>
+  <div class='ph'>☎ 817-599-5311</div>
+  
   <div class='lic'>License: 0798PR4</div>
 </a><a class="agent" href="/bailbonds/tx/agent/abc-bail-bonds-debby-lane-0798pr6/">
   <div class="an">ABC Bail Bonds (Debby Lane)</div>
   <div class="ad">104 N. Denton Street, Weatherford, 76086</div>
-  <div class='ph'>817-596-9200</div>
+  <div class='ph'>☎ 817-596-9200</div>
+  
   <div class='lic'>License: 0798PR6</div>
 </a><a class="agent" href="/bailbonds/tx/agent/bonds-for-less-continental-heritage-ins-nancy-shumaker-0798cs2/">
   <div class="an">Bonds For Less (Continental Heritage Ins.; Nancy Shumaker)</div>
   <div class="ad">918 Fort Worth Hwy, Weatherford, 76086</div>
-  <div class='ph'>817-599-9559</div>
+  <div class='ph'>☎ 817-599-9559</div>
+  
   <div class='lic'>License: 0798CS2</div>
 </a><a class="agent" href="/bailbonds/tx/agent/8-bail-bonds-nancy-shumaker-0899pr08/">
   <div class="an">8% Bail Bonds (Nancy Shumaker)</div>
   <div class="ad">918 Fort Worth Hwy, Weatherford, 76086</div>
-  <div class='ph'>817-599-9559</div>
+  <div class='ph'>☎ 817-599-9559</div>
+  
   <div class='lic'>License: 0899PR08</div>
 </a><a class="agent" href="/bailbonds/tx/agent/vaughn-s-cowtown-bail-bonds-ray-vaughn-0503pr10/">
   <div class="an">Vaughn's Cowtown Bail Bonds (Ray Vaughn)</div>
   <div class="ad">801 Fort Worth Hwy, Weatherford, 76086</div>
-  <div class='ph'>817-599-4949</div>
+  <div class='ph'>☎ 817-599-4949</div>
+  
   <div class='lic'>License: 0503PR10</div>
 </a><a class="agent" href="/bailbonds/tx/agent/hoppy-bail-bonds-bankers-insurance-co-ray-vaughn-0114cs12/">
   <div class="an">Hoppy Bail Bonds (Bankers Insurance Co.; Ray Vaughn)</div>
   <div class="ad">801 Fort Worth Hwy, Weatherford, 76086</div>
-  <div class='ph'>817-598-0700</div>
+  <div class='ph'>☎ 817-598-0700</div>
+  
   <div class='lic'>License: 0114CS12</div>
 </a><a class="agent" href="/bailbonds/tx/agent/joe-s-bail-bonds-united-states-fire-ins-co-michael-o-connor-1019cs13/">
   <div class="an">Joe's Bail Bonds (United States Fire Ins. Co.; Michael O'Connor)</div>
   <div class="ad">126 A. Hogle Street, Weatherford, 76086</div>
-  <div class='ph'>817-596-0208</div>
+  <div class='ph'>☎ 817-596-0208</div>
+  
   <div class='lic'>License: 1019CS13</div>
 </a><a class="agent" href="/bailbonds/tx/agent/amalgamated-bail-tamara-vaughn-1221pr12/">
   <div class="an">Amalgamated Bail (Tamara Vaughn)</div>
   <div class="ad">801 Fort Worth Hwy, Weatherford, 76086</div>
-  <div class='ph'>817-599-4949</div>
+  <div class='ph'>☎ 817-599-4949</div>
+  
   <div class='lic'>License: 1221PR12</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.parkercountytx.gov/DocumentCenter/View/8814/Approved-Bonding-Companies' rel='nofollow'>www.parkercountytx.gov</a></p>
 </div>
@@ -171,5 +181,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.7771, -97.8059], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.75916,"lng":-97.78697,"label":"<strong><a href='/bailbonds/tx/agent/brazos-bonding-company-michael-o-connor-0798pr4/'>Brazos Bonding Company (Michael O'Connor)</a></strong><br>\u260e 817-599-5311"},{"lat":32.75909,"lng":-97.7842,"label":"<strong><a href='/bailbonds/tx/agent/abc-bail-bonds-debby-lane-0798pr6/'>ABC Bail Bonds (Debby Lane)</a></strong><br>\u260e 817-596-9200"},{"lat":32.7586,"lng":-97.78413,"label":"<strong><a href='/bailbonds/tx/agent/bonds-for-less-continental-heritage-ins-nancy-shumaker-0798cs2/'>Bonds For Less (Continental Heritage Ins.; Nancy Shumaker)</a></strong><br>\u260e 817-599-9559"},{"lat":32.7586,"lng":-97.78413,"label":"<strong><a href='/bailbonds/tx/agent/8-bail-bonds-nancy-shumaker-0899pr08/'>8% Bail Bonds (Nancy Shumaker)</a></strong><br>\u260e 817-599-9559"},{"lat":32.75881,"lng":-97.786,"label":"<strong><a href='/bailbonds/tx/agent/vaughn-s-cowtown-bail-bonds-ray-vaughn-0503pr10/'>Vaughn's Cowtown Bail Bonds (Ray Vaughn)</a></strong><br>\u260e 817-599-4949"},{"lat":32.75881,"lng":-97.786,"label":"<strong><a href='/bailbonds/tx/agent/hoppy-bail-bonds-bankers-insurance-co-ray-vaughn-0114cs12/'>Hoppy Bail Bonds (Bankers Insurance Co.; Ray Vaughn)</a></strong><br>\u260e 817-598-0700"},{"lat":32.75916,"lng":-97.78697,"label":"<strong><a href='/bailbonds/tx/agent/joe-s-bail-bonds-united-states-fire-ins-co-michael-o-connor-1019cs13/'>Joe's Bail Bonds (United States Fire Ins. Co.; Michael O'Connor)</a></strong><br>\u260e 817-596-0208"},{"lat":32.75881,"lng":-97.786,"label":"<strong><a href='/bailbonds/tx/agent/amalgamated-bail-tamara-vaughn-1221pr12/'>Amalgamated Bail (Tamara Vaughn)</a></strong><br>\u260e 817-599-4949"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

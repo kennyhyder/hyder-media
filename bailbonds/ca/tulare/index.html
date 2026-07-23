@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,90 +107,108 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Alba, Eric</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1845717</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arredondo-erica-1m44639/">
   <div class="an">Arredondo, Erica</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1M44639</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cribbs-kristi-1724280/">
   <div class="an">Cribbs, Kristi</div>
   <div class="ad">27677AVE 146, C, Porterville, 93257</div>
   
+  
   <div class='lic'>License: 1724280</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dreo-nathan-1l73764/">
   <div class="an">Dreo, Nathan</div>
   <div class="ad">1345 S MOONEY BLVD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1L73764</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-samantha-1n13297/">
   <div class="an">Garcia, Samantha</div>
   <div class="ad">40662 EDDY RD, Cutler, 93615</div>
   
+  
   <div class='lic'>License: 1N13297</div>
 </a><a class="agent" href="/bailbonds/ca/agent/james-scott-1845823/">
   <div class="an">James, Scott</div>
   <div class="ad">2402 W MAIN ST, Visalia, 93291</div>
+  
   
   <div class='lic'>License: 1845823</div>
 </a><a class="agent" href="/bailbonds/ca/agent/leyva-fernando-1l10896/">
   <div class="an">Leyva, Fernando</div>
   <div class="ad">1107 S MOONEY BLVD, Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1L10896</div>
 </a><a class="agent" href="/bailbonds/ca/agent/macias-carrillo-alondra-1n12871/">
   <div class="an">Macias-Carrillo, Alondra</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1N12871</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-sasha-1m31819/">
   <div class="an">Martinez, Sasha</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1M31819</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendez-pedro-1n13174/">
   <div class="an">Mendez, Pedro</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1N13174</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mota-apodaca-annette-1840254/">
   <div class="an">Mota-Apodaca, Annette</div>
   <div class="ad">1043 S MOONEY BLVD, Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1840254</div>
 </a><a class="agent" href="/bailbonds/ca/agent/navarrette-florencio-1456712/">
   <div class="an">Navarrette, Florencio</div>
   <div class="ad">1907 CINDY, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1456712</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pacheco-sonia-1845422/">
   <div class="an">Pacheco, Sonia</div>
   <div class="ad">1043 S. MOONEY BLVD., Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1845422</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ramirez-adriana-1846711/">
   <div class="an">Ramirez, Adriana</div>
   <div class="ad">1345 SOUTH MOONEY BOULEVARD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1846711</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rodriguez-raul-1842725/">
   <div class="an">Rodriguez, Raul</div>
   <div class="ad">1043 S. MOONEY BLVD., Visalia, 93277</div>
   
+  
   <div class='lic'>License: 1842725</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stemple-michael-1n13026/">
   <div class="an">Stemple, Michael</div>
   <div class="ad">1043 S MOONEY BLVD, Visalia, 93292</div>
+  
   
   <div class='lic'>License: 1N13026</div>
 </a><a class="agent" href="/bailbonds/ca/agent/urtez-ernesto-4388552/">
   <div class="an">Urtez, Ernesto</div>
   <div class="ad">1043 S. MOONEY BLVD, Visalia, 93277</div>
   
+  
   <div class='lic'>License: 4388552</div>
 </a><a class="agent" href="/bailbonds/ca/agent/villagomez-eric-1845521/">
   <div class="an">Villagomez, Eric</div>
   <div class="ad">1107 S. MOONEY BLVD, Visalia, 93277</div>
+  
   
   <div class='lic'>License: 1845521</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -209,5 +229,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.22883, -118.78105], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/alba-eric-1845717/'>Alba, Eric</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/arredondo-erica-1m44639/'>Arredondo, Erica</a></strong>"},{"lat":36.05502,"lng":-118.9538,"label":"<strong><a href='/bailbonds/ca/agent/cribbs-kristi-1724280/'>Cribbs, Kristi</a></strong>"},{"lat":36.31899,"lng":-119.31398,"label":"<strong><a href='/bailbonds/ca/agent/dreo-nathan-1l73764/'>Dreo, Nathan</a></strong>"},{"lat":36.52849,"lng":-119.29065,"label":"<strong><a href='/bailbonds/ca/agent/garcia-samantha-1n13297/'>Garcia, Samantha</a></strong>"},{"lat":36.32972,"lng":-119.31757,"label":"<strong><a href='/bailbonds/ca/agent/james-scott-1845823/'>James, Scott</a></strong>"},{"lat":36.32106,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/leyva-fernando-1l10896/'>Leyva, Fernando</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/macias-carrillo-alondra-1n12871/'>Macias-Carrillo, Alondra</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/martinez-sasha-1m31819/'>Martinez, Sasha</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/mendez-pedro-1n13174/'>Mendez, Pedro</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/mota-apodaca-annette-1840254/'>Mota-Apodaca, Annette</a></strong>"},{"lat":36.31387,"lng":-119.3389,"label":"<strong><a href='/bailbonds/ca/agent/navarrette-florencio-1456712/'>Navarrette, Florencio</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/pacheco-sonia-1845422/'>Pacheco, Sonia</a></strong>"},{"lat":36.31899,"lng":-119.31398,"label":"<strong><a href='/bailbonds/ca/agent/ramirez-adriana-1846711/'>Ramirez, Adriana</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/rodriguez-raul-1842725/'>Rodriguez, Raul</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/stemple-michael-1n13026/'>Stemple, Michael</a></strong>"},{"lat":36.32161,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/urtez-ernesto-4388552/'>Urtez, Ernesto</a></strong>"},{"lat":36.32106,"lng":-119.31401,"label":"<strong><a href='/bailbonds/ca/agent/villagomez-eric-1845521/'>Villagomez, Eric</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

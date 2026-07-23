@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,45 +107,54 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Fales, Jeffery</div>
   <div class="ad">76 MAIN STREET, Placerville, 95667</div>
   
+  
   <div class='lic'>License: 1694807</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marin-francisco-1n12903/">
   <div class="an">Marin, Francisco</div>
   <div class="ad">1479 PLATEAU CIR, South Lake Tahoe, 96150</div>
+  
   
   <div class='lic'>License: 1N12903</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marin-francisco-1840300/">
   <div class="an">Marin, Francisco</div>
   <div class="ad">1479 PLATEAU CIR, South Lake Tahoe, 96150</div>
   
+  
   <div class='lic'>License: 1840300</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marin-louise-1767473/">
   <div class="an">Marin, Louise</div>
   <div class="ad">1479 PLATEAU CIR, South Lake Tahoe, 96150</div>
+  
   
   <div class='lic'>License: 1767473</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martincek-jesse-1846198/">
   <div class="an">Martincek, Jesse</div>
   <div class="ad">3789 MONTCLAIR ROAD, Cameron Park, 95682</div>
   
+  
   <div class='lic'>License: 1846198</div>
 </a><a class="agent" href="/bailbonds/ca/agent/medina-carlos-1845834/">
   <div class="an">Medina, Carlos</div>
   <div class="ad">705 PLEASANT VALLEY RD, Diamond Springs, 95619</div>
+  
   
   <div class='lic'>License: 1845834</div>
 </a><a class="agent" href="/bailbonds/ca/agent/medina-julio-1844868/">
   <div class="an">Medina, Julio</div>
   <div class="ad">705 PLEASANT VALLEY RD, Diamond Springs, 95619</div>
   
+  
   <div class='lic'>License: 1844868</div>
 </a><a class="agent" href="/bailbonds/ca/agent/morris-steffan-4258731/">
   <div class="an">Morris, Steffan</div>
   <div class="ad">76 MAIN STREET, Placerville, 95667</div>
   
+  
   <div class='lic'>License: 4258731</div>
 </a><a class="agent" href="/bailbonds/ca/agent/singh-vincent-1842981/">
   <div class="an">Singh, Vincent</div>
   <div class="ad">7260 CHAPARRAL DRIVE, Latrobe, 95682</div>
+  
   
   <div class='lic'>License: 1842981</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.78561, -120.53423], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.7276,"lng":-120.80735,"label":"<strong><a href='/bailbonds/ca/agent/fales-jeffery-1694807/'>Fales, Jeffery</a></strong>"},{"lat":38.90858,"lng":-119.96827,"label":"<strong><a href='/bailbonds/ca/agent/marin-francisco-1n12903/'>Marin, Francisco</a></strong>"},{"lat":38.90858,"lng":-119.96827,"label":"<strong><a href='/bailbonds/ca/agent/marin-francisco-1840300/'>Marin, Francisco</a></strong>"},{"lat":38.90858,"lng":-119.96827,"label":"<strong><a href='/bailbonds/ca/agent/marin-louise-1767473/'>Marin, Louise</a></strong>"},{"lat":38.66914,"lng":-120.98909,"label":"<strong><a href='/bailbonds/ca/agent/martincek-jesse-1846198/'>Martincek, Jesse</a></strong>"},{"lat":38.69566,"lng":-120.80947,"label":"<strong><a href='/bailbonds/ca/agent/medina-carlos-1845834/'>Medina, Carlos</a></strong>"},{"lat":38.69566,"lng":-120.80947,"label":"<strong><a href='/bailbonds/ca/agent/medina-julio-1844868/'>Medina, Julio</a></strong>"},{"lat":38.7276,"lng":-120.80735,"label":"<strong><a href='/bailbonds/ca/agent/morris-steffan-4258731/'>Morris, Steffan</a></strong>"},{"lat":38.5368,"lng":-120.97091,"label":"<strong><a href='/bailbonds/ca/agent/singh-vincent-1842981/'>Singh, Vincent</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">County Bail Bond Board</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing in Collin County</h2>
@@ -116,87 +118,104 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/tx/agent/bond-doctor-bail-bonds/">
   <div class="an">Bond Doctor Bail Bonds</div>
   <div class="ad">1502 W. University Dr., McKinney, 75069</div>
-  <div class='ph'>972-562-3937</div>
+  <div class='ph'>☎ 972-562-3937</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/bubba-s-bail-bonds/">
   <div class="an">Bubba's Bail Bonds</div>
   <div class="ad">1207 W. University Dr., Suite 101, McKinney, 75069</div>
-  <div class='ph'>972-529-6168</div>
+  <div class='ph'>☎ 972-529-6168</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/tess-armstrong-bail-bonds/">
   <div class="an">Tess Armstrong Bail Bonds</div>
   <div class="ad">105 S. Butler Dr., Allen, 75013</div>
-  <div class='ph'>214-383-0525</div>
+  <div class='ph'>☎ 214-383-0525</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/bring-em-home-24-7-bail-bonds/">
   <div class="an">Bring 'Em Home 24/7 Bail Bonds</div>
   <div class="ad">1705 W. University Dr., Suite 121, McKinney, 75069</div>
-  <div class='ph'>214-491-1676</div>
+  <div class='ph'>☎ 214-491-1676</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/delta-bail-bonds/">
   <div class="an">Delta Bail Bonds</div>
   <div class="ad">205 S. McDonald St., McKinney, 75069</div>
-  <div class='ph'>972-562-3030</div>
+  <div class='ph'>☎ 972-562-3030</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/not-guilty-bail-bonds/">
   <div class="an">Not Guilty Bail Bonds</div>
   <div class="ad">1405 W. University Dr. Suite D, McKinney, 75069</div>
-  <div class='ph'>469-714-0404</div>
+  <div class='ph'>☎ 469-714-0404</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/a-ez-out-bail-bonds/">
   <div class="an">A EZ Out Bail Bonds</div>
   <div class="ad">1202 W. University Dr., McKinney, 75069</div>
-  <div class='ph'>972-542-5155</div>
+  <div class='ph'>☎ 972-542-5155</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/bail-bond-headquarters/">
   <div class="an">Bail Bond Headquarters</div>
   <div class="ad">1011 University Dr., McKinney, 75069</div>
-  <div class='ph'>972-542-6811</div>
+  <div class='ph'>☎ 972-542-6811</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/alexis-bail-bonds/">
   <div class="an">Alexis Bail Bonds</div>
   <div class="ad">5820 Collin McKinney Pkwy. Suite 101, McKinney, 75070</div>
-  <div class='ph'>972-802-3000</div>
+  <div class='ph'>☎ 972-802-3000</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/express-bail-bonds/">
   <div class="an">Express Bail Bonds</div>
   <div class="ad">1836 W. Virginia Suite 106A, McKinney, 75069</div>
-  <div class='ph'>469-356-5335</div>
+  <div class='ph'>☎ 469-356-5335</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/doc-s-bail-bonds/">
   <div class="an">Doc's Bail Bonds</div>
   <div class="ad">1502 W. University Dr., Suite 101, McKinney, 75069</div>
-  <div class='ph'>972-562-6057</div>
+  <div class='ph'>☎ 972-562-6057</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/webb-s-statewide-bail-bonds/">
   <div class="an">Webb's Statewide Bail Bonds</div>
   <div class="ad">6951 Virginia Parkway Suite 306, McKinney, 75071</div>
-  <div class='ph'>214-491-1623</div>
+  <div class='ph'>☎ 214-491-1623</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/pat-kinnard-bail-bonds/">
   <div class="an">Pat Kinnard Bail Bonds</div>
   <div class="ad">1400 Ave G, Suite 200, Plano, 75074</div>
-  <div class='ph'>972-312-9444</div>
+  <div class='ph'>☎ 972-312-9444</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/you-walk-bail-bonds/">
   <div class="an">You Walk Bail Bonds</div>
   <div class="ad">1011 W. University Dr., Suite B, McKinney, 75069</div>
-  <div class='ph'>972-658-7753</div>
+  <div class='ph'>☎ 972-658-7753</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/a-affordable-bail-bonds/">
   <div class="an">A-Affordable Bail Bonds</div>
   <div class="ad">1836 W. Virginia, Suite 108, McKinney, 75069</div>
-  <div class='ph'>214-856-4022</div>
+  <div class='ph'>☎ 214-856-4022</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/1st-call-bail-bonds/">
   <div class="an">1st Call Bail Bonds</div>
   <div class="ad">1836 W. Virginia Suite 102, McKinney, 75069</div>
-  <div class='ph'>214-592-9000</div>
+  <div class='ph'>☎ 214-592-9000</div>
+  
   
 </a><a class="agent" href="/bailbonds/tx/agent/allied-bonding-agency/">
   <div class="an">Allied Bonding Agency</div>
   <div class="ad">1515 S. McDonald Street, Suite 106, McKinney, 75069</div>
-  <div class='ph'>972-548-8020</div>
+  <div class='ph'>☎ 972-548-8020</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.collincountytx.gov/docs/default-source/boards/bail-bond-board/documents/approved-collin-co-jail-list-7-1-2026.pdf' rel='nofollow'>www.collincountytx.gov</a></p>
 </div>
@@ -216,5 +235,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.19449, -96.57943], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.21638,"lng":-96.62595,"label":"<strong><a href='/bailbonds/tx/agent/bond-doctor-bail-bonds/'>Bond Doctor Bail Bonds</a></strong><br>\u260e 972-562-3937"},{"lat":33.21587,"lng":-96.6234,"label":"<strong><a href='/bailbonds/tx/agent/bubba-s-bail-bonds/'>Bubba's Bail Bonds</a></strong><br>\u260e 972-529-6168"},{"lat":33.10305,"lng":-96.67085,"label":"<strong><a href='/bailbonds/tx/agent/tess-armstrong-bail-bonds/'>Tess Armstrong Bail Bonds</a></strong><br>\u260e 214-383-0525"},{"lat":33.21645,"lng":-96.63185,"label":"<strong><a href='/bailbonds/tx/agent/bring-em-home-24-7-bail-bonds/'>Bring 'Em Home 24/7 Bail Bonds</a></strong><br>\u260e 214-491-1676"},{"lat":33.19588,"lng":-96.6124,"label":"<strong><a href='/bailbonds/tx/agent/delta-bail-bonds/'>Delta Bail Bonds</a></strong><br>\u260e 972-562-3030"},{"lat":33.21608,"lng":-96.62526,"label":"<strong><a href='/bailbonds/tx/agent/not-guilty-bail-bonds/'>Not Guilty Bail Bonds</a></strong><br>\u260e 469-714-0404"},{"lat":33.21613,"lng":-96.62334,"label":"<strong><a href='/bailbonds/tx/agent/a-ez-out-bail-bonds/'>A EZ Out Bail Bonds</a></strong><br>\u260e 972-542-5155"},{"lat":33.19835,"lng":-96.63558,"label":"<strong><a href='/bailbonds/tx/agent/express-bail-bonds/'>Express Bail Bonds</a></strong><br>\u260e 469-356-5335"},{"lat":33.21638,"lng":-96.62595,"label":"<strong><a href='/bailbonds/tx/agent/doc-s-bail-bonds/'>Doc's Bail Bonds</a></strong><br>\u260e 972-562-6057"},{"lat":33.1988,"lng":-96.7086,"label":"<strong><a href='/bailbonds/tx/agent/webb-s-statewide-bail-bonds/'>Webb's Statewide Bail Bonds</a></strong><br>\u260e 214-491-1623"},{"lat":33.01833,"lng":-96.70502,"label":"<strong><a href='/bailbonds/tx/agent/pat-kinnard-bail-bonds/'>Pat Kinnard Bail Bonds</a></strong><br>\u260e 972-312-9444"},{"lat":33.21552,"lng":-96.62163,"label":"<strong><a href='/bailbonds/tx/agent/you-walk-bail-bonds/'>You Walk Bail Bonds</a></strong><br>\u260e 972-658-7753"},{"lat":33.19835,"lng":-96.63558,"label":"<strong><a href='/bailbonds/tx/agent/a-affordable-bail-bonds/'>A-Affordable Bail Bonds</a></strong><br>\u260e 214-856-4022"},{"lat":33.19835,"lng":-96.63558,"label":"<strong><a href='/bailbonds/tx/agent/1st-call-bail-bonds/'>1st Call Bail Bonds</a></strong><br>\u260e 214-592-9000"},{"lat":33.18326,"lng":-96.61488,"label":"<strong><a href='/bailbonds/tx/agent/allied-bonding-agency/'>Allied Bonding Agency</a></strong><br>\u260e 972-548-8020"},{"lat":33.20112,"lng":-96.66416,"label":"<strong>2 agents in McKinney</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/tx/agent/bail-bond-headquarters/'>Bail Bond Headquarters</a></strong><br>\u260e 972-542-6811<br><strong><a href='/bailbonds/tx/agent/alexis-bail-bonds/'>Alexis Bail Bonds</a></strong><br>\u260e 972-802-3000"},{"lat":33.2468,"lng":-96.63605,"label":"<strong>Collin County Detention Facility</strong><br>County jail"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

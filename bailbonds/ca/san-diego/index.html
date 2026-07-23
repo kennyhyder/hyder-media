@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,875 +107,1050 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Aguayo, Lynda</div>
   <div class="ad">614 5TH AVE STE K, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13226</div>
 </a><a class="agent" href="/bailbonds/ca/agent/alexander-willie-1k64664/">
   <div class="an">Alexander, Willie</div>
   <div class="ad">942 C STREET, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1K64664</div>
 </a><a class="agent" href="/bailbonds/ca/agent/aliotti-angelo-1843497/">
   <div class="an">Aliotti, Angelo</div>
   <div class="ad">380 South Melrose Dr, 337, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1843497</div>
 </a><a class="agent" href="/bailbonds/ca/agent/aliotti-leslie-1845206/">
   <div class="an">Aliotti, Leslie</div>
   <div class="ad">380 MELROSE PLACE, 337, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1845206</div>
 </a><a class="agent" href="/bailbonds/ca/agent/anaya-mario-1n13050/">
   <div class="an">Anaya, Mario</div>
   <div class="ad">119 W C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13050</div>
 </a><a class="agent" href="/bailbonds/ca/agent/angulo-sisli-4443953/">
   <div class="an">Angulo, Sisli</div>
   <div class="ad">501 W BROADWAY, STE. 800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4443953</div>
 </a><a class="agent" href="/bailbonds/ca/agent/angulo-burkhart-erica-1n13181/">
   <div class="an">Angulo-Burkhart, Erica</div>
   <div class="ad">425 10TH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13181</div>
 </a><a class="agent" href="/bailbonds/ca/agent/araiza-ricardo-1843500/">
   <div class="an">Araiza, Ricardo</div>
   <div class="ad">125 W.C STREET, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1843500</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arana-valenzuela-andres-1n13088/">
   <div class="an">Arana Valenzuela, Andres</div>
   <div class="ad">1241 STATE ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13088</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arce-michelle-4430338/">
   <div class="an">Arce, Michelle</div>
   <div class="ad">109 WEST C STREET, SUITE E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4430338</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arreola-maria-1843140/">
   <div class="an">Arreola, Maria</div>
   <div class="ad">1000 AVIARA PARKWAY SUITE 300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1843140</div>
 </a><a class="agent" href="/bailbonds/ca/agent/arriaga-rivera-valentina-1k84756/">
   <div class="an">Arriaga Rivera, Valentina</div>
   <div class="ad">10503 MISSION GORGE ROAD, Santee, 92071</div>
+  
   
   <div class='lic'>License: 1K84756</div>
 </a><a class="agent" href="/bailbonds/ca/agent/baeza-norma-1m04471/">
   <div class="an">Baeza, Norma</div>
   <div class="ad">620 HACIENDA DR STE 105, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1M04471</div>
 </a><a class="agent" href="/bailbonds/ca/agent/baker-christopher-1m44505/">
   <div class="an">Baker, Christopher</div>
   <div class="ad">501 W BROADWAY STE 800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1M44505</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bartolome-john-alfred-1n13341/">
   <div class="an">Bartolome, John Alfred</div>
   <div class="ad">1241 STATE STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13341</div>
 </a><a class="agent" href="/bailbonds/ca/agent/bishop-araceli-1843618/">
   <div class="an">Bishop, Araceli</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1843618</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brown-joel-1843265/">
   <div class="an">Brown, Joel</div>
   <div class="ad">620 HACIENDA DR STE 105, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1843265</div>
 </a><a class="agent" href="/bailbonds/ca/agent/buckner-sandra-1n13301/">
   <div class="an">Buckner, Sandra</div>
   <div class="ad">501 W BROADWAY SUITE 800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13301</div>
 </a><a class="agent" href="/bailbonds/ca/agent/burns-kysha-4383399/">
   <div class="an">Burns, Kysha</div>
   <div class="ad">123 W C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4383399</div>
 </a><a class="agent" href="/bailbonds/ca/agent/camacho-jaime-1845519/">
   <div class="an">Camacho, Jaime</div>
   <div class="ad">109 W C ST, SUITE E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1845519</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cantu-mark-1844994/">
   <div class="an">Cantu, Mark</div>
   <div class="ad">109 WEST C STREET SUITE E, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1844994</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cardenas-eduardo-1m93596/">
   <div class="an">Cardenas, Eduardo</div>
   <div class="ad">530 HACIENDA DR STE 104D, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1M93596</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cesar-sarah-1846641/">
   <div class="an">Cesar, Sarah</div>
   <div class="ad">119 W C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1846641</div>
 </a><a class="agent" href="/bailbonds/ca/agent/chaffin-patricia-1830730/">
   <div class="an">Chaffin, Patricia</div>
   <div class="ad">1025 S. SANTA FE SUITE B, Vista, 92083</div>
+  
   
   <div class='lic'>License: 1830730</div>
 </a><a class="agent" href="/bailbonds/ca/agent/chavez-alex-1l75545/">
   <div class="an">Chavez, Alex</div>
   <div class="ad">1000 AVIARA PKWY., #300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1L75545</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coleman-dominic-4468454/">
   <div class="an">Coleman, Dominic</div>
   <div class="ad">6901 AIROSO AVENUE, San Diego, 92120</div>
+  
   
   <div class='lic'>License: 4468454</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coleman-emily-4468455/">
   <div class="an">Coleman, Emily</div>
   <div class="ad">6901 AIROSO AVENUE, San Diego, 92120</div>
   
+  
   <div class='lic'>License: 4468455</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coronel-edlin-1m63214/">
   <div class="an">Coronel, Edlin</div>
   <div class="ad">110 W C ST STE 2105, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1M63214</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coronel-guillermo-1n12922/">
   <div class="an">Coronel, Guillermo</div>
   <div class="ad">964 FIFTH AVE #408, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N12922</div>
 </a><a class="agent" href="/bailbonds/ca/agent/coronel-william-1k78774/">
   <div class="an">Coronel, William</div>
   <div class="ad">964 FIFTH AVE, 408, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1K78774</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cortez-rody-1l23705/">
   <div class="an">Cortez, Rody</div>
   <div class="ad">530 HACIENDA DRIVE, D-104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1L23705</div>
 </a><a class="agent" href="/bailbonds/ca/agent/corza-catalina-1846099/">
   <div class="an">Corza, Catalina</div>
   <div class="ad">530 HACIENDA DR. #D- 104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1846099</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cruz-enrique-1844279/">
   <div class="an">Cruz, Enrique</div>
   <div class="ad">942 C STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1844279</div>
 </a><a class="agent" href="/bailbonds/ca/agent/davalos-susana-1n13073/">
   <div class="an">Davalos, Susana</div>
   <div class="ad">501 W. BROADWAY SUITE 800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13073</div>
 </a><a class="agent" href="/bailbonds/ca/agent/day-christy-1843872/">
   <div class="an">Day, Christy</div>
   <div class="ad">530 HACIENDA DR STE D104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1843872</div>
 </a><a class="agent" href="/bailbonds/ca/agent/de-la-cruz-daniel-1m98062/">
   <div class="an">De La Cruz, Daniel</div>
   <div class="ad">530 HACIENDA DR STE D-104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1M98062</div>
 </a><a class="agent" href="/bailbonds/ca/agent/delacruz-adrian-4343903/">
   <div class="an">Delacruz, Adrian</div>
   <div class="ad">530 HACIENDA DRIVE, SUITE #D-104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 4343903</div>
 </a><a class="agent" href="/bailbonds/ca/agent/demery-matthew-1591559/">
   <div class="an">Demery, Matthew</div>
   <div class="ad">400 S MELROSE STE 219, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1591559</div>
 </a><a class="agent" href="/bailbonds/ca/agent/diaz-susana-4520009/">
   <div class="an">Diaz, Susana</div>
   <div class="ad">123 W C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4520009</div>
 </a><a class="agent" href="/bailbonds/ca/agent/dickow-vincent-1846405/">
   <div class="an">Dickow, Vincent</div>
   <div class="ad">8528 N. MAGNOLIA AVE, SUITE 106, Santee, 92071</div>
+  
   
   <div class='lic'>License: 1846405</div>
 </a><a class="agent" href="/bailbonds/ca/agent/douglass-alec-1830720/">
   <div class="an">Douglass, Alec</div>
   <div class="ad">1000 AVIARA PARKWAY SUITE 300, Carlbad, 92011</div>
   
+  
   <div class='lic'>License: 1830720</div>
 </a><a class="agent" href="/bailbonds/ca/agent/duenas-gabriel-4430316/">
   <div class="an">Duenas, Gabriel</div>
   <div class="ad">530 HACIENDA DRIVE #D-104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 4430316</div>
 </a><a class="agent" href="/bailbonds/ca/agent/durazo-karen-1n00473/">
   <div class="an">Durazo, Karen</div>
   <div class="ad">121 BROADWAY SUITE 551, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N00473</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-angela-1845620/">
   <div class="an">Espinoza, Angela</div>
   <div class="ad">616 THIRD AVENUE, Chula Vista, 91910</div>
+  
   
   <div class='lic'>License: 1845620</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-armando-1582164/">
   <div class="an">Espinoza, Armando</div>
   <div class="ad">616 THIRD AVENUE, Chula Vista, 91910</div>
   
+  
   <div class='lic'>License: 1582164</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-david-1k35551/">
   <div class="an">Espinoza, David</div>
   <div class="ad">444 WEST C ST, 100, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1K35551</div>
 </a><a class="agent" href="/bailbonds/ca/agent/espinoza-dina-1845349/">
   <div class="an">Espinoza, Dina</div>
   <div class="ad">616 THIRD AVENUE, Chula Vista, 91910</div>
   
+  
   <div class='lic'>License: 1845349</div>
 </a><a class="agent" href="/bailbonds/ca/agent/estrella-alejandro-1843791/">
   <div class="an">Estrella, Alejandro</div>
   <div class="ad">1817 DANCOL TER, El Cajon, 92021</div>
+  
   
   <div class='lic'>License: 1843791</div>
 </a><a class="agent" href="/bailbonds/ca/agent/estrella-jorge-1n13173/">
   <div class="an">Estrella, Jorge</div>
   <div class="ad">2802 SHENANDOAH DRIVE, Chula Vista, 91914</div>
   
+  
   <div class='lic'>License: 1N13173</div>
 </a><a class="agent" href="/bailbonds/ca/agent/estrella-maria-1n13258/">
   <div class="an">Estrella, Maria</div>
   <div class="ad">2802 SHENANDOAH DR, Chula Vista, 91914</div>
+  
   
   <div class='lic'>License: 1N13258</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ferreira-matthew-4470481/">
   <div class="an">Ferreira, Matthew</div>
   <div class="ad">777 W VISTA WAY SUITE 102, Vista, 92083</div>
   
+  
   <div class='lic'>License: 4470481</div>
 </a><a class="agent" href="/bailbonds/ca/agent/figueroa-pacas-david-4229837/">
   <div class="an">Figueroa Pacas, David</div>
   <div class="ad">11541 WOODSIDE AVE STE E, Santee, 92071</div>
+  
   
   <div class='lic'>License: 4229837</div>
 </a><a class="agent" href="/bailbonds/ca/agent/flores-catherine-1n13119/">
   <div class="an">Flores, Catherine</div>
   <div class="ad">237 W. GRAND AVE, Escondido, 92025</div>
   
+  
   <div class='lic'>License: 1N13119</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gallegos-armando-4397080/">
   <div class="an">Gallegos, Armando</div>
   <div class="ad">1045 6TH AVE, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4397080</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-enrique-1845304/">
   <div class="an">Garcia, Enrique</div>
   <div class="ad">620 HACIENDA DR, # 105, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1845304</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-norma-1843297/">
   <div class="an">Garcia, Norma</div>
   <div class="ad">1000 AVIARA PARKWAY SUITE 300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1843297</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gascon-solis-ricardo-1n13217/">
   <div class="an">Gascon Solis, Ricardo</div>
   <div class="ad">530 HACIENDA DR STE D104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1N13217</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gentapanan-kelvin-4366577/">
   <div class="an">Gentapanan, Kelvin</div>
   <div class="ad">1045 SIXTH AVE, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4366577</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gibbs-alejandra-1845556/">
   <div class="an">Gibbs, Alejandra</div>
   <div class="ad">121 BROADWAY SUITE 551, A, 551, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1845556</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gibbs-reyna-1845658/">
   <div class="an">Gibbs, Reyna</div>
   <div class="ad">121 BROADWAY, STE#551, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1845658</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gibbs-steffan-1840505/">
   <div class="an">Gibbs, Steffan</div>
   <div class="ad">530 HACIENDA DR STE D104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1840505</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gomez-christian-1n13057/">
   <div class="an">Gomez, Christian</div>
   <div class="ad">964 5TH AVE #320, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13057</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-oscar-1846578/">
   <div class="an">Gonzalez, Oscar</div>
   <div class="ad">1000 AVIARA PARKWAY #300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1846578</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gonzalez-samuel-1817332/">
   <div class="an">Gonzalez, Samuel</div>
   <div class="ad">400 S. MELROSE DR. SUITE 108, Vista, 92083</div>
+  
   
   <div class='lic'>License: 1817332</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gregory-brandon-4545306/">
   <div class="an">Gregory, Brandon</div>
   <div class="ad">1405 6TH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4545306</div>
 </a><a class="agent" href="/bailbonds/ca/agent/grundstein-aaron-1844353/">
   <div class="an">Grundstein, Aaron</div>
   <div class="ad">2251 SAN DIEGO AVE., San Diego, 92110</div>
+  
   
   <div class='lic'>License: 1844353</div>
 </a><a class="agent" href="/bailbonds/ca/agent/grundstein-lilitte-1845626/">
   <div class="an">Grundstein, Lilitte</div>
   <div class="ad">2251 SAN DIEGO AVE., San Diego, 92110</div>
   
+  
   <div class='lic'>License: 1845626</div>
 </a><a class="agent" href="/bailbonds/ca/agent/guerrero-austin-1l90834/">
   <div class="an">Guerrero, Austin</div>
   <div class="ad">964 5TH AVENUE, 203, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1L90834</div>
 </a><a class="agent" href="/bailbonds/ca/agent/guerrero-dustin-1844694/">
   <div class="an">Guerrero, Dustin</div>
   <div class="ad">123 W "C" STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1844694</div>
 </a><a class="agent" href="/bailbonds/ca/agent/guerrero-michael-1k74965/">
   <div class="an">Guerrero, Michael</div>
   <div class="ad">FREEWAY INSURANCE, 6915 EL CAJON BLVD, San Diego, 92115</div>
+  
   
   <div class='lic'>License: 1K74965</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-ariez-4483438/">
   <div class="an">Gutierrez, Ariez</div>
   <div class="ad">530 HACIENDA DRIVE #D-104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 4483438</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-jose-1845812/">
   <div class="an">Gutierrez, Jose</div>
   <div class="ad">620 HACIENDA DR STE 105, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1845812</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hartenstein-pedro-1k48920/">
   <div class="an">Hartenstein, Pedro</div>
   <div class="ad">123 WEST C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1K48920</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hayes-robert-1843076/">
   <div class="an">Hayes, Robert</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1843076</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-randolph-1n13058/">
   <div class="an">Hernandez, Randolph</div>
   <div class="ad">2727 HAZELNUT CT, Chula Vista, 91915</div>
   
+  
   <div class='lic'>License: 1N13058</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hernandez-yvette-1m36440/">
   <div class="an">Hernandez, Yvette</div>
   <div class="ad">1241 STATE STREET, San Diego, 92011</div>
+  
   
   <div class='lic'>License: 1M36440</div>
 </a><a class="agent" href="/bailbonds/ca/agent/herrera-timothy-1841810/">
   <div class="an">Herrera, Timothy</div>
   <div class="ad">1000 AVIARA DR STE 300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1841810</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hill-wayne-4435122/">
   <div class="an">Hill, Wayne</div>
   <div class="ad">4803 BERMUDA AVENUE, San Diego, 92107</div>
+  
   
   <div class='lic'>License: 4435122</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hoang-khanh-1843422/">
   <div class="an">Hoang, Khanh</div>
   <div class="ad">11878 CHARMAINE WAY, San Diego, 92131</div>
   
+  
   <div class='lic'>License: 1843422</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hoang-tammy-1842976/">
   <div class="an">Hoang, Tammy</div>
   <div class="ad">11878 CHARMAINE WAY, San Diego, 92131</div>
+  
   
   <div class='lic'>License: 1842976</div>
 </a><a class="agent" href="/bailbonds/ca/agent/hom-charles-4527883/">
   <div class="an">Hom, Charles</div>
   <div class="ad">3456 GLEN ABBEY BLVD, Chula Vista, 91910</div>
   
+  
   <div class='lic'>License: 4527883</div>
 </a><a class="agent" href="/bailbonds/ca/agent/howse-vanessa-1k45726/">
   <div class="an">Howse, Vanessa</div>
   <div class="ad">380 S. MELROSE DR 361, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1K45726</div>
 </a><a class="agent" href="/bailbonds/ca/agent/huerta-victor-1845822/">
   <div class="an">Huerta, Victor</div>
   <div class="ad">1446 FRONT ST STE 200, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1845822</div>
 </a><a class="agent" href="/bailbonds/ca/agent/iskander-basel-1845987/">
   <div class="an">Iskander, Basel</div>
   <div class="ad">680 S JOHNSON AVE, El Cajon, 92020</div>
+  
   
   <div class='lic'>License: 1845987</div>
 </a><a class="agent" href="/bailbonds/ca/agent/jessen-jordan-1n13150/">
   <div class="an">Jessen, Jordan</div>
   <div class="ad">574 WISTERIA ST, Chula Vista, 91911</div>
   
+  
   <div class='lic'>License: 1N13150</div>
 </a><a class="agent" href="/bailbonds/ca/agent/johnson-cindya-4558925/">
   <div class="an">Johnson, Cindya</div>
   <div class="ad">1441 STATE STREET, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4558925</div>
 </a><a class="agent" href="/bailbonds/ca/agent/kerbow-christopher-1846384/">
   <div class="an">Kerbow, Christopher</div>
   <div class="ad">2216 STARBURST LN, San Diego, 92154</div>
   
+  
   <div class='lic'>License: 1846384</div>
 </a><a class="agent" href="/bailbonds/ca/agent/kilkenny-stephanie-1c06894/">
   <div class="an">Kilkenny, Stephanie</div>
   <div class="ad">1000 AVIARA PARKWAY #300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1C06894</div>
 </a><a class="agent" href="/bailbonds/ca/agent/labolle-daniel-1840459/">
   <div class="an">Labolle, Daniel</div>
   <div class="ad">501 W. BROADWAY SUITE 800, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1840459</div>
 </a><a class="agent" href="/bailbonds/ca/agent/laracamberos-jazmin-1l29928/">
   <div class="an">Laracamberos, Jazmin</div>
   <div class="ad">1000 AVIARA DR STE 300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1L29928</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lauricella-francis-1845609/">
   <div class="an">Lauricella, Francis</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1845609</div>
 </a><a class="agent" href="/bailbonds/ca/agent/leanos-dorian-1n13285/">
   <div class="an">Leanos, Dorian</div>
   <div class="ad">501 W. BROADWAY #800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13285</div>
 </a><a class="agent" href="/bailbonds/ca/agent/leanos-joshua-1845856/">
   <div class="an">Leanos, Joshua</div>
   <div class="ad">10502 MISSION GORGE RD STE 130, Santee, 92071</div>
   
+  
   <div class='lic'>License: 1845856</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lee-sonia-1845678/">
   <div class="an">Lee, Sonia</div>
   <div class="ad">620 HACIENDA DR STE 105, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1845678</div>
 </a><a class="agent" href="/bailbonds/ca/agent/limandri-marco-1443837/">
   <div class="an">Limandri, Marco</div>
   <div class="ad">1010 STATE STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1443837</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lloyd-robert-1844393/">
   <div class="an">Lloyd, Robert</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1844393</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-sahara-1845569/">
   <div class="an">Lopez, Sahara</div>
   <div class="ad">2802 SHENANDOAH DR, Chula Vista, 91914</div>
   
+  
   <div class='lic'>License: 1845569</div>
 </a><a class="agent" href="/bailbonds/ca/agent/lopez-garcia-bianca-1n05676/">
   <div class="an">Lopez-Garcia, Bianca</div>
   <div class="ad">109 WEST C ST E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N05676</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mackinnon-ross-4344316/">
   <div class="an">Mackinnon, Ross</div>
   <div class="ad">1405 SIXTH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4344316</div>
 </a><a class="agent" href="/bailbonds/ca/agent/maldonado-jonathan-1n13330/">
   <div class="an">Maldonado, Jonathan</div>
   <div class="ad">110 W C ST #2105, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13330</div>
 </a><a class="agent" href="/bailbonds/ca/agent/malele-juneatta-1844187/">
   <div class="an">Malele, Juneatta</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1844187</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mariscal-torres-martin-4538766/">
   <div class="an">Mariscal-Torres, Martin</div>
   <div class="ad">1441 STATE STREET, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4538766</div>
 </a><a class="agent" href="/bailbonds/ca/agent/markarian-bianchi-4403367/">
   <div class="an">Markarian, Bianchi</div>
   <div class="ad">1405 SIXTH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4403367</div>
 </a><a class="agent" href="/bailbonds/ca/agent/marquez-eric-1846359/">
   <div class="an">Marquez, Eric</div>
   <div class="ad">400 S MELROSE DR STE 108, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1846359</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-gerardo-1845972/">
   <div class="an">Martinez, Gerardo</div>
   <div class="ad">121 BROADWAY , SUITE # 551, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1845972</div>
 </a><a class="agent" href="/bailbonds/ca/agent/martinez-torres-gabriela-1845127/">
   <div class="an">Martinez Torres, Gabriela</div>
   <div class="ad">109 WEST C STREET, SUITE E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1845127</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mchugh-stephen-1615765/">
   <div class="an">Mchugh, Stephen</div>
   <div class="ad">18295 MOON SONG COURT, San Diego, 92127</div>
   
+  
   <div class='lic'>License: 1615765</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendez-jose-1n13097/">
   <div class="an">Mendez, Jose</div>
   <div class="ad">530 HACIENDA DR SUITE D-104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1N13097</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mendez-marissa-1845638/">
   <div class="an">Mendez, Marissa</div>
   <div class="ad">1241 STATE ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1845638</div>
 </a><a class="agent" href="/bailbonds/ca/agent/molina-francisco-1k71835/">
   <div class="an">Molina, Francisco</div>
   <div class="ad">575 D WEST VISTA WAY, Vista, 92083</div>
+  
   
   <div class='lic'>License: 1K71835</div>
 </a><a class="agent" href="/bailbonds/ca/agent/monzon-lizabette-1846586/">
   <div class="an">Monzon, Lizabette</div>
   <div class="ad">620 HACIENDA DR STE 105, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1846586</div>
 </a><a class="agent" href="/bailbonds/ca/agent/moran-daniel-1846129/">
   <div class="an">Moran, Daniel</div>
   <div class="ad">109 WEST C STREET, E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1846129</div>
 </a><a class="agent" href="/bailbonds/ca/agent/mutter-herbert-1843602/">
   <div class="an">Mutter, Herbert</div>
   <div class="ad">1000 AVIARA PARKWAY, SUITE 300, Carlsbad, 92011</div>
   
+  
   <div class='lic'>License: 1843602</div>
 </a><a class="agent" href="/bailbonds/ca/agent/navarro-arthur-1846286/">
   <div class="an">Navarro, Arthur</div>
   <div class="ad">1405 6TH AVE, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1846286</div>
 </a><a class="agent" href="/bailbonds/ca/agent/navarro-ivan-1845908/">
   <div class="an">Navarro, Ivan</div>
   <div class="ad">7025 BOULEVARD DR APT 1, La Mesa, 91941</div>
   
+  
   <div class='lic'>License: 1845908</div>
 </a><a class="agent" href="/bailbonds/ca/agent/o-connor-vickie-1840940/">
   <div class="an">O'Connor, Vickie</div>
   <div class="ad">7467 MISSION GORGE RD SPC 218, Santee, 92071</div>
+  
   
   <div class='lic'>License: 1840940</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortega-david-4197879/">
   <div class="an">Ortega, David</div>
   <div class="ad">11541 WOODSIDE AVE, SUITE E, Santee, 92071</div>
   
+  
   <div class='lic'>License: 4197879</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ortiz-gerald-1841357/">
   <div class="an">Ortiz, Gerald</div>
   <div class="ad">946 S. ANZA ST, #22, El Cajon, 92020</div>
+  
   
   <div class='lic'>License: 1841357</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pacas-abel-1846751/">
   <div class="an">Pacas, Abel</div>
   <div class="ad">519 BROADWAY, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1846751</div>
 </a><a class="agent" href="/bailbonds/ca/agent/padilla-eddy-1l60545/">
   <div class="an">Padilla, Eddy</div>
   <div class="ad">109 WEST C STREET, SUITE E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1L60545</div>
 </a><a class="agent" href="/bailbonds/ca/agent/paredes-sonia-1m18305/">
   <div class="an">Paredes, Sonia</div>
   <div class="ad">109 W C ST SUITE E, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1M18305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/patino-taylor-1845857/">
   <div class="an">Patino, Taylor</div>
   <div class="ad">590 12TH ST APT C, Imperial Beach, 91932</div>
+  
   
   <div class='lic'>License: 1845857</div>
 </a><a class="agent" href="/bailbonds/ca/agent/peeck-kyle-1n13292/">
   <div class="an">Peeck, Kyle</div>
   <div class="ad">620 HACIENDA DR #105, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1N13292</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pellegrini-ian-1845639/">
   <div class="an">Pellegrini, Ian</div>
   <div class="ad">12925 POMERADO RD, SUITE B, Poway, 92064</div>
+  
   
   <div class='lic'>License: 1845639</div>
 </a><a class="agent" href="/bailbonds/ca/agent/perez-francisco-1845561/">
   <div class="an">Perez, Francisco</div>
   <div class="ad">945 4TH AVE # 305A, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1845561</div>
 </a><a class="agent" href="/bailbonds/ca/agent/perez-janae-1n12961/">
   <div class="an">Perez, Janae</div>
   <div class="ad">42029 10TH WEST, Lancaster, 92011</div>
+  
   
   <div class='lic'>License: 1N12961</div>
 </a><a class="agent" href="/bailbonds/ca/agent/prescott-stacie-1n12902/">
   <div class="an">Prescott, Stacie</div>
   <div class="ad">10438 MISSION GORGE RD, Santee, 92071</div>
   
+  
   <div class='lic'>License: 1N12902</div>
 </a><a class="agent" href="/bailbonds/ca/agent/pujols-liriano-oscar-1k13669/">
   <div class="an">Pujols-Liriano, Oscar</div>
   <div class="ad">6840 CAMINO DEL REY, Bonsall, 92003</div>
+  
   
   <div class='lic'>License: 1K13669</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-berenice-1n12938/">
   <div class="an">Reyes, Berenice</div>
   <div class="ad">2182 S. EL CAMINO REAL STE 103, Oceanside, 92054</div>
   
+  
   <div class='lic'>License: 1N12938</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-daniel-4514499/">
   <div class="an">Reyes, Daniel</div>
   <div class="ad">380 S Melrose, Suite 112, Vista, 92081</div>
+  
   
   <div class='lic'>License: 4514499</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-miguelangel-1845959/">
   <div class="an">Reyes, Miguelangel</div>
   <div class="ad">237 W GRAND AVE, Escondido, 92025</div>
   
+  
   <div class='lic'>License: 1845959</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-noah-4412785/">
   <div class="an">Reyes, Noah</div>
   <div class="ad">2182 S EL CAMINO REAL, SUITE 103, Oceanside, 92054</div>
+  
   
   <div class='lic'>License: 4412785</div>
 </a><a class="agent" href="/bailbonds/ca/agent/reyes-rafael-1l56800/">
   <div class="an">Reyes, Rafael</div>
   <div class="ad">2182 EL CAMINO REAL SUITE 103, Oceanside, 92054</div>
   
+  
   <div class='lic'>License: 1L56800</div>
 </a><a class="agent" href="/bailbonds/ca/agent/riley-lilli-1840912/">
   <div class="an">Riley, Lilli</div>
   <div class="ad">105 WEST F ST #100, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1840912</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rivers-corinne-4349670/">
   <div class="an">Rivers, Corinne</div>
   <div class="ad">5430 BALTIMORE DR #53, La Mesa, 91942</div>
   
+  
   <div class='lic'>License: 4349670</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rodriguez-adolfo-1845010/">
   <div class="an">Rodriguez, Adolfo</div>
   <div class="ad">10438 MISSION GORGE RD SUITE 4, Santee, 92071</div>
+  
   
   <div class='lic'>License: 1845010</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rodriguez-rosaura-1m11317/">
   <div class="an">Rodriguez, Rosaura</div>
   <div class="ad">1405 6TH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1M11317</div>
 </a><a class="agent" href="/bailbonds/ca/agent/roe-david-1842786/">
   <div class="an">Roe, David</div>
   <div class="ad">1241 STATE ST, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1842786</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rosas-robert-1841699/">
   <div class="an">Rosas, Robert</div>
   <div class="ad">4575 NORTH AVE, #6, San Diego, 92116</div>
   
+  
   <div class='lic'>License: 1841699</div>
 </a><a class="agent" href="/bailbonds/ca/agent/rubio-gabriela-1n12900/">
   <div class="an">Rubio, Gabriela</div>
   <div class="ad">1241 STATE ST, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N12900</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ruiz-briednette-1n13035/">
   <div class="an">Ruiz, Briednette</div>
   <div class="ad">1025 S SANTA FE #B, Vista, 92083</div>
   
+  
   <div class='lic'>License: 1N13035</div>
 </a><a class="agent" href="/bailbonds/ca/agent/salazar-joyce-4398724/">
   <div class="an">Salazar, Joyce</div>
   <div class="ad">620 HACIENDA DR. #105, Vista, 92081</div>
+  
   
   <div class='lic'>License: 4398724</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sanchez-emilio-1846333/">
   <div class="an">Sanchez, Emilio</div>
   <div class="ad">123 WEST C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1846333</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sanchez-jahaziel-4375399/">
   <div class="an">Sanchez, Jahaziel</div>
   <div class="ad">519 BROADWAY 5TH AVE., San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4375399</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandez-jeovahnni-1k68153/">
   <div class="an">Sandez, Jeovahnni</div>
   <div class="ad">964 FIFTH AVE , #408, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1K68153</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandoval-arturo-1n13007/">
   <div class="an">Sandoval, Arturo</div>
   <div class="ad">964 FIFTH AVE #320, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13007</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sandoval-ismael-1k62261/">
   <div class="an">Sandoval, Ismael</div>
   <div class="ad">530 HACIENDA DR STE D104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1K62261</div>
 </a><a class="agent" href="/bailbonds/ca/agent/santos-omar-4548281/">
   <div class="an">Santos, Omar</div>
   <div class="ad">123 W C ST, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4548281</div>
 </a><a class="agent" href="/bailbonds/ca/agent/schuh-christopher-1843288/">
   <div class="an">Schuh, Christopher</div>
   <div class="ad">1817 SOUTH COAST HIGHWAY, SUITE #B, Oceanside, 92054</div>
   
+  
   <div class='lic'>License: 1843288</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sepulveda-fabian-1844963/">
   <div class="an">Sepulveda, Fabian</div>
   <div class="ad">620 HACIENDA DR #101, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1844963</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sermeno-jesus-4424071/">
   <div class="an">Sermeno, Jesus</div>
   <div class="ad">839 COLORADO AVE APT A, Chula Vista, 91911</div>
   
+  
   <div class='lic'>License: 4424071</div>
 </a><a class="agent" href="/bailbonds/ca/agent/shams-nematullah-4403243/">
   <div class="an">Shams, Nematullah</div>
   <div class="ad">105 F STREET #220, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 4403243</div>
 </a><a class="agent" href="/bailbonds/ca/agent/shields-grant-4193380/">
   <div class="an">Shields, Grant</div>
   <div class="ad">519 BROADWAY, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4193380</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sink-lauren-1l35562/">
   <div class="an">Sink, Lauren</div>
   <div class="ad">4290 REDWOOD HWY, Carlsbad, 92011</div>
+  
   
   <div class='lic'>License: 1L35562</div>
 </a><a class="agent" href="/bailbonds/ca/agent/stephens-dylan-1k87742/">
   <div class="an">Stephens, Dylan</div>
   <div class="ad">530 HACIENDA DR STE 104, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1K87742</div>
 </a><a class="agent" href="/bailbonds/ca/agent/struzzieri-erika-1843714/">
   <div class="an">Struzzieri, Erika</div>
   <div class="ad">530 HACIENDA DR STE D104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1843714</div>
 </a><a class="agent" href="/bailbonds/ca/agent/theophil-matthew-4381481/">
   <div class="an">Theophil, Matthew</div>
   <div class="ad">620 HACIENDA DR. #105, Vista, 92011</div>
   
+  
   <div class='lic'>License: 4381481</div>
 </a><a class="agent" href="/bailbonds/ca/agent/torres-francisco-1845397/">
   <div class="an">Torres, Francisco</div>
   <div class="ad">530 HACIENDA DRIVE, SUITE D104, Vista, 92081</div>
+  
   
   <div class='lic'>License: 1845397</div>
 </a><a class="agent" href="/bailbonds/ca/agent/torres-humberto-1846603/">
   <div class="an">Torres, Humberto</div>
   <div class="ad">123 W. C. STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1846603</div>
 </a><a class="agent" href="/bailbonds/ca/agent/torres-smith-jeremy-1l37961/">
   <div class="an">Torres-Smith, Jeremy</div>
   <div class="ad">10503 MISSION GORGE ROAD, Santee, 92071</div>
+  
   
   <div class='lic'>License: 1L37961</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tyson-ryan-1n12991/">
   <div class="an">Tyson, Ryan</div>
   <div class="ad">10360 LONDONDERRY AVE, San Diego, 92126</div>
   
+  
   <div class='lic'>License: 1N12991</div>
 </a><a class="agent" href="/bailbonds/ca/agent/valdez-jaime-1842026/">
   <div class="an">Valdez, Jaime</div>
   <div class="ad">105 WEST F STREET, SUITE #220, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1842026</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vargas-rosa-4445439/">
   <div class="an">Vargas, Rosa</div>
   <div class="ad">1045 6TH AVE, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4445439</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vazquez-marisol-1n13317/">
   <div class="an">Vazquez, Marisol</div>
   <div class="ad">1241 STATE ST, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13317</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vazquez-balbuena-jorge-4469467/">
   <div class="an">Vazquez Balbuena, Jorge</div>
   <div class="ad">1441 STATE STREET, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 4469467</div>
 </a><a class="agent" href="/bailbonds/ca/agent/villegas-jesus-1m72282/">
   <div class="an">Villegas, Jesus</div>
   <div class="ad">109 WEST C ST E, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1M72282</div>
 </a><a class="agent" href="/bailbonds/ca/agent/walker-gema-1846499/">
   <div class="an">Walker, Gema</div>
   <div class="ad">450 S. MELROSE DR #111, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1846499</div>
 </a><a class="agent" href="/bailbonds/ca/agent/walker-kiersten-1n13102/">
   <div class="an">Walker, Kiersten</div>
   <div class="ad">501 W BROADWAY STE 800, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1N13102</div>
 </a><a class="agent" href="/bailbonds/ca/agent/walker-shola-1845584/">
   <div class="an">Walker, Shola</div>
   <div class="ad">2307 FENTON PKWY STE 107, San Diego, 92108</div>
   
+  
   <div class='lic'>License: 1845584</div>
 </a><a class="agent" href="/bailbonds/ca/agent/watkins-jerald-1843485/">
   <div class="an">Watkins, Jerald</div>
   <div class="ad">942 C ST, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1843485</div>
 </a><a class="agent" href="/bailbonds/ca/agent/watson-connie-1b28793/">
   <div class="an">Watson, Connie</div>
   <div class="ad">311 F ST STE 202, Chula Vista, 91910</div>
   
+  
   <div class='lic'>License: 1B28793</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-mark-1842305/">
   <div class="an">Williams, Mark</div>
   <div class="ad">119 WEST C STREET, San Diego, 92101</div>
+  
   
   <div class='lic'>License: 1842305</div>
 </a><a class="agent" href="/bailbonds/ca/agent/williams-paul-1843111/">
   <div class="an">Williams, Paul</div>
   <div class="ad">400 S. MELROSE DR. #108, Vista, 92081</div>
   
+  
   <div class='lic'>License: 1843111</div>
 </a><a class="agent" href="/bailbonds/ca/agent/yarborough-ryan-1n13264/">
   <div class="an">Yarborough, Ryan</div>
   <div class="ad">119 W C ST, San Diego, 92101</div>
   
+  
   <div class='lic'>License: 1N13264</div>
 </a><a class="agent" href="/bailbonds/ca/agent/zamutt-wendy-1840891/">
   <div class="an">Zamutt, Wendy</div>
   <div class="ad">8895 TOWNE CENTRE DR, SUITE 105, San Diego, 92122</div>
+  
   
   <div class='lic'>License: 1840891</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -994,5 +1171,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.0236, -116.77612], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.71168,"lng":-117.16019,"label":"<strong><a href='/bailbonds/ca/agent/aguayo-lynda-1n13226/'>Aguayo, Lynda</a></strong>"},{"lat":32.71682,"lng":-117.15613,"label":"<strong><a href='/bailbonds/ca/agent/alexander-willie-1k64664/'>Alexander, Willie</a></strong>"},{"lat":33.19113,"lng":-117.25381,"label":"<strong><a href='/bailbonds/ca/agent/aliotti-angelo-1843497/'>Aliotti, Angelo</a></strong>"},{"lat":32.71668,"lng":-117.16404,"label":"<strong><a href='/bailbonds/ca/agent/anaya-mario-1n13050/'>Anaya, Mario</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/angulo-sisli-4443953/'>Angulo, Sisli</a></strong>"},{"lat":32.70968,"lng":-117.15549,"label":"<strong><a href='/bailbonds/ca/agent/angulo-burkhart-erica-1n13181/'>Angulo-Burkhart, Erica</a></strong>"},{"lat":32.71668,"lng":-117.16409,"label":"<strong><a href='/bailbonds/ca/agent/araiza-ricardo-1843500/'>Araiza, Ricardo</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/arana-valenzuela-andres-1n13088/'>Arana Valenzuela, Andres</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/arce-michelle-4430338/'>Arce, Michelle</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/arreola-maria-1843140/'>Arreola, Maria</a></strong>"},{"lat":32.83832,"lng":-116.96893,"label":"<strong><a href='/bailbonds/ca/agent/arriaga-rivera-valentina-1k84756/'>Arriaga Rivera, Valentina</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/baeza-norma-1m04471/'>Baeza, Norma</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/baker-christopher-1m44505/'>Baker, Christopher</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/bartolome-john-alfred-1n13341/'>Bartolome, John Alfred</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/bishop-araceli-1843618/'>Bishop, Araceli</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/brown-joel-1843265/'>Brown, Joel</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/buckner-sandra-1n13301/'>Buckner, Sandra</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/burns-kysha-4383399/'>Burns, Kysha</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/camacho-jaime-1845519/'>Camacho, Jaime</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/cantu-mark-1844994/'>Cantu, Mark</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/cardenas-eduardo-1m93596/'>Cardenas, Eduardo</a></strong>"},{"lat":32.71668,"lng":-117.16404,"label":"<strong><a href='/bailbonds/ca/agent/cesar-sarah-1846641/'>Cesar, Sarah</a></strong>"},{"lat":33.19188,"lng":-117.22956,"label":"<strong><a href='/bailbonds/ca/agent/chaffin-patricia-1830730/'>Chaffin, Patricia</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/chavez-alex-1l75545/'>Chavez, Alex</a></strong>"},{"lat":32.77701,"lng":-117.05053,"label":"<strong><a href='/bailbonds/ca/agent/coleman-dominic-4468454/'>Coleman, Dominic</a></strong>"},{"lat":32.77701,"lng":-117.05053,"label":"<strong><a href='/bailbonds/ca/agent/coleman-emily-4468455/'>Coleman, Emily</a></strong>"},{"lat":32.7168,"lng":-117.16398,"label":"<strong><a href='/bailbonds/ca/agent/coronel-edlin-1m63214/'>Coronel, Edlin</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/coronel-guillermo-1n12922/'>Coronel, Guillermo</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/coronel-william-1k78774/'>Coronel, William</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/cortez-rody-1l23705/'>Cortez, Rody</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/corza-catalina-1846099/'>Corza, Catalina</a></strong>"},{"lat":32.71682,"lng":-117.15613,"label":"<strong><a href='/bailbonds/ca/agent/cruz-enrique-1844279/'>Cruz, Enrique</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/davalos-susana-1n13073/'>Davalos, Susana</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/day-christy-1843872/'>Day, Christy</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/de-la-cruz-daniel-1m98062/'>De La Cruz, Daniel</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/delacruz-adrian-4343903/'>Delacruz, Adrian</a></strong>"},{"lat":33.19089,"lng":-117.25387,"label":"<strong><a href='/bailbonds/ca/agent/demery-matthew-1591559/'>Demery, Matthew</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/diaz-susana-4520009/'>Diaz, Susana</a></strong>"},{"lat":32.82999,"lng":-116.9626,"label":"<strong><a href='/bailbonds/ca/agent/dickow-vincent-1846405/'>Dickow, Vincent</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/douglass-alec-1830720/'>Douglass, Alec</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/duenas-gabriel-4430316/'>Duenas, Gabriel</a></strong>"},{"lat":32.71566,"lng":-117.1636,"label":"<strong><a href='/bailbonds/ca/agent/durazo-karen-1n00473/'>Durazo, Karen</a></strong>"},{"lat":32.63033,"lng":-117.0757,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-angela-1845620/'>Espinoza, Angela</a></strong>"},{"lat":32.63033,"lng":-117.0757,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-armando-1582164/'>Espinoza, Armando</a></strong>"},{"lat":32.71678,"lng":-117.1669,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-david-1k35551/'>Espinoza, David</a></strong>"},{"lat":32.63033,"lng":-117.0757,"label":"<strong><a href='/bailbonds/ca/agent/espinoza-dina-1845349/'>Espinoza, Dina</a></strong>"},{"lat":32.81003,"lng":-116.91245,"label":"<strong><a href='/bailbonds/ca/agent/estrella-alejandro-1843791/'>Estrella, Alejandro</a></strong>"},{"lat":32.65003,"lng":-116.94302,"label":"<strong><a href='/bailbonds/ca/agent/estrella-jorge-1n13173/'>Estrella, Jorge</a></strong>"},{"lat":32.65003,"lng":-116.94302,"label":"<strong><a href='/bailbonds/ca/agent/estrella-maria-1n13258/'>Estrella, Maria</a></strong>"},{"lat":33.19459,"lng":-117.25761,"label":"<strong><a href='/bailbonds/ca/agent/ferreira-matthew-4470481/'>Ferreira, Matthew</a></strong>"},{"lat":32.85247,"lng":-116.94882,"label":"<strong><a href='/bailbonds/ca/agent/figueroa-pacas-david-4229837/'>Figueroa Pacas, David</a></strong>"},{"lat":33.12067,"lng":-117.08332,"label":"<strong><a href='/bailbonds/ca/agent/flores-catherine-1n13119/'>Flores, Catherine</a></strong>"},{"lat":32.71618,"lng":-117.1592,"label":"<strong><a href='/bailbonds/ca/agent/gallegos-armando-4397080/'>Gallegos, Armando</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/garcia-enrique-1845304/'>Garcia, Enrique</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/garcia-norma-1843297/'>Garcia, Norma</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/gascon-solis-ricardo-1n13217/'>Gascon Solis, Ricardo</a></strong>"},{"lat":32.71618,"lng":-117.1592,"label":"<strong><a href='/bailbonds/ca/agent/gentapanan-kelvin-4366577/'>Gentapanan, Kelvin</a></strong>"},{"lat":32.71566,"lng":-117.1636,"label":"<strong><a href='/bailbonds/ca/agent/gibbs-alejandra-1845556/'>Gibbs, Alejandra</a></strong>"},{"lat":32.71566,"lng":-117.1636,"label":"<strong><a href='/bailbonds/ca/agent/gibbs-reyna-1845658/'>Gibbs, Reyna</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/gibbs-steffan-1840505/'>Gibbs, Steffan</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/gomez-christian-1n13057/'>Gomez, Christian</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-oscar-1846578/'>Gonzalez, Oscar</a></strong>"},{"lat":33.19089,"lng":-117.25387,"label":"<strong><a href='/bailbonds/ca/agent/gonzalez-samuel-1817332/'>Gonzalez, Samuel</a></strong>"},{"lat":32.71999,"lng":-117.15923,"label":"<strong><a href='/bailbonds/ca/agent/gregory-brandon-4545306/'>Gregory, Brandon</a></strong>"},{"lat":32.74837,"lng":-117.19179,"label":"<strong><a href='/bailbonds/ca/agent/grundstein-aaron-1844353/'>Grundstein, Aaron</a></strong>"},{"lat":32.74837,"lng":-117.19179,"label":"<strong><a href='/bailbonds/ca/agent/grundstein-lilitte-1845626/'>Grundstein, Lilitte</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/guerrero-austin-1l90834/'>Guerrero, Austin</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/guerrero-dustin-1844694/'>Guerrero, Dustin</a></strong>"},{"lat":32.7686,"lng":-117.04889,"label":"<strong><a href='/bailbonds/ca/agent/guerrero-michael-1k74965/'>Guerrero, Michael</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-ariez-4483438/'>Gutierrez, Ariez</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-jose-1845812/'>Gutierrez, Jose</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/hartenstein-pedro-1k48920/'>Hartenstein, Pedro</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/hayes-robert-1843076/'>Hayes, Robert</a></strong>"},{"lat":32.63157,"lng":-116.94096,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-randolph-1n13058/'>Hernandez, Randolph</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/hernandez-yvette-1m36440/'>Hernandez, Yvette</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/herrera-timothy-1841810/'>Herrera, Timothy</a></strong>"},{"lat":32.73713,"lng":-117.25425,"label":"<strong><a href='/bailbonds/ca/agent/hill-wayne-4435122/'>Hill, Wayne</a></strong>"},{"lat":32.93371,"lng":-117.10455,"label":"<strong><a href='/bailbonds/ca/agent/hoang-khanh-1843422/'>Hoang, Khanh</a></strong>"},{"lat":32.93371,"lng":-117.10455,"label":"<strong><a href='/bailbonds/ca/agent/hoang-tammy-1842976/'>Hoang, Tammy</a></strong>"},{"lat":32.65034,"lng":-117.04998,"label":"<strong><a href='/bailbonds/ca/agent/hom-charles-4527883/'>Hom, Charles</a></strong>"},{"lat":33.19113,"lng":-117.25381,"label":"<strong><a href='/bailbonds/ca/agent/howse-vanessa-1k45726/'>Howse, Vanessa</a></strong>"},{"lat":32.72038,"lng":-117.16482,"label":"<strong><a href='/bailbonds/ca/agent/huerta-victor-1845822/'>Huerta, Victor</a></strong>"},{"lat":32.78799,"lng":-116.971,"label":"<strong><a href='/bailbonds/ca/agent/iskander-basel-1845987/'>Iskander, Basel</a></strong>"},{"lat":32.61126,"lng":-117.03124,"label":"<strong><a href='/bailbonds/ca/agent/jessen-jordan-1n13150/'>Jessen, Jordan</a></strong>"},{"lat":32.72031,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/johnson-cindya-4558925/'>Johnson, Cindya</a></strong>"},{"lat":32.57432,"lng":-117.08575,"label":"<strong><a href='/bailbonds/ca/agent/kerbow-christopher-1846384/'>Kerbow, Christopher</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/kilkenny-stephanie-1c06894/'>Kilkenny, Stephanie</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/labolle-daniel-1840459/'>Labolle, Daniel</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/laracamberos-jazmin-1l29928/'>Laracamberos, Jazmin</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/lauricella-francis-1845609/'>Lauricella, Francis</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/leanos-dorian-1n13285/'>Leanos, Dorian</a></strong>"},{"lat":32.83843,"lng":-116.96892,"label":"<strong><a href='/bailbonds/ca/agent/leanos-joshua-1845856/'>Leanos, Joshua</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/lee-sonia-1845678/'>Lee, Sonia</a></strong>"},{"lat":32.71586,"lng":-117.16656,"label":"<strong><a href='/bailbonds/ca/agent/limandri-marco-1443837/'>Limandri, Marco</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/lloyd-robert-1844393/'>Lloyd, Robert</a></strong>"},{"lat":32.65003,"lng":-116.94302,"label":"<strong><a href='/bailbonds/ca/agent/lopez-sahara-1845569/'>Lopez, Sahara</a></strong>"},{"lat":32.71668,"lng":-117.1637,"label":"<strong><a href='/bailbonds/ca/agent/lopez-garcia-bianca-1n05676/'>Lopez-Garcia, Bianca</a></strong>"},{"lat":32.71999,"lng":-117.15923,"label":"<strong><a href='/bailbonds/ca/agent/mackinnon-ross-4344316/'>Mackinnon, Ross</a></strong>"},{"lat":32.7168,"lng":-117.16398,"label":"<strong><a href='/bailbonds/ca/agent/maldonado-jonathan-1n13330/'>Maldonado, Jonathan</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/malele-juneatta-1844187/'>Malele, Juneatta</a></strong>"},{"lat":32.72031,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/mariscal-torres-martin-4538766/'>Mariscal-Torres, Martin</a></strong>"},{"lat":32.71999,"lng":-117.15923,"label":"<strong><a href='/bailbonds/ca/agent/markarian-bianchi-4403367/'>Markarian, Bianchi</a></strong>"},{"lat":33.19089,"lng":-117.25387,"label":"<strong><a href='/bailbonds/ca/agent/marquez-eric-1846359/'>Marquez, Eric</a></strong>"},{"lat":32.71566,"lng":-117.1636,"label":"<strong><a href='/bailbonds/ca/agent/martinez-gerardo-1845972/'>Martinez, Gerardo</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/martinez-torres-gabriela-1845127/'>Martinez Torres, Gabriela</a></strong>"},{"lat":33.04368,"lng":-117.089,"label":"<strong><a href='/bailbonds/ca/agent/mchugh-stephen-1615765/'>Mchugh, Stephen</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/mendez-jose-1n13097/'>Mendez, Jose</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/mendez-marissa-1845638/'>Mendez, Marissa</a></strong>"},{"lat":33.1957,"lng":-117.25386,"label":"<strong><a href='/bailbonds/ca/agent/molina-francisco-1k71835/'>Molina, Francisco</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/monzon-lizabette-1846586/'>Monzon, Lizabette</a></strong>"},{"lat":32.71668,"lng":-117.1637,"label":"<strong><a href='/bailbonds/ca/agent/moran-daniel-1846129/'>Moran, Daniel</a></strong>"},{"lat":33.12405,"lng":-117.30166,"label":"<strong><a href='/bailbonds/ca/agent/mutter-herbert-1843602/'>Mutter, Herbert</a></strong>"},{"lat":32.71999,"lng":-117.15923,"label":"<strong><a href='/bailbonds/ca/agent/navarro-arthur-1846286/'>Navarro, Arthur</a></strong>"},{"lat":32.75425,"lng":-117.04636,"label":"<strong><a href='/bailbonds/ca/agent/navarro-ivan-1845908/'>Navarro, Ivan</a></strong>"},{"lat":32.85247,"lng":-116.94882,"label":"<strong><a href='/bailbonds/ca/agent/ortega-david-4197879/'>Ortega, David</a></strong>"},{"lat":32.78299,"lng":-116.94827,"label":"<strong><a href='/bailbonds/ca/agent/ortiz-gerald-1841357/'>Ortiz, Gerald</a></strong>"},{"lat":32.71564,"lng":-117.15995,"label":"<strong><a href='/bailbonds/ca/agent/pacas-abel-1846751/'>Pacas, Abel</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/padilla-eddy-1l60545/'>Padilla, Eddy</a></strong>"},{"lat":32.71668,"lng":-117.16396,"label":"<strong><a href='/bailbonds/ca/agent/paredes-sonia-1m18305/'>Paredes, Sonia</a></strong>"},{"lat":32.58575,"lng":-117.10819,"label":"<strong><a href='/bailbonds/ca/agent/patino-taylor-1845857/'>Patino, Taylor</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/peeck-kyle-1n13292/'>Peeck, Kyle</a></strong>"},{"lat":32.9505,"lng":-117.06249,"label":"<strong><a href='/bailbonds/ca/agent/pellegrini-ian-1845639/'>Pellegrini, Ian</a></strong>"},{"lat":32.71512,"lng":-117.16101,"label":"<strong><a href='/bailbonds/ca/agent/perez-francisco-1845561/'>Perez, Francisco</a></strong>"},{"lat":34.64635,"lng":-118.14773,"label":"<strong><a href='/bailbonds/ca/agent/perez-janae-1n12961/'>Perez, Janae</a></strong>"},{"lat":32.83846,"lng":-116.97057,"label":"<strong><a href='/bailbonds/ca/agent/prescott-stacie-1n12902/'>Prescott, Stacie</a></strong>"},{"lat":33.2738,"lng":-117.18329,"label":"<strong><a href='/bailbonds/ca/agent/pujols-liriano-oscar-1k13669/'>Pujols-Liriano, Oscar</a></strong>"},{"lat":33.18736,"lng":-117.32829,"label":"<strong><a href='/bailbonds/ca/agent/reyes-berenice-1n12938/'>Reyes, Berenice</a></strong>"},{"lat":33.19113,"lng":-117.25381,"label":"<strong><a href='/bailbonds/ca/agent/reyes-daniel-4514499/'>Reyes, Daniel</a></strong>"},{"lat":33.12067,"lng":-117.08332,"label":"<strong><a href='/bailbonds/ca/agent/reyes-miguelangel-1845959/'>Reyes, Miguelangel</a></strong>"},{"lat":33.18736,"lng":-117.32829,"label":"<strong><a href='/bailbonds/ca/agent/reyes-noah-4412785/'>Reyes, Noah</a></strong>"},{"lat":33.18736,"lng":-117.32829,"label":"<strong><a href='/bailbonds/ca/agent/reyes-rafael-1l56800/'>Reyes, Rafael</a></strong>"},{"lat":32.71355,"lng":-117.16391,"label":"<strong><a href='/bailbonds/ca/agent/riley-lilli-1840912/'>Riley, Lilli</a></strong>"},{"lat":32.77751,"lng":-117.02997,"label":"<strong><a href='/bailbonds/ca/agent/rivers-corinne-4349670/'>Rivers, Corinne</a></strong>"},{"lat":32.83846,"lng":-116.97057,"label":"<strong><a href='/bailbonds/ca/agent/rodriguez-adolfo-1845010/'>Rodriguez, Adolfo</a></strong>"},{"lat":32.71999,"lng":-117.15923,"label":"<strong><a href='/bailbonds/ca/agent/rodriguez-rosaura-1m11317/'>Rodriguez, Rosaura</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/roe-david-1842786/'>Roe, David</a></strong>"},{"lat":32.76048,"lng":-117.14747,"label":"<strong><a href='/bailbonds/ca/agent/rosas-robert-1841699/'>Rosas, Robert</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/rubio-gabriela-1n12900/'>Rubio, Gabriela</a></strong>"},{"lat":33.19188,"lng":-117.22956,"label":"<strong><a href='/bailbonds/ca/agent/ruiz-briednette-1n13035/'>Ruiz, Briednette</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/salazar-joyce-4398724/'>Salazar, Joyce</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/sanchez-emilio-1846333/'>Sanchez, Emilio</a></strong>"},{"lat":32.71564,"lng":-117.15995,"label":"<strong><a href='/bailbonds/ca/agent/sanchez-jahaziel-4375399/'>Sanchez, Jahaziel</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/sandez-jeovahnni-1k68153/'>Sandez, Jeovahnni</a></strong>"},{"lat":32.71532,"lng":-117.16022,"label":"<strong><a href='/bailbonds/ca/agent/sandoval-arturo-1n13007/'>Sandoval, Arturo</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/sandoval-ismael-1k62261/'>Sandoval, Ismael</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/santos-omar-4548281/'>Santos, Omar</a></strong>"},{"lat":33.17492,"lng":-117.36201,"label":"<strong><a href='/bailbonds/ca/agent/schuh-christopher-1843288/'>Schuh, Christopher</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/sepulveda-fabian-1844963/'>Sepulveda, Fabian</a></strong>"},{"lat":32.61785,"lng":-117.09007,"label":"<strong><a href='/bailbonds/ca/agent/sermeno-jesus-4424071/'>Sermeno, Jesus</a></strong>"},{"lat":32.71355,"lng":-117.16391,"label":"<strong><a href='/bailbonds/ca/agent/shams-nematullah-4403243/'>Shams, Nematullah</a></strong>"},{"lat":32.71564,"lng":-117.15995,"label":"<strong><a href='/bailbonds/ca/agent/shields-grant-4193380/'>Shields, Grant</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/stephens-dylan-1k87742/'>Stephens, Dylan</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/struzzieri-erika-1843714/'>Struzzieri, Erika</a></strong>"},{"lat":33.19356,"lng":-117.25463,"label":"<strong><a href='/bailbonds/ca/agent/theophil-matthew-4381481/'>Theophil, Matthew</a></strong>"},{"lat":33.19361,"lng":-117.25174,"label":"<strong><a href='/bailbonds/ca/agent/torres-francisco-1845397/'>Torres, Francisco</a></strong>"},{"lat":32.71668,"lng":-117.16407,"label":"<strong><a href='/bailbonds/ca/agent/torres-humberto-1846603/'>Torres, Humberto</a></strong>"},{"lat":32.83832,"lng":-116.96893,"label":"<strong><a href='/bailbonds/ca/agent/torres-smith-jeremy-1l37961/'>Torres-Smith, Jeremy</a></strong>"},{"lat":32.90606,"lng":-117.13053,"label":"<strong><a href='/bailbonds/ca/agent/tyson-ryan-1n12991/'>Tyson, Ryan</a></strong>"},{"lat":32.71355,"lng":-117.16391,"label":"<strong><a href='/bailbonds/ca/agent/valdez-jaime-1842026/'>Valdez, Jaime</a></strong>"},{"lat":32.71618,"lng":-117.1592,"label":"<strong><a href='/bailbonds/ca/agent/vargas-rosa-4445439/'>Vargas, Rosa</a></strong>"},{"lat":32.71821,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/vazquez-marisol-1n13317/'>Vazquez, Marisol</a></strong>"},{"lat":32.72031,"lng":-117.16642,"label":"<strong><a href='/bailbonds/ca/agent/vazquez-balbuena-jorge-4469467/'>Vazquez Balbuena, Jorge</a></strong>"},{"lat":32.71668,"lng":-117.1637,"label":"<strong><a href='/bailbonds/ca/agent/villegas-jesus-1m72282/'>Villegas, Jesus</a></strong>"},{"lat":33.18993,"lng":-117.25386,"label":"<strong><a href='/bailbonds/ca/agent/walker-gema-1846499/'>Walker, Gema</a></strong>"},{"lat":32.71566,"lng":-117.16694,"label":"<strong><a href='/bailbonds/ca/agent/walker-kiersten-1n13102/'>Walker, Kiersten</a></strong>"},{"lat":32.77964,"lng":-117.12926,"label":"<strong><a href='/bailbonds/ca/agent/walker-shola-1845584/'>Walker, Shola</a></strong>"},{"lat":32.71682,"lng":-117.15613,"label":"<strong><a href='/bailbonds/ca/agent/watkins-jerald-1843485/'>Watkins, Jerald</a></strong>"},{"lat":32.64119,"lng":-117.08042,"label":"<strong><a href='/bailbonds/ca/agent/watson-connie-1b28793/'>Watson, Connie</a></strong>"},{"lat":32.71668,"lng":-117.16404,"label":"<strong><a href='/bailbonds/ca/agent/williams-mark-1842305/'>Williams, Mark</a></strong>"},{"lat":33.19089,"lng":-117.25387,"label":"<strong><a href='/bailbonds/ca/agent/williams-paul-1843111/'>Williams, Paul</a></strong>"},{"lat":32.71668,"lng":-117.16404,"label":"<strong><a href='/bailbonds/ca/agent/yarborough-ryan-1n13264/'>Yarborough, Ryan</a></strong>"},{"lat":32.86768,"lng":-117.20716,"label":"<strong><a href='/bailbonds/ca/agent/zamutt-wendy-1840891/'>Zamutt, Wendy</a></strong>"},{"lat":33.18968,"lng":-117.23858,"label":"<strong>1 agent in Vista</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/aliotti-leslie-1845206/'>Aliotti, Leslie</a></strong>"},{"lat":32.85499,"lng":-116.98606,"label":"<strong>1 agent in Santee</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/o-connor-vickie-1840940/'>O'Connor, Vickie</a></strong>"},{"lat":33.12928,"lng":-117.28418,"label":"<strong>1 agent in Carlsbad</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ca/agent/sink-lauren-1l35562/'>Sink, Lauren</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

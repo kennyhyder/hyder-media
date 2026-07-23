@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,75 +107,90 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Alvarez, Osiel</div>
   <div class="ad">11241 LONGVIEW RD, Atwater, 95301</div>
   
+  
   <div class='lic'>License: 1844991</div>
 </a><a class="agent" href="/bailbonds/ca/agent/andrade-hector-4334147/">
   <div class="an">Andrade, Hector</div>
   <div class="ad">727 W. 22ND STREET, Merced, 95340</div>
+  
   
   <div class='lic'>License: 4334147</div>
 </a><a class="agent" href="/bailbonds/ca/agent/booker-celestial-1n13193/">
   <div class="an">Booker, Celestial</div>
   <div class="ad">604 W. 8TH ST, Merced, 95341</div>
   
+  
   <div class='lic'>License: 1N13193</div>
 </a><a class="agent" href="/bailbonds/ca/agent/booker-jack-1m89423/">
   <div class="an">Booker, Jack</div>
   <div class="ad">604 W 8TH ST, Merced, 95341</div>
+  
   
   <div class='lic'>License: 1M89423</div>
 </a><a class="agent" href="/bailbonds/ca/agent/del-real-linda-1c39530/">
   <div class="an">Del Real, Linda</div>
   <div class="ad">505 J ST, Los Banos, 93635</div>
   
+  
   <div class='lic'>License: 1C39530</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-misael-1n13166/">
   <div class="an">Garcia, Misael</div>
   <div class="ad">727 W 22ND ST, Merced, 95340</div>
+  
   
   <div class='lic'>License: 1N13166</div>
 </a><a class="agent" href="/bailbonds/ca/agent/garcia-prado-maritza-4464552/">
   <div class="an">Garcia Prado, Maritza</div>
   <div class="ad">727 W. 22ND STREET, Merced, 95340</div>
   
+  
   <div class='lic'>License: 4464552</div>
 </a><a class="agent" href="/bailbonds/ca/agent/gutierrez-laura-1843347/">
   <div class="an">Gutierrez, Laura</div>
   <div class="ad">727 W 22ND STREET, Merced, 95340</div>
+  
   
   <div class='lic'>License: 1843347</div>
 </a><a class="agent" href="/bailbonds/ca/agent/jaimes-jorge-1846673/">
   <div class="an">Jaimes, Jorge</div>
   <div class="ad">735 W. 22ND STREET, Merced, 95340</div>
   
+  
   <div class='lic'>License: 1846673</div>
 </a><a class="agent" href="/bailbonds/ca/agent/ledesma-jacqueline-1i21107/">
   <div class="an">Ledesma, Jacqueline</div>
   <div class="ad">735 W. 22ND STREET, Merced, 95340</div>
+  
   
   <div class='lic'>License: 1I21107</div>
 </a><a class="agent" href="/bailbonds/ca/agent/saldana-bugarin-christina-1l88637/">
   <div class="an">Saldana-Bugarin, Christina</div>
   <div class="ad">727 W. 22nd STREET, Merced, 95340</div>
   
+  
   <div class='lic'>License: 1L88637</div>
 </a><a class="agent" href="/bailbonds/ca/agent/sarabia-cristobal-1846817/">
   <div class="an">Sarabia, Cristobal</div>
   <div class="ad">735 WEST 22ND STREET, Merced, 95340</div>
+  
   
   <div class='lic'>License: 1846817</div>
 </a><a class="agent" href="/bailbonds/ca/agent/tejeda-ana-1844657/">
   <div class="an">Tejeda, Ana</div>
   <div class="ad">735 WEST 22ND STREET, Merced, 95340</div>
   
+  
   <div class='lic'>License: 1844657</div>
 </a><a class="agent" href="/bailbonds/ca/agent/vasquez-tina-1661971/">
   <div class="an">Vasquez, Tina</div>
   <div class="ad">5782 MCHENRY RD, Merced, 95341</div>
   
+  
   <div class='lic'>License: 1661971</div>
 </a><a class="agent" href="/bailbonds/ca/agent/villafan-yazmin-4436549/">
   <div class="an">Villafan, Yazmin</div>
   <div class="ad">722 W. 22ND ST., Merced, 95341</div>
+  
   
   <div class='lic'>License: 4436549</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -194,5 +211,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([37.19481, -120.7228], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":37.35308,"lng":-120.69087,"label":"<strong><a href='/bailbonds/ca/agent/alvarez-osiel-1844991/'>Alvarez, Osiel</a></strong>"},{"lat":37.30783,"lng":-120.48414,"label":"<strong><a href='/bailbonds/ca/agent/andrade-hector-4334147/'>Andrade, Hector</a></strong>"},{"lat":37.29268,"lng":-120.49032,"label":"<strong><a href='/bailbonds/ca/agent/booker-celestial-1n13193/'>Booker, Celestial</a></strong>"},{"lat":37.29268,"lng":-120.49032,"label":"<strong><a href='/bailbonds/ca/agent/booker-jack-1m89423/'>Booker, Jack</a></strong>"},{"lat":37.06051,"lng":-120.84993,"label":"<strong><a href='/bailbonds/ca/agent/del-real-linda-1c39530/'>Del Real, Linda</a></strong>"},{"lat":37.30783,"lng":-120.48414,"label":"<strong><a href='/bailbonds/ca/agent/garcia-misael-1n13166/'>Garcia, Misael</a></strong>"},{"lat":37.30783,"lng":-120.48414,"label":"<strong><a href='/bailbonds/ca/agent/garcia-prado-maritza-4464552/'>Garcia Prado, Maritza</a></strong>"},{"lat":37.30783,"lng":-120.48414,"label":"<strong><a href='/bailbonds/ca/agent/gutierrez-laura-1843347/'>Gutierrez, Laura</a></strong>"},{"lat":37.30786,"lng":-120.48423,"label":"<strong><a href='/bailbonds/ca/agent/jaimes-jorge-1846673/'>Jaimes, Jorge</a></strong>"},{"lat":37.30786,"lng":-120.48423,"label":"<strong><a href='/bailbonds/ca/agent/ledesma-jacqueline-1i21107/'>Ledesma, Jacqueline</a></strong>"},{"lat":37.30783,"lng":-120.48414,"label":"<strong><a href='/bailbonds/ca/agent/saldana-bugarin-christina-1l88637/'>Saldana-Bugarin, Christina</a></strong>"},{"lat":37.30786,"lng":-120.48423,"label":"<strong><a href='/bailbonds/ca/agent/sarabia-cristobal-1846817/'>Sarabia, Cristobal</a></strong>"},{"lat":37.30786,"lng":-120.48423,"label":"<strong><a href='/bailbonds/ca/agent/tejeda-ana-1844657/'>Tejeda, Ana</a></strong>"},{"lat":37.25856,"lng":-120.38317,"label":"<strong><a href='/bailbonds/ca/agent/vasquez-tina-1661971/'>Vasquez, Tina</a></strong>"},{"lat":37.30753,"lng":-120.48368,"label":"<strong><a href='/bailbonds/ca/agent/villafan-yazmin-4436549/'>Villafan, Yazmin</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

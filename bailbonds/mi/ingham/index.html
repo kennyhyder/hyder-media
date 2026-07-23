@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,32 +106,38 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/mi/agent/timothy-craft/">
   <div class="an">Timothy Craft</div><div class='ad'>2A Speedy G Bail Bonds</div>
   <div class="ad">P.O. Box 493, Holt, 48842</div>
-  <div class='ph'>517-702-2663</div>
+  <div class='ph'>☎ 517-702-2663</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/timothy-currin/">
   <div class="an">Timothy Currin</div><div class='ad'>2A Speedy G Bail Bonds</div>
   <div class="ad">P.O. Box 493, Holt, 48842</div>
-  <div class='ph'>517-702-2663</div>
+  <div class='ph'>☎ 517-702-2663</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/lena-paddock/">
   <div class="an">Lena Paddock</div><div class='ad'>Lena's Bail Bond Agency</div>
   <div class="ad">1118 Goodrich St., Lansing, 48910</div>
-  <div class='ph'>517-899-9177</div>
+  <div class='ph'>☎ 517-899-9177</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/angela-gifford/">
   <div class="an">Angela Gifford</div><div class='ad'>Lena's Bail Bond Agency</div>
   <div class="ad">1118 Goodrich St., Lansing, 48910</div>
-  <div class='ph'>517-899-9177</div>
+  <div class='ph'>☎ 517-899-9177</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/michael-goll/">
   <div class="an">Michael Goll</div><div class='ad'>Leo's Bail Bonds</div>
   <div class="ad">P.O. Box 67, Mason, 48854</div>
-  <div class='ph'>517-676-1021</div>
+  <div class='ph'>☎ 517-676-1021</div>
+  
   
 </a><a class="agent" href="/bailbonds/mi/agent/kyle-hicks/">
   <div class="an">Kyle Hicks</div><div class='ad'>Top's Bail Bonds Agency Inc.</div>
   <div class="ad">117 S. Washington Sq., Lansing, 48933</div>
-  <div class='ph'>517-484-1600</div>
+  <div class='ph'>☎ 517-484-1600</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://files.7thcircuitcourt.com/Documents/Quick%20Links/Approved%20Bail%20Bond%20Companies/Approved%20Bond%20list.pdf' rel='nofollow'>files.7thcircuitcourt.com</a> · <a href='https://www.kentcountymi.gov/881/Approved-Bail-Bonding-Agencies' rel='nofollow'>www.kentcountymi.gov</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([42.60353, -84.37381], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":42.71284,"lng":-84.56813,"label":"<strong><a href='/bailbonds/mi/agent/lena-paddock/'>Lena Paddock</a></strong><br>\u260e 517-899-9177"},{"lat":42.71284,"lng":-84.56813,"label":"<strong><a href='/bailbonds/mi/agent/angela-gifford/'>Angela Gifford</a></strong><br>\u260e 517-899-9177"},{"lat":42.73352,"lng":-84.55217,"label":"<strong><a href='/bailbonds/mi/agent/kyle-hicks/'>Kyle Hicks</a></strong><br>\u260e 517-484-1600"},{"lat":42.64206,"lng":-84.53077,"label":"<strong>2 agents in Holt</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mi/agent/timothy-craft/'>Timothy Craft</a></strong><br>\u260e 517-702-2663<br><strong><a href='/bailbonds/mi/agent/timothy-currin/'>Timothy Currin</a></strong><br>\u260e 517-702-2663"},{"lat":42.58069,"lng":-84.44228,"label":"<strong>1 agent in Mason</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/mi/agent/michael-goll/'>Michael Goll</a></strong><br>\u260e 517-676-1021"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

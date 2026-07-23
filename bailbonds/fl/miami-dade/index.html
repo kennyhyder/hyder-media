@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,1791 +107,2149 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">#01&amp;24 Hours La Raza Bail Bonds,Inc</div>
   <div class="ad">7225 NW 25TH STREET SUITE-109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ MARTINEZXFIANZAS@YAHOO.COM</div>
   <div class='lic'>License: B000180</div>
 </a><a class="agent" href="/bailbonds/fl/agent/1-choice-bail-bonds-b000098/">
   <div class="an">#1 Choice Bail Bonds</div>
   <div class="ad">7045 NORTHWEST 41ST STREET #B, MIAMI, 33166</div>
   
+  <div class='ad'>✉ NO1CHOICEBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000098</div>
 </a><a class="agent" href="/bailbonds/fl/agent/1-stop-bail-services-inc-b000271/">
   <div class="an">1 Stop Bail Services Inc</div>
   <div class="ad">1126 W FLAGLER ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ KATTY33183@GMAIL.COM</div>
   <div class='lic'>License: B000271</div>
 </a><a class="agent" href="/bailbonds/fl/agent/305-bail-bonds-llc-b000355/">
   <div class="an">305 Bail Bonds Llc</div>
   <div class="ad">1885 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BERTVELUNZA@GMAIL.COM</div>
   <div class='lic'>License: B000355</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a-betta-bail-bonds-inc-b000548/">
   <div class="an">A Betta Bail Bonds, Inc.</div>
   <div class="ad">2967 NORTHWEST 62ND STREET, MIAMI, 33147</div>
   
+  <div class='ad'>✉ VINDAVIS1@GMAIL.COM</div>
   <div class='lic'>License: B000548</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a1-magic-bail-bonds-fianzas-llc-b000217/">
   <div class="an">A1 Magic Bail Bonds/Fianzas, Llc</div>
   <div class="ad">8400 NW 33 ST SUITE 310 # 196, DORAL, 33122</div>
   
+  <div class='ad'>✉ YALFONSO@GMAIL.COM</div>
   <div class='lic'>License: B000217</div>
 </a><a class="agent" href="/bailbonds/fl/agent/aaa-florida-24-hr-bail-bonds-inc-b000485/">
   <div class="an">Aaa Florida 24 Hr Bail Bonds Inc</div>
   <div class="ad">2637 W 76TH ST, HIALEAH, 33016</div>
   
+  <div class='ad'>✉ AAAFLORIDABAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000485</div>
 </a><a class="agent" href="/bailbonds/fl/agent/aaron-kervin-mikael-w900426/">
   <div class="an">Aaron, Kervin Mikael</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD STREET, MIAMI GDNS, 33169</div>
   
+  <div class='ad'>✉ KERVINAARON1@GMAIL.COM</div>
   <div class='lic'>License: W900426</div>
 </a><a class="agent" href="/bailbonds/fl/agent/abad-rodrigo-javier-w261709/">
   <div class="an">Abad, Rodrigo Javier</div><div class='ad'>Adg Bonding Inc</div>
   <div class="ad">ADG BONDING INC 601 SW 4TH AVENUE, FORT LAUDERDALE, 33315</div>
   
+  <div class='ad'>✉ RODRIGOJABAD@GMAIL.COM</div>
   <div class='lic'>License: W261709</div>
 </a><a class="agent" href="/bailbonds/fl/agent/abdeljawad-adham-saadalah-e018056/">
   <div class="an">Abdeljawad, Adham Saadalah</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ ADHAMJAWAD@AOL.COM</div>
   <div class='lic'>License: E018056</div>
 </a><a class="agent" href="/bailbonds/fl/agent/abdullah-sabreen-ameenah-a000249/">
   <div class="an">Abdullah, Sabreen Ameenah</div><div class='ad'>Bail Me Fast Bail Bonds</div>
   <div class="ad">BAIL ME FAST BAIL BONDS 12499 NE 8TH AVE, NORTH MIAMI, 33161</div>
-  <div class='ph'>305-547-1577</div>
+  <div class='ph'>☎ 305-547-1577</div>
+  <div class='ad'>✉ SABREEN.ABDULLAH@YAHOO.COM</div>
   <div class='lic'>License: A000249</div>
 </a><a class="agent" href="/bailbonds/fl/agent/abed-danny-j-d080493/">
   <div class="an">Abed, Danny J</div><div class='ad'>Xpress Bail Bonds</div>
   <div class="ad">XPRESS BAIL BONDS 7045 NW 41 ST, MIAMI, 33166</div>
-  <div class='ph'>305-447-6900</div>
+  <div class='ph'>☎ 305-447-6900</div>
+  <div class='ad'>✉ XPRESSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: D080493</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ablola-christina-estever-a000386/">
   <div class="an">Ablola, Christina Estever</div>
   <div class="ad">5570 N.W. 72ND AVENUE, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CHRISTINAABLOLA7@GMAIL.COM</div>
   <div class='lic'>License: A000386</div>
 </a><a class="agent" href="/bailbonds/fl/agent/acosta-claudia-g232552/">
   <div class="an">Acosta, Claudia</div>
   <div class="ad">7305 NW 174TH TER APT I103, HIALEAH, 33015</div>
   
+  <div class='ad'>✉ ACOSTACLAUDIA1020@GMAIL.COM</div>
   <div class='lic'>License: G232552</div>
 </a><a class="agent" href="/bailbonds/fl/agent/acosta-nelson-w477553/">
   <div class="an">Acosta, Nelson</div>
   <div class="ad">6600 NW 27TH AVE STE 112, MIAMI, 33147</div>
   
+  <div class='ad'>✉ NACOSTA74@AOL.COM</div>
   <div class='lic'>License: W477553</div>
 </a><a class="agent" href="/bailbonds/fl/agent/adams-brian-george-a298989/">
   <div class="an">Adams, Brian George</div><div class='ad'>B Adams Bail Bonds</div>
   <div class="ad">B ADAMS BAIL BONDS 17990 SW 97TH AVE, PALMETTO BAY, 33157</div>
   
+  <div class='ad'>✉ ADAMSSURETYGROUP@AOL.COM</div>
   <div class='lic'>License: A298989</div>
 </a><a class="agent" href="/bailbonds/fl/agent/adams-samone-ellis-d077519/">
   <div class="an">Adams, Samone Ellis</div><div class='ad'>B. Adams Bail Bonds Inc.</div>
   <div class="ad">B. ADAMS BAIL BONDS INC. 17990 SW 97TH AVENUE, PALMETTO BAY, 33157</div>
   
+  <div class='ad'>✉ ADAMSSURETYGROUP@AOL.COM</div>
   <div class='lic'>License: D077519</div>
 </a><a class="agent" href="/bailbonds/fl/agent/adler-scott-b-a001851/">
   <div class="an">Adler, Scott B</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25 ST STE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ DONDEEBONDING@AOL.COM</div>
   <div class='lic'>License: A001851</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alba-elly-w924016/">
   <div class="an">Alba, Elly</div><div class='ad'>Miami Vice Bail Bonds</div>
   <div class="ad">MIAMI VICE BAIL BONDS 15600 SW 288TH ST SUITE 303, HOMESTEAD, 33033</div>
   
+  <div class='ad'>✉ ELLYALBA1997@HOTMAIL.COM</div>
   <div class='lic'>License: W924016</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alex-bail-bonds-b000463/">
   <div class="an">Alex Bail Bonds</div>
   <div class="ad">435 SW 17TH AVE, MIAMI, 33135</div>
   
+  <div class='ad'>✉ ALEXBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000463</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alfonso-alina-a003470/">
   <div class="an">Alfonso, Alina</div>
   <div class="ad">951-A SW 87TH AVENUE, MIAMI, 33174</div>
   
+  <div class='ad'>✉ DAMARYBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A003470</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alicea-anthony-e036158/">
   <div class="an">Alicea, Anthony</div>
   <div class="ad">1030 NE 142ST., NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ MIA3PLATINUM@AOL.COM</div>
   <div class='lic'>License: E036158</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alicea-luis-e029497/">
   <div class="an">Alicea, Luis</div>
   <div class="ad">001 ALICEA BAIL BONDS 3901 NW 79TH AVE #255, DORAL, 33166</div>
   
+  <div class='ad'>✉ LUISALICEA2004@AOL.COM</div>
   <div class='lic'>License: E029497</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alina-alfonso-bail-bonds-inc-b000205/">
   <div class="an">Alina Alfonso Bail Bonds Inc.</div>
   <div class="ad">951-A SW 87TH AVENUE, MIAMI, 33174</div>
   
+  <div class='ad'>✉ DAMARYBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000205</div>
 </a><a class="agent" href="/bailbonds/fl/agent/all-city-bail-bonds-inc-b000147/">
   <div class="an">All City Bail Bonds Inc</div>
   <div class="ad">7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ ALLCITY24BAIL@GMAIL.COM</div>
   <div class='lic'>License: B000147</div>
 </a><a class="agent" href="/bailbonds/fl/agent/altieri-roger-jr-d049173/">
   <div class="an">Altieri, Roger Jr</div><div class='ad'>Universal Surety/ Bailbond</div>
   <div class="ad">UNIVERSAL SURETY/ BAILBOND 1540 NW 15TH STREET ROAD, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ROGER_ALTIERI@YAHOO.COM</div>
   <div class='lic'>License: D049173</div>
 </a><a class="agent" href="/bailbonds/fl/agent/alys-bail-bonds-b000706/">
   <div class="an">Alys Bail Bonds</div>
   <div class="ad">7225 NW 25 STREET, SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ ALYSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000706</div>
 </a><a class="agent" href="/bailbonds/fl/agent/arancibia-gustavo-daniel-e063894/">
   <div class="an">Arancibia, Gustavo Daniel</div>
   <div class="ad">12153 SW 122ND CT, MIAMI, 33186</div>
   
+  <div class='ad'>✉ GUS_ARANCIBIA@YAHOO.COM</div>
   <div class='lic'>License: E063894</div>
 </a><a class="agent" href="/bailbonds/fl/agent/arancibia-javier-martin-d071986/">
   <div class="an">Arancibia, Javier Martin</div><div class='ad'>Arancibia Bail Bonds Llc</div>
   <div class="ad">ARANCIBIA BAIL BONDS LLC 1542 NW 15 ST RD, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ARANCIBIABAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: D071986</div>
 </a><a class="agent" href="/bailbonds/fl/agent/attilus-volvick-p132013/">
   <div class="an">Attilus, Volvick</div>
   <div class="ad">1175 NE 125 ST SUITE 311, MORTH MAIMI, 33161</div>
   
+  <div class='ad'>✉ VICKINSURANCEAGENCY@GMAIL.COM</div>
   <div class='lic'>License: P132013</div>
 </a><a class="agent" href="/bailbonds/fl/agent/auguste-marvin-c-w739730/">
   <div class="an">Auguste, Marvin C</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 640 NW 183RD ST STE 07, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ GOLDENPROTECTIVESERVICE@GMAIL.COM</div>
   <div class='lic'>License: W739730</div>
 </a><a class="agent" href="/bailbonds/fl/agent/avila-felix-d-p167676/">
   <div class="an">Avila, Felix D</div>
   <div class="ad">7225 NW 25 ST, MIAMI, 33122</div>
   
+  <div class='ad'>✉ FELIXAVILA26@YAHOO.COM</div>
   <div class='lic'>License: P167676</div>
 </a><a class="agent" href="/bailbonds/fl/agent/b-adams-bail-bonds-b000662/">
   <div class="an">B. Adams Bail Bonds</div>
   <div class="ad">17990SW 97 AVE, PALMETTO BAY, 33157</div>
   
+  <div class='ad'>✉ ADAMSSURETYGROUP@AOL.COM</div>
   <div class='lic'>License: B000662</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bail-me-fast-bail-bonds-llc-b000457/">
   <div class="an">Bail Me Fast Bail Bonds, Llc</div>
   <div class="ad">12499 NE 8TH AVE, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ BMFBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000457</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ballers-bailbonds-b000186/">
   <div class="an">Ballers Bailbonds</div>
   <div class="ad">1175 NE 125ST #311, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ HOTPRP@HOTMAIL.COM</div>
   <div class='lic'>License: B000186</div>
 </a><a class="agent" href="/bailbonds/fl/agent/baptiste-elicsonne-e182034/">
   <div class="an">Baptiste, Elicsonne</div><div class='ad'>Fireline Bail Bonds</div>
   <div class="ad">FIRELINE BAIL BONDS 1395 NW 15TH ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BODYGUARD6009@YAHOO.COM</div>
   <div class='lic'>License: E182034</div>
 </a><a class="agent" href="/bailbonds/fl/agent/baquet-grace-ann-a301957/">
   <div class="an">Baquet, Grace Ann</div><div class='ad'>Rivas Bonding Agency</div>
   <div class="ad">RIVAS BONDING AGENCY 4150 N.W. 7TH STREET SUITE #203, MIAMI, 33126</div>
   
+  <div class='ad'>✉ GRACEANNBAQUET@USA.COM</div>
   <div class='lic'>License: A301957</div>
 </a><a class="agent" href="/bailbonds/fl/agent/barrera-mario-a-p132012/">
   <div class="an">Barrera, Mario A</div>
   <div class="ad">14340 SW 23 LN, MIAMI, 33175</div>
   
+  <div class='ad'>✉ MARIOBARRE85@OUTLOOK.COM</div>
   <div class='lic'>License: P132012</div>
 </a><a class="agent" href="/bailbonds/fl/agent/barrett-ryan-henrick-w924013/">
   <div class="an">Barrett, Ryan Henrick</div><div class='ad'>Huggins Bail Bonds, Inc.</div>
   <div class="ad">HUGGINS BAIL BONDS, INC. 260 NW 183RD STREET SUITE A, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ RYANTHEBARBER1989@GMAIL.COM</div>
   <div class='lic'>License: W924013</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bazile-richard-p170750/">
   <div class="an">Bazile, Richard</div>
   <div class="ad">10711 SW 216 ST SUITE 212, MIAMI, 33170</div>
   
+  <div class='ad'>✉ EXITBAILBONDSINC@GMAIL.COM</div>
   <div class='lic'>License: P170750</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bell-lauren-w958131/">
   <div class="an">Bell, Lauren</div><div class='ad'>Huggins Bail Bonds</div>
   <div class="ad">HUGGINS BAIL BONDS 260 NW 183RD STREET #A, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ LAURENBELL1296@GMAIL.COM</div>
   <div class='lic'>License: W958131</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bendahan-deborah-ayleen-a018743/">
   <div class="an">Bendahan, Deborah Ayleen</div>
   <div class="ad">4471 NW 36 STREET #229, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ DEBORAHBENDAHAN1@GMAIL.COM</div>
   <div class='lic'>License: A018743</div>
 </a><a class="agent" href="/bailbonds/fl/agent/benveniste-jacques-ira-a019675/">
   <div class="an">Benveniste, Jacques Ira</div><div class='ad'>All Dade Bail Bonds 1018-B</div>
   <div class="ad">ALL DADE BAIL BONDS 1018-B 71 STREET, MIAMI BEACH, 33141</div>
   
+  <div class='ad'>✉ JACK@SEFMSS.COM</div>
   <div class='lic'>License: A019675</div>
 </a><a class="agent" href="/bailbonds/fl/agent/berrane-charles-sherwood-e004008/">
   <div class="an">Berrane, Charles Sherwood</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NW 36 STREET, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ CBERRANE@MSN.COM</div>
   <div class='lic'>License: E004008</div>
 </a><a class="agent" href="/bailbonds/fl/agent/betancourt-nicholas-w375925/">
   <div class="an">Betancourt, Nicholas</div><div class='ad'>Tgi Bail Bonds</div>
   <div class="ad">TGI BAIL BONDS 7035 NW 41ST ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ NIKKO1187@HOTMAIL.COM</div>
   <div class='lic'>License: W375925</div>
 </a><a class="agent" href="/bailbonds/fl/agent/betancourt-rolando-javier-a021059/">
   <div class="an">Betancourt, Rolando Javier</div>
   <div class="ad">7035 NW 41 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ ROLANDOB@USA.COM</div>
   <div class='lic'>License: A021059</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bien-aime-daniel-a021630/">
   <div class="an">Bien-Aime, Daniel</div><div class='ad'>Daniel Bien Aime Bail Bonds</div>
   <div class="ad">DANIEL BIEN AIME BAIL BONDS 7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BIEN1994@BELLSOUTH.NET</div>
   <div class='lic'>License: A021630</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bill-bail-bonds-b000679/">
   <div class="an">Bill Bail Bonds</div>
   <div class="ad">1737 NW 42 STREET, MIAMI, 33142</div>
   
+  <div class='ad'>✉ BILL_ELIAS@BELLSOUTH.NET</div>
   <div class='lic'>License: B000679</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blain-daymi-w254099/">
   <div class="an">Blain, Daymi</div><div class='ad'>A1 Magic Bailbonds/Fianzas</div>
   <div class="ad">A1 MAGIC BAILBONDS/FIANZAS 8333 NW 53RD ST, DORAL, 33166</div>
   
+  <div class='ad'>✉ DADU99@AOL.COM</div>
   <div class='lic'>License: W254099</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blanco-ana-m-p130336/">
   <div class="an">Blanco, Ana M</div>
   <div class="ad">16517 SW 52ND ST, MIAMI, 33185</div>
   
+  <div class='ad'>✉ ANABLANCO536@AOL.COM</div>
   <div class='lic'>License: P130336</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blanco-lazaro-michel-p232424/">
   <div class="an">Blanco, Lazaro Michel</div>
   <div class="ad">1732 S ANHINGA LANE, HOMESTEAD, 33035</div>
   
+  <div class='ad'>✉ BLANCOINSURANCEGROUP@GMAIL.COM</div>
   <div class='lic'>License: P232424</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blandon-bailbonds-inc-b000692/">
   <div class="an">Blandon Bailbonds Inc</div>
   <div class="ad">4471 NW 36 STREET #253, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ BLANDONBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000692</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blandon-vanessa-e-p057685/">
   <div class="an">Blandon, Vanessa E</div><div class='ad'>Blandon Bail Bonds Inc</div>
   <div class="ad">BLANDON BAIL BONDS INC 4471 NW 36 ST SUITE 253, MIAMI, 33166</div>
   
+  <div class='ad'>✉ BLANDONBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: P057685</div>
 </a><a class="agent" href="/bailbonds/fl/agent/blangor-michael-t-w163130/">
   <div class="an">Blangor, Michael T</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ BLANGORM@BELLSOUTH.NET</div>
   <div class='lic'>License: W163130</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bonds-r-us-bailbonds-inc-b000052/">
   <div class="an">Bonds R Us Bailbonds Inc</div>
   <div class="ad">17560 NW 27TH AVE SUITE 107, MIAMI GARDENS, 33056</div>
   
+  <div class='ad'>✉ BONDSRUSBONDING@COMCAST.NET</div>
   <div class='lic'>License: B000052</div>
 </a><a class="agent" href="/bailbonds/fl/agent/borders-lytii-s-p132342/">
   <div class="an">Borders, Lytii S</div>
   <div class="ad">1975 WASHINGTION AVE APT 103, MIAMI BEACH, 33139</div>
   
+  <div class='ad'>✉ MAJORSTATUSPRODUCTION@YAHOO.COM</div>
   <div class='lic'>License: P132342</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bornote-alejandro-a026203/">
   <div class="an">Bornote, Alejandro</div><div class='ad'>Alex Bail Bonds</div>
   <div class="ad">ALEX BAIL BONDS 435 SW 17 AVENUE, MIAMI, 33135</div>
   
+  <div class='ad'>✉ ALEXBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A026203</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bornote-alexander-w231681/">
   <div class="an">Bornote, Alexander</div><div class='ad'>Alex Bail Bonds</div>
   <div class="ad">ALEX BAIL BONDS 435 SW 17TH AVENUE, MIAMI, 33135</div>
   
+  <div class='ad'>✉ ABORNOTE@GMAIL.COM</div>
   <div class='lic'>License: W231681</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brennan-joseph-patrick-a029626/">
   <div class="an">Brennan, Joseph Patrick</div><div class='ad'>Coral Gables Bail Bonds</div>
   <div class="ad">CORAL GABLES BAIL BONDS 225 ARAGON AVE, CORAL GABLES, 33134</div>
   
+  <div class='ad'>✉ BRENNANBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A029626</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brouwer-christopher-w423678/">
   <div class="an">Brouwer, Christopher</div>
   <div class="ad">7225 NW 25TH ST STE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BAILOUT305954@GMAIL.COM</div>
   <div class='lic'>License: W423678</div>
 </a><a class="agent" href="/bailbonds/fl/agent/brown-sharrone-j-p084339/">
   <div class="an">Brown, Sharrone J</div>
   <div class="ad">260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ DECEMBER0783@AOL.COM</div>
   <div class='lic'>License: P084339</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bunch-bail-bond-inc-b000146/">
   <div class="an">Bunch Bail Bond Inc,</div>
   <div class="ad">7225 NW 25 STREET SUITE 109 SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ JZBAILBONDS@AOL.COM</div>
   <div class='lic'>License: B000146</div>
 </a><a class="agent" href="/bailbonds/fl/agent/caceres-eduardo-francisco-d000921/">
   <div class="an">Caceres, Eduardo Francisco</div><div class='ad'>Miami Vice Bail Bonds</div>
   <div class="ad">MIAMI VICE BAIL BONDS 15600 SW 288 ST, HOMESTEAD, 33033</div>
   
+  <div class='ad'>✉ EDDYC0503@GMAIL.COM</div>
   <div class='lic'>License: D000921</div>
 </a><a class="agent" href="/bailbonds/fl/agent/calderon-catalina-beatriz-a038176/">
   <div class="an">Calderon, Catalina Beatriz</div><div class='ad'>Sunshine State Bailbonds</div>
   <div class="ad">SUNSHINE STATE BAILBONDS 7267 NW 36 ST, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ IRUIZ008@GMAIL.COM</div>
   <div class='lic'>License: A038176</div>
 </a><a class="agent" href="/bailbonds/fl/agent/caldwell-warren-leon-a038282/">
   <div class="an">Caldwell, Warren Leon</div><div class='ad'>Bill Bail Bonds</div>
   <div class="ad">BILL BAIL BONDS 1401 N.W. 17 AVE. REAR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BADDJUJU101@YAHOO.COM</div>
   <div class='lic'>License: A038282</div>
 </a><a class="agent" href="/bailbonds/fl/agent/calonge-henderson-carolina-a-g019083/">
   <div class="an">Calonge Henderson, Carolina A</div>
   <div class="ad">14346 SW 148 AVENUE, MIAMI, 33196</div>
   
+  <div class='ad'>✉ SABANAWINDOWS@YAHOO.COM</div>
   <div class='lic'>License: G019083</div>
 </a><a class="agent" href="/bailbonds/fl/agent/campa-oscar-p159316/">
   <div class="an">Campa, Oscar</div>
   <div class="ad">5770 NW 72 AVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ OSCARC8726@GMAIL.COM</div>
   <div class='lic'>License: P159316</div>
 </a><a class="agent" href="/bailbonds/fl/agent/canela-jacqueline-c-p235295/">
   <div class="an">Canela, Jacqueline C</div>
   <div class="ad">7225 NW 25 ST SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ JZBAILBONDS@AOL.COM</div>
   <div class='lic'>License: P235295</div>
 </a><a class="agent" href="/bailbonds/fl/agent/canizares-seidel-p111300/">
   <div class="an">Canizares, Seidel</div><div class='ad'>Seidel Bail Bonds</div>
   <div class="ad">SEIDEL BAIL BONDS 9500 NW 77 AVE # 20, HIALEAH, 33016</div>
   
+  <div class='ad'>✉ SEIDEL1981@YAHOO.COM</div>
   <div class='lic'>License: P111300</div>
 </a><a class="agent" href="/bailbonds/fl/agent/capener-roger-dean-a039906/">
   <div class="an">Capener, Roger Dean</div><div class='ad'>Ce Parish General Agy</div>
   <div class="ad">CE PARISH GENERAL AGY 1452 WEST COUNTY ROAD, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ ROGERCAPENER@BELLSOUTH.NET</div>
   <div class='lic'>License: A039906</div>
 </a><a class="agent" href="/bailbonds/fl/agent/carlos-nunez-bail-bonds-inc-b000352/">
   <div class="an">Carlos Nunez Bail Bonds, Inc</div>
   <div class="ad">7267 NW 36TH ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CARLOSN74@HOTMAIL.COM</div>
   <div class='lic'>License: B000352</div>
 </a><a class="agent" href="/bailbonds/fl/agent/casal-alina-a042596/">
   <div class="an">Casal, Alina</div>
   <div class="ad">7225 NW 25 STREET, SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ ALINABAILMEOUT@GMAIL.COM</div>
   <div class='lic'>License: A042596</div>
 </a><a class="agent" href="/bailbonds/fl/agent/casal-barbara-alina-d003460/">
   <div class="an">Casal, Barbara Alina</div>
   <div class="ad">7225 NW 25 ST SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BCBARBIECASAL@GMAIL.COM</div>
   <div class='lic'>License: D003460</div>
 </a><a class="agent" href="/bailbonds/fl/agent/casal-joseph-g098709/">
   <div class="an">Casal, Joseph</div>
   <div class="ad">1763 SW 131 PL CIR S., MIAMI, 33175</div>
   
+  <div class='ad'>✉ JCASAL@MAC.COM</div>
   <div class='lic'>License: G098709</div>
 </a><a class="agent" href="/bailbonds/fl/agent/casal-lilia-maria-a296542/">
   <div class="an">Casal, Lilia Maria</div>
   <div class="ad">3323 TORREMOLINOS AVE, DORAL, 33178</div>
   
+  <div class='ad'>✉ PERE1462@BELLSOUTH.NET</div>
   <div class='lic'>License: A296542</div>
 </a><a class="agent" href="/bailbonds/fl/agent/celcis-serge-jr-p117338/">
   <div class="an">Celcis, Serge Jr</div>
   <div class="ad">27415 SW 143 AVE, HOMESTEAD, 33032</div>
   
+  <div class='ad'>✉ CELCISJRPA@GMAIL.COM</div>
   <div class='lic'>License: P117338</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chavarria-jairo-e179942/">
   <div class="an">Chavarria, Jairo</div><div class='ad'>Do The Right Thing Bail Bonds, Inc.</div>
   <div class="ad">DO THE RIGHT THING BAIL BONDS, INC. 13500 N.W. 97 AVENUE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ CHAVAGE99@HOTMAIL.COM</div>
   <div class='lic'>License: E179942</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chichi-bail-bonds-b000357/">
   <div class="an">Chichi Bail Bonds</div>
   <div class="ad">1581 W 49 ST # 317 CHICHI BAIL BONDS, HIALEAH, 33012</div>
-  <div class='ph'>305-905-9107</div>
+  <div class='ph'>☎ 305-905-9107</div>
+  <div class='ad'>✉ CHICHIBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000357</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chico-bail-bonds-b000195/">
   <div class="an">Chico Bail Bonds</div>
   <div class="ad">215 SW 17TH AVE STE 216B, MIAMI, 33135</div>
   
+  <div class='ad'>✉ CHICOBAILBONDS@LIVE.COM</div>
   <div class='lic'>License: B000195</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chino-bail-bonds-inc-b000178/">
   <div class="an">Chino Bail Bonds, Inc.</div>
   <div class="ad">7225 NW 25TH STREET SUITE 109A, MIAMI, 33122</div>
   
+  <div class='ad'>✉ RAITUNEZ@YAHOO.COM</div>
   <div class='lic'>License: B000178</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chino-express-bail-bonds-inc-b000198/">
   <div class="an">Chino Express Bail Bonds Inc.</div>
   <div class="ad">7225 NW 25TH STREET #305, MIAMI, 33122</div>
   
+  <div class='ad'>✉ CCHINOX@AOL.COM</div>
   <div class='lic'>License: B000198</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chiuz-edgardo-rene-a046682/">
   <div class="an">Chiuz, Edgardo Rene</div><div class='ad'>Chino Express Bail Bonds</div>
   <div class="ad">CHINO EXPRESS BAIL BONDS 7225 NW 25TH STREET #305, MIAMI, 33122</div>
   
+  <div class='ad'>✉ CCHINOX@AOL.COM</div>
   <div class='lic'>License: A046682</div>
 </a><a class="agent" href="/bailbonds/fl/agent/chiuz-oscar-a046683/">
   <div class="an">Chiuz, Oscar</div><div class='ad'>Mister Bail Bonds</div>
   <div class="ad">MISTER BAIL BONDS 300 71ST STREET STE 410, MIAMI BEACH, 33141</div>
   
+  <div class='ad'>✉ BIGWORMAPPLE@YAHOO.COM</div>
   <div class='lic'>License: A046683</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cid-marco-a-jr-w079744/">
   <div class="an">Cid, Marco A Jr</div>
   <div class="ad">7975 NW 154TH STREET #280, MIAMI, 33016</div>
   
+  <div class='ad'>✉ XXDACIDXX@AOL.COM</div>
   <div class='lic'>License: W079744</div>
 </a><a class="agent" href="/bailbonds/fl/agent/clark-linsayd-yanely-d082784/">
   <div class="an">Clark, Linsayd Yanely</div><div class='ad'>Sunshine State Bb</div>
   <div class="ad">SUNSHINE STATE BB 7267 NW 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CLARK.LINSAYD@GMAIL.COM</div>
   <div class='lic'>License: D082784</div>
 </a><a class="agent" href="/bailbonds/fl/agent/coba-damian-antonio-w301175/">
   <div class="an">Coba, Damian Antonio</div>
   <div class="ad">18301 S DIXIE HWY PH 537, MIAMI, 33157</div>
   
+  <div class='ad'>✉ DAMIAN_COBA@YAHOO.COM</div>
   <div class='lic'>License: W301175</div>
 </a><a class="agent" href="/bailbonds/fl/agent/coral-gables-bail-bonds-inc-b000462/">
   <div class="an">Coral Gables Bail Bonds, Inc.</div>
   <div class="ad">225 ARAGON AVENUE, CORAL GABLES, 33134</div>
   
+  <div class='ad'>✉ BRENNANBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000462</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cordero-blanca-rosa-a054838/">
   <div class="an">Cordero, Blanca Rosa</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25TH STREET #109, MIAMI, 33166</div>
   
+  <div class='ad'>✉ BLANCA7261234@YAHOO.COM</div>
   <div class='lic'>License: A054838</div>
 </a><a class="agent" href="/bailbonds/fl/agent/corenthia-bail-bonds-llc-b000350/">
   <div class="an">Corenthia Bail Bonds, Llc</div>
   <div class="ad">1411 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ CEWILLIS143@YAHOO.COM</div>
   <div class='lic'>License: B000350</div>
 </a><a class="agent" href="/bailbonds/fl/agent/crowe-lucy-fernandez-a058464/">
   <div class="an">Crowe, Lucy Fernandez</div><div class='ad'>Rapid-O Bail Bonds</div>
   <div class="ad">RAPID-O BAIL BONDS 7267 NW 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ LUFER1949@YAHOO.COM</div>
   <div class='lic'>License: A058464</div>
 </a><a class="agent" href="/bailbonds/fl/agent/culver-de-eric-g235484/">
   <div class="an">Culver, De'Eric</div>
   <div class="ad">2970 NW 160 ST, OPA LOCKA, 33054</div>
   
+  <div class='ad'>✉ DEERICCUL@GMAIL.COM</div>
   <div class='lic'>License: G235484</div>
 </a><a class="agent" href="/bailbonds/fl/agent/daniel-bien-aime-bail-bonds-inc-b000148/">
   <div class="an">Daniel Bien-Aime Bail Bonds, Inc.</div>
   <div class="ad">7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BIEN1994@BELLSOUTH.NET</div>
   <div class='lic'>License: B000148</div>
 </a><a class="agent" href="/bailbonds/fl/agent/daniel-nia-s-w109988/">
   <div class="an">Daniel, Nia S</div><div class='ad'>Black Rabbit Bail Bonds</div>
   <div class="ad">BLACK RABBIT BAIL BONDS 4055 NW 17TH AVE, MIAMI, 33142</div>
   
+  <div class='ad'>✉ JUBALL33@YAHOO.COM</div>
   <div class='lic'>License: W109988</div>
 </a><a class="agent" href="/bailbonds/fl/agent/davila-carlos-w-p062276/">
   <div class="an">Davila, Carlos W</div><div class='ad'>Bail Miami</div>
   <div class="ad">BAIL MIAMI 5770 NW 72 AVE, MIAMI, 33166</div>
   
+  <div class='ad'>✉ DULCEDAVILA6@GMAIL.COM</div>
   <div class='lic'>License: P062276</div>
 </a><a class="agent" href="/bailbonds/fl/agent/davis-vincent-a317694/">
   <div class="an">Davis, Vincent</div><div class='ad'>A-Betta Bailbonds</div>
   <div class="ad">A-BETTA BAILBONDS 2967 NW 62ND ST, MIAMI, 33147</div>
   
+  <div class='ad'>✉ VINDAVIS1@GMAIL.COM</div>
   <div class='lic'>License: A317694</div>
 </a><a class="agent" href="/bailbonds/fl/agent/debbie-bail-bonds-inc-b000270/">
   <div class="an">Debbie Bail Bonds Inc</div>
   <div class="ad">1126 W FLAGLER ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ DEBRAZAYAS@YAHOO.COM</div>
   <div class='lic'>License: B000270</div>
 </a><a class="agent" href="/bailbonds/fl/agent/delacruz-ellie-p214940/">
   <div class="an">Delacruz, Ellie</div>
   <div class="ad">7315 NW 36 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ EJAZ1068@AOL.COM</div>
   <div class='lic'>License: P214940</div>
 </a><a class="agent" href="/bailbonds/fl/agent/deleon-lexter-a065191/">
   <div class="an">Deleon, Lexter</div><div class='ad'>Redd Bail Bonds</div>
   <div class="ad">REDD BAIL BONDS 4485 NW 36 STREET #2, MIAMI, 33166</div>
   
+  <div class='ad'>✉ LEXTERDELEON@GMAIL.COM</div>
   <div class='lic'>License: A065191</div>
 </a><a class="agent" href="/bailbonds/fl/agent/delgado-yanitza-ivette-e020909/">
   <div class="an">Delgado, Yanitza Ivette</div><div class='ad'>Fire Line Bail Bonds</div>
   <div class="ad">FIRE LINE BAIL BONDS 1395 NW 15 ST, MIAMI, 33101</div>
   
+  <div class='ad'>✉ YANITZADELGADO@YAHOO.COM</div>
   <div class='lic'>License: E020909</div>
 </a><a class="agent" href="/bailbonds/fl/agent/denson-pamela-williams-a097887/">
   <div class="an">Denson, Pamela Williams</div>
   <div class="ad">3375 NW 194 STREET, MIAMI GARDENS, 33056</div>
   
+  <div class='ad'>✉ PAMDENSON919@GMAIL.COM</div>
   <div class='lic'>License: A097887</div>
 </a><a class="agent" href="/bailbonds/fl/agent/diaz-jorge-l-e168286/">
   <div class="an">Diaz, Jorge L</div>
   <div class="ad">5760 NW 72 AVE, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JORGELD70@GMAIL.COM</div>
   <div class='lic'>License: E168286</div>
 </a><a class="agent" href="/bailbonds/fl/agent/do-the-right-thing-bail-bonds-inc-b000118/">
   <div class="an">Do The Right Thing Bail Bonds, Inc.</div>
   <div class="ad">13500 NW 97TH AVE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ KRYSTHELL@BAILBONDS.COM</div>
   <div class='lic'>License: B000118</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dobarganes-alfredo-a069497/">
   <div class="an">Dobarganes, Alfredo</div><div class='ad'>A Night &amp; Day Bail Bonds Inc</div>
   <div class="ad">A NIGHT &amp; DAY BAIL BONDS INC 1465 NW NORTH RIVER DR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ELSUPER0@AOL.COM</div>
   <div class='lic'>License: A069497</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dondee-bail-bonds-b000027/">
   <div class="an">Dondee Bail Bonds</div>
   <div class="ad">7225 NW 25 ST SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ DONDEEBONDING@AOL.COM</div>
   <div class='lic'>License: B000027</div>
 </a><a class="agent" href="/bailbonds/fl/agent/doral-bail-bonds-b000648/">
   <div class="an">Doral Bail Bonds</div>
   <div class="ad">7667 NW 50 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ DORALBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000648</div>
 </a><a class="agent" href="/bailbonds/fl/agent/dupoux-anthony-g242503/">
   <div class="an">Dupoux, Anthony</div>
   <div class="ad">18939 NW 86TH AVE UNIT 3202, HIALEAH, 33015</div>
   
+  <div class='ad'>✉ RARRIANTENT@GMAIL.COM</div>
   <div class='lic'>License: G242503</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ed-fabre-bail-bonds-b000650/">
   <div class="an">Ed Fabre Bail Bonds</div>
   <div class="ad">8801 BISCAYNE BLVD SUITE 103, MIAMI, 33138</div>
   
+  <div class='ad'>✉ EDFABREBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000650</div>
 </a><a class="agent" href="/bailbonds/fl/agent/elias-kelsey-g103918/">
   <div class="an">Elias, Kelsey</div>
   <div class="ad">1737 NW 42 STREET, MIAMI, 33142</div>
   
+  <div class='ad'>✉ KELSEYGIUTTA@GMAIL.COM</div>
   <div class='lic'>License: G103918</div>
 </a><a class="agent" href="/bailbonds/fl/agent/elias-william-abel-e136453/">
   <div class="an">Elias, William Abel</div>
   <div class="ad">1737 NW 42 STREET, MIAMI, 33142</div>
   
+  <div class='ad'>✉ BILL_ELIAS@BELLSOUTH.NET</div>
   <div class='lic'>License: E136453</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ennevor-kirk-hastings-a077889/">
   <div class="an">Ennevor, Kirk Hastings</div>
   <div class="ad">12499 NE 8 AVENUE, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ KENNEVOR@GMAIL.COM</div>
   <div class='lic'>License: A077889</div>
 </a><a class="agent" href="/bailbonds/fl/agent/escarra-luis-sr-e009549/">
   <div class="an">Escarra, Luis Sr</div>
   <div class="ad">7225 NW 25 ST SUITE 305, MIAMI, 33166</div>
   
+  <div class='ad'>✉ LUISESCARRA@ATT.NET</div>
   <div class='lic'>License: E009549</div>
 </a><a class="agent" href="/bailbonds/fl/agent/estrada-abraham-jr-a079171/">
   <div class="an">Estrada, Abraham Jr</div><div class='ad'>Sunshine State Bail Bonds - [ ]</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS - [ ] 7267 NW 36 ST, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ FISHUOUT@MSN.COM</div>
   <div class='lic'>License: A079171</div>
 </a><a class="agent" href="/bailbonds/fl/agent/estrella-bail-bonds-b000317/">
   <div class="an">Estrella Bail Bonds</div>
   <div class="ad">7267 NW 36 ST 1, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JAG175@YAHOO.COM</div>
   <div class='lic'>License: B000317</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fabre-eddy-wilmann-a080168/">
   <div class="an">Fabre, Eddy Wilmann</div>
   <div class="ad">8801 BISCAYNE BLVD # 103, MIAMI, 33138</div>
   
+  <div class='ad'>✉ EDFABREBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A080168</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fabre-guerdy-wilmann-p052063/">
   <div class="an">Fabre, Guerdy Wilmann</div>
   <div class="ad">8801 BISCAYNE BLVD SUITE 103, MIAMI, 33138</div>
   
+  <div class='ad'>✉ G.W.FABRE@GMAIL.COM</div>
   <div class='lic'>License: P052063</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fabre-patrick-bertin-a080172/">
   <div class="an">Fabre, Patrick Bertin</div>
   <div class="ad">8801 BISCAYNE BLVD #103, MIAMI, 33138</div>
   
+  <div class='ad'>✉ PATRICKFABRE5044@GMAIL.COM</div>
   <div class='lic'>License: A080172</div>
 </a><a class="agent" href="/bailbonds/fl/agent/faibisch-charles-d058805/">
   <div class="an">Faibisch, Charles</div>
   <div class="ad">13500 NW 97TH AVE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ FAIBISCH@GMAIL.COM</div>
   <div class='lic'>License: D058805</div>
 </a><a class="agent" href="/bailbonds/fl/agent/faibisch-russell-charles-a080346/">
   <div class="an">Faibisch, Russell Charles</div><div class='ad'>Do The Right Thing Bail Bonds</div>
   <div class="ad">DO THE RIGHT THING BAIL BONDS 13500 NW 97TH AVE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ RUSSELL@ULTRAMUSICFESTIVAL.COM</div>
   <div class='lic'>License: A080346</div>
 </a><a class="agent" href="/bailbonds/fl/agent/faibisch-russell-mark-a080347/">
   <div class="an">Faibisch, Russell Mark</div><div class='ad'>Do The Right Thing Bail Bonds</div>
   <div class="ad">DO THE RIGHT THING BAIL BONDS 13500 NW 97TH AVE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ RUSSELL@BAILBONDSMAN.COM</div>
   <div class='lic'>License: A080347</div>
 </a><a class="agent" href="/bailbonds/fl/agent/faroy-bail-bonds-inc-b000199/">
   <div class="an">Faroy Bail Bonds Inc.</div>
   <div class="ad">1330 SW 22ND ST SUITE 311, MIAMI, 33145</div>
   
+  <div class='ad'>✉ FAROYBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000199</div>
 </a><a class="agent" href="/bailbonds/fl/agent/faroy-emilio-gallor-a081130/">
   <div class="an">Faroy, Emilio Gallor</div>
   <div class="ad">1330 SW 22 ST, STE 307, MIAMI, 33145</div>
   
+  <div class='ad'>✉ FAROYBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A081130</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fast-24-7-bailbonds-b000707/">
   <div class="an">Fast 24/7 Bailbonds</div>
   <div class="ad">99 NW 183RD STREET, MIAMI, 33330</div>
   
+  <div class='ad'>✉ FASTBAILBONDS247@GMAIL.COM</div>
   <div class='lic'>License: B000707</div>
 </a><a class="agent" href="/bailbonds/fl/agent/felix-bail-bonds-b000182/">
   <div class="an">Felix Bail Bonds</div>
   <div class="ad">7225 NW 25 STREET 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ FELIXAVILA26@YAHOO.COM</div>
   <div class='lic'>License: B000182</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ferguson-alicia-voncia-d000922/">
   <div class="an">Ferguson, Alicia Voncia</div><div class='ad'>Ballers Bail Bonds</div>
   <div class="ad">BALLERS BAIL BONDS 1175 NE 125 STREET SUITE 311, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ PEACHES_HUNTRESS@YAHOO.COM</div>
   <div class='lic'>License: D000922</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fernandez-alida-d015146/">
   <div class="an">Fernandez, Alida</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25 STREET, SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ ALYSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: D015146</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fernandez-tricia-a083019/">
   <div class="an">Fernandez, Tricia</div>
   <div class="ad">7035 NW 41 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ PATTY@MIAMIBAIL.COM</div>
   <div class='lic'>License: A083019</div>
 </a><a class="agent" href="/bailbonds/fl/agent/figueroa-jacqueline-marie-e180528/">
   <div class="an">Figueroa, Jacqueline Marie</div>
   <div class="ad">1642 NW 17 AVENUE.#B MIDTOWN, MIAMI, 33125</div>
   
+  <div class='ad'>✉ JACKIESBAILBONDSINC@GMAIL.COM</div>
   <div class='lic'>License: E180528</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fireline-bail-bonds-inc-b000516/">
   <div class="an">Fireline Bail Bonds, Inc.</div>
   <div class="ad">1395 NW 15TH STREET, MIAMI, 33125</div>
   
+  <div class='ad'>✉ FIRELINEBB@GMAIL.COM</div>
   <div class='lic'>License: B000516</div>
 </a><a class="agent" href="/bailbonds/fl/agent/florida-boy-bailbonds-b000507/">
   <div class="an">Florida Boy Bailbonds</div>
   <div class="ad">7460 SOUTHWEST 107 AVE, MIAMI, 33173</div>
   
+  <div class='ad'>✉ FLORIDABOYFIANZA@GMAIL.COM</div>
   <div class='lic'>License: B000507</div>
 </a><a class="agent" href="/bailbonds/fl/agent/francois-keith-david-e013317/">
   <div class="an">Francois, Keith David</div><div class='ad'>Dade County Bail Bonds</div>
   <div class="ad">DADE COUNTY BAIL BONDS 1435 NW 13TH TER, MIAMI, 33125</div>
   
+  <div class='ad'>✉ KEFRADA@HOTMAIL.COM</div>
   <div class='lic'>License: E013317</div>
 </a><a class="agent" href="/bailbonds/fl/agent/frederique-ralph-p064267/">
   <div class="an">Frederique, Ralph</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ RALPH222@HOTMAIL.COM</div>
   <div class='lic'>License: P064267</div>
 </a><a class="agent" href="/bailbonds/fl/agent/fuentes-maykel-w238834/">
   <div class="an">Fuentes, Maykel</div><div class='ad'>Huggins Bail Bonds</div>
   <div class="ad">HUGGINS BAIL BONDS 260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ MAYKEL.FUENTES001@GMAIL.COM</div>
   <div class='lic'>License: W238834</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gallardo-danilo-a092302/">
   <div class="an">Gallardo, Danilo</div><div class='ad'>Coral Gables Bail Bonds</div>
   <div class="ad">CORAL GABLES BAIL BONDS 225 ARAGON AVE, CORAL GABLES, 33134</div>
   
+  <div class='ad'>✉ MIAMIKRONIC@AOL.COM</div>
   <div class='lic'>License: A092302</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garces-juan-carlos-e046922/">
   <div class="an">Garces, Juan Carlos</div>
   <div class="ad">18800 NW 2 AND AVENUE #106, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ TOJCGO@GMAIL.COM</div>
   <div class='lic'>License: E046922</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-bail-bonds-llc-b000370/">
   <div class="an">Garcia Bail Bonds, Llc</div>
   <div class="ad">4471 NW 36TH STREET SUITE 229, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GARCIA149@BELLSOUTH.NET</div>
   <div class='lic'>License: B000370</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-amanda-ann-p048612/">
   <div class="an">Garcia, Amanda Ann</div>
   <div class="ad">7264NW 36TH ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JAG175@YAHOO.COM</div>
   <div class='lic'>License: P048612</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-eduardo-r-a093075/">
   <div class="an">Garcia, Eduardo R</div><div class='ad'>Bill Bail Bonds</div>
   <div class="ad">BILL BAIL BONDS 1501 NW 14TH STREET, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ELCHEBAILBONDS@HOTMAIL.COM</div>
   <div class='lic'>License: A093075</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-gonzalo-jr-a092942/">
   <div class="an">Garcia, Gonzalo Jr</div><div class='ad'>Superior Bail Bonds</div>
   <div class="ad">SUPERIOR BAIL BONDS 7267 NW 36 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ MAGROT66@GMAIL.COM</div>
   <div class='lic'>License: A092942</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-hector-angel-a311368/">
   <div class="an">Garcia, Hector Angel</div><div class='ad'>Garcia Bail Bonds</div>
   <div class="ad">GARCIA BAIL BONDS 4471 NW 36TH STREET, SUITE 229, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GARCIA149@BELLSOUTH.NET</div>
   <div class='lic'>License: A311368</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-jenny-ann-a093131/">
   <div class="an">Garcia, Jenny Ann</div><div class='ad'>Estrella Bail Bonds</div>
   <div class="ad">ESTRELLA BAIL BONDS 7267 NW 36TH ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JAG175@YAHOO.COM</div>
   <div class='lic'>License: A093131</div>
 </a><a class="agent" href="/bailbonds/fl/agent/garcia-jesus-ernesto-jr-w560796/">
   <div class="an">Garcia, Jesus Ernesto Jr.</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7315 NW 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JESUSGARCIA2099@YAHOO.COM</div>
   <div class='lic'>License: W560796</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gartenmayer-cecilly-w890733/">
   <div class="an">Gartenmayer, Cecilly</div><div class='ad'>Tuff Luv Bail Bonds</div>
   <div class="ad">TUFF LUV BAIL BONDS 17891 S DIXIE HWY #102, PALMETTO BAY, 33157</div>
   
+  <div class='ad'>✉ CEC26789@GMAIL.COM</div>
   <div class='lic'>License: W890733</div>
 </a><a class="agent" href="/bailbonds/fl/agent/geraldo-carmen-canario-p048603/">
   <div class="an">Geraldo, Carmen Canario</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 NW N RIVER DR, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ CARMENCGERALDO@GMAIL.COM</div>
   <div class='lic'>License: P048603</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gloria-sunshine-state-bail-bonds-inc-b000349/">
   <div class="an">Gloria Sunshine State Bail Bonds, Inc</div>
   <div class="ad">1411 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ GMENA15@YAHOO.COM</div>
   <div class='lic'>License: B000349</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gomez-marek-h-p031415/">
   <div class="an">Gomez, Marek H</div>
   <div class="ad">14313 SW 96 ST 407, DORAL, 33166</div>
   
+  <div class='ad'>✉ MAREKGOMEZ@GMAIL.COM</div>
   <div class='lic'>License: P031415</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-adolfo-g252290/">
   <div class="an">Gonzalez, Adolfo</div>
   <div class="ad">11373 NW 52ND ST, MIAMI, 33178</div>
   
+  <div class='ad'>✉ ADOLFOGONZALEZ0607@GMAIL.COM</div>
   <div class='lic'>License: G252290</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-alexey-b-d026341/">
   <div class="an">Gonzalez, Alexey B</div><div class='ad'>Fire Line Bail Bonds Inc</div>
   <div class="ad">FIRE LINE BAIL BONDS INC 1395 NW 15TH STREET, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ALEXEY@FIRELINEBAILBONDS.NET</div>
   <div class='lic'>License: D026341</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-jose-a-a100106/">
   <div class="an">Gonzalez, Jose A</div>
   <div class="ad">7267 NW 36 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ SUPERIORBAILBONDS@AOL.COM</div>
   <div class='lic'>License: A100106</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-olga-marie-a100243/">
   <div class="an">Gonzalez, Olga Marie</div><div class='ad'>Fireline Bail Bonds Inc</div>
   <div class="ad">FIRELINE BAIL BONDS INC 1395 NW 15TH ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ OLGAGONZALEZ@BELLSOUTH.NET</div>
   <div class='lic'>License: A100243</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-rita-del-carmen-w064185/">
   <div class="an">Gonzalez, Rita Del Carmen</div>
   <div class="ad">5770 N.W 72 AVE, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CHINA228TD@YAHOO.COM</div>
   <div class='lic'>License: W064185</div>
 </a><a class="agent" href="/bailbonds/fl/agent/good-girls-bail-bonds-inc-b000591/">
   <div class="an">Good Girls Bail Bonds Inc.</div>
   <div class="ad">7667 NORTHWEST 50 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GOODGIRLSBAIL@GMAIL.COM</div>
   <div class='lic'>License: B000591</div>
 </a><a class="agent" href="/bailbonds/fl/agent/grenet-ernesto-cesar-a104351/">
   <div class="an">Grenet, Ernesto Cesar</div><div class='ad'>The Bail Bond Firm</div>
   <div class="ad">THE BAIL BOND FIRM 1390 NW 16TH ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ECOMM01@YAHOO.COM</div>
   <div class='lic'>License: A104351</div>
 </a><a class="agent" href="/bailbonds/fl/agent/guedes-lucia-c-d021058/">
   <div class="an">Guedes, Lucia C</div>
   <div class="ad">13500 N.W. 97 AVENUE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ LUCIACGUEDES@HOTMAIL.COM</div>
   <div class='lic'>License: D021058</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gunning-gussie-mae-p079531/">
   <div class="an">Gunning, Gussie Mae</div>
   <div class="ad">20401 NW 2ND AVE,, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ ACE1STHOME@GMAIL.COM</div>
   <div class='lic'>License: P079531</div>
 </a><a class="agent" href="/bailbonds/fl/agent/halsell-deon-w754758/">
   <div class="an">Halsell, Deon</div><div class='ad'>Martory Bail Bonds</div>
   <div class="ad">MARTORY BAIL BONDS 12905 SW 42ND STREET #208, MIAMI, 33175</div>
   
+  <div class='ad'>✉ DEONHALSELL375@GMAIL.COM</div>
   <div class='lic'>License: W754758</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hammonds-green-theria-elaine-p031152/">
   <div class="an">Hammonds-Green, Theria Elaine</div>
   <div class="ad">14411 COMMERCE WAY SUITE#225 T-MONEY GREEN BAILBONDS SERVICES LLC, MIAMI LAKES, 33016</div>
   
+  <div class='ad'>✉ THERIAGREEN@AOL.COM</div>
   <div class='lic'>License: P031152</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harris-william-thomas-a112386/">
   <div class="an">Harris, William Thomas</div>
   <div class="ad">260NW183RD STREET, MIAMI GARDEN, 33169</div>
   
+  <div class='ad'>✉ CASHSURETYBAIL@GMAIL.COM</div>
   <div class='lic'>License: A112386</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harvell-castleberry-junior-e032312/">
   <div class="an">Harvell, Castleberry Junior</div><div class='ad'>Universal Bailbond</div>
   <div class="ad">UNIVERSAL BAILBOND 7005 NW 41ST STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JWILLIAMS9@MED.MIAMI.EDU</div>
   <div class='lic'>License: E032312</div>
 </a><a class="agent" href="/bailbonds/fl/agent/heard-patrick-d021305/">
   <div class="an">Heard, Patrick</div>
   <div class="ad">10815 SW 142ND LANE, MIAMI, 33176</div>
   
+  <div class='ad'>✉ MBKBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: D021305</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hechevarria-guillermo-santoya-w227458/">
   <div class="an">Hechevarria, Guillermo Santoya</div><div class='ad'>Aaa Florida</div>
   <div class="ad">AAA FLORIDA 24 HR BAIL BONDS INC. 2637 W 76 ST, HIALEAH, 33016</div>
   
+  <div class='ad'>✉ AAAFLORIDABAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W227458</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hector-pierre-a115203/">
   <div class="an">Hector, Pierre</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7265 NW 36TH ST, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ TIRAM718@GMAIL.COM</div>
   <div class='lic'>License: A115203</div>
 </a><a class="agent" href="/bailbonds/fl/agent/heredia-aracely-d059884/">
   <div class="an">Heredia, Aracely</div>
   <div class="ad">6951 SW 156 COURT, MIAMI, 33193</div>
   
+  <div class='ad'>✉ ARACELY.1234@HOTMAIL.COM</div>
   <div class='lic'>License: D059884</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hernandez-amanda-g141394/">
   <div class="an">Hernandez, Amanda</div>
   <div class="ad">26780 SW 140TH AVE APT 209, HOMESTEAD, 33032</div>
   
+  <div class='ad'>✉ AMILOVE161@YAHOO.COM</div>
   <div class='lic'>License: G141394</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hernandez-carmen-maria-a117272/">
   <div class="an">Hernandez, Carmen Maria</div>
   <div class="ad">8333 NW 53 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GETUOUT247@YAHOO.COM</div>
   <div class='lic'>License: A117272</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hernandez-jacqueline-d-g161509/">
   <div class="an">Hernandez, Jacqueline D</div>
   <div class="ad">7045 NW 41ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ JDAYANARA5534@GMAIL.COM</div>
   <div class='lic'>License: G161509</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herrera-dallanara-l-e013995/">
   <div class="an">Herrera, Dallanara L</div>
   <div class="ad">ALINA ALFONSO BAIL BONDS 951-A SW 87TH AVENUE, MIAMI, 33174</div>
   
+  <div class='ad'>✉ DEEBAILBONDS@BELLSOUTH.NET</div>
   <div class='lic'>License: E013995</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herrera-damary-lee-d013286/">
   <div class="an">Herrera, Damary Lee</div>
   <div class="ad">951-A SW 87TH AVENUE, MIAMI, 33174</div>
   
+  <div class='ad'>✉ DAMARYBAILBONDS@BELLSOUTH.NET</div>
   <div class='lic'>License: D013286</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herrera-fernando-gilberto-a306878/">
   <div class="an">Herrera, Fernando Gilberto</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NW 36 ST, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ HERRERA.FERNANDO@ROCKETMAIL.COM</div>
   <div class='lic'>License: A306878</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hiller-teresa-gail-e029777/">
   <div class="an">Hiller, Teresa Gail</div><div class='ad'>Bail Bond Firm</div>
   <div class="ad">BAIL BOND FIRM 1390 NW 16TH ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ TERIHILLER305@GMAIL.COM</div>
   <div class='lic'>License: E029777</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hinds-christopher-sr-w271861/">
   <div class="an">Hinds, Christopher Sr</div><div class='ad'>Chico Bail Bonds</div>
   <div class="ad">CHICO BAIL BONDS 1661 NW 15TH STREET ROAD, MIAMI, 33125</div>
   
+  <div class='ad'>✉ MRHINDS@AOL.COM</div>
   <div class='lic'>License: W271861</div>
 </a><a class="agent" href="/bailbonds/fl/agent/holmes-robneka-jatalia-w301172/">
   <div class="an">Holmes, Robneka Jatalia</div>
   <div class="ad">000 TUFF LUV BAIL BONDS, INC 17891 S DIXIE HWY #102, PALMETTO BAY, 33157</div>
   
+  <div class='ad'>✉ KHALEB10@GMAIL.COM</div>
   <div class='lic'>License: W301172</div>
 </a><a class="agent" href="/bailbonds/fl/agent/howard-williams-jarvis-w101175/">
   <div class="an">Howard-Williams, Jarvis</div><div class='ad'>Bella Bail Bonds</div>
   <div class="ad">BELLA BAIL BONDS 18350 NW 2ND AVE #644, MIAMI GARDENS, 33056</div>
   
+  <div class='ad'>✉ MSJAJA01@GMAIL.COM</div>
   <div class='lic'>License: W101175</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-on-call-bail-bonds-b000328/">
   <div class="an">Huggins On Call Bail Bonds</div>
   <div class="ad">67 NW 183RD STREET #104 B, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ HUGGINSONCALLBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000328</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-fallen-w957960/">
   <div class="an">Huggins, Fallen</div><div class='ad'>Huggins Bail Bonds</div>
   <div class="ad">HUGGINS BAIL BONDS 260 NW 183RD STREET SUITE A, MIAMI, 33169</div>
   
+  <div class='ad'>✉ FYACINTHE87@GMAIL.COM</div>
   <div class='lic'>License: W957960</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-lester-l-d019894/">
   <div class="an">Huggins, Lester L</div>
   <div class="ad">260 NW 183RD STREET SUITE A, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ LESTERBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: D019894</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-marcus-kevin-p074210/">
   <div class="an">Huggins, Marcus Kevin</div><div class='ad'>Huggins</div>
   <div class="ad">HUGGINS 24 HOUR BAIL BONDS 18800 NW 2ND AVE #106, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ HUGGINS24HRSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: P074210</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-mckasey-kern-w126152/">
   <div class="an">Huggins, Mckasey Kern</div>
   <div class="ad">67 NW 183RD STREET #104 B, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ HUGGINSKC27@GMAIL.COM</div>
   <div class='lic'>License: W126152</div>
 </a><a class="agent" href="/bailbonds/fl/agent/huggins-steve-earnest-w456198/">
   <div class="an">Huggins, Steve Earnest</div>
   <div class="ad">260 NW 183RD, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ STEVEHUGGINS68@HOTMAIL.COM</div>
   <div class='lic'>License: W456198</div>
 </a><a class="agent" href="/bailbonds/fl/agent/indacochea-jackie-nancy-a127586/">
   <div class="an">Indacochea, Jackie Nancy</div><div class='ad'>A Abc Bail Bonds</div>
   <div class="ad">A ABC BAIL BONDS 901 HARDEE RD, CORAL GABLES, 33146</div>
   
+  <div class='ad'>✉ JAX77777@AOL.COM</div>
   <div class='lic'>License: A127586</div>
 </a><a class="agent" href="/bailbonds/fl/agent/infante-ann-e-w091789/">
   <div class="an">Infante, Ann E</div>
   <div class="ad">11117 W OKEECHOBEE RD. #122, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ ANNINFANTE1966@GMAIL.COM</div>
   <div class='lic'>License: W091789</div>
 </a><a class="agent" href="/bailbonds/fl/agent/infante-idalberto-d079024/">
   <div class="an">Infante, Idalberto</div><div class='ad'>Chichi Bail Bonds Inc.</div>
   <div class="ad">CHICHI BAIL BONDS INC. 11117 NW OKEECHOBEE RD #122, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ CHICHIBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: D079024</div>
 </a><a class="agent" href="/bailbonds/fl/agent/isidore-kanol-p168603/">
   <div class="an">Isidore, Kanol</div>
   <div class="ad">99 NW 183 ST #241 A, MIAMI GARDENS, 33179</div>
   
+  <div class='ad'>✉ KANOLISIDOR@COMCAST.NET</div>
   <div class='lic'>License: P168603</div>
 </a><a class="agent" href="/bailbonds/fl/agent/isidore-karny-w756877/">
   <div class="an">Isidore, Karny</div><div class='ad'>Fast 24/7 Bail Bonds</div>
   <div class="ad">FAST 24/7 BAIL BONDS 99 NW 183RD STREET SUITE 241, MIAMI, 33169</div>
   
+  <div class='ad'>✉ ISIDOREKARNY@YAHOO.COM</div>
   <div class='lic'>License: W756877</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jagers-jerry-russell-w124985/">
   <div class="an">Jagers, Jerry Russell</div>
   <div class="ad">10711 SW 216 ST 215, MIAMI, 33170</div>
   
+  <div class='ad'>✉ JERRYJAGERS@GMAIL.COM</div>
   <div class='lic'>License: W124985</div>
 </a><a class="agent" href="/bailbonds/fl/agent/james-ainsford-everton-e125377/">
   <div class="an">James, Ainsford Everton</div>
   <div class="ad">18350 NW 2ND AVE, STE 518, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ JAMESBAILBONDS@LIVE.COM</div>
   <div class='lic'>License: E125377</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jean-leslie-w287666/">
   <div class="an">Jean, Leslie</div><div class='ad'>Leslie'S</div>
   <div class="ad">LESLIE'S 24 HOUR BAIL BONDS 18800 NW 2ND AVE #106A, MIAMI, 33169</div>
   
+  <div class='ad'>✉ LESLIE24HRBAILBOND@YAHOO.COM</div>
   <div class='lic'>License: W287666</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jenkins-rackley-reashawnda-victoria-e111560/">
   <div class="an">Jenkins Rackley, Reashawnda Victoria</div>
   <div class="ad">8945 NW 9AVE, MIAMI, 33150</div>
   
+  <div class='ad'>✉ RVJ7794@AOL.COM</div>
   <div class='lic'>License: E111560</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jim-scottaline-bonding-agency-inc-b000600/">
   <div class="an">Jim Scottaline Bonding Agency, Inc.</div>
   <div class="ad">4471 NORTHWEST 36TH STREET, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ JIMBAIL45@GMAIL.COM</div>
   <div class='lic'>License: B000600</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jimeno-jesus-miguel-e181786/">
   <div class="an">Jimeno, Jesus Miguel</div>
   <div class="ad">12402 SW 215 LANE, MIAMI, 33177</div>
   
+  <div class='ad'>✉ QUICKRELEASEBAILBOND@YAHOO.COM</div>
   <div class='lic'>License: E181786</div>
 </a><a class="agent" href="/bailbonds/fl/agent/joey-s-bail-bonds-b000715/">
   <div class="an">Joey'S Bail Bonds</div>
   <div class="ad">1763 SW 131 PL CIR S., MIAMI, 33175</div>
   
+  <div class='ad'>✉ JCASAL@MAC.COM</div>
   <div class='lic'>License: B000715</div>
 </a><a class="agent" href="/bailbonds/fl/agent/johnson-mikesha-g105111/">
   <div class="an">Johnson, Mikesha</div>
   <div class="ad">1293 NW 44TH ST, MIAMI, 33142</div>
   
+  <div class='ad'>✉ JOHNSONMIKESHA@YAHOO.COM</div>
   <div class='lic'>License: G105111</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-matthew-allen-g233632/">
   <div class="an">Jones, Matthew Allen</div>
   <div class="ad">17891 S DIXIE HWY #102, MIAMI, 33157</div>
   
+  <div class='ad'>✉ MJONES08012006@GMAIL.COM</div>
   <div class='lic'>License: G233632</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-nefertia-taquena-w171689/">
   <div class="an">Jones, Nefertia Taquena</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ NEFERTIAJONES@GMAIL.COM</div>
   <div class='lic'>License: W171689</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-thomas-chauncey-jr-w081236/">
   <div class="an">Jones, Thomas Chauncey Jr.</div>
   <div class="ad">666 NORTHEAST 125 STREET SUITE 227, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ CHAUNCEY710@YAHOO.COM</div>
   <div class='lic'>License: W081236</div>
 </a><a class="agent" href="/bailbonds/fl/agent/joseph-peggy-w293280/">
   <div class="an">Joseph, Peggy</div>
   <div class="ad">12490 NE 7 AVENUE SUITE#227, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ BAPTISTEBAILBONDS2013@GMAIL.COM</div>
   <div class='lic'>License: W293280</div>
 </a><a class="agent" href="/bailbonds/fl/agent/king-robert-arnold-sr-a141581/">
   <div class="an">King, Robert Arnold Sr</div>
   <div class="ad">7315 NW 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ MISSSHARON2525@YAHOO.COM</div>
   <div class='lic'>License: A141581</div>
 </a><a class="agent" href="/bailbonds/fl/agent/largins-john-jr-w343031/">
   <div class="an">Largins, John Jr</div><div class='ad'>Bonds R Us Bail Bonds</div>
   <div class="ad">BONDS R US BAIL BONDS 17635 NW 27TH AVENUE, MIAMI GARDENS, 33056</div>
   
+  <div class='ad'>✉ JOHNLARGINS@YAHOO.COM</div>
   <div class='lic'>License: W343031</div>
 </a><a class="agent" href="/bailbonds/fl/agent/laso-charlene-a150285/">
   <div class="an">Laso, Charlene</div><div class='ad'>Midtown Bail Bonds</div>
   <div class="ad">MIDTOWN BAIL BONDS 1642 NW 17TH AVENUE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ CHARLENELASO@GMAIL.COM</div>
   <div class='lic'>License: A150285</div>
 </a><a class="agent" href="/bailbonds/fl/agent/leal-raul-e-p130766/">
   <div class="an">Leal, Raul E</div>
   <div class="ad">1 STOP BAIL SERVICES INC 1126 W FLAGLER STREET, MIAMI, 33130</div>
   
+  <div class='ad'>✉ KATTY33126@YAHOO.COM</div>
   <div class='lic'>License: P130766</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lee-kenneth-jerome-e163778/">
   <div class="an">Lee, Kenneth Jerome</div>
   <div class="ad">13302 SW 255TH TERR, MIAMI, 33032</div>
   
+  <div class='ad'>✉ MRMIAMILOGIC@GMAIL.COM</div>
   <div class='lic'>License: E163778</div>
 </a><a class="agent" href="/bailbonds/fl/agent/leon-lisbeth-p053347/">
   <div class="an">Leon, Lisbeth</div><div class='ad'>Rivas Bonding Agency</div>
   <div class="ad">RIVAS BONDING AGENCY 6555 NW 36TH ST #112, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CITYGIRL3569@YAHOO.COM</div>
   <div class='lic'>License: P053347</div>
 </a><a class="agent" href="/bailbonds/fl/agent/levy-lidia-m-d077247/">
   <div class="an">Levy, Lidia M</div>
   <div class="ad">8333 NW 53RD ST SUITE 450 #419, DORAL, 33166</div>
   
+  <div class='ad'>✉ LYMARI09@HOTMAIL.COM</div>
   <div class='lic'>License: D077247</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lopez-delfina-emerita-w216792/">
   <div class="an">Lopez, Delfina Emerita</div>
   <div class="ad">1106 SW 8TH ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ GLOBALMEX01@YAHOO.COM</div>
   <div class='lic'>License: W216792</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lopez-lazaro-a158404/">
   <div class="an">Lopez, Lazaro</div>
   <div class="ad">2365 NW 70TH AVE. UNIT C-3, MIAMI, 33122</div>
   
+  <div class='ad'>✉ LAZAROBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: A158404</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lopez-luis-rene-e017485/">
   <div class="an">Lopez, Luis Rene</div><div class='ad'>Eagle Bail Bonds</div>
   <div class="ad">EAGLE BAIL BONDS 1465 NW NORTH RIVER DR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ LUIS_R_LOPEZ@YAHOO.COM</div>
   <div class='lic'>License: E017485</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lovinsky-ronald-p228678/">
   <div class="an">Lovinsky, Ronald</div>
   <div class="ad">99 183RD ST #241 A, MIAMI GARDENS, 33069</div>
   
+  <div class='ad'>✉ RONALDLOVINSKY@GMAIL.COM</div>
   <div class='lic'>License: P228678</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mafran-carlos-p205838/">
   <div class="an">Mafran, Carlos</div>
   <div class="ad">7667 NW 50 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ MAFRANCARLOS1@AOL.COM</div>
   <div class='lic'>License: P205838</div>
 </a><a class="agent" href="/bailbonds/fl/agent/marks-daniel-syvlester-a165232/">
   <div class="an">Marks, Daniel Syvlester</div>
   <div class="ad">9927 NW 26TH AVENUE, MIAMI, 33147</div>
   
+  <div class='ad'>✉ DDMARKS123@COMCAST.NET</div>
   <div class='lic'>License: A165232</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-gloria-elena-p110788/">
   <div class="an">Martinez, Gloria Elena</div>
   <div class="ad">3710 NW 169TH TERR, MIAMI GARDENS, 33055</div>
   
+  <div class='ad'>✉ GLORIA_RAZA@HOTMAIL.COM</div>
   <div class='lic'>License: P110788</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-jennifer-g181473/">
   <div class="an">Martinez, Jennifer</div>
   <div class="ad">9955 NW 9TH ST CIR APT 3, MIAMI, 33172</div>
   
+  <div class='ad'>✉ MONSALVEBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: G181473</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-jose-g-a166996/">
   <div class="an">Martinez, Jose G</div>
   <div class="ad">7225 NW 25TH STREET SUITE-109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ MARTINEZXFIANZAS@YAHOO.COM</div>
   <div class='lic'>License: A166996</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-maria-a-a167040/">
   <div class="an">Martinez, Maria A</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25TH STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ MABAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A167040</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-parrish-j-e136015/">
   <div class="an">Martinez, Parrish J.</div><div class='ad'>Parrish Bail Bonds</div>
   <div class="ad">PARRISH BAIL BONDS 7225 NW 25TH STREET SUIT 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ PARRISHBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: E136015</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martinez-richard-p186262/">
   <div class="an">Martinez, Richard</div>
   <div class="ad">1661 NW 15 ST RD, MAIMI, 33125</div>
   
+  <div class='ad'>✉ RICHIERICHBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: P186262</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martory-bail-bonds-b000085/">
   <div class="an">Martory Bail Bonds</div>
   <div class="ad">12905 SW 42 ST SUITE 208, MIAMI, 33175</div>
   
+  <div class='ad'>✉ MMARTORY@YAHOO.COM</div>
   <div class='lic'>License: B000085</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martory-marco-joaquin-sr-a167209/">
   <div class="an">Martory, Marco Joaquin Sr.</div>
   <div class="ad">12905 SW 42 ST SUITE 208, MIAMI, 33175</div>
   
+  <div class='ad'>✉ MARTORYBAILBONDS@YMAIL.COM</div>
   <div class='lic'>License: A167209</div>
 </a><a class="agent" href="/bailbonds/fl/agent/master-key-bail-bonds-b000400/">
   <div class="an">Master Key Bail Bonds</div>
   <div class="ad">10883 NW 7TH STREET #14, MIAMI, 33172</div>
   
+  <div class='ad'>✉ MIAMIDADEBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000400</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcconnell-sharon-marie-a170946/">
   <div class="an">Mcconnell, Sharon Marie</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ MISSSHARON2525@YAHOO.COM</div>
   <div class='lic'>License: A170946</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mccray-eric-a-d000991/">
   <div class="an">Mccray, Eric A</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NORTHWEST 36 STREET, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ BIGGIEBAIL@YAHOO.COM</div>
   <div class='lic'>License: D000991</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcford-avis-yvette-w011436/">
   <div class="an">Mcford, Avis Yvette</div><div class='ad'>A Betta Bail Bonds</div>
   <div class="ad">A BETTA BAIL BONDS 2967 NW 62ND STREET, MIAMI, 33147</div>
   
+  <div class='ad'>✉ AMCFORD67@GMAIL.COM</div>
   <div class='lic'>License: W011436</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcintosh-bail-bonds-agency-b000495/">
   <div class="an">Mcintosh Bail Bonds Agency</div>
   <div class="ad">1400 NE MIAMI GARDENS DRIVE, NORTH MIAMI BEACH, 33179</div>
   
+  <div class='ad'>✉ MCINTOSHBAILBONDS@PROTON.ME</div>
   <div class='lic'>License: B000495</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcintosh-debbie-elaine-w460063/">
   <div class="an">Mcintosh, Debbie Elaine</div>
   <div class="ad">1400 NE MIAMI GARDENS DRIVE SUITE 205D, NORTH MIAMI BEACH, 33179</div>
   
+  <div class='ad'>✉ DEBBIE_MCINTOSH@YAHOO.COM</div>
   <div class='lic'>License: W460063</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mena-gloria-a-d085361/">
   <div class="an">Mena, Gloria A</div>
   <div class="ad">7267 NE 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GMENA15@YAHOO.COM</div>
   <div class='lic'>License: D085361</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mendoza-abraham-jose-p197556/">
   <div class="an">Mendoza, Abraham Jose</div>
   <div class="ad">NA</div>
   
+  <div class='ad'>✉ MENDOZA.ABRAHAMJ@YAHOO.COM</div>
   <div class='lic'>License: P197556</div>
 </a><a class="agent" href="/bailbonds/fl/agent/menendez-sergio-jr-p109856/">
   <div class="an">Menendez, Sergio Jr</div>
   <div class="ad">15541 SW 112TH TER, MIAMI, 33196</div>
   
+  <div class='ad'>✉ SMENENDEZ27@GMAIL.COM</div>
   <div class='lic'>License: P109856</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mesa-michelle-kae-a309549/">
   <div class="an">Mesa, Michelle Kae</div><div class='ad'>Midtown Bail Bonds</div>
   <div class="ad">MIDTOWN BAIL BONDS 1642 NW 17TH AVENUE STE B, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BONDSWMN519@AOL.COM</div>
   <div class='lic'>License: A309549</div>
 </a><a class="agent" href="/bailbonds/fl/agent/metropolitan-investigations-and-bail-inc-b000161/">
   <div class="an">Metropolitan Investigations And Bail Inc.</div>
   <div class="ad">1840 CORAL WAY 216, MIAMI, 33145</div>
   
+  <div class='ad'>✉ 305771BAIL@GMAIL.COM</div>
   <div class='lic'>License: B000161</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miami-vice-bail-bonds-l-l-c-b000285/">
   <div class="an">Miami Vice Bail Bonds L.L.C</div>
   <div class="ad">15600 SW 288TH ST STE 303, HOMESTEAD, 33033</div>
   
+  <div class='ad'>✉ LUIS@MIAMIVICEBAILBONDS.COM</div>
   <div class='lic'>License: B000285</div>
 </a><a class="agent" href="/bailbonds/fl/agent/midtown-bail-bonds-b000263/">
   <div class="an">Midtown Bail Bonds</div>
   <div class="ad">1642 NW 17 AVENUE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ CHARLENELASO@GMAIL.COM</div>
   <div class='lic'>License: B000263</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miller-charles-ellis-w133704/">
   <div class="an">Miller, Charles Ellis</div>
   <div class="ad">4849 NW 36 ST, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ ICEE70@YAHOO.COM</div>
   <div class='lic'>License: W133704</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miranda-anabel-d041876/">
   <div class="an">Miranda, Anabel</div>
   <div class="ad">31 S KROME AVENUE, HOMESTEAD, 33030</div>
   
+  <div class='ad'>✉ BONDSMANMIRANDA@GMAIL.COM</div>
   <div class='lic'>License: D041876</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mister-bail-bonds-b000196/">
   <div class="an">Mister Bail Bonds</div>
   <div class="ad">300 71 ST STE 405, MIAMI BEACH, 33141</div>
   
+  <div class='ad'>✉ BIGWORMAPPLE@YAHOO.COM</div>
   <div class='lic'>License: B000196</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mohmoud-jonathan-hernando-p235159/">
   <div class="an">Mohmoud, Jonathan Hernando</div>
   <div class="ad">7225 NW 25 STREET 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BALLERJUMPER@YAHOO.COM</div>
   <div class='lic'>License: P235159</div>
 </a><a class="agent" href="/bailbonds/fl/agent/molina-manuel-jesus-a181939/">
   <div class="an">Molina, Manuel Jesus</div><div class='ad'>Manny'S Bail Bonds</div>
   <div class="ad">MANNY'S BAIL BONDS 1465 NW NORTH RIVER DR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ MANNY.MOLINA@GMAIL.COM</div>
   <div class='lic'>License: A181939</div>
 </a><a class="agent" href="/bailbonds/fl/agent/monteagudo-thomas-humberto-a182489/">
   <div class="an">Monteagudo, Thomas Humberto</div>
   <div class="ad">7225 NW 25 STREET 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ BAILOUTTODAY@YAHOO.COM</div>
   <div class='lic'>License: A182489</div>
 </a><a class="agent" href="/bailbonds/fl/agent/moore-james-augustus-ii-a183295/">
   <div class="an">Moore, James Augustus Ii</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 N NORTHRIVER DR, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ AGR8AMERICAN@YAHOO.COM</div>
   <div class='lic'>License: A183295</div>
 </a><a class="agent" href="/bailbonds/fl/agent/morera-richard-a184208/">
   <div class="an">Morera, Richard</div>
   <div class="ad">16351 NW 16 ST, PEMBROKE PINES, 33028</div>
   
+  <div class='ad'>✉ RMORERA7@AOL.COM</div>
   <div class='lic'>License: A184208</div>
 </a><a class="agent" href="/bailbonds/fl/agent/moss-david-maurice-a185754/">
   <div class="an">Moss, David Maurice</div><div class='ad'>Bail Bonds By The Whitmans</div>
   <div class="ad">BAIL BONDS BY THE WHITMANS 18800 NORTHWEST 2ND AVENUE 205, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ HOAGY000@MSN.COM</div>
   <div class='lic'>License: A185754</div>
 </a><a class="agent" href="/bailbonds/fl/agent/murphy-akili-tunu-e024049/">
   <div class="an">Murphy, Akili Tunu</div>
   <div class="ad">4150 NW 7TH STREET SUITE 203, MIAMI, 33216</div>
   
+  <div class='ad'>✉ FASTBAILBONDS@AOL.COM</div>
   <div class='lic'>License: E024049</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nichols-joseph-stanley-a191899/">
   <div class="an">Nichols, Joseph Stanley</div><div class='ad'>Angel Hands Bail Bonds</div>
   <div class="ad">ANGEL HANDS BAIL BONDS 6555 NW 36 ST STE 112, MIAMI, 33166</div>
   
+  <div class='ad'>✉ GOREMA@COMCAST.NET</div>
   <div class='lic'>License: A191899</div>
 </a><a class="agent" href="/bailbonds/fl/agent/niva-jude-bail-bonds-llc-b000688/">
   <div class="an">Niva &amp; Jude Bail Bonds Llc</div>
   <div class="ad">20912 NE 2ND CT, MIAMI, 33179</div>
   
+  <div class='ad'>✉ NIVATELFORT@NIVATHEDIVA.COM</div>
   <div class='lic'>License: B000688</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nortelus-cecil-celecon-a193338/">
   <div class="an">Nortelus, Cecil Celecon</div>
   <div class="ad">10645 NW 7TH AVE, MIAMI, 33150</div>
   
+  <div class='ad'>✉ NORTELUS96@GMAIL.COM</div>
   <div class='lic'>License: A193338</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nuby-david-jr-p099834/">
   <div class="an">Nuby, David Jr</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 18164 NW 2ND AVENUE, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ DAVIDNUBY@AOL.COM</div>
   <div class='lic'>License: P099834</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nunez-carlos-alberto-p210755/">
   <div class="an">Nunez, Carlos Alberto</div>
   <div class="ad">7265 NW 36TH ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ CARLOSN74@HOTMAIL.COM</div>
   <div class='lic'>License: P210755</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nunez-dayanara-de-la-caridad-p092487/">
   <div class="an">Nunez, Dayanara De La Caridad</div><div class='ad'>Xpress Bail Bonds</div>
   <div class="ad">XPRESS BAIL BONDS 7045 NW 41 STREET, MIAMI, 33166</div>
-  <div class='ph'>305-447-6900</div>
+  <div class='ph'>☎ 305-447-6900</div>
+  <div class='ad'>✉ DTHEBONDSCHICK@GMAIL.COM</div>
   <div class='lic'>License: P092487</div>
 </a><a class="agent" href="/bailbonds/fl/agent/oliva-melissa-p162541/">
   <div class="an">Oliva, Melissa</div>
   <div class="ad">458 SE 3RD STREET, HIALEAH, 33010</div>
   
+  <div class='ad'>✉ PRINCESSMELY_15@YAHOO.COM</div>
   <div class='lic'>License: P162541</div>
 </a><a class="agent" href="/bailbonds/fl/agent/onate-felix-fabricio-w418600/">
   <div class="an">Onate, Felix Fabricio</div><div class='ad'>Catch And Release</div>
   <div class="ad">CATCH AND RELEASE 5744 NE 4TH AVE, MIAMI, 33137</div>
   
+  <div class='ad'>✉ FFONATE@GMAIL.COM</div>
   <div class='lic'>License: W418600</div>
 </a><a class="agent" href="/bailbonds/fl/agent/optimal-bail-bonds-b000399/">
   <div class="an">Optimal Bail Bonds</div>
   <div class="ad">11077 BISCAYNE BLVD SUITE 408, MIAMI, 33161</div>
-  <div class='ph'>786-536-7378</div>
+  <div class='ph'>☎ 786-536-7378</div>
+  <div class='ad'>✉ ROBINSON@SFLBAILBONDS.COM</div>
   <div class='lic'>License: B000399</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ortega-raul-fermin-d016034/">
   <div class="an">Ortega, Raul Fermin</div><div class='ad'>Miami Dade Bail Bond Underwriters</div>
   <div class="ad">MIAMI DADE BAIL BOND UNDERWRITERS 1465 NW N RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ RAUL_ORTEGA19@HOTMAIL.COM</div>
   <div class='lic'>License: D016034</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ospina-angela-amada-a197566/">
   <div class="an">Ospina, Angela Amada</div>
   <div class="ad">1860 SW 4TH AVENUE, MIAMI, 33129</div>
   
+  <div class='ad'>✉ ANGIEAOSPINA@GMAIL.COM</div>
   <div class='lic'>License: A197566</div>
 </a><a class="agent" href="/bailbonds/fl/agent/paez-francisco-javier-a198774/">
   <div class="an">Paez, Francisco Javier</div>
   <div class="ad">10756 N KENDALL DR. #J2, MIAMI, 33176</div>
   
+  <div class='ad'>✉ ZEAPFJ@YAHOO.COM</div>
   <div class='lic'>License: A198774</div>
 </a><a class="agent" href="/bailbonds/fl/agent/parrish-bail-bonds-b000711/">
   <div class="an">Parrish Bail Bonds</div>
   <div class="ad">7225 NW 25 ST SUITE 109, MIAMI, 33022</div>
   
+  <div class='ad'>✉ PARRISHBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000711</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pena-michael-xavier-d010153/">
   <div class="an">Pena, Michael Xavier</div>
   <div class="ad">5600 NW 72 AVE 668975, MIAMI, 33166</div>
   
+  <div class='ad'>✉ MICHAEL68XAVIER@COMCAST.NET</div>
   <div class='lic'>License: D010153</div>
 </a><a class="agent" href="/bailbonds/fl/agent/penalba-louie-a203513/">
   <div class="an">Penalba, Louie</div>
   <div class="ad">13391 SW 67TH STREET 13391 SW 67TH ST, MIAMI, 33183</div>
   
+  <div class='ad'>✉ LOU3053858050@GMAIL.COM</div>
   <div class='lic'>License: A203513</div>
 </a><a class="agent" href="/bailbonds/fl/agent/peralta-jeremy-g160477/">
   <div class="an">Peralta, Jeremy</div>
   <div class="ad">55 SW 9TH ST 3801, MIAMI, 33130</div>
   
+  <div class='ad'>✉ JEREMYPERALTA34@ICLOUD.COM</div>
   <div class='lic'>License: G160477</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-christian-hernan-w476552/">
   <div class="an">Perez, Christian Hernan</div><div class='ad'>Catch And Release</div>
   <div class="ad">CATCH AND RELEASE 5744 NE 4TH AVE, MIAMI, 33137</div>
   
+  <div class='ad'>✉ BMPBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W476552</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-helio-emilio-p094566/">
   <div class="an">Perez, Helio Emilio</div><div class='ad'>Fire Line Bail Bonds</div>
   <div class="ad">FIRE LINE BAIL BONDS 1395 NW 15 ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ HELIOPEREZ@BELLSOUTH.NET</div>
   <div class='lic'>License: P094566</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-joshua-w203411/">
   <div class="an">Perez, Joshua</div><div class='ad'>Fast</div>
   <div class="ad">FAST 24 HOUR BAIL BONDS 18350 NW 2ND AVE SITE 612, MIAMI, 33169</div>
   
+  <div class='ad'>✉ FAST24HOURBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: W203411</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-miguel-angel-e167814/">
   <div class="an">Perez, Miguel Angel</div>
   <div class="ad">531 WEST 39TH STREET, HIALEAH, 33012</div>
   
+  <div class='ad'>✉ MPEREZ035@YAHOO.COM</div>
   <div class='lic'>License: E167814</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-surama-carmen-a309046/">
   <div class="an">Perez, Surama Carmen</div><div class='ad'>Tgi Bail Bonds</div>
   <div class="ad">TGI BAIL BONDS 7035 NW 41 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ SURAMAP1968@GMAIL.COM</div>
   <div class='lic'>License: A309046</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perez-yamile-a204397/">
   <div class="an">Perez, Yamile</div><div class='ad'>Martory Bail Bonds</div>
   <div class="ad">MARTORY BAIL BONDS 12905 SW 42 STREET, SUITE 208, MIAMI, 33175</div>
   
+  <div class='ad'>✉ YAMI@AMERIFIRSTTITLE.COM</div>
   <div class='lic'>License: A204397</div>
 </a><a class="agent" href="/bailbonds/fl/agent/perrone-lorain-w102314/">
   <div class="an">Perrone, Lorain</div><div class='ad'>Bailbonds.Com</div>
   <div class="ad">BAILBONDS.COM 1575 NW 14 STREET, MIAMI, 33125</div>
   
+  <div class='ad'>✉ LORAINPERRONE27@YAHOO.COM</div>
   <div class='lic'>License: W102314</div>
 </a><a class="agent" href="/bailbonds/fl/agent/petrie-ricardo-anthony-w117564/">
   <div class="an">Petrie, Ricardo Anthony</div>
   <div class="ad">260 NW 183RD STREET, MIAMI GARDENS, 33069</div>
   
+  <div class='ad'>✉ JRPETRIE2100@GMAIL.COM</div>
   <div class='lic'>License: W117564</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pino-julio-cesar-w343026/">
   <div class="an">Pino, Julio Cesar</div>
   <div class="ad">1840 CORAL WAY 216, MIAMI, 33145</div>
   
+  <div class='ad'>✉ 305771BAIL@GMAIL.COM</div>
   <div class='lic'>License: W343026</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pino-maria-eugenia-a308269/">
   <div class="an">Pino, Maria Eugenia</div>
   <div class="ad">ALEX BAILBOND, MIAMI, 33122</div>
   
+  <div class='ad'>✉ MSPINOMD@GMAIL.COM</div>
   <div class='lic'>License: A308269</div>
 </a><a class="agent" href="/bailbonds/fl/agent/poje-jeff-p208124/">
   <div class="an">Poje, Jeff</div>
   <div class="ad">1395 NW 15ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ JEFF.POJE@GMAIL.COM</div>
   <div class='lic'>License: P208124</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pollas-vilford-pierre-a307128/">
   <div class="an">Pollas, Vilford Pierre</div><div class='ad'>Ballers Bail Bond Inc</div>
   <div class="ad">BALLERS BAIL BOND INC 1175 NE 125TH ST STE 311, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ HOTPRP@HOTMAIL.COM</div>
   <div class='lic'>License: A307128</div>
 </a><a class="agent" href="/bailbonds/fl/agent/portuondo-guillermo-d064941/">
   <div class="an">Portuondo, Guillermo</div><div class='ad'>Alex Bailbonds</div>
   <div class="ad">ALEX BAILBONDS 435 SW 17 AVENUE, MIAMI, 33135</div>
   
+  <div class='ad'>✉ ALLOUTBONDS@AOL.COM</div>
   <div class='lic'>License: D064941</div>
 </a><a class="agent" href="/bailbonds/fl/agent/posada-meike-p-a185805/">
   <div class="an">Posada, Meike P</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 1465 NW N RIVER DR, MIAMI, 33125</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ MICAMOSS777@GMAIL.COM</div>
   <div class='lic'>License: A185805</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pozo-barbara-caridad-e023575/">
   <div class="an">Pozo, Barbara Caridad</div>
   <div class="ad">7667 NORTHWEST 50 STREET, MIAMI-DADE, 33166</div>
   
+  <div class='ad'>✉ BARBY4U365@GMAIL.COM</div>
   <div class='lic'>License: E023575</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pozo-orlando-d005840/">
   <div class="an">Pozo, Orlando</div><div class='ad'>Miami Dade Bail Bond Underwriter</div>
   <div class="ad">MIAMI DADE BAIL BOND UNDERWRITER 1465 NW NORTH RIVER DR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ POZMICK@BELLSOUTH.NET</div>
   <div class='lic'>License: D005840</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pruett-bail-bonds-inc-b000521/">
   <div class="an">Pruett Bail Bonds, Inc.</div>
   <div class="ad">12830 SW 217TH TERRACE, MIAMI, 33170</div>
   
+  <div class='ad'>✉ PRUETTBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000521</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pruett-patricia-jean-a212432/">
   <div class="an">Pruett, Patricia Jean</div><div class='ad'>Pruett Bail Bonds</div>
   <div class="ad">PRUETT BAIL BONDS 12830 SW 217TH TER, MIAMI, 33170</div>
   
+  <div class='ad'>✉ PRUETTBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: A212432</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pupo-israel-a-jr-p193828/">
   <div class="an">Pupo, Israel A Jr</div>
   <div class="ad">1399 NW 17ST 305A, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ISPUPO@COMCAST.NET</div>
   <div class='lic'>License: P193828</div>
 </a><a class="agent" href="/bailbonds/fl/agent/quintana-rosalinda-d041791/">
   <div class="an">Quintana, Rosalinda</div><div class='ad'>Cathy Bail Bonds</div>
   <div class="ad">CATHY BAIL BONDS 1465 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ROSALINDAQ63@ICLOUD.COM</div>
   <div class='lic'>License: D041791</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ramdeo-ravianand-arun-e134023/">
   <div class="an">Ramdeo, Ravianand Arun</div><div class='ad'>Ballers Bailbond</div>
   <div class="ad">BALLERS BAILBOND 1175 NE 125TH ST @311, NORTH MIAMI, 33161</div>
   
+  <div class='ad'>✉ RAVI_RAMDEO@YAHOO.COM</div>
   <div class='lic'>License: E134023</div>
 </a><a class="agent" href="/bailbonds/fl/agent/reines-alexander-w248847/">
   <div class="an">Reines, Alexander</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NW 36 STREET, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ ALEX.REINES@GMAIL.COM</div>
   <div class='lic'>License: W248847</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rivas-bonding-agency-b000633/">
   <div class="an">Rivas Bonding Agency</div>
   <div class="ad">4150 NW 7TH STREET SUITE 203, MIAMI, 33126</div>
   
+  <div class='ad'>✉ SALVADOR.RIVAS@FIU.EDU</div>
   <div class='lic'>License: B000633</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rivas-salvador-armando-a221251/">
   <div class="an">Rivas, Salvador Armando</div><div class='ad'>Rivas Bonding Agency</div>
   <div class="ad">RIVAS BONDING AGENCY 4150 NW 7TH STREET SUITE#203, MIAMI, 33126</div>
   
+  <div class='ad'>✉ SALVADOR.RIVAS@FIU.EDU</div>
   <div class='lic'>License: A221251</div>
 </a><a class="agent" href="/bailbonds/fl/agent/roberts-aikim-shemour-w887902/">
   <div class="an">Roberts, Aikim Shemour</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD ST, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ IKEM13SHEMOUR@GMAIL.COM</div>
   <div class='lic'>License: W887902</div>
 </a><a class="agent" href="/bailbonds/fl/agent/robinson-gabriel-w097611/">
   <div class="an">Robinson, Gabriel</div>
   <div class="ad">11077 BISCAYNE BLVD SUITE 408, MIAMI, 33151</div>
   
+  <div class='ad'>✉ GABRIEL.ROBINSON001@GMAIL.COM</div>
   <div class='lic'>License: W097611</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rodriguez-fernando-alexander-p209945/">
   <div class="an">Rodriguez, Fernando Alexander</div><div class='ad'>Rivas Bonding Agency</div>
   <div class="ad">RIVAS BONDING AGENCY 4150 N.W. 7TH ST, SUITE 203, MIAMI, 33126</div>
   
+  <div class='ad'>✉ SOUTHFLORIDAPROCESS@GMAIL.COM</div>
   <div class='lic'>License: P209945</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rodriguez-frances-deese-w014973/">
   <div class="an">Rodriguez, Frances Deese</div>
   <div class="ad">225 ARAGON AVENUE, CORAL GABLES, 33134</div>
   
+  <div class='ad'>✉ DEESEBAIL@GMAIL.COM</div>
   <div class='lic'>License: W014973</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rodriguez-janiel-d005841/">
   <div class="an">Rodriguez, Janiel</div><div class='ad'>Fire Line Bail Bonds</div>
   <div class="ad">FIRE LINE BAIL BONDS 1395 NW 15ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ JRBONDS1@GMAIL.COM</div>
   <div class='lic'>License: D005841</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rodriguez-oscar-fautino-a223983/">
   <div class="an">Rodriguez, Oscar Fautino</div><div class='ad'>Oscar Rodriguez Bail Bonds</div>
   <div class="ad">OSCAR RODRIGUEZ BAIL BONDS 7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ REBENCUO@HOTMAIL.COM</div>
   <div class='lic'>License: A223983</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rojas-fernando-gaspar-a224814/">
   <div class="an">Rojas, Fernando Gaspar</div>
   <div class="ad">13279 SW 135 AVE, MIAMI, 33186</div>
   
+  <div class='ad'>✉ REDDBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: A224814</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rojas-ryan-w755288/">
   <div class="an">Rojas, Ryan</div>
   <div class="ad">1411 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ MIAMIDADEBONDS@GMAIL.COM</div>
   <div class='lic'>License: W755288</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rolle-glenn-arthur-a224909/">
   <div class="an">Rolle, Glenn Arthur</div><div class='ad'>Sunshine Bail Bonds</div>
   <div class="ad">SUNSHINE BAIL BONDS 7267 NW 36 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ ROLLEG54@GMAIL.COM</div>
   <div class='lic'>License: A224909</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rolle-paulette-k-a221517/">
   <div class="an">Rolle, Paulette K</div><div class='ad'>Sunshine Bail Bonds</div>
   <div class="ad">SUNSHINE BAIL BONDS 7267 NW 36TH STR, MIAMI, 33166</div>
   
+  <div class='ad'>✉ PKROLLE58@GMAIL.COM</div>
   <div class='lic'>License: A221517</div>
 </a><a class="agent" href="/bailbonds/fl/agent/romero-kent-edward-a225239/">
   <div class="an">Romero, Kent Edward</div>
   <div class="ad">14201 SW 176TH TER, MIAMI, 33177</div>
   
+  <div class='ad'>✉ INVESTIGATIONS1@BELLSOUTH.NET</div>
   <div class='lic'>License: A225239</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rouco-maria-cristina-a227019/">
   <div class="an">Rouco, Maria Cristina</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NW 36TH STREET, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ TINABAIL@YAHOO.COM</div>
   <div class='lic'>License: A227019</div>
 </a><a class="agent" href="/bailbonds/fl/agent/ruiz-stephanie-w128574/">
   <div class="an">Ruiz, Stephanie</div>
   <div class="ad">2503 N.W 72 AVE.#B, MIAMI, 33122</div>
   
+  <div class='ad'>✉ STEPHANIE.RUIZ008@GMAIL.COM</div>
   <div class='lic'>License: W128574</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sabbat-webens-d003472/">
   <div class="an">Sabbat, Webens</div><div class='ad'>Universal Surety Corp/Seneca Insur</div>
   <div class="ad">UNIVERSAL SURETY CORP/SENECA INSUR 7205 NW 41TH ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ WEBSABBAT18@YAHOO.COM</div>
   <div class='lic'>License: D003472</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sala-suarez-nathaniel-a229975/">
   <div class="an">Sala-Suarez, Nathaniel</div>
   <div class="ad">7225 NW 25 STREET, SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ NSALASUAREZ@GMAIL.COM</div>
   <div class='lic'>License: A229975</div>
 </a><a class="agent" href="/bailbonds/fl/agent/salgado-escandell-gabriell-m-w685163/">
   <div class="an">Salgado-Escandell, Gabriell M</div>
   <div class="ad">1330 SW 22ND ST STE 311, MIAMI, 33145</div>
   
+  <div class='ad'>✉ GABRIELL15291@GMAIL.COM</div>
   <div class='lic'>License: W685163</div>
 </a><a class="agent" href="/bailbonds/fl/agent/santiago-nilsa-m-e004159/">
   <div class="an">Santiago, Nilsa M</div><div class='ad'>Morris Bail Bond</div>
   <div class="ad">MORRIS BAIL BOND 125 NE 8 ST #2, MIAMI, 33030</div>
   
+  <div class='ad'>✉ MYLADYLISA@AOL.COM</div>
   <div class='lic'>License: E004159</div>
 </a><a class="agent" href="/bailbonds/fl/agent/saunders-amos-p237899/">
   <div class="an">Saunders, Amos</div>
   <div class="ad">1605 NW 95TH STREET, MIAMI, 33147</div>
   
+  <div class='ad'>✉ AMOSSAUNDERS3@YAHOO.COM</div>
   <div class='lic'>License: P237899</div>
 </a><a class="agent" href="/bailbonds/fl/agent/scottaline-james-robert-a236808/">
   <div class="an">Scottaline, James Robert</div><div class='ad'>Jim Scottaline Bail Bonds</div>
   <div class="ad">JIM SCOTTALINE BAIL BONDS 4471 NW 36 ST # 220, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ SCOTTALINE@BELLSOUTH.NET</div>
   <div class='lic'>License: A236808</div>
 </a><a class="agent" href="/bailbonds/fl/agent/seymour-lenora-p104364/">
   <div class="an">Seymour, Lenora</div>
   <div class="ad">640 NW 183RD STREET #07, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ LENORA_SEYMOUR@YAHOO.COM</div>
   <div class='lic'>License: P104364</div>
 </a><a class="agent" href="/bailbonds/fl/agent/shaheed-bail-bonds-inc-b000590/">
   <div class="an">Shaheed Bail Bonds Inc</div>
   <div class="ad">1126 W FLAGLER ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ KAS978@GMAIL.COM</div>
   <div class='lic'>License: B000590</div>
 </a><a class="agent" href="/bailbonds/fl/agent/shaheed-kamal-akbar-p229882/">
   <div class="an">Shaheed, Kamal Akbar</div><div class='ad'>Shaheed Bail Bonds</div>
   <div class="ad">SHAHEED BAIL BONDS 1126 W FLAGLER ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ KAS978@GMAIL.COM</div>
   <div class='lic'>License: P229882</div>
 </a><a class="agent" href="/bailbonds/fl/agent/simmons-antanette-w885592/">
   <div class="an">Simmons, Antanette</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ ANTANETTE33069@GMAIL.COM</div>
   <div class='lic'>License: W885592</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sims-rhonda-denise-w014310/">
   <div class="an">Sims, Rhonda Denise</div>
   <div class="ad">4995 NW 72ND AVENUE #208, MIAMI, 33166</div>
   
+  <div class='ad'>✉ RHONDA.BAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W014310</div>
 </a><a class="agent" href="/bailbonds/fl/agent/singh-linda-nadlee-e049400/">
   <div class="an">Singh, Linda Nadlee</div><div class='ad'>Xpress Bail Bonds Inc</div>
   <div class="ad">XPRESS BAIL BONDS INC 7045 NW 41 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ SSDRIVER04@HOTMAIL.COM</div>
   <div class='lic'>License: E049400</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-charles-eundra-d037446/">
   <div class="an">Smith, Charles Eundra</div><div class='ad'>Bail Depot Usa</div>
   <div class="ad">BAIL DEPOT USA 10711 SW 216TH ST., SUITE # 215, MIAMI, 33170</div>
   
+  <div class='ad'>✉ ANDRE645@GMAIL.COM</div>
   <div class='lic'>License: D037446</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-glaister-stethson-sr-w445871/">
   <div class="an">Smith, Glaister Stethson Sr.</div><div class='ad'>Chico Bail Bonds</div>
   <div class="ad">CHICO BAIL BONDS 1661 NW 15 ST RD, MIAMI, 33125</div>
   
+  <div class='ad'>✉ GLAISTERSMITH@GMAIL.COM</div>
   <div class='lic'>License: W445871</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-malachi-dermot-w396984/">
   <div class="an">Smith, Malachi Dermot</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ MALISMITH@AOL.COM</div>
   <div class='lic'>License: W396984</div>
 </a><a class="agent" href="/bailbonds/fl/agent/smith-rohan-nigel-a299628/">
   <div class="an">Smith, Rohan Nigel</div><div class='ad'>Athans Bailbonds</div>
   <div class="ad">ATHANS BAILBONDS 1850 SW 8TH ST STE 312, MIAMI, 33135</div>
   
+  <div class='ad'>✉ SMITHROHAN@BELLSOUTH.NET</div>
   <div class='lic'>License: A299628</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sosa-alain-w241609/">
   <div class="an">Sosa, Alain</div>
   <div class="ad">7045 NW 41 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ ALSOSA103@GMAIL.COM</div>
   <div class='lic'>License: W241609</div>
 </a><a class="agent" href="/bailbonds/fl/agent/st-fleur-young-w030189/">
   <div class="an">St Fleur, Young</div><div class='ad'>Huggins 24/7 Bailbonds</div>
   <div class="ad">HUGGINS 24/7 BAILBONDS 18164 NW 2 AVENUE, MIAMI GARDENS, FL., 33169</div>
   
+  <div class='ad'>✉ BOUTBREADONE@HOTMAIL.COM</div>
   <div class='lic'>License: W030189</div>
 </a><a class="agent" href="/bailbonds/fl/agent/st-jean-judney-w126151/">
   <div class="an">St Jean, Judney</div><div class='ad'>Sunshine State Bail</div>
   <div class="ad">SUNSHINE STATE BAIL 1465 NW N RIVER DRIVE, MIAMI, 33135</div>
   
+  <div class='ad'>✉ JUDNEY03@YAHOO.COM</div>
   <div class='lic'>License: W126151</div>
 </a><a class="agent" href="/bailbonds/fl/agent/staubs-william-eugene-d029071/">
   <div class="an">Staubs, William Eugene</div><div class='ad'>American Bonding</div>
   <div class="ad">AMERICAN BONDING 2299 SW 27TH AVE STE 200, MIAMI, 33145</div>
   
+  <div class='ad'>✉ CASECLOSED@BELLSOUTH.NET</div>
   <div class='lic'>License: D029071</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stevenson-beretta-hung-w443350/">
   <div class="an">Stevenson, Beretta Hung</div>
   <div class="ad">260 NW 183RD ST, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ IMBERETTA@ICLOUD.COM</div>
   <div class='lic'>License: W443350</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stevenson-justice-long-w532429/">
   <div class="an">Stevenson, Justice Long</div>
   <div class="ad">6555 NW 36 ST. # 117, MIAMI, 33166</div>
   
+  <div class='ad'>✉ SLATER1237@GMAIL.COM</div>
   <div class='lic'>License: W532429</div>
 </a><a class="agent" href="/bailbonds/fl/agent/stevenson-mui-t-e033846/">
   <div class="an">Stevenson, Mui T</div><div class='ad'>Stevenson Brothers Bail Bonds Inc</div>
   <div class="ad">STEVENSON BROTHERS BAIL BONDS INC 5901 NW 183 RD ST SUITE 101, MIAMI, 33015</div>
   
+  <div class='ad'>✉ STEVENSONBROTHERSBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: E033846</div>
 </a><a class="agent" href="/bailbonds/fl/agent/suarez-rogelio-a257363/">
   <div class="an">Suarez, Rogelio</div><div class='ad'>Speedy Bail Bonds</div>
   <div class="ad">SPEEDY BAIL BONDS 2301 NW 7 ST. #201, MIAMI, 33125</div>
   
+  <div class='ad'>✉ ROGELIOSUAREZ@YAHOO.COM</div>
   <div class='lic'>License: A257363</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sunshine-state-bail-bonds-b000316/">
   <div class="an">Sunshine State Bail Bonds</div>
   <div class="ad">7267 NW 36TH ST, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ JIMVIOLA1@AOL.COM</div>
   <div class='lic'>License: B000316</div>
 </a><a class="agent" href="/bailbonds/fl/agent/swaby-christopher-baltimore-e014621/">
   <div class="an">Swaby, Christopher Baltimore</div><div class='ad'>All About Bail Bonds</div>
   <div class="ad">ALL ABOUT BAIL BONDS 12499 NE 8 AVE, MIAMI, 33161</div>
   
+  <div class='ad'>✉ CHRISBSWABY@GMAIL.COM</div>
   <div class='lic'>License: E014621</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sweet-baby-jesus-bail-bonds-b000448/">
   <div class="an">Sweet Baby Jesus Bail Bonds</div>
   <div class="ad">7265 NW 36 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ SWEETBABYJESUSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000448</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tabares-roberto-p219621/">
   <div class="an">Tabares, Roberto</div>
   <div class="ad">1126 W FLAGLER ST, MIAMI, 33130</div>
   
+  <div class='ad'>✉ RTAB20@GMAIL.COM</div>
   <div class='lic'>License: P219621</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tansey-peter-joseph-iii-a260696/">
   <div class="an">Tansey, Peter Joseph Iii</div>
   <div class="ad">14201 SW 176 TER, MIAMI, 33177</div>
   
+  <div class='ad'>✉ OMEGABAILBONDS@HOTMAIL.COM</div>
   <div class='lic'>License: A260696</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tate-otis-g121258/">
   <div class="an">Tate, Otis</div>
   <div class="ad">260 NW 183RD STREET, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ OTIS.TATE12@OUTLOOK.COM</div>
   <div class='lic'>License: G121258</div>
 </a><a class="agent" href="/bailbonds/fl/agent/taylor-octavio-j-jr-p078919/">
   <div class="an">Taylor, Octavio J Jr</div><div class='ad'>Exit Bail Bonds</div>
   <div class="ad">EXIT BAIL BONDS 10711 S.W 216 STREET #212, MIAMI, 33170</div>
   
+  <div class='ad'>✉ TOCTAVIO7@GMAIL.COM</div>
   <div class='lic'>License: P078919</div>
 </a><a class="agent" href="/bailbonds/fl/agent/telfort-niva-w129644/">
   <div class="an">Telfort, Niva</div>
   <div class="ad">20454 NW 2ND AVENUE, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ NIVATELFORT@NTD1STCLASSREALTY.COM</div>
   <div class='lic'>License: W129644</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tgk-bail-bonds-b000597/">
   <div class="an">Tgk Bail Bonds</div>
   <div class="ad">7035 NW 41ST ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ PATTY@MIAMIBAIL.COM</div>
   <div class='lic'>License: B000597</div>
 </a><a class="agent" href="/bailbonds/fl/agent/the-bail-bond-firm-b000584/">
   <div class="an">The Bail Bond Firm</div>
   <div class="ad">1932 NE 151 STREET, MIAMI, 33162</div>
   
+  <div class='ad'>✉ RUSS@THEBAILBONDFIRM.COM</div>
   <div class='lic'>License: B000584</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thimote-bennedy-p070734/">
   <div class="an">Thimote, Bennedy</div><div class='ad'>Bonds R Us Bail Bonds</div>
   <div class="ad">BONDS R US BAIL BONDS 17560 NW 27AVE SUITE 107, MIAMI GARDENS, 33056</div>
   
+  <div class='ad'>✉ BENNEDYT@GMAIL.COM</div>
   <div class='lic'>License: P070734</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thomas-kent-k-p186480/">
   <div class="an">Thomas, Kent K</div><div class='ad'>Fast 24/7 Bail Bonds</div>
   <div class="ad">FAST 24/7 BAIL BONDS 99 NW 183RD STREET, MIAMI GARDENS,, 33169</div>
   
+  <div class='ad'>✉ TRINIKENT74@AOL.COM</div>
   <div class='lic'>License: P186480</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tijerino-claudia-r-e003058/">
   <div class="an">Tijerino, Claudia R</div><div class='ad'>Dade County Bail Bonds</div>
   <div class="ad">DADE COUNTY BAIL BONDS 1435 NW 13 TERR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ CLAUDIA_TIJERINO@HOTMAIL.COM</div>
   <div class='lic'>License: E003058</div>
 </a><a class="agent" href="/bailbonds/fl/agent/trista-leslie-ann-e026808/">
   <div class="an">Trista, Leslie Ann</div><div class='ad'>Wright And Wright Bail Bonds</div>
   <div class="ad">WRIGHT AND WRIGHT BAIL BONDS 6355 NW 36 STREET 200, MIAMI, 33166</div>
   
+  <div class='ad'>✉ LESLIETRISTA@YAHOO.COM</div>
   <div class='lic'>License: E026808</div>
 </a><a class="agent" href="/bailbonds/fl/agent/trujillo-mitch-e012229/">
   <div class="an">Trujillo, Mitch</div><div class='ad'>Mitch Trujillo Bail Bonds Inc</div>
   <div class="ad">MITCH TRUJILLO BAIL BONDS INC 1411 NW NORTH RIVER DR, MIAMI, 33125</div>
   
+  <div class='ad'>✉ DIVEACTIVESCUBA@YAHOO.COM</div>
   <div class='lic'>License: E012229</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tunez-raymond-antonio-a269195/">
   <div class="an">Tunez, Raymond Antonio</div><div class='ad'>Chino Bail Bonds</div>
   <div class="ad">CHINO BAIL BONDS 7225 NW 25TH STREET SUITE 109A, MIAMI, 33122</div>
   
+  <div class='ad'>✉ RAITUNEZ@YAHOO.COM</div>
   <div class='lic'>License: A269195</div>
 </a><a class="agent" href="/bailbonds/fl/agent/valdes-cristina-maria-w101947/">
   <div class="an">Valdes, Cristina Maria</div><div class='ad'>Dondee Bail Bonds</div>
   <div class="ad">DONDEE BAIL BONDS 7225 NW 25 STREET SUITE 109, MIAMI, 33122</div>
   
+  <div class='ad'>✉ ALLCITY24BAIL@GMAIL.COM</div>
   <div class='lic'>License: W101947</div>
 </a><a class="agent" href="/bailbonds/fl/agent/valdes-harold-a271008/">
   <div class="an">Valdes, Harold</div>
   <div class="ad">5246 SW 8TH ST 204 C, MIAMI, 33134</div>
   
+  <div class='ad'>✉ HVBB@YMAIL.COM</div>
   <div class='lic'>License: A271008</div>
 </a><a class="agent" href="/bailbonds/fl/agent/valle-krysthell-f-d058803/">
   <div class="an">Valle, Krysthell F</div><div class='ad'>Do The Right Thing Bail Bonds, Inc.</div>
   <div class="ad">DO THE RIGHT THING BAIL BONDS, INC. 13500 NW 97TH AVE, HIALEAH GARDENS, 33018</div>
   
+  <div class='ad'>✉ KRYSTHELL523@GMAIL.COM</div>
   <div class='lic'>License: D058803</div>
 </a><a class="agent" href="/bailbonds/fl/agent/vazquez-javier-a312179/">
   <div class="an">Vazquez, Javier</div><div class='ad'>Bail Miami Inc</div>
   <div class="ad">BAIL MIAMI INC 4471 NW 36 STREET STE 229, MIAMI, 33166</div>
   
+  <div class='ad'>✉ THECUBE_13@HOTMAIL.COM</div>
   <div class='lic'>License: A312179</div>
 </a><a class="agent" href="/bailbonds/fl/agent/velunza-bert-alexsander-a273064/">
   <div class="an">Velunza, Bert Alexsander</div>
   <div class="ad">1644 NW 17 AVENUE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BERTVELUNZA@GMAIL.COM</div>
   <div class='lic'>License: A273064</div>
 </a><a class="agent" href="/bailbonds/fl/agent/villalta-alfredo-r-p090261/">
   <div class="an">Villalta, Alfredo R</div>
   <div class="ad">7267 NW 36 ST, MIAMI, 33166</div>
   
+  <div class='ad'>✉ ALFREDOVILLALTABAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: P090261</div>
 </a><a class="agent" href="/bailbonds/fl/agent/villaverde-daniel-a273974/">
   <div class="an">Villaverde, Daniel</div>
   <div class="ad">215 SW 17 AVE #216B, MIAMI, 33135</div>
   
+  <div class='ad'>✉ CHICOBAILBONDS@LIVE.COM</div>
   <div class='lic'>License: A273974</div>
 </a><a class="agent" href="/bailbonds/fl/agent/viola-catherine-brodie-a030878/">
   <div class="an">Viola, Catherine Brodie</div>
   <div class="ad">14100 SW 72 AVENUE 14100 SW 72 AVENUE, MIAMI, 33158</div>
   
+  <div class='ad'>✉ CBVIOLA@COMCAST.NET</div>
   <div class='lic'>License: A030878</div>
 </a><a class="agent" href="/bailbonds/fl/agent/viola-james-michael-a274176/">
   <div class="an">Viola, James Michael</div>
   <div class="ad">14100 SW 72 AVE, MIAMI, 33158</div>
   
+  <div class='ad'>✉ JIMVIOLA1@AOL.COM</div>
   <div class='lic'>License: A274176</div>
 </a><a class="agent" href="/bailbonds/fl/agent/walker-javon-w242730/">
   <div class="an">Walker, Javon</div>
   <div class="ad">22601 SW 125TH AVE, MIAMI, 33170</div>
   
+  <div class='ad'>✉ JLWALKER305@GMAIL.COM</div>
   <div class='lic'>License: W242730</div>
 </a><a class="agent" href="/bailbonds/fl/agent/walters-russell-warren-jr-a277029/">
   <div class="an">Walters, Russell Warren Jr</div><div class='ad'>The Bail Bond Firm</div>
   <div class="ad">THE BAIL BOND FIRM 1932 NE 151 STREET, MIAMI, 33162</div>
   
+  <div class='ad'>✉ RUSS@THEBAILBONDFIRM.COM</div>
   <div class='lic'>License: A277029</div>
 </a><a class="agent" href="/bailbonds/fl/agent/watson-huggins-janice-w289860/">
   <div class="an">Watson-Huggins, Janice</div><div class='ad'>Huggins Bail Bonds Inc</div>
   <div class="ad">HUGGINS BAIL BONDS INC 260 NW 183RD ST, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ WATSON.JANICE365@GMAIL.COM</div>
   <div class='lic'>License: W289860</div>
 </a><a class="agent" href="/bailbonds/fl/agent/williams-ronnie-jr-p229980/">
   <div class="an">Williams, Ronnie Jr.</div>
   <div class="ad">1465 NW NORTH RIVER DRIVE, MIAMI, 33125</div>
   
+  <div class='ad'>✉ RONNIEWILLIAMS20061@YAHOO.COM</div>
   <div class='lic'>License: P229980</div>
 </a><a class="agent" href="/bailbonds/fl/agent/williams-torrey-e080056/">
   <div class="an">Williams, Torrey</div><div class='ad'>Black Rrbbit Bail Bonds 9507S. W.</div>
   <div class="ad">BLACK RRBBIT BAIL BONDS 9507S. W. 160 ST. SUIT 207, MIAMI, 33157</div>
   
+  <div class='ad'>✉ TW77BAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: E080056</div>
 </a><a class="agent" href="/bailbonds/fl/agent/willis-corenthia-evette-a286816/">
   <div class="an">Willis, Corenthia Evette</div><div class='ad'>Sunshine State Bail Bonds</div>
   <div class="ad">SUNSHINE STATE BAIL BONDS 7267 NW 36TH STREET, MIAMI, 33166</div>
-  <div class='ph'>407-999-9011</div>
+  <div class='ph'>☎ 407-999-9011</div>
+  <div class='ad'>✉ CEWILLIS143@YAHOO.COM</div>
   <div class='lic'>License: A286816</div>
 </a><a class="agent" href="/bailbonds/fl/agent/woodside-janice-l-w414854/">
   <div class="an">Woodside, Janice L</div><div class='ad'>Huggins Bail Bonds</div>
   <div class="ad">HUGGINS BAIL BONDS 260 NW 183RD STREET, #A, MIAMI GARDENS, 33169</div>
   
+  <div class='ad'>✉ SIDE02@YMAIL.COM</div>
   <div class='lic'>License: W414854</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wright-and-wright-bail-bonds-b000595/">
   <div class="an">Wright And Wright Bail Bonds</div>
   <div class="ad">6355 NW 36 STREET SUITE 200, MIAMI, 33166</div>
   
+  <div class='ad'>✉ LESLIETRISTA@YAHOO.COM</div>
   <div class='lic'>License: B000595</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wright-william-e125045/">
   <div class="an">Wright, William</div><div class='ad'>Fireline Bail Bonds</div>
   <div class="ad">FIRELINE BAIL BONDS 1395 NW 15 ST, MIAMI, 33125</div>
   
+  <div class='ad'>✉ BONDSMANWILLIAMWRIGHT@YAHOO.COM</div>
   <div class='lic'>License: E125045</div>
 </a><a class="agent" href="/bailbonds/fl/agent/xavier-robert-alexander-w235451/">
   <div class="an">Xavier, Robert Alexander</div><div class='ad'>Black Rabbit Bail Bond</div>
   <div class="ad">BLACK RABBIT BAIL BOND 847 NW 119TH STREET #204, MIAMI, 33168</div>
   
+  <div class='ad'>✉ XX_FOXX@HOTMAIL.COM</div>
   <div class='lic'>License: W235451</div>
 </a><a class="agent" href="/bailbonds/fl/agent/xpress-bail-bonds-b000446/">
   <div class="an">Xpress Bail Bonds</div>
   <div class="ad">7045 NW 41 STREET, MIAMI, 33166</div>
-  <div class='ph'>305-447-6900</div>
+  <div class='ph'>☎ 305-447-6900</div>
+  <div class='ad'>✉ XPRESSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000446</div>
 </a><a class="agent" href="/bailbonds/fl/agent/yester-anthony-ziggy-w050259/">
   <div class="an">Yester, Anthony Ziggy</div><div class='ad'>Ziggy'S Bail Bonds</div>
   <div class="ad">ZIGGY'S BAIL BONDS 8404 NW 66 STREET, MIAMI, 33166</div>
   
+  <div class='ad'>✉ ZIGGYSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W050259</div>
 </a><a class="agent" href="/bailbonds/fl/agent/yousef-suleiman-habib-w291890/">
   <div class="an">Yousef, Suleiman Habib</div>
   <div class="ad">428 S CONGRESS AVE, WEST PALM BEACH, 33406</div>
   
+  <div class='ad'>✉ S.YOUSEF@WARRANTSDEPARTMENT.COM</div>
   <div class='lic'>License: W291890</div>
 </a><a class="agent" href="/bailbonds/fl/agent/zayas-debra-p129314/">
   <div class="an">Zayas, Debra</div><div class='ad'>Debbie Bail Bond Inc</div>
   <div class="ad">DEBBIE BAIL BOND INC 1126 W FLAGLER STREET, MIAMI, 33130</div>
   
+  <div class='ad'>✉ DEBRAZAYAS@YAHOO.COM</div>
   <div class='lic'>License: P129314</div>
 </a><a class="agent" href="/bailbonds/fl/agent/zemlock-roy-paul-a293704/">
   <div class="an">Zemlock, Roy Paul</div>
   <div class="ad">4471 NW 36 STREET #229, MIAMI SPRINGS, 33166</div>
   
+  <div class='ad'>✉ RPZGMZ@GMAIL.COM</div>
   <div class='lic'>License: A293704</div>
 </a><a class="agent" href="/bailbonds/fl/agent/herald-valdes-bail-bonds/">
   <div class="an">Herald Valdes Bail Bonds</div>
   <div class="ad">607 SW 57th Ave, Miami, 33144</div>
-  <div class='ph'>786-953-8210</div>
+  <div class='ph'>☎ 786-953-8210</div>
+  
   
 </a><a class="agent" href="/bailbonds/fl/agent/xpress-bail-bonds/">
   <div class="an">Xpress Bail Bonds</div>
   <div class="ad">7045 NW 41st St., Miami, 33166</div>
-  <div class='ph'>305-447-6900</div>
+  <div class='ph'>☎ 305-447-6900</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://flbaa.com/ (Florida Bail Agents Association member directory)' rel='nofollow'>flbaa.com</a> · <a href='https://licenseesearch.fldfs.com/' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -1909,5 +2269,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([25.61601, -80.50375], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/01-24-hours-la-raza-bail-bonds-inc-b000180/'>#01&amp;24 Hours La Raza Bail Bonds,Inc</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/1-choice-bail-bonds-b000098/'>#1 Choice Bail Bonds</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/1-stop-bail-services-inc-b000271/'>1 Stop Bail Services Inc</a></strong>"},{"lat":25.78815,"lng":-80.22687,"label":"<strong><a href='/bailbonds/fl/agent/305-bail-bonds-llc-b000355/'>305 Bail Bonds Llc</a></strong>"},{"lat":25.83115,"lng":-80.24451,"label":"<strong><a href='/bailbonds/fl/agent/a-betta-bail-bonds-inc-b000548/'>A Betta Bail Bonds, Inc.</a></strong>"},{"lat":25.89158,"lng":-80.33674,"label":"<strong><a href='/bailbonds/fl/agent/aaa-florida-24-hr-bail-bonds-inc-b000485/'>Aaa Florida 24 Hr Bail Bonds Inc</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/aaron-kervin-mikael-w900426/'>Aaron, Kervin Mikael</a></strong>"},{"lat":26.11462,"lng":-80.14725,"label":"<strong><a href='/bailbonds/fl/agent/abad-rodrigo-javier-w261709/'>Abad, Rodrigo Javier</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/abdeljawad-adham-saadalah-e018056/'>Abdeljawad, Adham Saadalah</a></strong><br>\u260e 407-999-9011"},{"lat":25.89039,"lng":-80.18235,"label":"<strong><a href='/bailbonds/fl/agent/abdullah-sabreen-ameenah-a000249/'>Abdullah, Sabreen Ameenah</a></strong><br>\u260e 305-547-1577"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/abed-danny-j-d080493/'>Abed, Danny J</a></strong><br>\u260e 305-447-6900"},{"lat":25.82398,"lng":-80.31374,"label":"<strong><a href='/bailbonds/fl/agent/ablola-christina-estever-a000386/'>Ablola, Christina Estever</a></strong>"},{"lat":25.9321,"lng":-80.31961,"label":"<strong><a href='/bailbonds/fl/agent/acosta-claudia-g232552/'>Acosta, Claudia</a></strong>"},{"lat":25.83457,"lng":-80.24134,"label":"<strong><a href='/bailbonds/fl/agent/acosta-nelson-w477553/'>Acosta, Nelson</a></strong>"},{"lat":25.60268,"lng":-80.34843,"label":"<strong><a href='/bailbonds/fl/agent/adams-brian-george-a298989/'>Adams, Brian George</a></strong>"},{"lat":25.60268,"lng":-80.34843,"label":"<strong><a href='/bailbonds/fl/agent/adams-samone-ellis-d077519/'>Adams, Samone Ellis</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/adler-scott-b-a001851/'>Adler, Scott B</a></strong>"},{"lat":25.49932,"lng":-80.44346,"label":"<strong><a href='/bailbonds/fl/agent/alba-elly-w924016/'>Alba, Elly</a></strong>"},{"lat":25.76889,"lng":-80.22258,"label":"<strong><a href='/bailbonds/fl/agent/alex-bail-bonds-b000463/'>Alex Bail Bonds</a></strong>"},{"lat":25.76024,"lng":-80.33605,"label":"<strong><a href='/bailbonds/fl/agent/alfonso-alina-a003470/'>Alfonso, Alina</a></strong>"},{"lat":25.90609,"lng":-80.17851,"label":"<strong><a href='/bailbonds/fl/agent/alicea-anthony-e036158/'>Alicea, Anthony</a></strong>"},{"lat":25.80937,"lng":-80.32526,"label":"<strong><a href='/bailbonds/fl/agent/alicea-luis-e029497/'>Alicea, Luis</a></strong>"},{"lat":25.76024,"lng":-80.33605,"label":"<strong><a href='/bailbonds/fl/agent/alina-alfonso-bail-bonds-inc-b000205/'>Alina Alfonso Bail Bonds Inc.</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/all-city-bail-bonds-inc-b000147/'>All City Bail Bonds Inc</a></strong>"},{"lat":25.78949,"lng":-80.21996,"label":"<strong><a href='/bailbonds/fl/agent/altieri-roger-jr-d049173/'>Altieri, Roger Jr</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/alys-bail-bonds-b000706/'>Alys Bail Bonds</a></strong>"},{"lat":25.65554,"lng":-80.39192,"label":"<strong><a href='/bailbonds/fl/agent/arancibia-gustavo-daniel-e063894/'>Arancibia, Gustavo Daniel</a></strong>"},{"lat":25.7895,"lng":-80.21998,"label":"<strong><a href='/bailbonds/fl/agent/arancibia-javier-martin-d071986/'>Arancibia, Javier Martin</a></strong>"},{"lat":25.89079,"lng":-80.175,"label":"<strong><a href='/bailbonds/fl/agent/attilus-volvick-p132013/'>Attilus, Volvick</a></strong>"},{"lat":25.94221,"lng":-80.21192,"label":"<strong><a href='/bailbonds/fl/agent/auguste-marvin-c-w739730/'>Auguste, Marvin C</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/avila-felix-d-p167676/'>Avila, Felix D</a></strong>"},{"lat":25.60268,"lng":-80.34843,"label":"<strong><a href='/bailbonds/fl/agent/b-adams-bail-bonds-b000662/'>B. Adams Bail Bonds</a></strong>"},{"lat":25.89039,"lng":-80.18235,"label":"<strong><a href='/bailbonds/fl/agent/bail-me-fast-bail-bonds-llc-b000457/'>Bail Me Fast Bail Bonds, Llc</a></strong>"},{"lat":25.89079,"lng":-80.175,"label":"<strong><a href='/bailbonds/fl/agent/ballers-bailbonds-b000186/'>Ballers Bailbonds</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/baptiste-elicsonne-e182034/'>Baptiste, Elicsonne</a></strong>"},{"lat":25.77867,"lng":-80.26304,"label":"<strong><a href='/bailbonds/fl/agent/baquet-grace-ann-a301957/'>Baquet, Grace Ann</a></strong>"},{"lat":25.7453,"lng":-80.42688,"label":"<strong><a href='/bailbonds/fl/agent/barrera-mario-a-p132012/'>Barrera, Mario A</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/barrett-ryan-henrick-w924013/'>Barrett, Ryan Henrick</a></strong>"},{"lat":25.56651,"lng":-80.36707,"label":"<strong><a href='/bailbonds/fl/agent/bazile-richard-p170750/'>Bazile, Richard</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/bell-lauren-w958131/'>Bell, Lauren</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/bendahan-deborah-ayleen-a018743/'>Bendahan, Deborah Ayleen</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/berrane-charles-sherwood-e004008/'>Berrane, Charles Sherwood</a></strong><br>\u260e 407-999-9011"},{"lat":25.81168,"lng":-80.31203,"label":"<strong><a href='/bailbonds/fl/agent/betancourt-nicholas-w375925/'>Betancourt, Nicholas</a></strong>"},{"lat":25.81168,"lng":-80.31203,"label":"<strong><a href='/bailbonds/fl/agent/betancourt-rolando-javier-a021059/'>Betancourt, Rolando Javier</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/bien-aime-daniel-a021630/'>Bien-Aime, Daniel</a></strong>"},{"lat":25.81408,"lng":-80.22487,"label":"<strong><a href='/bailbonds/fl/agent/bill-bail-bonds-b000679/'>Bill Bail Bonds</a></strong>"},{"lat":25.82108,"lng":-80.33284,"label":"<strong><a href='/bailbonds/fl/agent/blain-daymi-w254099/'>Blain, Daymi</a></strong>"},{"lat":25.71668,"lng":-80.46156,"label":"<strong><a href='/bailbonds/fl/agent/blanco-ana-m-p130336/'>Blanco, Ana M</a></strong>"},{"lat":25.46148,"lng":-80.45394,"label":"<strong><a href='/bailbonds/fl/agent/blanco-lazaro-michel-p232424/'>Blanco, Lazaro Michel</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/blandon-bailbonds-inc-b000692/'>Blandon Bailbonds Inc</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/blandon-vanessa-e-p057685/'>Blandon, Vanessa E</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/blangor-michael-t-w163130/'>Blangor, Michael T</a></strong>"},{"lat":25.93424,"lng":-80.24504,"label":"<strong><a href='/bailbonds/fl/agent/bonds-r-us-bailbonds-inc-b000052/'>Bonds R Us Bailbonds Inc</a></strong>"},{"lat":25.79618,"lng":-80.13201,"label":"<strong><a href='/bailbonds/fl/agent/borders-lytii-s-p132342/'>Borders, Lytii S</a></strong>"},{"lat":25.76889,"lng":-80.22258,"label":"<strong><a href='/bailbonds/fl/agent/bornote-alejandro-a026203/'>Bornote, Alejandro</a></strong>"},{"lat":25.76889,"lng":-80.22258,"label":"<strong><a href='/bailbonds/fl/agent/bornote-alexander-w231681/'>Bornote, Alexander</a></strong>"},{"lat":25.75051,"lng":-80.25921,"label":"<strong><a href='/bailbonds/fl/agent/brennan-joseph-patrick-a029626/'>Brennan, Joseph Patrick</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/brouwer-christopher-w423678/'>Brouwer, Christopher</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/brown-sharrone-j-p084339/'>Brown, Sharrone J</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/bunch-bail-bond-inc-b000146/'>Bunch Bail Bond Inc,</a></strong>"},{"lat":25.49932,"lng":-80.44346,"label":"<strong><a href='/bailbonds/fl/agent/caceres-eduardo-francisco-d000921/'>Caceres, Eduardo Francisco</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/calderon-catalina-beatriz-a038176/'>Calderon, Catalina Beatriz</a></strong><br>\u260e 407-999-9011"},{"lat":25.78745,"lng":-80.22297,"label":"<strong><a href='/bailbonds/fl/agent/caldwell-warren-leon-a038282/'>Caldwell, Warren Leon</a></strong>"},{"lat":25.634,"lng":-80.43331,"label":"<strong><a href='/bailbonds/fl/agent/calonge-henderson-carolina-a-g019083/'>Calonge Henderson, Carolina A</a></strong>"},{"lat":25.82595,"lng":-80.31379,"label":"<strong><a href='/bailbonds/fl/agent/campa-oscar-p159316/'>Campa, Oscar</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/canela-jacqueline-c-p235295/'>Canela, Jacqueline C</a></strong>"},{"lat":25.85988,"lng":-80.32316,"label":"<strong><a href='/bailbonds/fl/agent/canizares-seidel-p111300/'>Canizares, Seidel</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/carlos-nunez-bail-bonds-inc-b000352/'>Carlos Nunez Bail Bonds, Inc</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/casal-alina-a042596/'>Casal, Alina</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/casal-barbara-alina-d003460/'>Casal, Barbara Alina</a></strong>"},{"lat":25.75152,"lng":-80.40961,"label":"<strong><a href='/bailbonds/fl/agent/casal-joseph-g098709/'>Casal, Joseph</a></strong>"},{"lat":25.80498,"lng":-80.36301,"label":"<strong><a href='/bailbonds/fl/agent/casal-lilia-maria-a296542/'>Casal, Lilia Maria</a></strong>"},{"lat":25.51278,"lng":-80.42225,"label":"<strong><a href='/bailbonds/fl/agent/celcis-serge-jr-p117338/'>Celcis, Serge Jr</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/chavarria-jairo-e179942/'>Chavarria, Jairo</a></strong>"},{"lat":25.86665,"lng":-80.31445,"label":"<strong><a href='/bailbonds/fl/agent/chichi-bail-bonds-b000357/'>Chichi Bail Bonds</a></strong><br>\u260e 305-905-9107"},{"lat":25.77115,"lng":-80.22266,"label":"<strong><a href='/bailbonds/fl/agent/chico-bail-bonds-b000195/'>Chico Bail Bonds</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/chino-bail-bonds-inc-b000178/'>Chino Bail Bonds, Inc.</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/chino-express-bail-bonds-inc-b000198/'>Chino Express Bail Bonds Inc.</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/chiuz-edgardo-rene-a046682/'>Chiuz, Edgardo Rene</a></strong>"},{"lat":25.85605,"lng":-80.12149,"label":"<strong><a href='/bailbonds/fl/agent/chiuz-oscar-a046683/'>Chiuz, Oscar</a></strong>"},{"lat":25.91334,"lng":-80.33061,"label":"<strong><a href='/bailbonds/fl/agent/cid-marco-a-jr-w079744/'>Cid, Marco A Jr</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/clark-linsayd-yanely-d082784/'>Clark, Linsayd Yanely</a></strong>"},{"lat":25.5996,"lng":-80.35364,"label":"<strong><a href='/bailbonds/fl/agent/coba-damian-antonio-w301175/'>Coba, Damian Antonio</a></strong>"},{"lat":25.75051,"lng":-80.25921,"label":"<strong><a href='/bailbonds/fl/agent/coral-gables-bail-bonds-inc-b000462/'>Coral Gables Bail Bonds, Inc.</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/cordero-blanca-rosa-a054838/'>Cordero, Blanca Rosa</a></strong>"},{"lat":25.78567,"lng":-80.21906,"label":"<strong><a href='/bailbonds/fl/agent/corenthia-bail-bonds-llc-b000350/'>Corenthia Bail Bonds, Llc</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/crowe-lucy-fernandez-a058464/'>Crowe, Lucy Fernandez</a></strong>"},{"lat":25.9196,"lng":-80.24983,"label":"<strong><a href='/bailbonds/fl/agent/culver-de-eric-g235484/'>Culver, De'Eric</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/daniel-bien-aime-bail-bonds-inc-b000148/'>Daniel Bien-Aime Bail Bonds, Inc.</a></strong>"},{"lat":25.81301,"lng":-80.22399,"label":"<strong><a href='/bailbonds/fl/agent/daniel-nia-s-w109988/'>Daniel, Nia S</a></strong>"},{"lat":25.82595,"lng":-80.31379,"label":"<strong><a href='/bailbonds/fl/agent/davila-carlos-w-p062276/'>Davila, Carlos W</a></strong>"},{"lat":25.83115,"lng":-80.24451,"label":"<strong><a href='/bailbonds/fl/agent/davis-vincent-a317694/'>Davis, Vincent</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/debbie-bail-bonds-inc-b000270/'>Debbie Bail Bonds Inc</a></strong>"},{"lat":25.80938,"lng":-80.31553,"label":"<strong><a href='/bailbonds/fl/agent/delacruz-ellie-p214940/'>Delacruz, Ellie</a></strong>"},{"lat":25.80829,"lng":-80.27036,"label":"<strong><a href='/bailbonds/fl/agent/deleon-lexter-a065191/'>Deleon, Lexter</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/delgado-yanitza-ivette-e020909/'>Delgado, Yanitza Ivette</a></strong>"},{"lat":25.95033,"lng":-80.25831,"label":"<strong><a href='/bailbonds/fl/agent/denson-pamela-williams-a097887/'>Denson, Pamela Williams</a></strong>"},{"lat":25.82588,"lng":-80.31379,"label":"<strong><a href='/bailbonds/fl/agent/diaz-jorge-l-e168286/'>Diaz, Jorge L</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/do-the-right-thing-bail-bonds-inc-b000118/'>Do The Right Thing Bail Bonds, Inc.</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/dobarganes-alfredo-a069497/'>Dobarganes, Alfredo</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/dondee-bail-bonds-b000027/'>Dondee Bail Bonds</a></strong>"},{"lat":25.81904,"lng":-80.31995,"label":"<strong><a href='/bailbonds/fl/agent/doral-bail-bonds-b000648/'>Doral Bail Bonds</a></strong>"},{"lat":25.94613,"lng":-80.34139,"label":"<strong><a href='/bailbonds/fl/agent/dupoux-anthony-g242503/'>Dupoux, Anthony</a></strong>"},{"lat":25.85632,"lng":-80.18486,"label":"<strong><a href='/bailbonds/fl/agent/ed-fabre-bail-bonds-b000650/'>Ed Fabre Bail Bonds</a></strong>"},{"lat":25.81408,"lng":-80.22487,"label":"<strong><a href='/bailbonds/fl/agent/elias-kelsey-g103918/'>Elias, Kelsey</a></strong>"},{"lat":25.81408,"lng":-80.22487,"label":"<strong><a href='/bailbonds/fl/agent/elias-william-abel-e136453/'>Elias, William Abel</a></strong>"},{"lat":25.89039,"lng":-80.18235,"label":"<strong><a href='/bailbonds/fl/agent/ennevor-kirk-hastings-a077889/'>Ennevor, Kirk Hastings</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/escarra-luis-sr-e009549/'>Escarra, Luis Sr</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/estrada-abraham-jr-a079171/'>Estrada, Abraham Jr</a></strong><br>\u260e 407-999-9011"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/estrella-bail-bonds-b000317/'>Estrella Bail Bonds</a></strong>"},{"lat":25.85632,"lng":-80.18486,"label":"<strong><a href='/bailbonds/fl/agent/fabre-eddy-wilmann-a080168/'>Fabre, Eddy Wilmann</a></strong>"},{"lat":25.85632,"lng":-80.18486,"label":"<strong><a href='/bailbonds/fl/agent/fabre-guerdy-wilmann-p052063/'>Fabre, Guerdy Wilmann</a></strong>"},{"lat":25.85632,"lng":-80.18486,"label":"<strong><a href='/bailbonds/fl/agent/fabre-patrick-bertin-a080172/'>Fabre, Patrick Bertin</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/faibisch-charles-d058805/'>Faibisch, Charles</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/faibisch-russell-charles-a080346/'>Faibisch, Russell Charles</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/faibisch-russell-mark-a080347/'>Faibisch, Russell Mark</a></strong>"},{"lat":25.75093,"lng":-80.21689,"label":"<strong><a href='/bailbonds/fl/agent/faroy-bail-bonds-inc-b000199/'>Faroy Bail Bonds Inc.</a></strong>"},{"lat":25.75093,"lng":-80.21689,"label":"<strong><a href='/bailbonds/fl/agent/faroy-emilio-gallor-a081130/'>Faroy, Emilio Gallor</a></strong>"},{"lat":25.94267,"lng":-80.20308,"label":"<strong><a href='/bailbonds/fl/agent/fast-24-7-bailbonds-b000707/'>Fast 24/7 Bailbonds</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/felix-bail-bonds-b000182/'>Felix Bail Bonds</a></strong>"},{"lat":25.89079,"lng":-80.175,"label":"<strong><a href='/bailbonds/fl/agent/ferguson-alicia-voncia-d000922/'>Ferguson, Alicia Voncia</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/fernandez-alida-d015146/'>Fernandez, Alida</a></strong>"},{"lat":25.81168,"lng":-80.31203,"label":"<strong><a href='/bailbonds/fl/agent/fernandez-tricia-a083019/'>Fernandez, Tricia</a></strong>"},{"lat":25.79021,"lng":-80.22319,"label":"<strong><a href='/bailbonds/fl/agent/figueroa-jacqueline-marie-e180528/'>Figueroa, Jacqueline Marie</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/fireline-bail-bonds-inc-b000516/'>Fireline Bail Bonds, Inc.</a></strong>"},{"lat":25.698,"lng":-80.36616,"label":"<strong><a href='/bailbonds/fl/agent/florida-boy-bailbonds-b000507/'>Florida Boy Bailbonds</a></strong>"},{"lat":25.78706,"lng":-80.2196,"label":"<strong><a href='/bailbonds/fl/agent/francois-keith-david-e013317/'>Francois, Keith David</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/frederique-ralph-p064267/'>Frederique, Ralph</a></strong><br>\u260e 407-999-9011"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/fuentes-maykel-w238834/'>Fuentes, Maykel</a></strong>"},{"lat":25.75051,"lng":-80.25921,"label":"<strong><a href='/bailbonds/fl/agent/gallardo-danilo-a092302/'>Gallardo, Danilo</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/garcia-bail-bonds-llc-b000370/'>Garcia Bail Bonds, Llc</a></strong>"},{"lat":25.80926,"lng":-80.31458,"label":"<strong><a href='/bailbonds/fl/agent/garcia-amanda-ann-p048612/'>Garcia, Amanda Ann</a></strong>"},{"lat":25.7875,"lng":-80.22069,"label":"<strong><a href='/bailbonds/fl/agent/garcia-eduardo-r-a093075/'>Garcia, Eduardo R</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/garcia-gonzalo-jr-a092942/'>Garcia, Gonzalo Jr</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/garcia-hector-angel-a311368/'>Garcia, Hector Angel</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/garcia-jenny-ann-a093131/'>Garcia, Jenny Ann</a></strong>"},{"lat":25.80938,"lng":-80.31553,"label":"<strong><a href='/bailbonds/fl/agent/garcia-jesus-ernesto-jr-w560796/'>Garcia, Jesus Ernesto Jr.</a></strong>"},{"lat":25.60365,"lng":-80.35187,"label":"<strong><a href='/bailbonds/fl/agent/gartenmayer-cecilly-w890733/'>Gartenmayer, Cecilly</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/geraldo-carmen-canario-p048603/'>Geraldo, Carmen Canario</a></strong><br>\u260e 407-999-9011"},{"lat":25.78567,"lng":-80.21906,"label":"<strong><a href='/bailbonds/fl/agent/gloria-sunshine-state-bail-bonds-inc-b000349/'>Gloria Sunshine State Bail Bonds, Inc</a></strong>"},{"lat":25.82082,"lng":-80.38093,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-adolfo-g252290/'>Gonzalez, Adolfo</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-alexey-b-d026341/'>Gonzalez, Alexey B</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-jose-a-a100106/'>Gonzalez, Jose A</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-olga-marie-a100243/'>Gonzalez, Olga Marie</a></strong>"},{"lat":25.82595,"lng":-80.31379,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-rita-del-carmen-w064185/'>Gonzalez, Rita Del Carmen</a></strong>"},{"lat":25.81904,"lng":-80.31995,"label":"<strong><a href='/bailbonds/fl/agent/good-girls-bail-bonds-inc-b000591/'>Good Girls Bail Bonds Inc.</a></strong>"},{"lat":25.79019,"lng":-80.21899,"label":"<strong><a href='/bailbonds/fl/agent/grenet-ernesto-cesar-a104351/'>Grenet, Ernesto Cesar</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/guedes-lucia-c-d021058/'>Guedes, Lucia C</a></strong>"},{"lat":25.96347,"lng":-80.20582,"label":"<strong><a href='/bailbonds/fl/agent/gunning-gussie-mae-p079531/'>Gunning, Gussie Mae</a></strong>"},{"lat":25.72964,"lng":-80.40376,"label":"<strong><a href='/bailbonds/fl/agent/halsell-deon-w754758/'>Halsell, Deon</a></strong>"},{"lat":25.9046,"lng":-80.32874,"label":"<strong><a href='/bailbonds/fl/agent/hammonds-green-theria-elaine-p031152/'>Hammonds-Green, Theria Elaine</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/harris-william-thomas-a112386/'>Harris, William Thomas</a></strong>"},{"lat":25.81168,"lng":-80.3115,"label":"<strong><a href='/bailbonds/fl/agent/harvell-castleberry-junior-e032312/'>Harvell, Castleberry Junior</a></strong>"},{"lat":25.63762,"lng":-80.36897,"label":"<strong><a href='/bailbonds/fl/agent/heard-patrick-d021305/'>Heard, Patrick</a></strong>"},{"lat":25.89158,"lng":-80.33674,"label":"<strong><a href='/bailbonds/fl/agent/hechevarria-guillermo-santoya-w227458/'>Hechevarria, Guillermo Santoya</a></strong>"},{"lat":25.80937,"lng":-80.31457,"label":"<strong><a href='/bailbonds/fl/agent/hector-pierre-a115203/'>Hector, Pierre</a></strong><br>\u260e 407-999-9011"},{"lat":25.70115,"lng":-80.44589,"label":"<strong><a href='/bailbonds/fl/agent/heredia-aracely-d059884/'>Heredia, Aracely</a></strong>"},{"lat":25.82108,"lng":-80.33284,"label":"<strong><a href='/bailbonds/fl/agent/hernandez-carmen-maria-a117272/'>Hernandez, Carmen Maria</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/hernandez-jacqueline-d-g161509/'>Hernandez, Jacqueline D</a></strong>"},{"lat":25.76024,"lng":-80.33605,"label":"<strong><a href='/bailbonds/fl/agent/herrera-dallanara-l-e013995/'>Herrera, Dallanara L</a></strong>"},{"lat":25.76024,"lng":-80.33605,"label":"<strong><a href='/bailbonds/fl/agent/herrera-damary-lee-d013286/'>Herrera, Damary Lee</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/herrera-fernando-gilberto-a306878/'>Herrera, Fernando Gilberto</a></strong><br>\u260e 407-999-9011"},{"lat":25.79019,"lng":-80.21899,"label":"<strong><a href='/bailbonds/fl/agent/hiller-teresa-gail-e029777/'>Hiller, Teresa Gail</a></strong>"},{"lat":25.79092,"lng":-80.22151,"label":"<strong><a href='/bailbonds/fl/agent/hinds-christopher-sr-w271861/'>Hinds, Christopher Sr</a></strong>"},{"lat":25.94305,"lng":-80.20527,"label":"<strong><a href='/bailbonds/fl/agent/howard-williams-jarvis-w101175/'>Howard-Williams, Jarvis</a></strong>"},{"lat":25.94271,"lng":-80.20228,"label":"<strong><a href='/bailbonds/fl/agent/huggins-on-call-bail-bonds-b000328/'>Huggins On Call Bail Bonds</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/huggins-fallen-w957960/'>Huggins, Fallen</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/huggins-lester-l-d019894/'>Huggins, Lester L</a></strong>"},{"lat":25.94692,"lng":-80.20539,"label":"<strong><a href='/bailbonds/fl/agent/huggins-marcus-kevin-p074210/'>Huggins, Marcus Kevin</a></strong>"},{"lat":25.94271,"lng":-80.20228,"label":"<strong><a href='/bailbonds/fl/agent/huggins-mckasey-kern-w126152/'>Huggins, Mckasey Kern</a></strong>"},{"lat":25.71247,"lng":-80.2681,"label":"<strong><a href='/bailbonds/fl/agent/indacochea-jackie-nancy-a127586/'>Indacochea, Jackie Nancy</a></strong>"},{"lat":25.94267,"lng":-80.20308,"label":"<strong><a href='/bailbonds/fl/agent/isidore-kanol-p168603/'>Isidore, Kanol</a></strong>"},{"lat":25.94267,"lng":-80.20308,"label":"<strong><a href='/bailbonds/fl/agent/isidore-karny-w756877/'>Isidore, Karny</a></strong>"},{"lat":25.56651,"lng":-80.36707,"label":"<strong><a href='/bailbonds/fl/agent/jagers-jerry-russell-w124985/'>Jagers, Jerry Russell</a></strong>"},{"lat":25.94305,"lng":-80.20527,"label":"<strong><a href='/bailbonds/fl/agent/james-ainsford-everton-e125377/'>James, Ainsford Everton</a></strong>"},{"lat":25.94692,"lng":-80.20539,"label":"<strong><a href='/bailbonds/fl/agent/jean-leslie-w287666/'>Jean, Leslie</a></strong>"},{"lat":25.85656,"lng":-80.21226,"label":"<strong><a href='/bailbonds/fl/agent/jenkins-rackley-reashawnda-victoria-e111560/'>Jenkins Rackley, Reashawnda Victoria</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/jim-scottaline-bonding-agency-inc-b000600/'>Jim Scottaline Bonding Agency, Inc.</a></strong>"},{"lat":25.56646,"lng":-80.39288,"label":"<strong><a href='/bailbonds/fl/agent/jimeno-jesus-miguel-e181786/'>Jimeno, Jesus Miguel</a></strong>"},{"lat":25.75152,"lng":-80.40961,"label":"<strong><a href='/bailbonds/fl/agent/joey-s-bail-bonds-b000715/'>Joey'S Bail Bonds</a></strong>"},{"lat":25.81572,"lng":-80.21783,"label":"<strong><a href='/bailbonds/fl/agent/johnson-mikesha-g105111/'>Johnson, Mikesha</a></strong>"},{"lat":25.60365,"lng":-80.35187,"label":"<strong><a href='/bailbonds/fl/agent/jones-matthew-allen-g233632/'>Jones, Matthew Allen</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/jones-nefertia-taquena-w171689/'>Jones, Nefertia Taquena</a></strong><br>\u260e 407-999-9011"},{"lat":25.89028,"lng":-80.1851,"label":"<strong><a href='/bailbonds/fl/agent/jones-thomas-chauncey-jr-w081236/'>Jones, Thomas Chauncey Jr.</a></strong>"},{"lat":25.89025,"lng":-80.18452,"label":"<strong><a href='/bailbonds/fl/agent/joseph-peggy-w293280/'>Joseph, Peggy</a></strong>"},{"lat":25.80938,"lng":-80.31553,"label":"<strong><a href='/bailbonds/fl/agent/king-robert-arnold-sr-a141581/'>King, Robert Arnold Sr</a></strong>"},{"lat":25.93489,"lng":-80.24495,"label":"<strong><a href='/bailbonds/fl/agent/largins-john-jr-w343031/'>Largins, John Jr</a></strong>"},{"lat":25.79021,"lng":-80.22319,"label":"<strong><a href='/bailbonds/fl/agent/laso-charlene-a150285/'>Laso, Charlene</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/leal-raul-e-p130766/'>Leal, Raul E</a></strong>"},{"lat":25.52985,"lng":-80.4067,"label":"<strong><a href='/bailbonds/fl/agent/lee-kenneth-jerome-e163778/'>Lee, Kenneth Jerome</a></strong>"},{"lat":25.80723,"lng":-80.30255,"label":"<strong><a href='/bailbonds/fl/agent/leon-lisbeth-p053347/'>Leon, Lisbeth</a></strong>"},{"lat":25.82108,"lng":-80.33284,"label":"<strong><a href='/bailbonds/fl/agent/levy-lidia-m-d077247/'>Levy, Lidia M</a></strong>"},{"lat":25.76584,"lng":-80.21289,"label":"<strong><a href='/bailbonds/fl/agent/lopez-delfina-emerita-w216792/'>Lopez, Delfina Emerita</a></strong>"},{"lat":25.7951,"lng":-80.31067,"label":"<strong><a href='/bailbonds/fl/agent/lopez-lazaro-a158404/'>Lopez, Lazaro</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/lopez-luis-rene-e017485/'>Lopez, Luis Rene</a></strong>"},{"lat":25.81904,"lng":-80.31995,"label":"<strong><a href='/bailbonds/fl/agent/mafran-carlos-p205838/'>Mafran, Carlos</a></strong>"},{"lat":25.86475,"lng":-80.2413,"label":"<strong><a href='/bailbonds/fl/agent/marks-daniel-syvlester-a165232/'>Marks, Daniel Syvlester</a></strong>"},{"lat":25.92788,"lng":-80.26349,"label":"<strong><a href='/bailbonds/fl/agent/martinez-gloria-elena-p110788/'>Martinez, Gloria Elena</a></strong>"},{"lat":25.77726,"lng":-80.35944,"label":"<strong><a href='/bailbonds/fl/agent/martinez-jennifer-g181473/'>Martinez, Jennifer</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/martinez-jose-g-a166996/'>Martinez, Jose G</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/martinez-maria-a-a167040/'>Martinez, Maria A</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/martinez-parrish-j-e136015/'>Martinez, Parrish J.</a></strong>"},{"lat":25.79092,"lng":-80.22151,"label":"<strong><a href='/bailbonds/fl/agent/martinez-richard-p186262/'>Martinez, Richard</a></strong>"},{"lat":25.72964,"lng":-80.40376,"label":"<strong><a href='/bailbonds/fl/agent/martory-bail-bonds-b000085/'>Martory Bail Bonds</a></strong>"},{"lat":25.72964,"lng":-80.40376,"label":"<strong><a href='/bailbonds/fl/agent/martory-marco-joaquin-sr-a167209/'>Martory, Marco Joaquin Sr.</a></strong>"},{"lat":25.77556,"lng":-80.37412,"label":"<strong><a href='/bailbonds/fl/agent/master-key-bail-bonds-b000400/'>Master Key Bail Bonds</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/mcconnell-sharon-marie-a170946/'>Mcconnell, Sharon Marie</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/mccray-eric-a-d000991/'>Mccray, Eric A</a></strong><br>\u260e 407-999-9011"},{"lat":25.83115,"lng":-80.24451,"label":"<strong><a href='/bailbonds/fl/agent/mcford-avis-yvette-w011436/'>Mcford, Avis Yvette</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/mena-gloria-a-d085361/'>Mena, Gloria A</a></strong>"},{"lat":25.66202,"lng":-80.44718,"label":"<strong><a href='/bailbonds/fl/agent/menendez-sergio-jr-p109856/'>Menendez, Sergio Jr</a></strong>"},{"lat":25.79021,"lng":-80.22319,"label":"<strong><a href='/bailbonds/fl/agent/mesa-michelle-kae-a309549/'>Mesa, Michelle Kae</a></strong>"},{"lat":25.49932,"lng":-80.44346,"label":"<strong><a href='/bailbonds/fl/agent/miami-vice-bail-bonds-l-l-c-b000285/'>Miami Vice Bail Bonds L.L.C</a></strong>"},{"lat":25.79021,"lng":-80.22319,"label":"<strong><a href='/bailbonds/fl/agent/midtown-bail-bonds-b000263/'>Midtown Bail Bonds</a></strong>"},{"lat":25.80811,"lng":-80.27592,"label":"<strong><a href='/bailbonds/fl/agent/miller-charles-ellis-w133704/'>Miller, Charles Ellis</a></strong>"},{"lat":25.46897,"lng":-80.47729,"label":"<strong><a href='/bailbonds/fl/agent/miranda-anabel-d041876/'>Miranda, Anabel</a></strong>"},{"lat":25.85605,"lng":-80.12149,"label":"<strong><a href='/bailbonds/fl/agent/mister-bail-bonds-b000196/'>Mister Bail Bonds</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/mohmoud-jonathan-hernando-p235159/'>Mohmoud, Jonathan Hernando</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/molina-manuel-jesus-a181939/'>Molina, Manuel Jesus</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/monteagudo-thomas-humberto-a182489/'>Monteagudo, Thomas Humberto</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/moore-james-augustus-ii-a183295/'>Moore, James Augustus Ii</a></strong><br>\u260e 407-999-9011"},{"lat":26.02207,"lng":-80.36559,"label":"<strong><a href='/bailbonds/fl/agent/morera-richard-a184208/'>Morera, Richard</a></strong>"},{"lat":25.94692,"lng":-80.20539,"label":"<strong><a href='/bailbonds/fl/agent/moss-david-maurice-a185754/'>Moss, David Maurice</a></strong>"},{"lat":25.77867,"lng":-80.26304,"label":"<strong><a href='/bailbonds/fl/agent/murphy-akili-tunu-e024049/'>Murphy, Akili Tunu</a></strong>"},{"lat":25.80723,"lng":-80.30255,"label":"<strong><a href='/bailbonds/fl/agent/nichols-joseph-stanley-a191899/'>Nichols, Joseph Stanley</a></strong>"},{"lat":25.96745,"lng":-80.19751,"label":"<strong><a href='/bailbonds/fl/agent/niva-jude-bail-bonds-llc-b000688/'>Niva &amp; Jude Bail Bonds Llc</a></strong>"},{"lat":25.87235,"lng":-80.20999,"label":"<strong><a href='/bailbonds/fl/agent/nortelus-cecil-celecon-a193338/'>Nortelus, Cecil Celecon</a></strong>"},{"lat":25.94119,"lng":-80.20519,"label":"<strong><a href='/bailbonds/fl/agent/nuby-david-jr-p099834/'>Nuby, David Jr</a></strong>"},{"lat":25.80937,"lng":-80.31457,"label":"<strong><a href='/bailbonds/fl/agent/nunez-carlos-alberto-p210755/'>Nunez, Carlos Alberto</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/nunez-dayanara-de-la-caridad-p092487/'>Nunez, Dayanara De La Caridad</a></strong><br>\u260e 305-447-6900"},{"lat":25.82011,"lng":-80.272,"label":"<strong><a href='/bailbonds/fl/agent/oliva-melissa-p162541/'>Oliva, Melissa</a></strong>"},{"lat":25.82825,"lng":-80.18803,"label":"<strong><a href='/bailbonds/fl/agent/onate-felix-fabricio-w418600/'>Onate, Felix Fabricio</a></strong>"},{"lat":25.87793,"lng":-80.16806,"label":"<strong><a href='/bailbonds/fl/agent/optimal-bail-bonds-b000399/'>Optimal Bail Bonds</a></strong><br>\u260e 786-536-7378"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/ortega-raul-fermin-d016034/'>Ortega, Raul Fermin</a></strong>"},{"lat":25.7612,"lng":-80.20273,"label":"<strong><a href='/bailbonds/fl/agent/ospina-angela-amada-a197566/'>Ospina, Angela Amada</a></strong>"},{"lat":25.66881,"lng":-80.36314,"label":"<strong><a href='/bailbonds/fl/agent/paez-francisco-javier-a198774/'>Paez, Francisco Javier</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/parrish-bail-bonds-b000711/'>Parrish Bail Bonds</a></strong>"},{"lat":25.82444,"lng":-80.31376,"label":"<strong><a href='/bailbonds/fl/agent/pena-michael-xavier-d010153/'>Pena, Michael Xavier</a></strong>"},{"lat":25.70409,"lng":-80.4098,"label":"<strong><a href='/bailbonds/fl/agent/penalba-louie-a203513/'>Penalba, Louie</a></strong>"},{"lat":25.76548,"lng":-80.19437,"label":"<strong><a href='/bailbonds/fl/agent/peralta-jeremy-g160477/'>Peralta, Jeremy</a></strong>"},{"lat":25.82825,"lng":-80.18803,"label":"<strong><a href='/bailbonds/fl/agent/perez-christian-hernan-w476552/'>Perez, Christian Hernan</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/perez-helio-emilio-p094566/'>Perez, Helio Emilio</a></strong>"},{"lat":25.94305,"lng":-80.20527,"label":"<strong><a href='/bailbonds/fl/agent/perez-joshua-w203411/'>Perez, Joshua</a></strong>"},{"lat":25.85733,"lng":-80.2935,"label":"<strong><a href='/bailbonds/fl/agent/perez-miguel-angel-e167814/'>Perez, Miguel Angel</a></strong>"},{"lat":25.81168,"lng":-80.31203,"label":"<strong><a href='/bailbonds/fl/agent/perez-surama-carmen-a309046/'>Perez, Surama Carmen</a></strong>"},{"lat":25.72964,"lng":-80.40376,"label":"<strong><a href='/bailbonds/fl/agent/perez-yamile-a204397/'>Perez, Yamile</a></strong>"},{"lat":25.78746,"lng":-80.2213,"label":"<strong><a href='/bailbonds/fl/agent/perrone-lorain-w102314/'>Perrone, Lorain</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/petrie-ricardo-anthony-w117564/'>Petrie, Ricardo Anthony</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/poje-jeff-p208124/'>Poje, Jeff</a></strong>"},{"lat":25.89079,"lng":-80.175,"label":"<strong><a href='/bailbonds/fl/agent/pollas-vilford-pierre-a307128/'>Pollas, Vilford Pierre</a></strong>"},{"lat":25.76889,"lng":-80.22258,"label":"<strong><a href='/bailbonds/fl/agent/portuondo-guillermo-d064941/'>Portuondo, Guillermo</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/posada-meike-p-a185805/'>Posada, Meike P</a></strong><br>\u260e 407-999-9011"},{"lat":25.81904,"lng":-80.31995,"label":"<strong><a href='/bailbonds/fl/agent/pozo-barbara-caridad-e023575/'>Pozo, Barbara Caridad</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/pozo-orlando-d005840/'>Pozo, Orlando</a></strong>"},{"lat":25.56467,"lng":-80.39929,"label":"<strong><a href='/bailbonds/fl/agent/pruett-bail-bonds-inc-b000521/'>Pruett Bail Bonds, Inc.</a></strong>"},{"lat":25.56467,"lng":-80.39929,"label":"<strong><a href='/bailbonds/fl/agent/pruett-patricia-jean-a212432/'>Pruett, Patricia Jean</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/quintana-rosalinda-d041791/'>Quintana, Rosalinda</a></strong>"},{"lat":25.89079,"lng":-80.175,"label":"<strong><a href='/bailbonds/fl/agent/ramdeo-ravianand-arun-e134023/'>Ramdeo, Ravianand Arun</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/reines-alexander-w248847/'>Reines, Alexander</a></strong><br>\u260e 407-999-9011"},{"lat":25.77867,"lng":-80.26304,"label":"<strong><a href='/bailbonds/fl/agent/rivas-bonding-agency-b000633/'>Rivas Bonding Agency</a></strong>"},{"lat":25.77867,"lng":-80.26304,"label":"<strong><a href='/bailbonds/fl/agent/rivas-salvador-armando-a221251/'>Rivas, Salvador Armando</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/roberts-aikim-shemour-w887902/'>Roberts, Aikim Shemour</a></strong>"},{"lat":25.87793,"lng":-80.16806,"label":"<strong><a href='/bailbonds/fl/agent/robinson-gabriel-w097611/'>Robinson, Gabriel</a></strong>"},{"lat":25.77867,"lng":-80.26304,"label":"<strong><a href='/bailbonds/fl/agent/rodriguez-fernando-alexander-p209945/'>Rodriguez, Fernando Alexander</a></strong>"},{"lat":25.75051,"lng":-80.25921,"label":"<strong><a href='/bailbonds/fl/agent/rodriguez-frances-deese-w014973/'>Rodriguez, Frances Deese</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/rodriguez-janiel-d005841/'>Rodriguez, Janiel</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/rodriguez-oscar-fautino-a223983/'>Rodriguez, Oscar Fautino</a></strong>"},{"lat":25.64246,"lng":-80.4126,"label":"<strong><a href='/bailbonds/fl/agent/rojas-fernando-gaspar-a224814/'>Rojas, Fernando Gaspar</a></strong>"},{"lat":25.78567,"lng":-80.21906,"label":"<strong><a href='/bailbonds/fl/agent/rojas-ryan-w755288/'>Rojas, Ryan</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/rolle-glenn-arthur-a224909/'>Rolle, Glenn Arthur</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/rolle-paulette-k-a221517/'>Rolle, Paulette K</a></strong>"},{"lat":25.60354,"lng":-80.42216,"label":"<strong><a href='/bailbonds/fl/agent/romero-kent-edward-a225239/'>Romero, Kent Edward</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/rouco-maria-cristina-a227019/'>Rouco, Maria Cristina</a></strong><br>\u260e 407-999-9011"},{"lat":25.8076,"lng":-80.31316,"label":"<strong><a href='/bailbonds/fl/agent/ruiz-stephanie-w128574/'>Ruiz, Stephanie</a></strong>"},{"lat":25.81167,"lng":-80.31345,"label":"<strong><a href='/bailbonds/fl/agent/sabbat-webens-d003472/'>Sabbat, Webens</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/sala-suarez-nathaniel-a229975/'>Sala-Suarez, Nathaniel</a></strong>"},{"lat":25.75093,"lng":-80.21689,"label":"<strong><a href='/bailbonds/fl/agent/salgado-escandell-gabriell-m-w685163/'>Salgado-Escandell, Gabriell M</a></strong>"},{"lat":25.86128,"lng":-80.22503,"label":"<strong><a href='/bailbonds/fl/agent/saunders-amos-p237899/'>Saunders, Amos</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/scottaline-james-robert-a236808/'>Scottaline, James Robert</a></strong>"},{"lat":25.94221,"lng":-80.21192,"label":"<strong><a href='/bailbonds/fl/agent/seymour-lenora-p104364/'>Seymour, Lenora</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/shaheed-bail-bonds-inc-b000590/'>Shaheed Bail Bonds Inc</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/shaheed-kamal-akbar-p229882/'>Shaheed, Kamal Akbar</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/simmons-antanette-w885592/'>Simmons, Antanette</a></strong>"},{"lat":25.81877,"lng":-80.31346,"label":"<strong><a href='/bailbonds/fl/agent/sims-rhonda-denise-w014310/'>Sims, Rhonda Denise</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/singh-linda-nadlee-e049400/'>Singh, Linda Nadlee</a></strong>"},{"lat":25.56651,"lng":-80.36707,"label":"<strong><a href='/bailbonds/fl/agent/smith-charles-eundra-d037446/'>Smith, Charles Eundra</a></strong>"},{"lat":25.79092,"lng":-80.22151,"label":"<strong><a href='/bailbonds/fl/agent/smith-glaister-stethson-sr-w445871/'>Smith, Glaister Stethson Sr.</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/smith-malachi-dermot-w396984/'>Smith, Malachi Dermot</a></strong>"},{"lat":25.76549,"lng":-80.22562,"label":"<strong><a href='/bailbonds/fl/agent/smith-rohan-nigel-a299628/'>Smith, Rohan Nigel</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/sosa-alain-w241609/'>Sosa, Alain</a></strong>"},{"lat":25.94119,"lng":-80.20519,"label":"<strong><a href='/bailbonds/fl/agent/st-fleur-young-w030189/'>St Fleur, Young</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/st-jean-judney-w126151/'>St Jean, Judney</a></strong>"},{"lat":25.74877,"lng":-80.23811,"label":"<strong><a href='/bailbonds/fl/agent/staubs-william-eugene-d029071/'>Staubs, William Eugene</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/stevenson-beretta-hung-w443350/'>Stevenson, Beretta Hung</a></strong>"},{"lat":25.80723,"lng":-80.30255,"label":"<strong><a href='/bailbonds/fl/agent/stevenson-justice-long-w532429/'>Stevenson, Justice Long</a></strong>"},{"lat":25.93952,"lng":-80.29705,"label":"<strong><a href='/bailbonds/fl/agent/stevenson-mui-t-e033846/'>Stevenson, Mui T</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/sunshine-state-bail-bonds-b000316/'>Sunshine State Bail Bonds</a></strong><br>\u260e 407-999-9011"},{"lat":25.89039,"lng":-80.18235,"label":"<strong><a href='/bailbonds/fl/agent/swaby-christopher-baltimore-e014621/'>Swaby, Christopher Baltimore</a></strong>"},{"lat":25.80937,"lng":-80.31457,"label":"<strong><a href='/bailbonds/fl/agent/sweet-baby-jesus-bail-bonds-b000448/'>Sweet Baby Jesus Bail Bonds</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/tabares-roberto-p219621/'>Tabares, Roberto</a></strong>"},{"lat":25.60354,"lng":-80.42216,"label":"<strong><a href='/bailbonds/fl/agent/tansey-peter-joseph-iii-a260696/'>Tansey, Peter Joseph Iii</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/tate-otis-g121258/'>Tate, Otis</a></strong>"},{"lat":25.56651,"lng":-80.36707,"label":"<strong><a href='/bailbonds/fl/agent/taylor-octavio-j-jr-p078919/'>Taylor, Octavio J Jr</a></strong>"},{"lat":25.963,"lng":-80.20591,"label":"<strong><a href='/bailbonds/fl/agent/telfort-niva-w129644/'>Telfort, Niva</a></strong>"},{"lat":25.81168,"lng":-80.31203,"label":"<strong><a href='/bailbonds/fl/agent/tgk-bail-bonds-b000597/'>Tgk Bail Bonds</a></strong>"},{"lat":25.91481,"lng":-80.16187,"label":"<strong><a href='/bailbonds/fl/agent/the-bail-bond-firm-b000584/'>The Bail Bond Firm</a></strong>"},{"lat":25.93424,"lng":-80.24504,"label":"<strong><a href='/bailbonds/fl/agent/thimote-bennedy-p070734/'>Thimote, Bennedy</a></strong>"},{"lat":25.94267,"lng":-80.20308,"label":"<strong><a href='/bailbonds/fl/agent/thomas-kent-k-p186480/'>Thomas, Kent K</a></strong>"},{"lat":25.78706,"lng":-80.2196,"label":"<strong><a href='/bailbonds/fl/agent/tijerino-claudia-r-e003058/'>Tijerino, Claudia R</a></strong>"},{"lat":25.80742,"lng":-80.29959,"label":"<strong><a href='/bailbonds/fl/agent/trista-leslie-ann-e026808/'>Trista, Leslie Ann</a></strong>"},{"lat":25.78567,"lng":-80.21906,"label":"<strong><a href='/bailbonds/fl/agent/trujillo-mitch-e012229/'>Trujillo, Mitch</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/tunez-raymond-antonio-a269195/'>Tunez, Raymond Antonio</a></strong>"},{"lat":25.79716,"lng":-80.31778,"label":"<strong><a href='/bailbonds/fl/agent/valdes-cristina-maria-w101947/'>Valdes, Cristina Maria</a></strong>"},{"lat":25.76375,"lng":-80.28115,"label":"<strong><a href='/bailbonds/fl/agent/valdes-harold-a271008/'>Valdes, Harold</a></strong>"},{"lat":25.89877,"lng":-80.35648,"label":"<strong><a href='/bailbonds/fl/agent/valle-krysthell-f-d058803/'>Valle, Krysthell F</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/vazquez-javier-a312179/'>Vazquez, Javier</a></strong>"},{"lat":25.79024,"lng":-80.22319,"label":"<strong><a href='/bailbonds/fl/agent/velunza-bert-alexsander-a273064/'>Velunza, Bert Alexsander</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/villalta-alfredo-r-p090261/'>Villalta, Alfredo R</a></strong>"},{"lat":25.77115,"lng":-80.22266,"label":"<strong><a href='/bailbonds/fl/agent/villaverde-daniel-a273974/'>Villaverde, Daniel</a></strong>"},{"lat":25.64024,"lng":-80.30959,"label":"<strong><a href='/bailbonds/fl/agent/viola-catherine-brodie-a030878/'>Viola, Catherine Brodie</a></strong>"},{"lat":25.64024,"lng":-80.30959,"label":"<strong><a href='/bailbonds/fl/agent/viola-james-michael-a274176/'>Viola, James Michael</a></strong>"},{"lat":25.55682,"lng":-80.39434,"label":"<strong><a href='/bailbonds/fl/agent/walker-javon-w242730/'>Walker, Javon</a></strong>"},{"lat":25.91481,"lng":-80.16187,"label":"<strong><a href='/bailbonds/fl/agent/walters-russell-warren-jr-a277029/'>Walters, Russell Warren Jr</a></strong>"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/watson-huggins-janice-w289860/'>Watson-Huggins, Janice</a></strong>"},{"lat":25.78604,"lng":-80.22005,"label":"<strong><a href='/bailbonds/fl/agent/williams-ronnie-jr-p229980/'>Williams, Ronnie Jr.</a></strong>"},{"lat":25.61964,"lng":-80.34675,"label":"<strong><a href='/bailbonds/fl/agent/williams-torrey-e080056/'>Williams, Torrey</a></strong>"},{"lat":25.80937,"lng":-80.3146,"label":"<strong><a href='/bailbonds/fl/agent/willis-corenthia-evette-a286816/'>Willis, Corenthia Evette</a></strong><br>\u260e 407-999-9011"},{"lat":25.94241,"lng":-80.20669,"label":"<strong><a href='/bailbonds/fl/agent/woodside-janice-l-w414854/'>Woodside, Janice L</a></strong>"},{"lat":25.80742,"lng":-80.29959,"label":"<strong><a href='/bailbonds/fl/agent/wright-and-wright-bail-bonds-b000595/'>Wright And Wright Bail Bonds</a></strong>"},{"lat":25.78946,"lng":-80.21891,"label":"<strong><a href='/bailbonds/fl/agent/wright-william-e125045/'>Wright, William</a></strong>"},{"lat":25.8837,"lng":-80.21311,"label":"<strong><a href='/bailbonds/fl/agent/xavier-robert-alexander-w235451/'>Xavier, Robert Alexander</a></strong>"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/xpress-bail-bonds-b000446/'>Xpress Bail Bonds</a></strong><br>\u260e 305-447-6900"},{"lat":25.83342,"lng":-80.33602,"label":"<strong><a href='/bailbonds/fl/agent/yester-anthony-ziggy-w050259/'>Yester, Anthony Ziggy</a></strong>"},{"lat":26.67025,"lng":-80.08782,"label":"<strong><a href='/bailbonds/fl/agent/yousef-suleiman-habib-w291890/'>Yousef, Suleiman Habib</a></strong>"},{"lat":25.77352,"lng":-80.21345,"label":"<strong><a href='/bailbonds/fl/agent/zayas-debra-p129314/'>Zayas, Debra</a></strong>"},{"lat":25.8083,"lng":-80.27013,"label":"<strong><a href='/bailbonds/fl/agent/zemlock-roy-paul-a293704/'>Zemlock, Roy Paul</a></strong>"},{"lat":25.76482,"lng":-80.28784,"label":"<strong><a href='/bailbonds/fl/agent/herald-valdes-bail-bonds/'>Herald Valdes Bail Bonds</a></strong><br>\u260e 786-953-8210"},{"lat":25.81168,"lng":-80.31207,"label":"<strong><a href='/bailbonds/fl/agent/xpress-bail-bonds/'>Xpress Bail Bonds</a></strong><br>\u260e 305-447-6900"},{"lat":25.81596,"lng":-80.35756,"label":"<strong>2 agents in DORAL</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/a1-magic-bail-bonds-fianzas-llc-b000217/'>A1 Magic Bail Bonds/Fianzas, Llc</a></strong><br><strong><a href='/bailbonds/fl/agent/gomez-marek-h-p031415/'>Gomez, Marek H</a></strong>"},{"lat":25.8106,"lng":-80.14885,"label":"<strong>1 agent in MIAMI BEACH</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/benveniste-jacques-ira-a019675/'>Benveniste, Jacques Ira</a></strong>"},{"lat":28.68695,"lng":-82.11441,"label":"<strong>1 agent in BUSHNELL</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/capener-roger-dean-a039906/'>Capener, Roger Dean</a></strong>"},{"lat":25.94889,"lng":-80.24358,"label":"<strong>3 agents in MIAMI GARDENS</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/garces-juan-carlos-e046922/'>Garces, Juan Carlos</a></strong><br><strong><a href='/bailbonds/fl/agent/huggins-steve-earnest-w456198/'>Huggins, Steve Earnest</a></strong><br><strong><a href='/bailbonds/fl/agent/lovinsky-ronald-p228678/'>Lovinsky, Ronald</a></strong>"},{"lat":25.46633,"lng":-80.44305,"label":"<strong>1 agent in HOMESTEAD</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/hernandez-amanda-g141394/'>Hernandez, Amanda</a></strong>"},{"lat":25.6217,"lng":-80.31891,"label":"<strong>1 agent in PALMETTO BAY</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/holmes-robneka-jatalia-w301172/'>Holmes, Robneka Jatalia</a></strong>"},{"lat":25.88771,"lng":-80.35693,"label":"<strong>2 agents in HIALEAH GARDENS</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/infante-ann-e-w091789/'>Infante, Ann E</a></strong><br><strong><a href='/bailbonds/fl/agent/infante-idalberto-d079024/'>Infante, Idalberto</a></strong>"},{"lat":25.93,"lng":-80.16518,"label":"<strong>2 agents in NORTH MIAMI BEACH</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/mcintosh-bail-bonds-agency-b000495/'>Mcintosh Bail Bonds Agency</a></strong><br><strong><a href='/bailbonds/fl/agent/mcintosh-debbie-elaine-w460063/'>Mcintosh, Debbie Elaine</a></strong>"},{"lat":25.77516,"lng":-80.20861,"label":"<strong>6 agents in MIAMI</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/metropolitan-investigations-and-bail-inc-b000161/'>Metropolitan Investigations And Bail Inc.</a></strong><br><strong><a href='/bailbonds/fl/agent/pino-julio-cesar-w343026/'>Pino, Julio Cesar</a></strong><br><strong><a href='/bailbonds/fl/agent/pino-maria-eugenia-a308269/'>Pino, Maria Eugenia</a></strong><br><strong><a href='/bailbonds/fl/agent/pupo-israel-a-jr-p193828/'>Pupo, Israel A Jr</a></strong><br><strong><a href='/bailbonds/fl/agent/santiago-nilsa-m-e004159/'>Santiago, Nilsa M</a></strong><br><strong><a href='/bailbonds/fl/agent/suarez-rogelio-a257363/'>Suarez, Rogelio</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

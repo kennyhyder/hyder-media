@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-20%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,22 +106,26 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ut/agent/2nd-chance-bail-bonds-382610/">
   <div class="an">2nd Chance Bail Bonds</div>
   <div class="ad">1075 W. 4175 S., Riverdale, 84405</div>
-  <div class='ph'>(801) 393-9999</div>
+  <div class='ph'>☎ (801) 393-9999</div>
+  
   <div class='lic'>License: 382610</div>
 </a><a class="agent" href="/bailbonds/ut/agent/aaa-bail-bonds-97856/">
   <div class="an">AAA Bail Bonds</div>
   <div class="ad">1260 S. 1200 W., Ste. 1, Marriott-Slaterville, 84404</div>
-  <div class='ph'>(855) 955-2245</div>
+  <div class='ph'>☎ (855) 955-2245</div>
+  
   <div class='lic'>License: 97856</div>
 </a><a class="agent" href="/bailbonds/ut/agent/bonds-r-us-664039/">
   <div class="an">Bonds R Us</div>
   <div class="ad">PO Box 3934, Ogden, 84409</div>
-  <div class='ph'>(801) 391-3994</div>
+  <div class='ph'>☎ (801) 391-3994</div>
+  
   <div class='lic'>License: 664039</div>
 </a><a class="agent" href="/bailbonds/ut/agent/pappas-bail-bonds-535187/">
   <div class="an">Pappas Bail Bonds</div>
   <div class="ad">1905 Lincoln Ave., Ogden, 84401</div>
-  <div class='ph'>(801) 399-1484</div>
+  <div class='ph'>☎ (801) 399-1484</div>
+  
   <div class='lic'>License: 535187</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://insurance.utah.gov/licensees/bail-bond/agencies/' rel='nofollow'>insurance.utah.gov</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.27032, -111.87688], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":41.18746,"lng":-112.00583,"label":"<strong><a href='/bailbonds/ut/agent/2nd-chance-bail-bonds-382610/'>2nd Chance Bail Bonds</a></strong><br>\u260e (801) 393-9999"},{"lat":41.24286,"lng":-112.00941,"label":"<strong><a href='/bailbonds/ut/agent/aaa-bail-bonds-97856/'>AAA Bail Bonds</a></strong><br>\u260e (855) 955-2245"},{"lat":41.23301,"lng":-111.97587,"label":"<strong><a href='/bailbonds/ut/agent/pappas-bail-bonds-535187/'>Pappas Bail Bonds</a></strong><br>\u260e (801) 399-1484"},{"lat":41.22839,"lng":-111.96815,"label":"<strong>1 agent in Ogden</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ut/agent/bonds-r-us-664039/'>Bonds R Us</a></strong><br>\u260e (801) 391-3994"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

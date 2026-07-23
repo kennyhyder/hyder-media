@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">12%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,82 +106,98 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/la/agent/timothy-john-fanguy-190440/">
   <div class="an">Timothy John Fanguy</div>
   <div class="ad">3204 Grand Caillou Rd, Houma, 70363</div>
-  <div class='ph'>(985) 872-3868</div>
+  <div class='ph'>☎ (985) 872-3868</div>
+  
   <div class='lic'>License: 190440</div>
 </a><a class="agent" href="/bailbonds/la/agent/margaret-wren-257060/">
   <div class="an">Margaret Wren</div>
   <div class="ad">3204 Grand Cailou Rd, Houma, 70363</div>
-  <div class='ph'>(985) 868-9599</div>
+  <div class='ph'>☎ (985) 868-9599</div>
+  
   <div class='lic'>License: 257060</div>
 </a><a class="agent" href="/bailbonds/la/agent/michael-ray-tucker-322520/">
   <div class="an">Michael Ray Tucker</div>
   <div class="ad">3186 Grand Caillou Road, Houma, 70363</div>
-  <div class='ph'>(985) 851-3733</div>
+  <div class='ph'>☎ (985) 851-3733</div>
+  
   <div class='lic'>License: 322520</div>
 </a><a class="agent" href="/bailbonds/la/agent/michael-wade-lausen-334146/">
   <div class="an">Michael Wade Lausen</div>
   <div class="ad">2126 Grand Caillou Road, Houma, 70363</div>
-  <div class='ph'>(985) 346-8337</div>
+  <div class='ph'>☎ (985) 346-8337</div>
+  
   <div class='lic'>License: 334146</div>
 </a><a class="agent" href="/bailbonds/la/agent/kanesha-l-lawson-283157/">
   <div class="an">Kanesha L Lawson</div>
   <div class="ad">902 Saadi Street, Houma, 70363</div>
-  <div class='ph'>(985) 303-1382</div>
+  <div class='ph'>☎ (985) 303-1382</div>
+  
   <div class='lic'>License: 283157</div>
 </a><a class="agent" href="/bailbonds/la/agent/nikki-stmartin-daigle-518312/">
   <div class="an">Nikki Stmartin Daigle</div>
   <div class="ad">374 Daralyn Drive, Houma, 70363</div>
-  <div class='ph'>(985) 870-8129</div>
+  <div class='ph'>☎ (985) 870-8129</div>
+  
   <div class='lic'>License: 518312</div>
 </a><a class="agent" href="/bailbonds/la/agent/tim-fanguy-bail-bond-inc-306784/">
   <div class="an">Tim Fanguy Bail Bond Inc</div>
   <div class="ad">3204 Grand Caillou Road, Houma, 70363</div>
-  <div class='ph'>(504) 368-2300</div>
+  <div class='ph'>☎ (504) 368-2300</div>
+  
   <div class='lic'>License: 306784</div>
 </a><a class="agent" href="/bailbonds/la/agent/melissa-landry-tucker-327407/">
   <div class="an">Melissa Landry Tucker</div>
   <div class="ad">3186 Grand Caillou Road, Houma, 70363</div>
-  <div class='ph'>(985) 858-2245</div>
+  <div class='ph'>☎ (985) 858-2245</div>
+  
   <div class='lic'>License: 327407</div>
 </a><a class="agent" href="/bailbonds/la/agent/michelle-mary-cenac-491941/">
   <div class="an">Michelle Mary Cenac</div>
   <div class="ad">870 Wood St., Houma, 70360</div>
-  <div class='ph'>(985) 665-0303</div>
+  <div class='ph'>☎ (985) 665-0303</div>
+  
   <div class='lic'>License: 491941</div>
 </a><a class="agent" href="/bailbonds/la/agent/latoya-keller-792570/">
   <div class="an">Latoya Keller</div>
   <div class="ad">114 Enterprise Drive, Houma, 70363</div>
-  <div class='ph'>(985) 317-3618</div>
+  <div class='ph'>☎ (985) 317-3618</div>
+  
   <div class='lic'>License: 792570</div>
 </a><a class="agent" href="/bailbonds/la/agent/eric-a-moses-885957/">
   <div class="an">Eric A Moses</div>
   <div class="ad">705 Wortham Way, Houma, 70360</div>
-  <div class='ph'>(985) 209-9890</div>
+  <div class='ph'>☎ (985) 209-9890</div>
+  
   <div class='lic'>License: 885957</div>
 </a><a class="agent" href="/bailbonds/la/agent/shakilla-george-lyons-1067643/">
   <div class="an">Shakilla George Lyons</div>
   <div class="ad">161 Camille St, Houma, 70360</div>
-  <div class='ph'>(985) 293-0642</div>
+  <div class='ph'>☎ (985) 293-0642</div>
+  
   <div class='lic'>License: 1067643</div>
 </a><a class="agent" href="/bailbonds/la/agent/dimitra-trosclair-moses-966593/">
   <div class="an">Dimitra Trosclair Moses</div>
   <div class="ad">705 Wortham Way, Houma, 70360</div>
-  <div class='ph'>(985) 209-0404</div>
+  <div class='ph'>☎ (985) 209-0404</div>
+  
   <div class='lic'>License: 966593</div>
 </a><a class="agent" href="/bailbonds/la/agent/oxen-enterprises-llc-695831/">
   <div class="an">Oxen Enterprises, LLC</div>
   <div class="ad">2126 Grand Caillou Road, Houma, 70363</div>
-  <div class='ph'>(985) 346-8337</div>
+  <div class='ph'>☎ (985) 346-8337</div>
+  
   <div class='lic'>License: 695831</div>
 </a><a class="agent" href="/bailbonds/la/agent/keller-bail-bonds-llc-986357/">
   <div class="an">Keller Bail Bonds Llc</div>
   <div class="ad">114 Enterprise Drive, Houma, 70360</div>
-  <div class='ph'>(985) 317-3618</div>
+  <div class='ph'>☎ (985) 317-3618</div>
+  
   <div class='lic'>License: 986357</div>
 </a><a class="agent" href="/bailbonds/la/agent/nicole-prejean-fanguy-1072397/">
   <div class="an">Nicole Prejean Fanguy</div>
   <div class="ad">3204 Grand Caillou Rd., Houma, 70360</div>
-  <div class='ph'>(985) 872-3868</div>
+  <div class='ph'>☎ (985) 872-3868</div>
+  
   <div class='lic'>License: 1072397</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.ldi.la.gov/LicenseeReports/ProducersBailBond.xls' rel='nofollow'>www.ldi.la.gov</a></p>
 </div>
@@ -199,5 +217,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.33413, -90.84367], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.51992,"lng":-90.67552,"label":"<strong><a href='/bailbonds/la/agent/timothy-john-fanguy-190440/'>Timothy John Fanguy</a></strong><br>\u260e (985) 872-3868"},{"lat":29.51992,"lng":-90.67552,"label":"<strong><a href='/bailbonds/la/agent/margaret-wren-257060/'>Margaret Wren</a></strong><br>\u260e (985) 868-9599"},{"lat":29.52058,"lng":-90.67546,"label":"<strong><a href='/bailbonds/la/agent/michael-ray-tucker-322520/'>Michael Ray Tucker</a></strong><br>\u260e (985) 851-3733"},{"lat":29.55356,"lng":-90.68002,"label":"<strong><a href='/bailbonds/la/agent/michael-wade-lausen-334146/'>Michael Wade Lausen</a></strong><br>\u260e (985) 346-8337"},{"lat":29.58542,"lng":-90.71275,"label":"<strong><a href='/bailbonds/la/agent/kanesha-l-lawson-283157/'>Kanesha L Lawson</a></strong><br>\u260e (985) 303-1382"},{"lat":29.55741,"lng":-90.66938,"label":"<strong><a href='/bailbonds/la/agent/nikki-stmartin-daigle-518312/'>Nikki Stmartin Daigle</a></strong><br>\u260e (985) 870-8129"},{"lat":29.51992,"lng":-90.67552,"label":"<strong><a href='/bailbonds/la/agent/tim-fanguy-bail-bond-inc-306784/'>Tim Fanguy Bail Bond Inc</a></strong><br>\u260e (504) 368-2300"},{"lat":29.52058,"lng":-90.67546,"label":"<strong><a href='/bailbonds/la/agent/melissa-landry-tucker-327407/'>Melissa Landry Tucker</a></strong><br>\u260e (985) 858-2245"},{"lat":29.59376,"lng":-90.71654,"label":"<strong><a href='/bailbonds/la/agent/michelle-mary-cenac-491941/'>Michelle Mary Cenac</a></strong><br>\u260e (985) 665-0303"},{"lat":29.61155,"lng":-90.75323,"label":"<strong><a href='/bailbonds/la/agent/latoya-keller-792570/'>Latoya Keller</a></strong><br>\u260e (985) 317-3618"},{"lat":29.5887,"lng":-90.75629,"label":"<strong><a href='/bailbonds/la/agent/eric-a-moses-885957/'>Eric A Moses</a></strong><br>\u260e (985) 209-9890"},{"lat":29.5752,"lng":-90.76183,"label":"<strong><a href='/bailbonds/la/agent/shakilla-george-lyons-1067643/'>Shakilla George Lyons</a></strong><br>\u260e (985) 293-0642"},{"lat":29.5887,"lng":-90.75629,"label":"<strong><a href='/bailbonds/la/agent/dimitra-trosclair-moses-966593/'>Dimitra Trosclair Moses</a></strong><br>\u260e (985) 209-0404"},{"lat":29.55356,"lng":-90.68002,"label":"<strong><a href='/bailbonds/la/agent/oxen-enterprises-llc-695831/'>Oxen Enterprises, LLC</a></strong><br>\u260e (985) 346-8337"},{"lat":29.61155,"lng":-90.75323,"label":"<strong><a href='/bailbonds/la/agent/keller-bail-bonds-llc-986357/'>Keller Bail Bonds Llc</a></strong><br>\u260e (985) 317-3618"},{"lat":29.51992,"lng":-90.67552,"label":"<strong><a href='/bailbonds/la/agent/nicole-prejean-fanguy-1072397/'>Nicole Prejean Fanguy</a></strong><br>\u260e (985) 872-3868"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,216 +107,259 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">A Key To Freedom Gary Calhoun Bail Bonds</div>
   <div class="ad">200 N.E. 1ST STREET STE.#117, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ AKEYTOFREEDOM@YAHOO.COM</div>
   <div class='lic'>License: B000627</div>
 </a><a class="agent" href="/bailbonds/fl/agent/agency-bail-bonds-by-sam-b-wesley-ii-b000628/">
   <div class="an">Agency Bail Bonds By Sam B Wesley Ii</div>
   <div class="ad">739 NW 5TH AVENUE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ SBWESLEYII@GMAIL.COM</div>
   <div class='lic'>License: B000628</div>
 </a><a class="agent" href="/bailbonds/fl/agent/andrae-bryant-bail-bonds-llc-b000630/">
   <div class="an">Andrae Bryant Bail Bonds Llc</div>
   <div class="ad">3141 NW 13TH STREET, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ ANDRAEBRYANT3333@GMAIL.COM</div>
   <div class='lic'>License: B000630</div>
 </a><a class="agent" href="/bailbonds/fl/agent/andre-pertee-bail-bonds-b000645/">
   <div class="an">Andre Pertee Bail Bonds</div>
   <div class="ad">3141 NW 13TH ST SUITE E, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ PERTEEFASTBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000645</div>
 </a><a class="agent" href="/bailbonds/fl/agent/baker-tyrone-devaughn-e129817/">
   <div class="an">Baker, Tyrone Devaughn</div>
   <div class="ad">TYRONE BAKER BAIL BONDS 106 SE 11TH ST, GAINESVILLE, 32641</div>
   
+  <div class='ad'>✉ TYRONEBAKER2007@YAHOO.COM</div>
   <div class='lic'>License: E129817</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bryant-andrae-christopher-p186031/">
   <div class="an">Bryant, Andrae Christopher</div>
   <div class="ad">ANDRAE BRYANT BAIL BONDS 3141 NW 13TH STREET SUITE B, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ ANDRAEBRYANT3333@GMAIL.COM</div>
   <div class='lic'>License: P186031</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bryant-cawan-w871636/">
   <div class="an">Bryant, Cawan</div>
   <div class="ad">CAWAN BRYANT BAIL BONDS 1731 NW 6TH ST STE A-8, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ CAWAN1823@GMAIL.COM</div>
   <div class='lic'>License: W871636</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bryant-marcia-ceceilua-w246519/">
   <div class="an">Bryant, Marcia Ceceilua</div>
   <div class="ad">MARCIA BRYANT BAIL BONDS 3141 NW 13TH ST STE C, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ MCBRYANT352@GMAIL.COM</div>
   <div class='lic'>License: W246519</div>
 </a><a class="agent" href="/bailbonds/fl/agent/calhoun-earlene-pinkney-w043560/">
   <div class="an">Calhoun, Earlene Pinkney</div>
   <div class="ad">2412 NE WALDO ROAD, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ EARLENEPINKNEY@YAHOO.COM</div>
   <div class='lic'>License: W043560</div>
 </a><a class="agent" href="/bailbonds/fl/agent/calhoun-gary-lamar-a315389/">
   <div class="an">Calhoun, Gary Lamar</div>
   <div class="ad">200 N.E. 1ST STREET STE.#117, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ AKEYTOFREEDOM@YAHOO.COM</div>
   <div class='lic'>License: A315389</div>
 </a><a class="agent" href="/bailbonds/fl/agent/calhoun-lee-n-a038335/">
   <div class="an">Calhoun, Lee N</div>
   <div class="ad">LEE CALHOUN BAIL BONDS 3131 NW 13TH STREET STE 9, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ LEECALHOUNSBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A038335</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cline-shannon-mathis-e001755/">
   <div class="an">Cline, Shannon Mathis</div>
   <div class="ad">MATHIS BAIL BONDS AGENCY 901 NW 8TH AVENUE, SUITE B-3 4, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ MATHISBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: E001755</div>
 </a><a class="agent" href="/bailbonds/fl/agent/douglas-bail-bonds-b000693/">
   <div class="an">Douglas Bail Bonds</div>
   <div class="ad">3221 NW 13TH ST, STE D2, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ DOUGLASBAIL1015@GMAIL.COM</div>
   <div class='lic'>License: B000693</div>
 </a><a class="agent" href="/bailbonds/fl/agent/douglas-lajoya-lashawn-w736828/">
   <div class="an">Douglas, Lajoya Lashawn</div>
   <div class="ad">DOUGLAS BAIL BONDS LLC 3221 NW 13TH ST STE D2, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ DOUGLASBAIL1015@GMAIL.COM</div>
   <div class='lic'>License: W736828</div>
 </a><a class="agent" href="/bailbonds/fl/agent/george-vanessa-w810077/">
   <div class="an">George, Vanessa</div>
   <div class="ad">AGENCY BAILBONDS 739 NW 5TH AVENUE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ VGEORGE1976@HOTMAIL.COM</div>
   <div class='lic'>License: W810077</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hargon-betty-j-a298737/">
   <div class="an">Hargon, Betty J</div>
   <div class="ad">AGENCY BAIL BOND BY SAM WESLEY 739 NW 5TH AVENUE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ BJ.WESLEY@YAHOO.COM</div>
   <div class='lic'>License: A298737</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harris-tonya-alicia-e010877/">
   <div class="an">Harris, Tonya Alicia</div>
   <div class="ad">739 N.W. 5TH AVE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ T_HARRIS_2001@YAHOO.COM</div>
   <div class='lic'>License: E010877</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hightower-kersandras-martin-e116934/">
   <div class="an">Hightower, Kersandras Martin</div>
   <div class="ad">1712 NE WALDO ROAD, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ KHIGHTOWER8861@WINDSTREAM.NET</div>
   <div class='lic'>License: E116934</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hill-clayton-colquitt-a119061/">
   <div class="an">Hill, Clayton Colquitt</div>
   <div class="ad">1031 NW 6TH ST UNIT A-1, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ CHILLSERVICES@YAHOO.COM</div>
   <div class='lic'>License: A119061</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lane-kimberly-p211358/">
   <div class="an">Lane, Kimberly</div>
   <div class="ad">6750 N ANDREWS AVE STE 125, FORT LAUDERDALE, 33309</div>
   
+  <div class='ad'>✉ KIMBERLY.LANE@CRCGROUP.COM</div>
   <div class='lic'>License: P211358</div>
 </a><a class="agent" href="/bailbonds/fl/agent/long-rodney-julius-a157992/">
   <div class="an">Long, Rodney Julius</div>
   <div class="ad">RODNEY J LONG BAIL BONDS AGENCY 1712 NE WALDO RD STE A, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ RODNEYLONGBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: A157992</div>
 </a><a class="agent" href="/bailbonds/fl/agent/martin-long-carole-a166098/">
   <div class="an">Martin-Long, Carole</div>
   <div class="ad">RODNEY J LONG BAIL BONDS AGENCY 1712 NE WALDO RD, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ LONGCAROLEM@GMAIL.COM</div>
   <div class='lic'>License: A166098</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mathis-bail-bonds-agency-b000520/">
   <div class="an">Mathis Bail Bonds Agency</div>
   <div class="ad">901 NW 8TH AVENUE, SUITE B3-4, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ MATHISBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000520</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mccloud-tonette-demetra-w461949/">
   <div class="an">Mccloud, Tonette Demetra</div>
   <div class="ad">3141 NW 13TH ST. SUITE A, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ MCCLOUD.TONETTE@YAHOO.COM</div>
   <div class='lic'>License: W461949</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mcleod-sonia-w734125/">
   <div class="an">Mcleod, Sonia</div>
   <div class="ad">ANDRAE BRYANT BAIL BONDS 3141 NW 13TH STREET STE B, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ SONIADMCLEOD@GMAIL.COM</div>
   <div class='lic'>License: W734125</div>
 </a><a class="agent" href="/bailbonds/fl/agent/nessmith-cason-tyler-w101960/">
   <div class="an">Nessmith, Cason Tyler</div>
   <div class="ad">105 SW 140TH CT STE 5, JONESVILLE, 32669</div>
   
+  <div class='ad'>✉ CASON.NESSMITH@EDWARDJONES.COM</div>
   <div class='lic'>License: W101960</div>
 </a><a class="agent" href="/bailbonds/fl/agent/pertee-andre-w-w589195/">
   <div class="an">Pertee, Andre W</div>
   <div class="ad">ANDRE PERTEE BAIL BONDS 3161 NW 13TH STREET SUITE A, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ PERTEEFASTBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W589195</div>
 </a><a class="agent" href="/bailbonds/fl/agent/priola-susan-marie-e038837/">
   <div class="an">Priola, Susan Marie</div>
   <div class="ad">2612 NORTHWEST 47 PLACE, GAINESVILLE, 32605</div>
   
+  <div class='ad'>✉ SUEMARIE34451@YAHOO.COM</div>
   <div class='lic'>License: E038837</div>
 </a><a class="agent" href="/bailbonds/fl/agent/quintesential-bail-bonds-b000529/">
   <div class="an">Quintesential Bail Bonds</div>
   <div class="ad">1620 SE HAWTHORNE RD, GAINESVILLE, 32641</div>
   
+  <div class='ad'>✉ QUINTESSENTIALBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000529</div>
 </a><a class="agent" href="/bailbonds/fl/agent/reaves-joey-leander-w104194/">
   <div class="an">Reaves, Joey Leander</div>
   <div class="ad">739 NW 5TH AVENUE SUITE 1, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ JOEYREAVES@GMAIL.COM</div>
   <div class='lic'>License: W104194</div>
 </a><a class="agent" href="/bailbonds/fl/agent/richard-yolanda-michelle-e015621/">
   <div class="an">Richard, Yolanda Michelle</div>
   <div class="ad">739 NW 5TH AVENUE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ YOLANDACALHOUN3248@GMAIL.COM</div>
   <div class='lic'>License: E015621</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rodney-long-bail-bonds-agency-llc-b000366/">
   <div class="an">Rodney Long Bail Bonds Agency, Llc</div>
   <div class="ad">1712 NE WALDO ROAD, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ RODNEYLONGBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: B000366</div>
 </a><a class="agent" href="/bailbonds/fl/agent/roundtree-richard-eugene-a227052/">
   <div class="an">Roundtree, Richard Eugene</div>
   <div class="ad">4106 N.W. 122 TERRACE, GAINESVILLE, 32606</div>
   
+  <div class='ad'>✉ RICKROUNDTREE@GMAIL.COM</div>
   <div class='lic'>License: A227052</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thomas-bonding-agency-b000682/">
   <div class="an">Thomas Bonding Agency</div>
   <div class="ad">2632 NW 43RD STREET #1114, GAINESVILLE, 32606</div>
   
+  <div class='ad'>✉ SEANTHOMAS.BAIL@GMAIL.COM</div>
   <div class='lic'>License: B000682</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thomas-anita-michelle-g050920/">
   <div class="an">Thomas, Anita Michelle</div>
   <div class="ad">2632 NW 43RD ST #1114, GAINESVILLE, 32606</div>
   
+  <div class='ad'>✉ TUCKTHOMAS13@GMAIL.COM</div>
   <div class='lic'>License: G050920</div>
 </a><a class="agent" href="/bailbonds/fl/agent/thomas-sean-robert-a263980/">
   <div class="an">Thomas, Sean Robert</div>
   <div class="ad">THOMAS BONDING AGENCY DBA ROUNDTREE BONDING AGENCY 2632 NW 43RD STREET SUITE 1114, GAINESVILLE, 32606</div>
   
+  <div class='ad'>✉ SEANTHOMAS.BAIL@GMAIL.COM</div>
   <div class='lic'>License: A263980</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tonette-mccloud-bail-bonds-b000680/">
   <div class="an">Tonette Mccloud Bail Bonds</div>
   <div class="ad">3141 NW 13TH ST SUITE A, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ MCCLOUD.TONETTE@YAHOO.COM</div>
   <div class='lic'>License: B000680</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tyrone-baker-bailbonds-b000524/">
   <div class="an">Tyrone Baker Bailbonds</div>
   <div class="ad">106 SOUTHEAST 11TH STREET, GAINESVILLE, 32641</div>
   
+  <div class='ad'>✉ TYRONEBAKER2007@YAHOO.COM</div>
   <div class='lic'>License: B000524</div>
 </a><a class="agent" href="/bailbonds/fl/agent/waldon-derrick-germaine-w073581/">
   <div class="an">Waldon, Derrick Germaine</div>
   <div class="ad">D WALDON BAIL BONDS 125 NW 23RD AVE UNIT 1, GAINESVILLE, 32609</div>
   
+  <div class='ad'>✉ DWALDONBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W073581</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wesley-christopher-l-e005112/">
   <div class="an">Wesley, Christopher L</div>
   <div class="ad">431 SE 14TH TERRACE, GAINESVILLE, 32641</div>
   
+  <div class='ad'>✉ MRWESLEY_32641@YAHOO.COM</div>
   <div class='lic'>License: E005112</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wesley-jalen-w633727/">
   <div class="an">Wesley, Jalen</div>
   <div class="ad">JALEN D. WESLEY 1620 SE HAWTHORNE RD, GAINESVILLE, 32641</div>
   
+  <div class='ad'>✉ QUINTESSENTIALBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: W633727</div>
 </a><a class="agent" href="/bailbonds/fl/agent/wesley-sam-benny-a281684/">
   <div class="an">Wesley, Sam Benny</div>
   <div class="ad">AGENCY BAIL BONDS BY SAM B WESLEY 739 NW 5TH AVE, GAINESVILLE, 32601</div>
   
+  <div class='ad'>✉ SBWESLEYII@GMAIL.COM</div>
   <div class='lic'>License: A281684</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mathis-bail-bond-agency/">
   <div class="an">Mathis Bail Bond Agency</div>
   <div class="ad">901 NW 8th Ave, Gainesville, 32601</div>
-  <div class='ph'>352-271-1244</div>
+  <div class='ph'>☎ 352-271-1244</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://flbaa.com/ (Florida Bail Agents Association member directory)' rel='nofollow'>flbaa.com</a> · <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -334,5 +379,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.67574, -82.35722], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.65344,"lng":-82.32407,"label":"<strong><a href='/bailbonds/fl/agent/a-key-to-freedom-gary-calhoun-bail-bonds-b000627/'>A Key To Freedom Gary Calhoun Bail Bonds</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/agency-bail-bonds-by-sam-b-wesley-ii-b000628/'>Agency Bail Bonds By Sam B Wesley Ii</a></strong>"},{"lat":29.65108,"lng":-82.31162,"label":"<strong><a href='/bailbonds/fl/agent/baker-tyrone-devaughn-e129817/'>Baker, Tyrone Devaughn</a></strong>"},{"lat":29.66785,"lng":-82.33084,"label":"<strong><a href='/bailbonds/fl/agent/bryant-cawan-w871636/'>Bryant, Cawan</a></strong>"},{"lat":29.67503,"lng":-82.29611,"label":"<strong><a href='/bailbonds/fl/agent/calhoun-earlene-pinkney-w043560/'>Calhoun, Earlene Pinkney</a></strong>"},{"lat":29.65344,"lng":-82.32407,"label":"<strong><a href='/bailbonds/fl/agent/calhoun-gary-lamar-a315389/'>Calhoun, Gary Lamar</a></strong>"},{"lat":29.65937,"lng":-82.33405,"label":"<strong><a href='/bailbonds/fl/agent/cline-shannon-mathis-e001755/'>Cline, Shannon Mathis</a></strong>"},{"lat":29.68236,"lng":-82.33892,"label":"<strong><a href='/bailbonds/fl/agent/douglas-bail-bonds-b000693/'>Douglas Bail Bonds</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/george-vanessa-w810077/'>George, Vanessa</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/hargon-betty-j-a298737/'>Hargon, Betty J</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/harris-tonya-alicia-e010877/'>Harris, Tonya Alicia</a></strong>"},{"lat":29.66762,"lng":-82.30114,"label":"<strong><a href='/bailbonds/fl/agent/hightower-kersandras-martin-e116934/'>Hightower, Kersandras Martin</a></strong>"},{"lat":29.66146,"lng":-82.33083,"label":"<strong><a href='/bailbonds/fl/agent/hill-clayton-colquitt-a119061/'>Hill, Clayton Colquitt</a></strong>"},{"lat":26.20955,"lng":-80.14283,"label":"<strong><a href='/bailbonds/fl/agent/lane-kimberly-p211358/'>Lane, Kimberly</a></strong>"},{"lat":29.66762,"lng":-82.30114,"label":"<strong><a href='/bailbonds/fl/agent/long-rodney-julius-a157992/'>Long, Rodney Julius</a></strong>"},{"lat":29.66762,"lng":-82.30114,"label":"<strong><a href='/bailbonds/fl/agent/martin-long-carole-a166098/'>Martin-Long, Carole</a></strong>"},{"lat":29.65937,"lng":-82.33405,"label":"<strong><a href='/bailbonds/fl/agent/mathis-bail-bonds-agency-b000520/'>Mathis Bail Bonds Agency</a></strong>"},{"lat":29.65304,"lng":-82.49256,"label":"<strong><a href='/bailbonds/fl/agent/nessmith-cason-tyler-w101960/'>Nessmith, Cason Tyler</a></strong>"},{"lat":29.69851,"lng":-82.36108,"label":"<strong><a href='/bailbonds/fl/agent/priola-susan-marie-e038837/'>Priola, Susan Marie</a></strong>"},{"lat":29.65079,"lng":-82.30477,"label":"<strong><a href='/bailbonds/fl/agent/quintesential-bail-bonds-b000529/'>Quintesential Bail Bonds</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/reaves-joey-leander-w104194/'>Reaves, Joey Leander</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/richard-yolanda-michelle-e015621/'>Richard, Yolanda Michelle</a></strong>"},{"lat":29.66762,"lng":-82.30114,"label":"<strong><a href='/bailbonds/fl/agent/rodney-long-bail-bonds-agency-llc-b000366/'>Rodney Long Bail Bonds Agency, Llc</a></strong>"},{"lat":29.69179,"lng":-82.47226,"label":"<strong><a href='/bailbonds/fl/agent/roundtree-richard-eugene-a227052/'>Roundtree, Richard Eugene</a></strong>"},{"lat":29.65108,"lng":-82.31162,"label":"<strong><a href='/bailbonds/fl/agent/tyrone-baker-bailbonds-b000524/'>Tyrone Baker Bailbonds</a></strong>"},{"lat":29.67389,"lng":-82.32589,"label":"<strong><a href='/bailbonds/fl/agent/waldon-derrick-germaine-w073581/'>Waldon, Derrick Germaine</a></strong>"},{"lat":29.64797,"lng":-82.30645,"label":"<strong><a href='/bailbonds/fl/agent/wesley-christopher-l-e005112/'>Wesley, Christopher L</a></strong>"},{"lat":29.65079,"lng":-82.30477,"label":"<strong><a href='/bailbonds/fl/agent/wesley-jalen-w633727/'>Wesley, Jalen</a></strong>"},{"lat":29.65562,"lng":-82.33249,"label":"<strong><a href='/bailbonds/fl/agent/wesley-sam-benny-a281684/'>Wesley, Sam Benny</a></strong>"},{"lat":29.65937,"lng":-82.33405,"label":"<strong><a href='/bailbonds/fl/agent/mathis-bail-bond-agency/'>Mathis Bail Bond Agency</a></strong><br>\u260e 352-271-1244"},{"lat":29.67954,"lng":-82.34679,"label":"<strong>13 agents in GAINESVILLE</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/andrae-bryant-bail-bonds-llc-b000630/'>Andrae Bryant Bail Bonds Llc</a></strong><br><strong><a href='/bailbonds/fl/agent/andre-pertee-bail-bonds-b000645/'>Andre Pertee Bail Bonds</a></strong><br><strong><a href='/bailbonds/fl/agent/bryant-andrae-christopher-p186031/'>Bryant, Andrae Christopher</a></strong><br><strong><a href='/bailbonds/fl/agent/bryant-marcia-ceceilua-w246519/'>Bryant, Marcia Ceceilua</a></strong><br><strong><a href='/bailbonds/fl/agent/calhoun-lee-n-a038335/'>Calhoun, Lee N</a></strong><br><strong><a href='/bailbonds/fl/agent/douglas-lajoya-lashawn-w736828/'>Douglas, Lajoya Lashawn</a></strong><br><strong><a href='/bailbonds/fl/agent/mccloud-tonette-demetra-w461949/'>Mccloud, Tonette Demetra</a></strong><br><strong><a href='/bailbonds/fl/agent/mcleod-sonia-w734125/'>Mcleod, Sonia</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

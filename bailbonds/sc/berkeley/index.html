@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,12 +106,14 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/durling-michael-william-rbm-21087331-npn-21087331/">
   <div class="an">Durling, Michael William</div>
   <div class="ad">Summerville, 29483</div>
-  <div class='ph'>(843) 489-1608</div>
+  <div class='ph'>☎ (843) 489-1608</div>
+  
   <div class='lic'>License: RBM 21087331 (NPN 21087331)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/carter-crystal-frances-sbb-18771635-npn-18771635/">
   <div class="an">Carter, Crystal Frances</div>
   <div class="ad">North Charleston, 29405</div>
-  <div class='ph'>(843) 554-2005</div>
+  <div class='ph'>☎ (843) 554-2005</div>
+  
   <div class='lic'>License: SBB 18771635 (NPN 18771635)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Berkeley' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Berkeley' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -129,5 +133,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.2077, -79.95365], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.00584,"lng":-80.17931,"label":"<strong>1 agent in Summerville</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/durling-michael-william-rbm-21087331-npn-21087331/'>Durling, Michael William</a></strong><br>\u260e (843) 489-1608"},{"lat":32.91788,"lng":-80.065,"label":"<strong>1 agent in North Charleston</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/carter-crystal-frances-sbb-18771635-npn-18771635/'>Carter, Crystal Frances</a></strong><br>\u260e (843) 554-2005"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

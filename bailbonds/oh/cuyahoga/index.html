@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,152 +106,182 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/oh/agent/charles-c-brown/">
   <div class="an">Charles C Brown</div><div class='ad'>Chuck Brown II Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>614-224-0788</div>
+  <div class='ph'>☎ 614-224-0788</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/gwendolyn-coats/">
   <div class="an">Gwendolyn Coats</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/philip-vari/">
   <div class="an">Philip Vari</div><div class='ad'>Atlas Bonding Inc.</div>
   <div class="ad"></div>
-  <div class='ph'>216-961-1967</div>
+  <div class='ph'>☎ 216-961-1967</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/stanley-rose/">
   <div class="an">Stanley Rose</div><div class='ad'>Atlas Bonding Inc.</div>
   <div class="ad"></div>
-  <div class='ph'>216-961-1967</div>
+  <div class='ph'>☎ 216-961-1967</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/francis-edwin-haas/">
   <div class="an">Francis Edwin Haas</div><div class='ad'>Smith Bonds and Surety</div>
   <div class="ad"></div>
-  <div class='ph'>419-865-7300</div>
+  <div class='ph'>☎ 419-865-7300</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/john-m-cunningham/">
   <div class="an">John M Cunningham</div><div class='ad'>Two Jinn Inc</div>
   <div class="ad"></div>
-  <div class='ph'>216-302-3620</div>
+  <div class='ph'>☎ 216-302-3620</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/rhonda-jennings/">
   <div class="an">Rhonda Jennings</div><div class='ad'>A1 Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-781-2221</div>
+  <div class='ph'>☎ 216-781-2221</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/carson-n-chlepciak/">
   <div class="an">Carson N Chlepciak</div><div class='ad'>J.C. Bail Bonding Agency LLC</div>
   <div class="ad"></div>
-  <div class='ph'>440-731-8449</div>
+  <div class='ph'>☎ 440-731-8449</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/conni-monique-overstreet/">
   <div class="an">Conni Monique Overstreet</div><div class='ad'>A1 Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-781-2221</div>
+  <div class='ph'>☎ 216-781-2221</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/pennie-s-johnson/">
   <div class="an">Pennie S Johnson</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/natasha-renee-watts/">
   <div class="an">Natasha Renee Watts</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/david-august-toth/">
   <div class="an">David August Toth</div><div class='ad'>T H Sly LLC</div>
   <div class="ad"></div>
-  <div class='ph'>330-438-1770</div>
+  <div class='ph'>☎ 330-438-1770</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/john-m-rocco/">
   <div class="an">John M Rocco</div><div class='ad'>Atlas Bonding Inc.</div>
   <div class="ad"></div>
-  <div class='ph'>216-961-1967</div>
+  <div class='ph'>☎ 216-961-1967</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/kathy-lewis/">
   <div class="an">Kathy Lewis</div><div class='ad'>A1 Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-781-2221</div>
+  <div class='ph'>☎ 216-781-2221</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/john-coats/">
   <div class="an">John Coats</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/anthony-jerome-horn-sr/">
   <div class="an">Anthony Jerome Horn Sr</div><div class='ad'>T-Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>440-240-8714</div>
+  <div class='ph'>☎ 440-240-8714</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/harry-lucas-jennings/">
   <div class="an">Harry Lucas Jennings</div><div class='ad'>T-Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>440-240-8714</div>
+  <div class='ph'>☎ 440-240-8714</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/torrey-deangelo-mitchell/">
   <div class="an">Torrey Deangelo Mitchell</div><div class='ad'>A1 Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-781-2221</div>
+  <div class='ph'>☎ 216-781-2221</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/maurie-lemaine-nunn/">
   <div class="an">Maurie Lemaine Nunn</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/james-edward-murray/">
   <div class="an">James Edward Murray</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-6966</div>
+  <div class='ph'>☎ 216-696-6966</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/michael-jackson/">
   <div class="an">Michael Jackson</div><div class='ad'>Second 2 None LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-244-5697</div>
+  <div class='ph'>☎ 216-244-5697</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/matthew-ian-james/">
   <div class="an">Matthew Ian James</div><div class='ad'>Executive Surety Inc. / ABC Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>216-696-4866</div>
+  <div class='ph'>☎ 216-696-4866</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/anthony-robert-sylvester/">
   <div class="an">Anthony Robert Sylvester</div><div class='ad'>T H Sly LLC</div>
   <div class="ad"></div>
-  <div class='ph'>330-438-1770</div>
+  <div class='ph'>☎ 330-438-1770</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/michael-earl-clark/">
   <div class="an">Michael Earl Clark</div><div class='ad'>Turoczy Bonding</div>
   <div class="ad"></div>
-  <div class='ph'>216-881-5005</div>
+  <div class='ph'>☎ 216-881-5005</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/dwayne-lacey/">
   <div class="an">Dwayne Lacey</div><div class='ad'>Fast Bob's Bail Bonding Inc</div>
   <div class="ad"></div>
-  <div class='ph'>330-395-7777</div>
+  <div class='ph'>☎ 330-395-7777</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/mary-frances-smith/">
   <div class="an">Mary Frances Smith</div><div class='ad'>Smith Bonds and Surety</div>
   <div class="ad"></div>
-  <div class='ph'>419-865-7300</div>
+  <div class='ph'>☎ 419-865-7300</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/dustin-e-gracemyer/">
   <div class="an">Dustin E Gracemyer</div><div class='ad'>Smith Bonds and Surety</div>
   <div class="ad"></div>
-  <div class='ph'>419-865-7300</div>
+  <div class='ph'>☎ 419-865-7300</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/alanna-janea-dunn/">
   <div class="an">Alanna Janea Dunn</div><div class='ad'>A1 Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>216-820-0077</div>
+  <div class='ph'>☎ 216-820-0077</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/nowlhas-eurick-caseres/">
   <div class="an">Nowlhas Eurick Caseres</div><div class='ad'>Smith Bonds and Surety</div>
   <div class="ad"></div>
-  <div class='ph'>419-865-7300</div>
+  <div class='ph'>☎ 419-865-7300</div>
+  
   
 </a><a class="agent" href="/bailbonds/oh/agent/franklin-milos-frazier/">
   <div class="an">Franklin Milos Frazier</div><div class='ad'>T H Sly LLC</div>
   <div class="ad"></div>
-  <div class='ph'>330-438-1770</div>
+  <div class='ph'>☎ 330-438-1770</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://cuyahogacms.blob.core.windows.net/home/docs/default-source/coc/activebondsmen.pdf?sfvrsn=7b2a444a_9' rel='nofollow'>cuyahogacms.blob.core.windows.net</a></p>
 </div>
@@ -269,5 +301,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([41.55504, -81.60496], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

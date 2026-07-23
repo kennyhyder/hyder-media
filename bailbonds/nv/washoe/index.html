@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,20 +107,24 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Brian Johnson</div><div class='ad'>Able Bail Bonds</div>
   <div class="ad">161 VINE ST, Reno, 89503</div>
   
+  
   <div class='lic'>License: R26804A-LIC</div>
 </a><a class="agent" href="/bailbonds/nv/agent/michael-deems-r126914a-lic/">
   <div class="an">Michael Deems</div><div class='ad'>Mike's Family Bail Bonds</div>
   <div class="ad">1280 TERMINAL WAY UNIT 26, Reno, 89502</div>
+  
   
   <div class='lic'>License: R126914A-LIC</div>
 </a><a class="agent" href="/bailbonds/nv/agent/travis-moore-r132666a-lic/">
   <div class="an">Travis Moore</div><div class='ad'>Bail Bonds Unlimited LLC</div>
   <div class="ad">205 S SIERRA ST UNIT 101, Reno, 89501</div>
   
+  
   <div class='lic'>License: R132666A-LIC</div>
 </a><a class="agent" href="/bailbonds/nv/agent/brian-johnson-r153534a-lic/">
   <div class="an">Brian Johnson</div><div class='ad'>Able Bail Bonds</div>
   <div class="ad">910 PARR BLVD UNIT 1, Reno, 89512</div>
+  
   
   <div class='lic'>License: R153534A-LIC</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://services5.arcgis.com/RjM4BJrv5ZkqP4XC/arcgis/rest/services/All_Reno_Businesses/FeatureServer/1 (City of Reno All Reno Businesses open data)' rel='nofollow'>services5.arcgis.com</a></p>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.73132, -119.66327], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":39.52427,"lng":-119.82433,"label":"<strong><a href='/bailbonds/nv/agent/brian-johnson-r26804a-lic/'>Brian Johnson</a></strong>"},{"lat":39.51171,"lng":-119.77737,"label":"<strong><a href='/bailbonds/nv/agent/michael-deems-r126914a-lic/'>Michael Deems</a></strong>"},{"lat":39.52329,"lng":-119.81318,"label":"<strong><a href='/bailbonds/nv/agent/travis-moore-r132666a-lic/'>Travis Moore</a></strong>"},{"lat":39.57105,"lng":-119.81058,"label":"<strong><a href='/bailbonds/nv/agent/brian-johnson-r153534a-lic/'>Brian Johnson</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

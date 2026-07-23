@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,71 +107,85 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">#1 Anytime Bail 24/7</div>
   <div class="ad">1651 W GULF TO LAKE HWY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ 1ANYTIMEBAIL247@GMAIL.COM</div>
   <div class='lic'>License: B000573</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a1-tnt-bail-bonds-inc-b000572/">
   <div class="an">A1 Tnt Bail Bonds Inc</div>
   <div class="ad">3778 W GULF TO LAKE HWY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ TBIBLE01@YAHOO.COM</div>
   <div class='lic'>License: B000572</div>
 </a><a class="agent" href="/bailbonds/fl/agent/all-florida-bail-bonds-b000223/">
   <div class="an">All Florida Bail Bonds</div>
   <div class="ad">425 N. CITRUS AVE, CRYSTASL RIVER, 34428</div>
   
+  <div class='ad'>✉ TARP64@GMAIL.COM</div>
   <div class='lic'>License: B000223</div>
 </a><a class="agent" href="/bailbonds/fl/agent/armato-anthony-matthew-a299767/">
   <div class="an">Armato, Anthony Matthew</div>
   <div class="ad">MIDNIGHT RUN BAIL BONDS 3224 WEST POSTAL LANE, LECANTO, 34461</div>
   
+  <div class='ad'>✉ BOUNTY5485@GMAIL.COM</div>
   <div class='lic'>License: A299767</div>
 </a><a class="agent" href="/bailbonds/fl/agent/armato-matthew-anthony-e027311/">
   <div class="an">Armato, Matthew Anthony</div>
   <div class="ad">MIDNIGHT RUN BAIL BONDS 3224 WEST POSTAL LANE, LECANTO, 34461</div>
   
+  <div class='ad'>✉ BOUNTY5485@GMAIL.COM</div>
   <div class='lic'>License: E027311</div>
 </a><a class="agent" href="/bailbonds/fl/agent/armato-teresa-h-w175928/">
   <div class="an">Armato, Teresa H</div>
   <div class="ad">MIDNIGHT RUN BAIL BONDS 3224 WEST POSTAL LANE, LECANTO, 34461</div>
   
+  <div class='ad'>✉ BOUNTY5485@GMAIL.COM</div>
   <div class='lic'>License: W175928</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bible-timothy-j-sr-w116011/">
   <div class="an">Bible, Timothy J Sr.</div>
   <div class="ad">A1 TNT BAIL BONDS INC. 3778 W GULF TO LAKE HWY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ TBIBLE01@YAHOO.COM</div>
   <div class='lic'>License: W116011</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bible-timothy-james-jr-g155673/">
   <div class="an">Bible, Timothy James Jr</div>
   <div class="ad">2787 N CAROLINA RD, CRYSTAL RIVER, 34428</div>
   
+  <div class='ad'>✉ TBIBLECG@GMAIL.COM</div>
   <div class='lic'>License: G155673</div>
 </a><a class="agent" href="/bailbonds/fl/agent/hargreaves-john-harold-e024050/">
   <div class="an">Hargreaves, John Harold</div>
   <div class="ad">7449 W GOLF TO LAKE HWY STE #8, CRYSTAL RIVER, 34429</div>
   
+  <div class='ad'>✉ BONDSMAN3200@YAHOO.COM</div>
   <div class='lic'>License: E024050</div>
 </a><a class="agent" href="/bailbonds/fl/agent/livengood-neil-g082944/">
   <div class="an">Livengood, Neil</div>
   <div class="ad">1651 W GULF TO LAKE HWY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ LIVENGOODHI@GMAIL.COM</div>
   <div class='lic'>License: G082944</div>
 </a><a class="agent" href="/bailbonds/fl/agent/midnight-run-bail-bonds-b000580/">
   <div class="an">Midnight Run Bail Bonds</div>
   <div class="ad">3224 WEST POSTAL LANE, LECANTO, 34461</div>
   
+  <div class='ad'>✉ BOUNTY5485@GMAIL.COM</div>
   <div class='lic'>License: B000580</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rohan-brendan-dylan-w517176/">
   <div class="an">Rohan, Brendan Dylan</div>
   <div class="ad">1651 W GULF TO LAKE HIGHWAY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ BRENDANROHAN@YAHOO.COM</div>
   <div class='lic'>License: W517176</div>
 </a><a class="agent" href="/bailbonds/fl/agent/rossi-jonathan-newton-w069282/">
   <div class="an">Rossi, Jonathan Newton</div>
   <div class="ad">1651 W GULF TO LAKE HWY, LECANTO, 34461</div>
   
+  <div class='ad'>✉ 1ANYTIMEBAIL247@GMAIL.COM</div>
   <div class='lic'>License: W069282</div>
 </a><a class="agent" href="/bailbonds/fl/agent/tarpenning-dale-thomas-w097726/">
   <div class="an">Tarpenning, Dale Thomas</div>
   <div class="ad">7449 W GULF TO LAKE HWY STE #8, CRYSTAL RIVER, 34429</div>
   
+  <div class='ad'>✉ TARP64@GMAIL.COM</div>
   <div class='lic'>License: W097726</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -189,5 +205,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([28.85029, -82.59555], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":28.85214,"lng":-82.46145,"label":"<strong><a href='/bailbonds/fl/agent/1-anytime-bail-24-7-b000573/'>#1 Anytime Bail 24/7</a></strong>"},{"lat":28.85299,"lng":-82.49746,"label":"<strong><a href='/bailbonds/fl/agent/a1-tnt-bail-bonds-inc-b000572/'>A1 Tnt Bail Bonds Inc</a></strong>"},{"lat":28.89824,"lng":-82.59301,"label":"<strong><a href='/bailbonds/fl/agent/all-florida-bail-bonds-b000223/'>All Florida Bail Bonds</a></strong>"},{"lat":28.85093,"lng":-82.48708,"label":"<strong><a href='/bailbonds/fl/agent/armato-anthony-matthew-a299767/'>Armato, Anthony Matthew</a></strong>"},{"lat":28.85093,"lng":-82.48708,"label":"<strong><a href='/bailbonds/fl/agent/armato-matthew-anthony-e027311/'>Armato, Matthew Anthony</a></strong>"},{"lat":28.85093,"lng":-82.48708,"label":"<strong><a href='/bailbonds/fl/agent/armato-teresa-h-w175928/'>Armato, Teresa H</a></strong>"},{"lat":28.85299,"lng":-82.49746,"label":"<strong><a href='/bailbonds/fl/agent/bible-timothy-j-sr-w116011/'>Bible, Timothy J Sr.</a></strong>"},{"lat":28.90354,"lng":-82.56356,"label":"<strong><a href='/bailbonds/fl/agent/bible-timothy-james-jr-g155673/'>Bible, Timothy James Jr</a></strong>"},{"lat":28.89579,"lng":-82.55866,"label":"<strong><a href='/bailbonds/fl/agent/hargreaves-john-harold-e024050/'>Hargreaves, John Harold</a></strong>"},{"lat":28.85214,"lng":-82.46145,"label":"<strong><a href='/bailbonds/fl/agent/livengood-neil-g082944/'>Livengood, Neil</a></strong>"},{"lat":28.85093,"lng":-82.48708,"label":"<strong><a href='/bailbonds/fl/agent/midnight-run-bail-bonds-b000580/'>Midnight Run Bail Bonds</a></strong>"},{"lat":28.85214,"lng":-82.46145,"label":"<strong><a href='/bailbonds/fl/agent/rohan-brendan-dylan-w517176/'>Rohan, Brendan Dylan</a></strong>"},{"lat":28.85214,"lng":-82.46145,"label":"<strong><a href='/bailbonds/fl/agent/rossi-jonathan-newton-w069282/'>Rossi, Jonathan Newton</a></strong>"},{"lat":28.89579,"lng":-82.55866,"label":"<strong><a href='/bailbonds/fl/agent/tarpenning-dale-thomas-w097726/'>Tarpenning, Dale Thomas</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,47 +106,56 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/adams-chauncey-prb-6431135-npn-6431135/">
   <div class="an">Adams, Chauncey</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 412-2736</div>
+  <div class='ph'>☎ (803) 412-2736</div>
+  
   <div class='lic'>License: PRB 6431135 (NPN 6431135)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/adams-warren-prb-6424625-npn-6424625/">
   <div class="an">Adams, Warren</div><div class='ad'>Warren Adams Bail Bonds</div>
   <div class="ad">York, 29745</div>
-  <div class='ph'>(803) 322-1625</div>
+  <div class='ph'>☎ (803) 322-1625</div>
+  
   <div class='lic'>License: PRB 6424625 (NPN 6424625)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/anderson-clarence-iii-prb-9041204-npn-9041204/">
   <div class="an">Anderson, Clarence Iii</div><div class='ad'>Anderson Bonding Company</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 366-1835</div>
+  <div class='ph'>☎ (803) 366-1835</div>
+  
   <div class='lic'>License: PRB 9041204 (NPN 9041204)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/burris-alphonzo-prb-18393626-npn-18393626/">
   <div class="an">Burris, Alphonzo</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 517-3393</div>
+  <div class='ph'>☎ (803) 517-3393</div>
+  
   <div class='lic'>License: PRB 18393626 (NPN 18393626)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/chisholm-altavia-c-prb-18393185-npn-18393185/">
   <div class="an">Chisholm, Altavia C</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 242-6935</div>
+  <div class='ph'>☎ (803) 242-6935</div>
+  
   <div class='lic'>License: PRB 18393185 (NPN 18393185)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/gilliam-bonn-j-prb-18393421-npn-18393421/">
   <div class="an">Gilliam, Bonn J</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 325-5444</div>
+  <div class='ph'>☎ (803) 325-5444</div>
+  
   <div class='lic'>License: PRB 18393421 (NPN 18393421)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/knox-michelle-h-prb-103719-npn-103719/">
   <div class="an">Knox, Michelle H</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 524-0828</div>
+  <div class='ph'>☎ (803) 524-0828</div>
+  
   <div class='lic'>License: PRB 103719 (NPN 103719)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/knox-myron-m-prb-6415741-npn-6415741/">
   <div class="an">Knox, Myron M</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 366-9900</div>
+  <div class='ph'>☎ (803) 366-9900</div>
+  
   <div class='lic'>License: PRB 6415741 (NPN 6415741)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/polk-neddie-l-sr-prb-5626869-npn-5626869/">
   <div class="an">Polk, Neddie L Sr</div><div class='ad'>Polk Bonding Agency, Polk Insurance Agency, Aaa Mobile Ins, A &amp; A Adrevark Bailbonds</div>
   <div class="ad">Rock Hill, 29730</div>
-  <div class='ph'>(803) 230-6789</div>
+  <div class='ph'>☎ (803) 230-6789</div>
+  
   <div class='lic'>License: PRB 5626869 (NPN 5626869)</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=York' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.97019, -81.18319], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.93822,"lng":-81.01918,"label":"<strong>8 agents in Rock Hill</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/adams-chauncey-prb-6431135-npn-6431135/'>Adams, Chauncey</a></strong><br>\u260e (803) 412-2736<br><strong><a href='/bailbonds/sc/agent/anderson-clarence-iii-prb-9041204-npn-9041204/'>Anderson, Clarence Iii</a></strong><br>\u260e (803) 366-1835<br><strong><a href='/bailbonds/sc/agent/burris-alphonzo-prb-18393626-npn-18393626/'>Burris, Alphonzo</a></strong><br>\u260e (803) 517-3393<br><strong><a href='/bailbonds/sc/agent/chisholm-altavia-c-prb-18393185-npn-18393185/'>Chisholm, Altavia C</a></strong><br>\u260e (803) 242-6935<br><strong><a href='/bailbonds/sc/agent/gilliam-bonn-j-prb-18393421-npn-18393421/'>Gilliam, Bonn J</a></strong><br>\u260e (803) 325-5444<br><strong><a href='/bailbonds/sc/agent/knox-michelle-h-prb-103719-npn-103719/'>Knox, Michelle H</a></strong><br>\u260e (803) 524-0828<br><strong><a href='/bailbonds/sc/agent/knox-myron-m-prb-6415741-npn-6415741/'>Knox, Myron M</a></strong><br>\u260e (803) 366-9900<br><strong><a href='/bailbonds/sc/agent/polk-neddie-l-sr-prb-5626869-npn-5626869/'>Polk, Neddie L Sr</a></strong><br>\u260e (803) 230-6789"},{"lat":34.99835,"lng":-81.23307,"label":"<strong>1 agent in York</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/adams-warren-prb-6424625-npn-6424625/'>Adams, Warren</a></strong><br>\u260e (803) 322-1625"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,86 +107,103 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">24/7 Hd Bail Bonds, Inc</div>
   <div class="ad">300 S PINE ST SUITE A, SEBRING, 33870</div>
   
+  <div class='ad'>✉ HDRESTINC@GMAIL.COM</div>
   <div class='lic'>License: B000028</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a-cochran-cooper-bail-bonds-b000218/">
   <div class="an">A Cochran Cooper Bail Bonds</div>
   <div class="ad">339 S ORANGE STREET, SEBRING, 33870</div>
   
+  <div class='ad'>✉ COOPERBAILBONDS@YAHOO.COM</div>
   <div class='lic'>License: B000218</div>
 </a><a class="agent" href="/bailbonds/fl/agent/a-sottile-bail-bonds-inc-b000060/">
   <div class="an">A-Sottile Bail Bonds Inc.</div>
   <div class="ad">357 S. ORANGE ST., SEBRING, 33870</div>
   
+  <div class='ad'>✉ JSOTTILE2002@EMBARQMAIL.COM</div>
   <div class='lic'>License: B000060</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bates-christopher-g223263/">
   <div class="an">Bates, Christopher</div>
   <div class="ad">357 S. ORANGE STREET, SEBRING, 33870</div>
   
+  <div class='ad'>✉ CLB7126@GMAIL.COM</div>
   <div class='lic'>License: G223263</div>
 </a><a class="agent" href="/bailbonds/fl/agent/benton-uriel-james-w384462/">
   <div class="an">Benton, Uriel James</div>
   <div class="ad">357 S. ORANGE ST, SEBRING, 33872</div>
   
+  <div class='ad'>✉ JBENTONX64@GMAIL.COM</div>
   <div class='lic'>License: W384462</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bubel-delgado-yolanda-p084885/">
   <div class="an">Bubel-Delgado, Yolanda</div>
   <div class="ad">A COCHRAN COOPER BAIL BONDS 339 SOUTH ORANGE STREET, SEBRING, 33870</div>
   
+  <div class='ad'>✉ YOLY.BAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: P084885</div>
 </a><a class="agent" href="/bailbonds/fl/agent/elinor-rodney-kyle-d069395/">
   <div class="an">Elinor, Rodney Kyle</div>
   <div class="ad">300 S . PINE ST STE A, SEBRING, 33870</div>
   
+  <div class='ad'>✉ FRONTNINE1@GMAIL.COM</div>
   <div class='lic'>License: D069395</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gonzalez-cotto-ricardo-w539106/">
   <div class="an">Gonzalez Cotto, Ricardo</div>
   <div class="ad">COOPER BAIL BONDS 351 S COMMERCE AVE, SEBRING, 33870</div>
   
+  <div class='ad'>✉ RICKYG00081@GMAIL.COM</div>
   <div class='lic'>License: W539106</div>
 </a><a class="agent" href="/bailbonds/fl/agent/harden-lehue-toni-marie-g289649/">
   <div class="an">Harden-Lehue, Toni Marie</div>
   <div class="ad">339 S ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ LEHUETONI@GMAIL.COM</div>
   <div class='lic'>License: G289649</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jackson-cash-dollar-w142427/">
   <div class="an">Jackson, Cash Dollar</div>
   <div class="ad">339 S ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ CASH_JACKSON@HOTMAIL.COM</div>
   <div class='lic'>License: W142427</div>
 </a><a class="agent" href="/bailbonds/fl/agent/lassiter-harold-alan-jr-e035910/">
   <div class="an">Lassiter, Harold Alan Jr</div>
   <div class="ad">A&amp;A RECOVERY &amp; INVESTIGATION, INC DBA A&amp;A BAIL BONDS 6512 US HWY 27 N, SEBRING, 33870</div>
   
+  <div class='ad'>✉ AARECINV@GMAIL.COM</div>
   <div class='lic'>License: E035910</div>
 </a><a class="agent" href="/bailbonds/fl/agent/mclean-joshua-steven-w544084/">
   <div class="an">Mclean, Joshua Steven</div>
   <div class="ad">COOPER BAIL BONDS 351 SOUTH COMMERCE AVE, SEBRING, 33870</div>
   
+  <div class='ad'>✉ MCLEANJOSH88@GMAIL.COM</div>
   <div class='lic'>License: W544084</div>
 </a><a class="agent" href="/bailbonds/fl/agent/miller-douglas-james-a179134/">
   <div class="an">Miller, Douglas James</div>
   <div class="ad">MILLER BAIL BONDS 8600 COUNTY RD 635, SEBRING, 33875</div>
   
+  <div class='ad'>✉ CDMILLER1216@MSN.COM</div>
   <div class='lic'>License: A179134</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sottile-bernadette-marietta-a249621/">
   <div class="an">Sottile, Bernadette Marietta</div>
   <div class="ad">A-SOTTILE BAIL BONDS INC 357 S ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ BERNADETTESOTTILE@HOTMAIL.COM</div>
   <div class='lic'>License: A249621</div>
 </a><a class="agent" href="/bailbonds/fl/agent/sottile-james-stewart-sr-a249622/">
   <div class="an">Sottile, James Stewart Sr.</div>
   <div class="ad">A-SOTTILE BAIL BONDS INC 357 S ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ JSOTTILE0777@GMAIL.COM</div>
   <div class='lic'>License: A249622</div>
 </a><a class="agent" href="/bailbonds/fl/agent/teeter-jonathan-ross-w845528/">
   <div class="an">Teeter, Jonathan Ross</div>
   <div class="ad">357 S ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ JTBAREBONES100@GMAIL.COM</div>
   <div class='lic'>License: W845528</div>
 </a><a class="agent" href="/bailbonds/fl/agent/williams-chad-regan-a310751/">
   <div class="an">Williams, Chad Regan</div>
   <div class="ad">339 SOUTH ORANGE ST, SEBRING, 33870</div>
   
+  <div class='ad'>✉ CJW8714@YAHOO.COM</div>
   <div class='lic'>License: A310751</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -204,5 +223,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([27.34108, -81.34235], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":27.49507,"lng":-81.43799,"label":"<strong><a href='/bailbonds/fl/agent/24-7-hd-bail-bonds-inc-b000028/'>24/7 Hd Bail Bonds, Inc</a></strong>"},{"lat":27.494,"lng":-81.43637,"label":"<strong><a href='/bailbonds/fl/agent/a-cochran-cooper-bail-bonds-b000218/'>A Cochran Cooper Bail Bonds</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/a-sottile-bail-bonds-inc-b000060/'>A-Sottile Bail Bonds Inc.</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/bates-christopher-g223263/'>Bates, Christopher</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/benton-uriel-james-w384462/'>Benton, Uriel James</a></strong>"},{"lat":27.494,"lng":-81.43637,"label":"<strong><a href='/bailbonds/fl/agent/bubel-delgado-yolanda-p084885/'>Bubel-Delgado, Yolanda</a></strong>"},{"lat":27.49507,"lng":-81.43799,"label":"<strong><a href='/bailbonds/fl/agent/elinor-rodney-kyle-d069395/'>Elinor, Rodney Kyle</a></strong>"},{"lat":27.49331,"lng":-81.4383,"label":"<strong><a href='/bailbonds/fl/agent/gonzalez-cotto-ricardo-w539106/'>Gonzalez Cotto, Ricardo</a></strong>"},{"lat":27.494,"lng":-81.43637,"label":"<strong><a href='/bailbonds/fl/agent/harden-lehue-toni-marie-g289649/'>Harden-Lehue, Toni Marie</a></strong>"},{"lat":27.494,"lng":-81.43637,"label":"<strong><a href='/bailbonds/fl/agent/jackson-cash-dollar-w142427/'>Jackson, Cash Dollar</a></strong>"},{"lat":27.52896,"lng":-81.50006,"label":"<strong><a href='/bailbonds/fl/agent/lassiter-harold-alan-jr-e035910/'>Lassiter, Harold Alan Jr</a></strong>"},{"lat":27.49331,"lng":-81.4383,"label":"<strong><a href='/bailbonds/fl/agent/mclean-joshua-steven-w544084/'>Mclean, Joshua Steven</a></strong>"},{"lat":27.4475,"lng":-81.51514,"label":"<strong><a href='/bailbonds/fl/agent/miller-douglas-james-a179134/'>Miller, Douglas James</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/sottile-bernadette-marietta-a249621/'>Sottile, Bernadette Marietta</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/sottile-james-stewart-sr-a249622/'>Sottile, James Stewart Sr.</a></strong>"},{"lat":27.49388,"lng":-81.4365,"label":"<strong><a href='/bailbonds/fl/agent/teeter-jonathan-ross-w845528/'>Teeter, Jonathan Ross</a></strong>"},{"lat":27.494,"lng":-81.43637,"label":"<strong><a href='/bailbonds/fl/agent/williams-chad-regan-a310751/'>Williams, Chad Regan</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

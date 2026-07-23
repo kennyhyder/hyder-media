@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,40 +107,48 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Aguilar, Maria</div>
   <div class="ad">300 W. 7TH STREET, Hanford, 93230</div>
   
+  
   <div class='lic'>License: 4400742</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brieno-arthur-1546861/">
   <div class="an">Brieno, Arthur</div>
   <div class="ad">533 WEST IVY STREET, Hanford, 93230</div>
+  
   
   <div class='lic'>License: 1546861</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brieno-eddie-1516156/">
   <div class="an">Brieno, Eddie</div>
   <div class="ad">533 W. IVY STREET, Hanford, 93230</div>
   
+  
   <div class='lic'>License: 1516156</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brieno-edward-1845070/">
   <div class="an">Brieno, Edward</div>
   <div class="ad">533 W IVY ST, Hanford, 93230</div>
+  
   
   <div class='lic'>License: 1845070</div>
 </a><a class="agent" href="/bailbonds/ca/agent/brieno-irene-1841510/">
   <div class="an">Brieno, Irene</div>
   <div class="ad">533 W. IVY STREET, Hanford, 93230</div>
   
+  
   <div class='lic'>License: 1841510</div>
 </a><a class="agent" href="/bailbonds/ca/agent/cardoso-maria-4316204/">
   <div class="an">Cardoso, Maria</div>
   <div class="ad">300 W 7TH ST, Hanford, 93230</div>
+  
   
   <div class='lic'>License: 4316204</div>
 </a><a class="agent" href="/bailbonds/ca/agent/collado-vera-1n13234/">
   <div class="an">Collado, Vera</div>
   <div class="ad">385 CAMPUS DR, Hanford, 93230</div>
   
+  
   <div class='lic'>License: 1N13234</div>
 </a><a class="agent" href="/bailbonds/ca/agent/glascock-justin-4376452/">
   <div class="an">Glascock, Justin</div>
   <div class="ad">385 CAMPUS DR., Hanford, 93230</div>
+  
   
   <div class='lic'>License: 4376452</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://cdicloud.insurance.ca.gov/brcc/BailReportPDF (report type BA, All Counties)' rel='nofollow'>cdicloud.insurance.ca.gov</a></p>
@@ -159,5 +169,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.07248, -119.81553], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":36.32616,"lng":-119.64896,"label":"<strong><a href='/bailbonds/ca/agent/aguilar-maria-4400742/'>Aguilar, Maria</a></strong>"},{"lat":36.33211,"lng":-119.6536,"label":"<strong><a href='/bailbonds/ca/agent/brieno-arthur-1546861/'>Brieno, Arthur</a></strong>"},{"lat":36.33211,"lng":-119.6536,"label":"<strong><a href='/bailbonds/ca/agent/brieno-eddie-1516156/'>Brieno, Eddie</a></strong>"},{"lat":36.33211,"lng":-119.6536,"label":"<strong><a href='/bailbonds/ca/agent/brieno-edward-1845070/'>Brieno, Edward</a></strong>"},{"lat":36.33211,"lng":-119.6536,"label":"<strong><a href='/bailbonds/ca/agent/brieno-irene-1841510/'>Brieno, Irene</a></strong>"},{"lat":36.32616,"lng":-119.64896,"label":"<strong><a href='/bailbonds/ca/agent/cardoso-maria-4316204/'>Cardoso, Maria</a></strong>"},{"lat":36.32764,"lng":-119.663,"label":"<strong><a href='/bailbonds/ca/agent/collado-vera-1n13234/'>Collado, Vera</a></strong>"},{"lat":36.32764,"lng":-119.663,"label":"<strong><a href='/bailbonds/ca/agent/glascock-justin-4376452/'>Glascock, Justin</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

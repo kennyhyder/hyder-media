@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,27 +106,32 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/boatwright-michael-l-prb-20860871-npn-20860871/">
   <div class="an">Boatwright, Michael L</div>
   <div class="ad">Dillon, 29536</div>
-  <div class='ph'>(843) 289-2752</div>
+  <div class='ph'>☎ (843) 289-2752</div>
+  
   <div class='lic'>License: PRB 20860871 (NPN 20860871)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/deberry-fredrick-a-prb-6441262-npn-6441262/">
   <div class="an">Deberry, Fredrick A</div><div class='ad'>Deberry Bail Bonds</div>
   <div class="ad">Sellers, 29592</div>
-  <div class='ph'>(843) 615-0222</div>
+  <div class='ph'>☎ (843) 615-0222</div>
+  
   <div class='lic'>License: PRB 6441262 (NPN 6441262)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/woods-james-l-prb-6428543-npn-6428543/">
   <div class="an">Woods, James L</div><div class='ad'>Woods Bonding Company</div>
   <div class="ad">Dillon, 29536</div>
-  <div class='ph'>(843) 774-4184</div>
+  <div class='ph'>☎ (843) 774-4184</div>
+  
   <div class='lic'>License: PRB 6428543 (NPN 6428543)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/abraham-barbara-rbm-21781150-npn-21781150/">
   <div class="an">Abraham, Barbara</div>
   <div class="ad">Dillon, 29536</div>
-  <div class='ph'>(843) 260-6412</div>
+  <div class='ph'>☎ (843) 260-6412</div>
+  
   <div class='lic'>License: RBM 21781150 (NPN 21781150)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/bethea-james-s-sbb-20491877-npn-20491877/">
   <div class="an">Bethea, James S</div>
   <div class="ad">Dillon, 29536</div>
-  <div class='ph'>(843) 632-0354</div>
+  <div class='ph'>☎ (843) 632-0354</div>
+  
   <div class='lic'>License: SBB 20491877 (NPN 20491877)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Dillon' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Dillon' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Dillon' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.39021, -79.37529], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.42447,"lng":-79.36759,"label":"<strong>4 agents in Dillon</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/boatwright-michael-l-prb-20860871-npn-20860871/'>Boatwright, Michael L</a></strong><br>\u260e (843) 289-2752<br><strong><a href='/bailbonds/sc/agent/woods-james-l-prb-6428543-npn-6428543/'>Woods, James L</a></strong><br>\u260e (843) 774-4184<br><strong><a href='/bailbonds/sc/agent/abraham-barbara-rbm-21781150-npn-21781150/'>Abraham, Barbara</a></strong><br>\u260e (843) 260-6412<br><strong><a href='/bailbonds/sc/agent/bethea-james-s-sbb-20491877-npn-20491877/'>Bethea, James S</a></strong><br>\u260e (843) 632-0354"},{"lat":34.28259,"lng":-79.4723,"label":"<strong>1 agent in Sellers</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/deberry-fredrick-a-prb-6441262-npn-6441262/'>Deberry, Fredrick A</a></strong><br>\u260e (843) 615-0222"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

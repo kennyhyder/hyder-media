@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,122 +106,146 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/az/agent/chelsea-d-alessandro/">
   <div class="an">Chelsea D'Alessandro</div><div class='ad'>Apex Bail Bonds</div>
   <div class="ad">PO Box 10338, Casa Grande, 85122</div>
-  <div class='ph'>(480) 398-6115</div>
+  <div class='ph'>☎ (480) 398-6115</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jessica-chacon/">
   <div class="an">Jessica Chacon</div><div class='ad'>Didn't Do It Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>602-626-5214</div>
+  <div class='ph'>☎ 602-626-5214</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/priscilla-olivas-2/">
   <div class="an">Priscilla Olivas</div><div class='ad'>Azteca Bail Bonds, LLC</div>
   <div class="ad"></div>
-  <div class='ph'>520-623-1333</div>
+  <div class='ph'>☎ 520-623-1333</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/veronica-l-contreras/">
   <div class="an">Veronica L. Contreras</div><div class='ad'>Azteca Bail Bonds, LLC</div>
   <div class="ad"></div>
-  <div class='ph'>602-459-5631</div>
+  <div class='ph'>☎ 602-459-5631</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/denise-k-whitten/">
   <div class="an">Denise K Whitten</div><div class='ad'>Didn't Do It Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>480-689-6969</div>
+  <div class='ph'>☎ 480-689-6969</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/luke-a-hamilton/">
   <div class="an">Luke A. Hamilton</div><div class='ad'>Didn't Do It Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>480-689-6969</div>
+  <div class='ph'>☎ 480-689-6969</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/lance-robinson-2/">
   <div class="an">Lance Robinson</div><div class='ad'>Nice Guy's Bail Bonds, LLC</div>
   <div class="ad"></div>
-  <div class='ph'>602-795-9000</div>
+  <div class='ph'>☎ 602-795-9000</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/james-kang/">
   <div class="an">James Kang</div><div class='ad'>Harris Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>520-260-5470</div>
+  <div class='ph'>☎ 520-260-5470</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jason-roque/">
   <div class="an">Jason Roque</div><div class='ad'>Alliance Bail Bonds Services LLC</div>
   <div class="ad"></div>
-  <div class='ph'>888-306-5364</div>
+  <div class='ph'>☎ 888-306-5364</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/victor-manuel-arreola/">
   <div class="an">Victor Manuel Arreola</div><div class='ad'>Dignity Bail Bonds LLC</div>
   <div class="ad"></div>
-  <div class='ph'>520-799-9999</div>
+  <div class='ph'>☎ 520-799-9999</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jeff-edward-feldman/">
   <div class="an">Jeff Edward Feldman</div><div class='ad'>Sanctuary Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>602-224-5247</div>
+  <div class='ph'>☎ 602-224-5247</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jennifer-a-barkus/">
   <div class="an">Jennifer A. Barkus</div><div class='ad'>Harris Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>602-402-2879</div>
+  <div class='ph'>☎ 602-402-2879</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/deven-e-schroeter/">
   <div class="an">Deven E. Schroeter</div><div class='ad'>2nd Chance Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>602-374-3880</div>
+  <div class='ph'>☎ 602-374-3880</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/salvatore-travaglio/">
   <div class="an">Salvatore Travaglio</div><div class='ad'>The Bond Barn LLC</div>
   <div class="ad"></div>
-  <div class='ph'>623-428-2276</div>
+  <div class='ph'>☎ 623-428-2276</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/todd-a-seashore/">
   <div class="an">Todd A. Seashore</div><div class='ad'>2nd Chance Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>602-374-3888</div>
+  <div class='ph'>☎ 602-374-3888</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/andreas-phillips/">
   <div class="an">Andreas Phillips</div><div class='ad'>Phillips Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>520-510-9606</div>
+  <div class='ph'>☎ 520-510-9606</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/tyler-s-baldwin/">
   <div class="an">Tyler S. Baldwin</div><div class='ad'>American Pride Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>480-748-7899</div>
+  <div class='ph'>☎ 480-748-7899</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jennifer-kelley/">
   <div class="an">Jennifer Kelley</div><div class='ad'>Quick Bail Inc.</div>
   <div class="ad"></div>
-  <div class='ph'>520-622-3350</div>
+  <div class='ph'>☎ 520-622-3350</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/jeffrey-penrod/">
   <div class="an">Jeffrey Penrod</div><div class='ad'>Renegade Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>480-881-5065</div>
+  <div class='ph'>☎ 480-881-5065</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/chelsea-lynn-dalessandro/">
   <div class="an">Chelsea Lynn Dalessandro</div><div class='ad'>Renegade Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>480-881-5065</div>
+  <div class='ph'>☎ 480-881-5065</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/john-m-carpenter/">
   <div class="an">John M. Carpenter</div><div class='ad'>Action Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>928-783-1515</div>
+  <div class='ph'>☎ 928-783-1515</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/veronica-contreras/">
   <div class="an">Veronica Contreras</div><div class='ad'>Azteca Bail Bonds, LLC</div>
   <div class="ad"></div>
-  <div class='ph'>520-623-1333</div>
+  <div class='ph'>☎ 520-623-1333</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/danielle-guerrero-2/">
   <div class="an">Danielle Guerrero</div><div class='ad'>Azteca Bail Bonds, LLC</div>
   <div class="ad"></div>
-  <div class='ph'>520-623-1333</div>
+  <div class='ph'>☎ 520-623-1333</div>
+  
   
 </a><a class="agent" href="/bailbonds/az/agent/arlette-v-guerrero/">
   <div class="an">Arlette V. Guerrero</div><div class='ad'>Arlette Bail Bonds</div>
   <div class="ad"></div>
-  <div class='ph'>520-633-1358</div>
+  <div class='ph'>☎ 520-633-1358</div>
+  
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://www.coscpinalcountyaz.gov/DocumentCenter/View/1316/Bail-Bondsman-Report-PDF' rel='nofollow'>www.coscpinalcountyaz.gov</a> · <a href='https://www.mohavecourts.com/sites/default/files/Mohave%20Courts/Court%20Departments/Clerk%20of%20Court/Docs/LP/Publishing%20Bail%20Bondsmen.pdf' rel='nofollow'>www.mohavecourts.com</a></p>
 </div>
@@ -239,5 +265,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([32.91852, -111.36634], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":32.90692,"lng":-111.76349,"label":"<strong>1 agent in Casa Grande</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/az/agent/chelsea-d-alessandro/'>Chelsea D'Alessandro</a></strong><br>\u260e (480) 398-6115"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

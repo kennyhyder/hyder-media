@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -106,14 +108,17 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="ad">915 N 10th St, Canon City, 81212</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/edith-elizabeth-ashley/">
   <div class="an">Edith Elizabeth Ashley</div><div class='ad'>Ashley Bail Bonds, LLC</div>
   <div class="ad">915 N 10th St, Canon City, 81212</div>
   
   
+  
 </a><a class="agent" href="/bailbonds/co/agent/kariane-ruth-amparan/">
   <div class="an">Kariane Ruth Amparan</div><div class='ad'>Royal Bail &amp; Bond Recovery LLC</div>
   <div class="ad">200 S 5th St, Canon City, 81212</div>
+  
   
   
 </a></div><p class='src'>Source: official license rosters — <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20061183478)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20061243392)' rel='nofollow'>data.colorado.gov</a> · <a href='https://data.colorado.gov/resource/4ykn-tg5h.json (Colorado Secretary of State Business Entities; entity ID 20241525489)' rel='nofollow'>data.colorado.gov</a></p>
@@ -134,5 +139,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([38.45517, -105.42496], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":38.44922,"lng":-105.2374,"label":"<strong><a href='/bailbonds/co/agent/edith-ashley/'>Edith Ashley</a></strong>"},{"lat":38.44922,"lng":-105.2374,"label":"<strong><a href='/bailbonds/co/agent/edith-elizabeth-ashley/'>Edith Elizabeth Ashley</a></strong>"},{"lat":38.43971,"lng":-105.23997,"label":"<strong><a href='/bailbonds/co/agent/kariane-ruth-amparan/'>Kariane Ruth Amparan</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

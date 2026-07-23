@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10-15%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,52 +106,62 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ga/agent/24-7-fly-free-bonding/">
   <div class="an">24/7 Fly Free Bonding</div>
   <div class="ad">371 Pat Mell Road, Suite 101, Marietta, 30060</div>
-  <div class='ph'>678-919-4866</div>
+  <div class='ph'>☎ 678-919-4866</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/a-24-hour-bonding/">
   <div class="an">A 24 Hour Bonding</div>
   <div class="ad">2248 Austell Road, Marietta, 30008</div>
-  <div class='ph'>770-434-9665</div>
+  <div class='ph'>☎ 770-434-9665</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/a-2nd-chance-bail-bonds-2/">
   <div class="an">A 2nd Chance Bail Bonds</div>
   <div class="ad">1052 Powder Springs Road, Marietta, 30064</div>
-  <div class='ph'>770-627-3235</div>
+  <div class='ph'>☎ 770-627-3235</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/aaa-assured-bail-bonding/">
   <div class="an">AAA Assured Bail Bonding</div>
   <div class="ad">1115 Powder Springs St., Marietta, 30064</div>
-  <div class='ph'>678-401-5810</div>
+  <div class='ph'>☎ 678-401-5810</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/allied-bonding/">
   <div class="an">Allied Bonding</div>
   <div class="ad">469 Washington Ave., Marietta, 30060</div>
-  <div class='ph'>678-799-5005</div>
+  <div class='ph'>☎ 678-799-5005</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/anytime-bonding/">
   <div class="an">Anytime Bonding</div>
   <div class="ad">2357 Austell Road, Marietta, 30008</div>
-  <div class='ph'>770-333-8589</div>
+  <div class='ph'>☎ 770-333-8589</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/asap-bail-bonds/">
   <div class="an">ASAP Bail Bonds</div>
   <div class="ad">2311 Austell Rd SW, Marietta, 30008</div>
-  <div class='ph'>770-450-1166</div>
+  <div class='ph'>☎ 770-450-1166</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/bond-james-bond/">
   <div class="an">Bond, James Bond</div>
   <div class="ad">1485 County Services Parkway, Marietta, 30008</div>
-  <div class='ph'>678-354-0070</div>
+  <div class='ph'>☎ 678-354-0070</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/free-at-last-bail-bonds/">
   <div class="an">Free at Last Bail Bonds</div>
   <div class="ad">2351 Austell Rd, Marietta, 30008</div>
-  <div class='ph'>678-968-5664</div>
+  <div class='ph'>☎ 678-968-5664</div>
+  
   
 </a><a class="agent" href="/bailbonds/ga/agent/spring-u-bonding/">
   <div class="an">Spring U Bonding</div>
   <div class="ad">2110 Austell Road, Marietta, 30008</div>
-  <div class='ph'>770-427-6475</div>
+  <div class='ph'>☎ 770-427-6475</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://www.cobbsheriff.org/inmates/bonding-information' rel='nofollow'>www.cobbsheriff.org</a></p>
 </div>
@@ -169,5 +181,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([33.93993, -84.57411], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":33.89893,"lng":-84.57244,"label":"<strong><a href='/bailbonds/ga/agent/a-24-hour-bonding/'>A 24 Hour Bonding</a></strong><br>\u260e 770-434-9665"},{"lat":33.92785,"lng":-84.56964,"label":"<strong><a href='/bailbonds/ga/agent/a-2nd-chance-bail-bonds-2/'>A 2nd Chance Bail Bonds</a></strong><br>\u260e 770-627-3235"},{"lat":33.91665,"lng":-84.58568,"label":"<strong><a href='/bailbonds/ga/agent/aaa-assured-bail-bonding/'>AAA Assured Bail Bonding</a></strong><br>\u260e 678-401-5810"},{"lat":33.95222,"lng":-84.5385,"label":"<strong><a href='/bailbonds/ga/agent/allied-bonding/'>Allied Bonding</a></strong><br>\u260e 678-799-5005"},{"lat":33.8965,"lng":-84.57522,"label":"<strong><a href='/bailbonds/ga/agent/anytime-bonding/'>Anytime Bonding</a></strong><br>\u260e 770-333-8589"},{"lat":33.89717,"lng":-84.57459,"label":"<strong><a href='/bailbonds/ga/agent/asap-bail-bonds/'>ASAP Bail Bonds</a></strong><br>\u260e 770-450-1166"},{"lat":33.91624,"lng":-84.58215,"label":"<strong><a href='/bailbonds/ga/agent/bond-james-bond/'>Bond, James Bond</a></strong><br>\u260e 678-354-0070"},{"lat":33.89657,"lng":-84.57515,"label":"<strong><a href='/bailbonds/ga/agent/free-at-last-bail-bonds/'>Free at Last Bail Bonds</a></strong><br>\u260e 678-968-5664"},{"lat":33.90269,"lng":-84.56818,"label":"<strong><a href='/bailbonds/ga/agent/spring-u-bonding/'>Spring U Bonding</a></strong><br>\u260e 770-427-6475"},{"lat":33.95356,"lng":-84.54246,"label":"<strong>1 agent in Marietta</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ga/agent/24-7-fly-free-bonding/'>24/7 Fly Free Bonding</a></strong><br>\u260e 678-919-4866"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

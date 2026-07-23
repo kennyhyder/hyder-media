@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,26 +107,31 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Finch, Ira Gene</div>
   <div class="ad">2153 LOVEWOOD RD, COTTONDALE, 32431</div>
   
+  <div class='ad'>✉ GFINCH59@HOTMAIL.COM</div>
   <div class='lic'>License: A084029</div>
 </a><a class="agent" href="/bailbonds/fl/agent/finch-sandra-lynn-a084044/">
   <div class="an">Finch, Sandra Lynn</div>
   <div class="ad">2153 LOVEWOOD ROAD, COTTONDALE, 32431</div>
   
+  <div class='ad'>✉ GFINCH59@HOTMAIL.COM</div>
   <div class='lic'>License: A084044</div>
 </a><a class="agent" href="/bailbonds/fl/agent/freeman-marina-d-a089801/">
   <div class="an">Freeman, Marina D</div>
   <div class="ad">D &amp; D BAIL BONDS 4396 LAFAYETTE STREET STE 215, MARIANNA, 32446</div>
   
+  <div class='ad'>✉ MARINATING1@GMAIL.COM</div>
   <div class='lic'>License: A089801</div>
 </a><a class="agent" href="/bailbonds/fl/agent/gene-finch-bail-bonds-b000481/">
   <div class="an">Gene Finch Bail Bonds</div>
   <div class="ad">2153 LOVEWOOD RD, COTTONDALE, 32431</div>
   
+  <div class='ad'>✉ GFINCH59@HOTMAIL.COM</div>
   <div class='lic'>License: B000481</div>
 </a><a class="agent" href="/bailbonds/fl/agent/williams-rosalind-w596533/">
   <div class="an">Williams, Rosalind</div>
   <div class="ad">2829 PONTIAC LOOP, COTTONDALE, 32431</div>
   
+  <div class='ad'>✉ ROSALIND01WILLIAMS@GMAIL.COM</div>
   <div class='lic'>License: W596533</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([30.78925, -85.20881], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":30.82231,"lng":-85.42084,"label":"<strong><a href='/bailbonds/fl/agent/finch-ira-gene-a084029/'>Finch, Ira Gene</a></strong>"},{"lat":30.82231,"lng":-85.42084,"label":"<strong><a href='/bailbonds/fl/agent/finch-sandra-lynn-a084044/'>Finch, Sandra Lynn</a></strong>"},{"lat":30.77464,"lng":-85.22916,"label":"<strong><a href='/bailbonds/fl/agent/freeman-marina-d-a089801/'>Freeman, Marina D</a></strong>"},{"lat":30.82231,"lng":-85.42084,"label":"<strong><a href='/bailbonds/fl/agent/gene-finch-bail-bonds-b000481/'>Gene Finch Bail Bonds</a></strong>"},{"lat":30.78923,"lng":-85.36149,"label":"<strong><a href='/bailbonds/fl/agent/williams-rosalind-w596533/'>Williams, Rosalind</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

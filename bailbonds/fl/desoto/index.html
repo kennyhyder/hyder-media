@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,31 +107,37 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Bohannan, Andrea Michelle</div>
   <div class="ad">BUSTIN' OUT BAILBONDS 118 N. BREVARD AVE., ARCADIA, 34266</div>
   
+  <div class='ad'>✉ ANDREABOHANNAN@GMAIL.COM</div>
   <div class='lic'>License: W025540</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bohannan-elizabeth-w128386/">
   <div class="an">Bohannan, Elizabeth</div>
   <div class="ad">118 N. BREVARD AVE., ARCADIA, 34266</div>
   
+  <div class='ad'>✉ BETHBOHANNAN66@GMAIL.COM</div>
   <div class='lic'>License: W128386</div>
 </a><a class="agent" href="/bailbonds/fl/agent/bustin-out-bailbonds-b000264/">
   <div class="an">Bustin' Out Bailbonds</div>
   <div class="ad">118 N BREVARD AVE, ARCADIA, 34266</div>
   
+  <div class='ad'>✉ ANDREABOHANNAN@GMAIL.COM</div>
   <div class='lic'>License: B000264</div>
 </a><a class="agent" href="/bailbonds/fl/agent/cottrell-audra-w836740/">
   <div class="an">Cottrell, Audra</div>
   <div class="ad">1ST EXIT BAIL BONDS 115 S DESOTO AVE, ARCADIA, 34266</div>
   
+  <div class='ad'>✉ AUDRA@1STEXITBAILBONDS.COM</div>
   <div class='lic'>License: W836740</div>
 </a><a class="agent" href="/bailbonds/fl/agent/muse-angela-powell-d025121/">
   <div class="an">Muse, Angela Powell</div>
   <div class="ad">BUSTIN OUT BAIL BONDS 118 N. BREVARD AVE., ARCADIA, 34266</div>
   
+  <div class='ad'>✉ ANGELAFURLOW70@ICLOUD.COM</div>
   <div class='lic'>License: D025121</div>
 </a><a class="agent" href="/bailbonds/fl/agent/watson-travis-detrone-sr-e002887/">
   <div class="an">Watson, Travis Detrone Sr</div>
   <div class="ad">115 S DESOTO AVE, ARCADIA, 34266</div>
   
+  <div class='ad'>✉ ALLWATSONBAILBONDS@GMAIL.COM</div>
   <div class='lic'>License: E002887</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -149,5 +157,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([27.19058, -81.80625], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":27.21658,"lng":-81.85819,"label":"<strong><a href='/bailbonds/fl/agent/bohannan-andrea-michelle-w025540/'>Bohannan, Andrea Michelle</a></strong>"},{"lat":27.21658,"lng":-81.85819,"label":"<strong><a href='/bailbonds/fl/agent/bohannan-elizabeth-w128386/'>Bohannan, Elizabeth</a></strong>"},{"lat":27.21658,"lng":-81.85819,"label":"<strong><a href='/bailbonds/fl/agent/bustin-out-bailbonds-b000264/'>Bustin' Out Bailbonds</a></strong>"},{"lat":27.21397,"lng":-81.8607,"label":"<strong><a href='/bailbonds/fl/agent/cottrell-audra-w836740/'>Cottrell, Audra</a></strong>"},{"lat":27.21658,"lng":-81.85819,"label":"<strong><a href='/bailbonds/fl/agent/muse-angela-powell-d025121/'>Muse, Angela Powell</a></strong>"},{"lat":27.21397,"lng":-81.8607,"label":"<strong><a href='/bailbonds/fl/agent/watson-travis-detrone-sr-e002887/'>Watson, Travis Detrone Sr</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

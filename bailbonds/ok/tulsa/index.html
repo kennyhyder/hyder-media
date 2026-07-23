@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,37 +106,44 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/ok/agent/roberta-ann-aguilar/">
   <div class="an">Roberta Ann Aguilar</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 584-4500</div>
+  <div class='ph'>☎ (918) 584-4500</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/david-lee-hamilton/">
   <div class="an">David Lee Hamilton</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 587-1506</div>
+  <div class='ph'>☎ (918) 587-1506</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/dean-freeman-jennings/">
   <div class="an">Dean Freeman Jennings</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(702) 596-5674</div>
+  <div class='ph'>☎ (702) 596-5674</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/patricia-ann-rohling/">
   <div class="an">Patricia Ann Rohling</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 743-9998</div>
+  <div class='ph'>☎ (918) 743-9998</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/roxana-kay-sellars/">
   <div class="an">Roxana Kay Sellars</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 446-6040</div>
+  <div class='ph'>☎ (918) 446-6040</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/dennis-carlton-wharton/">
   <div class="an">Dennis Carlton Wharton</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 747-1368</div>
+  <div class='ph'>☎ (918) 747-1368</div>
+  
   
 </a><a class="agent" href="/bailbonds/ok/agent/debi-j-young-ewton/">
   <div class="an">Debi J Young-Ewton</div>
   <div class="ad">Tulsa</div>
-  <div class='ph'>(918) 747-2317</div>
+  <div class='ph'>☎ (918) 747-2317</div>
+  
   
 </a></div><p class='src'>Source: official license roster — <a href='https://howbailbondswork.com/oklahoma/Oklahoma_Bail_Bonds_Agents_List.pdf' rel='nofollow'>howbailbondswork.com</a></p>
 </div>
@@ -154,5 +163,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([36.12032, -95.94181], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":36.12795,"lng":-95.90232,"label":"<strong>7 agents in Tulsa</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/ok/agent/roberta-ann-aguilar/'>Roberta Ann Aguilar</a></strong><br>\u260e (918) 584-4500<br><strong><a href='/bailbonds/ok/agent/david-lee-hamilton/'>David Lee Hamilton</a></strong><br>\u260e (918) 587-1506<br><strong><a href='/bailbonds/ok/agent/dean-freeman-jennings/'>Dean Freeman Jennings</a></strong><br>\u260e (702) 596-5674<br><strong><a href='/bailbonds/ok/agent/patricia-ann-rohling/'>Patricia Ann Rohling</a></strong><br>\u260e (918) 743-9998<br><strong><a href='/bailbonds/ok/agent/roxana-kay-sellars/'>Roxana Kay Sellars</a></strong><br>\u260e (918) 446-6040<br><strong><a href='/bailbonds/ok/agent/dennis-carlton-wharton/'>Dennis Carlton Wharton</a></strong><br>\u260e (918) 747-1368<br><strong><a href='/bailbonds/ok/agent/debi-j-young-ewton/'>Debi J Young-Ewton</a></strong><br>\u260e (918) 747-2317"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

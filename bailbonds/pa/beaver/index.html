@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">5-10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,27 +106,32 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/pa/agent/john-jeffery-bates-cp-04-md-655-2016/">
   <div class="an">John Jeffery Bates</div><div class='ad'>Mobile Bail Bonds PA, LLC</div>
   <div class="ad">127 E. North Street, New Castle, 16101</div>
-  <div class='ph'>(724) 698-7858</div>
+  <div class='ph'>☎ (724) 698-7858</div>
+  
   <div class='lic'>License: CP-04-MD-655-2016</div>
 </a><a class="agent" href="/bailbonds/pa/agent/stormy-lynn-greenawalt-cp-04-md-655-2016/">
   <div class="an">Stormy Lynn Greenawalt</div><div class='ad'>Mobile Bail Bonds PA, LLC</div>
   <div class="ad">127 E. North Street, New Castle, 16101</div>
-  <div class='ph'>(724) 698-7858</div>
+  <div class='ph'>☎ (724) 698-7858</div>
+  
   <div class='lic'>License: CP-04-MD-655-2016</div>
 </a><a class="agent" href="/bailbonds/pa/agent/herbert-mitchell-cp-04-md-321-2014/">
   <div class="an">Herbert Mitchell</div><div class='ad'>Mitch's Bail Bonds</div>
   <div class="ad">PO Box 122, Hiller, 15444</div>
-  <div class='ph'>(724) 430-0303</div>
+  <div class='ph'>☎ (724) 430-0303</div>
+  
   <div class='lic'>License: CP-04-MD-321-2014</div>
 </a><a class="agent" href="/bailbonds/pa/agent/erin-ewing-cp-04-md-579-2026/">
   <div class="an">Erin Ewing</div><div class='ad'>A Plus Bail Agency LLC</div>
   <div class="ad">3415 McClelland Ave, Erie, 16510</div>
   
+  
   <div class='lic'>License: CP-04-MD-579-2026</div>
 </a><a class="agent" href="/bailbonds/pa/agent/erik-kaufman-cp-04-md-1117-2025/">
   <div class="an">Erik Kaufman</div><div class='ad'>Smith Bonds &amp; Surety</div>
   <div class="ad">237 Scenery Drive, Weirton, 26062</div>
-  <div class='ph'>(304) 491-9212</div>
+  <div class='ph'>☎ (304) 491-9212</div>
+  
   <div class='lic'>License: CP-04-MD-1117-2025</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://www.beavercountypa.gov/departments/clerk-of-courts/registered-bail-bondsman' rel='nofollow'>www.beavercountypa.gov</a></p>
 </div>
@@ -144,5 +151,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([40.68414, -80.35072], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":41.00141,"lng":-80.34496,"label":"<strong><a href='/bailbonds/pa/agent/john-jeffery-bates-cp-04-md-655-2016/'>John Jeffery Bates</a></strong><br>\u260e (724) 698-7858"},{"lat":41.00141,"lng":-80.34496,"label":"<strong><a href='/bailbonds/pa/agent/stormy-lynn-greenawalt-cp-04-md-655-2016/'>Stormy Lynn Greenawalt</a></strong><br>\u260e (724) 698-7858"},{"lat":42.12415,"lng":-80.0188,"label":"<strong><a href='/bailbonds/pa/agent/erin-ewing-cp-04-md-579-2026/'>Erin Ewing</a></strong>"},{"lat":40.41384,"lng":-80.52175,"label":"<strong><a href='/bailbonds/pa/agent/erik-kaufman-cp-04-md-1117-2025/'>Erik Kaufman</a></strong><br>\u260e (304) 491-9212"},{"lat":40.00777,"lng":-79.91003,"label":"<strong>1 agent in Hiller</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/pa/agent/herbert-mitchell-cp-04-md-321-2014/'>Herbert Mitchell</a></strong><br>\u260e (724) 430-0303"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

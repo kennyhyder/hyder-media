@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10%</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -104,22 +106,26 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="agent-list"><a class="agent" href="/bailbonds/sc/agent/galloway-john-a-prb-8069249-npn-8069249/">
   <div class="an">Galloway, John A</div><div class='ad'>Jag Bail Bonding</div>
   <div class="ad">Anderson, 29621</div>
-  <div class='ph'>(864) 260-3387</div>
+  <div class='ph'>☎ (864) 260-3387</div>
+  
   <div class='lic'>License: PRB 8069249 (NPN 8069249)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/thomas-mary-gladys-prb-18393255-npn-18393255/">
   <div class="an">Thomas, Mary Gladys</div>
   <div class="ad">Easley, 29642</div>
-  <div class='ph'>(864) 979-2230</div>
+  <div class='ph'>☎ (864) 979-2230</div>
+  
   <div class='lic'>License: PRB 18393255 (NPN 18393255)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/brown-terence-bertrend-rbm-21314923-npn-21314923/">
   <div class="an">Brown, Terence Bertrend</div>
   <div class="ad">Anderson, 29624</div>
-  <div class='ph'>(864) 965-0805</div>
+  <div class='ph'>☎ (864) 965-0805</div>
+  
   <div class='lic'>License: RBM 21314923 (NPN 21314923)</div>
 </a><a class="agent" href="/bailbonds/sc/agent/bryant-takeisha-rashaun-sbb-19363411-npn-19363411/">
   <div class="an">Bryant, Takeisha Rashaun</div>
   <div class="ad">Piedmont, 29673</div>
-  <div class='ph'>(864) 971-2353</div>
+  <div class='ph'>☎ (864) 971-2353</div>
+  
   <div class='lic'>License: SBB 19363411 (NPN 19363411)</div>
 </a></div><p class='src'>Source: official license rosters — <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=PRB&licenseStatus=A&mailingCounty=Anderson' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=RBM&licenseStatus=A&mailingCounty=Anderson' rel='nofollow'>services.naic.org</a> · <a href='https://services.naic.org/api/licenseLookup/search?searchType=Licensee&jurisdiction=SC&entityType=IND&licenseType=SBB&licenseStatus=A&mailingCounty=Anderson' rel='nofollow'>services.naic.org</a></p>
 </div>
@@ -139,5 +145,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([34.52123, -82.6386], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":34.52149,"lng":-82.64352,"label":"<strong>2 agents in Anderson</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/galloway-john-a-prb-8069249-npn-8069249/'>Galloway, John A</a></strong><br>\u260e (864) 260-3387<br><strong><a href='/bailbonds/sc/agent/brown-terence-bertrend-rbm-21314923-npn-21314923/'>Brown, Terence Bertrend</a></strong><br>\u260e (864) 965-0805"},{"lat":34.81981,"lng":-82.58216,"label":"<strong>1 agent in Easley</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/thomas-mary-gladys-prb-18393255-npn-18393255/'>Thomas, Mary Gladys</a></strong><br>\u260e (864) 979-2230"},{"lat":34.70562,"lng":-82.46675,"label":"<strong>1 agent in Piedmont</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/sc/agent/bryant-takeisha-rashaun-sbb-19363411-npn-19363411/'>Bryant, Takeisha Rashaun</a></strong><br>\u260e (864) 971-2353"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

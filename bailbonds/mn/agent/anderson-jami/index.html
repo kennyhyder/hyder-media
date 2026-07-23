@@ -9,7 +9,7 @@
 <meta property="og:title" content="Anderson, Jami — Licensed Bail Bond Agent in Hennepin County">
 <meta property="og:description" content="Anderson, Jami: licensed bail bond agent in Hennepin County. Contact details, license number, and official-roster verification.">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Anderson, Jami","url":"https://hyder.me/bailbonds/mn/agent/anderson-jami/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"651-324-8006","address":{"@type":"PostalAddress","streetAddress":"310 South 4th Ave Suite 1050","addressLocality":"Minneapolis","postalCode":"55415","addressRegion":"MN"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Anderson, Jami","url":"https://hyder.me/bailbonds/mn/agent/anderson-jami/","additionalType":"https://en.wikipedia.org/wiki/Bail_bondsman","telephone":"651-324-8006","address":{"@type":"PostalAddress","streetAddress":"310 South 4th Ave Suite 1050","addressLocality":"Minneapolis","postalCode":"55415","addressRegion":"MN"},"geo":{"@type":"GeoCoordinates","latitude":44.97832,"longitude":-93.26371}}</script>
 <style>
 :root { --ink:#1a2333; --muted:#5b6779; --accent:#1d5fbf; --bg:#f7f8fa; --card:#ffffff; --line:#e3e7ee; }
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -57,6 +57,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -69,11 +70,12 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
 <h1>Anderson, Jami</h1>
 <p class="sub">Licensed bail bond agent in Minnesota — from the official license roster.</p>
 <div class="card">
-  <h2>Profile</h2>
-  <ul><li><strong>Agency:</strong> Metro Bail Bonds, LLC</li><li><strong>Address:</strong> 310 South 4th Ave Suite 1050, Minneapolis, 55415</li><li><strong>Phone:</strong> 651-324-8006</li><li><strong>Serves:</strong> <a href="/bailbonds/mn/hennepin/">Hennepin County, MN</a></li></ul>
+  <h2>Contact & License</h2>
+  <ul><li><strong>Agency:</strong> Metro Bail Bonds, LLC</li><li><strong>Address:</strong> 310 South 4th Ave Suite 1050, Minneapolis, 55415</li><li><strong>Phone:</strong> <a href="tel:651-324-8006">651-324-8006</a></li><li><strong>Serves:</strong> <a href="/bailbonds/mn/hennepin/">Hennepin County, MN</a></li></ul>
   <p class="src">Source: official roster — <a href="https://mncourtsdocs.courts.state.mn.us/Documents/BailBond/BB104.pdf" rel="nofollow">mncourtsdocs.courts.state.mn.us</a>.
   License status can change; verify with the licensing authority before doing business.</p>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:300px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>How Bail Works in Minnesota</h2>
@@ -107,5 +109,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([44.97832, -93.26371], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":44.97832,"lng":-93.26371,"label":"<strong>Anderson, Jami</strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>

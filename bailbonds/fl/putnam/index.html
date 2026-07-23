@@ -58,6 +58,7 @@ a { color:var(--accent); }
 footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; font-size:.82rem; color:var(--muted); }
 .crumb { font-size:.85rem; margin-top:14px; }
 </style>
+<link rel="stylesheet" href="/bailbonds/assets/leaflet/leaflet.css"><script src="/bailbonds/assets/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -74,6 +75,7 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="fact"><div class="k">Bail Framework</div><div class="v small"><span class="badge">Commercial bail operates</span></div></div>
   <div class="fact"><div class="k">Typical Premium</div><div class="v small">10% (15% federal)</div></div>
 </div>
+<div class="card"><h2>Map</h2><div id="bbmap" style="height:380px;border-radius:8px;"></div><p class="src">Map data © OpenStreetMap contributors. Pins marked "approximate" are placed at the city center.</p></div>
 
 <div class="card">
   <h2>Bail Bond Licensing</h2>
@@ -105,46 +107,55 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <div class="an">Freeman'S Bail Bonds</div>
   <div class="ad">211 NORTH 6TH ST, PALATKA, 32177</div>
   
+  <div class='ad'>✉ RAYSHAWNFREEMAN123@GMAIL.COM</div>
   <div class='lic'>License: B000611</div>
 </a><a class="agent" href="/bailbonds/fl/agent/freeman-rayshawn-w491429/">
   <div class="an">Freeman, Rayshawn</div>
   <div class="ad">211 NORTH 6TH STREET, PALATKA, 32177</div>
   
+  <div class='ad'>✉ RAYSHAWNFREEMAN123@GMAIL.COM</div>
   <div class='lic'>License: W491429</div>
 </a><a class="agent" href="/bailbonds/fl/agent/john-jennifer-marie-w391727/">
   <div class="an">John, Jennifer Marie</div>
   <div class="ad">BOB'S 24 HR BAIL BOND 4384 S US 301, BUSHNELL, 33513</div>
   
+  <div class='ad'>✉ JENNIFERMARIEJOHN@GMAIL.COM</div>
   <div class='lic'>License: W391727</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-willie-lamar-e113508/">
   <div class="an">Jones, Willie Lamar</div>
   <div class="ad">WILL JONES BAIL BONDS 5019 CRILL AVENUE SUITE B, PALATKA, 32177</div>
   
+  <div class='ad'>✉ WILLJONESBAIL@GMAIL.COM</div>
   <div class='lic'>License: E113508</div>
 </a><a class="agent" href="/bailbonds/fl/agent/jones-yvette-ann-w078638/">
   <div class="an">Jones, Yvette Ann</div>
   <div class="ad">5015 CRILL AVE SUITE 102, PALATKA, 32177</div>
   
+  <div class='ad'>✉ YVETTEAJONES@HOTMAIL.COM</div>
   <div class='lic'>License: W078638</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kearse-bail-bonds-b000622/">
   <div class="an">Kearse Bail Bonds</div>
   <div class="ad">1095 N. STATE ROAD 19, PALATKA, 32177</div>
   
+  <div class='ad'>✉ MARTHA.KEARSE10@COMCAST.NET</div>
   <div class='lic'>License: B000622</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kearse-herman-w038494/">
   <div class="an">Kearse, Herman</div>
   <div class="ad">1095 N SR 19, PALATKA, 32177</div>
   
+  <div class='ad'>✉ MARTHA.KEARSE10@COMCAST.NET</div>
   <div class='lic'>License: W038494</div>
 </a><a class="agent" href="/bailbonds/fl/agent/kearse-keiara-w693881/">
   <div class="an">Kearse, Keiara</div>
   <div class="ad">KEARSE BAIL BONDS 1093 N STATE RD 19, PALATKA, 32177</div>
   
+  <div class='ad'>✉ KEIARAKEARSE10@GMAIL.COM</div>
   <div class='lic'>License: W693881</div>
 </a><a class="agent" href="/bailbonds/fl/agent/will-jones-bail-bonds-llc-b000677/">
   <div class="an">Will Jones Bail Bonds Llc</div>
   <div class="ad">1005 TIERRA WOODS DRIVE, PALATKA, 32177</div>
   
+  <div class='ad'>✉ WILLJONESBAIL@GMAIL.COM</div>
   <div class='lic'>License: B000677</div>
 </a></div><p class='src'>Source: official license roster — <a href='https://licenseesearch.fldfs.com/ (FL DFS limited surety agent licensees)' rel='nofollow'>licenseesearch.fldfs.com</a></p>
 </div>
@@ -164,5 +175,23 @@ footer { border-top:1px solid var(--line); margin-top:40px; padding-top:18px; fo
   <p>Staging build — not yet published to its permanent domain.</p>
 </footer>
 </div>
+
+<script>
+(function() {
+  if (typeof L === 'undefined') return;
+  L.Icon.Default.imagePath = '/bailbonds/assets/leaflet/images/';
+  var m = L.map('bbmap', {scrollWheelZoom: false}).setView([29.5939, -81.73204], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution: '© OpenStreetMap contributors', maxZoom: 19}).addTo(m);
+  var pts = [{"lat":29.6483,"lng":-81.63415,"label":"<strong><a href='/bailbonds/fl/agent/freeman-s-bail-bonds-b000611/'>Freeman'S Bail Bonds</a></strong>"},{"lat":29.6483,"lng":-81.63415,"label":"<strong><a href='/bailbonds/fl/agent/freeman-rayshawn-w491429/'>Freeman, Rayshawn</a></strong>"},{"lat":29.64108,"lng":-81.68447,"label":"<strong><a href='/bailbonds/fl/agent/jones-willie-lamar-e113508/'>Jones, Willie Lamar</a></strong>"},{"lat":29.64108,"lng":-81.68443,"label":"<strong><a href='/bailbonds/fl/agent/jones-yvette-ann-w078638/'>Jones, Yvette Ann</a></strong>"},{"lat":29.61895,"lng":-81.70395,"label":"<strong><a href='/bailbonds/fl/agent/kearse-bail-bonds-b000622/'>Kearse Bail Bonds</a></strong>"},{"lat":29.61895,"lng":-81.70395,"label":"<strong><a href='/bailbonds/fl/agent/kearse-herman-w038494/'>Kearse, Herman</a></strong>"},{"lat":29.61889,"lng":-81.70405,"label":"<strong><a href='/bailbonds/fl/agent/kearse-keiara-w693881/'>Kearse, Keiara</a></strong>"},{"lat":29.6398,"lng":-81.70233,"label":"<strong><a href='/bailbonds/fl/agent/will-jones-bail-bonds-llc-b000677/'>Will Jones Bail Bonds Llc</a></strong>"},{"lat":28.68695,"lng":-82.11441,"label":"<strong>1 agent in BUSHNELL</strong> <em>(approximate)</em><br><strong><a href='/bailbonds/fl/agent/john-jennifer-marie-w391727/'>John, Jennifer Marie</a></strong>"}];
+  pts.forEach(function(p) {
+    var mk = L.marker([p.lat, p.lng]).addTo(m);
+    if (p.label) mk.bindPopup(p.label);
+  });
+  if (pts.length > 1) {
+    m.fitBounds(pts.map(function(p) { return [p.lat, p.lng]; }), {padding: [30, 30], maxZoom: 13});
+  }
+})();
+</script>
 </body>
 </html>
