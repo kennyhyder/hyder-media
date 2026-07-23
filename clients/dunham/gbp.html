@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunham & Jones — GBP Capture Tool</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — GBP Profiles</title>
     <link rel="icon" href="../../favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <script>
@@ -14,6 +15,28 @@
             }
         })();
     </script>
+    <style>
+        .container { max-width: 1240px; }
+        .muted { color: var(--text-secondary); font-size: 0.9rem; }
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+        .pcard { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+        .pcard .ph { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+        .pcard .city { font-size: 1.05rem; font-weight: 800; }
+        .pcard .title { color: var(--text-secondary); font-size: 0.78rem; }
+        .pcard .row { font-size: 0.84rem; margin-top: 6px; color: var(--text-secondary); }
+        .pcard .row b { color: var(--text-primary); font-weight: 600; }
+        .pcard a { color: var(--accent); text-decoration: none; }
+        .pcard a:hover { text-decoration: underline; }
+        .pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+        .pill-green { background: rgba(34,197,94,0.15); color: var(--success); }
+        .pill-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .pill-gray { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .stars { color: #f59e0b; }
+        .desc { font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; border-top: 1px solid rgba(71,85,105,0.4); padding-top: 8px; max-height: 76px; overflow: hidden; }
+        .stats-row { margin-bottom: 18px; }
+        .stat-sub { font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+    </style>
 </head>
 <body>
     <nav class="main-nav">
@@ -21,933 +44,105 @@
             <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
             Dunham &amp; Jones
         </a>
-        <div class="nav-links"><a href="dashboard.html" class="nav-link">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link active">GBP</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
+        <div class="nav-links"><a href="dashboard.html" class="nav-link">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link active">GBP</a><a href="gbp-edits.html" class="nav-link">Approvals</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
     </nav>
-    <div class="page-toolbar"><button class="btn btn-secondary" id="btn-toggle-mode">Print View</button><button class="btn btn-primary" id="btn-print" style="display:none;" onclick="window.print()">Print Report</button></div>
-
-    <div class="container">
-        <!-- Loading -->
-        <div class="loading" id="loading-state">
-            <div class="spinner"></div>
-            <div>Loading locations...</div>
-        </div>
-
-        <!-- ===== IMPORT MODAL ===== -->
-        <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;">
-            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:700px;max-height:90vh;display:flex;flex-direction:column;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                    <h2 style="margin:0;font-size:1.1rem;">Import from Google Business Profile</h2>
-                    <button onclick="closeImportModal()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;padding:0 4px;">×</button>
-                </div>
-                <div style="margin-bottom:12px;font-size:0.9rem;color:var(--text-secondary);line-height:1.5;">
-                    <strong>Steps:</strong>
-                    1. Go to <a href="https://business.google.com/locations" target="_blank">business.google.com</a> →
-                    2. Click pencil to edit a location →
-                    3. Select all text on the page (<strong>Ctrl+A</strong>) →
-                    4. Copy (<strong>Ctrl+C</strong>) →
-                    5. Paste below (<strong>Ctrl+V</strong>)
-                </div>
-                <textarea id="import-textarea" style="flex:1;min-height:300px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);padding:12px;font-size:13px;font-family:monospace;resize:vertical;" placeholder="Paste the copied text from Google Business Profile here..."></textarea>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
-                    <span id="import-status" style="font-size:0.85rem;color:var(--text-secondary);"></span>
-                    <div>
-                        <button class="btn btn-secondary btn-sm" onclick="closeImportModal()">Cancel</button>
-                        <button class="btn btn-primary btn-sm" onclick="parseAndImport()" style="margin-left:8px;">Parse & Import</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== CAPTURE MODE ===== -->
-        <div id="capture-mode" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <button class="btn btn-primary btn-sm" onclick="openImportModal()">
-                    Import from GBP
-                </button>
-            </div>
-
-            <div class="capture-layout">
-                <!-- Location sidebar -->
-                <div class="capture-sidebar">
-                    <div class="sidebar-header">
-                        <h3>Locations</h3>
-                        <button class="btn btn-secondary btn-sm" onclick="addLocation()">+ Add</button>
-                    </div>
-                    <div id="location-list"></div>
-                </div>
-
-                <!-- Main capture area -->
-                <div class="capture-main">
-                    <!-- No location selected -->
-                    <div id="no-location" class="empty-prompt">
-                        <h2>Select a location to begin capturing</h2>
-                        <p>Choose a location from the sidebar, or click <strong>Import from GBP</strong> to paste data from business.google.com</p>
-                    </div>
-
-                    <!-- Location capture -->
-                    <div id="location-capture" style="display:none;">
-                        <div class="capture-header">
-                            <h2 id="capture-location-name"></h2>
-                            <div class="capture-header-actions">
-                                <span id="capture-progress" class="capture-progress-badge"></span>
-                                <button class="btn btn-primary btn-sm" onclick="saveCurrentLocation()">Save</button>
-                                <button class="btn btn-danger btn-xs" onclick="deleteCurrentLocation()">Delete</button>
-                            </div>
-                        </div>
-                        <div id="save-status" class="save-status"></div>
-
-                        <div class="capture-instructions-banner">
-                            <strong>How to use:</strong> Click <strong>Import from GBP</strong> to auto-fill from a copy-paste, or manually fill in each section below.
-                            You can also paste screenshots (Ctrl+V / Cmd+V) into any section.
-                        </div>
-
-                        <div id="sections-container"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== PRINT / VIEW MODE ===== -->
-        <div id="print-mode" style="display:none;">
-            <div class="report-header">
-                <h1>Google Business Profile Audit</h1>
-                <p class="subtitle">Dunham & Jones — All Locations</p>
-                <div class="report-meta">
-                    <span id="report-date"></span>
-                    <span id="report-stat"></span>
-                </div>
-            </div>
-            <div id="print-content"></div>
-        </div>
+    <div class="page-toolbar">
+        <button class="btn btn-secondary" id="btn-refresh" onclick="refreshLive()">Refresh from Google</button>
+        <button class="btn btn-primary" onclick="downloadCsv()">Download CSV</button>
     </div>
 
-    <div class="footer">
-        Prepared by <a href="https://hyder.me" target="_blank">Hyder Media</a>
+    <div class="container">
+        <div class="report-header">
+            <h1>Google Business Profiles</h1>
+            <p class="subtitle">Every managed Dunham &amp; Jones profile — live data from the Google Business Profile API</p>
+            <div class="report-meta">
+                <span id="meta-count">Loading…</span>
+                <span id="meta-refreshed"></span>
+            </div>
+        </div>
+
+        <div class="stats-row" id="stats"></div>
+        <div class="profile-grid" id="grid"><div class="muted">Loading profiles…</div></div>
+
+        <div class="footer-note">
+            Data via Google Business Information API (read) · Edits are proposed and approved on the
+            <a href="gbp-edits.html" style="color:var(--accent);">Approvals</a> page before being applied ·
+            Prepared by Hyder Media
+        </div>
     </div>
 
     <script>
-    // ─── Config ───
-    const API_URL = '/api/gbp/locations';
-    const SECTIONS = [
-        {
-            id: 'info',
-            title: 'Business Information',
-            icon: 'ℹ️',
-            instruction: 'Go to <strong>Edit profile → Business information</strong>. Copy address, phone, website, and categories.',
-            fields: [
-                { id: 'address', label: 'Address', type: 'text' },
-                { id: 'phone', label: 'Phone', type: 'text' },
-                { id: 'website', label: 'Website', type: 'text' },
-                { id: 'categories', label: 'Categories', type: 'text', placeholder: 'Primary, Additional 1, Additional 2...' },
-                { id: 'maps_url', label: 'Google Maps URL', type: 'text', placeholder: 'Search the business on Google Maps → copy URL' }
-            ]
-        },
-        {
-            id: 'description',
-            title: 'Business Description',
-            icon: '📝',
-            instruction: 'Go to <strong>Edit profile → Description</strong>. Copy the full "From the business" text.',
-            fields: [
-                { id: 'text', label: 'Description', type: 'textarea', rows: 4 }
-            ]
-        },
-        {
-            id: 'hours',
-            title: 'Hours of Operation',
-            icon: '🕐',
-            instruction: 'Go to <strong>Edit profile → Hours</strong>. Enter regular business hours below.',
-            fields: 'hours'
-        },
-        {
-            id: 'services',
-            title: 'Services',
-            icon: '⚙️',
-            instruction: 'Go to <strong>Edit profile → Services</strong>. List all service categories and items.',
-            fields: [
-                { id: 'text', label: 'Services', type: 'textarea', rows: 4, placeholder: 'e.g. Criminal Defense: DWI Defense, Drug Charges, Assault...' }
-            ]
-        },
-        {
-            id: 'attributes',
-            title: 'Attributes',
-            icon: '🏷️',
-            instruction: 'Go to <strong>Edit profile → More</strong>. Capture all attributes (accessibility, amenities, etc.).',
-            fields: [
-                { id: 'text', label: 'Attributes', type: 'textarea', rows: 3, placeholder: 'e.g. Wheelchair accessible, Free parking, Online appointments...' }
-            ]
-        },
-        {
-            id: 'reviews',
-            title: 'Reviews',
-            icon: '⭐',
-            instruction: 'Go to the <strong>Reviews</strong> tab. Capture total count, average rating, and notable reviews. Screenshot the reviews list.',
-            fields: [
-                { id: 'total_count', label: 'Total Review Count', type: 'text', placeholder: 'e.g. 847' },
-                { id: 'avg_rating', label: 'Average Rating', type: 'text', placeholder: 'e.g. 4.9' },
-                { id: 'notes', label: 'Review Notes', type: 'textarea', rows: 3, placeholder: 'Notable reviews, common themes, issues...' }
-            ]
-        },
-        {
-            id: 'photos',
-            title: 'Photos & Media',
-            icon: '📷',
-            instruction: 'Go to the <strong>Photos</strong> tab. Screenshot the photo grid. Note total counts by category (by owner, by customer).',
-            fields: [
-                { id: 'owner_count', label: 'Owner Photos', type: 'text', placeholder: 'e.g. 24' },
-                { id: 'customer_count', label: 'Customer Photos', type: 'text', placeholder: 'e.g. 58' },
-                { id: 'notes', label: 'Photo Notes', type: 'textarea', rows: 2, placeholder: 'Cover photo description, logo, categories...' }
-            ]
-        },
-        {
-            id: 'posts',
-            title: 'Google Posts',
-            icon: '📢',
-            instruction: 'Go to <strong>Add update</strong> or check existing posts. Capture recent posts and their performance.',
-            fields: [
-                { id: 'text', label: 'Recent Posts', type: 'textarea', rows: 3, placeholder: 'List recent posts with dates and engagement...' }
-            ]
-        },
-        {
-            id: 'performance',
-            title: 'Performance / Insights',
-            icon: '📊',
-            instruction: 'Go to the <strong>Performance</strong> tab. Screenshot the overview charts. Note key metrics.',
-            fields: [
-                { id: 'views', label: 'Business Profile Views (last 28 days)', type: 'text' },
-                { id: 'searches', label: 'Searches (last 28 days)', type: 'text' },
-                { id: 'direction_requests', label: 'Direction Requests', type: 'text' },
-                { id: 'calls', label: 'Phone Calls', type: 'text' },
-                { id: 'website_clicks', label: 'Website Clicks', type: 'text' },
-                { id: 'notes', label: 'Insights Notes', type: 'textarea', rows: 2 }
-            ]
-        },
-        {
-            id: 'qa',
-            title: 'Questions & Answers',
-            icon: '❓',
-            instruction: 'Search for the business on Google and check the <strong>Questions & answers</strong> section on the listing.',
-            fields: [
-                { id: 'text', label: 'Q&A Content', type: 'textarea', rows: 3, placeholder: 'Copy any questions and answers from the public listing...' }
-            ]
-        }
-    ];
+        let offices = [];
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        async function load(fromRefresh) {
+            const d = await (await fetch('/api/dunham/gbp-audit' + (fromRefresh ? '?refresh=1' : ''))).json();
+            offices = (d.offices || []).sort((a, b) => (a.city || '').localeCompare(b.city || ''));
+            document.getElementById('meta-count').textContent = `${offices.length} profiles under management`;
+            document.getElementById('meta-refreshed').textContent = d.refreshedAt
+                ? 'Refreshed: ' + new Date(d.refreshedAt).toLocaleString() : '';
 
-    // ─── State ───
-    let locations = [];
-    let currentLocationId = null;
-    let currentMode = 'capture';
-    let unsavedChanges = false;
-    let activePasteSection = null;
+            const totReviews = offices.reduce((s, o) => s + (o.reviews?.total || 0), 0);
+            const bail = offices.filter(o => o.audit.hasBailCategory).length;
+            const h24 = offices.filter(o => o.audit.is24x7).length;
+            const rated = offices.filter(o => o.reviews?.averageRating);
+            const avgRating = rated.reduce((s, o) => s + o.reviews.averageRating, 0) / (rated.length || 1);
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card"><div class="stat-label">Profiles</div><div class="stat-value">${offices.length}</div><div class="stat-sub">of ~19 expected (Georgetown + San Marcos missing)</div></div>
+                <div class="stat-card"><div class="stat-label">Total Reviews</div><div class="stat-value">${totReviews.toLocaleString()}</div><div class="stat-sub">avg rating ${avgRating.toFixed(2)}&#9733;</div></div>
+                <div class="stat-card"><div class="stat-label">Bail Category</div><div class="stat-value">${bail}/${offices.length}</div><div class="stat-sub">rollout on hold — verification plan</div></div>
+                <div class="stat-card"><div class="stat-label">Open 24/7</div><div class="stat-value">${h24}/${offices.length}</div><div class="stat-sub">top-5 ranking factor</div></div>`;
 
-    // ─── Mode Toggle ───
-    const btnToggle = document.getElementById('btn-toggle-mode');
-    const btnPrint = document.getElementById('btn-print');
-
-    btnToggle.addEventListener('click', () => {
-        if (currentMode === 'capture') {
-            if (unsavedChanges && !confirm('You have unsaved changes. Switch to Print View anyway?')) return;
-            currentMode = 'print';
-            btnToggle.textContent = 'Capture Mode';
-            btnPrint.style.display = '';
-            document.getElementById('capture-mode').style.display = 'none';
-            renderPrintView();
-            document.getElementById('print-mode').style.display = 'block';
-        } else {
-            currentMode = 'capture';
-            btnToggle.textContent = 'Print View';
-            btnPrint.style.display = 'none';
-            document.getElementById('print-mode').style.display = 'none';
-            document.getElementById('capture-mode').style.display = 'block';
-        }
-    });
-
-    // ─── Data Loading ───
-    async function loadData() {
-        document.getElementById('loading-state').style.display = 'flex';
-        try {
-            const resp = await fetch(`${API_URL}?client=dunham`);
-            const json = await resp.json();
-            if (!resp.ok || json.error) throw new Error(json.error);
-            locations = json.locations || [];
-        } catch (err) {
-            console.error('Load error:', err);
-            locations = [];
-        }
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('capture-mode').style.display = currentMode === 'capture' ? 'block' : 'none';
-        document.getElementById('print-mode').style.display = currentMode === 'print' ? 'block' : 'none';
-        renderLocationList();
-        if (currentLocationId) loadLocationCapture(currentLocationId);
-    }
-
-    // ─── Location List ───
-    function renderLocationList() {
-        const list = document.getElementById('location-list');
-        if (locations.length === 0) {
-            list.innerHTML = '<div class="sidebar-empty">No locations yet. Click "+ Add" to start.</div>';
-            return;
-        }
-        list.innerHTML = locations.map(loc => {
-            const d = loc.data || {};
-            const sectionCount = SECTIONS.filter(s => isSectionCaptured(d, s.id)).length;
-            const active = loc.id === currentLocationId ? ' active' : '';
-            return `<div class="location-item${active}" onclick="selectLocation('${loc.id}')">
-                <div class="location-item-name">${esc(loc.location_name)}</div>
-                <div class="location-item-progress">${sectionCount}/${SECTIONS.length}</div>
-            </div>`;
-        }).join('');
-    }
-
-    function isSectionCaptured(data, sectionId) {
-        const s = data[sectionId];
-        if (!s) return false;
-        // Has screenshots?
-        if (s.screenshots && s.screenshots.length > 0) return true;
-        // Has any non-empty field?
-        for (const [k, v] of Object.entries(s)) {
-            if (k === 'screenshots') continue;
-            if (Array.isArray(v) && v.length > 0) return true;
-            if (typeof v === 'string' && v.trim()) return true;
-        }
-        return false;
-    }
-
-    function selectLocation(id) {
-        if (unsavedChanges && !confirm('You have unsaved changes. Switch locations anyway?')) return;
-        currentLocationId = id;
-        renderLocationList();
-        loadLocationCapture(id);
-    }
-
-    async function addLocation() {
-        const name = prompt('Location name (e.g. "Dunham & Jones — San Antonio"):');
-        if (!name || !name.trim()) return;
-
-        try {
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ client_key: 'dunham', location_name: name.trim(), data: {} })
-            });
-            const json = await resp.json();
-            if (!resp.ok || json.error) throw new Error(json.error);
-            currentLocationId = json.location.id;
-            await loadData();
-        } catch (err) {
-            alert('Failed to add location: ' + err.message);
-        }
-    }
-
-    async function deleteCurrentLocation() {
-        if (!currentLocationId) return;
-        const loc = locations.find(l => l.id === currentLocationId);
-        if (!confirm(`Delete "${loc?.location_name}"? This cannot be undone.`)) return;
-
-        try {
-            const resp = await fetch(`${API_URL}?id=${currentLocationId}`, { method: 'DELETE' });
-            const json = await resp.json();
-            if (!resp.ok || json.error) throw new Error(json.error);
-            currentLocationId = null;
-            unsavedChanges = false;
-            await loadData();
-            document.getElementById('location-capture').style.display = 'none';
-            document.getElementById('no-location').style.display = 'block';
-        } catch (err) {
-            alert('Failed to delete: ' + err.message);
-        }
-    }
-
-    // ─── Location Capture ───
-    function loadLocationCapture(id) {
-        const loc = locations.find(l => l.id === id);
-        if (!loc) return;
-
-        unsavedChanges = false;
-        document.getElementById('no-location').style.display = 'none';
-        document.getElementById('location-capture').style.display = 'block';
-        document.getElementById('capture-location-name').textContent = loc.location_name;
-        document.getElementById('save-status').textContent = '';
-
-        const data = loc.data || {};
-        const container = document.getElementById('sections-container');
-        container.innerHTML = '';
-
-        for (const section of SECTIONS) {
-            const sData = data[section.id] || {};
-            const captured = isSectionCaptured(data, section.id);
-            container.innerHTML += renderSectionPanel(section, sData, captured);
+            document.getElementById('grid').innerHTML = offices.map(o => `
+                <div class="pcard">
+                    <div class="ph">
+                        <span class="city">${esc(o.city)}</span>
+                        <span class="title">${esc(o.title)}</span>
+                    </div>
+                    <div class="row">${esc(o.address || '')}</div>
+                    <div class="row"><b>${esc(o.phone || '—')}</b> ·
+                        ${o.reviews ? `<span class="stars">&#9733;</span> <b>${(o.reviews.averageRating || 0).toFixed(1)}</b> (${o.reviews.total.toLocaleString()} reviews)` : 'reviews n/a'}</div>
+                    <div class="row">${esc(o.primaryCategory || '')}
+                        ${o.audit.hasBailCategory ? '<span class="pill pill-green">+ Bail bonds service</span>' : '<span class="pill pill-gray">no bail category</span>'}
+                        ${o.audit.is24x7 ? '<span class="pill pill-green">24/7</span>' : '<span class="pill pill-red">not 24/7</span>'}</div>
+                    <div class="row">Services: <b>${o.serviceItemCount ?? 0}</b> · Description: ${o.audit.hasDescription ? '<b>set</b>' : '<span class="pill pill-red">missing</span>'}</div>
+                    <div class="row" style="overflow-wrap:anywhere;">${o.website ? `<a href="${esc(o.website)}" target="_blank" rel="noopener">${esc(o.website.replace(/^https:\/\/(www\.)?/, ''))}</a>` : '<span class="pill pill-red">no website link</span>'}</div>
+                    <div class="row">
+                        ${o.mapsUri ? `<a href="${esc(o.mapsUri)}" target="_blank" rel="noopener">View on Google Maps →</a>` : ''}
+                        ${o.placeId ? ` · <a href="https://search.google.com/local/writereview?placeid=${esc(o.placeId)}" target="_blank" rel="noopener">Review link →</a>` : ''}
+                    </div>
+                    ${o.description ? `<div class="desc">${esc(o.description)}</div>` : ''}
+                </div>`).join('');
         }
 
-        updateProgress();
-    }
-
-    function renderSectionPanel(section, sData, captured) {
-        const checkmark = captured ? ' captured' : '';
-        let html = `<div class="section-panel${checkmark}" id="panel-${section.id}">
-            <div class="section-panel-header" onclick="toggleSection('${section.id}')">
-                <span class="section-icon">${section.icon}</span>
-                <span class="section-title">${section.title}</span>
-                <span class="section-check">${captured ? '✓' : ''}</span>
-                <span class="section-chevron">▸</span>
-            </div>
-            <div class="section-panel-body" id="body-${section.id}" style="display:none;">
-                <div class="section-instruction">${section.instruction}</div>`;
-
-        // Screenshot area
-        const screenshots = sData.screenshots || [];
-        html += `<div class="screenshot-area" data-section="${section.id}">
-            <div class="screenshot-drop" onclick="document.getElementById('file-${section.id}').click()" onfocus="activePasteSection='${section.id}'">
-                <div class="screenshot-drop-text">
-                    Click to upload or <strong>paste a screenshot</strong> (Ctrl+V / Cmd+V)
-                </div>
-                <input type="file" id="file-${section.id}" accept="image/*" multiple style="display:none;" onchange="handleFiles('${section.id}', this.files)">
-            </div>
-            <div class="screenshot-grid" id="screenshots-${section.id}">`;
-        for (let i = 0; i < screenshots.length; i++) {
-            html += `<div class="screenshot-thumb">
-                <img src="${screenshots[i]}" alt="Screenshot" onclick="viewScreenshot(this.src)">
-                <button class="screenshot-remove" onclick="removeScreenshot('${section.id}', ${i})">×</button>
-            </div>`;
-        }
-        html += `</div></div>`;
-
-        // Fields
-        if (section.fields === 'hours') {
-            html += renderHoursFields(sData);
-        } else {
-            for (const f of section.fields) {
-                const val = esc(sData[f.id] || '');
-                if (f.type === 'textarea') {
-                    html += `<div class="gbp-form-group">
-                        <label>${f.label}</label>
-                        <textarea data-section="${section.id}" data-field="${f.id}" rows="${f.rows || 3}" placeholder="${f.placeholder || ''}" onchange="markUnsaved()">${val}</textarea>
-                    </div>`;
-                } else {
-                    html += `<div class="gbp-form-group">
-                        <label>${f.label}</label>
-                        <input type="text" data-section="${section.id}" data-field="${f.id}" value="${val}" placeholder="${f.placeholder || ''}" onchange="markUnsaved()">
-                    </div>`;
-                }
-            }
+        async function refreshLive() {
+            const b = document.getElementById('btn-refresh');
+            b.disabled = true; b.textContent = 'Refreshing…';
+            await load(true);
+            b.disabled = false; b.textContent = 'Refresh from Google';
         }
 
-        html += `</div></div>`;
-        return html;
-    }
-
-    function renderHoursFields(sData) {
-        const hours = sData.hours || [];
-        const hourMap = {};
-        for (const h of hours) hourMap[h.day] = h;
-
-        let html = '<div class="gbp-hours-edit-grid">';
-        for (const day of DAYS) {
-            const h = hourMap[day] || {};
-            const closed = h.closed || false;
-            html += `<div class="gbp-hours-edit-row">
-                <span class="gbp-hours-edit-day">${day}</span>
-                <input type="text" class="gbp-hours-input" data-section="hours" data-day="${day}" data-which="open"
-                    value="${esc(h.open || '')}" placeholder="8:00 AM" ${closed ? 'disabled' : ''} onchange="markUnsaved()">
-                <span class="gbp-hours-dash">–</span>
-                <input type="text" class="gbp-hours-input" data-section="hours" data-day="${day}" data-which="close"
-                    value="${esc(h.close || '')}" placeholder="5:00 PM" ${closed ? 'disabled' : ''} onchange="markUnsaved()">
-                <label class="gbp-hours-closed-label">
-                    <input type="checkbox" data-section="hours" data-day="${day}" data-which="closed"
-                        ${closed ? 'checked' : ''} onchange="toggleHoursClosed(this, '${day}'); markUnsaved()"> Closed
-                </label>
-            </div>`;
-        }
-        html += '</div>';
-        return html;
-    }
-
-    function toggleSection(sectionId) {
-        const body = document.getElementById('body-' + sectionId);
-        const panel = document.getElementById('panel-' + sectionId);
-        const isOpen = body.style.display !== 'none';
-        body.style.display = isOpen ? 'none' : 'block';
-        panel.classList.toggle('open', !isOpen);
-        if (!isOpen) activePasteSection = sectionId;
-    }
-
-    function toggleHoursClosed(cb, day) {
-        const row = cb.closest('.gbp-hours-edit-row');
-        const inputs = row.querySelectorAll('input[type="text"]');
-        inputs.forEach(inp => inp.disabled = cb.checked);
-    }
-
-    function markUnsaved() {
-        unsavedChanges = true;
-        document.getElementById('save-status').textContent = 'Unsaved changes';
-        document.getElementById('save-status').style.color = 'var(--warning)';
-    }
-
-    function updateProgress() {
-        const loc = locations.find(l => l.id === currentLocationId);
-        if (!loc) return;
-        const d = loc.data || {};
-        const count = SECTIONS.filter(s => isSectionCaptured(d, s.id)).length;
-        document.getElementById('capture-progress').textContent = `${count}/${SECTIONS.length} sections`;
-    }
-
-    // ─── Screenshots ───
-    // Global paste handler
-    document.addEventListener('paste', (e) => {
-        if (currentMode !== 'capture' || !currentLocationId) return;
-        const items = e.clipboardData?.items;
-        if (!items) return;
-
-        for (const item of items) {
-            if (item.type.startsWith('image/')) {
-                e.preventDefault();
-                const blob = item.getAsFile();
-                // Determine which section to paste into
-                const targetSection = activePasteSection || SECTIONS[0].id;
-                resizeAndAddScreenshot(targetSection, blob);
-                return;
-            }
-        }
-    });
-
-    // Click on screenshot area sets active section
-    document.addEventListener('click', (e) => {
-        const area = e.target.closest('.screenshot-area');
-        if (area) activePasteSection = area.dataset.section;
-    });
-
-    function handleFiles(sectionId, files) {
-        for (const file of files) {
-            if (file.type.startsWith('image/')) {
-                resizeAndAddScreenshot(sectionId, file);
-            }
-        }
-    }
-
-    function resizeAndAddScreenshot(sectionId, blob) {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const maxW = 1400;
-            let w = img.width, h = img.height;
-            if (w > maxW) { h = h * maxW / w; w = maxW; }
-            canvas.width = w;
-            canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-
-            // Add to DOM
-            const grid = document.getElementById('screenshots-' + sectionId);
-            const idx = grid.children.length;
-            const div = document.createElement('div');
-            div.className = 'screenshot-thumb';
-            div.innerHTML = `<img src="${dataUrl}" alt="Screenshot" onclick="viewScreenshot(this.src)">
-                <button class="screenshot-remove" onclick="removeScreenshot('${sectionId}', ${idx})">×</button>`;
-            grid.appendChild(div);
-
-            markUnsaved();
-            URL.revokeObjectURL(img.src);
-        };
-        img.src = URL.createObjectURL(blob);
-    }
-
-    function removeScreenshot(sectionId, index) {
-        const grid = document.getElementById('screenshots-' + sectionId);
-        if (grid.children[index]) {
-            grid.children[index].remove();
-            markUnsaved();
-        }
-    }
-
-    function viewScreenshot(src) {
-        const overlay = document.createElement('div');
-        overlay.className = 'screenshot-overlay';
-        overlay.onclick = () => overlay.remove();
-        overlay.innerHTML = `<img src="${src}" alt="Screenshot">`;
-        document.body.appendChild(overlay);
-    }
-
-    // ─── Save ───
-    async function saveCurrentLocation() {
-        const loc = locations.find(l => l.id === currentLocationId);
-        if (!loc) return;
-
-        const btn = document.querySelector('#location-capture .btn-primary');
-        btn.disabled = true;
-        btn.textContent = 'Saving...';
-
-        // Collect data from all sections
-        const data = {};
-
-        for (const section of SECTIONS) {
-            const sData = {};
-
-            // Collect screenshots
-            const grid = document.getElementById('screenshots-' + section.id);
-            if (grid) {
-                const imgs = grid.querySelectorAll('img');
-                sData.screenshots = Array.from(imgs).map(img => img.src);
-            }
-
-            // Collect fields
-            if (section.fields === 'hours') {
-                const hours = [];
-                for (const day of DAYS) {
-                    const openEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="open"]`);
-                    const closeEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="close"]`);
-                    const closedEl = document.querySelector(`[data-section="hours"][data-day="${day}"][data-which="closed"]`);
-                    if (closedEl?.checked) {
-                        hours.push({ day, closed: true });
-                    } else if (openEl?.value.trim() || closeEl?.value.trim()) {
-                        hours.push({ day, open: openEl.value.trim(), close: closeEl.value.trim() });
-                    }
-                }
-                sData.hours = hours;
-            } else {
-                for (const f of section.fields) {
-                    const el = document.querySelector(`[data-section="${section.id}"][data-field="${f.id}"]`);
-                    if (el) sData[f.id] = el.value.trim();
-                }
-            }
-
-            data[section.id] = sData;
+        function downloadCsv() {
+            const cols = ['city', 'title', 'address', 'phone', 'website', 'primaryCategory',
+                'additionalCategories', 'description', 'serviceItemCount', 'openStatus', 'placeId', 'mapsUri'];
+            const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+            const lines = [
+                ['City', 'Business Name', 'Address', 'Phone', 'Website', 'Primary Category',
+                 'Additional Categories', 'Description', 'Service Items', 'Status', 'Place ID',
+                 'Maps URL', 'Reviews', 'Avg Rating', '24/7'].join(','),
+                ...offices.map(o => [
+                    ...cols.map(c => q(Array.isArray(o[c]) ? o[c].join('; ') : o[c])),
+                    o.reviews?.total ?? '', o.reviews?.averageRating?.toFixed?.(2) ?? '',
+                    o.audit.is24x7 ? 'yes' : 'no',
+                ].join(',')),
+            ];
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+            a.download = `dunham-gbp-profiles-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
         }
 
-        try {
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: currentLocationId,
-                    client_key: 'dunham',
-                    location_name: loc.location_name,
-                    data
-                })
-            });
-            const json = await resp.json();
-            if (!resp.ok || json.error) throw new Error(json.error);
-
-            unsavedChanges = false;
-            // Update local data
-            const idx = locations.findIndex(l => l.id === currentLocationId);
-            if (idx >= 0) locations[idx].data = data;
-            renderLocationList();
-            updateProgress();
-
-            document.getElementById('save-status').textContent = 'Saved!';
-            document.getElementById('save-status').style.color = 'var(--success)';
-
-            // Update section checkmarks
-            for (const section of SECTIONS) {
-                const panel = document.getElementById('panel-' + section.id);
-                const check = panel.querySelector('.section-check');
-                if (isSectionCaptured(data, section.id)) {
-                    panel.classList.add('captured');
-                    check.textContent = '✓';
-                } else {
-                    panel.classList.remove('captured');
-                    check.textContent = '';
-                }
-            }
-        } catch (err) {
-            document.getElementById('save-status').textContent = 'Save failed: ' + err.message;
-            document.getElementById('save-status').style.color = 'var(--danger)';
-        }
-
-        btn.disabled = false;
-        btn.textContent = 'Save';
-    }
-
-    // ─── Print View ───
-    function renderPrintView() {
-        document.getElementById('report-date').textContent = 'Generated: ' +
-            new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('report-stat').textContent = locations.length + ' locations';
-
-        if (locations.length === 0) {
-            document.getElementById('print-content').innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px;">No locations captured yet.</p>';
-            return;
-        }
-
-        let html = '';
-        for (const loc of locations) {
-            html += renderLocationPrint(loc);
-        }
-        document.getElementById('print-content').innerHTML = html;
-    }
-
-    function renderLocationPrint(loc) {
-        const d = loc.data || {};
-        let html = `<div class="campaign-section print-location">
-            <div class="campaign-header"><div class="campaign-name">${esc(loc.location_name)}</div></div>
-            <div class="campaign-body">`;
-
-        for (const section of SECTIONS) {
-            const sData = d[section.id];
-            if (!sData || !isSectionCaptured(d, section.id)) continue;
-
-            html += `<div class="gbp-info-section">
-                <div class="gbp-section-title">${section.icon} ${section.title}</div>`;
-
-            // Screenshots
-            if (sData.screenshots && sData.screenshots.length > 0) {
-                html += '<div class="print-screenshots">';
-                for (const src of sData.screenshots) {
-                    html += `<img src="${src}" alt="${section.title} screenshot" class="print-screenshot">`;
-                }
-                html += '</div>';
-            }
-
-            // Fields
-            if (section.fields === 'hours') {
-                if (sData.hours && sData.hours.length > 0) {
-                    html += '<div class="gbp-hours-grid">';
-                    for (const h of sData.hours) {
-                        if (h.closed) {
-                            html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time gbp-closed">Closed</span></div>`;
-                        } else if (h.open || h.close) {
-                            html += `<div class="gbp-hours-row"><span class="gbp-hours-day">${esc(h.day)}</span><span class="gbp-hours-time">${esc(h.open)} – ${esc(h.close)}</span></div>`;
-                        }
-                    }
-                    html += '</div>';
-                }
-            } else {
-                html += '<div class="gbp-info-grid">';
-                for (const f of section.fields) {
-                    const val = sData[f.id];
-                    if (val && val.trim()) {
-                        if (f.type === 'textarea') {
-                            html += `<div class="gbp-description" style="margin-bottom:8px;">${esc(val)}</div>`;
-                        } else {
-                            html += `<div class="gbp-info-row"><div class="gbp-info-label">${f.label}</div><div class="gbp-info-value">${esc(val)}</div></div>`;
-                        }
-                    }
-                }
-                html += '</div>';
-            }
-
-            html += '</div>';
-        }
-
-        html += '</div></div>';
-        return html;
-    }
-
-    // ─── Util ───
-    function esc(str) {
-        if (str == null) return '';
-        const div = document.createElement('div');
-        div.textContent = String(str);
-        return div.innerHTML;
-    }
-
-    // ─── Import from GBP (Paste-based) ───
-    function openImportModal() {
-        const modal = document.getElementById('import-modal');
-        modal.style.display = 'flex';
-        document.getElementById('import-textarea').value = '';
-        document.getElementById('import-status').textContent = '';
-        document.getElementById('import-textarea').focus();
-    }
-
-    function closeImportModal() {
-        document.getElementById('import-modal').style.display = 'none';
-    }
-
-    function parseGBPHours(text) {
-        const hm = text.match(/Business hours[\s\S]*?Hours\n(?:Open with main hours\n)?((?:Sunday|Monday)[\s\S]*?)(?=Special hours|Add more hours|\nMore\n|\n\n\n)/);
-        if (!hm) return [];
-        const lines = hm[1].split('\n');
-        const hours = [];
-        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (days.includes(line)) {
-                const next = (lines[i + 1] || '').trim();
-                if (next === 'Open 24 hours') {
-                    hours.push({ day: line, open: '12:00 AM', close: '11:59 PM' });
-                } else if (next === 'Closed') {
-                    hours.push({ day: line, closed: true });
-                } else if (/[AP]M/.test(next)) {
-                    const parts = next.split(/\s*[\u2013–-]\s*/);
-                    hours.push({ day: line, open: parts[0], close: parts[1] || '' });
-                }
-                i++;
-            }
-        }
-        return hours;
-    }
-
-    function parseGBPText(text) {
-        let m;
-        const result = { name: 'Unknown', data: {} };
-
-        // Business name
-        m = text.match(/Business name\n([^\n]+)/);
-        if (m) result.name = m[1].trim();
-
-        // Categories
-        let cats = '';
-        m = text.match(/Business category\n([\s\S]*?)(?=\nDescription)/);
-        if (m) {
-            cats = m[1]
-                .replace(/Your edit was not approved\.\n?/g, '')
-                .replace(/Current\n/g, '')
-                .replace(/Not approved\n/g, '')
-                .replace(/\nPrimary\n/g, ' (Primary), ')
-                .replace(/\nPrimary/g, ' (Primary)')
-                .replace(/\n/g, ', ')
-                .replace(/, ,/g, ',')
-                .trim();
-        }
-
-        // Description
-        let desc = '';
-        m = text.match(/Description\n([\s\S]*?)(?=\nOpening date|\nContact information)/);
-        if (m) desc = m[1].trim();
-
-        // Opening date
-        let openDate = '';
-        m = text.match(/Opening date\n([^\n]+)/);
-        if (m) openDate = m[1].trim();
-
-        // Phone
-        let phone = '';
-        m = text.match(/Phone number\n([^\n]+)/);
-        if (m) phone = m[1].trim();
-
-        // Website
-        let website = '';
-        m = text.match(/Website\n([^\n]+)/);
-        if (m) website = m[1].trim();
-
-        // Social profiles
-        let social = '';
-        m = text.match(/Social profiles[\s\S]*?(?:Current\n)?(https?:\/\/[^\n]+)/);
-        if (m) social = m[1].trim();
-
-        // Short name
-        let shortName = '';
-        m = text.match(/Short name\n([^\n]+)/);
-        if (m) shortName = m[1].trim();
-
-        // Address
-        let addr = '';
-        m = text.match(/Business location\n([^\n]+)/);
-        if (m) addr = m[1].trim();
-
-        // Service area
-        let svcArea = '';
-        m = text.match(/Service area\n([\s\S]*?)(?=\nBusiness hours)/);
-        if (m) svcArea = m[1].trim();
-
-        // Hours
-        const hours = parseGBPHours(text);
-
-        // Attributes
-        const attrs = [];
-        m = text.match(/Accessibility\n([\s\S]*?)(?=\nAmenities|\nCrowd|\nParking|\nPlace page|\nPlanning|\nService options)/);
-        if (m) attrs.push('Accessibility: ' + m[1].replace(/\n/g, ', ').trim());
-
-        m = text.match(/Amenities\n([\s\S]*?)(?=\nCrowd|\nParking|\nPlace page|\nPlanning|\nService options)/);
-        if (m) attrs.push('Amenities: ' + m[1].replace(/\n/g, ', ').trim());
-
-        m = text.match(/Crowd\n([\s\S]*?)(?=\nParking|\nPlace page|\nPlanning|\nService options)/);
-        if (m) {
-            const ct = m[1].replace(/Let customers[\s\S]*?Learn more\n?/, '').trim();
-            if (ct) attrs.push('Crowd: ' + ct.replace(/\n/g, ', '));
-        }
-
-        m = text.match(/Service options\n([\s\S]*?)(?=\nSpanish|\nLearn how|$)/);
-        if (m) attrs.push('Service options: ' + m[1].replace(/\n/g, ', ').trim());
-
-        result.data = {
-            info: { address: addr, phone, website, categories: cats, social_profiles: social, short_name: shortName, maps_url: '', screenshots: [] },
-            description: { text: desc, screenshots: [] },
-            hours: { hours, screenshots: [] },
-            services: { text: svcArea ? 'Service areas: ' + svcArea.replace(/\n/g, ', ') : '', screenshots: [] },
-            attributes: { text: attrs.join('\n'), screenshots: [] },
-            reviews: { total_count: '', avg_rating: '', notes: '', screenshots: [] },
-            photos: { owner_count: '', customer_count: '', notes: '', screenshots: [] },
-            posts: { text: '', screenshots: [] },
-            performance: { views: '', searches: '', direction_requests: '', calls: '', website_clicks: '', notes: '', screenshots: [] },
-            qa: { text: '', screenshots: [] },
-            _raw: { raw_text: text, extracted_at: new Date().toISOString(), service_area: svcArea, opening_date: openDate }
-        };
-
-        return result;
-    }
-
-    async function parseAndImport() {
-        const text = document.getElementById('import-textarea').value.trim();
-        const statusEl = document.getElementById('import-status');
-
-        if (!text) {
-            statusEl.textContent = 'Paste some text first.';
-            statusEl.style.color = 'var(--danger)';
-            return;
-        }
-
-        if (!text.includes('Business name')) {
-            statusEl.textContent = 'This doesn\'t look like GBP data (no "Business name" found).';
-            statusEl.style.color = 'var(--danger)';
-            return;
-        }
-
-        const parsed = parseGBPText(text);
-        statusEl.textContent = `Parsed: ${parsed.name}. Saving...`;
-        statusEl.style.color = 'var(--text-secondary)';
-
-        // Check if location already exists
-        const existing = locations.find(l => l.location_name === parsed.name);
-
-        try {
-            const payload = {
-                client_key: 'dunham',
-                location_name: parsed.name,
-                data: parsed.data
-            };
-            if (existing) payload.id = existing.id;
-
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const json = await resp.json();
-            if (!resp.ok || json.error) throw new Error(json.error);
-
-            closeImportModal();
-            currentLocationId = json.location.id;
-            await loadData();
-
-            // Show what was imported
-            const d = parsed.data;
-            const summary = [
-                d.info.address && `Address: ${d.info.address}`,
-                d.info.phone && `Phone: ${d.info.phone}`,
-                d.info.website && `Website: ${d.info.website}`,
-                d.info.categories && `Categories: ${d.info.categories}`,
-                d.info.social_profiles && `Social: ${d.info.social_profiles}`,
-                d.info.short_name && `Short name: ${d.info.short_name}`,
-                d.description.text && `Description: ${d.description.text.substring(0, 60)}...`,
-                d.hours.hours.length && `Hours: ${d.hours.hours.length} days`,
-                d.services.text && `Services: captured`,
-                d.attributes.text && `Attributes: captured`,
-                d._raw.opening_date && `Opening date: ${d._raw.opening_date}`,
-                d._raw.service_area && `Service areas: ${d._raw.service_area.split('\n').length} areas`
-            ].filter(Boolean).join('\n');
-
-            alert(`Imported: ${parsed.name}\n\n${summary}`);
-        } catch (err) {
-            statusEl.textContent = 'Save failed: ' + err.message;
-            statusEl.style.color = 'var(--danger)';
-        }
-    }
-
-    // ─── Init ───
-    loadData();
+        load(false);
     </script>
 </body>
 </html>

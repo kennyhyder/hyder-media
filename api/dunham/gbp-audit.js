@@ -16,7 +16,7 @@
 import { supabase, getGoogleAccessToken } from './_google.js';
 
 const CLIENT_KEY = 'dunham-gbp-audit';
-const READ_MASK = 'name,title,storefrontAddress,categories,regularHours,phoneNumbers,websiteUri,openInfo,metadata,profile';
+const READ_MASK = 'name,title,storefrontAddress,categories,regularHours,phoneNumbers,websiteUri,openInfo,metadata,profile,serviceItems';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -168,6 +168,7 @@ function auditOffice(loc, accountName, reviews) {
         primaryCategory: primary,
         additionalCategories: additional,
         description: loc.profile?.description || null,
+        serviceItemCount: (loc.serviceItems || []).length,
         hoursPeriodCount: periods.length,
         reviews,
         audit: {
@@ -176,6 +177,7 @@ function auditOffice(loc, accountName, reviews) {
             hasHours: periods.length > 0,
             websiteIsCountyPage: !!website && /\/tx\/(bail-bonds|[a-z-]+-criminal-attorneys)\//.test(website),
             hasDescription: !!loc.profile?.description,
+            hasServiceItems: (loc.serviceItems || []).length > 0,
             isOpen: loc.openInfo?.status === 'OPEN',
         },
         auditedAt: new Date().toISOString(),

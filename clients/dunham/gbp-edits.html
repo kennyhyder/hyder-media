@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — Proposed GBP Edits</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .container { max-width: 1100px; }
+        .muted { color: var(--text-secondary); font-size: 0.9rem; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 22px; }
+        .intro { border-left: 4px solid var(--accent); background: rgba(59,130,246,0.08); border-radius: 0 10px 10px 0; padding: 16px 20px; margin-bottom: 26px; font-size: 0.93rem; }
+        .intro b { display: block; margin-bottom: 6px; }
+
+        .office-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+        .office-name { font-size: 1.25rem; font-weight: 800; }
+        .office-sub { color: var(--text-secondary); font-size: 0.85rem; }
+        .office-status { margin-left: auto; }
+
+        .edit-block { border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+        .edit-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .edit-title { font-weight: 700; font-size: 0.98rem; }
+        .edit-why { color: var(--text-secondary); font-size: 0.8rem; }
+        .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 760px) { .cmp { grid-template-columns: 1fr; } }
+        .cmp-col { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 0.87rem; line-height: 1.55; }
+        .cmp-col .lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+        .cmp-col.cur .lbl { color: var(--text-secondary); }
+        .cmp-col.prop { border-color: rgba(34,197,94,0.5); }
+        .cmp-col.prop .lbl { color: var(--success); }
+        .cmp-col a { color: var(--accent); word-break: break-all; }
+        .svc { margin: 4px 0 0 16px; }
+        .svc li { margin-bottom: 5px; }
+        .svc b { color: var(--text-primary); }
+
+        .approve-row { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+        .btn-approve, .btn-hold {
+            border: 1px solid var(--border); background: var(--bg-tertiary); color: var(--text-primary);
+            border-radius: 8px; padding: 7px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-approve.on { background: var(--success); border-color: var(--success); color: #fff; }
+        .btn-hold.on { background: var(--warning); border-color: var(--warning); color: #111; }
+        .note-input {
+            flex: 1; min-width: 200px; background: var(--bg-primary); border: 1px solid var(--border);
+            color: var(--text-primary); border-radius: 8px; padding: 7px 12px; font-size: 0.85rem;
+        }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+        .pill-green { background: rgba(34,197,94,0.15); color: var(--success); }
+        .pill-yellow { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .pill-gray { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .save-note { font-size: 0.78rem; color: var(--text-secondary); }
+        .summary-bar { position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham &amp; Jones
+        </a>
+        <div class="nav-links"><a href="dashboard.html" class="nav-link">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link">GBP</a><a href="gbp-edits.html" class="nav-link active">Approvals</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
+    </nav>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Proposed Google Business Profile Edits</h1>
+            <p class="subtitle">All 16 criminal-defense offices — the 5 with the bail category live are the priority group</p>
+            <div class="report-meta">
+                <span>No changes are made until approved here</span>
+                <span id="meta-state">Loading…</span>
+            </div>
+        </div>
+
+        <div class="intro">
+            <b>What this is — and what it isn't</b>
+            These are <i>safe, non-category</i> profile edits: business descriptions, added service listings,
+            and website-link updates. No categories are touched (that rollout stays on hold until the
+            verification plan is ready). All bail language is representation-bound per Tex. Occ. Code
+            §1704.163 — "for clients we represent" — with no fee claims. Approve each item, or mark it
+            Hold with a note and we'll revise. Once an office's items are approved, Hyder Media applies
+            them via the Google API — typically live within minutes, and fully reversible.
+        </div>
+
+        <div class="summary-bar">
+            <span id="progress" style="font-weight:700;">—</span>
+            <span class="save-note" id="save-note"></span>
+            <span style="margin-left:auto;" class="muted">Decisions save automatically and are shared.</span>
+        </div>
+
+        <div class="card" id="findings-card">
+            <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:4px;">Full-Fleet Optimization Audit</h2>
+            <p class="muted" style="margin-bottom:12px;">Every managed profile, checked against the optimization baseline. Items marked as proposals below are covered by the approvals; the rest are noted for the roadmap.</p>
+            <div id="findings">Loading…</div>
+        </div>
+
+        <div id="offices"><div class="muted" style="text-align:center; padding:30px;">Loading current profile data…</div></div>
+
+        <div class="footer-note">
+            Current values pulled live from the Google Business Profile audit · Proposed edits applied only
+            after approval · Prepared by Hyder Media
+        </div>
+    </div>
+
+    <script>
+        const STATE_API = '/api/gbp/locations';
+        const STATE_CLIENT = 'dunham-maps';
+        const STATE_ROW = '_gbp-edit-approvals';
+
+        // ---------------- Proposed edits (drafted 2026-07-23) ----------------
+        const SERVICES = [
+            ['24/7 Jail Release', 'Around-the-clock help getting clients released from county jail — nights, weekends, and holidays.'],
+            ['Attorney Bail Bond', 'Under Texas Occupations Code §1704.163, our attorneys can post bail for clients we represent in their criminal case — release and defense handled in one call.'],
+            ['Free Warrant Check', 'Confidential warrant search for any Texas county, at no charge.'],
+            ['Magistration & Bond Hearings', 'Representation at magistration and bond-reduction hearings to get bail set fairly and fast.'],
+        ];
+
+        function desc(city, county, phone) {
+            return `Dunham & Jones, Attorneys at Law — criminal defense and 24/7 jail release in ${city}. ` +
+`Since 1989 our attorneys have defended DWI and criminal cases across Texas, with the #1 goal of a dismissal or reduction. ` +
+`Under Texas law (Tex. Occ. Code §1704.163), our attorneys can also post bail directly for clients we represent in ${county} County — ` +
+`one call handles both the jail release and the defense, with no separate bondsman to deal with. ` +
+`Our Jail Release Team answers 24 hours a day, 7 days a week at ${phone}.`;
+        }
+
+        function bailUrl(countySlug, city) {
+            return `https://www.dunhamlaw.com/tx/bail-bonds/${countySlug}/?utm_source=gbp&utm_medium=organic&utm_campaign=maps-initiative-${city.toLowerCase().replace(/\s+/g, '-')}`;
+        }
+
+        const DJ_NOTE = 'This profile currently points at dunhamjones.com — the proposal also standardizes it onto dunhamlaw.com (the primary domain). If you prefer keeping dunhamjones.com, mark Hold and note it.';
+        const OFFICES = [
+            // Priority group — already carry the "Bail bonds service" category
+            { id: 'midland', city: 'Midland', county: 'Midland', countySlug: 'midland-county', phone: '(432) 888-8888', priority: true },
+            { id: 'lubbock', city: 'Lubbock', county: 'Lubbock', countySlug: 'lubbock-county', phone: '(806) 999-9999', priority: true },
+            { id: 'el-paso', city: 'El Paso', county: 'El Paso', countySlug: 'el-paso-county', phone: '(915) 777-7777', priority: true },
+            { id: 'amarillo', city: 'Amarillo', county: 'Potter', countySlug: 'potter-county', phone: '(806) 222-2222', priority: true },
+            { id: 'bryan', city: 'Bryan', county: 'Brazos', countySlug: 'brazos-county', phone: '(979) 333-3333', priority: true, domainNote: DJ_NOTE },
+            // Remaining criminal-defense offices (bail category held — these edits are category-independent)
+            { id: 'houston', city: 'Houston', county: 'Harris', countySlug: 'harris-county', phone: '(713) 999-9999' },
+            { id: 'dallas', city: 'Dallas', county: 'Dallas', countySlug: 'dallas-county', phone: '(214) 888-8888' },
+            { id: 'san-antonio', city: 'San Antonio', county: 'Bexar', countySlug: 'bexar-county', phone: '(210) 777-7777' },
+            { id: 'austin', city: 'Austin', county: 'Travis', countySlug: 'travis-county', phone: '(512) 777-7777' },
+            { id: 'fort-worth', city: 'Fort Worth', county: 'Tarrant', countySlug: 'tarrant-county', phone: '(817) 888-8888' },
+            { id: 'plano', city: 'Plano', county: 'Collin', countySlug: 'collin-county', phone: '(214) 888-8888' },
+            { id: 'denton', city: 'Denton', county: 'Denton', countySlug: 'denton-county', phone: '(817) 888-8888' },
+            { id: 'abilene', city: 'Abilene', county: 'Taylor', countySlug: 'taylor-county', phone: '(325) 999-9999' },
+            { id: 'waco', city: 'Waco', county: 'McLennan', countySlug: 'mclennan-county', phone: '(254) 777-7777', domainNote: DJ_NOTE },
+            { id: 'harker-heights', city: 'Harker Heights', county: 'Bell', countySlug: 'bell-county', phone: '(254) 777-7777', domainNote: DJ_NOTE },
+            { id: 'corpus-christi', city: 'Corpus Christi', county: 'Nueces', countySlug: 'nueces-county', phone: '(361) 888-8888' },
+        ];
+        const EDIT_TYPES = [
+            ['description', 'Business description', 'Adds the jail-release + attorney-bond story to a profile that currently only mentions criminal defense. Description text is not a ranking factor, but it converts profile viewers into callers.'],
+            ['services', 'Add 4 service listings', 'Service listings appear on the profile and help Google understand what the business offers. These are additions — existing services are untouched.'],
+            ['website', 'Website link → county bail page (with tracking)', 'Points the profile at the county bail-bonds page (currently the criminal-attorneys page) and adds UTM tags so GBP traffic shows up attributed in the Reporting dashboard.'],
+        ];
+
+        let approvals = {};
+        let approvalsRowId = null;
+        let audit = {};
+
+        async function boot() {
+            const [aud, st] = await Promise.all([
+                fetch('/api/dunham/gbp-audit').then(r => r.json()),
+                fetch(`${STATE_API}?client=${STATE_CLIENT}`).then(r => r.json()),
+            ]);
+            for (const o of (aud.offices || [])) {
+                const key = (o.city || '').toLowerCase() + (o.primaryCategory === 'Personal injury attorney' ? '-injury' : '');
+                audit[key] = o;
+            }
+            const row = (st.locations || []).find(l => l.location_name === STATE_ROW);
+            if (row) { approvalsRowId = row.id; approvals = row.data || {}; }
+            renderFindings();
+            render();
+        }
+
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+        const SEV = { critical: ['pill-red', 'CRITICAL'], high: ['pill-red', 'HIGH'], med: ['pill-yellow', 'MED'], low: ['pill-gray', 'LOW'], info: ['pill-gray', 'INFO'] };
+        function renderFindings() {
+            const rows = [];
+            const add = (city, sev, text) => rows.push({ city, sev, text });
+            for (const key of Object.keys(audit)) {
+                const o = audit[key];
+                const city = o.city + (o.primaryCategory === 'Personal injury attorney' ? ' (injury)' : '');
+                if (o.reviews && o.reviews.total === 0) add(city, 'critical', '0 Google reviews — a profile with no reviews is invisible as a trust signal. Review-engine priority #1.');
+                else if (o.reviews && o.reviews.total < 75) add(city, 'med', `Only ${o.reviews.total} reviews — below the fleet median; review-engine priority.`);
+                if (!o.audit.hasDescription) add(city, 'high', 'No business description set — proposed below.');
+                if ((o.website || '').includes('dunhamjones.com')) add(city, 'med', 'Website points at dunhamjones.com (secondary domain) — splits authority; consolidation proposed below.');
+                if ((o.serviceItemCount ?? 0) === 0) add(city, 'med', 'No service listings on the profile.');
+                else if (o.serviceItemCount < 20 && o.primaryCategory !== 'Personal injury attorney') add(city, 'med', `Thin service list (${o.serviceItemCount} items vs. 40–80 on the strongest profiles).`);
+                if (!(o.website || '').includes('utm_')) add(city, 'low', 'Website link untagged — GBP traffic not attributable in Reporting. UTM proposed below.');
+                if (!o.audit.hasBailCategory && o.primaryCategory !== 'Personal injury attorney') add(city, 'info', 'No "Bail bonds service" category yet — on hold pending the verification travel plan.');
+                if (!o.audit.is24x7) add(city, 'high', 'Hours are not set to 24/7 — a top-5 map ranking factor.');
+            }
+            add('Fort Worth (injury)', 'info', 'Second Fort Worth profile (personal-injury practice) — excluded from bail edits; distinct-practice profiles are allowed but names/categories must stay distinct.');
+            add('Georgetown', 'high', 'No Google Business Profile exists under managed access — office listed on dunhamlaw.com. Needs claim/create + verification.');
+            add('San Marcos', 'high', 'No Google Business Profile exists under managed access — office listed on dunhamlaw.com. Needs claim/create + verification.');
+            const order = { critical: 0, high: 1, med: 2, low: 3, info: 4 };
+            rows.sort((a, b) => order[a.sev] - order[b.sev] || a.city.localeCompare(b.city));
+            document.getElementById('findings').innerHTML = `
+                <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.87rem;">
+                    ${rows.map(r => `<tr>
+                        <td style="padding:7px 10px; border-bottom:1px solid rgba(71,85,105,0.3); white-space:nowrap;"><b>${esc(r.city)}</b></td>
+                        <td style="padding:7px 10px; border-bottom:1px solid rgba(71,85,105,0.3); white-space:nowrap;"><span class="pill ${SEV[r.sev][0]}">${SEV[r.sev][1]}</span></td>
+                        <td style="padding:7px 10px; border-bottom:1px solid rgba(71,85,105,0.3);">${esc(r.text)}</td>
+                    </tr>`).join('')}
+                </table>`;
+        }
+
+        function render() {
+            const root = document.getElementById('offices');
+            root.innerHTML = OFFICES.map(o => {
+                const cur = audit[o.city.toLowerCase()] || {};
+                const blocks = EDIT_TYPES.map(([type, title, why]) => {
+                    const key = `${o.id}:${type}`;
+                    const a = approvals[key] || {};
+                    let current, proposed;
+                    if (type === 'description') {
+                        current = esc(cur.description || '(no description set)');
+                        proposed = esc(desc(o.city, o.county, o.phone));
+                    } else if (type === 'services') {
+                        current = '(existing services remain unchanged)';
+                        proposed = '<ul class="svc">' + SERVICES.map(([n, d]) =>
+                            `<li><b>${esc(n)}</b> — ${esc(d)}</li>`).join('') + '</ul>';
+                    } else {
+                        current = cur.website ? `<a href="${esc(cur.website)}" target="_blank" rel="noopener">${esc(cur.website)}</a>` : '(none)';
+                        const u = bailUrl(o.countySlug, o.city);
+                        proposed = `<a href="${esc(u.split('?')[0])}" target="_blank" rel="noopener">${esc(u)}</a>`;
+                    }
+                    return `
+                    <div class="edit-block">
+                        <div class="edit-head">
+                            <span class="edit-title">${title}</span>
+                            <span class="edit-why">${why}</span>
+                        </div>
+                        <div class="cmp">
+                            <div class="cmp-col cur"><div class="lbl">Current</div>${current}</div>
+                            <div class="cmp-col prop"><div class="lbl">Proposed</div>${proposed}</div>
+                        </div>
+                        <div class="approve-row">
+                            <button class="btn-approve ${a.status === 'approved' ? 'on' : ''}" onclick="setStatus('${key}', 'approved')">✓ Approve</button>
+                            <button class="btn-hold ${a.status === 'hold' ? 'on' : ''}" onclick="setStatus('${key}', 'hold')">Hold</button>
+                            <input class="note-input" placeholder="Optional note / requested change…"
+                                value="${esc(a.note || '')}" onchange="setNote('${key}', this.value)">
+                        </div>
+                    </div>`;
+                }).join('');
+
+                const officeStatuses = EDIT_TYPES.map(([t]) => (approvals[`${o.id}:${t}`] || {}).status);
+                const done = officeStatuses.filter(s => s === 'approved').length;
+                const held = officeStatuses.filter(s => s === 'hold').length;
+                const statusPill = done === 3 ? '<span class="pill pill-green">All approved</span>'
+                    : held ? `<span class="pill pill-yellow">${held} on hold</span>`
+                    : `<span class="pill pill-gray">${done}/3 approved</span>`;
+                return `
+                <div class="card" id="office-${o.id}">
+                    <div class="office-head">
+                        <span class="office-name">${o.city}</span>
+                        ${o.priority ? '<span class="pill pill-green">PRIORITY — bail category live</span>' : ''}
+                        <span class="office-sub">${o.county} County · ${o.phone} · ${cur.reviews ? cur.reviews.total + ' reviews' : ''}</span>
+                        <span class="office-status">${statusPill}</span>
+                    </div>
+                    ${o.domainNote ? `<p class="muted" style="margin:6px 0 0;">⚠ ${o.domainNote}</p>` : ''}
+                    ${blocks}
+                </div>`;
+            }).join('');
+
+            const all = OFFICES.length * EDIT_TYPES.length;
+            const approved = Object.values(approvals).filter(a => a.status === 'approved').length;
+            const held = Object.values(approvals).filter(a => a.status === 'hold').length;
+            document.getElementById('progress').textContent =
+                `${approved} of ${all} items approved${held ? ` · ${held} on hold` : ''}`;
+            document.getElementById('meta-state').textContent = approved === all
+                ? 'All approved — Hyder Media will apply the edits'
+                : 'Awaiting review';
+        }
+
+        async function save() {
+            const note = document.getElementById('save-note');
+            note.textContent = 'Saving…';
+            try {
+                const body = { client_key: STATE_CLIENT, location_name: STATE_ROW, data: approvals };
+                if (approvalsRowId) body.id = approvalsRowId;
+                const resp = await (await fetch(STATE_API, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+                })).json();
+                if (resp.location?.id) approvalsRowId = resp.location.id;
+                note.textContent = 'Saved ✓';
+                setTimeout(() => note.textContent = '', 2000);
+            } catch (e) { note.textContent = 'Save failed — retry'; }
+        }
+        function setStatus(key, status) {
+            const a = approvals[key] || {};
+            a.status = a.status === status ? null : status;
+            a.at = new Date().toISOString();
+            approvals[key] = a;
+            render(); save();
+        }
+        function setNote(key, note) {
+            const a = approvals[key] || {};
+            a.note = note;
+            approvals[key] = a;
+            save();
+        }
+
+        boot();
+    </script>
+</body>
+</html>
