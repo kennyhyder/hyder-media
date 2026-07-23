@@ -221,7 +221,9 @@ async function throttleStamp(supabase) {
 async function sendAlert(stales) {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) return { ok: false, error: "RESEND_API_KEY missing" };
-  const lines = stales.map((s) => `  ${s.label}: ${s.age_minutes} min old (threshold: ${s.stale_after_minutes} min) · table: ${s.table}`).join("\n");
+  const lines = stales.map((s) => s.age_minutes != null
+    ? `  ${s.label}: ${s.age_minutes} min old (threshold: ${s.stale_after_minutes} min) · table: ${s.table}`
+    : `  ${s.label}: check FAILED (${s.error || s.status || "unknown"}) · table: ${s.table}`).join("\n");
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
