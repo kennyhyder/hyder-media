@@ -108,6 +108,25 @@
         .chip.r { background: rgba(239,68,68,0.2); color: var(--danger); }
         .num { text-align: right; font-variant-numeric: tabular-nums; }
         .loading { text-align: center; color: var(--text-secondary); padding: 40px 0; }
+
+        /* Hover tooltips */
+        [data-tip] { position: relative; cursor: help; }
+        [data-tip]::after {
+            content: attr(data-tip);
+            position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%);
+            width: 290px; background: #0b1222; color: var(--text-primary);
+            border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+            font-size: 0.78rem; font-weight: 400; line-height: 1.5; text-align: left;
+            opacity: 0; pointer-events: none; transition: opacity 0.15s; z-index: 60;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5); white-space: normal;
+        }
+        [data-tip]::before {
+            content: ''; position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: var(--border);
+            opacity: 0; transition: opacity 0.15s; z-index: 60;
+        }
+        [data-tip]:hover::after, [data-tip]:hover::before { opacity: 1; }
+        .data-table th[data-tip]::after { width: 240px; left: auto; right: 0; transform: none; }
         .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
     </style>
 </head>
@@ -169,6 +188,14 @@
             if (kind === 'solv') cls = v >= 50 ? 'g' : v > 0 ? 'y' : 'r';
             else cls = v <= 3 ? 'g' : v <= 10 ? 'y' : 'r';
             return `<span class="chip ${cls}">${kind === 'solv' ? v.toFixed(2) : fmt1(v)}</span>`;
+        };
+        const TIPS = {
+            arp: 'Average Rank Position — your average map rank across only the grid pins where you appear. Lower is better; 1–3 means map-pack territory. Ignores pins where you are missing entirely.',
+            atrp: 'Average Total Rank Position — like ARP, but pins where you do not appear count as rank 21. The honest whole-market number: a big gap between ARP and ATRP means a coverage problem, not a rank problem.',
+            solv: 'Share of Local Voice — the % of grid pins where you rank in the TOP 3, i.e. where you would actually show in the Google map pack. This is the metric that gets the phone call. 0 = never in the pack; 100 = in the pack everywhere.',
+            osolv: 'Opportunity SoLV — your SoLV vs. the market leader\u2019s. The gap is your headroom: if the top competitor holds 100, full-grid map-pack coverage is provably achievable in this market.',
+            dist: 'SoLV Distance — how far from your location your top-3 visibility reaches, vs. the market average. Shows whether your pack presence travels or stays hyper-local.',
+            comps: 'Competitors — every business that appeared in this grid\u2019s results. \u201cWith SoLV > 0\u201d counts those with real map-pack presence; the rest are visible but rarely in the top 3.',
         };
         const badgeCls = (v, kind) => {
             if (v == null) return 'bad';
@@ -297,9 +324,9 @@
                                 found in ${s.foundIn}/${s.totalPoints} pins (${s.foundPct}%) · ${esc(d.date)}</div>
                         </div>
                         <div class="metric-badges">
-                            <div class="mbadge ${badgeCls(s.arp, 'arp')}"><div class="k">ARP</div><div class="v">${fmt1(s.arp)}</div></div>
-                            <div class="mbadge ${badgeCls(s.atrp, 'arp')}"><div class="k">ATRP</div><div class="v">${fmt1(s.atrp)}</div></div>
-                            <div class="mbadge ${badgeCls(s.solv, 'solv')}"><div class="k">SoLV</div><div class="v">${s.solv == null ? '—' : s.solv.toFixed(2)}</div></div>
+                            <div class="mbadge ${badgeCls(s.arp, 'arp')}" data-tip="${TIPS.arp}"><div class="k">ARP ⓘ</div><div class="v">${fmt1(s.arp)}</div></div>
+                            <div class="mbadge ${badgeCls(s.atrp, 'arp')}" data-tip="${TIPS.atrp}"><div class="k">ATRP ⓘ</div><div class="v">${fmt1(s.atrp)}</div></div>
+                            <div class="mbadge ${badgeCls(s.solv, 'solv')}" data-tip="${TIPS.solv}"><div class="k">SoLV ⓘ</div><div class="v">${s.solv == null ? '—' : s.solv.toFixed(2)}</div></div>
                         </div>
                     </div>
                 </div>
@@ -310,19 +337,19 @@
                     <h2>Metric Insights</h2>
                     <div class="insight-grid">
                         <div class="insight green">
-                            <div class="t">OSoLV</div><div class="d">Potential for SoLV improvement</div>
+                            <div class="t" data-tip="${TIPS.osolv}">OSoLV ⓘ</div><div class="d">Potential for SoLV improvement</div>
                             <div class="ins-vals"><span>Your SoLV<br><span class="big">${ins.osolv ? (ins.osolv.yours ?? 0).toFixed(2) : '—'}</span></span>
                             <span style="text-align:right">Top SoLV<br><span class="big">${ins.osolv ? (ins.osolv.top ?? 0).toFixed(2) : '—'}</span></span></div>
                             <div class="ins-bar"><div style="width:${osolvPct}%; background:var(--success);"></div></div>
                         </div>
                         <div class="insight blue">
-                            <div class="t">SoLV Distance</div><div class="d">Your distance visibility vs. market</div>
+                            <div class="t" data-tip="${TIPS.dist}">SoLV Distance ⓘ</div><div class="d">Your distance visibility vs. market</div>
                             <div class="ins-vals"><span>Your reach<br><span class="big">${ins.solvDistance ? (ins.solvDistance.yours ?? 0).toFixed(2) : '—'} mi</span></span>
                             <span style="text-align:right">Market avg<br><span class="big">${ins.solvDistance ? (ins.solvDistance.average ?? 0).toFixed(2) : '—'} mi</span></span></div>
                             <div class="ins-bar"><div style="width:${distPct}%; background:var(--accent);"></div></div>
                         </div>
                         <div class="insight red">
-                            <div class="t">Competitors</div><div class="d">Active competitors in market</div>
+                            <div class="t" data-tip="${TIPS.comps}">Competitors ⓘ</div><div class="d">Active competitors in market</div>
                             <div class="ins-vals"><span>Total<br><span class="big">${ins.competitors ? ins.competitors.total : '—'}</span></span>
                             <span style="text-align:right">With SoLV &gt; 0<br><span class="big">${ins.competitors ? ins.competitors.active : '—'}</span></span></div>
                             <div class="ins-bar"><div style="width:${compPct}%; background:var(--danger);"></div></div>
@@ -339,8 +366,12 @@
                         : 'Change tracking starts with the next scan of this keyword.'}
                         ${d.competitors.length < 6 ? ' Few businesses rank for this keyword in this market — a visibility opportunity.' : ''}</p>
                     <div class="table-scroll"><table class="data-table">
-                        <thead><tr><th>#</th><th>Business</th><th class="num">Change</th><th class="num">Found In</th>
-                        <th class="num">ARP</th><th class="num">ATRP</th><th class="num">SoLV</th></tr></thead>
+                        <thead><tr><th>#</th><th>Business</th>
+                        <th class="num" data-tip="Position change vs. the previous scan of this keyword: ▲ climbed, ▼ dropped, NEW = first appearance in this market.">Change ⓘ</th>
+                        <th class="num" data-tip="How many of the grid\u2019s pins this business appears in, and what % of all results that represents. Full coverage = it shows up everywhere in the market.">Found In ⓘ</th>
+                        <th class="num" data-tip="${TIPS.arp}">ARP ⓘ</th>
+                        <th class="num" data-tip="${TIPS.atrp}">ATRP ⓘ</th>
+                        <th class="num" data-tip="${TIPS.solv}">SoLV ⓘ</th></tr></thead>
                         <tbody>${compRows}</tbody>
                     </table></div>
                 </div>`;
