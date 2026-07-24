@@ -73,8 +73,7 @@ const FRESHNESS_TARGETS = [
   // run to Mission Control mc_ingest_runs). stale_after = 3× refresh cadence,
   // except panel/well (annual/manual sources — ~400d per panelcensus README).
   { table: "cc_stations", column: "fetched_at", label: "ChargeCensus AFDC stations", cron_minutes: 10080, stale_after_minutes: 30240,
-    envUrl: "CHARGECENSUS_SUPABASE_URL", envKey: "CHARGECENSUS_SUPABASE_SERVICE_KEY",
-    allowEmpty: true /* NREL AFDC outage — initial load hasn't landed; remove once cc_stations populates so emptiness alerts again */ },
+    envUrl: "CHARGECENSUS_SUPABASE_URL", envKey: "CHARGECENSUS_SUPABASE_SERVICE_KEY" /* NREL AFDC outage — initial load hasn't landed; remove once cc_stations populates so emptiness alerts again */ },
   { table: "tc_structures", column: "fetched_at", label: "TowerCensus FCC ASR structures", cron_minutes: 10080, stale_after_minutes: 30240,
     envUrl: "TOWERCENSUS_SUPABASE_URL", envKey: "TOWERCENSUS_SUPABASE_SERVICE_KEY" },
   { table: "cr_carriers", column: "fetched_at", label: "CarrierCensus FMCSA carriers", cron_minutes: 43200, stale_after_minutes: 129600,
