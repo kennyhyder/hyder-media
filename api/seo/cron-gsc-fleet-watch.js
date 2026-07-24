@@ -64,6 +64,14 @@ async function checkDomain(at, { domain, sitemapIndex }) {
     if (r.status !== 200) out.critical.push(`sitemap index HTTP ${r.status}`);
   } catch (e) { out.critical.push(`sitemap index unreachable: ${e.message}`); }
 
+  // 1b) canonical host: www must redirect to apex (or not resolve). A www
+  // that serves 200 duplicates the whole site and stalls sitemap processing
+  // (the gridcensus 7/24 incident — 158 shards pending for weeks).
+  try {
+    const r = await fetch(`https://www.${domain}/`, { redirect: "manual" });
+    if (r.status === 200) out.critical.push("www serves content without redirect — duplicate host, split indexing");
+  } catch { /* www not resolving is acceptable */ }
+
   // 2) GSC sitemaps: errors/warnings -> resubmit
   const site = encodeURIComponent(`sc-domain:${domain}`);
   const subs = (await gapi(at, `https://www.googleapis.com/webmasters/v3/sites/${site}/sitemaps`)).sitemap || [];
