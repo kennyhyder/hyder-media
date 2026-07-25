@@ -47,7 +47,33 @@ async function sendEmail(to: string, subject: string, html: string) {
   return { ok: true };
 }
 
-function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[], topMovers: FeedAlert[]): string {
+async function composeEditorsNote(buys: FeedAlert[], sells: FeedAlert[], movers: FeedAlert[]): Promise<string | null> {
+  const key = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!key) return null;
+  const brief = {
+    buys: buys.map((a) => ({ t: a.title, s: a.subtitle, league: a.league, edge_pct: +(a.delta * 100).toFixed(1), kalshi_pct: +(a.probability * 100).toFixed(1), hours_ago: +(((Date.now() - +new Date(a.fired_at)) / 3600e3).toFixed(1)) })),
+    sells: sells.map((a) => ({ t: a.title, s: a.subtitle, league: a.league, edge_pct: +(a.delta * 100).toFixed(1), kalshi_pct: +(a.probability * 100).toFixed(1) })),
+    movers: movers.map((a) => ({ t: a.title, league: a.league, now_pct: +(a.probability * 100).toFixed(1), was_pct: +(a.reference * 100).toFixed(1) })),
+  };
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-opus-4-8",
+        max_tokens: 400,
+        system: `You write "The Read" — a 2-3 sentence editor's note for a daily betting-edges email. Voice: sharp quant peer, plain language, zero hype. Look ACROSS the rows for the day's actual story: where edges cluster (league, market type, direction), what's likely stale vs live, what one thing a reader should check first and why. Concrete numbers. Never restate rows; synthesize them. Never use: lock, smash, hammer, tail, fade, lfg. If the slate is genuinely thin or noisy, say exactly that in one honest sentence. Output the note text only — no preamble, no markdown.`,
+        messages: [{ role: "user", content: JSON.stringify(brief) }],
+      }),
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    const text = (data.content || []).find((c: { type: string }) => c.type === "text")?.text?.trim();
+    return text && text.length > 40 && text.length < 700 ? text : null;
+  } catch { return null; }
+}
+
+function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[], topMovers: FeedAlert[], editorsNote: string | null): string {
   const dateStr = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   const renderRows = (alerts: FeedAlert[], mode: "buy" | "sell" | "mover") =>
     alerts.map((a) => {
@@ -55,9 +81,11 @@ function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[], topMovers: Feed
       const sign = a.delta >= 0 ? "+" : "";
       const pctDelta = `${sign}${(a.delta * 100).toFixed(1)}%`;
       const color = mode === "buy" ? "#059669" : mode === "sell" ? "#dc2626" : (a.delta >= 0 ? "#059669" : "#dc2626");
-      const subline = mode === "mover"
+      const ageH = Math.max(0, (Date.now() - new Date(a.fired_at).getTime()) / 3600e3);
+      const fresh = ageH < 1 ? "just now" : ageH < 2 ? "1h ago" : `${Math.round(ageH)}h ago`;
+      const subline = (mode === "mover"
         ? `Kalshi ${(a.probability * 100).toFixed(1)}% (was ${(a.reference * 100).toFixed(1)}%)`
-        : `Kalshi ${(a.probability * 100).toFixed(1)}%`;
+        : `Kalshi ${(a.probability * 100).toFixed(1)}%`) + ` · ${fresh}`;
       return `<tr>
         <td style="padding: 12px 0; border-top: 1px solid #e5e5e5;">
           <a href="${SITE_URL}${a.link}" style="color: #111; text-decoration: none;">
@@ -78,6 +106,12 @@ function digestHtml(topBuys: FeedAlert[], topSells: FeedAlert[], topMovers: Feed
     <h1 style="margin: 8px 0 0; font-size: 26px;">Today's top edges</h1>
     <div style="font-size: 14px; color: #666;">From the last 24h on Kalshi vs the books</div>
   </div>
+
+  ${editorsNote ? `
+  <div style="margin: 0 0 8px; padding: 14px 16px; background: #f0fdf4; border-left: 3px solid #059669; border-radius: 6px;">
+    <div style="font-size: 11px; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 4px;">The Read</div>
+    <div style="font-size: 14px; color: #333; line-height: 1.5;">${editorsNote}</div>
+  </div>` : ""}
 
   ${topBuys.length > 0 ? `
   <h2 style="font-size: 16px; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 0;">🟢 Top buys</h2>
@@ -211,6 +245,16 @@ export async function GET(req: Request) {
     return !staleTournaments.has(tName);
   });
 
+  // Sharpness scoring: |delta| decayed by age (half-life ~6h — an edge from
+  // yesterday morning is usually gone by send time) with a boost for the
+  // actionable probability band (25–75%) where edges are actually tradeable.
+  function sharpScore(a: FeedAlert): number {
+    const ageH = Math.max(0, (nowMs - new Date(a.fired_at).getTime()) / 3600e3);
+    const decay = Math.pow(0.5, ageH / 6);
+    const zone = a.probability != null && a.probability >= 0.25 && a.probability <= 0.75 ? 1.25 : 1.0;
+    return Math.abs(a.delta) * decay * zone;
+  }
+
   // 1b. Dedupe by (title, subtitle) — keep only the largest-|delta| alert
   // per unique market so a player whose line moved 5 times intra-day
   // appears once, not five times.
@@ -229,7 +273,7 @@ export async function GET(req: Request) {
   // NFL/MLS actually appear instead of 8 golf rows + 2 others.
   function topByDirection(direction: "buy" | "sell" | "up" | "down", maxPerSport = 2, maxTotal = 8) {
     const filtered = alerts.filter((a) => a.direction === direction || (direction === "buy" && a.direction === "up") || (direction === "sell" && a.direction === "down"));
-    const sorted = [...filtered].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    const sorted = [...filtered].sort((a, b) => sharpScore(b) - sharpScore(a));
     const perSport = new Map<string, number>();
     const taken: FeedAlert[] = [];
     // Pass 1: enforce per-sport cap
@@ -263,7 +307,7 @@ export async function GET(req: Request) {
   const shownIds = new Set([...buys, ...sells].map((a) => a.id));
   const movers = alerts
     .filter((a) => a.source === "sports" && !shownIds.has(a.id))
-    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    .sort((a, b) => sharpScore(b) - sharpScore(a));
   const moversStratified: FeedAlert[] = [];
   const moversPerSport = new Map<string, number>();
   for (const a of movers) {
@@ -307,8 +351,12 @@ export async function GET(req: Request) {
     page++;
   }
 
-  const html = digestHtml(buys, sells, moversStratified);
-  const subject = `📊 Today's top sports edges — SportsBookISH`;
+  const editorsNote = await composeEditorsNote(buys, sells, moversStratified);
+  const html = digestHtml(buys, sells, moversStratified, editorsNote);
+  const lead = buys[0] || sells[0];
+  const subject = lead
+    ? `⚡ ${lead.title.slice(0, 40)} ${(lead.delta >= 0 ? "+" : "")}${(lead.delta * 100).toFixed(1)}% vs books — today's edges`
+    : `📊 Today's top sports edges — SportsBookISH`;
 
   // 3. Send + record. Insert dispatch record first (uniqueness prevents duplicates).
   let sent = 0;

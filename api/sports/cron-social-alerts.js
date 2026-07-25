@@ -3,7 +3,7 @@ import { postSocial } from "./_social.js";
 import { getBudgetState, alertCanRun } from "./_social_budget.js";
 import {
   fetchCandidates, attachContext, passesInsightGate,
-  composeSharp, validateTweet,
+  composeSharp, validateTweet, validateNovelty,
 } from "./_sharp_alert.js";
 
 // SHARP move-alert poster. Replaces the old template-driven cron that fired
@@ -71,6 +71,17 @@ export default async function handler(req, res) {
 
   // 4. Insight gate — drop anything without a real signal beyond "% moved"
   const gated = [];
+  // Recent sent posts: anti-repetition context + lens cooldown
+  const { data: recentSent } = await supabase
+    .from("sb_social_posts")
+    .select("text, lens_key")
+    .eq("platform", "x").eq("kind", "move_alert").eq("status", "sent")
+    .order("posted_at", { ascending: false })
+    .limit(5);
+  const recentTexts = (recentSent || []).map((r) => r.text).filter(Boolean);
+  const recentLensKeys = (recentSent || []).map((r) => r.lens_key).filter(Boolean).slice(0, 3);
+
+
   for (const c of withCtx) {
     const g = passesInsightGate(c);
     if (g.pass) {
@@ -115,7 +126,10 @@ export default async function handler(req, res) {
       continue;
     }
 
-    const composed = await composeSharp(c, SITE_URL);
+    const composed = await composeSharp(c, SITE_URL, {
+      recentPosts: recentTexts,
+      excludeLensKeys: recentLensKeys,
+    });
     if (!composed.tweet_text) {
       results.push({
         contestant: c.market.contestant_label,
@@ -132,6 +146,11 @@ export default async function handler(req, res) {
         skipped: `validation:${vErr}`,
         attempted_text: composed.tweet_text,
       });
+      continue;
+    }
+    const nErr = validateNovelty(composed.tweet_text, recentTexts);
+    if (nErr) {
+      results.push({ contestant: c.market.contestant_label, skipped: `novelty:${nErr}`, attempted_text: composed.tweet_text });
       continue;
     }
     if (composed.confidence < 0.7) {
@@ -152,6 +171,7 @@ export default async function handler(req, res) {
         kind: "move_alert",
         dedup_key: dedupKey,
         text: composed.tweet_text,
+        lens_key: composed.lens_key || null,
         post_uri: r.uri || null,
         post_cid: r.cid || null,
         status: r.ok ? "sent" : (r.skipped ? "skipped" : "failed"),
@@ -159,6 +179,8 @@ export default async function handler(req, res) {
       }, { onConflict: "platform,dedup_key" });
     }
 
+    recentTexts.unshift(composed.tweet_text);
+    if (composed.lens_key) recentLensKeys.unshift(composed.lens_key);
     results.push({
       contestant: c.market.contestant_label,
       tweet: composed.tweet_text,

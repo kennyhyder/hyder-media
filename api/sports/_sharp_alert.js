@@ -345,7 +345,7 @@ export const STRUCTURE_LENSES = [
     key: "leverage_shift_drift",
     priority: 9,
     applies_when: (c) => c.event_started === true && Math.abs(c.kalshi_4h_delta_pp || 0) >= 5 && c.kalshi_volume_24h >= 1000,
-    frame: "Mid-game drift on liquid markets reflects both score state AND leverage exit — once a side's contracts go deep, holders pay a discount to unwind. The line moves more than the win probability strictly justifies.",
+    frame: "Mid-game drift on liquid markets reflects both score state AND leverage exit — once a side's contracts go deep, holders pay a discount to unwind. Note: the multi-book 'fair' is mostly pre-game pricing once play starts, so in-game gaps vs books measure book staleness, not exchange error.",
   },
   {
     key: "books_lag_sharp_money",
@@ -385,18 +385,25 @@ export const STRUCTURE_LENSES = [
   },
 ];
 
-function pickLens(context) {
-  const candidates = STRUCTURE_LENSES.filter((l) => {
+function pickLens(context, excludeKeys = []) {
+  const applicable = STRUCTURE_LENSES.filter((l) => {
     try { return l.applies_when(context); }
     catch { return false; }
   });
-  candidates.sort((a, b) => b.priority - a.priority);
-  return candidates[0];
+  applicable.sort((a, b) => b.priority - a.priority);
+  // Lens cooldown: skip lenses used in recent posts so the feed doesn't
+  // read like one idea on repeat (the 2026-07 Sonnet-era failure mode).
+  const fresh = applicable.filter((l) => !excludeKeys.includes(l.key) || l.key === "default_no_lens");
+  return (fresh[0] || applicable[0]);
 }
 
 const COMPOSER_SYSTEM = `You write betting-market analysis tweets for @sportsbookish. Voice: quant peer who actually understands market microstructure — not a data-bot reading off numbers.
 
 You'll get JSON with one market move + its full context (Kalshi price, cross-source comparison vs sportsbook fair, Polymarket, volume on this rung, the ladder of related rungs, and what insight signal triggered this candidate). You'll ALSO get a "structure_lens" field with a 1-sentence frame explaining WHY this pattern shows up — settlement risk, leverage exit, books-lag-sharp-money, ladder volume concentration, etc.
+
+Two integrity rules that override everything else:
+1. STALE-BOOK GUARD: when event_started=true, sportsbook_fair_pct is mostly PRE-GAME pricing — books in this dataset do not reprice live. NEVER describe an in-game Kalshi-vs-books gap as the exchange being wrong or "overshooting". The correct in-game reads are: the exchange tape itself (drift velocity, volume, spread), or explicitly framing the books as stale. If neither yields a real insight, return null.
+2. ANTI-REPETITION: recent_posts contains your last posted tweets. Your tweet must take a genuinely different analytical angle AND different sentence rhythm from all of them. If the honest analysis of this market would repeat a recent post's idea, return tweet_text = null — a silent feed is sharper than a repetitive one.
 
 Hard rules:
 - NEVER announce the move as the headline. Lead with the INSIGHT.
@@ -426,11 +433,12 @@ Output JSON only:
   "reasoning": "one sentence: why this is sharp, what lens you used, or why you skipped"
 }`;
 
-export async function composeSharp(context, siteUrl) {
+export async function composeSharp(context, siteUrl, opts = {}) {
   if (!process.env.ANTHROPIC_API_KEY) {
     return { tweet_text: null, confidence: 0, reasoning: "ANTHROPIC_API_KEY missing" };
   }
   const url = `${siteUrl}/sports/${context.league}/event/${context.event.id}`;
+  let payloadLensKey = "default_no_lens";
   const payload = {
     event_title: context.event.title,
     contestant: context.market.contestant_label,
@@ -473,9 +481,11 @@ export async function composeSharp(context, siteUrl) {
         ladder: context.ladder,
         insight_signals: context.insight_reasons || [],
       };
-      const lens = pickLens(ctxForLens);
+      const lens = pickLens(ctxForLens, opts.excludeLensKeys || []);
+      payloadLensKey = lens.key;
       return { key: lens.key, frame: lens.frame };
     })(),
+    recent_posts: (opts.recentPosts || []).slice(0, 5),
     site_url_for_event: url,
   };
 
@@ -488,8 +498,8 @@ export async function composeSharp(context, siteUrl) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 500,
+        model: "claude-opus-4-8",
+        max_tokens: 600,
         system: COMPOSER_SYSTEM,
         messages: [{ role: "user", content: JSON.stringify(payload, null, 2) }],
       }),
@@ -513,6 +523,7 @@ export async function composeSharp(context, siteUrl) {
       tweet_text: parsed.tweet_text || null,
       confidence: Math.min(1, Math.max(0, Number(parsed.confidence) || 0)),
       reasoning: parsed.reasoning || "",
+      lens_key: payloadLensKey,
     };
   } catch (e) {
     return { tweet_text: null, confidence: 0, reasoning: `compose error: ${e.message}` };
@@ -532,6 +543,21 @@ const FORBIDDEN = [
   /\b(lock|smash|hammer|lfg|tail|fade)\b/i,
   /\b(juice|chalk|lean)\b\s*(is|gettin)/i,
 ];
+
+// Word-overlap novelty check vs recent posts — belt to the prompt's suspenders.
+export function validateNovelty(text, recentTexts = []) {
+  const words = (t) => new Set(String(t).toLowerCase().replace(/https?:\S+/g, "").match(/[a-z']{4,}/g) || []);
+  const mine = words(text);
+  if (!mine.size) return null;
+  for (const r of recentTexts) {
+    const theirs = words(r);
+    if (!theirs.size) continue;
+    let shared = 0;
+    for (const w of mine) if (theirs.has(w)) shared++;
+    if (shared / mine.size > 0.55) return "too similar to a recent post";
+  }
+  return null;
+}
 
 export function validateTweet(text) {
   if (!text || text.length < 50) return "too short";
