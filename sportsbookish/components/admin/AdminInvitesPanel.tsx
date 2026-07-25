@@ -117,8 +117,8 @@ export default function AdminInvitesPanel({ initialCodes, redemptions }: { initi
                 <div>
                   <Label>Tier</Label>
                   <select value={form.tier} onChange={(e) => setForm({ ...form, tier: e.target.value as "free" | "pro" | "elite" })} className="w-full rounded border border-border bg-background px-3 py-2 text-sm">
-                    <option value="elite">Elite ($39/mo equivalent)</option>
-                    <option value="pro">Pro ($19/mo equivalent)</option>
+                    <option value="elite">Elite ($100/yr equivalent)</option>
+                    <option value="pro">Pro ($10/mo equivalent)</option>
                     <option value="free">Free</option>
                   </select>
                 </div>

@@ -405,11 +405,11 @@ export default async function EventView({
             {isAnonymous ? (
               <>
                 <strong>Don&apos;t miss the next edge.</strong> <Link href={`/signup?next=${encodeURIComponent(canonicalPath)}`} className="text-emerald-400 hover:underline">Sign up free</Link> to save preferences and get the daily top edges by email.{" "}
-                <Link href="/pricing" className="text-emerald-400 hover:underline">Elite ($39)</Link> sends email + SMS the moment Kalshi moves ≥3% in 15 min on any market.
+                <Link href="/pricing" className="text-emerald-400 hover:underline">Elite ($100/yr)</Link> sends email + SMS the moment Kalshi moves ≥3% in 15 min on any market.
               </>
             ) : (
               <>
-                <strong>Elite</strong> ($39/mo) gets live email + SMS the moment Kalshi moves ≥3% in 15 min on any market.{" "}
+                <strong>Elite</strong> ($100/yr) gets live email + SMS the moment Kalshi moves ≥3% in 15 min on any market.{" "}
                 <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade →</Link>
               </>
             )}

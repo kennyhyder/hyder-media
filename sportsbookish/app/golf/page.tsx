@@ -84,7 +84,7 @@ export default async function GolfHome() {
               <> You&apos;re on the <strong>First Line</strong> plan — winner markets only. <Link href="/pricing" className="text-emerald-400 hover:underline">Upgrade to Pro</Link> for top-5/10/20, props, matchups, and your home-book preference.</>
             )}
             {isAnonymous && (
-              <> Free signup: save favorites + daily edge digest. <Link href="/pricing" className="text-emerald-400 hover:underline">Pro $19</Link> unlocks every market, every book.</>
+              <> Free signup: save favorites + daily edge digest. <Link href="/pricing" className="text-emerald-400 hover:underline">Pro $10</Link> unlocks every market, every book.</>
             )}
           </p>
         </div>

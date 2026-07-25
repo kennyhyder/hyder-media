@@ -142,8 +142,8 @@ export default function AdminUserDetail({ data, adminEmail }: { data: UserDetail
                 className={`text-sm rounded px-3 py-1.5 border-0 ${TIER_COLORS[tier]}`}
               >
                 <option value="free">Free</option>
-                <option value="pro">Pro ($19)</option>
-                <option value="elite">Elite ($39)</option>
+                <option value="pro">Pro ($10/mo)</option>
+                <option value="elite">Elite ($100/yr)</option>
               </select>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" disabled={working || !data.user.email} onClick={sendMagicLink} title="Send magic link to user's email">

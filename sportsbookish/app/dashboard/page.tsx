@@ -89,7 +89,7 @@ export default async function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Golf — PGA Championship 2026</CardTitle>
+              <CardTitle>Golf — PGA Tour</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-3">

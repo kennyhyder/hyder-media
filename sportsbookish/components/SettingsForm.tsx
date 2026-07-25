@@ -236,7 +236,7 @@ export default function SettingsForm({ tier, initial, allBooks }: Props) {
             <div className="flex items-start gap-3">
               <Badge className="bg-amber-500/20 text-amber-300 hover:bg-amber-500/20">Elite</Badge>
               <div className="flex-1 text-sm text-muted-foreground">
-                SMS alerts, custom thresholds, watchlist, sub-minute Kalshi updates, and movement alerts are part of Elite ($39/mo).{" "}
+                SMS alerts, custom thresholds, watchlist, sub-minute Kalshi updates, and movement alerts are part of Elite ($100/yr).{" "}
                 <a href="/pricing" className="text-emerald-400 hover:underline">Upgrade →</a>
               </div>
             </div>

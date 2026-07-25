@@ -12,7 +12,7 @@ interface Props {
   variant?: "card" | "inline";
 }
 
-const TIER_PRICE = { pro: "$19/mo", elite: "$39/mo" } as const;
+const TIER_PRICE = { pro: "$10/mo", elite: "$100/yr" } as const;
 
 export default function PaywallCard({ feature, description, isAnonymous, requiredTier = "pro", next, variant = "card" }: Props) {
   const signupHref = next ? `/signup?next=${encodeURIComponent(next)}` : "/signup";

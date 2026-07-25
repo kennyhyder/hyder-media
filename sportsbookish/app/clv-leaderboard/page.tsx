@@ -155,7 +155,7 @@ export default async function CLVLeaderboardPage() {
             <CardContent className="p-8 text-center text-muted-foreground">
               <p className="text-lg font-medium mb-2 text-foreground">No leaders yet.</p>
               <p className="text-sm">Be the first — log 10+ bets in the tracker and opt in from <Link href="/settings" className="text-emerald-400 hover:underline">/settings</Link>.</p>
-              <p className="text-xs mt-3">Bet Tracker is an Elite feature ($39/mo). <Link href="/pricing" className="text-emerald-400 hover:underline">See plans →</Link></p>
+              <p className="text-xs mt-3">Bet Tracker is an Elite feature ($100/yr). <Link href="/pricing" className="text-emerald-400 hover:underline">See plans →</Link></p>
             </CardContent>
           </Card>
         ) : (

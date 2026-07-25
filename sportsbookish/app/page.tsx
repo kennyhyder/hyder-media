@@ -70,7 +70,7 @@ export default async function Home() {
         <div className="container relative mx-auto max-w-6xl px-4 py-20 md:py-28 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <Zap className="h-3 w-3" aria-hidden="true" />
-            <span>Live now: PGA Championship · NBA Playoffs · 41 MLB games · EPL · MLS</span>
+            <span>Live odds across MLB, PGA Tour golf, NFL, NBA + more — refreshed every 5 minutes</span>
           </div>
           <h1 className="mx-auto max-w-3xl text-4xl md:text-6xl font-bold tracking-tight">
             Live{" "}
