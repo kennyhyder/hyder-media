@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     // the card rendered "No markets yet". 10000 is a safe ceiling: a busy
     // league won't exceed it short-term, and a single Supabase response of
     // ~10K rows is still well under the 6MB body limit.
-    const [{ data: markets }, { data: bookQuotes }, { data: polymarketQuotes }] = await Promise.all([
+    const [marketsRes, bookQuotesRes, polymarketQuotesRes] = await Promise.all([
       supabase
         .from("sports_markets")
         .select("id, event_id, contestant_label, market_type")
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         .eq("market_type", "winner")
         .range(0, 9999),
       supabase
-        .from("sports_book_v_latest")
+        .from("sports_book_latest")
         // fetched_at is required for the staleness filter on line ~121.
         // Without it `b.fetched_at` is undefined → freshBook short-circuits
         // to true → stale (e.g. 3h-old) offshore quotes get mixed with
@@ -67,6 +67,12 @@ export default async function handler(req, res) {
         .in("sports_event_id", eventIds)
         .range(0, 9999),
     ]);
+    // Never swallow read errors again — a timing-out book query silently
+    // rendered "0 books" on every league hub for weeks (2026-07 audit).
+    for (const [label, r] of [["markets", marketsRes], ["book_latest", bookQuotesRes], ["polymarket", polymarketQuotesRes]]) {
+      if (r.error) console.error(`events.js ${label} query error:`, r.error.message);
+    }
+    const markets = marketsRes.data, bookQuotes = bookQuotesRes.data, polymarketQuotes = polymarketQuotesRes.data;
 
     // 30-min staleness filter — drop quotes that haven't refreshed in one
     // cron cycle. Prevents stale book/polymarket data from creating fake edges

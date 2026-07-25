@@ -83,8 +83,14 @@ export default async function ArbitragePage() {
   // OPPOSITE contestant), and (b) Polymarket vs books.
   const arbs: ArbRow[] = [];
 
+  const nowMs = Date.now();
   for (const ld of leagueData) {
     for (const ev of ld.events) {
+      // In-play integrity guard: sportsbook lines in this dataset do NOT
+      // reprice live, so a live Kalshi price vs a frozen pre-game book line
+      // manufactures phantom "guaranteed profit" (2026-07 audit: +11.54% arbs
+      // on games mid-play). Pre-game arbs only.
+      if (ev.start_time && new Date(ev.start_time).getTime() <= nowMs) continue;
       const markets = ev.markets || [];
       // For 2-contestant events, pair markets
       if (markets.length < 2) continue;

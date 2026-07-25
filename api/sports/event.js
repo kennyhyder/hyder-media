@@ -128,7 +128,7 @@ export default async function handler(req, res) {
     // Pull all book quotes for this event in one query, then split by market_type
     const [{ data: allBookQuotes }, { data: polymarketQuotes }] = await Promise.all([
       supabase
-        .from("sports_book_v_latest")
+        .from("sports_book_latest")
         .select("contestant_label, contestant_norm, market_type, book, implied_prob_novig, american, point, fetched_at")
         .eq("sports_event_id", id),
       supabase

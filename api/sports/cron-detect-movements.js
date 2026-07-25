@@ -7,7 +7,10 @@ import { getSupabase, checkAuth } from "./_lib.js";
 //
 // Cron: every 5 min, scans all open events with recent quote activity.
 
-const MOVEMENT_THRESHOLD = 0.02;   // 2% move in 15 min (lowered from 3% to surface more candidates)
+const MOVEMENT_THRESHOLD = 0.03;        // 3% move in 15 min (2% was noise-dominated)
+const PROP_MOVEMENT_THRESHOLD = 0.05;   // props settle constantly in-play; need a wider bar
+const SETTLEMENT_HIGH = 0.95;           // moves ending pinned = settlement, not signal
+const SETTLEMENT_LOW = 0.05;
 const LOOKBACK_MIN = 15;
 const DEDUP_MIN = 30;
 
@@ -38,7 +41,7 @@ export default async function handler(req, res) {
   for (let i = 0; i < eventIds.length; i += 100) {
     const { data } = await supabase
       .from("sports_markets")
-      .select("id, event_id, contestant_label")
+      .select("id, event_id, contestant_label, market_type, prop_line, prop_side")
       .in("event_id", eventIds.slice(i, i + 100));
     if (data) allMarkets.push(...data);
   }
@@ -93,7 +96,11 @@ export default async function handler(req, res) {
     const base = baselineByMarket.get(market.id);
     if (!now || !base || now.implied_prob == null || base.implied_prob == null) continue;
     const delta = now.implied_prob - base.implied_prob;
-    if (Math.abs(delta) < MOVEMENT_THRESHOLD) continue;
+    const isProp = !!(market.prop_line != null || market.prop_side || (market.market_type && market.market_type !== "win"));
+    const thr = isProp ? PROP_MOVEMENT_THRESHOLD : MOVEMENT_THRESHOLD;
+    if (Math.abs(delta) < thr) continue;
+    // Settlement moves ("39% -> 99%" as the outcome happens) are outcomes, not edges.
+    if (now.implied_prob >= SETTLEMENT_HIGH || now.implied_prob <= SETTLEMENT_LOW) continue;
     const direction = delta > 0 ? "up" : "down";
     const key = `${market.id}|${direction}`;
     if (recentKey.has(key)) continue;

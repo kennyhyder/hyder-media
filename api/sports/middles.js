@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
   // Pull spreads + totals quotes
   const { data: quotes, error } = await supabase
-    .from("sports_book_v_latest")
+    .from("sports_book_latest")
     .select("sports_event_id, league, contestant_label, contestant_norm, book, american, point, market_type, fetched_at")
     .in("market_type", ["spreads", "totals"])
     .gte("fetched_at", since)

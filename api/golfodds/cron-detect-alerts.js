@@ -22,13 +22,18 @@ const MID_TOURNAMENT_RESOLVING = new Set(["mc", "r1lead", "r2lead", "r3lead", "t
 const RESOLVED_KALSHI_HIGH = 0.95;
 const RESOLVED_KALSHI_LOW = 0.05;
 // Books haven't quoted in this long → lines are stale, skip the alert.
-const BOOK_STALENESS_MS = 6 * 60 * 60 * 1000;
+// 45 min matches the UI's own staleness rule (comparison drops >30min books);
+// the old 6h window fired alerts against lines the site itself refused to show.
+const BOOK_STALENESS_MS = 45 * 60 * 1000;
 
-// Thresholds. Positive edge = Kalshi is CHEAPER than book median → buy on Kalshi.
-const BUY_EDGE_THRESHOLD = 0.02;   // +2% buy edge (lowered from 3% to surface more candidates)
-const SELL_EDGE_THRESHOLD = -0.03; // -3% sell edge (lowered from -5% for symmetry)
-const MIN_BOOK_COUNT = 3;          // require ≥3 books quoting for reliability
-const DEDUP_WINDOW_MIN = 30;       // don't refire same alert within 30 min
+// Thresholds — recalibrated 2026-07-24 from a 7-day audit of 33.6k alerts:
+// the +2/−3 config produced 94% refires and a sell-side dominated by stale-book
+// artifacts (73% of volume). Median alert wasn't actionable. New config keeps
+// ~220 unique streams on a live day — a feed a human can actually read.
+const BUY_EDGE_THRESHOLD = 0.05;   // +5% buy edge
+const SELL_EDGE_THRESHOLD = -0.10; // -10% sell edge (sells vs live-drifting books need a wide bar)
+const MIN_BOOK_COUNT = 5;          // >=5 fresh books quoting
+const DEDUP_WINDOW_MIN = 360;      // 6h dedupe — refires added noise, not news
 
 function median(values) {
   const xs = values.filter((v) => typeof v === "number").sort((a, b) => a - b);
@@ -89,11 +94,12 @@ async function detectForTournament(supabase, tournament) {
     const kProb = kalshi?.implied_prob;
     if (kProb == null) continue;
 
-    // Mid-tournament-resolving markets (mc, rNlead, t40): once Kalshi pins to
-    // an extreme the market has settled, but book lines often stay stuck at
-    // their pre-resolution consensus. Skip — every "edge" here is phantom.
-    if (MID_TOURNAMENT_RESOLVING.has(m.market_type) &&
-        (kProb >= RESOLVED_KALSHI_HIGH || kProb <= RESOLVED_KALSHI_LOW)) continue;
+    // Mid-tournament-resolving markets (mc, rNlead, t40) are dropped from
+    // alerting ENTIRELY — the 7d audit showed even their "unpinned" alerts
+    // were stuck-book phantoms (2.5k of them slipped the old pinned-only skip).
+    if (MID_TOURNAMENT_RESOLVING.has(m.market_type)) continue;
+    // Pinned Kalshi on ANY market = settled or settling; edges are phantoms.
+    if (kProb >= RESOLVED_KALSHI_HIGH || kProb <= RESOLVED_KALSHI_LOW) continue;
 
     const books = booksByMarket.get(m.id) || [];
     if (books.length < MIN_BOOK_COUNT) continue;
