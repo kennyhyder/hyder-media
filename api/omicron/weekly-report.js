@@ -70,11 +70,21 @@ function aggregateMonthly(accounts) {
   return out;
 }
 
+// QuickChart only executes JS functions (datalabels formatters etc.) when the
+// chart config arrives as a JS-object-literal STRING — functions inside a JSON
+// object are inert and the datalabels plugin falls back to printing every
+// segment's raw value (the "duplicate numbers over every bar" bug). So: config
+// values prefixed __FN__ are unquoted into real functions and the whole config
+// is sent as a string. Functions must use single quotes only.
+function chartConfigString(config) {
+  return JSON.stringify(config).replace(/"__FN__((?:[^"\\]|\\.)*)"/g, (_, esc) => JSON.parse('"' + esc + '"'));
+}
+
 async function chartPng(config, width = 820, height = 540) {
   const res = await fetch('https://quickchart.io/chart', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chart: config, width, height, format: 'png', backgroundColor: 'white', devicePixelRatio: 2, version: '4' }),
+    body: JSON.stringify({ chart: chartConfigString(config), width, height, format: 'png', backgroundColor: 'white', devicePixelRatio: 2, version: '4' }),
   });
   if (!res.ok) throw new Error('quickchart ' + res.status);
   return Buffer.from(await res.arrayBuffer());
@@ -89,10 +99,13 @@ async function mapLimit(items, limit, fn) {
   return out;
 }
 
-// Datalabels formatter (as a string — QuickChart evaluates it server-side;
-// JSON.stringify would drop a real function). Renders the STACK TOTAL once,
-// on the top-most dataset, above the bar. Blank on lower datasets.
-const STACK_TOTAL_FMT = "function(value, ctx){var ds=ctx.chart.data.datasets;if(ctx.datasetIndex!==ds.length-1)return '';var t=0;for(var j=0;j<ds.length;j++){t+=(Number(ds[j].data[ctx.dataIndex])||0);}return t?Math.round(t).toLocaleString():'';}";
+// Datalabels callbacks (as __FN__ strings — see chartConfigString). The stack
+// total renders ONCE per bar: display gates to the top-most dataset, the
+// formatter sums the whole stack. Matches the dashboard's label behavior.
+const STACK_TOTAL_FMT = "__FN__function(value, ctx){var ds=ctx.chart.data.datasets;var t=0;for(var j=0;j<ds.length;j++){t+=(Number(ds[j].data[ctx.dataIndex])||0);}return t?Math.round(t).toLocaleString():'';}";
+const TOP_DATASET_ONLY = "__FN__function(ctx){return ctx.datasetIndex===ctx.chart.data.datasets.length-1;}";
+const STACK_TOTAL_LABEL = { display: TOP_DATASET_ONLY, anchor: 'end', align: 'end', color: INK, font: { size: 12, weight: 'bold' }, clip: false, formatter: STACK_TOTAL_FMT };
+const NONZERO_FMT = "__FN__function(value){var n=Math.round(Number(value)||0);return n?n.toLocaleString():'';}";
 
 // brand/non-brand bar chart. kind: conv | cpa | cost | costpct
 function barConfig(monthly, kind) {
@@ -112,22 +125,18 @@ function barConfig(monthly, kind) {
       { label: 'Brand', data: monthly.map(m => Math.round(pick(m, 'brand'))), backgroundColor: RED },
     ];
   }
-  // Labels: grouped CPA shows each value above its bar; percentage shows the
-  // segment share inside; stacked counts/spend show segment values inside PLUS
-  // the stack total above the bar.
+  // Labels — mirrors the dashboard: grouped CPA shows each value above its own
+  // bar; percentage shows the segment share inside; stacked counts/spend show
+  // ONLY the stack total above the bar (segment split is visible by color +
+  // legend — repeating the numbers inside was the duplicate-label complaint).
   const showTotalAbove = stacked && kind !== 'costpct';
   let datalabels;
   if (kind === 'cpa') {
-    datalabels = { color: INK, anchor: 'end', align: 'end', font: { size: 11, weight: 'bold' } };
+    datalabels = { color: INK, anchor: 'end', align: 'end', font: { size: 11, weight: 'bold' }, formatter: NONZERO_FMT };
   } else if (kind === 'costpct') {
     datalabels = { color: '#fff', anchor: 'center', align: 'center', font: { size: 10, weight: 'bold' } };
   } else {
-    datalabels = {
-      labels: {
-        value: { color: '#fff', anchor: 'center', align: 'center', font: { size: 10, weight: 'bold' } },
-        total: { anchor: 'end', align: 'end', color: INK, font: { size: 12, weight: 'bold' }, clip: false, formatter: STACK_TOTAL_FMT },
-      },
-    };
+    datalabels = STACK_TOTAL_LABEL;
   }
   return {
     type: 'bar', data: { labels, datasets },
@@ -155,7 +164,7 @@ function skuConfig(convAccount, isReview) {
       layout: { padding: { top: 26 } },
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 8 }, boxWidth: 8, padding: 4 } },
-        datalabels: { anchor: 'end', align: 'end', color: INK, font: { size: 12, weight: 'bold' }, clip: false, formatter: STACK_TOTAL_FMT },
+        datalabels: STACK_TOTAL_LABEL,
       },
       scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true, ticks: { font: { size: 10 } } } },
     },

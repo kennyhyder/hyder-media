@@ -1289,6 +1289,7 @@
         // One smart config drives every bar chart by shape:
         //   • stacked, ≤2 datasets (brand/non-brand) → SUM on top of the stack
         //   • stacked, >2 datasets (SKU/brand breakdown) → value on EACH segment
+        //     PLUS the stack total above the bar (stackTotal label)
         //   • not stacked (grouped CPA) → value on top of each bar
         // Dollar/percent formatting is borrowed from each chart's own y-axis tick
         // callback, so labels match the axis ($, %, or plain count).
@@ -1306,31 +1307,51 @@
         const DATALABELS = {
             clamp: true,
             clip: false,
-            color: (ctx) => dlIsSku(ctx) ? '#ffffff' : '#e2e8f0',
-            font: (ctx) => dlIsSku(ctx) ? { weight: '700', size: 9 } : { weight: '600', size: 10 },
-            anchor: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
-            align: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
-            display: (ctx) => {
-                if (ctx.chart.config.type !== 'bar') return false;
-                const ds = ctx.chart.data.datasets;
-                if (dlStacked(ctx) && ds.length <= 2) return ctx.datasetIndex === ds.length - 1; // total once, on top
-                return true; // grouped value, or SKU per-segment
-            },
-            formatter: (value, ctx) => {
-                const ds = ctx.chart.data.datasets;
-                const i = ctx.dataIndex;
-                if (dlIsSku(ctx)) {
-                    const v = Number(value) || 0;
-                    const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
-                    if (!v || (total && v / total < 0.07)) return ''; // hide slivers
-                    return Math.round(v).toLocaleString();
+            labels: {
+                // Per-segment / per-bar values (unchanged behavior).
+                seg: {
+                    color: (ctx) => dlIsSku(ctx) ? '#ffffff' : '#e2e8f0',
+                    font: (ctx) => dlIsSku(ctx) ? { weight: '700', size: 9 } : { weight: '600', size: 10 },
+                    anchor: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
+                    align: (ctx) => dlIsSku(ctx) ? 'center' : 'end',
+                    display: (ctx) => {
+                        if (ctx.chart.config.type !== 'bar') return false;
+                        const ds = ctx.chart.data.datasets;
+                        if (dlStacked(ctx) && ds.length <= 2) return ctx.datasetIndex === ds.length - 1; // total once, on top
+                        return true; // grouped value, or SKU per-segment
+                    },
+                    formatter: (value, ctx) => {
+                        const ds = ctx.chart.data.datasets;
+                        const i = ctx.dataIndex;
+                        if (dlIsSku(ctx)) {
+                            const v = Number(value) || 0;
+                            const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
+                            if (!v || (total && v / total < 0.07)) return ''; // hide slivers
+                            return Math.round(v).toLocaleString();
+                        }
+                        if (dlStacked(ctx)) {
+                            const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
+                            return total ? dlAxisFmt(ctx, total) : '';
+                        }
+                        const v = Number(value) || 0;
+                        return v ? dlAxisFmt(ctx, v) : '';
+                    }
+                },
+                // Stack TOTAL above SKU/brand breakdown bars (>2 stacked datasets) —
+                // the ≤2-dataset stacked charts already show their total via `seg`.
+                stackTotal: {
+                    display: (ctx) => ctx.chart.config.type === 'bar' && dlIsSku(ctx) && ctx.datasetIndex === ctx.chart.data.datasets.length - 1,
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#e2e8f0',
+                    font: { weight: '600', size: 10 },
+                    formatter: (value, ctx) => {
+                        const ds = ctx.chart.data.datasets;
+                        const i = ctx.dataIndex;
+                        const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
+                        return total ? dlAxisFmt(ctx, total) : '';
+                    }
                 }
-                if (dlStacked(ctx)) {
-                    const total = ds.reduce((s, d) => s + (Number(d.data[i]) || 0), 0);
-                    return total ? dlAxisFmt(ctx, total) : '';
-                }
-                const v = Number(value) || 0;
-                return v ? dlAxisFmt(ctx, v) : '';
             }
         };
 
