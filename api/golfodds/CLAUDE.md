@@ -1,3 +1,14 @@
+# ⛓️ SUNSET NOTICE (2026-07-28)
+The **hyder.me/golfodds frontend is retired** and **staff email alerts are OFF permanently**.
+Golf now lives entirely on **sportsbookish.com/golf**. `/golfodds/*` 301-redirects there.
+BUT this directory's crons are STILL LIVE and load-bearing: they are sportsbookish.com's golf
+**data plane** (ingest Kalshi/DataGolf/Polymarket/props + `cron-detect-alerts` writes
+`golfodds_alerts`, which powers the sportsbookish alert feed, daily digest, and Elite SMS).
+`cron-detect-alerts` `sendEmail()` is a permanent no-op; `ALERT_EMAIL_TO` env is deleted.
+Do NOT "revive GolfOdds" by re-adding that env or a frontend — it's intentional.
+
+---
+
 # api/golfodds — GolfOdds Serverless Backend
 
 Vercel serverless functions powering the golf data plane. Consumed by

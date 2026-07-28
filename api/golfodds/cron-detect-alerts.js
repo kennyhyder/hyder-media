@@ -185,59 +185,13 @@ async function sendSMSAlerts(supabase, alerts) {
   return { sent };
 }
 
-async function sendEmail(alerts) {
-  if (!process.env.RESEND_API_KEY) return { sent: false, reason: "no RESEND_API_KEY" };
-  if (!process.env.ALERT_EMAIL_TO) return { sent: false, reason: "no ALERT_EMAIL_TO" };
-  const subject = alerts.length === 1
-    ? `🟢 GolfOdds: ${alerts[0]._player_name} ${MARKET_LABELS[alerts[0].market_type] || alerts[0].market_type} edge ${alerts[0].direction === "buy" ? "+" : ""}${(alerts[0].edge_value * 100).toFixed(2)}%`
-    : `🟢 GolfOdds: ${alerts.length} new edge opportunities`;
-
-  const rows = alerts.map((a) => {
-    const pct = (n) => `${(n * 100).toFixed(2)}%`;
-    const edgeStr = a.direction === "buy" ? `+${(a.edge_value * 100).toFixed(2)}%` : `${(a.edge_value * 100).toFixed(2)}%`;
-    const url = `https://hyder.me/golfodds/player/?id=${a.player_id}&tournament_id=${a.tournament_id}`;
-    const color = a.direction === "buy" ? "#22c55e" : "#f87171";
-    return `<tr style="border-bottom:1px solid #262626">
-      <td style="padding:8px"><a href="${url}" style="color:#f3f4f6;text-decoration:none">${a._player_name}</a></td>
-      <td style="padding:8px;color:#a3a3a3">${MARKET_LABELS[a.market_type] || a.market_type}</td>
-      <td style="padding:8px;text-align:right;color:${color};font-weight:600">${edgeStr}</td>
-      <td style="padding:8px;text-align:right;color:#fbbf24">${pct(a.kalshi_prob)}</td>
-      <td style="padding:8px;text-align:right;color:#d4d4d4">${pct(a.reference_prob)}</td>
-      <td style="padding:8px;text-align:right;color:#737373;font-size:12px">${a.book_count} books</td>
-    </tr>`;
-  }).join("");
-  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0a0a0a;color:#ededed;padding:20px">
-    <h2 style="color:#22c55e;margin:0 0 8px">⛳ GolfOdds — ${alerts.length} new edge${alerts.length === 1 ? "" : "s"}</h2>
-    <p style="color:#a3a3a3;margin:0 0 16px;font-size:14px">${alerts[0]._tournament_name}</p>
-    <table style="width:100%;border-collapse:collapse;background:#171717;border-radius:6px;overflow:hidden">
-      <thead><tr style="background:#262626;color:#9ca3af;font-size:11px;text-transform:uppercase">
-        <th style="padding:8px;text-align:left">Player</th>
-        <th style="padding:8px;text-align:left">Market</th>
-        <th style="padding:8px;text-align:right">Buy edge</th>
-        <th style="padding:8px;text-align:right">Kalshi</th>
-        <th style="padding:8px;text-align:right">Books med</th>
-        <th style="padding:8px;text-align:right">Books</th>
-      </tr></thead><tbody>${rows}</tbody></table>
-    <p style="color:#737373;font-size:12px;margin-top:16px">
-      Positive edge = Kalshi cheaper than book consensus → consider buying YES on Kalshi.
-      Negative edge = Kalshi overpriced → sell on Kalshi (or bet at the books).
-      <br>Sent by GolfOdds cron · <a href="https://hyder.me/golfodds/alerts/" style="color:#22c55e">all alerts</a>
-    </p>
-  </div>`;
-
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: process.env.ALERT_EMAIL_FROM || "GolfOdds <golfodds@hyder.me>",
-      to: [process.env.ALERT_EMAIL_TO],
-      subject,
-      html,
-    }),
-  });
-  if (!r.ok) return { sent: false, reason: `Resend ${r.status}: ${await r.text().catch(() => "")}` };
-  const data = await r.json();
-  return { sent: true, id: data.id };
+async function sendEmail() {
+  // GolfOdds SUNSET (2026-07-28): the hyder.me GolfOdds frontend is retired and
+  // staff email alerts are permanently disabled — golf lives on sportsbookish.com.
+  // This cron still matters: it writes golfodds_alerts (sportsbookish alert feed,
+  // daily digest, Elite SMS all read it). Only the GolfOdds-branded email is gone.
+  // Do NOT re-enable by setting ALERT_EMAIL_TO; that env is intentionally removed.
+  return { sent: false, reason: "golfodds email sunset 2026-07-28" };
 }
 
 export default async function handler(req, res) {
