@@ -76,8 +76,11 @@
                 await client.auth.mfa.getAuthenticatorAssuranceLevel();
             if (aalErr || !aalData) { redirectToLogin(); return; }
 
-            // Require AAL2 — i.e. an MFA factor has been verified this session
-            if (aalData.currentLevel !== 'aal2') { redirectToLogin(); return; }
+            // MFA is OPTIONAL (2026-07-29): users who have enrolled a TOTP
+            // factor (nextLevel aal2) must have verified it this session;
+            // password-only users pass at aal1. Membership in omicron_users
+            // (checked above) remains the hard tenant gate.
+            if (aalData.nextLevel === 'aal2' && aalData.currentLevel !== 'aal2') { redirectToLogin(); return; }
 
             reveal();
         } catch (err) {

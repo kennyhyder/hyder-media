@@ -239,7 +239,7 @@
             <!-- Step "Set Password": shown after accepting an invite or password-reset email -->
             <div class="step" id="step-set-password">
                 <h1>Set Your Password</h1>
-                <p class="subtitle">Choose a password for your account. You'll set up two-factor authentication next.</p>
+                <p class="subtitle">Choose a password for your account.</p>
 
                 <form id="set-password-form">
                     <div class="form-group">
@@ -498,16 +498,20 @@
             }
             const verifiedTotp = (factors.totp || []).find(f => f.status === 'verified');
             if (verifiedTotp) {
-                // Existing user, has TOTP enrolled — challenge them
+                // User has TOTP enrolled — they must verify it (their choice to have it)
                 await beginMfaChallenge(verifiedTotp.id);
             } else {
-                // No verified factor — clean up any half-enrolled factors and start enrollment
+                // MFA is OPTIONAL (2026-07-29): no forced enrollment. Clean up
+                // any half-enrolled factors so they never block a login, then
+                // straight to the dashboard at AAL1. auth-check.js allows AAL1
+                // for users with no verified factor; omicron_users membership
+                // (verified above) remains the hard tenant gate.
                 for (const f of (factors.totp || [])) {
                     if (f.status !== 'verified') {
                         try { await sb.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
                     }
                 }
-                await beginMfaEnrollment();
+                window.location.href = NEXT_URL;
             }
         }
 

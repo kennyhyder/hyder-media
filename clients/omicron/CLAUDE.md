@@ -6,7 +6,16 @@
 
 ## Authentication
 
-**Current (2026): Supabase Auth with MFA.** `login.html` + `auth-check.js` verify an active Supabase session at AAL2 (MFA verified) against the shared project `ilbovwnhrowvxjdkvrln`; unauthenticated visitors redirect to `login.html?next=<page>`. `auth-check.js` exposes `window.omicronSupabase` + `window.omicronSignOut()`. SQL helpers in `supabase/`.
+**Current (2026): Supabase Auth, MFA optional (since 2026-07-29).** `login.html` + `auth-check.js` verify an active Supabase session AND a membership row in `omicron_users` (shared project `ilbovwnhrowvxjdkvrln` — a session alone proves nothing, see the 2026-07-14 cross-tenant incident). MFA: users who have enrolled TOTP must verify it each session (AAL2); everyone else signs in with password only (AAL1) — no authenticator app required. Unauthenticated visitors redirect to `login.html?next=<page>`. `auth-check.js` exposes `window.omicronSupabase` + `window.omicronSignOut()`. SQL helpers in `supabase/`.
+
+**User administration — `scripts/omicron-user.mjs` (the ONLY sanctioned way):**
+```bash
+node scripts/omicron-user.mjs list                    # members + sign-in status
+node scripts/omicron-user.mjs add <email> [--name ""] # create + membership + print link/code
+node scripts/omicron-user.mjs link <email>            # fresh set-password link
+node scripts/omicron-user.mjs remove <email>          # revoke membership + sessions
+```
+It tags users `{product:'omicron'}`, writes the `omicron_users` row BEFORE issuing credentials, and never sends a Supabase-branded email — it prints a one-time link + 6-digit code for Kenny to deliver personally (shared email templates can't leak another product's branding). Needs `SUPABASE_URL`/`SUPABASE_SERVICE_KEY` in env.
 
 **Historical (pre-migration) sessionStorage flow** — kept for reference; `password.html` still exists:
 1. User visits `/clients/omicron/` → redirects to `password.html`
