@@ -264,6 +264,10 @@
     {
       "path": "/api/dunham/cron-grid-scans",
       "schedule": "0 14 * * 1"
+    },
+    {
+      "path": "/api/dunham/cron-apply-gbp-edits",
+      "schedule": "0 14 * * *"
     }
   ],
   "functions": {
