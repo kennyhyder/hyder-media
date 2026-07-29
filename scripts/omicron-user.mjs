@@ -17,9 +17,12 @@
 // Usage (from repo root; reads SUPABASE_URL + SUPABASE_SERVICE_KEY from env
 // or .env.local):
 //   node scripts/omicron-user.mjs list
-//   node scripts/omicron-user.mjs add <email> [--name "Full Name"] [--admin]
-//   node scripts/omicron-user.mjs link <email>      # fresh set-password link
+//   node scripts/omicron-user.mjs add <email> [--name "Full Name"] [--admin] [--send]
+//   node scripts/omicron-user.mjs link <email> [--send]   # fresh set-password link
 //   node scripts/omicron-user.mjs remove <email> [--delete-auth]
+//
+// --send emails the link from kenny@hyder.me via Gmail SMTP (EMAIL_USER /
+// EMAIL_PASS in .env.local) — a personal email, NOT a Supabase template.
 //
 // MFA note: since 2026-07-29 MFA is optional — users who enroll TOTP must
 // verify it each session; everyone else signs in with password only.
@@ -75,6 +78,46 @@ async function upsertMembership(user, role, displayName) {
     ...(displayName ? { display_name: displayName } : {}),
   }, { onConflict: 'user_id' });
   if (error) throw error;
+}
+
+async function sendCredentialEmail(em, link, otp, isNew, displayName) {
+  const user = (process.env.EMAIL_USER || '').trim();
+  const pass = (process.env.EMAIL_PASS || '').trim();
+  if (!user || !pass) throw new Error('EMAIL_USER / EMAIL_PASS not set — cannot send');
+  const { default: nodemailer } = await import('nodemailer');
+  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
+  const first = displayName ? displayName.split(' ')[0]
+    : em.split('@')[0].split('.')[0].replace(/^./, c => c.toUpperCase());
+  const intro = isNew
+    ? 'Your login for the Omicron Google Ads dashboard is ready.'
+    : 'Here is a fresh link to reset your Omicron Google Ads dashboard password.';
+  const text = `Hi ${first},
+
+${intro}
+
+Click this link to set your password (single-use, expires in 24 hours):
+
+${link}
+
+After setting your password you'll land right in the dashboard — no authenticator app needed.
+${otp ? `
+Prefer a code? Go to https://hyder.me/clients/omicron/login.html, choose "Enter code instead", and use:
+  email: ${em}
+  code:  ${otp}
+` : ''}
+Bookmark for future sign-ins: https://hyder.me/clients/omicron/login.html
+
+Any trouble, just reply to this email.
+
+Kenny Hyder
+Hyder Media · kenny@hyder.me`;
+  const info = await transporter.sendMail({
+    from: `Kenny Hyder <${user}>`,
+    to: em,
+    subject: 'Your Omicron dashboard login',
+    text,
+  });
+  console.log(`✓ emailed ${em} from ${user} (${info.messageId})`);
 }
 
 function printCredentials(em, link, otp, isNew) {
@@ -144,7 +187,14 @@ async function main() {
     await upsertMembership(user, flag('--admin') ? 'admin' : 'member', opt('--name'));
     console.log(`✓ ${email} — auth user ${isNew ? 'created' : 'exists'} (${user.id})`);
     console.log('✓ omicron_users membership row upserted (product tag set)');
-    printCredentials(email, link, otp, isNew);
+    // "Login is ready" phrasing for anyone who has never signed in;
+    // "reset your password" only for users with sign-in history.
+    const neverUsed = isNew || !user.last_sign_in_at;
+    if (flag('--send')) {
+      await sendCredentialEmail(email, link, otp, neverUsed, opt('--name'));
+    } else {
+      printCredentials(email, link, otp, neverUsed);
+    }
     return;
   }
 
