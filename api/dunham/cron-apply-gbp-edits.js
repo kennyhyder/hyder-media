@@ -132,6 +132,19 @@ export default async function handler(req, res) {
                     <p>Primary category (${esc(primary?.displayName || 'Criminal justice attorney')}) is unchanged.</p>
                     <p style="color:#b45816;">Note: Google occasionally asks businesses to re-verify after category changes.
                     We are monitoring this profile for the next 72 hours and will handle any verification request.</p>`;
+            } else if (edit.field === 'websiteUri') {
+                const cur = await (await fetch(`${base}?readMask=websiteUri`, { headers: authHdr })).json();
+                if (cur.error) throw new Error(cur.error.message);
+                edit.before = cur.websiteUri || null;
+                const patch = await (await fetch(`${base}?updateMask=websiteUri`, {
+                    method: 'PATCH',
+                    headers: { ...authHdr, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ websiteUri: edit.value }),
+                })).json();
+                if (patch.error) throw new Error(patch.error.message);
+                summaryHtml = `<p><b>Website link updated</b> (same page — tracking parameters added):</p>
+                    <p>New: <a href="${esc(edit.value)}">${esc(edit.value)}</a></p>
+                    <p style="color:#64748b;">Previous: ${esc(edit.before || '(none)')}</p>`;
             } else {
                 throw new Error(`unsupported field: ${edit.field}`);
             }
