@@ -17,6 +17,11 @@
  *                           serviceItems and appends free-form items (dupe-safe)
  *   'placeActionLink'     — value = {type, uri}; creates a place action link
  *                           (requires My Business Place Actions API enabled)
+ *   'categories.append'   — value = {name: 'categories/gcid:...', displayName};
+ *                           appends a secondary category (primary untouched).
+ *                           NOTE: category edits can trigger re-verification in
+ *                           high-risk verticals — before/after state is captured
+ *                           in the queue item for instant rollback.
  * Auth (fail-closed): Bearer CRON_SECRET or same-origin.
  */
 
@@ -106,6 +111,27 @@ export default async function handler(req, res) {
                 summaryHtml = `<p><b>Second profile link added</b> (${esc(edit.value.type)}):</p>
                     <p><a href="${esc(edit.value.uri)}">${esc(edit.value.uri)}</a></p>
                     <p>The main website link is unchanged.</p>`;
+            } else if (edit.field === 'categories.append') {
+                const cur = await (await fetch(`${base}?readMask=categories`, { headers: authHdr })).json();
+                if (cur.error) throw new Error(cur.error.message);
+                const primary = cur.categories?.primaryCategory;
+                const additional = cur.categories?.additionalCategories || [];
+                edit.before = { primary: primary?.name, additional: additional.map(c => c.name) };
+                if (!additional.some(c => c.name === edit.value.name)) {
+                    const patch = await (await fetch(`${base}?updateMask=categories`, {
+                        method: 'PATCH',
+                        headers: { ...authHdr, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ categories: {
+                            primaryCategory: { name: primary.name },
+                            additionalCategories: [...additional.map(c => ({ name: c.name })), { name: edit.value.name }],
+                        } }),
+                    })).json();
+                    if (patch.error) throw new Error(patch.error.message);
+                }
+                summaryHtml = `<p><b>Secondary category added:</b> ${esc(edit.value.displayName)}</p>
+                    <p>Primary category (${esc(primary?.displayName || 'Criminal justice attorney')}) is unchanged.</p>
+                    <p style="color:#b45816;">Note: Google occasionally asks businesses to re-verify after category changes.
+                    We are monitoring this profile for the next 72 hours and will handle any verification request.</p>`;
             } else {
                 throw new Error(`unsupported field: ${edit.field}`);
             }
