@@ -11,7 +11,12 @@
  *   { id, locationId, city, field: 'description', value, applyAfter (ISO),
  *     notify: [emails], status: 'scheduled' | 'applied' | 'failed', ... }
  *
- * Currently supports field 'description' (updateMask=profile.description).
+ * Supported fields:
+ *   'description'         — updateMask=profile.description
+ *   'serviceItems.append' — value = [{displayName, description}]; reads current
+ *                           serviceItems and appends free-form items (dupe-safe)
+ *   'placeActionLink'     — value = {type, uri}; creates a place action link
+ *                           (requires My Business Place Actions API enabled)
  * Auth (fail-closed): Bearer CRON_SECRET or same-origin.
  */
 
@@ -46,24 +51,64 @@ export default async function handler(req, res) {
 
     for (const edit of due) {
         try {
-            if (edit.field !== 'description') throw new Error(`unsupported field: ${edit.field}`);
+            let summaryHtml;
+            const base = `https://mybusinessbusinessinformation.googleapis.com/v1/locations/${edit.locationId}`;
+            const authHdr = { 'Authorization': `Bearer ${token}` };
 
-            // Capture "before" for the notification
-            const before = await (await fetch(
-                `https://mybusinessbusinessinformation.googleapis.com/v1/locations/${edit.locationId}?readMask=profile`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            )).json();
-            const beforeText = before?.profile?.description || '(none)';
-
-            const patch = await (await fetch(
-                `https://mybusinessbusinessinformation.googleapis.com/v1/locations/${edit.locationId}?updateMask=profile.description`,
-                {
+            if (edit.field === 'description') {
+                const before = await (await fetch(`${base}?readMask=profile`, { headers: authHdr })).json();
+                const beforeText = before?.profile?.description || '(none)';
+                const patch = await (await fetch(`${base}?updateMask=profile.description`, {
                     method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    headers: { ...authHdr, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ profile: { description: edit.value } }),
+                })).json();
+                if (patch.error) throw new Error(patch.error.message);
+                summaryHtml = `<p><b>New description:</b></p><blockquote style="border-left:3px solid #3b82f6;padding-left:12px;color:#334155;">${esc(edit.value)}</blockquote>
+                    <p><b>Previous description:</b></p><blockquote style="border-left:3px solid #94a3b8;padding-left:12px;color:#64748b;">${esc(beforeText)}</blockquote>`;
+            } else if (edit.field === 'serviceItems.append') {
+                const cur = await (await fetch(`${base}?readMask=serviceItems,categories`, { headers: authHdr })).json();
+                if (cur.error) throw new Error(cur.error.message);
+                const items = cur.serviceItems || [];
+                const category = cur.categories?.primaryCategory?.name || 'categories/gcid:criminal_law_attorney';
+                const existingNames = new Set(items
+                    .map(i => i.freeFormServiceItem?.label?.displayName?.toLowerCase())
+                    .filter(Boolean));
+                const additions = (edit.value || [])
+                    .filter(v => !existingNames.has(v.displayName.toLowerCase()))
+                    .map(v => ({ freeFormServiceItem: {
+                        category,
+                        label: { displayName: v.displayName, description: v.description || undefined },
+                    } }));
+                if (additions.length) {
+                    const patch = await (await fetch(`${base}?updateMask=serviceItems`, {
+                        method: 'PATCH',
+                        headers: { ...authHdr, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ serviceItems: [...items, ...additions] }),
+                    })).json();
+                    if (patch.error) throw new Error(patch.error.message);
                 }
-            )).json();
-            if (patch.error) throw new Error(patch.error.message);
+                summaryHtml = `<p><b>${additions.length} service listings added</b> (existing ${items.length} preserved):</p>
+                    <ul>${(edit.value || []).map(v => `<li><b>${esc(v.displayName)}</b>${v.description ? ' — ' + esc(v.description) : ''}</li>`).join('')}</ul>`;
+            } else if (edit.field === 'placeActionLink') {
+                const paBase = `https://mybusinessplaceactions.googleapis.com/v1/locations/${edit.locationId}/placeActionLinks`;
+                const existing = await (await fetch(paBase, { headers: authHdr })).json();
+                if (existing.error) throw new Error(existing.error.message);
+                const dupe = (existing.placeActionLinks || []).some(l => l.uri === edit.value.uri);
+                if (!dupe) {
+                    const created = await (await fetch(paBase, {
+                        method: 'POST',
+                        headers: { ...authHdr, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ placeActionType: edit.value.type, uri: edit.value.uri }),
+                    })).json();
+                    if (created.error) throw new Error(created.error.message);
+                }
+                summaryHtml = `<p><b>Second profile link added</b> (${esc(edit.value.type)}):</p>
+                    <p><a href="${esc(edit.value.uri)}">${esc(edit.value.uri)}</a></p>
+                    <p>The main website link is unchanged.</p>`;
+            } else {
+                throw new Error(`unsupported field: ${edit.field}`);
+            }
 
             edit.status = 'applied';
             edit.appliedAt = new Date().toISOString();
@@ -71,10 +116,9 @@ export default async function handler(req, res) {
 
             await sendEmail(edit.notify || ['kenny@hyder.me'],
                 `✅ Google profile updated — Dunham & Jones ${edit.city}`,
-                `<p>The approved business description for the <b>${edit.city}</b> office is now live on Google.</p>
+                `<p>An approved update for the <b>${edit.city}</b> office profile is now live on Google.</p>
                  <p><b>Applied:</b> ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })} (Central)</p>
-                 <p><b>New description:</b></p><blockquote style="border-left:3px solid #3b82f6;padding-left:12px;color:#334155;">${esc(edit.value)}</blockquote>
-                 <p><b>Previous description:</b></p><blockquote style="border-left:3px solid #94a3b8;padding-left:12px;color:#64748b;">${esc(beforeText)}</blockquote>
+                 ${summaryHtml}
                  <p>Google typically shows profile edits within minutes; occasionally an edit is queued for review for up to 24&nbsp;hours.</p>
                  <p style="color:#64748b;font-size:13px;">Dunham &amp; Jones Maps Initiative · applied by Hyder Media via the Google Business Profile API</p>`);
         } catch (err) {
