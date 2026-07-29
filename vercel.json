@@ -72,27 +72,12 @@
       "statusCode": 301
     },
     {
-      "source": "/golfodds",
-      "destination": "https://sportsbookish.com/golf",
-      "permanent": true
-    },
-    {
-      "source": "/golfodds/",
-      "destination": "https://sportsbookish.com/golf",
-      "permanent": true
-    },
-    {
-      "source": "/golfodds/player/:path*",
+      "source": "/golfodds/player(.*)",
       "destination": "https://sportsbookish.com/golf/players",
       "permanent": true
     },
     {
-      "source": "/golfodds/alerts/:path*",
-      "destination": "https://sportsbookish.com/golf",
-      "permanent": true
-    },
-    {
-      "source": "/golfodds/:path*",
+      "source": "/golfodds(.*)",
       "destination": "https://sportsbookish.com/golf",
       "permanent": true
     }
