@@ -91,23 +91,30 @@ async function sendCredentialEmail(em, link, otp, isNew, displayName) {
   const intro = isNew
     ? 'Your login for the Omicron Google Ads dashboard is ready.'
     : 'Here is a fresh link to reset your Omicron Google Ads dashboard password.';
+  // CODE-ONLY on purpose: corporate mail scanners (Outlook Safe Links etc.)
+  // follow every link in an email, which consumes a one-time tokenized link
+  // before the recipient can click it (burned Liehao 2026-07-29). A 6-digit
+  // code is plain text — nothing to consume — and the login page's "Enter
+  // code instead" flow handles it. Never put the action_link in email.
+  if (!otp) throw new Error('no email_otp on generated link — cannot send code-only email');
   const text = `Hi ${first},
 
 ${intro}
 
-Click this link to set your password (single-use, expires in 24 hours):
+To sign in:
 
-${link}
+  1. Go to:  https://hyder.me/clients/omicron/login.html
+  2. Click "Use the 6-digit code from your invite email"
+  3. Enter your email (${em}) and this one-time code:
 
-After setting your password you'll land right in the dashboard — no authenticator app needed.
-${otp ? `
-Prefer a code? Go to https://hyder.me/clients/omicron/login.html, choose "Enter code instead", and use:
-  email: ${em}
-  code:  ${otp}
-` : ''}
+     ${otp}
+
+  4. Set your password — you'll land right in the dashboard.
+
+No authenticator app needed. The code is single-use and expires after a few
+hours — just reply to this email if you need a fresh one.
+
 Bookmark for future sign-ins: https://hyder.me/clients/omicron/login.html
-
-Any trouble, just reply to this email.
 
 Kenny Hyder
 Hyder Media · kenny@hyder.me`;
