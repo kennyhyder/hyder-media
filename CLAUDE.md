@@ -53,7 +53,7 @@ Desktop syncs to iCloud Drive; large files (e.g. `clients/digistore24/data/keywo
 ## Client dashboard passwords (sessionStorage gates unless noted)
 - Digistore24: TR8FFIC
 - Omicron: ~~LIEHAO~~ → migrated to Supabase Auth + MFA (see `clients/omicron/CLAUDE.md`)
-- AG2020: ~~AG2020FLOW~~ → migrated to Supabase Auth (see `clients/ag2020/CLAUDE.md`)
+- AG2020: **HYDERMEDIA** (shared password gate; reverted off Supabase Auth 2026-07-15 after the cross-tenant incident, pw changed from AG2020FLOW 2026-07-30 — see `clients/ag2020/CLAUDE.md`)
 - Vita Brevis: VITABREVIS
 - SolarTrack: CHECKITOUT · Dunham & Jones: DUNHAMJONES · Falcon Labs: THANKYOU · GolfOdds: BIRDIE
 

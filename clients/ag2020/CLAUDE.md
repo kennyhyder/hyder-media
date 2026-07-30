@@ -11,7 +11,8 @@ ad-spend ingest, and an investor pitch deck. **Companion memory:**
 [[ag2020-platform-state]] and [[ag2020-pending-items]].
 
 ## Authentication (single shared password — Supabase auth REMOVED 2026-07-15)
-- **Gate:** `/clients/ag2020/password.html` — shared password **AG2020FLOW**,
+- **Gate:** `/clients/ag2020/password.html` — shared password **HYDERMEDIA**
+  (was AG2020FLOW; changed 2026-07-30 during the diversion investigation),
   sets `sessionStorage['ag2020_dashboard_auth'] = 'authenticated'`. Preserves
   deep links via `?next=` (and legacy `?redirect=`).
 - **Why removed:** 2026-07-14/15 cross-tenant incident — the shared Supabase
