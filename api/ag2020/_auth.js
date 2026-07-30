@@ -90,7 +90,7 @@ async function verifySupabaseJwt(token) {
  * accepted mechanisms (default: all three, with 'referer' auto-disabled for
  * non-GET/HEAD methods).
  */
-export async function requireAuth(req, res, { allow = ['cron', 'jwt', 'referer'] } = {}) {
+export async function requireAuth(req, res, { allow = ['cron', 'jwt'] } = {}) {
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
     const m = /^Bearer\s+(.+)$/i.exec(authHeader);
     const token = m ? m[1].trim() : null;
@@ -108,22 +108,18 @@ export async function requireAuth(req, res, { allow = ['cron', 'jwt', 'referer']
         return { via: 'dash' };
     }
 
-    // 2. Supabase user JWT
+    // 2. Supabase user JWT (legacy — kept for any straggler with a live session)
     if (allow.includes('jwt') && token) {
         if (await verifySupabaseJwt(token)) {
             return { via: 'jwt' };
         }
     }
 
-    // 3. Transition-period referer fallback — GET/HEAD reads only, never writes.
-    const method = (req.method || 'GET').toUpperCase();
-    if (allow.includes('referer') && (method === 'GET' || method === 'HEAD')) {
-        const referer = req.headers.referer || req.headers.referrer || '';
-        if (typeof referer === 'string' && referer.startsWith('https://hyder.me/clients/ag2020')) {
-            console.warn('[ag2020-auth] referer-fallback', req.url);
-            return { via: 'referer-fallback' };
-        }
-    }
+    // NOTE: the transition-period Referer fallback was REMOVED 2026-07-30.
+    // It accepted any GET/HEAD request whose Referer header started with
+    // https://hyder.me/clients/ag2020 — a trivially-forgeable header — which
+    // made every lead-PII read endpoint effectively public. A caller must now
+    // present CRON_SECRET, the dash token, or a valid Supabase JWT.
 
     res.status(401).json({ error: 'Unauthorized' });
     return null;

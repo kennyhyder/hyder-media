@@ -15,6 +15,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+import { requireAuth } from '../ag2020/_auth.js';
+
 const AD_ACCOUNT_ID = 'act_1455451028117748';
 const GRAPH_BASE = 'https://graph.facebook.com/v22.0';
 
@@ -29,12 +31,16 @@ const CONVERSION_ACTION_TYPES = new Set([
 ]);
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'https://hyder.me');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+    // Client ad-spend/ROAS is financial data — gate it (was fully public).
+    const auth = await requireAuth(req, res);
+    if (!auth) return;
 
     const breakdown = (req.query.breakdown || 'summary').toLowerCase();
     const compareFlag = req.query.compare === 'true' || req.query.compare === '1';

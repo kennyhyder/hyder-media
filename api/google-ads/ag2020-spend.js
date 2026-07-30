@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { requireAuth } from '../ag2020/_auth.js';
 
 // Account configuration
 const AG2020_ACCOUNTS = [
@@ -20,9 +21,9 @@ const AG2020_ACCOUNTS = [
 
 export default async function handler(req, res) {
     // Enable CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'https://hyder.me');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -31,6 +32,10 @@ export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
+
+    // Client ad-spend is financial data — gate it (was fully public).
+    const auth = await requireAuth(req, res);
+    if (!auth) return;
 
     // Parse parameters - get all available historical data
     const startDate = req.query.startDate || '2020-01-01';
