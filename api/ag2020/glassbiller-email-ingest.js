@@ -50,7 +50,23 @@ export default async function handler(req, res) {
         if (body.attachment_base64) {
             xlsxBuffer = Buffer.from(String(body.attachment_base64), 'base64');
         } else if (body.attachment_url) {
-            const r = await fetch(String(body.attachment_url));
+            // SSRF guard: only fetch from known file-host domains (Zapier
+            // storage / GlassBiller / S3). Without this, an authenticated
+            // caller could point the server at internal/metadata URLs.
+            const ALLOWED_HOSTS = [
+                'zapier.com', 'zapierusercontent.com', 'files.zapier.com',
+                'glassbiller.com', 'amazonaws.com', 'cloudfront.net',
+            ];
+            let parsed;
+            try { parsed = new URL(String(body.attachment_url)); }
+            catch { return res.status(400).json({ error: 'attachment_url is not a valid URL' }); }
+            const host = parsed.hostname.toLowerCase();
+            const allowed = parsed.protocol === 'https:' &&
+                ALLOWED_HOSTS.some(h => host === h || host.endsWith('.' + h));
+            if (!allowed) {
+                return res.status(400).json({ error: 'attachment_url host not allowed' });
+            }
+            const r = await fetch(parsed.toString());
             if (!r.ok) return res.status(400).json({ error: `failed to fetch attachment_url (${r.status})` });
             xlsxBuffer = Buffer.from(await r.arrayBuffer());
         }
