@@ -94,6 +94,17 @@ All accounts accessible via **single OAuth connection**:
 - Dashboard pulls live metrics from all 10 accounts
 - Google Ads API v23; MCC 673-698-8718
 
+## Weekly PDF → client Google Drive (2026-07-31)
+`api/omicron/weekly-report.js` emails the Monday-night deck AND uploads a copy to the
+client's "PPC Weekly Performance" Drive folder (`1CPuqh31SD2HnRJXcWkZf61E4F09MqzhO`).
+Mechanics: `hyder-reports@hyder-ads-dashboard.iam.gserviceaccount.com` service account
+(key: `OMICRON_DRIVE_SA_KEY` b64 in Vercel) **impersonates kenny@hyder.me** via
+Workspace domain-wide delegation (SA client ID `108702062939536198220` authorized for
+the `drive` scope in the hyder.me admin console) — Google gives service accounts zero
+Drive storage quota, so direct SA uploads to My Drive folders 403. kenny@hyder.me has
+Editor on the folder. Upload never blocks the email; failures alert kenny@. Test:
+`?force=1&drivetest=1` (CRON_SECRET) uploads without emailing.
+
 ## API Endpoints
 
 | Endpoint | Purpose |
