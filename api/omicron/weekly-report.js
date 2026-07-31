@@ -183,10 +183,15 @@ function kpis(monthly) {
 
 // ---- Google Drive upload (client-requested copy in their shared folder) ----
 // Service account: hyder-reports@hyder-ads-dashboard.iam.gserviceaccount.com
-// (key in OMICRON_DRIVE_SA_KEY — raw JSON or base64). The client folder must
-// be shared with that address as Editor. Upload failure never blocks the
-// email — it alerts kenny@ instead.
+// (key in OMICRON_DRIVE_SA_KEY — raw JSON or base64). Google gives service
+// accounts ZERO Drive storage quota, so the SA cannot own files in a My Drive
+// folder — instead it IMPERSONATES kenny@hyder.me via Workspace domain-wide
+// delegation (hyder.me admin console → API controls → the SA's OAuth2 client
+// ID authorized for the drive scope). Uploads land as kenny@hyder.me, who has
+// Editor on the client folder. Upload failure never blocks the email — it
+// alerts kenny@ instead.
 const DRIVE_FOLDER_ID = (process.env.OMICRON_DRIVE_FOLDER_ID || '1CPuqh31SD2HnRJXcWkZf61E4F09MqzhO').trim();
+const DRIVE_IMPERSONATE = (process.env.OMICRON_DRIVE_IMPERSONATE || 'kenny@hyder.me').trim();
 
 function loadDriveKey() {
   let raw = (process.env.OMICRON_DRIVE_SA_KEY || '').trim();
@@ -199,7 +204,7 @@ async function driveToken(key) {
   const b64url = (b) => Buffer.from(b).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const claim = b64url(JSON.stringify({ iss: key.client_email, scope: 'https://www.googleapis.com/auth/drive', aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 }));
+  const claim = b64url(JSON.stringify({ iss: key.client_email, sub: DRIVE_IMPERSONATE, scope: 'https://www.googleapis.com/auth/drive', aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 }));
   const sig = crypto.createSign('RSA-SHA256').update(`${header}.${claim}`).sign(key.private_key);
   const r = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
