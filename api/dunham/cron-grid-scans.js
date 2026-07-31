@@ -53,8 +53,14 @@ export default async function handler(req, res) {
     const apiKey = (process.env.LOCALFALCON_API_KEY || '').trim();
     if (!apiKey) return res.status(500).json({ error: 'LOCALFALCON_API_KEY not set' });
 
+    // Credit-budget exceptions: full-fleet benchmark ran 2026-07-30 (post-GBP-rollout),
+    // so the Aug 3 sweep is redundant and skipped to keep the cycle inside its
+    // credit package (renews ~Aug 22).
+    const SKIP_DATES = ['2026-08-03'];
+    const today = new Date().toISOString().slice(0, 10);
+    const skipScans = SKIP_DATES.includes(today);
     const includeSmall = new Date().getUTCDate() <= 7;   // first Monday of the month
-    const targets = includeSmall ? [...METROS, ...SMALL_MARKETS] : METROS;
+    const targets = skipScans ? [] : (includeSmall ? [...METROS, ...SMALL_MARKETS] : METROS);
 
     const fired = [];
     const errors = [];
@@ -112,12 +118,70 @@ export default async function handler(req, res) {
         errors.push(`history sync: ${e.message}`);
     }
 
+    // Movement digest: compare the two most recent scans per metro+keyword and
+    // email a summary of meaningful changes (ARP ±1.0, SoLV any change, coverage flips).
+    let movements = [];
+    try {
+        const sb2 = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+        const { data: hist } = await sb2.from('dunham_grid_scans')
+            .select('scan_date, metro, keyword, arp, solv')
+            .order('scan_date', { ascending: false })
+            .limit(400);
+        const series = {};
+        for (const h of (hist || [])) {
+            const k = `${h.metro}|${h.keyword}`;
+            (series[k] = series[k] || []).push(h);
+        }
+        for (const [k, rows] of Object.entries(series)) {
+            if (rows.length < 2) continue;
+            const [cur, prev] = rows;
+            if (cur.scan_date === prev.scan_date) continue;
+            const arpD = (prev.arp ?? 21) - (cur.arp ?? 21);      // + = improved
+            const solvD = (cur.solv ?? 0) - (prev.solv ?? 0);
+            if (Math.abs(arpD) >= 1 || Math.abs(solvD) >= 0.5) {
+                movements.push({ key: k, from: prev.scan_date, to: cur.scan_date,
+                    arp: `${prev.arp ?? '20+'} → ${cur.arp ?? '20+'}`,
+                    solv: `${prev.solv ?? 0} → ${cur.solv ?? 0}`,
+                    good: arpD > 0 || solvD > 0 });
+            }
+        }
+        if (movements.length) {
+            const rowsHtml = movements.map(m =>
+                `<tr><td style="padding:3px 12px 3px 0;"><b>${m.key.replace('|', ' · ')}</b></td>` +
+                `<td style="padding:3px 12px 3px 0;">ARP ${m.arp}</td>` +
+                `<td style="padding:3px 12px 3px 0;">SoLV ${m.solv}</td>` +
+                `<td>${m.good ? '📈' : '📉'}</td></tr>`).join('');
+            await sendDigest(`📊 Dunham grid movement — ${movements.filter(m => m.good).length} up / ${movements.filter(m => !m.good).length} down`,
+                `<p>Ranking movement detected between the last two scans:</p>
+                 <table style="border-collapse:collapse;font-size:14px;">${rowsHtml}</table>
+                 <p><a href="https://hyder.me/clients/dunham/grid-tracking.html">Full grids on the dashboard →</a></p>`);
+        }
+    } catch (e) {
+        errors.push(`movement digest: ${e.message}`);
+    }
+
     return res.status(200).json({
-        status: errors.length && !fired.length ? 'error' : 'success',
+        status: errors.length && !fired.length && !skipScans ? 'error' : 'success',
         firedScans: fired.length,
         creditsUsed: fired.length * 49,
-        includedSmallMarkets: includeSmall,
+        skippedScans: skipScans,
+        includedSmallMarkets: includeSmall && !skipScans,
         historySynced: synced,
+        movements: movements.length,
         errors: errors.slice(0, 10),
+    });
+}
+
+async function sendDigest(subject, html) {
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+    if (!apiKey) return;
+    await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            from: 'Dunham Maps Initiative <alerts@sportsbookish.com>',
+            to: ['kenny@hyder.me'],
+            subject, html,
+        }),
     });
 }
