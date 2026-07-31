@@ -16,6 +16,7 @@
 
 import PDFDocument from 'pdfkit';
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 const HM = 'https://hyder.me';
 const BLUE = '#3b82f6';
@@ -180,6 +181,54 @@ function kpis(monthly) {
   }, { spend: 0, conv: 0, bSpend: 0, bConv: 0, nSpend: 0, nConv: 0 });
 }
 
+// ---- Google Drive upload (client-requested copy in their shared folder) ----
+// Service account: hyder-reports@hyder-ads-dashboard.iam.gserviceaccount.com
+// (key in OMICRON_DRIVE_SA_KEY — raw JSON or base64). The client folder must
+// be shared with that address as Editor. Upload failure never blocks the
+// email — it alerts kenny@ instead.
+const DRIVE_FOLDER_ID = (process.env.OMICRON_DRIVE_FOLDER_ID || '1CPuqh31SD2HnRJXcWkZf61E4F09MqzhO').trim();
+
+function loadDriveKey() {
+  let raw = (process.env.OMICRON_DRIVE_SA_KEY || '').trim();
+  if (!raw) throw new Error('OMICRON_DRIVE_SA_KEY not set');
+  try { return JSON.parse(raw); } catch {}
+  return JSON.parse(Buffer.from(raw, 'base64').toString('utf8'));
+}
+
+async function driveToken(key) {
+  const b64url = (b) => Buffer.from(b).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const claim = b64url(JSON.stringify({ iss: key.client_email, scope: 'https://www.googleapis.com/auth/drive', aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 }));
+  const sig = crypto.createSign('RSA-SHA256').update(`${header}.${claim}`).sign(key.private_key);
+  const r = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${header}.${claim}.${b64url(sig)}`,
+  });
+  const j = await r.json();
+  if (!j.access_token) throw new Error('drive token: ' + JSON.stringify(j).slice(0, 200));
+  return j.access_token;
+}
+
+async function uploadPdfToDrive(pdf, filename) {
+  const token = await driveToken(loadDriveKey());
+  const boundary = 'hm' + crypto.randomBytes(12).toString('hex');
+  const meta = JSON.stringify({ name: filename, parents: [DRIVE_FOLDER_ID], mimeType: 'application/pdf' });
+  const body = Buffer.concat([
+    Buffer.from(`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/pdf\r\n\r\n`),
+    pdf,
+    Buffer.from(`\r\n--${boundary}--`),
+  ]);
+  const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,name,webViewLink', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': `multipart/related; boundary=${boundary}` },
+    body,
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error('drive upload ' + r.status + ': ' + JSON.stringify(j.error || j).slice(0, 200));
+  return j; // { id, name, webViewLink }
+}
+
 export default async function handler(req, res) {
   const secret = (process.env.CRON_SECRET || '').trim();
   const auth = req.headers.authorization || '';
@@ -317,6 +366,18 @@ export default async function handler(req, res) {
     doc.end();
     await done;
     const pdf = Buffer.concat(chunks);
+    const pdfName = `Omicron-Weekly-${new Date().toISOString().slice(0, 10)}.pdf`;
+
+    // ?drivetest=1 — upload to the client Drive folder only (no email), for
+    // verifying the Drive integration end-to-end. CRON_SECRET-gated like all.
+    if (req.query?.drivetest === '1') {
+      try {
+        const f = await uploadPdfToDrive(pdf, pdfName);
+        return res.status(200).json({ ok: true, drive: f, folder: DRIVE_FOLDER_ID, bytes: pdf.length });
+      } catch (e) {
+        return res.status(200).json({ ok: false, driveError: String(e && e.message || e), folder: DRIVE_FOLDER_ID });
+      }
+    }
 
     if (req.query?.pdf === '1') {
       res.statusCode = 200;
@@ -338,10 +399,27 @@ export default async function handler(req, res) {
       to, ...(cc ? { cc } : {}),
       subject: `Omicron Weekly Performance — ${stamp}`,
       text: `Attached: the full Omicron weekly performance deck (${range}) — overview, review sites, owned sites, and per-brand account details.\n\n— Hyder Media`,
-      attachments: [{ filename: `Omicron-Weekly-${new Date().toISOString().slice(0, 10)}.pdf`, content: pdf }],
+      attachments: [{ filename: pdfName, content: pdf }],
     });
 
-    return res.status(200).json({ ok: true, sent_to: to, cc: cc || null, slides: slides.length + 1, accounts: orderedAccounts.length, charts: jobs.length, months: overview.length, bytes: pdf.length, forced: force });
+    // Also drop a copy in the client's shared Drive folder (their request,
+    // 2026-07-31). Never blocks the email; failures alert kenny@ instead.
+    let drive = null;
+    try {
+      drive = await uploadPdfToDrive(pdf, pdfName);
+    } catch (e) {
+      drive = { error: String(e && e.message || e) };
+      try {
+        await transporter.sendMail({
+          from: `Hyder Media <${process.env.EMAIL_USER}>`,
+          to: 'kenny@hyder.me',
+          subject: 'ALERT: Omicron weekly report Drive upload failed',
+          text: `The weekly PDF emailed fine, but the copy to the client's Drive folder failed:\n\n${drive.error}\n\nFolder: https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}`,
+        });
+      } catch (_) {}
+    }
+
+    return res.status(200).json({ ok: true, sent_to: to, cc: cc || null, drive, slides: slides.length + 1, accounts: orderedAccounts.length, charts: jobs.length, months: overview.length, bytes: pdf.length, forced: force });
   } catch (e) {
     return res.status(500).json({ error: String(e && e.message || e) });
   }
