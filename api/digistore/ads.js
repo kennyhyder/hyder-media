@@ -83,8 +83,8 @@ export default async function handler(req, res) {
         // Fetch live ads (no date filter), metrics for date range, and asset performance in parallel
         const [liveAds, adMetrics, assetData] = await Promise.all([
             fetchLiveRSAAds(headers),
-            fetchRSAMetrics(headers, start, end),
-            fetchAssetPerformance(headers, start, end).catch(() => null),
+            fetchRSAMetrics(headers, start, end, scope),
+            fetchAssetPerformance(headers, start, end, scope).catch(() => null),
         ]);
 
         // Build asset leaderboard from asset performance data
@@ -120,7 +120,7 @@ async function fetchQuery(headers, query) {
     return data.results || [];
 }
 
-async function fetchLiveRSAAds(headers) {
+async function fetchLiveRSAAds(headers, scope) {
     // All enabled RSA ads in enabled campaigns/ad groups — no date filter, structural only
     const query = `
         SELECT
@@ -148,7 +148,7 @@ async function fetchLiveRSAAds(headers) {
     return fetchQuery(headers, query);
 }
 
-async function fetchRSAMetrics(headers, start, end) {
+async function fetchRSAMetrics(headers, start, end, scope) {
     // Metrics per ad for the date range (aggregated, no segments in SELECT)
     const query = `
         SELECT
@@ -166,7 +166,7 @@ async function fetchRSAMetrics(headers, start, end) {
     return fetchQuery(headers, query);
 }
 
-async function fetchAssetPerformance(headers, start, end) {
+async function fetchAssetPerformance(headers, start, end, scope) {
     // v23 added full metrics support for RSA assets in ad_group_ad_asset_view.
     // We pull impressions/clicks/cost/conversions per asset for the date range —
     // these surface next to each headline/description on the ad card.
