@@ -9,6 +9,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { guard } from './_guard.js';
 
+
+const scopeClause = (scope) => scope === 'pagewheel' ? "AND campaign.name LIKE '%PageWheel%'" : scope === 'all' ? '' : "AND campaign.name NOT LIKE '%PageWheel%'";
 const CUSTOMER_ID = '2466246400';
 const LOGIN_CUSTOMER_ID = '2466246400';
 
@@ -21,6 +23,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+    const scope = ['pagewheel','all'].includes(req.query.scope) ? req.query.scope : 'ds24';
     try {
         const supabase = createClient(
             process.env.SUPABASE_URL,
@@ -92,6 +95,7 @@ export default async function handler(req, res) {
                 metrics.conversions_value
             FROM keyword_view
             WHERE segments.date BETWEEN '${start}' AND '${end}'
+            ${scopeClause(scope)}
                 AND ad_group_criterion.status != 'REMOVED'
                 AND campaign.status = 'ENABLED'
             ORDER BY metrics.cost_micros DESC

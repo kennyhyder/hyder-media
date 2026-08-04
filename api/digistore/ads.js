@@ -9,6 +9,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { guard } from './_guard.js';
 
+
+const scopeClause = (scope) => scope === 'pagewheel' ? "AND campaign.name LIKE '%PageWheel%'" : scope === 'all' ? '' : "AND campaign.name NOT LIKE '%PageWheel%'";
 const CUSTOMER_ID = '2466246400';
 const LOGIN_CUSTOMER_ID = '2466246400';
 
@@ -21,6 +23,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+    const scope = ['pagewheel','all'].includes(req.query.scope) ? req.query.scope : 'ds24';
     try {
         const supabase = createClient(
             process.env.SUPABASE_URL,
@@ -137,6 +140,7 @@ async function fetchLiveRSAAds(headers) {
             ad_group_ad.ad.final_urls
         FROM ad_group_ad
         WHERE ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD'
+        ${scopeClause(scope)}
             AND ad_group_ad.status = 'ENABLED'
             AND ad_group.status = 'ENABLED'
             AND campaign.status = 'ENABLED'
@@ -156,6 +160,7 @@ async function fetchRSAMetrics(headers, start, end) {
             metrics.conversions_value
         FROM ad_group_ad
         WHERE segments.date BETWEEN '${start}' AND '${end}'
+        ${scopeClause(scope)}
             AND ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD'
     `;
     return fetchQuery(headers, query);
@@ -180,6 +185,7 @@ async function fetchAssetPerformance(headers, start, end) {
             metrics.conversions_value
         FROM ad_group_ad_asset_view
         WHERE segments.date BETWEEN '${start}' AND '${end}'
+        ${scopeClause(scope)}
             AND ad_group_ad_asset_view.field_type IN ('HEADLINE', 'DESCRIPTION')
     `;
     return fetchQuery(headers, query);

@@ -32,8 +32,12 @@ export default async function handler(req, res) {
 
     const breakdown = req.query.breakdown || 'summary'; // 'summary' | 'campaign' | 'adgroup' | 'monthly' | 'daily'
     const dateRange = resolveDateRange(req.query);
+    // scope: 'ds24' (default — EXCLUDES PageWheel campaigns) | 'pagewheel' | 'all'.
+    // PageWheel is a separate product ($47/mo SaaS) run in the same account;
+    // blending it into DS24 reporting distorts CPA/ROAS.
+    const scope = ['pagewheel', 'all'].includes(req.query.scope) ? req.query.scope : 'ds24';
 
-    const result = { dateRange, status: 'loading', errors: [] };
+    const result = { dateRange, scope, status: 'loading', errors: [] };
 
     try {
         const supabase = createClient(
@@ -96,17 +100,17 @@ export default async function handler(req, res) {
         };
 
         if (breakdown === 'campaign') {
-            result.campaigns = await fetchCampaignBreakdown(headers, dateRange);
+            result.campaigns = await fetchCampaignBreakdown(headers, dateRange, scope);
         } else if (breakdown === 'adgroup') {
-            result.adGroups = await fetchAdGroupBreakdown(headers, dateRange);
+            result.adGroups = await fetchAdGroupBreakdown(headers, dateRange, scope);
         } else if (breakdown === 'monthly') {
-            result.monthly = await fetchMonthlyMetrics(headers, dateRange);
+            result.monthly = await fetchMonthlyMetrics(headers, dateRange, scope);
         } else if (breakdown === 'daily') {
-            result.daily = await fetchDailyMetrics(headers, dateRange);
+            result.daily = await fetchDailyMetrics(headers, dateRange, scope);
         } else if (breakdown === 'vendor-affiliate') {
-            result.vendorAffiliate = await fetchVendorAffiliateBreakdown(headers, dateRange);
+            result.vendorAffiliate = await fetchVendorAffiliateBreakdown(headers, dateRange, scope);
         } else {
-            result.summary = await fetchSummaryMetrics(headers, dateRange);
+            result.summary = await fetchSummaryMetrics(headers, dateRange, scope);
         }
 
         result.status = result.errors.length > 0 ? 'partial' : 'success';
@@ -119,19 +123,25 @@ export default async function handler(req, res) {
     }
 }
 
-async function fetchSummaryMetrics(headers, dateRange) {
+// Campaign-name clause implementing the PageWheel/DS24 split.
+function scopeClause(scope) {
+    if (scope === 'pagewheel') return "AND campaign.name LIKE '%PageWheel%'";
+    if (scope === 'all') return '';
+    return "AND campaign.name NOT LIKE '%PageWheel%'";
+}
+
+async function fetchSummaryMetrics(headers, dateRange, scope) {
+    // FROM campaign (not customer) so the PageWheel scope filter can apply.
     const query = `
         SELECT
             metrics.cost_micros,
             metrics.clicks,
             metrics.impressions,
             metrics.conversions,
-            metrics.conversions_value,
-            metrics.ctr,
-            metrics.average_cpc,
-            metrics.cost_per_conversion
-        FROM customer
+            metrics.conversions_value
+        FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
+            ${scopeClause(scope)}
     `;
 
     const response = await fetch(
@@ -165,7 +175,7 @@ async function fetchSummaryMetrics(headers, dateRange) {
     };
 }
 
-async function fetchCampaignBreakdown(headers, dateRange) {
+async function fetchCampaignBreakdown(headers, dateRange, scope) {
     const query = `
         SELECT
             campaign.id,
@@ -181,6 +191,7 @@ async function fetchCampaignBreakdown(headers, dateRange) {
         FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
             AND campaign.status = 'ENABLED'
+            ${scopeClause(scope)}
         ORDER BY metrics.cost_micros DESC
     `;
 
@@ -218,7 +229,7 @@ async function fetchCampaignBreakdown(headers, dateRange) {
     });
 }
 
-async function fetchMonthlyMetrics(headers, dateRange) {
+async function fetchMonthlyMetrics(headers, dateRange, scope) {
     const query = `
         SELECT
             campaign.id,
@@ -233,6 +244,7 @@ async function fetchMonthlyMetrics(headers, dateRange) {
         FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
             AND campaign.status = 'ENABLED'
+            ${scopeClause(scope)}
         ORDER BY segments.month ASC
     `;
 
@@ -270,7 +282,9 @@ async function fetchMonthlyMetrics(headers, dateRange) {
     }));
 }
 
-async function fetchDailyMetrics(headers, dateRange) {
+async function fetchDailyMetrics(headers, dateRange, scope) {
+    // FROM campaign (not customer) so the PageWheel scope filter can apply;
+    // rows are per-campaign-per-day, aggregated to per-day below.
     const query = `
         SELECT
             segments.date,
@@ -279,8 +293,9 @@ async function fetchDailyMetrics(headers, dateRange) {
             metrics.impressions,
             metrics.conversions,
             metrics.conversions_value
-        FROM customer
+        FROM campaign
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
+            ${scopeClause(scope)}
         ORDER BY segments.date ASC
     `;
 
@@ -292,30 +307,29 @@ async function fetchDailyMetrics(headers, dateRange) {
     const data = await response.json();
     if (data.error) return { error: data.error.message };
 
-    return (data.results || []).map(row => {
+    const dayMap = {};
+    for (const row of (data.results || [])) {
+        const date = row.segments?.date;
+        if (!date) continue;
         const m = row.metrics || {};
-        const spend = parseFloat(m.costMicros || 0) / 1000000;
-        const clicks = parseInt(m.clicks || 0, 10);
-        const impressions = parseInt(m.impressions || 0, 10);
-        const conversions = parseFloat(m.conversions || 0);
-        const conversionValue = parseFloat(m.conversionsValue || 0);
+        if (!dayMap[date]) dayMap[date] = { date, spend: 0, clicks: 0, impressions: 0, conversions: 0, conversionValue: 0 };
+        dayMap[date].spend += parseFloat(m.costMicros || 0) / 1000000;
+        dayMap[date].clicks += parseInt(m.clicks || 0, 10);
+        dayMap[date].impressions += parseInt(m.impressions || 0, 10);
+        dayMap[date].conversions += parseFloat(m.conversions || 0);
+        dayMap[date].conversionValue += parseFloat(m.conversionsValue || 0);
+    }
 
-        return {
-            date: row.segments?.date,
-            spend,
-            clicks,
-            impressions,
-            conversions,
-            conversionValue,
-            ctr: impressions > 0 ? clicks / impressions : 0,
-            cpc: clicks > 0 ? spend / clicks : 0,
-            cpa: conversions > 0 ? spend / conversions : 0,
-            roas: spend > 0 ? conversionValue / spend : 0,
-        };
-    });
+    return Object.values(dayMap).sort((a, b) => a.date < b.date ? -1 : 1).map(d => ({
+        ...d,
+        ctr: d.impressions > 0 ? d.clicks / d.impressions : 0,
+        cpc: d.clicks > 0 ? d.spend / d.clicks : 0,
+        cpa: d.conversions > 0 ? d.spend / d.conversions : 0,
+        roas: d.spend > 0 ? d.conversionValue / d.spend : 0,
+    }));
 }
 
-async function fetchAdGroupBreakdown(headers, dateRange) {
+async function fetchAdGroupBreakdown(headers, dateRange, scope) {
     const query = `
         SELECT
             campaign.id,
@@ -333,6 +347,7 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
         WHERE segments.date BETWEEN '${dateRange.start}' AND '${dateRange.end}'
             AND campaign.status = 'ENABLED'
             AND ad_group.status != 'REMOVED'
+            ${scopeClause(scope)}
         ORDER BY metrics.cost_micros DESC
     `;
 
@@ -382,7 +397,7 @@ async function fetchAdGroupBreakdown(headers, dateRange) {
 // Vendor / Affiliate signups per ad group from the dedicated Google Ads
 // conversion actions added 2026-05-01. Auto-clamps the start date to the
 // cutoff — anything earlier comes from GA4 via /api/digistore/ga4-insights.
-async function fetchVendorAffiliateBreakdown(headers, dateRange) {
+async function fetchVendorAffiliateBreakdown(headers, dateRange, scope) {
     const requested = { start: dateRange.start, end: dateRange.end };
     const start = dateRange.start < VA_CUTOFF_START ? VA_CUTOFF_START : dateRange.start;
     const end = dateRange.end;
@@ -412,6 +427,7 @@ async function fetchVendorAffiliateBreakdown(headers, dateRange) {
             AND ad_group.status != 'REMOVED'
             AND campaign.status = 'ENABLED'
             AND segments.conversion_action_name IN ('${VENDOR_NAME}', '${AFFILIATE_NAME}')
+            ${scopeClause(scope)}
     `;
 
     const response = await fetch(

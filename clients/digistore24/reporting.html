@@ -790,10 +790,14 @@
     <div class="container">
         <div class="page-header">
             <div>
-                <h1>Google Ads Reporting</h1>
+                <h1 id="pageTitle">Google Ads Reporting</h1>
             </div>
             <div class="header-controls">
                 <span id="dataBadge" class="data-badge loading">Loading...</span>
+                <div class="date-selector" style="margin-right: 6px;">
+                    <button class="date-btn scope-btn active" data-scope="ds24" onclick="setScope('ds24')">DG24</button>
+                    <button class="date-btn scope-btn" data-scope="pagewheel" onclick="setScope('pagewheel')" style="color: #a78bfa;">PageWheel</button>
+                </div>
                 <div class="date-selector">
                     <button class="date-btn active" data-days="7">7d</button>
                     <button class="date-btn" data-days="30">30d</button>
@@ -1204,11 +1208,33 @@ function applyCustomRange() {
 }
 
 // Build the date query-string fragment used by all API fetches
+// Product scope: 'ds24' (default — excludes the PageWheel campaign) or
+// 'pagewheel' (PageWheel campaign only). Persisted per session.
+let currentScope = sessionStorage.getItem('ds24_report_scope') || 'ds24';
+function setScope(scope) {
+    currentScope = scope;
+    sessionStorage.setItem('ds24_report_scope', scope);
+    document.querySelectorAll('.scope-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.scope === scope));
+    document.getElementById('pageTitle').textContent =
+        scope === 'pagewheel' ? 'PageWheel Reporting' : 'Google Ads Reporting';
+    loadAllData();
+}
+
+// Sync toggle + title with persisted scope on load
+(function syncScopeUI() {
+    document.querySelectorAll('.scope-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.scope === currentScope));
+    const t = document.getElementById('pageTitle');
+    if (t) t.textContent = currentScope === 'pagewheel' ? 'PageWheel Reporting' : 'Google Ads Reporting';
+})();
+
 function dateParams() {
+    const scopeParam = `scope=${currentScope}`;
     if (dateMode === 'custom' && customStart && customEnd) {
-        return `start=${customStart}&end=${customEnd}`;
+        return `start=${customStart}&end=${customEnd}&${scopeParam}`;
     }
-    return `days=${currentDays}`;
+    return `days=${currentDays}&${scopeParam}`;
 }
 
 // Day count for the active date range — used to pick chart granularity
