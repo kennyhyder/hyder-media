@@ -82,7 +82,7 @@ export default async function handler(req, res) {
 
         // Fetch live ads (no date filter), metrics for date range, and asset performance in parallel
         const [liveAds, adMetrics, assetData] = await Promise.all([
-            fetchLiveRSAAds(headers),
+            fetchLiveRSAAds(headers, scope),
             fetchRSAMetrics(headers, start, end, scope),
             fetchAssetPerformance(headers, start, end, scope).catch(() => null),
         ]);
