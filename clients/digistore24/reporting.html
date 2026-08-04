@@ -1624,13 +1624,16 @@ function renderCharts() {
     document.getElementById('spendChartTitle').textContent = `${titlePrefix} Spend & Conversions`;
     document.getElementById('cpaChartTitle').textContent = `${titlePrefix} CPA Trend`;
 
+    // Parse date parts manually — new Date('YYYY-MM-DD') is interpreted as UTC
+    // midnight, which shifts back a day (and month bars back a whole month
+    // label) in any US timezone. Bit us 2026-08-04: July's bar was labeled
+    // "Jun 26" and August-to-date was labeled "Jul 26".
+    const localDate = (s) => { const [y, mo, d] = String(s).split('-').map(Number); return new Date(y, mo - 1, d || 1); };
     const labels = trendData.map(m => {
         if (trendGranularity === 'daily') {
-            const d = new Date(m.date);
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return localDate(m.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
-        const d = new Date(m.month);
-        return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+        return localDate(m.month).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
     });
 
     const chartDefaults = {
