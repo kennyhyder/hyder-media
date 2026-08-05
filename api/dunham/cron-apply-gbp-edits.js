@@ -189,7 +189,7 @@ async function sendEmail(to, subject, html) {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            from: 'Dunham Maps Initiative <alerts@sportsbookish.com>',
+            from: 'Dunham Maps Initiative <alerts@hyder.me>',
             to, subject, html,
         }),
     });

@@ -204,7 +204,7 @@ async function sendDigest(win, rows, errors) {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            from: 'Omicron Fraud Watch <alerts@sportsbookish.com>',
+            from: 'Omicron Fraud Watch <alerts@hyder.me>',
             to: [ALERT_TO],
             subject,
             text,
