@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageWheel LP Roadmap | Digistore24</title>
+    <script>
+        (function() {
+            const AUTH_KEY = 'digistore24_ci_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-tertiary: #334155;
+            --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #64748b;
+            --accent: #3b82f6; --accent-hover: #2563eb; --pw: #a78bfa;
+            --success: #22c55e; --warning: #f59e0b; --danger: #ef4444; --border: #475569;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.9rem; margin-bottom: 8px; }
+        .page-header .subtitle { color: var(--text-secondary); font-size: 0.98rem; max-width: 880px; }
+        .page-header .meta { color: var(--text-muted); font-size: 0.82rem; margin-top: 6px; }
+
+        .verdict-card { background: linear-gradient(135deg, rgba(167, 139, 250, 0.10), rgba(59, 130, 246, 0.08)); border: 1px solid var(--pw); border-radius: 12px; padding: 24px 28px; margin-bottom: 28px; }
+        .verdict-card .label { color: var(--pw); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 8px; }
+        .verdict-card h2 { font-size: 1.45rem; margin-bottom: 12px; }
+        .verdict-card p { font-size: 1rem; margin-bottom: 10px; }
+        .verdict-card p:last-child { margin-bottom: 0; }
+
+        .lp-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 24px 26px; margin-bottom: 20px; }
+        .lp-card .rank-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+        .lp-card .rank { background: var(--pw); color: #0f172a; font-weight: 800; border-radius: 8px; padding: 2px 12px; font-size: 1.05rem; }
+        .lp-card h2 { font-size: 1.3rem; }
+        .lp-card .tagline { color: var(--pw); font-style: italic; font-size: 0.95rem; margin-bottom: 14px; }
+        .lp-card p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 10px; }
+        .lp-card p strong { color: var(--text-primary); }
+        .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 14px 0; }
+        .ministat { background: var(--bg-tertiary); border-radius: 8px; padding: 10px 14px; }
+        .ministat .v { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .ministat .l { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .v.good { color: var(--success); } .v.bad { color: var(--danger); } .v.warn { color: var(--warning); } .v.pw { color: var(--pw); }
+        .build-note { border-left: 3px solid var(--pw); background: rgba(167, 139, 250, 0.07); border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 0.92rem; color: var(--text-primary); margin-top: 12px; }
+        .build-note .t { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pw); margin-bottom: 4px; }
+
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 24px 26px; margin-bottom: 24px; }
+        .card h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; }
+        .card .card-sub { color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 16px; }
+        .card ol { margin-left: 22px; color: var(--text-secondary); font-size: 0.95rem; }
+        .card ol li { margin-bottom: 8px; }
+        .card ol li strong { color: var(--text-primary); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: var(--bg-tertiary); color: var(--text-secondary); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 1px; font-weight: 600; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th.right, td.right { text-align: right; font-variant-numeric: tabular-nums; }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
+        .pill { display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pill.build { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .pill.hold { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .pill.skip { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    </style>
+</head>
+<body>
+    <style id="hm-nav-css">
+        .hm-nav { background: #1e293b; border-bottom: 1px solid #475569; }
+        .hm-nav-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 20px 10px; }
+        .hm-brand { font-size: 1.1rem; font-weight: 700; color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .hm-brand img { height: 30px; width: auto; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%); }
+        .hm-switch { display: flex; border: 1px solid #475569; border-radius: 8px; overflow: hidden; }
+        .hm-prod { padding: 7px 20px; font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-decoration: none; letter-spacing: 0.4px; }
+        .hm-prod.on.dg { background: #3b82f6; color: #fff; }
+        .hm-prod.on.pw { background: #a78bfa; color: #0f172a; }
+        .hm-prod:not(.on):hover { background: #334155; color: #f1f5f9; }
+        .hm-links { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 20px 12px; }
+        .hm-link { padding: 7px 15px; border-radius: 6px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 500; background: #334155; }
+        .hm-link:hover { background: #475569; color: #f1f5f9; }
+        .hm-link.active.dg { background: #3b82f6; color: #fff; }
+        .hm-link.active.pw { background: #a78bfa; color: #0f172a; }
+    </style>
+    <nav class="hm-nav">
+        <div class="hm-nav-top">
+            <a href="competitive-intel-summary.html" class="hm-brand">
+                <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                Digistore24 Intel
+            </a>
+            <div class="hm-switch">
+                <a href="competitive-intel-summary.html" class="hm-prod dg">DG24</a>
+                <a href="pagewheel-competitive-intel-summary.html" class="hm-prod pw on">PageWheel</a>
+            </div>
+        </div>
+        <div class="hm-links">
+            <a href="pagewheel-competitive-intel-summary.html" class="hm-link">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="hm-link">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="hm-link">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="hm-link">Landing Pages</a>
+            <a href="pagewheel-lp-roadmap.html" class="hm-link active pw">LP Roadmap</a>
+            <a href="pagewheel-projection-tool.html" class="hm-link">Projections</a>
+            <a href="reporting.html?scope=pagewheel" class="hm-link">Reporting</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>PageWheel — Landing Page Roadmap</h1>
+            <p class="subtitle">Where dedicated landing pages will lift Quality Score and conversion rate, ranked from live campaign data. Today every ad group routes to the single <code>/pagewheel-ai-page-builder</code> page, which leads with "sales pages &amp; funnels" — every theme whose searcher wanted something else pays a QS tax as higher CPCs and suppressed impression share (most ad groups serve at only 13–28% of eligible impressions).</p>
+            <p class="meta">Built from the Aug 3 search-term audit · 14-day campaign data ($6.8K spend, 3,394 visible queries) + Google Keyword Planner volumes · Conversion counts carry the tracking caveat below</p>
+        </div>
+
+        <div class="verdict-card">
+            <div class="label">The Play</div>
+            <h2>Ship Ebook + Digital Product Creator pages first — they cover $3.8K of the $6.8K fortnightly spend.</h2>
+            <p>Both themes already show real engagement (6.8–8.9% CTR) and the campaign's only conversion signal, but sit at QS 2–5 because the destination page never speaks their language. QS relief on these two lowers CPCs on the majority of the budget. The done-for-you/PLR page is the cheapest high-intent test on the list. Builder and funnel pages are volume plays to sequence after the first wave proves out.</p>
+            <p><strong>Standing caveat:</strong> the only conversion action live is "PageWheel Purchase" (deep-funnel, $0 value, cross-domain attribution unverified). All conversion-rate judgments inherit that gap — trial-start tracking remains pre-work for reading any of these pages' true results.</p>
+        </div>
+
+        <div class="lp-card">
+            <div class="rank-row"><span class="rank">1</span><h2>AI Digital Product Creator</h2></div>
+            <div class="tagline">"Describe your idea. AI builds the product — and the page that sells it."</div>
+            <div class="stat-row">
+                <div class="ministat"><div class="v">$1,956</div><div class="l">14d Spend (#1)</div></div>
+                <div class="ministat"><div class="v">6.8%</div><div class="l">CTR</div></div>
+                <div class="ministat"><div class="v bad">QS 2</div><div class="l">digital product creator</div></div>
+                <div class="ministat"><div class="v">24%</div><div class="l">Impr. Share</div></div>
+                <div class="ministat"><div class="v good">✓ converts</div><div class="l">only theme w/ signal</div></div>
+            </div>
+            <p>Head-term KP volume reads small (~2K/mo) but this theme owns the campaign's biggest query universe — the "how to create digital products…" phrase tail dominated the search-term report. The purest-intent keyword sits at QS 2 because the current page talks pages, not products.</p>
+            <div class="build-note"><div class="t">Page must show</div>Product-generation flow front and center (ebook / planner / course created <em>for</em> you) · one output = finished product + its sales page together · fold lead-magnet messaging in here · $47 all-in-one close.</div>
+        </div>
+
+        <div class="lp-card">
+            <div class="rank-row"><span class="rank">2</span><h2>AI Ebook Creator</h2></div>
+            <div class="tagline">"Your ebook, written and designed in minutes."</div>
+            <div class="stat-row">
+                <div class="ministat"><div class="v">$1,874</div><div class="l">14d Spend</div></div>
+                <div class="ministat"><div class="v good">8.9%</div><div class="l">CTR — best in campaign</div></div>
+                <div class="ministat"><div class="v warn">QS 5</div><div class="l">across the board</div></div>
+                <div class="ministat"><div class="v pw">4,170/mo</div><div class="l">KP volume</div></div>
+                <div class="ministat"><div class="v good">~$2.19</div><div class="l">cheapest bids</div></div>
+            </div>
+            <p>The highest-confidence build: demand, engagement, and cheap clicks are all present — the ads resonate, then the landing page never says "ebook" above the fold. Everything is stuck at QS 5 for a theme with the campaign's best CTR.</p>
+            <div class="build-note"><div class="t">Page must show</div>Ebook generation demo (prompt → written &amp; designed book) · business-ebook / lead-magnet use case, not fiction · keep the book-author negatives on (novelists, kids' books, KDP are excluded traffic).</div>
+        </div>
+
+        <div class="lp-card">
+            <div class="rank-row"><span class="rank">3</span><h2>Done-For-You / PLR Digital Products</h2></div>
+            <div class="tagline">"A sellable digital product, done for you."</div>
+            <div class="stat-row">
+                <div class="ministat"><div class="v good">2 of 2</div><div class="l">visible conversions</div></div>
+                <div class="ministat"><div class="v good">~$0.80</div><div class="l">median top-of-page bid</div></div>
+                <div class="ministat"><div class="v pw">~1–2K/mo</div><div class="l">true commercial volume</div></div>
+                <div class="ministat"><div class="v">NEW</div><div class="l">needs its own ad group</div></div>
+            </div>
+            <p>The only theme that actually converted, at the cheapest CPCs on the list — and it's literally PageWheel's own FAQ promise ("we will create your digital products FOR YOU"). No ad group exists for it today; this is a new LP + new ad group pairing and the cheapest high-intent test available. (Cluster volume quoted after stripping "what is MRR" finance noise.)</p>
+            <div class="build-note"><div class="t">Page must show</div>"Done for you" language mirroring the search · contrast vs. buying static PLR packs (yours is generated fresh, branded to you, with the sales page included) · resale-ready positioning.</div>
+        </div>
+
+        <div class="lp-card">
+            <div class="rank-row"><span class="rank">4</span><h2>AI Landing Page Builder <span class="pill hold" style="vertical-align: middle;">sequence after 1–3</span></h2></div>
+            <div class="tagline">The volume play — higher risk.</div>
+            <div class="stat-row">
+                <div class="ministat"><div class="v pw">7,130/mo</div><div class="l">biggest keyword pool</div></div>
+                <div class="ministat"><div class="v">$1,867</div><div class="l">14d spend (2 ad groups)</div></div>
+                <div class="ministat"><div class="v bad">QS 2</div><div class="l">landing page generator</div></div>
+                <div class="ministat"><div class="v bad">0</div><div class="l">conversions</div></div>
+            </div>
+            <p>These searchers want a <strong>tool</strong>. The page that fixes this needs product proof — builder UI screenshots, template gallery, "publish in 2 minutes" demo — not the business-in-a-box pitch. Build only if PageWheel wants to compete head-on as a builder; otherwise the theme stays throttled.</p>
+        </div>
+
+        <div class="lp-card">
+            <div class="rank-row"><span class="rank">5</span><h2>AI Funnel Builder <span class="pill hold" style="vertical-align: middle;">fix-or-kill</span></h2></div>
+            <div class="tagline">"A complete funnel, built by AI — $47/mo."</div>
+            <div class="stat-row">
+                <div class="ministat"><div class="v pw">7,780/mo</div><div class="l">KP volume</div></div>
+                <div class="ministat"><div class="v bad">QS 1.2</div><div class="l">worst in campaign</div></div>
+                <div class="ministat"><div class="v">$353</div><div class="l">14d spend (throttled)</div></div>
+            </div>
+            <p>Google is saying the current page has nothing to do with funnel queries — full stop. A dedicated funnel page is also the natural home for the phase-2 ClickFunnels-alternative angle ($97–297/mo anchoring vs $47). Sequence after the first wave proves the model; if it can't earn QS 5+ with its own page, kill the theme.</p>
+        </div>
+
+        <div class="card">
+            <h2>Skipped themes</h2>
+            <table>
+                <thead><tr><th>Theme</th><th>Verdict</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td>One Page Website</td><td><span class="pill skip">Skip</span></td><td>Generic small-business site intent, weak product fit, QS 3.4, zero conversions — not worth a dedicated page.</td></tr>
+                    <tr><td>Lead Magnet Pages</td><td><span class="pill skip">Fold in</span></td><td>Only 570/mo volume — fold lead-magnet messaging into LP #1 instead of building a page.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Sequence</h2>
+            <ol>
+                <li><strong>Week 1:</strong> Ship #2 (Ebook) and #1 (Digital Product Creator) — together they cover 56% of current spend and both have demonstrated engagement.</li>
+                <li><strong>Same week:</strong> Launch #3 as a new ad group + LP test (cheap, proven intent).</li>
+                <li><strong>Pre-work in parallel:</strong> PageWheel trial-start conversion action + cross-domain attribution — every page's results are unreadable without it.</li>
+                <li><strong>After QS moves:</strong> Decide #4 (builder positioning question for PageWheel) and #5 (fix-or-kill on funnel).</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

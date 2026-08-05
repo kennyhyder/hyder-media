@@ -472,21 +472,43 @@
     </script>
 
     <!-- Navigation -->
-    <nav class="main-nav">
-    <a href="pagewheel-competitive-intel-summary.html" class="nav-brand"><img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">PageWheel Competitive Intel</a>
-    <div class="nav-links">
-        <select class="brand-switcher" onchange="if(this.value) window.location.href=this.value" title="Switch brand">
-            <option value="competitive-intel-summary.html">Switch to PageWheel ↓</option>
-            <option value="pagewheel-competitive-intel-summary.html" selected>PageWheel ✓</option>
-        </select>
-            <a href="pagewheel-competitive-intel-summary.html" class="nav-link active">Summary</a>
-            <a href="pagewheel-keyword-tool.html" class="nav-link">Keyword Tool</a>
-            <a href="pagewheel-competitor-ads.html" class="nav-link">Competitor Ads</a>
-            <a href="pagewheel-landing-page-analysis.html" class="nav-link">Landing Pages</a>
-            <a href="pagewheel-projection-tool.html" class="nav-link">Projections</a>
-            <a href="reporting.html" class="nav-link">Reporting</a>
-    </div>
-</nav>
+    <style id="hm-nav-css">
+        .hm-nav { background: #1e293b; border-bottom: 1px solid #475569; }
+        .hm-nav-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 20px 10px; }
+        .hm-brand { font-size: 1.1rem; font-weight: 700; color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .hm-brand img { height: 30px; width: auto; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(200deg) brightness(118%) contrast(91%); }
+        .hm-switch { display: flex; border: 1px solid #475569; border-radius: 8px; overflow: hidden; }
+        .hm-prod { padding: 7px 20px; font-size: 0.85rem; font-weight: 700; color: #94a3b8; text-decoration: none; letter-spacing: 0.4px; }
+        .hm-prod.on.dg { background: #3b82f6; color: #fff; }
+        .hm-prod.on.pw { background: #a78bfa; color: #0f172a; }
+        .hm-prod:not(.on):hover { background: #334155; color: #f1f5f9; }
+        .hm-links { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 20px 12px; }
+        .hm-link { padding: 7px 15px; border-radius: 6px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 500; background: #334155; }
+        .hm-link:hover { background: #475569; color: #f1f5f9; }
+        .hm-link.active.dg { background: #3b82f6; color: #fff; }
+        .hm-link.active.pw { background: #a78bfa; color: #0f172a; }
+    </style>
+    <nav class="hm-nav">
+        <div class="hm-nav-top">
+            <a href="competitive-intel-summary.html" class="hm-brand">
+                <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+                Digistore24 Intel
+            </a>
+            <div class="hm-switch">
+                <a href="competitive-intel-summary.html" class="hm-prod dg">DG24</a>
+                <a href="pagewheel-competitive-intel-summary.html" class="hm-prod pw on">PageWheel</a>
+            </div>
+        </div>
+        <div class="hm-links">
+            <a href="pagewheel-competitive-intel-summary.html" class="hm-link active pw">Summary</a>
+            <a href="pagewheel-keyword-tool.html" class="hm-link">Keyword Tool</a>
+            <a href="pagewheel-competitor-ads.html" class="hm-link">Competitor Ads</a>
+            <a href="pagewheel-landing-page-analysis.html" class="hm-link">Landing Pages</a>
+            <a href="pagewheel-lp-roadmap.html" class="hm-link">LP Roadmap</a>
+            <a href="pagewheel-projection-tool.html" class="hm-link">Projections</a>
+            <a href="reporting.html?scope=pagewheel" class="hm-link">Reporting</a>
+        </div>
+    </nav>
 
     <div class="container">
         <!-- Hero Section -->
