@@ -89,17 +89,27 @@ async function gaql(customerId, mcc, token, query) {
     let results = [];
     let pageToken;
     do {
-        const r = await fetch(`https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'developer-token': (process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '').trim(),
-                'login-customer-id': mcc,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(pageToken ? { query, pageToken } : { query }),
-        });
-        const d = await r.json();
+        let d;
+        // Google Ads intermittently returns 500 INTERNAL on healthy queries —
+        // one retry after a short pause clears virtually all of them.
+        for (let attempt = 0; ; attempt++) {
+            const r = await fetch(`https://googleads.googleapis.com/v23/customers/${customerId}/googleAds:search`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'developer-token': (process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '').trim(),
+                    'login-customer-id': mcc,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pageToken ? { query, pageToken } : { query }),
+            });
+            d = await r.json();
+            if (d.error && d.error.code === 500 && attempt === 0) {
+                await new Promise(rr => setTimeout(rr, 2000));
+                continue;
+            }
+            break;
+        }
         if (d.error) throw new Error(JSON.stringify(d.error).slice(0, 200));
         results = results.concat(d.results || []);
         pageToken = d.nextPageToken;
