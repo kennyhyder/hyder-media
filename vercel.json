@@ -238,6 +238,10 @@
       "schedule": "0 1,2 * * 2"
     },
     {
+      "path": "/api/omicron/cron-fraud-watch",
+      "schedule": "0 18 3 * *"
+    },
+    {
       "path": "/api/ag2020/sync-google-sheets",
       "schedule": "0 7,13,19 * * *"
     },

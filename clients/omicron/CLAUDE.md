@@ -105,6 +105,20 @@ Drive storage quota, so direct SA uploads to My Drive folders 403. kenny@hyder.m
 Editor on the folder. Upload never blocks the email; failures alert kenny@. Test:
 `?force=1&drivetest=1` (CRON_SECRET) uploads without emailing.
 
+## Click-fraud watch (2026-08-05)
+ClickCease was disabled on all accounts Feb 2026. An 18-month analysis (Feb25–Jul26,
+account/network/campaign level) found NO fraud signal from it being off: Google invalid
+click rate fell post-Feb (6.28%→5.15% macro) and matched year-ago months when ClickCease
+was ON; search-only conversion rates held. Decision: leave it off, monitor instead.
+`api/omicron/cron-fraud-watch.js` (cron: 3rd of month, 18:00 UTC) compares each account's
+last full month vs trailing 6-month baseline on (1) Google invalid click rate and
+(2) SEARCH-only conv rate (network-filtered so YouTube/Demand Gen mix can't fake a decay),
+and always emails a digest to kenny@ via Resend — 🚨 subject + per-account flag lines when
+thresholds trip (inv rate >1.5× baseline AND +2pts; conv rate <65% of baseline; volume
+floors exclude tiny accounts). Manual run: `?dry=1` with `Bearer CRON_SECRET` returns JSON
+without emailing. If a flag fires, drill geo/device/hour click reports before considering
+re-enabling ClickCease.
+
 ## API Endpoints
 
 | Endpoint | Purpose |
@@ -157,12 +171,5 @@ Tabs support direct linking via URL hash:
 - Later: migrated auth from sessionStorage password (LIEHAO) to Supabase email/password + MFA (AAL2)
 
 <claude-mem-context>
-# Recent Activity
 
-### Apr 17, 2026
-
-| ID | Time | T | Title | Read |
-|----|------|---|-------|------|
-| #431 | 9:57 AM | 🟣 | March 2026 time tracking CSV generated with distribution constraints | ~373 |
-| #430 | 9:55 AM | 🔵 | Time tracking CSV template structure analyzed | ~127 |
 </claude-mem-context>
