@@ -514,8 +514,8 @@ async function refreshTokenIfNeeded(connection, supabase) {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-            client_id: process.env.BING_ADS_CLIENT_ID,
-            client_secret: process.env.BING_ADS_CLIENT_SECRET,
+            client_id: (process.env.BING_ADS_CLIENT_ID || '').trim(),
+            client_secret: (process.env.BING_ADS_CLIENT_SECRET || '').trim(),
             refresh_token: connection.refresh_token,
             grant_type: 'refresh_token',
             scope: 'https://ads.microsoft.com/msads.manage offline_access',

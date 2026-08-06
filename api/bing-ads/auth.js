@@ -11,7 +11,7 @@ export default function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const clientId = process.env.BING_ADS_CLIENT_ID;
+    const clientId = (process.env.BING_ADS_CLIENT_ID || '').trim();
     const redirectUri = 'https://hyder.me/api/bing-ads/callback';
 
     if (req.query.debug === 'true') {

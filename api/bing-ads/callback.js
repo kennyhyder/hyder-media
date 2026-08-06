@@ -38,8 +38,8 @@ export default async function handler(req, res) {
     }
 
     try {
-        const clientId = process.env.BING_ADS_CLIENT_ID;
-        const clientSecret = process.env.BING_ADS_CLIENT_SECRET;
+        const clientId = (process.env.BING_ADS_CLIENT_ID || '').trim();
+        const clientSecret = (process.env.BING_ADS_CLIENT_SECRET || '').trim();
 
         // Step 1: Exchange code for tokens
         const tokenResp = await fetch(TOKEN_URL, {
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
         const expiresAt = new Date(Date.now() + expiresIn * 1000);
 
         // Step 2: Get user info
-        const devToken = process.env.BING_ADS_DEVELOPER_TOKEN;
+        const devToken = (process.env.BING_ADS_DEVELOPER_TOKEN || '').trim();
         let userName = 'Microsoft User';
         let userId = 'unknown';
 
