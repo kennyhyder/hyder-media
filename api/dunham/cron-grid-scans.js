@@ -56,7 +56,7 @@ export default async function handler(req, res) {
     // Credit-budget exceptions: full-fleet benchmark ran 2026-07-30 (post-GBP-rollout),
     // so the Aug 3 sweep is redundant and skipped to keep the cycle inside its
     // credit package (renews ~Aug 22).
-    const SKIP_DATES = ['2026-08-03'];
+    const SKIP_DATES = ['2026-08-03', '2026-08-10'];   // 8/10 superseded by the 8/7 fleet movement check
     const today = new Date().toISOString().slice(0, 10);
     const skipScans = SKIP_DATES.includes(today);
     const includeSmall = new Date().getUTCDate() <= 7;   // first Monday of the month
