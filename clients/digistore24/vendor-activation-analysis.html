@@ -91,22 +91,22 @@
     <div class="container">
         <div class="page-header">
             <h1>Vendor Activation &amp; True ROAS — First Real Data</h1>
-            <p class="subtitle">Google Ads clicks are now traceable end-to-end in PostHog: click (gclid) → vendor signup → product creation → first sale → ongoing sales volume. This is the first measured view of what paid signups actually become — previously modeled, now observed.</p>
-            <p class="meta">Source: PostHog (Prod_Digistore24) · gclid capture live since June 2026 · queried 2026-08-11 · junk "None" gclid values excluded (97% of raw rows — real attributed signups only)</p>
+            <p class="subtitle">Google Ads clicks are now traceable end-to-end in PostHog: click (gclid) → vendor signup → product creation → first sale → ongoing sales volume. <strong>Cohort note:</strong> the measured population is Google Ads traffic in DACH + Canada (Digistore24's own campaigns) — the US/BR campaigns in this program are not yet attributable because the click ID is dropped at the experience-funnel → signup handoff (fix already specified, one small dev task). Paid-search vendors are paid-search vendors: this is the best available benchmark for what our signups become, and the identical measurement lights up for US/BR the moment the handoff fix ships.</p>
+            <p class="meta">Source: PostHog (Prod_Digistore24) · gclid capture live since June 2026 · queried 2026-08-11 · junk "None" gclid values excluded · cohort geo: DE 80% / CA+rest 20% (US/BR pending handoff fix)</p>
         </div>
 
         <div class="verdict-card">
             <div class="label">Headline</div>
-            <h2>Measured activation: 2.64% of Google-attributed signups make their first sale — in ~8 days, not 3 months.</h2>
-            <p>The June cohort (the only one with ~10 weeks of maturity) activates at 2.64% and counting. Vendors who activate do so fast (avg 8 days to first sale). Value is whale-driven: one June vendor has already done €33.5K in tracked sales — a single signup covering roughly a third of that month's ad cost by itself.</p>
-            <p><strong>The swing variable is measurement coverage, not performance</strong> — only 20 of 93 activated vendors currently match purchase records in PostHog (EUR only). Confirming purchase-event coverage is the single question that determines whether this channel is already at break-even on a 1-year view or meaningfully beyond it.</p>
+            <h2>Measured activation: 2.64% of Google-Ads-acquired signups make their first sale — in ~8 days, not 3 months.</h2>
+            <p>The June cohort (~10 weeks matured) activates at 2.64% and counting, and activators move fast (avg 8 days to first sale). Value is whale-driven: one June vendor has already done <strong>€33.5K in total sales volume (GMV — the vendor's sales, not Digistore24 revenue)</strong>; Digistore24's collected margin on that is roughly €2.6K to date, from a single signup.</p>
+            <p><strong>Two things to fix to make this OUR channel's number:</strong> (1) the US/BR funnel drops the Google click ID before signup — the one-field dev fix already specified in July makes US/BR cohorts measurable exactly like this one; (2) only 20 of 93 activated vendors match purchase records, so GMV figures are floors pending a purchase-event coverage check.</p>
         </div>
 
         <div class="stat-grid">
-            <div class="stat"><div class="v">7,430</div><div class="l">Attributed signups (Jun–Aug)</div></div>
+            <div class="stat"><div class="v">7,430</div><div class="l">Attributed signups, DACH+CA (Jun–Aug)</div></div>
             <div class="stat"><div class="v good">2.64%</div><div class="l">June activation @ ~10 wks</div></div>
             <div class="stat"><div class="v">8 days</div><div class="l">Avg time to first sale</div></div>
-            <div class="stat"><div class="v">€35.3K</div><div class="l">Tracked GMV (floor)</div></div>
+            <div class="stat"><div class="v">€35.3K</div><div class="l">Tracked sales volume — GMV, not DS24 revenue (floor)</div></div>
             <div class="stat"><div class="v warn">21%</div><div class="l">Purchase-record match rate</div></div>
         </div>
 
@@ -156,7 +156,7 @@
 
         <div class="card">
             <h2>Best-guess true ROAS on a 1-year CLTV lookback</h2>
-            <p class="card-sub">Model: DS24 revenue ≈ 7.9% + €1 per sale on vendor GMV. June cohort cost basis: $41.1K (ad spend + management fee). Three scenarios differing ONLY in purchase-tracking coverage — performance assumptions held at Base:</p>
+            <p class="card-sub">Model: DS24 revenue ≈ 7.9% + €1 per sale on vendor GMV. Cost basis shown for scale using our June US/BR spend ($41.1K incl. fees) against the benchmark cohort&rsquo;s funnel shape — a like-for-like ROAS for our own campaigns becomes directly measurable once the handoff fix ships. Three scenarios differing ONLY in purchase-tracking coverage — performance assumptions held at Base:</p>
             <table>
                 <thead><tr><th>Scenario</th><th class="right">Coverage multiple</th><th class="right">DS24 revenue / cohort @ 1yr</th><th class="right">1-yr ROAS (incl. fees)</th><th>Read</th></tr></thead>
                 <tbody>
