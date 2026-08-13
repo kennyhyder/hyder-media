@@ -27,6 +27,8 @@ const ALERT_TO = "kenny@hyder.me";
 // stale_after_minutes is the alarm threshold (typically 3× cron_minutes
 // to absorb one missed cycle + processing lag).
 const FRESHNESS_TARGETS = [
+  // Digistore24 — PostHog activation/gclid sync (daily cron 09:40 UTC)
+  { table: "ds24_gclid_capture_daily", column: "fetched_at", label: "DS24 gclid capture (PostHog)", cron_minutes: 1440, stale_after_minutes: 4320 },
   // Sports — Kalshi
   { table: "sports_quotes", column: "fetched_at", label: "Sports Kalshi quotes", cron_minutes: 5, stale_after_minutes: 20 },
   // Sports — sportsbooks (Odds API)

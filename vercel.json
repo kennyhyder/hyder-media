@@ -272,6 +272,10 @@
     {
       "path": "/api/dunham/cron-apply-gbp-edits",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/digistore/cron-posthog-activation",
+      "schedule": "40 9 * * *"
     }
   ],
   "functions": {

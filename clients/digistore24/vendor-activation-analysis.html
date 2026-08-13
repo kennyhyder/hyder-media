@@ -95,6 +95,43 @@
             <p class="meta">Source: PostHog (Prod_Digistore24) · gclid capture live since June 2026 · queried 2026-08-11 · junk "None" gclid values excluded · cohort geo: DE 80% / CA+rest 20% (US/BR pending handoff fix)</p>
         </div>
 
+        <div class="card" id="live-capture-card" style="display: none;">
+            <h2>Live gclid capture status <span id="live-sync" style="font-weight: 400; font-size: 0.78rem; color: var(--text-muted);"></span></h2>
+            <p class="card-sub">Synced daily from PostHog. The moment DS24 ships the signup-handoff fix, US/BR flips green here (and Kenny gets an email alert).</p>
+            <table>
+                <thead><tr><th>Traffic</th><th class="right">Signups (7d)</th><th class="right">With gclid</th><th class="right">Capture rate</th><th>Status</th></tr></thead>
+                <tbody id="live-capture-rows"></tbody>
+            </table>
+        </div>
+
+        <script>
+        (async function () {
+            try {
+                const r = await fetch('/api/digistore/activation');
+                const d = await r.json();
+                if (d.status !== 'success' || !d.capture.length) return;
+                const days = [...new Set(d.capture.map(c => c.day))].sort().slice(-7);
+                const agg = {};
+                for (const row of d.capture.filter(c => days.includes(c.day))) {
+                    const a = (agg[row.geo] ||= { s: 0, g: 0 });
+                    a.s += row.signups; a.g += row.with_gclid;
+                }
+                const label = { US: 'US (our campaigns)', BR: 'Brazil (our campaigns)', DACH: 'DACH (client benchmark)', other: 'Other geos' };
+                const rows = ['US', 'BR', 'DACH', 'other'].filter(g => agg[g]).map(g => {
+                    const a = agg[g];
+                    const pct = a.s ? (a.g / a.s * 100) : 0;
+                    const ours = g === 'US' || g === 'BR';
+                    const cls = ours ? (pct >= 1 ? 'good' : 'bad') : 'blue';
+                    const status = ours ? (pct >= 1 ? '✓ CAPTURING — handoff fix is live' : 'blocked at funnel handoff (fix pending w/ DS24)') : 'working — benchmark';
+                    return `<tr><td>${label[g]}</td><td class="right">${a.s.toLocaleString()}</td><td class="right">${a.g.toLocaleString()}</td><td class="right ${cls}">${pct.toFixed(2)}%</td><td>${status}</td></tr>`;
+                }).join('');
+                document.getElementById('live-capture-rows').innerHTML = rows;
+                document.getElementById('live-sync').textContent = d.fetchedAt ? '· last sync ' + new Date(d.fetchedAt).toLocaleString() : '';
+                document.getElementById('live-capture-card').style.display = '';
+            } catch (_) { /* static page remains authoritative */ }
+        })();
+        </script>
+
         <div class="verdict-card">
             <div class="label">Headline</div>
             <h2>Measured activation: 2.64% of Google-Ads-acquired signups make their first sale — in ~8 days, not 3 months.</h2>
