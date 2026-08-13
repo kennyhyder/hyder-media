@@ -23,7 +23,12 @@ export const config = { maxDuration: 120 };
 const PH_HOST = 'https://eu.posthog.com';
 const PH_PROJECT = '91832';
 const GEO_BUCKET = `multiIf(toString(properties.$geoip_country_code) = 'US', 'US', toString(properties.$geoip_country_code) = 'BR', 'BR', toString(properties.$geoip_country_code) IN ('DE','AT','CH'), 'DACH', 'other')`;
-const REAL_GCLID = `toString(properties.gclid) NOT IN ('', 'None') AND length(toString(properties.gclid)) > 15`;
+// Attribution counts if EITHER capture path has a real value:
+//  - event property gclid (their backend capture at signup), or
+//  - person property $initial_gclid (PostHog-native first-touch capture —
+//    the path that lights up if DS24 ships the "add snippet to experience
+//    funnel" fix, Option C in the 2026-08-12 email).
+const REAL_GCLID = `((toString(properties.gclid) NOT IN ('', 'None') AND length(toString(properties.gclid)) > 15) OR (toString(person.properties.$initial_gclid) NOT IN ('', 'None', 'null') AND length(toString(person.properties.$initial_gclid)) > 15))`;
 const SIGNUP_EVENTS = `event IN ('Signup Submitted','Signup form submitted')`;
 
 async function hogql(query) {

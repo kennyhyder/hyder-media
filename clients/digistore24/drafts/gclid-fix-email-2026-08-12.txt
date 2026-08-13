@@ -1,0 +1,34 @@
+Subject: gclid attribution — why US/BR signups aren't being captured (and the one-line fix)
+
+Hi Nick,
+
+Following up on the activation analysis: your team's gclid capture in PostHog is working — but it's structurally missing almost all signups from our managed account (246-624-6400, the US and Brazil campaigns). Here's exactly what's happening, verified from both the Google Ads API and PostHog data, so your engineers can fix it in one pass.
+
+The evidence (PostHog, signups since June 1):
+
+- Germany/Austria/Switzerland (your internal campaigns): 23,422 signups, 7,120 with gclid — roughly 30% capture
+- US (our campaigns): 30,907 signups, 4 with gclid — 0.01% capture
+- Brazil (our campaigns): 21,460 signups, 52 with gclid — 0.24% capture
+
+The last US capture was July 24; Brazil's captures cluster almost entirely in a 4-day window (June 24-27, right when capture went live) and then stop. This is not a Google Ads configuration issue on our side — I've verified via the API that auto-tagging is enabled on 246-624-6400 (auto_tagging_enabled: true), meaning every click we've ever sent arrives at the landing page with ?gclid= in the URL. Your own Google Ads conversion tracking on this account depends on that and has worked all along.
+
+The root cause is one hop in the funnel:
+
+1. Our ads land on experience.digistore24.com/...?gclid=Cj0K... — parameter present.
+2. The landing page CTAs link to https://www.digistore24.com/en/signup as a bare URL — no query parameters are forwarded. The gclid dies here.
+3. Your PostHog capture reads the gclid from the signup page's URL, so for our traffic there's nothing to read. Your DACH campaigns don't have this problem because they land directly on www.digistore24.com pages and the parameter survives to signup.
+
+The fix — two options, and option A is strictly better:
+
+Option A (recommended): read the _gcl_aw cookie at signup instead of (or as a fallback to) the URL parameter. Google's tag already stores the gclid in a first-party cookie scoped to .digistore24.com — it's readable on the signup page for every one of our signups right now (it's how your Google conversion tracking works). Format: GCL.<timestamp>.<gclid> — take the third segment. One change in the signup tracking code, and it also improves your own campaigns' capture beyond the current ~30%, because the cookie survives multi-page journeys that strip URL parameters.
+
+Option B: forward query parameters through the experience-funnel CTAs (gclid, plus utm_* while you're in there). Works, but has to be maintained across every funnel page and misses any journey where the user navigates before signing up.
+
+Option C (possibly the least effort of all): add your existing PostHog snippet to the experience.digistore24.com funnel pages — it currently is not installed there (verified). PostHog then captures $initial_gclid natively from the landing-page URL (where the parameter IS present), the shared .digistore24.com cookie carries the anonymous visitor across the hop to signup, and the identify at signup merges it onto the account — the same mechanism already working today for the campaigns that land on digistore24-app.com. No signup-code changes, no parameter forwarding; just the snippet you already run elsewhere.
+
+This is the same change described in the attribution spec we sent July 23 (attached again) — that spec also covers persisting the value onto the vendor record, which is what unlocks the signup-to-activation-to-revenue reporting on a 1-year CLTV basis that you asked for. Once this ships, the US/BR campaigns start populating the same cohort analysis we walked through this week, with the first readable cohort about 4-6 weeks later.
+
+Happy to get on a call with whoever owns the signup flow — this is a small, well-bounded change and we can verify it end-to-end the same day it deploys.
+
+Thanks,
+Kenny
