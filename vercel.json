@@ -344,6 +344,12 @@
     },
     "api/bailbonds/**/*.js": {
       "maxDuration": 300
+    },
+    "api/dunham/cron-grid-scans.js": {
+      "maxDuration": 300
+    },
+    "api/dunham/cron-apply-gbp-edits.js": {
+      "maxDuration": 300
     }
   }
 }
