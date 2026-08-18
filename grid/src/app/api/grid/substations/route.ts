@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("grid_substations")
-      .select("id,name,state,county,latitude,longitude,max_voltage_kv,hifld_id,created_at", { count: "exact" });
+      .select("id,name,state,latitude,longitude,max_voltage_kv,min_voltage_kv,connected_line_count,created_at", { count: "exact" });
 
     // Apply filters
     if (state) query = query.eq("state", state.toUpperCase());

@@ -19,13 +19,13 @@ export async function GET(request: Request) {
     const supabase = getSupabase();
     // Totals (head:true = count only, no data transfer)
     const [sitesRes, linesRes, subsRes, ixpRes, dcRes, bfRes, countyRes] = await Promise.all([
-      supabase.from("grid_dc_sites").select("id", { count: "exact", head: true }),
-      supabase.from("grid_transmission_lines").select("id", { count: "exact", head: true }),
-      supabase.from("grid_substations").select("id", { count: "exact", head: true }),
-      supabase.from("grid_ixp_facilities").select("id", { count: "exact", head: true }),
-      supabase.from("grid_datacenters").select("id", { count: "exact", head: true }),
-      supabase.from("grid_brownfield_sites").select("id", { count: "exact", head: true }),
-      supabase.from("grid_county_data").select("id", { count: "exact", head: true }),
+      supabase.from("grid_dc_sites").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_transmission_lines").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_substations").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_ixp_facilities").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_datacenters").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_brownfield_sites").select("id", { count: "estimated", head: true }),
+      supabase.from("grid_county_data").select("id", { count: "estimated", head: true }),
     ]);
 
     // Check for Supabase errors on totals

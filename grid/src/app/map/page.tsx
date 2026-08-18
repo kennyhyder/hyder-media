@@ -139,17 +139,21 @@ function escapeHtml(str: string | number | null | undefined): string {
 }
 
 function parseWKTLineString(wkt: string): [number, number][] | null {
-  // Handle LINESTRING and MULTILINESTRING WKT
-  const match = wkt.match(/LINESTRING\s*\(([^)]+)\)/i) || wkt.match(/MULTILINESTRING\s*\(\(([^)]+)\)/i);
-  if (!match) return null;
-  try {
-    return match[1].split(",").map(pair => {
-      const [lng, lat] = pair.trim().split(/\s+/).map(Number);
-      return [lat, lng] as [number, number];
-    });
-  } catch {
-    return null;
+  // MUST test MULTILINESTRING first: "MULTILINESTRING" contains "LINESTRING" as
+  // a substring, so a LINESTRING regex matches it too and captures a stray "("
+  // (from the double paren), turning the first longitude into NaN and crashing
+  // Leaflet ("Invalid LatLng object: (lat, NaN)"). 141 multi-geometries hit this.
+  const multi = wkt.match(/MULTILINESTRING\s*\((.+)\)/i);
+  const single = multi ? null : wkt.match(/LINESTRING\s*\(([^)]+)\)/i);
+  const body = multi ? multi[1] : single ? single[1] : null;
+  if (body === null) return null;
+  // Strip any segment parens (multi has "(seg),(seg)"), then parse "lng lat" pairs.
+  const coords: [number, number][] = [];
+  for (const pair of body.replace(/[()]/g, "").split(",")) {
+    const [lng, lat] = pair.trim().split(/\s+/).map(Number);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) coords.push([lat, lng]);
   }
+  return coords.length ? coords : null;
 }
 
 const US_STATES = [

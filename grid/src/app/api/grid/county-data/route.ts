@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("grid_county_data")
-      .select("id,fips_code,county_name,state,population,median_income,labor_force,unemployment_rate,avg_electricity_rate,water_stress_score,fiber_availability,hazard_risk_score,dc_tax_incentives,land_price_per_acre,land_price_source,land_price_year,created_at", { count: "exact" });
+      .select("id,fips_code,county_name,state,population,nri_score,nri_rating,water_stress_score,water_stress_label,has_fiber,fiber_provider_count,fiber_served_pct,has_dc_tax_incentive,dc_incentive_type,avg_commercial_rate_cents_kwh,avg_industrial_rate_cents_kwh,total_employment,land_price_per_acre,land_price_source,land_price_year,latitude,longitude,created_at", { count: "exact" });
 
     if (fips) query = query.eq("fips_code", fips);
     if (state) query = query.eq("state", state.toUpperCase());
