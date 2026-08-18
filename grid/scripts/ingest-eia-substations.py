@@ -55,8 +55,8 @@ CTX = ssl.create_default_context(); CTX.check_hostname = False; CTX.verify_mode 
 
 
 def env(key):
-    for p in ["/Users/kennyhyder/Desktop/hyder-media/grid/.env.local",
-              "/Users/kennyhyder/Desktop/hyder-media/.env.local"]:
+    for p in ["/Users/kennyhyder/Projects/hyder-media/grid/.env.local",
+              "/Users/kennyhyder/Projects/hyder-media/.env.local"]:
         try:
             for line in open(p):
                 if line.startswith(key + "="):

@@ -21,8 +21,8 @@ Usage:
   .venv/bin/python3.13 -u scripts/enrich-energy-prices.py --skip-download
   .venv/bin/python3.13 -u scripts/enrich-energy-prices.py --skip-download --dry-run
 
-Must run from: /Users/kennyhyder/Desktop/hyder-media/grid/
-Must use:      /Users/kennyhyder/Desktop/hyder-media/solar/.venv/bin/python3.13
+Must run from: /Users/kennyhyder/Projects/hyder-media/grid/
+Must use:      /Users/kennyhyder/Projects/hyder-media/solar/.venv/bin/python3.13
 """
 
 import os

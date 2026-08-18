@@ -53,8 +53,8 @@ ISO_STATE = {  # for the "<STATE>_aggregate" poi_name on single-state ISOs
 
 
 def env(key, files=None):
-    files = files or ["/Users/kennyhyder/Desktop/hyder-media/grid/.env.local",
-                      "/Users/kennyhyder/Desktop/hyder-media/.env.local"]
+    files = files or ["/Users/kennyhyder/Projects/hyder-media/grid/.env.local",
+                      "/Users/kennyhyder/Projects/hyder-media/.env.local"]
     if key in os.environ:
         return os.environ[key]
     for p in files:

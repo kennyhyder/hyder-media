@@ -35,7 +35,7 @@ import urllib.error
 from dotenv import load_dotenv
 
 # Load env from solar/.env.local (same Supabase credentials)
-load_dotenv('/Users/kennyhyder/Desktop/hyder-media/solar/.env.local')
+load_dotenv('/Users/kennyhyder/Projects/hyder-media/solar/.env.local')
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL') or os.environ.get('NEXT_PUBLIC_SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_KEY')
