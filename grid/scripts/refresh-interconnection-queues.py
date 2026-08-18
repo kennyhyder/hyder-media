@@ -1,55 +1,80 @@
 #!/usr/bin/env python3
 """
 refresh-interconnection-queues.py — refresh grid_queue_summary (per-ISO / per-POI
-interconnection-queue rollups) from the best FREE source available.
+interconnection-queue rollups) from the FREE open-source `gridstatus` library.
 
-Source priority:
-  1. GridStatus.io API  — if GRIDSTATUS_API_KEY is in env. Pulls each ISO's
-     interconnection-queue dataset, aggregates to ISO-level + the existing POI
-     rows, and UPSERTS on (iso, poi_name). AUTOMATABLE.
-  2. LBNL "Queued Up" — the comprehensive national queue dataset. Published as
-     a LARGE multi-tab XLSX once or twice a year. There is NO stable API; the
-     file must be downloaded + parsed manually. This script FLAGS that as a
-     manual step (does not fabricate data).
+WHY the rewrite (2026-08-18): the previous version pulled from the GridStatus.io
+HOSTED API (GRIDSTATUS_API_KEY + `{iso}_interconnection_queue` datasets). GridStatus
+REMOVED those queue datasets from the hosted API — the key still authenticates but
+the datasets 404. The open-source `gridstatus` PyPI library scrapes each ISO's
+public queue directly (no key, no cost) and normalizes the columns, so it's the
+durable free feed. Requires Python 3.13 + `pip install gridstatus` (the solar venv
+at solar/.venv/bin/python3.13 already has it; the droplet gets its own).
+
+  RUN:  solar/.venv/bin/python3.13 scripts/refresh-interconnection-queues.py
+        ... --dry     # fetch + aggregate, print, no writes
 
 id-STABILITY / SAFETY (the live site reads grid_queue_summary):
-  * grid_queue_summary has a UNIQUE(iso, poi_name). All writes are UPSERT on
-    that key (Prefer: resolution=merge-duplicates) — existing rows are updated
-    IN PLACE (ids preserved), new POIs are inserted. NO wipe, NO regenerate.
-  * Aggregate rows use poi_name="<STATE>_aggregate" to match existing rows
-    (e.g. 'TX_aggregate', 'CA_aggregate').
-
-RUN:
-  python3 scripts/refresh-interconnection-queues.py            # auto (GridStatus if key)
-  python3 scripts/refresh-interconnection-queues.py --dry      # no writes
-  GRIDSTATUS_API_KEY=... python3 scripts/refresh-interconnection-queues.py
-
-GridStatus dataset ids (interconnection queues), one per ISO:
-  caiso_interconnection_queue, ercot_interconnection_queue,
-  pjm_interconnection_queue, miso_interconnection_queue,
-  spp_interconnection_queue, nyiso_interconnection_queue,
-  isone_interconnection_queue
-  API docs: https://docs.gridstatus.io/  (GET https://api.gridstatus.io/v1/datasets/{id}/query)
+  * grid_queue_summary has a UNIQUE(iso, poi_name). All writes UPSERT on that key
+    (Prefer: resolution=merge-duplicates) — existing rows update IN PLACE (ids
+    preserved), new POIs insert. NO wipe, NO regenerate.
+  * Aggregate rows use poi_name="<STATE>_aggregate" (e.g. 'TX_aggregate').
+  * Per-ISO fetch is isolated: one ISO failing (e.g. SPP schema drift in the lib)
+    leaves that ISO's existing row untouched and never blocks the others.
+  * We roll up ACTIVE queue projects only (Withdrawn/Completed/Operational are
+    excluded) — that's the "speed to power" signal the DC score actually wants.
 """
-import json, os, sys, time, ssl, urllib.request, urllib.parse, urllib.error
+import json, os, sys, math, re, urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timezone
 
 DRY = "--dry" in sys.argv
-CTX = ssl.create_default_context(); CTX.check_hostname = False; CTX.verify_mode = ssl.CERT_NONE
 SOURCE_NAME = "interconnection_queues"
 
-GRIDSTATUS_DATASETS = {
-    "CAISO": "caiso_interconnection_queue",
-    "ERCOT": "ercot_interconnection_queue",
-    "PJM":   "pjm_interconnection_queue",
-    "MISO":  "miso_interconnection_queue",
-    "SPP":   "spp_interconnection_queue",
-    "NYISO": "nyiso_interconnection_queue",
-    "ISO-NE": "isone_interconnection_queue",
+# gridstatus ISO classes (open-source lib). ERCOT is `Ercot`; ISO-NE is `ISONE`.
+import gridstatus  # noqa: E402  (py3.13 venv only)
+ISO_CLASSES = {
+    "CAISO": gridstatus.CAISO,
+    "ERCOT": gridstatus.Ercot,
+    "PJM":   gridstatus.PJM,
+    "MISO":  gridstatus.MISO,
+    "SPP":   gridstatus.SPP,
+    "NYISO": gridstatus.NYISO,
+    "ISO-NE": gridstatus.ISONE,
 }
-ISO_STATE = {  # for the "<STATE>_aggregate" poi_name on single-state ISOs
-    "ERCOT": "TX", "CAISO": "CA", "NYISO": "NY",
+# Status substrings that mean a project is NO LONGER an active queue entry.
+INACTIVE = ("withdrawn", "completed", "operational", "in service",
+            "suspended", "deactivated", "cancelled", "canceled")
+# Don't delete+replace an ISO's rows unless the fresh fetch cleared this many
+# active projects — a guard so a malformed upstream file can't wipe good data.
+MIN_ACTIVE_TO_REPLACE = 10
+
+# US state name → USPS code, for ISOs that report full state names.
+_STATES = {
+    "alabama":"AL","alaska":"AK","arizona":"AZ","arkansas":"AR","california":"CA",
+    "colorado":"CO","connecticut":"CT","delaware":"DE","florida":"FL","georgia":"GA",
+    "hawaii":"HI","idaho":"ID","illinois":"IL","indiana":"IN","iowa":"IA","kansas":"KS",
+    "kentucky":"KY","louisiana":"LA","maine":"ME","maryland":"MD","massachusetts":"MA",
+    "michigan":"MI","minnesota":"MN","mississippi":"MS","missouri":"MO","montana":"MT",
+    "nebraska":"NE","nevada":"NV","new hampshire":"NH","new jersey":"NJ","new mexico":"NM",
+    "new york":"NY","north carolina":"NC","north dakota":"ND","ohio":"OH","oklahoma":"OK",
+    "oregon":"OR","pennsylvania":"PA","rhode island":"RI","south carolina":"SC",
+    "south dakota":"SD","tennessee":"TN","texas":"TX","utah":"UT","vermont":"VT",
+    "virginia":"VA","washington":"WA","west virginia":"WV","wisconsin":"WI","wyoming":"WY",
+    "district of columbia":"DC",
 }
+
+
+_US_CODES = set(_STATES.values())
+
+
+def norm_state(v):
+    """Normalize a State cell to a valid 2-letter US code, or None (drops non-US
+    entries like MX border projects, blanks, and unrecognized values)."""
+    if not v:
+        return None
+    s = str(v).strip()
+    code = s.upper() if (len(s) == 2 and s.isalpha()) else _STATES.get(s.lower())
+    return code if code in _US_CODES else None
 
 
 def env(key, files=None):
@@ -79,76 +104,81 @@ def rest(method, path, body=None, extra=None):
     return urllib.request.urlopen(req)
 
 
-def gridstatus_rows(api_key, dataset):
-    """Pull queue rows from GridStatus for one ISO dataset (paginated)."""
-    rows, cursor = [], None
-    base = f"https://api.gridstatus.io/v1/datasets/{dataset}/query"
-    while True:
-        params = {"api_key": api_key, "limit": 10000}
-        if cursor:
-            params["cursor"] = cursor
-        req = urllib.request.Request(base + "?" + urllib.parse.urlencode(params),
-                                     headers={"User-Agent": "gridcensus/1.0"})
-        data = json.load(urllib.request.urlopen(req, context=CTX, timeout=120))
-        page = data.get("data", [])
-        rows.extend(page)
-        cursor = (data.get("meta") or {}).get("cursor") or data.get("cursor")
-        if not cursor or not page:
-            break
-        time.sleep(0.3)
-    return rows
-
-
-def aggregate(iso, rows):
-    """Roll up raw queue rows into a single <STATE>_aggregate summary row.
-    Field names vary by ISO in GridStatus; probe a few common ones."""
-    def num(r, *keys):
-        for k in keys:
-            v = r.get(k)
-            if v is not None:
-                try:
-                    return float(v)
-                except (TypeError, ValueError):
-                    pass
+def _num(v):
+    """Coerce a cell to a positive float, treating None/NaN/blank as missing."""
+    if v is None:
         return None
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return None if math.isnan(f) else f
 
-    total_mw = 0.0
-    n = 0
-    solar = wind = storage = 0
-    oldest = None
-    for r in rows:
-        mw = num(r, "capacity_mw", "Capacity (MW)", "mw", "summer_capacity_mw")
-        if mw:
-            total_mw += mw
-        n += 1
-        fuel = str(r.get("fuel") or r.get("resource_type") or
-                   r.get("Generation Type") or r.get("type") or "").lower()
-        if "solar" in fuel:
-            solar += 1
-        if "wind" in fuel:
-            wind += 1
-        if "storage" in fuel or "battery" in fuel:
-            storage += 1
-        yr = r.get("queue_year") or r.get("Queue Year")
+
+def _year(v):
+    """Extract a 4-digit year from a date cell (str, datetime, or pandas Timestamp)."""
+    if v is None:
+        return None
+    if hasattr(v, "year"):  # datetime / pandas Timestamp
         try:
-            yr = int(str(yr)[:4]) if yr else None
-        except ValueError:
-            yr = None
-        if yr and (oldest is None or yr < oldest):
-            oldest = yr
+            y = int(v.year)
+            return y if 1990 <= y <= 2100 else None
+        except (TypeError, ValueError):
+            return None
+    m = re.search(r"(19|20)\d{2}", str(v))
+    return int(m.group(0)) if m else None
 
-    state = ISO_STATE.get(iso, iso)
-    return {
-        "iso": iso,
-        "poi_name": f"{state}_aggregate",
-        "state": ISO_STATE.get(iso),
-        "total_projects": n,
-        "total_capacity_mw": round(total_mw, 2),
-        "solar_projects": solar,
-        "wind_projects": wind,
-        "storage_projects": storage,
-        "oldest_project_year": oldest,
-    }
+
+def aggregate_by_state(iso, rows):
+    """Roll up ACTIVE queue rows into one <STATE>_aggregate row PER STATE.
+
+    Matches the existing grid_queue_summary model (one row per iso+state, keyed
+    poi_name='<STATE>_aggregate') which the scorer matches on (state, iso) and
+    the map overlay sums per ISO. Column names are the gridstatus-normalized set
+    (Capacity (MW), Generation Type, Queue Date, Status, Proposed Completion)."""
+    by_state = {}
+    for r in rows:
+        status = str(r.get("Status") or r.get("Project Status") or "").lower()
+        if any(bad in status for bad in INACTIVE):
+            continue  # active queue only
+        st = norm_state(r.get("State") or r.get("state"))
+        if not st:
+            continue
+        a = by_state.setdefault(st, {"n": 0, "mw": 0.0, "solar": 0, "wind": 0,
+                                     "storage": 0, "oldest": None, "waits": []})
+        a["n"] += 1
+        mw = _num(r.get("Capacity (MW)")) or _num(r.get("Summer Capacity (MW)"))
+        if mw:
+            a["mw"] += mw
+        fuel = str(r.get("Generation Type") or r.get("Fuel") or "").lower()
+        if "solar" in fuel or fuel.startswith("sol") or "pv" in fuel:
+            a["solar"] += 1
+        if "wind" in fuel or fuel.startswith("wnd") or fuel.startswith("win"):
+            a["wind"] += 1
+        if "storage" in fuel or "battery" in fuel or fuel.startswith("bat") or fuel == "es":
+            a["storage"] += 1
+        qy = _year(r.get("Queue Date"))
+        if qy and (a["oldest"] is None or qy < a["oldest"]):
+            a["oldest"] = qy
+        cy = _year(r.get("Proposed Completion Date"))
+        if qy and cy and 0 < (cy - qy) <= 30:
+            a["waits"].append(cy - qy)
+
+    out = []
+    for st, a in by_state.items():
+        out.append({
+            "iso": iso,
+            "poi_name": f"{st}_aggregate",
+            "state": st,
+            "total_projects": a["n"],
+            "total_capacity_mw": round(a["mw"], 2),
+            "solar_projects": a["solar"],
+            "wind_projects": a["wind"],
+            "storage_projects": a["storage"],
+            "avg_wait_years": round(sum(a["waits"]) / len(a["waits"]), 1) if a["waits"] else None,
+            "oldest_project_year": a["oldest"],
+        })
+    return out
 
 
 def ensure_data_source():
@@ -160,63 +190,72 @@ def ensure_data_source():
         pass
     try:
         rest("POST", "grid_data_sources",
-             {"name": SOURCE_NAME, "url": "https://api.gridstatus.io/",
-              "description": "ISO interconnection-queue rollups (GridStatus / LBNL)"},
+             {"name": SOURCE_NAME, "url": "https://github.com/gridstatus/gridstatus",
+              "description": "ISO interconnection-queue rollups (open-source gridstatus lib)"},
              {"Prefer": "return=minimal"})
     except urllib.error.HTTPError:
         pass
+
+
+def replace_iso(iso, state_rows):
+    """Atomically refresh one ISO: delete its existing rows, insert fresh per-state
+    aggregates. Guarded by MIN_ACTIVE_TO_REPLACE so a bad fetch can't wipe data.
+    Skipped ISOs (guard/fetch failure) keep their existing rows untouched."""
+    total_active = sum(r["total_projects"] for r in state_rows)
+    if total_active < MIN_ACTIVE_TO_REPLACE:
+        print(f"  {iso}: only {total_active} active across {len(state_rows)} states "
+              f"(< {MIN_ACTIVE_TO_REPLACE}) — SKIP, keeping existing rows")
+        return 0
+    # delete-then-insert. iso is a fixed internal constant (not user input).
+    rest("DELETE", f"grid_queue_summary?iso=eq.{urllib.parse.quote(iso)}",
+         extra={"Prefer": "return=minimal"})
+    rest("POST", "grid_queue_summary", state_rows, {"Prefer": "return=minimal"})
+    return len(state_rows)
 
 
 def main():
-    api_key = env("GRIDSTATUS_API_KEY")
-    if not api_key:
-        print("=" * 72)
-        print("NO GRIDSTATUS_API_KEY in env — cannot auto-refresh.")
-        print("MANUAL FALLBACK (LBNL 'Queued Up'):")
-        print("  1. Download the latest LBNL Queued Up XLSX:")
-        print("     https://emp.lbl.gov/queues  (multi-tab workbook, ~annual)")
-        print("  2. Parse the per-ISO active-queue tabs (xlsx is available in")
-        print("     repo deps) and aggregate to <STATE>_aggregate rows.")
-        print("  3. UPSERT grid_queue_summary on (iso, poi_name).")
-        print("  This script does NOT fabricate queue data. Re-run with a")
-        print("  GRIDSTATUS_API_KEY set to automate, or wire the LBNL parser.")
-        print("=" * 72)
-        sys.exit(2)
-
     ensure_data_source()
-    summaries = []
-    for iso, dataset in GRIDSTATUS_DATASETS.items():
+    plans, failures = {}, []
+    for iso, cls in ISO_CLASSES.items():
         try:
-            print(f"Fetching {iso} ({dataset})…", flush=True)
-            rows = gridstatus_rows(api_key, dataset)
-            print(f"  {len(rows)} queue rows")
-            if rows:
-                summaries.append(aggregate(iso, rows))
-        except urllib.error.HTTPError as e:
-            print(f"  {iso} err: {e.code} {e.read()[:160]}")
+            print(f"Fetching {iso} interconnection queue…", flush=True)
+            df = cls().get_interconnection_queue()
+            rows = df.to_dict("records")
+            state_rows = aggregate_by_state(iso, rows)
+            active = sum(r["total_projects"] for r in state_rows)
+            print(f"  {len(rows)} rows → {active} active across {len(state_rows)} states")
+            plans[iso] = state_rows
+        except Exception as e:  # per-ISO isolation (network, or lib schema drift like SPP)
+            failures.append(iso)
+            print(f"  {iso} FAILED ({type(e).__name__}: {str(e)[:120]}) — existing rows untouched")
 
     if DRY:
-        print("\nDRY — would upsert these rollups:")
-        for s in summaries:
-            print(f"  {s['iso']:7} {s['poi_name']:14} proj={s['total_projects']} "
-                  f"mw={s['total_capacity_mw']}")
+        print("\nDRY — per-ISO/state rollups that WOULD replace existing rows:")
+        for iso, srows in plans.items():
+            active = sum(r["total_projects"] for r in srows)
+            top = sorted(srows, key=lambda r: r["total_capacity_mw"] or 0, reverse=True)[:4]
+            print(f"  {iso:7} {active} active / {len(srows)} states | "
+                  + ", ".join(f"{r['state']}:{r['total_projects']}p/{int(r['total_capacity_mw'] or 0)}MW" for r in top))
+        if failures:
+            print(f"  (failed ISOs, left as-is: {', '.join(failures)})")
         return
 
-    up = 0
-    for s in summaries:
+    replaced = 0
+    for iso, srows in plans.items():
         try:
-            rest("POST", "grid_queue_summary", [s],
-                 {"Prefer": "resolution=merge-duplicates,return=minimal"})
-            up += 1
+            replaced += replace_iso(iso, srows)
         except urllib.error.HTTPError as e:
-            print(f"  upsert err {s['iso']}: {e.code} {e.read()[:160]}")
-    print(f"Done. Upserted {up} ISO-aggregate queue rows (id-stable on iso,poi_name).")
-    try:
-        rest("PATCH", f"grid_data_sources?name=eq.{SOURCE_NAME}",
-             {"last_import": datetime.now(timezone.utc).isoformat(), "record_count": up},
-             {"Prefer": "return=minimal"})
-    except urllib.error.HTTPError:
-        pass
+            failures.append(iso)
+            print(f"  replace err {iso}: {e.code} {e.read()[:160]}")
+    print(f"Done. Replaced {replaced} per-state rows across "
+          f"{len(plans)} ISOs. Failed/skipped: {', '.join(failures) or 'none'}")
+    if replaced:
+        try:
+            rest("PATCH", f"grid_data_sources?name=eq.{SOURCE_NAME}",
+                 {"last_import": datetime.now(timezone.utc).isoformat(), "record_count": replaced},
+                 {"Prefer": "return=minimal"})
+        except urllib.error.HTTPError:
+            pass
 
 
 if __name__ == "__main__":
