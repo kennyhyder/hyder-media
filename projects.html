@@ -62,6 +62,9 @@
         .cap-page td {
             font-family: 'PT Sans', sans-serif;
         }
+        /* Hero title uses the site-default Roboto Mono (matches homepage/tools),
+           not the PT Sans cap-page body font — was rendering smaller/lighter. */
+        .cap-page .main__title { font-family: var(--roboto-mono); }
         .cap-page p,
         .cap-page li {
             font-size: 1.0625rem;
