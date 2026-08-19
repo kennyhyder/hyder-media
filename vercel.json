@@ -242,6 +242,14 @@
       "schedule": "0 18 3 * *"
     },
     {
+      "path": "/api/omicron/eweka-pause",
+      "schedule": "30,40 13 20 8 *"
+    },
+    {
+      "path": "/api/omicron/eweka-resume",
+      "schedule": "0,10 17 20 8 *"
+    },
+    {
       "path": "/api/ag2020/sync-google-sheets",
       "schedule": "0 7,13,19 * * *"
     },
