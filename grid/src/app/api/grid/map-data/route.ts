@@ -178,6 +178,15 @@ export async function GET(request: Request) {
         lineQuery = lineQuery.eq("state", state.toUpperCase());
       }
 
+      // Viewport filter via the precomputed WKT centroid. Transmission lines have
+      // no lat/lng, so WITHOUT this the map returned the top-2000 lines NATIONWIDE
+      // and any single view showed almost none of the 94k lines (very sparse).
+      if (parsedBounds) {
+        lineQuery = lineQuery
+          .gte("centroid_lat", parsedBounds.swLat).lte("centroid_lat", parsedBounds.neLat)
+          .gte("centroid_lng", parsedBounds.swLng).lte("centroid_lng", parsedBounds.neLng);
+      }
+
       const { data: lines, error: lineErr } = await lineQuery
         .order("voltage_kv", { ascending: false, nullsFirst: true })
         .limit(2000);
