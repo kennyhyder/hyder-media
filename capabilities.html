@@ -582,13 +582,15 @@
                         </h1>
                         <div class="hero__links">
                             <ul class="hero__links__wrap d-flex align-items-center">
-                                <li class="hero__links__item lh-1">
-                                    <a href="/" class="hero__link fw-light text-uppercase">Home</a>
-                                </li>
+                                <li class="hero__links__item lh-1"><a href="/" class="hero__link fw-light text-uppercase">Home</a></li>
                                 <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
-                                <li class="hero__links__item lh-1">
-                                    <a href="#contact" class="hero__link fw-light text-uppercase">Contact</a>
-                                </li>
+                                <li class="hero__links__item lh-1"><a href="/capabilities" class="hero__link fw-light text-uppercase">Capabilities</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="/projects" class="hero__link fw-light text-uppercase">Projects</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="/tools" class="hero__link fw-light text-uppercase">Tools</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="#contact" class="hero__link fw-light text-uppercase">Contact</a></li>
                             </ul>
                         </div>
                     </div>
@@ -791,7 +793,7 @@
                             <div class="cap-card__industry">Commercial auto-glass installer</div>
                             <h3 class="cap-card__title">Financial operations + multi-source ops layer</h3>
                             <p class="cap-card__sub">High-stakes engagement supporting a court-overseen restructuring.</p>
-                            <p class="cap-card__body">Six years of margin reports, ad spend, bank statements, debts, and forecast scenarios merged into a financial dashboard used in court filings. Alongside it, a live ops layer: tens of thousands of call records ingested through a custom CSV pipeline, ActiveCampaign CRM integration that creates deals on missed calls via Outlook → Zapier email-parser → custom webhook, and an Airtable rebates sync exposing six-figure outstanding payments.</p>
+                            <p class="cap-card__body">Six years of margin reports, ad spend, bank statements, debts, and forecast scenarios merged into a financial dashboard used in court filings. Alongside it, a live ops layer: tens of thousands of call records ingested through a custom CSV pipeline, ActiveCampaign CRM integration that creates deals on missed calls via Outlook → Zapier email-parser → custom webhook, and an Airtable rebates sync exposing six-figure outstanding payments. Now extended with a full accounting layer &mdash; automated GlassBiller invoice and receivables ingestion, transaction categorization, and profit-and-loss reporting that closes the loop from job to books.</p>
                             <div class="cap-logo-row">
                                 <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
                                 <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta">
@@ -854,7 +856,7 @@
                             <div class="cap-card__industry">Personal injury law firm · Texas</div>
                             <h3 class="cap-card__title">Multi-platform paid media + expert-witness production</h3>
                             <p class="cap-card__sub">Two engagements in one — paid media reporting and litigation deliverables.</p>
-                            <p class="cap-card__body">A reporting layer pulling Google Ads, Meta, and Microsoft Advertising. The Bing integration required a hand-rolled SOAP XML client because Microsoft's REST endpoints don't reliably work for the operations needed. Plus Google Business Profile location export and an expert-witness production line — rebuttal reports, PDF generation, exhibit packaging via Chrome headless rendering.</p>
+                            <p class="cap-card__body">A reporting layer pulling Google Ads, Meta, and Microsoft Advertising. The Bing integration required a hand-rolled SOAP XML client because Microsoft's REST endpoints don't reliably work for the operations needed. Plus Google Business Profile location export and an expert-witness production line — rebuttal reports, PDF generation, exhibit packaging via Chrome headless rendering. Newest addition: a native local-rank grid tracker &mdash; a self-hosted LocalFalcon that scans Google Business Profile rankings across a geographic grid, maps every position, surfaces competitor rankings, and runs weekly alongside a scheduled Business-Profile edit applier.</p>
                             <div class="cap-logo-row">
                                 <img class="cap-logo" src="https://cdn.simpleicons.org/googleads/4285F4" alt="Google Ads">
                                 <img class="cap-logo" src="https://cdn.simpleicons.org/meta/0467DF" alt="Meta">
@@ -946,96 +948,6 @@
             </div>
         </section>
 
-        <!-- ===== INDEPENDENT PRODUCTS ===== -->
-        <section class="cap-section">
-            <div class="container">
-                <div class="section__block mx-auto cap-wide">
-                    <span class="cap-mono cap-eyebrow">Independent products</span>
-                    <h2 class="cap-h2">SaaS I've shipped on my own</h2>
-                    <p class="cap-lede">Each of these is publicly accessible — designed, built, deployed, and operated end-to-end. They're the proof that the same systems thinking that delivers your client work also ships real businesses.</p>
-
-                    <div class="cap-grid cap-grid--2">
-
-                        <div class="cap-card">
-                            <div class="cap-card__industry">SaaS · Live</div>
-                            <h3 class="cap-card__title">SportsBookish</h3>
-                            <p class="cap-card__sub">Pricing-edge analytics across Kalshi versus traditional sportsbooks.</p>
-                            <p class="cap-card__body">A three-tier SaaS surfacing arbitrage between Kalshi event contracts and the sportsbook market. Free, $19 Pro, and $39 Elite tiers with Stripe checkout, magic-link auth via Supabase, tier-gated feature flags, an alert dispatch engine, watchlist presets, and a public API with key management plus usage tracking. The data plane pulls from DataGolf Scratch+ and free Kalshi REST/WebSocket feeds.</p>
-                            <div class="cap-logo-row">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/resend/000000" alt="Resend">
-                            </div>
-                            <a class="cap-card__cta" href="https://sportsbookish.com" target="_blank" rel="noopener">Visit sportsbookish.com →</a>
-                        </div>
-
-                        <div class="cap-card">
-                            <div class="cap-card__industry">SaaS · Live</div>
-                            <h3 class="cap-card__title">AutomateDojo</h3>
-                            <p class="cap-card__sub">Done-for-you websites and marketing for martial arts dojos.</p>
-                            <p class="cap-card__body">A multi-tenant platform that generates branded dojo websites with AI-edited content. Two Claude engines work in concert — Opus for content edits, Haiku for extraction — with an intent classifier dispatching each prompt to the right tool. Per-template fallback registries. Compliance scanning that blocks the model from introducing violations. Version snapshotting for one-click rollback. Plus an integrations layer covering Meta, Stripe, and Twilio.</p>
-                            <div class="cap-logo-row">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/anthropic/D97757" alt="Anthropic">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
-                            </div>
-                            <a class="cap-card__cta" href="https://automatedojo.com" target="_blank" rel="noopener">Visit automatedojo.com →</a>
-                        </div>
-
-                        <div class="cap-card">
-                            <div class="cap-card__industry">AI search · Live</div>
-                            <h3 class="cap-card__title">MarkSearch.ai</h3>
-                            <p class="cap-card__sub">Natural-language search across the entire USPTO trademark database.</p>
-                            <p class="cap-card__body">Plain-English search over the federal trademark register. Maps business descriptions to Nice Classification codes (1–45) automatically. OpenAI embeddings plus Postgres pgvector for semantic similarity. Layered with Meilisearch for full-text speed and Qdrant for vector queries at scale. Includes domain availability checks and lead capture for IP law firms.</p>
-                            <div class="cap-logo-row">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/openai/412991" alt="OpenAI">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/meilisearch/FF5CAA" alt="Meilisearch">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/qdrant/DC244C" alt="Qdrant">
-                            </div>
-                            <a class="cap-card__cta" href="https://marksearch.ai" target="_blank" rel="noopener">Visit marksearch.ai →</a>
-                        </div>
-
-                        <div class="cap-card">
-                            <div class="cap-card__industry">Monitoring · Live</div>
-                            <h3 class="cap-card__title">SubredMonitor</h3>
-                            <p class="cap-card__sub">Real-time Reddit keyword alerts. Multi-user.</p>
-                            <p class="cap-card__body">Tracks unlimited keywords across any subreddit and fires email plus SMS alerts the moment matches surface. Multi-user auth, persistent SQLite storage with dedupe, configurable polling intervals, a web dashboard with real-time stats. Vercel-deployed Python and Flask — proof that "marketing engineering" doesn't always mean Next.js.</p>
-                            <div class="cap-logo-row">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/python/3776AB" alt="Python">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/flask/000000" alt="Flask">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/reddit/FF4500" alt="Reddit">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
-                            </div>
-                            <a class="cap-card__cta" href="https://subredmonitor.com" target="_blank" rel="noopener">Visit subredmonitor.com →</a>
-                        </div>
-
-                        <div class="cap-card">
-                            <div class="cap-card__industry">SaaS · Live</div>
-                            <h3 class="cap-card__title">GridCensus</h3>
-                            <p class="cap-card__sub">Public datacenter-siting intelligence — a census of every candidate site in the US.</p>
-                            <p class="cap-card__body">164,000 datacenter candidate sites scored on a ten-factor readiness model, enumerated into one indexable page each — map-first browsing, owner and operator cross-links, and programmatic SEO across every state and county. Next.js plus Supabase with on-demand ISR entity pages, a precomputed rollup layer, an autonomous Search Console optimization loop, Supabase Auth with claim-and-contribute accounts, and a compliance-gated build. The free, public top-of-funnel for an infrastructure-investor data product.</p>
-                            <div class="cap-logo-row">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/leaflet/199900" alt="Leaflet">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind">
-                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
-                            </div>
-                            <a class="cap-card__cta" href="https://gridcensus.com" target="_blank" rel="noopener">Visit gridcensus.com →</a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- ===== RESEARCH / INVESTOR-FACING ===== -->
         <section class="cap-section cap-section--tinted-purple">
             <div class="container">
@@ -1046,32 +958,7 @@
 
                     <div class="cap-grid cap-grid--3">
 
-                        <div class="cap-card">
-                            <div class="cap-card__industry">Equipment market intel</div>
-                            <h3 class="cap-card__title">SolarTrack</h3>
-                            <p class="cap-card__sub">Commercial and utility-scale solar installation database.</p>
-                            <p class="cap-card__body">Every commercial (≥25 kW) and utility-scale (≥1 MW) solar installation in the United States, enriched and searchable. Aggregates 26 primary federal and state ingest pipelines, 75 city/county permit portals, and 30 enrichment scripts. Geospatial "near me" search without PostGIS. Built for a solar equipment reseller targeting commercial accounts.</p>
-                            <div class="cap-card__metrics">
-                                <div><div class="cap-metric__num">726K</div><div class="cap-metric__label">Installations</div></div>
-                                <div><div class="cap-metric__num">33K</div><div class="cap-metric__label">Installers profiled</div></div>
-                                <div><div class="cap-metric__num">101</div><div class="cap-metric__label">Data sources</div></div>
-                                <div><div class="cap-metric__num">3.4M</div><div class="cap-metric__label">Events ingested</div></div>
-                            </div>
-                        </div>
 
-                        <div class="cap-card">
-                            <div class="cap-card__industry">Market data R&amp;D</div>
-                            <h3 class="cap-card__title">GolfOdds</h3>
-                            <p class="cap-card__sub">Live Kalshi-versus-sportsbook arbitrage scanner.</p>
-                            <p class="cap-card__body">The R&amp;D platform that became SportsBookish. Pulls Kalshi market quotes alongside a 14-book consensus from DataGolf and surfaces pricing edges in real time. Postgres data plane. WebSocket primary with REST fallback. Identified meaningful edges at a major championship — the kind of signal that justified building the productized subscription on top.</p>
-                            <div class="cap-card__metrics">
-                                <div><div class="cap-metric__num">8K+</div><div class="cap-metric__label">Daily book quotes</div></div>
-                                <div><div class="cap-metric__num">14</div><div class="cap-metric__label">Books polled</div></div>
-                                <div><div class="cap-metric__num">WS</div><div class="cap-metric__label">+REST fallback</div></div>
-                                <div><div class="cap-metric__num">→</div><div class="cap-metric__label">Productized as SaaS</div></div>
-                            </div>
-                            <a class="cap-card__cta" href="/golfodds" target="_blank" rel="noopener">View at hyder.me/golfodds →</a>
-                        </div>
 
                         <div class="cap-card">
                             <div class="cap-card__industry">Investor research</div>

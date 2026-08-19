@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-731HHGLMJS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-731HHGLMJS');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="Public-facing products Kenny Hyder has designed, built, and run solo — subscription SaaS, a fleet of national data-census properties, and personal apps." />
+    <meta name="keywords" content="Kenny Hyder, marketing engineering, custom dashboards, Google Ads API, Meta API, Supabase, Next.js, full-stack consultant, AI tooling, performance marketing" />
+    <meta name="author" content="Kenny Hyder" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Projects — What I’ve Shipped | Hyder Media" />
+    <meta property="og:description" content="Subscription SaaS, a fleet of national data-census properties, and personal apps — designed, built, deployed, and operated end-to-end." />
+    <meta property="og:url" content="https://hyder.me/projects" />
+    <meta property="og:site_name" content="Hyder Media" />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <title>Projects — What I’ve Shipped | Hyder Media</title>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/imgs/logos/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/imgs/logos/favicon.png" />
+    <link rel="canonical" href="https://hyder.me/projects" />
+
+    <!-- Site CSS first so we can override carefully -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/responsive.css" />
+
+    <!-- Add PT Serif as an editorial companion to PT Sans for big display headlines -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <!-- Dark mode init (matches homepage) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') document.documentElement.classList.add('dark-mode');
+            else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark-mode');
+        })();
+    </script>
+
+    <style>
+        /* ----- Typography reset for THIS page only ----- */
+        /* Site default is Roboto Mono everywhere — unreadable in long-form.
+           Override with PT Sans for body, reserve Roboto Mono for tiny accents,
+           introduce PT Serif for editorial display headlines. */
+        .cap-page,
+        .cap-page p,
+        .cap-page li,
+        .cap-page td {
+            font-family: 'PT Sans', sans-serif;
+        }
+        .cap-page p,
+        .cap-page li {
+            font-size: 1.0625rem;
+            line-height: 1.65;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-page p,
+        html.dark-mode .cap-page li,
+        html.dark-mode .cap-page td { color: var(--light-body-color); }
+
+        .cap-page .cap-display {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .cap-mono {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ----- Layout containers ----- */
+        .cap-section { padding: 96px 0; position: relative; }
+        @media (max-width: 768px) { .cap-section { padding: 64px 0; } }
+
+        .cap-section--tinted-brown { background-color: rgba(121, 82, 50, 0.05); }
+        .cap-section--tinted-purple { background-color: rgba(76, 44, 75, 0.06); }
+        .cap-section--tinted-cream { background-color: var(--light-body-color); }
+        html.dark-mode .cap-section--tinted-brown { background-color: rgba(225, 212, 43, 0.04); }
+        html.dark-mode .cap-section--tinted-purple { background-color: rgba(225, 212, 43, 0.06); }
+        html.dark-mode .cap-section--tinted-cream { background-color: rgba(255, 255, 255, 0.025); }
+
+        .cap-narrow { max-width: 760px; }
+        .cap-wide   { max-width: 1140px; }
+
+        /* ----- Section headers ----- */
+        .cap-eyebrow {
+            color: var(--crimson-red-color);
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        html.dark-mode .cap-eyebrow { color: var(--sand-yellow-color); }
+
+        .cap-h2 {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            color: var(--text-color);
+            font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+            line-height: 1.05;
+            letter-spacing: -0.015em;
+            margin-bottom: 22px;
+        }
+        html.dark-mode .cap-h2 { color: var(--light-body-color); }
+
+        .cap-h3 {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            line-height: 1.2;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+        }
+        html.dark-mode .cap-h3 { color: var(--yellow-color); }
+
+        .cap-lede {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 720px;
+            margin-bottom: 0;
+        }
+        html.dark-mode .cap-lede { color: var(--light-body-color); }
+
+        /* ----- Hero polish ----- */
+        .cap-hero-meta {
+            margin-top: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px 36px;
+            align-items: center;
+        }
+        .cap-hero-stat-num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--dark-brown-color);
+        }
+        html.dark-mode .cap-hero-stat-num { color: var(--yellow-color); }
+        .cap-hero-stat-label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+            margin-top: 6px;
+        }
+        html.dark-mode .cap-hero-stat-label { color: rgba(255,255,240,0.6); }
+
+        /* ----- Logo strips ----- */
+        .cap-logo-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 36px 44px;
+            align-items: center;
+            margin: 40px 0 0;
+        }
+        .cap-logo {
+            width: 28px; height: 28px;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+        }
+        .cap-logo--lg { width: 36px; height: 36px; }
+        .cap-logo--sm { width: 20px; height: 20px; }
+        .cap-logo:hover { opacity: 1; }
+        html.dark-mode .cap-logo {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+            opacity: 0.9;
+        }
+
+        .cap-logo-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            align-items: center;
+            margin-top: 14px;
+            margin-bottom: 18px;
+        }
+        .cap-logo-row .cap-logo { width: 22px; height: 22px; }
+
+        /* ----- Cards ----- */
+        .cap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+        @media (min-width: 992px) {
+            .cap-grid--2 { grid-template-columns: repeat(2, 1fr); }
+            .cap-grid--3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .cap-card {
+            background-color: var(--white-color);
+            border: 1px solid rgba(121, 82, 50, 0.25);
+            border-radius: 2px;
+            padding: 30px 28px;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        html.dark-mode .cap-card {
+            background-color: rgba(255, 255, 255, 0.035);
+            border-color: rgba(225, 212, 43, 0.18);
+        }
+        .cap-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--dark-brown-color);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+        html.dark-mode .cap-card:hover {
+            border-color: var(--yellow-color);
+            box-shadow: 0 12px 28px rgba(225, 212, 43, 0.08);
+        }
+        .cap-card__industry {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--crimson-red-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-card__industry { color: var(--sand-yellow-color); }
+        .cap-card__pillar-num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-style: italic;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--dark-brown-color);
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        html.dark-mode .cap-card__pillar-num { color: var(--sand-yellow-color); opacity: 0.85; }
+        .cap-card__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            line-height: 1.2;
+            color: var(--text-color);
+            margin-bottom: 6px;
+        }
+        html.dark-mode .cap-card__title { color: var(--light-body-color); }
+        .cap-card__sub {
+            font-family: 'PT Sans', sans-serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--light-text-color);
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-card__sub { color: rgba(255,255,240,0.65); }
+        .cap-card__body {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.985rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            flex-grow: 1;
+        }
+        html.dark-mode .cap-card__body { color: var(--light-body-color); }
+
+        .cap-card__metrics {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(121, 82, 50, 0.18);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
+        }
+        html.dark-mode .cap-card__metrics { border-top-color: rgba(225, 212, 43, 0.18); }
+        .cap-metric__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--crimson-red-color);
+            line-height: 1;
+        }
+        html.dark-mode .cap-metric__num { color: var(--sand-yellow-color); }
+        .cap-metric__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.66rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+            margin-top: 4px;
+        }
+        html.dark-mode .cap-metric__label { color: rgba(255,255,240,0.65); }
+
+        .cap-card__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--crimson-red-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--crimson-red-color);
+            padding-bottom: 2px;
+            align-self: flex-start;
+            transition: all 0.2s ease;
+        }
+        html.dark-mode .cap-card__cta {
+            color: var(--sand-yellow-color);
+            border-bottom-color: var(--sand-yellow-color);
+        }
+        .cap-card__cta:hover {
+            color: var(--deep-orange-color);
+            border-bottom-color: var(--deep-orange-color);
+            gap: 12px;
+        }
+        html.dark-mode .cap-card__cta:hover {
+            color: var(--yellow-color);
+            border-bottom-color: var(--yellow-color);
+        }
+
+        /* ----- Stats strip ----- */
+        .cap-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0;
+            margin-top: 56px;
+            border: 1px solid rgba(121, 82, 50, 0.3);
+        }
+        html.dark-mode .cap-stats { border-color: rgba(225, 212, 43, 0.25); }
+        .cap-stat {
+            padding: 32px 24px;
+            text-align: left;
+            border-right: 1px solid rgba(121, 82, 50, 0.18);
+            border-bottom: 1px solid rgba(121, 82, 50, 0.18);
+        }
+        html.dark-mode .cap-stat {
+            border-right-color: rgba(225, 212, 43, 0.15);
+            border-bottom-color: rgba(225, 212, 43, 0.15);
+        }
+        .cap-stat:last-child { border-right: none; }
+        .cap-stat__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.6rem;
+            color: var(--dark-brown-color);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        html.dark-mode .cap-stat__num { color: var(--yellow-color); }
+        .cap-stat__label {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--light-text-color);
+        }
+        html.dark-mode .cap-stat__label { color: rgba(255,255,240,0.65); }
+
+        /* ----- Stack section (logo-first) ----- */
+        .cap-stack-section { padding: 96px 0; }
+        .cap-stack-cluster {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin-top: 56px;
+        }
+        @media (min-width: 768px) { .cap-stack-cluster { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .cap-stack-cluster { grid-template-columns: repeat(3, 1fr); } }
+        .cap-stack-group {
+            padding: 28px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-left: 3px solid var(--dark-brown-color);
+        }
+        html.dark-mode .cap-stack-group {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left-color: var(--yellow-color);
+        }
+        .cap-stack-group h4 {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            margin-bottom: 20px;
+        }
+        html.dark-mode .cap-stack-group h4 { color: var(--yellow-color); }
+        .cap-stack-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 18px;
+        }
+        .cap-stack-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.92rem;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-stack-item { color: var(--light-body-color); }
+        .cap-stack-item img { width: 18px; height: 18px; object-fit: contain; opacity: 0.85; }
+        html.dark-mode .cap-stack-item img {
+            filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(2143%) hue-rotate(360deg) brightness(98%) contrast(91%);
+        }
+
+        /* ----- Comparison table ----- */
+        .cap-compare {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 48px;
+            font-family: 'PT Sans', sans-serif;
+        }
+        .cap-compare th, .cap-compare td {
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(121, 82, 50, 0.2);
+            vertical-align: top;
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }
+        .cap-compare thead th {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.74rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            border-bottom: 2px solid var(--dark-brown-color);
+            text-align: left;
+            background: transparent;
+            padding-bottom: 14px;
+        }
+        html.dark-mode .cap-compare thead th { color: var(--yellow-color); border-bottom-color: var(--yellow-color); }
+        .cap-compare tbody tr:hover { background-color: rgba(121, 82, 50, 0.04); }
+        html.dark-mode .cap-compare tbody tr:hover { background-color: rgba(225,212,43,0.04); }
+        .cap-compare td.cap-rowlabel {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            color: var(--dark-brown-color);
+            width: 25%;
+        }
+        html.dark-mode .cap-compare td.cap-rowlabel { color: var(--sand-yellow-color); }
+        .cap-compare small { font-size: 0.8rem; color: var(--light-text-color); display: block; margin-top: 4px; }
+        html.dark-mode .cap-compare small { color: rgba(255,255,240,0.55); }
+        html.dark-mode .cap-compare th, html.dark-mode .cap-compare td { border-bottom-color: rgba(225, 212, 43, 0.18); }
+
+        /* ----- Engagement steps ----- */
+        .cap-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin-top: 56px;
+        }
+        @media (min-width: 900px) { .cap-steps { grid-template-columns: repeat(3, 1fr); } }
+        .cap-step {
+            padding: 36px 32px;
+            border-right: 1px solid rgba(121, 82, 50, 0.18);
+            position: relative;
+        }
+        @media (max-width: 899px) {
+            .cap-step { border-right: none; border-bottom: 1px solid rgba(121, 82, 50, 0.18); }
+        }
+        html.dark-mode .cap-step { border-color: rgba(225, 212, 43, 0.15); }
+        .cap-step:last-child { border-right: none; border-bottom: none; }
+        .cap-step__num {
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 3.6rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--dark-brown-color);
+            opacity: 0.25;
+            margin-bottom: 16px;
+        }
+        html.dark-mode .cap-step__num { color: var(--sand-yellow-color); opacity: 0.5; }
+        .cap-step__title {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: var(--text-color);
+            margin-bottom: 12px;
+        }
+        html.dark-mode .cap-step__title { color: var(--light-body-color); }
+        .cap-step__body {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-step__body { color: rgba(255,255,240,0.85); }
+
+        /* ----- Pull-quote / callout ----- */
+        .cap-pullquote {
+            margin: 64px auto;
+            max-width: 820px;
+            padding: 0 32px;
+            border-left: 3px solid var(--crimson-red-color);
+            font-family: 'PT Serif', Georgia, serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        html.dark-mode .cap-pullquote {
+            border-left-color: var(--sand-yellow-color);
+            color: var(--light-body-color);
+        }
+        .cap-pullquote cite {
+            display: block;
+            margin-top: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--dark-brown-color);
+            font-style: normal;
+        }
+        html.dark-mode .cap-pullquote cite { color: var(--yellow-color); }
+
+        /* ----- Body copy max width override for sections ----- */
+        .cap-prose p { max-width: 720px; }
+
+        /* Projects page: a lone card in a 2-col grid spans full width; flagship accent. */
+        @media (min-width: 992px) {
+            .cap-grid--2 > .cap-card:only-child { grid-column: 1 / -1; }
+        }
+        .cap-card--flagship { border-width: 2px; border-color: var(--dark-brown-color); }
+        html.dark-mode .cap-card--flagship { border-color: rgba(225, 212, 43, 0.45); }
+    </style>
+</head>
+
+<body class="cap-page">
+
+    <!-- Theme toggle (same widget as homepage) -->
+    <div class="page-theme-toggle position-relative">
+        <div class="page-theme-toggle-inner">
+            <label id="theme-switch" class="theme-switch">
+                <input type="checkbox" id="toggleSwitch" />
+                <div class="page-theme-slider">
+                    <div class="sun"></div><div class="moon"></div>
+                    <div class="cloud cloud1"></div><div class="cloud cloud2"></div>
+                    <div class="star star1"></div><div class="star star2"></div>
+                    <div class="star star3"></div><div class="star star4"></div>
+                    <div class="star star5"></div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <header class="header header--area">
+        <div class="header__topbar">
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+            <span class="header__topbar__line d-block"></span>
+        </div>
+    </header>
+
+    <main class="main">
+
+        <!-- ===== HERO ===== -->
+        <section class="hero hero--section position-relative z-1 d-flex flex-column justify-content-center">
+            <div class="container">
+                <div class="section__block mx-auto text-md-end">
+                    <div class="hero__wrapper text-start d-md-inline-block">
+                        <p class="hero__badge ff-pt-sans fs-xsm text-uppercase fw-semibold lh-1 mb-4 pb-md-1 pb-xl-2">
+                            PROJECTS
+                        </p>
+                        <h1 class="main__title fs-1 text-dark-brown fw-medium mb-4 pb-md-2 pb-xl-3">
+                            What I’ve
+                            <br />shipped
+                        </h1>
+                        <div class="hero__links">
+                            <ul class="hero__links__wrap d-flex align-items-center">
+                                <li class="hero__links__item lh-1"><a href="/" class="hero__link fw-light text-uppercase">Home</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="/capabilities" class="hero__link fw-light text-uppercase">Capabilities</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="/projects" class="hero__link fw-light text-uppercase">Projects</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="/tools" class="hero__link fw-light text-uppercase">Tools</a></li>
+                                <li class="hero__links__sep flex-shrink-0 d-inline-block rounded-circle"></li>
+                                <li class="hero__links__item lh-1"><a href="#contact" class="hero__link fw-light text-uppercase">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INTRO ===== -->
+        <section class="cap-section cap-prose">
+            <div class="container">
+                <div class="section__block mx-auto cap-narrow">
+                    <p>These are the products I've designed, built, deployed, and run myself &mdash; every one publicly accessible. Some are subscription SaaS with paying users, some are large public data properties built on a single replicable programmatic-SEO playbook, and one is a personal app I use most nights. The same systems thinking behind my client work, pointed at my own ideas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INDEPENDENT SAAS ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Independent SaaS</span>
+                    <h2 class="cap-h2">Subscription products, shipped solo</h2>
+                    <p class="cap-lede">Designed, built, deployed, and operated end-to-end &mdash; auth, billing, data pipelines, and all.</p>
+
+                    <div class="cap-grid cap-grid--2">
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">SaaS &middot; Live</div>
+                            <h3 class="cap-card__title">SportsBookish</h3>
+                            <p class="cap-card__sub">Pricing-edge analytics across Kalshi versus traditional sportsbooks.</p>
+                            <p class="cap-card__body">A three-tier SaaS surfacing arbitrage between Kalshi event contracts and the sportsbook market. Free, $19 Pro, and $39 Elite tiers with Stripe checkout, magic-link auth via Supabase, tier-gated feature flags, an alert dispatch engine, watchlist presets, and a public API with key management plus usage tracking. The data plane pulls from DataGolf Scratch+ and free Kalshi REST/WebSocket feeds.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/tailwindcss/06B6D4" alt="Tailwind">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/resend/000000" alt="Resend">
+                            </div>
+                            <a class="cap-card__cta" href="https://sportsbookish.com" target="_blank" rel="noopener">Visit sportsbookish.com &rarr;</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">SaaS &middot; Live</div>
+                            <h3 class="cap-card__title">AutomateDojo</h3>
+                            <p class="cap-card__sub">Done-for-you websites and marketing for martial arts dojos.</p>
+                            <p class="cap-card__body">A multi-tenant platform that generates branded dojo websites with AI-edited content. Two Claude engines work in concert &mdash; Opus for content edits, Haiku for extraction &mdash; with an intent classifier dispatching each prompt to the right tool. Per-template fallback registries. Compliance scanning that blocks the model from introducing violations. Version snapshotting for one-click rollback. Plus an integrations layer covering Meta, Stripe, and Twilio.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/anthropic/D97757" alt="Anthropic">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/stripe/635BFF" alt="Stripe">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
+                            </div>
+                            <a class="cap-card__cta" href="https://automatedojo.com" target="_blank" rel="noopener">Visit automatedojo.com &rarr;</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">AI search &middot; Live</div>
+                            <h3 class="cap-card__title">MarkSearch.ai</h3>
+                            <p class="cap-card__sub">Natural-language search across the entire USPTO trademark database.</p>
+                            <p class="cap-card__body">Plain-English search over the federal trademark register. Maps business descriptions to Nice Classification codes (1&ndash;45) automatically. OpenAI embeddings plus Postgres pgvector for semantic similarity. Layered with Meilisearch for full-text speed and Qdrant for vector queries at scale. Includes domain availability checks and lead capture for IP law firms.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostgreSQL">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/openai/412991" alt="OpenAI">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/meilisearch/FF5CAA" alt="Meilisearch">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/qdrant/DC244C" alt="Qdrant">
+                            </div>
+                            <a class="cap-card__cta" href="https://marksearch.ai" target="_blank" rel="noopener">Visit marksearch.ai &rarr;</a>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Monitoring &middot; Live</div>
+                            <h3 class="cap-card__title">SubredMonitor</h3>
+                            <p class="cap-card__sub">Real-time Reddit keyword alerts. Multi-user.</p>
+                            <p class="cap-card__body">Tracks unlimited keywords across any subreddit and fires email plus SMS alerts the moment matches surface. Multi-user auth, persistent SQLite storage with dedupe, configurable polling intervals, a web dashboard with real-time stats. Vercel-deployed Python and Flask &mdash; proof that "marketing engineering" doesn't always mean Next.js.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/python/3776AB" alt="Python">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/flask/000000" alt="Flask">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/reddit/FF4500" alt="Reddit">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/twilio/F22F46" alt="Twilio">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
+                            </div>
+                            <a class="cap-card__cta" href="https://subredmonitor.com" target="_blank" rel="noopener">Visit subredmonitor.com &rarr;</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CENSUS FLEET ===== -->
+        <section class="cap-section cap-section--tinted-purple">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">The Census Fleet</span>
+                    <h2 class="cap-h2">A fleet of national data censuses</h2>
+                    <p class="cap-lede">One replicable playbook &mdash; ingest a national public dataset, score and enrich it, and enumerate every record into its own indexable page with map-first browsing and programmatic SEO across every state and county. Each property is a free, public top-of-funnel for a vertical data product.</p>
+
+                    <div class="cap-grid cap-grid--2">
+                        <div class="cap-card cap-card--flagship">
+                            <div class="cap-card__industry">Datacenter siting &middot; Flagship</div>
+                            <h3 class="cap-card__title">GridCensus</h3>
+                            <p class="cap-card__sub">A census of every candidate datacenter site in the US.</p>
+                            <p class="cap-card__body">164,000+ datacenter candidate sites scored on a ten-factor readiness model &mdash; power, speed-to-power, fiber, water, hazard, and more &mdash; each enumerated into one indexable page. Map-first browsing over 94k transmission lines and live interconnection-queue data, owner and operator cross-links, on-demand ISR entity pages, a precomputed rollup layer, an autonomous Search Console optimization loop, and Supabase Auth with claim-and-contribute accounts.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/nextdotjs/000000" alt="Next.js">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/supabase/3FCF8E" alt="Supabase">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/leaflet/199900" alt="Leaflet">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/postgresql/4169E1" alt="PostGIS">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
+                            </div>
+                            <a class="cap-card__cta" href="https://gridcensus.com" target="_blank" rel="noopener">Visit gridcensus.com &rarr;</a>
+                        </div>
+                    </div>
+
+                    <p class="cap-lede" style="margin-top:40px;">GridCensus proved the playbook. These properties run it across other national infrastructure datasets:</p>
+
+                    <div class="cap-grid cap-grid--3">
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Telecom infrastructure</div>
+                            <h3 class="cap-card__title">TowerCensus</h3>
+                            <p class="cap-card__body">Every FCC-registered antenna structure in the US &mdash; cell towers, masts, and monopoles &mdash; with height, ownership, and location, refreshed weekly from the FCC ASR registry.</p>
+                            <a class="cap-card__cta" href="https://towercensus.com" target="_blank" rel="noopener">towercensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Water systems</div>
+                            <h3 class="cap-card__title">AquaCensus</h3>
+                            <p class="cap-card__body">Every public water system in the country, its service area, and its EPA Safe Drinking Water Act violation history &mdash; refreshed quarterly from EPA SDWIS.</p>
+                            <a class="cap-card__cta" href="https://aquacensus.com" target="_blank" rel="noopener">aquacensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Energy &middot; subsurface</div>
+                            <h3 class="cap-card__title">WellCensus</h3>
+                            <p class="cap-card__body">4.1M+ oil, gas, and injection wells drawn from state regulatory registries, with operators profiled and mapped &mdash; one page per well, per operator, per county.</p>
+                            <a class="cap-card__cta" href="https://wellcensus.com" target="_blank" rel="noopener">wellcensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Freight &middot; logistics</div>
+                            <h3 class="cap-card__title">CarrierCensus</h3>
+                            <p class="cap-card__body">Every active DOT-registered motor carrier in the US &mdash; 2M+ trucking companies with fleet size, safety BASIC scores, and crash history from the FMCSA census, refreshed monthly.</p>
+                            <a class="cap-card__cta" href="https://carriercensus.com" target="_blank" rel="noopener">carriercensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Built environment</div>
+                            <h3 class="cap-card__title">BuildingCensus</h3>
+                            <p class="cap-card__body">Commercial and industrial building stock assembled from municipal open-data portals &mdash; footprints, permits, and use classifications, normalized across cities into one browsable index.</p>
+                            <a class="cap-card__cta" href="https://buildingcensus.com" target="_blank" rel="noopener">buildingcensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">Solar &middot; equipment intel</div>
+                            <h3 class="cap-card__title">PanelCensus</h3>
+                            <p class="cap-card__body">Commercial and utility-scale solar installations nationwide with the installers behind them, built from LBNL Tracking the Sun and federal/state permit data &mdash; a lead map for the solar supply chain.</p>
+                            <a class="cap-card__cta" href="https://panelcensus.com" target="_blank" rel="noopener">panelcensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card">
+                            <div class="cap-card__industry">EV infrastructure</div>
+                            <h3 class="cap-card__title">ChargeCensus</h3>
+                            <p class="cap-card__body">Every public EV charging station in the US &mdash; connector types, networks, and power levels &mdash; sourced from the NREL Alternative Fuels Data Center and mapped station by station.</p>
+                            <a class="cap-card__cta" href="https://chargecensus.com" target="_blank" rel="noopener">chargecensus.com &rarr;</a>
+                        </div>
+                        <div class="cap-card cap-card--hub">
+                            <div class="cap-card__industry">The fleet</div>
+                            <h3 class="cap-card__title">CensusFleet</h3>
+                            <p class="cap-card__body">The hub for all of it &mdash; the shared playbook, data-ops layer, and daily freshness monitoring that keeps every property in the fleet current and self-checking.</p>
+                            <a class="cap-card__cta" href="https://censusfleet.com" target="_blank" rel="noopener">censusfleet.com &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== KILOSKY ===== -->
+        <section class="cap-section">
+            <div class="container">
+                <div class="section__block mx-auto cap-wide">
+                    <span class="cap-mono cap-eyebrow">Personal apps</span>
+                    <h2 class="cap-h2">Things I built for myself</h2>
+                    <p class="cap-lede">Not everything is a business. This one I use most nights.</p>
+
+                    <div class="cap-grid cap-grid--2">
+                        <div class="cap-card">
+                            <div class="cap-card__industry">PWA &middot; Live</div>
+                            <h3 class="cap-card__title">KiloSky</h3>
+                            <p class="cap-card__sub">A personal sun, moon, and star tracker.</p>
+                            <p class="cap-card__body">An installable progressive web app that tracks the sun and moon's position, golden and blue hour, moon phase, and the visible night sky for your exact location &mdash; with constellation names and tap-to-identify stars on a live sky view. A single-purpose replacement for two apps I was paying for, built as a static PWA with no backend.</p>
+                            <div class="cap-logo-row">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/javascript/F7DF1E" alt="JavaScript">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/pwa/5A0FC8" alt="PWA">
+                                <img class="cap-logo" src="https://cdn.simpleicons.org/vercel/000000" alt="Vercel">
+                            </div>
+                            <a class="cap-card__cta" href="https://sky.hyder.me" target="_blank" rel="noopener">Visit sky.hyder.me &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ===== CONTACT ===== -->
+        <section class="contact contact--section" id="contact">
+            <div class="container">
+                <div class="section__block mx-auto">
+                    <div class="section__head mb-4 pb-md-2 pb-lg-3 pb-xl-4">
+                        <h2 class="section__title text-color fw-bold text-uppercase fs-normal">
+                            START A CONVERSATION
+                        </h2>
+                    </div>
+
+                    <div class="contact__form">
+                        <form class="form" id="contactForm">
+                            <div style="display:none;">
+                                <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="row form__row g-3">
+                                <div class="col-lg-6">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="name" class="form__label fs-sm">Your name <span style="color: red;">*</span></label>
+                                        <input type="text" id="name" name="name" placeholder="John Doe" class="form__input" required />
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="email" class="form__label fs-sm">Email <span style="color: red;">*</span></label>
+                                        <input type="email" id="email" name="email" placeholder="john@example.com" class="form__input" required />
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form__item d-flex flex-column">
+                                        <label for="message" class="form__label fs-sm">What are you trying to build, replace, or fix? <span style="color: red;">*</span></label>
+                                        <textarea id="message" name="message" placeholder="Tell me about your project — current tools, biggest reporting headache, what you'd build if Supermetrics didn't exist..." class="form__input form__textarea" required></textarea>
+                                        <span class="form__error" style="color: red; font-size: 0.875rem; display: none;"></span>
+                                        <small style="color: #666; font-size: 0.875rem;"><span id="charCount">0</span>/1000 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form__item d-flex flex-column align-items-center">
+                                        <button type="submit" class="form__submit btn" id="submitBtn">SEND MESSAGE</button>
+                                        <div id="formMessage" style="margin-top: 1rem; display: none; padding: 0.75rem; border-radius: 4px; width: 100%; text-align: center;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer footer--area">
+        <div class="container">
+            <div class="section__block mx-auto">
+                <div class="footer__wrapper text-center">
+                    <p class="text-white fs-sm">
+                        Copyright © 2026 <span itemprop="name">Hyder Media</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
