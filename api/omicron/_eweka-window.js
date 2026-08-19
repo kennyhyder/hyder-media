@@ -15,7 +15,7 @@ import { createClient } from '@supabase/supabase-js';
 export const EWEKA = { id: '7079118680', mcc: '8086957043' };
 export const WINDOW_DATE = '2026-08-20'; // UTC date gate — crons repeat yearly, this doesn't
 export const LABEL = 'TEMP-PAUSE-2026-08-20';
-const ALERT_TO = 'kenny@hyder.me';
+const ALERT_TO = ['kenny@hyder.me', 'marisa.petrick@omicronmedia.com'];
 
 async function getAccessToken() {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -79,7 +79,7 @@ async function email(subject, text) {
     await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: 'Omicron Ads Window <alerts@hyder.me>', to: [ALERT_TO], subject, text }),
+        body: JSON.stringify({ from: 'Omicron Ads Window <alerts@hyder.me>', to: ALERT_TO, subject, text }),
     }).catch(() => {});
 }
 
