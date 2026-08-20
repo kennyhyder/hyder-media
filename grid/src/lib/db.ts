@@ -197,6 +197,15 @@ export interface CountyDetail {
   land_price_per_acre: number | null;
   ferc714_load_growth_pct: number | null;
   area_sq_miles: number | null;
+  population: number | null;
+  it_employment: number | null;
+  fiber_served_pct: number | null;
+  public_supply_mgd: number | null;
+  industrial_water_mgd: number | null;
+  proposed_generation_mw: number | null;
+  proposed_generator_count: number | null;
+  nri_flooding: number | null;
+  nri_coastal_flooding: number | null;
 }
 
 const COUNTY_COLS = [
@@ -223,6 +232,15 @@ const COUNTY_COLS = [
   "land_price_per_acre",
   "ferc714_load_growth_pct",
   "area_sq_miles",
+  "population",
+  "it_employment",
+  "fiber_served_pct",
+  "public_supply_mgd",
+  "industrial_water_mgd",
+  "proposed_generation_mw",
+  "proposed_generator_count",
+  "nri_flooding",
+  "nri_coastal_flooding",
 ].join(",");
 
 /** Per-county context row from grid_county_data, keyed by 5-digit FIPS. */
@@ -238,6 +256,30 @@ export async function countyDetail(
 /** Alias matching the requested entity-infra naming. */
 export async function getCountyByFips(fips: string): Promise<CountyDetail | null> {
   return countyDetail(fips);
+}
+
+/**
+ * County context by state + county NAME — for entities (e.g. brownfields) that
+ * carry a county name but no FIPS. County names are stored inconsistently
+ * ("San Francisco" vs "San Francisco County"), so we match on the base name
+ * with a trailing-" County" tolerance via ilike.
+ */
+export async function getCountyByStateAndName(
+  state: string | null | undefined,
+  name: string | null | undefined
+): Promise<CountyDetail | null> {
+  if (!state || !name) return null;
+  const base = name.replace(/\s+County$/i, "").trim();
+  if (!base) return null;
+  const rows = await restGet<CountyDetail>("grid_county_data", {
+    params: {
+      select: COUNTY_COLS,
+      state: `eq.${state}`,
+      county_name: `ilike.${base}%`,
+      limit: 1,
+    },
+  });
+  return rows[0] ?? null;
 }
 
 // ── Per-site profile (full row) ──────────────────────────────────────────────
@@ -436,6 +478,35 @@ export async function nearbySitesByLatLng(
   });
 }
 
+/**
+ * Nearby brownfield / retired-plant / EPA sites in a lat/long box — a
+ * proximity screen of contaminated & retired-generation sites around a point
+ * (excludes the anchor site). Ordered by existing capacity so the highest-value
+ * grid legacies surface first.
+ */
+export async function nearbyBrownfieldsByLatLng(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  n = 8,
+  excludeId?: string,
+  deg = 0.4
+): Promise<BrownfieldSite[]> {
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return [];
+  }
+  const params: Record<string, string | string[]> = {
+    select: BROWNFIELD_COLS,
+    order: "existing_capacity_mw.desc.nullslast",
+    latitude: [`gte.${lat - deg}`, `lte.${lat + deg}`],
+    longitude: [`gte.${lng - deg}`, `lte.${lng + deg}`],
+    name: "not.is.null",
+    limit: String(n + 1),
+  };
+  if (excludeId) params.id = `neq.${excludeId}`;
+  const rows = await restGet<BrownfieldSite>("grid_brownfield_sites", { params });
+  return rows.slice(0, n);
+}
+
 // ── Substations (grid_substations) ───────────────────────────────────────────
 
 export interface Substation {
@@ -534,6 +605,7 @@ export interface BrownfieldSite {
   nearest_substation_distance_km: number | null;
   operator_name: string | null;
   operator_address: string | null;
+  operator_phone: string | null;
   created_at: string | null;
 }
 
@@ -541,7 +613,7 @@ const BROWNFIELD_COLS = [
   "id", "name", "site_type", "former_use", "state", "county", "city", "latitude", "longitude",
   "acreage", "eia_plant_id", "existing_capacity_mw", "retirement_date", "grid_connection_voltage_kv",
   "epa_id", "cleanup_status", "contaminant_type", "nearest_substation_id",
-  "nearest_substation_distance_km", "operator_name", "operator_address", "created_at",
+  "nearest_substation_distance_km", "operator_name", "operator_address", "operator_phone", "created_at",
 ].join(",");
 
 /** All brownfield sites in a state, by existing capacity (for the state index). */

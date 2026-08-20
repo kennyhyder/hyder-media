@@ -4,16 +4,20 @@ import { SITE_URL } from "@/lib/site";
 import { stateBySlug, stateName } from "@/lib/geo";
 import {
   getBrownfieldByShortId,
+  getCountyByStateAndName,
   nearbySitesByLatLng,
+  nearbyBrownfieldsByLatLng,
   nearbyIxpsByLatLng,
   type BrownfieldSite,
   type DcSite,
 } from "@/lib/db";
-import { parseShortId, siteProfilePath, ixpProfilePath } from "@/lib/entity-slug";
-import { fmtInt, fmtKv, fmtMwExact } from "@/lib/format";
+import { parseShortId, siteProfilePath, ixpProfilePath, brownfieldProfilePath } from "@/lib/entity-slug";
+import { fmtInt, fmtKv, fmtMwExact, fmtCents, fmtUsd, fmtScore } from "@/lib/format";
 import SitesTable from "@/components/SitesTable";
 import Freshness from "@/components/Freshness";
 import UpgradeCTA from "@/components/UpgradeCTA";
+import PrintButton from "@/components/PrintButton";
+import LeadCapture from "@/components/LeadCapture";
 import JsonLd from "@/components/JsonLd";
 import { Row, Card, km2mi } from "@/components/EntityProfile";
 import OrgLink from "@/components/OrgLink";
@@ -60,6 +64,30 @@ function formerUseLabel(u: string | null | undefined): string {
   return FORMER_USE_LABEL[u.toLowerCase()] || `former ${u} site`;
 }
 
+// Great-circle miles between two lat/lng points (for the nearby-sites screen).
+function milesBetween(
+  aLat: number | null,
+  aLng: number | null,
+  bLat: number | null,
+  bLng: number | null
+): number | null {
+  if (aLat == null || aLng == null || bLat == null || bLng == null) return null;
+  const R = 3958.8;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+}
+
+// NRI sub-hazard score (0–100) → short label.
+function riskLabel(v: number | null | undefined): string | null {
+  if (v == null || !Number.isFinite(v)) return null;
+  const band = v >= 80 ? "Very high" : v >= 60 ? "High" : v >= 40 ? "Moderate" : v >= 20 ? "Low" : "Very low";
+  return `${band} (${Math.round(v)}/100)`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -104,9 +132,11 @@ export default async function BrownfieldProfilePage({
   if (!r) notFound();
   const { bf } = r;
 
-  const [nearby, ixps] = await Promise.all([
+  const [nearby, ixps, county, nearbyBf] = await Promise.all([
     nearbySitesByLatLng(bf.latitude, bf.longitude, 8),
     nearbyIxpsByLatLng(bf.latitude, bf.longitude, 4),
+    getCountyByStateAndName(bf.state, bf.county),
+    nearbyBrownfieldsByLatLng(bf.latitude, bf.longitude, 8, bf.id),
   ]);
 
   const name = bf.name || "Retired Power Plant Site";
@@ -184,6 +214,10 @@ export default async function BrownfieldProfilePage({
         )}
       </header>
 
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <PrintButton />
+      </div>
+
       <p className="mt-4 max-w-3xl text-gray-700">
         {name} is a {formerUseLabel(bf.former_use)} in {loc}, {r.stateNm}
         {bf.retirement_date ? `, retired ${bf.retirement_date}` : ""}. Retired generation sites are
@@ -220,6 +254,7 @@ export default async function BrownfieldProfilePage({
           <Row label="EPA ID" value={bf.epa_id} />
           <Row label="Operator" value={bf.operator_name ? <OrgLink owner={bf.operator_name} /> : null} />
           <Row label="Operator address" value={bf.operator_address} />
+          <Row label="Operator phone" value={bf.operator_phone} />
         </Card>
       </section>
 
@@ -229,6 +264,176 @@ export default async function BrownfieldProfilePage({
         frequently shaving years off the interconnection queue. Retired-plant sites also tend to be
         already zoned for heavy industrial use with established road, rail, and water infrastructure.
       </section>
+
+      {county && (
+        <section className="mt-8">
+          <h2 className="text-xl font-bold text-gray-900">
+            Site conditions &amp; market — {county.county_name || loc}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm text-gray-600">
+            County-level intelligence for this site&apos;s location — the power economics, water,
+            hazard, connectivity, and workforce a developer screens before ever visiting. Assembled
+            from FEMA NRI, BLS QCEW, FCC BDC, USGS water-use, and EIA.
+          </p>
+          <div className="mt-4 grid gap-5 lg:grid-cols-2">
+            <Card title="Market &amp; workforce">
+              <Row label="Population" value={county.population != null ? fmtInt(county.population) : null} />
+              <Row
+                label="Total employment (laborshed)"
+                value={county.total_employment != null ? fmtInt(county.total_employment) : null}
+              />
+              <Row label="IT / tech employment" value={county.it_employment != null ? fmtInt(county.it_employment) : null} />
+              <Row
+                label="Construction employment"
+                value={county.construction_employment != null ? fmtInt(county.construction_employment) : null}
+              />
+              <Row
+                label="Land value"
+                value={county.land_price_per_acre != null ? `${fmtUsd(county.land_price_per_acre)}/acre` : null}
+              />
+              <Row
+                label="Datacenter tax incentive"
+                value={county.has_dc_tax_incentive ? county.dc_incentive_type || "Yes" : null}
+              />
+            </Card>
+
+            <Card title="Power economics &amp; interconnection">
+              <Row
+                label="Commercial power rate"
+                value={county.avg_commercial_rate_cents_kwh != null ? fmtCents(county.avg_commercial_rate_cents_kwh) : null}
+              />
+              <Row
+                label="Industrial power rate"
+                value={county.avg_industrial_rate_cents_kwh != null ? fmtCents(county.avg_industrial_rate_cents_kwh) : null}
+              />
+              <Row
+                label="Load growth (FERC-714)"
+                value={county.ferc714_load_growth_pct != null ? `${county.ferc714_load_growth_pct.toFixed(1)}%` : null}
+              />
+              <Row
+                label="Proposed generation nearby"
+                value={
+                  county.proposed_generation_mw != null
+                    ? `${fmtMwExact(county.proposed_generation_mw)}${
+                        county.proposed_generator_count ? ` · ${fmtInt(county.proposed_generator_count)} projects` : ""
+                      }`
+                    : null
+                }
+              />
+            </Card>
+
+            <Card title="Water &amp; cooling">
+              <Row label="Water stress" value={county.water_stress_label} />
+              <Row
+                label="Public water supply"
+                value={county.public_supply_mgd != null ? `${county.public_supply_mgd.toFixed(1)} MGD` : null}
+              />
+              <Row
+                label="Industrial water use"
+                value={county.industrial_water_mgd != null ? `${county.industrial_water_mgd.toFixed(1)} MGD` : null}
+              />
+              <Row
+                label="Cooling degree days"
+                value={county.cooling_degree_days != null ? fmtInt(county.cooling_degree_days) : null}
+              />
+              <Row
+                label="Mean annual temp"
+                value={county.mean_annual_temp_f != null ? `${Math.round(county.mean_annual_temp_f)}°F` : null}
+              />
+            </Card>
+
+            <Card title="Hazard, flood &amp; connectivity">
+              <Row
+                label="FEMA risk index"
+                value={
+                  county.nri_score != null
+                    ? `${fmtScore(county.nri_score)}${county.nri_rating ? ` · ${county.nri_rating}` : ""}`
+                    : null
+                }
+              />
+              <Row label="Flood risk" value={riskLabel(county.nri_flooding)} />
+              <Row label="Coastal flood risk" value={riskLabel(county.nri_coastal_flooding)} />
+              <Row
+                label="Fiber providers"
+                value={
+                  county.fiber_provider_count != null
+                    ? `${fmtInt(county.fiber_provider_count)}${
+                        county.fiber_served_pct != null ? ` · ${Math.round(county.fiber_served_pct)}% served` : ""
+                      }`
+                    : null
+                }
+              />
+            </Card>
+          </div>
+          <p className="mt-2 text-xs text-gray-400">
+            County-level context — address-level utility offerings and flood zoning vary within the
+            county. Confirm site-specific service with the utility and a Phase I ESA.
+          </p>
+        </section>
+      )}
+
+      {nearbyBf.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-xl font-bold text-gray-900">Nearby brownfield &amp; retired-generation sites</h2>
+          <p className="mt-1 max-w-3xl text-sm text-gray-600">
+            A proximity screen of other retired-plant, contaminated, and EPA-flagged sites near{" "}
+            {name} — the environmental neighborhood, ranked by legacy grid capacity.
+          </p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
+                  <th className="py-2 pr-3 font-medium">Site</th>
+                  <th className="py-2 pr-3 font-medium">Former use</th>
+                  <th className="py-2 pr-3 font-medium text-right">Legacy MW</th>
+                  <th className="py-2 pr-3 font-medium text-right">Distance</th>
+                  <th className="py-2 font-medium">Cleanup status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nearbyBf.map((b) => {
+                  const mi = milesBetween(bf.latitude, bf.longitude, b.latitude, b.longitude);
+                  const href = brownfieldProfilePath(b);
+                  return (
+                    <tr key={b.id} className="border-b border-gray-100 last:border-0">
+                      <td className="py-2 pr-3">
+                        {href ? (
+                          <a href={href} className="font-medium text-purple-700 hover:underline">
+                            {b.name}
+                          </a>
+                        ) : (
+                          <span className="font-medium text-gray-900">{b.name}</span>
+                        )}
+                      </td>
+                      <td className="py-2 pr-3 text-gray-600">{formerUseLabel(b.former_use)}</td>
+                      <td className="py-2 pr-3 text-right tabular-nums text-gray-700">
+                        {b.existing_capacity_mw != null ? fmtInt(b.existing_capacity_mw) : "—"}
+                      </td>
+                      <td className="py-2 pr-3 text-right tabular-nums text-gray-500">
+                        {mi != null ? `${mi.toFixed(1)} mi` : "—"}
+                      </td>
+                      <td className="py-2 text-gray-600">{b.cleanup_status || "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-gray-400">
+            Derived from GridCensus&apos;s retired-generator &amp; EPA brownfield dataset. Not a
+            substitute for an ASTM E1527 Phase I environmental radius report.
+          </p>
+        </section>
+      )}
+
+      <div className="mt-8">
+        <LeadCapture
+          variant="watch"
+          entityType="brownfield"
+          entityId={bf.id}
+          entityName={name}
+        />
+      </div>
 
       {nearby.length > 0 && (
         <section className="mt-8">
