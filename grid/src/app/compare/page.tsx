@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
-import { slugify, stateByCode, countySlug } from "@/lib/geo";
 import {
   SCORE_FACTOR_KEYS,
   DEFAULT_WEIGHTS,
@@ -15,6 +14,7 @@ import WeightEditor from "@/components/WeightEditor";
 
 interface SiteData {
   site: Record<string, number | string | null>;
+  path?: string | null;
   county: Record<string, number | string | null> | null;
 }
 
@@ -45,22 +45,6 @@ function typeBadge(type: string) {
 function kmToMi(km: number | string | null): string {
   if (km == null) return "—";
   return `${(Number(km) * 0.621371).toFixed(1)} mi`;
-}
-
-// Canonical GridCensus site path from the fetched row (+ the id from the URL,
-// which is always reliable). Kept inline (geo helpers only) so this client
-// route doesn't bundle rollups.json.
-function siteHref(
-  s: Record<string, number | string | null>,
-  id: string
-): string | null {
-  const state = s.state as string | null;
-  const county = s.county as string | null;
-  if (!state || !county) return null;
-  const st = stateByCode(state);
-  if (!st) return null;
-  const name = (s.name as string | null) || "site";
-  return `/datacenter-sites/${st.slug}/${countySlug(county)}/${slugify(name)}-${id.slice(0, 8)}`;
 }
 
 export default function ComparePage() {
@@ -307,7 +291,7 @@ function CompareContent() {
                 </div>
               )}
               {(() => {
-                const href = siteHref(s, ids[i]);
+                const href = sites[i]?.path;
                 return href ? (
                   <a href={href} className="text-sm font-semibold text-purple-600 hover:underline print:text-gray-900 print:no-underline">
                     {String(s.name)}

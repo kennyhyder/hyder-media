@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabase } from "@/lib/grid-api/db";
 import { checkDemoAccess, demoLimitsPayload } from "@/lib/grid-api/demo";
 import { CORS_HEADERS, cacheHeaders, handleError, internalError } from "@/lib/grid-api/utils";
+import { siteProfilePath } from "@/lib/entity-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -191,6 +192,9 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         site,
+        // Authoritative canonical profile path (rollup-resolved county) so
+        // clients (e.g. the compare tool) link without reconstructing it.
+        path: siteProfilePath(site),
         county: countyData,
         nearbyLines,
         nearbyFiber,
