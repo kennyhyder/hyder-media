@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Confidential Briefing — brownfield.ai / Kyle Gulau</title>
+<style>
+  :root{
+    --bg:#0c0e13; --panel:#13161d; --panel2:#171b24; --line:#262c38;
+    --ink:#e7ebf2; --mut:#9aa4b4; --dim:#6c7686;
+    --amber:#e6b04b; --green:#4bd6a0; --red:#ef6a6a; --blue:#5aa3ff;
+    --mono:'SF Mono',ui-monospace,'Roboto Mono',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px 120px}
+  a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+
+  header.top{border-bottom:1px solid var(--line);padding:34px 0 26px;margin-bottom:8px}
+  .conf{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase}
+  h1{font-size:30px;line-height:1.18;margin:14px 0 8px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:15px;max-width:70ch}
+  .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:16px;display:flex;flex-wrap:wrap;gap:6px 22px}
+
+  section{margin-top:40px}
+  h2{font-size:12px;font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin:0 0 4px}
+  h2 + .lede{color:var(--mut);font-size:14.5px;margin:0 0 18px}
+  h3{font-size:19px;margin:22px 0 8px;letter-spacing:-.01em}
+  h4{font-size:14px;font-family:var(--mono);letter-spacing:.04em;color:var(--ink);margin:18px 0 6px;text-transform:uppercase}
+  p{margin:10px 0}
+  strong{color:#fff;font-weight:600}
+  .muted{color:var(--mut)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px}
+  .tl{border-left:3px solid var(--amber)}
+  .callout{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:16px 18px;margin:16px 0}
+  .callout.warn{border-left-color:var(--amber)}
+  .callout.risk{border-left-color:var(--red)}
+  .callout .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:6px}
+
+  ul{margin:10px 0;padding-left:20px} li{margin:7px 0}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--mut);vertical-align:middle}
+  .tag.ok{color:var(--green);border-color:#1f4a3a} .tag.warn{color:var(--amber);border-color:#4a3f1f} .tag.no{color:var(--red);border-color:#4a2020}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:400}
+  td.you{color:#fff} .win{color:var(--green)} .them{color:var(--mut)}
+  .scroll{overflow-x:auto}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+  .stat .n{font-size:24px;font-weight:700;font-family:var(--mono);color:var(--amber)}
+  .stat .l{font-size:12px;color:var(--mut);margin-top:2px}
+
+  .val{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .valrow{display:grid;grid-template-columns:180px 130px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:start}
+  .valrow .num{font-family:var(--mono);color:var(--green);font-weight:600}
+  @media(max-width:720px){.valrow{grid-template-columns:1fr;gap:4px}}
+  .num.warn{color:var(--amber)}
+
+  ol.play{counter-reset:p;list-style:none;padding-left:0}
+  ol.play li{counter-increment:p;position:relative;padding:12px 0 12px 42px;border-bottom:1px solid var(--line)}
+  ol.play li::before{content:counter(p);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:12px;color:var(--amber);border:1px solid var(--line);border-radius:6px;width:26px;height:26px;display:grid;place-items:center}
+  .q{font-family:var(--mono);font-size:13.5px;color:var(--ink)}
+  .src{font-size:12px;color:var(--dim)} .src a{color:var(--dim)} .src a:hover{color:var(--mut)}
+  hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <span class="conf">● Confidential — prepared for Kenny Hyder · internal use only</span>
+  <h1>Meeting Prospectus: brownfield.ai &amp; Kyle Gulau</h1>
+  <p class="sub">Deep-dive on the counterparty, a GridCensus comparison, his likely interest in your data, and realistic value ranges — assembled to walk you into tomorrow's call from a position of strength.</p>
+  <div class="meta">
+    <span>PREPARED 2026-08-19</span><span>SUBJECT Kyle Gulau · brownfield.ai</span><span>FOR gridcensus.com</span><span>SOURCING: all claims cited; unverified items flagged</span>
+  </div>
+</header>
+
+<!-- ===== BOTTOM LINE ===== -->
+<section>
+  <div class="panel tl">
+    <h2 style="color:var(--amber)">Bottom line up front</h2>
+    <p>Kyle is a <strong>credible, domain-deep operator</strong> — a Michigan real-estate developer and digital-agency principal who built brownfield.ai on top of lived brownfield expertise. But he is <strong>bootstrapped with no verified funding or prior exit</strong>. brownfield.ai is an early (~6-month-old) <strong>environmental due-diligence tool</strong>, not a datacenter-siting platform — it recently bolted "Data Center Site Selection" landing pages onto the AI wave, <strong>but it carries none of the power / transmission / interconnection data that actually drives datacenter siting</strong>. That gap is <em>exactly</em> GridCensus's core.</p>
+    <p>So the strategic reality: <strong>he is complementary to you, not a threat, and he needs your data far more than you need his.</strong> A cash acquisition <em>from Kyle</em> is unlikely — he doesn't have the capital. The realistic value with him is a <strong>data partnership or licensing arrangement</strong>. Your <em>true</em> valuation is anchored to the funded players and incumbents who are buying exactly this layer (LandGate → Wood Mackenzie, datacenterHawk → S&amp;P Global, both 2026). Go in warm and collaborative, guard your data-pipeline methods, and treat this as market intel + option-generation — not a sale.</p>
+  </div>
+</section>
+
+<!-- ===== THE PERSON ===== -->
+<section>
+  <h2>The counterparty</h2>
+  <p class="lede">Who Kyle Gulau is, what he's actually built, and how he's likely to operate.</p>
+
+  <h3>Kyle Gulau — Kalamazoo, Michigan <span class="tag ok">identity confirmed</span></h3>
+  <ul>
+    <li><strong>Day job:</strong> Team Principal / Strategy at <strong>Percent Invisible</strong>, a Kalamazoo digital strategy-and-build agency (co-principals Kevin Wolf, design; Scott Gerstl, technology). Its tagline "make the invisible visible" is echoed in brownfield.ai's copy — strong signal the product was <strong>built inside his own agency</strong>.</li>
+    <li><strong>Real-estate developer:</strong> owner of <strong>Zooward / Zoo North LLC</strong>, an "incremental / missing-middle" development company; redeveloped historic buildings in Kalamazoo's Northside (~$1.2–1.3M mixed-use project with apartments + a brewery/beer garden).</li>
+    <li><strong>Recognition:</strong> WMU Haworth "30 Under 30" (inaugural); SBA / SCORE Founders Award. Self-describes as a <strong>"5x founder"</strong> (the five companies are not named anywhere public).</li>
+    <li><strong>Prior roles:</strong> Product/Senior Strategist at Maestro (corporate-learning agency); Director of Finance &amp; HR at Streamline Healthcare Solutions (a Kalamazoo behavioral-health EHR firm).</li>
+    <li><strong>Public voice:</strong> hosts the <em>"Patterns of Development"</em> podcast; "3x Top Writer on Medium"; active in the Incremental Development Alliance and Strong Towns communities. He is a <strong>prolific storyteller and relationship-builder</strong>.</li>
+    <li><strong>brownfield.ai link confirmed:</strong> introduced as "Kyle Gulau from Brownfield AI" on the HRP Podcast, recorded at the 2025 Mohawk Valley Brownfields Developer Summit. He also personally built <em>brownfield101.com</em> (a GPT trained on Michigan brownfield law) — the obvious precursor.</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="k">Read on the person — how to play it</span>
+    <p style="margin-top:0"><strong>Domain-first, not capital-first.</strong> His edge is credibility, regulatory knowledge, and network — not deep pockets or a growth-engineering org. He'll value <strong>data provenance, accuracy, and trust</strong>, and he'll likely run the meeting as relationship-building and narrative-shaping. Because he's lean, he's <strong>opportunistic about partnerships and data-sharing</strong> — and he has a strong incentive to learn <em>how you assemble your public data product</em>. Be generous with vision, guarded with method.</p>
+  </div>
+
+  <div class="callout risk">
+    <span class="k">Do not misattribute</span>
+    <p style="margin-top:0">A 2025 acquisition of <strong>"Streamline Health Solutions" (Nasdaq: STRM)</strong> by MDaudit shows up in searches. That is a <strong>different, publicly-traded company</strong> — <em>not</em> his employer (Streamline Healthcare Solutions, a private Kalamazoo firm) and <strong>not his exit</strong>. Don't credit him with it.</p>
+  </div>
+</section>
+
+<!-- ===== THE COMPANY ===== -->
+<section>
+  <h2>The company</h2>
+  <p class="lede">What brownfield.ai actually is — and where the datacenter story is real vs. veneer.</p>
+
+  <h3>brownfield.ai — environmental due-diligence SaaS <span class="tag warn">~6 months old</span></h3>
+  <p>An address-lookup tool that scans public + private environmental records and returns a <strong>property risk report</strong> — "weeks of manual research into minutes." Native market is <strong>brownfield real estate</strong>: brokers, developers, lenders, environmental consultants, and economic-development orgs.</p>
+
+  <h4>What it does</h4>
+  <ul>
+    <li><strong>Deep Search</strong> — address → environmental risk report from EPA/ECHO, CERCLIS/Superfund, LUST/UST tanks, PFAS indicators, FEMA flood zones, state cleanup records, zoning/permits. Text/report-based, <strong>not map-based</strong>.</li>
+    <li><strong>Data Rooms</strong> — secure document sharing (Phase I/II ESAs, remediation records).</li>
+    <li><strong>Listings</strong> — controlled brownfield property listings. <strong>Knowledge Base</strong> — per-property dashboard.</li>
+  </ul>
+
+  <h4>The datacenter angle <span class="tag no">veneer, not substance</span></h4>
+  <p>They run dedicated "Data Center" and "Energy &amp; Infrastructure" landing pages with the right buzzwords ("power, fiber, redundancy, speed to execution"). But the product <strong>explicitly disclaims utility/power studies</strong> and delivers <strong>no transmission, interconnection-queue, or speed-to-power data</strong>. It surfaces environmental red flags; it does not answer "is this site good for a datacenter, and how good, ranked." <strong>This is your single strongest wedge.</strong></p>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--green)">Where they're genuinely strong</h4>
+      <ul style="margin-bottom:0">
+        <li>Real environmental-risk depth (EPA/CERCLIS/LUST/PFAS/flood) — a niche you're thinner on.</li>
+        <li>A deal-room / listings / collaboration workflow you don't have.</li>
+        <li>Clean SMB pricing + self-serve onboarding.</li>
+        <li>Disciplined SEO content engine (~20 posts in 6 months) — they get your playbook.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4 style="margin-top:0;color:var(--red)">Where they're thin / exposed</h4>
+      <ul style="margin-bottom:0">
+        <li><strong>No power / grid / interconnection data</strong> — the decisive DC layer.</li>
+        <li>No disclosed scale (vs. your 147k scored sites); on-demand lookups, not a pre-scored national universe.</li>
+        <li>Gated &amp; address-based — you can't <em>discover</em> sites, only look up ones you have.</li>
+        <li>Early &amp; unproven: no funding/press, no named customers, no team/About page (404).</li>
+        <li>$150–$500/mo pricing signals SMB brokers, not hyperscaler/enterprise budgets.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Pricing &amp; model</h4>
+  <div class="scroll"><table>
+    <tr><th>Plan</th><th>Price</th><th>Seats</th><th>Reports</th></tr>
+    <tr><td>Free</td><td>$0</td><td>1</td><td>2 (then buy more)</td></tr>
+    <tr><td>Professional</td><td>$150/mo</td><td>1</td><td>3/mo</td></tr>
+    <tr><td>Organization</td><td>$500/mo</td><td>up to 5</td><td>5/user/mo</td></tr>
+    <tr><td>Custom</td><td>contact</td><td>—</td><td>enterprise upsell</td></tr>
+  </table></div>
+  <p class="muted" style="font-size:13.5px">Low-ticket, self-serve SMB SaaS with per-report metering. No data-licensing or API revenue line advertised.</p>
+</section>
+
+<!-- ===== COMPARISON ===== -->
+<section>
+  <h2>GridCensus vs. brownfield.ai</h2>
+  <p class="lede">You are not competing head-to-head. You are the missing half of his own datacenter pitch.</p>
+  <div class="scroll"><table>
+    <tr><th>Dimension</th><th>GridCensus (you)</th><th>brownfield.ai (him)</th></tr>
+    <tr><td>Core question answered</td><td class="you win">"Where are the best datacenter sites, scored?"</td><td class="them">"What's the environmental risk on this address?"</td></tr>
+    <tr><td>Power / transmission / interconnection</td><td class="you win">Core — 94k lines, 75k substations, live ISO queues</td><td class="them">None (explicitly out of scope)</td></tr>
+    <tr><td>Environmental / contamination depth</td><td class="them">Lighter (2k brownfield sites as one type)</td><td class="you win">Strong — EPA/CERCLIS/LUST/PFAS/flood</td></tr>
+    <tr><td>Scale</td><td class="you win">147,272 scored sites · 545k fiber · 233k+ pages</td><td class="them">Undisclosed; on-demand lookups</td></tr>
+    <tr><td>Discovery</td><td class="you win">Public, map-first, SEO-indexed — browse &amp; rank</td><td class="them">Gated, address-only lookup</td></tr>
+    <tr><td>Scoring</td><td class="you win">10-factor 0–100 readiness model</td><td class="them">Flags risk; doesn't quantify/rank</td></tr>
+    <tr><td>Business stage</td><td class="them">Pre-revenue, trial API live</td><td class="them">~6 mo, SMB SaaS $150–500/mo</td></tr>
+    <tr><td>Workflow / deal rooms</td><td class="them">Not yet</td><td class="you win">Data rooms + listings</td></tr>
+  </table></div>
+  <p><strong>The takeaway to hold in your head:</strong> his environmental layer + your power/land/scored-site layer = the complete datacenter-brownfield screen that neither of you has alone. That's the natural conversation.</p>
+</section>
+
+<!-- ===== WHY HE WANTS YOU ===== -->
+<section>
+  <h2>Why he'd want GridCensus</h2>
+  <p class="lede">His interests, ranked by how badly he needs each.</p>
+  <ol class="play">
+    <li><strong>The power/grid data he can't build.</strong> He's chasing datacenter/energy siting but has zero transmission, interconnection, or speed-to-power data — the #1 siting driver. You already own it, nationally, scored. This is the gap he can't close quickly or cheaply on his own.</li>
+    <li><strong>Your public, discoverable top-of-funnel.</strong> He's gated; every competitor is gated. Your ~233k SEO-indexed scored-site pages are the free demand-gen front door to the whole category — the one asset none of them have.</li>
+    <li><strong>Scale as a corpus.</strong> 147k pre-scored sites is a dataset, not a feature. In this market <em>datasets are what get acquired</em> (LandGate's 150M parcels just sold to Wood Mac on that basis).</li>
+    <li><strong>Your build capability.</strong> He's SEO-savvy but you operate a 233k-page programmatic engine with an autonomous Search Console loop and a live data pipeline. That's an acqui-hire / partnership asset by itself.</li>
+    <li><strong>A complementary bundle to sell.</strong> Environmental risk + power readiness in one screen is a stronger pitch to his brokers/developers than either half — and lets him credibly enter the DC vertical he's currently faking.</li>
+  </ol>
+  <div class="callout">
+    <span class="k">What he probably wants out of the meeting</span>
+    <p style="margin-top:0">Intel on your data pipeline and go-to-market; a read on whether to compete, cooperate, or (aspirationally) acquire; and ideally a <strong>data or distribution partnership</strong>. Given his lean posture, this is more likely him scouting collaboration/data than mounting a competitive threat.</p>
+  </div>
+</section>
+
+<!-- ===== VALUE RANGES ===== -->
+<section>
+  <h2>What it's worth — value ranges</h2>
+  <p class="lede">Directional ranges by deal shape. Anchored to 2026 comps; Kyle-specific caveats flagged. These are negotiating reference points, not appraisals.</p>
+
+  <div class="val">
+    <div class="valrow"><div><strong>Data partnership / swap</strong><div class="muted" style="font-size:12.5px">His environmental layer ⇄ your power layer</div></div><div class="num">$0 cash</div><div class="muted">Most likely first deal. Non-cash, mutual value; low commitment; generates the relationship and reveals his roadmap. Best opening ask.</div></div>
+
+    <div class="valrow"><div><strong>Data licensing / API</strong><div class="muted" style="font-size:12.5px">License your scored-site feed to him</div></div><div class="num">$50k–$300k / yr</div><div class="muted">Recurring; to <strong>$500k+</strong> with usage-based or rev-share terms. Enterprise energy/land data (Enverus/LandGate-class) runs tens of thousands <em>per seat</em>, so a wholesale feed clears in low-to-mid six figures. Non-dilutive, keeps your independent brand — <strong>the most likely first deal.</strong></div></div>
+
+    <div class="valrow"><div><strong>Distribution / referral</strong><div class="muted" style="font-size:12.5px">You = free funnel → his paid workflow</div></div><div class="num">rev-share</div><div class="muted">Plays your SEO reach to his sales motion. 10–25% referral share on closed accounts is a common shape.</div></div>
+
+    <div class="valrow"><div><strong>Full dataset / product acquisition</strong><div class="muted" style="font-size:12.5px">Data + audience + pipeline</div></div><div class="num warn">$1M–$5M · up to $5M–$25M</div><div class="muted"><strong>$1–5M</strong> valued as a data asset alone; <strong>$5–25M</strong> if the SEO/distribution moat + live-queue data are treated as strategically critical (a buyer filling the <em>power half</em> it structurally lacks, racing a hot market). Benchmarks: LandGate→Wood Mac &amp; datacenterHawk→S&amp;P (2026, undisclosed); EDR→LightBox <strong>$205M</strong> is the mature-business ceiling. <span style="color:var(--amber)">Caveat: Kyle can't fund this today</span> — the range applies to a funded acquirer (Enverus, S&amp;P, Wood Mac, Paces, Build) or a Kyle deal that's equity-heavy / earn-out. A proven revenue line moves this to an ARR-multiple basis and can exceed it.</div></div>
+
+    <div class="valrow"><div><strong>Acqui-hire / merge</strong><div class="muted" style="font-size:12.5px">You + data + skill into a funded entity</div></div><div class="num warn">$500k–$3M effective</div><div class="muted">Retention/earnout-weighted; mostly equity, not cash. Only interesting if <em>he</em> raises — otherwise you'd trade a compounding asset for illiquid paper. Set a high bar.</div></div>
+  </div>
+
+  <div class="callout warn">
+    <span class="k">The honest framing on price</span>
+    <p style="margin-top:0">Your asset is genuinely valuable to <em>the category</em> — power+land+scored-sites+public SEO is precisely what the 2026 acquirers are buying. But <strong>Kyle is the wrong buyer for a big check.</strong> Don't anchor on an exit with him; anchor on <strong>partnership/licensing now</strong>, and use the meeting to learn the space and surface who <em>his</em> acquirer relationships are. If a number comes up, your reference point is "LandGate/datacenterHawk-class data asset," not "6-month-old SMB SaaS."</p>
+  </div>
+</section>
+
+<!-- ===== MARKET ===== -->
+<section>
+  <h2>Why this market is hot (your leverage backdrop)</h2>
+  <p class="lede">Power is the binding constraint, capital is flooding in, and the intelligence layer is consolidating.</p>
+  <div class="grid3">
+    <div class="stat"><div class="n">2,600+ GW</div><div class="l">stuck in US interconnection queues — 2× existing capacity</div></div>
+    <div class="stat"><div class="n">~$700B</div><div class="l">projected 2026 US datacenter investment (+81% YoY)</div></div>
+    <div class="stat"><div class="n">5–7 yrs</div><div class="l">typical interconnection delay; grid approval 24–36 mo</div></div>
+    <div class="stat"><div class="n">78%</div><div class="l">of 2025 built-environment VC went to datacenters ($4.5B of $5.7B)</div></div>
+    <div class="stat"><div class="n">2 exits</div><div class="l">datacenterHawk→S&amp;P &amp; LandGate→Wood Mac, both 2026</div></div>
+    <div class="stat"><div class="n">~68%</div><div class="l">of US load growth driven by datacenters through 2030 (Wood Mac)</div></div>
+  </div>
+  <h4>The players funding / buying this exact layer</h4>
+  <div class="scroll"><table>
+    <tr><th>Company</th><th>What</th><th>Money</th></tr>
+    <tr><td><strong>Paces</strong> (paces.com)</td><td>Closest VC analog — AI site selection for clean energy / DC / EV; permitting + grid data</td><td>YC S22; <strong>$11M Series A (2024)</strong>, Navitas Capital</td></tr>
+    <tr><td><strong>Build</strong> (build.inc)</td><td>AI infra due diligence; 1,600+ data sources</td><td><strong>$8.5M seed (Jun 2026)</strong>, Index Ventures</td></tr>
+    <tr><td><strong>Nira Energy</strong></td><td>Interconnection-queue automation; 500+ GW studied</td><td>YC; Energize Capital (figures conflict)</td></tr>
+    <tr><td><strong>Enverus</strong></td><td>Incumbent "Data Center Siting" — 43k substations, 156M parcels</td><td>Large PE-backed incumbent</td></tr>
+    <tr><td><strong>datacenterHawk</strong></td><td>DC market intelligence</td><td><strong>Acquired by S&amp;P Global, Jul 2026</strong></td></tr>
+    <tr><td><strong>LandGate</strong></td><td>Parcel + grid analytics (150M parcels) — your nearest data twin</td><td><strong>Acquired by Wood Mackenzie, Jun 2026</strong></td></tr>
+  </table></div>
+  <p class="muted" style="font-size:13px">Note: capital is funding whoever "owns a bottleneck" (power, interconnection, permitting, feasibility). Your public scored-site layer is a bottleneck asset none of the gated players have.</p>
+</section>
+
+<!-- ===== PLAYBOOK ===== -->
+<section>
+  <h2>Meeting playbook</h2>
+  <p class="lede">Posture, questions, and what to guard.</p>
+
+  <h4>Posture</h4>
+  <ul>
+    <li><strong>Warm, peer-to-peer, curious.</strong> You've dodged his last few asks, so he's clearly keen — you hold the scarcity. Don't oversell; let him articulate what he wants first.</li>
+    <li><strong>Lead with complementarity</strong>, not competition. "Your environmental depth + my power/scored-site breadth is the complete screen" is the frame that opens every good option.</li>
+    <li><strong>Anchor your value to the category, quietly.</strong> Mention the LandGate / datacenterHawk consolidation as context, not as a demand.</li>
+    <li><strong>Guard the method.</strong> Talk vision and outcomes; be vague on how your pipeline, scoring, and SEO engine actually work. He has every incentive to learn it.</li>
+  </ul>
+
+  <h4>Questions to ask him (public info is thin — make him fill the gaps)</h4>
+  <ol class="play">
+    <li><span class="q">Is brownfield.ai funded, or bootstrapped inside Percent Invisible? Any raise planned?</span></li>
+    <li><span class="q">Who's actually using the datacenter product today — any named DC/energy customers or pilots?</span></li>
+    <li><span class="q">How are you sourcing power/grid data, if at all — or is that the piece you're looking to solve?</span></li>
+    <li><span class="q">What's the vision — environmental DD tool, or a full site-selection platform? Where does it stop?</span></li>
+    <li><span class="q">Any acquirer or channel relationships already in motion (Enverus, S&amp;P, Wood Mac, brokers)?</span></li>
+  </ol>
+
+  <h4>Options to have ready to float (in escalating order)</h4>
+  <ul>
+    <li><strong>Data swap pilot</strong> — trade a slice of each other's data on a shared set of sites; see if the combined screen is compelling. Cheap, fast, reveals fit.</li>
+    <li><strong>License the GridCensus power/scored-site feed</strong> into his reports (annual, with refresh + support).</li>
+    <li><strong>Referral loop</strong> — your public funnel → his paid workflow; his brownfield leads → your DC scoring.</li>
+    <li><strong>Bigger only if he's funded</strong> — dataset acquisition or merge, on category-anchored terms with cash weighting, not paper.</li>
+  </ul>
+</section>
+
+<!-- ===== OPEN QUESTIONS ===== -->
+<section>
+  <h2>Open questions — confirm live (currently unverified)</h2>
+  <ul>
+    <li>Kyle's <strong>exact title/role</strong> at brownfield.ai (founder/CEO implied, never stated).</li>
+    <li>brownfield.ai <strong>funding, revenue, team size, real customers</strong> — none found publicly; assume he'll pitch strength.</li>
+    <li>The five companies behind his <strong>"5x founder"</strong> claim — unnamed.</li>
+    <li>His <strong>LinkedIn / X / GitHub</strong> — did not surface; unconfirmed.</li>
+    <li>If he mentions <strong>"Marena"</strong> — likely a mix-up with <strong>Marengo</strong> (datacenter <em>design</em>, a16z/YC) — clarify.</li>
+  </ul>
+</section>
+
+<hr>
+<section>
+  <h2>Sources</h2>
+  <p class="src">
+    brownfield.ai (<a href="https://www.brownfield.ai/">home</a>, <a href="https://www.brownfield.ai/buyers-data-centers/">DC page</a>, <a href="https://www.brownfield.ai/pricing">pricing</a>, <a href="https://www.brownfield.ai/blog">blog</a>) ·
+    <a href="https://kylegulau.com/">kylegulau.com</a> · <a href="https://www.percentinvisible.com/explore">Percent Invisible</a> · <a href="https://zooward.com/">Zooward</a> · <a href="https://brownfield101.com">brownfield101.com</a> · <a href="https://www.1millioncups.com/kalamazoo/presentations/zooward-28295">1MC Kalamazoo</a> ·
+    Paces (<a href="https://www.esgtoday.com/energy-infrastructure-software-startup-paces-raises-11-million-to-accelerate-green-energy-development/">$11M A</a>) · Build (<a href="https://aecmag.com/ai/build-raises-8-5m-seed-for-ai-driven-infrastructure-due-diligence-platform/">$8.5M seed</a>) ·
+    <a href="https://investor.spglobal.com/news-releases/news-details/2026/SP-Global-to-Acquire-datacenterHawk-Connecting-Global-Data-Center-Power-and-Infrastructure-Markets/default.aspx">S&amp;P → datacenterHawk</a> · <a href="https://www.woodmac.com/press-releases/wood-mackenzie-acquires-landgate-to-deliver-connected-intelligence-for-the-new-era-of-us-power-markets/">Wood Mac → LandGate</a> ·
+    <a href="https://enkiai.com/data-center/ai-data-center-energy-2026-2600-gw-queue-pjm-plan/">interconnection queue</a> · <a href="https://www.bvp.com/atlas/roadmap-the-ai-data-center-stack">Bessemer DC stack</a> · <a href="https://www.enverus.com/products/data-center-siting-solutions/">Enverus siting</a>.
+  </p>
+</section>
+
+<div class="foot">
+  Confidential working document · not for distribution · figures are directional and, where noted, unverified — confirm before relying on them in a term discussion. GridCensus stats current as of 2026-08-19 (147,272 scored sites; 94,619 transmission lines; 545,148 fiber routes; ~233k indexable pages).
+</div>
+
+</div>
+</body>
+</html>
