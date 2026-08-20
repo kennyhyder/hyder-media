@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { isDemoMode, withDemoToken } from "@/lib/demoAccess";
+import { slugify, stateByCode, countySlug } from "@/lib/geo";
 import {
   SCORE_FACTOR_KEYS,
   DEFAULT_WEIGHTS,
@@ -44,6 +45,22 @@ function typeBadge(type: string) {
 function kmToMi(km: number | string | null): string {
   if (km == null) return "—";
   return `${(Number(km) * 0.621371).toFixed(1)} mi`;
+}
+
+// Canonical GridCensus site path from the fetched row (+ the id from the URL,
+// which is always reliable). Kept inline (geo helpers only) so this client
+// route doesn't bundle rollups.json.
+function siteHref(
+  s: Record<string, number | string | null>,
+  id: string
+): string | null {
+  const state = s.state as string | null;
+  const county = s.county as string | null;
+  if (!state || !county) return null;
+  const st = stateByCode(state);
+  if (!st) return null;
+  const name = (s.name as string | null) || "site";
+  return `/datacenter-sites/${st.slug}/${countySlug(county)}/${slugify(name)}-${id.slice(0, 8)}`;
 }
 
 export default function ComparePage() {
@@ -102,16 +119,16 @@ function CompareContent() {
     newIds.splice(idx, 1);
     if (newIds.length === 0) {
       // Clear localStorage and go back
-      localStorage.removeItem("gridscout_compare");
-      window.location.href = "/grid/sites/";
+      localStorage.removeItem("gc_compare");
+      window.location.href = "/datacenter-sites";
     } else {
-      window.location.href = `/grid/compare/?ids=${newIds.join(",")}`;
+      window.location.href = `/compare?ids=${newIds.join(",")}`;
     }
   };
 
   const handleClearAll = () => {
-    localStorage.removeItem("gridscout_compare");
-    window.location.href = "/grid/sites/";
+    localStorage.removeItem("gc_compare");
+    window.location.href = "/datacenter-sites";
   };
 
   const handlePrint = () => {
@@ -162,7 +179,7 @@ function CompareContent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `gridscout-comparison-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `gridcensus-comparison-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -186,10 +203,10 @@ function CompareContent() {
         <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
           <p className="text-gray-600 mb-4">No sites selected for comparison.</p>
           <p className="text-sm text-gray-500 mb-6">
-            Go to <a href="/grid/sites/" className="text-purple-600 hover:underline">Greenfield Sites</a> and
-            click the checkbox next to sites you want to compare, then click &ldquo;Compare&rdquo;.
+            Browse <a href="/datacenter-sites" className="text-purple-600 hover:underline">datacenter sites</a>,
+            open any site, and click &ldquo;Add to compare&rdquo; — then return here to see them side by side.
           </p>
-          <a href="/grid/sites/" className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
+          <a href="/datacenter-sites" className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700">
             Browse Sites
           </a>
         </div>
@@ -289,9 +306,16 @@ function CompareContent() {
                   Default: <span className={scoreColor(defaultScore)}>{defaultScore}</span>
                 </div>
               )}
-              <a href={`/grid/site/?id=${ids[i]}`} className="text-sm font-semibold text-purple-600 hover:underline print:text-gray-900 print:no-underline">
-                {String(s.name)}
-              </a>
+              {(() => {
+                const href = siteHref(s, ids[i]);
+                return href ? (
+                  <a href={href} className="text-sm font-semibold text-purple-600 hover:underline print:text-gray-900 print:no-underline">
+                    {String(s.name)}
+                  </a>
+                ) : (
+                  <span className="text-sm font-semibold text-gray-900">{String(s.name)}</span>
+                );
+              })()}
               <div className="text-xs text-gray-500 mt-0.5">
                 {s.county && `${s.county}, `}{s.state}
               </div>

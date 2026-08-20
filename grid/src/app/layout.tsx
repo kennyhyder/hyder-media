@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import MobileNav from "../components/MobileNav";
 import ThemeScript from "../components/ThemeScript";
 import ErrorBoundary from "../components/ErrorBoundary";
+import CompareTray from "../components/CompareTray";
 import JsonLd from "../components/JsonLd";
 import { organizationSchema, webApplicationSchema } from "../lib/schema";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_TAGLINE } from "../lib/site";
@@ -99,6 +100,7 @@ gtag('config', '${GA_ID}');`}
             <ErrorBoundary>{children}</ErrorBoundary>
           </div>
         </main>
+        <CompareTray />
       </body>
     </html>
   );

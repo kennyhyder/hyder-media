@@ -43,6 +43,7 @@ import { freshness } from "@/lib/rollups";
 import SaveButton from "@/components/account/SaveButton";
 import LeadCapture from "@/components/LeadCapture";
 import PrintButton from "@/components/PrintButton";
+import AddToCompareButton from "@/components/AddToCompareButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
@@ -103,6 +104,26 @@ function shouldIndex(site: FullDcSite): boolean {
 function km2mi(km: number | null | undefined): string {
   if (km == null || !Number.isFinite(km)) return "—";
   return `${(km * 0.621371).toFixed(1)} mi`;
+}
+
+// Land-based buildable-load estimate ("how many MW could physically fit here")
+// — a Tier-1 competitor feature (PVcase, Transect Buildable Area). Transparent
+// planning heuristic: a full DC campus (building + electrical yard + cooling +
+// setbacks) runs ~1 MW per 1–2.5 developable acres. We surface a conservative
+// range and flag when nearby grid headroom is the tighter constraint.
+function capacityFit(site: FullDcSite): {
+  lo: number;
+  hi: number;
+  gridBound: boolean;
+} | null {
+  const ac = site.acreage;
+  if (ac == null || !Number.isFinite(ac) || ac < 5) return null;
+  const lo = Math.round(ac / 2.5);
+  const hi = Math.round(ac / 1.0);
+  if (lo < 1) return null;
+  const grid = site.available_capacity_mw;
+  const gridBound = grid != null && Number.isFinite(grid) && grid < lo;
+  return { lo, hi, gridBound };
 }
 
 // Synthesized interconnection outlook — the decision-grade "speed to power" read
@@ -427,6 +448,7 @@ export default async function SiteProfilePage({
           entityId={site.id}
           fields={["name", "available_capacity_mw", "parcel_owner", "acreage", "former_use"]}
         />
+        <AddToCompareButton id={site.id} name={name} />
         <PrintButton />
       </div>
 
@@ -578,6 +600,24 @@ export default async function SiteProfilePage({
             }
           />
           <Row label="Acreage" value={site.acreage != null ? `${fmtInt(site.acreage)} ac` : null} />
+          {(() => {
+            const cf = capacityFit(site);
+            if (!cf) return null;
+            return (
+              <Row
+                label="Buildable load (est.)"
+                value={
+                  <span>
+                    ~{fmtInt(cf.lo)}&ndash;{fmtInt(cf.hi)} MW
+                    <span className="ml-1 text-xs text-gray-400">land-based</span>
+                    {cf.gridBound && (
+                      <span className="ml-1 text-xs text-amber-600">· grid headroom is tighter</span>
+                    )}
+                  </span>
+                }
+              />
+            );
+          })()}
           <Row label="Parcel owner" value={site.parcel_owner ? <OrgLink owner={site.parcel_owner} /> : null} />
           <Row label="Land contact" value={site.land_contact_name} />
           <Row label="Parcel APN" value={site.parcel_apn} />

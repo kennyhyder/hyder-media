@@ -44,7 +44,8 @@ const nextConfig: NextConfig = {
       { source: "/line", destination: "/explore", permanent: true },
       { source: "/corridors", destination: "/explore", permanent: true },
       { source: "/corridor", destination: "/explore", permanent: true },
-      { source: "/compare", destination: "/datacenter-sites", permanent: true },
+      // NOTE: /compare is now a live side-by-side comparison tool (src/app/compare)
+      // — do NOT re-add a redirect here or it will shadow the page.
       { source: "/hyperscale", destination: "/datacenters", permanent: true },
       { source: "/market", destination: "/rankings", permanent: true },
       { source: "/search", destination: "/explore", permanent: true },
