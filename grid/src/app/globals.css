@@ -384,3 +384,14 @@ html.dark .surface-card {
   50% { opacity: .45; }
 }
 .gcm-live-dot { animation: gcm-live 1.6s ease-in-out infinite; }
+
+/* Print / Save-as-PDF: turn a site page into a clean one-page report.
+   Hides nav, footer, map, lead-capture, and interactive chrome. */
+@media print {
+  .print-hide, nav, header.header, footer, .leaflet-container,
+  [class*="LeadCapture"], button { display: none !important; }
+  a { color: #000 !important; text-decoration: none !important; }
+  body { background: #fff !important; }
+  .rounded-xl, .rounded-2xl, .rounded-lg { box-shadow: none !important; }
+  main, .container { max-width: 100% !important; }
+}

@@ -42,6 +42,7 @@ import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 import SaveButton from "@/components/account/SaveButton";
 import LeadCapture from "@/components/LeadCapture";
+import PrintButton from "@/components/PrintButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
@@ -102,6 +103,36 @@ function shouldIndex(site: FullDcSite): boolean {
 function km2mi(km: number | null | undefined): string {
   if (km == null || !Number.isFinite(km)) return "—";
   return `${(km * 0.621371).toFixed(1)} mi`;
+}
+
+// Synthesized interconnection outlook — the decision-grade "speed to power" read
+// competitors (Paces, Enverus) sell behind a login, computed from the queue
+// signals GridCensus already holds. Not a guarantee; a directional screen.
+function interconnectionOutlook(site: FullDcSite): {
+  level: "favorable" | "moderate" | "constrained" | "unknown";
+  label: string;
+  est: string | null;
+  note: string;
+} {
+  const wait = site.recent_queue_wait_years ?? site.avg_queue_wait_years;
+  const depth = site.queue_depth;
+  const comp = site.queue_completion_rate; // 0–1
+  const sp = site.score_speed_to_power; // 0–100
+  if (wait == null && sp == null) return { level: "unknown", label: "", est: null, note: "" };
+  const w = wait ?? (sp != null ? (100 - sp) / 12 : 5);
+  let level: "favorable" | "moderate" | "constrained";
+  if (w <= 3 && (comp == null || comp >= 0.15)) level = "favorable";
+  else if (w >= 5 || (depth != null && depth > 500) || (comp != null && comp < 0.08)) level = "constrained";
+  else level = "moderate";
+  const label = level === "favorable" ? "Favorable" : level === "moderate" ? "Moderate" : "Constrained";
+  const est = wait != null ? `≈ ${fmtYears(wait)} typical interconnection wait` : sp != null ? `Speed-to-power score ${Math.round(sp)}/100` : null;
+  const note =
+    level === "favorable"
+      ? "Shorter queues and healthier completion here — a faster path to energization than the national norm."
+      : level === "constrained"
+        ? "Deep queue and long historical waits — plan for a multi-year interconnection timeline and engage the utility early."
+        : "Middle-of-the-pack interconnection conditions for this grid.";
+  return { level, label, est, note };
 }
 
 export async function generateMetadata({
@@ -396,6 +427,7 @@ export default async function SiteProfilePage({
           entityId={site.id}
           fields={["name", "available_capacity_mw", "parcel_owner", "acreage", "former_use"]}
         />
+        <PrintButton />
       </div>
 
       <p className="mt-4 max-w-3xl text-gray-700">
@@ -446,6 +478,26 @@ export default async function SiteProfilePage({
         </Card>
 
         <Card title="Speed to power">
+          {(() => {
+            const o = interconnectionOutlook(site);
+            if (o.level === "unknown") return null;
+            const cls =
+              o.level === "favorable"
+                ? "border-green-200 bg-green-50 text-green-800"
+                : o.level === "constrained"
+                  ? "border-red-200 bg-red-50 text-red-800"
+                  : "border-amber-200 bg-amber-50 text-amber-800";
+            return (
+              <div className={`mb-3 rounded-lg border p-3 ${cls}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[11px] font-mono uppercase tracking-wider opacity-70">Interconnection outlook</span>
+                  <span className="text-sm font-bold">{o.label}</span>
+                </div>
+                {o.est && <div className="mt-1 text-sm font-semibold">{o.est}</div>}
+                <p className="mt-1 text-xs leading-snug opacity-80">{o.note}</p>
+              </div>
+            );
+          })()}
           <Row
             label="ISO / RTO region"
             value={
