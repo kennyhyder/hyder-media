@@ -677,7 +677,7 @@ export default async function SiteProfilePage({
 
       {/* Lead capture — track this site */}
       <section className="mt-8">
-        <LeadCapture variant="watch" entityType="site" entityId={site.id} entityName={site.name} />
+        <LeadCapture variant="watch" entityType="site" entityId={site.id} entityName={site.name ?? undefined} />
       </section>
 
       {/* Full sub-score breakdown */}
