@@ -41,6 +41,7 @@ import type { MapSite } from "@/components/map/types";
 import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 import SaveButton from "@/components/account/SaveButton";
+import LeadCapture from "@/components/LeadCapture";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
@@ -673,6 +674,11 @@ export default async function SiteProfilePage({
           <SiteMiniMap site={mapSite} nearby={mapNearby} height={380} />
         </section>
       )}
+
+      {/* Lead capture — track this site */}
+      <section className="mt-8">
+        <LeadCapture variant="watch" entityType="site" entityId={site.id} entityName={site.name} />
+      </section>
 
       {/* Full sub-score breakdown */}
       <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5">

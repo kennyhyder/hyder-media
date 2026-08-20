@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
+import LeadCapture from "@/components/LeadCapture";
 
 export const revalidate = 86400;
 
@@ -113,6 +114,10 @@ export default function PricingPage() {
             </a>
           </div>
         ))}
+      </div>
+
+      <div className="mx-auto mt-12 max-w-xl">
+        <LeadCapture variant="access" sourcePage="/pricing" />
       </div>
 
       <p className="mt-8 text-center text-xs text-gray-400">
