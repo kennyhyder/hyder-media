@@ -311,6 +311,7 @@ export interface FullDcSite {
   superfund_nearby: boolean | null;
   superfund_site_name: string | null;
   env_superfund_count: number | null;
+  env_constraint_score: number | null;
   construction_cost_index: number | null;
   // location context / nearest-of
   nearest_dc_name: string | null;
@@ -351,7 +352,7 @@ const FULL_SITE_COLS = [
   "retirement_date",
   "flood_zone", "flood_zone_sfha", "wri_water_stress", "wri_basin_name", "wetland_present",
   "wetland_type", "critical_habitat", "critical_habitat_species", "superfund_nearby",
-  "superfund_site_name", "env_superfund_count", "construction_cost_index",
+  "superfund_site_name", "env_superfund_count", "env_constraint_score", "construction_cost_index",
   "nearest_dc_name", "nearest_dc_distance_km", "nearest_rail_km", "nearest_gas_pipeline_km",
   "nearest_fiber_km",
   "score_power", "score_speed_to_power", "score_fiber", "score_water", "score_hazard", "score_labor",

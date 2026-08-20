@@ -549,6 +549,31 @@ export default async function SiteProfilePage({
 
         <Card title="Risk & environment">
           <Row
+            label="Environmental constraint"
+            value={
+              site.env_constraint_score != null ? (
+                <span
+                  className={
+                    site.env_constraint_score > 60
+                      ? "text-red-600"
+                      : site.env_constraint_score > 30
+                        ? "text-amber-600"
+                        : "text-green-600"
+                  }
+                >
+                  {site.env_constraint_score === 0
+                    ? "None"
+                    : site.env_constraint_score > 60
+                      ? "High"
+                      : site.env_constraint_score > 30
+                        ? "Moderate"
+                        : "Low"}{" "}
+                  ({site.env_constraint_score}/100)
+                </span>
+              ) : null
+            }
+          />
+          <Row
             label="Flood zone"
             value={
               site.flood_zone ? (
