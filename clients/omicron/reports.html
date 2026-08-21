@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Reports | Omicron Google Ads</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Supabase Auth gate — requires AAL2 (MFA-verified) session -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-check.js"></script>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="summary.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Omicron Google Ads
+        </a>
+        <div class="nav-links">
+            <a href="summary.html" class="nav-link">Summary</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="legacy-dashboard.html" class="nav-link">Legacy View</a>
+            <a href="reports.html" class="nav-link active">Reports</a>
+            <a href="#" class="nav-link" onclick="event.preventDefault(); window.omicronSignOut();">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px; margin: 32px auto; padding: 0 20px;">
+        <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Reports</h1>
+        <p class="text-muted" style="margin-bottom: 24px;">Point-in-time analyses across all accounts. Newest first.</p>
+
+        <div class="card mb-4" style="padding: 18px 22px;">
+            <h2 class="card-title" style="margin: 0 0 4px 0;">
+                <a href="report-impression-share-2026-08.html" style="text-decoration: none;">Impression Share &amp; Auction Insights — August 2026</a>
+            </h2>
+            <div class="text-muted" style="font-size: 0.85rem;">
+                Campaign-level impression share (last 30 days) with account rollups for all 10 accounts,
+                plus full auction insights: competitor overlap, position-above and outranking share per account.
+                Generated 2026-08-20.
+            </div>
+        </div>
+
+        <div class="card mb-4" style="padding: 18px 22px;">
+            <h2 class="card-title" style="margin: 0 0 4px 0;">
+                <a href="report-final-urls-2026-08.html" style="text-decoration: none;">Live Ad Final URL Destinations — August 2026</a>
+            </h2>
+            <div class="text-muted" style="font-size: 0.85rem;">
+                Every enabled ad across all 10 accounts (3,175 ads) deduplicated to unique final URLs per brand,
+                with ad counts, campaigns and ad types. Generated 2026-08-20.
+            </div>
+        </div>
+
+        <div class="card mb-4" style="padding: 18px 22px;">
+            <h2 class="card-title" style="margin: 0 0 4px 0;">
+                <a href="Omicron_PPC_Audit_2026.pdf" style="text-decoration: none;">PPC Audit 2026 (PDF)</a>
+            </h2>
+            <div class="text-muted" style="font-size: 0.85rem;">
+                Full-account PPC audit deck.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
