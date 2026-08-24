@@ -76,9 +76,10 @@
 
         <div class="card">
             <h2>Issues Found — Listings Needing Correction (<span id="fix-count"></span>)</h2>
-            <p class="muted" style="margin-bottom:10px;">Existing listings with wrong or outdated data, discovered in the fleet-wide audit. Click any listing to view it live. Fixes are executed as part of the campaign.</p>
-            <div class="table-scroll" style="max-height:420px;"><table class="data-table">
-                <thead><tr><th>Office</th><th>Directory</th><th>Listing</th><th>What's Wrong</th></tr></thead>
+            <p class="muted" style="margin-bottom:10px;">Existing listings with wrong or outdated data, discovered in the fleet-wide audit. Click any listing to view it live. <b>No existing profile is edited until its fix is approved here</b> — approve individually, or use Approve All. Add a note to any row to give special instructions.</p>
+            <div style="margin-bottom:10px;"><button class="btn btn-primary" onclick="approveAllFixes()">Approve All Fixes</button> <span class="muted" id="fix-save-note" style="margin-left:8px;"></span></div>
+            <div class="table-scroll" style="max-height:480px;"><table class="data-table">
+                <thead><tr><th>Office</th><th>Directory</th><th>Listing</th><th>What's Wrong</th><th>Approval</th></tr></thead>
                 <tbody id="fix-rows"></tbody>
             </table></div>
             <div style="margin-top:14px; padding:12px 14px; background:var(--bg-tertiary); border-radius:8px; font-size:0.85rem;">
@@ -139,9 +140,9 @@
             sel.onchange = () => { state.loc = +sel.value; render(); };
             document.getElementById('pack-select').onchange = e => { state.pack = e.target.value; render(); };
             renderStats();
-            renderFixes();
             render();
             loadDecisions();
+            loadFixApprovals();
         }
 
         // ---- Sign-off decisions (persisted via the same state store as the Approvals page) ----
@@ -228,19 +229,91 @@
             }
         }
 
+        // ---- Fix approvals (persisted to '_citation-fix-approvals' state row, keyed by submission id) ----
+        let fixState = {}, fixRowId = null;
+
+        async function loadFixApprovals() {
+            try {
+                const st = await (await fetch(`${STATE_API}?client=dunham-maps`)).json();
+                const row = (st.locations || []).find(l => l.location_name === '_citation-fix-approvals');
+                if (row) { fixRowId = row.id; fixState = row.data || {}; }
+            } catch (_) {}
+            renderFixes();
+        }
+
+        async function saveFixApprovals() {
+            const note = document.getElementById('fix-save-note');
+            try {
+                try {
+                    const st = await (await fetch(`${STATE_API}?client=dunham-maps`)).json();
+                    const row = (st.locations || []).find(l => l.location_name === '_citation-fix-approvals');
+                    if (row?.data) {
+                        fixRowId = row.id;
+                        for (const [k, remote] of Object.entries(row.data)) {
+                            const local = fixState[k];
+                            if (!local || (remote.at && local.at && remote.at > local.at)) fixState[k] = remote;
+                        }
+                    }
+                } catch (_) {}
+                const body = { client_key: 'dunham-maps', location_name: '_citation-fix-approvals', data: fixState };
+                if (fixRowId) body.id = fixRowId;
+                const resp = await (await fetch(STATE_API, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+                })).json();
+                if (resp.location?.id) fixRowId = resp.location.id;
+                if (note) { note.textContent = 'Saved ✓'; setTimeout(() => note.textContent = '', 2500); }
+            } catch (e) { if (note) note.textContent = 'Save failed — check connection and try again'; }
+        }
+
+        function setFix(id, status) {
+            const a = fixState[id] || {};
+            a.status = a.status === status ? null : status;
+            a.at = new Date().toISOString();
+            fixState[id] = a;
+            renderFixes();
+            saveFixApprovals();
+        }
+
+        function setFixNote(id, text) {
+            const a = fixState[id] || {};
+            a.note = text;
+            a.at = new Date().toISOString();
+            fixState[id] = a;
+            saveFixApprovals();
+        }
+
+        function approveAllFixes() {
+            const now = new Date().toISOString();
+            for (const s of data.submissions.filter(x => x.status === 'needs_fix')) {
+                const a = fixState[s.id] || {};
+                if (a.status !== 'approved') fixState[s.id] = { ...a, status: 'approved', at: now };
+            }
+            renderFixes();
+            saveFixApprovals();
+        }
+
         function renderFixes() {
             const srcBySlug = Object.fromEntries(data.sources.map(s => [s.slug, s]));
             const locById = Object.fromEntries(data.locations.map(l => [l.id, l]));
             const fixes = data.submissions.filter(s => s.status === 'needs_fix')
                 .sort((a, b) => (locById[a.location_id]?.city || '').localeCompare(locById[b.location_id]?.city || ''));
             document.getElementById('fix-count').textContent = fixes.length;
-            document.getElementById('fix-rows').innerHTML = fixes.map(s => `
-                <tr>
+            document.getElementById('fix-rows').innerHTML = fixes.map(s => {
+                const a = fixState[s.id] || {};
+                return `<tr>
                     <td><b>${esc(locById[s.location_id]?.city)}</b></td>
                     <td>${esc(srcBySlug[s.source_slug]?.name || s.source_slug)}</td>
                     <td>${s.listing_url ? `<a href="${esc(s.listing_url)}" target="_blank" rel="noopener" style="color:var(--accent)">view listing →</a>` : '<span class="muted">no public URL</span>'}</td>
                     <td class="muted" style="font-size:0.8rem;">${esc(s.notes || '')}</td>
-                </tr>`).join('');
+                    <td style="white-space:nowrap;">
+                        <button class="btn ${a.status === 'approved' ? 'btn-primary' : 'btn-secondary'}" style="padding:3px 10px; font-size:0.75rem;" onclick="setFix(${s.id},'approved')">${a.status === 'approved' ? '✓ Approved' : 'Approve'}</button>
+                        <button class="btn ${a.status === 'hold' ? 'btn-primary' : 'btn-secondary'}" style="padding:3px 10px; font-size:0.75rem;" onclick="setFix(${s.id},'hold')">${a.status === 'hold' ? '⏸ On Hold' : 'Hold'}</button>
+                        <br><input type="text" placeholder="note…" value="${esc(a.note || '')}" onchange="setFixNote(${s.id}, this.value)"
+                            style="margin-top:4px; width:150px; background:var(--bg-tertiary); border:1px solid var(--border); color:var(--text-primary); border-radius:6px; padding:3px 8px; font-size:0.75rem;">
+                        ${a.at ? `<div class="muted" style="font-size:0.68rem; margin-top:2px;">${a.at.slice(0, 16).replace('T', ' ')}</div>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
         }
 
         function renderStats() {
