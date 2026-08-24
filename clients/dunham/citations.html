@@ -68,6 +68,29 @@
 
         <div class="stats-row" id="stats"></div>
 
+        <div class="card" id="decisions-card">
+            <h2>Needs Sign-Off Before Submissions Begin</h2>
+            <p class="muted" style="margin-bottom:12px;">Two one-time decisions lock in the exact data used on every directory submission. Directories currently show mixed name variants ("Dunham &amp; Jones", "Dunham And Jones", "Dunham Law Firm") — one canonical form everywhere is the point of this campaign. Pick an option and click Approve; your choice saves instantly and Hyder Media is notified.</p>
+            <div id="decisions"></div>
+        </div>
+
+        <div class="card">
+            <h2>Issues Found — Listings Needing Correction (<span id="fix-count"></span>)</h2>
+            <p class="muted" style="margin-bottom:10px;">Existing listings with wrong or outdated data, discovered in the fleet-wide audit. Click any listing to view it live. Fixes are executed as part of the campaign.</p>
+            <div class="table-scroll" style="max-height:420px;"><table class="data-table">
+                <thead><tr><th>Office</th><th>Directory</th><th>Listing</th><th>What's Wrong</th></tr></thead>
+                <tbody id="fix-rows"></tbody>
+            </table></div>
+            <div style="margin-top:14px; padding:12px 14px; background:var(--bg-tertiary); border-radius:8px; font-size:0.85rem;">
+                <b>Special cases needing platform-level action (not just data edits):</b>
+                <ul style="margin:8px 0 0 18px; line-height:1.7;">
+                    <li><b>Nextdoor page hijack (Fort Worth):</b> a legacy page, <a href="https://nextdoor.com/pages/dunham-jones-ft-worth-dwi-attorneys-fort-worth-tx/" target="_blank" rel="noopener" style="color:var(--accent)">"Dunham &amp; Jones Ft Worth DWI Attorneys"</a>, has been merged into an unrelated Royse City business. Unmerge/removal request will be filed when the correct <a href="https://nextdoor.com/pages/dunham-jones-attorneys-at-law-pc-fort-worth-tx/" target="_blank" rel="noopener" style="color:var(--accent)">Fort Worth page</a> is claimed.</li>
+                    <li><b>"Dunham Law Firm" duplicates (Fort Worth):</b> <a href="https://www.yellowpages.com/fort-worth-tx/mip/dunham-jones-ft-worth-dwi-attorneys-541739026" target="_blank" rel="noopener" style="color:var(--accent)">YellowPages</a> and <a href="https://www.superpages.com/fort-worth-tx/bpp/dunham-law-firm-455833963" target="_blank" rel="noopener" style="color:var(--accent)">Superpages</a> carry the old name variant; one duplicate carries a 1-star review — suppression request planned.</li>
+                    <li><b>Fort Worth injury office (6707 Brentwood Stair Rd):</b> zero directory presence anywhere except a possible <a href="https://www.yelp.com/biz/dunham-and-jones-fort-worth" target="_blank" rel="noopener" style="color:var(--accent)">Yelp listing</a> that may duplicate the criminal office. It's a personal-injury practice, so it needs its own description (the criminal-defense copy doesn't apply) — full build-out from scratch.</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="controls">
             <label class="muted">Office:</label>
             <select id="loc-select"></select>
@@ -116,7 +139,108 @@
             sel.onchange = () => { state.loc = +sel.value; render(); };
             document.getElementById('pack-select').onchange = e => { state.pack = e.target.value; render(); };
             renderStats();
+            renderFixes();
             render();
+            loadDecisions();
+        }
+
+        // ---- Sign-off decisions (persisted via the same state store as the Approvals page) ----
+        const STATE_API = '/api/gbp/locations';
+        const DECISIONS = [
+            { key: 'canonical_name', title: '1. Canonical Business Name', why: 'Used verbatim on every directory. Consistency across listings is a direct local-ranking factor.',
+              options: [
+                { id: 'full', label: '"Dunham & Jones, Attorneys at Law, P.C."', note: 'Full legal form — matches most Google Business Profiles (recommended)' },
+                { id: 'short', label: '"Dunham & Jones"', note: 'Short form — cleaner display, less exact-match consistency with GBP' },
+              ] },
+            { key: 'canonical_domain', title: '2. Canonical Website Domain', why: 'Every listing links to the office’s page with tracking parameters, so directory-driven visits show up in analytics.',
+              options: [
+                { id: 'dunhamlaw', label: 'dunhamlaw.com for all 17 offices', note: 'One domain everywhere (recommended — matches the GBP rollout)' },
+                { id: 'split', label: 'Keep dunhamjones.com for Waco / Harker Heights / Bryan', note: 'Mirrors the current site split; two domains in the citation record' },
+              ] },
+        ];
+        let decState = {}, decRowId = null;
+
+        async function loadDecisions() {
+            try {
+                const st = await (await fetch(`${STATE_API}?client=dunham-maps`)).json();
+                const row = (st.locations || []).find(l => l.location_name === '_citation-decisions');
+                if (row) { decRowId = row.id; decState = row.data || {}; }
+            } catch (_) {}
+            renderDecisions();
+        }
+
+        function renderDecisions() {
+            document.getElementById('decisions').innerHTML = DECISIONS.map(d => {
+                const cur = decState[d.key] || {};
+                return `<div style="margin-bottom:16px; padding:14px; background:var(--bg-tertiary); border-radius:10px;">
+                    <div style="font-weight:700; margin-bottom:2px;">${d.title}
+                        ${cur.approved ? '<span class="pill st-verified" style="margin-left:8px;">APPROVED ' + (cur.at || '').slice(0, 10) + '</span>' : '<span class="pill st-needs_fix" style="margin-left:8px;">awaiting sign-off</span>'}</div>
+                    <div class="muted" style="margin-bottom:10px;">${d.why}</div>
+                    ${d.options.map(o => `
+                        <label style="display:flex; gap:10px; align-items:flex-start; padding:8px 10px; border-radius:8px; cursor:pointer; ${cur.choice === o.id ? 'background:rgba(59,130,246,0.12); outline:1px solid var(--accent);' : ''}">
+                            <input type="radio" name="dec-${d.key}" ${cur.choice === o.id ? 'checked' : ''} onchange="pickDecision('${d.key}','${o.id}')" style="margin-top:4px;">
+                            <span><b>${o.label}</b><br><span class="muted" style="font-size:0.8rem;">${o.note}</span></span>
+                        </label>`).join('')}
+                    <div style="margin-top:10px;">
+                        <button class="btn btn-primary" ${cur.choice && !cur.approved ? '' : 'disabled'} onclick="approveDecision('${d.key}')">Approve Selection</button>
+                        <span class="muted" id="dec-note-${d.key}" style="margin-left:8px;"></span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function pickDecision(key, id) {
+            const cur = decState[key] || {};
+            if (cur.approved) return;
+            decState[key] = { ...cur, choice: id, at: new Date().toISOString() };
+            renderDecisions();
+        }
+
+        async function approveDecision(key) {
+            decState[key] = { ...decState[key], approved: true, at: new Date().toISOString() };
+            renderDecisions();
+            const note = document.getElementById(`dec-note-${key}`);
+            try {
+                // merge-before-write: pull remote, keep newer entries, then save
+                try {
+                    const st = await (await fetch(`${STATE_API}?client=dunham-maps`)).json();
+                    const row = (st.locations || []).find(l => l.location_name === '_citation-decisions');
+                    if (row?.data) {
+                        decRowId = row.id;
+                        for (const [k, remote] of Object.entries(row.data)) {
+                            const local = decState[k];
+                            if (!local || (remote.at && local.at && remote.at > local.at)) decState[k] = remote;
+                        }
+                    }
+                } catch (_) {}
+                const body = { client_key: 'dunham-maps', location_name: '_citation-decisions', data: decState };
+                if (decRowId) body.id = decRowId;
+                const resp = await (await fetch(STATE_API, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+                })).json();
+                if (resp.location?.id) decRowId = resp.location.id;
+                if (note) note.textContent = 'Saved ✓';
+            } catch (e) {
+                decState[key].approved = false;
+                renderDecisions();
+                const n2 = document.getElementById(`dec-note-${key}`);
+                if (n2) n2.textContent = 'Save failed — check connection and try again';
+            }
+        }
+
+        function renderFixes() {
+            const srcBySlug = Object.fromEntries(data.sources.map(s => [s.slug, s]));
+            const locById = Object.fromEntries(data.locations.map(l => [l.id, l]));
+            const fixes = data.submissions.filter(s => s.status === 'needs_fix')
+                .sort((a, b) => (locById[a.location_id]?.city || '').localeCompare(locById[b.location_id]?.city || ''));
+            document.getElementById('fix-count').textContent = fixes.length;
+            document.getElementById('fix-rows').innerHTML = fixes.map(s => `
+                <tr>
+                    <td><b>${esc(locById[s.location_id]?.city)}</b></td>
+                    <td>${esc(srcBySlug[s.source_slug]?.name || s.source_slug)}</td>
+                    <td>${s.listing_url ? `<a href="${esc(s.listing_url)}" target="_blank" rel="noopener" style="color:var(--accent)">view listing →</a>` : '<span class="muted">no public URL</span>'}</td>
+                    <td class="muted" style="font-size:0.8rem;">${esc(s.notes || '')}</td>
+                </tr>`).join('');
         }
 
         function renderStats() {
