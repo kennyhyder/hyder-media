@@ -10,7 +10,7 @@ import { STATES } from "@/lib/geo";
 import { freshnessDate } from "@/lib/rollups";
 import { orgSitemapShardCount } from "@/lib/organizations";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
 export async function GET() {
   // Shard 0 = core hubs; shards 1..N = per-state county pages; shards N+1..2N =

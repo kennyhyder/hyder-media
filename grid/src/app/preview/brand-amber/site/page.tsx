@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
 function titleCase(s: string | null) {
   if (!s) return "Unnamed site";

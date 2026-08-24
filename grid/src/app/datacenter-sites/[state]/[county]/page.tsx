@@ -27,7 +27,7 @@ import {
   faqSchema,
 } from "@/lib/schema";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const dynamicParams = true;
 
 // Static-generate counties with >=10 sites; >=5 render on demand (ISR).

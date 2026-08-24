@@ -4,7 +4,7 @@ import { parseShortId } from "@/lib/entity-slug";
 import { fmtScore, fmtMwExact } from "@/lib/format";
 import { ogCard, OG_SIZE, OG_CONTENT_TYPE } from "@/lib/og";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const alt = "GridCensus — Datacenter candidate site";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;

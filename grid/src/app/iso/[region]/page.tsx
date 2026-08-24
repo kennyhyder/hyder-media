@@ -21,7 +21,7 @@ import {
   faqSchema,
 } from "@/lib/schema";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
 export function generateStaticParams() {
   return Object.values(ISO_REGIONS).map((r) => ({ region: r.slug }));

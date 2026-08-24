@@ -18,7 +18,7 @@ import {
   faqSchema,
 } from "@/lib/schema";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const dynamicParams = true;
 
 // Combos where the state has >=5 sites of that type.

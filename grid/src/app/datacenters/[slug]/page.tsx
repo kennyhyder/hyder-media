@@ -31,7 +31,7 @@ import SaveButton from "@/components/account/SaveButton";
 import ClaimButton from "@/components/account/ClaimButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const dynamicParams = true;
 export function generateStaticParams() {
   return [] as Array<{ slug: string }>;

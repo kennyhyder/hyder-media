@@ -8,7 +8,7 @@ import UpgradeCTA from "@/components/UpgradeCTA";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, datasetSchema, itemListSchema } from "@/lib/schema";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
 export const metadata: Metadata = {
   title: "Organizations — Infrastructure Owners & Operators",

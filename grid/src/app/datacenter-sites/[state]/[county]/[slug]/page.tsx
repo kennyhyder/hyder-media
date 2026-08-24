@@ -48,7 +48,7 @@ import SuggestEditButton from "@/components/account/SuggestEditButton";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 // On-demand ISR: 164k sites must NOT prerender at build.
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const dynamicParams = true;
 
 // Return [] — every site renders on first request and caches. The sitemap

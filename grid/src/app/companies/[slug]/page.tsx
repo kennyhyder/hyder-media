@@ -32,7 +32,7 @@ import { breadcrumbSchema, datasetSchema } from "@/lib/schema";
 import { freshness } from "@/lib/rollups";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 export const dynamicParams = true;
 
 // Pre-render the top organizations at build; the long tail renders on-demand

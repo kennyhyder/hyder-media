@@ -4,7 +4,7 @@ import { national } from "@/lib/rollups";
 import { fmtInt } from "@/lib/format";
 import ReadinessMap from "@/components/map/ReadinessMap";
 
-export const revalidate = 86400;
+export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
 export const metadata: Metadata = {
   title: "Explore the datacenter readiness atlas",
