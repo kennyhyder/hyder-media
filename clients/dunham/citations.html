@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dunham &amp; Jones — Citations</title>
+    <link rel="icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            const AUTH_KEY = 'dunham_dashboard_auth';
+            if (sessionStorage.getItem(AUTH_KEY) !== 'authenticated') {
+                window.location.href = 'password.html';
+            }
+        })();
+    </script>
+    <style>
+        .container { max-width: 1240px; }
+        .muted { color: var(--text-secondary); font-size: 0.9rem; }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-bottom: 18px; }
+        .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+        .stats-row { margin-bottom: 16px; }
+        .stat-sub { font-size: 0.74rem; color: var(--text-secondary); margin-top: 4px; }
+        .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+        .controls select { background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+        .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+        .st-planned { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .st-queued { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .st-submitted { background: rgba(139,92,246,0.15); color: var(--purple); }
+        .st-live { background: rgba(34,197,94,0.15); color: var(--success); }
+        .st-verified { background: rgba(34,197,94,0.3); color: var(--success); }
+        .st-needs_fix { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .st-rejected, .st-skipped { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .data-table th { text-align: left; padding: 9px 10px; background: var(--bg-tertiary); font-weight: 600; border-bottom: 2px solid var(--border); position: sticky; top: 0; }
+        .data-table td { padding: 8px 10px; border-bottom: 1px solid rgba(71,85,105,0.35); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .table-scroll { overflow-x: auto; max-height: 640px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+        .pack-tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+        .bar { background: var(--bg-tertiary); border-radius: 4px; height: 10px; overflow: hidden; }
+        .bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 4px; }
+        .footer-note { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; color: var(--text-secondary); text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-brand">
+            <img src="../../assets/imgs/logos/hyder-media-icon.png" alt="Hyder Media">
+            Dunham &amp; Jones
+        </a>
+        <div class="nav-links"><a href="dashboard.html" class="nav-link">Ad Report</a><a href="reporting.html" class="nav-link">Reporting</a><a href="maps-ops.html" class="nav-link">Maps Ops</a><a href="grid-tracking.html" class="nav-link">Grid Tracking</a><a href="bail-bonds.html" class="nav-link">Strategy</a><a href="gbp.html" class="nav-link">GBP</a><a href="gbp-edits.html" class="nav-link">Approvals</a><a href="citations.html" class="nav-link active">Citations</a><a href="exhibits.html" class="nav-link">Exhibits</a></div>
+    </nav>
+    <div class="page-toolbar">
+        <button class="btn btn-primary" onclick="downloadCsv()">Download Work Log (CSV)</button>
+    </div>
+
+    <div class="container">
+        <div class="report-header">
+            <h1>Citations Campaign</h1>
+            <p class="subtitle">Building &amp; verifying consistent business listings across the directories that matter — owned outright, no subscriptions</p>
+            <div class="report-meta">
+                <span>Identity rule: listed as a law firm everywhere — bail emphasis via approved descriptions</span>
+                <span id="meta-updated">Loading…</span>
+            </div>
+        </div>
+
+        <div class="stats-row" id="stats"></div>
+
+        <div class="controls">
+            <label class="muted">Office:</label>
+            <select id="loc-select"></select>
+            <label class="muted">Pack:</label>
+            <select id="pack-select">
+                <option value="">All</option>
+                <option value="platforms">Platforms</option>
+                <option value="aggregators">Aggregators</option>
+                <option value="legal">Legal</option>
+                <option value="general">General</option>
+                <option value="owned">Owned</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h2 id="matrix-title">Listings</h2>
+            <div class="table-scroll"><table class="data-table">
+                <thead><tr><th>Directory</th><th>Pack</th><th>Status</th><th>Listing URL</th><th>NAP</th><th>Dates</th><th>Notes</th></tr></thead>
+                <tbody id="rows"><tr><td colspan="7" class="muted">Loading…</td></tr></tbody>
+            </table></div>
+        </div>
+
+        <div class="footer-note">
+            Statuses: planned → submitted → live → verified (NAP-checked). Listings are built once and
+            owned — no rented subscriptions. Quarterly verification re-checks every listing for drift.
+            Prepared by Hyder Media.
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let state = { loc: '', pack: '' };
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+        async function boot() {
+            data = await (await fetch('/api/dunham/citations-status')).json();
+            if (data.status !== 'success') {
+                document.getElementById('rows').innerHTML = `<tr><td colspan="7">Error: ${esc(data.error)}</td></tr>`;
+                return;
+            }
+            const sel = document.getElementById('loc-select');
+            sel.innerHTML = data.locations.map(l =>
+                `<option value="${l.id}">${esc(l.city)}${l.name.includes('P.C.') && l.city === 'Fort Worth' ? '' : ''}</option>`).join('');
+            state.loc = data.locations[0]?.id;
+            sel.value = state.loc;
+            sel.onchange = () => { state.loc = +sel.value; render(); };
+            document.getElementById('pack-select').onchange = e => { state.pack = e.target.value; render(); };
+            renderStats();
+            render();
+        }
+
+        function renderStats() {
+            const subs = data.submissions;
+            const total = subs.length;
+            const by = s => subs.filter(x => x.status === s).length;
+            const done = by('live') + by('verified');
+            const pct = total ? Math.round(100 * done / total) : 0;
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card"><div class="stat-label">Planned Listings</div><div class="stat-value">${total}</div><div class="stat-sub">${data.locations.length} offices × ${data.sources.length} directories</div></div>
+                <div class="stat-card"><div class="stat-label">Submitted</div><div class="stat-value">${by('submitted')}</div><div class="stat-sub">awaiting publication</div></div>
+                <div class="stat-card"><div class="stat-label">Live</div><div class="stat-value">${done}</div><div class="stat-sub">${by('verified')} NAP-verified</div></div>
+                <div class="stat-card"><div class="stat-label">Completion</div><div class="stat-value">${pct}%</div><div class="bar" style="margin-top:8px;"><div style="width:${pct}%"></div></div></div>`;
+            document.getElementById('meta-updated').textContent =
+                'Updated: ' + new Date().toLocaleDateString();
+        }
+
+        function render() {
+            const srcBySlug = Object.fromEntries(data.sources.map(s => [s.slug, s]));
+            const loc = data.locations.find(l => l.id === +state.loc);
+            document.getElementById('matrix-title').textContent =
+                `Listings — ${loc ? loc.city : ''} (${loc ? esc(loc.address || '') : ''})`;
+            const rows = data.submissions
+                .filter(s => s.location_id === +state.loc)
+                .map(s => ({ ...s, src: srcBySlug[s.source_slug] }))
+                .filter(s => s.src && (!state.pack || s.src.pack === state.pack))
+                .sort((a, b) => a.src.pack.localeCompare(b.src.pack) || a.src.tier - b.src.tier || a.src.name.localeCompare(b.src.name));
+            document.getElementById('rows').innerHTML = rows.map(s => `
+                <tr>
+                    <td><b>${esc(s.src.name)}</b>${s.src.notes ? `<br><span class="muted" style="font-size:0.75rem">${esc(s.src.notes)}</span>` : ''}</td>
+                    <td><span class="pack-tag">${esc(s.src.pack)}</span></td>
+                    <td><span class="pill st-${s.status}">${s.status.replace('_', ' ')}</span></td>
+                    <td>${s.listing_url ? `<a href="${esc(s.listing_url)}" target="_blank" rel="noopener" style="color:var(--accent)">view listing →</a>` : '—'}</td>
+                    <td>${s.nap_ok === true ? '✓' : s.nap_ok === false ? '<span style="color:var(--danger)">✗</span>' : '—'}</td>
+                    <td class="muted" style="font-size:0.78rem">${s.submitted_at ? 'sub ' + s.submitted_at.slice(0, 10) : ''}${s.verified_at ? '<br>ver ' + s.verified_at.slice(0, 10) : ''}</td>
+                    <td class="muted" style="font-size:0.78rem">${esc(s.notes || '')}</td>
+                </tr>`).join('') || '<tr><td colspan="7" class="muted">No listings match.</td></tr>';
+        }
+
+        function downloadCsv() {
+            const srcBySlug = Object.fromEntries(data.sources.map(s => [s.slug, s]));
+            const locById = Object.fromEntries(data.locations.map(l => [l.id, l]));
+            const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+            const lines = ['Office,Directory,Pack,Status,Listing URL,NAP OK,Submitted,Verified,Notes'];
+            for (const s of data.submissions) {
+                const src = srcBySlug[s.source_slug], loc = locById[s.location_id];
+                if (!src || !loc) continue;
+                lines.push([q(loc.city), q(src.name), q(src.pack), q(s.status), q(s.listing_url),
+                    q(s.nap_ok === true ? 'yes' : s.nap_ok === false ? 'NO' : ''),
+                    q((s.submitted_at || '').slice(0, 10)), q((s.verified_at || '').slice(0, 10)), q(s.notes)].join(','));
+            }
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+            a.download = `dunham-citations-worklog-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+        }
+
+        boot();
+    </script>
+</body>
+</html>
