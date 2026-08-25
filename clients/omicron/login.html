@@ -511,6 +511,13 @@
                         try { await sb.auth.mfa.unenroll({ factorId: f.id }); } catch (_) {}
                     }
                 }
+                // ?enroll=1 → opt-in TOTP setup for this sign-in (invite links
+                // for users who want/require 2FA carry it). Membership was
+                // verified above, so we never enroll a non-member's factor.
+                if (_initialQS.get('enroll') === '1' || new URLSearchParams(window.location.search).get('enroll') === '1') {
+                    await beginMfaEnrollment();
+                    return;
+                }
                 window.location.href = NEXT_URL;
             }
         }
