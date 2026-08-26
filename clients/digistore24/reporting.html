@@ -821,6 +821,10 @@
                     <button class="date-btn scope-btn active" data-scope="ds24" onclick="setScope('ds24')">DG24</button>
                     <button class="date-btn scope-btn" data-scope="pagewheel" onclick="setScope('pagewheel')" style="color: #a78bfa;">PageWheel</button>
                 </div>
+                <div class="date-selector" style="margin-right: 6px;">
+                    <button class="date-btn platform-btn active" data-platform="google" onclick="setPlatform('google')">Google</button>
+                    <button class="date-btn platform-btn" data-platform="bing" onclick="setPlatform('bing')" style="color: #14b8a6;">Bing</button>
+                </div>
                 <div class="date-selector">
                     <button class="date-btn active" data-days="7">7d</button>
                     <button class="date-btn" data-days="30">30d</button>
@@ -1272,8 +1276,64 @@ function activeDayCount() {
     return currentDays;
 }
 
+// ===== Platform (Google Ads | Microsoft/Bing Ads) =====
+// Bing (account G1456B2Z) supports Overview + Campaigns; the other tabs are
+// Google-only and hide while Bing is active.
+let currentPlatform = sessionStorage.getItem('ds24_report_platform') || 'google';
+const BING_TABS = ['overview', 'campaigns'];
+function setPlatform(p) {
+    currentPlatform = p;
+    sessionStorage.setItem('ds24_report_platform', p);
+    syncPlatformUI();
+    loadAllData();
+}
+function syncPlatformUI() {
+    document.querySelectorAll('.platform-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.platform === currentPlatform));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        const supported = currentPlatform === 'google' || BING_TABS.includes(b.dataset.tab);
+        b.style.display = supported ? '' : 'none';
+    });
+    if (currentPlatform === 'bing') {
+        const active = document.querySelector('.tab-btn.active');
+        if (active && !BING_TABS.includes(active.dataset.tab)) {
+            document.querySelector('.tab-btn[data-tab="overview"]')?.click();
+        }
+    }
+}
+syncPlatformUI();
+
+async function loadBingData() {
+    setBadge('loading', 'Loading Bing…');
+    document.getElementById('refreshBtn').disabled = true;
+    try {
+        const r = await fetch(`${API_BASE}/ms-performance?days=${activeDayCount()}&scope=${currentScope}&_t=${Date.now()}`).then(x => x.json());
+        if (r?.status === 'success' && r.summary) {
+            isDemo = false;
+            performanceData = r.summary;
+            campaignData = r.campaigns || [];
+            adGroupData = [];
+            trendGranularity = 'daily';
+            trendData = r.daily || [];
+            adsData = null; searchTermsData = []; keywordsData = []; ga4Data = null;
+            setBadge('live', 'Bing · Live Data');
+        } else {
+            isDemo = false;
+            performanceData = { spend: 0, clicks: 0, impressions: 0, conversions: 0, conversionValue: 0, ctr: 0, cpc: 0, cpa: 0, roas: 0, convRate: 0 };
+            campaignData = []; trendData = []; adsData = null; searchTermsData = []; keywordsData = []; ga4Data = null;
+            setBadge('demo', 'Bing: ' + (r?.errors?.[0]?.error || 'no data yet'));
+        }
+    } catch (e) {
+        setBadge('demo', 'Bing: fetch failed');
+    }
+    renderOverview();
+    renderCampaigns();
+    document.getElementById('refreshBtn').disabled = false;
+}
+
 // ===== Data loading =====
 async function loadAllData() {
+    if (currentPlatform === 'bing') return loadBingData();
     // Pick granularity based on active range (preset or custom)
     const dayCount = activeDayCount();
     trendGranularity = dayCount <= DAILY_GRANULARITY_MAX_DAYS ? 'daily' : 'monthly';
