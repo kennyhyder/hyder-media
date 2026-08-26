@@ -54,6 +54,7 @@ export default function SiteFinder() {
   const [mw, setMw] = useState("350");
   const [state, setState] = useState("");
   const [siteType, setSiteType] = useState("");
+  const [existing, setExisting] = useState(false);
   const [sites, setSites] = useState<FinderSite[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -66,6 +67,7 @@ export default function SiteFinder() {
     if (mw) p.set("min_capacity", mw);
     if (state) p.set("state", state);
     if (siteType) p.set("site_type", siteType);
+    if (existing) p.set("existing", "true");
     fetch(`${window.location.origin}/api/grid/dc-sites?${p.toString()}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
@@ -74,7 +76,7 @@ export default function SiteFinder() {
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [mw, state, siteType]);
+  }, [mw, state, siteType, existing]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -104,6 +106,17 @@ export default function SiteFinder() {
             <option value="">All types</option>
             {SITE_TYPES.map((t) => <option key={t} value={t}>{siteTypeLabel(t)}</option>)}
           </select>
+        </label>
+        <label className="flex items-center gap-2 pb-2 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={existing}
+            onChange={(e) => setExisting(e.target.checked)}
+            className="h-4 w-4 accent-purple-600"
+          />
+          <span title="Retired-plant / substation sites with existing grid interconnection — the fastest speed to power">
+            Existing interconnection <span className="text-gray-400">(fastest power)</span>
+          </span>
         </label>
         <div className="ml-auto text-sm text-gray-500">
           {loading ? "Searching…" : `${fmtInt(total)} site${total === 1 ? "" : "s"} match`}

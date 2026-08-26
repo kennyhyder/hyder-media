@@ -37,6 +37,7 @@ export async function GET(request: Request) {
     const min_score = searchParams.get("min_score");
     const max_score = searchParams.get("max_score");
     const min_capacity = searchParams.get("min_capacity");
+    const existing = searchParams.get("existing"); // "true" => has existing grid interconnection
     const iso_region = searchParams.get("iso_region");
     const flood = searchParams.get("flood");
     const search = searchParams.get("search");
@@ -100,6 +101,7 @@ export async function GET(request: Request) {
     if (min_score) query = query.gte("dc_score", parseFloat(min_score));
     if (max_score) query = query.lte("dc_score", parseFloat(max_score));
     if (min_capacity) query = query.gte("available_capacity_mw", parseFloat(min_capacity));
+    if (existing === "true") query = query.gt("existing_capacity_mw", 0);
     if (iso_region) query = query.eq("iso_region", iso_region);
     if (flood === "no_sfha") query = query.or("flood_zone_sfha.is.null,flood_zone_sfha.eq.false");
     if (flood === "sfha") query = query.eq("flood_zone_sfha", true);
