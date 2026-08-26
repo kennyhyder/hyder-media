@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>GridCensus v2 — Build Plan (Jon De Pena / Hut 8)</title>
+<style>
+  :root{
+    --bg:#0c0e13; --panel:#13161d; --panel2:#171b24; --line:#262c38;
+    --ink:#e7ebf2; --mut:#9aa4b4; --dim:#6c7686;
+    --amber:#e6b04b; --green:#4bd6a0; --red:#ef6a6a; --blue:#5aa3ff; --purple:#a78bfa;
+    --mono:'SF Mono',ui-monospace,'Roboto Mono',Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:15.5px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px 110px}
+  a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+  header.top{border-bottom:1px solid var(--line);padding:32px 0 24px;margin-bottom:6px}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase}
+  h1{font-size:28px;line-height:1.16;margin:12px 0 8px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:14.5px;max-width:78ch}
+  .meta{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:14px;display:flex;flex-wrap:wrap;gap:6px 20px}
+  section{margin-top:34px}
+  h2{font-size:12px;font-family:var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin:0 0 6px}
+  h2 + .lede{color:var(--mut);font-size:14px;margin:0 0 16px}
+  h3{font-size:18px;margin:20px 0 6px;letter-spacing:-.01em}
+  h4{font-size:13px;font-family:var(--mono);letter-spacing:.03em;color:var(--ink);margin:16px 0 6px;text-transform:uppercase}
+  p{margin:9px 0} strong{color:#fff;font-weight:600} em{color:var(--ink)}
+  code{font-family:var(--mono);font-size:12.5px;background:#0a0c11;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--amber)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
+  .tl{border-left:3px solid var(--amber)}
+  .callout{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:15px 17px;margin:15px 0}
+  .callout.warn{border-left-color:var(--amber)} .callout.risk{border-left-color:var(--red)} .callout.fix{border-left-color:var(--purple)}
+  .callout .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:6px}
+  ul{margin:9px 0;padding-left:19px} li{margin:6px 0}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--mut);vertical-align:middle}
+  .tag.easy{color:var(--green);border-color:#1f4a3a} .tag.med{color:var(--amber);border-color:#4a3f1f} .tag.hard{color:var(--red);border-color:#4a2020} .tag.have{color:var(--blue);border-color:#20406a}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:400}
+  td.you{color:#fff} .scroll{overflow-x:auto}
+  .phase{display:flex;align-items:baseline;gap:12px;margin:26px 0 4px}
+  .phase .n{font-family:var(--mono);font-size:11px;color:var(--bg);background:var(--amber);border-radius:5px;padding:3px 9px;font-weight:700}
+  .phase h3{margin:0}
+  .feat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:15px 17px;margin:10px 0}
+  .feat .ft{font-size:15px;font-weight:600;color:#fff;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .feat .fd{font-size:13.5px;color:var(--mut);margin-top:5px}
+  .feat .src{font-size:12px;color:var(--dim);margin-top:7px;font-family:var(--mono)}
+  .feat .src b{color:var(--mut)}
+  .foot{margin-top:50px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <span class="kick">● Internal build plan · GridCensus v2 · confidential</span>
+  <h1>GridCensus v2 — the Jon De Pena / Hut 8 build plan</h1>
+  <p class="sub">Scoped from the Aug 26 call with Jon De Pena — the person GridCensus was originally built for, who starts Oct 1 leading data-center development at Hut 8 (public co., NASDAQ: HUT). He is simultaneously the origin user and the buyer-side decision-maker, and he offered to pressure-test data with his incoming engineering team. This turns his wishlist into a prioritized, data-sourced roadmap.</p>
+  <div class="meta">
+    <span>PREPARED 2026-08-26</span><span>SOURCE call + Kenny's notes</span><span>All data sources free/keyless unless noted</span>
+  </div>
+</header>
+
+<section>
+  <div class="panel tl">
+    <h2 style="color:var(--amber)">Bottom line</h2>
+    <p>Jon handed you a product roadmap from the exact seat you're building for. Two modes matter to him: <strong>"I need a site" (discovery — what GridCensus does today)</strong> and <strong>"someone brought me a site, vet it" (new)</strong>. Across both, his priorities rank: <strong>(1) speed-to-power reality incl. utility progress, (2) power bottlenecks / captive power, (3) size-aware regulatory support, (4) the DC pipeline + who the off-taker is.</strong> Almost everything he asked for is buildable on <strong>free public data</strong> — the hard part isn't access, it's calibration and honesty.</p>
+    <p style="margin-bottom:0"><strong>But first, fix the credibility bug.</strong> Both Jon and Kyle (brownfield.ai) independently sensed the scoring is off because <em>Texas ranks low</em> — and they're right. It's a concrete inversion in the code (below). Nothing else you build lands with a sophisticated user until Texas ranks where every analyst puts it: at the top. Fix that in Phase 0, then build.</p>
+  </div>
+</section>
+
+<!-- WHAT JON WANTS -->
+<section>
+  <h2>What Jon actually asked for (ranked by his emphasis)</h2>
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Ask</th><th>Why it matters to him</th><th>Feasible free?</th></tr>
+    <tr><td>1</td><td class="you">Utility conversation / interconnection progress at a site</td><td>The long-lead item — even a perfect site dies on the utility. Sites where the process started are worth paying up for.</td><td><span class="tag hard">partial</span> mostly non-public; approximate</td></tr>
+    <tr><td>2</td><td class="you">Power bottlenecks / captive power</td><td>The sophisticated edge — find curtailed/underutilized MW behind a transmission constraint and site there. He lit up on this.</td><td><span class="tag med">yes (approx)</span> ERCOT/CAISO/SPP first</td></tr>
+    <tr><td>3</td><td class="you">MW-size input (sub-1 → 2,000 MW) + support filtered by size</td><td>"A crucial piece." Rules/moratoria are MW-gated; a site good for 15 MW is hostile at 200 MW.</td><td><span class="tag easy">yes</span></td></tr>
+    <tr><td>4</td><td class="you">Vet-a-site mode: address/town/coords → map, satellite, hurdles</td><td>His second workflow. "Abilene, TX + 350 MW → hurdles + latest developments."</td><td><span class="tag easy">yes</span></td></tr>
+    <tr><td>5</td><td class="you">DC pipeline: operating / under-construction / queued + off-taker</td><td>Who's building where, and who the tenant is (Meta/AWS) — or who has a footprint nearby.</td><td><span class="tag med">mostly</span> off-taker ~50/50</td></tr>
+    <tr><td>6</td><td class="you">Repurposing heavy-industrial sites (existing 100–150 MW permits)</td><td>Growing theme — legacy steel/smelting sites already hold big interconnections.</td><td><span class="tag have">have data</span> validate + enrich</td></tr>
+  </table></div>
+</section>
+
+<!-- PHASE 0 -->
+<section>
+  <h2>The plan — phased</h2>
+  <p class="lede">Phase 0 is the trust fix. Phase 1 is Jon's "buildable this week" list. Phase 2 is the differentiators. Phase 3 is moat.</p>
+
+  <div class="phase"><span class="n">0</span><h3>Fix the scoring credibility bug (days)</h3></div>
+  <div class="callout fix">
+    <span class="k">The exact bug</span>
+    <p style="margin-top:0"><code>score-dc-sites.py</code> → <code>score_speed_to_power()</code> computes <code>depth_score = linear_score(queue_depth, 0, 30)</code> — "30+ queued projects = 0." ERCOT has the <strong>deepest</strong> interconnection queue in the US, so Texas gets zeroed on 20% of its speed-to-power score. But ERCOT's deep queue is a <em>demand</em> signal, not a slowness signal: its <strong>connect-and-manage</strong> model energizes in <strong>~1.5–3 yrs vs 5–7 in PJM</strong>, at ~$29/kW vs PJM's ~$240/kW, and it brought 14.2 GW online in 2021–22 vs PJM's 5.6. The score has the single most important siting factor <em>inverted.</em></p>
+  </div>
+  <div class="feat">
+    <div class="ft">Rip out the queue-depth penalty → ISO-keyed speed-to-power</div>
+    <div class="fd">Replace the depth penalty with a market-level speed-to-power factor: <strong>ERCOT = fastest (top), MISO/SPP = mid, PJM = slowest</strong>, non-ISO case-by-case. Reinterpret queue depth as a positive liquidity signal or drop it — never zero out a fast market. Re-weight toward what CBRE/JLL/datacenterHawk actually price: <strong>speed-to-power ~35% · power price/availability ~25% · regulatory/siting ~20% · land ~15% · fiber/water ~5%</strong>. Then <code>--rescore</code> all 164k sites.</div>
+    <div class="src"><b>Sanity check:</b> after rescoring, West Texas / Abilene must rank high (CBRE calls Abilene a tertiary market outpacing primaries). If a PJM N-Virginia parcel outranks an ERCOT parcel on speed-to-power, it's still miscalibrated.</div>
+  </div>
+  <div class="callout warn">
+    <span class="k">Make the score defensible, not just correct</span>
+    <p style="margin-top:0">Kyle and Jon distrusted a black-box number. Every scored site should <strong>show its components</strong> ("speed-to-power 82: ERCOT connect-and-manage, load growth +6%, brownfield grid bonus") so a developer can agree or argue. Explainability <em>is</em> the credibility feature.</p>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase"><span class="n">1</span><h3>Jon's "this week" list (1–2 wks)</h3></div>
+
+  <div class="feat">
+    <div class="ft">MW-size selector <span class="tag easy">easy</span></div>
+    <div class="fd">A size input (dropdown: <strong>&lt;1, 25, 50, 150, 350, 500, 1000, 2000 MW</strong>) that filters/re-scores sites for that build size. Every downstream layer (regulatory, power, bottleneck) reads this. His stated range: sub-1 to 2,000 MW, "2 is a good top end."</div>
+    <div class="src"><b>Data:</b> none new — drives filtering over existing power/capacity fields.</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">Vet-a-site mode <span class="tag easy">easy</span></div>
+    <div class="fd">Input an <strong>address, town, or coordinates</strong> → drop a pin → show the site with latest satellite imagery, resolved jurisdiction, nearby infrastructure, score, and "latest developments/hurdles." His second workflow, verbatim.</div>
+    <div class="src"><b>Data (all free/keyless):</b> geocode = <b>US Census Geocoder</b> (+ self-hosted Photon or proxied Mapbox for town names); imagery = <b>Esri World Imagery</b> default + <b>USGS NAIP</b> "latest US aerial" toggle (0.3–0.6 m, 2023–24); jurisdiction = <b>FCC Area API</b> + Census Places; news = <b>GDELT DOC 2.0</b>. Add tile/API hosts to the CSP in <code>next.config.ts</code>.</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">Regulatory-support layer + MW slider <span class="tag med">medium</span> <span class="tag" style="color:var(--purple);border-color:#3f2f5a">killer feature</span></div>
+    <div class="fd">A per-state and per-county <strong>DC-support score (0–100) that changes with the MW slider</strong> — a heat map that re-colors as thresholds trip (green &lt;25 MW, yellow 25–74, red ≥75 in a SB6-type jurisdiction). Restrictions are overwhelmingly MW-gated, so "supportive up to X MW" is a real, sourceable attribute — exactly Jon's ask.</div>
+    <div class="src"><b>Data (free):</b> local moratoria = <b>Bommar <code>moratorium-data-2026</code></b> (533 local + 440 state actions, lat/long, CC-BY, quarterly, GitHub); utility posture = <b>SEPA DELTa</b> large-load tariffs (77 filings, MW threshold + take-or-pay); state incentives/laws = MultiState + Good Jobs First (semi-manual monthly). Store per-jurisdiction breakpoints <code>(threshold_mw, regime, severity)</code>, evaluate as a step function of the queried MW.</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">DC pipeline v1 + hyperscaler footprint <span class="tag have">have base</span></div>
+    <div class="fd">Surface <strong>operating datacenters</strong> on the map + in the site drawer (you already hold ~3.7k in <code>grid_datacenters</code>), and add a <strong>"who's nearby" hyperscaler footprint</strong> panel (AWS/Meta/Google/MS/Oracle) so even when the specific off-taker is unknown, Jon sees who's over/under-represented in an area — his explicit fallback.</div>
+    <div class="src"><b>Data (free, redistributable):</b> operating set = <b>PNNL/IM3 Data Center Atlas</b> (ODbL, bulk CSV/GeoPackage) + <b>OSM Overpass</b> (<code>telecom=data_center</code>) for freshness. Hyperscaler footprint = <b>dgl/cloud-regions</b> (CSV+coords, ODbL/MIT) + <b>Meta atmeta.com</b> (real campuses). <b>Avoid:</b> Baxtel (paid), datacenters.com (scraping banned in ToS) — use only as manual cross-checks.</div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase"><span class="n">2</span><h3>The differentiators (2–4 wks)</h3></div>
+
+  <div class="feat">
+    <div class="ft">Captive-power / bottleneck screen <span class="tag med">medium</span> <span class="tag" style="color:var(--purple);border-color:#3f2f5a">the flagship</span></div>
+    <div class="fd">A per-site <strong>Captive Power flag</strong>: co-locate three free signals — (a) a large generator nearby (EIA-860, with interconnection kV), (b) low utilization (EIA-923 generation ÷ nameplate = capacity factor) or measured curtailment, (c) an export constraint present (ERCOT SCED binding constraints — <em>you already ingest these</em>; other ISOs via persistent nodal LMP spread). Surface components, not a fake number: "~100 MW likely captive: 350 MW plant, 61% CF, node $18/MWh below load hub 40% of hours, 138 kV tie." This is Jon's captive-power concept, made real.</div>
+    <div class="src"><b>Data (free):</b> <b>gridstatus</b> OSS lib (nodal LMP + congestion, all 7 ISOs, no key), <b>EIA-860/923 via PUDL</b> (clean joins), ERCOT <b>NP6-86-CD</b> SCED constraints + curtailment (have), <b>CAISO/SPP</b> direct curtailment. Ship <strong>ERCOT + CAISO + SPP first</strong> (best data); extend to PJM/MISO/NYISO/ISO-NE; flag non-ISO Southeast/West as weak.</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">DC pipeline v2 — under-construction + queue + off-taker <span class="tag med">medium</span></div>
+    <div class="fd">Layer in <strong>under-construction/announced</strong> projects and <strong>datacenter interconnection queue</strong>. <strong>Key nuance:</strong> only <strong>ERCOT tags "data center" load</strong> (NPRR-1267 Large Load report, monthly — but aggregated to Load-Zone/TSP, not lat-lng; ~233 GW under study, &gt;70% datacenters). <strong>LBNL "Queued Up" and gridstatus queues are generation-only</strong> — they do NOT cover load. So: site-score datacenter load inside ERCOT; everywhere else show only <em>regional GW-in-pipeline</em> with a source link. Attach <strong>off-taker/tenant</strong> where public.</div>
+    <div class="src"><b>Data:</b> pipeline spine = <b>Epoch AI Frontier DC Hub</b> (CC-BY, direct CSV, coords + IT-power MW + phases, daily) + <b>dcmap.us</b> (API, 307 UC / 751 planned) + <b>Cleanview</b> (free tier). New-project firehose = Business Wire / DCD RSS + <b>SEC EDGAR full-text</b> (public devs incl. Hut 8). ERCOT queue = <b>NPRR-1267</b> + <b>ercotqueue.com</b> (CC-BY, county-level, generation). Off-taker = <b>Texas Comptroller DC Registry</b> (names owner+occupant+operator, XLSX) + <b>DataCentersExposed.com</b> (free shell-LLC unmasking, 1,343 codenames) + DIY assessor→SoS→SEC Exhibit-21 chain. Skip Acres (enterprise, no free API).</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">Industrial-repurposing layer <span class="tag have">have data</span></div>
+    <div class="fd">Promote heavy-power <strong>legacy industrial sites</strong> (steel/aluminum/smelting) that already hold large interconnections/permits into a first-class filter — a hot conversion theme Jon raised. Validate completeness of your existing set against EIA retired-generator + EPA heavy-industry data and flag confidence.</div>
+    <div class="src"><b>Data (free, public-domain):</b> <b>DOE Sept-2024 coal-site study</b> (145 coal sites; Table 6 = 27 retired ≥600 MW, reusable switchyards) + <b>EIA-860M</b> (monthly retirements) / <b>EIA-860</b> (lat/lon) via PUDL + <b>EPA GHGRP/FLIGHT</b> (steel Subpart Q, aluminum Subpart F, lat/lon+NAICS) + <b>USGS</b> aluminum-smelter list. Join on <b>EPA FRS Registry ID</b>. Validate completeness by cross-checking 3 universes (EIA retirements, GHGRP heavy-industry, DOE list) vs trade-press. Proof case: Century Hawesville KY → TeraWulf → ~401 MW Anthropic lease.</div>
+  </div>
+
+  <div class="feat">
+    <div class="ft">Utility posture → into the score <span class="tag med">medium</span></div>
+    <div class="fd">Fold <strong>large-load tariff terms</strong> (threshold, take-or-pay %, collateral, curtailment/BYO-gen mandates) into the regulatory score per utility service territory — the closest public proxy for "has the utility gotten the joke / how hard will they make this."</div>
+    <div class="src"><b>Data (free):</b> <b>SEPA DELTa</b> + <b>EEI large-load list</b> (monthly). Map utility → county by service territory.</div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase"><span class="n">3</span><h3>Moat (ongoing)</h3></div>
+  <div class="feat">
+    <div class="ft">Persistent-congestion nodal analysis (all 7 ISOs) · News→sentiment LLM pass · Off-taker unmasking</div>
+    <div class="fd">Deepen the captive-power signal into a trailing-12-mo persistent-congestion metric per node; run a weekly cheap-LLM pass over GDELT/local-gov feeds to produce a live per-county "latest hurdles" summary + sentiment; expand off-taker/entity resolution. These are the compounding-data advantages the gated incumbents have — built free and public.</div>
+  </div>
+</section>
+
+<!-- LIMITS -->
+<section>
+  <h2>What you can't fully deliver (say so in the UI)</h2>
+  <ul>
+    <li><strong>Actual utility conversations</strong> (Jon's #1) are mostly non-public. Approximate with tariff posture + queue entries + news; never claim to know a private negotiation. Position sites as "worth a real interconnection study," not "shovel-ready."</li>
+    <li><strong>Exact captive MW</strong> everywhere needs paid deliverability data (ERIS/NRIS limits). Report measured curtailment where it exists (CAISO/SPP/ERCOT); elsewhere show the <em>pattern</em>, flagged as qualitative.</li>
+    <li><strong>Non-ISO Southeast &amp; West</strong> (vertically integrated, no nodal LMP) → the bottleneck feature is materially weaker there. Flag the region, lean on WECC paths + OASIS ATC.</li>
+    <li><strong>Off-taker</strong> is ~50/50 public (hyperscalers hide behind shell LLCs). Default to the hyperscaler-footprint fallback + Texas Comptroller registry + DataCentersExposed.</li>
+    <li><strong>Datacenter load queue</strong> is ERCOT-only and aggregated to Load-Zone/TSP (no lat-lng); elsewhere show regional GW-in-pipeline, not per-site.</li>
+  </ul>
+  <div class="callout warn" style="margin-top:14px">
+    <span class="k">Licensing discipline (public tool)</span>
+    <p style="margin-top:0">Only <strong>CC-BY / ODbL / public-domain</strong> sources are safe to redistribute: Epoch AI, PNNL/OSM, Bommar moratorium data, ercotqueue, LBNL, and all EPA/EIA/USGS/SEC/Census/FCC/GDELT. Proprietary trackers (dcmap, Cleanview, Baxtel, datacenterHawk, ZoneWire) are <strong>leads only</strong> — verify against primary sources and <strong>store the source URL per row</strong> so every GridCensus record is independently attributable. Bake a browser-grade User-Agent + polite throttling for bot-blocked hosts (DCD, datacentermap 429).</p>
+  </div>
+  <p class="muted" style="font-size:13px;color:var(--mut)">Being explicit about these is the credibility move — it's what separates a screening tool a developer trusts from a black box he doesn't.</p>
+</section>
+
+<!-- POSITIONING -->
+<section>
+  <h2>Where this leaves you</h2>
+  <p>This roadmap turns GridCensus from a <em>scored directory</em> into a <strong>siting workbench</strong> that serves both of Jon's workflows. It leapfrogs brownfield.ai (which is just user-input site-vet scoring) by owning discovery <em>and</em> vet, and it pushes into the enterprise tools' territory — captive-power, MW-gated regulatory support, speed-to-power — but <strong>free, public, and indexable</strong>. And it's being built with the incoming head of DC development at a public company as your design partner, whose engineering team offered to pressure-test the data. That's a moat the gated incumbents can't buy.</p>
+  <div class="callout">
+    <span class="k">Immediate next actions</span>
+    <ul style="margin:6px 0 0">
+      <li>Phase 0: fix the ERCOT speed-to-power inversion, reweight, rescore, add component explainability. <em>Do this before the next Jon email.</em></li>
+      <li>Phase 1: MW selector + vet-a-site + regulatory MW-slider + pipeline v1 — the "this week" batch Jon expects.</li>
+      <li>Email Jon: "Fixed the Texas calibration (here's why it was off), shipped the MW-sizer + site-vet + regulatory heat map; captive-power screen is next — can your engineering team tell me what they use for grid-constraint data?" (his open action item).</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot">
+  Internal working doc · GridCensus v2 planning · 2026-08-26. Data sources are free/keyless unless noted (gridstatus OSS, EIA-860/923 via PUDL, ERCOT NP6-86-CD, Bommar moratorium-data-2026 [CC-BY], SEPA DELTa, US Census Geocoder, Esri World Imagery, USGS NAIP, FCC Area API, GDELT DOC 2.0, LBNL Queued Up). ERCOT interconnection-speed + market-ranking claims: Utility Dive, RMI, CBRE/JLL 2025. New tile/API hosts must be whitelisted in the strict CSP (grid/next.config.ts). Utility-conversation status and exact captive-MW remain partial/paid — flagged in-product.
+</div>
+
+</div>
+</body>
+</html>

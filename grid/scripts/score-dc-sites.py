@@ -46,20 +46,40 @@ BATCH_SIZE = 50
 # Redistributed from power/speed/fiber to accommodate new data layers
 WEIGHTS = {
     'power': 0.20,
-    'speed_to_power': 0.15,
+    'speed_to_power': 0.20,   # v5: raised from 0.15 — speed-to-power is the #1 siting factor (CBRE/JLL)
     'fiber': 0.12,
     'energy_cost': 0.10,
-    'water': 0.08,
-    'hazard': 0.08,
+    'water': 0.07,            # v5: -0.01
+    'hazard': 0.06,           # v5: -0.02
     'buildability': 0.07,
     'labor': 0.04,
     'existing_dc': 0.04,
     'land': 0.03,
     'construction_cost': 0.03,
     'gas_pipeline': 0.02,
-    'tax': 0.02,
-    'climate': 0.02,
+    'tax': 0.01,              # v5: -0.01
+    'climate': 0.01,          # v5: -0.01
 }
+
+# v5 — Structural speed-to-power by market/ISO. This is the dominant driver of how
+# fast a datacenter can actually energize, and REPLACES the old queue-depth penalty,
+# which perversely punished ERCOT for having the deepest (most in-demand) queue.
+# ERCOT's connect-and-manage model is the fastest + cheapest path to power in the US
+# (~1.5-3 yr vs 5-7 in PJM; ~$29/kW vs ~$240/kW); the Southeast's vertically-integrated
+# utilities (SERC: Georgia Power, Southern, TVA, Duke) move fast and court DCs; PJM is
+# slowest and most expensive. Sources: Utility Dive, RMI, CBRE/JLL 2025.
+ISO_SPEED_SCORE = {
+    'ERCOT': 92,   # connect-and-manage, energy-only market, fastest + cheapest
+    'SERC':  78,   # Southeast, vertically integrated, DC-friendly, fast
+    'SPP':   70,   # relatively fast, high renewables
+    'WECC':  60,   # western non-CAISO, vertically integrated, varies by utility
+    'MISO':  58,   # mid
+    'CAISO': 50,   # permitting/siting friction
+    'NYISO': 48,
+    'ISO-NE': 46,
+    'PJM':   34,   # slowest (~5-7 yr), highest upgrade cost (~$240/kW)
+}
+DEFAULT_ISO_SPEED = 55  # unknown / non-ISO neutral
 
 
 def supabase_request(method, path, data=None, headers_extra=None):
@@ -207,14 +227,19 @@ def score_power(site):
 
 
 def score_speed_to_power(site, queue_data, county_data):
-    """Speed to energization: queue depth, wait time, completion rate, trend, load growth.
+    """Speed to energization: ISO market structure, wait time, completion, trend, load growth.
 
-    v4: incorporates LBNL-derived per-state metrics + FERC 714 load growth:
-      0.20 * depth_score       — fewer queued projects = faster
-      0.30 * wait_score        — shorter median wait = better
-      0.20 * completion_score  — higher completion rate = more likely to succeed
-      0.15 * trend_score       — improving recent wait vs historical = bonus
-      0.15 * load_growth_score — growing demand = more investment in grid
+    v5: ISO-keyed structural speed replaces the old queue-depth penalty (which
+    inverted reality — it punished ERCOT for having the deepest, most in-demand
+    queue, tanking Texas to a bottom-quartile rank). Deep queue is a demand signal,
+    not a slowness signal; ERCOT's connect-and-manage model is the FASTEST US path
+    to power. Formula:
+      0.45 * iso_base          — structural market speed (ERCOT fast, PJM slow)
+      0.20 * wait_score        — shorter measured median wait = better (when known)
+      0.15 * completion_score  — higher completion rate = more likely to succeed
+      0.10 * trend_score       — improving recent wait vs historical = bonus
+      0.10 * load_growth_score — growing demand = more grid investment
+    queue_depth is still stored for display, but no longer penalizes the score.
     """
     state = site.get('state', '')
     iso = site.get('iso_region', '')
@@ -249,14 +274,12 @@ def score_speed_to_power(site, queue_data, county_data):
     site['_queue_depth'] = queue_depth
     site['_avg_queue_wait_years'] = avg_wait
 
-    # --- Sub-component 1: Queue depth (25%) ---
-    # Fewer projects = faster (0 projects = 100, 30+ = 0)
-    if queue_depth is not None:
-        depth_score = linear_score(queue_depth, 0, 30)
-    else:
-        depth_score = 50
+    # --- Sub-component 1: ISO structural speed (45%) ---
+    # v5: the market's structural speed-to-power. ERCOT (connect-and-manage) is
+    # fastest; PJM slowest. This is the anchor, replacing the old depth penalty.
+    iso_base = ISO_SPEED_SCORE.get(iso, DEFAULT_ISO_SPEED)
 
-    # --- Sub-component 2: Wait time (35%) ---
+    # --- Sub-component 2: Wait time (20%) ---
     # Shorter wait = better (1 year = 100, 6+ years = 0)
     if avg_wait is not None:
         wait_score = linear_score(float(avg_wait), 1.0, 6.0)
@@ -305,12 +328,12 @@ def score_speed_to_power(site, queue_data, county_data):
     else:
         load_growth_score = 50
 
-    # Weighted combination (v4 formula)
-    queue_score = (0.20 * depth_score +
-                   0.30 * wait_score +
-                   0.20 * completion_score +
-                   0.15 * trend_score +
-                   0.15 * load_growth_score)
+    # Weighted combination (v5 formula) — ISO structural speed anchors it
+    queue_score = (0.45 * iso_base +
+                   0.20 * wait_score +
+                   0.15 * completion_score +
+                   0.10 * trend_score +
+                   0.10 * load_growth_score)
 
     if site.get('brownfield_id'):
         # Brownfield sites get a bonus for existing grid connection, but scale
