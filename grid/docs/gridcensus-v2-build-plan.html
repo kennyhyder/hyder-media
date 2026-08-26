@@ -121,7 +121,8 @@
   </div>
 
   <div class="feat">
-    <div class="ft">Vet-a-site mode <span class="tag easy">easy</span></div>
+    <div class="ft">Vet-a-site mode <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ DONE</span></div>
+    <div class="fd" style="color:var(--green)">Shipped: <strong>gridcensus.com/vet</strong> — address/town/coords + target MW → satellite (Esri), jurisdiction (FCC), MW-gated regulatory, county context, nearby scored sites, hyperscaler footprint, local news. Verified with Jon's "Abilene, TX @ 350 MW" (→ Moderate, SB6 gate). Census + Nominatim town fallback.</div>
     <div class="fd">Input an <strong>address, town, or coordinates</strong> → drop a pin → show the site with latest satellite imagery, resolved jurisdiction, nearby infrastructure, score, and "latest developments/hurdles." His second workflow, verbatim.</div>
     <div class="src"><b>Data (all free/keyless):</b> geocode = <b>US Census Geocoder</b> (+ self-hosted Photon or proxied Mapbox for town names); imagery = <b>Esri World Imagery</b> default + <b>USGS NAIP</b> "latest US aerial" toggle (0.3–0.6 m, 2023–24); jurisdiction = <b>FCC Area API</b> + Census Places; news = <b>GDELT DOC 2.0</b>. Add tile/API hosts to the CSP in <code>next.config.ts</code>.</div>
   </div>
@@ -134,7 +135,8 @@
   </div>
 
   <div class="feat">
-    <div class="ft">DC pipeline v1 + hyperscaler footprint <span class="tag have">have base</span></div>
+    <div class="ft">DC pipeline v1 + hyperscaler footprint <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ v1 DONE</span></div>
+    <div class="fd" style="color:var(--green)">Shipped: vet-a-site shows nearby existing datacenters + a "hyperscalers present" summary (Ashburn VA → Google/Microsoft), classified from real operator data. Phase 2 adds under-construction/queue + off-taker.</div>
     <div class="fd">Surface <strong>operating datacenters</strong> on the map + in the site drawer (you already hold ~3.7k in <code>grid_datacenters</code>), and add a <strong>"who's nearby" hyperscaler footprint</strong> panel (AWS/Meta/Google/MS/Oracle) so even when the specific off-taker is unknown, Jon sees who's over/under-represented in an area — his explicit fallback.</div>
     <div class="src"><b>Data (free, redistributable):</b> operating set = <b>PNNL/IM3 Data Center Atlas</b> (ODbL, bulk CSV/GeoPackage) + <b>OSM Overpass</b> (<code>telecom=data_center</code>) for freshness. Hyperscaler footprint = <b>dgl/cloud-regions</b> (CSV+coords, ODbL/MIT) + <b>Meta atmeta.com</b> (real campuses). <b>Avoid:</b> Baxtel (paid), datacenters.com (scraping banned in ToS) — use only as manual cross-checks.</div>
   </div>
