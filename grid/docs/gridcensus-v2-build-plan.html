@@ -91,7 +91,11 @@
   <h2>The plan — phased</h2>
   <p class="lede">Phase 0 is the trust fix. Phase 1 is Jon's "buildable this week" list. Phase 2 is the differentiators. Phase 3 is moat.</p>
 
-  <div class="phase"><span class="n">0</span><h3>Fix the scoring credibility bug (days)</h3></div>
+  <div class="phase"><span class="n">0</span><h3>Fix the scoring credibility bug <span style="color:var(--green);font-size:13px;font-family:var(--mono)">✓ DONE — shipped 2026-08-26</span></h3></div>
+  <div class="callout">
+    <span class="k">Shipped &amp; verified</span>
+    <p style="margin-top:0">v5 scoring live: replaced the queue-depth penalty with an ISO-keyed speed-to-power base (ERCOT 92 … PJM 34), reweighted speed 15%→20%, rescored all 164k sites, and synced the on-site score breakdown + methodology + api-docs + home copy. <strong>Result (live in DB): Texas rank 36→12 of 47; top TX site 71.5 (speed 84); Georgia #2, Virginia 34, Ohio 20, California last</strong> — matches CBRE/JLL market reality. The methodology page now states plainly that Texas ranks at the top.</p>
+  </div>
   <div class="callout fix">
     <span class="k">The exact bug</span>
     <p style="margin-top:0"><code>score-dc-sites.py</code> → <code>score_speed_to_power()</code> computes <code>depth_score = linear_score(queue_depth, 0, 30)</code> — "30+ queued projects = 0." ERCOT has the <strong>deepest</strong> interconnection queue in the US, so Texas gets zeroed on 20% of its speed-to-power score. But ERCOT's deep queue is a <em>demand</em> signal, not a slowness signal: its <strong>connect-and-manage</strong> model energizes in <strong>~1.5–3 yrs vs 5–7 in PJM</strong>, at ~$29/kW vs PJM's ~$240/kW, and it brought 14.2 GW online in 2021–22 vs PJM's 5.6. The score has the single most important siting factor <em>inverted.</em></p>
