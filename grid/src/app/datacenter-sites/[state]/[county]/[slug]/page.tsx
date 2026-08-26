@@ -31,6 +31,7 @@ import {
   scoreColor,
   article,
 } from "@/lib/format";
+import { regulatoryClimate, statePolicy, DC_POLICY_AS_OF } from "@/lib/dc-policy";
 import SitesTable from "@/components/SitesTable";
 import OrgLink from "@/components/OrgLink";
 import Freshness from "@/components/Freshness";
@@ -750,6 +751,37 @@ export default async function SiteProfilePage({
               See all datacenter sites in {countyLabel} →
             </a>
           </div>
+        </Card>
+
+        <Card title="Regulatory climate">
+          {(() => {
+            const rc = regulatoryClimate(site.state, null);
+            const sp = statePolicy(site.state);
+            const cls =
+              rc.effective === "favorable"
+                ? "bg-green-100 text-green-800"
+                : rc.effective === "moderate"
+                ? "bg-amber-100 text-amber-800"
+                : "bg-red-100 text-red-800";
+            return (
+              <>
+                <div className="flex items-center gap-2 py-1">
+                  <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${cls}`}>
+                    {rc.label}
+                  </span>
+                  <span className="text-xs text-gray-400">state posture · as of {DC_POLICY_AS_OF}</span>
+                </div>
+                <p className="mt-1 mb-1 text-sm text-gray-700">{rc.summary}</p>
+                <Row label="DC tax incentive" value={rc.incentive ? "Yes" : "No / suspended"} />
+                {sp.mwThreshold != null && (
+                  <Row label="Large-load threshold" value={`≥ ${sp.mwThreshold} MW`} />
+                )}
+                {sp.thresholdNote && (
+                  <p className="mt-1 text-xs text-gray-500">{sp.thresholdNote}</p>
+                )}
+              </>
+            );
+          })()}
         </Card>
       </section>
 

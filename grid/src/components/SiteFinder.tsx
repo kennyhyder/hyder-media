@@ -9,6 +9,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { STATES, siteTypeLabel } from "@/lib/geo";
 import { fmtInt, fmtScore, scoreColor } from "@/lib/format";
+import { regulatoryClimate, type Posture } from "@/lib/dc-policy";
+
+const POSTURE_CLS: Record<Posture, string> = {
+  favorable: "bg-green-100 text-green-800",
+  moderate: "bg-amber-100 text-amber-800",
+  restrictive: "bg-red-100 text-red-800",
+};
 
 interface FinderSite {
   id: string;
@@ -131,6 +138,7 @@ export default function SiteFinder() {
                   <th className="py-2 pr-3 font-medium">Type</th>
                   <th className="py-2 pr-3 font-medium text-right">Est. capacity</th>
                   <th className="py-2 pr-3 font-medium">Grid</th>
+                  <th className="py-2 pr-3 font-medium">Regulatory</th>
                   <th className="py-2 font-medium text-right">Readiness</th>
                 </tr>
               </thead>
@@ -151,6 +159,19 @@ export default function SiteFinder() {
                     <td className="py-2 pr-3 text-gray-600">{s.site_type ? siteTypeLabel(s.site_type) : "—"}</td>
                     <td className="py-2 pr-3 text-right tabular-nums text-gray-800">{fmtMw(s.available_capacity_mw)}</td>
                     <td className="py-2 pr-3 text-gray-500">{s.iso_region ?? "—"}</td>
+                    <td className="py-2 pr-3">
+                      {(() => {
+                        const rc = regulatoryClimate(s.state, mw ? Number(mw) : null);
+                        return (
+                          <span
+                            className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${POSTURE_CLS[rc.effective]}`}
+                            title={rc.gated ?? rc.summary}
+                          >
+                            {rc.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="py-2 text-right">
                       <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold tabular-nums ${scoreColor(s.dc_score)}`}>
                         {fmtScore(s.dc_score)}
