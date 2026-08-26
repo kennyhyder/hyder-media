@@ -160,8 +160,8 @@ export async function GET(request: Request) {
       city: dc.city,
       state: dc.state,
       capacity_mw: dc.capacity_mw,
-      hyperscaler: hyperscalerOf(dc.operator),
-      colo: coloOf(dc.operator),
+      hyperscaler: hyperscalerOf(dc.operator) ?? hyperscalerOf(dc.name),
+      colo: coloOf(dc.operator) ?? coloOf(dc.name),
       distance_mi:
         dc.latitude != null && dc.longitude != null
           ? Math.round(milesBetween(geo.lat, geo.lng, dc.latitude, dc.longitude) * 10) / 10
