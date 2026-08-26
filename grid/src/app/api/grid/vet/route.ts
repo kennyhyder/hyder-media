@@ -109,7 +109,8 @@ async function news(place: string): Promise<Article[]> {
   // Google News RSS — keyless, robust, actually returns results from server IPs
   // (GDELT returns empty from cloud IPs). Query scoped to DC-siting topics.
   try {
-    const query = `"${place}" (data center OR datacenter OR substation OR "large load")`;
+    // place AND at least one DC-siting term (Google News treats space as AND, OR as OR)
+    const query = `${place} ("data center" OR datacenter OR "large load" OR substation OR interconnection OR megawatt)`;
     const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
     const r = await fetch(url, {
       signal: AbortSignal.timeout(8000),
@@ -202,7 +203,10 @@ export async function GET(request: Request) {
   const state = juris?.state ?? null;
   const reg = regulatoryClimate(state, mw);
   const placeLabel = juris?.county && juris?.state ? `${juris.county}, ${juris.state}` : geo.label;
-  const articles = await news(placeLabel);
+  // For news, prefer the user's specific place (e.g. "Abilene, TX") over the
+  // county — it's more locally relevant. Fall back to county for coord queries.
+  const newsPlace = COORD_RE.test(q) ? placeLabel : q;
+  const articles = await news(newsPlace);
 
   const nearbyOut = (nearby || []).map((s: DcSite) => ({ ...s, path: siteProfilePath(s) }));
 
