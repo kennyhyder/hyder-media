@@ -45,6 +45,7 @@ function iconFor(href: string): string {
   if (href === "/iso") return ICONS.iso;
   if (href === "/rankings") return ICONS.rankings;
   if (href === "/substations") return ICONS.substations;
+  if (href === "/grid-congestion") return ICONS.substations;
   if (href === "/datacenters") return ICONS.datacenters;
   if (href === "/companies") return ICONS.companies;
   if (href === "/internet-exchanges") return ICONS.exchanges;

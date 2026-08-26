@@ -1,0 +1,508 @@
+{
+  "generated_at": "2026-08-26T22:50:58.609949+00:00",
+  "iso": "ERCOT",
+  "intervals": 8820,
+  "distinct_constraints": 78,
+  "constraints": [
+    {
+      "constraint": "FORTMA_YELWJC1_1",
+      "from_station": "YELWJCKT",
+      "to_station": "FORTMA",
+      "kv": 138,
+      "binding_intervals": 413,
+      "max_shadow_price": 881.0,
+      "avg_shadow_price": 146.0,
+      "severity": 363.8
+    },
+    {
+      "constraint": "LARDVN_LOBO2_1",
+      "from_station": "LOBO",
+      "to_station": "LARDVNTH",
+      "kv": 138,
+      "binding_intervals": 766,
+      "max_shadow_price": 422.0,
+      "avg_shadow_price": 115.0,
+      "severity": 323.4
+    },
+    {
+      "constraint": "587__A",
+      "from_station": "ARGYL",
+      "to_station": "LWSVH",
+      "kv": 138,
+      "binding_intervals": 339,
+      "max_shadow_price": 942.0,
+      "avg_shadow_price": 377.0,
+      "severity": 319.3
+    },
+    {
+      "constraint": "BRUNI_69_1",
+      "from_station": "BRUNI",
+      "to_station": "BRUNI",
+      "kv": 138,
+      "binding_intervals": 119,
+      "max_shadow_price": 2600.0,
+      "avg_shadow_price": 723.0,
+      "severity": 309.4
+    },
+    {
+      "constraint": "ASHERT_CATARI1_1",
+      "from_station": "ASHERTON",
+      "to_station": "CATARINA",
+      "kv": 138,
+      "binding_intervals": 332,
+      "max_shadow_price": 905.0,
+      "avg_shadow_price": 106.0,
+      "severity": 300.6
+    },
+    {
+      "constraint": "BR_HOC09_A",
+      "from_station": "BR",
+      "to_station": "HOC",
+      "kv": 138,
+      "binding_intervals": 302,
+      "max_shadow_price": 920.0,
+      "avg_shadow_price": 112.0,
+      "severity": 277.7
+    },
+    {
+      "constraint": "943__B",
+      "from_station": "ENWSW",
+      "to_station": "SHKSW",
+      "kv": 138,
+      "binding_intervals": 50,
+      "max_shadow_price": 3500.0,
+      "avg_shadow_price": 289.0,
+      "severity": 175.0
+    },
+    {
+      "constraint": "HAINE__LA_PAL1_1",
+      "from_station": "LA_PALMA",
+      "to_station": "HAINE_DR",
+      "kv": 138,
+      "binding_intervals": 368,
+      "max_shadow_price": 419.0,
+      "avg_shadow_price": 151.0,
+      "severity": 154.0
+    },
+    {
+      "constraint": "3180__A",
+      "from_station": "FCRSW",
+      "to_station": "CDHSW",
+      "kv": 138,
+      "binding_intervals": 83,
+      "max_shadow_price": 1311.0,
+      "avg_shadow_price": 461.0,
+      "severity": 108.8
+    },
+    {
+      "constraint": "ATSO_SONR1_1",
+      "from_station": "SONR",
+      "to_station": "ATSO",
+      "kv": 69,
+      "binding_intervals": 442,
+      "max_shadow_price": 245.0,
+      "avg_shadow_price": 115.0,
+      "severity": 108.4
+    },
+    {
+      "constraint": "FREER_LOBO1_1",
+      "from_station": "LOBO",
+      "to_station": "FREER",
+      "kv": 69,
+      "binding_intervals": 114,
+      "max_shadow_price": 936.0,
+      "avg_shadow_price": 285.0,
+      "severity": 106.7
+    },
+    {
+      "constraint": "HON_DEVI_1",
+      "from_station": "HONDOCK",
+      "to_station": "DEVINESW",
+      "kv": 69,
+      "binding_intervals": 139,
+      "max_shadow_price": 545.0,
+      "avg_shadow_price": 245.0,
+      "severity": 75.7
+    },
+    {
+      "constraint": "651__B",
+      "from_station": "CMNSW",
+      "to_station": "CMNTP",
+      "kv": 138,
+      "binding_intervals": 211,
+      "max_shadow_price": 348.0,
+      "avg_shadow_price": 72.0,
+      "severity": 73.5
+    },
+    {
+      "constraint": "THWZEN71_A",
+      "from_station": "ZEN",
+      "to_station": "THW",
+      "kv": 345,
+      "binding_intervals": 478,
+      "max_shadow_price": 131.0,
+      "avg_shadow_price": 44.0,
+      "severity": 62.5
+    },
+    {
+      "constraint": "6965__A",
+      "from_station": "LNGSW",
+      "to_station": "PRLSW",
+      "kv": 345,
+      "binding_intervals": 283,
+      "max_shadow_price": 181.0,
+      "avg_shadow_price": 106.0,
+      "severity": 51.2
+    },
+    {
+      "constraint": "CELANE_KLEBER1_1",
+      "from_station": "CELANEBI",
+      "to_station": "KLEBERG",
+      "kv": 138,
+      "binding_intervals": 183,
+      "max_shadow_price": 245.0,
+      "avg_shadow_price": 83.0,
+      "severity": 44.8
+    },
+    {
+      "constraint": "35055__A",
+      "from_station": "SAMSW",
+      "to_station": "VENSW",
+      "kv": 345,
+      "binding_intervals": 174,
+      "max_shadow_price": 235.0,
+      "avg_shadow_price": 113.0,
+      "severity": 40.9
+    },
+    {
+      "constraint": "GREENL_WEAVER1_1",
+      "from_station": "WEAVERRD",
+      "to_station": "GREENLK",
+      "kv": 69,
+      "binding_intervals": 13,
+      "max_shadow_price": 2728.0,
+      "avg_shadow_price": 393.0,
+      "severity": 35.5
+    },
+    {
+      "constraint": "MADDUX_SAPOWE1_1",
+      "from_station": "MADDUX",
+      "to_station": "SAPOWER",
+      "kv": 138,
+      "binding_intervals": 236,
+      "max_shadow_price": 134.0,
+      "avg_shadow_price": 44.0,
+      "severity": 31.5
+    },
+    {
+      "constraint": "UVALDE",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 503,
+      "max_shadow_price": 56.0,
+      "avg_shadow_price": 14.0,
+      "severity": 28.0
+    },
+    {
+      "constraint": "HHGTOM_1",
+      "from_station": "HHGT",
+      "to_station": "OMEGA",
+      "kv": 345,
+      "binding_intervals": 279,
+      "max_shadow_price": 83.0,
+      "avg_shadow_price": 59.0,
+      "severity": 23.2
+    },
+    {
+      "constraint": "SOLSTICE_PST1",
+      "from_station": "SOLSTICE",
+      "to_station": "SOLSTICE",
+      "kv": 138,
+      "binding_intervals": 119,
+      "max_shadow_price": 195.0,
+      "avg_shadow_price": 38.0,
+      "severity": 23.2
+    },
+    {
+      "constraint": "NELRIO",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 381,
+      "max_shadow_price": 59.0,
+      "avg_shadow_price": 13.0,
+      "severity": 22.6
+    },
+    {
+      "constraint": "VAN_VNDB_1",
+      "from_station": "VANBLTSS",
+      "to_station": "VANBLT69",
+      "kv": 69,
+      "binding_intervals": 74,
+      "max_shadow_price": 301.0,
+      "avg_shadow_price": 91.0,
+      "severity": 22.3
+    },
+    {
+      "constraint": "NE_LOB",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 445,
+      "max_shadow_price": 45.0,
+      "avg_shadow_price": 18.0,
+      "severity": 19.9
+    },
+    {
+      "constraint": "PALOUS_WOLFCA1_1",
+      "from_station": "PALOUSE",
+      "to_station": "WOLFCAMP",
+      "kv": 138,
+      "binding_intervals": 84,
+      "max_shadow_price": 233.0,
+      "avg_shadow_price": 73.0,
+      "severity": 19.6
+    },
+    {
+      "constraint": "BLESSING_1382",
+      "from_station": "BLESSING",
+      "to_station": "BLESSING",
+      "kv": 345,
+      "binding_intervals": 144,
+      "max_shadow_price": 133.0,
+      "avg_shadow_price": 34.0,
+      "severity": 19.1
+    },
+    {
+      "constraint": "450__A",
+      "from_station": "SNDSW",
+      "to_station": "AUSTRO",
+      "kv": 345,
+      "binding_intervals": 198,
+      "max_shadow_price": 89.0,
+      "avg_shadow_price": 23.0,
+      "severity": 17.7
+    },
+    {
+      "constraint": "122T122_1",
+      "from_station": "COMFOR",
+      "to_station": "RAYBAR",
+      "kv": 138,
+      "binding_intervals": 10,
+      "max_shadow_price": 1541.0,
+      "avg_shadow_price": 1138.0,
+      "severity": 15.4
+    },
+    {
+      "constraint": "NLARSW_PILONC1_1",
+      "from_station": "PILONCIL",
+      "to_station": "NLARSW",
+      "kv": 138,
+      "binding_intervals": 51,
+      "max_shadow_price": 291.0,
+      "avg_shadow_price": 92.0,
+      "severity": 14.8
+    },
+    {
+      "constraint": "I_KALO",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 125,
+      "max_shadow_price": 86.0,
+      "avg_shadow_price": 30.0,
+      "severity": 10.7
+    },
+    {
+      "constraint": "E_PASP",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 55,
+      "max_shadow_price": 109.0,
+      "avg_shadow_price": 48.0,
+      "severity": 6.0
+    },
+    {
+      "constraint": "I_DUPS_RESNIK1_1",
+      "from_station": "I_DUPSW",
+      "to_station": "RESNIK",
+      "kv": 138,
+      "binding_intervals": 99,
+      "max_shadow_price": 56.0,
+      "avg_shadow_price": 14.0,
+      "severity": 5.5
+    },
+    {
+      "constraint": "40T189_1",
+      "from_station": "FERGUS",
+      "to_station": "WIRTZ",
+      "kv": 138,
+      "binding_intervals": 149,
+      "max_shadow_price": 37.0,
+      "avg_shadow_price": 10.0,
+      "severity": 5.4
+    },
+    {
+      "constraint": "6325__D",
+      "from_station": "LTVSB",
+      "to_station": "GRDPR",
+      "kv": 138,
+      "binding_intervals": 8,
+      "max_shadow_price": 433.0,
+      "avg_shadow_price": 195.0,
+      "severity": 3.5
+    },
+    {
+      "constraint": "35065__A",
+      "from_station": "FVLSW",
+      "to_station": "FTSSW",
+      "kv": 345,
+      "binding_intervals": 67,
+      "max_shadow_price": 46.0,
+      "avg_shadow_price": 35.0,
+      "severity": 3.1
+    },
+    {
+      "constraint": "MAXWEL_WHITIN1_1",
+      "from_station": "MAXWELL",
+      "to_station": "WHITING",
+      "kv": 138,
+      "binding_intervals": 47,
+      "max_shadow_price": 66.0,
+      "avg_shadow_price": 23.0,
+      "severity": 3.1
+    },
+    {
+      "constraint": "BALLIN_PAINTR1_1",
+      "from_station": "BALLINGE",
+      "to_station": "PAINTROC",
+      "kv": 69,
+      "binding_intervals": 2,
+      "max_shadow_price": 1566.0,
+      "avg_shadow_price": 1509.0,
+      "severity": 3.1
+    },
+    {
+      "constraint": "HEC_NEDIN2_1",
+      "from_station": "HEC",
+      "to_station": "NEDIN",
+      "kv": 138,
+      "binding_intervals": 166,
+      "max_shadow_price": 18.0,
+      "avg_shadow_price": 7.0,
+      "severity": 2.9
+    },
+    {
+      "constraint": "35045__A",
+      "from_station": "SAMSW",
+      "to_station": "FVLSW",
+      "kv": 345,
+      "binding_intervals": 64,
+      "max_shadow_price": 46.0,
+      "avg_shadow_price": 13.0,
+      "severity": 2.9
+    },
+    {
+      "constraint": "109__A",
+      "from_station": "EXCSW",
+      "to_station": "RNKSW",
+      "kv": 345,
+      "binding_intervals": 48,
+      "max_shadow_price": 59.0,
+      "avg_shadow_price": 32.0,
+      "severity": 2.8
+    },
+    {
+      "constraint": "BAKRFLD_CEDCAN_1",
+      "from_station": "CEDACA",
+      "to_station": "BAKESW",
+      "kv": 345,
+      "binding_intervals": 40,
+      "max_shadow_price": 55.0,
+      "avg_shadow_price": 18.0,
+      "severity": 2.2
+    },
+    {
+      "constraint": "BLASCOFE_RC_1",
+      "from_station": "BLASW",
+      "to_station": "COFESSRC",
+      "kv": 138,
+      "binding_intervals": 26,
+      "max_shadow_price": 83.0,
+      "avg_shadow_price": 7.0,
+      "severity": 2.2
+    },
+    {
+      "constraint": "PANTER_WESMER1_1",
+      "from_station": "WESMER",
+      "to_station": "PANTERA",
+      "kv": 138,
+      "binding_intervals": 17,
+      "max_shadow_price": 122.0,
+      "avg_shadow_price": 101.0,
+      "severity": 2.1
+    },
+    {
+      "constraint": "SND_ORAN_1",
+      "from_station": "ORNGROV",
+      "to_station": "SNDIEGS",
+      "kv": 69,
+      "binding_intervals": 12,
+      "max_shadow_price": 177.0,
+      "avg_shadow_price": 135.0,
+      "severity": 2.1
+    },
+    {
+      "constraint": "MLB_SLR_TLINE_1",
+      "from_station": "MLB_SLR",
+      "to_station": "QUASAR",
+      "kv": 345,
+      "binding_intervals": 36,
+      "max_shadow_price": 57.0,
+      "avg_shadow_price": 44.0,
+      "severity": 2.0
+    },
+    {
+      "constraint": "E_PATA",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 16,
+      "max_shadow_price": 113.0,
+      "avg_shadow_price": 40.0,
+      "severity": 1.8
+    },
+    {
+      "constraint": "MCCAMY",
+      "from_station": null,
+      "to_station": null,
+      "kv": null,
+      "binding_intervals": 65,
+      "max_shadow_price": 24.0,
+      "avg_shadow_price": 3.0,
+      "severity": 1.5
+    },
+    {
+      "constraint": "VERTRE_WESLAU1_1",
+      "from_station": "WESLAU",
+      "to_station": "VERTREES",
+      "kv": 138,
+      "binding_intervals": 13,
+      "max_shadow_price": 112.0,
+      "avg_shadow_price": 91.0,
+      "severity": 1.5
+    },
+    {
+      "constraint": "6945__A",
+      "from_station": "MGSES",
+      "to_station": "CATSW",
+      "kv": 345,
+      "binding_intervals": 18,
+      "max_shadow_price": 82.0,
+      "avg_shadow_price": 31.0,
+      "severity": 1.5
+    }
+  ]
+}

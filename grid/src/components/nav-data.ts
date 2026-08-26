@@ -29,6 +29,7 @@ export const INFRA_GROUP: NavGroup = {
   label: "Infrastructure",
   links: [
     { href: "/substations", label: "Substations", match: "/substations" },
+    { href: "/grid-congestion", label: "Grid Congestion", match: "/grid-congestion" },
     { href: "/datacenters", label: "Datacenters", match: "/datacenters" },
     { href: "/companies", label: "Organizations", match: "/companies" },
     { href: "/internet-exchanges", label: "Internet Exchanges", match: "/internet-exchanges" },
