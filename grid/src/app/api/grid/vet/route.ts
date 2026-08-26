@@ -4,6 +4,7 @@ import { nearbySitesByLatLng, nearbyDatacentersByLatLng, getCountyByFips, type D
 import { siteProfilePath } from "@/lib/entity-slug";
 import { regulatoryClimate } from "@/lib/dc-policy";
 import { hyperscalerOf, coloOf } from "@/lib/hyperscalers";
+import { fetchNews } from "@/lib/grid-api/news";
 import frontier from "@/data/frontier-dc.json";
 
 function milesBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
@@ -98,47 +99,6 @@ async function jurisdiction(lat: number, lng: number) {
   return null;
 }
 
-interface Article { title: string; url: string; domain: string; date: string }
-
-function tag(block: string, name: string): string {
-  const m = block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`, "i"));
-  return (m?.[1] || "").replace(/<!\[CDATA\[|\]\]>/g, "").trim();
-}
-
-async function news(place: string): Promise<Article[]> {
-  // Google News RSS — keyless, robust, actually returns results from server IPs
-  // (GDELT returns empty from cloud IPs). Query scoped to DC-siting topics.
-  try {
-    // place AND at least one DC-siting term (Google News treats space as AND, OR as OR)
-    const query = `${place} ("data center" OR datacenter OR "large load" OR substation OR interconnection OR megawatt)`;
-    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
-    const r = await fetch(url, {
-      signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; GridCensus/1.0)" },
-    });
-    if (!r.ok) return [];
-    const xml = await r.text();
-    const items = xml.split("<item>").slice(1, 9);
-    const out: Article[] = [];
-    for (const it of items) {
-      let title = tag(it, "title");
-      const link = tag(it, "link");
-      const source = tag(it, "source");
-      const pub = tag(it, "pubDate");
-      if (!title || !link) continue;
-      // Google News appends " - Source" to titles; trim it when we have the source.
-      if (source && title.endsWith(` - ${source}`)) title = title.slice(0, -(source.length + 3));
-      let date = pub;
-      const t = Date.parse(pub);
-      if (!isNaN(t)) date = new Date(t).toISOString().slice(0, 10);
-      out.push({ title, url: link, domain: source, date });
-    }
-    return out.slice(0, 6);
-  } catch {
-    return [];
-  }
-}
-
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
 }
@@ -206,7 +166,7 @@ export async function GET(request: Request) {
   // For news, prefer the user's specific place (e.g. "Abilene, TX") over the
   // county — it's more locally relevant. Fall back to county for coord queries.
   const newsPlace = COORD_RE.test(q) ? placeLabel : q;
-  const articles = await news(newsPlace);
+  const articles = await fetchNews(newsPlace);
 
   const nearbyOut = (nearby || []).map((s: DcSite) => ({ ...s, path: siteProfilePath(s) }));
 

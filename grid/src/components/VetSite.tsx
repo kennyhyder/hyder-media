@@ -73,12 +73,15 @@ export default function VetSite() {
   const [result, setResult] = useState<VetResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dev, setDev] = useState<{ summary: string | null; sentiment: string | null } | null>(null);
+  const [devLoading, setDevLoading] = useState(false);
 
   const run = () => {
     const query = q.trim();
     if (!query) return;
     setLoading(true);
     setError(null);
+    setDev(null);
     const p = new URLSearchParams({ q: query });
     if (mw) p.set("mw", mw);
     fetch(`${window.location.origin}/api/grid/vet?${p.toString()}`)
@@ -90,6 +93,27 @@ export default function VetSite() {
       .then((j) => setResult(j))
       .catch((e) => { setError(e.message); setResult(null); })
       .finally(() => setLoading(false));
+  };
+
+  const summarize = () => {
+    if (!result) return;
+    setDevLoading(true);
+    const loc = result.location;
+    const place = loc.county && loc.state ? `${loc.county}, ${loc.state}` : loc.label;
+    const p = new URLSearchParams({ place });
+    if (loc.state) p.set("state", loc.state);
+    if (result.targetMw != null) p.set("mw", String(result.targetMw));
+    fetch(`${window.location.origin}/api/grid/developments?${p.toString()}`)
+      .then((r) => r.json())
+      .then((j) => setDev({ summary: j.summary ?? null, sentiment: j.sentiment ?? null }))
+      .catch(() => setDev({ summary: null, sentiment: null }))
+      .finally(() => setDevLoading(false));
+  };
+
+  const SENTIMENT_CLS: Record<string, string> = {
+    supportive: "bg-green-100 text-green-800",
+    mixed: "bg-amber-100 text-amber-800",
+    cautionary: "bg-red-100 text-red-800",
   };
 
   const c = result?.county;
@@ -314,7 +338,26 @@ export default function VetSite() {
           {/* News */}
           {result.news.length > 0 && (
             <div>
-              <h3 className="mb-2 text-sm font-bold text-gray-900">Latest local developments</h3>
+              <div className="mb-2 flex flex-wrap items-center gap-3">
+                <h3 className="text-sm font-bold text-gray-900">Latest local developments</h3>
+                {!dev && (
+                  <button
+                    onClick={summarize}
+                    disabled={devLoading}
+                    className="rounded-lg border border-purple-300 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700 transition hover:bg-purple-100 disabled:opacity-50"
+                  >
+                    {devLoading ? "Summarizing…" : "✨ Summarize developments & hurdles"}
+                  </button>
+                )}
+                {dev?.sentiment && (
+                  <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${SENTIMENT_CLS[dev.sentiment] || "bg-gray-100 text-gray-700"}`}>
+                    {dev.sentiment}
+                  </span>
+                )}
+              </div>
+              {dev?.summary && (
+                <p className="mb-3 rounded-lg border border-purple-100 bg-purple-50 p-3 text-sm text-gray-800">{dev.summary}</p>
+              )}
               <ul className="space-y-1.5 text-sm">
                 {result.news.map((a, i) => (
                   <li key={i} className="flex flex-wrap items-baseline gap-x-2 border-b border-gray-100 py-1.5 last:border-0">
