@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { CORS_HEADERS, handleError } from "@/lib/grid-api/utils";
-import { nearbySitesByLatLng, getCountyByFips, type DcSite } from "@/lib/db";
+import { nearbySitesByLatLng, nearbyDatacentersByLatLng, getCountyByFips, type DcSite, type Datacenter } from "@/lib/db";
 import { siteProfilePath } from "@/lib/entity-slug";
 import { regulatoryClimate } from "@/lib/dc-policy";
+import { hyperscalerOf, coloOf } from "@/lib/hyperscalers";
+
+function milesBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 3958.8;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+}
 
 // Vet-a-site (Phase 1) — Jon De Pena's second workflow: bring a location
 // (address / town / lat,lng) + a target build size, and get a first-pass read:
@@ -134,10 +145,30 @@ export async function GET(request: Request) {
   }
 
   const juris = await jurisdiction(geo.lat, geo.lng);
-  const [nearby, county] = await Promise.all([
+  const [nearby, county, dcs] = await Promise.all([
     nearbySitesByLatLng(geo.lat, geo.lng, 8),
     juris?.fips ? getCountyByFips(juris.fips) : Promise.resolve(null),
+    nearbyDatacentersByLatLng(geo.lat, geo.lng, null, 10, 0.7),
   ]);
+
+  // Existing-datacenter footprint near the location, with hyperscaler/colo tags.
+  const datacenters = (dcs || [])
+    .map((dc: Datacenter) => ({
+      id: dc.id,
+      name: dc.name,
+      operator: dc.operator,
+      city: dc.city,
+      state: dc.state,
+      capacity_mw: dc.capacity_mw,
+      hyperscaler: hyperscalerOf(dc.operator),
+      colo: coloOf(dc.operator),
+      distance_mi:
+        dc.latitude != null && dc.longitude != null
+          ? Math.round(milesBetween(geo.lat, geo.lng, dc.latitude, dc.longitude) * 10) / 10
+          : null,
+    }))
+    .sort((a, b) => (a.distance_mi ?? 1e9) - (b.distance_mi ?? 1e9));
+  const hyperscalerFootprint = [...new Set(datacenters.map((d) => d.hyperscaler).filter(Boolean))];
 
   const state = juris?.state ?? null;
   const reg = regulatoryClimate(state, mw);
@@ -161,6 +192,8 @@ export async function GET(request: Request) {
       regulatory: reg,
       county,
       nearby: nearbyOut,
+      datacenters,
+      hyperscalerFootprint,
       news: articles,
     },
     { headers: CORS_HEADERS }

@@ -39,6 +39,11 @@ interface VetResult {
     id: string; path: string | null; name: string | null; state: string | null; county: string | null;
     site_type: string | null; dc_score: number | null; available_capacity_mw: number | null; iso_region: string | null;
   }>;
+  datacenters: Array<{
+    id: string; name: string | null; operator: string | null; city: string | null; state: string | null;
+    capacity_mw: number | null; hyperscaler: string | null; colo: string | null; distance_mi: number | null;
+  }>;
+  hyperscalerFootprint: string[];
   news: Array<{ title: string; url: string; domain: string; date: string }>;
 }
 
@@ -219,6 +224,58 @@ export default function VetSite() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* Datacenter / hyperscaler footprint */}
+          {result.datacenters.length > 0 && (
+            <div>
+              <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h3 className="text-sm font-bold text-gray-900">Datacenter footprint nearby</h3>
+                {result.hyperscalerFootprint.length > 0 && (
+                  <span className="text-xs text-gray-500">
+                    Hyperscalers present:{" "}
+                    {result.hyperscalerFootprint.map((h) => (
+                      <span key={h} className="mr-1 inline-block rounded bg-purple-50 px-1.5 py-0.5 font-medium text-purple-700 ring-1 ring-purple-200">
+                        {h}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
+                      <th className="py-2 pr-3 font-medium">Datacenter</th>
+                      <th className="py-2 pr-3 font-medium">Operator</th>
+                      <th className="py-2 pr-3 font-medium text-right">Capacity</th>
+                      <th className="py-2 font-medium text-right">Distance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.datacenters.slice(0, 8).map((dc) => (
+                      <tr key={dc.id} className="border-b border-gray-100 last:border-0">
+                        <td className="py-2 pr-3 font-medium text-gray-900">{dc.name || "—"}</td>
+                        <td className="py-2 pr-3 text-gray-600">
+                          {dc.operator || "—"}
+                          {dc.hyperscaler && (
+                            <span className="ml-1 inline-block rounded bg-purple-50 px-1.5 py-0.5 text-xs font-medium text-purple-700">
+                              {dc.hyperscaler}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2 pr-3 text-right tabular-nums text-gray-700">{fmtMw(dc.capacity_mw)}</td>
+                        <td className="py-2 text-right tabular-nums text-gray-500">{dc.distance_mi != null ? `${dc.distance_mi} mi` : "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                Who already operates near here — a proxy for likely off-takers and grid/ecosystem
+                maturity when the specific tenant isn&apos;t public.
+              </p>
             </div>
           )}
 
