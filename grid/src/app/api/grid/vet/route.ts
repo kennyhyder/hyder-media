@@ -37,7 +37,29 @@ async function geocode(q: string): Promise<{ lat: number; lng: number; label: st
       return { lat: match.coordinates.y, lng: match.coordinates.x, label: match.matchedAddress || q };
     }
   } catch {
-    /* geocode failed — return null below */
+    /* Census failed — fall through to the place fallback */
+  }
+  // Fallback for town / place names (Census is address-only). Low-volume,
+  // server-side, US-only, with a contact User-Agent per OSM policy.
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=us`;
+    const r = await fetch(url, {
+      signal: AbortSignal.timeout(8000),
+      headers: { "User-Agent": "GridCensus/1.0 (+https://gridcensus.com; kenny@hyder.me)" },
+    });
+    if (r.ok) {
+      const j = await r.json();
+      const hit = Array.isArray(j) ? j[0] : null;
+      if (hit) {
+        const lat = parseFloat(hit.lat);
+        const lng = parseFloat(hit.lon);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          return { lat, lng, label: (hit.display_name as string) || q };
+        }
+      }
+    }
+  } catch {
+    /* place fallback failed — return null below */
   }
   return null;
 }
