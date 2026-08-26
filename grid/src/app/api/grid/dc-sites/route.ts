@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabase } from "@/lib/grid-api/db";
 import { checkDemoAccess, demoLimitsPayload } from "@/lib/grid-api/demo";
 import { CORS_HEADERS, cacheHeaders, handleError, internalError, sanitizeSearch } from "@/lib/grid-api/utils";
+import { siteProfilePath } from "@/lib/entity-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -157,9 +158,21 @@ export async function GET(request: Request) {
       results.sort((a, b) => (a.distance_miles || 0) - (b.distance_miles || 0));
     }
 
+    // Attach canonical profile path (rollup-resolved county) for clean client links.
+    const withPath = results.map((site) => ({
+      ...site,
+      path: siteProfilePath({
+        id: String(site.id),
+        name: site.name as string | null | undefined,
+        state: site.state as string | null | undefined,
+        fips_code: site.fips_code as string | null | undefined,
+        county: site.county as string | null | undefined,
+      }),
+    }));
+
     return NextResponse.json(
       {
-        data: results,
+        data: withPath,
         pagination: {
           limit: limitNum,
           offset: offsetNum,

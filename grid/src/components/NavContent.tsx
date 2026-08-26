@@ -38,6 +38,7 @@ function Icon({ d }: { d: string }) {
 
 function iconFor(href: string): string {
   if (href === "/map") return ICONS.map;
+  if (href === "/find") return ICONS.search;
   if (href === "/datacenter-sites") return ICONS.locations;
   if (href === "/site-types") return ICONS.types;
   if (href === "/iso") return ICONS.iso;
