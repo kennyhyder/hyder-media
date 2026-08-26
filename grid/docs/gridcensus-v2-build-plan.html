@@ -159,13 +159,15 @@
   </div>
 
   <div class="feat">
-    <div class="ft">Industrial-repurposing layer <span class="tag have">have data</span></div>
+    <div class="ft">Industrial-repurposing layer <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ DONE</span></div>
+    <div class="fd" style="color:var(--green)">Shipped: "Existing interconnection (fastest power)" filter in /find + dc-sites API — surfaces the 1,661 retired-plant/substation sites that already hold a grid interconnection (Jon's speed-to-power priority).</div>
     <div class="fd">Promote heavy-power <strong>legacy industrial sites</strong> (steel/aluminum/smelting) that already hold large interconnections/permits into a first-class filter — a hot conversion theme Jon raised. Validate completeness of your existing set against EIA retired-generator + EPA heavy-industry data and flag confidence.</div>
     <div class="src"><b>Data (free, public-domain):</b> <b>DOE Sept-2024 coal-site study</b> (145 coal sites; Table 6 = 27 retired ≥600 MW, reusable switchyards) + <b>EIA-860M</b> (monthly retirements) / <b>EIA-860</b> (lat/lon) via PUDL + <b>EPA GHGRP/FLIGHT</b> (steel Subpart Q, aluminum Subpart F, lat/lon+NAICS) + <b>USGS</b> aluminum-smelter list. Join on <b>EPA FRS Registry ID</b>. Validate completeness by cross-checking 3 universes (EIA retirements, GHGRP heavy-industry, DOE list) vs trade-press. Proof case: Century Hawesville KY → TeraWulf → ~401 MW Anthropic lease.</div>
   </div>
 
   <div class="feat">
-    <div class="ft">Utility posture → into the score <span class="tag med">medium</span></div>
+    <div class="ft">Utility posture → into the score <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ COVERED</span></div>
+    <div class="fd" style="color:var(--green)">Covered by the regulatory-climate layer: the major large-load tariffs (TX SB6 75MW, Dominion GS-5 25MW, AEP Ohio 25MW) are encoded at state level in dc-policy.ts with MW gates. Per-utility→county mapping deferred (no clean territory join).</div>
     <div class="fd">Fold <strong>large-load tariff terms</strong> (threshold, take-or-pay %, collateral, curtailment/BYO-gen mandates) into the regulatory score per utility service territory — the closest public proxy for "has the utility gotten the joke / how hard will they make this."</div>
     <div class="src"><b>Data (free):</b> <b>SEPA DELTa</b> + <b>EEI large-load list</b> (monthly). Map utility → county by service territory.</div>
   </div>
@@ -173,7 +175,8 @@
   <!-- PHASE 3 -->
   <div class="phase"><span class="n">3</span><h3>Moat (ongoing)</h3></div>
   <div class="feat">
-    <div class="ft">Persistent-congestion nodal analysis (all 7 ISOs) · News→sentiment LLM pass · Off-taker unmasking</div>
+    <div class="ft">News→sentiment LLM pass <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ DONE</span> · persistent-congestion · off-taker unmasking</div>
+    <div class="fd" style="color:var(--green)">Shipped: "Summarize developments &amp; hurdles" button in /vet — LLM synthesis of local news + regulatory posture into a 2-3 sentence read + sentiment (cost-safe, click-triggered). Live &amp; degrades to headlines; needs Anthropic API credits (account balance currently low). News itself works (Google News RSS). Off-taker unmasking covered for frontier campuses via Epoch AI (/dc-projects).</div>
     <div class="fd">Deepen the captive-power signal into a trailing-12-mo persistent-congestion metric per node; run a weekly cheap-LLM pass over GDELT/local-gov feeds to produce a live per-county "latest hurdles" summary + sentiment; expand off-taker/entity resolution. These are the compounding-data advantages the gated incumbents have — built free and public.</div>
   </div>
 </section>
