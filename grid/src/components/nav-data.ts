@@ -17,6 +17,7 @@ export interface NavGroup {
 export const PRIMARY_LINKS: NavLink[] = [
   { href: "/map", label: "Map", match: "/map" },
   { href: "/find", label: "Find by Size", match: "/find" },
+  { href: "/vet", label: "Vet a Site", match: "/vet" },
   { href: "/datacenter-sites", label: "Locations", match: "/datacenter-sites" },
   { href: "/site-types", label: "Site Types", match: "/site-types" },
   { href: "/iso", label: "ISO Regions", match: "/iso" },
