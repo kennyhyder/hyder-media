@@ -114,7 +114,8 @@
   <div class="phase"><span class="n">1</span><h3>Jon's "this week" list (1–2 wks)</h3></div>
 
   <div class="feat">
-    <div class="ft">MW-size selector <span class="tag easy">easy</span></div>
+    <div class="ft">MW-size selector <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ DONE</span></div>
+    <div class="fd" style="color:var(--green)">Shipped: <strong>gridcensus.com/find</strong> — pick a target size (25 MW–2 GW) + state/type, get sites that support it ranked by DC Readiness. Verified live.</div>
     <div class="fd">A size input (dropdown: <strong>&lt;1, 25, 50, 150, 350, 500, 1000, 2000 MW</strong>) that filters/re-scores sites for that build size. Every downstream layer (regulatory, power, bottleneck) reads this. His stated range: sub-1 to 2,000 MW, "2 is a good top end."</div>
     <div class="src"><b>Data:</b> none new — drives filtering over existing power/capacity fields.</div>
   </div>
@@ -126,7 +127,8 @@
   </div>
 
   <div class="feat">
-    <div class="ft">Regulatory-support layer + MW slider <span class="tag med">medium</span> <span class="tag" style="color:var(--purple);border-color:#3f2f5a">killer feature</span></div>
+    <div class="ft">Regulatory-support layer + MW slider <span class="tag" style="color:var(--green);border-color:#1f4a3a">✓ v1 DONE</span></div>
+    <div class="fd" style="color:var(--green)">Shipped v1: MW-gated regulatory-climate posture (Favorable/Moderate/Restrictive) on every site page + a Regulatory column in /find that escalates when the target build trips a threshold (TX SB6 75 MW, VA/OH 25 MW, AZ/IL/NY restrictions). Curated state dataset. Phase 2 adds the county moratorium heat map (Bommar CC-BY) + a live MW slider.</div>
     <div class="fd">A per-state and per-county <strong>DC-support score (0–100) that changes with the MW slider</strong> — a heat map that re-colors as thresholds trip (green &lt;25 MW, yellow 25–74, red ≥75 in a SB6-type jurisdiction). Restrictions are overwhelmingly MW-gated, so "supportive up to X MW" is a real, sourceable attribute — exactly Jon's ask.</div>
     <div class="src"><b>Data (free):</b> local moratoria = <b>Bommar <code>moratorium-data-2026</code></b> (533 local + 440 state actions, lat/long, CC-BY, quarterly, GitHub); utility posture = <b>SEPA DELTa</b> large-load tariffs (77 filings, MW threshold + take-or-pay); state incentives/laws = MultiState + Good Jobs First (semi-manual monthly). Store per-jurisdiction breakpoints <code>(threshold_mw, regime, severity)</code>, evaluate as a step function of the queried MW.</div>
   </div>
