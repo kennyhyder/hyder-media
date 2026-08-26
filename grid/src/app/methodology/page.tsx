@@ -15,22 +15,26 @@ export const metadata: Metadata = {
 };
 
 const WEIGHTS = [
-  { factor: "Power availability", weight: 25, note: "Estimated deliverable capacity, substation proximity, and headroom." },
-  { factor: "Speed-to-power", weight: 20, note: "Interconnection-queue dynamics, substation adjacency, transmission distance." },
-  { factor: "Fiber", weight: 15, note: "Count of nearby fiber providers and internet-exchange proximity." },
-  { factor: "Water", weight: 10, note: "Water-stress index (cooling-water availability proxy)." },
-  { factor: "Hazard", weight: 10, note: "FEMA National Risk Index and flood-zone exposure." },
-  { factor: "Labor", weight: 5, note: "Construction-trades employment and wage data." },
-  { factor: "Existing datacenter", weight: 5, note: "Proximity to existing datacenter clusters and ecosystem." },
-  { factor: "Land", weight: 5, note: "Estimated land price per acre and parcel size." },
-  { factor: "Tax", weight: 3, note: "Presence of datacenter tax incentives in the jurisdiction." },
-  { factor: "Climate", weight: 2, note: "Cooling/heating degree days and mean temperature." },
+  { factor: "Power availability", weight: 20, note: "Estimated deliverable capacity, substation proximity, voltage, and headroom." },
+  { factor: "Speed-to-power", weight: 20, note: "Structural interconnection speed of the market (ERCOT's connect-and-manage is the fastest US path to power, ~1.5–3 yr vs 5–7 in PJM), plus measured queue wait, completion rate, and load growth." },
+  { factor: "Fiber", weight: 12, note: "Count of nearby fiber providers and internet-exchange proximity." },
+  { factor: "Energy cost", weight: 10, note: "Commercial/industrial electricity rates." },
+  { factor: "Water", weight: 7, note: "Water-stress index (cooling-water availability proxy)." },
+  { factor: "Hazard", weight: 6, note: "FEMA National Risk Index and flood-zone exposure." },
+  { factor: "Buildability", weight: 7, note: "Slope, parcel size, and site-development friction." },
+  { factor: "Labor", weight: 4, note: "Construction-trades employment and wage data." },
+  { factor: "Existing datacenter", weight: 4, note: "Proximity to existing datacenter clusters and ecosystem." },
+  { factor: "Land", weight: 3, note: "Estimated land price per acre and parcel size." },
+  { factor: "Construction cost", weight: 3, note: "Regional construction cost index." },
+  { factor: "Gas pipeline", weight: 2, note: "Proximity to natural-gas pipeline for on-site generation." },
+  { factor: "Tax", weight: 1, note: "Presence of datacenter tax incentives in the jurisdiction." },
+  { factor: "Climate", weight: 1, note: "Cooling/heating degree days and mean temperature." },
 ];
 
 const FAQ = [
   {
     q: "What does the DC Readiness score mean?",
-    a: "It is a 0–100 screening estimate that blends ten weighted factors into a single number. A higher score means a site screens better across power, speed-to-power, fiber, water, and hazard. It is a starting point for site selection, not a substitute for site-specific engineering, environmental, or interconnection studies.",
+    a: "It is a 0–100 screening estimate that blends fourteen weighted factors into a single number. A higher score means a site screens better across power, speed-to-power, fiber, energy cost, and hazard. Speed-to-power is scored on the structural interconnection speed of the market — ERCOT's connect-and-manage model is the fastest US path to power, so Texas scores at the top, not the bottom. It is a starting point for site selection, not a substitute for site-specific engineering, environmental, or interconnection studies.",
   },
   {
     q: "Is the catalogued capacity actually available power?",
@@ -62,7 +66,7 @@ export default function MethodologyPage() {
       <p className="mt-3 text-gray-700">
         {SITE_NAME} scores {fmtInt(national.count)} candidate datacenter
         locations on a single 0–100 <strong>DC Readiness</strong> score. The
-        score is a weighted blend of ten factors derived from public data
+        score is a weighted blend of fourteen factors derived from public data
         sources. It is a screening tool to triage where to look first — not a
         site-specific engineering, environmental, or interconnection
         assessment.

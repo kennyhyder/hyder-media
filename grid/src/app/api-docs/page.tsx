@@ -173,7 +173,7 @@ export default function APIDocsPage() {
 
   const scoreWeights = [
     { factor: "Power Availability", weight: "20%", desc: "Substation distance, voltage, available capacity" },
-    { factor: "Speed to Power", weight: "15%", desc: "ISO queue depth, brownfield grid bonus, existing capacity" },
+    { factor: "Speed to Power", weight: "20%", desc: "ISO market structure (ERCOT connect-and-manage = fastest), measured queue wait, brownfield grid bonus" },
     { factor: "Fiber Connectivity", weight: "12%", desc: "IXP distance, fiber route proximity, county fiber providers" },
     { factor: "Energy Cost", weight: "10%", desc: "EIA state-level commercial electricity price ($/MWh)" },
     { factor: "Water Risk", weight: "8%", desc: "WRI Aqueduct baseline water stress (inverted)" },

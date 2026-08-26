@@ -257,10 +257,11 @@ export default async function HomePage() {
       <section className="mt-10 rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="text-lg font-bold text-gray-900">How scoring works</h2>
         <p className="mt-2 text-sm text-gray-700">
-          DC Readiness is a 0–100 weighted blend of ten factors — power (25%),
-          speed-to-power (20%), fiber (15%), water (10%), hazard (10%), and
-          smaller weights for labor, existing-datacenter ecosystem, land, tax,
-          and climate. Scores are screening estimates from public data sources;
+          DC Readiness is a 0–100 weighted blend of fourteen factors — power (20%),
+          speed-to-power (20%, scored on market interconnection speed — ERCOT ranks
+          fastest), fiber (12%), energy cost (10%), and smaller weights for water,
+          hazard, buildability, labor, existing-datacenter ecosystem, land,
+          construction cost, gas pipeline, tax, and climate. Scores are screening estimates from public data sources;
           catalogued capacity is a theoretical aggregate, not deliverable power.{" "}
           <a href="/methodology" className="font-medium text-purple-700 hover:underline">
             Read the full methodology →

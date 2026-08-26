@@ -246,19 +246,19 @@ function YesFlag({
 
 const SUBSCORES: Array<{ key: keyof FullDcSite; label: string; weight: string }> = [
   { key: "score_power", label: "Power availability", weight: "20%" },
-  { key: "score_speed_to_power", label: "Speed to power", weight: "15%" },
+  { key: "score_speed_to_power", label: "Speed to power", weight: "20%" },
   { key: "score_fiber", label: "Fiber connectivity", weight: "12%" },
   { key: "score_energy_cost", label: "Energy cost", weight: "10%" },
-  { key: "score_water", label: "Water risk", weight: "8%" },
-  { key: "score_hazard", label: "Natural hazard", weight: "8%" },
+  { key: "score_water", label: "Water risk", weight: "7%" },
+  { key: "score_hazard", label: "Natural hazard", weight: "6%" },
   { key: "score_buildability", label: "Buildability", weight: "7%" },
   { key: "score_labor", label: "Labor market", weight: "4%" },
   { key: "score_existing_dc", label: "DC cluster", weight: "4%" },
   { key: "score_land", label: "Land / acreage", weight: "3%" },
   { key: "score_construction_cost", label: "Construction cost", weight: "3%" },
   { key: "score_gas_pipeline", label: "Gas pipeline", weight: "2%" },
-  { key: "score_tax", label: "Tax incentive", weight: "2%" },
-  { key: "score_climate", label: "Climate / cooling", weight: "2%" },
+  { key: "score_tax", label: "Tax incentive", weight: "1%" },
+  { key: "score_climate", label: "Climate / cooling", weight: "1%" },
 ];
 
 function ScoreBar({ label, weight, value }: { label: string; weight: string; value: number | null }) {
