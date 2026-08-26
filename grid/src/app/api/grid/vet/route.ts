@@ -100,25 +100,39 @@ async function jurisdiction(lat: number, lng: number) {
 
 interface Article { title: string; url: string; domain: string; date: string }
 
+function tag(block: string, name: string): string {
+  const m = block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`, "i"));
+  return (m?.[1] || "").replace(/<!\[CDATA\[|\]\]>/g, "").trim();
+}
+
 async function news(place: string): Promise<Article[]> {
+  // Google News RSS — keyless, robust, actually returns results from server IPs
+  // (GDELT returns empty from cloud IPs). Query scoped to DC-siting topics.
   try {
     const query = `"${place}" (data center OR datacenter OR substation OR "large load")`;
-    const url =
-      `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}` +
-      `&mode=artlist&maxrecords=6&format=json&sort=datedesc&timespan=6m`;
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
     const r = await fetch(url, {
       signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "GridCensus/1.0 (+https://gridcensus.com)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; GridCensus/1.0)" },
     });
     if (!r.ok) return [];
-    const j = await r.json();
-    const arts = Array.isArray(j?.articles) ? j.articles : [];
-    return arts.slice(0, 6).map((a: Record<string, string>) => ({
-      title: a.title,
-      url: a.url,
-      domain: a.domain,
-      date: a.seendate,
-    }));
+    const xml = await r.text();
+    const items = xml.split("<item>").slice(1, 9);
+    const out: Article[] = [];
+    for (const it of items) {
+      let title = tag(it, "title");
+      const link = tag(it, "link");
+      const source = tag(it, "source");
+      const pub = tag(it, "pubDate");
+      if (!title || !link) continue;
+      // Google News appends " - Source" to titles; trim it when we have the source.
+      if (source && title.endsWith(` - ${source}`)) title = title.slice(0, -(source.length + 3));
+      let date = pub;
+      const t = Date.parse(pub);
+      if (!isNaN(t)) date = new Date(t).toISOString().slice(0, 10);
+      out.push({ title, url: link, domain: source, date });
+    }
+    return out.slice(0, 6);
   } catch {
     return [];
   }

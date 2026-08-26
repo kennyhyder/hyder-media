@@ -63,9 +63,8 @@ function fmtMw(n: number | null): string {
 }
 
 function fmtDate(d: string): string {
-  // GDELT seendate is YYYYMMDDThhmmssZ
-  if (!d || d.length < 8) return "";
-  return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
+  // API normalizes to YYYY-MM-DD; pass through, else blank.
+  return /^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d : "";
 }
 
 export default function VetSite() {
@@ -324,7 +323,7 @@ export default function VetSite() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs text-gray-400">News via GDELT — a recency signal, not a curated feed.</p>
+              <p className="mt-2 text-xs text-gray-400">Latest local news (Google News) — a recency signal, not a curated feed.</p>
             </div>
           )}
         </div>

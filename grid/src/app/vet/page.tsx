@@ -46,7 +46,7 @@ export default function VetPage() {
 
       <p className="mt-8 max-w-3xl text-xs text-gray-400">
         A screening read from public data — geocoding via the US Census, jurisdiction via the FCC,
-        imagery via Esri World Imagery, news via GDELT. Not a substitute for interconnection,
+        imagery via Esri World Imagery, news via Google News. Not a substitute for interconnection,
         environmental, or engineering studies.
       </p>
     </div>
