@@ -44,6 +44,7 @@ interface VetResult {
     capacity_mw: number | null; hyperscaler: string | null; colo: string | null; distance_mi: number | null;
   }>;
   hyperscalerFootprint: string[];
+  pipeline: Array<{ name: string; owner: string; off_takers: string[]; power_mw: number | null; distance_mi: number }>;
   news: Array<{ title: string; url: string; domain: string; date: string }>;
 }
 
@@ -276,6 +277,38 @@ export default function VetSite() {
                 Who already operates near here — a proxy for likely off-takers and grid/ecosystem
                 maturity when the specific tenant isn&apos;t public.
               </p>
+            </div>
+          )}
+
+          {/* AI datacenter pipeline nearby */}
+          {result.pipeline && result.pipeline.length > 0 && (
+            <div>
+              <h3 className="mb-2 text-sm font-bold text-gray-900">AI datacenter projects nearby</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500">
+                      <th className="py-2 pr-3 font-medium">Campus</th>
+                      <th className="py-2 pr-3 font-medium">Owner</th>
+                      <th className="py-2 pr-3 font-medium">Off-taker</th>
+                      <th className="py-2 pr-3 font-medium text-right">Power</th>
+                      <th className="py-2 font-medium text-right">Distance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.pipeline.map((p, i) => (
+                      <tr key={p.name + i} className="border-b border-gray-100 last:border-0">
+                        <td className="py-2 pr-3 font-medium text-gray-900">{p.name}</td>
+                        <td className="py-2 pr-3 text-gray-700">{p.owner || "—"}</td>
+                        <td className="py-2 pr-3 text-gray-600">{p.off_takers.length ? p.off_takers.join(", ") : "—"}</td>
+                        <td className="py-2 pr-3 text-right tabular-nums text-gray-800">{p.power_mw != null ? `${fmtInt(p.power_mw)} MW` : "—"}</td>
+                        <td className="py-2 text-right tabular-nums text-gray-500">{p.distance_mi} mi</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-2 text-xs text-gray-400">Frontier AI campuses within 75 mi — who&apos;s building here and for whom (Epoch AI, CC-BY).</p>
             </div>
           )}
 

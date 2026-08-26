@@ -4,6 +4,7 @@ import { nearbySitesByLatLng, nearbyDatacentersByLatLng, getCountyByFips, type D
 import { siteProfilePath } from "@/lib/entity-slug";
 import { regulatoryClimate } from "@/lib/dc-policy";
 import { hyperscalerOf, coloOf } from "@/lib/hyperscalers";
+import frontier from "@/data/frontier-dc.json";
 
 function milesBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
   const R = 3958.8;
@@ -170,6 +171,20 @@ export async function GET(request: Request) {
     .sort((a, b) => (a.distance_mi ?? 1e9) - (b.distance_mi ?? 1e9));
   const hyperscalerFootprint = [...new Set(datacenters.map((d) => d.hyperscaler).filter(Boolean))];
 
+  // Nearby frontier AI datacenter projects (Epoch AI) — pipeline + off-taker context.
+  const pipeline = frontier.projects
+    .filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({
+      name: p.name,
+      owner: p.owner,
+      off_takers: p.off_takers,
+      power_mw: p.power_mw,
+      distance_mi: Math.round(milesBetween(geo.lat, geo.lng, p.lat as number, p.lng as number) * 10) / 10,
+    }))
+    .filter((p) => p.distance_mi <= 75)
+    .sort((a, b) => a.distance_mi - b.distance_mi)
+    .slice(0, 5);
+
   const state = juris?.state ?? null;
   const reg = regulatoryClimate(state, mw);
   const placeLabel = juris?.county && juris?.state ? `${juris.county}, ${juris.state}` : geo.label;
@@ -194,6 +209,7 @@ export async function GET(request: Request) {
       nearby: nearbyOut,
       datacenters,
       hyperscalerFootprint,
+      pipeline,
       news: articles,
     },
     { headers: CORS_HEADERS }

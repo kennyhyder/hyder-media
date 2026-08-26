@@ -1,0 +1,1002 @@
+{
+  "generated_at": "2026-08-26T23:03:44.364056+00:00",
+  "source": "Epoch AI \u2014 Frontier Data Centers (CC-BY 4.0)",
+  "source_url": "https://epoch.ai/data/ai-data-centers",
+  "count": 73,
+  "geocoded": 51,
+  "projects": [
+    {
+      "name": "Colossus 2",
+      "owner": "SpaceXAI",
+      "off_takers": [
+        "Anthropic",
+        "Cursor",
+        "SpaceXAI"
+      ],
+      "power_mw": 946.0,
+      "capex_b": 35.836372,
+      "chips": "B200,B300",
+      "address": "5420 Tulane Rd, Memphis, TN 38109",
+      "lat": 34.999489,
+      "lng": -90.042977,
+      "source": "https://www.wsj.com/tech/elon-musk-xai-memphis-tennessee-power-dec4c70d"
+    },
+    {
+      "name": "Anthropic-Amazon New Carlisle",
+      "owner": "Amazon",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 910.0,
+      "capex_b": 34.47262,
+      "chips": "Trainium2",
+      "address": "55001 Larrison Blvd, New Carlisle, IN 46552",
+      "lat": 41.693776,
+      "lng": -86.460524,
+      "source": "https://drive.google.com/file/d/1BKiTFNUk2KDaUaiHG7fz0KlkNSBTHzbb/view?usp=sharing"
+    },
+    {
+      "name": "Microsoft Fairwater Atlanta",
+      "owner": "Microsoft",
+      "off_takers": [
+        "OpenAI",
+        "Microsoft"
+      ],
+      "power_mw": 636.0,
+      "capex_b": 24.092952,
+      "chips": "B200",
+      "address": "1435 Hwy 54 W, Fayetteville, GA 30214",
+      "lat": 33.445342,
+      "lng": -84.525447,
+      "source": "https://drive.google.com/file/d/1p7aY9syz319IcEuyukgIIvzmhTNKRS6p/view?usp=sharing"
+    },
+    {
+      "name": "Meta Prometheus",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 562.0,
+      "capex_b": 21.289684,
+      "chips": "B200",
+      "address": "1 Community Cir, New Albany, OH 43054",
+      "lat": null,
+      "lng": null,
+      "source": "https://engineering.fb.com/2025/09/29/data-infrastructure/metas-infrastructure-evolution-and-the-advent-of-ai/"
+    },
+    {
+      "name": "Google New Albany",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 453.0,
+      "capex_b": 17.160546,
+      "chips": "TPU v5e,TPU v5p,TPU v6e,TPU v7",
+      "address": "1101 Beech Rd SW, New Albany, OH 43054",
+      "lat": 40.070051,
+      "lng": -82.754042,
+      "source": "https://drive.google.com/file/d/1KN7o-wQOyt1UEud8wpM8PymXJF479r0n/view?usp=sharing"
+    },
+    {
+      "name": "OpenAI Stargate Abilene",
+      "owner": "Oracle",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 421.0,
+      "capex_b": 15.948322,
+      "chips": "B200,B300",
+      "address": "5502 Spinks Rd, Abilene, TX 79601",
+      "lat": 32.494232,
+      "lng": -99.800907,
+      "source": "https://drive.google.com/file/d/1oHWA9vmpvFOh-LvDy5fgq_wq5ITuxd1r/view?usp=sharing"
+    },
+    {
+      "name": "Microsoft Fairwater Wisconsin",
+      "owner": "Microsoft",
+      "off_takers": [
+        "OpenAI",
+        "Microsoft"
+      ],
+      "power_mw": 369.0,
+      "capex_b": 13.978458,
+      "chips": "B200",
+      "address": "4800 90th St, Mount Pleasant, WI 53403",
+      "lat": 42.674892,
+      "lng": -87.894854,
+      "source": "https://blogs.microsoft.com/blog/2025/09/18/inside-the-worlds-most-powerful-ai-datacenter/"
+    },
+    {
+      "name": "Google Pryor (North)",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 368.0,
+      "capex_b": 13.940576,
+      "chips": "TPU v5p,TPU v5e",
+      "address": "4581 Webb St, Pryor, OK 74361",
+      "lat": 36.241172,
+      "lng": -95.330047,
+      "source": "https://blog.google/inside-google/company-announcements/google-american-innovation-oklahoma/"
+    },
+    {
+      "name": "Colossus 1",
+      "owner": "SpaceXAI",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 340.0,
+      "capex_b": 12.87988,
+      "chips": "H100,H200,B200",
+      "address": "3231 Riverport Rd, Memphis, TN 38109",
+      "lat": 35.073554,
+      "lng": -90.087308,
+      "source": "https://drive.google.com/file/d/17WAFThn95X85ebzA_e19R1zYycwFzAl2/view?usp=sharing"
+    },
+    {
+      "name": "Google Columbus",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 303.0,
+      "capex_b": 11.478245999999999,
+      "chips": "TPU v5e,TPU v5p,TPU v6e,TPU v7",
+      "address": "5076 S High St, Columbus, OH 43207",
+      "lat": 39.861452,
+      "lng": -83.004,
+      "source": "https://www.datacenterdynamics.com/en/news/google-breaks-ground-on-columbus-ohio-data-center/"
+    },
+    {
+      "name": "Amazon Madison Mega Site",
+      "owner": "Amazon",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 284.0,
+      "capex_b": 10.758488,
+      "chips": "Trainium2",
+      "address": "Amazon Data Services Inc, Madison Mega Site Nissan Parkway and Highway 22 Canton, Mississippi Madison County",
+      "lat": null,
+      "lng": null,
+      "source": "https://drive.google.com/file/d/1lhSF8TBA7fNWsN4Onj-nfL7X_-BN573r/view?usp=sharing"
+    },
+    {
+      "name": "Google Bristow",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 279.0,
+      "capex_b": 10.569078000000001,
+      "chips": "TPU v5e,TPU v5p,TPU v6e,TPU v7",
+      "address": "13001 Rollins Ford Road, Bristow, VA 20136",
+      "lat": 38.782542,
+      "lng": -77.57972,
+      "source": "https://sustainability.google/reports/google-2026-environmental-report/"
+    },
+    {
+      "name": "CoreWeave Denton TX",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 262.0,
+      "capex_b": 9.925084,
+      "chips": "B200",
+      "address": "8171 Jim Christal Rd, Denton, TX 76207",
+      "lat": 33.219273,
+      "lng": -97.174715,
+      "source": "https://investors.corescientific.com/news-events/press-releases/detail/110/core-scientific-and-coreweave-announce-1-2-billion-expansion-at-denton-tx-site"
+    },
+    {
+      "name": "QTS Richmond 1",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 238.0,
+      "capex_b": 9.015915999999999,
+      "chips": null,
+      "address": "6000 Technology Blvd, Sandston, VA 23150",
+      "lat": 37.488827,
+      "lng": -77.24749,
+      "source": "https://qtsdatacenters.com/data-centers/richmond-1/"
+    },
+    {
+      "name": "Google Council Bluffs (East)",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 237.0,
+      "capex_b": 8.978034,
+      "chips": "TPU v5e,TPU v6e,TPU v5p,TPU v7",
+      "address": "10410 Bunge Ave, Council Bluffs, IA 51503",
+      "lat": 41.167416,
+      "lng": -95.793106,
+      "source": "https://programs.iowadnr.gov/easyair/Public/EnSuite/Shared/Pages/Util/ServerRptViewer.aspx?sr=/IDNR/Reports/EASY/RPT_Construction_Application_A_GEN&SUBMISSION_RID=67330&SUB_FORM_RID=148293"
+    },
+    {
+      "name": "Google Omaha",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 237.0,
+      "capex_b": 8.978034,
+      "chips": "TPU v5e,TPU v5p,TPU v6e",
+      "address": "11110 State St, Omaha, NE 68142",
+      "lat": 41.335727,
+      "lng": -96.088471,
+      "source": "https://drive.google.com/file/d/1KN7o-wQOyt1UEud8wpM8PymXJF479r0n/view?usp=sharing"
+    },
+    {
+      "name": "Google Papillion",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 237.0,
+      "capex_b": 8.978034,
+      "chips": "TPU v4,TPU v5e,TPU v6e,TPU v5p",
+      "address": "14651-15249 Gold Coast Rd 68138 Papillion Nebraska, USA",
+      "lat": null,
+      "lng": null,
+      "source": "https://drive.google.com/file/d/1nONzuLnpMPST0bOINDKXmSZ0ANlynYY0/view?usp=sharing"
+    },
+    {
+      "name": "Amazon Ridgeland",
+      "owner": "Amazon",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 228.0,
+      "capex_b": 8.637096,
+      "chips": "Trainium2",
+      "address": "1626 County Line Road Ridgeland, Mississippi",
+      "lat": 32.399547,
+      "lng": -90.120484,
+      "source": "https://drive.google.com/file/d/1dQ5Pxl7rQAHLvHoTYrpOX32WAolo46d7/view?usp=sharing"
+    },
+    {
+      "name": "Microsoft Goodyear",
+      "owner": "Microsoft",
+      "off_takers": [
+        "OpenAI",
+        "Microsoft"
+      ],
+      "power_mw": 202.0,
+      "capex_b": 7.652164000000001,
+      "chips": "H100,B200",
+      "address": "14250 W Broadway Rd, Goodyear, AZ 85338",
+      "lat": 33.408991,
+      "lng": -112.3648,
+      "source": "https://gis.maricopa.gov/aqd/recordsviewer/#"
+    },
+    {
+      "name": "Microsoft Project Osmium",
+      "owner": "Microsoft",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 190.0,
+      "capex_b": 7.19758,
+      "chips": "A100,H100,B200",
+      "address": "5855 SW Kerry St, Cumming, IA 50061",
+      "lat": null,
+      "lng": null,
+      "source": "https://newsletter.semianalysis.com/p/microsofts-ai-strategy-deconstructed"
+    },
+    {
+      "name": "Google Mesa",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 183.0,
+      "capex_b": 6.932405999999999,
+      "chips": "TPU v6e",
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://www.datacenterdynamics.com/en/news/google-breaks-ground-on-mesa-data-center-campus-in-arizona/"
+    },
+    {
+      "name": "QTS Richmond 2",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 180.0,
+      "capex_b": 6.818759999999999,
+      "chips": null,
+      "address": "6030\u20136070 Technology Blvd, Sandston, VA 23150",
+      "lat": null,
+      "lng": null,
+      "source": "https://qtsdatacenters.com/data-centers/richmond-1/"
+    },
+    {
+      "name": "Meta-QTS Hillsboro 2",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 180.0,
+      "capex_b": 6.818759999999999,
+      "chips": "H100",
+      "address": "4755 NE Huffman St, Hillsboro, OR 97124",
+      "lat": 45.556954,
+      "lng": -122.931942,
+      "source": "https://q.com/data-centers/hillsboro-2/"
+    },
+    {
+      "name": "Meta Rosemount",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 178.0,
+      "capex_b": 6.742996,
+      "chips": "B200",
+      "address": "1772-2396 145th St, Rosemount, MN 55068, USA",
+      "lat": 44.738817,
+      "lng": -93.057005,
+      "source": "https://datacenters.atmeta.com/2024/03/hello-rosemount/"
+    },
+    {
+      "name": "Meta Jeffersonville",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 178.0,
+      "capex_b": 6.742996,
+      "chips": "B300",
+      "address": "500 8th St, Jeffersonville, IN 47130, USA",
+      "lat": 38.279116,
+      "lng": -85.739097,
+      "source": "https://datacenters.atmeta.com/wp-content/uploads/2025/02/Meta_s-Jeffersonville-Data-Center.pdf"
+    },
+    {
+      "name": "Google Storey County",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": 161.0,
+      "capex_b": 6.0990020000000005,
+      "chips": "TPU v5e,TPU v6e",
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://ndep-onbase.nv.gov/api/Document/AeFo%C3%89pjclbkomJ7CWpPryLOjA6FQT9HFrkSuMWbMXTpKCzSR%C3%81W1f8zzFhGhik1iZCcNSpuTRRqNXD1inrrpBxtA%3D/"
+    },
+    {
+      "name": "Google The Dalles",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 154.0,
+      "capex_b": 5.8338280000000005,
+      "chips": "TPU v6e,TPU v5p,TPU v7",
+      "address": "3500 River Rd, The Dalles, OR",
+      "lat": 45.625389,
+      "lng": -121.202389,
+      "source": "https://static1.squarespace.com/static/5e9a1686f716835e61268f2a/t/63659cb153e00407c9cd0bc9/1667603634454/SPR%2B512-22%2C%2BNOD%2C%2B10-31-22%2B%281%29.pdf"
+    },
+    {
+      "name": "Meta Montgomery",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 153.0,
+      "capex_b": 5.795946,
+      "chips": "B300",
+      "address": "Co Rd 42, Montgomery, AL 36105, USA",
+      "lat": 32.264996,
+      "lng": -86.363513,
+      "source": "https://datacenters.atmeta.com/2024/05/hello-montgomery/"
+    },
+    {
+      "name": "Meta Kuna",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 152.0,
+      "capex_b": 5.758064,
+      "chips": "B300",
+      "address": "601 Kuna Mora Rd,  Kuna ID 83634",
+      "lat": 43.459233,
+      "lng": -116.421078,
+      "source": "https://datacenters.atmeta.com/wp-content/uploads/2025/02/Meta_s-Kuna-Data-Center.pdf"
+    },
+    {
+      "name": "Meta Temple",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 152.0,
+      "capex_b": 5.758064,
+      "chips": "B300",
+      "address": "2310 Eberhardt Rd, Temple, TX 76504",
+      "lat": 31.126016,
+      "lng": -97.36,
+      "source": "https://jedunn.com/projects/meta-temple-data-center/"
+    },
+    {
+      "name": "Meta Cheyenne",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 152.0,
+      "capex_b": 5.758064,
+      "chips": "B300",
+      "address": "Cheyenne, WY 82007, USA",
+      "lat": 41.139981,
+      "lng": -104.820246,
+      "source": "https://datacenters.atmeta.com/2024/07/hello-cheyenne/"
+    },
+    {
+      "name": "Meta Huntsville",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 146.0,
+      "capex_b": 5.530772,
+      "chips": "B300",
+      "address": "5400 Prosperity Dr NW, Toney, AL",
+      "lat": null,
+      "lng": null,
+      "source": "https://plateauexcavation.com/projects/huntsville-meta-data-center-meta-project-ferris/"
+    },
+    {
+      "name": "QTS Richmond 3",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 144.0,
+      "capex_b": 5.455007999999999,
+      "chips": null,
+      "address": "3525\u20133543 Portugee Rd, Sandston, VA 23150",
+      "lat": null,
+      "lng": null,
+      "source": "https://q.com/data-centers/richmond-3/"
+    },
+    {
+      "name": "Meta Aiken",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 142.0,
+      "capex_b": 5.379244,
+      "chips": "B300",
+      "address": "7601 State Hwy 105, Trenton, SC 29847, USA",
+      "lat": null,
+      "lng": null,
+      "source": "https://datacenters.atmeta.com/2024/08/hello-south-carolina/"
+    },
+    {
+      "name": "Google Lincoln",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 141.0,
+      "capex_b": 5.341361999999999,
+      "chips": null,
+      "address": "5475 Cloud Ct, Lincoln, NE 68514",
+      "lat": 40.907472,
+      "lng": -96.645783,
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/25/Application_no-_NWO-2019-00110-WEH_-_USACE-p16021coll15-1525.pdf"
+    },
+    {
+      "name": "Google Lancaster",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 137.0,
+      "capex_b": 5.189834,
+      "chips": "TPU v5e,TPU v5p,TPU v7,TPU v6e",
+      "address": "105 Whiley Rd, Lancaster, OH 43130",
+      "lat": 39.727035,
+      "lng": -82.683112,
+      "source": "https://www.datacenterdynamics.com/en/news/google-to-build-two-more-data-centers-in-columbus-ohio/"
+    },
+    {
+      "name": "Meta Eagle Mountain",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 133.0,
+      "capex_b": 5.038306,
+      "chips": "B300",
+      "address": "1275 N Community Cir, Eagle Mountain, UT 84005",
+      "lat": null,
+      "lng": null,
+      "source": "https://www.facebook.com/EagleMountainDataCenter/posts/517902967007646"
+    },
+    {
+      "name": "Coreweave Helios",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 132.0,
+      "capex_b": 5.000424000000001,
+      "chips": "B200",
+      "address": "984 County Road 112, Afton, TX 79220",
+      "lat": 33.780636,
+      "lng": -100.8671,
+      "source": "https://investor.galaxy.com/news/news-details/2025/Galaxy-Announces-Third-Quarter-2025-Financial-Results/default.aspx"
+    },
+    {
+      "name": "AWS Berwick",
+      "owner": "Amazon",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 108.0,
+      "capex_b": 4.091256,
+      "chips": "Trainium2",
+      "address": "1125 Electron Ave, Berwick, PA 18603",
+      "lat": 41.083849,
+      "lng": -76.143533,
+      "source": "https://www.nytimes.com/2025/06/24/technology/amazon-ai-data-centers.html"
+    },
+    {
+      "name": "Google Kansas City East",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 105.0,
+      "capex_b": 3.9776099999999994,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://huntmidwest.com/2024/03/google-announces-1-billion-data-center-at-hunt-midwest-business-center/"
+    },
+    {
+      "name": "Google Midlothian",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 103.0,
+      "capex_b": 3.901846,
+      "chips": null,
+      "address": "3250 Railport Parkway, Midlothian, TX 76065",
+      "lat": 32.438927,
+      "lng": -97.050799,
+      "source": "https://ecode360.com/MI6405/laws/LF1665983.pdf"
+    },
+    {
+      "name": "Meta Gallatin",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 87.0,
+      "capex_b": 3.2957339999999995,
+      "chips": "B300",
+      "address": "1 Meta Lp, Gallatin, TN 37066",
+      "lat": null,
+      "lng": null,
+      "source": "https://datacenters.atmeta.com/wp-content/uploads/2025/02/Meta_s-Gallatin-Data-Center.pdf"
+    },
+    {
+      "name": "Meta Los Lunas",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 87.0,
+      "capex_b": 3.2957339999999995,
+      "chips": "B300",
+      "address": "4250 Messenger Lp, Los Lunas, NM 87031",
+      "lat": 34.830165,
+      "lng": -106.783827,
+      "source": "https://datacenters.atmeta.com/wp-content/uploads/2025/02/Meta_s-Los-Lunas-Data-Center.pdf"
+    },
+    {
+      "name": "STACK Infrastructure NVA02",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 85.0,
+      "capex_b": 3.21997,
+      "chips": "H100",
+      "address": "9590 Hornbaker Rd, Manassas, VA 20109",
+      "lat": 38.749822,
+      "lng": -77.535849,
+      "source": "https://www.stackinfra.com/locations/americas/northern-virginia/nva02/"
+    },
+    {
+      "name": "CoreWeave Chester VA",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 82.0,
+      "capex_b": 3.106324,
+      "chips": "H100,B200",
+      "address": "1401 Meadowville Technology Parkway, Chester, VA",
+      "lat": 37.361747,
+      "lng": -77.325261,
+      "source": "https://www.datacenterdynamics.com/en/news/chirisa-secures-200-million-loan-to-fit-out-virginia-data-center-for-coreweave/"
+    },
+    {
+      "name": "Meta Sarpy",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": 80.0,
+      "capex_b": 3.03056,
+      "chips": "B300",
+      "address": "14436-14998 Fairview Rd, Springfield, NE 68059, USA",
+      "lat": 41.103572,
+      "lng": -96.147915,
+      "source": "https://datacenters.atmeta.com/asset/sarpy-data-center-info-sheet/"
+    },
+    {
+      "name": "Google Arcola",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 77.0,
+      "capex_b": 2.9169140000000002,
+      "chips": null,
+      "address": "42575 Arcola Blvd, Sterling, VA 20166",
+      "lat": null,
+      "lng": null,
+      "source": "https://www.bisnow.com/national/news/data-center/google-investing-1b-to-improve-northern-virginia-data-centers-124025"
+    },
+    {
+      "name": "Google Red Oak",
+      "owner": "Google",
+      "off_takers": [],
+      "power_mw": 77.0,
+      "capex_b": 2.9169140000000002,
+      "chips": "TPU v6e,TPU v7",
+      "address": "330 Austin Blvd, Red Oak, TX 75154",
+      "lat": 32.529977,
+      "lng": -96.799787,
+      "source": "https://www.mysanantonio.com/business/article/google-texas-data-center-21236627.php"
+    },
+    {
+      "name": "Microsoft SAT40",
+      "owner": "Microsoft",
+      "off_takers": [],
+      "power_mw": 75.0,
+      "capex_b": 2.84115,
+      "chips": "H100,B300",
+      "address": "15000 Lambda Drive, San Antonio, TX 78245",
+      "lat": null,
+      "lng": null,
+      "source": "https://www.tdlr.texas.gov/TABS/Search/Project/TABS2023013247"
+    },
+    {
+      "name": "CoreWeave Ellendale ND",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 68.0,
+      "capex_b": 2.5759760000000003,
+      "chips": "B200",
+      "address": "9685 87th Ave SE, Ellendale, ND 58436",
+      "lat": 46.021467,
+      "lng": -98.568495,
+      "source": "https://ir.applieddigital.com/news-events/press-releases/detail/123/applied-digital-announces-250mw-ai-data-center-lease-with"
+    },
+    {
+      "name": "CoreWeave Marble NC",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 65.0,
+      "capex_b": 2.46233,
+      "chips": "B200",
+      "address": "155 Palmer Ln, Marble, NC 28905",
+      "lat": 35.184985,
+      "lng": -83.91409,
+      "source": "https://investors.corescientific.com/sec-filings/all-sec-filings/content/0001628280-26-031246/q1fy26earningsdeck.htm"
+    },
+    {
+      "name": "Stream Phoenix",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 64.0,
+      "capex_b": 2.424448,
+      "chips": "H100",
+      "address": "2950 S. Litchfield Road",
+      "lat": 33.479279,
+      "lng": -112.359328,
+      "source": "https://www.streamdatacenters.com/locations/phoenix/"
+    },
+    {
+      "name": "Microsoft-Nebius New Jersey",
+      "owner": "Nebius",
+      "off_takers": [
+        "Microsoft"
+      ],
+      "power_mw": 50.0,
+      "capex_b": 1.8941,
+      "chips": "B300",
+      "address": "3963 S Lincoln Ave, Vineland, New Jersey",
+      "lat": 39.428192,
+      "lng": -75.018455,
+      "source": "https://nebius.com/newsroom/nebius-accelerates-us-expansion-adding-up-to-300-mw-capacity-at-new-data-center-in-new-jersey"
+    },
+    {
+      "name": "Microsoft SAT14",
+      "owner": "Microsoft",
+      "off_takers": [],
+      "power_mw": 47.0,
+      "capex_b": 1.7804540000000002,
+      "chips": "H100,B300",
+      "address": "3545 Wiseman Boulevard, San Antonio, TX 78251",
+      "lat": 29.473179,
+      "lng": -98.681508,
+      "source": "https://www.tdlr.texas.gov/TABS/Search/Project/TABS2021019142"
+    },
+    {
+      "name": "Anthropic Lake Mariner",
+      "owner": "AI XPV Platform",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": 42.0,
+      "capex_b": 1.5910440000000001,
+      "chips": "TPU v7",
+      "address": "7725 Lake Rd, Barker, NY 14012",
+      "lat": 43.348937,
+      "lng": -78.602908,
+      "source": "https://investors.terawulf.com/news-events/press-releases/detail/132/terawulf-reports-fourth-quarter-and-full-year-2025-results"
+    },
+    {
+      "name": "Vantage TX1",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": 32.0,
+      "capex_b": 1.212224,
+      "chips": "B200",
+      "address": "14720 Omicron Dr, San Antonio, TX 78245",
+      "lat": 29.416682,
+      "lng": -98.788564,
+      "source": "https://www.tdlr.texas.gov/TABS/Search/Project/TABS2024007561"
+    },
+    {
+      "name": "CoreWeave Dalton 1 & 2",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": 28.0,
+      "capex_b": 1.060696,
+      "chips": "B300",
+      "address": "2205 Industrial South Rd, Dalton, GA, 30721",
+      "lat": 34.713505,
+      "lng": -84.952185,
+      "source": "https://corescientific.com/high-density-data-centers/dalton-ga-dnn1-2/"
+    },
+    {
+      "name": "xAI QTS Atlanta",
+      "owner": "SpaceXAI",
+      "off_takers": [
+        "SpaceXAI"
+      ],
+      "power_mw": 17.32971,
+      "capex_b": 0.6564840742199999,
+      "chips": "H100,A100",
+      "address": "1025 Jefferson Street NW, Atlanta, GA 30318",
+      "lat": 33.775665,
+      "lng": -84.422574,
+      "source": "https://www.developfultoncounty.com/meetings-and-minutes_239_547601452.pdf"
+    },
+    {
+      "name": "Anthropic Barber Lake",
+      "owner": "Cipher Mining",
+      "off_takers": [
+        "Anthropic"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://www.globenewswire.com/news-release/2025/09/25/3156107/0/en/Cipher-Mining-Signs-168-MW-10-Year-AI-Hosting-Agreement-with-Fluidstack.html"
+    },
+    {
+      "name": "CoreWeave Muskogee OK",
+      "owner": "CoreWeave",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "1525 W 43rd St S, Muskogee, OK 74401, USA",
+      "lat": 35.696785,
+      "lng": -95.495165,
+      "source": "https://investors.corescientific.com/news-events/press-releases/detail/99/core-scientific-and-port-muskogee-break-ground-on-100-mw-hpc-data-center"
+    },
+    {
+      "name": "Crusoe Abilene Expansion",
+      "owner": "Microsoft",
+      "off_takers": [
+        "Microsoft"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "5502 Spinks Rd, Abilene, TX 79601",
+      "lat": 32.494232,
+      "lng": -99.800907,
+      "source": "https://www.bloomberg.com/news/articles/2026-03-06/oracle-and-openai-end-plans-to-expand-flagship-data-center"
+    },
+    {
+      "name": "Goodnight",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "10001 Lima Rd, Claude, TX 79019",
+      "lat": null,
+      "lng": null,
+      "source": "https://www.co.armstrong.tx.us/upload/page/5361/Amended_Restated_Consolidated%20Second%20Property%20Tax%20Abatement%20Agreement%20%20GNDC1_ArmstrongCounty.pdf"
+    },
+    {
+      "name": "Google Cedar Rapids",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "5800 EDGEWOOD RD SW CEDAR RAPIDS, IA 52404",
+      "lat": 41.921946,
+      "lng": -91.715628,
+      "source": "https://cdn.misoenergy.org/NEW%20LOAD%20ANNOUNCEMENTS%20IN%20MISO%20REGIONS%2012062024684954.pdf"
+    },
+    {
+      "name": "Google Fort Wayne",
+      "owner": "Google",
+      "off_takers": [
+        "Google DeepMind"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "6015 Adams Center Road, Fort Wayne, IN 46806",
+      "lat": 41.031167,
+      "lng": -85.05777,
+      "source": "https://www.thelocalfw.com/what-to-know-about-googles-plans-for-wetlands-in-fort-wayne/"
+    },
+    {
+      "name": "Meta Hyperion",
+      "owner": "Meta",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "Holly Ridge, LA 71269",
+      "lat": 32.467642,
+      "lng": -91.626788,
+      "source": "https://datacenters.atmeta.com/richland-parish-data-center/"
+    },
+    {
+      "name": "OpenAI Stargate Lordstown",
+      "owner": "Softbank",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "2300 Hallock Young Rd, Warren, OH 44481",
+      "lat": 41.143719,
+      "lng": -80.883295,
+      "source": "https://www.datacenterdynamics.com/en/news/openai-announces-five-more-us-stargate-data-centers-with-oracle-and-softbank/"
+    },
+    {
+      "name": "OpenAI Stargate Michigan",
+      "owner": "Oracle",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://www.related-digital.com/michigan"
+    },
+    {
+      "name": "OpenAI Stargate Milam",
+      "owner": "Softbank",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://www.datacenterdynamics.com/en/news/softbanks-sb-energy-to-build-and-operate-openais-12gw-stargate-data-center-in-milam-county-texas/"
+    },
+    {
+      "name": "OpenAI Stargate New Mexico",
+      "owner": "Oracle",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://projectjupitertogether.com/"
+    },
+    {
+      "name": "OpenAI Stargate Shackelford",
+      "owner": "Oracle",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "175 Private Road 1604, Abilene, TX 79601, Shackelford County",
+      "lat": null,
+      "lng": null,
+      "source": "https://vantage-dc.com/data-center-locations/north-america/shackelford-county-tx"
+    },
+    {
+      "name": "OpenAI Stargate Wisconsin",
+      "owner": "Oracle",
+      "off_takers": [
+        "OpenAI"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": null,
+      "lat": null,
+      "lng": null,
+      "source": "https://vantage-dc.com/data-center-locations/north-america/port-washington-wisconsin"
+    },
+    {
+      "name": "QTS Cedar Rapids",
+      "owner": "",
+      "off_takers": [],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "6200 76th Ave SW, Fairfax, IA 52228",
+      "lat": 41.905598,
+      "lng": -91.751083,
+      "source": "https://cdn.misoenergy.org/NEW%20LOAD%20ANNOUNCEMENTS%20IN%20MISO%20REGIONS%2012062024684954.pdf"
+    },
+    {
+      "name": "QTS Eagle Mountain",
+      "owner": "",
+      "off_takers": [
+        "Meta"
+      ],
+      "power_mw": null,
+      "capex_b": null,
+      "chips": null,
+      "address": "652 E Hyperscale Way, Eagle Mountain, UT 84013",
+      "lat": 40.268886,
+      "lng": -112.034294,
+      "source": "https://q.com/data-centers/eagle-mountain/"
+    }
+  ]
+}

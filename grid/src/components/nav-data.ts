@@ -31,6 +31,7 @@ export const INFRA_GROUP: NavGroup = {
     { href: "/substations", label: "Substations", match: "/substations" },
     { href: "/grid-congestion", label: "Grid Congestion", match: "/grid-congestion" },
     { href: "/datacenters", label: "Datacenters", match: "/datacenters" },
+    { href: "/dc-projects", label: "AI Pipeline", match: "/dc-projects" },
     { href: "/companies", label: "Organizations", match: "/companies" },
     { href: "/internet-exchanges", label: "Internet Exchanges", match: "/internet-exchanges" },
     { href: "/brownfield-sites", label: "Brownfields", match: "/brownfield-sites" },
