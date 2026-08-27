@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>5289 Kihei Rd — Private Due-Diligence Dossier</title>
+<style>
+  :root{
+    --paper:#f4f2ec; --paper-2:#fbfaf6; --ink:#161c1e; --ink-2:#3d4a4d;
+    --muted:#6b7a7d; --line:#dcd8cd; --line-2:#e8e4da;
+    --teal:#0d5b63; --teal-2:#0a464c; --sand:#b98a3e;
+    --flag:#b0392c; --flag-bg:#f7e7e4; --flag-line:#e6c3bd;
+    --warn:#9a6a12; --warn-bg:#f7efdc; --warn-line:#e8d6a8;
+    --good:#2f6f4f; --good-bg:#e6f0e8; --good-line:#c2ddca;
+    --shadow:0 1px 2px rgba(20,26,28,.06),0 8px 30px rgba(20,26,28,.06);
+    --serif:'Iowan Old Style','Palatino Linotype','Palatino',Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;
+    -webkit-font-smoothing:antialiased;font-size:16px}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---------- password gate ---------- */
+  #gate{position:fixed;inset:0;z-index:999;background:#0c1416;color:#e8ede9;
+    display:flex;align-items:center;justify-content:center;padding:24px}
+  #gate .g{max-width:400px;width:100%;background:#111c1e;border:1px solid #1f2f31;
+    border-radius:14px;padding:34px}
+  #gate .ki{font-family:var(--serif);font-size:13px;letter-spacing:.28em;text-transform:uppercase;
+    color:#6fb3ad;margin-bottom:18px}
+  #gate h1{font-family:var(--serif);font-size:25px;font-weight:600;line-height:1.25;margin-bottom:8px;color:#f3f6f3}
+  #gate p{color:#93a3a2;font-size:14px;margin-bottom:22px}
+  #gate input{width:100%;background:#0c1416;border:1px solid #2a3c3e;border-radius:9px;
+    padding:13px 15px;color:#e8ede9;font-size:16px;font-family:inherit;outline:none}
+  #gate input:focus{border-color:#3f9a92}
+  #gate button{width:100%;margin-top:14px;background:#0d5b63;color:#eafaf7;border:0;border-radius:9px;
+    padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.01em}
+  #gate button:hover{background:#0f6d76}
+  #gate .err{color:#e5897d;font-size:13px;height:16px;margin-top:11px}
+  #doc{display:none}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px}
+  header.masthead{border-bottom:1px solid var(--line);background:
+    linear-gradient(180deg,#eef0ea,var(--paper));padding:46px 0 30px}
+  .eyebrow{font-family:var(--serif);font-size:12.5px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--teal);margin-bottom:14px}
+  h1.title{font-family:var(--serif);font-size:clamp(30px,5.4vw,46px);font-weight:600;line-height:1.08;
+    letter-spacing:-.01em;text-wrap:balance;margin-bottom:10px}
+  .addr{color:var(--ink-2);font-size:17px;margin-bottom:20px}
+  .metaline{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13.5px;color:var(--muted);
+    border-top:1px solid var(--line-2);padding-top:16px}
+  .metaline b{color:var(--ink-2);font-weight:600}
+
+  nav.toc{position:sticky;top:0;z-index:20;background:rgba(244,242,236,.93);
+    backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line);
+    padding:11px 0;margin-bottom:6px}
+  nav.toc .wrap{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  nav.toc .wrap::-webkit-scrollbar{display:none}
+  nav.toc a{white-space:nowrap;font-size:13px;color:var(--ink-2);text-decoration:none;
+    padding:6px 11px;border-radius:7px;font-weight:500}
+  nav.toc a:hover{background:#e6e8e1;color:var(--teal)}
+
+  section{padding:40px 0;border-bottom:1px solid var(--line-2)}
+  section:last-of-type{border-bottom:0}
+  .kicker{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--sand);
+    font-weight:700;margin-bottom:9px}
+  h2{font-family:var(--serif);font-size:clamp(23px,3.6vw,30px);font-weight:600;line-height:1.15;
+    letter-spacing:-.01em;margin-bottom:8px;text-wrap:balance}
+  h3{font-family:var(--serif);font-size:20px;font-weight:600;margin:26px 0 8px}
+  .lede{font-size:17.5px;color:var(--ink-2);margin-bottom:20px;max-width:66ch}
+  p{margin-bottom:14px;max-width:70ch}
+  p:last-child{margin-bottom:0}
+  a.ref{color:var(--teal);text-decoration:none;border-bottom:1px solid #a9cdcf}
+  a.ref:hover{border-bottom-color:var(--teal)}
+  strong{font-weight:670}
+  ul,ol{margin:0 0 14px 2px;padding-left:20px;max-width:70ch}
+  li{margin-bottom:8px}
+
+  /* ---------- verdict card ---------- */
+  .verdict{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);padding:26px;margin-top:8px}
+  .verdict .tag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);
+    border:1px solid var(--warn-line);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+  .verdict .dot{width:8px;height:8px;border-radius:99px;background:var(--warn)}
+  .vstats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:6px 0 4px;
+    border-top:1px solid var(--line-2);padding-top:20px}
+  .vstat .l{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .vstat .v{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1.05;color:var(--ink)}
+  .vstat .s{font-size:12.5px;color:var(--muted);margin-top:3px}
+  @media(max-width:620px){.vstats{grid-template-columns:1fr;gap:14px}}
+
+  /* ---------- tables ---------- */
+  .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:6px 0 4px;
+    border:1px solid var(--line);border-radius:12px;background:var(--paper-2)}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+  caption{text-align:left;font-size:13px;color:var(--muted);padding:12px 16px 0;caption-side:top}
+  th,td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--line-2)}
+  thead th{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;background:#efece4;border-bottom:1px solid var(--line)}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{font-weight:700;background:#eef0ea;border-top:1px solid var(--line)}
+  tr.sub td{color:var(--ink-2)}
+  .tnote{font-size:12.5px;color:var(--muted);margin-top:8px}
+
+  /* ---------- flag cards ---------- */
+  .flags{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+  .flag{border:1px solid var(--line);border-left-width:4px;border-radius:12px;
+    background:var(--paper-2);padding:18px 20px;box-shadow:var(--shadow)}
+  .flag.sev-hi{border-left-color:var(--flag)}
+  .flag.sev-md{border-left-color:var(--warn)}
+  .flag.sev-lo{border-left-color:var(--muted)}
+  .flag .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+  .flag h3{font-family:var(--sans);font-size:17px;font-weight:680;margin:0}
+  .sev{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap}
+  .sev.hi{color:var(--flag);background:var(--flag-bg);border:1px solid var(--flag-line)}
+  .sev.md{color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-line)}
+  .sev.lo{color:var(--muted);background:#eef0ea;border:1px solid var(--line)}
+  .flag p{font-size:14.5px;color:var(--ink-2);margin:0}
+  .flag .cost{font-size:13px;color:var(--ink);margin-top:9px;font-weight:600}
+  .flag .cost span{color:var(--flag)}
+
+  .callout{border-radius:12px;padding:16px 18px;margin:16px 0;font-size:14.5px}
+  .callout.good{background:var(--good-bg);border:1px solid var(--good-line)}
+  .callout.warn{background:var(--warn-bg);border:1px solid var(--warn-line)}
+  .callout.flag{background:var(--flag-bg);border:1px solid var(--flag-line)}
+  .callout b{font-weight:700}
+  .callout .h{font-weight:700;margin-bottom:4px;display:block}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:640px){.cols{grid-template-columns:1fr}}
+  .pill{display:inline-block;font-size:12.5px;padding:4px 10px;border-radius:99px;
+    background:#eef0ea;border:1px solid var(--line);color:var(--ink-2);margin:0 4px 6px 0}
+
+  .steps{counter-reset:s;list-style:none;padding:0;margin-top:8px}
+  .steps li{position:relative;padding:2px 0 16px 42px;border-left:2px solid var(--line-2);margin-left:14px}
+  .steps li:last-child{border-left-color:transparent}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:-15px;top:-2px;
+    width:28px;height:28px;border-radius:99px;background:var(--teal);color:#fff;font-weight:700;
+    font-size:13px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .steps li b{display:block;margin-bottom:2px}
+  .steps li span{font-size:14.5px;color:var(--ink-2)}
+
+  .docgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  @media(max-width:640px){.docgrid{grid-template-columns:1fr}}
+  .doc-item{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--paper-2);font-size:14px}
+  .doc-item b{display:block;font-size:14.5px;margin-bottom:2px}
+  .doc-item span{color:var(--muted);font-size:12.5px}
+
+  footer{padding:34px 0 60px;color:var(--muted);font-size:12.5px;text-align:center}
+  footer .disc{max-width:60ch;margin:0 auto 10px;line-height:1.55}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div id="gate">
+  <div class="g">
+    <div class="ki">Hyder Media · Private</div>
+    <h1>5289 Kihei Road</h1>
+    <p>Confidential property due-diligence dossier. Enter the password to continue.</p>
+    <input id="pw" type="password" placeholder="Password" autocomplete="off" autocapitalize="off"
+      autocorrect="off" spellcheck="false" autofocus onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">Unlock</button>
+    <div class="err" id="gerr"></div>
+  </div>
+</div>
+
+<!-- ============ DOCUMENT ============ -->
+<div id="doc">
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Property Due-Diligence Dossier</div>
+    <h1 class="title">5289 Kihei Road</h1>
+    <div class="addr">Kapaʻa, Kauaʻi, HI 96746 · Wailua House Lots · TMK 4-4-1-010-017</div>
+    <div class="metaline num">
+      <span><b>List:</b> $998,000</span>
+      <span><b>$/sqft:</b> $605</span>
+      <span><b>2 bd / 2 ba</b> · 1,650 sqft</span>
+      <span><b>Lot:</b> 10,000 sqft</span>
+      <span><b>Built:</b> 1956 · reno 2022</span>
+      <span><b>Days on market:</b> 115</span>
+      <span><b>Prepared:</b> Aug 27, 2026</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#verdict">Bottom line</a>
+    <a href="#overhead">Monthly overhead</a>
+    <a href="#mortgage">Mortgage</a>
+    <a href="#value">Valuation</a>
+    <a href="#flags">Red flags</a>
+    <a href="#solar">Solar lease</a>
+    <a href="#cesspool">Cesspool</a>
+    <a href="#permits">Permits</a>
+    <a href="#tax">Tax cliff</a>
+    <a href="#plus">Positives</a>
+    <a href="#plan">Game plan</a>
+    <a href="#docs">Documents</a>
+  </div>
+</nav>
+
+<!-- ===== VERDICT ===== -->
+<section id="verdict">
+  <div class="wrap">
+    <div class="kicker">The bottom line</div>
+    <h2>A genuinely nice renovation carrying three real liabilities the listing doesn't price in.</h2>
+    <p class="lede">The 2022 remodel is high quality and the solar over-produces (your KIUC account currently
+      runs a credit). But "energy independence" is a <strong>leased</strong> obligation, the home is on a
+      <strong>cesspool</strong> facing a state conversion mandate, and an unpermitted bathroom move is a live
+      threat to your <strong>financing</strong>. None of that kills the deal — it's leverage. The 115 days on
+      market and the $102k price cut already tell you the seller knows.</p>
+
+    <div class="verdict">
+      <span class="tag"><span class="dot"></span>Proceed — but with conditions &amp; a lower number</span>
+      <div class="vstats num">
+        <div class="vstat">
+          <div class="l">All-in monthly (owner-occ.)</div>
+          <div class="v">~$7,230</div>
+          <div class="s">$6,360 hard bills + ~$875 reserves · at $998k / 6.66%</div>
+        </div>
+        <div class="vstat">
+          <div class="l">Est. fair value</div>
+          <div class="v">$925k–$975k</div>
+          <div class="s">Suggested opening offer ~$930k</div>
+        </div>
+        <div class="vstat">
+          <div class="l">Cash to close</div>
+          <div class="v">~$225k</div>
+          <div class="s">$200k down + ~$25k costs · +$84k if you buy out the solar</div>
+        </div>
+      </div>
+    </div>
+    <p class="tnote" style="margin-top:14px">Every figure below is derived from your own documents (MLS,
+      CMA, permit reports, the 48-page Sunrun contract, three KIUC bills, and Zack's email) plus current 2026
+      Kauaʻi tax, lending, insurance, and DOH data. Sources are linked throughout.</p>
+  </div>
+</section>
+
+<!-- ===== OVERHEAD ===== -->
+<section id="overhead">
+  <div class="wrap">
+    <div class="kicker">Overhead outside the mortgage</div>
+    <h2>What it actually costs to hold, per month</h2>
+    <p class="lede">Zack's "under $6K/month" is close on the <em>hard bills</em> but leaves out reserves a
+      1956 house on a steep lot will demand. Here is the full picture at full asking, owner-occupied.</p>
+
+    <div class="tbl-scroll">
+      <table class="num">
+        <caption>Monthly carrying cost · $998,000 price · $200,000 down · $798,000 loan @ 6.66% · owner-occupant</caption>
+        <thead>
+          <tr><th>Line item</th><th class="n">Monthly</th><th class="n">Annual</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mortgage P&amp;I</td><td class="n">$5,128</td><td class="n">$61,536</td><td>30-yr fixed, 6.66%</td></tr>
+          <tr><td>Property tax (Homestead)</td><td class="n">$168</td><td class="n">$2,015</td><td>Owner-occ. rate $2.59/$1k after $220k exemption</td></tr>
+          <tr><td>Insurance (HO-3 + hurricane)</td><td class="n">$542</td><td class="n">$6,500</td><td>Estimate — <strong>get a real quote</strong>; volatile market</td></tr>
+          <tr><td>Sunrun solar lease</td><td class="n">$358</td><td class="n">$4,294</td><td>0% escalator, ~23 yrs left (you assume it)</td></tr>
+          <tr><td>KIUC electricity</td><td class="n">~$12</td><td class="n">~$140</td><td>Net <strong>credit</strong> today; only the fixed customer charge</td></tr>
+          <tr><td>Water / internet / misc</td><td class="n">$150</td><td class="n">$1,800</td><td>County water; fiber available</td></tr>
+          <tr class="sub"><td>— Hard bills subtotal —</td><td class="n">$6,358</td><td class="n">$76,285</td><td></td></tr>
+          <tr><td>Maintenance reserve</td><td class="n">$750</td><td class="n">$9,000</td><td>~0.9%/yr · old home, steep terraced lot</td></tr>
+          <tr><td>Cesspool sinking fund</td><td class="n">$125</td><td class="n">$1,500</td><td>Toward eventual $30–50k conversion</td></tr>
+          <tr class="total"><td>All-in with reserves</td><td class="n">$7,233</td><td class="n">$86,785</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tnote">If this is <strong>not</strong> your primary residence, property tax jumps from ~$168 to
+      <strong>~$453/mo</strong> (see the <a href="#tax" class="ref">tax cliff</a>), pushing all-in to
+      roughly <span class="num">$7,520/mo</span>.</p>
+
+    <div class="callout good">
+      <span class="h">The one pleasant surprise: electricity is effectively free.</span>
+      All three KIUC bills (May–Jul 2026) show the account in <b>credit</b> — the 24-panel system + 2 Powerwalls
+      over-produce, and your July statement carried a <b>$491.52 credit balance</b>. The only guaranteed KIUC cost
+      is the ~$11.42/mo customer charge, currently fully offset by generation credits. So your real energy cost is
+      the <b>$358/mo Sunrun lease</b> — which is roughly what a fully-electric Kauaʻi home would pay the grid anyway.
+      The catch is entirely in <a href="#solar" class="ref">who owns the panels</a>.
+    </div>
+  </div>
+</section>
+
+<!-- ===== MORTGAGE ===== -->
+<section id="mortgage">
+  <div class="wrap">
+    <div class="kicker">Financing</div>
+    <h2>Mortgage on $200k down</h2>
+    <p class="lede">$998,000 − $200,000 = a <strong>$798,000</strong> loan. Good news: that's
+      <strong>conforming</strong> in Kauaʻi County (2026 high-cost limit is $1,249,125), so you avoid jumbo
+      pricing/underwriting — and 20% down means <strong>no PMI</strong>.</p>
+
+    <div class="tbl-scroll">
+      <table class="num">
+        <caption>30-year fixed P&amp;I on $798,000 at a range of rates (principal &amp; interest only)</caption>
+        <thead><tr><th>Rate</th><th class="n">Monthly P&amp;I</th><th class="n">Annual</th><th class="n">Interest paid, yr 1</th></tr></thead>
+        <tbody>
+          <tr><td>6.50%</td><td class="n">$5,044</td><td class="n">$60,528</td><td class="n">~$51,700</td></tr>
+          <tr><td>6.66% <span class="pill" style="margin:0">market, Aug 27</span></td><td class="n">$5,128</td><td class="n">$61,536</td><td class="n">~$52,900</td></tr>
+          <tr><td>6.75%</td><td class="n">$5,176</td><td class="n">$62,112</td><td class="n">~$53,700</td></tr>
+          <tr><td>7.00%</td><td class="n">$5,309</td><td class="n">$63,708</td><td class="n">~$55,700</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tnote">Base case uses the Freddie Mac 30-yr average of <strong>6.66%</strong>
+      (<a class="ref" href="https://www.freddiemac.com/pmms" target="_blank" rel="noopener">week of Aug 27, 2026</a>).
+      Well-qualified borrowers are running ~6.5–6.75%. A $798k conforming loan sits under even the mainland baseline
+      (<a class="ref" href="https://www.fhfa.gov/news/news-release/fhfa-announces-conforming-loan-limit-values-for-2026" target="_blank" rel="noopener">FHFA 2026 limits</a>).</p>
+
+    <div class="callout warn">
+      <span class="h">⚠︎ Financing is not guaranteed here — the appraisal is the risk.</span>
+      Your agent's own words: <i>"If the appraiser picks up that the renovations happened and weren't permitted,
+      you won't get a loan."</i> The unpermitted bathroom relocation (see <a href="#permits" class="ref">permits</a>)
+      can surface at appraisal and stall the loan. <b>Keep your financing contingency until the certificate of
+      completion and stamped plans are in hand.</b>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VALUATION ===== -->
+<section id="value">
+  <div class="wrap">
+    <div class="kicker">Is $998k fair?</div>
+    <h2>Valuation &amp; the comps</h2>
+    <p class="lede">The CMA (prepared by <strong>your</strong> buyer's agent, Zack Kamen) leans on one line:
+      this is the <strong>lowest $/sqft of any active listing</strong>. True — but that framing quietly ignores
+      that it's a <strong>2-bedroom in a 3-bedroom market</strong>, and that the market has already spoken.</p>
+
+    <div class="cols">
+      <div class="callout warn" style="margin:0">
+        <span class="h">Signals it's still rich</span>
+        <ul style="margin:0">
+          <li><b>115 days on market</b> vs a neighborhood average of <b>52</b>.</li>
+          <li>Already cut <b>$102,000</b> (from $1,100,000 → $998,000, −9.3%).</li>
+          <li>Sold homes fetched <b>95.85% of list</b> on average → ~$958k implied even at today's ask.</li>
+          <li>2 bd narrows the buyer pool; most comparable sales are 3 bd.</li>
+        </ul>
+      </div>
+      <div class="callout good" style="margin:0">
+        <span class="h">Signals it holds value</span>
+        <ul style="margin:0">
+          <li>Quality, permitted-envelope <b>2022 renovation</b> (double-wall, quartz, LVP, mini-splits).</li>
+          <li>Agent pegs replacement cost at <b>~$1.16M</b> (lot ~$500k + build ~$660k) + 2 yrs of permitting.</li>
+          <li><b>Fee simple, $0 HOA, Flood Zone X</b> (low flood risk).</li>
+          <li>Over-producing solar + big usable outbuildings (office, studio, "she-shed").</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>The two-bedroom comps that actually matter</h3>
+    <div class="tbl-scroll">
+      <table class="num">
+        <caption>Closest comparables by bedroom count / condition (from your CMA)</caption>
+        <thead><tr><th>Address</th><th class="n">Bd/Ba</th><th class="n">Sqft</th><th class="n">Sold</th><th class="n">$/sqft</th><th>Read</th></tr></thead>
+        <tbody>
+          <tr><td>341 Nana Pl A</td><td class="n">2/2</td><td class="n">1,496</td><td class="n">$1,220,000</td><td class="n">$816</td><td>Exceptional 1940 cottage, furnished, 10 DOM — the ceiling</td></tr>
+          <tr><td>189 Eggerking Rd</td><td class="n">2/2</td><td class="n">1,311</td><td class="n">$839,000</td><td class="n">$640</td><td>Dated/original — the floor for a 2 bd</td></tr>
+          <tr><td>210 Eggerking Rd</td><td class="n">2/1</td><td class="n">926</td><td class="n">$825,000</td><td class="n">$891</td><td>Small; high $/sqft on low base</td></tr>
+          <tr><td>5318 Kihei Rd</td><td class="n">3/2</td><td class="n">1,508</td><td class="n">$999,000</td><td class="n">$662</td><td>Same street, 3 bd, cesspool — took 207 DOM</td></tr>
+          <tr class="total"><td>5289 Kihei Rd</td><td class="n">2/2</td><td class="n">1,650</td><td class="n">$998,000*</td><td class="n">$605</td><td>*asking · renovated, but cesspool + leased solar</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tnote">The subject sits between the dated 2 bd ($640/sqft) and the exceptional one ($816/sqft),
+      closer to the middle for its finish level. Applying ~$580–$590/sqft (a modest renovated premium, discounted
+      for the cesspool + leased solar + steep lot) to 1,650 sqft lands around <strong>$960–$975k</strong>;
+      the DOM/price-cut pressure argues for opening below that. <strong>Fair-value range: $925k–$975k.</strong></p>
+  </div>
+</section>
+
+<!-- ===== FLAGS ===== -->
+<section id="flags">
+  <div class="wrap">
+    <div class="kicker">The problems, ranked</div>
+    <h2>Red flags &amp; hidden costs</h2>
+    <p class="lede">In severity order — the first three are the ones that move price and risk.</p>
+
+    <div class="flags">
+      <div class="flag sev-hi">
+        <div class="top"><h3>1 · Unpermitted bathroom move → financing &amp; resale risk</h3><span class="sev hi">High</span></div>
+        <p>The seller's own email admits the master bath was <strong>relocated to the walk-in-closet location
+          after the 9/13/2021 final inspection</strong> — so the as-built layout doesn't match the approved
+          plans. Your agent warns this can <strong>kill the loan at appraisal</strong>. Permit 05-1859 shows
+          "Certificate Issued," but the public record doesn't show the paper certificate, the stamped plan set,
+          or the inspection narrative.</p>
+        <div class="cost">Cost if it surfaces: <span>loan delay/denial, or retro-permit + possible rework</span> — resolve before removing the financing contingency.</div>
+      </div>
+
+      <div class="flag sev-hi">
+        <div class="top"><h3>2 · Cesspool + Hawaiʻi's 2050 conversion mandate</h3><span class="sev hi">High</span></div>
+        <p>Wastewater is a <strong>cesspool</strong>. Under <strong>Act 125 (HRS §342D-72)</strong>, every cesspool
+          in Hawaiʻi must be upgraded/converted or sewer-connected by <strong>Jan 1, 2050</strong> — and Priority-1
+          zones (near streams/coast, common on Kauaʻi's east side) face accelerated timelines. The seller's claim
+          that it's "grandfathered" because permits predate Act 125 is <strong>incorrect</strong> for the 2050
+          deadline, which applies to all cesspools regardless of permit age.</p>
+        <div class="cost">Future cost: <span>$20,000–$50,000</span> (steep/terraced lot pushes toward an ATU at the high end). No state tax credit right now — the $10k credit expired in 2020.</div>
+      </div>
+
+      <div class="flag sev-hi">
+        <div class="top"><h3>3 · "Energy independence" is a leased liability</h3><span class="sev hi">High</span></div>
+        <p>The 24 panels + 2 Tesla Powerwalls are a <strong>Sunrun lease, not owned</strong>. You must either
+          <strong>assume $357.87/mo for ~23 more years</strong> (~$99k remaining, 0% escalator) or arrange a
+          <strong>buyout at fair market value</strong>. It complicates appraisal and title, and the renewable
+          credits belong to Sunrun. Full breakdown <a href="#solar" class="ref">below</a>.</p>
+        <div class="cost">Liability: <span>~$99,000 remaining lease</span> — or a one-time buyout of roughly <span>$76,000–$88,000</span>.</div>
+      </div>
+
+      <div class="flag sev-md">
+        <div class="top"><h3>4 · 1956 home on a steep, terraced lot</h3><span class="sev md">Medium</span></div>
+        <p>The foundation/slab inspections were logged <strong>"Approved with Exception."</strong> Steep terraced
+          sites carry drainage, retaining-wall, and access exposure, and this is a ~70-year-old structure under a
+          2022 cosmetic refresh. Budget a real maintenance reserve and get a <strong>structural + drainage</strong>
+          look, not just a general inspection.</p>
+        <div class="cost">Reserve: <span>~$9,000/yr</span> — plus one-off retaining/drainage risk.</div>
+      </div>
+
+      <div class="flag sev-md">
+        <div class="top"><h3>5 · Property-tax cliff if not owner-occupied</h3><span class="sev md">Medium</span></div>
+        <p>The advertised ~$1,755/yr tax <strong>only holds if you make this your primary residence</strong>
+          (Homestead exemption, &gt;271 days/yr, HI resident filing). As a second home it reclassifies to
+          Non-Owner-Occupied and roughly <strong>triples</strong>. Detail in the <a href="#tax" class="ref">tax cliff</a>.</p>
+        <div class="cost">Delta: <span>~$1,800/yr → ~$5,400/yr</span> if it's not your primary home.</div>
+      </div>
+
+      <div class="flag sev-md">
+        <div class="top"><h3>6 · Insurance — availability, not just price</h3><span class="sev md">Medium</span></div>
+        <p>Post-Lahaina, Hawaiʻi's market has hardened sharply (statewide premiums +13.4% in 2024; carriers exiting).
+          Standard HO-3 <strong>excludes hurricane</strong> — you buy it separately, typically with a <strong>5%
+          deductible</strong> (~$50k out-of-pocket on a $1M dwelling before it pays). Get a <strong>bindable quote
+          for this exact address early</strong>.</p>
+        <div class="cost">Estimate: <span>~$6,000–$9,000/yr</span> all-in, trending up.</div>
+      </div>
+
+      <div class="flag sev-lo">
+        <div class="top"><h3>7 · Marketing vs. record discrepancy + neighbor fire</h3><span class="sev lo">Low</span></div>
+        <p>The "owner renovated in 2022" story doesn't fully line up with permits tied to prior owner/contractor
+          <strong>Joseph Galante</strong> just before Andrew Locke took ownership — worth confirming who actually
+          did the work (warranty/quality). Separately, your agent notes a <strong>major fire at the adjacent house</strong>
+          (since rebuilt) — note for insurance disclosure.</p>
+        <div class="cost">Diligence item, not a hard cost.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SOLAR ===== -->
+<section id="solar">
+  <div class="wrap">
+    <div class="kicker">The Sunrun lease, in full</div>
+    <h2>Assume it, or buy it out?</h2>
+    <p class="lede">Signed by the seller on <strong>Nov 11, 2023</strong>, this is a 25-year lease — so about
+      <strong>2 years in, ~23 to go</strong>. The economics aren't bad; the point is that it's an obligation you
+      inherit, not a free asset.</p>
+
+    <div class="cols">
+      <div>
+        <h3>Assume the lease</h3>
+        <ul>
+          <li><b>$357.87/mo</b> ($0.140/kWh + $204/mo battery service), <b>0.00% escalator</b> — fixed for life.</li>
+          <li>~23 years remaining ≈ <b>~$98,700</b> total future payments.</li>
+          <li>You must qualify (FICO 650+, or cash/mortgage) to assume; otherwise a $250 fee or seller buyout.</li>
+          <li>System over-produces (~13,189 kWh/yr) → your KIUC account runs a <b>credit</b> (net-metered).</li>
+          <li>25-yr workmanship + equipment warranty; 10-yr roof-penetration watertight warranty stays in force.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Buy it out (own it)</h3>
+        <ul>
+          <li>Buyout = independent-appraiser <b>fair market value</b>; purchase windows include <b>"when you move"</b> (i.e., now, at this sale).</li>
+          <li>Contract prepayment schedule: Yr 2 <b>$87,931</b> · Yr 3 <b>$80,325</b> → today ≈ <b>$76k–$88k</b>.</li>
+          <li>Own it and electricity is genuinely near-free for 20+ years — but you take over monitoring/maintenance.</li>
+          <li>Best played as a <b>seller concession</b>: ask them to pay it off at closing, or credit you the buyout.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="h">Recommendation</span>
+      Don't let "24 solar panels + 2 Powerwalls" be sold to you as owned value — it isn't. Either (a) negotiate the
+      <b>seller buys out the lease</b> so it conveys free-and-clear, or (b) treat the ~$99k assumption as a real
+      liability and knock it off your price. At minimum, get Sunrun's exact <b>current buyout quote in writing</b>
+      before you commit.
+    </div>
+  </div>
+</section>
+
+<!-- ===== CESSPOOL ===== -->
+<section id="cesspool">
+  <div class="wrap">
+    <div class="kicker">Wastewater</div>
+    <h2>The cesspool clock</h2>
+    <p>Hawaiʻi has ~83,000 cesspools (~14,000 on Kauaʻi) and passed <a class="ref"
+      href="https://law.justia.com/codes/hawaii/title-19/chapter-342d/section-342d-72/" target="_blank" rel="noopener">Act 125</a>
+      in 2017 requiring every one to be converted, upgraded, or sewer-connected by <strong>2050</strong>. There is
+      no automatic upgrade-on-sale trigger statewide today, but Priority-1 cesspools (near water) can be ordered
+      converted sooner — and the east side of Kauaʻi is water-adjacent.</p>
+    <ul>
+      <li><strong>Cost:</strong> ~$20k–$40k for a conventional septic; ~$20k–$50k for an ATU. A steep terraced lot
+        with tight access commonly forces the pricier ATU and pushes to the top of the range.</li>
+      <li><strong>Tax credit:</strong> the old up-to-$10,000 state credit <strong>sunset in 2020</strong> and is not
+        available in 2026. Reinstatement bills (e.g., HB2079) are pending but not law — don't budget for it.</li>
+      <li><strong>Diligence:</strong> confirm the cesspool's location/condition and whether the parcel is in a
+        Priority-1 zone during inspection; that determines whether this is a 2040s problem or a sooner one.</li>
+    </ul>
+    <p class="tnote">Treat this as a <strong>known future capital cost of ~$30–50k</strong>. It's a legitimate line
+      in your offer math, and a fair thing to ask the seller to credit.</p>
+  </div>
+</section>
+
+<!-- ===== PERMITS ===== -->
+<section id="permits">
+  <div class="wrap">
+    <div class="kicker">Permits &amp; the paper trail</div>
+    <h2>Get these three documents before you waive financing</h2>
+    <p class="lede">Permit <strong>05-1859</strong> (add bedroom/bath/living, ~980 sqft, Galante Construction)
+      reads "Certificate Issued" and building-final approved 9/13/2021 — but the electronic record doesn't display
+      the actual certificate, the stamped plans, or the inspection narrative. The professional permit report
+      recommends you obtain exactly that.</p>
+    <ol>
+      <li><strong>Copy of the Certificate of Completion / Occupancy</strong> for permit 05-1859 from Kauaʻi County (Click2Gov / DPW).</li>
+      <li><strong>The full stamped plan set</strong> — so you can compare approved plans to the as-built (does the master-bath location match?).</li>
+      <li><strong>A certified inspection-history letter</strong> — to clear the "Approved with Exception" foundation note and the moved-bathroom question.</li>
+    </ol>
+    <div class="callout flag">
+      <span class="h">Why this is the pivotal item</span>
+      If the as-built doesn't match approved plans, two things follow: your <b>lender's appraiser can halt the loan</b>,
+      and a future buyer's will too. Best case, it's a paperwork clean-up. Worst case, it's a retro-permit and rework.
+      Either way, you want it resolved (or priced/credited) <b>before</b> your contingencies expire.
+    </div>
+  </div>
+</section>
+
+<!-- ===== TAX ===== -->
+<section id="tax">
+  <div class="wrap">
+    <div class="kicker">The property-tax cliff</div>
+    <h2>$1,755 or $5,400 — it depends entirely on how you occupy it</h2>
+    <p class="lede">Kauaʻi's owner-occupant deal is excellent; the non-owner rate is not. Which one you get is the
+      single biggest swing in your annual overhead outside the mortgage.</p>
+
+    <div class="tbl-scroll">
+      <table class="num">
+        <caption>Kauaʻi County real-property tax by use class · applied to a ~$998k assessment</caption>
+        <thead><tr><th>How you hold it</th><th class="n">Rate /$1,000</th><th>Exemption</th><th class="n">Est. annual tax</th></tr></thead>
+        <tbody>
+          <tr><td>Homestead (your primary residence)</td><td class="n">$2.59</td><td>−$220,000</td><td class="n">~$1,800–$2,015</td></tr>
+          <tr><td>Non-owner-occupied (2nd home) · Tier 1</td><td class="n">$5.45</td><td>none</td><td class="n">~$5,439</td></tr>
+          <tr><td>Short-term / vacation rental*</td><td class="n">$11.30</td><td>none</td><td class="n">~$11,277</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tnote">*Vacation-rental use is almost certainly <strong>not permitted</strong> for a new operator in this
+      residential neighborhood — shown only to illustrate the class ceiling. Homestead requires &gt;271 days/yr
+      occupancy + Hawaiʻi resident tax filing; the filing deadline for the next assessment year is <strong>Sept 30</strong>.
+      Rates per <a class="ref" href="https://www.kauai.gov/Government/Departments-Agencies/Finance/Real-Property-Tax/Assessment/Tax-Rates" target="_blank" rel="noopener">Kauaʻi County</a>.</p>
+
+    <div class="callout warn">
+      <span class="h">Decision point</span>
+      If Kauaʻi will be your <b>primary home</b>, the tax is trivially low — one of the real perks here. If it's a
+      <b>second home</b> you visit, add ~<b>$3,600/yr</b> to every number on this page and re-check whether it pencils.
+    </div>
+  </div>
+</section>
+
+<!-- ===== POSITIVES ===== -->
+<section id="plus">
+  <div class="wrap">
+    <div class="kicker">The other side of the ledger</div>
+    <h2>What's genuinely good here</h2>
+    <p class="lede">This isn't a bad house — it's a good house that's mispriced for its liabilities. The upside is real:</p>
+    <div>
+      <span class="pill">Quality 2022 renovation — double-wall, LVP, quartz, custom cabinetry</span>
+      <span class="pill">Net-positive solar (KIUC runs a credit)</span>
+      <span class="pill">Mini-split climate control in every room + smart lighting</span>
+      <span class="pill">Fee simple · $0 HOA</span>
+      <span class="pill">Flood Zone X (low flood risk)</span>
+      <span class="pill">Very low owner-occupant tax (~$1,755/yr)</span>
+      <span class="pill">Quiet dead-end street, mountain/forest views</span>
+      <span class="pill">Home office + studio + insulated grow shed + tool shed</span>
+      <span class="pill">Mature fruit forest (mango, citrus, papaya, dragon/passion fruit, fig)</span>
+      <span class="pill">Minutes to Sleeping Giant trailhead, Wailua Beach &amp; surf</span>
+      <span class="pill">Motivated seller — 115 DOM, already −$102k</span>
+      <span class="pill">Lowest $/sqft of active listings; ~$1.16M replacement cost</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLAN ===== -->
+<section id="plan">
+  <div class="wrap">
+    <div class="kicker">What to do with all this</div>
+    <h2>Negotiation strategy &amp; next steps</h2>
+    <ol class="steps">
+      <li><b>Open around $930,000</b><span>Anchor below fair value. The 115 DOM and $102k prior cut give you room; comparable sales closed at ~96% of list.</span></li>
+      <li><b>Make the Sunrun lease a concession</b><span>Ask the seller to buy out the lease at closing so the system conveys free-and-clear — or credit you its ~$76–88k buyout. Get Sunrun's written buyout figure first.</span></li>
+      <li><b>Ask for a cesspool credit</b><span>Request ~$25–35k toward the inevitable Act 125 conversion. It's a documented future cost, not a wish.</span></li>
+      <li><b>Keep the financing + inspection contingencies live</b><span>Do not waive financing until the certificate, stamped plans, and certified inspection letter (see permits) are in hand and clear.</span></li>
+      <li><b>Order the right inspections</b><span>General + a structural/drainage look at the terraced slope and slab ("Approved with Exception"), + a cesspool condition/location check and Priority-1 zone confirmation.</span></li>
+      <li><b>Bind insurance early</b><span>Get an actual quote for this address before removing contingencies — on Kauaʻi, availability is the real risk, not just price.</span></li>
+      <li><b>Confirm occupancy plan → tax class</b><span>Decide primary-residence vs. second-home now; it changes annual overhead by ~$3,600 and drives whether the deal pencils.</span></li>
+    </ol>
+    <div class="callout good">
+      <span class="h">Net read</span>
+      A fair, clean deal here looks like <b>~$930–960k with the solar lease bought out by the seller and a cesspool
+      credit</b>, financing kept contingent on the permit paperwork clearing. Get those and it's a sound buy of a
+      well-renovated home in a desirable pocket of Kauaʻi. Pay $998k as-is, assume the lease, and inherit the
+      cesspool + permit risk, and you've overpaid for someone else's deferred problems.
+    </div>
+  </div>
+</section>
+
+<!-- ===== DOCS ===== -->
+<section id="docs">
+  <div class="wrap">
+    <div class="kicker">Sources</div>
+    <h2>Documents reviewed &amp; reference links</h2>
+    <h3>Your file (read in full)</h3>
+    <div class="docgrid">
+      <div class="doc-item"><b>MLS Listing #728517</b><span>Core facts, features, tax figure, remarks</span></div>
+      <div class="doc-item"><b>Comparative Market Analysis (Aug 27, 2026)</b><span>15 comps, $/sqft, DOM, sold-price analysis</span></div>
+      <div class="doc-item"><b>Kihei Permits (Summary) — seller email</b><span>Bathroom-move admission; owner-of-record Galante</span></div>
+      <div class="doc-item"><b>Bathroom permit report (Aug 24, 2026)</b><span>Permit 05-1859; recommends 3 documents to obtain</span></div>
+      <div class="doc-item"><b>Sunrun contract (48 pp)</b><span>$357.87/mo, 0% escalator, buyout schedule</span></div>
+      <div class="doc-item"><b>KIUC bills — May / Jun / Jul 2026</b><span>Net credit; $491.52 credit balance in July</span></div>
+      <div class="doc-item"><b>Zack Kamen email</b><span>Financing/appraisal warning; "under $6K/mo"; neighbor fire</span></div>
+      <div class="doc-item"><b>NEM / KIUC interconnection</b><span>Net-metering basis for the generation credit</span></div>
+    </div>
+
+    <h3>External references</h3>
+    <ul>
+      <li><a class="ref" href="https://www.kauai.gov/Government/Departments-Agencies/Finance/Real-Property-Tax/Assessment/Tax-Rates" target="_blank" rel="noopener">Kauaʻi County real property tax rates</a> — Homestead $2.59, Non-owner $5.45, Vacation $11.30 per $1,000</li>
+      <li><a class="ref" href="https://law.justia.com/codes/hawaii/title-19/chapter-342d/section-342d-72/" target="_blank" rel="noopener">HRS §342D-72 — Act 125 cesspool mandate (2050 deadline)</a></li>
+      <li><a class="ref" href="https://health.hawaii.gov/wastewater/files/2019/10/FinancingConversions.pdf" target="_blank" rel="noopener">Hawaiʻi DOH — financing cesspool conversions</a></li>
+      <li><a class="ref" href="https://www.fhfa.gov/news/news-release/fhfa-announces-conforming-loan-limit-values-for-2026" target="_blank" rel="noopener">FHFA 2026 conforming loan limits</a> — Kauaʻi high-cost 1-unit $1,249,125</li>
+      <li><a class="ref" href="https://www.freddiemac.com/pmms" target="_blank" rel="noopener">Freddie Mac PMMS</a> — 30-yr fixed 6.66% (Aug 27, 2026)</li>
+      <li><a class="ref" href="https://www.hawaiilife.com/blog/home-insurance-changing-hawai%CA%BBi-what-buyers-homeowners-need-to-know/" target="_blank" rel="noopener">Hawaiʻi Life — post-Lahaina home insurance market</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="disc">Prepared privately for Kenny Hyder as a decision aid, Aug 27, 2026. Figures are estimates
+      derived from the documents provided and current public data; property tax, insurance, appraisal, and Sunrun
+      buyout values must be confirmed with the county, a bindable insurance quote, your lender/appraiser, and
+      Sunrun before relying on them. Not legal, tax, or lending advice.</p>
+    <div>Hyder Media · confidential</div>
+  </div>
+</footer>
+
+</div><!-- /#doc -->
+
+<script>
+  (function(){
+    var PW='DAKINE', KEY='kihei_dossier_auth_2026';
+    function reveal(){
+      document.getElementById('gate').style.display='none';
+      document.getElementById('doc').style.display='block';
+    }
+    if(sessionStorage.getItem(KEY)==='ok') reveal();
+    window.unlock=function(){
+      var v=document.getElementById('pw').value.trim();
+      if(v===PW){ sessionStorage.setItem(KEY,'ok'); reveal(); }
+      else{ document.getElementById('gerr').textContent='Incorrect password.';
+            document.getElementById('pw').value=''; document.getElementById('pw').focus(); }
+    };
+  })();
+</script>
+</body>
+</html>
