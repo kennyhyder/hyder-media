@@ -68,7 +68,10 @@ export async function GET(request: Request) {
       }),
       signal: AbortSignal.timeout(20000),
     });
-    if (!res.ok) throw new Error(`Anthropic ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`Anthropic ${res.status}: ${body.slice(0, 300)}`);
+    }
     const j = await res.json();
     const text: string = (j?.content?.[0]?.text || "").trim();
     const sm = text.match(/SENTIMENT:\s*(supportive|mixed|cautionary)/i);
@@ -78,8 +81,9 @@ export async function GET(request: Request) {
       { summary, sentiment, sources: articles.slice(0, 5) },
       { headers: CORS_HEADERS }
     );
-  } catch {
-    // Claude failed — still return the headlines.
+  } catch (e) {
+    // Claude synthesis failed — log why so it isn't a silent black box, still return headlines.
+    console.error(`[developments] synthesis failed for "${place}":`, e);
     return NextResponse.json(
       { summary: null, sentiment: null, sources: articles.slice(0, 5) },
       { headers: CORS_HEADERS }
