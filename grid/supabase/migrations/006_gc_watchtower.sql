@@ -13,7 +13,7 @@ create table if not exists public.gc_watches (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.gc_users(id) on delete cascade,
   kind text not null check (kind in ('site','place','query')),
-  dc_site_id bigint,                       -- kind=site
+  dc_site_id text,                         -- kind=site (grid_dc_sites.id is a uuid string)
   lat double precision,
   lng double precision,
   label text not null,
