@@ -26,6 +26,8 @@ export interface StatePolicy {
   thresholdNote?: string;
 }
 
+// BUMP THIS on ANY edit to the policy dataset below — Watchtower snapshots key
+// on it to detect regulatory changes and email watchers (see vet-signals.ts).
 export const DC_POLICY_AS_OF = "2026-08";
 
 // Only states with a notable, sourced posture are listed; others fall back to a

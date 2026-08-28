@@ -1,103 +1,21 @@
 import { NextResponse } from "next/server";
 import { CORS_HEADERS, handleError } from "@/lib/grid-api/utils";
-import { nearbySitesByLatLng, nearbyDatacentersByLatLng, getCountyByFips, type DcSite, type Datacenter } from "@/lib/db";
 import { siteProfilePath } from "@/lib/entity-slug";
-import { regulatoryClimate } from "@/lib/dc-policy";
-import { hyperscalerOf, coloOf } from "@/lib/hyperscalers";
-import { fetchNews } from "@/lib/grid-api/news";
-import frontier from "@/data/frontier-dc.json";
-
-function milesBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
-  const R = 3958.8;
-  const dLat = ((bLat - aLat) * Math.PI) / 180;
-  const dLng = ((bLng - aLng) * Math.PI) / 180;
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
-}
+import type { DcSite } from "@/lib/db";
+import { geocode, COORD_RE, assembleVetData } from "@/lib/vet-signals";
 
 // Vet-a-site (Phase 1) — Jon De Pena's second workflow: bring a location
 // (address / town / lat,lng) + a target build size, and get a first-pass read:
 // jurisdiction, regulatory climate (MW-gated), county power/water/hazard context,
 // nearby scored candidate sites, and latest local news. All external calls
-// (Census geocoder, FCC jurisdiction, GDELT news) run server-side, so the browser
+// (Census geocoder, FCC jurisdiction, news) run server-side, so the browser
 // only hits same-origin — no CSP additions needed. Satellite imagery is an <img>
 // on the client (Esri World Imagery, allowed by the existing img-src https:).
+//
+// Signal assembly lives in src/lib/vet-signals.ts, shared with the Watchtower
+// scan cron — keep this route a thin shell over it.
 
 export const dynamic = "force-dynamic";
-
-const COORD_RE = /^\s*(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/;
-
-async function geocode(q: string): Promise<{ lat: number; lng: number; label: string } | null> {
-  const m = q.match(COORD_RE);
-  if (m) {
-    const lat = parseFloat(m[1]);
-    const lng = parseFloat(m[2]);
-    if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
-      return { lat, lng, label: `${lat.toFixed(5)}, ${lng.toFixed(5)}` };
-    }
-  }
-  try {
-    const url =
-      `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(q)}` +
-      `&benchmark=Public_AR_Current&format=json`;
-    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!r.ok) return null;
-    const j = await r.json();
-    const match = j?.result?.addressMatches?.[0];
-    if (match?.coordinates && Number.isFinite(match.coordinates.y) && Number.isFinite(match.coordinates.x)) {
-      return { lat: match.coordinates.y, lng: match.coordinates.x, label: match.matchedAddress || q };
-    }
-  } catch {
-    /* Census failed — fall through to the place fallback */
-  }
-  // Fallback for town / place names (Census is address-only). Low-volume,
-  // server-side, US-only, with a contact User-Agent per OSM policy.
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=us`;
-    const r = await fetch(url, {
-      signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "GridCensus/1.0 (+https://gridcensus.com; kenny@hyder.me)" },
-    });
-    if (r.ok) {
-      const j = await r.json();
-      const hit = Array.isArray(j) ? j[0] : null;
-      if (hit) {
-        const lat = parseFloat(hit.lat);
-        const lng = parseFloat(hit.lon);
-        if (Number.isFinite(lat) && Number.isFinite(lng)) {
-          return { lat, lng, label: (hit.display_name as string) || q };
-        }
-      }
-    }
-  } catch {
-    /* place fallback failed — return null below */
-  }
-  return null;
-}
-
-async function jurisdiction(lat: number, lng: number) {
-  try {
-    const r = await fetch(`https://geo.fcc.gov/api/census/area?lat=${lat}&lon=${lng}&format=json`, {
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!r.ok) return null;
-    const j = await r.json();
-    const a = j?.results?.[0];
-    if (a?.state_code) {
-      return {
-        state: a.state_code as string,
-        stateName: (a.state_name as string) ?? null,
-        county: (a.county_name as string) ?? null,
-        fips: (a.county_fips as string) ?? null,
-      };
-    }
-  } catch {
-    /* reverse-geocode failed */
-  }
-  return null;
-}
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
@@ -120,55 +38,12 @@ export async function GET(request: Request) {
     );
   }
 
-  const juris = await jurisdiction(geo.lat, geo.lng);
-  const [nearby, county, dcs] = await Promise.all([
-    nearbySitesByLatLng(geo.lat, geo.lng, 8),
-    juris?.fips ? getCountyByFips(juris.fips) : Promise.resolve(null),
-    nearbyDatacentersByLatLng(geo.lat, geo.lng, null, 10, 0.7),
-  ]);
-
-  // Existing-datacenter footprint near the location, with hyperscaler/colo tags.
-  const datacenters = (dcs || [])
-    .map((dc: Datacenter) => ({
-      id: dc.id,
-      name: dc.name,
-      operator: dc.operator,
-      city: dc.city,
-      state: dc.state,
-      capacity_mw: dc.capacity_mw,
-      hyperscaler: hyperscalerOf(dc.operator) ?? hyperscalerOf(dc.name),
-      colo: coloOf(dc.operator) ?? coloOf(dc.name),
-      distance_mi:
-        dc.latitude != null && dc.longitude != null
-          ? Math.round(milesBetween(geo.lat, geo.lng, dc.latitude, dc.longitude) * 10) / 10
-          : null,
-    }))
-    .sort((a, b) => (a.distance_mi ?? 1e9) - (b.distance_mi ?? 1e9));
-  const hyperscalerFootprint = [...new Set(datacenters.map((d) => d.hyperscaler).filter(Boolean))];
-
-  // Nearby frontier AI datacenter projects (Epoch AI) — pipeline + off-taker context.
-  const pipeline = frontier.projects
-    .filter((p) => p.lat != null && p.lng != null)
-    .map((p) => ({
-      name: p.name,
-      owner: p.owner,
-      off_takers: p.off_takers,
-      power_mw: p.power_mw,
-      distance_mi: Math.round(milesBetween(geo.lat, geo.lng, p.lat as number, p.lng as number) * 10) / 10,
-    }))
-    .filter((p) => p.distance_mi <= 75)
-    .sort((a, b) => a.distance_mi - b.distance_mi)
-    .slice(0, 5);
-
-  const state = juris?.state ?? null;
-  const reg = regulatoryClimate(state, mw);
-  const placeLabel = juris?.county && juris?.state ? `${juris.county}, ${juris.state}` : geo.label;
   // For news, prefer the user's specific place (e.g. "Abilene, TX") over the
   // county — it's more locally relevant. Fall back to county for coord queries.
-  const newsPlace = COORD_RE.test(q) ? placeLabel : q;
-  const articles = await fetchNews(newsPlace);
+  const newsPlace = COORD_RE.test(q) ? undefined : q;
+  const data = await assembleVetData(geo, mw, newsPlace);
 
-  const nearbyOut = (nearby || []).map((s: DcSite) => ({ ...s, path: siteProfilePath(s) }));
+  const nearbyOut = (data.nearby || []).map((s: DcSite) => ({ ...s, path: siteProfilePath(s) }));
 
   return NextResponse.json(
     {
@@ -176,19 +51,19 @@ export async function GET(request: Request) {
         lat: geo.lat,
         lng: geo.lng,
         label: geo.label,
-        state,
-        stateName: juris?.stateName ?? null,
-        county: juris?.county ?? null,
-        fips: juris?.fips ?? null,
+        state: data.state,
+        stateName: data.juris?.stateName ?? null,
+        county: data.juris?.county ?? null,
+        fips: data.juris?.fips ?? null,
       },
       targetMw: mw,
-      regulatory: reg,
-      county,
+      regulatory: data.regulatory,
+      county: data.county,
       nearby: nearbyOut,
-      datacenters,
-      hyperscalerFootprint,
-      pipeline,
-      news: articles,
+      datacenters: data.datacenters,
+      hyperscalerFootprint: data.hyperscalerFootprint,
+      pipeline: data.pipeline,
+      news: data.news,
     },
     { headers: CORS_HEADERS }
   );

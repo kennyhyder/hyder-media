@@ -3,6 +3,7 @@ import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/lib/schema";
 import LeadCapture from "@/components/LeadCapture";
+import UpgradeButton from "@/components/account/UpgradeButton";
 
 export const revalidate = 604800; // 7d (was 24h) — data refreshes monthly; deploys bust ISR cache
 
@@ -23,6 +24,7 @@ const TIERS = [
       "Top scored sites per geography",
       "DC Readiness methodology",
       "Monthly dataset refresh",
+      "Watchtower: 1 watched site, weekly digest",
     ],
     cta: { label: "Browse the data", href: "/datacenter-sites" },
     highlight: false,
@@ -35,11 +37,12 @@ const TIERS = [
     features: [
       "All 164,098 sites with full sub-scores",
       "Parcel ownership & interconnection-queue detail",
+      "Watchtower: watch up to 25 sites — nightly signal scans, change digests & alerts",
       "Saved searches & CSV export",
       "Custom scoring weights",
       "Email support",
     ],
-    cta: { label: "Contact sales", href: `mailto:${CONTACT_EMAIL}?subject=MegaWatt%20Site%20Pro` },
+    cta: { label: "Go Pro — instant checkout", href: "checkout" },
     highlight: true,
   },
   {
@@ -54,7 +57,7 @@ const TIERS = [
       "Priority analyst support",
       "SLA & onboarding",
     ],
-    cta: { label: "Talk to us", href: `mailto:${CONTACT_EMAIL}?subject=MegaWatt%20Site%20Enterprise` },
+    cta: { label: "Talk to us", href: `mailto:${CONTACT_EMAIL}?subject=GridCensus%20Enterprise` },
     highlight: false,
   },
 ];
@@ -73,8 +76,8 @@ export default function PricingPage() {
         <p className="mx-auto mt-3 max-w-2xl text-gray-600">
           {SITE_NAME} turns public infrastructure data into a datacenter
           site-selection screen. Start free; upgrade when you need the full
-          catalog, raw scores, or API access. Billing wiring is in progress —
-          reach out to get set up today.
+          catalog, Watchtower monitoring, or API access. Pro checkout is instant;
+          cancel anytime.
         </p>
       </header>
 
@@ -102,16 +105,22 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <a
-              href={t.cta.href}
-              className={`mt-6 rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
-                t.highlight
-                  ? "bg-purple-600 text-white hover:bg-purple-700"
-                  : "border border-gray-300 bg-white text-gray-800 hover:bg-gray-50"
-              }`}
-            >
-              {t.cta.label}
-            </a>
+            {t.cta.href === "checkout" ? (
+              <div className="mt-6">
+                <UpgradeButton className="w-full rounded-lg bg-purple-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-purple-700" />
+              </div>
+            ) : (
+              <a
+                href={t.cta.href}
+                className={`mt-6 rounded-lg px-4 py-2.5 text-center text-sm font-semibold ${
+                  t.highlight
+                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    : "border border-gray-300 bg-white text-gray-800 hover:bg-gray-50"
+                }`}
+              >
+                {t.cta.label}
+              </a>
+            )}
           </div>
         ))}
       </div>
@@ -121,7 +130,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-8 text-center text-xs text-gray-400">
-        Real checkout (Stripe) is a later milestone. Questions? {CONTACT_EMAIL}
+        Secure checkout by Stripe. Questions? {CONTACT_EMAIL}
       </p>
     </div>
   );

@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/gsc-pull",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/watchtower-scan",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/watchtower-digest",
+      "schedule": "0 17 * * *"
     }
   ]
 }

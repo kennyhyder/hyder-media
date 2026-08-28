@@ -10,6 +10,7 @@ import { useState } from "react";
 import { fmtInt, fmtScore, fmtCents, scoreColor } from "@/lib/format";
 import { siteTypeLabel } from "@/lib/geo";
 import type { Posture } from "@/lib/dc-policy";
+import WatchButton from "@/components/account/WatchButton";
 
 const POSTURE_CLS: Record<Posture, string> = {
   favorable: "bg-green-100 text-green-800",
@@ -169,6 +170,18 @@ export default function VetSite() {
               <p className="mt-1 text-sm text-gray-500">
                 {result.location.label} · {result.location.lat.toFixed(4)}, {result.location.lng.toFixed(4)}
               </p>
+              <div className="mt-2">
+                <WatchButton
+                  lat={result.location.lat}
+                  lng={result.location.lng}
+                  label={
+                    result.location.county && result.location.state
+                      ? `${result.location.county}, ${result.location.state}`
+                      : result.location.label
+                  }
+                  targetMw={result.targetMw}
+                />
+              </div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className={`inline-block rounded px-2.5 py-1 text-sm font-semibold ${POSTURE_CLS[result.regulatory.effective]}`}>
                   {result.regulatory.label} regulatory climate

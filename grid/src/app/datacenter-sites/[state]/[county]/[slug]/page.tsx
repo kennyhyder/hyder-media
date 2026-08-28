@@ -46,6 +46,7 @@ import LeadCapture from "@/components/LeadCapture";
 import PrintButton from "@/components/PrintButton";
 import AddToCompareButton from "@/components/AddToCompareButton";
 import SuggestEditButton from "@/components/account/SuggestEditButton";
+import WatchButton from "@/components/account/WatchButton";
 import { getPageOverride, applyOverride } from "@/lib/gsc/page-override";
 
 // On-demand ISR: 164k sites must NOT prerender at build.
@@ -450,6 +451,7 @@ export default async function SiteProfilePage({
           fields={["name", "available_capacity_mw", "parcel_owner", "acreage", "former_use"]}
         />
         <AddToCompareButton id={site.id} name={name} />
+        <WatchButton siteId={site.id} label={name} />
         <PrintButton />
       </div>
 
