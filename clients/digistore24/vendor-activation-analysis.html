@@ -92,8 +92,8 @@
     <div class="container">
         <div class="page-header">
             <h1>Vendor Activation &amp; True ROAS — First Real Data</h1>
-            <p class="subtitle">Google Ads clicks are now traceable end-to-end in PostHog: click (gclid) → vendor signup → product creation → first sale → ongoing sales volume. <strong>Cohort note:</strong> the measured population is Google Ads traffic in DACH + Canada (Digistore24's own campaigns) — the US/BR campaigns in this program are not yet attributable because the click ID is dropped at the experience-funnel → signup handoff (fix already specified, one small dev task). Paid-search vendors are paid-search vendors: this is the best available benchmark for what our signups become, and the identical measurement lights up for US/BR the moment the handoff fix ships.</p>
-            <p class="meta">Source: PostHog (Prod_Digistore24) · gclid capture live since June 2026 · queried 2026-08-11 · junk "None" gclid values excluded · cohort geo: DE 80% / CA+rest 20% (US/BR pending handoff fix)</p>
+            <p class="subtitle">Google Ads clicks are now traceable end-to-end in PostHog: click (gclid) → vendor signup → product creation → first sale → ongoing sales volume. <strong>Update 2026-08-29:</strong> Digistore24 shipped the signup-handoff fix on Aug 21 — <strong>US/BR attribution is now live</strong> (US capture reached ~27%, on par with the DACH benchmark). The matured-cohort analysis below is still the DACH benchmark population; US/BR cohorts are accumulating now and their first-sale numbers appear here as they mature (median ~8 days to first sale). Early signal: 19% of US gclid signups since Aug 21 have already started product creation.</p>
+            <p class="meta">Source: PostHog (Prod_Digistore24) · gclid capture live since June 2026 · queried 2026-08-11 · junk "None" gclid values excluded · matured cohorts: DACH benchmark · US/BR capture live since 2026-08-21, cohorts maturing</p>
         </div>
 
         <div class="card" id="live-capture-card" style="display: none;">
