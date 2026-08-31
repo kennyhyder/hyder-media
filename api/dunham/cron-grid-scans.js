@@ -2,10 +2,11 @@
  * Dunham grid tracking — weekly LocalFalcon scan cron
  * GET /api/dunham/cron-grid-scans     (Mondays 14:00 UTC)
  *
- * Cadence (fits the 7,500-credit/month LocalFalcon package):
- *   - 6 priority metros × 3 keywords, every week           (882 credits/week)
- *   - 10 small markets × 3 keywords, first Monday of month (1,470 credits/month)
- *   ≈ 5,290 credits/month total, ~2,200 headroom for ad-hoc scans.
+ * Cadence (fits the 7,500-credit/month LocalFalcon package; changed 2026-08-31):
+ *   - ALL 16 markets × 'bail bonds', every week                  (784 credits/week)
+ *   - ALL 16 markets × 'jail release', first Monday of month     (784 credits/month)
+ *   - 'fianzas' dropped (not actively optimizing Spanish yet)
+ *   ≈ 4,180 credits/month total, ~3,300 headroom for ad-hoc scans.
  *
  * Each scan: 7×7 grid, 5 mi radius, jail-centered, eager (fire and return —
  * reports are pulled by the dashboard via /api/dunham/grid-reports).
@@ -19,7 +20,10 @@ import { createClient } from '@supabase/supabase-js';
 
 export const config = { maxDuration: 300 };
 
-const KEYWORDS = ['bail bonds', 'fianzas', 'jail release'];   // 'bail bondsman' dropped 2026-07-23: 83-95% result overlap w/ 'bail bonds'; fianzas = 35% overlap (distinct Spanish market)
+// 'bail bondsman' dropped 2026-07-23 (83-95% overlap w/ 'bail bonds');
+// 'fianzas' dropped 2026-08-31 (not actively optimizing Spanish yet — historical data kept)
+const WEEKLY_KEYWORDS = ['bail bonds'];
+const MONTHLY_KEYWORDS = ['bail bonds', 'jail release'];   // first Monday of month
 const METROS = [
     ['houston', 'ChIJFbCscprBQIYRM53MaGUqvkI', '29.7687', '-95.3576'],
     ['dallas', 'ChIJOe9WbTuZToYRdjnk3g4hdlc', '32.7770', '-96.8090'],
@@ -59,13 +63,14 @@ export default async function handler(req, res) {
     const SKIP_DATES = ['2026-08-03', '2026-08-10'];   // 8/10 superseded by the 8/7 fleet movement check
     const today = new Date().toISOString().slice(0, 10);
     const skipScans = SKIP_DATES.includes(today);
-    const includeSmall = new Date().getUTCDate() <= 7;   // first Monday of the month
-    const targets = skipScans ? [] : (includeSmall ? [...METROS, ...SMALL_MARKETS] : METROS);
+    const firstMonday = new Date().getUTCDate() <= 7;   // first Monday of the month
+    const targets = skipScans ? [] : [...METROS, ...SMALL_MARKETS];   // all markets, every week (2026-08-31)
+    const keywords = firstMonday ? MONTHLY_KEYWORDS : WEEKLY_KEYWORDS;
 
     const fired = [];
     const errors = [];
     for (const [slug, pid, lat, lng] of targets) {
-        for (const kw of KEYWORDS) {
+        for (const kw of keywords) {
             const body = new URLSearchParams({
                 api_key: apiKey, place_id: pid, keyword: kw,
                 lat, lng, grid_size: '7', radius: '5',
