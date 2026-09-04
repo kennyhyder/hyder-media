@@ -105,11 +105,84 @@
             </table>
         </div>
 
+        <div class="card" id="tracker-card" style="display: none;">
+            <h2>Running Activation Tracker <span id="tracker-geo-wrap" style="float: right; font-size: 0.8rem;">
+                <select id="tracker-geo" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; padding: 4px 10px;">
+                    <option value="US" selected>US</option><option value="BR">BR</option><option value="DACH">DACH (benchmark)</option>
+                </select></span></h2>
+            <p class="card-sub">Weekly signup cohorts with activation measured at fixed ages — cohorts fill rightward as they mature (updated daily). "Extrapolated" scales tracked results to all paid signups using each cohort's gclid capture rate; treat as an estimate, strongest where capture ≥ 20%.</p>
+            <div class="stat-grid" id="tracker-stats" style="margin-bottom: 14px;"></div>
+            <div style="overflow-x: auto;">
+            <table id="tracker-table" style="min-width: 900px;">
+                <thead><tr>
+                    <th>Cohort Week</th><th class="right">Paid Signups</th><th class="right">Tracked</th><th class="right">Capture</th>
+                    <th class="right">Product Started</th>
+                    <th class="right">1st Sale @7d</th><th class="right">@14d</th><th class="right">@30d</th><th class="right">@60d</th><th class="right">@90d</th>
+                    <th class="right">Activation %</th><th class="right">Tracked GMV</th><th class="right">Extrap. GMV</th><th class="right">Est. DS24 Margin</th>
+                </tr></thead>
+                <tbody></tbody>
+            </table>
+            </div>
+            <p class="assume">Milestone cells show "—" until a cohort reaches that age. Activation % = tracked first sales ÷ tracked signups (rate is measurement-valid even at partial capture). Est. margin ≈ 7.9% of extrapolated GMV + €1 per sale. GMV carries the purchase-record coverage caveat below.</p>
+        </div>
+
         <script>
+        let TRACKER = null;
+        function renderTracker() {
+            if (!TRACKER) return;
+            const geo = document.getElementById('tracker-geo').value;
+            const rows = TRACKER.filter(w => w.geo === geo && w.attributed_signups > 0)
+                .sort((a, b) => a.cohort_week < b.cohort_week ? 1 : -1);
+            const now = Date.now();
+            const ageDays = (wk) => Math.floor((now - new Date(wk + 'T00:00:00Z').getTime()) / 86400000) - 6; // youngest member age
+            const fmt = (n) => (n ?? 0).toLocaleString();
+            const eur = (n) => n == null ? '—' : '€' + Math.round(n).toLocaleString();
+            const mile = (w, days, val) => ageDays(w.cohort_week) >= days ? fmt(val) : '—';
+            let tSig = 0, tAttr = 0, tFs = 0, tGmv = 0, tPaid = 0, tExGmv = 0;
+            const body = rows.map(w => {
+                const cap = w.capture_pct ? w.capture_pct / 100 : null;
+                const actPct = w.attributed_signups ? (w.first_sales / w.attributed_signups * 100) : 0;
+                const exGmv = (cap && cap > 0.03 && w.tracked_gmv != null) ? w.tracked_gmv / cap : null;
+                const exSales = (cap && cap > 0.03) ? (w.tracked_sales || 0) / cap : 0;
+                const margin = exGmv != null ? exGmv * 0.079 + exSales * 1 : null;
+                tSig += w.attributed_signups; tFs += w.first_sales; tGmv += (w.tracked_gmv || 0);
+                tPaid += (w.paid_signups || 0); tExGmv += (exGmv || 0);
+                return `<tr>
+                    <td>${w.cohort_week}</td>
+                    <td class="right">${w.paid_signups != null ? fmt(w.paid_signups) : '—'}</td>
+                    <td class="right">${fmt(w.attributed_signups)}</td>
+                    <td class="right ${w.capture_pct >= 20 ? 'good' : w.capture_pct >= 5 ? 'warn' : 'bad'}">${w.capture_pct != null ? w.capture_pct.toFixed(1) + '%' : '—'}</td>
+                    <td class="right">${fmt(w.product_started)}</td>
+                    <td class="right">${mile(w, 7, w.fs_7d)}</td><td class="right">${mile(w, 14, w.fs_14d)}</td>
+                    <td class="right">${mile(w, 30, w.fs_30d)}</td><td class="right">${mile(w, 60, w.fs_60d)}</td>
+                    <td class="right">${mile(w, 90, w.fs_90d)}</td>
+                    <td class="right ${actPct >= 2 ? 'good' : ''}">${actPct.toFixed(2)}%</td>
+                    <td class="right">${eur(w.tracked_gmv)}</td>
+                    <td class="right blue">${eur(exGmv)}</td>
+                    <td class="right good">${margin != null ? '€' + Math.round(margin).toLocaleString() : '—'}</td>
+                </tr>`;
+            }).join('');
+            document.querySelector('#tracker-table tbody').innerHTML = body || '<tr><td colspan="14" style="color: var(--text-muted);">No attributed cohorts for this geo yet.</td></tr>';
+            const wAct = tSig ? (tFs / tSig * 100).toFixed(2) : '0';
+            const capAll = tPaid ? (tSig / tPaid * 100).toFixed(1) : null;
+            document.getElementById('tracker-stats').innerHTML = `
+                <div class="stat"><div class="v">${fmt(tPaid) || '—'}</div><div class="l">Paid signups (all cohorts)</div></div>
+                <div class="stat"><div class="v ${capAll >= 20 ? 'good' : 'warn'}">${capAll != null ? capAll + '%' : '—'}</div><div class="l">Tracked via gclid</div></div>
+                <div class="stat"><div class="v">${fmt(tFs)}</div><div class="l">Tracked activations</div></div>
+                <div class="stat"><div class="v">${wAct}%</div><div class="l">Blended activation rate</div></div>
+                <div class="stat"><div class="v">${eur(tGmv)}</div><div class="l">Tracked GMV (floor)</div></div>
+                <div class="stat"><div class="v blue">${eur(tExGmv)}</div><div class="l">Extrapolated GMV</div></div>`;
+            document.getElementById('tracker-card').style.display = '';
+        }
+        document.getElementById('tracker-geo').addEventListener('change', renderTracker);
+
         (async function () {
             try {
                 const r = await fetch('/api/digistore/activation');
                 const d = await r.json();
+                if (d.status === 'success' && Array.isArray(d.weekly) && d.weekly.length) {
+                    TRACKER = d.weekly; renderTracker();
+                }
                 if (d.status !== 'success' || !d.capture.length) return;
                 const days = [...new Set(d.capture.map(c => c.day))].sort().slice(-7);
                 const agg = {};

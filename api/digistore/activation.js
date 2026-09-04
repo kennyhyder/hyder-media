@@ -25,13 +25,14 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
-    const [cohorts, capture] = await Promise.all([
+    const [cohorts, capture, weekly] = await Promise.all([
       sbGet('ds24_activation_cohorts?select=*&order=cohort_month.asc,geo.asc'),
       sbGet('ds24_gclid_capture_daily?select=*&order=day.asc,geo.asc'),
+      sbGet('ds24_activation_weekly?select=*&order=cohort_week.asc,geo.asc'),
     ]);
     const fetchedAt = cohorts.length ? cohorts[cohorts.length - 1].fetched_at : null;
-    return res.status(200).json({ status: 'success', fetchedAt, cohorts, capture });
+    return res.status(200).json({ status: 'success', fetchedAt, cohorts, capture, weekly });
   } catch (e) {
-    return res.status(200).json({ status: 'error', error: String((e && e.message) || e), cohorts: [], capture: [] });
+    return res.status(200).json({ status: 'error', error: String((e && e.message) || e), cohorts: [], capture: [], weekly: [] });
   }
 }

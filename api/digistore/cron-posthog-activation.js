@@ -129,6 +129,68 @@ export default async function handler(req, res) {
       }
     }
 
+    // 3) WEEKLY running tracker: cohort week × geo with age-milestone
+    // activation (fs_Xd = first sales within X days of signup — lets cohorts
+    // of different ages compare honestly), tracked sales + GMV.
+    const weekly = await hogql(`
+      WITH cohort AS (
+        SELECT person_id, min(timestamp) AS su, any(${GEO_BUCKET}) AS geo
+        FROM events WHERE ${SIGNUP_EVENTS} AND ${REAL_GCLID}
+        GROUP BY person_id),
+      pcs AS (SELECT person_id, min(timestamp) AS t FROM events WHERE event = 'Product Creation Started' GROUP BY person_id),
+      fs AS (SELECT person_id, min(timestamp) AS t, any(toString(properties.userId)) AS uid FROM events WHERE event = 'First Sale' GROUP BY person_id),
+      pv AS (SELECT toString(properties.vendor_id) AS vid, count() AS n, sum(toFloat(properties.order_price)) AS gmv FROM events WHERE event = 'Purchase Completed' GROUP BY vid)
+      SELECT toMonday(su) AS wk, cohort.geo AS geo,
+        count() AS attributed,
+        countIf(pcs.t >= su) AS product_started,
+        countIf(fs.t >= su AND fs.t <= su + INTERVAL 7 DAY) AS fs7,
+        countIf(fs.t >= su AND fs.t <= su + INTERVAL 14 DAY) AS fs14,
+        countIf(fs.t >= su AND fs.t <= su + INTERVAL 30 DAY) AS fs30,
+        countIf(fs.t >= su AND fs.t <= su + INTERVAL 60 DAY) AS fs60,
+        countIf(fs.t >= su AND fs.t <= su + INTERVAL 90 DAY) AS fs90,
+        countIf(fs.t >= su) AS fs_total,
+        sumIf(pv.n, fs.t >= su) AS tracked_sales,
+        round(sumIf(pv.gmv, fs.t >= su), 2) AS tracked_gmv
+      FROM cohort
+      LEFT JOIN pcs ON pcs.person_id = cohort.person_id
+      LEFT JOIN fs ON fs.person_id = cohort.person_id
+      LEFT JOIN pv ON pv.vid = fs.uid
+      GROUP BY wk, geo ORDER BY wk, geo`);
+
+    // Paid-signup denominators from Google Ads (Vendor + Affiliate Sign-up
+    // conversions per week, geo from campaign name) — the extrapolation base.
+    let paidByWkGeo = {};
+    try {
+      const gconns = await sbGet('google_ads_connections?select=*&order=created_at.desc&limit=1');
+      const gconn = gconns[0];
+      const gtok = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ client_id: (process.env.GOOGLE_ADS_CLIENT_ID || '').trim(), client_secret: (process.env.GOOGLE_ADS_CLIENT_SECRET || '').trim(), refresh_token: gconn.refresh_token, grant_type: 'refresh_token' }),
+      }).then((r) => r.json());
+      const gres = await fetch('https://googleads.googleapis.com/v23/customers/2466246400/googleAds:searchStream', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${gtok.access_token}`, 'developer-token': (process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '').trim(), 'login-customer-id': '2466246400', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: `SELECT segments.week, campaign.name, metrics.conversions FROM campaign WHERE segments.date DURING LAST_90_DAYS AND segments.conversion_action_name IN ('Vendor Sign-up','Affiliate Sign-up') AND campaign.name NOT LIKE '%PageWheel%'` }),
+      }).then((r) => r.json());
+      for (const row of (Array.isArray(gres) ? gres : []).flatMap((c) => c.results || [])) {
+        const geo = /BR \| PT/.test(row.campaign.name) ? 'BR' : 'US';
+        const k = `${row.segments.week}|${geo}`;
+        paidByWkGeo[k] = (paidByWkGeo[k] || 0) + Number(row.metrics.conversions || 0);
+      }
+    } catch (e) { /* denominators optional — tracker still works without */ }
+
+    await sbUpsert('ds24_activation_weekly', weekly.map((r) => {
+      const wk = String(r[0]).slice(0, 10), geo = r[1], attributed = r[2];
+      const paid = paidByWkGeo[`${wk}|${geo}`] ?? null;
+      return {
+        cohort_week: wk, geo, paid_signups: paid ? Math.round(paid) : null,
+        attributed_signups: attributed,
+        capture_pct: paid ? Math.round(attributed / paid * 10000) / 100 : null,
+        product_started: r[3], fs_7d: r[4], fs_14d: r[5], fs_30d: r[6], fs_60d: r[7], fs_90d: r[8],
+        first_sales: r[9], tracked_sales: r[10] || 0, tracked_gmv: r[11], fetched_at: now,
+      };
+    }));
+
     await sbUpsert('ds24_activation_cohorts', cohorts.map((r) => ({
       cohort_month: String(r[0]).slice(0, 10), geo: r[1], signups: r[2], product_started: r[3],
       first_sales: r[4], activation_pct: r[5], avg_days_to_sale: r[6], tracked_gmv: r[7], fetched_at: now,
@@ -137,7 +199,7 @@ export default async function handler(req, res) {
       day: String(r[0]).slice(0, 10), geo: r[1], signups: r[2], with_gclid: r[3], capture_pct: r[4], fetched_at: now,
     })));
 
-    return res.status(200).json({ ok: true, cohorts: cohorts.length, daily: daily.length, alerts });
+    return res.status(200).json({ ok: true, cohorts: cohorts.length, weekly: weekly.length, daily: daily.length, alerts });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
   }
