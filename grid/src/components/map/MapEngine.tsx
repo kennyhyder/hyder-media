@@ -248,7 +248,8 @@ export default function MapEngine({
     tileRef.current = L.tileLayer(t.url, {
       attribution: t.attribution,
       maxZoom: 19,
-      subdomains: "abcd",
+      // Esri Gray Canvas serves native tiles to z16; Leaflet upscales beyond.
+      maxNativeZoom: 16,
     }).addTo(map);
     tileRef.current.bringToFront();
     // tiles must sit BELOW the choropleth + points

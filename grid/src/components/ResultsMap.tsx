@@ -50,8 +50,8 @@ export default function ResultsMap({ points, height = "400px", geoCenter }: Resu
     leafletMap.current = map;
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      { attribution: '&copy; <a href="https://carto.com/">CARTO</a>', maxZoom: 19 }
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+      { attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, OpenStreetMap contributors', maxZoom: 19, maxNativeZoom: 16 }
     ).addTo(map);
 
     markersRef.current = L.layerGroup().addTo(map);

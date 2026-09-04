@@ -48,11 +48,11 @@ export default function SiteMiniMap({ markers, height = "340px" }: Props) {
       mapRef.current = map;
 
       L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
         {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+          attribution: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, OpenStreetMap contributors',
           subdomains: "abcd",
-          maxZoom: 19,
+          maxZoom: 19, maxNativeZoom: 16,
         }
       ).addTo(map);
 

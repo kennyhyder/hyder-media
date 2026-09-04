@@ -67,18 +67,19 @@ export const RAMP: { label: string; range: string; color: string }[] = [
 ];
 
 // ── Tile providers (theme-aware) ────────────────────────────────────────────
-// CartoDB basemaps: Positron (light) + Dark Matter (dark). Read at runtime from
+// Esri Gray Canvas basemaps (light + dark) — keyless with attribution; CARTO
+// raster basemaps began requiring API keys (Sept 2026). Read at runtime from
 // the <html> class so a theme toggle re-tiles the map.
 export const TILES = {
   light: {
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, OpenStreetMap contributors',
   },
   dark: {
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, HERE, OpenStreetMap contributors',
   },
 } as const;
 

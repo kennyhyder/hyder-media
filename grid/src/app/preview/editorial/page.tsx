@@ -171,7 +171,7 @@ export default async function EditorialHome() {
         >
           Darker teal indicates a higher mean screening score across the state&rsquo;s
           candidate parcels. Hover any state for its average and site count.
-          Base tiles &copy; CARTO &amp; OpenStreetMap.
+          Base tiles &copy; Esri &amp; OpenStreetMap.
         </p>
       </section>
 

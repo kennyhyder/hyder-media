@@ -336,7 +336,7 @@ export default async function EditorialSite() {
               style={{ fontSize: "0.75rem", fontStyle: "italic", color: C.muted, margin: "0.6rem 0 0" }}
             >
               The screened parcel (teal) shown with the {nearby.length} nearest
-              comparable candidates (amber). Positron base tiles &copy; CARTO.
+              comparable candidates (amber). Light Gray Canvas base tiles &copy; Esri.
             </p>
 
             {nearby.length > 0 && (
