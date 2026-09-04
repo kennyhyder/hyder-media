@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>The Halo Engine — Cross-Channel Activation Measurement for Digistore24</title>
+<style>
+    :root {
+        --ink: #0f172a; --sub: #475569; --muted: #64748b; --line: #e2e8f0;
+        --blue: #2563eb; --blue-soft: #eff6ff; --green: #16a34a; --green-soft: #f0fdf4;
+        --amber: #d97706; --paper: #ffffff; --wash: #f8fafc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--ink); background: #eef2f7; line-height: 1.55; }
+    .sheet { max-width: 880px; margin: 0 auto; background: var(--paper); padding: 56px 64px; }
+    @media (max-width: 720px) { .sheet { padding: 32px 22px; } }
+
+    .kicker { font-size: 0.72rem; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+    h1 { font-size: 1.9rem; line-height: 1.22; letter-spacing: -0.5px; margin-bottom: 14px; }
+    .headline-sub { font-size: 1.02rem; color: var(--sub); max-width: 720px; }
+    .byline { margin-top: 14px; font-size: 0.82rem; color: var(--muted); }
+
+    section { margin-top: 34px; }
+    h2 { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+    p { font-size: 0.93rem; color: var(--ink); margin-bottom: 10px; }
+    p.sub { color: var(--sub); }
+    strong { font-weight: 650; }
+
+    .rule { border: none; border-top: 1px solid var(--line); margin: 34px 0 0; }
+
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    @media (max-width: 640px) { .problem-grid { grid-template-columns: 1fr; } }
+    .pcard { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--wash); }
+    .pcard .n { font-size: 1.35rem; font-weight: 750; letter-spacing: -0.5px; }
+    .pcard .l { font-size: 0.8rem; color: var(--sub); margin-top: 2px; }
+
+    .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 16px 0 6px; }
+    @media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+    .step { border: 1px solid var(--line); border-top: 3px solid var(--blue); border-radius: 8px; padding: 12px 12px 10px; background: var(--paper); }
+    .step .num { font-size: 0.68rem; font-weight: 700; color: var(--blue); letter-spacing: 1px; }
+    .step .name { font-weight: 700; font-size: 0.92rem; margin: 2px 0 4px; }
+    .step .d { font-size: 0.78rem; color: var(--sub); line-height: 1.45; }
+
+    .proof-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+    @media (max-width: 720px) { .proof-grid { grid-template-columns: 1fr; } }
+    .proof { border: 1px solid #bbf7d0; background: var(--green-soft); border-radius: 10px; padding: 14px 16px; }
+    .proof .v { font-size: 1.25rem; font-weight: 750; color: var(--green); letter-spacing: -0.5px; }
+    .proof .t { font-size: 0.85rem; font-weight: 650; margin: 4px 0 4px; }
+    .proof .d { font-size: 0.78rem; color: var(--sub); line-height: 1.45; }
+    .curve { display: flex; align-items: flex-end; gap: 4px; height: 34px; margin-top: 8px; }
+    .curve .bar { width: 18px; background: var(--green); opacity: 0.85; border-radius: 3px 3px 0 0; }
+    .curve .cl { font-size: 0.62rem; color: var(--muted); text-align: center; width: 18px; }
+
+    ul.clean { list-style: none; margin: 8px 0 0; }
+    ul.clean li { font-size: 0.9rem; padding: 5px 0 5px 22px; position: relative; color: var(--ink); }
+    ul.clean li::before { content: ""; position: absolute; left: 4px; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+
+    .deliv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px; }
+    @media (max-width: 720px) { .deliv-grid { grid-template-columns: 1fr; } }
+    .deliv h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+    .deliv li { font-size: 0.82rem; padding: 3px 0 3px 18px; }
+    .deliv li::before { width: 5px; height: 5px; top: 11px; left: 3px; }
+
+    .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    @media (max-width: 640px) { .tiers { grid-template-columns: 1fr; } }
+    .tier { border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+    .tier.premium { border: 2px solid var(--blue); background: var(--blue-soft); position: relative; }
+    .tier .tname { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .tier.premium .tname { color: var(--blue); }
+    .tier .price { font-size: 1.7rem; font-weight: 780; letter-spacing: -0.8px; margin: 6px 0 2px; }
+    .tier .per { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+    .tier li { font-size: 0.83rem; padding: 4px 0 4px 20px; }
+    .build-band { border: 1px solid var(--line); border-radius: 10px; background: var(--wash); padding: 14px 18px; margin-top: 12px; font-size: 0.88rem; color: var(--sub); }
+    .build-band strong { color: var(--ink); }
+
+    .neutral { border-left: 3px solid var(--amber); background: #fffbeb; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-top: 14px; }
+    .neutral .t { font-size: 0.7rem; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+    .neutral p { font-size: 0.86rem; margin: 0; color: var(--ink); }
+
+    ol.next { margin: 12px 0 0 0; counter-reset: n; list-style: none; }
+    ol.next li { counter-increment: n; font-size: 0.92rem; padding: 7px 0 7px 38px; position: relative; }
+    ol.next li::before { content: counter(n); position: absolute; left: 0; top: 6px; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+    .footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; color: var(--muted); }
+
+    @media print {
+        body { background: #fff; }
+        .sheet { max-width: none; padding: 0.35in 0.45in; }
+        section { margin-top: 22px; }
+        h1 { font-size: 1.55rem; }
+        .rule { margin-top: 22px; }
+        .proof, .pcard, .step, .tier, .neutral, .build-band { break-inside: avoid; }
+        section { break-inside: avoid; }
+    }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+    <div class="kicker">Prepared for Nick Eubanks · Digistore24 · September 2026</div>
+    <h1>The Halo Engine: a single source of truth for which marketing dollars create activated, revenue&#8209;producing vendors.</h1>
+    <p class="headline-sub">A cross-channel activation measurement system — every channel instrumented click-to-CLTV in Digistore24's own PostHog, compared on one yardstick, and fed back into every ad platform's bidding. Built and operated by Hyder Media. No media buying in scope.</p>
+    <p class="byline">Kenny Hyder · kenny@hyder.me · hyder.me</p>
+
+    <hr class="rule">
+
+    <section>
+        <h2>The Problem</h2>
+        <p>Digistore24's growth engine is judged on <strong>signups</strong>, but the business runs on <strong>activated vendors</strong> — and activation lags acquisition by ~3 months. Today every channel is graded by its own platform's numbers, which means no two channels can be compared on what actually matters: cost per activated vendor and CLTV per dollar.</p>
+        <div class="problem-grid">
+            <div class="pcard"><div class="n">1 of N</div><div class="l">Channels currently measured click&#8209;to&#8209;activation (Google Ads — live Aug 21). Meta, Microsoft, affiliates, organic, email: not instrumented.</div></div>
+            <div class="pcard"><div class="n">0.01%</div><div class="l">US click-ID capture before the funnel-handoff fix — a silent instrumentation failure no platform dashboard could ever surface.</div></div>
+            <div class="pcard"><div class="n">~3 mo</div><div class="l">Median lag from signup to readable activation — platform bidding optimizes signups, blind to what activates.</div></div>
+            <div class="pcard"><div class="n">?</div><div class="l">CLTV per dollar by channel — the number a CMO allocates budget on. Currently unanswerable.</div></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Why It Exists</h2>
+        <p class="sub">This is not a data problem — the events exist in PostHog. It is an <strong>identity and instrumentation problem</strong>, in four specific places: click IDs die at funnel handoffs (URL-param capture loses ~30% even post-fix; cookie-read closes it); vendor records carry no acquisition fields; revenue events don't reliably join back to signup identities (today only 20 of 93 first-sale vendors match a purchase record); and nothing feeds activation truth back into platform bidding. Fix those four joints and every channel becomes measurable on the same spine — <em>click → signup → product created → first sale → ongoing GMV</em>.</p>
+    </section>
+
+    <section>
+        <h2>The Outcome</h2>
+        <ul class="clean">
+            <li><strong>Within 60 days:</strong> capture and identity fixed across all funnels (Google, Microsoft, Meta, affiliate click IDs); revenue join resolved; the live activation tracker generalized from one channel to all of them.</li>
+            <li><strong>Within 2 quarters:</strong> a channel league table — spend → signups → activation rate → CLTV per dollar — updated daily, plus activation-weighted conversions feeding every platform's bidding.</li>
+            <li><strong>Ongoing:</strong> budget allocation decisions made on measured CLTV-per-dollar, with incrementality (halo) analysis showing what each channel lifts beyond what its platform claims.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>The Framework — Five Steps</h2>
+        <div class="steps">
+            <div class="step"><div class="num">STEP 1</div><div class="name">Capture</div><div class="d">Click IDs (gclid, msclkid, fbclid, affiliate IDs) + UTM discipline across every funnel — cookie-read, not URL-param, so nothing dies at handoffs.</div></div>
+            <div class="step"><div class="num">STEP 2</div><div class="name">Identify</div><div class="d">Acquisition fields written onto the vendor record at signup; revenue events joined to vendor identity — one spine per vendor.</div></div>
+            <div class="step"><div class="num">STEP 3</div><div class="name">Cohort</div><div class="d">Weekly signup cohorts per channel with activation measured at fixed ages (7/14/30/60/90 days) — cohorts compare honestly as they mature.</div></div>
+            <div class="step"><div class="num">STEP 4</div><div class="name">Compare</div><div class="d">The league table: CAC → activation → CLTV per dollar by channel, plus halo/incrementality testing across channels.</div></div>
+            <div class="step"><div class="num">STEP 5</div><div class="name">Feed &amp; Govern</div><div class="d">Offline activation conversions uploaded to every ad platform so all bidding optimizes activations; quarterly measurement review for budget allocation.</div></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Proof — Already Running on Digistore24's Own Data</h2>
+        <div class="proof-grid">
+            <div class="proof">
+                <div class="v">Live today</div>
+                <div class="t">The activation tracker, channel one</div>
+                <div class="d">Weekly cohorts with age-milestone first sales, running daily on DS24's PostHog. A mature cohort maturing in the tracker (first sales at 7/14/30/60/90 days):</div>
+                <div class="curve">
+                    <div><div class="bar" style="height: 20px;"></div><div class="cl">12</div></div>
+                    <div><div class="bar" style="height: 25px;"></div><div class="cl">15</div></div>
+                    <div><div class="bar" style="height: 28px;"></div><div class="cl">17</div></div>
+                    <div><div class="bar" style="height: 31px;"></div><div class="cl">19</div></div>
+                    <div><div class="bar" style="height: 34px;"></div><div class="cl">20</div></div>
+                </div>
+            </div>
+            <div class="proof">
+                <div class="v">0.01% &rarr; ~70%</div>
+                <div class="t">US paid-signup capture recovered</div>
+                <div class="d">Diagnosed the funnel-handoff drop from outside the stack, spec'd the fix for DS24 engineering, verified it live, and quantified true capture against paid-signup denominators.</div>
+            </div>
+            <div class="proof">
+                <div class="v">$2.81 : $1</div>
+                <div class="t">The halo method, proven elsewhere</div>
+                <div class="d">Cross-channel incrementality build for another client measured $2.81 of incremental revenue per $1 of spend (p&nbsp;&lt;&nbsp;0.00001) — the same methodology Step 4 applies here.</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Deliverables &amp; Advisory</h2>
+        <div class="deliv-grid">
+            <div class="deliv">
+                <h3>Build</h3>
+                <ul class="clean">
+                    <li>Capture &amp; identity spec per funnel, verified live</li>
+                    <li>Revenue-join resolution with DS24 data team</li>
+                    <li>Per-channel cohort tracker &amp; league table dashboard</li>
+                    <li>Offline conversion feeds (Premium)</li>
+                </ul>
+            </div>
+            <div class="deliv">
+                <h3>Measurement</h3>
+                <ul class="clean">
+                    <li>Daily-updated cohort &amp; capture-health monitoring</li>
+                    <li>Data-quality alerting (regressions caught in days, not quarters)</li>
+                    <li>Extrapolation methodology for untracked share</li>
+                </ul>
+            </div>
+            <div class="deliv">
+                <h3>Advisory</h3>
+                <ul class="clean">
+                    <li>Monthly measurement insights &amp; channel readout</li>
+                    <li>Quarterly measurement review — budget-allocation grade</li>
+                    <li>Incrementality test design (Premium)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Investment</h2>
+        <div class="build-band"><strong>Phase 1 — Foundation Build: $25,000</strong> (one-time, first 60 days) · Capture + identity across all funnels, revenue join, tracker generalized to every channel. Retainer begins month 3.</div>
+        <div class="tiers">
+            <div class="tier">
+                <div class="tname">Core</div>
+                <div class="price">$10,000</div>
+                <div class="per">per month · 6-month initial term</div>
+                <ul class="clean">
+                    <li>All channels tracked click-to-CLTV, daily</li>
+                    <li>Channel league table dashboard</li>
+                    <li>Capture-health monitoring &amp; alerting</li>
+                    <li>Monthly insights readout + quarterly review</li>
+                </ul>
+            </div>
+            <div class="tier premium">
+                <div class="tname">Premium</div>
+                <div class="price">$16,000</div>
+                <div class="per">per month · 6-month initial term</div>
+                <ul class="clean">
+                    <li>Everything in Core</li>
+                    <li>Offline activation-conversion feeds to every ad platform — bidding optimizes activations, not signups</li>
+                    <li>Halo incrementality testing across channels</li>
+                    <li>Expansion measurement (EU / BR / new-market cohorts)</li>
+                    <li>Weekly advisory access</li>
+                </ul>
+            </div>
+        </div>
+        <div class="neutral">
+            <div class="t">Measurement Neutrality</div>
+            <p>Everything lives in Digistore24's own PostHog and a DS24-readable data store; every metric is reproducible by your team with the queries provided. This engagement includes <strong>no media buying</strong> and its fees are independent of any channel's performance — including the PPC program we manage. Glass, not a black box.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Next Steps</h2>
+        <ol class="next">
+            <li>Confirm tier. A simple two-page agreement follows within 24 hours.</li>
+            <li>Engineering kickoff with the DS24 data team (cookie-read capture + revenue join — the two client-side dependencies).</li>
+            <li>Foundation Build begins; first cross-channel cohorts visible inside 30 days.</li>
+        </ol>
+    </section>
+
+    <div class="footer">
+        <span>Hyder Media · Kenny Hyder · kenny@hyder.me</span>
+        <span>Prepared September 2026 · Confidential</span>
+    </div>
+
+</div>
+</body>
+</html>
