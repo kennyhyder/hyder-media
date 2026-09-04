@@ -2,8 +2,9 @@
 
 ## What It Is
 
-**GridCensus** is a standalone, public SaaS that scores **164,098 candidate
-datacenter locations** across the US (0–100 DC Readiness Score) on power
+**GridCensus** is a standalone, public SaaS that scores **147,272 candidate
+datacenter locations** (as of the Sep 2026 refresh; 164,098 at June launch)
+across the US (0–100 DC Readiness Score) on power
 availability, speed-to-power, fiber, water, and hazard — built from public
 infrastructure data (HIFLD, EIA, FEMA, FCC, BLS, PeeringDB, ERCOT, etc.).
 
@@ -93,7 +94,7 @@ Core tables (record counts approximate):
 
 | Table | Purpose |
 |---|---|
-| `grid_dc_sites` | **164,098 scored sites** — dc_score + 10 sub-scores, nearest substation/IXP/DC distances, ISO region, acreage |
+| `grid_dc_sites` | **147,272 scored sites** (Sep 2026 refresh) — dc_score + 10 sub-scores, nearest substation/IXP/DC distances, ISO region, acreage |
 | `grid_transmission_lines` | 52K HIFLD lines + NREL ratings + ERCOT congestion |
 | `grid_substations` | 38K substations (extracted from line endpoints) |
 | `grid_county_data` | 3.2K counties — FEMA NRI, BLS labor, NOAA climate, WRI water, FCC fiber, tax incentives |
