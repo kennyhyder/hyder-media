@@ -110,7 +110,7 @@
                 <select id="tracker-geo" style="background: var(--bg-tertiary); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; padding: 4px 10px;">
                     <option value="US" selected>US</option><option value="BR">BR</option><option value="DACH">DACH (benchmark)</option>
                 </select></span></h2>
-            <p class="card-sub">Weekly signup cohorts with activation measured at fixed ages — cohorts fill rightward as they mature (updated daily). "Extrapolated" scales tracked results to all paid signups using each cohort's gclid capture rate; treat as an estimate, strongest where capture ≥ 20%.</p>
+            <p class="card-sub">Weekly signup cohorts with activation measured at fixed ages — cohorts fill rightward as they mature (updated daily). "Extrapolated" scales tracked results to all paid signups (Google Ads vendor + affiliate conversions) using each cohort's capture rate. Capture is measured against PAID signups — currently ~70% since the Aug 21 fix. Recent weeks can read high/low from click-date vs signup-date week boundaries; ratios settle as weeks close.</p>
             <div class="stat-grid" id="tracker-stats" style="margin-bottom: 14px;"></div>
             <div style="overflow-x: auto;">
             <table id="tracker-table" style="min-width: 900px;">
@@ -140,7 +140,7 @@
             const mile = (w, days, val) => ageDays(w.cohort_week) >= days ? fmt(val) : '—';
             let tSig = 0, tAttr = 0, tFs = 0, tGmv = 0, tPaid = 0, tExGmv = 0;
             const body = rows.map(w => {
-                const cap = w.capture_pct ? w.capture_pct / 100 : null;
+                const cap = w.capture_pct ? Math.min(w.capture_pct / 100, 1) : null; // >100% = click-date vs signup-date week smear
                 const actPct = w.attributed_signups ? (w.first_sales / w.attributed_signups * 100) : 0;
                 const exGmv = (cap && cap > 0.03 && w.tracked_gmv != null) ? w.tracked_gmv / cap : null;
                 const exSales = (cap && cap > 0.03) ? (w.tracked_sales || 0) / cap : 0;
@@ -151,7 +151,7 @@
                     <td>${w.cohort_week}</td>
                     <td class="right">${w.paid_signups != null ? fmt(w.paid_signups) : '—'}</td>
                     <td class="right">${fmt(w.attributed_signups)}</td>
-                    <td class="right ${w.capture_pct >= 20 ? 'good' : w.capture_pct >= 5 ? 'warn' : 'bad'}">${w.capture_pct != null ? w.capture_pct.toFixed(1) + '%' : '—'}</td>
+                    <td class="right ${w.capture_pct >= 20 ? 'good' : w.capture_pct >= 5 ? 'warn' : 'bad'}">${w.capture_pct != null ? Math.min(w.capture_pct, 100).toFixed(1) + '%' : '—'}</td>
                     <td class="right">${fmt(w.product_started)}</td>
                     <td class="right">${mile(w, 7, w.fs_7d)}</td><td class="right">${mile(w, 14, w.fs_14d)}</td>
                     <td class="right">${mile(w, 30, w.fs_30d)}</td><td class="right">${mile(w, 60, w.fs_60d)}</td>
