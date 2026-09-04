@@ -170,7 +170,7 @@ export default async function handler(req, res) {
       const gres = await fetch('https://googleads.googleapis.com/v23/customers/2466246400/googleAds:searchStream', {
         method: 'POST',
         headers: { Authorization: `Bearer ${gtok.access_token}`, 'developer-token': (process.env.GOOGLE_ADS_DEVELOPER_TOKEN || '').trim(), 'login-customer-id': '2466246400', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: `SELECT segments.week, campaign.name, metrics.conversions FROM campaign WHERE segments.date BETWEEN '${new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10)}' AND '${new Date().toISOString().slice(0, 10)}' AND segments.conversion_action_name IN ('Vendor Sign-up','Affiliate Sign-up') AND campaign.name NOT LIKE '%PageWheel%'` }),
+        body: JSON.stringify({ query: `SELECT segments.week, segments.conversion_action_name, campaign.name, metrics.conversions FROM campaign WHERE segments.date BETWEEN '${new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10)}' AND '${new Date().toISOString().slice(0, 10)}' AND segments.conversion_action_name IN ('Vendor Sign-up','Affiliate Sign-up') AND campaign.name NOT LIKE '%PageWheel%'` }),
       }).then((r) => r.json());
       for (const row of (Array.isArray(gres) ? gres : []).flatMap((c) => c.results || [])) {
         const geo = /BR \| PT/.test(row.campaign.name) ? 'BR' : 'US';
